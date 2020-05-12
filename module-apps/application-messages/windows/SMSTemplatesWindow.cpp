@@ -3,12 +3,12 @@
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/widgets/SMSTemplateItem.hpp"
 #include "application-messages/MessagesStyle.hpp"
-#include "application-messages/data/SMSdata.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBMessage.hpp>
 #include <i18/i18.hpp>
 #include <Style.hpp>
+#include <log/log.hpp>
 
 #include <cassert>
 #include <functional>
@@ -23,6 +23,11 @@ namespace gui
         : AppWindow(app, name::window::sms_templates), smsTemplateModel{std::make_unique<SMSTemplateModel>(app)}
     {
         buildInterface();
+    }
+
+    SMSTemplatesWindow::~SMSTemplatesWindow()
+    {
+        destroyInterface();
     }
 
     void SMSTemplatesWindow::rebuild()
@@ -46,14 +51,6 @@ namespace gui
         list->setProvider(smsTemplateModel.get());
 
         setFocusItem(list);
-
-        if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
-            app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
-                std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
-                application->switchWindow(requestingWindow, std::move(data));
-                return true;
-            };
-        }
     }
 
     void SMSTemplatesWindow::destroyInterface()
@@ -61,9 +58,34 @@ namespace gui
         erase();
     }
 
-    SMSTemplatesWindow::~SMSTemplatesWindow()
+    void SMSTemplatesWindow::smsTemplateRequestHandler(const SMSTemplateRequest *const switchData)
     {
-        destroyInterface();
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+
+        auto requestingWindow  = switchData->requestingWindow;
+        app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
+            LOG_DEBUG("SMS template id = %" PRIu32 "chosen", templ->ID);
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
+            application->switchWindow(requestingWindow, std::move(data));
+            return true;
+        };
+    }
+
+    void SMSTemplatesWindow::smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData)
+    {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+
+        auto phoneNumber       = switchData->getPhoneNumber().getEntered();
+        app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
+            LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.c_str());
+            app->sendSms(phoneNumber, templ->text);
+            sapm::ApplicationManager::messageSwitchPreviousApplication(
+                app,
+                std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::make_unique<SMSTemplateSent>()));
+            return true;
+        };
     }
 
     void SMSTemplatesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -76,7 +98,11 @@ namespace gui
         }
 
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
-            requestingWindow = switchData->requestingWindow;
+            smsTemplateRequestHandler(switchData);
+        }
+
+        if (auto switchData = dynamic_cast<SMSSendTemplateRequest *>(data); switchData != nullptr) {
+            smsSendTemplateRequestHandler(switchData);
         }
     }
 

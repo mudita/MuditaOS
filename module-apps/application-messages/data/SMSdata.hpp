@@ -17,14 +17,41 @@ class SMSThreadData : public gui::SwitchData
     virtual ~SMSThreadData() = default;
 };
 
-class SMSSendRequest : public gui::SwitchData
+class SMSRequest : public gui::SwitchData
+{
+  protected:
+    utils::PhoneNumber::View phoneNumber;
+
+  public:
+    SMSRequest() = delete;
+    SMSRequest(const utils::PhoneNumber::View &phoneNumber) : phoneNumber(phoneNumber)
+    {}
+    virtual ~SMSRequest() = default;
+
+    const utils::PhoneNumber::View &getPhoneNumber() const
+    {
+        return phoneNumber;
+    };
+};
+
+class SMSSendRequest : public SMSRequest
 {
   public:
-    std::shared_ptr<ContactRecord> contact = nullptr;
-    SMSSendRequest(std::shared_ptr<ContactRecord> contact) : contact(contact)
+    SMSSendRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
     {}
     virtual ~SMSSendRequest() = default;
 };
+
+class SMSSendTemplateRequest : public SMSRequest
+{
+  public:
+    SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
+    {}
+    virtual ~SMSSendTemplateRequest() = default;
+};
+
+class SMSTemplateSent : public gui::SwitchData
+{};
 
 class SMSTemplateData : public gui::SwitchData
 {

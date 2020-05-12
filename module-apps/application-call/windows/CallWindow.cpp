@@ -24,6 +24,9 @@
 #include "Margins.hpp"
 #include "application-call/data/CallAppStyle.hpp"
 
+#include <UiCommonActions.hpp>
+#include <application-messages/data/SMSdata.hpp>
+
 #include <memory>
 #include <functional>
 #include <sstream>
@@ -130,7 +133,8 @@ namespace gui
             return true;
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
-            LOG_ERROR("TODO: Reject call and send message template");
+            LOG_INFO("Send messaage template and reject the call");
+            app::sms(application, app::SmsOperation::Template, phoneNumber);
             return true;
         };
 
@@ -234,13 +238,15 @@ namespace gui
 
     bool CallWindow::handleSwitchData(SwitchData *data)
     {
-
         if (data == nullptr) {
-            LOG_ERROR("Received null pointer");
+            LOG_DEBUG("Received null pointer");
             return false;
         }
 
-        utils::PhoneNumber::View phoneNumber;
+        if (dynamic_cast<SMSTemplateSent *>(data) != nullptr) {
+            CellularServiceAPI::HangupCall(application);
+            return true;
+        }
 
         if (data->getDescription() == app::CallSwitchData::descriptionStr) {
             auto *callData = dynamic_cast<app::CallSwitchData *>(data);
@@ -271,15 +277,13 @@ namespace gui
             LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
                      phoneNumber.getEntered().c_str(),
                      rec.ID,
-                     rec.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
-            displayName = rec.getFormattedName(ContactRecord::NameFormatType::Default);
+                     rec.getFormattedName().c_str());
+            displayName = rec.getFormattedName();
         }
         else if (records->size() > 1) {
             LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.getEntered().c_str());
             for (auto i : *records) {
-                LOG_ERROR("contact id = %" PRIu32 ", name = %s",
-                          i.ID,
-                          i.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
+                LOG_ERROR("contact id = %" PRIu32 ", name = %s", i.ID, i.getFormattedName().c_str());
             }
         }
         else {

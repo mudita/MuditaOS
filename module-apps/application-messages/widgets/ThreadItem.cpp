@@ -79,7 +79,7 @@ namespace gui
         if (model != nullptr) {
             auto contactRec = DBServiceAPI::ContactGetByID(model->getApplication(), thread->contactID);
             auto cont       = contactRec->front();
-            contact->setText(cont.getFormattedName(ContactRecord::NameFormatType::Default));
+            contact->setText(cont.getFormattedName());
         }
 
         timestamp->setText(utils::time::DateTime(thread->date));

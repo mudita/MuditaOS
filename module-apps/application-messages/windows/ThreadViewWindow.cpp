@@ -358,28 +358,8 @@ namespace gui
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
-                setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Default));
+                setTitle(ret->front().getFormattedName());
                 return;
-            }
-        }
-        {
-            auto pdata = dynamic_cast<SMSSendRequest *>(data);
-            if (pdata) {
-                LOG_INFO("Phonebook sms send request!");
-                // TODO agree what should be used and how. Now Request have only contact,
-                // maybe it should have additional info - which nr to use and how to show it
-                if (pdata->contact->numbers.size() != 0) {
-                    LOG_DEBUG("SEND SMS TO: %s %s %s",
-                              pdata->contact->numbers[0].numberE164.c_str(),
-                              pdata->contact->numbers[0].numberUser.c_str(),
-                              pdata->contact->getFormattedName(ContactRecord::NameFormatType::Default).c_str());
-                    setTitle(pdata->contact->getFormattedName(ContactRecord::NameFormatType::Default));
-                    contact = pdata->contact;
-                }
-                else {
-                    // TODO handle error better
-                    setTitle("NO CONTACT");
-                }
             }
         }
         if (auto pdata = dynamic_cast<SMSTemplateData *>(data)) {

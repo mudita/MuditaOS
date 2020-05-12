@@ -10,7 +10,6 @@
 #include "Utils.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/SMSdata.hpp"
 #include "application-messages/windows/ThreadViewWindow.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -172,16 +171,10 @@ namespace gui
 
         numberPrimaryMessageLabel->setPenFocusWidth(3);
         numberPrimaryMessageLabel->setPenWidth(0);
-        numberPrimaryMessageLabel->inputCallback = [=](Item &item, const InputEvent &input) {
-            if (input.keyCode == KeyCode::KEY_ENTER) {
-                LOG_DEBUG("numberPrimaryLabel->inputCallback switch to sms window");
-                return sapm::ApplicationManager::messageSwitchApplication(application,
-                                                                          app::name_messages,
-                                                                          gui::name::window::thread_view,
-                                                                          std::make_unique<SMSSendRequest>(contact));
-            }
-            LOG_DEBUG("numberPrimaryMessageLabel->inputCallback just return false");
-            return (false);
+        numberPrimaryMessageLabel->activatedCallback = [=](Item &item) {
+            LOG_ERROR("TODO missing support for libphonenumber in phonebook, simply open new messagew window");
+            return app::sms(
+                application, app::SmsOperation::New, utils::PhoneNumber::View()); // get number from primary number
         };
 
         numberPrimaryMessage = new Image(this, 401, 248, 32, 32, "mail");
@@ -232,14 +225,10 @@ namespace gui
                      Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
         numberSecondaryMessageLabel->setPenFocusWidth(3);
         numberSecondaryMessageLabel->setPenWidth(0);
-        numberSecondaryMessageLabel->inputCallback = [=](Item &item, const InputEvent &input) {
-            if (input.keyCode == KeyCode::KEY_ENTER) {
-                return sapm::ApplicationManager::messageSwitchApplication(application,
-                                                                          app::name_messages,
-                                                                          gui::name::window::thread_view,
-                                                                          std::make_unique<SMSSendRequest>(contact));
-            }
-            return (false);
+        numberSecondaryMessageLabel->activatedCallback = [=](Item &item) {
+            LOG_ERROR("TODO missing support for libphonenumber in phonebook, simply open new messagew window");
+            return app::sms(
+                application, app::SmsOperation::New, utils::PhoneNumber::View()); // get number from secondary number
         };
 
         numberSecondaryMessage = new Image(this, 401, 306, 32, 32, "mail");
