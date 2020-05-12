@@ -1,6 +1,7 @@
 #pragma once
 
 #include "application-messages/widgets/SMSTemplateModel.hpp"
+#include "application-messages/data/SMSdata.hpp"
 
 #include <AppWindow.hpp>
 #include <gui/widgets/Label.hpp>
@@ -15,7 +16,9 @@ namespace gui
     {
         std::unique_ptr<SMSTemplateModel> smsTemplateModel;
         gui::ListView *list = nullptr;
-        std::string requestingWindow;
+
+        void smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData);
+        void smsTemplateRequestHandler(const SMSTemplateRequest *const switchData);
 
       public:
         SMSTemplatesWindow() = delete;

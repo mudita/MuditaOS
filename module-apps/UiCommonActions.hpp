@@ -54,7 +54,8 @@ namespace app
 
     enum class SmsOperation
     {
-        Add
+        New,
+        Template
     };
 
     /// @brief requests selected sms operation
@@ -62,20 +63,10 @@ namespace app
     /// @param app - requesting application
     /// @param smsOperation - selected sms operation.
     ///
-    /// @parem contact - contact record on which the operation is requested
+    /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
-    bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact);
-
-    /// @brief requests selected sms operation
-    ///
-    /// @param app - requesting application
-    /// @param smsOperation - selected sms operation.
-    ///
-    /// @parem number - phone number (assigned to contact) on which the operation is requested
-    ///
-    /// @return true if succeed
-    bool sms(Application *app, SmsOperation smsOperation, const std::string &number);
+    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number);
 
     enum class ContactOperation
     {

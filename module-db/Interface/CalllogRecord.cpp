@@ -66,7 +66,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     auto localRec      = rec;
     auto contact       = (*contactRec)[0];
     localRec.contactId = std::to_string(contact.ID);
-    localRec.name      = contact.getFormattedName(ContactRecord::NameFormatType::Default);
+    localRec.name      = contact.getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
     return calllogDB->calls.Add(CalllogTableRow{.ID           = localRec.ID, // this is only to remove warning
@@ -121,7 +121,7 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
             continue;
         }
 
-        c.name = contactRec.getFormattedName(ContactRecord::NameFormatType::Default);
+        c.name = contactRec.getFormattedName();
         records->push_back(c);
     }
 
@@ -182,7 +182,7 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
         return CalllogRecord();
     }
 
-    call.name = contactRec.getFormattedName(ContactRecord::NameFormatType::Default);
+    call.name = contactRec.getFormattedName();
     return CalllogRecord(call);
 }
 
