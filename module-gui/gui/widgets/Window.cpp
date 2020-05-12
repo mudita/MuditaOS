@@ -18,9 +18,6 @@ namespace gui
         : Item(), windowID{id}, refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
     {}
 
-    Window::~Window()
-    {}
-
     void Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {}
 
