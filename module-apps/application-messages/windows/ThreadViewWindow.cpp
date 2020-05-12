@@ -81,6 +81,7 @@ namespace gui
             {InputMode::ABC, InputMode::abc},
             [=](const UTF8 &text) { textModeShowCB(text); },
             [=]() { textSelectSpecialCB(); }));
+        text->setBorderColor(ColorNoColor);
         text->setPenFocusWidth(style::window::default_border_focucs_w);
         text->setPenWidth(style::window::default_border_focucs_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
