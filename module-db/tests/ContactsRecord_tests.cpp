@@ -47,6 +47,7 @@ TEST_CASE("Contact Record tests")
     REQUIRE(contRecInterface.Add(recordIN) == true);
     REQUIRE(contRecInterface.Add(recordIN) == true);
 
+    SECTION("Get record by ID")
     {
         auto recordOUT = contRecInterface.GetByID(1);
 
@@ -68,6 +69,7 @@ TEST_CASE("Contact Record tests")
 
     REQUIRE(contRecInterface.RemoveByID(5) == true);
 
+    SECTION("Get records by limit offset")
     {
         auto recordList = contRecInterface.GetLimitOffset(0, 4);
         REQUIRE(recordList->size() == 4);
@@ -91,6 +93,7 @@ TEST_CASE("Contact Record tests")
         }
     }
 
+    SECTION("Get records by limit offset by PrimaryName field")
     {
         auto recordList =
             contRecInterface.GetLimitOffsetByField(0, 4, ContactRecordField::PrimaryName, primaryNameTest);
@@ -115,6 +118,7 @@ TEST_CASE("Contact Record tests")
         }
     }
 
+    SECTION("Get records by limit offset by NumberE164 filed")
     {
         auto recordList = contRecInterface.GetLimitOffsetByField(0, 2, ContactRecordField::NumberE164, numberE164Test);
         REQUIRE(recordList->size() == 2);
@@ -138,6 +142,7 @@ TEST_CASE("Contact Record tests")
         }
     }
 
+    SECTION("Test contact name formatting")
     {
         ContactRecord testRecord;
 
@@ -153,7 +158,8 @@ TEST_CASE("Contact Record tests")
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) ==
                 primaryAlternativeNameFormat.str());
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryAlternativeNameFormat.str());
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == primaryAlternativeNameFormat.str());
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+                primaryAlternativeNameFormat.str());
 
         testRecord.primaryName = "";
 
@@ -172,13 +178,16 @@ TEST_CASE("Contact Record tests")
 
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberUserTest);
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberUserTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == utils::localize.get("app_phonebook_contact_no_name"));
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+                utils::localize.get("app_phonebook_contact_no_name"));
 
         testRecord.numbers.clear();
 
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == "");
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == utils::localize.get("app_phonebook_contact_no_name"));
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == utils::localize.get("app_phonebook_contact_no_name"));
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) ==
+                utils::localize.get("app_phonebook_contact_no_name"));
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+                utils::localize.get("app_phonebook_contact_no_name"));
     }
 
     Database::Deinitialize();
