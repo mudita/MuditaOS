@@ -443,12 +443,14 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
                 if (board == Board::T3 || board == Board::Linux) {
                     state.set(this, State::ST::CellularConfProcedure);
+                    responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
                 LOG_INFO("New incoming sms received");
                 receiveSMS(msg->data);
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 break;
             }
             case CellularNotificationMessage::Type::RawCommand: {
@@ -472,10 +474,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::SIM:
                 if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
                     state.set(this, cellular::State::ST::SimInit);
+                    responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
                 break;
             default: {
                 LOG_INFO("Skipped CellularNotificationMessage::Type %d", static_cast<int>(msg->type));
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
             }
         }
@@ -750,7 +754,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         }
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, service::name::evt_manager, this);
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
+        //        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
     // Incoming call
@@ -825,7 +829,7 @@ bool ServiceCellular::sendSMS(void)
                     ->SendCommandPrompt(
                         (std::string(at::factory(at::AT::CMGS)) + UCS2(record.number).modemStr() + "\"\r").c_str(),
                         1,
-                        1000))) {
+                        120000))) {
 
             if (cmux->get(TS0710::Channel::Commands)->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                 result = true;
