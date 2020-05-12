@@ -1,4 +1,5 @@
 #include "../Interface/ContactRecord.hpp"
+#include "i18/i18.hpp"
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -135,6 +136,49 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.assetPath == assetPath);
             REQUIRE(w.speeddial == speeddialTest);
         }
+    }
+
+    {
+        ContactRecord testRecord;
+
+        testRecord.primaryName     = primaryNameTest;
+        testRecord.alternativeName = alternativeNameTest;
+        testRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
+        });
+
+        std::stringstream primaryAlternativeNameFormat;
+        primaryAlternativeNameFormat << primaryNameTest << ' ' << alternativeNameTest;
+
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) ==
+                primaryAlternativeNameFormat.str());
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryAlternativeNameFormat.str());
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == primaryAlternativeNameFormat.str());
+
+        testRecord.primaryName = "";
+
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == alternativeNameTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == alternativeNameTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == alternativeNameTest);
+
+        testRecord.primaryName     = primaryNameTest;
+        testRecord.alternativeName = "";
+
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == primaryNameTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryNameTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == primaryNameTest);
+
+        testRecord.primaryName = "";
+
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberUserTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberUserTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == utils::localize.get("app_phonebook_contact_no_name"));
+
+        testRecord.numbers.clear();
+
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == "");
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == utils::localize.get("app_phonebook_contact_no_name"));
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == utils::localize.get("app_phonebook_contact_no_name"));
     }
 
     Database::Deinitialize();
