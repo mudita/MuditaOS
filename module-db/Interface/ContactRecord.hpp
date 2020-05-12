@@ -42,7 +42,7 @@ struct ContactRecord
         Title,
     };
 
-    inline auto getFormattedName(const NameFormatType type) const -> UTF8
+    inline auto getFormattedName(const NameFormatType type = NameFormatType::Default) const -> UTF8
     {
         if (primaryName.length() > 0) {
             return alternativeName.length() > 0 ? primaryName + " " + alternativeName : primaryName;
