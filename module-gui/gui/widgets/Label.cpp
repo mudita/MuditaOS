@@ -1,9 +1,3 @@
-/*
- * Label.cpp
- *
- *  Created on: 7 mar 2019
- *      Author: robert
- */
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 
@@ -12,6 +6,7 @@
 
 #include "Label.hpp"
 #include <Style.hpp>
+#include <cassert>
 
 namespace gui
 {
@@ -45,6 +40,10 @@ namespace gui
     void Label::calculateDisplayText()
     {
         uint32_t availableSpace = widgetArea.w;
+        if (font == nullptr) {
+            LOG_ERROR("No font loaded!");
+            return;
+        }
         charDrawableCount       = font->getCharCountInSpace(text, availableSpace);
         textArea.w              = font->getPixelWidth(text.substr(0, charDrawableCount));
         textDisplayed           = font->getTextWithElipsis(text, availableSpace, ellipsis);
@@ -116,9 +115,14 @@ namespace gui
     Label::Fits Label::textFitsIn(const UTF8 &text, uint32_t width)
     {
         Fits fits;
-        auto cnt            = font->getCharCountInSpace(text, area(Area::Max).w);
-        fits.fits           = cnt == text.length();
-        fits.space_consumed = font->getPixelWidth(text);
+        if (font == nullptr) {
+            fits.fits = false;
+        }
+        else {
+            auto cnt            = font->getCharCountInSpace(text, area(Area::Max).w);
+            fits.fits           = cnt == text.length();
+            fits.space_consumed = font->getPixelWidth(text);
+        }
         return fits;
     }
 
@@ -202,31 +206,33 @@ namespace gui
         std::list<DrawCommand *> commandsBase;
         commandsBase = gui::Rect::buildDrawList();
 
-        // set local draw commands - text command
-        CommandText *textCmd = new CommandText();
-        textCmd->str         = textDisplayed;
-        textCmd->fontID      = font->id;
-        textCmd->color       = textColor;
-
-        textCmd->x          = drawArea.x;
-        textCmd->y          = drawArea.y;
-        textCmd->w          = drawArea.w;
-        textCmd->h          = drawArea.h;
-        textCmd->tx         = textArea.x;
-        textCmd->ty         = textArea.y;
-        textCmd->tw         = textArea.w;
-        textCmd->th         = textArea.h;
-        textCmd->charsWidth = stringPixelWidth;
-
-        textCmd->areaX = widgetArea.x;
-        textCmd->areaY = widgetArea.y;
-        textCmd->areaW = widgetArea.w;
-        textCmd->areaH = widgetArea.h;
-
         commands.splice(commands.end(), commandsBase);
-        commands.push_back(textCmd);
-        if (not commandsChildren.empty())
+        // set local draw commands - text command
+        if (font != nullptr) {
+            CommandText *textCmd = new CommandText();
+            textCmd->str         = textDisplayed;
+            textCmd->fontID      = font->id;
+            textCmd->color       = textColor;
+
+            textCmd->x          = drawArea.x;
+            textCmd->y          = drawArea.y;
+            textCmd->w          = drawArea.w;
+            textCmd->h          = drawArea.h;
+            textCmd->tx         = textArea.x;
+            textCmd->ty         = textArea.y;
+            textCmd->tw         = textArea.w;
+            textCmd->th         = textArea.h;
+            textCmd->charsWidth = stringPixelWidth;
+
+            textCmd->areaX = widgetArea.x;
+            textCmd->areaY = widgetArea.y;
+            textCmd->areaW = widgetArea.w;
+            textCmd->areaH = widgetArea.h;
+            commands.push_back(textCmd);
+        }
+        if (not commandsChildren.empty()) {
             commands.splice(commands.end(), commandsChildren);
+        }
 
         return commands;
     }
