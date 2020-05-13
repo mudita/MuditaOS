@@ -47,7 +47,7 @@ namespace gui
         }
     }
 
-    Item *Navigation::getDirectionItem(const NavigationDirection direction)
+    Item *Navigation::getDirectionItem(const NavigationDirection direction) const
     {
         switch (direction) {
         case (NavigationDirection::LEFT):
@@ -62,7 +62,7 @@ namespace gui
         return nullptr;
     }
 
-    Navigation::Navigation() : left{nullptr}, up{nullptr}, right{nullptr}, down{nullptr}
+    Navigation::Navigation()
     {}
 
     Navigation::~Navigation()
