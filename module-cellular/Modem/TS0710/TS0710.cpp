@@ -239,16 +239,21 @@ TS0710::ConfState TS0710::ConfProcedure()
     }
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
-    uint32_t tries      = 0;
-    auto const maxTries = 40;
-    while (!parser->cmd(at::AT::QSCLK_ON)) {
-        auto const sec = 1000;
-        vTaskDelay(pdMS_TO_TICKS(
-            sec)); // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
-        if (tries > maxTries) {
-            return ConfState ::Failure;
+
+    bool timed_out                = false;
+    constexpr uint32_t msInSecond = 1000;
+    constexpr uint32_t timeout    = 30;
+    auto timeout_ticks            = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(timeout * msInSecond);
+    while (!timed_out) {
+        if (parser->cmd(at::AT::QSCLK_ON)) {
+            break;
         }
-        tries++;
+        // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
+        vTaskDelay(pdMS_TO_TICKS(msInSecond));
+        timed_out = cpp_freertos::Ticks::GetTicks() > timeout_ticks;
+        if (timed_out) {
+            return ConfState::Failure;
+        }
     }
 
     return ConfState ::Success;
