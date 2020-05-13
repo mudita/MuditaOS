@@ -106,7 +106,7 @@ namespace gui
         std::function<bool(Item &)> focusChangedCallback;
         /// called when item has dimensions changed
         /// @note should be part of widgetArea
-        std::function<void(Item &, void *data)> dimensionChangedCallback;
+        std::function<bool(Item &, void *data)> dimensionChangedCallback;
         /// called when item is activated, this is enter is pressed
         /// @param `this` item
         std::function<bool(Item &)> activatedCallback;
