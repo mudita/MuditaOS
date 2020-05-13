@@ -87,6 +87,8 @@ const char *State::c_str(State::ST state)
         return "ModemFatalFailure";
     case ST::CellularConfProcedure:
         return "CellularStartConfProcedure";
+    case ST::Ready:
+        return "Ready";
     }
     return "";
 }
@@ -265,12 +267,21 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
     case State::ST::Failed:
         handle_failure();
         break;
+    case State::ST::Ready:
+        handle_ready();
+        break;
     };
 }
 
 bool ServiceCellular::handle_idle()
 {
     LOG_DEBUG("Idle");
+    return true;
+}
+
+bool ServiceCellular::handle_ready()
+{
+    LOG_DEBUG("Ready");
     return true;
 }
 
@@ -1253,7 +1264,8 @@ bool ServiceCellular::handle_select_sim()
     bsp::cellular::sim::sim_sel();
     bsp::cellular::sim::hotswap_trigger();
 #if defined(TARGET_Linux)
-    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::QSIMSTAT);
+    DLC_channel *channel = cmux->get(TS0710::Channel::Commands);
+    auto ret             = channel->cmd(at::AT::QSIMSTAT);
     if (!ret) {
         LOG_FATAL("Cant check sim stat status");
     }
@@ -1267,6 +1279,16 @@ bool ServiceCellular::handle_select_sim()
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
+        bool ready = false;
+        while (!ready) {
+            auto response = channel->cmd("AT+CPIN?\r");
+            for (auto &line : response.response) {
+                if (line.find("+CPIN: READY") != std::string::npos) {
+                    ready = true;
+                }
+            }
+        }
+        state.set(this, cellular::State::ST::SimInit);
     }
 #endif
     return true;
@@ -1301,7 +1323,7 @@ bool ServiceCellular::handle_sim_init()
         }
     }
 
-    state.set(this, State::ST::Idle);
+    state.set(this, State::ST::Ready);
     return success;
 }
 

@@ -106,6 +106,7 @@ class ServiceCellular : public sys::Service
     /// @{
     /// idle handler
     bool handle_idle();
+    bool handle_ready();
     /// cellular power up procedure
     bool handle_status_check();
     /// cellular power up procedure

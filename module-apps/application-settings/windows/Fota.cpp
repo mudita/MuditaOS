@@ -152,10 +152,12 @@ void Fota::handleInternetNotification()
                            case InternetService::NotificationMessage::Type::Configured:
                                currentState_m = Confiured;
                                statusLable_m->setText(getStateString());
+                               app_m->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                                break;
                            case InternetService::NotificationMessage::Type::Connected:
                                currentState_m = Connected;
                                statusLable_m->setText(getStateString());
+                               app_m->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                                break;
                            case InternetService::NotificationMessage::Type::Disconnected:
                                currentState_m = Disconnected;

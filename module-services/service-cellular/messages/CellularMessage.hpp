@@ -100,6 +100,7 @@ class CellularCallRequestMessage : public CellularMessage
     {}
     utils::PhoneNumber::View number;
 };
+
 class CellularGetChannelMessage : public sys::DataMessage
 {
   public:
@@ -108,6 +109,7 @@ class CellularGetChannelMessage : public sys::DataMessage
     {}
     TS0710::Channel dataChannel;
 };
+
 class CellularGetChannelResponseMessage : public sys::DataMessage
 {
   public:
@@ -115,14 +117,6 @@ class CellularGetChannelResponseMessage : public sys::DataMessage
         : sys::DataMessage(MessageType::CellularGetChannelResponse), dataChannelPtr(dataChannelPtr)
     {}
     DLC_channel *dataChannelPtr;
-};
-class CellularGetChannelResponseMessage : public sys::DataMessage
-{
-  public:
-    CellularGetChannelResponseMessage(DLC_channel *channelPtr = nullptr)
-        : sys::DataMessage(MessageType::CellularGetChannelResponse), channelPtr(channelPtr)
-    {}
-    DLC_channel *channelPtr;
 };
 
 class CellularResponseMessage : public sys::ResponseMessage

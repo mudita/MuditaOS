@@ -88,7 +88,7 @@ namespace InternetService
         connect(cellular::StateChange(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
             if (auto msg = dynamic_cast<cellular::StateChange *>(req)) {
                 LOG_DEBUG("cellular::StageChange: %s", cellular::State::c_str(msg->request));
-                if (msg->request == cellular::State::ST::Idle) {
+                if (msg->request == cellular::State::ST::Ready) {
                     LOG_DEBUG("Modem is Idle");
                     if (dataChannel == nullptr) {
                         LOG_DEBUG("Requesting channel");
@@ -495,7 +495,7 @@ namespace InternetService
             break;
         }
 
-        return responseMsg;
+        return (responseMsg ? responseMsg : std::make_shared<sys::ResponseMessage>());
     }
 
 } // namespace InternetService
