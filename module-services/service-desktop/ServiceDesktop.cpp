@@ -1,4 +1,7 @@
 #include "ServiceDesktop.hpp"
+#include <random>
+#include <../module-vfs/vfs.hpp>
+#include <time/time_conversion.hpp>
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
@@ -9,21 +12,24 @@ ServiceDesktop::ServiceDesktop() : sys::Service(serviceName)
 
 ServiceDesktop::~ServiceDesktop()
 {
-
     LOG_INFO("[ServiceDesktop] Cleaning resources");
-    if (DesktopWorker != nullptr) {
-        DesktopWorker->deinit();
+#ifdef TARGET_RT1051
+    if (desktopWorker != nullptr) {
+        desktopWorker->deinit();
     }
+#endif
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
+#ifdef TARGET_RT1051
+    desktopWorker = std::make_unique<WorkerDesktop>(this);
+    desktopWorker->init({{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1},
+                         {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
+    desktopWorker->run();
 
-    DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    DesktopWorker->init({{DesktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1},
-                         {DesktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
-    DesktopWorker->run();
-
+    updateOS = std::make_unique<UpdatePureOS>(this);
+#endif
     return (sys::ReturnCodes::Success);
 }
 

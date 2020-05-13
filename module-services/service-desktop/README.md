@@ -1,4 +1,4 @@
-Service Desktop
+# Service Desktop
 =================
 
 This service is handling communication between Mudita Deskatop App and PurePhone.

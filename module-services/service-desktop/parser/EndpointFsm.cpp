@@ -51,13 +51,13 @@ class StateEndpointDeviceInfo : public EndpointFsm
 {
     void entry() override
     {
-        LOG_DEBUG("*** entry StateEndpointDeviceInfo *** uuid:%" PRIu32 "", uuid);
+        LOG_DEBUG("*** entry StateEndpointDeviceInfo *** uuid:%lu", uuid);
 
         EndpointHandler endpointHandler = EndpointHandler();
 
         std::string responseStr;
         sys::ReturnCodes retCode = endpointHandler.deviceInfo(method, uuid, body, responseStr, ownerService);
-        LOG_DEBUG("endpointHandler.deviceInfo retCode %s uuid %" PRIu32 "", c_str(retCode), uuid);
+        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %lu", static_cast<int>(retCode), uuid);
 
         putToSendQueue(responseStr);
         transit<StateDecodeJson>();
@@ -74,7 +74,7 @@ class StateEndpointUpdate : public EndpointFsm
 
         std::string responseStr;
         sys::ReturnCodes retCode = endpointHandler.update(method, uuid, body, responseStr, ownerService);
-        LOG_DEBUG("endpointHandler.deviceInfo retCode %s uuid %" PRIu32 "", c_str(retCode), uuid);
+        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %lu", static_cast<int>(retCode), uuid);
 
         putToSendQueue(responseStr);
         transit<StateDecodeJson>();

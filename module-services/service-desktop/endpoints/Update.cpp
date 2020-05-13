@@ -1,24 +1,18 @@
 #include "EndpointHandler.hpp"
 #include "ParserUtils.hpp"
-#include "version.hpp"
-#include "vfs.hpp"
-#include <common_data/EventStore.hpp>
-#include <string>
-#include <time/time_conversion.hpp>
-#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "../ServiceDesktop.hpp"
 
 sys::ReturnCodes EndpointHandler::update(
     uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService)
 {
     if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::post)) {
-        LOG_INFO("update request");
-        uint32_t dataSize = static_cast<uint32_t>(body["fileSize"].number_value());
-        LOG_INFO("file name: %s", body["fileName"].string_value().c_str());
-        LOG_INFO("file size: %" PRIu32 "", dataSize);
+        LOG_INFO("update request: ");
+        LOG_INFO("%s", body.dump().c_str());
+        std::string fileName = body["fileName"].string_value();
 
-        json11::Json responseBodyJson =
-            json11::Json::object({{"updateReady", true}, {"dataSize", std::to_string(dataSize)}});
+        LOG_INFO("update request, fileName: %s", fileName.c_str());
+
+        json11::Json responseBodyJson = json11::Json::object({{parserutils::json::updateReady, true}});
 
         json11::Json responsePayloadJson =
             json11::Json::object({{parserutils::json::endpoint, static_cast<int>(parserutils::Endpoint::update)},
@@ -31,7 +25,7 @@ sys::ReturnCodes EndpointHandler::update(
         ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
         if (service) {
             LOG_INFO("got a pointer to the destkop service, store state");
-            service->updateOs(true);
+            service->updateOS->runUpdate(fileName);
         }
         else {
             LOG_INFO("no valid service handle");
@@ -39,15 +33,30 @@ sys::ReturnCodes EndpointHandler::update(
 
         return sys::ReturnCodes::Success;
     }
-    else if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::put)) {
+    else if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::get)) {
+        LOG_INFO("update get request: ");
+        LOG_INFO("%s", body.dump().c_str());
+
+        json11::Json fileList;
         ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
         if (service) {
-            if (service->isUpdating()) {
-                LOG_INFO("a chunk of an update file");
-                return sys::ReturnCodes::Success;
-            }
+            fileList = service->updateOS->getUpdateFileList();
         }
-    }
 
+        json11::Json responseBodyJson = json11::Json::object { { parserutils::json::updateFileList, fileList } };
+
+        json11::Json responsePayloadJson =
+            json11::Json::object({{parserutils::json::endpoint, static_cast<int>(parserutils::Endpoint::update)},
+                                  {parserutils::json::status, static_cast<int>(parserutils::http::Code::OK)},
+                                  {parserutils::json::uuid, std::to_string(uuid)},
+                                  {parserutils::json::body, responseBodyJson}});
+
+        responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
+
+        return sys::ReturnCodes::Success;
+    }
+    else if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::put)) {
+        return sys::ReturnCodes::Failure;
+    }
     return sys::ReturnCodes::Failure;
 }
