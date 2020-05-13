@@ -1,3 +1,7 @@
+// This is minimalistic example how our GUI renderer works - this code won't compile right now
+// there shouldn't be much work to do to make it compile again, there is no target like that in need so it's not added
+// this could be potentially used instead running whole PurePhone simulator to test/create UI only code
+
 #include <gui/widgets/Window.hpp>
 #include <gui/core/Context.hpp>
 #include <gui/core/Renderer.hpp>
@@ -66,4 +70,5 @@ int main(int argc, char **argv)
     win->setSize(480, 600);
     win->buildInterface();
     win->setTitle("LOL");
+    drawWindow(win, createSHMBuffer());
 }

@@ -536,19 +536,18 @@ namespace gui
 
     bool FontManager::init(std::string baseDirectory)
     {
-        static bool initialized = false;
-        if (!initialized) {
-            loadFonts(baseDirectory);
-        }
-
-        return true;
+        loadFonts(baseDirectory);
+        initialized = true;
+        return initialized;
     }
 
     FontManager &FontManager::getInstance()
     {
 
         static FontManager instance;
-
+        if (!instance.initialized) {
+            LOG_WARN("Using uninitialized font manager will result in no font loaded");
+        }
         return instance;
     }
 

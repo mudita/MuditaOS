@@ -176,6 +176,9 @@ namespace gui
 
     class FontManager
     {
+      private:
+        bool initialized = false;
+
       protected:
         std::string fontFolder;
         std::vector<Font *> fonts;
