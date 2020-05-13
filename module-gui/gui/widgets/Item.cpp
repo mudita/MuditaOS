@@ -364,7 +364,10 @@ namespace gui
 
     bool Item::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        return true;
+        if (dimensionChangedCallback) {
+            return dimensionChangedCallback(*this, nullptr);
+        }
+        return false;
     }
 
     bool Item::onContent()

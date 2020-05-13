@@ -1,15 +1,15 @@
-/*
- * BoundingBox.cpp
- *
- *  Created on: 4 mar 2019
- *      Author: robert
- */
-
 #include "BoundingBox.hpp"
 #include <sstream>
 
 namespace gui
 {
+    const uint16_t BoundingBox::zero_size = 0;
+    const uint16_t BoundingBox::max_size  = std::numeric_limits<uint16_t>().max();
+    const uint16_t BoundingBox::min_size  = std::numeric_limits<uint16_t>().min();
+
+    const int16_t BoundingBox::zero_position = 0;
+    const int16_t BoundingBox::max_position  = std::numeric_limits<int16_t>().max();
+    const int16_t BoundingBox::min_position  = std::numeric_limits<int16_t>().min();
 
     BoundingBox::BoundingBox(int32_t x, int32_t y, uint32_t w, uint32_t h)
     {

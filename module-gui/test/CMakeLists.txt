@@ -3,6 +3,8 @@ project("unittest_gui" VERSION 1.0 DESCRIPTION "GUI tests.")
 add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
     test-gui.cpp
     test-context.cpp
+    test-gui-callbacks.cpp
+    test-gui-resizes.cpp
     )
 
 target_include_directories(${PROJECT_NAME}
