@@ -154,10 +154,10 @@ namespace gui
     void ListView::resizeWithScroll()
     {
         if (scroll->shouldShowScroll(currentPageSize, elementsCount)) {
-            body->setSize(style::listview::item_width_with_scroll, body->h());
+            body->setSize(style::listview::item_width_with_scroll, body->getHeight());
         }
         else {
-            body->setSize(style::window::default_body_width, body->h());
+            body->setSize(style::window::default_body_width, body->getHeight());
         }
     }
 
