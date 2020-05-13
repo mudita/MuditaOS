@@ -41,7 +41,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 
-#include "service-evtmgr/api/EventServiceAPI.hpp"
+#include "service-evtmgr/api/EventManagerServiceAPI.hpp"
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
@@ -170,7 +170,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-    board = EventServiceAPI::GetBoard(this);
+    board = EventManagerServiceAPI::GetBoard(this);
     switch (board) {
     case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
