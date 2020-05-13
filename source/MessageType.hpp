@@ -172,8 +172,12 @@ enum class MessageType
     EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
-    EVMGetHw,
+
+    // cellular messages
+    EVMGetBoard,
     EVMModemStatus,
+
+    // bluetooth messages
     BluetoothRequest,
 
     LwIP_request,

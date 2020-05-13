@@ -155,8 +155,14 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
-    else if (msgl->messageType == MessageType::EVMGetHw) {
-        return std::make_shared<sevm::EVMResponseMessage>(bsp::magnetometer::isPresent());
+    else if (msgl->messageType == MessageType::EVMGetBoard) {
+
+        auto msg   = std::make_shared<sevm::EVMBoardResponseMessage>(true);
+        auto board = bsp::magnetometer::GetBoard();
+        msg->board = board;
+        LOG_INFO("Board discovered: %s", GetBoarName(board).c_str());
+
+        return msg;
     }
     else if (msgl->messageType == MessageType::EVMModemStatus) {
         sevm::StateMessage *msg = dynamic_cast<sevm::StateMessage *>(msgl);
@@ -240,4 +246,26 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
+}
+
+std::string EventManager::GetBoarName(bsp::Board board)
+{
+    using bsp::Board;
+    std::string ret;
+    switch (board) {
+    case Board::T3:
+        ret = "T3";
+        break;
+    case Board::T4:
+        ret = "T4";
+        break;
+    case Board::Linux:
+        ret = "Linux";
+        break;
+    case Board::none:
+    default:
+        ret = "none";
+        break;
+    }
+    return ret;
 }

@@ -170,22 +170,15 @@ void ServiceCellular::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-#if defined(TARGET_Linux)
-    board = cellular::Board::Linux;
-#else
-    bool dev = EventServiceAPI::GetHwPlatform(this);
-
-    LOG_INFO("Hardware platform: %s", dev ? "T4" : "T3");
-    board = dev ? cellular::Board::T4 : cellular::Board::T3;
-#endif
+    board = EventServiceAPI::GetBoard(this);
     switch (board) {
-    case cellular::Board::T4:
+    case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
         break;
-    case cellular::Board::T3:
+    case bsp::Board::T3:
         state.set(this, State::ST::PowerUpProcedure);
         break;
-    case cellular::Board::Linux:
+    case bsp::Board::Linux:
         state.set(this, State::ST::PowerUpProcedure);
         break;
     default:
@@ -271,13 +264,13 @@ bool ServiceCellular::handle_idle()
 bool ServiceCellular::handle_power_up_procedure()
 {
     switch (board) {
-    case Board::T4: {
+    case bsp::Board::T4: {
         LOG_DEBUG("T4 - cold start");
         cmux->TurnOnModem();
         state.set(this, State::ST::PowerUpInProgress);
         break;
     }
-    case Board::T3: {
+    case bsp::Board::T3: {
         // check baud once to determine if it's already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
@@ -296,7 +289,7 @@ bool ServiceCellular::handle_power_up_procedure()
             break;
         }
     }
-    case Board::Linux: {
+    case bsp::Board::Linux: {
         // it is basically the same as T3
         // check baud once to determine if it's already turned on
         auto ret = cmux->BaudDetectOnce();
@@ -317,7 +310,7 @@ bool ServiceCellular::handle_power_up_procedure()
             break;
         }
     }
-    case Board::none:
+    case bsp::Board::none:
         LOG_FATAL("Board not known!");
         assert(0);
         break;
@@ -441,7 +434,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
-                if (board == Board::T3 || board == Board::Linux) {
+                if (board == bsp::Board::T3 || board == bsp::Board::Linux) {
                     state.set(this, State::ST::CellularConfProcedure);
                     responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
@@ -699,7 +692,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto msg = dynamic_cast<sevm::StateMessage *>(msgl);
         if (msg != nullptr) {
             auto status_pin = msg->state == true ? value::ACTIVE : value::INACTIVE;
-            if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == Board::T4) {
+            if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == bsp::Board::T4) {
                 state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
             }
         }

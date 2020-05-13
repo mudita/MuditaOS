@@ -6,17 +6,17 @@
 
 #include "../Constants.hpp"
 
-bool EventServiceAPI::GetHwPlatform(sys::Service *serv)
+bsp::Board EventServiceAPI::GetBoard(sys::Service *serv)
 {
-    std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(MessageType::EVMGetHw);
+    std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(MessageType::EVMGetBoard);
     auto ret                              = sys::Bus::SendUnicast(msg, service::name::evt_manager, serv, 1000);
 
-    sevm::EVMResponseMessage *response = dynamic_cast<sevm::EVMResponseMessage *>(ret.second.get());
+    sevm::EVMBoardResponseMessage *response = dynamic_cast<sevm::EVMBoardResponseMessage *>(ret.second.get());
 
     if (response != nullptr) {
-        if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-            return true;
+        if ((ret.first == sys::ReturnCodes::Success)) {
+            return response->board;
         }
     }
-    return false;
+    return bsp::Board::none;
 }

@@ -27,6 +27,12 @@ namespace bsp
 
     };
 
+    enum Board{
+    	T3,
+    	T4,
+    	Linux,
+    	none
+    };
 
 }
 

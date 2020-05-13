@@ -38,5 +38,13 @@ namespace bsp
             }
             return true;
         }
+
+        bsp::Board GetBoard(void)
+        {
+            if (isPresent()) {
+                return bsp::Board::T4;
+            }
+            return bsp::Board::T3;
+        }
     } // namespace magnetometer
 } // namespace bsp
