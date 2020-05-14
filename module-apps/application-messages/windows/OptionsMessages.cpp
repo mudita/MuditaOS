@@ -80,8 +80,12 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)),
 
         // TODO
-        gui::newOptionLabel(gui::Option{UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")),
-                                        [=](gui::Item &item) { return false; }}),
+        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_forvard_message")),
+                                        [=](gui::Item &item) {
+                                            std::unique_ptr<gui::SwitchData> data =
+                                                std::make_unique<SMSTextData>(record.body);
+                                            return app->switchWindow(gui::name::window::new_sms, std::move(data));
+                                        }}),
         gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")),
                                         [=](gui::Item &item) {
                                             Clipboard::getInstance().copy(record.body);

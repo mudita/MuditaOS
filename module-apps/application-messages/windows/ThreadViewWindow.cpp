@@ -362,10 +362,10 @@ namespace gui
                 return;
             }
         }
-        if (auto pdata = dynamic_cast<SMSTemplateData *>(data)) {
-            auto templText = pdata->templ->text;
-            LOG_INFO("received sms templates data \"%s\"", templText.c_str());
-            text->setText(text->getText() + templText);
+        if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
+            auto txt = pdata->text;
+            LOG_INFO("received sms templates data \"%s\"", txt.c_str());
+            text->setText(text->getText() + txt);
         }
     }
 

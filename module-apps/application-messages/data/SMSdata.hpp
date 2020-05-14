@@ -53,13 +53,13 @@ class SMSSendTemplateRequest : public SMSRequest
 class SMSTemplateSent : public gui::SwitchData
 {};
 
-class SMSTemplateData : public gui::SwitchData
+class SMSTextData : public gui::SwitchData
 {
   public:
-    SMSTemplateData(std::shared_ptr<SMSTemplateRecord> templ) : templ(templ)
+    SMSTextData(const UTF8 &text) : text(text)
     {}
-    virtual ~SMSTemplateData()               = default;
-    std::shared_ptr<SMSTemplateRecord> templ = nullptr;
+    virtual ~SMSTextData() = default;
+    UTF8 text;
 };
 
 class SMSTemplateRequest : public gui::SwitchData
