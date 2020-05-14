@@ -184,7 +184,7 @@ int main()
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
 
         // Service Desktop disabled on master - pulling read on usb driver
-        // ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;

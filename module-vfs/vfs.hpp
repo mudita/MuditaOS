@@ -30,6 +30,8 @@ namespace fs = std::filesystem;
 
 #define PATH_USER "/user/"
 #define PATH_SYS  "/sys"
+#define PATH_CURRENT "current"
+#define PATH_PREVIOUS "previous"
 
 // this just concatenates two strings and creates a /user/ subdirectory filename
 #define USER_PATH(file) PATH_USER file
@@ -44,8 +46,10 @@ namespace purefs
 
     namespace dir
     {
-        const inline fs::path eMMC_disk = PATH_SYS;
-        const inline fs::path user_disk = PATH_USER;
+        const inline fs::path eMMC_disk  = PATH_SYS;
+        const inline fs::path user_disk  = PATH_USER;
+        const inline fs::path os_current = eMMC_disk / PATH_CURRENT;
+        const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
     } // namespace dir
 
     namespace extension
@@ -58,6 +62,7 @@ namespace purefs
         const inline int crc_buf       = 1024;
         const inline int crc_char_size = 9;
         const inline int crc_radix     = 16;
+        const inline int tar_buf       = 8192;
     } // namespace buffer
 
     namespace ini
