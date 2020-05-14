@@ -15,9 +15,10 @@ namespace style::design
 
     inline const auto tile_w       = 130;
     inline const auto tile_h       = 130;
-    inline const auto tile_margin  = 24;
+    inline const auto tile_margin  = 24 - (64 - 50) / 2; // this is waiting for proper adjust-to-design anyway
     inline const auto tile_text_y  = 50;
     inline const auto notify_dot_x = 80;
+    inline const auto notify_dot_y = (64 - 50) / 2;
     inline const auto grid_offset  = 20;
 }; // namespace style::design
 
@@ -46,7 +47,7 @@ namespace gui
 
         if (notifications > 0) {
             auto thumbnail = new gui::Image("dot_12px_soft");
-            thumbnail->setPosition(it->area().x + style::design::notify_dot_x, this->area().y);
+            thumbnail->setPosition(style::design::notify_dot_x, style::design::notify_dot_y);
             it->addWidget(thumbnail);
         }
 
@@ -111,7 +112,7 @@ namespace gui
             {
 
                 new gui::Tile{
-                    "menu_tools",
+                    "menu_tools_W_G",
                     "app_desktop_menu_tools",
                     [=](gui::Item &item) {
                         {
@@ -120,7 +121,7 @@ namespace gui
                         }
                     },
                 },
-                new gui::Tile("menu_alarm", "app_desktop_menu_alarm", [=](gui::Item &item) { return true; }),
+                new gui::Tile("menu_alarm_W_G", "app_desktop_menu_alarm", [=](gui::Item &item) { return true; }),
 
                 new gui::Tile("menu_calendar_W_G",
                               "app_desktop_menu_calendar",
@@ -130,7 +131,7 @@ namespace gui
                                   return true;
                               }),
 
-                new gui::Tile{"menu_phone",
+                new gui::Tile{"menu_phone_W_G",
                               "app_desktop_menu_phone",
                               [=](gui::Item &item) {
                                   LOG_INFO("Call Log");
@@ -139,7 +140,7 @@ namespace gui
                                   return true;
                               },
                               app->notifications.notSeenCalls},
-                new gui::Tile("menu_contacts",
+                new gui::Tile("menu_contacts_W_G",
                               "app_desktop_menu_contacts",
                               [=](gui::Item &item) {
                                   LOG_INFO("Phonebook");
@@ -148,7 +149,7 @@ namespace gui
                                   return true;
                               }),
 
-                new gui::Tile{"menu_messages",
+                new gui::Tile{"menu_messages_W_G",
                               "app_desktop_menu_messages",
                               [=](gui::Item &item) {
                                   LOG_INFO("Messages");
@@ -157,10 +158,10 @@ namespace gui
                                   return true;
                               },
                               app->notifications.notSeenSMS},
-                new gui::Tile{"menu_music_player", "app_desktop_menu_music", [=](gui::Item &item) { return true; }},
+                new gui::Tile{"menu_music_player_W_G", "app_desktop_menu_music", [=](gui::Item &item) { return true; }},
                 new gui::Tile{
                     "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
-                new gui::Tile{"menu_settings",
+                new gui::Tile{"menu_settings_W_G",
                               "app_desktop_menu_settings",
                               [=](gui::Item &item) {
                                   LOG_INFO("page 1 settings");
@@ -174,7 +175,7 @@ namespace gui
             this,
             utils::localize.get("app_desktop_tools_title"),
             {
-                new gui::Tile{"menu_tools_notes",
+                new gui::Tile{"menu_tools_notes_W_G",
                               "app_desktop_tools_notes",
                               [=](gui::Item &item) {
                                   sapm::ApplicationManager::messageSwitchApplication(
@@ -182,8 +183,8 @@ namespace gui
                                   return true;
                               }},
                 new gui::Tile{
-                    "menu_tools_calculator", "app_desktop_tools_calculator", [=](gui::Item &item) { return true; }},
-                new gui::Tile{"menu_tools_recorder",
+                    "menu_tools_calculator_W_G", "app_desktop_tools_calculator", [=](gui::Item &item) { return true; }},
+                new gui::Tile{"menu_tools_recorder_W_G",
                               "app_desktop_tools_antenna",
                               [=](gui::Item &item) {
                                   sapm::ApplicationManager::messageSwitchApplication(
