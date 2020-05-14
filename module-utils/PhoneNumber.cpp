@@ -12,15 +12,14 @@
 using namespace utils;
 
 PhoneNumber::PhoneNumber(const std::string &phoneNumber, country::Id defaultCountryCode)
-    : valid(false), countryCode(defaultCountryCode), util(*phn_util::GetInstance()), rawInput(phoneNumber)
+    : countryCode(defaultCountryCode), util(*phn_util::GetInstance()), rawInput(phoneNumber)
 {
-    valid = util.ParseAndKeepRawInput(phoneNumber, country::getAlpha2Code(countryCode), &pbNumber) ==
-            errCode::NO_PARSING_ERROR;
+    util.ParseAndKeepRawInput(phoneNumber, country::getAlpha2Code(countryCode), &pbNumber);
 }
 
 bool PhoneNumber::isValid() const
 {
-    return valid;
+    return util.IsValidNumber(pbNumber);
 }
 
 const std::string &PhoneNumber::get() const
@@ -34,7 +33,7 @@ const std::string &PhoneNumber::get() const
 
 std::string PhoneNumber::getFormatted() const
 {
-    if (!valid) {
+    if (!isValid()) {
         return rawInput;
     }
 
@@ -45,7 +44,7 @@ std::string PhoneNumber::getFormatted() const
 
 std::string PhoneNumber::toE164() const
 {
-    if (!valid) {
+    if (!isValid()) {
         throw std::runtime_error("Can't create E164 format from an invalid number.");
     }
 
@@ -55,12 +54,12 @@ std::string PhoneNumber::toE164() const
     return e164number;
 }
 
-bool PhoneNumber::operator==(const PhoneNumber &right)
+bool PhoneNumber::operator==(const PhoneNumber &right) const
 {
     return util.IsNumberMatch(pbNumber, right.pbNumber) == phn_util::EXACT_MATCH;
 }
 
-bool PhoneNumber::operator==(const View &view)
+bool PhoneNumber::operator==(const View &view) const
 {
     if (isValid() != view.isValid()) {
         return false;
@@ -167,3 +166,8 @@ PhoneNumber::View::View(const std::string &enteredNumber,
                         bool valid)
     : entered(enteredNumber), formatted(formattedNumber), e164(e164Number), valid(valid)
 {}
+
+bool PhoneNumber::View::operator==(const View &rhs) const
+{
+    return valid == rhs.valid && e164 == rhs.e164;
+}
