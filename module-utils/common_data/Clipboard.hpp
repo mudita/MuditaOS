@@ -8,8 +8,8 @@ class Clipboard
 {
     Clipboard() = default;
 
-    std::string data = "clipboard test";
-    bool validData   = true;
+    std::string data;
+    bool validData = false;
 
     static cpp_freertos::MutexStandard mutex;
 
