@@ -19,7 +19,7 @@ namespace Store
         return battery;
     }
 
-    cpp_freertos::MutexStandard mutex;
+    cpp_freertos::MutexStandard GSM::mutex;
 
     GSM *GSM::get()
     {
@@ -35,13 +35,13 @@ namespace Store
                  signalStrength.rssi,
                  static_cast<int>(signalStrength.rssiBar));
 
-        get()->signalStrength = signalStrength;
+        this->signalStrength = signalStrength;
     }
 
     SignalStrength GSM::getSignalStrength()
     {
         cpp_freertos::LockGuard lock(mutex);
 
-        return get()->signalStrength;
+        return signalStrength;
     }
 }; // namespace Store
