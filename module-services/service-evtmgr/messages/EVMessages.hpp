@@ -10,7 +10,7 @@
 #include "bsp/common.hpp"
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
-
+#include "bsp/cellular/bsp_cellular.hpp"
 namespace sevm
 {
     namespace message
@@ -90,14 +90,14 @@ namespace sevm
         bsp::Board board = bsp::Board::none;
     };
 
-    class StateMessage : public Message
+    class StatusStateMessage : public Message
     {
       public:
-        StateMessage(MessageType messageType) : Message(messageType)
+        StatusStateMessage(MessageType messageType) : Message(messageType)
         {
             type = Type::Data;
         }
-        bool state = false;
+        bsp::cellular::status::value state = bsp::cellular::status::value::INACTIVE;
     };
 } /* namespace sevm*/
 

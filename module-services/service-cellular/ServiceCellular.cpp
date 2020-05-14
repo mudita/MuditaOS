@@ -311,10 +311,9 @@ bool ServiceCellular::handle_power_up_procedure()
         }
     }
     case bsp::Board::none:
+    default:
         LOG_FATAL("Board not known!");
         assert(0);
-        break;
-    default:
         break;
     }
     return true;
@@ -689,9 +688,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     case MessageType::EVMModemStatus: {
         using namespace bsp::cellular::status;
-        auto msg = dynamic_cast<sevm::StateMessage *>(msgl);
+        auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
         if (msg != nullptr) {
-            auto status_pin = msg->state == true ? value::ACTIVE : value::INACTIVE;
+            auto status_pin = msg->state;
             if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == bsp::Board::T4) {
                 state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
             }
