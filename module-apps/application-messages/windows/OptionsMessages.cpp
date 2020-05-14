@@ -1,10 +1,12 @@
 #include "OptionsMessages.hpp"
 #include "application-messages/data/SMSdata.hpp"
 
+#include <common_data/Clipboard.hpp>
 #include <Options.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
 
+#include <Text.hpp>
 #include <BoxLayout.hpp>
 
 using namespace style::window;
@@ -92,19 +94,25 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
     };
 }
 
-std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app, const std::string &requestingWindow)
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
+                                               const std::string &requestingWindow,
+                                               gui::Text *text)
 {
-    return {
-        gui::newOptionLabel({UTF8(utils::localize.get("sms_use_template")),
-                             [=](gui::Item &item) {
-                                 std::unique_ptr<gui::SwitchData> data =
-                                     std::make_unique<SMSTemplateRequest>(requestingWindow);
-                                 return app->switchWindow(gui::name::window::sms_templates, std::move(data));
-                             },
-                             gui::Arrow::Disabled}),
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_paste")),
-                             [=](gui::Item &item) { return false; },
-                             gui::Arrow::Disabled}),
+    std::list<gui::Item *> options;
 
-    };
+    options.push_back(gui::newOptionLabel(
+        gui::Option{UTF8(utils::localize.get("sms_use_template")), [=](gui::Item &item) {
+                        std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateRequest>(requestingWindow);
+                        return app->switchWindow(gui::name::window::sms_templates, std::move(data));
+                    }}));
+
+    if (Clipboard::getInstance().gotData()) {
+        options.push_back(
+            gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_paste")), [=](gui::Item &item) {
+                                     text->setText(text->getText() + Clipboard::getInstance().paste());
+                                     return app->returnToPreviousView();
+                                 }}));
+    }
+
+    return options;
 }

@@ -181,7 +181,7 @@ namespace gui
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                return app->newMessageOptions(getName());
+                return app->newMessageOptions(getName(), message);
             }
             return false;
         };

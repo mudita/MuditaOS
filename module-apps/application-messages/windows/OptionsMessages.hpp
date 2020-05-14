@@ -10,4 +10,6 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
 ///
 /// @param app - application pointer
 /// @param requestingWindow -requesting window - intentionally return point from an "action"
-std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app, const std::string &requestingWindow);
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
+                                               const std::string &requestingWindow,
+                                               gui::Text *text);
