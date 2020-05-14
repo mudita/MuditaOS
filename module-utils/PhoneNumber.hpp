@@ -115,6 +115,15 @@ namespace utils
              */
             bool isValid() const;
 
+            /**
+             * @brief Compares two View objects
+             *
+             * @param rhs - instance of a VIew to compare to.
+             * @return true if objects are equal.
+             * @return false if objects are different (not equal).
+             */
+            bool operator==(const View &rhs) const;
+
           private:
             View(const std::string &enteredNumber,
                  const std::string &formattedNumber,
@@ -202,7 +211,7 @@ namespace utils
          * @return true if objects are equal.
          * @return false if objects are different (not equal).
          */
-        bool operator==(const PhoneNumber &right);
+        bool operator==(const PhoneNumber &right) const;
 
         /**
          * @brief Compares PhoneNumber with number represented by View.
@@ -211,7 +220,7 @@ namespace utils
          * @return true if objects are equal.
          * @return false if objects are different (not equal).
          */
-        bool operator==(const View &view);
+        bool operator==(const View &view) const;
 
         /**
          * @brief Convenience wrapper for E164 number formatting.
@@ -248,7 +257,6 @@ namespace utils
         static View viewFromE164(const std::string &e164);
 
       private:
-        bool valid;
         const country::Id countryCode;
         phn_util &util;
         gnumber pbNumber;
