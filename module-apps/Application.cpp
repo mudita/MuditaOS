@@ -211,6 +211,21 @@ namespace app
         return 0;
     }
 
+    bool Application::returnToPreviousView()
+    {
+        auto prevWindow = getPrevWindow();
+        if (prevWindow == gui::name::window::no_window) {
+            LOG_INFO("Back to previous application");
+            cleanPrevWindw();
+            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+        }
+        else {
+            LOG_INFO("Back to previous window %s", prevWindow.c_str());
+            switchWindow(prevWindow, gui::ShowMode::GUI_SHOW_RETURN);
+        }
+        return true;
+    }
+
     // TODO: this one seems to be unused
     int Application::switchBackWindow(const std::string &windowName,
                                       uint32_t cmd,

@@ -176,6 +176,8 @@ namespace app
             return switchWindow(windowName, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         };
 
+        bool returnToPreviousView();
+
         /// Metod sendind switch command for previous window on windows stack.
         int switchBackWindow(const std::string &windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data);
 
