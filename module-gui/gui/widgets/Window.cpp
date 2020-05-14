@@ -55,10 +55,10 @@ namespace gui
 
     bool Window::onInput(const InputEvent &inputEvent)
     {
-        if (inputCallback && inputCallback(*this, inputEvent)) {
+        if (focusItem != nullptr && focusItem->onInput(inputEvent)) {
             return true;
         }
-        if (focusItem != nullptr && focusItem->onInput(inputEvent)) {
+        if (inputCallback != nullptr && inputCallback(*this, inputEvent)) {
             return true;
         }
         return handleNavigation(inputEvent);
