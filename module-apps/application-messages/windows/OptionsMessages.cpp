@@ -80,15 +80,16 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)),
 
         // TODO
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")),
-                             [=](gui::Item &item) { return false; },
-                             gui::Arrow::Disabled}),
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_copy")),
-                             [=](gui::Item &item) { return false; },
-                             gui::Arrow::Disabled}),
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")),
-                             [=](gui::Item &item) { return false; },
-                             gui::Arrow::Disabled}),
+        gui::newOptionLabel(gui::Option{UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")),
+                                        [=](gui::Item &item) { return false; }}),
+        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")),
+                                        [=](gui::Item &item) {
+                                            Clipboard::getInstance().copy(record.body);
+                                            return app->returnToPreviousView();
+                                        }}),
+
+        gui::newOptionLabel(gui::Option{UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")),
+                                        [=](gui::Item &item) { return false; }}),
         placeholder(utils::localize.get("sms_from_this_sms")),
         newCombo(app, contact) // contact.numbers[0].numberE164)
     };
