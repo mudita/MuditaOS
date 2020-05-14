@@ -43,7 +43,7 @@ sys::ReturnCodes EndpointHandler::update(
             fileList = service->updateOS->getUpdateFileList();
         }
 
-        json11::Json responseBodyJson = json11::Json::object { { parserutils::json::updateFileList, fileList } };
+        json11::Json responseBodyJson = json11::Json::object{{parserutils::json::updateFileList, fileList}};
 
         json11::Json responsePayloadJson =
             json11::Json::object({{parserutils::json::endpoint, static_cast<int>(parserutils::Endpoint::update)},

@@ -63,7 +63,8 @@ updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
 
         if ((err = prepareRoot()) == updateos::NoError) {
             LOG_INFO("runUpdate %s root ready for reset", tarFileName.c_str());
-        } else {
+        }
+        else {
             LOG_ERROR("runUpdate %s can't prepare root dir for reset", tarFileName.c_str());
         }
     }
@@ -104,9 +105,10 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
 
 updateos::UpdateError UpdatePureOS::verifyChecksums()
 {
-    std::unique_ptr<char[]> lineBuff(new char[purefs::buffer::tar_buf]);// max line should be freertos max path + checksum, so this is enough
+    std::unique_ptr<char[]> lineBuff(
+        new char[purefs::buffer::tar_buf]); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
-    FF_FILE *fpChecksums = ff_fopen(checksumsFile.c_str(), "r");
+    FF_FILE *fpChecksums   = ff_fopen(checksumsFile.c_str(), "r");
     if (fpChecksums != NULL) {
         while (!ff_feof(fpChecksums)) {
             char *line = ff_fgets(lineBuff.get(), purefs::buffer::tar_buf, fpChecksums);
@@ -119,21 +121,26 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
                     std::string filePath;
                     unsigned long fileCRC32;
 
-                    getChecksumInfo(line,  filePath, &fileCRC32);
+                    getChecksumInfo(line, filePath, &fileCRC32);
                     unsigned long computedCRC32 = getExtractedFileCRC32(filePath);
                     if (computedCRC32 != fileCRC32) {
-                        LOG_ERROR("verifyChecksums %s crc32 match FAIL %lX != %lX", filePath.c_str(), fileCRC32, computedCRC32);
+                        LOG_ERROR("verifyChecksums %s crc32 match FAIL %lX != %lX",
+                                  filePath.c_str(),
+                                  fileCRC32,
+                                  computedCRC32);
                         ff_fclose(fpChecksums);
                         return (updateos::VerifyChecksumsFailure);
                     }
                     else {
-                        LOG_INFO("verifyChecksums %s crc32 match OK %lX == %lX", filePath.c_str(), fileCRC32, computedCRC32);
+                        LOG_INFO(
+                            "verifyChecksums %s crc32 match OK %lX == %lX", filePath.c_str(), fileCRC32, computedCRC32);
                     }
                 }
             }
         }
         ff_fclose(fpChecksums);
-    } else {
+    }
+    else {
         LOG_ERROR("verifyChecksums can't open checksums file %s", checksumsFile.c_str());
         return (updateos::CantOpenChecksumsFile);
     }
@@ -154,10 +161,11 @@ void UpdatePureOS::getChecksumInfo(const std::string infoLine, std::string &file
 {
     std::size_t lastSpacePos = infoLine.find_last_of(' ');
     if (lastSpacePos > 0) {
-        filePath  = infoLine.substr(0, lastSpacePos);
-        const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, purefs::buffer::crc_char_size-1);
-        *fileCRC32Long = strtoull(fileCRC32Str.c_str(), nullptr, purefs::buffer::crc_radix);
-        LOG_INFO("filePath: %s fileCRC32Str: %s fileCRC32Long: %lu", filePath.c_str(), fileCRC32Str.c_str(), *fileCRC32Long);
+        filePath                       = infoLine.substr(0, lastSpacePos);
+        const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, purefs::buffer::crc_char_size - 1);
+        *fileCRC32Long                 = strtoull(fileCRC32Str.c_str(), nullptr, purefs::buffer::crc_radix);
+        LOG_INFO(
+            "filePath: %s fileCRC32Str: %s fileCRC32Long: %lu", filePath.c_str(), fileCRC32Str.c_str(), *fileCRC32Long);
     }
 }
 
@@ -175,7 +183,9 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     ret = ff_deltree(purefs::dir::os_previous.c_str());
 
     if (ret != 0) {
-        LOG_ERROR("prepareRoot ff_deltree on %s caused an error %s", purefs::dir::os_previous.c_str(), strerror(stdioGET_ERRNO()));
+        LOG_ERROR("prepareRoot ff_deltree on %s caused an error %s",
+                  purefs::dir::os_previous.c_str(),
+                  strerror(stdioGET_ERRNO()));
     }
 
     if (isDirectory(purefs::dir::os_previous)) {
@@ -186,7 +196,10 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     ret = ff_rename(purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str(), true);
 
     if (ret != 0) {
-        LOG_ERROR("prepareRoot can't rename %s -> %s error %s", purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str(), strerror(stdioGET_ERRNO()));
+        LOG_ERROR("prepareRoot can't rename %s -> %s error %s",
+                  purefs::dir::os_current.c_str(),
+                  purefs::dir::os_previous.c_str(),
+                  strerror(stdioGET_ERRNO()));
         return (updateos::CantRenameCurrentToPrevious);
     }
 
@@ -194,7 +207,10 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     ret = ff_rename(updateTempDirectory.c_str(), purefs::dir::os_current.c_str(), true);
 
     if (ret != 0) {
-        LOG_ERROR("prepareRoot can't rename %s -> %s error %s", updateTempDirectory.c_str(), purefs::dir::os_current.c_str(), strerror(stdioGET_ERRNO()));
+        LOG_ERROR("prepareRoot can't rename %s -> %s error %s",
+                  updateTempDirectory.c_str(),
+                  purefs::dir::os_current.c_str(),
+                  strerror(stdioGET_ERRNO()));
         return (updateos::CantRenameTempToCurrent);
     }
     // make sure that boot.ini points to the current version
@@ -206,7 +222,7 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
 {
     sbini_t *ini;
     ini = sbini_load(purefs::file::boot_ini.c_str());
-    if (!ini){
+    if (!ini) {
         LOG_ERROR("updateBootINI can't open %s", purefs::file::boot_ini.c_str());
     }
     return (updateos::NoError);
@@ -219,8 +235,8 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     LOG_INFO("unpackFileToTemp %s", fullPath.c_str());
     uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
     uint32_t sizeToRead   = purefs::buffer::tar_buf;
-    *crc32   = 0;
-    int errCode = MTAR_ESUCCESS;
+    *crc32                = 0;
+    int errCode           = MTAR_ESUCCESS;
     FF_FILE *fp           = ff_fopen(fullPath.c_str(), "w+");
     if (fp == NULL) {
         LOG_INFO("unpackFileToTemp %s can't open for reading", fullPath.c_str());
@@ -235,8 +251,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
                 sizeToRead = updateTar.remaining_data;
         }
 
-        if ((errCode = mtar_read_data(&updateTar, readBuf.get(), sizeToRead)) != MTAR_ESUCCESS)
-        {
+        if ((errCode = mtar_read_data(&updateTar, readBuf.get(), sizeToRead)) != MTAR_ESUCCESS) {
             LOG_ERROR("unpackFileToTemp mtar_read_data failed, errCode=%d", errCode);
             return (false);
         }
@@ -319,8 +334,8 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
     LOG_INFO("prepareTempDirForUpdate trying to create %s as tempDir", updateTempDirectory.c_str());
     if (ff_mkdir(updateTempDirectory.c_str()) != 0) {
         LOG_ERROR("prepareTempDirForUpdate failed to create: %s error: %s",
-                 updateTempDirectory.c_str(),
-                 strerror(stdioGET_ERRNO()));
+                  updateTempDirectory.c_str(),
+                  strerror(stdioGET_ERRNO()));
         return (updateos::CantCreateUniqueTmpDir);
     }
 
@@ -365,11 +380,11 @@ const json11::Json UpdatePureOS::getUpdateFileList()
             /* Print the files name, size, and attribute string. */
             LOG_INFO("%s", pxFindStruct->pcFileName);
             if (endsWith(pxFindStruct->pcFileName, updateos::extension::update)) {
-                updateFiles.push_back (pxFindStruct);
+                updateFiles.push_back(pxFindStruct);
             }
         } while (ff_findnext(pxFindStruct) == 0);
     }
 
     vPortFree(pxFindStruct);
-    return (json11::Json (updateFiles));
+    return (json11::Json(updateFiles));
 }
