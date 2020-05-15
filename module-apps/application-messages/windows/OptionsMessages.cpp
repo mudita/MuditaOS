@@ -89,7 +89,7 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")),
                                         [=](gui::Item &item) {
                                             Clipboard::getInstance().copy(record.body);
-                                            return app->returnToPreviousView();
+                                            return app->returnToPreviousWindow();
                                         }}),
 
         gui::newOptionLabel(gui::Option{UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")),
@@ -115,7 +115,7 @@ std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
         options.push_back(gui::newOptionLabel(gui::Option{utils::localize.get("sms_paste"), [=](gui::Item &item) {
                                                               text->setText(text->getText() +
                                                                             Clipboard::getInstance().paste());
-                                                              return app->returnToPreviousView();
+                                                              return app->returnToPreviousWindow();
                                                           }}));
     }
 

@@ -139,7 +139,7 @@ namespace gui
             return application->decreaseCurrentVolume();
         }
         case KeyCode::KEY_RF: {
-            return application->returnToPreviousView();
+            return application->returnToPreviousWindow();
         }
         default:
             break;

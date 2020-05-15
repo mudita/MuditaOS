@@ -211,7 +211,7 @@ namespace app
         return 0;
     }
 
-    bool Application::returnToPreviousView()
+    bool Application::returnToPreviousWindow()
     {
         auto prevWindow = getPrevWindow();
         if (prevWindow == gui::name::window::no_window) {
@@ -226,16 +226,6 @@ namespace app
         return true;
     }
 
-    // TODO: this one seems to be unused
-    int Application::switchBackWindow(const std::string &windowName,
-                                      uint32_t cmd,
-                                      std::unique_ptr<gui::SwitchData> data)
-    {
-        auto msg = std::make_shared<AppMessage>(MessageType::AppSwitchWindowBack);
-        sys::Bus::SendUnicast(msg, this->GetName(), this);
-
-        return 0;
-    }
     int Application::refreshWindow(gui::RefreshModes mode)
     {
         auto msg = std::make_shared<AppRefreshMessage>(mode);
