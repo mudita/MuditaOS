@@ -239,7 +239,7 @@ namespace gui
 
         setTitle(page->title);
         setFocusItem(page);
-        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
 } /* namespace gui */
