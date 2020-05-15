@@ -50,6 +50,7 @@ class Fota
 
     void registerHandlers();
     void handleInternetNotification();
+    void handleHTTPResponse();
 
     void getCurrentVersion();
     std::shared_ptr<app::Application> app_m;

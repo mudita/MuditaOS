@@ -5,6 +5,8 @@
 
 #include <gui/widgets/Label.hpp>
 
+#include <numeric>
+
 Fota::Fota(app::Application *app, gui::Label *statusLabel)
     : app_m(app), currentState_m(Disconnected), statusLable_m(statusLabel)
 {
@@ -112,8 +114,9 @@ void Fota::downloadInfo()
 {
     currentState_m = DownloadingInfo;
     LOG_DEBUG("!");
-    // do the dwonload
-    currentState_m = DownloadedInfo;
+    std::string url("https://www.wicik.pl/mudita/fota/fota.txt");
+    std::string data;
+    InternetService::API::HTTPGET(app_m.get(), url);
 }
 
 void Fota::parseInfo()
@@ -136,6 +139,7 @@ void Fota::registerHandlers()
 {
     LOG_DEBUG("Registrng handles");
     handleInternetNotification();
+    handleHTTPResponse();
 }
 
 void Fota::handleInternetNotification()
@@ -170,6 +174,26 @@ void Fota::handleInternetNotification()
                        }
                        return std::make_shared<sys::ResponseMessage>();
                    });
+}
+
+void Fota::handleHTTPResponse()
+{
+    LOG_DEBUG("Handling http response");
+    app_m->connect(
+        InternetService::HTTPResponseMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+            if (auto msg = dynamic_cast<InternetService::HTTPResponseMessage *>(req)) {
+                LOG_DEBUG("HTTP Response to: %s", msg->url.c_str());
+                LOG_DEBUG("HTPP AT Error   : %s", InternetService::toString(msg->httpError).c_str());
+                LOG_DEBUG("response headers:\n\t%s",
+                          std::accumulate(msg->responseHeaders.begin(), msg->responseHeaders.end(), std::string("\n\t"))
+                              .c_str());
+                LOG_DEBUG("response data   :\n%s", msg->response.c_str());
+                currentState_m = DownloadedInfo;
+                statusLable_m->setText(getStateString());
+                app_m->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        });
 }
 
 void Fota::getCurrentVersion()

@@ -53,6 +53,7 @@ namespace InternetService
         void handleServiceCellularNotifications();
         void handleConfigureAPN();
         void handleConnect();
+        void handleHttpGet();
         uint32_t connectionTimer = 0;
         //    NotificationMuxChannel::NotificationCallback_t notificationCallback = nullptr;
         void getApnConfiguration();
@@ -60,7 +61,12 @@ namespace InternetService
         void getActiveCotext();
         void setState();
         void parseQIACT(const at::Result &result);
+        bool isHTTPS(const std::string &url) const;
+        void normalizeUrl(std::string &url) const;
         std::string prepareQICSGPcmd(const APN::Config &apn);
+        void setupSSLContext();
+        void openURL(const std::string &url);
+        void messageError(const string &msg) const;
 
         State state              = State ::Idle;
         DLC_channel *dataChannel = nullptr;

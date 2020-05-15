@@ -86,6 +86,29 @@ namespace InternetService
         std::string request;
     };
 
+    class HTTPRequestMessage : public InternetMessage
+    {
+      public:
+        HTTPRequestMessage() : InternetMessage(MessageType::HttpRequest)
+        {}
+
+        std::string url; ///< url to download
+        HTTPMethod method;
+    };
+
+    class HTTPResponseMessage : public InternetMessage
+    {
+      public:
+        HTTPResponseMessage() : InternetMessage(MessageType::HttpResponse)
+        {}
+
+        std::string url;             ///< requested url (copied from HTTPRequest message)
+        HTTPErrors httpError;        ///< HTTP commands error
+        int httpServerResponseError; ///< HTTP response error retruned by server
+        std::vector<std::string> responseHeaders;
+        std::string response; ///< Content of the file downloade from server
+    };
+
     class ConfigureAPNMessage : public InternetMessage
     {
       public:

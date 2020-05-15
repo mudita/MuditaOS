@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 namespace sys
 {
@@ -57,13 +58,40 @@ namespace InternetService
         using ContextPair = std::pair<unsigned char, APN::Config>;
     } // namespace APN
 
+    enum HTTPErrors
+    {
+        OK,
+        UnknowError,
+        OpenFailed,
+        URLFailed,
+        GetFailed,
+    };
+
+    std::string toString(HTTPErrors error);
+    enum HTTPMethod
+    {
+        GET,
+        POST,
+    };
+
     class API
     {
       public:
         static bool Configure(sys::Service *serv, const APN::Config &config);
         static bool Connect(sys::Service *serv);
         static bool Disconnect(sys::Service *serv);
-        static std::string HTTPGET(sys::Service *serv, const std::string &url, const std::string &request);
+        /**
+         * @brief HTTPGET downloads a file,
+         * @param serv - service where response should be send
+         * @param url  - url to connect to (automatically detects https)
+         *
+         * This function is asynchronius.
+         * Pirior to calling this function serv must be connected to @a InternetService::HTTPResponse message,
+         * otherwise Application will not receive data.
+         * @return
+         */
+        static void HTTPGET(sys::Service *serv, const std::string &url);
+
         static std::string HTTPPOST(sys::Service *serv,
                                     const std::string &url,
                                     const std::string &request,

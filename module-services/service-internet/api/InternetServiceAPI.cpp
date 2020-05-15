@@ -35,34 +35,13 @@ namespace InternetService
         return sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
     }
 
-    std::string API::HTTPGET(sys::Service *serv, const std::string &url, const std::string &request)
+    void API::HTTPGET(sys::Service *serv, const std::string &url)
     {
-        std::shared_ptr<InternetRequestMessage> msg =
-            std::make_shared<InternetRequestMessage>(MessageType::InternetOpenHTTPConnection);
         LOG_DEBUG("HTTP GET API called");
-
-        auto ret = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
-        if (!ret)
-            return "HTTP Open failed";
-
-        msg      = std::make_shared<InternetRequestMessage>(MessageType::InternetHTTPUrl);
-        msg->url = url;
-        ret      = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
-        if (!ret)
-            return "HTTP URL failed";
-
-        msg          = std::make_shared<InternetRequestMessage>(MessageType::InternetHTTPGET);
-        msg->request = request;
-        ret          = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
-        if (!ret)
-            return "HTTP GET failed";
-
-        msg = std::make_shared<InternetRequestMessage>(MessageType::InternetHTTPReadData);
-        ret = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
-        if (!ret)
-            return "HTTP Done";
-
-        return "HTTP ERROR";
+        std::shared_ptr<HTTPRequestMessage> msg = std::make_shared<HTTPRequestMessage>();
+        msg->url                                = url;
+        msg->method                             = InternetService::HTTPMethod::GET;
+        sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
     }
 
     std::string API::HTTPPOST(sys::Service *serv,
@@ -201,6 +180,23 @@ namespace InternetService
             << "," << username << "," << password << "," << APN::toString(authMethod) << ","
             << (activated ? "Activated" : "Deactivated") << "," << ip << ",";
         return out.str();
+    }
+
+    std::string toString(HTTPErrors error)
+    {
+        switch (error) {
+        case HTTPErrors::OK:
+            return "OK";
+        case HTTPErrors::UnknowError:
+            return "UnknowError";
+        case HTTPErrors::OpenFailed:
+            return "OpenFailed";
+        case HTTPErrors::URLFailed:
+            return "URLFailed";
+        case HTTPErrors::GetFailed:
+            return "GetFailed";
+        }
+        return "unknown (" + std::to_string(static_cast<int>(error)) + ")";
     }
 
 } // namespace InternetService

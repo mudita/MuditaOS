@@ -193,6 +193,8 @@ enum class MessageType
     InternetHTTPGET,
     InternetHTTPPOST,
     InternetHTTPReadData,
+    HttpRequest,
+    HttpResponse,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

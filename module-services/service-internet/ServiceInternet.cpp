@@ -13,6 +13,7 @@
 #include "messages/InternetMessage.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <numeric>
 #include <sstream>
@@ -67,6 +68,7 @@ namespace InternetService
         handleCellularGetChannelResponseMessage();
         handleConfigureAPN();
         handleConnect();
+        handleHttpGet();
     }
 
     void Service::handleCellularGetChannelResponseMessage()
@@ -190,6 +192,64 @@ namespace InternetService
         });
     }
 
+    void Service::handleHttpGet()
+    {
+        connect(
+            HTTPRequestMessage(),
+            [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> std::shared_ptr<sys::ResponseMessage> {
+                std::shared_ptr<sys::ResponseMessage> responseMsg;
+                if (auto msg = dynamic_cast<HTTPRequestMessage *>(req)) {
+                    normalizeUrl(msg->url);
+                    LOG_DEBUG("HTTP Get   : '%s' (%d)", msg->url.c_str(), (int)msg->url.size());
+                    LOG_DEBUG("HTTP Method: %s", (msg->method == HTTPMethod::GET ? "GET" : "POST"));
+                    // setup http context
+                    std::string currCmd;
+                    currCmd = "AT+QHTTPCFG=\"contextid\",1\r";
+                    if (!dataChannel->cmd(currCmd)) {
+                        messageError(currCmd);
+                        return std::make_shared<InternetResponseMessage>(false);
+                    }
+                    currCmd = "AT+QHTTPCFG=\"responseheader\",1\r";
+                    if (!dataChannel->cmd(currCmd)) {
+                        messageError(currCmd);
+                        return std::make_shared<InternetResponseMessage>(false);
+                    }
+                    if (isHTTPS(msg->url)) {
+                        setupSSLContext();
+                    }
+                    openURL(msg->url);
+
+                    switch (msg->method) {
+                    case HTTPMethod::GET: {
+                        LOG_DEBUG("GET");
+                        currCmd = "AT+QHTTPGET=20\r";
+                        if (!dataChannel->cmd(currCmd, 20000)) {
+                            auto response = dataChannel->cmd(at::AT::QIGETERROR);
+                            LOG_DEBUG(
+                                "error: %s",
+                                std::accumulate(response.response.begin(), response.response.end(), std::string("\n\t"))
+                                    .c_str());
+                            return std::make_shared<InternetResponseMessage>(false);
+                        }
+                        break;
+                    }
+                    case HTTPMethod::POST:
+                        LOG_DEBUG("POST - not supported yet");
+                        break;
+                    }
+                    currCmd       = "AT+QHTTPREAD=30\r";
+                    auto response = dataChannel->cmd(currCmd);
+                    if (response) {
+                        for (auto &line : response.response) {
+                            LOG_DEBUG("%s", line.c_str());
+                        }
+                    }
+                    return std::make_shared<InternetResponseMessage>(true);
+                }
+                return std::make_shared<InternetResponseMessage>(false);
+            });
+    }
+
     void Service::getApnConfiguration()
     {
         getActiveCotext();
@@ -272,12 +332,62 @@ namespace InternetService
         }
     }
 
+    bool Service::isHTTPS(const std::string &url) const
+    {
+        return url.find("https://") != std::string::npos;
+    }
+
+    void Service::normalizeUrl(std::string &url) const
+    {
+        std::transform(url.begin(), url.end(), url.begin(), [](unsigned char chr) { return std::tolower(chr); });
+    }
+
     std::string Service::prepareQICSGPcmd(const APN::Config &apn)
     {
         ostringstream cmd;
         cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId) << "," << static_cast<int>(apn.type) << ",\"" << apn.apn
             << "\",\"" << apn.username << "\",\"" << apn.password << "\"," << static_cast<int>(apn.authMethod) << "\r";
         return cmd.str();
+    }
+
+    void Service::setupSSLContext()
+    {
+        std::vector<std::string> sslConfigCommands;
+        sslConfigCommands.push_back("AT+QHTTPCFG=\"sslctxid\",1\r");
+        sslConfigCommands.push_back("AT+QSSLCFG=\"sslversion\",1,5\r");
+        sslConfigCommands.push_back("AT+QSSLCFG=\"ciphersuite\",1,0xFFFF\r");
+        sslConfigCommands.push_back("AT+QSSLCFG=\"seclevel\",1,0\r");
+
+        for (auto &currCmd : sslConfigCommands) {
+            auto response = dataChannel->cmd(currCmd);
+            if (!response) {
+                response = dataChannel->cmd(at::AT::QIGETERROR);
+                LOG_WARN(
+                    "error cmd: %s:%s",
+                    currCmd.c_str(),
+                    std::accumulate(response.response.begin(), response.response.end(), std::string("\n\t")).c_str());
+            }
+        }
+    }
+
+    void Service::openURL(const string &url)
+    {
+        std::stringstream currCmnd;
+        int timeInSec(10);
+        currCmnd << "AT+QHTTPURL=" << url.size() << "," << timeInSec << "\r";
+        auto response = dataChannel->cmd(currCmnd.str().c_str(), timeInSec * 1000);
+        if (response && (response.response[0] == "CONNECT")) {
+            response = dataChannel->cmd(url.c_str(), 10);
+            if (!response) {
+                messageError("open url error");
+            }
+        }
+    }
+
+    void Service::messageError(const std::string &msg) const
+    {
+        LOG_WARN("%s", msg.c_str());
+        // send messatge
     }
 
     sys::Message_t Service::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
@@ -375,7 +485,7 @@ namespace InternetService
         case MessageType::InternetOpenHTTPConnection: {
             LOG_DEBUG("MessageType::InternetOpenHTTPConnection.");
             //        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
-            retVal = dataChannel->cmd("AT+QHTTPCFG=1;\r", 1);
+            retVal = dataChannel->cmd("AT+QHTTPCFG=?;\r", 1);
             if (retVal) {
                 responseMsg = std::make_shared<InternetResponseMessage>(true);
 
@@ -471,7 +581,7 @@ namespace InternetService
             LOG_DEBUG("HTTP Read data.");
             //        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
 
-            auto retVal = dataChannel->cmd("AT+QHTTPREAD=30;\r", 10000);
+            auto retVal = dataChannel->cmd("AT+QHTTPREAD=30;\r", 30000);
             if (retVal) { // wait for 'COMMAND' from gsm module
                 LOG_DEBUG("HTTP: %s", retVal.response[0].c_str());
             }
