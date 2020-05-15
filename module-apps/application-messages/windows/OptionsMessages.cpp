@@ -79,7 +79,6 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         gui::newOptionLabel(gui::options::call(app, app::CallOperation::ExecuteCall, contact)),
         gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)),
 
-        // TODO
         gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_forvard_message")),
                                         [=](gui::Item &item) {
                                             std::unique_ptr<gui::SwitchData> data =
