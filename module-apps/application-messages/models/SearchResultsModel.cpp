@@ -4,7 +4,7 @@
 namespace gui::model
 {
 
-    SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel(app)
+    SearchResultsModel::SearchResultsModel(app::Application *app) : BaseThreadRecordModel(app)
     {}
 
     gui::ListItem *SearchResultsModel::getItem(int index)
