@@ -66,8 +66,8 @@ ContactsNameTableRow ContactsNameTable::GetByID(uint32_t id)
 
 std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery =
-        db->Query("SELECT * from contact_name ORDER BY name_alternative LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->Query(
+        "SELECT * from contact_name ORDER BY favourite DESC, name_alternative LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsNameTableRow>();

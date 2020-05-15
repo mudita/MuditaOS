@@ -21,7 +21,7 @@ struct ContactRecord
             : numberUser(n_user), numberE164(n_e164), numberType(n_type)
         {}
     };
-    std::vector<Number> numbers;
+    std::vector<Number> numbers = {};
 
     UTF8 address                   = "";
     UTF8 note                      = "";
@@ -30,10 +30,11 @@ struct ContactRecord
 
     UTF8 assetPath = "";
 
-    bool isOnWhitelist  = false;
-    bool isOnBlacklist  = false;
-    bool isOnFavourites = false;
-    UTF8 speeddial      = "";
+    bool isOnWhitelist    = false;
+    bool isOnBlacklist    = false;
+    bool isOnFavourites   = false;
+    bool isEmptyListLabel = false;
+    UTF8 speeddial        = "";
 
     enum class NameFormatType
     {

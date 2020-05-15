@@ -11,20 +11,23 @@
 
 #include <vector>
 
+#include "application-phonebook/data/PhonebookStyle.hpp"
 #include "Application.hpp"
-#include "DatabaseModel_old.hpp"
+#include "DatabaseModel.hpp"
 #include "Interface/ContactRecord.hpp"
-#include "ListItemProvider_old.hpp"
+#include "ListItemProvider.hpp"
 #include "NotesRecord.hpp"
+#
 /*
  *
  */
-class PhonebookModel : public gui::ListItemProvider_old, public app::DatabaseModel_old<ContactRecord>
+class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider
 {
     /**
      * Number of favourite records in the database.
      */
     uint32_t favouriteCount = 0;
+    void preProcessData(const uint32_t offset, const uint32_t limit);
 
   public:
     PhonebookModel(app::Application *app);
@@ -35,13 +38,12 @@ class PhonebookModel : public gui::ListItemProvider_old, public app::DatabaseMod
     bool updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
                        const uint32_t offset,
                        const uint32_t limit,
-                       uint32_t count,
-                       bool favourite);
+                       uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    gui::ListItem *getItem(
-        int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
+    gui::ListItem *getItem(int index) override;
+
     int getItemCount() const override
     {
         return recordsCount;
