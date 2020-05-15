@@ -1,4 +1,6 @@
 #include "SearchResults.hpp"
+#include <messages/DBThreadMessage.hpp>
+#include "service-db/messages/DBMessage.hpp"
 #include <i18/i18.hpp>
 
 namespace gui
@@ -15,18 +17,34 @@ namespace gui
         body->setBoundingBox(bodySize());
         addWidget(body);
 
-        provider = std::make_unique<model::SearchResultsModel>(application);
+        model = std::make_unique<model::SearchResultsModel>(application);
 
         list = new gui::ListView(body,
                                  body->area().x + style::window::list_offset_default,
                                  8,
                                  body->area().w - 2 * style::window::list_offset_default,
                                  body->area().h);
-        list->setProvider(provider.get());
+        list->setProvider(model.get());
         setFocusItem(list);
     }
 
     void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
+            model->clear();
+            model->requestRecordsCount();
+            list->clear();
+            list->setElementsCount(model->getItemCount());
+            setFocusItem(list);
+        }
+    }
+
+    bool SearchResults::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto msg = reinterpret_cast<DBThreadResponseMessage *>(msgl);
+        if (model->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
+            return true;
+
+        return false;
     }
 }; // namespace gui

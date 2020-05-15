@@ -15,11 +15,14 @@ namespace gui
     {
         gui::Item *body     = nullptr;
         gui::ListView *list = nullptr;
-        std::unique_ptr<gui::ListItemProvider> provider;
+        std::unique_ptr<model::SearchResultsModel> model;
 
       public:
         SearchResults(app::Application *app);
-        virtual void onBeforeShow(ShowMode mode, SwitchData *data);
+        /// needed to init populate db
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        /// needed to populate db responses
+        auto onDatabaseMessage(sys::Message *msgl) -> bool override;
     };
 
 } // namespace gui
