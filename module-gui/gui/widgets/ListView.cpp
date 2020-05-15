@@ -184,6 +184,7 @@ namespace gui
             }
 
             itemsOnPage++;
+            //            if(item->activeItem) itemsOnPage++;
 
             listSpanItem = new Span(Axis::Y, itemSpanSize);
             body->addWidget(listSpanItem);

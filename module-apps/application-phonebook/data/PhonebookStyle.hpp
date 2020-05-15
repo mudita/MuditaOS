@@ -40,12 +40,12 @@ namespace phonebookStyle
         namespace contactsList
         {
             constexpr uint32_t x = style::window::default_left_margin;
-            constexpr uint32_t y = style::header::height + 6;
-            constexpr uint32_t w =
-                style::window_width - style::window::default_left_margin - style::window::default_right_margin;
-            constexpr uint32_t h             = style::window_height - y - 50;
+            constexpr uint32_t y = style::header::height + style::listview::top_margin_big;
+            constexpr uint32_t w = style::listview::body_width_with_scroll;
+            constexpr uint32_t h = style::window_height - y - style::footer::height;
+
             constexpr uint32_t maxElements   = 7;
-            constexpr uint32_t pageSize      = 7;
+            constexpr uint32_t pageSize      = 8;
             constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
             constexpr uint32_t penWidth      = 0;
         } // namespace contactsList
