@@ -21,6 +21,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/widgets/SearchResultsItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/BaseThreadItem.cpp"
 
+        "${CMAKE_CURRENT_LIST_DIR}/models/BaseThreadRecordModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/ThreadModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/SearchResultsModel.cpp"
         
