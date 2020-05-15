@@ -14,8 +14,8 @@ namespace gui
 
     PhonebookItem::PhonebookItem()
     {
-        setMinimumSize(436, style::window::label::big_h);
-        setMaximumSize(436, 200);
+        setMinimumSize(style::window::default_body_width, style::window::label::big_h);
+        setMaximumSize(style::window::default_body_width, style::window::label::big_h);
 
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
@@ -54,6 +54,13 @@ namespace gui
         this->contact = contact;
         /* alternativeName is used as Surname or Second name */
         value->setText(contact->getFormattedName(ContactRecord::NameFormatType::List));
+
+        if (contact.get()->isOnFavourites) {
+            value->setFont(style::window::font::bigbold);
+        }
+        else {
+            value->setFont(style::window::font::big);
+        }
     }
 
     void PhonebookItem::setValue(UTF8 text)
