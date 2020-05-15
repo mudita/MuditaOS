@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseThreadItem.hpp"
-#include "ThreadModel.hpp"
+#include "../models/ThreadModel.hpp"
 
 namespace gui
 {

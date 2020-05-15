@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../widgets/Icon.hpp"
-#include "../widgets/ThreadModel.hpp"
+#include "../models/ThreadModel.hpp"
 
 #include <AppWindow.hpp>
 #include <Image.hpp>

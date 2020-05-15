@@ -14,7 +14,6 @@ target_sources( ${PROJECT_NAME}
 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationMessages.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/SMSTemplateModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/SMSTemplateItem.cpp"
@@ -22,6 +21,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/widgets/SearchResultsItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/BaseThreadItem.cpp"
 
+        "${CMAKE_CURRENT_LIST_DIR}/models/ThreadModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/SearchResultsModel.cpp"
         
         "${CMAKE_CURRENT_LIST_DIR}/windows/MessagesMainWindow.cpp"
@@ -36,7 +36,7 @@ target_sources( ${PROJECT_NAME}
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationMessages.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/MessagesStyle.hpp"
-         "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.hpp"
+         "${CMAKE_CURRENT_LIST_DIR}/models/ThreadModel.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.hpp"
 
 )
