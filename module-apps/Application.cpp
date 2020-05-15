@@ -211,16 +211,21 @@ namespace app
         return 0;
     }
 
-    // TODO: this one seems to be unused
-    int Application::switchBackWindow(const std::string &windowName,
-                                      uint32_t cmd,
-                                      std::unique_ptr<gui::SwitchData> data)
+    bool Application::returnToPreviousWindow()
     {
-        auto msg = std::make_shared<AppMessage>(MessageType::AppSwitchWindowBack);
-        sys::Bus::SendUnicast(msg, this->GetName(), this);
-
-        return 0;
+        auto prevWindow = getPrevWindow();
+        if (prevWindow == gui::name::window::no_window) {
+            LOG_INFO("Back to previous application");
+            cleanPrevWindw();
+            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+        }
+        else {
+            LOG_INFO("Back to previous window %s", prevWindow.c_str());
+            switchWindow(prevWindow, gui::ShowMode::GUI_SHOW_RETURN);
+        }
+        return true;
     }
+
     int Application::refreshWindow(gui::RefreshModes mode)
     {
         auto msg = std::make_shared<AppRefreshMessage>(mode);
