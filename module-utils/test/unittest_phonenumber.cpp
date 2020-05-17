@@ -44,6 +44,21 @@ TEST_CASE("PhoneNumber - parsing")
         PhoneNumber number3("");
         REQUIRE_FALSE(number3.isValid());
     }
+
+    SECTION("Wrapper")
+    {
+        const std::string dummy = "12345";
+
+        auto view         = PhoneNumber::parse(pl_e164);
+        auto invalid_view = PhoneNumber::parse(dummy);
+
+        REQUIRE(view.isValid());
+        REQUIRE(view.getE164() == pl_e164);
+
+        REQUIRE_FALSE(invalid_view.isValid());
+        REQUIRE(invalid_view.getE164() == "");
+        REQUIRE(invalid_view.getEntered() == dummy);
+    }
 }
 
 TEST_CASE("PhoneNumber - formatting")
@@ -84,6 +99,23 @@ TEST_CASE("PhoneNumber - views")
         REQUIRE(view.getEntered() == pl_entered);
         REQUIRE(view.getE164() == pl_e164);
         REQUIRE(view.getFormatted() == pl_formatted);
+    }
+
+    SECTION("Safe get non empty number")
+    {
+        const std::string dummyNumber = "12345";
+
+        auto invalid_view = PhoneNumber::parse(dummyNumber);
+        auto valid_view   = PhoneNumber::parse(pl_entered);
+
+        REQUIRE_FALSE(invalid_view.isValid());
+        REQUIRE(valid_view.isValid());
+
+        REQUIRE(invalid_view.getNonEmpty() != "");
+        REQUIRE(valid_view.getNonEmpty() != "");
+
+        REQUIRE(invalid_view.getNonEmpty() == dummyNumber);
+        REQUIRE(valid_view.getNonEmpty() == pl_e164);
     }
 }
 

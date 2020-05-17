@@ -134,9 +134,9 @@ void PhoneNumber::View::clear()
     this->operator=(View());
 }
 
-PhoneNumber::View PhoneNumber::viewFromE164(const std::string &e164)
+PhoneNumber::View PhoneNumber::parse(const std::string &inputNumber)
 {
-    PhoneNumber number(e164, country::Id::UNKNOWN);
+    PhoneNumber number(inputNumber);
     return number.makeView();
 }
 
@@ -170,4 +170,9 @@ PhoneNumber::View::View(const std::string &enteredNumber,
 bool PhoneNumber::View::operator==(const View &rhs) const
 {
     return valid == rhs.valid && e164 == rhs.e164;
+}
+
+const std::string &PhoneNumber::View::getNonEmpty() const
+{
+    return valid ? e164 : entered;
 }
