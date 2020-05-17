@@ -80,6 +80,13 @@ namespace utils
             void clear();
 
             /**
+             * @brief A convenience method to get a non empty number.
+             *
+             * @return E164 number if it has one, entered number otherwise.
+             */
+            const std::string &getNonEmpty() const;
+
+            /**
              * @brief Getter for the entered number - number parsed from.
              *
              * @return const std::string& - reference to entered number
@@ -251,10 +258,10 @@ namespace utils
         /**
          * @brief Create instance of View directly from the E164 format.
          *
-         * @param e164 - number in the E164 format to create View from
+         * @param inputNumber - a string represenation of a number to create View from
          * @return View - phone number representation
          */
-        static View viewFromE164(const std::string &e164);
+        static View parse(const std::string &inputNumber);
 
       private:
         const country::Id countryCode;
