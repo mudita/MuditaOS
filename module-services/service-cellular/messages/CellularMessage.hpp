@@ -45,7 +45,7 @@ class CellularCallMessage : public CellularMessage
         : CellularMessage(MessageType::CellularCall), type(type), number(number.makeView())
     {}
     CellularCallMessage(Type type, const std::string &e164number)
-        : CellularMessage(MessageType::CellularCall), type(type), number(utils::PhoneNumber::viewFromE164(e164number))
+        : CellularMessage(MessageType::CellularCall), type(type), number(utils::PhoneNumber::parse(e164number))
     {}
 
     Type type;

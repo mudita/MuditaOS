@@ -46,7 +46,7 @@ namespace app
 
     bool call(Application *app, const std::string &e164number)
     {
-        return call(app, utils::PhoneNumber::viewFromE164(e164number));
+        return call(app, utils::PhoneNumber::parse(e164number));
     }
 
     bool prepare_call(Application *app, const std::string &number)
