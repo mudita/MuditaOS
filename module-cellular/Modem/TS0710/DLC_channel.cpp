@@ -173,9 +173,6 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t 
             if (tokens.size() >= rxCount) {
                 break;
             }
-            if (tokens.size() < rxCount) {
-                continue;
-            }
         }
     }
 

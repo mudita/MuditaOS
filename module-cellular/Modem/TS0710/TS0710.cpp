@@ -243,7 +243,7 @@ TS0710::ConfState TS0710::ConfProcedure()
     bool timed_out                = false;
     constexpr uint32_t msInSecond = 1000;
     constexpr uint32_t timeout    = 30;
-    auto timeout_ticks            = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(timeout * msInSecond);
+    const auto timeout_ticks      = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(timeout * msInSecond);
     while (!timed_out) {
         if (parser->cmd(at::AT::QSCLK_ON)) {
             break;

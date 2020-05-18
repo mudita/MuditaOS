@@ -746,7 +746,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         }
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, service::name::evt_manager, this);
-        //        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
     // Incoming call

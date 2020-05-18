@@ -27,7 +27,7 @@ namespace bsp
 
     };
 
-    enum Board{
+    enum class Board{
     	T3,
     	T4,
     	Linux,
