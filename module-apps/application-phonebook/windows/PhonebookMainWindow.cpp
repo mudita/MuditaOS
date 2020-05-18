@@ -5,7 +5,7 @@
 #include "application-phonebook/widgets/PhonebookItem.hpp"
 
 #include <i18/i18.hpp>
-#include <service-db/messages/DBMessage.hpp>
+#include <service-db/messages/DBContactMessage.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 
 namespace gui
