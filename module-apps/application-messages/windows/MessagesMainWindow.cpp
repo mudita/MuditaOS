@@ -10,7 +10,7 @@
 #include "application-messages/windows/SearchStart.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBMessage.hpp>
+#include <service-db/messages/DBThreadMessage.hpp>
 #include <i18/i18.hpp>
 #include <Margins.hpp>
 #include <service-db/api/DBServiceAPI.hpp>

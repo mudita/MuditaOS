@@ -5,7 +5,7 @@
 #include "application-messages/MessagesStyle.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBMessage.hpp>
+#include <service-db/messages/DBSMSTemplateMessage.hpp>
 #include <i18/i18.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>

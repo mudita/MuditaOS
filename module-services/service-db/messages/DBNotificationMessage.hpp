@@ -1,12 +1,4 @@
-/*
- * DBNotificationMessage.hpp
- *
- *  Created on: 18 lip 2019
- *      Author: kuba
- */
-
-#ifndef MODULE_SERVICES_SERVICE_DB_MESSAGES_DBNOTIFICATIONMESSAGE_HPP_
-#define MODULE_SERVICES_SERVICE_DB_MESSAGES_DBNOTIFICATIONMESSAGE_HPP_
+#pragma once
 
 #include "DBMessage.hpp"
 #include "MessageType.hpp"
@@ -31,12 +23,11 @@ namespace DB
         SmsDB
     };
 } // namespace DB
+
 class DBNotificationMessage : public sys::DataMessage
 {
   public:
-    DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType)
-        : sys::DataMessage(messageType), notificationType(notificationType), baseType(baseType){};
-    ~DBNotificationMessage() override = default;
+    DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType);
 
     DB::NotificationType notificationType;
     DB::BaseType baseType;
@@ -45,10 +36,7 @@ class DBNotificationMessage : public sys::DataMessage
 class DBNotificationResponseMessage : public sys::ResponseMessage
 {
   public:
-    DBNotificationResponseMessage(uint32_t retCode) : sys::ResponseMessage(), retCode(retCode){};
-    virtual ~DBNotificationResponseMessage(){};
+    DBNotificationResponseMessage(uint32_t retCode);
 
     uint32_t retCode;
 };
-
-#endif /* MODULE_SERVICES_SERVICE_DB_MESSAGES_DBNOTIFICATIONMESSAGE_HPP_ */
