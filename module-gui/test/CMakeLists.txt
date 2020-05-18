@@ -5,6 +5,7 @@ add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
     test-context.cpp
     test-gui-callbacks.cpp
     test-gui-resizes.cpp
+    mock/TestWindow.cpp
     )
 
 target_include_directories(${PROJECT_NAME}

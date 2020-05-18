@@ -6,7 +6,9 @@
 
 namespace gui
 {
+    // fw declarations
     class OptionWindow;
+    class Text;
     namespace name
     {
         namespace window
@@ -51,7 +53,7 @@ namespace app
         /// show dialog with big search icon and text which was used for query
         bool searchEmpty(const std::string &query = "");
         bool sendSms(const UTF8 &number, const UTF8 &body);
-        bool newMessageOptions(const std::string &requestingWindow);
+        bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;

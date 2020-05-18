@@ -80,6 +80,13 @@ namespace utils
             void clear();
 
             /**
+             * @brief A convenience method to get a non empty number.
+             *
+             * @return E164 number if it has one, entered number otherwise.
+             */
+            const std::string &getNonEmpty() const;
+
+            /**
              * @brief Getter for the entered number - number parsed from.
              *
              * @return const std::string& - reference to entered number
@@ -114,6 +121,15 @@ namespace utils
              * failed to parse number using provided country identification.
              */
             bool isValid() const;
+
+            /**
+             * @brief Compares two View objects
+             *
+             * @param rhs - instance of a VIew to compare to.
+             * @return true if objects are equal.
+             * @return false if objects are different (not equal).
+             */
+            bool operator==(const View &rhs) const;
 
           private:
             View(const std::string &enteredNumber,
@@ -202,7 +218,7 @@ namespace utils
          * @return true if objects are equal.
          * @return false if objects are different (not equal).
          */
-        bool operator==(const PhoneNumber &right);
+        bool operator==(const PhoneNumber &right) const;
 
         /**
          * @brief Compares PhoneNumber with number represented by View.
@@ -211,7 +227,7 @@ namespace utils
          * @return true if objects are equal.
          * @return false if objects are different (not equal).
          */
-        bool operator==(const View &view);
+        bool operator==(const View &view) const;
 
         /**
          * @brief Convenience wrapper for E164 number formatting.
@@ -242,13 +258,12 @@ namespace utils
         /**
          * @brief Create instance of View directly from the E164 format.
          *
-         * @param e164 - number in the E164 format to create View from
+         * @param inputNumber - a string represenation of a number to create View from
          * @return View - phone number representation
          */
-        static View viewFromE164(const std::string &e164);
+        static View parse(const std::string &inputNumber);
 
       private:
-        bool valid;
         const country::Id countryCode;
         phn_util &util;
         gnumber pbNumber;

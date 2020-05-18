@@ -58,9 +58,9 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
     auto contactRec =
-        contactInterface.GetByNumber(rec.phoneNumber.getE164(), ContactRecordInterface::CreateTempContact::True);
+        contactInterface.GetByNumber(rec.phoneNumber.getNonEmpty(), ContactRecordInterface::CreateTempContact::True);
     if (contactRec->size() == 0) {
-        LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getE164().c_str());
+        LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
         return false;
     }
     auto localRec      = rec;

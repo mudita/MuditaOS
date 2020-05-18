@@ -7,6 +7,13 @@
 // it's not meant to serve as polling interface - rather to serve data
 
 #include <cstddef>
+
+namespace cpp_freertos
+{
+    // fw decl
+    class MutexStandard;
+} // namespace cpp_freertos
+
 namespace Store
 {
     struct Battery
@@ -46,7 +53,12 @@ namespace Store
         GSM() = default;
         SignalStrength signalStrength;
 
+        static cpp_freertos::MutexStandard mutex;
+
       public:
+        GSM(const GSM &) = delete;
+        GSM &operator=(const GSM &) = delete;
+
         enum class Tray
         {
             OUT,

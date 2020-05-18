@@ -5,7 +5,7 @@
 #include "application-messages/MessagesStyle.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBMessage.hpp>
+#include <service-db/messages/DBSMSTemplateMessage.hpp>
 #include <i18/i18.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
@@ -66,7 +66,7 @@ namespace gui
         auto requestingWindow  = switchData->requestingWindow;
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
             LOG_DEBUG("SMS template id = %" PRIu32 "chosen", templ->ID);
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(templ->text);
             application->switchWindow(requestingWindow, std::move(data));
             return true;
         };

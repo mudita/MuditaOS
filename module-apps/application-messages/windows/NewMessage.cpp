@@ -34,10 +34,10 @@ namespace gui
             recipient->setText(pdata->result->getFormattedName());
             contact = pdata->result;
         }
-        if (auto pdata = dynamic_cast<SMSTemplateData *>(data); pdata != nullptr) {
-            auto templText = pdata->templ->text;
-            LOG_INFO("received sms templates data \"%s\"", templText.c_str());
-            message->setText(message->getText() + templText);
+        if (auto pdata = dynamic_cast<SMSTextData *>(data); pdata != nullptr) {
+            auto text = pdata->text;
+            LOG_INFO("received sms templates data \"%s\"", text.c_str());
+            message->setText(message->getText() + text);
         }
         if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
             LOG_INFO("recieved sms send request");
@@ -181,7 +181,7 @@ namespace gui
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                return app->newMessageOptions(getName());
+                return app->newMessageOptions(getName(), message);
             }
             return false;
         };

@@ -18,11 +18,12 @@
 
 #include <module-gui/gui/core/ImageManager.hpp>
 #include <module-gui/gui/core/BoundingBox.hpp>
-#include <module-gui/gui/widgets/Window.hpp>
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
 #include <vfs.hpp>
+
+#include "mock/TestWindow.hpp"
 
 using namespace std;
 
@@ -57,25 +58,6 @@ TEST_CASE("Are fonts loaded")
     // check if there is at least default font
     REQUIRE(fontmanager.getFont(0) != nullptr);
 }
-
-namespace gui
-{
-    class TestWindow : public Window
-    {
-      public:
-        TestWindow(const std::string &name) : Window(name)
-        {}
-
-        void buildInterface() override
-        {}
-
-        void destroyInterface() override
-        {}
-
-        void rebuild() override
-        {}
-    };
-} // namespace gui
 
 TEST_CASE("Draw window with labels")
 {

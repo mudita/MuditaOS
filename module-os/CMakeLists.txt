@@ -72,6 +72,10 @@ target_compile_definitions(${PROJECT_NAME}
         CPP_FREERTOS_CONDITION_VARIABLES
 )
 
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_FREERTOS)
+endif ()
+
 target_include_directories(${PROJECT_NAME}
 
         PUBLIC

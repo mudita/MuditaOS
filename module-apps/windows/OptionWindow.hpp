@@ -19,8 +19,8 @@ namespace gui
     {
         const UTF8 text                               = "";
         std::function<bool(Item &)> activatedCallback = nullptr;
-        Arrow arrow                                   = Arrow::Enabled;
-        Option(const UTF8 &text, std::function<bool(Item &)> cb, Arrow arrow)
+        Arrow arrow                                   = Arrow::Disabled;
+        Option(const UTF8 &text, std::function<bool(Item &)> cb, Arrow arrow = Arrow::Disabled)
             : text(text), activatedCallback(cb), arrow(arrow)
         {
             LOG_INFO("text: %s", text.c_str());
