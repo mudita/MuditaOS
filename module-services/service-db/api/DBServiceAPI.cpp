@@ -1,24 +1,14 @@
-
-/*
- * @file DBServiceAPI.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 06.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "DBServiceAPI.hpp"
 
-#include "../messages/DBThreadMessage.hpp"
-#include "../messages/DBSettingsMessage.hpp"
-#include "../messages/DBSMSMessage.hpp"
-#include "../messages/DBSMSTemplateMessage.hpp"
-#include "../messages/DBContactMessage.hpp"
-#include "../messages/DBAlarmMessage.hpp"
-#include "../messages/DBNotesMessage.hpp"
-#include "../messages/DBCalllogMessage.hpp"
-#include "../messages/DBCountryCodeMessage.hpp"
+#include <messages/DBThreadMessage.hpp>
+#include <messages/DBSettingsMessage.hpp>
+#include <messages/DBSMSMessage.hpp>
+#include <messages/DBSMSTemplateMessage.hpp>
+#include <messages/DBContactMessage.hpp>
+#include <messages/DBAlarmMessage.hpp>
+#include <messages/DBNotesMessage.hpp>
+#include <messages/DBCalllogMessage.hpp>
+#include <messages/DBCountryCodeMessage.hpp>
 
 #include "../ServiceDB.hpp"
 
