@@ -9,6 +9,8 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Bus.hpp"
+#include "../includes/databases.hpp"
+#include <Common/Query.hpp>
 
 class DBServiceAPI
 {
@@ -59,6 +61,7 @@ class DBServiceAPI
     static bool SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord &rec);
     static uint32_t SMSTemplateGetCount(sys::Service *serv);
     static bool SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
+    static bool GetByQuery(sys::Service *serv, db::DB database, std::unique_ptr<db::Query> query);
 
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.

@@ -32,4 +32,13 @@ namespace gui::model
         return ret;
     }
 
+    //    void BaseThreadRecordModel::requestRecordsCount(void)
+    //    {
+    //        // was used BaseThreadRecordModel::requestRecordsCount(void)
+    //        // now I want to use more general API
+    //        // virtual std::unique_ptr<std::vector<T>> GetByQuerry(std::unique_ptr<db::Querry> querry)
+    //        DBServiceAPI::GetByQuerry(application, db::DB::SMS, new QuerrySMS_Search({"what_to_serach", start_pos,
+    //        number_of_elements})); recordsCount = result_from_QuerrySMS_Search();
+    //    }
+
 }; // namespace gui::model
