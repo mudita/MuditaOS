@@ -498,12 +498,12 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     case MessageType::DBQuery: {
         auto msg = dynamic_cast<db::QueryMessage *>(msgl);
         assert(msg);
-        switch (msg->getDatabase()) {
-        case db::DB::SMS:
+        switch (msg->getInterface()) {
+        case db::interface::SMS:
             LOG_INFO("TODO query database!");
             break;
         default:
-            LOG_DEBUG("Database: %s doesn't implement Query interface", c_str(msg->getDatabase()));
+            LOG_DEBUG("Database: %s doesn't implement Query interface", c_str(msg->getInterface()));
             break;
         }
     } break;

@@ -2,12 +2,12 @@
 
 namespace db
 {
-    QueryMessage::QueryMessage(db::DB database, std::unique_ptr<db::Query> query)
-        : DBMessage(MessageType::DBQuery), query(std::move(query)), database(database)
+    QueryMessage::QueryMessage(db::interface interface, std::unique_ptr<db::Query> query)
+        : DBMessage(MessageType::DBQuery), query(std::move(query)), interface(interface)
     {}
 
-    DB QueryMessage::getDatabase() const
+    interface QueryMessage::getInterface() const
     {
-        return database;
+        return interface;
     }
 } // namespace db

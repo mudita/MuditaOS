@@ -2,7 +2,7 @@
 
 namespace db
 {
-    enum DB
+    enum interface
     {
         Settings,
         SMS,
@@ -14,22 +14,22 @@ namespace db
     };
 }
 
-constexpr const char *c_str(enum db::DB db)
+constexpr const char *c_str(enum db::interface db)
 {
     switch (db) {
-    case db::DB::Settings:
+    case db::interface::Settings:
         return "Settings";
-    case db::DB::SMS:
+    case db::interface::SMS:
         return "SMS";
-    case db::DB::Contact:
+    case db::interface::Contact:
         return "Contact";
-    case db::DB::Alarms:
+    case db::interface::Alarms:
         return "Alarms";
-    case db::DB::Notes:
+    case db::interface::Notes:
         return "Notes";
-    case db::DB::Calllog:
+    case db::interface::Calllog:
         return "Callog";
-    case db::DB::CountryCodes:
+    case db::interface::CountryCodes:
         return "CountryCodes";
     };
     return "";

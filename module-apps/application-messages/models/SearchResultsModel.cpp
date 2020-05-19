@@ -41,7 +41,7 @@ namespace gui::model
 
         // consider && instead move instead
         DBServiceAPI::GetByQuery(
-            getApplication(), db::DB::SMS, std::make_unique<db::query::SMSSearch>("what_to_serach", 0, 10));
+            getApplication(), db::interface::SMS, std::make_unique<db::query::SMSSearch>("what_to_serach", 0, 10));
         // recordsCount = result_from_QuerySMS_Search()->max_depth;
     }
 
