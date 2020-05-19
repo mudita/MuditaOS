@@ -3,6 +3,7 @@
 #include "../widgets/SearchResultsItem.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include <module-db/queries/sms/QuerySMSSearch.hpp>
 
 namespace gui::model
 {
@@ -32,13 +33,16 @@ namespace gui::model
         return ret;
     }
 
-    //    void BaseThreadRecordModel::requestRecordsCount(void)
-    //    {
-    //        // was used BaseThreadRecordModel::requestRecordsCount(void)
-    //        // now I want to use more general API
-    //        // virtual std::unique_ptr<std::vector<T>> GetByQuerry(std::unique_ptr<db::Querry> querry)
-    //        DBServiceAPI::GetByQuerry(application, db::DB::SMS, new QuerrySMS_Search({"what_to_serach", start_pos,
-    //        number_of_elements})); recordsCount = result_from_QuerrySMS_Search();
-    //    }
+    void SearchResultsModel::requestRecordsCount()
+    {
+        // was used BaseThreadRecordModel::requestRecordsCount(void)
+        // now I want to use more general API
+        // virtual std::unique_ptr<std::vector<T>> GetByQuerry(std::unique_ptr<db::Query> querry)
+
+        // consider && instead move instead
+        DBServiceAPI::GetByQuery(
+            getApplication(), db::DB::SMS, std::make_unique<db::query::SMSSearch>("what_to_serach", 0, 10));
+        // recordsCount = result_from_QuerySMS_Search()->max_depth;
+    }
 
 }; // namespace gui::model

@@ -4,6 +4,7 @@ namespace db
 {
     class Query
     {
-        virtual ~Query();
+      public:
+        virtual ~Query() = default;
     };
 } // namespace db

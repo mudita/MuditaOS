@@ -48,6 +48,5 @@ class ServiceDB : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-    static const char *serviceName;
 };
 

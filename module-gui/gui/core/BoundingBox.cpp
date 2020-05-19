@@ -1,4 +1,5 @@
 #include "BoundingBox.hpp"
+#include <limits>
 #include <sstream>
 #include <limits>
 

@@ -28,10 +28,10 @@
 
 #include <cassert>
 #include <time/ScopedTime.hpp>
+#include "includes/DBServiceName.hpp"
+#include "messages/QueryMessage.hpp"
 
-const char *ServiceDB::serviceName = "ServiceDB";
-
-ServiceDB::ServiceDB() : sys::Service(serviceName, "", 1024 * 24, sys::ServicePriority::Idle)
+ServiceDB::ServiceDB() : sys::Service(service::name::db, "", 1024 * 24, sys::ServicePriority::Idle)
 {
     LOG_INFO("[ServiceDB] Initializing");
 }
@@ -495,8 +495,24 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         responseMsg               = std::make_shared<DBCountryCodeResponseMessage>(ret);
     } break;
 
+    case MessageType::DBQuery: {
+        auto msg = dynamic_cast<db::QueryMessage *>(msgl);
+        assert(msg);
+        switch (msg->getDatabase()) {
+        case db::DB::SMS:
+            LOG_INFO("TODO query database!");
+            break;
+        default:
+            LOG_DEBUG("Database: %s doesn't implement Query interface", c_str(msg->getDatabase()));
+            break;
+        }
+    } break;
+
     default:
-        // ignore this message
+        break;
+    }
+
+    if (responseMsg == nullptr) {
         return std::make_shared<sys::ResponseMessage>();
     }
 

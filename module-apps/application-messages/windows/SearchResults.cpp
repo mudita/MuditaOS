@@ -41,10 +41,11 @@ namespace gui
 
     bool SearchResults::onDatabaseMessage(sys::Message *msgl)
     {
-        auto msg = reinterpret_cast<DBThreadResponseMessage *>(msgl);
-        if (model->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
-            return true;
-
+        // TODO
+        //        auto msg = reinterpret_cast<DBThreadResponseMessage *>(msgl);
+        //        if (model->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
+        //            return true;
+        //
         return false;
     }
 }; // namespace gui

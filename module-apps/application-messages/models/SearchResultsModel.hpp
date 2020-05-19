@@ -10,5 +10,6 @@ namespace gui::model
       public:
         SearchResultsModel(app::Application *app);
         gui::ListItem *getItem(int index) override;
+        void requestRecordsCount() override;
     };
 }; // namespace gui::model
