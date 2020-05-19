@@ -250,4 +250,3 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
 }
-
