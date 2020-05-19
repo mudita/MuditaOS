@@ -46,7 +46,7 @@ namespace gui
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
         virtual void resizeItems();
-        bool reverse_order = false;
+        bool reverseOrder = false;
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items
         std::list<Item *>::iterator nextNavigationItem(std::list<Item *>::iterator from);
 
@@ -71,11 +71,7 @@ namespace gui
         void setVisible(bool value) override;
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
-        void setReverseOrder(bool reverse_order)
-        {
-            this->reverse_order = reverse_order;
-            resizeItems();
-        }
+        void setReverseOrder(bool value);
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
