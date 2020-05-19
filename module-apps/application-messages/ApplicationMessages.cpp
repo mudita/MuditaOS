@@ -55,6 +55,7 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBThreadGetLimitOffset:
+            case MessageType::DBQuery:
             case MessageType::DBSMSTemplateGetLimitOffset: {
                 if (getCurrentWindow()->onDatabaseMessage(resp))
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
