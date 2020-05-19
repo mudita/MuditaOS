@@ -52,6 +52,7 @@ namespace gui
                 model->updateRecords(std::move(records), 0, 3, count);
                 model->setRecordsCount(response->getMax());
             }
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         return false;
