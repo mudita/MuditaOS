@@ -23,7 +23,6 @@ class EventManager : public sys::Service
   private:
     void HandleAlarmTrigger(sys::DataMessage *msgl);
     void GetNextAlarmTimestamp(time_t timestamp);
-    std::string GetBoardName(bsp::Board board);
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;

@@ -30,6 +30,7 @@
 
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
+#include "bsp/common.hpp"
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -157,11 +158,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
     else if (msgl->messageType == MessageType::EVMGetBoard) {
+        using namespace bsp;
 
         auto msg   = std::make_shared<sevm::EVMBoardResponseMessage>(true);
         auto board = bsp::magnetometer::GetBoard();
         msg->board = board;
-        LOG_INFO("Board discovered: %s", GetBoardName(board).c_str());
+        LOG_INFO("Board discovered: %s", c_str(board));
 
         return msg;
     }
@@ -249,24 +251,3 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
 }
 
-std::string EventManager::GetBoardName(bsp::Board board)
-{
-    using bsp::Board;
-    std::string ret;
-    switch (board) {
-    case Board::T3:
-        ret = "T3";
-        break;
-    case Board::T4:
-        ret = "T4";
-        break;
-    case Board::Linux:
-        ret = "Linux";
-        break;
-    case Board::none:
-    default:
-        ret = "none";
-        break;
-    }
-    return ret;
-}
