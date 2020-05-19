@@ -13,16 +13,19 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
     return {
         gui::options::call(app, app::CallOperation::ExecuteCall, contact),
         gui::options::contact(app, app::ContactOperation::Details, contact),
-        {utils::localize.get("sms_delete_conversation"),
-         [=](gui::Item &item) {
-             LOG_INFO("Removing sms thread!");
-             return app->removeSMS_thread(record);
-         },
-         gui::Arrow::Disabled},
+        gui::Option{utils::localize.get("sms_delete_conversation"),
+                    [=](gui::Item &item) {
+                        LOG_INFO("Removing sms thread!");
+                        return app->removeSMS_thread(record);
+                    }},
 
         // TODO
         // last sms, all sms? what author had in mind?
-        // {utils::localize.get("sms_mark_read_unread"), [=](gui::Item &item) { return true; }},
+        gui::Option{"<STUB>" + utils::localize.get("sms_mark_unread"),
+                    [=](gui::Item &item) {
+                        LOG_ERROR("TODO: need implementation");
+                        return true;
+                    }},
 
         // TODO
         // shouldn't this be in show contact details actually? it would be much easier too
