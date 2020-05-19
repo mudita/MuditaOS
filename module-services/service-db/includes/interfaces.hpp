@@ -6,6 +6,8 @@ namespace db
     {
         Settings,
         SMS,
+        SMSThread,
+        SMSTemplate,
         Contact,
         Alarms,
         Notes,
@@ -21,6 +23,10 @@ constexpr const char *c_str(enum db::interface db)
         return "Settings";
     case db::interface::SMS:
         return "SMS";
+    case db::interface::SMSThread:
+        return "SMSThread";
+    case db::interface::SMSTemplate:
+        return "SMSTemplate";
     case db::interface::Contact:
         return "Contact";
     case db::interface::Alarms:

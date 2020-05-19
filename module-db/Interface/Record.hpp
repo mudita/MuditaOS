@@ -14,11 +14,18 @@
 
 namespace db
 {
-    class Querry
-    {};
+
+    class Query;
+    class QueryResult;
+
+    class Interface
+    {
+      public:
+        virtual std::unique_ptr<db::QueryResult> getByQuery(db::Query *query);
+    };
 }; // namespace db
 
-template <typename T, typename F> class RecordInterface
+template <typename T, typename F> class RecordInterface : public db::Interface
 {
   public:
     RecordInterface(){};
@@ -64,12 +71,6 @@ template <typename T, typename F> class RecordInterface
                                                                   uint32_t limit,
                                                                   F field,
                                                                   const char *str)
-    {
-        return std::make_unique<std::vector<T>>();
-    }
-
-    // abstract interface to avoid Get(...) clunkiness...
-    virtual std::unique_ptr<std::vector<T>> GetByQuerry(std::unique_ptr<db::Querry> querry)
     {
         return std::make_unique<std::vector<T>>();
     }

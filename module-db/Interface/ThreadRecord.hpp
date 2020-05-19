@@ -15,6 +15,7 @@
 #include "../Databases/SmsDB.hpp"
 #include "../Databases/ContactsDB.hpp"
 #include "../Common/Common.hpp"
+#include "../queries/sms/QuerySMSSearch.hpp"
 
 struct ThreadRecord
 {
@@ -65,7 +66,14 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
                                                                      ThreadRecordField field,
                                                                      const char *str) override final;
 
+    std::unique_ptr<db::QueryResult> getByQuery(db::Query *query) override;
+
   private:
     SmsDB *smsDB;
     ContactsDB *contactsDB;
+
+    /// for now implementation between Interface <-> Database
+    /// it would only make sense to pass Query from Inteface to multiple databases to get all data we are interested in
+    /// or better split it to smaller entities... this could be done with any db high level interface -  left as it is
+    std::unique_ptr<db::query::SMSSearchResult> getByQueryImpl(db::query::SMSSearch *query);
 };

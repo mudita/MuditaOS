@@ -50,6 +50,31 @@ ServiceDB::~ServiceDB()
     LOG_INFO("[ServiceDB] Cleaning resources");
 }
 
+db::Interface *ServiceDB::getInterface(db::interface interface)
+{
+    switch (interface) {
+    case db::interface::Settings:
+        return settingsRecordInterface.get();
+    case db::interface::SMS:
+        return smsRecordInterface.get();
+    case db::interface::SMSThread:
+        return threadRecordInterface.get();
+    case db::interface::SMSTemplate:
+        return smsTemplateRecordInterface.get();
+    case db::interface::Contact:
+        return contactRecordInterface.get();
+    case db::interface::Alarms:
+        return alarmsRecordInterface.get();
+    case db::interface::Notes:
+        return notesRecordInterface.get();
+    case db::interface::Calllog:
+        return calllogRecordInterface.get();
+    case db::interface::CountryCodes:
+        return countryCodeRecordInterface.get();
+    }
+    return nullptr;
+}
+
 // Invoked upon receiving data message
 sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
@@ -498,14 +523,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     case MessageType::DBQuery: {
         auto msg = dynamic_cast<db::QueryMessage *>(msgl);
         assert(msg);
-        switch (msg->getInterface()) {
-        case db::interface::SMS:
-            LOG_INFO("TODO query database!");
-            break;
-        default:
-            LOG_DEBUG("Database: %s doesn't implement Query interface", c_str(msg->getInterface()));
-            break;
-        }
+        db::Interface *interface = getInterface(msg->getInterface());
+        assert(interface != nullptr);
+        auto result = interface->getByQuery(msg->getQuery());
+        responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
     } break;
 
     default:

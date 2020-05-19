@@ -9,6 +9,7 @@
  */
 
 #include "ThreadsTable.hpp"
+#include "log/log.hpp"
 
 ThreadsTable::ThreadsTable(Database *db) : Table(db)
 {}
@@ -180,4 +181,34 @@ uint32_t ThreadsTable::GetCountByFieldID(const char *field, uint32_t id)
     }
 
     return uint32_t{(*queryRet)[0].GetUInt32()};
+}
+
+std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(std::string text,
+                                                                              uint32_t offset,
+                                                                              uint32_t limit)
+{
+    auto ret = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
+    //  TODO here prepare proper queries and assignments in glue code
+    //    auto count_ret = db->Query("SELECT COUNT (*) from sms where sms.body=%s", text.c_str()); // TODO not sanitized
+    //    input !!!!!!! ret.first =  count_ret == nullptr ? 0 : (*ret)[0].GetUInt32(); if (ret.first != 0) {
+    //        auto retQuery = db->Query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
+    //        do {
+    //            ret.second.push_back(SMSTableRow{
+    //                (*retQuery)[0].GetUInt32(),                       // ID
+    //                (*retQuery)[1].GetUInt32(),                       // threadID
+    //                (*retQuery)[2].GetUInt32(),                       // contactID
+    //                (*retQuery)[3].GetUInt32(),                       // date
+    //                (*retQuery)[4].GetUInt32(),                       // dateSent
+    //                (*retQuery)[5].GetUInt32(),                       // errorCode
+    //                (*retQuery)[6].GetString(),                       // body
+    //                (*retQuery)[7].GetBool(),                         // isRead
+    //                static_cast<SMSType>((*retQuery)[8].GetUInt32()), // type
+    //            });
+    //
+    //        } while (retQuery->NextRow());
+    //    }
+    //    else {
+    //        ret.second = {};
+    //    }
+    return ret;
 }

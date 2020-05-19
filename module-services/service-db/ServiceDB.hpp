@@ -11,6 +11,7 @@
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
+#include "includes/interfaces.hpp"
 
 class ServiceDB : public sys::Service
 {
@@ -34,6 +35,8 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
 
   protected:
+    db::Interface *getInterface(db::interface interface);
+
   public:
     ServiceDB();
     virtual ~ServiceDB();

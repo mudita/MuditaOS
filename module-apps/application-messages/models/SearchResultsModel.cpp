@@ -40,8 +40,9 @@ namespace gui::model
         // virtual std::unique_ptr<std::vector<T>> GetByQuerry(std::unique_ptr<db::Query> querry)
 
         // consider && instead move instead
-        DBServiceAPI::GetByQuery(
-            getApplication(), db::interface::SMS, std::make_unique<db::query::SMSSearch>("what_to_serach", 0, 10));
+        DBServiceAPI::GetByQuery(getApplication(),
+                                 db::interface::SMSThread,
+                                 std::make_unique<db::query::SMSSearch>("what_to_serach", 0, 10));
         // recordsCount = result_from_QuerySMS_Search()->max_depth;
     }
 
