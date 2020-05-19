@@ -73,9 +73,6 @@ extern "C"
             delete transferContext;
 
         worker->deinit();
-
-        gui::ImageManager::getInstance().clear();
-        gui::FontManager::getInstance().clear();
     }
 
     void ServiceGUI::sendBuffer()
