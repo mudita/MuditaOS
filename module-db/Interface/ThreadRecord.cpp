@@ -131,7 +131,8 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
 
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::getByQuery(db::Query *query)
 {
-    // note this could be avoided with visitor pattern
+    // note this `if` could be avoided with visitor pattern
+    // query->run(interface);
     if (auto local_query = dynamic_cast<db::query::SMSSearch *>(query)) {
         return getByQueryImpl(local_query);
     }

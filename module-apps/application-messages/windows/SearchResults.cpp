@@ -1,5 +1,6 @@
 #include "SearchResults.hpp"
-#include <messages/DBThreadMessage.hpp>
+#include "messages/DBThreadMessage.hpp"
+#include "queries/sms/QuerySMSSearch.hpp"
 #include "service-db/messages/DBMessage.hpp"
 #include <i18/i18.hpp>
 
@@ -42,7 +43,9 @@ namespace gui
     bool SearchResults::onDatabaseMessage(sys::Message *msgl)
     {
         // TODO
-        //        auto msg = reinterpret_cast<DBThreadResponseMessage *>(msgl);
+        if (auto msg = reinterpret_cast<db::query::SMSSearchResult *>(msgl)) {
+            LOG_DEBUG("!!!!!!!!!!!!!!!!!!!!!! %d", msg->getMax());
+        }
         //        if (model->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
         //            return true;
         //

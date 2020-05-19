@@ -108,6 +108,21 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint3
     return ret;
 }
 
+void fillRetQuery(std::vector<ThreadsTableRow> &ret, const std::unique_ptr<QueryResult> &retQuery)
+{
+    do {
+        ret.push_back(ThreadsTableRow{
+            (*retQuery)[0].GetUInt32(),                       // ID
+            (*retQuery)[1].GetUInt32(),                       // date
+            (*retQuery)[2].GetUInt32(),                       // msgCount
+            (*retQuery)[3].GetUInt32(),                       // msgRead
+            (*retQuery)[4].GetUInt32(),                       // contactID
+            (*retQuery)[5].GetString(),                       // snippet
+            static_cast<SMSType>((*retQuery)[6].GetUInt32()), // type/last-dir
+        });
+    } while (retQuery->NextRow());
+}
+
 std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByField(uint32_t offset,
                                                                  uint32_t limit,
                                                                  ThreadsTableFields field,
@@ -145,19 +160,7 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByField(uint32_t offset
     }
 
     std::vector<ThreadsTableRow> ret;
-
-    do {
-        ret.push_back(ThreadsTableRow{
-            (*retQuery)[0].GetUInt32(),                       // ID
-            (*retQuery)[1].GetUInt32(),                       // date
-            (*retQuery)[2].GetUInt32(),                       // msgCount
-            (*retQuery)[3].GetUInt32(),                       // msgRead
-            (*retQuery)[4].GetUInt32(),                       // contactID
-            (*retQuery)[5].GetString(),                       // snippet
-            static_cast<SMSType>((*retQuery)[6].GetUInt32()), // type/last-dir
-        });
-    } while (retQuery->NextRow());
-
+    fillRetQuery(ret, retQuery);
     return ret;
 }
 
@@ -188,27 +191,15 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                                                                               uint32_t limit)
 {
     auto ret = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
-    //  TODO here prepare proper queries and assignments in glue code
-    //    auto count_ret = db->Query("SELECT COUNT (*) from sms where sms.body=%s", text.c_str()); // TODO not sanitized
-    //    input !!!!!!! ret.first =  count_ret == nullptr ? 0 : (*ret)[0].GetUInt32(); if (ret.first != 0) {
-    //        auto retQuery = db->Query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
-    //        do {
-    //            ret.second.push_back(SMSTableRow{
-    //                (*retQuery)[0].GetUInt32(),                       // ID
-    //                (*retQuery)[1].GetUInt32(),                       // threadID
-    //                (*retQuery)[2].GetUInt32(),                       // contactID
-    //                (*retQuery)[3].GetUInt32(),                       // date
-    //                (*retQuery)[4].GetUInt32(),                       // dateSent
-    //                (*retQuery)[5].GetUInt32(),                       // errorCode
-    //                (*retQuery)[6].GetString(),                       // body
-    //                (*retQuery)[7].GetBool(),                         // isRead
-    //                static_cast<SMSType>((*retQuery)[8].GetUInt32()), // type
-    //            });
-    //
-    //        } while (retQuery->NextRow());
-    //    }
-    //    else {
-    //        ret.second = {};
-    //    }
+    auto count_ret = db->Query("SELECT COUNT (*) from sms where sms.body like \"%%%s%%\"",
+                               text.c_str()); // TODO not sanitized input !!!!!!!
+    ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].GetUInt32();
+    if (ret.first != 0) {
+        auto retQuery = db->Query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
+        fillRetQuery(ret.second, retQuery);
+    }
+    else {
+        ret.second = {};
+    }
     return ret;
 }
