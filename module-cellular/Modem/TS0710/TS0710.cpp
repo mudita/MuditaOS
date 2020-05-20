@@ -34,7 +34,6 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text          = {{PortSpeed_e::PS9600, 9
                                                 {PortSpeed_e::PS115200, 115200},
                                                 {PortSpeed_e::PS230400, 230400},
                                                 {PortSpeed_e::PS460800, 460800}};
-
 /**
  * TS0710 implementation
  */
