@@ -161,7 +161,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         using namespace bsp;
 
         auto msg   = std::make_shared<sevm::EVMBoardResponseMessage>(true);
-        auto board = bsp::magnetometer::GetBoard();
+        auto board = magnetometer::GetBoard();
         msg->board = board;
         LOG_INFO("Board discovered: %s", c_str(board));
 

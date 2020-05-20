@@ -8,8 +8,10 @@
 
 bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
 {
+    constexpr uint32_t timeout = 1000;
+
     std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(MessageType::EVMGetBoard);
-    auto ret                              = sys::Bus::SendUnicast(msg, service::name::evt_manager, serv, 1000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::evt_manager, serv, timeout);
 
     sevm::EVMBoardResponseMessage *response = dynamic_cast<sevm::EVMBoardResponseMessage *>(ret.second.get());
 

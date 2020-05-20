@@ -18,8 +18,6 @@ namespace bsp{
                 return "none";
                 break;
         }
-            return "";
-        }
-
+   }
 };
 
