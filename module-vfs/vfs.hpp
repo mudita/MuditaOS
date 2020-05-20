@@ -159,6 +159,7 @@ class vfs
     static void computeCRC32(FILE *file, unsigned long *outCrc32);
     static bool verifyCRC(const std::string filePath, const unsigned long crc32);
     static bool verifyCRC(const fs::path filePath);
+    static std::string generateRandomId(size_t length);
 
   private:
     bool getOSRootFromIni();

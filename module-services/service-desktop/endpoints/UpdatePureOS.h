@@ -2,8 +2,7 @@
 // Created by atom on 3/19/20.
 //
 
-#ifndef PUREPHONE_UPDATEPUREOS_H
-#define PUREPHONE_UPDATEPUREOS_H
+#pragma once
 
 #include <../module-utils/microtar/src/microtar.h>
 #include <string.h>
@@ -40,7 +39,7 @@ namespace updateos
 
     const inline int prefix_len = 8;
 
-    enum UpdateError
+    enum class UpdateError
     {
         NoError,
         CantCreateTempDir,
@@ -114,6 +113,5 @@ class UpdatePureOS
     fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
     mtar_t updateTar;
-    ServiceDesktop *owner;
+    ServiceDesktop *owner = nullptr;
 };
-#endif // PUREPHONE_UPDATEPUREOS_H
