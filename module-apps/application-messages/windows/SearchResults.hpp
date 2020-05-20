@@ -19,6 +19,7 @@ namespace gui
 
       public:
         SearchResults(app::Application *app);
+        virtual void onBeforeShow(ShowMode mode, SwitchData *data);
     };
 
 } // namespace gui

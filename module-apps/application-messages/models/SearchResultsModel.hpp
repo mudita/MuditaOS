@@ -19,7 +19,7 @@ namespace gui::model
         gui::ListItem *getItem(int index) override;
         int getItemCount() const override
         {
-            return 10;
+            return 1;
         } // TODO
 
         void setResults(std::shared_ptr<std::vector<ThreadRecord>> _results)

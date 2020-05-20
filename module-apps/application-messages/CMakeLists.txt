@@ -20,6 +20,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/widgets/SMSTemplateItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/Icon.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/SearchResultsItem.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/widgets/BaseThreadItem.cpp"
 
         "${CMAKE_CURRENT_LIST_DIR}/models/SearchResultsModel.cpp"
         

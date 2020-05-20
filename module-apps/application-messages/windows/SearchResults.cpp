@@ -22,14 +22,11 @@ namespace gui
                                  8,
                                  body->area().w - 2 * style::window::list_offset_default,
                                  body->area().h);
-        list->setPenFocusWidth(0);
-        list->setPenWidth(1);
         list->setProvider(provider.get());
-        // setFocusItem(body);
-        LOG_DEBUG("%d", provider->getItemCount());
-
-        list->clear();
-        list->setElementsCount(provider->getItemCount());
         setFocusItem(list);
+    }
+
+    void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
     }
 }; // namespace gui

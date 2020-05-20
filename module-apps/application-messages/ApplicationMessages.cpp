@@ -170,6 +170,13 @@ namespace app
         return switchWindow(gui::name::window::thread_search_none, nullptr);
     }
 
+    bool ApplicationMessages::showSearchResults(const UTF8 &title)
+    {
+        auto name = gui::name::window::search_results;
+        windows[name]->setTitle(title);
+        return switchWindow(name, nullptr);
+    }
+
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
     {
         if (number.length() == 0 || body.length() == 0) {
