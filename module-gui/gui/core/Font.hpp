@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include "Ellipsis.hpp"
+#include <limits>
 
 namespace gui
 {

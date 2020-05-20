@@ -11,6 +11,7 @@
 #define PUREPHONE_DRIVERI2C_HPP
 
 #include <memory>
+#include <sys/types.h>
 
 namespace drivers
 {

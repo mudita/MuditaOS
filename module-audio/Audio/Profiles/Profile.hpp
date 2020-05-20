@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <functional>
+#include <string>
 
 #include "bsp/audio/bsp_audio.hpp"
 
