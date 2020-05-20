@@ -47,7 +47,10 @@ namespace bsp
         }
     }
 
-    void usbCDCFlush() { fsync(fd); }
+    void usbCDCFlush()
+    {
+        fsync(fd);
+    }
 
     int usbCDCInit(xQueueHandle receiveQueue)
     {

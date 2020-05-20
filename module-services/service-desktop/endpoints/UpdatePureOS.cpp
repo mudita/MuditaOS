@@ -2,6 +2,7 @@
 // Created by atom on 3/19/20.
 //
 
+#include <module-utils/time/ScopedTime.hpp>
 #include "UpdatePureOS.h"
 #include "../ServiceDesktop.hpp"
 
@@ -34,6 +35,7 @@ std::string UpdatePureOS::generateRandomId(size_t length = 0)
 updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
 {
     LOG_INFO("runUpdate fileName:%s", fileName.c_str());
+
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::NoError) {
         LOG_ERROR("runUpdate can't prepare temp directory for update");
@@ -173,7 +175,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
 {
     LOG_INFO("prepareRoot()");
     int ret;
-
+    owner->getWorker()->sendMessage("UpdatePureOS::prepareRoot");
     // basic needed dirs
     ff_mkdir(purefs::dir::os_previous.c_str());
     ff_mkdir(purefs::dir::os_current.c_str());
@@ -232,16 +234,20 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 {
     std::unique_ptr<unsigned char[]> readBuf(new unsigned char[purefs::buffer::tar_buf]);
     const fs::path fullPath = getUpdateTmpChild(h.name);
+
     LOG_INFO("unpackFileToTemp %s", fullPath.c_str());
+
     uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
     uint32_t sizeToRead   = purefs::buffer::tar_buf;
-    *crc32                = 0;
-    int errCode           = MTAR_ESUCCESS;
-    FF_FILE *fp           = ff_fopen(fullPath.c_str(), "w+");
+    if (crc32 != nullptr)
+        *crc32 = 0;
+    int errCode = MTAR_ESUCCESS;
+    FF_FILE *fp = ff_fopen(fullPath.c_str(), "w+");
     if (fp == NULL) {
         LOG_INFO("unpackFileToTemp %s can't open for reading", fullPath.c_str());
         return (false);
     }
+    auto time = utils::time::Scoped(std::string(fullPath));
 
     for (uint32_t i = 0; i < blocksToRead; i++) {
         if (i + 1 == blocksToRead) {
@@ -264,7 +270,8 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
             return (false);
         }
 
-        *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
+        if (crc32 != nullptr)
+            *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
     }
     LOG_INFO("unpackFileToTemp %s unpacked CRC32: %lX", fullPath.c_str(), *crc32);
     ff_fclose(fp);

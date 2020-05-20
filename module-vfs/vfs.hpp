@@ -62,7 +62,7 @@ namespace purefs
         const inline int crc_buf       = 1024;
         const inline int crc_char_size = 9;
         const inline int crc_radix     = 16;
-        const inline int tar_buf       = 8192;
+        const inline int tar_buf       = 8192 * 4;
     } // namespace buffer
 
     namespace ini

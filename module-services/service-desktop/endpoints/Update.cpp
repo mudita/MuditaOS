@@ -23,7 +23,7 @@ sys::ReturnCodes EndpointHandler::update(
         responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
 
         ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
-        if (service) {
+        if (service && service->updateOS) {
             LOG_INFO("got a pointer to the destkop service, store state");
             service->updateOS->runUpdate(fileName);
         }
@@ -39,7 +39,7 @@ sys::ReturnCodes EndpointHandler::update(
 
         json11::Json fileList;
         ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
-        if (service) {
+        if (service && service->updateOS) {
             fileList = service->updateOS->getUpdateFileList();
         }
 
