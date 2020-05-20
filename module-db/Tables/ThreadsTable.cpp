@@ -179,12 +179,11 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                                                                               uint32_t limit)
 {
     auto ret = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
-    auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \"%%%s%%\"",
-                               text.c_str()); // TODO not sanitized input !!!!!!!
+    auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \"%%%q%%\"", text.c_str());
     ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].GetUInt32();
     if (ret.first != 0) {
         auto retQuery =
-            db->Query("SELECT * from sms WHERE sms.body like \"%%%s%%\" ORDER BY date DESC LIMIT %lu OFFSET %lu;",
+            db->Query("SELECT * from sms WHERE sms.body like \"%%%q%%\" ORDER BY date DESC LIMIT %lu OFFSET %lu;",
                       text.c_str(),
                       limit,
                       offset);

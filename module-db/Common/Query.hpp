@@ -9,11 +9,9 @@ namespace db
     {
       public:
         virtual ~Query() = default;
-        /// TODO make it pure virtual
-        /// literally any debug info which might be helpful for debugging
         [[nodiscard]] virtual auto debugInfo() const -> std::string
         {
-            return "";
+            return "Base Query";
         };
     };
 
