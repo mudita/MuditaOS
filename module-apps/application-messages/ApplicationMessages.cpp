@@ -1,5 +1,6 @@
 #include "ApplicationMessages.hpp"
 
+#include "application-messages/data/SMSTextToSearch.hpp"
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
@@ -195,11 +196,11 @@ namespace app
         return true;
     }
 
-    bool ApplicationMessages::showSearchResults(const UTF8 &title)
+    bool ApplicationMessages::showSearchResults(const UTF8 &title, const UTF8 &search_text)
     {
         auto name = gui::name::window::search_results;
         windows[name]->setTitle(title);
-        switchWindow(name, nullptr);
+        switchWindow(name, std::make_unique<SMSTextToSearch>(search_text));
         return true;
     }
 

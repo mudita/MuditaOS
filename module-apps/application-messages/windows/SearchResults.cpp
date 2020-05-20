@@ -1,5 +1,6 @@
 #include "SearchResults.hpp"
 #include "ThreadRecord.hpp"
+#include <application-messages/data/SMSTextToSearch.hpp>
 #include "messages/DBThreadMessage.hpp"
 #include "messages/QueryMessage.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
@@ -27,17 +28,22 @@ namespace gui
                                  8,
                                  body->area().w - 2 * style::window::list_offset_default,
                                  body->area().h);
-        list->setProvider(model.get());
-        setFocusItem(list);
     }
 
     void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
+            if (data != nullptr) {
+                if (auto search_data = dynamic_cast<SMSTextToSearch *>(data)) {
+                    model->setSearchValue(search_data->getTextToSearch());
+                }
+            }
             model->clear();
             model->requestRecordsCount();
             list->clear();
             list->setElementsCount(model->getItemCount());
+
+            list->setProvider(model.get());
             setFocusItem(list);
         }
     }

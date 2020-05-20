@@ -35,13 +35,21 @@ namespace gui::model
 
     void SearchResultsModel::requestRecordsCount()
     {
-        DBServiceAPI::GetByQuery(
-            getApplication(), db::interface::SMSThread, std::make_unique<db::query::SMSSearch>("naj", 0, 10));
+        if (std::string(search_value).compare("") != 0) {
+            DBServiceAPI::GetByQuery(getApplication(),
+                                     db::interface::SMSThread,
+                                     std::make_unique<db::query::SMSSearch>(search_value, 0, 10));
+        }
     }
 
     void SearchResultsModel::setRecordsCount(uint32_t count)
     {
         recordsCount = count;
+    }
+
+    void SearchResultsModel::setSearchValue(const UTF8 &search_value)
+    {
+        this->search_value = search_value;
     }
 
 }; // namespace gui::model
