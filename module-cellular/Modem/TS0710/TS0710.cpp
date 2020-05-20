@@ -239,8 +239,8 @@ TS0710::ConfState TS0710::ConfProcedure()
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
 
-    bool timed_out                = false;
-    constexpr uint32_t timeout    = 30;
+    bool timed_out             = false;
+    constexpr uint32_t timeout = 30;
     const auto timeout_ticks =
         cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(timeout * utils::time::milisecondsInSecond);
     while (!timed_out) {
