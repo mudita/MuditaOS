@@ -10,7 +10,7 @@ namespace gui::options
     Option call(Application *app, CallOperation callOperation, const ContactRecord &contact)
     {
         assert(app != nullptr);
-        return Option{UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
+        return Option{UTF8(utils::localize.get("sms_call_text")) + contact.getFormattedName(),
                       [app, contact, callOperation](gui::Item &item) { return app::call(app, contact); }};
     }
 
