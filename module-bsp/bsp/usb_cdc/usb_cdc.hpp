@@ -26,4 +26,5 @@ namespace bsp
     int usbCDCInit(xQueueHandle);
     void usbCDCReceive(void *ptr);
     int usbCDCSend(std::string *sendMsg);
+    void usbCDCFlush();
 } // namespace bsp

@@ -71,4 +71,9 @@ namespace bsp
 
         return ret;
     }
+
+    void usbCDCFlush()
+    {
+        USB_CDCSend(NULL, 0);
+    }
 } // namespace bsp
