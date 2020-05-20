@@ -75,29 +75,35 @@ gui::Item *placeholder(const UTF8 &text)
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {
     ContactRecord contact = DBServiceAPI::ContactGetByID(app, record.contactID)->front();
-    return {
-        gui::newOptionLabel(gui::options::call(app, app::CallOperation::ExecuteCall, contact)),
-        gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)),
+    std::list<gui::Item *> options;
 
-        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_forvard_message")),
-                                        [=](gui::Item &item) {
-                                            std::unique_ptr<gui::SwitchData> data =
-                                                std::make_unique<SMSTextData>(record.body);
-                                            app->switchWindow(gui::name::window::new_sms, std::move(data));
+    if (record.type == SMSType::FAILED) {
+        options.push_back(
+            gui::newOptionLabel(gui::Option{utils::localize.get("sms_resend_failed"), [=, &record](gui::Item &item) {
+                                                app->resendSms(record);
+                                                app->returnToPreviousWindow();
+                                                return true;
+                                            }}));
+    }
+    options.push_back(gui::newOptionLabel(gui::options::call(app, app::CallOperation::ExecuteCall, contact)));
+    options.push_back(gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)));
+    options.push_back(gui::newOptionLabel(
+        gui::Option{UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) {
+                        std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
+                         app->switchWindow(gui::name::window::new_sms, std::move(data));
                                             return true;
-                                        }}),
-        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")),
-                                        [=](gui::Item &item) {
-                                            Clipboard::getInstance().copy(record.body);
-                                            app->returnToPreviousWindow();
-                                            return true;
-                                        }}),
+                    }}));
+    options.push_back(gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")), [=](gui::Item &item) {
+                                                          Clipboard::getInstance().copy(record.body);
+                                                           app->returnToPreviousWindow();
+                                                      return true;
+                                        }}));
+    options.push_back(gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
+                                                      [=](gui::Item &item) { return app->removeSMS(record); }}));
+    options.push_back(placeholder(utils::localize.get("sms_from_this_sms")));
+    options.push_back(newCombo(app, contact)); // contact.numbers[0].numberE164
 
-        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
-                                        [=](gui::Item &item) { return app->removeSMS(record); }}),
-        placeholder(utils::localize.get("sms_from_this_sms")),
-        newCombo(app, contact) // contact.numbers[0].numberE164)
-    };
+    return options;
 }
 
 std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
