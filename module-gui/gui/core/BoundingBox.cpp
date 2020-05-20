@@ -1,5 +1,6 @@
 #include "BoundingBox.hpp"
 #include <sstream>
+#include <limits>
 
 namespace gui
 {
