@@ -1,6 +1,7 @@
 #include "SearchResults.hpp"
 #include "ThreadRecord.hpp"
 #include <application-messages/data/SMSTextToSearch.hpp>
+#include <application-messages/ApplicationMessages.hpp>
 #include "messages/DBThreadMessage.hpp"
 #include "messages/QueryMessage.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
@@ -35,16 +36,21 @@ namespace gui
         if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
             if (data != nullptr) {
                 if (auto search_data = dynamic_cast<SMSTextToSearch *>(data)) {
-                    model->setSearchValue(search_data->getTextToSearch());
+                    if (search_data->getTextToSearch().length() != 0u) {
+                        model->setSearchValue(search_data->getTextToSearch());
+                        model->clear();
+                        model->requestRecordsCount();
+                        list->clear();
+                        list->setElementsCount(model->getItemCount());
+
+                        list->setProvider(model.get());
+                        setFocusItem(list);
+                    }
+                    else {
+                        showEmptyResults();
+                    }
                 }
             }
-            model->clear();
-            model->requestRecordsCount();
-            list->clear();
-            list->setElementsCount(model->getItemCount());
-
-            list->setProvider(model.get());
-            setFocusItem(list);
         }
     }
 
@@ -57,10 +63,22 @@ namespace gui
                 auto records = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
                 model->updateRecords(std::move(records), 0, 3, count);
                 model->setRecordsCount(response->getMax());
+                if (response->getMax() == 0) {
+                    return showEmptyResults();
+                }
+                else {
+                    application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
             }
-            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         return false;
+    }
+
+    bool SearchResults::showEmptyResults()
+    {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app);
+        return app->searchEmpty();
     }
 }; // namespace gui
