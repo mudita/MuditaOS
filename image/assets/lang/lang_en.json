@@ -204,6 +204,7 @@
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",
     "sms_call_text"  : "Call ",
+    "sms_resend_failed" : "Send again",
     "sms_delete_conversation" : "Delete conversation",
     "sms_forvard_message" : "Forward message",
     "sms_copy" : "Copy",

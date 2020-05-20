@@ -300,7 +300,7 @@ namespace gui
                                           style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding));
 
-        smsLabel->inputCallback = [=](Item &, const InputEvent &event) {
+        smsLabel->inputCallback = [=, &smsRecord](Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
