@@ -40,12 +40,12 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
 
-    if ((bsp::usbCDCInit(Worker::getQueueByName("receiveQueueBuffer")) < 0)) {
+    if ((bsp::usbCDCInit(Worker::getQueueByName(WorkerDesktop::RECEIVE_QUEUE_BUFFER_NAME)) < 0)) {
         LOG_ERROR("won't start desktop service without serial port");
         return false;
     }
 
-    EndpointFsm::sendQueue = Worker::getQueueByName("sendQueueBuffer");
+    EndpointFsm::sendQueue = Worker::getQueueByName(WorkerDesktop::SEND_QUEUE_BUFFER_NAME);
 
     fsm_list::start();
 
@@ -56,4 +56,15 @@ bool WorkerDesktop::deinit(void)
 {
     Worker::deinit();
     return true;
+}
+
+bool WorkerDesktop::sendMessage(const std::string messageToSend)
+{
+    const int ret = bsp::usbCDCSend(new std::string(messageToSend));
+
+    if (ret == 2) {
+        bsp::usbCDCFlush();
+    }
+
+    return (ret ? true : false);
 }
