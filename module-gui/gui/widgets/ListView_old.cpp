@@ -158,7 +158,7 @@ namespace gui
         for (unsigned int i = 0; i < items.size(); i++) {
             if (availableHeight > 0) {
 
-                itemHeight            = (*it)->minHeight;
+                itemHeight            = (*it)->area(Area::Min).h;
                 gui::BoundingBox bbox = (*it)->widgetArea;
                 bbox.h                = itemHeight;
                 bbox.w                = itemWidth;

@@ -20,10 +20,8 @@ namespace gui
         using namespace style;
 
         model     = threadmodel;
-        minWidth  = window::default_body_width;
-        minHeight = 100;
-        maxWidth  = window::default_body_width;
-        maxHeight = 100;
+        setMinimumSize(window::default_body_width, 100);
+        setMaximumSize(window::default_body_width, 100);
 
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);

@@ -10,11 +10,17 @@
 
 #include "ServiceDB.hpp"
 
-#include "messages/DBMessage.hpp"
-
+#include "messages/DBSMSMessage.hpp"
+#include "messages/DBThreadMessage.hpp"
 #include "messages/DBNotificationMessage.hpp"
-
-#include "MessageType.hpp"
+#include "messages/DBSettingsMessage.hpp"
+#include "messages/DBSMSMessage.hpp"
+#include "messages/DBSMSTemplateMessage.hpp"
+#include "messages/DBContactMessage.hpp"
+#include "messages/DBAlarmMessage.hpp"
+#include "messages/DBNotesMessage.hpp"
+#include "messages/DBCalllogMessage.hpp"
+#include "messages/DBCountryCodeMessage.hpp"
 
 #include "Database/Database.hpp"
 

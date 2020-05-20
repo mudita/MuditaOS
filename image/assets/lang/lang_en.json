@@ -100,7 +100,7 @@
     "app_desktop_menu_tools": "TOOLS",
     "app_desktop_menu_settings": "SETTINGS",
     "app_desktop_menu_phonebook": "PHONEBOOK",
-    "app_desktop_menu_title": "Main Menu",
+    "app_desktop_menu_title": "Menu",
     "app_desktop_tools_title": "Tools",
     "app_desktop_tools_notes": "NOTES",
     "app_desktop_tools_calculator": "CALCULATOR",
@@ -198,7 +198,7 @@
 
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",
-    "sms_call_text"  : "Call: ",
+    "sms_call_text"  : "Call ",
     "sms_delete_conversation" : "Delete conversation",
     "sms_forvard_message" : "Forward message",
     "sms_copy" : "Copy",
@@ -206,6 +206,9 @@
     "sms_from_this_sms" : "From this message",
     "sms_use_template" : "Use Template",
     "sms_paste" : "Paste",
+    "sms_reply" : "REPLY",
+    "sms_mark_read" : "Mark as read",
+    "sms_mark_unread" : "Mark as unread",
     
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG",

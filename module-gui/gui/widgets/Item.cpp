@@ -166,7 +166,7 @@ namespace gui
 
     void Item::setMaximumWidth(uint32_t w)
     {
-        setMaximumSize(w, Axis::Y);
+        setMaximumSize(w, Axis::X);
     }
 
     void Item::setMaximumHeight(uint32_t h)

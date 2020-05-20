@@ -13,10 +13,8 @@ namespace gui
 
     SMSTemplateItem::SMSTemplateItem()
     {
-        minWidth  = smsTemplItemStyle::w;
-        minHeight = smsTemplItemStyle::h;
-        maxWidth  = smsTemplItemStyle::w;
-        maxHeight = smsTemplItemStyle::h;
+        setMinimumSize(smsTemplItemStyle::w, smsTemplItemStyle::h);
+        setMaximumSize(smsTemplItemStyle::w, smsTemplItemStyle::h);
 
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorateOption(text);

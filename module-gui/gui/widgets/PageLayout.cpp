@@ -67,22 +67,26 @@ namespace gui
                 return;
             }
         }
-        auto el = dynamic_cast<VBox *>(children.back());
-        el->addWidget(item);
-        if (!item->visible) {
-            el->removeWidget(item);
-            item->visible = true;
-            // add next page and try again - first set last box to not visible to avoid it's rebuild
-            if (!addPage()) {
-                return;
-            }
-            // set new (next) page invisible
-            children.back()->setVisible(false);
-            /// to not recure on addWidget
-            auto el = dynamic_cast<VBox *>(children.back());
-            el->addWidget(item);
-            if (!el->visible) {
-                LOG_ERROR("Child not added on 2nd try, check sizes of Page and children u try to add!");
+
+        VBox *vbox = dynamic_cast<VBox *>(children.back());
+        if (vbox != nullptr) {
+            vbox->addWidget(item);
+            if (!item->visible) {
+                vbox->removeWidget(item);
+                item->visible = true;
+
+                // add next page and try again - first set last box to not visible to avoid it's rebuild
+                vbox = addPage();
+                if (vbox == nullptr) {
+                    return;
+                }
+                // set new (next) page invisible
+                vbox->setVisible(false);
+                /// to not recure on addWidget
+                vbox->addWidget(item);
+                if (!vbox->visible) {
+                    LOG_ERROR("Child not added on 2nd try, check sizes of Page and children u try to add!");
+                }
             }
         }
         return;
