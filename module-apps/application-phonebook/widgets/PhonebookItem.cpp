@@ -14,10 +14,8 @@ namespace gui
 
     PhonebookItem::PhonebookItem()
     {
-        minWidth  = 436;
-        minHeight = style::window::label::big_h;
-        maxWidth  = 436;
-        maxHeight = 200;
+        setMinimumSize(436, style::window::label::big_h);
+        setMaximumSize(436, 200);
 
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);

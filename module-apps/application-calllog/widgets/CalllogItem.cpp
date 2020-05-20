@@ -40,10 +40,8 @@ namespace gui
 
     CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
     {
-        minWidth  = clItemStyle::w;
-        minHeight = clItemStyle::h;
-        maxWidth  = clItemStyle::w;
-        maxHeight = clItemStyle::h;
+        setMinimumSize(clItemStyle::w, clItemStyle::h);
+        setMaximumSize(clItemStyle::w, clItemStyle::h);
 
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
