@@ -198,6 +198,8 @@ namespace gui
 
         LOG_DEBUG("ADD SMS TYPE: %d", static_cast<int>(el.type));
         switch (el.type) {
+        case SMSType::QUEUED:
+            // pending sending display as already sent
         case SMSType::OUTBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
             smsBubble->setX(body->getWidth() - smsBubble->getWidth());
