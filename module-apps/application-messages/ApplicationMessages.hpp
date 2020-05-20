@@ -57,6 +57,7 @@ namespace app
         bool searchEmpty(const std::string &query = "");
         bool showSearchResults(const UTF8 &title, const UTF8 &search_text);
         bool sendSms(const UTF8 &number, const UTF8 &body);
+        bool resendSms(const SMSRecord &record);
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
         bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
         bool handleSendSmsFromThread(const UTF8 &number, const UTF8 &body);
