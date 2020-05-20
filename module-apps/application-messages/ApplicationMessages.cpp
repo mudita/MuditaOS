@@ -192,7 +192,9 @@ namespace app
         meta.text  = utils::localize.get("app_messages_thread_no_result");
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
-        switchWindow(gui::name::window::thread_search_none, nullptr);
+        auto data                        = std::make_unique<gui::SwitchData>();
+        data->ignoreCurrentWindowOnStack = true;
+        switchWindow(gui::name::window::thread_search_none, std::move(data));
         return true;
     }
 
