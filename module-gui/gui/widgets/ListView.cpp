@@ -58,6 +58,7 @@ namespace gui
                                     style::listview::scroll::y,
                                     style::listview::scroll::w,
                                     style::listview::scroll::h);
+        type   = gui::ItemType::LIST;
     }
 
     ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
@@ -90,6 +91,8 @@ namespace gui
                                     style::listview::scroll::y,
                                     style::listview::scroll::w,
                                     style::listview::scroll::h);
+
+        type = gui::ItemType::LIST;
     }
 
     ListView::~ListView()
@@ -115,7 +118,11 @@ namespace gui
     void ListView::setProvider(ListItemProvider *prov)
     {
         provider       = prov;
-        provider->list = this;
+        if (provider != nullptr) {
+            provider->list = this;
+            setElementsCount(provider->getItemCount());
+        }
+        refresh();
     }
 
     void ListView::clear()
@@ -168,10 +175,6 @@ namespace gui
         ListItem *item = nullptr;
 
         while ((item = provider->getItem(itemsOnPage)) != nullptr) {
-
-            item->setSize(item->minWidth, item->minHeight);
-            item->setMinimumWidth(item->minWidth);
-            item->setMinimumHeight(item->minHeight);
 
             body->addWidget(item);
 

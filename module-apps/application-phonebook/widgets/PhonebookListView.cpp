@@ -326,7 +326,7 @@ namespace gui
         for (unsigned int i = 0; i < items.size(); i++) {
             if (availableHeight > 0) {
 
-                itemHeight = (*it)->minHeight;
+                itemHeight = (*it)->area(Area::Min).h;
 
                 (*it)->setPosition(0, verticalPosition);
                 verticalPosition += itemHeight + 1; // 1 for separator
