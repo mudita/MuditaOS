@@ -106,6 +106,7 @@ namespace gui
 
     void ThreadViewWindow::cleanView()
     {
+        body->removeWidget(text);
         body->erase();
     }
 
