@@ -2,7 +2,7 @@
 
 #include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
-#include "../widgets/ThreadModel.hpp"
+#include "../models/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
 #include "Span.hpp"
 
@@ -37,11 +37,7 @@ namespace gui
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_messages_title_main"));
         topBar->setActive(TopBar::Elements::TIME, true);
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         body = new gui::VBox(this,
                              style::window::default_left_margin,
@@ -78,8 +74,8 @@ namespace gui
         text = new gui::Text(
             this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc},
-            [=](const UTF8 &text) { textModeShowCB(text); },
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) {},
             [=]() { textSelectSpecialCB(); }));
         text->setBorderColor(ColorNoColor);
         text->setPenFocusWidth(style::window::default_border_focucs_w);
@@ -101,6 +97,10 @@ namespace gui
                 return app->newMessageOptions(getName(), text);
             }
             return false;
+        };
+        text->focusChangedCallback = [=](Item &) -> bool {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("sms_reply"));
+            return true;
         };
     }
 
@@ -312,6 +312,10 @@ namespace gui
                 return true;
             }
             return false;
+        };
+        smsLabel->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            return true;
         };
 
         // wrap label in H box, to make fit datetime in it

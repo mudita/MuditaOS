@@ -123,9 +123,14 @@ namespace gui
         setVisible(value, false);
     }
 
+    void BoxLayout::setReverseOrder(bool value)
+    {
+        reverseOrder = value;
+        resizeItems();
+    }
+
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
     {
-
         if (it->visible) {
             outOfDrawAreaItems.push_back(it);
             it->visible = false;
@@ -134,18 +139,18 @@ namespace gui
 
     template <Axis axis> void BoxLayout::updatePosition()
     {
-        int32_t pos        = reverse_order ? this->area().size(axis) : 0;
+        int32_t pos        = reverseOrder ? this->area().size(axis) : 0;
         uint32_t size_left = this->getSize(axis);
 
         auto pos_update = [this](Item *it, int32_t &pos, uint32_t &size_left) {
             if (it->area().size(axis) <= size_left) {
-                if (reverse_order) {
+                if (reverseOrder) {
                     pos -= it->area().size(axis);
                 }
 
                 it->setPosition(pos, axis);
 
-                if (!reverse_order) {
+                if (!reverseOrder) {
                     pos += it->area().size(axis);
                 }
 
@@ -191,7 +196,9 @@ namespace gui
             }
 
             // Set size of orthogonal axis to Normal BoxLayout size
-            it->setSize(this->area(Area::Normal).size(orthogonal(axis)), orthogonal(axis));
+            it->setSize(
+                std::min(this->area(Area::Normal).size(orthogonal(axis)), it->area(Area::Max).size(orthogonal(axis))),
+                orthogonal(axis));
         };
 
         for (auto &el : children) {
@@ -231,9 +238,9 @@ namespace gui
         if (type == ItemType::VBOX) {
             while ((previous != children.end()) &&
                    ((next = nextNavigationItem(std::next(previous))) != std::end(children))) {
-                (*previous)->setNavigationItem(reverse_order ? NavigationDirection::UP : NavigationDirection::DOWN,
+                (*previous)->setNavigationItem(reverseOrder ? NavigationDirection::UP : NavigationDirection::DOWN,
                                                *next);
-                (*next)->setNavigationItem(reverse_order ? NavigationDirection::DOWN : NavigationDirection::UP,
+                (*next)->setNavigationItem(reverseOrder ? NavigationDirection::DOWN : NavigationDirection::UP,
                                            *previous);
                 previous = next;
             }
@@ -242,9 +249,9 @@ namespace gui
         if (type == ItemType::HBOX) {
             while ((previous != children.end()) &&
                    ((next = nextNavigationItem(std::next(previous))) != std::end(children))) {
-                (*previous)->setNavigationItem(reverse_order ? NavigationDirection::LEFT : NavigationDirection::RIGHT,
+                (*previous)->setNavigationItem(reverseOrder ? NavigationDirection::LEFT : NavigationDirection::RIGHT,
                                                *next);
-                (*next)->setNavigationItem(reverse_order ? NavigationDirection::RIGHT : NavigationDirection::LEFT,
+                (*next)->setNavigationItem(reverseOrder ? NavigationDirection::RIGHT : NavigationDirection::LEFT,
                                            *previous);
                 previous = next;
             }
