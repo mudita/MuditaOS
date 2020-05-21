@@ -3,19 +3,23 @@
 #include <vector>
 
 #include "Application.hpp"
-#include "DatabaseModel_old.hpp"
+#include "DatabaseModel.hpp"
 #include "Interface/ContactRecord.hpp"
-#include "ListItemProvider_old.hpp"
+#include "ListItemProvider.hpp"
 #include "NotesRecord.hpp"
 
-class SearchResultsModel : public gui::ListItemProvider_old, public app::DatabaseModel_old<ContactRecord>
+class SearchResultsModel : public gui::ListItemProvider, public app::DatabaseModel<ContactRecord>
 {
+
+    uint32_t internalOffset = 0;
+
   public:
     SearchResultsModel(app::Application *app);
     virtual ~SearchResultsModel();
 
-    gui::ListItem *getItem(
-        int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
+    // virtual methods for ListViewProvider
+    gui::ListItem *getItem(int index) override;
+
     int getItemCount() const override;
     void setResults(std::shared_ptr<std::vector<ContactRecord>> _results);
     void requestFavouritesCount();

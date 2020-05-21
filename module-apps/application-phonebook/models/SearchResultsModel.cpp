@@ -1,10 +1,12 @@
+#include <module-apps/application-phonebook/windows/PhonebookContact.hpp>
 #include "SearchResultsModel.hpp"
 #include "i18/i18.hpp"
 
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "UiCommonActions.hpp"
 
-SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel_old(app, 14)
+SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel(app)
 {}
 
 SearchResultsModel::~SearchResultsModel()
@@ -20,139 +22,49 @@ void SearchResultsModel::requestFavouritesCount()
 void SearchResultsModel::requestRecordsCount()
 {}
 void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t limit)
-{}
-
-gui::ListItem *SearchResultsModel::getItem(
-    int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-    auto isInResultsRange = [&](int idx) {
-        try {
-            results->at(idx);
-        }
-        catch (const std::out_of_range &oor) {
-            LOG_ERROR("Out of Range error:  %s", oor.what());
-            return false;
-        }
-        return true;
-    };
+    internalOffset = offset;
+    list->onProviderDataUpdate();
+}
 
-    auto compareFirstChar = [](UTF8 nameA, UTF8 nameB) {
-        if (nameA.substr(0, 1) == nameB.substr(0, 1)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
+gui::ListItem *SearchResultsModel::getItem(int index)
+{
+    if (results != nullptr && internalOffset + index < results->size()) {
+        auto contact = std::make_shared<ContactRecord>(results->at(internalOffset + index));
+        //    std::shared_ptr<ContactRecord> contact = getRecord(index);
 
-    if (!isInResultsRange(index)) {
-        return nullptr;
+        if (contact == nullptr) {
+            return nullptr;
+        }
+
+        gui::PhonebookItem *item = new gui::PhonebookItem();
+
+        if (item != nullptr) {
+            item->setContact(contact);
+            item->setID(index);
+            item->activatedCallback = [=](gui::Item &item) {
+                LOG_INFO("activatedCallback");
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+                application->switchWindow(gui::window::name::contact, std::move(data));
+                return true;
+            };
+
+            item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+                if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                    return false;
+                }
+                if (event.keyCode == gui::KeyCode::KEY_LF) {
+                    LOG_DEBUG("calling");
+                    return app::call(application, *item->contact);
+                }
+                return false;
+            };
+        }
+
+        return item;
     }
 
-    auto contact = std::make_shared<ContactRecord>(results->at(index));
-
-    if (contact == nullptr)
-        return nullptr;
-
-    if (topDown) {
-        // return item from favorite part of contacts
-        if (static_cast<uint32_t>(index) < favouriteCount) {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-
-            if ((index == firstElement) && (index != prevIndex)) {
-                item->setValue(utils::localize.get("app_phonebook_list_favourites"));
-            }
-            else {
-                item->markFavourite(true);
-                item->setContact(contact);
-                item->setID(index);
-            }
-            return item;
-        }
-        else {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-            // on top the page or if element next after last favourite contact is requested
-            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex)) {
-
-                item->setValue(contact->primaryName.substr(0, 1));
-            }
-            else {
-                if (!isInResultsRange(prevIndex)) {
-                    return nullptr;
-                }
-                auto prevContact = std::make_unique<ContactRecord>(results->at(prevIndex));
-                if (prevContact == nullptr)
-                    return nullptr;
-                if (compareFirstChar(contact->primaryName, prevContact->primaryName)) {
-                    item->markFavourite(false);
-                    item->setContact(contact);
-                    item->setID(index);
-                }
-                else {
-                    item->setValue(contact->primaryName.substr(0, 1));
-                }
-            }
-            return item;
-        }
-    }
-    else {
-        if (static_cast<uint32_t>(index) < favouriteCount - 1) {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-            if (remaining == 0) {
-                item->setValue(utils::localize.get("app_phonebook_list_favourites"));
-            }
-            else {
-                item->markFavourite(true);
-                item->setContact(contact);
-                item->setID(index);
-            }
-            return item;
-        }
-        else {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-
-            // leaving normal contacts list and entering favourite area but character is already placed
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex)) {
-                item->markFavourite(true);
-                item->setContact(contact);
-                item->setID(index);
-            }
-            // leaving normal contacts list and entering favourite area - return character
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex)) {
-                item->setValue(contact->primaryName.substr(0, 1));
-            }
-            else {
-                if (prevIndex < 0) {
-                    prevIndex = index - 1;
-                }
-                if (!isInResultsRange(prevIndex)) {
-                    return nullptr;
-                }
-                auto prevContact = std::make_unique<ContactRecord>(results->at(prevIndex));
-                if (remaining == 0) {
-                    // previous element has the same first character of alternative name so display first character
-                    if (index == prevIndex) {
-                        item->markFavourite(false);
-                        item->setContact(contact);
-                        item->setID(index);
-                    }
-                    else {
-                        item->setValue(prevContact->primaryName.substr(0, 1));
-                    }
-                }
-                else if (((index == firstElement) || (index == prevIndex) ||
-                          (compareFirstChar(contact->primaryName, prevContact->primaryName)))) {
-                    item->markFavourite(false);
-                    item->setContact(contact);
-                    item->setID(index);
-                }
-                else {
-                    item->setValue(prevContact->primaryName.substr(0, 1));
-                }
-            }
-            return item;
-        }
-    }
+    return nullptr;
 }
 
 int SearchResultsModel::getItemCount() const

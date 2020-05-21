@@ -50,7 +50,7 @@ namespace gui
         Direction direction   = Direction::Bottom;
 
         void clearItems();
-        void addItemsOnPage();
+        virtual void addItemsOnPage();
         void setFocus();
         void refresh();
         void resizeWithScroll();
