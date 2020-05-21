@@ -41,14 +41,9 @@ namespace app
         if (msgl->messageType == MessageType::DBServiceNotification) {
             DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
-            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB) &&
-                ((msg->notificationType == DB::NotificationType::Updated) ||
-                 (msg->notificationType == DB::NotificationType::Added))) {
-                if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view] ||
-                    this->getCurrentWindow() == this->windows[gui::name::window::main_window]) {
-                    LOG_DEBUG("TODO");
-                    this->getCurrentWindow()->rebuild();
-                }
+            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB)) {
+                this->windows[gui::name::window::thread_view]->rebuild();
+                this->windows[gui::name::window::main_window]->rebuild();
                 return std::make_shared<sys::ResponseMessage>();
             }
         }
