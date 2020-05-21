@@ -32,11 +32,21 @@ namespace gui
         buildInterface();
     }
 
+    void MessagesMainWindow::loadData()
+    {
+        threadModel->clear();
+        threadModel->requestRecordsCount();
+        list->clear();
+        list->setElementsCount(threadModel->getItemCount());
+
+        setFocusItem(list);
+    }
+
     void MessagesMainWindow::rebuild()
     {
-        destroyInterface();
-        buildInterface();
+        loadData();
     }
+
     void MessagesMainWindow::buildInterface()
     {
 
@@ -95,11 +105,6 @@ namespace gui
             return true;
         };
     }
-    void MessagesMainWindow::destroyInterface()
-    {
-        erase();
-        delete threadModel;
-    }
 
     MessagesMainWindow::~MessagesMainWindow()
     {
@@ -123,12 +128,7 @@ namespace gui
             }
         }
         if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
-            threadModel->clear();
-            threadModel->requestRecordsCount();
-            list->clear();
-            list->setElementsCount(threadModel->getItemCount());
-
-            setFocusItem(list);
+            loadData();
         }
 
         if (threadModel->getItemCount() == 0) {
@@ -166,9 +166,10 @@ namespace gui
 
     bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        DBThreadResponseMessage *msg = reinterpret_cast<DBThreadResponseMessage *>(msgl);
-        if (threadModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
+        DBThreadResponseMessage *msg = dynamic_cast<DBThreadResponseMessage *>(msgl);
+        if (msg && threadModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count)) {
             return true;
+        }
 
         return false;
     }
