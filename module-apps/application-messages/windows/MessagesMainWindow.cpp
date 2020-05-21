@@ -27,8 +27,7 @@
 namespace gui
 {
 
-    MessagesMainWindow::MessagesMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), threadModel{new ThreadModel(app)}
+    MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
     {
         buildInterface();
     }
@@ -44,6 +43,8 @@ namespace gui
         using namespace messages;
 
         AppWindow::buildInterface();
+
+        threadModel = new ThreadModel(application);
 
         list = new gui::ListView(
             this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listHeight);
