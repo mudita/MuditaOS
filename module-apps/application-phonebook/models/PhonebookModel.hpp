@@ -1,13 +1,4 @@
-/*
- * @file PhonebookModel.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 10 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_
-#define MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_
+#pragma once
 
 #include <vector>
 
@@ -26,8 +17,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     /**
      * Number of favourite records in the database.
      */
-    uint32_t favouriteCount = 0;
-    void preProcessData(const uint32_t offset, const uint32_t limit);
+    uint32_t favouriteCount  = 0;
 
   public:
     PhonebookModel(app::Application *app);
@@ -49,5 +39,3 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
         return recordsCount;
     };
 };
-
-#endif /* MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_ */

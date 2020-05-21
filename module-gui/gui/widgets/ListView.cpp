@@ -117,7 +117,7 @@ namespace gui
 
     void ListView::setProvider(ListItemProvider *prov)
     {
-        provider       = prov;
+        provider = prov;
         if (provider != nullptr) {
             provider->list = this;
             setElementsCount(provider->getItemCount());
@@ -184,7 +184,6 @@ namespace gui
             }
 
             itemsOnPage++;
-            //            if(item->activeItem) itemsOnPage++;
 
             listSpanItem = new Span(Axis::Y, itemSpanSize);
             body->addWidget(listSpanItem);
