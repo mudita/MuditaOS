@@ -14,6 +14,7 @@ declare ignore_paths=(
     './module-os/'
     './board/'
     './module-bsp/bsp/'
+    './module-bsp/board/rt1051/common/fsl_drivers/'
     './module-bsp/board/rt1051/common/board.cpp'
     './module-vfs/board/cross/freeRTOS_FAT/'
     './module-db/[Dd]atabase/sqlite3.h'

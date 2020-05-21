@@ -7,6 +7,7 @@
 
 #include "bsp/rtc/rtc.hpp"
 #include "fsl_snvs_hp.h"
+#include "fsl_snvs_lp.h"
 #include <time.h>
 
 #include "FreeRTOS.h"
@@ -23,8 +24,17 @@ namespace bsp
     {
         qHandleRtcIrq = qHandle;
 
+        CLOCK_EnableClock(kCLOCK_SnvsLp);
         SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
         SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
+
+        SNVS_LPCR_LPTA_EN(1);
+
+        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
+        while (!(SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK))
+            ;
+
+        SNVS_HP_RTC_TimeSynchronize(SNVS);
 
         NVIC_SetPriority(SNVS_HP_WRAPPER_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
         /* Enable at the NVIC */
@@ -57,7 +67,7 @@ namespace bsp
             return RtcBspError;
         }
 
-        snvs_hp_rtc_datetime_t rtcDate;
+        snvs_lp_srtc_datetime_t rtcDate;
 
         rtcDate.year   = time->tm_year + 1900;
         rtcDate.month  = time->tm_mon + 1;
@@ -67,9 +77,10 @@ namespace bsp
         rtcDate.second = time->tm_sec;
 
         portENTER_CRITICAL();
-        SNVS_HP_RTC_StopTimer(SNVS);
-        SNVS_HP_RTC_SetDatetime(SNVS, &rtcDate);
-        SNVS_HP_RTC_StartTimer(SNVS);
+        SNVS_LP_SRTC_StopTimer(SNVS);
+        SNVS_LP_SRTC_SetDatetime(SNVS, &rtcDate);
+        SNVS_LP_SRTC_StartTimer(SNVS);
+        SNVS_HP_RTC_TimeSynchronize(SNVS);
         portEXIT_CRITICAL();
 
         return RtcBspOK;

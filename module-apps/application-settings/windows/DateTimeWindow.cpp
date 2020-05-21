@@ -193,7 +193,6 @@ namespace gui
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         label->activatedCallback = [=](gui::Item &) {
             this->setRTC();
-            LOG_INFO("callback");
             return true;
         };
         label->setText(value);
@@ -347,7 +346,7 @@ namespace gui
             timeinfo.tm_min  = std::stoi(getDateTimeItemValue(DateTimeItems::Minute));
         }
         catch (std::exception &e) {
-            LOG_ERROR("ServiceCellular::getIMSI exception: %s", e.what());
+            LOG_ERROR("DateTimeWindow::setRTC: %s", e.what());
         }
 
         bsp::rtc_SetDateTime(&timeinfo);
