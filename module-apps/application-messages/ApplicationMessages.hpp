@@ -14,7 +14,7 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string thread_rm_confirm  = "ConfirmRM";
+            inline const std::string dialog             = "Dialog";
             inline const std::string thread_search_none = "SearchNone";
             inline const std::string new_sms            = "NewSMS";
             inline const std::string thread_sms_search  = "SMSSearch";
