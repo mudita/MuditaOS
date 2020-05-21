@@ -151,7 +151,7 @@ enum class MessageType
     // keyboard messages
     KBDKeyEvent,
 
-    AppSwitch, // application receives this message from application manager. It a signal to gain or loose focus.
+    AppSwitch,       // application receives this message from application manager. It a signal to gain or loose focus.
     AppSwitchWindow, // This is internal message transmitted within application to change window. Additional command and
                      // data are transmitted with it.
     AppInputEvent,   // used after key event translation to send input event to application
@@ -172,8 +172,12 @@ enum class MessageType
     EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
-    EVMGetHw,
+
+    // cellular messages
+    EVMGetBoard,
     EVMModemStatus,
+
+    // bluetooth messages
     BluetoothRequest,
 
     LwIP_request,

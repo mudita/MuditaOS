@@ -19,7 +19,7 @@ namespace utils
         constexpr auto hoursInday      = 24;
         constexpr auto secondsInHour   = minutesInHour * secondsInMinute;
         constexpr auto secondsInDay    = hoursInday * secondsInHour;
-
+        constexpr auto milisecondsInSecond = 1000;
         enum class GetParameters
         {
             Hour,
