@@ -27,6 +27,8 @@ namespace gui
 
         Icon *emptyListIcon = nullptr;
 
+        void loadData();
+
       public:
         MessagesMainWindow(app::Application *app);
         virtual ~MessagesMainWindow();
@@ -39,7 +41,6 @@ namespace gui
 
         void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
     };
 
 } /* namespace gui */
