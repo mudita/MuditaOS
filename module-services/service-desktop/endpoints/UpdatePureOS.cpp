@@ -4,12 +4,15 @@
 #include "service-desktop/ServiceDesktop.hpp"
 #include "module-vfs/vfs.hpp"
 
-using namespace updateos;
-
-static bool endsWith(std::string const &s, std::string const &suffix)
+#ifdef TARGET_Linux
+extern int errno;
+int stdioGET_ERRNO()
 {
-    return s.size() >= suffix.size() && std::equal(suffix.rbegin(), suffix.rend(), s.rbegin());
+    return (errno);
 }
+#endif
+
+using namespace updateos;
 
 UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
 {}
@@ -180,7 +183,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
         return (UpdateError::CantDeletePreviousOS);
     }
     // rename the current OS to previous on partition
-    ret = ff_rename(purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str(), true);
+    ret = ff_rename(purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str());
 
     if (ret != 0) {
         LOG_ERROR("prepareRoot can't rename %s -> %s error %s",
@@ -191,7 +194,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     }
 
     // rename the temp directory to current (extracted update)
-    ret = ff_rename(updateTempDirectory.c_str(), purefs::dir::os_current.c_str(), true);
+    ret = ff_rename(updateTempDirectory.c_str(), purefs::dir::os_current.c_str());
 
     if (ret != 0) {
         LOG_ERROR("prepareRoot can't rename %s -> %s error %s",
@@ -350,7 +353,7 @@ bool UpdatePureOS::isDirectory(const fs::path pathToCheck)
         FF_Stat_t fileStatus;
         const int ret = ff_stat(pathToCheck.c_str(), &fileStatus);
         if (ret == 0) {
-            return (fileStatus.st_mode == FF_IFDIR);
+            return (S_ISDIR(fileStatus.st_mode));
         }
         else {
             return (false);
@@ -361,21 +364,24 @@ bool UpdatePureOS::isDirectory(const fs::path pathToCheck)
 
 const json11::Json UpdatePureOS::getUpdateFileList()
 {
-    FF_FindData_t *pxFindStruct = nullptr;
     std::vector<FileInfo> updateFiles;
-    pxFindStruct = (FF_FindData_t *)pvPortMalloc(sizeof(FF_FindData_t));
+#ifndef TARGET_Linux
+    FF_FindData_t *pxFindStruct = nullptr;
+
+    pxFindStruct = static_cast<FF_FindData_t *>(pvPortMalloc(sizeof(FF_FindData_t)));
     memset(pxFindStruct, 0x00, sizeof(FF_FindData_t));
 
     if (ff_findfirst(updateos::dir::updates.c_str(), pxFindStruct) == 0) {
         do {
             /* Print the files name, size, and attribute string. */
             LOG_INFO("%s", pxFindStruct->pcFileName);
-            if (endsWith(pxFindStruct->pcFileName, updateos::extension::update)) {
+            if (vfs::endsWith(pxFindStruct->pcFileName, updateos::extension::update)) {
                 updateFiles.push_back(pxFindStruct);
             }
         } while (ff_findnext(pxFindStruct) == 0);
     }
 
     vPortFree(pxFindStruct);
+#endif
     return (json11::Json(updateFiles));
 }

@@ -1,22 +1,21 @@
 #pragma once
 
-#include "FreeRTOS.h"
+#include "WorkerDesktop.hpp"
+#include "UpdatePureOS.h"
+
 #include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBMessage.hpp"
-#include "task.h"
 #include "vfs.hpp"
+
+#include <FreeRTOS.h>
+#include <task.h>
 #include <memory>
 #include <string.h>
 #include <sstream>
-
-#ifndef TARGET_Linux
-#include "WorkerDesktop.hpp"
-#include "UpdatePureOS.h"
-#endif
 
 class ServiceDesktop : public sys::Service
 {
@@ -31,13 +30,8 @@ class ServiceDesktop : public sys::Service
     {
         return (desktopWorker);
     }
-#ifdef TARGET_RT1051
-    std::unique_ptr<UpdatePureOS> updateOS;
-#endif
 
-  private:
-#ifdef TARGET_RT1051
+    std::unique_ptr<UpdatePureOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
-#endif
     static const char *serviceName;
 };

@@ -13,23 +13,20 @@ ServiceDesktop::ServiceDesktop() : sys::Service(serviceName)
 ServiceDesktop::~ServiceDesktop()
 {
     LOG_INFO("[ServiceDesktop] Cleaning resources");
-#ifdef TARGET_RT1051
     if (desktopWorker != nullptr) {
         desktopWorker->deinit();
     }
-#endif
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
-#ifdef TARGET_RT1051
     desktopWorker = std::make_unique<WorkerDesktop>(this);
     desktopWorker->init({{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1},
                          {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
     desktopWorker->run();
 
     updateOS = std::make_unique<UpdatePureOS>(this);
-#endif
+
     return (sys::ReturnCodes::Success);
 }
 

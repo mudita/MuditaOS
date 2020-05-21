@@ -2,6 +2,11 @@
 #include <time/time_conversion.hpp>
 #include <random>
 
+bool vfs::endsWith(std::string const &s, std::string const &suffix)
+{
+    return s.size() >= suffix.size() && std::equal(suffix.rbegin(), suffix.rend(), s.rbegin());
+}
+
 std::string vfs::generateRandomId(size_t length = 0)
 {
     const std::string CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
