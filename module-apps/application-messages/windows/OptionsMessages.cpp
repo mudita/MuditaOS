@@ -92,11 +92,7 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
                                         }}),
 
         gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
-                                        [=](gui::Item &item) {
-                                            LOG_DEBUG("Delete sms record ID %" PRIu32, record.ID);
-                                            DBServiceAPI::SMSRemove(app, record.ID);
-                                            return app->returnToPreviousWindow();
-                                        }}),
+                                        [=](gui::Item &item) { return app->removeSMS(record); }}),
         placeholder(utils::localize.get("sms_from_this_sms")),
         newCombo(app, contact) // contact.numbers[0].numberE164)
     };

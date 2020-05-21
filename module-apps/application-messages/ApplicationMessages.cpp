@@ -154,6 +154,30 @@ namespace app
         }
     }
 
+    bool ApplicationMessages::removeSMS(const SMSRecord &record)
+    {
+        LOG_DEBUG("Removing sms: %" PRIu32, record.ID);
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_rm_confirm]);
+        if (dialog != nullptr) {
+            auto meta   = dialog->meta;
+            meta.action = [=]() -> bool {
+                if (!DBServiceAPI::SMSRemove(this, record.ID)) {
+                    LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
+                    return false;
+                }
+                return this->switchWindow(gui::name::window::thread_view);
+            };
+            meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
+            meta.title = record.body;
+            dialog->update(meta);
+            return switchWindow(gui::name::window::thread_rm_confirm, nullptr);
+        }
+        else {
+            LOG_ERROR("Dialog bad type!");
+            return false;
+        }
+    }
+
     bool ApplicationMessages::searchEmpty(const std::string &query)
     {
         auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_search_none]);
