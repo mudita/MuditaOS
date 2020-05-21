@@ -182,6 +182,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
         auto ret             = threadRecordInterface->RemoveByID(msg->id);
         responseMsg          = std::make_shared<DBThreadResponseMessage>(nullptr, ret);
+        // send notification
+        auto notificationMessage = std::make_shared<DBNotificationMessage>(
+            MessageType::DBServiceNotification, DB::NotificationType::Removed, DB::BaseType::SmsDB);
+        sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
     } break;
 
     case MessageType::DBThreadGetLimitOffset: {
