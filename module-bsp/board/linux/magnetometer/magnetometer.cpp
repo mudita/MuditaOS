@@ -24,5 +24,10 @@ namespace bsp
         {
             return false;
         }
+
+        bsp::Board GetBoard(void)
+        {
+            return bsp::Board::Linux;
+        }
     } // namespace magnetometer
 } // namespace bsp

@@ -4,6 +4,8 @@
 #include "bsp/BoardDefinitions.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 
+#include "fsl_common.h"
+
 using namespace drivers;
 
 std::shared_ptr<drivers::DriverI2C> i2cDev;
@@ -24,7 +26,7 @@ namespace bsp
                 DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_I2C_BAUDRATE)});
 
             qHandleIrq = qHandle;
-            return 1;
+            return kStatus_Success;
         }
 
         bool isPresent(void)
@@ -37,6 +39,14 @@ namespace bsp
                 return false;
             }
             return true;
+        }
+
+        bsp::Board GetBoard(void)
+        {
+            if (isPresent()) {
+                return bsp::Board::T4;
+            }
+            return bsp::Board::T3;
         }
     } // namespace magnetometer
 } // namespace bsp

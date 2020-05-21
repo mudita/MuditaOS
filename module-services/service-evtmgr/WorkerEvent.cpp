@@ -135,8 +135,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             LOG_DEBUG("GSM Status pin change: %s",
                       (GSMstatus == bsp::cellular::status::value::ACTIVE ? "ACTIVE" : "INACTIVE"));
 
-            auto message   = std::make_shared<sevm::StateMessage>(MessageType::EVMModemStatus);
-            message->state = GSMstatus == bsp::cellular::status::value::ACTIVE ? true : false;
+            auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
+            message->state = GSMstatus;
             sys::Bus::SendUnicast(message, "EventManager", this->service);
         }
 
