@@ -1,16 +1,17 @@
 #pragma once
 
-#include "Fota.hpp"
-
 #include <Application.hpp>
 #include <AppWindow.hpp>
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Text.hpp>
 #include <gui/widgets/BoxLayout.hpp>
+#include <gui/widgets/Progress.hpp>
 
 #include <memory>
 #include <string>
+
+class Fota;
 
 namespace gui
 {
@@ -36,13 +37,18 @@ namespace gui
         //        Text apnUser;
         //        Text apnPassword;
 
-      private:
-        void add_box_label(BoxLayout *layout, const std::string &text);
-        std::unique_ptr<Fota> fotaWorker;
+      public:
+        Label *add_box_label(BoxLayout *layout, const std::string &text);
+
         Label *currentFirmwareLabel;
         Label *availablUpdateLabel;
         Label *statusLabel;
-
+        Label *newFirmwareLabelText;
+        Label *newFirmwareLabel;
+        Progress *downloadProgress;
         VBox *mainBox;
+
+      private:
+        std::unique_ptr<Fota> fotaWorker;
     };
 } // namespace gui

@@ -195,6 +195,9 @@ enum class MessageType
     InternetHTTPReadData,
     HttpRequest,
     HttpResponse,
+    FotaStart,
+    FotaProgress,
+    FotaFinished
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

@@ -4,8 +4,9 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 
-#include <module-cellular/Modem/TS0710/TS0710.h>
 #include <module-cellular/at/Result.hpp>
+#include <module-cellular/at/URC_QIND.hpp>
+#include <module-cellular/Modem/TS0710/TS0710.h>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 
 #include "MessageType.hpp"
@@ -69,6 +70,7 @@ namespace InternetService
         handleConfigureAPN();
         handleConnect();
         handleHttpGet();
+        handleFotaStart();
     }
 
     void Service::handleCellularGetChannelResponseMessage()
@@ -79,8 +81,10 @@ namespace InternetService
             auto responseMessage = static_cast<CellularGetChannelResponseMessage *>(req);
             LOG_DEBUG("chanel ptr: %p", responseMessage->dataChannelPtr);
             dataChannel = responseMessage->dataChannelPtr;
+            handleNotifications();
             getApnConfiguration();
             setState();
+            stopActiveContext();
             return sys::Message_t();
         });
     }
@@ -200,6 +204,8 @@ namespace InternetService
                 std::shared_ptr<sys::ResponseMessage> responseMsg;
                 if (auto msg = dynamic_cast<HTTPRequestMessage *>(req)) {
                     normalizeUrl(msg->url);
+                    url                 = msg->url;
+                    receiverServiceName = msg->sender;
                     LOG_DEBUG("HTTP Get   : '%s' (%d)", msg->url.c_str(), (int)msg->url.size());
                     LOG_DEBUG("HTTP Method: %s", (msg->method == HTTPMethod::GET ? "GET" : "POST"));
                     // setup http context
@@ -214,16 +220,29 @@ namespace InternetService
                         messageError(currCmd);
                         return std::make_shared<InternetResponseMessage>(false);
                     }
+                    currCmd = "AT+QIDNSCFG=?\r";
+                    if (!dataChannel->cmd(currCmd)) {
+                        messageError(currCmd);
+                        return std::make_shared<InternetResponseMessage>(false);
+                    }
+                    currCmd = "AT+QIDNSCFG=1\r";
+                    if (!dataChannel->cmd(currCmd)) {
+                        messageError(currCmd);
+                        return std::make_shared<InternetResponseMessage>(false);
+                    }
+
                     if (isHTTPS(msg->url)) {
                         setupSSLContext();
                     }
-                    openURL(msg->url);
+                    if (!openURL(msg->url)) {
+                        return std::make_shared<InternetResponseMessage>(false);
+                    }
 
                     switch (msg->method) {
                     case HTTPMethod::GET: {
                         LOG_DEBUG("GET");
                         currCmd = "AT+QHTTPGET=20\r";
-                        if (!dataChannel->cmd(currCmd, 20000)) {
+                        if (!dataChannel->cmd(currCmd)) {
                             auto response = dataChannel->cmd(at::AT::QIGETERROR);
                             LOG_DEBUG(
                                 "error: %s",
@@ -237,16 +256,76 @@ namespace InternetService
                         LOG_DEBUG("POST - not supported yet");
                         break;
                     }
-                    currCmd       = "AT+QHTTPREAD=30\r";
-                    auto response = dataChannel->cmd(currCmd);
-                    if (response) {
-                        for (auto &line : response.response) {
-                            LOG_DEBUG("%s", line.c_str());
-                        }
-                    }
+                    LOG_DEBUG("=== === ===");
                     return std::make_shared<InternetResponseMessage>(true);
                 }
                 return std::make_shared<InternetResponseMessage>(false);
+            });
+    }
+
+    void Service::handleNotifications()
+    {
+        dataChannel->setCallback([&](std::vector<uint8_t> &data) -> void {
+            const std::string QHTTPGET("+QHTTPGET:");
+            std::vector<uint8_t> buffer(data.begin(), data.end());
+            TS0710_Frame::frame_t frame;
+            frame.deserialize(buffer);
+
+            std::string response(frame.data.begin(), frame.data.end());
+            LOG_DEBUG("URC: %s", response.c_str());
+
+            if (auto begin = response.find(QHTTPGET) != std::string::npos) {
+                auto end = response.find("\r", begin);
+                unsigned int dataPosition;
+                dataPosition = begin + QHTTPGET.size();
+                std::istringstream msg(
+                    response.substr(dataPosition, (end != std::string::npos ? end : response.size()) - dataPosition));
+                std::string tag;
+                std::vector<std::string> tags;
+                while (std::getline(msg, tag, ',')) {
+                    tags.push_back(tag);
+                }
+
+                if (tags[1] == "200") {
+                    LOG_DEBUG("HTTP Response 200 - reading data");
+                    int timeout = 10;
+                    dataChannel->cmd("AT+QHTTPREAD=" + std::to_string(timeout) + "\r" /*, timeout * 1000*/);
+                    state = State::QHTTPREAD;
+                    file.clear();
+                }
+            }
+
+            if (state == State::QHTTPREAD) {
+                LOG_DEBUG("QHTTPREAD");
+                if (response.find("+QHTTPREAD: 0") != std::string::npos) {
+                    LOG_DEBUG("QHTTPREAD:finished");
+                    state = State::Connected;
+                    parseResponse();
+                }
+                else {
+                    LOG_DEBUG("QHTTPREAD: append: |%s|", response.c_str());
+                    file += response;
+                }
+            }
+
+            parseQIND(response);
+        });
+    }
+
+    void Service::handleFotaStart()
+    {
+        connect(
+            FOTAStart(),
+            [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> std::shared_ptr<sys::ResponseMessage> {
+                LOG_DEBUG("handle Fota Start");
+                if (auto msg = dynamic_cast<FOTAStart *>(req)) {
+                    LOG_DEBUG("Starting fota update: %s", msg->url.c_str());
+                    receiverServiceName = msg->sender;
+                    state               = State::FOTAUpdate;
+                    LOG_DEBUG("fota cmd: %s", prepareQFOTADLcmd(msg->url).c_str());
+                    dataChannel->cmd(prepareQFOTADLcmd(msg->url));
+                }
+                return std::make_shared<InternetResponseMessage>(true);
             });
     }
 
@@ -294,6 +373,16 @@ namespace InternetService
             auto availableContext = dataChannel->cmd("AT+QIACT?\r");
             if (availableContext) {
                 parseQIACT(availableContext);
+            }
+        }
+    }
+
+    void Service::stopActiveContext()
+    {
+        std::string deactivateCmd = "AT+QIDEACT=";
+        for (auto &context : contextMap) {
+            if (context.second.activated) {
+                dataChannel->cmd(deactivateCmd + std::to_string(context.second.contextId) + "\r");
             }
         }
     }
@@ -350,6 +439,14 @@ namespace InternetService
         return cmd.str();
     }
 
+    string Service::prepareQFOTADLcmd(const string &url)
+    {
+        std::string fotaCmd("AT+QFOTADL=\"");
+        fotaCmd += url;
+        fotaCmd += "\"\r";
+        return fotaCmd;
+    }
+
     void Service::setupSSLContext()
     {
         std::vector<std::string> sslConfigCommands;
@@ -370,24 +467,122 @@ namespace InternetService
         }
     }
 
-    void Service::openURL(const string &url)
+    bool Service::openURL(const string &url)
     {
         std::stringstream currCmnd;
-        int timeInSec(10);
-        currCmnd << "AT+QHTTPURL=" << url.size() << "," << timeInSec << "\r";
-        auto response = dataChannel->cmd(currCmnd.str().c_str(), timeInSec * 1000);
-        if (response && (response.response[0] == "CONNECT")) {
-            response = dataChannel->cmd(url.c_str(), 10);
+        //        int timeInSec(60);
+        //        currCmnd << "AT+QHTTPURL=" << url.size() << "," << timeInSec << "\r";
+        currCmnd << "AT+QHTTPURL=" << url.size() << "\r";
+        auto response = dataChannel->cmd(currCmnd.str().c_str());
+        if (/*response &&*/ (response.response[0] == "CONNECT")) {
+            response = dataChannel->cmd(url.c_str());
             if (!response) {
                 messageError("open url error");
+                return false;
             }
         }
+        else {
+            LOG_INFO("open url error: %s",
+                     std::accumulate(response.response.begin(), response.response.end(), std::string("\n")).c_str());
+            return false;
+        }
+        return true;
     }
 
     void Service::messageError(const std::string &msg) const
     {
-        LOG_WARN("%s", msg.c_str());
+        auto results = dataChannel->cmd(at::AT::QIGETERROR);
+        LOG_WARN("%s:%s",
+                 msg.c_str(),
+                 std::accumulate(results.response.begin(), results.response.end(), std::string("\n")).c_str());
         // send messatge
+    }
+
+    void Service::parseResponse()
+    {
+        LOG_DEBUG("Got full fille: \n%s", file.c_str());
+        std::istringstream input(file);
+        enum Part
+        {
+            URC,
+            Headers,
+            Body
+        } part;
+        part = URC;
+        std::vector<string> headers;
+        std::string body;
+        std::string line;
+        while (std::getline(input, line, '\n')) {
+            line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+
+            LOG_DEBUG("line -> '%s'", line.c_str());
+            switch (part) {
+            case URC:
+                if (line.find("CONNECT") != std::string::npos) {
+                    part = Headers;
+                }
+                continue;
+            case Headers:
+                if (line.empty()) {
+                    part = Body;
+                    LOG_DEBUG("=== body part! ===");
+                }
+                else {
+                    headers.push_back(line);
+                }
+                break;
+            case Body:
+                body += line + '\n';
+                break;
+            }
+        }
+        std::shared_ptr<HTTPResponseMessage> msg = std::make_shared<HTTPResponseMessage>();
+        msg->url                                 = url;
+        msg->httpError                           = HTTPErrors::OK;
+        msg->httpServerResponseError             = 200;
+        msg->responseHeaders                     = std::move(headers);
+        msg->body                                = std::move(body);
+        sys::Bus::SendUnicast(msg, receiverServiceName, this);
+    }
+
+    void Service::parseQIND(const string &message)
+    {
+        auto qind = at::urc::QIND(message);
+        if (qind.is()) {
+            if (qind.tokens[0].find("FOTA") != std::string::npos) {
+                if (qind.tokens[1].find("START") != std::string::npos) {
+                    LOG_DEBUG("FOTA UPDATING");
+                }
+                else if (qind.tokens[1].find("HTTPEND") != std::string::npos) {
+                    LOG_DEBUG("Downloading finished: %s", qind.tokens[2].c_str());
+                }
+                else if (qind.tokens[1].find("END") != std::string::npos) {
+                    LOG_DEBUG("FOTA FINISHED -> reboot");
+                    sendFotaFinshed(receiverServiceName);
+                }
+                else if (qind.tokens[1].find("UPDATING") != std::string::npos) {
+                    unsigned char progress = static_cast<unsigned char>(std::stoi(qind.tokens[2]));
+                    LOG_DEBUG("FOTA UPDATING: %d", progress);
+                    sendProgress(progress, receiverServiceName);
+                }
+                else if (qind.tokens[1].find("HTTPSTART") != std::string::npos) {
+                    LOG_DEBUG("Start downloading DELTA");
+                }
+            }
+        }
+    }
+
+    void Service::sendProgress(unsigned int progress, const string &receiver)
+    {
+        auto progressMsg      = std::make_shared<FOTAProgres>();
+        progressMsg->progress = progress;
+        sys::Bus::SendUnicast(progressMsg, receiver, this);
+    }
+
+    void Service::sendFotaFinshed(const string &receiver)
+    {
+        auto msg = make_shared<FOTAFinished>();
+        sys::Bus::SendUnicast(std::move(msg), receiver, this);
     }
 
     sys::Message_t Service::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)

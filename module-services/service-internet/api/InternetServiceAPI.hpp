@@ -97,6 +97,8 @@ namespace InternetService
                                     const std::string &request,
                                     const std::string &audio);
 
+        static void FotaStart(sys::Service *serv, const std::string &url);
+
         enum class encodings
         {
             encUNSPECIFIED,

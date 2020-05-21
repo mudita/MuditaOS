@@ -814,7 +814,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         }
     }
 
-    LOG_WARN("Unhandled notification");
+    LOG_WARN("Unhandled notification: %s", str.c_str());
     return std::nullopt;
 }
 

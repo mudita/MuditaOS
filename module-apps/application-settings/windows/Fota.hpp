@@ -8,6 +8,7 @@
 namespace gui
 {
     class Label;
+    class FotaWindow;
 }
 
 class Fota
@@ -22,13 +23,19 @@ class Fota
         DownloadingInfo,
         DownloadedInfo,
         ParsingInfo,
-        ParsedInfo,
+        NeedUpdate,
         Updating,
         Finished,
     };
 
   public:
-    Fota(app::Application *app, gui::Label *statusLabel);
+    struct VersionInfo
+    {
+        std::string newVersion;
+        std::string file;
+    };
+    using VersionMap = std::unordered_map<std::string, VersionInfo>;
+    Fota(gui::FotaWindow *parent);
     virtual ~Fota();
     void next();
     std::string currentFirmwareVersion()
@@ -51,11 +58,17 @@ class Fota
     void registerHandlers();
     void handleInternetNotification();
     void handleHTTPResponse();
+    void handleFotaProgres();
+    void handleFotaFinished();
 
     void getCurrentVersion();
-    std::shared_ptr<app::Application> app_m;
     State currentState_m;
+
+    gui::FotaWindow *parent_m;
+    std::shared_ptr<app::Application> app_m;
     std::string currentFirmwareVersion_m;
     std::string newFirmwareVersion_m;
-    gui::Label *statusLable_m;
+    VersionMap versionMap_m;
+    static std::string urlPrefix;
+    static std::string versionFile;
 };

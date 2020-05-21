@@ -9,6 +9,7 @@
 #include <Service/Service.hpp>
 
 #include <memory>
+#include <sstream>
 
 namespace InternetService
 {
@@ -22,6 +23,8 @@ namespace InternetService
             Idle,
             Connecting,
             Connected,
+            QHTTPREAD,
+            FOTAUpdate,
             Failed
         };
 
@@ -54,23 +57,34 @@ namespace InternetService
         void handleConfigureAPN();
         void handleConnect();
         void handleHttpGet();
+        void handleNotifications();
+        void handleFotaStart();
         uint32_t connectionTimer = 0;
         //    NotificationMuxChannel::NotificationCallback_t notificationCallback = nullptr;
         void getApnConfiguration();
         void getConfig();
         void getActiveCotext();
+        void stopActiveContext();
         void setState();
         void parseQIACT(const at::Result &result);
         bool isHTTPS(const std::string &url) const;
         void normalizeUrl(std::string &url) const;
         std::string prepareQICSGPcmd(const APN::Config &apn);
+        std::string prepareQFOTADLcmd(const std::string &url);
         void setupSSLContext();
-        void openURL(const std::string &url);
+        bool openURL(const std::string &url);
         void messageError(const string &msg) const;
+        void parseResponse();
+        void parseQIND(const string &message);
+        void sendProgress(unsigned int progress, const std::string &receiver);
+        void sendFotaFinshed(const std::string &receiver);
 
         State state              = State ::Idle;
         DLC_channel *dataChannel = nullptr;
         APN::ContextMap contextMap;
+        std::string url;
+        std::string file;
+        std::string receiverServiceName;
     };
 
 } // namespace InternetService

@@ -106,7 +106,30 @@ namespace InternetService
         HTTPErrors httpError;        ///< HTTP commands error
         int httpServerResponseError; ///< HTTP response error retruned by server
         std::vector<std::string> responseHeaders;
-        std::string response; ///< Content of the file downloade from server
+        std::string body; ///< Content of the file downloade from server
+    };
+
+    class FOTAStart : public InternetMessage
+    {
+      public:
+        FOTAStart() : InternetMessage(MessageType::FotaStart)
+        {}
+        std::string url;
+    };
+
+    class FOTAProgres : public InternetMessage
+    {
+      public:
+        FOTAProgres() : InternetMessage(MessageType::FotaProgress)
+        {}
+        unsigned char progress = 0;
+    };
+
+    class FOTAFinished : public InternetMessage
+    {
+      public:
+        FOTAFinished() : InternetMessage(MessageType::FotaFinished)
+        {}
     };
 
     class ConfigureAPNMessage : public InternetMessage

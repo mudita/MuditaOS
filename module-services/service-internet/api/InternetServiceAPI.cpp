@@ -18,21 +18,21 @@ namespace InternetService
     {
         std::shared_ptr<ConfigureAPNMessage> msg = std::make_shared<ConfigureAPNMessage>(config);
         LOG_DEBUG("!!!Internet Config called");
-        return sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        return sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
     }
 
     bool API::Connect(sys::Service *serv)
     {
         LOG_DEBUG("!!!Internet connection called");
         auto msg = std::make_shared<ConnectMessage>();
-        return sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        return sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
     }
 
     bool API::Disconnect(sys::Service *serv)
     {
         std::shared_ptr<InternetRequestMessage> msg =
             std::make_shared<InternetRequestMessage>(MessageType::InternetDisconnect);
-        return sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        return sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
     }
 
     void API::HTTPGET(sys::Service *serv, const std::string &url)
@@ -41,7 +41,7 @@ namespace InternetService
         std::shared_ptr<HTTPRequestMessage> msg = std::make_shared<HTTPRequestMessage>();
         msg->url                                = url;
         msg->method                             = InternetService::HTTPMethod::GET;
-        sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
     }
 
     std::string API::HTTPPOST(sys::Service *serv,
@@ -53,29 +53,37 @@ namespace InternetService
             std::make_shared<InternetRequestMessage>(MessageType::InternetOpenHTTPConnection);
         LOG_DEBUG("HTTP POST API called");
 
-        auto ret = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        auto ret = sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
         if (!ret)
             return "HTTP Open failed";
 
         msg      = std::make_shared<InternetRequestMessage>(MessageType::InternetHTTPUrl);
         msg->url = url;
-        ret      = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        ret      = sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
         if (!ret)
             return "HTTP URL failed";
 
         msg          = std::make_shared<InternetRequestMessage>(MessageType::InternetHTTPPOST);
         msg->request = request;
         msg->data    = audio;
-        ret          = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        ret          = sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
         if (!ret)
             return "HTTP POST failed";
 
         msg = std::make_shared<InternetRequestMessage>(MessageType::InternetHTTPReadData);
-        ret = sys::Bus::SendUnicast(msg, InternetService::Service::serviceName, serv);
+        ret = sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
         if (!ret)
             return "HTTP Done";
 
         return "HTTP ERROR";
+    }
+
+    void API::FotaStart(sys::Service *serv, const string &url)
+    {
+        LOG_DEBUG("Fota Star: %s", url.c_str());
+        std::shared_ptr<InternetService::FOTAStart> msg = std::make_shared<InternetService::FOTAStart>();
+        msg->url                                        = url;
+        sys::Bus::SendUnicast(std::move(msg), InternetService::Service::serviceName, serv);
     }
 
     std::string API::json(encodings encoding, int samplerate, languages language, uint8_t *buffer, uint32_t length)

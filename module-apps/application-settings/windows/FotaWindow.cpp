@@ -1,4 +1,7 @@
 #include "FotaWindow.hpp"
+
+#include "Fota.hpp"
+
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <i18/i18.hpp>
 
@@ -8,7 +11,7 @@ namespace gui
     FotaWindow::FotaWindow(app::Application *app) : AppWindow(app, window::fota_window)
     {
         buildInterface();
-        fotaWorker = std::make_unique<Fota>(app, statusLabel);
+        fotaWorker = std::make_unique<Fota>(this);
         currentFirmwareLabel->setText(fotaWorker->currentFirmwareVersion());
     }
 
@@ -40,11 +43,8 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("Check for updates"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-        mainBox = new gui::VBox(this,
-                                0,
-                                title->offset_h(),
-                                style::window_width,
-                                6 * style::window::label::default_h); // style::window_height);
+        mainBox = new gui::VBox(this, 0, title->offset_h(), style::window_width, style::window_height
+                                /*8 * style::window::label::default_h*/); // style::window_height);
         mainBox->setPenWidth(style::window::default_border_no_focus_w);
 
         add_box_label(mainBox, "FOTA Status:");
@@ -55,6 +55,17 @@ namespace gui
         currentFirmwareLabel = new Label(mainBox, 0, 0, style::window_width, style::window::label::default_h);
 
         setFocusItem(statusLabel);
+
+        newFirmwareLabelText = add_box_label(mainBox, "New Firmare:");
+        newFirmwareLabelText->setVisible(false);
+        newFirmwareLabel = new Label(mainBox, 0, 0, style::window_width, style::window::label::default_h);
+        newFirmwareLabel->setText("");
+        newFirmwareLabel->setVisible(false);
+
+        downloadProgress = new Progress(mainBox, 0, 0, style::window_width, style::window::label::default_h);
+        downloadProgress->setTotalProgress(100);
+        downloadProgress->setCurrentPercent(0);
+        downloadProgress->setVisible(false);
 
         statusLabel->activatedCallback = [&](Item &) -> bool {
             fotaWorker->next();
@@ -68,11 +79,12 @@ namespace gui
         AppWindow::destroyInterface();
     }
 
-    void FotaWindow::add_box_label(BoxLayout *layout, const std::string &text)
+    gui::Label *FotaWindow::add_box_label(BoxLayout *layout, const std::string &text)
     {
         auto el = new gui::Label(layout, 0, 0, style::window_width, style::window::label::default_h);
         style::window::decorateOption(el);
         el->setText(text);
+        return el;
     }
 
 } // namespace gui
