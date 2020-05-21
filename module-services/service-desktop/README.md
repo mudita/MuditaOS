@@ -126,7 +126,7 @@ service on the faulty driver you need to uncomment the relevant line in main.cpp
 ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
 ````
-Once enabled, load the OS and connect the USB3 cable to the phone, ypu should see
+Once enabled, load the OS and connect the USB3 cable to the phone, you should see
 a new serial CDC/ACM device in your OS, it should look like below:
 ````asm
 # lsusb

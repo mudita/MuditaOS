@@ -60,11 +60,5 @@ bool WorkerDesktop::deinit(void)
 
 bool WorkerDesktop::sendMessage(const std::string messageToSend)
 {
-    const int ret = bsp::usbCDCSend(new std::string(messageToSend));
-
-    if (ret == 2) {
-        bsp::usbCDCFlush();
-    }
-
-    return (ret ? true : false);
+    return (bsp::usbCDCSend(new std::string(messageToSend)) ? true : false);
 }

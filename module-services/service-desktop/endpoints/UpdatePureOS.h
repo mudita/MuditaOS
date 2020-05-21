@@ -1,20 +1,19 @@
-//
-// Created by atom on 3/19/20.
-//
-
 #pragma once
 
-#include <../module-utils/microtar/src/microtar.h>
+#include "module-utils/microtar/src/microtar.h"
+#include "module-vfs/vfs.hpp"
+
+#ifndef TARGET_Linux
+#include "ff_stdio.h"
+#endif
+
+#include "json/json11.hpp"
 #include <string.h>
 #include <sstream>
 #include <vector>
 #include <random>
-#include <vfs.hpp>
 #include <time/time_conversion.hpp>
-#include "json/json11.hpp"
-#ifndef TARGET_Linux
-#include "ff_stdio.h"
-#endif
+
 class ServiceDesktop;
 namespace fs = std::filesystem;
 namespace updateos

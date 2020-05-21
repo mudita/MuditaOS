@@ -25,7 +25,12 @@ sys::ReturnCodes EndpointHandler::update(
         ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
         if (service && service->updateOS) {
             LOG_INFO("got a pointer to the destkop service, store state");
-            service->updateOS->runUpdate(fileName);
+            if (service->updateOS->runUpdate(fileName) == updateos::UpdateError::NoError) {
+                responseStr = EndpointHandler::buildResponseStr(2, "OK");
+            }
+            else {
+                responseStr = EndpointHandler::buildResponseStr(5, "ERROR");
+            }
         }
         else {
             LOG_INFO("no valid service handle");
