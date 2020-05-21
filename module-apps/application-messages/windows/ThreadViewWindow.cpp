@@ -2,7 +2,7 @@
 
 #include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
-#include "../widgets/ThreadModel.hpp"
+#include "../models/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
 #include "Span.hpp"
 

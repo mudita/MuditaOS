@@ -25,7 +25,7 @@ namespace gui
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-                app->searchEmpty();
+                app->showSearchResults(utils::localize.get("app_phonebook_search_results"));
             }
             return false;
         };

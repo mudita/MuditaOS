@@ -69,6 +69,7 @@ namespace style
             inline const uint32_t sms_border_no_focus = 1;
             /// TODO 100 is static size, sms elements should have size depending on text amount
             inline const uint32_t sms_height                = 100;
+            inline const uint32_t sms_thread_item_h         = 100;
             const inline unsigned short yaps_size_default   = 10;
             const inline unsigned short sms_max_width       = 320;
             const inline unsigned short sms_h_padding       = 15;

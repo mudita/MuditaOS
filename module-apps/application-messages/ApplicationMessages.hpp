@@ -52,6 +52,7 @@ namespace app
         bool removeSMS_thread(const ThreadRecord *record);
         /// show dialog with big search icon and text which was used for query
         bool searchEmpty(const std::string &query = "");
+        bool showSearchResults(const UTF8 &title);
         bool sendSms(const UTF8 &number, const UTF8 &body);
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
 

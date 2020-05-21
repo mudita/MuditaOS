@@ -7,6 +7,7 @@
 #include "windows/ThreadViewWindow.hpp"
 #include "windows/SearchStart.hpp"
 #include "windows/SMSTemplatesWindow.hpp"
+#include "windows/SearchResults.hpp"
 
 #include <MessageType.hpp>
 #include <Dialog.hpp>
@@ -120,6 +121,7 @@ namespace app
                                         gui::Dialog::Meta{.icon = "search_big", .have_choice = false})});
         windows.insert({gui::name::window::thread_sms_search, new gui::SMSSearch(this)});
         windows.insert({gui::name::window::sms_templates, new gui::SMSTemplatesWindow(this)});
+        windows.insert({gui::name::window::search_results, new gui::SearchResults(this)});
     }
 
     void ApplicationMessages::destroyUserInterface()
@@ -166,6 +168,13 @@ namespace app
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
         return switchWindow(gui::name::window::thread_search_none, nullptr);
+    }
+
+    bool ApplicationMessages::showSearchResults(const UTF8 &title)
+    {
+        auto name = gui::name::window::search_results;
+        windows[name]->setTitle(title);
+        return switchWindow(name, nullptr);
     }
 
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)

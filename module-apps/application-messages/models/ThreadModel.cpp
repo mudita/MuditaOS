@@ -1,42 +1,11 @@
 #include "ThreadModel.hpp"
 #include "OptionWindow.hpp"
-#include "ThreadItem.hpp"
-
-#include "application-messages/ApplicationMessages.hpp"
-
-#include "application-messages/MessagesStyle.hpp"
+#include "application-messages/windows/OptionsWindow.hpp"
+#include "../widgets/ThreadItem.hpp"
 #include "application-messages/data/SMSdata.hpp"
 
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/windows/OptionsWindow.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <cassert>
-ThreadModel::ThreadModel(app::Application *app) : DatabaseModel(app)
+ThreadModel::ThreadModel(app::Application *app) : BaseThreadRecordModel(app)
 {}
-
-void ThreadModel::requestRecordsCount(void)
-{
-    recordsCount = DBServiceAPI::ThreadGetCount(application);
-
-    if (recordsCount > 0) {
-
-        DBServiceAPI::ThreadGetLimitOffset(application, 0, messages::threads::pageSize);
-    }
-}
-bool ThreadModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,
-                                const uint32_t offset,
-                                const uint32_t limit,
-                                uint32_t count)
-{
-    DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-    list->onProviderDataUpdate();
-    return true;
-}
-
-void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
-{
-    DBServiceAPI::ThreadGetLimitOffset(application, offset, limit);
-}
 
 gui::ListItem *ThreadModel::getItem(int index)
 {
