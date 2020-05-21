@@ -101,6 +101,11 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
         auto ret          = smsRecordInterface->RemoveByID(msg->id);
         responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
+
+        // send notification
+        auto notificationMessage = std::make_shared<DBNotificationMessage>(
+            MessageType::DBServiceNotification, DB::NotificationType::Removed, DB::BaseType::SmsDB);
+        sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
     } break;
 
     case MessageType::DBSMSUpdate: {

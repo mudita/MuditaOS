@@ -91,8 +91,12 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
                                             return app->returnToPreviousWindow();
                                         }}),
 
-        gui::newOptionLabel(gui::Option{UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")),
-                                        [=](gui::Item &item) { return false; }}),
+        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
+                                        [=](gui::Item &item) {
+                                            LOG_DEBUG("Delete sms record ID %u", record.ID);
+                                            DBServiceAPI::SMSRemove(app, record.ID);
+                                            return app->returnToPreviousWindow();
+                                        }}),
         placeholder(utils::localize.get("sms_from_this_sms")),
         newCombo(app, contact) // contact.numbers[0].numberE164)
     };
