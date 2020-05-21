@@ -65,7 +65,7 @@ namespace app
 
     auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
     {
-        LOG_DEBUG("Received multicast");
+        LOG_DEBUG("DB notification handler");
         assert(msg);
         notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
         notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
