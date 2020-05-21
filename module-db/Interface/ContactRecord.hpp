@@ -30,11 +30,10 @@ struct ContactRecord
 
     UTF8 assetPath = "";
 
-    bool isOnWhitelist    = false;
-    bool isOnBlacklist    = false;
-    bool isOnFavourites   = false;
-    bool isEmptyListLabel = false;
-    UTF8 speeddial        = "";
+    bool isOnWhitelist  = false;
+    bool isOnBlacklist  = false;
+    bool isOnFavourites = false;
+    UTF8 speeddial      = "";
 
     enum class NameFormatType
     {
