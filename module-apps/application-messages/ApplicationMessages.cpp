@@ -41,14 +41,9 @@ namespace app
         if (msgl->messageType == MessageType::DBServiceNotification) {
             DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
-            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB) &&
-                ((msg->notificationType == DB::NotificationType::Updated) ||
-                 (msg->notificationType == DB::NotificationType::Added))) {
-                if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view] ||
-                    this->getCurrentWindow() == this->windows[gui::name::window::main_window]) {
-                    LOG_DEBUG("TODO");
-                    this->getCurrentWindow()->rebuild();
-                }
+            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB)) {
+                this->windows[gui::name::window::thread_view]->rebuild();
+                this->windows[gui::name::window::main_window]->rebuild();
                 return std::make_shared<sys::ResponseMessage>();
             }
         }
@@ -103,9 +98,9 @@ namespace app
         windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
         windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
         windows.insert({windowOptions->getName(), windowOptions});
-        windows.insert({gui::name::window::thread_rm_confirm,
+        windows.insert({gui::name::window::dialog,
                         new gui::Dialog(this,
-                                        gui::name::window::thread_rm_confirm,
+                                        gui::name::window::dialog,
                                         {
                                             .title  = "",
                                             .icon   = "phonebook_contact_delete_trashcan",
@@ -135,7 +130,7 @@ namespace app
         }
         else {
             LOG_DEBUG("Removing thread: %" PRIu32, record->dbID);
-            auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_rm_confirm]);
+            auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
             if (dialog != nullptr) {
                 auto meta   = dialog->meta;
                 meta.action = [=]() -> bool {
@@ -150,12 +145,36 @@ namespace app
                 auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
                 meta.title      = cont.getFormattedName();
                 dialog->update(meta);
-                return switchWindow(gui::name::window::thread_rm_confirm, nullptr);
+                return switchWindow(gui::name::window::dialog, nullptr);
             }
             else {
                 LOG_ERROR("Dialog bad type!");
                 return false;
             }
+        }
+    }
+
+    bool ApplicationMessages::removeSMS(const SMSRecord &record)
+    {
+        LOG_DEBUG("Removing sms: %" PRIu32, record.ID);
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
+        if (dialog != nullptr) {
+            auto meta   = dialog->meta;
+            meta.action = [=]() -> bool {
+                if (!DBServiceAPI::SMSRemove(this, record.ID)) {
+                    LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
+                    return false;
+                }
+                return this->switchWindow(gui::name::window::thread_view);
+            };
+            meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
+            meta.title = record.body;
+            dialog->update(meta);
+            return switchWindow(gui::name::window::dialog, nullptr);
+        }
+        else {
+            LOG_ERROR("Dialog bad type!");
+            return false;
         }
     }
 

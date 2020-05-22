@@ -65,17 +65,13 @@ namespace app
 
     auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
     {
-        LOG_DEBUG("Received multicast");
+        LOG_DEBUG("DB notification handler");
         assert(msg);
-        if ((msg->notificationType == DB::NotificationType::Updated) ||
-            (msg->notificationType == DB::NotificationType::Added)) {
-            notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-            notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
-            windows[app::window::name::desktop_menu]->rebuild();
-            windows[app::window::name::desktop_main_window]->rebuild();
-            return true;
-        }
-        return false;
+        notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+        notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+        windows[app::window::name::desktop_menu]->rebuild();
+        windows[app::window::name::desktop_main_window]->rebuild();
+        return true;
     }
 
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool

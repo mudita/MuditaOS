@@ -91,8 +91,8 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
                                             return app->returnToPreviousWindow();
                                         }}),
 
-        gui::newOptionLabel(gui::Option{UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")),
-                                        [=](gui::Item &item) { return false; }}),
+        gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
+                                        [=](gui::Item &item) { return app->removeSMS(record); }}),
         placeholder(utils::localize.get("sms_from_this_sms")),
         newCombo(app, contact) // contact.numbers[0].numberE164)
     };

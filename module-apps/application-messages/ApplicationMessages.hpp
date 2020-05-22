@@ -3,6 +3,7 @@
 #include <Application.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
+#include <Interface/SMSRecord.hpp>
 
 namespace gui
 {
@@ -13,7 +14,7 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string thread_rm_confirm  = "ConfirmRM";
+            inline const std::string dialog             = "Dialog";
             inline const std::string thread_search_none = "SearchNone";
             inline const std::string new_sms            = "NewSMS";
             inline const std::string thread_sms_search  = "SMSSearch";
@@ -49,6 +50,7 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
+        bool removeSMS(const SMSRecord &record);
         bool removeSMS_thread(const ThreadRecord *record);
         /// show dialog with big search icon and text which was used for query
         bool searchEmpty(const std::string &query = "");
