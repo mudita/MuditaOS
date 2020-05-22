@@ -53,11 +53,15 @@ target_compile_options(${PROJECT_NAME}
     PUBLIC
     ${TARGET_COMPILE_OPTIONS}
     PRIVATE
-    -Wno-error
     -Wno-sign-compare
     -Wno-missing-field-initializers
-    $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
     -Wno-unused-function
+    -Wno-switch
+    -Wno-implicit-fallthrough
+    -Wno-unused-variable
+
+    # C only flags
+    $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
 )
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
