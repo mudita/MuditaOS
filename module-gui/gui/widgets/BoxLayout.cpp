@@ -128,7 +128,6 @@ namespace gui
     void BoxLayout::setReverseOrder(bool value)
     {
         reverseOrder = value;
-        resizeItems();
     }
 
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
@@ -170,7 +169,8 @@ namespace gui
             pos_update(el, pos, size_left);
         }
 
-        Rect::updateDrawArea();
+        if (reverseOrder)
+            moveBySizeLeft<axis>();
     }
 
     // space left distposition `first is better` tactics
@@ -232,6 +232,14 @@ namespace gui
             }
             return false;
         });
+    }
+
+    template <Axis axis> void BoxLayout::moveBySizeLeft()
+    {
+
+        for (auto &it : children) {
+            it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
+        }
     }
 
     void BoxLayout::setNavigation()

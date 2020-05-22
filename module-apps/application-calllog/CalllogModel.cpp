@@ -55,6 +55,12 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+
+    if (direction == style::listview::Direction::Top)
+        modelIndex = this->records.size() - 1;
+    else if (direction == style::listview::Direction::Bottom)
+        modelIndex = 0;
+
     list->onProviderDataUpdate();
 
     return true;
@@ -62,8 +68,16 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
 
 gui::ListItem *CalllogModel::getItem(int index)
 {
-    std::shared_ptr<CalllogRecord> call = getRecord(index);
-    SettingsRecord &settings            = application->getSettings();
+    std::shared_ptr<CalllogRecord> call = getRecord(modelIndex);
+
+    if (direction == style::listview::Direction::Top)
+        modelIndex--;
+    else if (direction == style::listview::Direction::Bottom)
+        modelIndex++;
+
+    LOG_DEBUG("Model index: %d", modelIndex);
+
+    SettingsRecord &settings = application->getSettings();
     if (call.get() == nullptr) {
         // LOG_ERROR("getItem nullptr");
         return nullptr;
@@ -72,7 +86,7 @@ gui::ListItem *CalllogModel::getItem(int index)
     auto item = new gui::CalllogItem(this, !settings.timeFormat12);
     if (item != nullptr) {
         item->setCall(call);
-        item->setID(index);
+        item->setID(modelIndex);
         item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("activatedCallback");
             std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
