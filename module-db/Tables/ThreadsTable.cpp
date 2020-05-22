@@ -178,7 +178,7 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                                                                               uint32_t offset,
                                                                               uint32_t limit)
 {
-    auto ret = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
+    auto ret       = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
     auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \"%%%q%%\"", text.c_str());
     ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].GetUInt32();
     if (ret.first != 0) {
