@@ -1,4 +1,6 @@
 option(COLOR_OUTPUT "Use colored output" ON)
+set(CMAKE_COLOR_MAKEFILE ${COLOR_OUTPUT})
+
 if (COLOR_OUTPUT)
 	string(ASCII 27 Esc)
 	set(ColourReset "${Esc}[m")
@@ -19,4 +21,8 @@ if (COLOR_OUTPUT)
 	set(BoldWhite   "${Esc}[1;37m")
 
 	set(ORANGE      "${Esc}[38;2;255;100;0m")
+
+	add_compile_options (-fdiagnostics-color=always)
+else (COLOR_OUTPUT)
+	add_compile_options (-fdiagnostics-color=never)
 endif (COLOR_OUTPUT)
