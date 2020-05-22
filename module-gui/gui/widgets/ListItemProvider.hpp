@@ -12,7 +12,8 @@ namespace gui
     {
 
       public:
-        ListView *list = nullptr;
+        ListView *list                       = nullptr;
+        style::listview::Direction direction = style::listview::Direction::Bottom;
 
         virtual int getItemCount() const = 0;
 

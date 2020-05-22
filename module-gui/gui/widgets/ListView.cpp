@@ -74,11 +74,11 @@ namespace gui
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP) {
-                direction = Direction::Top;
+                direction = style::listview::Direction::Top;
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
-                direction = Direction::Bottom;
+                direction = style::listview::Direction::Bottom;
                 return this->listPageEndReached();
             }
             else {
@@ -105,7 +105,7 @@ namespace gui
         elementsCount = count;
     }
 
-    void ListView::setListViewType(ListViewType type)
+    void ListView::setListViewType(style::listview::Type type)
     {
         listType = type;
     }
@@ -195,13 +195,7 @@ namespace gui
 
     void ListView::setFocus()
     {
-        if (direction == Direction::Top) {
-            setFocusItem(body);
-            body->setFocusOnLastElement();
-        }
-        if (direction == Direction::Bottom) {
-            setFocusItem(body);
-        }
+        setFocusItem(body);
     };
 
     std::list<DrawCommand *> ListView::buildDrawList()
@@ -229,21 +223,28 @@ namespace gui
 
     bool ListView::listPageEndReached()
     {
+        auto minLimit = (2 * currentPageSize > 4 ? 2 * currentPageSize : 4);
+
         auto calculateLimit = [&]() {
             // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
             // before it gets them, requests twice size of current page with down limit of at least 4.
-            auto minLimit = (2 * currentPageSize > 4 ? 2 * currentPageSize : 4);
-
-            return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
+            if (direction == style::listview::Direction::Bottom)
+                return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
+            else
+                return (startIndex - (minLimit - currentPageSize) >= 0 ? minLimit : currentPageSize);
         };
 
-        if (direction == Direction::Bottom) {
+        provider->direction = direction;
 
-            if (startIndex + currentPageSize >= elementsCount && listType == ListViewType::Continuous) {
+        if (direction == style::listview::Direction::Bottom) {
+
+            body->setReverseOrder(false);
+
+            if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::Continuous) {
 
                 startIndex = 0;
             }
-            else if (startIndex + currentPageSize >= elementsCount && listType == ListViewType::TopDown) {
+            else if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::TopDown) {
 
                 return true;
             }
@@ -257,21 +258,27 @@ namespace gui
             provider->requestRecords(startIndex, calculateLimit());
         }
 
-        if (direction == Direction::Top) {
+        if (direction == style::listview::Direction::Top) {
 
-            if (startIndex == 0 && listType == ListViewType::Continuous) {
+            body->setReverseOrder(true);
+
+            if (startIndex == 0 && listType == style::listview::Type::Continuous) {
 
                 startIndex = elementsCount - (elementsCount % currentPageSize);
             }
-            else if (startIndex == 0 && listType == ListViewType::TopDown) {
+            else if (startIndex == 0 && listType == style::listview::Type::TopDown) {
 
                 return true;
             }
             else {
-                startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
+                startIndex = startIndex - currentPageSize >= 0 ? startIndex - currentPageSize : 0;
             }
 
-            provider->requestRecords(startIndex, calculateLimit());
+            LOG_DEBUG("Start off: %u, limit: %u, page: %u", startIndex, calculateLimit(), currentPageSize);
+
+            provider->requestRecords(
+                startIndex - (minLimit - currentPageSize) >= 0 ? startIndex - (minLimit - currentPageSize) : 0,
+                calculateLimit());
         }
 
         return true;

@@ -9,13 +9,6 @@
 
 namespace gui
 {
-
-    enum class ListViewType
-    {
-        TopDown,
-        Continuous
-    };
-
     class ListItemProvider;
 
     class ListViewScroll : public Rect
@@ -40,14 +33,8 @@ namespace gui
 
         int currentPageSize = 0;
 
-        enum class Direction
-        {
-            Top,
-            Bottom
-        };
-
-        ListViewType listType = ListViewType::TopDown;
-        Direction direction   = Direction::Bottom;
+        style::listview::Type listType       = style::listview::Type::TopDown;
+        style::listview::Direction direction = style::listview::Direction::Bottom;
 
         void clearItems();
         virtual void addItemsOnPage();
@@ -63,7 +50,7 @@ namespace gui
 
         void setElementsCount(int count);
         void setProvider(ListItemProvider *provider);
-        void setListViewType(ListViewType type);
+        void setListViewType(style::listview::Type type);
         void setItemSpanSize(int size);
         void onProviderDataUpdate();
         void clear();
