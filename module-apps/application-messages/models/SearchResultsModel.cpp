@@ -34,11 +34,15 @@ namespace gui::model
     }
 
     void SearchResultsModel::requestRecordsCount()
+    {}
+
+    void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
-            DBServiceAPI::GetByQuery(getApplication(),
-                                     db::interface::SMSThread,
-                                     std::make_unique<db::query::SMSSearch>(search_value, 0, 10));
+            DBServiceAPI::GetByQuery(
+                getApplication(),
+                db::interface::SMSThread,
+                std::make_unique<db::query::SMSSearch>(search_value, offset, max_search_items_on_screen));
         }
     }
 

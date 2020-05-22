@@ -33,22 +33,17 @@ namespace gui
 
     void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
-            if (data != nullptr) {
-                if (auto search_data = dynamic_cast<SMSTextToSearch *>(data)) {
-                    if (search_data->getTextToSearch().length() != 0u) {
-                        model->setSearchValue(search_data->getTextToSearch());
-                        model->clear();
-                        model->requestRecordsCount();
-                        list->clear();
-                        list->setElementsCount(model->getItemCount());
-
-                        list->setProvider(model.get());
-                        setFocusItem(list);
-                    }
-                    else {
-                        showEmptyResults();
-                    }
+        if (mode == ShowMode::GUI_SHOW_INIT && data != nullptr) {
+            if (auto search_data = dynamic_cast<SMSTextToSearch *>(data)) {
+                if (search_data->getTextToSearch().length() != 0u) {
+                    model->setSearchValue(search_data->getTextToSearch());
+                    model->requestRecords(0, model->getMaxItemsOnScreen());
+                    list->setElementsCount(model->getItemCount());
+                    list->setProvider(model.get());
+                    setFocusItem(list);
+                }
+                else {
+                    showEmptyResults();
                 }
             }
         }

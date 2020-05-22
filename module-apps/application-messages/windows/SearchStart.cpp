@@ -18,7 +18,7 @@ namespace gui
         body = new gui::Item();
         body->setBoundingBox(bodySize());
         addWidget(body);
-        auto text = searchBox(this, utils::localize.get("app_phonebook_search_win_search"), "search");
+        auto text = searchBox(this, utils::localize.get("common_search_uc"), "search");
 
         inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
@@ -28,8 +28,8 @@ namespace gui
             }
             if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
                 auto search_text = text->getText();
-                app->showSearchResults(
-                    utils::localize.get("app_phonebook_search_results") + ": " + std::string(search_text), search_text);
+                app->showSearchResults(utils::localize.get("common_search_results") + ": " + std::string(search_text),
+                                       search_text);
             }
             return false;
         };
