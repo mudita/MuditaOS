@@ -90,14 +90,14 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
     options.push_back(gui::newOptionLabel(
         gui::Option{UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) {
                         std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
-                         app->switchWindow(gui::name::window::new_sms, std::move(data));
-                                            return true;
+                        app->switchWindow(gui::name::window::new_sms, std::move(data));
+                        return true;
                     }}));
     options.push_back(gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")), [=](gui::Item &item) {
                                                           Clipboard::getInstance().copy(record.body);
-                                                           app->returnToPreviousWindow();
-                                                      return true;
-                                        }}));
+                                                          app->returnToPreviousWindow();
+                                                          return true;
+                                                      }}));
     options.push_back(gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
                                                       [=](gui::Item &item) { return app->removeSMS(record); }}));
     options.push_back(placeholder(utils::localize.get("sms_from_this_sms")));
