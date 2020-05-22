@@ -16,6 +16,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
         board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/bluetooth/Bluetooth.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/common.cpp"
         )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

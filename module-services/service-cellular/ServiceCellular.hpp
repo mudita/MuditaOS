@@ -17,22 +17,11 @@
 #include "messages/CellularMessage.hpp"
 #include <utf8/UTF8.hpp>
 #include "State.hpp"
+#include "bsp/common.hpp"
 
 #include <optional>
 
 class MuxDaemon;
-
-namespace cellular
-{
-
-    enum class Board
-    {
-        none,
-        Linux,
-        T3,
-        T4
-    };
-}
 
 class ServiceCellular : public sys::Service
 {
@@ -83,7 +72,7 @@ class ServiceCellular : public sys::Service
     DLC_channel::Callback_t notificationCallback = nullptr;
 
     cellular::State state;
-    cellular::Board board = cellular::Board::none;
+    bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
     std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::vector<uint8_t> &data);

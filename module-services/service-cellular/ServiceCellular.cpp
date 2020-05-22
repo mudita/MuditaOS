@@ -41,7 +41,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 
-#include "service-evtmgr/api/EventServiceAPI.hpp"
+#include "service-evtmgr/api/EventManagerServiceAPI.hpp"
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
@@ -170,22 +170,15 @@ void ServiceCellular::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-#if defined(TARGET_Linux)
-    board = cellular::Board::Linux;
-#else
-    bool dev = EventServiceAPI::GetHwPlatform(this);
-
-    LOG_INFO("Hardware platform: %s", dev ? "T4" : "T3");
-    board = dev ? cellular::Board::T4 : cellular::Board::T3;
-#endif
+    board = EventManagerServiceAPI::GetBoard(this);
     switch (board) {
-    case cellular::Board::T4:
+    case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
         break;
-    case cellular::Board::T3:
+    case bsp::Board::T3:
         state.set(this, State::ST::PowerUpProcedure);
         break;
-    case cellular::Board::Linux:
+    case bsp::Board::Linux:
         state.set(this, State::ST::PowerUpProcedure);
         break;
     default:
@@ -271,13 +264,13 @@ bool ServiceCellular::handle_idle()
 bool ServiceCellular::handle_power_up_procedure()
 {
     switch (board) {
-    case Board::T4: {
+    case bsp::Board::T4: {
         LOG_DEBUG("T4 - cold start");
         cmux->TurnOnModem();
         state.set(this, State::ST::PowerUpInProgress);
         break;
     }
-    case Board::T3: {
+    case bsp::Board::T3: {
         // check baud once to determine if it's already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
@@ -296,7 +289,7 @@ bool ServiceCellular::handle_power_up_procedure()
             break;
         }
     }
-    case Board::Linux: {
+    case bsp::Board::Linux: {
         // it is basically the same as T3
         // check baud once to determine if it's already turned on
         auto ret = cmux->BaudDetectOnce();
@@ -317,11 +310,10 @@ bool ServiceCellular::handle_power_up_procedure()
             break;
         }
     }
-    case Board::none:
+    case bsp::Board::none:
+    default:
         LOG_FATAL("Board not known!");
         assert(0);
-        break;
-    default:
         break;
     }
     return true;
@@ -441,14 +433,16 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
-                if (board == Board::T3 || board == Board::Linux) {
+                if (board == bsp::Board::T3 || board == bsp::Board::Linux) {
                     state.set(this, State::ST::CellularConfProcedure);
+                    responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
                 LOG_INFO("New incoming sms received");
                 receiveSMS(msg->data);
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 break;
             }
             case CellularNotificationMessage::Type::RawCommand: {
@@ -472,10 +466,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::SIM:
                 if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
                     state.set(this, cellular::State::ST::SimInit);
+                    responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
                 break;
             default: {
                 LOG_INFO("Skipped CellularNotificationMessage::Type %d", static_cast<int>(msg->type));
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
             }
         }
@@ -692,10 +688,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     case MessageType::EVMModemStatus: {
         using namespace bsp::cellular::status;
-        auto msg = dynamic_cast<sevm::StateMessage *>(msgl);
+        auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
         if (msg != nullptr) {
-            auto status_pin = msg->state == true ? value::ACTIVE : value::INACTIVE;
-            if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == Board::T4) {
+            auto status_pin = msg->state;
+            if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == bsp::Board::T4) {
                 state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
             }
         }
@@ -750,7 +746,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         }
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, service::name::evt_manager, this);
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
     // Incoming call
@@ -825,7 +820,7 @@ bool ServiceCellular::sendSMS(void)
                     ->SendCommandPrompt(
                         (std::string(at::factory(at::AT::CMGS)) + UCS2(record.number).modemStr() + "\"\r").c_str(),
                         1,
-                        1000))) {
+                        2000))) {
 
             if (cmux->get(TS0710::Channel::Commands)->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                 result = true;
@@ -863,7 +858,7 @@ bool ServiceCellular::sendSMS(void)
                     cmux->get(TS0710::Channel::Commands)->SendCommandPrompt(command.c_str(), 1, 5000))) {
                 // prompt sign received, send data ended by "Ctrl+Z"
                 if (cmux->get(TS0710::Channel::Commands)
-                        ->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)) {
+                        ->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2000, 2)) {
                     result = true;
                 }
                 else {

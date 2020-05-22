@@ -29,6 +29,8 @@
 #include <cassert>
 
 #include "bsp/magnetometer/magnetometer.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
+#include "bsp/common.hpp"
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -155,13 +157,20 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
-    else if (msgl->messageType == MessageType::EVMGetHw) {
-        return std::make_shared<sevm::EVMResponseMessage>(bsp::magnetometer::isPresent());
+    else if (msgl->messageType == MessageType::EVMGetBoard) {
+        using namespace bsp;
+
+        auto msg   = std::make_shared<sevm::EVMBoardResponseMessage>(true);
+        auto board = magnetometer::GetBoard();
+        msg->board = board;
+        LOG_INFO("Board discovered: %s", c_str(board));
+
+        return msg;
     }
     else if (msgl->messageType == MessageType::EVMModemStatus) {
-        sevm::StateMessage *msg = dynamic_cast<sevm::StateMessage *>(msgl);
+        auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
         if (msg != nullptr) {
-            auto message   = std::make_shared<sevm::StateMessage>(MessageType::EVMModemStatus);
+            auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
             sys::Bus::SendUnicast(message, "ServiceCellular", this);
         }

@@ -26,10 +26,10 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/harness/events/GPIO.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/harness/actions/CellularCMD.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/harness/events/AtResponse.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/api/EventServiceAPI.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/api/EventManagerServiceAPI.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/EventManager.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/WorkerEvent.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/api/EventServiceAPI.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/api/EventManagerServiceAPI.hpp"
 )
 

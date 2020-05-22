@@ -9,8 +9,7 @@
  */
 
 
-#ifndef MODULE_BSP_COMMON_HPP
-#define MODULE_BSP_COMMON_HPP
+#pragma once
 
 //TODO maybe move KeyEvents to keyboard.hpp
 namespace bsp
@@ -28,6 +27,13 @@ namespace bsp
     };
 
 
+    enum class Board{
+    	T3,
+    	T4,
+    	Linux,
+    	none
+    };
+    [[nodiscard]] const char *c_str(const Board &board);
+
 }
 
-#endif //MODULE_BSP_COMMON_HPP

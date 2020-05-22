@@ -8,14 +8,16 @@ extern "C" {
 	#include "queue.h"
 }
 
-namespace bsp {
+#include "../common.hpp"
 
+namespace bsp {
 
 namespace magnetometer{
 
 	int32_t init(xQueueHandle qHandle);
 
 	bool isPresent(void);
+	bsp::Board GetBoard(void);
 }
 
 }

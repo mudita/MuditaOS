@@ -7,9 +7,10 @@
 #include <SwitchData.hpp>
 #include "Service/Service.hpp"
 #include "bsp/keyboard/key_codes.hpp"
+#include "bsp/common.hpp"
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
-
+#include "bsp/cellular/bsp_cellular.hpp"
 namespace sevm
 {
     namespace message
@@ -75,26 +76,28 @@ namespace sevm
         uint32_t dbID                  = 0;
     };
 
-    class EVMResponseMessage : public sys::ResponseMessage
+    class EVMBoardResponseMessage : public sys::ResponseMessage
     {
       public:
-        EVMResponseMessage(bool retCode,
-                           std::string retdata    = std::string(),
-                           MessageType responseTo = MessageType::MessageTypeUninitialized)
+        EVMBoardResponseMessage(bool retCode,
+                                std::string retdata    = std::string(),
+                                MessageType responseTo = MessageType::MessageTypeUninitialized)
             : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
-        EVMResponseMessage(bool retCode, MessageType responseTo)
+        EVMBoardResponseMessage(bool retCode, MessageType responseTo)
             : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
 
         bool retCode;
+        bsp::Board board = bsp::Board::none;
     };
-    class StateMessage : public Message
+
+    class StatusStateMessage : public Message
     {
       public:
-        StateMessage(MessageType messageType) : Message(messageType)
+        StatusStateMessage(MessageType messageType) : Message(messageType)
         {
             type = Type::Data;
         }
-        bool state = false;
+        bsp::cellular::status::value state = bsp::cellular::status::value::INACTIVE;
     };
 } /* namespace sevm*/
 
