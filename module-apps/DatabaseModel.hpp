@@ -17,6 +17,7 @@ namespace app
         Application *application = nullptr;
         uint32_t recordsCount;
         std::vector<std::shared_ptr<T>> records;
+        int modelIndex = 0;
 
       public:
         DatabaseModel(Application *app) : application{app}, recordsCount{0}
@@ -42,6 +43,7 @@ namespace app
                 for (uint32_t i = 0; i < dbRecords->size(); i++) {
                     records.push_back(std::make_shared<T>(dbRecords.get()->operator[](i)));
                 }
+
                 return true;
             }
             else {

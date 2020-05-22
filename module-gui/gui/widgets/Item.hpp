@@ -180,6 +180,7 @@ namespace gui
         virtual void setPosition(const short &x, const short &y);
         virtual void setPosition(const short &val, Axis axis);
         [[nodiscard]] uint16_t getSize(Axis axis) const;
+        [[nodiscard]] uint16_t getPosition(Axis axis) const;
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///

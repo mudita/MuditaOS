@@ -208,6 +208,11 @@ namespace gui
         return widgetArea.size(axis);
     }
 
+    uint16_t Item::getPosition(Axis axis) const
+    {
+        return widgetArea.pos(axis);
+    }
+
     void Item::setPosition(const short &val, Axis axis)
     {
         int16_t x = getX();

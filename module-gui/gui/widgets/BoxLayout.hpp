@@ -42,6 +42,7 @@ namespace gui
 
         template <Axis axis> void resizeItems();
         template <Axis axis> void updatePosition();
+        template <Axis axis> void moveBySizeLeft();
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);

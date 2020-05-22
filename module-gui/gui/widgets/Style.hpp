@@ -157,6 +157,18 @@ namespace style
 
     namespace listview
     {
+        enum class Type
+        {
+            TopDown,
+            Continuous
+        };
+
+        enum class Direction
+        {
+            Top,
+            Bottom
+        };
+
         namespace scroll
         {
             const inline uint32_t x           = 0;
