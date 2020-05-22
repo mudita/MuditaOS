@@ -60,5 +60,5 @@ bool WorkerDesktop::deinit(void)
 
 bool WorkerDesktop::sendMessage(const std::string messageToSend)
 {
-    return (bsp::usbCDCSend(new std::string(messageToSend)) ? true : false);
+    return ((bool)bsp::usbCDCSend(new std::string(messageToSend)));
 }
