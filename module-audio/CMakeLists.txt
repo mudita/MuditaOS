@@ -39,14 +39,14 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME}
-    PUBLIC
-    ${TARGET_COMPILE_OPTIONS}
-    PRIVATE
-    -Wno-error
-)
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
+# supress warning for flac decoder
+set_source_files_properties(
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
+        PROPERTIES COMPILE_FLAGS
+	"-Wno-implicit-fallthrough"
+)
 
 target_compile_definitions(${PROJECT_NAME}
 
