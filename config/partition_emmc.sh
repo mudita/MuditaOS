@@ -41,9 +41,9 @@ part2=$(sfdisk $dev --dump | tail -n 1 | awk '{print $1}')
 
 echo "create FATs"
 echo "FAT: PUREOS"
-mkfs.vfat -n PUREOS $part1
+mkfs.vfat -S 512 -s 64 -n PUREOS $part1
 echo "FAT: BACKUP"
-mkfs.vfat -n BACKUP $part2
+mkfs.vfat -S 512 -s 64 -n BACKUP $part2
 
 echo "probe new partitions to OS"
 partprobe
