@@ -76,6 +76,8 @@ namespace Store
         } sim      = SIM::SIM_UNKNOWN,
           selected = SIM::SIM1;
 
+        bool simCardInserted();
+
         /// state of modem
         enum class Modem
         {
