@@ -41,6 +41,10 @@ class ServiceCellular : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
+    /** Register message handlers.
+     */
+    void registerMessageHandlers();
+
     static const char *serviceName;
 
     bool sendSMS(UTF8 &number, UTF8 &text);
@@ -114,6 +118,9 @@ class ServiceCellular : public sys::Service
     bool handle_fatal_failure();
 
     /// @}
+
+    /// Handle message CellularGetChannelMessage
+    void handle_CellularGetChannelMessage();
 
     bool SetScanMode(std::string mode);
     std::string GetScanMode(void);

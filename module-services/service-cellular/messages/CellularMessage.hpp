@@ -16,6 +16,7 @@
 #include <utf8/UTF8.hpp>
 #include <memory>
 #include "../State.hpp"
+#include <Modem/TS0710/TS0710.h>
 
 #include <PhoneNumber.hpp>
 
@@ -100,6 +101,24 @@ class CellularCallRequestMessage : public CellularMessage
     utils::PhoneNumber::View number;
 };
 
+class CellularGetChannelMessage : public sys::DataMessage
+{
+  public:
+    CellularGetChannelMessage(TS0710::Channel dataChannel = TS0710::Channel::None)
+        : sys::DataMessage(MessageType::CellularGetChannel), dataChannel(dataChannel)
+    {}
+    TS0710::Channel dataChannel;
+};
+
+class CellularGetChannelResponseMessage : public sys::DataMessage
+{
+  public:
+    CellularGetChannelResponseMessage(DLC_channel *dataChannelPtr = nullptr)
+        : sys::DataMessage(MessageType::CellularGetChannelResponse), dataChannelPtr(dataChannelPtr)
+    {}
+    DLC_channel *dataChannelPtr;
+};
+
 class CellularResponseMessage : public sys::ResponseMessage
 {
   public:
@@ -122,7 +141,8 @@ namespace cellular
     {
       public:
         const State::ST request;
-        StateChange(const State::ST request) : CellularMessage(MessageType::CellularStateRequest), request(request)
+        StateChange(const State::ST request = State::ST::Failed)
+            : CellularMessage(MessageType::CellularStateRequest), request(request)
         {}
     };
 
