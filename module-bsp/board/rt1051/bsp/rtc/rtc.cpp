@@ -9,8 +9,10 @@
 #include "fsl_snvs_hp.h"
 #include "fsl_snvs_lp.h"
 #include <time.h>
+#include "time/time_conversion.hpp"
 
 #include "FreeRTOS.h"
+#include <module-os/RTOSWrapper/include/ticks.hpp>
 
 static xQueueHandle qHandleRtcIrq = NULL;
 
@@ -30,9 +32,20 @@ namespace bsp
 
         SNVS_LPCR_LPTA_EN(1);
 
+        bool timedOut     = false;
+        auto timeoutTicks = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(utils::time::milisecondsInSecond);
+
         SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
-        while (!(SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK))
-            ;
+        while (!timedOut) {
+            if ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK)) {
+                break;
+            }
+            timedOut = cpp_freertos::Ticks::GetTicks() > timeoutTicks;
+            if (timedOut) {
+                LOG_ERROR("rtc_Init timeout!!!");
+                return RtcBspError;
+            }
+        }
 
         SNVS_HP_RTC_TimeSynchronize(SNVS);
 
