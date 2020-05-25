@@ -18,6 +18,7 @@ namespace gui
 
         bool selectContact();
         bool sendSms();
+        bool switchToThreadWindow(UTF8 number);
 
       public:
         NewSMS_Window(app::Application *app);

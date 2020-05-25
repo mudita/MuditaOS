@@ -135,6 +135,8 @@
     "app_messages_thread_no_result" : "There are no results",
     "app_messages_message": "Message",
     "app_messages_templates": "Templates",
+    "app_messages_no_sim" : "To send a SMS, please\ninsert a SIM card.",
+    "app_messages_nffline" : "To send a SMS\n switch to the Connected mode.",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",

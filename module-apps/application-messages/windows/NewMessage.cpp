@@ -78,6 +78,15 @@ namespace gui
             return false;
         }
 
+        if (!Store::GSM::get()->simCardInserted()) {
+            return app->smsErrorNotification([=]() -> bool { return switchToThreadWindow(number); });
+        }
+
+        return switchToThreadWindow(number);
+    }
+
+    bool NewSMS_Window::switchToThreadWindow(UTF8 number)
+    {
         uint32_t contactId;
         if (!contact || contact->numbers.size() == 0) {
             // once the sms is send, there is assumption that contact exists
