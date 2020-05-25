@@ -1,7 +1,7 @@
 #pragma once
-
 #include "../messages/CellularMessage.hpp"
 #include "utf8/UTF8.hpp"
+#include <Modem/TS0710/TS0710.h>
 
 #include <PhoneNumber.hpp>
 
@@ -46,4 +46,7 @@ namespace CellularServiceAPI
     bool SetScanMode(sys::Service *serv, std::string mode);
     bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
+    bool GetChannel(sys::Service *serv,
+                    TS0710::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
+    bool GetDataChannel(sys::Service *serv);
 }; // namespace CellularServiceAPI
