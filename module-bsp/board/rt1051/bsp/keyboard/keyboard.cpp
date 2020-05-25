@@ -80,8 +80,8 @@ namespace bsp
         vTaskDelay(10);
 
         /* Assemble a mask for row and column registers */
-        reg = ~(~0 << TCA8418_ROWS_COUNT);
-        reg += (~(~0 << TCA8418_COL_COUNT)) << 8;
+        reg = ~(uint32_t(~0) << TCA8418_ROWS_COUNT);
+        reg += (~(uint32_t(~0) << TCA8418_COL_COUNT)) << 8;
 
         /* Set registers to keypad mode */
         i2cAddr.subAddress = REG_KP_GPIO1;

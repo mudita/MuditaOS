@@ -7,7 +7,6 @@
  *  @details
  */
 
-#define _GNU_SOURCE
 #include "xing_header.h"
 #include <string.h>
 

@@ -453,6 +453,7 @@ extern "C"
 #include "MIMXRT1051.h"
 #include "macros.h"
 #include <log/log.hpp>
+#include <cinttypes>
 #include <cstdlib>
 #include <cstdint>
 #include <string>
@@ -961,27 +962,27 @@ extern "C"
 #if (DEBUG_PRINT_HARD_FAULT_INFO == 1)
         LOG_FATAL("!!! HardFault Detected !!!");
         LOG_FATAL("* Stack Frame:");
-        LOG_FATAL("R0  = 0x%08X", syslog.stackFrame.r0);
-        LOG_FATAL("R1  = 0x%08X", syslog.stackFrame.r1);
-        LOG_FATAL("R2  = 0x%08X", syslog.stackFrame.r2);
-        LOG_FATAL("R3  = 0x%08X", syslog.stackFrame.r3);
-        LOG_FATAL("R12 = 0x%08X", syslog.stackFrame.r12);
-        LOG_FATAL("LR  = 0x%08X", syslog.stackFrame.lr);
-        LOG_FATAL("PC  = 0x%08X", syslog.stackFrame.pc);
-        LOG_FATAL("PSR = 0x%08X", syslog.stackFrame.psr);
+        LOG_FATAL("R0  = 0x%0" PRIX32, syslog.stackFrame.r0);
+        LOG_FATAL("R1  = 0x%0" PRIX32, syslog.stackFrame.r1);
+        LOG_FATAL("R2  = 0x%0" PRIX32, syslog.stackFrame.r2);
+        LOG_FATAL("R3  = 0x%0" PRIX32, syslog.stackFrame.r3);
+        LOG_FATAL("R12 = 0x%0" PRIX32, syslog.stackFrame.r12);
+        LOG_FATAL("LR  = 0x%0" PRIX32, syslog.stackFrame.lr);
+        LOG_FATAL("PC  = 0x%0" PRIX32, syslog.stackFrame.pc);
+        LOG_FATAL("PSR = 0x%0" PRIX32, syslog.stackFrame.psr);
 
         LOG_FATAL("* Fault Status Registers:");
-        LOG_FATAL("SCB->HFSR = 0x%08X", syslog.registers.hfsr.all);
-        LOG_FATAL("SCB->CFSR = 0x%08X", syslog.registers.cfsr.all);
-        LOG_FATAL("SCB->MMAR = 0x%08X", syslog.registers.mmfar);
-        LOG_FATAL("SCB->BFAR = 0x%08X", syslog.registers.bfar);
-        LOG_FATAL("SCB->ABFSR = 0x%08x", syslog.registers.abfsr.all);
-        LOG_FATAL("EXC_RETURN = 0x%08x", syslog.registers.exc_return);
+        LOG_FATAL("SCB->HFSR = 0x%0" PRIX32, syslog.registers.hfsr.all);
+        LOG_FATAL("SCB->CFSR = 0x%0" PRIX32, syslog.registers.cfsr.all);
+        LOG_FATAL("SCB->MMAR = 0x%0" PRIX32, syslog.registers.mmfar);
+        LOG_FATAL("SCB->BFAR = 0x%0" PRIX32, syslog.registers.bfar);
+        LOG_FATAL("SCB->ABFSR = 0x%0" PRIX32, syslog.registers.abfsr.all);
+        LOG_FATAL("EXC_RETURN = 0x%0" PRIX32, syslog.registers.exc_return);
 
 #if (DEBUG_DETAILED_HARD_FAULT_INFO == 1)
         LOG_FATAL("* Details of Fault Status Registers:");
         hfsr_t hfsr = syslog.registers.hfsr;
-        LOG_FATAL("SCB->HFSR = 0x%08X - HardFault Status Register", hfsr.all);
+        LOG_FATAL("SCB->HFSR = 0x%0" PRIX32 " - HardFault Status Register", hfsr.all);
         if (hfsr.debugevt)
             LOG_FATAL(" - DEBUGEVT: Hard fault caused by debug event");
         if (hfsr.forced)
@@ -990,9 +991,9 @@ extern "C"
             LOG_FATAL(" - VECTBL: BusFault on vector table read");
 
         cfsr_t cfsr = syslog.registers.cfsr;
-        LOG_FATAL("SCB->CFSR = 0x%08X - Configurable Fault Status Register", cfsr.all);
+        LOG_FATAL("SCB->CFSR = 0x%0" PRIX32 " - Configurable Fault Status Register", cfsr.all);
         mmfsr_t mmfsr = cfsr.mmfsr;
-        LOG_FATAL("> SCB->MMFSR = 0x%02X Memory Management Fault Status Register", mmfsr.all);
+        LOG_FATAL("> SCB->MMFSR = 0x%0" PRIX8 " Memory Management Fault Status Register", mmfsr.all);
         if (mmfsr.mmarvalid)
             LOG_FATAL(" - MMARVALID: MMAR is valid");
         if (mmfsr.mlsperr)
@@ -1007,7 +1008,7 @@ extern "C"
             LOG_FATAL(" - IACCVIOL: Instruction access violation");
 
         bfsr_t bfsr = cfsr.bfsr;
-        LOG_FATAL("> SCB->BFSR = 0x%02x - Bus Fault Status Register ", bfsr.all);
+        LOG_FATAL("> SCB->BFSR = 0x%0" PRIX8 " - Bus Fault Status Register ", bfsr.all);
         if (bfsr.bfarvalid)
             LOG_FATAL(" - BFARVALID: BFAR is valid  ");
         if (bfsr.lsperr)
@@ -1024,7 +1025,7 @@ extern "C"
             LOG_FATAL(" - IBUSERR: Instruction bus error");
 
         ufsr_t ufsr = cfsr.ufsr;
-        LOG_FATAL("> SCB->UFSR = 0x%04x - Usage Fault Status Register", ufsr.all);
+        LOG_FATAL("> SCB->UFSR = 0x%0" PRIX16 " - Usage Fault Status Register", ufsr.all);
         if (ufsr.divbyzero)
             LOG_FATAL(" - DIVBYZERO: Divide by zero UsageFault");
         if (ufsr.unaligned)
@@ -1039,7 +1040,7 @@ extern "C"
             LOG_FATAL(" - UNDEFINSTR: Undefined instruction UsageFault");
 
         abfsr_t abfsr = syslog.registers.abfsr;
-        LOG_FATAL("SCB->ABFSR = 0x%08x - Auxiliary Bus Fault Status register", abfsr.all);
+        LOG_FATAL("SCB->ABFSR = 0x%0" PRIX32 " - Auxiliary Bus Fault Status register", abfsr.all);
         if (abfsr.itcm)
             LOG_FATAL(" - ITCM: Asynchronous fault on ITCM interface");
         if (abfsr.dtcm)
@@ -1047,7 +1048,7 @@ extern "C"
         if (abfsr.ahbp)
             LOG_FATAL(" - AHBP: Asynchronous fault on AHBP interface");
         if (abfsr.axim)
-            LOG_FATAL(" - AXIM: Asynchronous fault on AXIM interface, AXIMTYPE: 0x%x", abfsr.aximtype);
+            LOG_FATAL(" - AXIM: Asynchronous fault on AXIM interface, AXIMTYPE: 0x%0" PRIX32, abfsr.aximtype);
         if (abfsr.eppb)
             LOG_FATAL(" - EPPB: Asynchronous fault on EPPB interface");
 #endif // (DEBUG_DETAILED_HARD_FAULT_INFO == 1)

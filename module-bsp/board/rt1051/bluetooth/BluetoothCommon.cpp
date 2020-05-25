@@ -15,8 +15,8 @@ void BTdev::_circ::sem_take()
         xSemaphoreTake(sem, 0);
     }
     else {
-        BaseType_t *px;
-        xSemaphoreTakeFromISR(sem, px);
+        BaseType_t px;
+        xSemaphoreTakeFromISR(sem, &px);
     }
 }
 
@@ -26,8 +26,8 @@ void BTdev::_circ::sem_give()
         xSemaphoreGive(sem);
     }
     else {
-        BaseType_t *px;
-        xSemaphoreGiveFromISR(sem, px);
+        BaseType_t px;
+        xSemaphoreGiveFromISR(sem, &px);
     }
 }
 
