@@ -1,30 +1,9 @@
 #pragma once
 
-#include "module-utils/microtar/src/microtar.h"
-#include "module-vfs/vfs.hpp"
+#include <module-utils/microtar/src/microtar.h>
+#include <module-vfs/vfs.hpp>
+#include <json/json11.hpp>
 
-#ifndef TARGET_Linux
-#include "ff_stdio.h"
-#define ff_rename(a, b) ff_rename(a, b, true)
-#else
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <filesystem>
-int stdioGET_ERRNO();
-#define FF_FILE        FILE
-#define ff_fopen       fopen
-#define ff_feof        feof
-#define ff_fgets       fgets
-#define ff_fwrite      fwrite
-#define ff_fclose      fclose
-#define ff_rename      rename
-#define ff_stat        stat
-#define FF_Stat_t      struct stat
-#define ff_deltree     std::filesystem::remove_all
-#define ff_mkdir(path) mkdir(path, S_IRWXU)
-#endif
-
-#include "json/json11.hpp"
 #include <string.h>
 #include <sstream>
 #include <vector>
@@ -70,7 +49,6 @@ namespace updateos
         CantRenameCurrentToPrevious,
         CantRenameTempToCurrent
     };
-
 }; // namespace updateos
 
 struct FileInfo
@@ -120,8 +98,6 @@ class UpdatePureOS
     bool unpackFileToTemp(mtar_header_t &header, unsigned long *crc32);
 
     void cleanupAfterUpdate();
-    bool fileExists(const fs::path pathToCheck);
-    bool isDirectory(const fs::path pathToCheck);
     static std::string generateRandomId(size_t length);
     const fs::path getUpdateTmpChild(const fs::path childPath);
     static void printDir(const char *pcDirectoryToScan);

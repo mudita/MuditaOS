@@ -18,6 +18,7 @@
 #include <sbini/sbini.h>
 #include <crc32/crc32.h>
 #include <log/log.hpp>
+#include <json/json11.hpp>
 
 namespace fs = std::filesystem;
 
@@ -32,6 +33,7 @@ namespace fs = std::filesystem;
 #define PATH_SYS      "/sys"
 #define PATH_CURRENT  "current"
 #define PATH_PREVIOUS "previous"
+#define PATH_UPDATES  "updates"
 
 // this just concatenates two strings and creates a /user/ subdirectory filename
 #define USER_PATH(file) PATH_USER file
@@ -50,6 +52,7 @@ namespace purefs
         const inline fs::path user_disk   = PATH_USER;
         const inline fs::path os_current  = eMMC_disk / PATH_CURRENT;
         const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
+        const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
     } // namespace dir
 
     namespace extension
@@ -93,6 +96,11 @@ class vfs
         std::string fileName;
         FileAttributes attributes;
         uint32_t fileSize;
+        json11::Json to_json() const
+        {
+            return (json11::Json::object{
+                {"name", fileName}, {"size", std::to_string(fileSize)}});
+        }
     };
 
     struct FilesystemStats
@@ -150,17 +158,22 @@ class vfs
 
     FilesystemStats getFilesystemStats();
 
+    std::string relativeToRoot(const std::string path);
+    bool isDir(const char *path);
+    bool fileExists(const char *path);
+    int deltree(const char *path);
+    int mkdir(const char *dir);
+    int rename(const char *oldname, const char *newname);
+
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
     FF_Disk_t *emmcFFDisk;
 #endif
-    std::string relativeToRoot(const std::string path);
 
     static void computeCRC32(FILE *file, unsigned long *outCrc32);
     static bool verifyCRC(const std::string filePath, const unsigned long crc32);
     static bool verifyCRC(const fs::path filePath);
     static std::string generateRandomId(size_t length);
-    static bool endsWith(std::string const &s, std::string const &suffix);
 
   private:
     bool getOSRootFromIni();

@@ -304,3 +304,41 @@ std::string vfs::relativeToRoot(const std::string path)
     else
         return (osRootPath / fsPath);
 }
+
+bool vfs::isDir(const char *path)
+{
+    FF_Stat_t fileStatus;
+
+    const int ret = ff_stat(path, &fileStatus);
+    if (ret == 0) {
+        return (fileStatus.st_mode == FF_IFDIR);
+    }
+    else {
+        return (false);
+    }
+}
+
+bool vfs::fileExists(const char *path)
+{
+    FF_Stat_t fileStatus;
+    const int ret = ff_stat(path, &fileStatus);
+    if (ret == 0) {
+        return (true);
+    }
+    return (false);
+}
+
+int vfs::deltree(const char *path)
+{
+    return (deltree(path));
+}
+
+int vfs::mkdir(const char *dir)
+{
+    return (ff_mkdir(dir));
+}
+
+int vfs::rename(const char *oldname, const char *newname)
+{
+    return (ff_rename(oldname, newname, true));
+}

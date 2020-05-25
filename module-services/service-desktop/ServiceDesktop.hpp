@@ -17,6 +17,21 @@
 #include <string.h>
 #include <sstream>
 
+namespace sdesktop
+{
+    class UpdateOsMessage : public sys::DataMessage
+    {
+      public:
+        UpdateOsMessage(MessageType messageType, const std::string updateFilePath, const uint32_t requestUUID)
+            : sys::DataMessage(messageType), updateFile(updateFilePath), uuid(requestUUID)
+            {};
+        virtual ~UpdateOsMessage(){};
+
+        std::string updateFile;
+        uint32_t uuid;
+    };
+}; // namespace ServiceDesktop
+
 class ServiceDesktop : public sys::Service
 {
   public:

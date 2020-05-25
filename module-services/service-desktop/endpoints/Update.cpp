@@ -22,19 +22,8 @@ sys::ReturnCodes EndpointHandler::update(
 
         responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
 
-        ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
-        if (service && service->updateOS) {
-            LOG_INFO("got a pointer to the destkop service, store state");
-            if (service->updateOS->runUpdate(fileName) == updateos::UpdateError::NoError) {
-                responseStr = EndpointHandler::buildResponseStr(2, "OK");
-            }
-            else {
-                responseStr = EndpointHandler::buildResponseStr(5, "ERROR");
-            }
-        }
-        else {
-            LOG_INFO("no valid service handle");
-        }
+        auto msg = std::make_shared<sdesktop::UpdateOsMessage>(MessageType::UpdateOS, fileName, uuid);
+        sys::Bus::SendUnicast(msg, ServiceDesktop::serviceName, ownerService);
 
         return sys::ReturnCodes::Success;
     }
@@ -42,11 +31,7 @@ sys::ReturnCodes EndpointHandler::update(
         LOG_INFO("update get request: ");
         LOG_INFO("%s", body.dump().c_str());
 
-        json11::Json fileList;
-        ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
-        if (service && service->updateOS) {
-            fileList = service->updateOS->getUpdateFileList();
-        }
+        json11::Json fileList = vfs.listdir(PATH_UPDATES, updateos::extension::update);
 
         json11::Json responseBodyJson = json11::Json::object{{parserutils::json::updateFileList, fileList}};
 

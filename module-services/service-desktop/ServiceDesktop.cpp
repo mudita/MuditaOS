@@ -8,6 +8,8 @@ const char *ServiceDesktop::serviceName = "ServiceDesktop";
 ServiceDesktop::ServiceDesktop() : sys::Service(serviceName)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
+
+    updateOS = std::make_unique<UpdatePureOS>(this);
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -25,8 +27,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                          {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
     desktopWorker->run();
 
-    updateOS = std::make_unique<UpdatePureOS>(this);
-
     return (sys::ReturnCodes::Success);
 }
 
@@ -42,5 +42,10 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
 
 sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
+    sdesktop::UpdateOsMessage *updateOs = static_cast<sdesktop::UpdateOsMessage *>(msg);
+    if (updateOs) {
+        LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "", updateOs->updateFile.c_str(), updateOs->uuid);
+        updateOS->runUpdate(updateOs->updateFile);
+    }
     return std::make_shared<sys::ResponseMessage>();
 }

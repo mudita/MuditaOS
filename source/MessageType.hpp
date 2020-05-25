@@ -183,6 +183,9 @@ enum class MessageType
     LwIP_request,
     EVM_GPIO,
     SIMTrayEvent,
+
+    // service-desktop  messages
+    UpdateOS,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
