@@ -26,10 +26,6 @@ class ServiceDesktop : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
     sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
-    std::unique_ptr<WorkerDesktop> &getWorker()
-    {
-        return (desktopWorker);
-    }
 
     std::unique_ptr<UpdatePureOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;

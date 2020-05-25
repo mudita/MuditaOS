@@ -125,7 +125,6 @@ class UpdatePureOS
     static std::string generateRandomId(size_t length);
     const fs::path getUpdateTmpChild(const fs::path childPath);
     static void printDir(const char *pcDirectoryToScan);
-    static std::vector<std::string> split(const std::string &s, char delimiter);
 
   private:
     fs::path updateTempDirectory;

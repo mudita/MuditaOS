@@ -74,7 +74,7 @@ class StateEndpointUpdate : public EndpointFsm
 
         std::string responseStr;
         sys::ReturnCodes retCode = endpointHandler.update(method, uuid, body, responseStr, ownerService);
-        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %" PRIu32 "", static_cast<int>(retCode), uuid);
+        LOG_DEBUG("endpointHandler.update retCode %d uuid %" PRIu32 "", static_cast<int>(retCode), uuid);
 
         putToSendQueue(responseStr);
         transit<StateDecodeJson>();
