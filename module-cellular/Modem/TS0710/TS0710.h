@@ -203,6 +203,7 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include "Modem/ATParser.hpp"
 #include "Service/Service.hpp"
 #include <queue>
+#include <string>
 
 #if defined(__cplusplus)
 extern "C"
@@ -224,15 +225,18 @@ void workerTaskFunction(void *ptr);
 class TS0710
 {
   public:
-    enum class Channel
+    enum class Channel : unsigned char
     {
+        None          = 0,
         Commands      = 1,
         Notifications = 2,
         Data          = 3,
     };
-    std::string name(enum Channel name)
+    static std::string name(enum Channel name)
     {
         switch (name) {
+        case Channel::None:
+            return "None";
         case Channel::Commands:
             return "Commands";
         case Channel::Notifications:

@@ -181,3 +181,14 @@ bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &res
     }
     return false;
 }
+
+bool CellularServiceAPI::GetChannel(sys::Service *serv, TS0710::Channel channel)
+{
+    std::shared_ptr<CellularGetChannelMessage> msg = std::make_shared<CellularGetChannelMessage>(channel);
+    return sys::Bus::SendUnicast(std::move(msg), ServiceCellular::serviceName, serv);
+}
+
+bool CellularServiceAPI::GetDataChannel(sys::Service *serv)
+{
+    return GetChannel(serv, TS0710::Channel::Data);
+}
