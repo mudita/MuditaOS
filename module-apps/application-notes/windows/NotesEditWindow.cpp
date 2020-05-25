@@ -68,8 +68,8 @@ namespace gui
             vfs.fclose(file);
             return true;
         };
-        text->setTextType(gui::Text::TextType::MULTI_LINE);
-        text->setEditMode(gui::Text::EditMode::BROWSE);
+        text->setTextType(TextType::MULTI_LINE);
+        text->setEditMode(EditMode::BROWSE);
         text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
 
         topBar->setActive(TopBar::Elements::TIME, true);

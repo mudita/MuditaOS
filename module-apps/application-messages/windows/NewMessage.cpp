@@ -139,7 +139,7 @@ namespace gui
         reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
 
         recipient = new gui::Text(
-            reciepientHbox, 0, 0, body->getWidth() - recipientImg::w, text::h, "", gui::Text::ExpandMode::EXPAND_NONE);
+            reciepientHbox, 0, 0, body->getWidth() - recipientImg::w, text::h, "", ExpandMode::EXPAND_NONE);
         recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
@@ -161,7 +161,7 @@ namespace gui
         labelMessage->setFont(style::window::font::small);
         labelMessage->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        message = new gui::Text(nullptr, 0, 0, body->getWidth(), text::h, "", gui::Text::ExpandMode::EXPAND_UP);
+        message = new gui::Text(nullptr, 0, 0, body->getWidth(), text::h, "", ExpandMode::EXPAND_UP);
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},

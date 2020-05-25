@@ -85,7 +85,7 @@ void PhonebookOptionsNamecard::buildInterface()
     dbg->setPenWidth(0);
     dbg->setBorderColor(gui::ColorFullBlack);
     dbg->setUnderline(false);
-    dbg->setTextType(Text::TextType::MULTI_LINE);
+    dbg->setTextType(TextType::MULTI_LINE);
     dbg->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 }
 

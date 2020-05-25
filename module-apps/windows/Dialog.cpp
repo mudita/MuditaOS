@@ -53,8 +53,8 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
 
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
     text->setText(meta.text);
-    text->setTextType(Text::TextType::MULTI_LINE);
-    text->setEditMode(Text::EditMode::BROWSE);
+    text->setTextType(TextType::MULTI_LINE);
+    text->setEditMode(EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));

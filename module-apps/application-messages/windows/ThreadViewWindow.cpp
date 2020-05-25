@@ -71,8 +71,8 @@ namespace gui
     void ThreadViewWindow::rebuildText()
     {
         body->erase(text);
-        text = new gui::Text(
-            this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
+        text =
+            new gui::Text(this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) {},
@@ -285,14 +285,14 @@ namespace gui
     {
         /// dummy sms thread - TODO load from db - on switchData
         auto smsLabel = new Text(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
-        smsLabel->setTextType(Text::TextType::MULTI_LINE);
-        smsLabel->setEditMode(Text::EditMode::SCROLL);
+        smsLabel->setTextType(TextType::MULTI_LINE);
+        smsLabel->setEditMode(EditMode::SCROLL);
         smsLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         smsLabel->setRadius(style::window::messages::sms_radius);
         smsLabel->setFont(style::window::font::medium);
         smsLabel->setPenFocusWidth(style::window::default_border_focucs_w);
         smsLabel->setPenWidth(style::window::messages::sms_border_no_focus);
-        smsLabel->expandMode = Text::ExpandMode::EXPAND_DOWN;
+        smsLabel->expandMode = ExpandMode::EXPAND_DOWN;
         smsLabel->setText(smsRecord.body.length() ? smsRecord.body : " "); // text doesn't really like being empty//
         smsLabel->setMargins(gui::Margins(style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding,

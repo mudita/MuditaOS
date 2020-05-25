@@ -44,8 +44,8 @@ void PhonebookDialog::buildInterface()
 
     confirmationLabel = new Text(this, 45, 293, 390, 128);
     confirmationLabel->setText(utils::localize.get("app_phonebook_options_delete_confirm"));
-    confirmationLabel->setTextType(Text::TextType::MULTI_LINE);
-    confirmationLabel->setEditMode(Text::EditMode::BROWSE);
+    confirmationLabel->setTextType(TextType::MULTI_LINE);
+    confirmationLabel->setEditMode(EditMode::BROWSE);
     confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     confirmationLabel->setFont(style::window::font::small);
 

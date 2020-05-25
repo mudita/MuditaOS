@@ -50,5 +50,8 @@ namespace gui
         {
             return row == 0 && column == 0;
         }
+
+        /// TODO make one from cursorMove - need to create TextModel first and establish boundaries
+        bool move(const NavigationDirection &direction);
     };
 } // namespace gui

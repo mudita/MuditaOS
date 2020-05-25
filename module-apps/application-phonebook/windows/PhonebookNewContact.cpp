@@ -70,7 +70,7 @@ namespace gui
             page1.text[i]->setPenWidth(1);
             page1.text[i]->setBorderColor(gui::ColorFullBlack);
             page1.text[i]->setUnderline(true);
-            page1.text[i]->setTextType(Text::TextType::SINGLE_LINE);
+            page1.text[i]->setTextType(TextType::SINGLE_LINE);
             page1.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
             page1.text[i]->setFont(style::window::font::small);
             page1.text[i]->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
@@ -100,8 +100,8 @@ namespace gui
                 page1.text[i]->contentCallback = [=](gui::Item &item) { return true; };
             }
 
-            page1.text[i]->setTextType(gui::Text::TextType::SINGLE_LINE);
-            page1.text[i]->setEditMode(gui::Text::EditMode::EDIT);
+            page1.text[i]->setTextType(TextType::SINGLE_LINE);
+            page1.text[i]->setEditMode(EditMode::EDIT);
         }
 
         page1.text[2]->setInputMode(new InputMode({InputMode::digit}));

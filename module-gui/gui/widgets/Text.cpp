@@ -1,11 +1,3 @@
-/*
- * @file Text.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 sie 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include <iterator>
 
 #include "../core/Font.hpp"
@@ -20,8 +12,8 @@
 namespace gui
 {
 
-    Text::TextLine::TextLine(
-        const UTF8 &text, uint32_t startIndex, uint32_t endIndex, Text::LineEndType endType, uint32_t pixelLength)
+    TextLine::TextLine(
+        const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength)
         : text{text}, startIndex{startIndex}, endIndex{endIndex}, endType{endType}, pixelLength{pixelLength}
     {}
 
@@ -44,9 +36,9 @@ namespace gui
             splitTextToLines(text);
         }
         else {
-            textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-            firstLine = textLines.begin();
-            lastLine  = textLines.begin();
+            document->lines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
+            document->firstLine = document->lines.begin();
+            document->lastLine  = document->lines.begin();
         }
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
@@ -61,10 +53,10 @@ namespace gui
     Text::~Text()
     {
         // if there are text lines erase them.
-        if (!textLines.empty()) {
-            while (!textLines.empty()) {
-                delete textLines.front();
-                textLines.pop_front();
+        if (!document->lines.empty()) {
+            while (!document->lines.empty()) {
+                delete document->lines.front();
+                document->lines.pop_front();
             }
         }
         if (mode) {
@@ -115,20 +107,15 @@ namespace gui
             barriers &= ~(static_cast<uint32_t>(barrier));
     }
 
-    void Text::setCursorWidth(uint32_t w)
-    {
-        cursorWidth = w;
-    }
-
     void Text::setText(const UTF8 &text)
     {
         clear();
         cursor->reset();
         if (text.length() > 0) {
             // erase default empty line
-            delete textLines.front();
-            textLines.pop_front();
-            textLines.clear();
+            delete document->lines.front();
+            document->lines.pop_front();
+            document->lines.clear();
             // split and add new lines
             splitTextToLines(text);
         }
@@ -147,17 +134,17 @@ namespace gui
     void Text::clear()
     {
         // if there are text lines erase them.
-        if (!textLines.empty()) {
-            while (!textLines.empty()) {
-                delete textLines.front();
-                textLines.pop_front();
+        if (!document->lines.empty()) {
+            while (!document->lines.empty()) {
+                delete document->lines.front();
+                document->lines.pop_front();
             }
         }
-        textLines.clear();
+        document->lines.clear();
         // insert first empty text line
-        textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-        firstLine = textLines.begin();
-        lastLine  = textLines.begin();
+        document->lines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
+        document->firstLine = document->lines.begin();
+        document->lastLine  = document->lines.begin();
     }
 
     UTF8 Text::getText()
@@ -166,8 +153,8 @@ namespace gui
         UTF8 output;
 
         // iterate over all lines and add content from each line to output string.
-        auto it = textLines.begin();
-        while (it != textLines.end()) {
+        auto it = document->lines.begin();
+        while (it != document->lines.end()) {
 
             auto textLine = (*it);
             assert(textLine);
@@ -193,10 +180,10 @@ namespace gui
         if (file == nullptr)
             return false;
 
-        auto it = textLines.begin();
+        auto it = document->lines.begin();
 
         // iterate over all lines in text edit
-        while (it != textLines.end()) {
+        while (it != document->lines.end()) {
 
             vfs.fwrite((*it)->text.c_str(), (*it)->text.used() - 1, 1, file);
             if ((*it)->endType == LineEndType::BREAK) {
@@ -234,9 +221,9 @@ namespace gui
     {
 
         if (text.length() == 0) {
-            if (textLines.size() == 0) {
-                firstLine = textLines.end();
-                lastLine  = textLines.end();
+            if (document->lines.size() == 0) {
+                document->firstLine = document->lines.end();
+                document->lastLine  = document->lines.end();
             }
             return;
         }
@@ -267,18 +254,18 @@ namespace gui
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
                     lineEndType = LineEndType::BREAK;
-                    textLines.push_back(new TextLine(tmpText.substr(0, enterIndex),
-                                                     startIndex,
-                                                     endIndex,
-                                                     lineEndType,
-                                                     font->getPixelWidth(tmpText.substr(0, enterIndex))));
-                    //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+                    document->lines.push_back(new TextLine(tmpText.substr(0, enterIndex),
+                                                           startIndex,
+                                                           endIndex,
+                                                           lineEndType,
+                                                           font->getPixelWidth(tmpText.substr(0, enterIndex))));
+                    //				LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
                 } // no enter found last line can be copied as a whole.
                 else {
                     startIndex = index;
                     endIndex   = totalLength;
-                    textLines.push_back(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
-                    //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+                    document->lines.push_back(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
+                    //				LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
                     index += charCount;
                 }
             }
@@ -293,9 +280,9 @@ namespace gui
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
                     lineEndType = LineEndType::BREAK;
-                    textLines.push_back(
+                    document->lines.push_back(
                         new TextLine(tmpText.substr(0, enterIndex), startIndex, endIndex, lineEndType, spaceConsumed));
-                    //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+                    //				LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
                 }
                 else {
                     // if there was no enter look for last space in the tmpText and break line on it
@@ -306,8 +293,9 @@ namespace gui
                         endIndex = index + charCount;
                         index += charCount;
                         lineEndType = LineEndType::CONTINUE;
-                        textLines.push_back(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
-                        //					LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+                        document->lines.push_back(
+                            new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
+                        //					LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
                     }
                     else {
                         lineEndType = LineEndType::CONTINUE_SPACE;
@@ -317,37 +305,39 @@ namespace gui
                         if (spaceIndex == tmpText.length() - 1) {
                             endIndex = index + charCount - 1;
                             index += charCount;
-                            textLines.push_back(new TextLine(tmpText.substr(0, tmpText.length() - 1),
-                                                             startIndex,
-                                                             endIndex,
-                                                             lineEndType,
-                                                             spaceConsumed - spaceWidth));
-                            //						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+                            document->lines.push_back(new TextLine(tmpText.substr(0, tmpText.length() - 1),
+                                                                   startIndex,
+                                                                   endIndex,
+                                                                   lineEndType,
+                                                                   spaceConsumed - spaceWidth));
+                            //						LOG_INFO("Text Input Line: [%s]",
+                            // document->lines.back()->text.c_str());
                         }
                         else {
                             endIndex = index + spaceIndex;
                             index += spaceIndex + 1;
-                            textLines.push_back(new TextLine(tmpText.substr(0, spaceIndex),
-                                                             startIndex,
-                                                             endIndex,
-                                                             lineEndType,
-                                                             font->getPixelWidth(tmpText.substr(0, spaceIndex))));
-                            //						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+                            document->lines.push_back(new TextLine(tmpText.substr(0, spaceIndex),
+                                                                   startIndex,
+                                                                   endIndex,
+                                                                   lineEndType,
+                                                                   font->getPixelWidth(tmpText.substr(0, spaceIndex))));
+                            //						LOG_INFO("Text Input Line: [%s]",
+                            // document->lines.back()->text.c_str());
                         }
                     }
                 }
             }
 
             if (textType == TextType::SINGLE_LINE) {
-                // LOG_INFO("NUMBER OF LINES: %d", textLines.size());
-                auto textLine     = textLines.front();
+                // LOG_INFO("NUMBER OF LINES: %d", document->lines.size());
+                auto textLine     = document->lines.front();
                 textLine->endType = LineEndType::EOT;
                 break;
             }
         }
 
-        firstLine = textLines.begin();
-        lastLine  = textLines.begin();
+        document->firstLine = document->lines.begin();
+        document->lastLine  = document->lines.begin();
     }
 
     bool Text::splitText(UTF8 &source, UTF8 &remaining, LineEndType &endType, uint32_t availableSpace)
@@ -392,7 +382,7 @@ namespace gui
     {
 
         // iterate until end of text lines or till line that fits available space has break line ending (enter).
-        while (it != textLines.end()) {
+        while (it != document->lines.end()) {
 
             // if current line has BREAK of EOT line ending check if current text fits available space
             // finish procedure
@@ -412,7 +402,7 @@ namespace gui
             UTF8 mergedLinesText = (*it)->getTextWithEnding();
 
             // if processed text line is not finished with break end type
-            if (((*it)->endType != LineEndType::BREAK) && (itNext != textLines.end())) {
+            if (((*it)->endType != LineEndType::BREAK) && (itNext != document->lines.end())) {
 
                 // merge text from two lines
                 mergedLinesText += (*itNext)->getTextWithEnding();
@@ -421,7 +411,7 @@ namespace gui
 
                 // remove next line as the text was taken to the current line
                 delete (*itNext);
-                textLines.erase(itNext);
+                document->lines.erase(itNext);
             }
 
             LineEndType endType;
@@ -436,7 +426,7 @@ namespace gui
 
                 itNext = it;
                 itNext++;
-                textLines.insert(
+                document->lines.insert(
                     itNext,
                     new TextLine(
                         remainingText, 0, remainingText.length(), (*it)->endType, font->getPixelWidth(remainingText)));
@@ -642,7 +632,7 @@ namespace gui
             if (cursor->column == 0) {
 
                 // if there is no previous line return false so window can switch focus to the item on the left.
-                if (it == textLines.begin()) {
+                if (it == document->lines.begin()) {
                     return false;
                 }
 
@@ -652,7 +642,7 @@ namespace gui
                     --cursor->row;
                 }
                 else {
-                    --firstLine;
+                    --document->firstLine;
                     recalculateDrawParams();
                 }
                 return true;
@@ -672,13 +662,13 @@ namespace gui
             else {
                 auto itNext = std::next(it, 1);
                 // if this is not the last line increment row and set column to 0
-                if (itNext != textLines.end()) {
+                if (itNext != document->lines.end()) {
                     ++cursor->row;
                     cursor->column = 0;
 
                     // if increased row is out of visible are increment first line
                     if (cursor->row >= visibleRows) {
-                        firstLine++;
+                        document->firstLine++;
                         recalculateDrawParams();
                         cursor->row = visibleRows - 1;
                     }
@@ -695,7 +685,7 @@ namespace gui
             auto itNext = std::next(it, 1);
 
             // this is the last line, check for barrier
-            if (itNext == textLines.end()) {
+            if (itNext == document->lines.end()) {
                 if (barriers & static_cast<uint32_t>(NavigationBarrier::BARRIER_DOWN))
                     return true;
                 return false;
@@ -709,7 +699,7 @@ namespace gui
                 cursor->column = (*itNext)->text.length();
 
             if (cursor->row >= visibleRows) {
-                firstLine++;
+                document->firstLine++;
                 recalculateDrawParams();
                 cursor->row = visibleRows - 1;
             }
@@ -722,13 +712,13 @@ namespace gui
                 return false;
 
             // if cursor is standing on the first line return false to allow focus change to previous widget
-            if (it == textLines.begin()) {
+            if (it == document->lines.begin()) {
                 return false;
             }
 
             auto itPrev = std::prev(it, 1);
             if (cursor->row == 0) {
-                --firstLine;
+                --document->firstLine;
 
                 recalculateDrawParams();
                 return true;
@@ -762,9 +752,9 @@ namespace gui
         } break;
         case KeyCode::KEY_DOWN: {
             // move cursor to the last visible element
-            auto it   = firstLine;
+            auto it     = document->firstLine;
             cursor->row = 0;
-            while ((it != textLines.end()) && (cursor->row < visibleRows - 1)) {
+            while ((it != document->lines.end()) && (cursor->row < visibleRows - 1)) {
                 it++;
                 cursor->row++;
             }
@@ -808,7 +798,7 @@ namespace gui
             return false;
 
         // get textline where cursor is located
-        auto it = firstLine;
+        auto it = document->firstLine;
         std::advance(it, cursor->row);
 
         // split current text in line using cursors position
@@ -821,14 +811,14 @@ namespace gui
         // create and add new line using remaining parts of text
         auto itNext = it;
         ++itNext;
-        textLines.insert(
+        document->lines.insert(
             itNext,
             new TextLine(remainingText, 0, remainingText.length(), endType, font->getPixelWidth(remainingText)));
         cursor->row++;
 
         if (cursor->row >= visibleRows) {
             cursor->row = visibleRows - 1;
-            firstLine++;
+            document->firstLine++;
         }
 
         cursor->column = 0;
@@ -860,7 +850,7 @@ namespace gui
         // this is when cursor is located at the beginning of the line and there are previous lines
         else {
 
-            if (it == textLines.begin()) {
+            if (it == document->lines.begin()) {
                 return true;
             }
 
@@ -880,7 +870,7 @@ namespace gui
             cursor->column = (*itPrev)->text.length();
 
             if (cursor->row == 0) {
-                firstLine = itPrev;
+                document->firstLine = itPrev;
             }
             else {
                 --cursor->row;
@@ -890,7 +880,7 @@ namespace gui
             (*itPrev)->endType = (*it)->endType;
 
             // delete current line
-            textLines.erase(it);
+            document->lines.erase(it);
             it = itPrev;
         }
 
@@ -960,9 +950,9 @@ namespace gui
         return true;
     }
 
-    std::list<Text::TextLine *>::iterator Text::getCursorTextLine()
+    std::list<TextLine *>::iterator Text::getCursorTextLine()
     {
-        auto it = firstLine;
+        auto it = document->firstLine;
         // TODO add check for distance to advance
         std::advance(it, cursor->row);
         return it;
@@ -971,7 +961,7 @@ namespace gui
     void Text::updateCursor()
     {
         cursor->setSize(2, font->info.line_height);
-        auto it = std::next(firstLine, cursor->row);
+        auto it = std::next(document->firstLine, cursor->row);
 
         uint32_t posX = margins.left + innerMargins.left + font->getPixelWidth((*it)->text, 0, cursor->column);
         uint32_t posY = (margins.top + innerMargins.top) + cursor->row * font->info.line_height;
@@ -980,8 +970,8 @@ namespace gui
 
     int32_t Text::expand(uint32_t rowCount, int32_t h)
     {
-        if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE) {
-            h = font->info.line_height * textLines.size() +
+        if (rowCount < document->lines.size() && expandMode != ExpandMode::EXPAND_NONE) {
+            h = font->info.line_height * document->lines.size() +
                 (margins.getAlong(Axis::Y) + innerMargins.getAlong(Axis::Y));
             if (parent && widgetArea.h > parent->widgetArea.h) {
                 h = widgetArea.h;
@@ -1047,14 +1037,15 @@ namespace gui
         visibleRows = rowCount;
 
         // assign text to all lines
-        auto textIterator = firstLine;
+        auto textIterator = document->firstLine;
         /// if there is less lines than possible to show, copy only needed lines
-        auto num_lines_visible = labelLines.size() > textLines.size() ? textLines.size() : labelLines.size();
+        auto num_lines_visible =
+            labelLines.size() > document->lines.size() ? document->lines.size() : labelLines.size();
         for (uint32_t i = 0; i < num_lines_visible; i++) {
-            if (textIterator == textLines.end())
+            if (textIterator == document->lines.end())
                 break;
             labelLines[i]->setText((*textIterator)->text);
-            lastLine = textIterator;
+            document->lastLine = textIterator;
             textIterator++;
         }
     }
@@ -1078,7 +1069,7 @@ namespace gui
 
     bool Text::onContent()
     {
-        if ((expandMode == Text::ExpandMode::EXPAND_DOWN) || (expandMode == Text::ExpandMode::EXPAND_UP)) {
+        if ((expandMode == ExpandMode::EXPAND_DOWN) || (expandMode == ExpandMode::EXPAND_UP)) {
             if ((parent->type == ItemType::VBOX) || (parent->type == ItemType::HBOX)) {
                 parent->onContent();
             }

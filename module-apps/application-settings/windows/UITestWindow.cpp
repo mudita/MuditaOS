@@ -31,7 +31,7 @@ namespace gui
                              "Add text, long press * adds special char, long press # changes input (and shows it in "
                              "bottom bar) arrows walk, 1 in text mode "
                              "adds special chars too");
-        text->setEditMode(gui::Text::EditMode::EDIT);
+        text->setEditMode(EditMode::EDIT);
         text->setFont(style::window::font::medium);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
