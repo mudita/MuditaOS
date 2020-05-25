@@ -25,26 +25,6 @@ namespace gui
         : text{text}, startIndex{startIndex}, endIndex{endIndex}, endType{endType}, pixelLength{pixelLength}
     {}
 
-    Text::Text()
-    {
-        setPenWidth(1);
-        setPenFocusWidth(3);
-        uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
-        font            = FontManager::getInstance().getFont(fontID);
-
-        cursor = new Rect(this, 0, 0, 1, 1);
-        cursor->setFilled(true);
-        cursor->setVisible(false);
-
-        // insert first empty text line
-        textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-        firstLine = textLines.begin();
-        lastLine  = textLines.begin();
-        setBorderColor(gui::ColorFullBlack);
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        updateCursor();
-    }
-
     Text::Text(Item *parent,
                const uint32_t &x,
                const uint32_t &y,
@@ -56,16 +36,11 @@ namespace gui
         : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType}
     {
 
-        setPenWidth(style::window::default_border_no_focus_w);
-        setPenFocusWidth(style::window::default_border_focucs_w);
         uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
         font            = FontManager::getInstance().getFont(fontID);
+        cursor          = new TextCursor(this);
 
-        cursor = new Rect(this, 0, 0, 1, 1);
-        cursor->setFilled(true);
-        cursor->setVisible(false);
-
-        if (text.length()) {
+        if (text.length() != 0u) {
             splitTextToLines(text);
         }
         else {
@@ -75,10 +50,13 @@ namespace gui
         }
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        // TODO this is bad - cursorColumn is badly handled on newline etc.
-        cursorColumn += text.length();
+        // TODO this is bad - cursor->column is badly handled on newline etc.
+        cursor->column += text.length();
         updateCursor();
     }
+
+    Text::Text() : Text(nullptr, 0, 0, 0, 0)
+    {}
 
     Text::~Text()
     {
@@ -89,7 +67,6 @@ namespace gui
                 textLines.pop_front();
             }
         }
-        textLines.clear();
         if (mode) {
             delete mode;
         }
@@ -104,12 +81,7 @@ namespace gui
     void Text::setEditMode(EditMode mode)
     {
         editMode = mode;
-        if (mode == EditMode::BROWSE)
-            cursor->setVisible(false);
-        else {
-            if (focus)
-                cursor->setVisible(true);
-        }
+        cursor->setVisible(mode != EditMode::BROWSE && focus);
     }
 
     void Text::setTextType(TextType type)
@@ -151,8 +123,7 @@ namespace gui
     void Text::setText(const UTF8 &text)
     {
         clear();
-        cursorRow    = 0;
-        cursorColumn = 0;
+        cursor->reset();
         if (text.length() > 0) {
             // erase default empty line
             delete textLines.front();
@@ -630,7 +601,7 @@ namespace gui
         }
         bool ret = Rect::onFocus(state);
         if (focus && editMode == EditMode::EDIT) {
-            cursor->setVisible(true);
+            cursor->setVisible(visible);
             for (auto it = labelLines.begin(); it != labelLines.end(); it++)
                 (*it)->setPenWidth(3);
         }
@@ -668,7 +639,7 @@ namespace gui
 
         if (direction == NavigationDirection::LEFT) {
             // if we are standing on the beginning for the line move to previous line
-            if (cursorColumn == 0) {
+            if (cursor->column == 0) {
 
                 // if there is no previous line return false so window can switch focus to the item on the left.
                 if (it == textLines.begin()) {
@@ -676,9 +647,9 @@ namespace gui
                 }
 
                 // there is a previous line, check if cursor's row is greater than 0;
-                cursorColumn = (*std::prev(it, 1))->text.length();
-                if (cursorRow > 0) {
-                    --cursorRow;
+                cursor->column = (*std::prev(it, 1))->text.length();
+                if (cursor->row > 0) {
+                    --cursor->row;
                 }
                 else {
                     --firstLine;
@@ -688,28 +659,28 @@ namespace gui
             }
             // cursor's column is greater than 0
             else {
-                --cursorColumn;
+                --cursor->column;
                 return true;
             }
         }
         else if (direction == NavigationDirection::RIGHT) {
             // if cursor is not at the end of current line simply move curosr
-            if (cursorColumn < (*it)->text.length()) {
-                ++cursorColumn;
+            if (cursor->column < (*it)->text.length()) {
+                ++cursor->column;
                 return true;
             }
             else {
                 auto itNext = std::next(it, 1);
                 // if this is not the last line increment row and set column to 0
                 if (itNext != textLines.end()) {
-                    ++cursorRow;
-                    cursorColumn = 0;
+                    ++cursor->row;
+                    cursor->column = 0;
 
                     // if increased row is out of visible are increment first line
-                    if (cursorRow >= visibleRows) {
+                    if (cursor->row >= visibleRows) {
                         firstLine++;
                         recalculateDrawParams();
-                        cursorRow = visibleRows - 1;
+                        cursor->row = visibleRows - 1;
                     }
                     return true;
                 }
@@ -731,16 +702,16 @@ namespace gui
             }
 
             // increment line
-            ++cursorRow;
+            ++cursor->row;
 
             // check if column position is still valid
-            if (cursorColumn > (*itNext)->text.length())
-                cursorColumn = (*itNext)->text.length();
+            if (cursor->column > (*itNext)->text.length())
+                cursor->column = (*itNext)->text.length();
 
-            if (cursorRow >= visibleRows) {
+            if (cursor->row >= visibleRows) {
                 firstLine++;
                 recalculateDrawParams();
-                cursorRow = visibleRows - 1;
+                cursor->row = visibleRows - 1;
             }
             return true;
         }
@@ -756,19 +727,19 @@ namespace gui
             }
 
             auto itPrev = std::prev(it, 1);
-            if (cursorRow == 0) {
+            if (cursor->row == 0) {
                 --firstLine;
 
                 recalculateDrawParams();
                 return true;
             }
             else {
-                --cursorRow;
+                --cursor->row;
             }
 
             // check if previous line is shorter than last one if so move cursor to the end of previous line
-            if (cursorColumn > (*itPrev)->text.length()) {
-                cursorColumn = (*itPrev)->text.length();
+            if (cursor->column > (*itPrev)->text.length()) {
+                cursor->column = (*itPrev)->text.length();
             }
 
             return true;
@@ -786,16 +757,16 @@ namespace gui
         switch (inputEvent.keyCode) {
         case (KeyCode::KEY_UP): {
             // move cursor to first visible element
-            cursorRow = 0;
+            cursor->row = 0;
             return moveCursor(NavigationDirection::UP);
         } break;
         case KeyCode::KEY_DOWN: {
             // move cursor to the last visible element
             auto it   = firstLine;
-            cursorRow = 0;
-            while ((it != textLines.end()) && (cursorRow < visibleRows - 1)) {
+            cursor->row = 0;
+            while ((it != textLines.end()) && (cursor->row < visibleRows - 1)) {
                 it++;
-                cursorRow++;
+                cursor->row++;
             }
 
             return moveCursor(NavigationDirection::DOWN);
@@ -838,10 +809,10 @@ namespace gui
 
         // get textline where cursor is located
         auto it = firstLine;
-        std::advance(it, cursorRow);
+        std::advance(it, cursor->row);
 
         // split current text in line using cursors position
-        UTF8 remainingText = (*it)->text.split(cursorColumn);
+        UTF8 remainingText = (*it)->text.split(cursor->column);
 
         // store old type of line ending set new type of ending to the current line
         LineEndType endType = (*it)->endType;
@@ -853,14 +824,14 @@ namespace gui
         textLines.insert(
             itNext,
             new TextLine(remainingText, 0, remainingText.length(), endType, font->getPixelWidth(remainingText)));
-        cursorRow++;
+        cursor->row++;
 
-        if (cursorRow >= visibleRows) {
-            cursorRow = visibleRows - 1;
+        if (cursor->row >= visibleRows) {
+            cursor->row = visibleRows - 1;
             firstLine++;
         }
 
-        cursorColumn = 0;
+        cursor->column = 0;
 
         reworkLines(it);
 
@@ -876,15 +847,15 @@ namespace gui
             return false;
 
         // if cursor is in column 0 and there is no previous line return
-        if ((cursorRow == 0) && (cursorColumn == 0) && (firstLine == textLines.begin()))
+        if (cursor->atTextBegin())
             return true;
 
         // if cursor is in position other than 0 remove previous character and run lines rework
         auto it = getCursorTextLine();
-        if (cursorColumn > 0) {
+        if (cursor->column > 0) {
             TextLine *currentTextLine = (*it);
-            currentTextLine->text.removeChar(cursorColumn - 1);
-            cursorColumn--;
+            currentTextLine->text.removeChar(cursor->column - 1);
+            cursor->column--;
         }
         // this is when cursor is located at the beginning of the line and there are previous lines
         else {
@@ -906,13 +877,13 @@ namespace gui
                 (*itPrev)->endType = LineEndType::CONTINUE;
             }
 
-            cursorColumn = (*itPrev)->text.length();
+            cursor->column = (*itPrev)->text.length();
 
-            if (cursorRow == 0) {
+            if (cursor->row == 0) {
                 firstLine = itPrev;
             }
             else {
-                --cursorRow;
+                --cursor->row;
             }
 
             (*itPrev)->text += (*it)->text;
@@ -947,7 +918,7 @@ namespace gui
         }
 
         // insert character into string in currently selected line
-        if (currentTextLine->text.insertCode(chars, cursorColumn) == false)
+        if (currentTextLine->text.insertCode(chars, cursor->column) == false)
             return false;
 
         // if sum of the old string and width of the new character are greater than available space run lines rework
@@ -960,27 +931,27 @@ namespace gui
             // is creating the line that doesn't fit available space.
             if (textType == TextType::SINGLE_LINE) {
 
-                currentTextLine->text.removeChar(cursorColumn, 1);
+                currentTextLine->text.removeChar(cursor->column, 1);
                 return true;
             }
 
-            ++cursorColumn;
+            ++cursor->column;
             reworkLines(it);
 
             // if cursor position is greater than number of characters in current line move cursor to next line.
-            if (cursorColumn > (*it)->text.length()) {
-                cursorColumn = 0;
-                ++cursorRow;
+            if (cursor->column > (*it)->text.length()) {
+                cursor->column = 0;
+                ++cursor->row;
             }
 
-            if (cursorRow >= visibleRows) {
+            if (cursor->row >= visibleRows) {
                 firstRow++;
             }
         }
         // no line splitting, update pixel width and proceed
         else {
             currentTextLine->pixelLength = font->getPixelWidth(currentTextLine->text);
-            ++cursorColumn;
+            ++cursor->column;
         }
 
         recalculateDrawParams();
@@ -993,17 +964,17 @@ namespace gui
     {
         auto it = firstLine;
         // TODO add check for distance to advance
-        std::advance(it, cursorRow);
+        std::advance(it, cursor->row);
         return it;
     }
 
     void Text::updateCursor()
     {
         cursor->setSize(2, font->info.line_height);
-        auto it = std::next(firstLine, cursorRow);
+        auto it = std::next(firstLine, cursor->row);
 
-        uint32_t posX = (margins.left + innerMargins.left) + font->getPixelWidth((*it)->text, 0, cursorColumn);
-        uint32_t posY = (margins.top + innerMargins.top) + cursorRow * font->info.line_height;
+        uint32_t posX = margins.left + innerMargins.left + font->getPixelWidth((*it)->text, 0, cursor->column);
+        uint32_t posY = (margins.top + innerMargins.top) + cursor->row * font->info.line_height;
         cursor->setPosition(posX, posY);
     }
 

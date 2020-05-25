@@ -13,7 +13,7 @@ namespace gui
     {
       public:
         /// color used for drawing border
-        Color borderColor = Color(0, 0);
+        Color borderColor = gui::ColorFullBlack;
         /// color for filling rectangle
         Color fillColor = Color(15, 15);
         /// number of pixels used to draw border of rectangle without focus

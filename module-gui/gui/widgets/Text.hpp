@@ -20,6 +20,7 @@
 #include "Style.hpp"
 #include "InputMode.hpp"
 #include "Translator.hpp"
+#include "TextCursor.hpp"
 
 namespace gui
 {
@@ -124,12 +125,8 @@ namespace gui
         std::list<TextLine *>::iterator firstLine = textLines.end();
         // pointer to the last visible line.
         std::list<TextLine *>::iterator lastLine = textLines.end();
-        // row where cursor is located ( 0 - first row from top )
-        uint32_t cursorRow = 0;
-        // column where cursor is located( 0 - position before first character in the line )
-        uint32_t cursorColumn = 0;
 
-        Rect *cursor = nullptr;
+        TextCursor *cursor = nullptr;
 
         EditMode editMode = EditMode::EDIT;
 

@@ -268,7 +268,7 @@ namespace gui
         textColor = color;
     }
 
-    uint32_t Label::getTextNeedSpace()
+    uint32_t Label::getTextNeedSpace() const
     {
         if (font == nullptr) {
             return 0;

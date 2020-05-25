@@ -133,7 +133,7 @@ namespace gui
         void setPosition(const short &x, const short &y) override;
 
         void setSize(const unsigned short w, const unsigned short h) override;
-        uint32_t getTextNeedSpace();
+        uint32_t getTextNeedSpace() const;
     };
 
 } /* namespace gui */
