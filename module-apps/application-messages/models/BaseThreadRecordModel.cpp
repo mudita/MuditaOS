@@ -14,7 +14,7 @@ void BaseThreadRecordModel::requestRecordsCount(void)
 
     if (recordsCount > 0) {
 
-        DBServiceAPI::ThreadGetLimitOffset(application, 0, messages::threads::pageSize);
+        DBServiceAPI::ThreadGetLimitOffset(application, 0, ::messages::threads::pageSize);
     }
 }
 bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,

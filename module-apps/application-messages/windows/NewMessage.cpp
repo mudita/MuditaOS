@@ -111,7 +111,6 @@ namespace gui
 
     void NewSMS_Window::buildInterface()
     {
-        using namespace messages::newMessage;
         AppWindow::buildInterface();
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
@@ -126,20 +125,25 @@ namespace gui
         const uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
         body             = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
-        auto recipientLabel = new Label(body, 0, 0, body->getWidth(), recipientLabel::h);
+        auto recipientLabel = new Label(body, 0, 0, body->getWidth(), ::messages::newMessage::recipientLabel::h);
         recipientLabel->setText(utils::localize.get("sms_add_rec_num"));
         recipientLabel->activeItem = false;
         recipientLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipientLabel->setFont(style::window::font::small);
         recipientLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), text::h);
+        auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), ::messages::newMessage::text::h);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         reciepientHbox->setPenFocusWidth(style::window::default_border_focucs_w);
         reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
 
-        recipient = new gui::Text(
-            reciepientHbox, 0, 0, body->getWidth() - recipientImg::w, text::h, "", gui::Text::ExpandMode::EXPAND_NONE);
+        recipient = new gui::Text(reciepientHbox,
+                                  0,
+                                  0,
+                                  body->getWidth() - ::messages::newMessage::recipientImg::w,
+                                  ::messages::newMessage::text::h,
+                                  "",
+                                  gui::Text::ExpandMode::EXPAND_NONE);
         recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
@@ -154,14 +158,15 @@ namespace gui
         auto img        = new gui::Image(reciepientHbox, 0, 0, 0, 0, "phonebook_small");
         img->activeItem = false;
 
-        auto labelMessage = new Label(body, 0, 0, body->getWidth(), messageLabel::h);
+        auto labelMessage = new Label(body, 0, 0, body->getWidth(), ::messages::newMessage::messageLabel::h);
         labelMessage->setText(utils::localize.get("app_messages_message"));
         labelMessage->activeItem = false;
         labelMessage->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         labelMessage->setFont(style::window::font::small);
         labelMessage->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        message = new gui::Text(nullptr, 0, 0, body->getWidth(), text::h, "", gui::Text::ExpandMode::EXPAND_UP);
+        message = new gui::Text(
+            nullptr, 0, 0, body->getWidth(), ::messages::newMessage::text::h, "", gui::Text::ExpandMode::EXPAND_UP);
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},

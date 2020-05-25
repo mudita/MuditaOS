@@ -49,15 +49,15 @@ namespace gui
 
     void MessagesMainWindow::buildInterface()
     {
-
-        using namespace messages;
-
         AppWindow::buildInterface();
 
         threadModel = new ThreadModel(application);
 
-        list = new gui::ListView(
-            this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listHeight);
+        list = new gui::ListView(this,
+                                 ::messages::threads::listPositionX,
+                                 ::messages::threads::ListPositionY,
+                                 ::messages::threads::listWidth,
+                                 ::messages::threads::listHeight);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);
@@ -88,7 +88,7 @@ namespace gui
                                  utils::localize.get("app_messages_no_messages"));
 
         list->setVisible(true);
-        list->focusChangedCallback = [=](gui::Item &item) {
+        list->focusChangedCallback = [=](gui::Item & /*item*/) {
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             bottomBar->setActive(BottomBar::Side::CENTER, true);
             rightArrowImage->setVisible(true);
@@ -97,7 +97,7 @@ namespace gui
         };
 
         emptyListIcon->setVisible(false);
-        emptyListIcon->focusChangedCallback = [=](gui::Item &item) {
+        emptyListIcon->focusChangedCallback = [=](gui::Item & /*item*/) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             rightArrowImage->setVisible(false);

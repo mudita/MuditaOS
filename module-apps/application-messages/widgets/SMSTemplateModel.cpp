@@ -16,7 +16,7 @@ void SMSTemplateModel::requestRecordsCount()
     // request first
     if (recordsCount > 0) {
         LOG_DEBUG("SMSTemplateGetLimitOffset");
-        auto pageSize = messages::templates::list::pageSize;
+        auto pageSize = ::messages::templates::list::pageSize;
         DBServiceAPI::SMSTemplateGetLimitOffset(application, 0, pageSize);
     }
 }
