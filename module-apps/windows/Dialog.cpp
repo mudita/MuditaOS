@@ -44,8 +44,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     topBar->setActive(TopBar::Elements::TIME, true);
     bottomBar->setActive(BottomBar::Side::LEFT, false);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
     setTitle(meta.title);
 
@@ -70,17 +69,41 @@ void Dialog::buildInterface()
 
 void Dialog::update(const Meta &meta)
 {
+    erase(no);
+    erase(yes);
+    setFocusItem(nullptr);
+
     this->meta = meta;
     setTitle(meta.title);
     text->setText(meta.text);
-    if (meta.have_choice) {
+
+    switch (meta.options) {
+    case Options::onlyOk: {
+        bottomBar->setActive(BottomBar::Side::RIGHT, false);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+        setFocusItem(icon);
+        icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
+            if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
+                return true;
+            }
+            return false;
+        };
+        icon->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+    } break;
+    case Options::onlyBack: {
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setActive(BottomBar::Side::CENTER, false);
+    } break;
+    case Options::haveChoice: {
         setupChoice();
+    } break;
+    default:
+        LOG_ERROR("Not supported option");
     }
 }
 
 void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    setFocusItem(no);
 }
 
 void Dialog::setupChoice()

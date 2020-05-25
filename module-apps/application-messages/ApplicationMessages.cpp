@@ -113,10 +113,6 @@ namespace app
                                                 return true;
                                             },
                                         })});
-        windows.insert({gui::name::window::thread_search_none,
-                        new gui::Dialog(this,
-                                        gui::name::window::thread_search_none,
-                                        gui::Dialog::Meta{.icon = "search_big", .have_choice = false})});
         windows.insert({gui::name::window::thread_sms_search, new gui::SMSSearch(this)});
         windows.insert({gui::name::window::sms_templates, new gui::SMSTemplatesWindow(this)});
         windows.insert({gui::name::window::search_results, new gui::SearchResults(this)});
@@ -148,6 +144,8 @@ namespace app
                 auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
                 auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
                 meta.title      = cont.getFormattedName();
+                meta.options    = gui::Dialog::Options::haveChoice;
+                meta.icon       = "phonebook_contact_delete_trashcan";
                 dialog->update(meta);
                 switchWindow(gui::name::window::dialog, nullptr);
                 return true;
@@ -175,6 +173,8 @@ namespace app
             };
             meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
             meta.title = record.body;
+            meta.options = gui::Dialog::Options::haveChoice;
+            meta.icon    = "phonebook_contact_delete_trashcan";
             dialog->update(meta);
             switchWindow(gui::name::window::dialog, nullptr);
             return true;
@@ -187,11 +187,13 @@ namespace app
 
     bool ApplicationMessages::searchEmpty(const std::string &query)
     {
-        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_search_none]);
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
         assert(dialog);
         auto meta  = dialog->meta;
+        meta.icon    = "search_big";
         meta.text  = utils::localize.get("app_messages_thread_no_result");
         meta.title = utils::localize.get("common_results_prefix") + query;
+        meta.options = gui::Dialog::Options::onlyBack;
         dialog->update(meta);
         auto data                        = std::make_unique<gui::SwitchData>();
         data->ignoreCurrentWindowOnStack = true;
@@ -205,6 +207,20 @@ namespace app
         windows[name]->setTitle(title);
         switchWindow(name, std::make_unique<SMSTextToSearch>(search_text));
         return true;
+    }
+
+    bool ApplicationMessages::smsErrorNotification(std::function<bool()> action)
+    {
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
+        assert(dialog);
+        auto meta    = dialog->meta;
+        meta.icon    = "search_big";
+        meta.text    = utils::localize.get("app_messages_no_sim");
+        meta.title   = "";
+        meta.options = gui::Dialog::Options::onlyOk;
+        meta.action  = action;
+        dialog->update(meta);
+        return switchWindow(gui::name::window::dialog, nullptr);
     }
 
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)

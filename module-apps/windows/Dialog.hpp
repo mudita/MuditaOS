@@ -14,6 +14,13 @@ namespace gui
         Image *icon = nullptr;
 
       public:
+        enum class Options
+        {
+            haveChoice, // yes / no
+            onlyOk,
+            onlyBack
+        };
+
         struct Meta
         {
             std::string title = "";
@@ -21,7 +28,7 @@ namespace gui
             UTF8 text                    = "";
             std::function<bool()> action = []() -> bool { return false; };
 
-            bool have_choice = true;
+            Options options = Options::haveChoice;
         } meta;
 
         Dialog(app::Application *app, const std::string &name, const Meta &meta);
