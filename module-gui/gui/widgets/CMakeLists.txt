@@ -19,6 +19,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TopBar/SIM.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Text.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TextCursor.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Style.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/InputMode.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/GridLayout.cpp"

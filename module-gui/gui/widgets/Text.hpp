@@ -78,7 +78,7 @@ namespace gui
         /**
          * Moves cursor in specified direction
          */
-        bool moveCursor(const NavigationDirection &direction);
+        bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
         /**
          * Function is used to move text up and down in the browsing mode
          */
@@ -104,10 +104,6 @@ namespace gui
         void updateCursor();
 
       private:
-        /**
-         * Returns text line where cursor is located
-         */
-        std::list<TextLine *>::iterator getCursorTextLine();
         /**
          * Returns horizontal pixel space available for text.
          */

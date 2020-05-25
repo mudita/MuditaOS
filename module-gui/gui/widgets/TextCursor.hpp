@@ -1,9 +1,14 @@
 #pragma once
 
 #include "Rect.hpp"
+#include "TextConstants.hpp"
+#include <memory>
 
 namespace gui
 {
+
+    class TextDocument;
+
     class TextCursor : public Rect
     {
       public:
@@ -52,6 +57,6 @@ namespace gui
         }
 
         /// TODO make one from cursorMove - need to create TextModel first and establish boundaries
-        bool move(const NavigationDirection &direction);
+        bool move(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document, TextType type);
     };
 } // namespace gui

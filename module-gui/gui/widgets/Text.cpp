@@ -622,122 +622,6 @@ namespace gui
         return false;
     }
 
-    bool Text::moveCursor(const NavigationDirection &direction)
-    {
-
-        auto it = getCursorTextLine();
-
-        if (direction == NavigationDirection::LEFT) {
-            // if we are standing on the beginning for the line move to previous line
-            if (cursor->column == 0) {
-
-                // if there is no previous line return false so window can switch focus to the item on the left.
-                if (it == document->lines.begin()) {
-                    return false;
-                }
-
-                // there is a previous line, check if cursor's row is greater than 0;
-                cursor->column = (*std::prev(it, 1))->text.length();
-                if (cursor->row > 0) {
-                    --cursor->row;
-                }
-                else {
-                    --document->firstLine;
-                    recalculateDrawParams();
-                }
-                return true;
-            }
-            // cursor's column is greater than 0
-            else {
-                --cursor->column;
-                return true;
-            }
-        }
-        else if (direction == NavigationDirection::RIGHT) {
-            // if cursor is not at the end of current line simply move curosr
-            if (cursor->column < (*it)->text.length()) {
-                ++cursor->column;
-                return true;
-            }
-            else {
-                auto itNext = std::next(it, 1);
-                // if this is not the last line increment row and set column to 0
-                if (itNext != document->lines.end()) {
-                    ++cursor->row;
-                    cursor->column = 0;
-
-                    // if increased row is out of visible are increment first line
-                    if (cursor->row >= visibleRows) {
-                        document->firstLine++;
-                        recalculateDrawParams();
-                        cursor->row = visibleRows - 1;
-                    }
-                    return true;
-                }
-            }
-        }
-        else if (direction == NavigationDirection::DOWN) {
-
-            // if this is a single line text widget there is no navigation down allowed
-            if (textType == TextType::SINGLE_LINE)
-                return false;
-
-            auto itNext = std::next(it, 1);
-
-            // this is the last line, check for barrier
-            if (itNext == document->lines.end()) {
-                if (barriers & static_cast<uint32_t>(NavigationBarrier::BARRIER_DOWN))
-                    return true;
-                return false;
-            }
-
-            // increment line
-            ++cursor->row;
-
-            // check if column position is still valid
-            if (cursor->column > (*itNext)->text.length())
-                cursor->column = (*itNext)->text.length();
-
-            if (cursor->row >= visibleRows) {
-                document->firstLine++;
-                recalculateDrawParams();
-                cursor->row = visibleRows - 1;
-            }
-            return true;
-        }
-        else if (direction == NavigationDirection::UP) {
-
-            // if this is a single line text widget there is no navigation up allowed
-            if (textType == TextType::SINGLE_LINE)
-                return false;
-
-            // if cursor is standing on the first line return false to allow focus change to previous widget
-            if (it == document->lines.begin()) {
-                return false;
-            }
-
-            auto itPrev = std::prev(it, 1);
-            if (cursor->row == 0) {
-                --document->firstLine;
-
-                recalculateDrawParams();
-                return true;
-            }
-            else {
-                --cursor->row;
-            }
-
-            // check if previous line is shorter than last one if so move cursor to the end of previous line
-            if (cursor->column > (*itPrev)->text.length()) {
-                cursor->column = (*itPrev)->text.length();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     bool Text::handleBrowsing(const InputEvent &inputEvent)
     {
         // if this is a single line text widget there is no browsing allowed
@@ -748,7 +632,7 @@ namespace gui
         case (KeyCode::KEY_UP): {
             // move cursor to first visible element
             cursor->row = 0;
-            return moveCursor(NavigationDirection::UP);
+            return cursor->move(NavigationDirection::UP, document, textType);
         } break;
         case KeyCode::KEY_DOWN: {
             // move cursor to the last visible element
@@ -759,7 +643,7 @@ namespace gui
                 cursor->row++;
             }
 
-            return moveCursor(NavigationDirection::DOWN);
+            return cursor->move(NavigationDirection::DOWN, document, textType);
         } break;
         default: {
             LOG_ERROR("Received unknown navigation key");
@@ -773,16 +657,16 @@ namespace gui
 
         switch (inputEvent.keyCode) {
         case (KeyCode::KEY_UP): {
-            return moveCursor(NavigationDirection::UP);
+            return cursor->move(NavigationDirection::UP, document, textType);
         } break;
         case KeyCode::KEY_DOWN: {
-            return moveCursor(NavigationDirection::DOWN);
+            return cursor->move(NavigationDirection::DOWN, document, textType);
         } break;
         case KeyCode::KEY_LEFT: {
-            return moveCursor(NavigationDirection::LEFT);
+            return cursor->move(NavigationDirection::LEFT, document, textType);
         } break;
         case KeyCode::KEY_RIGHT: {
-            return moveCursor(NavigationDirection::RIGHT);
+            return cursor->move(NavigationDirection::RIGHT, document, textType);
         } break;
         default: {
             LOG_ERROR("Received unknown navigation key");
@@ -841,7 +725,7 @@ namespace gui
             return true;
 
         // if cursor is in position other than 0 remove previous character and run lines rework
-        auto it = getCursorTextLine();
+        auto it = document->getTextLineByCursorRow(cursor->getRow());
         if (cursor->column > 0) {
             TextLine *currentTextLine = (*it);
             currentTextLine->text.removeChar(cursor->column - 1);
@@ -897,7 +781,7 @@ namespace gui
             return false;
 
         // get text line where cursor is standing
-        auto it                   = getCursorTextLine();
+        auto it                   = document->getTextLineByCursorRow(cursor->getRow());
         TextLine *currentTextLine = (*it);
 
         // TODO
@@ -948,14 +832,6 @@ namespace gui
         // calculate new position of the cursor
 
         return true;
-    }
-
-    std::list<TextLine *>::iterator Text::getCursorTextLine()
-    {
-        auto it = document->firstLine;
-        // TODO add check for distance to advance
-        std::advance(it, cursor->row);
-        return it;
     }
 
     void Text::updateCursor()
