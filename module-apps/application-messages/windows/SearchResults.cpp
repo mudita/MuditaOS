@@ -53,21 +53,23 @@ namespace gui
     {
         if (auto msg = dynamic_cast<db::QueryResponse *>(msgl)) {
             if (auto response = dynamic_cast<db::query::SMSSearchResult *>(msg->getResult())) {
-                int count         = response->getResults().size();
-                auto records_data = response->getResults();
-                auto records = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
-                model->updateRecords(std::move(records), 0, 3, count);
-                model->setRecordsCount(response->getMax());
-                if (response->getMax() == 0) {
-                    return showEmptyResults();
-                }
-                else {
-                    application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                }
+                return listViewUpdate(response);
             }
         }
-
         return false;
+    }
+
+    auto SearchResults::listViewUpdate(db::query::SMSSearchResult *response) -> bool
+    {
+        int count         = response->getResults().size();
+        auto records_data = response->getResults();
+        auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+        model->updateRecords(std::move(records), 0, 3, count);
+        model->setRecordsCount(response->getMax());
+        if (response->getMax() == 0) {
+            return showEmptyResults();
+        }
+        return true;
     }
 
     bool SearchResults::showEmptyResults()
