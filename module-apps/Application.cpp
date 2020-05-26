@@ -223,12 +223,10 @@ namespace app
         }
     }
 
-    int Application::refreshWindow(gui::RefreshModes mode)
+    void Application::refreshWindow(gui::RefreshModes mode)
     {
         auto msg = std::make_shared<AppRefreshMessage>(mode);
         sys::Bus::SendUnicast(msg, this->GetName(), this);
-
-        return 0;
     }
 
     sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
@@ -514,48 +512,43 @@ namespace app
         return ret == audio::RetCode::Success;
     }
 
-    bool Application::messageSwitchApplication(sys::Service *sender,
+    void Application::messageSwitchApplication(sys::Service *sender,
                                                std::string application,
                                                std::string window,
                                                std::unique_ptr<gui::SwitchData> data)
     {
         auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data));
         sys::Bus::SendUnicast(msg, application, sender);
-        return true;
     }
 
-    bool Application::messageRefreshApplication(sys::Service *sender,
+    void Application::messageRefreshApplication(sys::Service *sender,
                                                 std::string application,
                                                 std::string window,
                                                 gui::SwitchData *data)
     {
         auto msg = std::make_shared<AppMessage>(MessageType::AppRefresh);
         sys::Bus::SendUnicast(msg, application, sender);
-        return true;
     }
 
-    bool Application::messageCloseApplication(sys::Service *sender, std::string application)
+    void Application::messageCloseApplication(sys::Service *sender, std::string application)
     {
 
         auto msg = std::make_shared<AppMessage>(MessageType::AppClose);
         sys::Bus::SendUnicast(msg, application, sender);
-        return true;
     }
 
-    bool Application::messageRebuildApplication(sys::Service *sender, std::string application)
+    void Application::messageRebuildApplication(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppRebuildMessage>();
         sys::Bus::SendUnicast(msg, application, sender);
-        return true;
     }
 
-    bool Application::messageInputEventApplication(sys::Service *sender,
+    void Application::messageInputEventApplication(sys::Service *sender,
                                                    std::string application,
                                                    const gui::InputEvent &event)
     {
         auto msg = std::make_shared<AppInputEventMessage>(event);
         sys::Bus::SendUnicast(msg, application, sender);
-        return true;
     }
 
     bool Application::popToWindow(const std::string &window)
