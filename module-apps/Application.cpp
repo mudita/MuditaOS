@@ -181,9 +181,9 @@ namespace app
     {
         acceptInput = isBlocked;
     }
-    int Application::switchWindow(const std::string &windowName,
-                                  gui::ShowMode cmd,
-                                  std::unique_ptr<gui::SwitchData> data)
+    void Application::switchWindow(const std::string &windowName,
+                                   gui::ShowMode cmd,
+                                   std::unique_ptr<gui::SwitchData> data)
     {
 
         std::string window;
@@ -207,11 +207,9 @@ namespace app
                 window, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
             sys::Bus::SendUnicast(msg, this->GetName(), this);
         }
-
-        return 0;
     }
 
-    bool Application::returnToPreviousWindow()
+    void Application::returnToPreviousWindow()
     {
         auto prevWindow = getPrevWindow();
         if (prevWindow == gui::name::window::no_window) {
@@ -223,7 +221,6 @@ namespace app
             LOG_INFO("Back to previous window %s", prevWindow.c_str());
             switchWindow(prevWindow, gui::ShowMode::GUI_SHOW_RETURN);
         }
-        return true;
     }
 
     int Application::refreshWindow(gui::RefreshModes mode)

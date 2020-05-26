@@ -95,7 +95,10 @@ void Dialog::setupChoice()
     no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     no->setFont(style::window::font::big);
     no->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
-    no->activatedCallback = [=](Item &) -> bool { return application->returnToPreviousWindow(); };
+    no->activatedCallback = [=](Item &) -> bool {
+        application->returnToPreviousWindow();
+        return true;
+    };
 
     erase(yes);
     yes = new Label(this,

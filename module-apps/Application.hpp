@@ -166,17 +166,17 @@ namespace app
         /// Method sending switch command for another window. It will switch window within active application.
         /// to switch windows between applications use sapm::ApplicationManager::messageSwitchApplication
         /// it will effectivelly trigger setActiveWindow and change on windows stack
-        int switchWindow(const std::string &windowName,
-                         gui::ShowMode cmd                     = gui::ShowMode::GUI_SHOW_INIT,
-                         std::unique_ptr<gui::SwitchData> data = nullptr);
+        void switchWindow(const std::string &windowName,
+                          gui::ShowMode cmd                     = gui::ShowMode::GUI_SHOW_INIT,
+                          std::unique_ptr<gui::SwitchData> data = nullptr);
 
         /// Same as switchWindow above
-        inline auto switchWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
+        inline void switchWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
         {
-            return switchWindow(windowName, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            switchWindow(windowName, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         };
 
-        bool returnToPreviousWindow();
+        void returnToPreviousWindow();
 
         /// Method refreshing active window
         int refreshWindow(gui::RefreshModes mode);

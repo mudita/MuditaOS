@@ -138,14 +138,16 @@ namespace app
                         LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->dbID);
                         return false;
                     }
-                    return this->switchWindow(gui::name::window::main_window);
+                    this->switchWindow(gui::name::window::main_window);
+                    return true;
                 };
                 meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
                 auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
                 auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
                 meta.title      = cont.getFormattedName();
                 dialog->update(meta);
-                return switchWindow(gui::name::window::dialog, nullptr);
+                switchWindow(gui::name::window::dialog, nullptr);
+                return true;
             }
             else {
                 LOG_ERROR("Dialog bad type!");
@@ -165,12 +167,14 @@ namespace app
                     LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
                     return false;
                 }
-                return this->switchWindow(gui::name::window::thread_view);
+                this->switchWindow(gui::name::window::thread_view);
+                return true;
             };
             meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
             meta.title = record.body;
             dialog->update(meta);
-            return switchWindow(gui::name::window::dialog, nullptr);
+            switchWindow(gui::name::window::dialog, nullptr);
+            return true;
         }
         else {
             LOG_ERROR("Dialog bad type!");
@@ -186,14 +190,16 @@ namespace app
         meta.text  = utils::localize.get("app_messages_thread_no_result");
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
-        return switchWindow(gui::name::window::thread_search_none, nullptr);
+        switchWindow(gui::name::window::thread_search_none, nullptr);
+        return true;
     }
 
     bool ApplicationMessages::showSearchResults(const UTF8 &title)
     {
         auto name = gui::name::window::search_results;
         windows[name]->setTitle(title);
-        return switchWindow(name, nullptr);
+        switchWindow(name, nullptr);
+        return true;
     }
 
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
