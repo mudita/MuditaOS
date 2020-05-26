@@ -3,6 +3,7 @@
 #include "../core/Font.hpp"
 #include "Ellipsis.hpp"
 #include "Text.hpp"
+#include "TextDocument.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
@@ -32,14 +33,10 @@ namespace gui
         font            = FontManager::getInstance().getFont(fontID);
         cursor          = new TextCursor(this);
 
-        if (text.length() != 0u) {
-            splitTextToLines(text);
-        }
-        else {
-            document->lines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-            document->firstLine = document->lines.begin();
-            document->lastLine  = document->lines.begin();
-        }
+        document = std::make_unique<TextDocument>(text);
+        // TODO move to TextDocument
+        splitTextToLines(text);
+
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         // TODO this is bad - cursor->column is badly handled on newline etc.
@@ -52,14 +49,7 @@ namespace gui
 
     Text::~Text()
     {
-        // if there are text lines erase them.
-        if (!document->lines.empty()) {
-            while (!document->lines.empty()) {
-                delete document->lines.front();
-                document->lines.pop_front();
-            }
-        }
-        if (mode) {
+        if (mode != nullptr) {
             delete mode;
         }
     }
@@ -99,28 +89,15 @@ namespace gui
         }
     }
 
-    void Text::setNavigationBarrier(const NavigationBarrier &barrier, bool value)
-    {
-        if (value)
-            barriers |= static_cast<uint32_t>(barrier);
-        else
-            barriers &= ~(static_cast<uint32_t>(barrier));
-    }
-
     void Text::setText(const UTF8 &text)
     {
         clear();
         cursor->reset();
         if (text.length() > 0) {
-            // erase default empty line
-            delete document->lines.front();
-            document->lines.pop_front();
-            document->lines.clear();
-            // split and add new lines
+            document->destroy();
             splitTextToLines(text);
         }
         recalculateDrawParams();
-        updateCursor();
     }
 
     void Text::setTextColor(Color color)
@@ -133,83 +110,31 @@ namespace gui
 
     void Text::clear()
     {
-        // if there are text lines erase them.
-        if (!document->lines.empty()) {
-            while (!document->lines.empty()) {
-                delete document->lines.front();
-                document->lines.pop_front();
-            }
-        }
-        document->lines.clear();
-        // insert first empty text line
-        document->lines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-        document->firstLine = document->lines.begin();
-        document->lastLine  = document->lines.begin();
+        document = std::make_unique<TextDocument>();
     }
 
     UTF8 Text::getText()
     {
-
-        UTF8 output;
-
-        // iterate over all lines and add content from each line to output string.
-        auto it = document->lines.begin();
-        while (it != document->lines.end()) {
-
-            auto textLine = (*it);
-            assert(textLine);
-            output += textLine->text;
-            if (textLine->endType == LineEndType::BREAK) {
-                output.insert("\n");
-            }
-
-            if (textLine->endType == LineEndType::CONTINUE_SPACE) {
-                output.insert(" ");
-            }
-
-            ++it;
-        }
-        return output;
+        return document->getText();
     }
 
     bool Text::saveText(UTF8 path)
     {
-
-        auto file = vfs.fopen(path.c_str(), "wb");
-
-        if (file == nullptr)
-            return false;
-
-        auto it = document->lines.begin();
-
-        // iterate over all lines in text edit
-        while (it != document->lines.end()) {
-
-            vfs.fwrite((*it)->text.c_str(), (*it)->text.used() - 1, 1, file);
-            if ((*it)->endType == LineEndType::BREAK) {
-                vfs.fwrite("\n", 1, 1, file);
-            }
-
-            if ((*it)->endType == LineEndType::CONTINUE_SPACE) {
-                vfs.fwrite(" ", 1, 1, file);
-            }
-
-            ++it;
+        if (auto file = vfs.fopen(path.c_str(), "wb")) {
+            auto text = getText();
+            vfs.fwrite(text.c_str(), text.length(), text.length(), file);
+            vfs.fclose(file);
+            return true;
         }
-        // close file
-        vfs.fclose(file);
-
-        return true;
+        return false;
     }
 
     void Text::setFont(const UTF8 &fontName)
     {
-
         uint32_t fontID = FontManager::getInstance().getFontID(fontName.c_str());
         Font *newFont   = FontManager::getInstance().getFont(fontID);
         if (newFont != nullptr) {
             font = newFont;
-            //		calculateDisplayText();
         }
         else {
             LOG_ERROR("Font not found");
@@ -217,9 +142,9 @@ namespace gui
         recalculateDrawParams();
     }
 
+    // TODO full separation TextDocument <>--TextChunk <==> TextLine (sick)
     void Text::splitTextToLines(const UTF8 &text)
     {
-
         if (text.length() == 0) {
             if (document->lines.size() == 0) {
                 document->firstLine = document->lines.end();
@@ -254,18 +179,16 @@ namespace gui
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
                     lineEndType = LineEndType::BREAK;
-                    document->lines.push_back(new TextLine(tmpText.substr(0, enterIndex),
-                                                           startIndex,
-                                                           endIndex,
-                                                           lineEndType,
-                                                           font->getPixelWidth(tmpText.substr(0, enterIndex))));
-                    //				LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
+                    document->append(new TextLine(tmpText.substr(0, enterIndex),
+                                                  startIndex,
+                                                  endIndex,
+                                                  lineEndType,
+                                                  font->getPixelWidth(tmpText.substr(0, enterIndex))));
                 } // no enter found last line can be copied as a whole.
                 else {
                     startIndex = index;
                     endIndex   = totalLength;
-                    document->lines.push_back(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
-                    //				LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
+                    document->append(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
                     index += charCount;
                 }
             }
@@ -280,9 +203,8 @@ namespace gui
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
                     lineEndType = LineEndType::BREAK;
-                    document->lines.push_back(
+                    document->append(
                         new TextLine(tmpText.substr(0, enterIndex), startIndex, endIndex, lineEndType, spaceConsumed));
-                    //				LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
                 }
                 else {
                     // if there was no enter look for last space in the tmpText and break line on it
@@ -293,9 +215,7 @@ namespace gui
                         endIndex = index + charCount;
                         index += charCount;
                         lineEndType = LineEndType::CONTINUE;
-                        document->lines.push_back(
-                            new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
-                        //					LOG_INFO("Text Input Line: [%s]", document->lines.back()->text.c_str());
+                        document->append(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
                     }
                     else {
                         lineEndType = LineEndType::CONTINUE_SPACE;
@@ -305,31 +225,26 @@ namespace gui
                         if (spaceIndex == tmpText.length() - 1) {
                             endIndex = index + charCount - 1;
                             index += charCount;
-                            document->lines.push_back(new TextLine(tmpText.substr(0, tmpText.length() - 1),
-                                                                   startIndex,
-                                                                   endIndex,
-                                                                   lineEndType,
-                                                                   spaceConsumed - spaceWidth));
-                            //						LOG_INFO("Text Input Line: [%s]",
-                            // document->lines.back()->text.c_str());
+                            document->append(new TextLine(tmpText.substr(0, tmpText.length() - 1),
+                                                          startIndex,
+                                                          endIndex,
+                                                          lineEndType,
+                                                          spaceConsumed - spaceWidth));
                         }
                         else {
                             endIndex = index + spaceIndex;
                             index += spaceIndex + 1;
-                            document->lines.push_back(new TextLine(tmpText.substr(0, spaceIndex),
-                                                                   startIndex,
-                                                                   endIndex,
-                                                                   lineEndType,
-                                                                   font->getPixelWidth(tmpText.substr(0, spaceIndex))));
-                            //						LOG_INFO("Text Input Line: [%s]",
-                            // document->lines.back()->text.c_str());
+                            document->append(new TextLine(tmpText.substr(0, spaceIndex),
+                                                          startIndex,
+                                                          endIndex,
+                                                          lineEndType,
+                                                          font->getPixelWidth(tmpText.substr(0, spaceIndex))));
                         }
                     }
                 }
             }
 
             if (textType == TextType::SINGLE_LINE) {
-                // LOG_INFO("NUMBER OF LINES: %d", document->lines.size());
                 auto textLine     = document->lines.front();
                 textLine->endType = LineEndType::EOT;
                 break;
@@ -449,14 +364,12 @@ namespace gui
     {
         Rect::setPosition(x, y);
         recalculateDrawParams();
-        updateCursor();
     }
 
     void Text::setSize(const unsigned short w, const unsigned short h)
     {
         Rect::setSize(w, h);
         recalculateDrawParams();
-        updateCursor();
     }
 
     bool Text::onInput(const InputEvent &inputEvent)
@@ -612,7 +525,6 @@ namespace gui
             margins.left = value;
         if (margins.right < value)
             margins.right = value;
-        updateCursor();
     }
 
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -924,22 +836,18 @@ namespace gui
             document->lastLine = textIterator;
             textIterator++;
         }
+
+        updateCursor();
     }
 
     void Text::setMargins(const Margins &margins)
     {
         this->margins = margins;
         recalculateDrawParams();
-        updateCursor();
     }
 
     Item *Text::getNavigationItem(NavigationDirection direction)
     {
-        // if provided direction is forbidden than return nullptr
-        if (barriers & static_cast<uint32_t>(direction))
-            return nullptr;
-
-        // otherwise run default navigation method (Item)
         return Rect::getNavigationItem(direction);
     }
 
@@ -958,7 +866,6 @@ namespace gui
     {
         alignment = _alignment;
         recalculateDrawParams();
-        updateCursor();
     }
 
 } /* namespace gui */

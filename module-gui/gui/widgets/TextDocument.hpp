@@ -8,6 +8,28 @@ namespace gui
     class TextDocument
     {
       public:
+        TextDocument(const UTF8 &text = "")
+        {
+            lines     = splitToTextChunk(text);
+            firstLine = lines.begin();
+            lastLine  = lines.begin();
+        }
+
+        // TODO use TextChunk and TextLines instead, make some "logic"
+        std::list<TextLine *> splitToTextChunk(const UTF8 &text) // text
+        {
+            std::list<TextLine *> lines;
+            lines.push_back(new TextLine(text, 0, 0, LineEndType::EOT, 0));
+            return lines;
+        }
+
+        void append(TextLine *&&text)
+        {
+            lines.push_back(text);
+        }
+
+        UTF8 getText();
+
         // holds list of all lines that  text was divided to.
         std::list<TextLine *> lines;
         // pointer to the first visible line of text
@@ -32,5 +54,25 @@ namespace gui
             }
             return std::distance(firstLine, lastLine);
         }
+
+        void destroy()
+        {
+            for (auto el : lines) {
+                delete el;
+            }
+            lines.clear();
+        }
+
+        ~TextDocument()
+        {
+            destroy();
+        }
+
+        // Instead working on TextLine -> work on TextBlock ( Text & it's params (underline, bold, size etc) )
+        //        // TODO -> add whole chunk
+        //        void addTextBlock();
+        //
+        //        // TODO -> append to current chunk
+        //        void addTextChar();
     };
 }; // namespace gui

@@ -56,8 +56,6 @@ namespace gui
         Color textColor;
         // margins for text
         Margins margins;
-        // barrier for navigation
-        uint32_t barriers = static_cast<uint32_t>(NavigationBarrier::BARRIER_NONE);
         // default alignment
         Alignment alignment = style::text::defaultTextAlignment;
         // defines whether internal labels have underline
@@ -141,7 +139,6 @@ namespace gui
          * @param underline - if true text lines will have underline, if false no underline will be drawn.
          */
         void setUnderline(bool underline);
-        void setNavigationBarrier(const NavigationBarrier &barrier, bool value);
         virtual void setText(const UTF8 &text);
         virtual void clear();
         virtual UTF8 getText();

@@ -30,14 +30,4 @@ namespace gui
         SINGLE_LINE = 1,
         MULTI_LINE
     };
-
-    enum class NavigationBarrier
-    {
-        BARRIER_NONE  = 0x00,
-        BARRIER_UP    = 0x01,
-        BARRIER_DOWN  = 0x02,
-        BARRIER_LEFT  = 0x04,
-        BARRIER_RIGHT = 0x08,
-        BARRIER_ALL   = 0x0F,
-    };
 } // namespace gui
