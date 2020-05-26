@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
 
-# Locate GTest
-find_package(GTest)
-
-set( CMAKE_PROJECT_GTEST_UTF8 "gtest_utf8" )
-
 ###########################################
 # Log functional tests project
 project(test_module-utils_log VERSION 1.0
@@ -40,31 +35,22 @@ add_test(NAME ${PROJECT_NAME}
 add_dependencies(check ${PROJECT_NAME})
 
 ###########################################
-# UTF8 gtest executable
-if( ${GTEST_FOUND} )
-    add_executable( ${CMAKE_PROJECT_GTEST_UTF8} EXCLUDE_FROM_ALL
-        gtest_utf8.cpp)
-    target_include_directories(${CMAKE_PROJECT_GTEST_UTF8}
-        PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/.."
-        "${GTEST_INCLUDE_DIRS}"
-        )
-    target_link_libraries( ${CMAKE_PROJECT_GTEST_UTF8}
-        #${LIBRARY_UTF8}
-        GTest::GTest
-        GTest::Main
-        pthread
-        module-utils
-        )
-    add_test(NAME ${CMAKE_PROJECT_GTEST_UTF8}
-        COMMAND ${CMAKE_PROJECT_GTEST_UTF8}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-    add_dependencies(check ${CMAKE_PROJECT_GTEST_UTF8})
-else()
-    message( "${Red} No GTest ${ColourReset} - skipping build of ${CMAKE_PROJECT_GTEST_UTF8} ")
-    message(WARNING "Tests for ${PROJECT_NAME} need update - disabled:  https://appnroll.atlassian.net/browse/EGD-2996")
-endif()
+# UTF8 unit tests project
+project(unittest_module-utils_utf8 VERSION 1.0
+    DESCRIPTION "Module-utils UTF8 tests")
+
+add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
+    unittest_utf8.cpp
+    ../utf8/UTF8.cpp
+    ../utf8/UTF8.hpp
+)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
+target_compile_definitions(${PROJECT_NAME} PRIVATE UNIT_TESTS)
+add_test(NAME ${PROJECT_NAME}
+     COMMAND ${PROJECT_NAME}
+     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+add_dependencies(check ${PROJECT_NAME})
 
 ###########################################
 #time conversion unit tests project
