@@ -122,11 +122,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
         auto ret          = smsRecordInterface->RemoveByID(msg->id);
         responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
-
-        // send notification
-        auto notificationMessage = std::make_shared<DBNotificationMessage>(
-            MessageType::DBServiceNotification, DB::NotificationType::Removed, DB::BaseType::SmsDB);
-        sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+        sendUpdateNotification(db::Interface::Name::SMS);
     } break;
 
     case MessageType::DBSMSUpdate: {
@@ -199,10 +195,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
         auto ret             = threadRecordInterface->RemoveByID(msg->id);
         responseMsg          = std::make_shared<DBThreadResponseMessage>(nullptr, ret);
-        // send notification
-        auto notificationMessage = std::make_shared<DBNotificationMessage>(
-            MessageType::DBServiceNotification, DB::NotificationType::Removed, DB::BaseType::SmsDB);
-        sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+        sendUpdateNotification(db::Interface::Name::SMSThread);
     } break;
 
     case MessageType::DBThreadGetLimitOffset: {
