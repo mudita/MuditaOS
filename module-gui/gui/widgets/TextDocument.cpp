@@ -3,9 +3,9 @@
 
 namespace gui
 {
-    TextDocument::TextDocument(const UTF8 &text = "")
+    TextDocument::TextDocument(const UTF8 &text)
     {
-        lines     = splitToTextChunk(text);
+        lines     = splitToTextBlock(text);
         firstLine = lines.begin();
         lastLine  = lines.begin();
     }

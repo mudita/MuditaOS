@@ -1,7 +1,7 @@
 #pragma once
 
 #include <list>
-#include "TextLine.hpp"
+#include "TextBlock.hpp"
 
 namespace gui
 {
@@ -10,15 +10,15 @@ namespace gui
       public:
         TextDocument(const UTF8 &text = "");
 
-        // TODO use TextChunk and TextLines instead, make some "logic"
-        std::list<TextLine *> splitToTextChunk(const UTF8 &text) // text
+        // TODO use TextBlock and TextBlocks instead, make some "logic"
+        std::list<TextBlock *> splitToTextBlock(const UTF8 &text) // text
         {
-            std::list<TextLine *> lines;
-            lines.push_back(new TextLine(text, 0, 0, LineEndType::EOT, 0));
+            std::list<TextBlock *> lines;
+            lines.push_back(new TextBlock(text, 0, 0, LineEndType::EOT, 0));
             return lines;
         }
 
-        void append(TextLine *&&text)
+        void append(TextBlock *&&text)
         {
             lines.push_back(text);
         }
@@ -26,14 +26,14 @@ namespace gui
         UTF8 getText();
 
         // holds list of all lines that  text was divided to.
-        std::list<TextLine *> lines;
+        std::list<TextBlock *> lines;
         // pointer to the first visible line of text
-        std::list<TextLine *>::iterator firstLine = lines.end();
+        std::list<TextBlock *>::iterator firstLine = lines.end();
         // pointer to the last visible line.
-        std::list<TextLine *>::iterator lastLine = lines.end();
+        std::list<TextBlock *>::iterator lastLine = lines.end();
 
         // TODO make private
-        std::list<TextLine *>::iterator getTextLineByCursorRow(unsigned int row)
+        std::list<TextBlock *>::iterator getTextBlockByCursorRow(unsigned int row)
         {
             if (row >= std::distance(firstLine, lines.end())) {
                 lines.end();
@@ -63,7 +63,7 @@ namespace gui
             destroy();
         }
 
-        // Instead working on TextLine -> work on TextBlock ( Text & it's params (underline, bold, size etc) )
+        // Instead working on TextBlock -> work on TextBlock ( Text & it's params (underline, bold, size etc) )
         //        // TODO -> add whole chunk
         //        void addTextBlock();
         //

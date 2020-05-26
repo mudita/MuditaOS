@@ -5,7 +5,7 @@
 
 namespace gui
 {
-    class TextLine
+    class TextBlock
     {
       public:
         UTF8 text;
@@ -14,7 +14,7 @@ namespace gui
         LineEndType endType  = LineEndType::EOT;
         uint32_t pixelLength = 0;
 
-        TextLine(const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength);
+        TextBlock(const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength);
         /**
          * Returns text with appropriate ending.
          */

@@ -67,7 +67,7 @@ namespace gui
          * Function stops on the last line or it there is a lines break ( enter ) or if last concatenated line doesn;t
          * change after update.
          */
-        void reworkLines(std::list<TextLine *>::iterator it);
+        void reworkLines(std::list<TextBlock *>::iterator it);
         /**
          * Splits text in two on ENTER, space or dot.
          * @return true if line was actually splitted

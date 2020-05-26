@@ -7,7 +7,7 @@ namespace gui
     bool TextCursor::move(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document, TextType type)
     {
 
-        auto it = document->getTextLineByCursorRow(getRow());
+        auto it = document->getTextBlockByCursorRow(getRow());
 
         if (direction == NavigationDirection::LEFT) {
             // if we are standing on the beginning for the line move to previous line

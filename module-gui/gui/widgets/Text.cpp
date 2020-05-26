@@ -13,7 +13,7 @@
 namespace gui
 {
 
-    TextLine::TextLine(
+    TextBlock::TextBlock(
         const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength)
         : text{text}, startIndex{startIndex}, endIndex{endIndex}, endType{endType}, pixelLength{pixelLength}
     {}
@@ -143,7 +143,7 @@ namespace gui
         recalculateDrawParams();
     }
 
-    // TODO full separation TextDocument <>--TextChunk <==> TextLine (sick)
+    // TODO full separation TextDocument <>--TextBlock <==> TextBlock (sick)
     void Text::splitTextToLines(const UTF8 &text)
     {
         if (text.length() == 0) {
@@ -180,16 +180,16 @@ namespace gui
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
                     lineEndType = LineEndType::BREAK;
-                    document->append(new TextLine(tmpText.substr(0, enterIndex),
-                                                  startIndex,
-                                                  endIndex,
-                                                  lineEndType,
-                                                  font->getPixelWidth(tmpText.substr(0, enterIndex))));
+                    document->append(new TextBlock(tmpText.substr(0, enterIndex),
+                                                   startIndex,
+                                                   endIndex,
+                                                   lineEndType,
+                                                   font->getPixelWidth(tmpText.substr(0, enterIndex))));
                 } // no enter found last line can be copied as a whole.
                 else {
                     startIndex = index;
                     endIndex   = totalLength;
-                    document->append(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
+                    document->append(new TextBlock(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
                     index += charCount;
                 }
             }
@@ -205,7 +205,7 @@ namespace gui
                     index += enterIndex + 1;
                     lineEndType = LineEndType::BREAK;
                     document->append(
-                        new TextLine(tmpText.substr(0, enterIndex), startIndex, endIndex, lineEndType, spaceConsumed));
+                        new TextBlock(tmpText.substr(0, enterIndex), startIndex, endIndex, lineEndType, spaceConsumed));
                 }
                 else {
                     // if there was no enter look for last space in the tmpText and break line on it
@@ -216,7 +216,7 @@ namespace gui
                         endIndex = index + charCount;
                         index += charCount;
                         lineEndType = LineEndType::CONTINUE;
-                        document->append(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
+                        document->append(new TextBlock(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
                     }
                     else {
                         lineEndType = LineEndType::CONTINUE_SPACE;
@@ -226,20 +226,20 @@ namespace gui
                         if (spaceIndex == tmpText.length() - 1) {
                             endIndex = index + charCount - 1;
                             index += charCount;
-                            document->append(new TextLine(tmpText.substr(0, tmpText.length() - 1),
-                                                          startIndex,
-                                                          endIndex,
-                                                          lineEndType,
-                                                          spaceConsumed - spaceWidth));
+                            document->append(new TextBlock(tmpText.substr(0, tmpText.length() - 1),
+                                                           startIndex,
+                                                           endIndex,
+                                                           lineEndType,
+                                                           spaceConsumed - spaceWidth));
                         }
                         else {
                             endIndex = index + spaceIndex;
                             index += spaceIndex + 1;
-                            document->append(new TextLine(tmpText.substr(0, spaceIndex),
-                                                          startIndex,
-                                                          endIndex,
-                                                          lineEndType,
-                                                          font->getPixelWidth(tmpText.substr(0, spaceIndex))));
+                            document->append(new TextBlock(tmpText.substr(0, spaceIndex),
+                                                           startIndex,
+                                                           endIndex,
+                                                           lineEndType,
+                                                           font->getPixelWidth(tmpText.substr(0, spaceIndex))));
                         }
                     }
                 }
@@ -294,7 +294,7 @@ namespace gui
         return false;
     }
 
-    void Text::reworkLines(std::list<TextLine *>::iterator it)
+    void Text::reworkLines(std::list<TextBlock *>::iterator it)
     {
 
         // iterate until end of text lines or till line that fits available space has break line ending (enter).
@@ -344,7 +344,7 @@ namespace gui
                 itNext++;
                 document->lines.insert(
                     itNext,
-                    new TextLine(
+                    new TextBlock(
                         remainingText, 0, remainingText.length(), (*it)->endType, font->getPixelWidth(remainingText)));
 
                 (*it)->endType = endType;
@@ -610,7 +610,7 @@ namespace gui
         ++itNext;
         document->lines.insert(
             itNext,
-            new TextLine(remainingText, 0, remainingText.length(), endType, font->getPixelWidth(remainingText)));
+            new TextBlock(remainingText, 0, remainingText.length(), endType, font->getPixelWidth(remainingText)));
         cursor->row++;
 
         if (cursor->row >= visibleRows) {
@@ -638,10 +638,10 @@ namespace gui
             return true;
 
         // if cursor is in position other than 0 remove previous character and run lines rework
-        auto it = document->getTextLineByCursorRow(cursor->getRow());
+        auto it = document->getTextBlockByCursorRow(cursor->getRow());
         if (cursor->column > 0) {
-            TextLine *currentTextLine = (*it);
-            currentTextLine->text.removeChar(cursor->column - 1);
+            TextBlock *currentTextBlock = (*it);
+            currentTextBlock->text.removeChar(cursor->column - 1);
             cursor->column--;
         }
         // this is when cursor is located at the beginning of the line and there are previous lines
@@ -694,8 +694,8 @@ namespace gui
             return false;
 
         // get text line where cursor is standing
-        auto it                   = document->getTextLineByCursorRow(cursor->getRow());
-        TextLine *currentTextLine = (*it);
+        auto it                     = document->getTextBlockByCursorRow(cursor->getRow());
+        TextBlock *currentTextBlock = (*it);
 
         // TODO
         // calculate width of the character that is going to be inserted
@@ -705,20 +705,20 @@ namespace gui
         }
 
         // insert character into string in currently selected line
-        if (currentTextLine->text.insertCode(chars, cursor->column) == false)
+        if (currentTextBlock->text.insertCode(chars, cursor->column) == false)
             return false;
 
         // if sum of the old string and width of the new character are greater than available space run lines rework
         // procedure
         uint32_t availableSpace = getAvailableHPixelSpace();
-        uint32_t currentWidth   = currentTextLine->pixelLength;
+        uint32_t currentWidth   = currentTextBlock->pixelLength;
         if (currentWidth + charWidth > availableSpace) {
 
             // this is the case when new character inserted into single line text
             // is creating the line that doesn't fit available space.
             if (textType == TextType::SINGLE_LINE) {
 
-                currentTextLine->text.removeChar(cursor->column, 1);
+                currentTextBlock->text.removeChar(cursor->column, 1);
                 return true;
             }
 
@@ -737,7 +737,7 @@ namespace gui
         }
         // no line splitting, update pixel width and proceed
         else {
-            currentTextLine->pixelLength = font->getPixelWidth(currentTextLine->text);
+            currentTextBlock->pixelLength = font->getPixelWidth(currentTextBlock->text);
             ++cursor->column;
         }
 
