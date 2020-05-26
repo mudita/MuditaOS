@@ -3,17 +3,17 @@ cmake_minimum_required(VERSION 3.12)
 # Locate GTest
 find_package(GTest)
 
-
 set( CMAKE_PROJECT_UNIT_TEST_UTF8 "unittest_utf8" )
-set( CMAKE_PROJECT_UNIT_TEST_LOG "unittest_log" )
 set( CMAKE_PROJECT_GTEST_UTF8 "gtest_utf8" )
-#Log unit tests projeet
-project(unittest_module-utils_log VERSION 1.0
-       DESCRIPTION "Module-utils log unit tests")
+
+###########################################
+# Log functional tests project
+project(test_module-utils_log VERSION 1.0
+    DESCRIPTION "Module-utils log functional tests")
 
 add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-    unittest_log.cpp
-    unittest_log2.cpp
+    test_log.cpp
+    test_log2.cpp
 )
 add_test(NAME ${PROJECT_NAME}
     COMMAND ${PROJECT_NAME}
