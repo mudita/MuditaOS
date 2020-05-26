@@ -10,7 +10,7 @@
 #include <iostream>
 #include <string>
 
-#include "unittest_log2.h"
+#include "test_log2.h"
 
 using namespace std;
 
