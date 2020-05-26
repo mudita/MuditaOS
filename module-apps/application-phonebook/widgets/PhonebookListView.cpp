@@ -18,6 +18,7 @@ namespace gui
                 phonebookLabel->setMarkerItem(labelMark);
 
                 body->addWidget(phonebookLabel);
+                addSpanItem();
             }
         }
         if (direction == style::listview::Direction::Top) {
@@ -33,8 +34,10 @@ namespace gui
 
                 gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
                 phonebookLabel->setMarkerItem(previousLabelMark);
+
                 body->removeWidget(item);
                 body->addWidget(phonebookLabel);
+                addSpanItem();
                 body->addWidget(item);
             }
         }
@@ -42,8 +45,7 @@ namespace gui
 
     void PhonebookListView::addItemsOnPage()
     {
-        currentPageSize = 0;
-        //        auto itemsOnPage = 0;
+        currentPageSize            = 0;
         ListItem *item             = nullptr;
         ListItem *previousListItem = nullptr;
         labelMark                  = "";
@@ -51,6 +53,7 @@ namespace gui
 
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
 
+            // if direction bot add label mark before adding item
             if (direction == style::listview::Direction::Bottom) {
                 addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
             }
@@ -59,9 +62,12 @@ namespace gui
 
             if (item->visible != true) {
 
+                // if list full and direction top remove last element and add floating label mark on top
                 if (direction == style::listview::Direction::Top) {
+
                     body->removeWidget(item);
                     body->removeWidget(previousListItem);
+
                     gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
 
                     if (!(previousLabelMark == labelMark)) {
@@ -69,28 +75,34 @@ namespace gui
                     }
 
                     body->addWidget(phonebookLabel);
+                    addSpanItem();
 
                     currentPageSize--;
                 }
-                //                currentPageSize = itemsOnPage;
                 break;
             }
 
-            //            itemsOnPage++;
-
+            // if direction top add label mark after adding item
             if (direction == style::listview::Direction::Top) {
                 addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
             }
 
             previousListItem = item;
-            //            previousLabelMark = reinterpret_cast<gui::PhonebookItem *>(item)->getLabelMarker();
             currentPageSize++;
+            //
+            //            LOG_DEBUG("Page id %d, Label Mark %s", currentPageSize, labelMark.c_str());
+            //            LOG_DEBUG("Page id %d, Prev Mark %s", currentPageSize, previousLabelMark.c_str());
 
-            LOG_DEBUG("Page id %d, Label Mark %s", currentPageSize, labelMark.c_str());
-            LOG_DEBUG("Page id %d, Prev Mark %s", currentPageSize, previousLabelMark.c_str());
+            addSpanItem();
+        }
 
-            listSpanItem = new Span(Axis::Y, itemSpanSize);
-            body->addWidget(listSpanItem);
+        recalculateStartIndex();
+
+        // Add element on top for first page purpose
+        if (startIndex == 0 && direction == style::listview::Direction::Top) {
+            gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
+            phonebookLabel->setMarkerItem(labelMark);
+            body->addWidget(phonebookLabel);
         }
     }
 
