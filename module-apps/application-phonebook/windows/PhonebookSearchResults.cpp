@@ -59,7 +59,6 @@ namespace gui
     void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         setFocusItem(searchResultList);
-        searchResultsModel->requestFavouritesCount();
     }
 
     bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)

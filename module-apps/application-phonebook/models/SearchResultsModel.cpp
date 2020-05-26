@@ -5,8 +5,9 @@
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "UiCommonActions.hpp"
+#include "ListView.hpp"
 
-SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel(app)
+SearchResultsModel::SearchResultsModel(app::Application *app) : application{app}
 {}
 
 SearchResultsModel::~SearchResultsModel()
@@ -14,34 +15,49 @@ SearchResultsModel::~SearchResultsModel()
     results = nullptr;
 }
 
-void SearchResultsModel::requestFavouritesCount()
-{
-    favouriteCount = DBServiceAPI::ContactGetCount(application, true);
-}
-
-void SearchResultsModel::requestRecordsCount()
-{}
 void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     internalOffset = offset;
+    internalLimit  = limit;
     list->onProviderDataUpdate();
 }
 
-gui::ListItem *SearchResultsModel::getItem(int index)
+gui::ListItem *SearchResultsModel::getItem(gui::Order order)
 {
-    if (results != nullptr && internalOffset + index < results->size()) {
-        auto contact = std::make_shared<ContactRecord>(results->at(internalOffset + index));
+    auto index = 0;
+    if (order == gui::Order::Previous) {
+        index = internalOffset + internalLimit;
+    }
+    if (order == gui::Order::Next) {
+        index = internalOffset;
+    }
+
+    if (results != nullptr && index < static_cast<int>(results->size()) && index >= 0) {
+        auto contact = std::make_shared<ContactRecord>(results->at(index));
         //    std::shared_ptr<ContactRecord> contact = getRecord(index);
+
+        if (order == gui::Order::Previous) {
+            internalOffset--;
+        }
+        if (order == gui::Order::Next) {
+            internalOffset++;
+        }
 
         if (contact == nullptr) {
             return nullptr;
         }
 
+        LOG_DEBUG("index: %d, id: %d, name: %s %s, fav: %d",
+                  index,
+                  internalOffset,
+                  contact->primaryName.c_str(),
+                  contact->alternativeName.c_str(),
+                  contact->isOnFavourites);
         gui::PhonebookItem *item = new gui::PhonebookItem();
 
         if (item != nullptr) {
             item->setContact(contact);
-            item->setID(index);
+            item->setID(internalOffset);
             item->activatedCallback = [=](gui::Item &item) {
                 LOG_INFO("activatedCallback");
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);

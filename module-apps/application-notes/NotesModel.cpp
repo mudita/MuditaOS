@@ -10,6 +10,7 @@
 #include "widgets/NotesItem.hpp"
 
 #include "NotesModel.hpp"
+#include "ListView.hpp"
 
 NotesModel::NotesModel(app::Application *app) : DatabaseModel(app)
 {}
@@ -19,7 +20,7 @@ NotesModel::~NotesModel()
 
 void NotesModel::requestRecordsCount()
 {
-    recordsCount   = DBServiceAPI::NotesGetCount(application);
+    recordsCount = DBServiceAPI::NotesGetCount(application);
 
     // request first and second page if possible
     if (recordsCount > 0) {
@@ -45,15 +46,22 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    modelIndex = 0;
     list->onProviderDataUpdate();
 
     return true;
 }
 
-gui::ListItem *NotesModel::getItem(int index)
+gui::ListItem *NotesModel::getItem(gui::Order order)
 {
+    auto index = modelIndex;
+    if (order == gui::Order::Previous) {
+        index = records.size() - 1 - modelIndex;
+    }
 
     std::shared_ptr<NotesRecord> note = getRecord(index);
+
+    modelIndex++;
 
     SettingsRecord &settings = application->getSettings();
 

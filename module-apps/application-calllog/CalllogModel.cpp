@@ -12,6 +12,7 @@
 #include "data/CallLogInternals.hpp"
 #include "CalllogModel.hpp"
 #include "UiCommonActions.hpp"
+#include "ListView.hpp"
 
 using namespace calllog;
 
@@ -55,27 +56,24 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-
-    if (direction == style::listview::Direction::Top)
-        modelIndex = this->records.size() - 1;
-    else if (direction == style::listview::Direction::Bottom)
-        modelIndex = 0;
-
+    modelIndex = 0;
     list->onProviderDataUpdate();
 
     return true;
 }
 
-gui::ListItem *CalllogModel::getItem(int index)
+gui::ListItem *CalllogModel::getItem(gui::Order order)
 {
-    std::shared_ptr<CalllogRecord> call = getRecord(modelIndex);
+    auto index = modelIndex;
+    if (order == gui::Order::Previous) {
+        index = records.size() - 1 - modelIndex;
+    }
 
-    if (direction == style::listview::Direction::Top)
-        modelIndex--;
-    else if (direction == style::listview::Direction::Bottom)
-        modelIndex++;
+    std::shared_ptr<CalllogRecord> call = getRecord(index);
 
-    LOG_DEBUG("Model index: %d", modelIndex);
+    modelIndex++;
+
+    LOG_DEBUG("Model index: %d", index);
 
     SettingsRecord &settings = application->getSettings();
     if (call.get() == nullptr) {
@@ -86,7 +84,7 @@ gui::ListItem *CalllogModel::getItem(int index)
     auto item = new gui::CalllogItem(this, !settings.timeFormat12);
     if (item != nullptr) {
         item->setCall(call);
-        item->setID(modelIndex);
+        item->setID(index);
         item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("activatedCallback");
             std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
