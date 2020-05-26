@@ -1,23 +1,27 @@
 #pragma once
 
 #include "ListItem.hpp"
-#include "ListView.hpp"
 
 namespace gui
 {
 
     class ListView;
 
+    enum class Order
+    {
+        Next,
+        Previous
+    };
+
     class ListItemProvider
     {
 
       public:
-        ListView *list                       = nullptr;
-        style::listview::Direction direction = style::listview::Direction::Bottom;
+        ListView *list = nullptr;
 
         virtual int getItemCount() const = 0;
 
-        virtual ListItem *getItem(int index) = 0;
+        virtual ListItem *getItem(Order order) = 0;
 
         virtual void requestRecords(const uint32_t offset, const uint32_t limit) = 0;
     };

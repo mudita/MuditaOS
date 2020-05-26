@@ -17,7 +17,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     /**
      * Number of favourite records in the database.
      */
-    uint32_t favouriteCount  = 0;
+    uint32_t favouriteCount = 0;
 
   public:
     PhonebookModel(app::Application *app);
@@ -32,7 +32,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    gui::ListItem *getItem(int index) override;
+    gui::ListItem *getItem(gui::Order order) override;
 
     int getItemCount() const override
     {

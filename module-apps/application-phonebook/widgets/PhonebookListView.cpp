@@ -9,43 +9,89 @@ namespace gui
 
     void PhonebookListView::addLabelMarker(gui::PhonebookItem *item)
     {
-        if (!(labelMark == (item)->getLabelMarker())) {
+        if (direction == style::listview::Direction::Bottom) {
+            if (!(labelMark == (item)->getLabelMarker())) {
 
-            labelMark = (item)->getLabelMarker();
+                labelMark = (item)->getLabelMarker();
 
-            gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
-            phonebookLabel->setMarkerItem(labelMark);
+                gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
+                phonebookLabel->setMarkerItem(labelMark);
 
-            body->addWidget(phonebookLabel);
+                body->addWidget(phonebookLabel);
+            }
+        }
+        if (direction == style::listview::Direction::Top) {
+
+            if (currentPageSize == 0) {
+                labelMark = (item)->getLabelMarker();
+                return;
+            }
+            else if (!(labelMark == (item)->getLabelMarker())) {
+
+                previousLabelMark = labelMark;
+                labelMark         = (item)->getLabelMarker();
+
+                gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
+                phonebookLabel->setMarkerItem(previousLabelMark);
+                body->removeWidget(item);
+                body->addWidget(phonebookLabel);
+                body->addWidget(item);
+            }
         }
     }
 
     void PhonebookListView::addItemsOnPage()
     {
-        auto itemsOnPage = 0;
+        currentPageSize = 0;
+        //        auto itemsOnPage = 0;
+        ListItem *item             = nullptr;
+        ListItem *previousListItem = nullptr;
+        labelMark                  = "";
+        previousLabelMark          = "";
 
-        ListItem *item = nullptr;
-        labelMark      = "";
+        while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
 
-        while ((item = provider->getItem(itemsOnPage)) != nullptr) {
-
-            addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
+            if (direction == style::listview::Direction::Bottom) {
+                addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
+            }
 
             body->addWidget(item);
 
             if (item->visible != true) {
-                currentPageSize = itemsOnPage;
+
+                if (direction == style::listview::Direction::Top) {
+                    body->removeWidget(item);
+                    body->removeWidget(previousListItem);
+                    gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
+
+                    if (!(previousLabelMark == labelMark)) {
+                        phonebookLabel->setMarkerItem(labelMark);
+                    }
+
+                    body->addWidget(phonebookLabel);
+
+                    currentPageSize--;
+                }
+                //                currentPageSize = itemsOnPage;
                 break;
             }
 
-            itemsOnPage++;
+            //            itemsOnPage++;
+
+            if (direction == style::listview::Direction::Top) {
+                addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
+            }
+
+            previousListItem = item;
+            //            previousLabelMark = reinterpret_cast<gui::PhonebookItem *>(item)->getLabelMarker();
+            currentPageSize++;
+
+            LOG_DEBUG("Page id %d, Label Mark %s", currentPageSize, labelMark.c_str());
+            LOG_DEBUG("Page id %d, Prev Mark %s", currentPageSize, previousLabelMark.c_str());
 
             listSpanItem = new Span(Axis::Y, itemSpanSize);
             body->addWidget(listSpanItem);
         }
-
-        if (currentPageSize == 0)
-            currentPageSize = itemsOnPage;
     }
 
 } /* namespace gui */

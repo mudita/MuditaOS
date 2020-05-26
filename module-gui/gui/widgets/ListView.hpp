@@ -41,6 +41,7 @@ namespace gui
         void setFocus();
         void refresh();
         void resizeWithScroll();
+        Order getOrderFromDirection();
         bool listPageEndReached();
 
       public:

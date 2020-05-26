@@ -5,6 +5,7 @@
 #include "application-messages/MessagesStyle.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include <service-db/api/DBServiceAPI.hpp>
+#include "ListView.hpp"
 
 SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app)
 {}
@@ -36,14 +37,23 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
 
     if (DatabaseModel::updateRecords(std::move(records), offset, limit, count)) {
         list->onProviderDataUpdate();
+        modelIndex = 0;
         return true;
     }
     return false;
 }
 
-gui::ListItem *SMSTemplateModel::getItem(int index)
+gui::ListItem *SMSTemplateModel::getItem(gui::Order order)
 {
+    auto index = modelIndex;
+    if (order == gui::Order::Previous) {
+        index = records.size() - 1 - modelIndex;
+    }
+
     auto templ = getRecord(index);
+
+    modelIndex++;
+
     if (!templ) {
         return nullptr;
     }

@@ -6,5 +6,5 @@ class ThreadModel : public BaseThreadRecordModel
 {
   public:
     ThreadModel(app::Application *app);
-    gui::ListItem *getItem(int index) override;
+    gui::ListItem *getItem(gui::Order order) override;
 };

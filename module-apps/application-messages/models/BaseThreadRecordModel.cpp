@@ -3,6 +3,7 @@
 #include "application-messages/MessagesStyle.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <cassert>
+#include "ListView.hpp"
 
 BaseThreadRecordModel::BaseThreadRecordModel(app::Application *app) : DatabaseModel(app)
 {}
@@ -22,12 +23,7 @@ bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadReco
                                           uint32_t count)
 {
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-
-    if (direction == style::listview::Direction::Top)
-        modelIndex = this->records.size() - 1;
-    else if (direction == style::listview::Direction::Bottom)
-        modelIndex = 0;
-
+    modelIndex = 0;
     list->onProviderDataUpdate();
     return true;
 }

@@ -7,14 +7,16 @@
 ThreadModel::ThreadModel(app::Application *app) : BaseThreadRecordModel(app)
 {}
 
-gui::ListItem *ThreadModel::getItem(int index)
+gui::ListItem *ThreadModel::getItem(gui::Order order)
 {
-    std::shared_ptr<ThreadRecord> thread = getRecord(modelIndex);
+    auto index = modelIndex;
+    if (order == gui::Order::Previous) {
+        modelIndex = records.size() - 1 - modelIndex;
+    }
 
-    if (direction == style::listview::Direction::Top)
-        modelIndex--;
-    else if (direction == style::listview::Direction::Bottom)
-        modelIndex++;
+    std::shared_ptr<ThreadRecord> thread = getRecord(index);
+
+    modelIndex++;
 
     if (thread.get() == nullptr) {
         return nullptr;
@@ -23,7 +25,7 @@ gui::ListItem *ThreadModel::getItem(int index)
     auto item = new gui::ThreadItem(this);
     if (item != nullptr) {
         item->setThreadItem(thread);
-        item->setID(modelIndex);
+        item->setID(index);
         item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("ThreadItem ActivatedCallback");
             if (application) {
