@@ -184,7 +184,7 @@ namespace sys
         }
     }
 
-    void Bus::SendMulticast(std::shared_ptr<Message> msg, BusChannels channel, Service *s)
+    void Bus::SendMulticast(std::shared_ptr<Message> msg, BusChannels channel, Service *source)
     {
         CriticalSection::Enter();
         msg->id      = uniqueMsgId++;
@@ -192,21 +192,20 @@ namespace sys
         CriticalSection::Exit();
 
         msg->transType = Message::TransmissionType ::Multicast;
-        msg->sender    = s->GetName();
-
+        msg->sender    = source->GetName();
         for (auto const &w : channels[channel].m_services) {
             w->mailbox.push(msg);
         }
     }
 
-    void Bus::SendBroadcast(std::shared_ptr<Message> msg, Service *s)
+    void Bus::SendBroadcast(std::shared_ptr<Message> msg, Service *source)
     {
         CriticalSection::Enter();
         msg->id = uniqueMsgId++;
         CriticalSection::Exit();
 
         msg->transType = Message::TransmissionType ::Broadcaast;
-        msg->sender    = s->GetName();
+        msg->sender    = source->GetName();
 
         for (auto const &w : servicesRegistered) {
             w.second->mailbox.push(msg);
