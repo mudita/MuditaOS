@@ -20,6 +20,7 @@ namespace cellular
             ModemOn, /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
             ModemFatalFailure, /// modem full shutdown need
             SimSelect,         /// triggers hw SIM selection (! state now will be **changed on URC** )
+            Ready,             /// modem and sim card is ready for new commands.
             Failed,
         };
 
