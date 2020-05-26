@@ -179,7 +179,7 @@ namespace app
         void returnToPreviousWindow();
 
         /// Method refreshing active window
-        int refreshWindow(gui::RefreshModes mode);
+        void refreshWindow(gui::RefreshModes mode);
 
         /// Mehtod to handle bus messages, all message types are defined in Message.hpp
         /// Message types are in MessageType
@@ -230,16 +230,16 @@ namespace app
         /// @note consider moving these as private elements of ApplicationManager i.e. under names
         /// message::switchApplication etc.
         /// @{
-        static bool messageSwitchApplication(sys::Service *sender,
+        static void messageSwitchApplication(sys::Service *sender,
                                              std::string application,
                                              std::string window,
                                              std::unique_ptr<gui::SwitchData> data);
-        static bool messageRefreshApplication(sys::Service *sender,
+        static void messageRefreshApplication(sys::Service *sender,
                                               std::string application,
                                               std::string window,
                                               gui::SwitchData *data = nullptr);
-        static bool messageCloseApplication(sys::Service *sender, std::string application);
-        static bool messageRebuildApplication(sys::Service *sender, std::string application);
+        static void messageCloseApplication(sys::Service *sender, std::string application);
+        static void messageRebuildApplication(sys::Service *sender, std::string application);
         /// @}
 
       protected:
@@ -306,7 +306,7 @@ namespace app
 
         /// informs self that there was key press
         /// used to provide a way for long press/multipress handling in application
-        static bool messageInputEventApplication(sys::Service *sender,
+        static void messageInputEventApplication(sys::Service *sender,
                                                  std::string application,
                                                  const gui::InputEvent &event);
     };
