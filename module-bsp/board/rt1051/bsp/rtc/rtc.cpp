@@ -7,9 +7,12 @@
 
 #include "bsp/rtc/rtc.hpp"
 #include "fsl_snvs_hp.h"
+#include "fsl_snvs_lp.h"
 #include <time.h>
+#include "time/time_conversion.hpp"
 
 #include "FreeRTOS.h"
+#include <module-os/RTOSWrapper/include/ticks.hpp>
 
 static xQueueHandle qHandleRtcIrq = NULL;
 
@@ -23,8 +26,30 @@ namespace bsp
     {
         qHandleRtcIrq = qHandle;
 
+        CLOCK_EnableClock(kCLOCK_SnvsLp);
         SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
         SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
+
+        SNVS_LPCR_LPTA_EN(1);
+
+        bool timedOut     = false;
+        auto timeoutTicks = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(utils::time::milisecondsInSecond);
+        const auto delay  = 10;
+
+        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
+        while (!timedOut) {
+            if ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK)) {
+                break;
+            }
+            timedOut = cpp_freertos::Ticks::GetTicks() > timeoutTicks;
+            if (timedOut) {
+                LOG_ERROR("rtc_Init timeout!!!");
+                return RtcBspError;
+            }
+            vTaskDelay(delay);
+        }
+
+        SNVS_HP_RTC_TimeSynchronize(SNVS);
 
         NVIC_SetPriority(SNVS_HP_WRAPPER_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
         /* Enable at the NVIC */
@@ -32,6 +57,8 @@ namespace bsp
 
         // Start the timer
         SNVS_HP_RTC_StartTimer(SNVS);
+
+        LOG_INFO("RTC configured successfully");
         return RtcBspOK;
     }
 
@@ -57,7 +84,7 @@ namespace bsp
             return RtcBspError;
         }
 
-        snvs_hp_rtc_datetime_t rtcDate;
+        snvs_lp_srtc_datetime_t rtcDate;
 
         rtcDate.year   = time->tm_year + 1900;
         rtcDate.month  = time->tm_mon + 1;
@@ -67,9 +94,10 @@ namespace bsp
         rtcDate.second = time->tm_sec;
 
         portENTER_CRITICAL();
-        SNVS_HP_RTC_StopTimer(SNVS);
-        SNVS_HP_RTC_SetDatetime(SNVS, &rtcDate);
-        SNVS_HP_RTC_StartTimer(SNVS);
+        SNVS_LP_SRTC_StopTimer(SNVS);
+        SNVS_LP_SRTC_SetDatetime(SNVS, &rtcDate);
+        SNVS_LP_SRTC_StartTimer(SNVS);
+        SNVS_HP_RTC_TimeSynchronize(SNVS);
         portEXIT_CRITICAL();
 
         return RtcBspOK;
