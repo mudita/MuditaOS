@@ -53,12 +53,12 @@ add_test(NAME ${PROJECT_NAME}
 add_dependencies(check ${PROJECT_NAME})
 
 ###########################################
-#time conversion unit tests project
+# time conversion tests project
 project(unittest_module-utils_time VERSION 1.0
-       DESCRIPTION "Module-utils time unit tests")
+    DESCRIPTION "Module-utils time tests")
 
 add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-    unittest_time_conversion.cpp
+    test_time_conversion.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
 target_link_libraries(${PROJECT_NAME} PRIVATE module-utils module-vfs)

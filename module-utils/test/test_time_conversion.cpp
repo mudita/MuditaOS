@@ -88,7 +88,7 @@ bool test_time_date_format(std::ostream &outstream, std::string locale_format, s
 {
     bool retval = true;
     // prepare common point in time
-    auto mytime   = Timestamp();
+    auto mytime = Timestamp();
     mytime.set_time(time);
 
     if (!(mytime.str(locale_format) == fromtime(time, format))) {
