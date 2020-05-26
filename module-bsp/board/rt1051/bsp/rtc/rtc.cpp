@@ -34,6 +34,7 @@ namespace bsp
 
         bool timedOut     = false;
         auto timeoutTicks = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(utils::time::milisecondsInSecond);
+        const auto delay  = 10;
 
         SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
         while (!timedOut) {
@@ -45,6 +46,7 @@ namespace bsp
                 LOG_ERROR("rtc_Init timeout!!!");
                 return RtcBspError;
             }
+            vTaskDelay(delay);
         }
 
         SNVS_HP_RTC_TimeSynchronize(SNVS);
@@ -55,6 +57,8 @@ namespace bsp
 
         // Start the timer
         SNVS_HP_RTC_StartTimer(SNVS);
+
+        LOG_INFO("RTC configured successfully");
         return RtcBspOK;
     }
 
