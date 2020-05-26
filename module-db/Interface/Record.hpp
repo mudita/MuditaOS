@@ -8,7 +8,7 @@ template <typename T, typename F> class RecordInterface : public db::Interface
   public:
     RecordInterface() = default;
 
-    virtual ~RecordInterface(){};
+    virtual ~RecordInterface() = default;
 
     virtual bool Add(const T &)
     {

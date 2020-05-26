@@ -5,7 +5,7 @@
 namespace db
 {
 
-    std::unique_ptr<QueryResult> Interface::getQuery(const Query *query)
+    std::unique_ptr<QueryResult> Interface::runQuery(const Query *query)
     {
         LOG_DEBUG("Query not handled! debugInfo: %s", query ? query->debugInfo().c_str() : "empty");
         return nullptr;

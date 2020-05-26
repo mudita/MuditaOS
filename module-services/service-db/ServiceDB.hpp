@@ -52,6 +52,6 @@ class ServiceDB : public sys::Service
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final;
 
-    void sendUpdateNotification(db::Interface::Name interface);
+    void sendUpdateNotification(db::Interface::Name interface, db::NotificationMessage::Type type);
 };
 

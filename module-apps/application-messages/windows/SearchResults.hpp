@@ -3,6 +3,7 @@
 #include "AppWindow.hpp"
 #include <ListView.hpp>
 #include "../models/SearchResultsModel.hpp"
+#include "messages/QueryMessage.hpp"
 
 namespace gui
 {
@@ -16,6 +17,7 @@ namespace gui
         gui::Item *body     = nullptr;
         gui::ListView *list = nullptr;
         std::unique_ptr<model::SearchResultsModel> model;
+        auto listViewRequest(const std::string &text) -> bool;
 
       public:
         SearchResults(app::Application *app);
@@ -24,7 +26,6 @@ namespace gui
         /// needed to populate db responses
         auto onDatabaseMessage(sys::Message *msgl) -> bool override;
         auto showEmptyResults() -> bool;
-        auto listViewRequest(const std::string &text) -> bool;
         /// listView update on DB notification
         auto listViewUpdate(db::query::SMSSearchResult *) -> bool;
     };
