@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 # Locate GTest
 find_package(GTest)
 
-set( CMAKE_PROJECT_UNIT_TEST_UTF8 "unittest_utf8" )
 set( CMAKE_PROJECT_GTEST_UTF8 "gtest_utf8" )
 
 ###########################################
@@ -25,12 +24,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..
 target_link_libraries(${PROJECT_NAME} PRIVATE module-utils)
 
 ###########################################
-#UTF8 unit tests projeet
-project(unittest_module-utils_utf8 VERSION 1.0
-       DESCRIPTION "Module-utils utf8 unit tests")
+# UTF8 functional tests projeet
+project(test_module-utils_utf8 VERSION 1.0
+    DESCRIPTION "Module-utils utf8 functional tests")
 
 add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-    unittest_utf8.cpp
+    test_utf8.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
 target_link_libraries(${PROJECT_NAME} PRIVATE module-utils)
