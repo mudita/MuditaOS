@@ -27,6 +27,7 @@ namespace db::query
         SMSSearchResult(unsigned int results_max_depth, std::vector<ThreadsTableRow> result_rows);
         [[nodiscard]] auto getMax() const -> unsigned int;
         [[nodiscard]] auto getResults() const -> std::vector<ThreadsTableRow>;
+        [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
 }; // namespace db::query

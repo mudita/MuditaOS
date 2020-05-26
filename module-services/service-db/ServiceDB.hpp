@@ -11,7 +11,7 @@
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
-#include "includes/interfaces.hpp"
+#include "messages/DBNotificationMessage.hpp"
 
 class ServiceDB : public sys::Service
 {
@@ -35,11 +35,11 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
 
   protected:
-    db::Interface *getInterface(db::interface interface);
+    db::Interface *getInterface(db::Interface::Name interface);
 
   public:
     ServiceDB();
-    virtual ~ServiceDB();
+    ~ServiceDB() override;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
     // Invoked when timer ticked
@@ -50,6 +50,8 @@ class ServiceDB : public sys::Service
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final;
+
+    void sendUpdateNotification(db::Interface::Name interface);
 };
 

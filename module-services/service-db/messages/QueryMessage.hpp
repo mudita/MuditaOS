@@ -2,18 +2,18 @@
 
 #include "DBMessage.hpp"
 #include <module-db/Common/Query.hpp>
-#include <includes/interfaces.hpp>
+#include <module-db/Interface/BaseInterface.hpp>
 
 namespace db
 {
     class QueryMessage : public DBMessage
     {
         std::unique_ptr<db::Query> query;
-        db::interface interface;
+        db::Interface::Name interface;
 
       public:
-        QueryMessage(db::interface interface, std::unique_ptr<db::Query> query);
-        [[nodiscard]] auto getInterface() const -> db::interface;
+        QueryMessage(db::Interface::Name interface, std::unique_ptr<db::Query> query);
+        [[nodiscard]] auto getInterface() const -> db::Interface::Name;
         [[nodiscard]] auto getQuery() const -> db::Query *;
     };
 

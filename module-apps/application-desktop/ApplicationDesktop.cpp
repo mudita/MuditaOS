@@ -48,7 +48,7 @@ namespace app
         }
 
         bool handled = false;
-        if (auto msg = dynamic_cast<DBNotificationMessage *>(msgl)) {
+        if (auto msg = dynamic_cast<db::NotificationMessage *>(msgl)) {
             handled = handle(msg);
         }
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
@@ -63,7 +63,7 @@ namespace app
         }
     }
 
-    auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
+    auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
     {
         LOG_DEBUG("DB notification handler");
         assert(msg);

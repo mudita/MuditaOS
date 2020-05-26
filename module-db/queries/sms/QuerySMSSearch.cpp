@@ -24,4 +24,9 @@ namespace db::query
     {
         return results;
     }
+
+    [[nodiscard]] auto SMSSearchResult::debugInfo() const -> std::string
+    {
+        return "SMSSearchResult";
+    }
 } // namespace db::query

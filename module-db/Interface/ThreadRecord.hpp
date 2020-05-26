@@ -66,7 +66,7 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
                                                                      ThreadRecordField field,
                                                                      const char *str) override final;
 
-    std::unique_ptr<db::QueryResult> getByQuery(db::Query *query) override;
+    std::unique_ptr<db::QueryResult> getByQuery(const db::Query *query) override;
 
   private:
     SmsDB *smsDB;
@@ -75,5 +75,5 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     /// for now implementation between Interface <-> Database
     /// it would only make sense to pass Query from Inteface to multiple databases to get all data we are interested in
     /// or better split it to smaller entities... this could be done with any db high level interface -  left as it is
-    std::unique_ptr<db::query::SMSSearchResult> getByQueryImpl(db::query::SMSSearch *query);
+    std::unique_ptr<db::query::SMSSearchResult> getByQueryImpl(const db::query::SMSSearch *query);
 };

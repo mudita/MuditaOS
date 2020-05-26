@@ -28,8 +28,7 @@ namespace gui
             }
             if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
                 auto search_text = text->getText();
-                app->showSearchResults(utils::localize.get(style::strings::common::search_results) + ": " +
-                                           std::string(search_text),
+                app->showSearchResults(utils::localize.get("common_search_results") + ": " + std::string(search_text),
                                        search_text);
             }
             return false;

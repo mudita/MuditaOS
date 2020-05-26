@@ -39,9 +39,9 @@ namespace gui::model
     void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
-            DBServiceAPI::GetByQuery(
+            DBServiceAPI::GetQuery(
                 getApplication(),
-                db::interface::SMSThread,
+                db::Interface::Name::SMSThread,
                 std::make_unique<db::query::SMSSearch>(search_value, offset, max_search_items_on_screen));
         }
     }

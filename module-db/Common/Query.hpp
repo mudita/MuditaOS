@@ -8,17 +8,15 @@ namespace db
     class Query
     {
       public:
-        virtual ~Query() = default;
-        [[nodiscard]] virtual auto debugInfo() const -> std::string
-        {
-            return "Base Query";
-        };
+        virtual ~Query()                                            = default;
+        [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
     };
 
     /// virtual query output (result) interface
     class QueryResult
     {
       public:
-        virtual ~QueryResult() = default;
+        virtual ~QueryResult()                                      = default;
+        [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
     };
 } // namespace db

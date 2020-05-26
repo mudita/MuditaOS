@@ -4,39 +4,14 @@
 #include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include <memory>
+#include <module-db/Interface/BaseInterface.hpp>
 
-namespace DB
+namespace db
 {
-    enum class NotificationType
+    class NotificationMessage : public sys::DataMessage
     {
-        Updated,
-        Added,
-        Removed
+      public:
+        NotificationMessage(MessageType messageType, db::Interface::Name interface);
+        db::Interface::Name interface;
     };
-    enum class BaseType
-    {
-        AlarmDB,
-        CalllogDB,
-        ContacstDB,
-        NotesDB,
-        SettingsDB,
-        SmsDB
-    };
-} // namespace DB
-
-class DBNotificationMessage : public sys::DataMessage
-{
-  public:
-    DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType);
-
-    DB::NotificationType notificationType;
-    DB::BaseType baseType;
-};
-
-class DBNotificationResponseMessage : public sys::ResponseMessage
-{
-  public:
-    DBNotificationResponseMessage(uint32_t retCode);
-
-    uint32_t retCode;
-};
+} // namespace db

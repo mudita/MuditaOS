@@ -1,34 +1,12 @@
-
-/*
- * @file Record.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
-#include <memory>
 #include "../Database/Database.hpp"
-
-namespace db
-{
-
-    class Query;
-    class QueryResult;
-
-    class Interface
-    {
-      public:
-        virtual std::unique_ptr<db::QueryResult> getByQuery(db::Query *query);
-    };
-}; // namespace db
+#include "BaseInterface.hpp"
 
 template <typename T, typename F> class RecordInterface : public db::Interface
 {
   public:
-    RecordInterface(){};
+    RecordInterface() = default;
 
     virtual ~RecordInterface(){};
 

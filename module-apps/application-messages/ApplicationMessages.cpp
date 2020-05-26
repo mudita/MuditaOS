@@ -40,11 +40,12 @@ namespace app
         }
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
-            DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
-            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB)) {
-                this->windows[gui::name::window::thread_view]->rebuild();
-                this->windows[gui::name::window::main_window]->rebuild();
+            if ((msg != nullptr) &&
+                ((msg->interface == db::Interface::Name::SMS) || (msg->interface == db::Interface::Name::SMSThread))) {
+                    this->windows[gui::name::window::thread_view]->rebuild();
+                    this->windows[gui::name::window::main_window]->rebuild();
                 return std::make_shared<sys::ResponseMessage>();
             }
         }

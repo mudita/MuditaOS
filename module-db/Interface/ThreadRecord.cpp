@@ -129,17 +129,17 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
     return a;
 }
 
-std::unique_ptr<db::QueryResult> ThreadRecordInterface::getByQuery(db::Query *query)
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::getByQuery(const db::Query *query)
 {
     // note this `if` could be avoided with visitor pattern
     // query->run(interface);
-    if (auto local_query = dynamic_cast<db::query::SMSSearch *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::SMSSearch *>(query)) {
         return getByQueryImpl(local_query);
     }
     return nullptr;
 }
 
-std::unique_ptr<db::query::SMSSearchResult> ThreadRecordInterface::getByQueryImpl(db::query::SMSSearch *query)
+std::unique_ptr<db::query::SMSSearchResult> ThreadRecordInterface::getByQueryImpl(const db::query::SMSSearch *query)
 {
     auto db_result = smsDB->threads.getBySMSQuery(query->text, query->starting_postion, query->depth);
     return std::make_unique<db::query::SMSSearchResult>(db_result.first, db_result.second);
