@@ -83,12 +83,14 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
                                         [=](gui::Item &item) {
                                             std::unique_ptr<gui::SwitchData> data =
                                                 std::make_unique<SMSTextData>(record.body);
-                                            return app->switchWindow(gui::name::window::new_sms, std::move(data));
+                                            app->switchWindow(gui::name::window::new_sms, std::move(data));
+                                            return true;
                                         }}),
         gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_copy")),
                                         [=](gui::Item &item) {
                                             Clipboard::getInstance().copy(record.body);
-                                            return app->returnToPreviousWindow();
+                                            app->returnToPreviousWindow();
+                                            return true;
                                         }}),
 
         gui::newOptionLabel(gui::Option{UTF8(utils::localize.get("sms_delete_message")),
@@ -107,14 +109,16 @@ std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
     options.push_back(gui::newOptionLabel(
         gui::Option{UTF8(utils::localize.get("sms_use_template")), [=](gui::Item &item) {
                         std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateRequest>(requestingWindow);
-                        return app->switchWindow(gui::name::window::sms_templates, std::move(data));
+                        app->switchWindow(gui::name::window::sms_templates, std::move(data));
+                        return true;
                     }}));
 
     if (Clipboard::getInstance().gotData()) {
         options.push_back(gui::newOptionLabel(gui::Option{utils::localize.get("sms_paste"), [=](gui::Item &item) {
                                                               text->setText(text->getText() +
                                                                             Clipboard::getInstance().paste());
-                                                              return app->returnToPreviousWindow();
+                                                              app->returnToPreviousWindow();
+                                                              return true;
                                                           }}));
     }
 
