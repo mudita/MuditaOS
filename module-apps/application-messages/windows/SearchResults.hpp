@@ -24,6 +24,7 @@ namespace gui
         /// needed to populate db responses
         auto onDatabaseMessage(sys::Message *msgl) -> bool override;
         auto showEmptyResults() -> bool;
+        auto listViewRequest(const std::string &text) -> bool;
         /// listView update on DB notification
         auto listViewUpdate(db::query::SMSSearchResult *) -> bool;
     };

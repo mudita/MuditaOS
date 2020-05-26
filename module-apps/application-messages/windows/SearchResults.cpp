@@ -35,18 +35,24 @@ namespace gui
     {
         if (mode == ShowMode::GUI_SHOW_INIT && data != nullptr) {
             if (auto search_data = dynamic_cast<SMSTextToSearch *>(data)) {
-                if (search_data->getTextToSearch().length() != 0u) {
-                    model->setSearchValue(search_data->getTextToSearch());
-                    model->requestRecords(0, model->getMaxItemsOnScreen());
-                    list->setElementsCount(model->getItemCount());
-                    list->setProvider(model.get());
-                    setFocusItem(list);
-                }
-                else {
+                if (listViewRequest(search_data->getTextToSearch()) == false) {
                     showEmptyResults();
                 }
             }
         }
+    }
+
+    bool SearchResults::listViewRequest(const std::string &text)
+    {
+        if (text.length() != 0u) {
+            model->setSearchValue(text);
+            model->requestRecords(0, model->getMaxItemsOnScreen());
+            list->setElementsCount(model->getItemCount());
+            list->setProvider(model.get());
+            setFocusItem(list);
+            return true;
+        }
+        return false;
     }
 
     bool SearchResults::onDatabaseMessage(sys::Message *msgl)
