@@ -8,12 +8,7 @@ namespace gui
     class TextDocument
     {
       public:
-        TextDocument(const UTF8 &text = "")
-        {
-            lines     = splitToTextChunk(text);
-            firstLine = lines.begin();
-            lastLine  = lines.begin();
-        }
+        TextDocument(const UTF8 &text = "");
 
         // TODO use TextChunk and TextLines instead, make some "logic"
         std::list<TextLine *> splitToTextChunk(const UTF8 &text) // text

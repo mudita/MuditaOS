@@ -74,18 +74,19 @@ namespace gui
     void Text::setUnderline(bool underline)
     {
         // do nothing, value of the flag doesn;t change
-        if (this->underline == underline)
+        if (this->underline == underline) {
             return;
+        }
 
         this->underline = underline;
-        // LOG_INFO("lines count: %d", labelLines.size());
-        for (auto it = labelLines.begin(); it != labelLines.end(); it++) {
 
-            gui::Label *label = *it;
-            if (this->underline)
+        for (auto label : labelLines) {
+            if (this->underline) {
                 label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-            else
+            }
+            else {
                 label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            }
         }
     }
 
@@ -775,15 +776,13 @@ namespace gui
 
         // calculate number of lines for displaying text
         int32_t h = widgetArea.h - (margins.getAlong(Axis::Y) + innerMargins.getAlong(Axis::Y));
-        if (h < 0)
+        if (h < 0) {
             h = 0;
-
-        // remove all old labels
-        for (uint32_t i = 0; i < labelLines.size(); ++i) {
-            removeWidget(labelLines[i]);
-            delete labelLines[i];
         }
 
+        for (auto el : labelLines) {
+            erase(el);
+        }
         labelLines.clear();
 
         // calculate how many rows can fit in available height.

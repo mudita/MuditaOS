@@ -69,7 +69,7 @@ namespace gui
          */
         void reworkLines(std::list<TextLine *>::iterator it);
         /**
-         * Splites text in two on ENTER, space or dot.
+         * Splits text in two on ENTER, space or dot.
          * @return true if line was actually splitted
          */
         bool splitText(UTF8 &source, UTF8 &remaining, LineEndType &endType, uint32_t availableSpace);
@@ -82,12 +82,9 @@ namespace gui
          */
         bool handleBrowsing(const InputEvent &inputEvent);
         /**
-         * Function is used to move cursor in all directions when in the Wdit mode.
+         * Function is used to move cursor in all directions when in the Edit mode.
          */
         bool handleNavigation(const InputEvent &inputEvent);
-        /**
-         * Handles enter key
-         */
         bool handleEnter();
         bool handleBackspace();
 
@@ -112,7 +109,7 @@ namespace gui
         }
 
         void recalculateDrawParams();
-        /// check height available in h by rowCound and Font set
+        /// check height available in h by rowCount and Font set
         /// if size needed is bigger and mode is set to Expand -> make item bigger
         /// TODO think about callback to parent on expansion
         int32_t expand(uint32_t rowCount, int32_t h);

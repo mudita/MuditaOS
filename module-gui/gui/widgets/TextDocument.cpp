@@ -3,6 +3,12 @@
 
 namespace gui
 {
+    TextDocument::TextDocument(const UTF8 &text = "")
+    {
+        lines     = splitToTextChunk(text);
+        firstLine = lines.begin();
+        lastLine  = lines.begin();
+    }
 
     UTF8 TextDocument::getText()
     {
