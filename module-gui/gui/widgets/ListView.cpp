@@ -158,6 +158,14 @@ namespace gui
         refresh();
     }
 
+    Order ListView::getOrderFromDirection()
+    {
+        if (direction == style::listview::Direction::Bottom)
+            return Order::Next;
+
+        return Order::Previous;
+    }
+
     void ListView::resizeWithScroll()
     {
         if (scroll->shouldShowScroll(currentPageSize, elementsCount)) {
@@ -174,7 +182,7 @@ namespace gui
 
         ListItem *item = nullptr;
 
-        while ((item = provider->getItem(itemsOnPage)) != nullptr) {
+        while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
 
             body->addWidget(item);
 
@@ -234,8 +242,6 @@ namespace gui
                 return (startIndex - (minLimit - currentPageSize) >= 0 ? minLimit : currentPageSize);
         };
 
-        provider->direction = direction;
-
         if (direction == style::listview::Direction::Bottom) {
 
             body->setReverseOrder(false);
@@ -274,11 +280,15 @@ namespace gui
                 startIndex = startIndex - currentPageSize >= 0 ? startIndex - currentPageSize : 0;
             }
 
-            LOG_DEBUG("Start off: %u, limit: %u, page: %u", startIndex, calculateLimit(), currentPageSize);
+            auto temp = startIndex - (minLimit - currentPageSize) >= 0 ? startIndex - (minLimit - currentPageSize) : 0;
 
-            provider->requestRecords(
-                startIndex - (minLimit - currentPageSize) >= 0 ? startIndex - (minLimit - currentPageSize) : 0,
-                calculateLimit());
+            LOG_DEBUG("Start off: %u, offset send: %u, limit: %u, page: %u",
+                      startIndex,
+                      temp,
+                      calculateLimit(),
+                      currentPageSize);
+
+            provider->requestRecords(temp, calculateLimit());
         }
 
         return true;

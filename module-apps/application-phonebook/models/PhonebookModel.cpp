@@ -5,6 +5,7 @@
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "UiCommonActions.hpp"
+#include "ListView.hpp"
 
 PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel(app)
 {}
@@ -24,7 +25,7 @@ void PhonebookModel::requestRecordsCount()
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
 
-    LOG_DEBUG("Req off: %u, limit: %u", offset, limit);
+    //    LOG_DEBUG("REQUESTED!!!!!!!!!!!!! eq off: %u, limit: %u", offset, limit);
 
     DBServiceAPI::ContactGetLimitOffset(application, offset, limit);
 }
@@ -47,14 +48,22 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    modelIndex = 0;
     list->onProviderDataUpdate();
 
     return true;
 }
 
-gui::ListItem *PhonebookModel::getItem(int index)
+gui::ListItem *PhonebookModel::getItem(gui::Order order)
 {
+    auto index = modelIndex;
+    if (order == gui::Order::Previous) {
+        index = records.size() - 1 - modelIndex;
+    }
+
     std::shared_ptr<ContactRecord> contact = getRecord(index);
+
+    modelIndex++;
 
     if (contact == nullptr) {
         return nullptr;
