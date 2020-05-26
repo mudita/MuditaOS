@@ -352,6 +352,10 @@ namespace gui
 
             // proceed to next line
             it++;
+            if (splitFlag) {
+                ++cursor->row;
+                cursor->column = (*it)->text.length();
+            }
         }
 
         // TODO starting from first modified line up to last modified line update start and end index
