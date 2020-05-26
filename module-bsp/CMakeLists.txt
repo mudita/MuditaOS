@@ -83,8 +83,3 @@ set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
 target_link_libraries(${PROJECT_NAME} module-os ${TARGET_LIBRARIES})
 
-# Host target configuration(mainly used for unit testing)
-
-message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2984")
-#add_subdirectory(tests)
-
