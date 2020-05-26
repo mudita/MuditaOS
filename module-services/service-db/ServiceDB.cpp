@@ -511,7 +511,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         assert(msg);
         db::Interface *interface = getInterface(msg->getInterface());
         assert(interface != nullptr);
-        auto result = interface->getByQuery(msg->getQuery());
+        auto result = interface->getQuery(msg->getQuery());
         responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
         sendUpdateNotification(msg->getInterface());
     } break;

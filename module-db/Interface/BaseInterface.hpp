@@ -11,7 +11,7 @@ namespace db
     class Interface
     {
       public:
-        virtual std::unique_ptr<db::QueryResult> getByQuery(const db::Query *query);
+        virtual std::unique_ptr<db::QueryResult> getQuery(const db::Query *query);
 
         enum class Name
         {

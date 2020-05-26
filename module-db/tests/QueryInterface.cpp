@@ -34,14 +34,14 @@ TEST_CASE("Query interface")
     REQUIRE(smsInterface);
 
     // unknown query -> no results
-    REQUIRE(smsInterface->getByQuery(std::make_unique<db::TestQuery>().get()) == nullptr);
+    REQUIRE(smsInterface->getQuery(std::make_unique<db::TestQuery>().get()) == nullptr);
 
     // known query, wrong interface
     auto query  = std::make_unique<db::query::SMSSearch>("a", 0, 10);
-    auto result = smsInterface->getByQuery(query.get());
+    auto result = smsInterface->getQuery(query.get());
     REQUIRE(result == nullptr);
 
-    result = threadInterface->getByQuery(query.get());
+    result = threadInterface->getQuery(query.get());
     // proper result returned
     REQUIRE(dynamic_cast<db::query::SMSSearchResult *>(result.get()));
 }
