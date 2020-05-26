@@ -65,6 +65,7 @@ namespace gui
     {
 
         this->setBorderColor(ColorNoColor);
+        //        this->setListViewType(style::listview::Type::Continuous);
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
@@ -166,6 +167,19 @@ namespace gui
         return Order::Previous;
     }
 
+    void ListView::recalculateStartIndex()
+    {
+        if (direction == style::listview::Direction::Top) {
+            startIndex = startIndex - currentPageSize >= 0 ? startIndex - currentPageSize : 0;
+        }
+    }
+
+    void ListView::addSpanItem()
+    {
+        listSpanItem = new Span(Axis::Y, itemSpanSize);
+        body->addWidget(listSpanItem);
+    }
+
     void ListView::resizeWithScroll()
     {
         if (scroll->shouldShowScroll(currentPageSize, elementsCount)) {
@@ -178,7 +192,7 @@ namespace gui
 
     void ListView::addItemsOnPage()
     {
-        auto itemsOnPage = 0;
+        currentPageSize = 0;
 
         ListItem *item = nullptr;
 
@@ -187,18 +201,14 @@ namespace gui
             body->addWidget(item);
 
             if (item->visible != true) {
-                currentPageSize = itemsOnPage;
                 break;
             }
 
-            itemsOnPage++;
+            currentPageSize++;
 
-            listSpanItem = new Span(Axis::Y, itemSpanSize);
-            body->addWidget(listSpanItem);
+            addSpanItem();
         }
-
-        if (currentPageSize == 0)
-            currentPageSize = itemsOnPage;
+        recalculateStartIndex();
     }
 
     void ListView::setFocus()
@@ -231,15 +241,15 @@ namespace gui
 
     bool ListView::listPageEndReached()
     {
-        auto minLimit = (2 * currentPageSize > 4 ? 2 * currentPageSize : 4);
+        auto minLimit = (2 * currentPageSize > 8 ? 2 * currentPageSize : 8);
 
         auto calculateLimit = [&]() {
             // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
-            // before it gets them, requests twice size of current page with down limit of at least 4.
+            // before it gets them, requests twice size of current page with down limit of at least 8.
             if (direction == style::listview::Direction::Bottom)
                 return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
             else
-                return (startIndex - (minLimit - currentPageSize) >= 0 ? minLimit : currentPageSize);
+                return minLimit < startIndex ? minLimit : startIndex;
         };
 
         if (direction == style::listview::Direction::Bottom) {
@@ -261,34 +271,40 @@ namespace gui
                                  : elementsCount - (elementsCount - startIndex);
             }
 
+            LOG_DEBUG("BOTTOM ---------- Start off: %u, offset send: %u, limit: %u, page: %u",
+                      startIndex,
+                      startIndex,
+                      calculateLimit(),
+                      currentPageSize);
+
             provider->requestRecords(startIndex, calculateLimit());
         }
 
         if (direction == style::listview::Direction::Top) {
 
             body->setReverseOrder(true);
+            auto topFetchIndex = 0;
 
             if (startIndex == 0 && listType == style::listview::Type::Continuous) {
 
-                startIndex = elementsCount - (elementsCount % currentPageSize);
+                topFetchIndex = elementsCount - (elementsCount % currentPageSize);
+                startIndex    = elementsCount;
             }
             else if (startIndex == 0 && listType == style::listview::Type::TopDown) {
 
                 return true;
             }
             else {
-                startIndex = startIndex - currentPageSize >= 0 ? startIndex - currentPageSize : 0;
+                topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
             }
 
-            auto temp = startIndex - (minLimit - currentPageSize) >= 0 ? startIndex - (minLimit - currentPageSize) : 0;
-
-            LOG_DEBUG("Start off: %u, offset send: %u, limit: %u, page: %u",
+            LOG_DEBUG("TOP ---------------- Start off: %u, offset send: %u, limit: %u, page: %u",
                       startIndex,
-                      temp,
+                      topFetchIndex,
                       calculateLimit(),
                       currentPageSize);
 
-            provider->requestRecords(temp, calculateLimit());
+            provider->requestRecords(topFetchIndex, calculateLimit());
         }
 
         return true;
