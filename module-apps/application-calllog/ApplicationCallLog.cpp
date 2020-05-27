@@ -101,17 +101,7 @@ namespace app
         windowOptions = gui::newOptionWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(windowOptions->getName(), windowOptions));
 
-        window = new gui::Dialog(this,
-                                 calllog::settings::CallDeleteWindowStr,
-                                 {
-                                     .title  = "",
-                                     .icon   = "phonebook_contact_delete_trashcan",
-                                     .text   = utils::localize.get("app_calllog_delete_call_confirmation"),
-                                     .action = []() -> bool {
-                                         LOG_INFO("!");
-                                         return true;
-                                     },
-                                 });
+        window = new gui::DialogYesNo(this, calllog::settings::DialogYesNoStr);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
@@ -121,26 +111,23 @@ namespace app
     bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
     {
         LOG_DEBUG("Removing CalllogRecord: %" PRIu32, record.ID);
-        auto dialog = dynamic_cast<gui::Dialog *>(windows[calllog::settings::CallDeleteWindowStr]);
-        if (dialog != nullptr) {
-            auto meta   = dialog->meta;
-            meta.action = [=]() -> bool {
-                if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
-                    LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
-                    return false;
-                }
-                this->switchWindow(calllog::settings::MainWindowStr);
-                return true;
-            };
-            meta.title = record.name;
-            dialog->update(meta);
-            switchWindow(calllog::settings::CallDeleteWindowStr, nullptr);
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[calllog::settings::DialogYesNoStr]);
+        assert(dialog != nullptr);
+        auto meta   = dialog->meta;
+        meta.action = [=]() -> bool {
+            if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
+                LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
+                return false;
+            }
+            this->switchWindow(calllog::settings::MainWindowStr);
             return true;
-        }
-        else {
-            LOG_ERROR("Dialog bad type!");
-            return false;
-        }
+        };
+        meta.title = record.name;
+        meta.text  = utils::localize.get("app_calllog_delete_call_confirmation");
+        meta.icon  = "phonebook_contact_delete_trashcan";
+        dialog->update(meta);
+        switchWindow(dialog->getName());
+        return true;
     }
 
 } /* namespace app */

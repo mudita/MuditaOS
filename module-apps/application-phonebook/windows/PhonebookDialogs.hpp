@@ -81,7 +81,7 @@ class PhonebookBlockContact : public PhonebookDialog
     void setContactData();
 };
 
-class DuplicatedContactDialogWindow : public Dialog
+class DuplicatedContactDialogWindow : public DialogYesNo
 {
   public:
     DuplicatedContactDialogWindow(app::Application *app);
