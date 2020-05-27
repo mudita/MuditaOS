@@ -44,8 +44,8 @@ namespace app
             LOG_DEBUG("Received multicast");
             if ((msg != nullptr) &&
                 ((msg->interface == db::Interface::Name::SMS) || (msg->interface == db::Interface::Name::SMSThread))) {
-                    this->windows[gui::name::window::thread_view]->rebuild();
-                    this->windows[gui::name::window::main_window]->rebuild();
+                this->windows[gui::name::window::thread_view]->rebuild();
+                this->windows[gui::name::window::main_window]->rebuild();
                 return std::make_shared<sys::ResponseMessage>();
             }
         }
