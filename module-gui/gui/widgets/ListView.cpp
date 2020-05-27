@@ -69,6 +69,7 @@ namespace gui
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
+        body->setAxisAlignment(true);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
@@ -109,6 +110,11 @@ namespace gui
     void ListView::setListViewType(style::listview::Type type)
     {
         listType = type;
+    }
+
+    void ListView::setMinimalPageSize(int size)
+    {
+        minimalPageSize = size;
     }
 
     void ListView::setItemSpanSize(int size)
@@ -170,7 +176,7 @@ namespace gui
     void ListView::recalculateStartIndex()
     {
         if (direction == style::listview::Direction::Top) {
-            startIndex = startIndex - currentPageSize >= 0 ? startIndex - currentPageSize : 0;
+            startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
         }
     }
 
@@ -201,6 +207,7 @@ namespace gui
             body->addWidget(item);
 
             if (item->visible != true) {
+                body->removeWidget(listSpanItem);
                 break;
             }
 
@@ -208,6 +215,10 @@ namespace gui
 
             addSpanItem();
         }
+
+        if (listSpanItem != nullptr)
+            body->removeWidget(listSpanItem);
+
         recalculateStartIndex();
     }
 
@@ -241,11 +252,11 @@ namespace gui
 
     bool ListView::listPageEndReached()
     {
-        auto minLimit = (2 * currentPageSize > 8 ? 2 * currentPageSize : 8);
+        auto minLimit = (2 * currentPageSize > minimalPageSize ? 2 * currentPageSize : minimalPageSize);
 
         auto calculateLimit = [&]() {
             // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
-            // before it gets them, requests twice size of current page with down limit of at least 8.
+            // before it gets them, requests twice size of current page with down limit of at least 8 (minimalPageSize).
             if (direction == style::listview::Direction::Bottom)
                 return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
             else
