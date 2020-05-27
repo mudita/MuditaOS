@@ -92,6 +92,11 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/Database
 )
 
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    -Wno-error=return-local-addr
+)
+
 target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
 
 # Host target configuration(mainly used for unit testing)

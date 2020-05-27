@@ -117,13 +117,10 @@
 #include <assert.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/stat.h>
-//#include <sys/file.h>
 #include <sys/param.h>
 #include <unistd.h>
 #include <time.h>
 #include <errno.h>
-#include <fcntl.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
