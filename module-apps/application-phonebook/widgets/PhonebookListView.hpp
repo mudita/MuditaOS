@@ -12,8 +12,9 @@ namespace gui
     class PhonebookListView : public ListView
     {
 
-        UTF8 labelMark         = "";
-        UTF8 previousLabelMark = "";
+        UTF8 labelMark           = "";
+        UTF8 previousLabelMark   = "";
+        bool previousItemIsLabel = false;
 
         void addItemsOnPage() override;
         void addLabelMarker(PhonebookItem *item);

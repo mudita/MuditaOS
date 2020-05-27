@@ -39,6 +39,8 @@ namespace gui
                 body->addWidget(phonebookLabel);
                 addSpanItem();
                 body->addWidget(item);
+
+                previousItemIsLabel = true;
             }
         }
     }
@@ -60,38 +62,42 @@ namespace gui
 
             body->addWidget(item);
 
+            // if added item is not visible -> page is full.
             if (item->visible != true) {
 
-                // if list full and direction top remove last element and add floating label mark on top
+                // if page full and direction top remove last element and add floating label mark on top if there was no
+                // one previously
                 if (direction == style::listview::Direction::Top) {
 
-                    body->removeWidget(item);
-                    body->removeWidget(previousListItem);
-
-                    gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
-
-                    if (!(previousLabelMark == labelMark)) {
-                        phonebookLabel->setMarkerItem(labelMark);
+                    if (previousItemIsLabel) {
+                        break;
                     }
+                    else {
 
-                    body->addWidget(phonebookLabel);
-                    addSpanItem();
+                        body->removeWidget(item);
+                        body->removeWidget(previousListItem);
+                        body->removeWidget(listSpanItem);
 
-                    currentPageSize--;
+                        gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
+
+                        phonebookLabel->setMarkerItem(labelMark);
+
+                        body->addWidget(phonebookLabel);
+                        currentPageSize--;
+                    }
                 }
                 break;
             }
 
             // if direction top add label mark after adding item
             if (direction == style::listview::Direction::Top) {
+                previousItemIsLabel = false;
                 addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
             }
 
             previousListItem = item;
+
             currentPageSize++;
-            //
-            //            LOG_DEBUG("Page id %d, Label Mark %s", currentPageSize, labelMark.c_str());
-            //            LOG_DEBUG("Page id %d, Prev Mark %s", currentPageSize, previousLabelMark.c_str());
 
             addSpanItem();
         }
