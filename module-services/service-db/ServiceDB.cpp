@@ -314,7 +314,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     case MessageType::DBContactGetByNumber: {
         auto time             = utils::time::Scoped("DBContactGetByNumber");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->GetByNumber(msg->record.numbers[0].numberE164);
+        auto ret              = contactRecordInterface->GetByNumber(msg->record.numbers[0].number);
         responseMsg           = std::make_shared<DBContactResponseMessage>(std::move(ret),
                                                                  true,
                                                                  msg->limit,
@@ -322,6 +322,21 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
                                                                  msg->favourite,
                                                                  ret->size(),
                                                                  MessageType::DBContactGetByNumber);
+    } break;
+
+    case MessageType::DBContactMatchByNumber: {
+        auto time = utils::time::Scoped("DBContactMatchByNumber");
+        auto *msg = dynamic_cast<DBContactNumberMessage *>(msgl);
+        auto ret  = contactRecordInterface->MatchByNumber(msg->numberView);
+
+        if (ret.has_value()) {
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Success,
+                                                                           std::make_unique<ContactRecord>(*ret));
+        }
+        else {
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Failure,
+                                                                           std::unique_ptr<ContactRecord>());
+        }
     } break;
 
     case MessageType::DBContactRemove: {

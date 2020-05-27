@@ -19,18 +19,21 @@ TEST_CASE("PhoneNumber - parsing")
     {
         PhoneNumber number(pl_entered, country::Id::POLAND);
         REQUIRE(number.isValid());
+        REQUIRE(number.getCountryCode() == country::Id::POLAND);
     }
 
     SECTION("Wrong country")
     {
         PhoneNumber number(pl_entered, country::Id::UNITED_KINGDOM);
         REQUIRE_FALSE(number.isValid());
+        REQUIRE(number.getCountryCode() == country::Id::UNKNOWN);
     }
 
     SECTION("From E164")
     {
         PhoneNumber number(pl_e164, country::Id::UNKNOWN);
         REQUIRE(number.isValid());
+        REQUIRE(number.getCountryCode() == country::Id::POLAND);
     }
 
     SECTION("Invalid input")
@@ -84,7 +87,7 @@ TEST_CASE("PhoneNumber - views")
         PhoneNumber number(dummyNumber);
         REQUIRE_FALSE(number.isValid());
 
-        auto view = number.makeView();
+        auto view = number.getView();
         REQUIRE(view.getEntered() == dummyNumber);
         REQUIRE(view.getFormatted() == dummyNumber);
         REQUIRE(view.getE164() == "");
@@ -95,7 +98,7 @@ TEST_CASE("PhoneNumber - views")
         PhoneNumber number(pl_entered, country::Id::POLAND);
         REQUIRE(number.isValid());
 
-        auto view = number.makeView();
+        auto view = number.getView();
         REQUIRE(view.getEntered() == pl_entered);
         REQUIRE(view.getE164() == pl_e164);
         REQUIRE(view.getFormatted() == pl_formatted);
@@ -117,6 +120,22 @@ TEST_CASE("PhoneNumber - views")
         REQUIRE(invalid_view.getNonEmpty() == dummyNumber);
         REQUIRE(valid_view.getNonEmpty() == pl_e164);
     }
+
+    SECTION("View promotion (E164)")
+    {
+        auto number1 = PhoneNumber(pl_e164);
+        auto number2 = PhoneNumber(number1.getView());
+
+        REQUIRE(number1 == number2);
+    }
+
+    SECTION("View promotion (non E164)")
+    {
+        auto number1 = PhoneNumber(pl_entered);
+        auto number2 = PhoneNumber(number1.getView());
+
+        REQUIRE(number1 == number2);
+    }
 }
 
 TEST_CASE("PhoneNumber - equality")
@@ -129,23 +148,73 @@ TEST_CASE("PhoneNumber - equality")
 
     REQUIRE(number1 == number2);
 
-    REQUIRE(number1 == number2.makeView());
-    REQUIRE(number2 == number1.makeView());
-    REQUIRE(number1.makeView() == number2.makeView());
+    REQUIRE(number1 == number2.getView());
+    REQUIRE(number2 == number1.getView());
+    REQUIRE(number1.getView() == number2.getView());
+}
+
+TEST_CASE("PhoneNumber - matching")
+{
+    PhoneNumber number1(pl_entered, country::Id::POLAND);
+    PhoneNumber number2(pl_e164, country::Id::UNKNOWN);
+    PhoneNumber number4("600123", country::Id::UNKNOWN);
+    PhoneNumber number5("456", country::Id::UNKNOWN);
+    PhoneNumber number6("600456", country::Id::UNKNOWN);
+    PhoneNumber number7(pl_entered, country::Id::UNKNOWN);
+
+    SECTION("Exact")
+    {
+        // E164 exact matches national with country code
+        REQUIRE(number1.match(number2) == PhoneNumber::Match::EXACT);
+        REQUIRE(number2.match(number1) == PhoneNumber::Match::EXACT);
+
+        // national matches national, e164 matches e164
+        REQUIRE(number7.match(PhoneNumber(pl_entered, country::Id::UNKNOWN)) == PhoneNumber::Match::EXACT);
+        REQUIRE(number2.match(PhoneNumber(pl_e164, country::Id::UNKNOWN)) == PhoneNumber::Match::EXACT);
+    }
+
+    SECTION("Possible")
+    {
+        // possible that national with unknown country matches same national
+        // with valid country
+        REQUIRE(number7.match(number1) == PhoneNumber::Match::POSSIBLE);
+        REQUIRE(number1.match(number7) == PhoneNumber::Match::POSSIBLE);
+        REQUIRE(number7.match(number2) == PhoneNumber::Match::POSSIBLE);
+        REQUIRE(number2.match(number7) == PhoneNumber::Match::POSSIBLE);
+    }
+
+    SECTION("Probable")
+    {
+        REQUIRE(number7.match(number5) == PhoneNumber::Match::PROBABLE);
+        REQUIRE(number5.match(number7) == PhoneNumber::Match::PROBABLE);
+    }
+
+    SECTION("No match")
+    {
+        REQUIRE(number1.match(number4) == PhoneNumber::Match::NO_MATCH);
+        REQUIRE(number1.match(number6) == PhoneNumber::Match::NO_MATCH);
+    }
 }
 
 TEST_CASE("PhoneNumber - record validation")
 {
     SECTION("Valid")
     {
-        auto view = PhoneNumber::validateNumber(pl_e164, pl_entered);
-        REQUIRE(view.isValid());
-        REQUIRE(view.getFormatted() == pl_formatted);
+        auto number = PhoneNumber(pl_entered, pl_e164);
+        REQUIRE(number.isValid());
+        REQUIRE(number.getFormatted() == pl_formatted);
+    }
+
+    SECTION("Valid, both E164")
+    {
+        auto number = PhoneNumber(pl_e164, pl_e164);
+        REQUIRE(number.isValid());
+        REQUIRE(number.getFormatted() == pl_formatted_int);
     }
 
     SECTION("Invalid")
     {
-        auto view = PhoneNumber::validateNumber("+44600123456", pl_entered);
-        REQUIRE_FALSE(view.isValid());
+        REQUIRE_THROWS_AS(PhoneNumber(pl_entered, "+44600123456"), utils::PhoneNumber::Error);
+        REQUIRE_THROWS_AS(PhoneNumber(pl_entered, pl_entered), utils::PhoneNumber::Error);
     }
 }

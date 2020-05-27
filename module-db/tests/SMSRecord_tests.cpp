@@ -45,7 +45,7 @@ TEST_CASE("SMS Record tests")
     const uint32_t dateTest      = 123456789;
     const uint32_t dateSentTest  = 987654321;
     const uint32_t errorCodeTest = 555;
-    const char *numberTest       = "111222333";
+    const char *numberTest       = "+48600123456";
     const char *numberTest2      = "222333444";
     const char *bodyTest         = "Test SMS Body";
     const char *bodyTest2        = "Test SMS Body2";

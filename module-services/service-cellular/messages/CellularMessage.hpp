@@ -43,7 +43,7 @@ class CellularCallMessage : public CellularMessage
         : CellularMessage(MessageType::CellularCall), type(type), number(number)
     {}
     CellularCallMessage(Type type, const utils::PhoneNumber &number)
-        : CellularMessage(MessageType::CellularCall), type(type), number(number.makeView())
+        : CellularMessage(MessageType::CellularCall), type(type), number(number.getView())
     {}
     CellularCallMessage(Type type, const std::string &e164number)
         : CellularMessage(MessageType::CellularCall), type(type), number(utils::PhoneNumber::parse(e164number))

@@ -4,11 +4,12 @@
 
 #include <phonenumbers/phonenumberutil.h>
 
-#include <array>
+#include <exception>
 #include <string>
 
 namespace utils
 {
+
     /**
      * @brief Phone number representation. It wraps calls to Google's libphonenumber
      * to provide more convienient API. Because operations on phone numbers are
@@ -34,6 +35,63 @@ namespace utils
         using numberType = i18n::phonenumbers::PhoneNumberUtil::PhoneNumberType;
 
         /**
+         * @brief Phone Number match type:
+         *  - EXACT - 100% match (match on E164),
+         *  - POSSIBLE - highly likely that numbers match, e.g. one number is in
+         *    national format with unknown country code and the other is the
+         *    same but has country code.
+         *  - PROBABLE - less likely than POSSIBLE but not impossible, e.g. one
+         *    number match ending of another number
+         *  - NO_MATCH - no match possible
+         * number without country code matches same number with country code.
+         *
+         */
+        enum class Match
+        {
+            NO_MATCH,
+            PROBABLE,
+            POSSIBLE,
+            EXACT
+        };
+
+        /**
+         * @brief Phone number processing error. Holds reason and string
+         * representation of a problematic phone number.
+         *
+         */
+        class Error : public std::exception
+        {
+          private:
+            std::string number;
+            std::string reason;
+
+          public:
+            Error() = delete;
+
+            /**
+             * @brief Construct a new PhoneNumber exception object.
+             *
+             * @param number - phone number which was processed when an exception occurred
+             * @param reason - fail reason
+             */
+            Error(const std::string &number, const std::string &reason);
+
+            /**
+             * @brief Get exception reason
+             *
+             * @return exception reason
+             */
+            const char *what() const noexcept override;
+
+            /**
+             * @brief Get the phone number related to the exception
+             *
+             * @return string represenation of a number
+             */
+            const std::string &getNumber() const;
+        };
+
+        /**
          * @brief A lightweight representation of PhoneNumber class. It does not
          * wrap calls to libphonenumber and contains precomputed values only.
          * It is not possible to create an instance of View from outside of
@@ -55,14 +113,7 @@ namespace utils
              *
              * @param view - object to copy from
              */
-            explicit View(const View &view) = default;
-
-            /**
-             * @brief Default move constructor.
-             *
-             * @param view - object to move from
-             */
-            explicit View(View &&view) = default;
+            View(const View &view) = default;
 
             /**
              * @brief Default assignment operator.
@@ -149,7 +200,11 @@ namespace utils
         using gnumber  = i18n::phonenumbers::PhoneNumber;
 
       public:
-        PhoneNumber() = delete;
+        /**
+         * @brief Construct an empty PhoneNumber object
+         *
+         */
+        PhoneNumber() = default;
 
         /**
          * @brief Creates PhoneNumber from a string.
@@ -163,11 +218,29 @@ namespace utils
         PhoneNumber(const std::string &phoneNumber, country::Id defaultCountryCode = country::defaultCountry);
 
         /**
+         * @brief Construct a new Phone Number object from its e164
+         * representation checking if it matches entered number in the proces.
+         * Country code is retrieved from E164 number format.
+         *
+         * @param phoneNumber - phone number provided by the user
+         * @param e164number - E164 number representation
+         *
+         * \throws PhoneNumber::Error when numbers do not match or a parsing error
+         * occurs.
+         */
+        PhoneNumber(const std::string &phoneNumber, const std::string &e164number);
+
+        /**
+         * @brief Construct a PhoneNumber object from View representation.
+         *
+         * @param numberView - lightweight number representation
+         */
+        PhoneNumber(const View &numberView);
+
+        /**
          * @brief Creates E164 number representation.
          *
          * @return std::string - E164 number representation.
-         * \throws std::runtime_error - tried to get E164 format from a number
-         * with \a invalid state (see isValid()).
          */
         std::string toE164() const;
 
@@ -195,12 +268,19 @@ namespace utils
         numberType getType() const;
 
         /**
-         * @brief Creates lightweight representation of itself (see View class).
+         * @brief Get the country code for number
+         *
+         * @return country::Id
+         */
+        country::Id getCountryCode() const noexcept;
+
+        /**
+         * @brief Get lightweight representation of a PhoneNumber (see View class).
          *
          * @return View - instance of View object which represents state of
          * PhoneNumber instance.
          */
-        View makeView() const;
+        const View &getView() const;
 
         /**
          * @brief Returns validity state, i.e. if number has been successfully
@@ -212,7 +292,15 @@ namespace utils
         bool isValid() const;
 
         /**
-         * @brief Compares two PhoneNumber objects (strict match).
+         * @brief Compare current instance with an other number.
+         *
+         * @param other - number to compare
+         * @return type of match, Match::NO_MATCH when number do not match at all
+         */
+        Match match(const PhoneNumber &other) const;
+
+        /**
+         * @brief Compares two PhoneNumber objects (exact match).
          *
          * @param right - instance of PhoneNumber to compare to.
          * @return true if objects are equal.
@@ -245,17 +333,6 @@ namespace utils
                                country::Id defaultCountryCode = country::defaultCountry);
 
         /**
-         * @brief Create instance of View from a pair of numbers - raw format
-         * (as entered by the user) and E164 format. This method is convenient
-         * when both numbers has to be stored, e.g. in a database.
-         *
-         * @param e164 - phone number in the E164 format
-         * @param entered - phone number as entered by the user
-         * @return View - phone number representation with validity state set.
-         */
-        static View validateNumber(const std::string &e164, const std::string &entered);
-
-        /**
          * @brief Create instance of View directly from the E164 format.
          *
          * @param inputNumber - a string represenation of a number to create View from
@@ -264,9 +341,10 @@ namespace utils
         static View parse(const std::string &inputNumber);
 
       private:
-        const country::Id countryCode;
-        phn_util &util;
+        View makeView(const std::string &input) const;
+
+        country::Id countryCode = country::Id::UNKNOWN;
         gnumber pbNumber;
-        std::string rawInput;
+        View viewSelf;
     };
 } // namespace utils

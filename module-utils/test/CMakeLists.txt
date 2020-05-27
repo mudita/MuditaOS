@@ -119,6 +119,7 @@ project(unittest_module-utils_phonenumber VERSION 1.0
        DESCRIPTION "Module-utils phonenumber unit tests")
 add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
     unittest_phonenumber.cpp
+    unittest_numbermatcher.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
 target_link_libraries(${PROJECT_NAME} PRIVATE module-utils module-vfs)
