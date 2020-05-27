@@ -232,18 +232,16 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(app::window::name_dialogConfirm, window));
     }
 
-    bool ApplicationCall::showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack)
+    bool ApplicationCall::showNotification(std::function<bool()> action)
     {
         auto dialog = dynamic_cast<gui::DialogConfirm *>(windows[app::window::name_dialogConfirm]);
         assert(dialog);
         auto meta   = dialog->meta;
         meta.icon   = "info_big_circle_W_G";
-        meta.text   = utils::localize.get("app_messages_no_sim"); // TODO: alek:chage it
+        meta.text   = utils::localize.get("app_call_no_sim");
         meta.action = action;
         dialog->update(meta);
-        auto switchData                        = std::make_unique<gui::SwitchData>();
-        switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
-        switchWindow(dialog->getName(), std::move(switchData));
+        switchWindow(dialog->getName());
         return true;
     }
 
