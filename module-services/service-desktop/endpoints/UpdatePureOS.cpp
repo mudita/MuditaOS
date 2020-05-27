@@ -221,6 +221,7 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
     }
 
     ret = sbini_set_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str(), PATH_CURRENT);
+    ret = sbini_set_string(ini, purefs::ini::main.c_str(), purefs::ini::os_image.c_str(), purefs::file::boot_bin.c_str());
     ret = sbini_set_string(ini, PATH_CURRENT, purefs::ini::os_git_tag.c_str(), GIT_TAG);
     ret = sbini_set_string(ini, PATH_CURRENT, purefs::ini::os_git_revision.c_str(), GIT_REV);
     ret = sbini_set_string(ini, PATH_CURRENT, purefs::ini::os_git_branch.c_str(), GIT_BRANCH);

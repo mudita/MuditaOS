@@ -53,6 +53,7 @@ namespace purefs
     {
         const inline fs::path boot_ini     = ".boot.ini";
         const inline fs::path boot_ini_bak = ".boot.ini.bak";
+        const inline fs::path boot_bin     = "boot.bin";
     }; // namespace file
 
     namespace extension
@@ -72,6 +73,7 @@ namespace purefs
     {
         const inline std::string main    = "main";
         const inline std::string os_type = "ostype";
+        const inline std::string os_image = "imagename";
 
         const inline std::string os_git_tag      = "git_tag";
         const inline std::string os_git_revision = "git_commit";
