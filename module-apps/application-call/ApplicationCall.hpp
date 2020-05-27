@@ -17,6 +17,7 @@ namespace app
         inline const std::string name_enterNumber       = "EnterNumberWindow";
         inline const std::string name_emergencyCall     = "EmergencyCallWindow";
         inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
+        inline const std::string name_dialogConfirm     = "DialogConfirm";
     } // namespace window
 
     inline const std::string ringtone_path = "sys/assets/audio/ringtone.wav"; // Should bo moved to database
@@ -59,5 +60,7 @@ namespace app
 
         void handleCallEvent(const std::string &number);
         void handleAddContactEvent(const std::string &number);
+
+        bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
     };
 } /* namespace app */
