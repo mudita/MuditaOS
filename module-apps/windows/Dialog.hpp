@@ -8,42 +8,46 @@ namespace gui
 {
     class Dialog : public AppWindow
     {
-
-        Label *yes = nullptr, *no = nullptr;
+      protected:
         Text *text  = nullptr;
         Image *icon = nullptr;
 
       public:
-        enum class Options
-        {
-            haveChoice, // yes / no
-            onlyOk,
-            onlyBack
-        };
-
         struct Meta
         {
-            std::string title = "";
-            UTF8 icon;
-            UTF8 text                    = "";
+            std::string title            = "No title";
+            UTF8 icon                    = "";
+            UTF8 text                    = "No text";
             std::function<bool()> action = []() -> bool { return false; };
 
-            Options options = Options::haveChoice;
+            Meta() = default;
         } meta;
 
         Dialog(app::Application *app, const std::string &name, const Meta &meta);
         ~Dialog() override = default;
 
-        bool onInput(const InputEvent &inputEvent) override;
-        void buildInterface() override;
+        virtual void update(const Meta &meta);
+    };
 
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+    class DialogConfirm : public Dialog
+    {
+      public:
+        DialogConfirm(app::Application *app, const std::string &name, const Dialog::Meta &meta = Dialog::Meta());
+        ~DialogConfirm() override = default;
+
+        virtual void update(const Meta &meta) override;
+    };
+
+    class DialogYesNo : public Dialog
+    {
+      protected:
+        Label *yes = nullptr, *no = nullptr;
+
+      public:
+        DialogYesNo(app::Application *app, const std::string &name, const Meta &meta = Dialog::Meta());
+        ~DialogYesNo() override = default;
 
         void update(const Meta &meta);
-
-      private:
-        /// build yes / no elements and set focus on no
-        void setupChoice();
     };
 
 }; // namespace gui

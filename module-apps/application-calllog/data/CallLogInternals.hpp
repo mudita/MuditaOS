@@ -41,7 +41,7 @@ namespace calllog
         // Windows
         const inline std::string MainWindowStr       = gui::name::window::main_window;
         const inline std::string DetailsWindowStr    = "DetailsWindow";
-        const inline std::string CallDeleteWindowStr = "CallDeleteOptionsWindow";
+        const inline std::string DialogYesNoStr      = "DialogYesNo";
 
         constexpr auto pageSize = 8;
     } // namespace settings
