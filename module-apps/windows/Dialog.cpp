@@ -9,14 +9,14 @@ namespace style
     namespace image
     {
         constexpr uint32_t x = 176;
-        constexpr uint32_t y = 135;
+        constexpr uint32_t y = 132;
     } // namespace image
     namespace text
     {
-        constexpr uint32_t x = 45;
-        constexpr uint32_t y = 293;
+        constexpr uint32_t x = 40;
+        constexpr uint32_t y = 290;
         constexpr uint32_t w = 400;
-        constexpr uint32_t h = 66;
+        constexpr uint32_t h = 132;
     } // namespace text
     namespace no
     {
@@ -41,7 +41,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     AppWindow::buildInterface();
     // TODO fix elements positioning with styles ready, right now copied from Phonebook as it is
 
-    topBar->setActive(TopBar::Elements::TIME, true);
+    topBar->setActive(TopBar::Elements::TIME, true); // TODO: alek: to be or not to be?
     bottomBar->setActive(BottomBar::Side::LEFT, false);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
@@ -76,6 +76,7 @@ void Dialog::update(const Meta &meta)
     this->meta = meta;
     setTitle(meta.title);
     text->setText(meta.text);
+    icon->set(meta.icon);
 
     switch (meta.options) {
     case Options::onlyOk: {

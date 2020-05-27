@@ -97,8 +97,8 @@ namespace gui
     void AppWindow::setTitle(const UTF8 &text)
     {
         if (title != nullptr) {
-            title->setVisible(true);
             title->setText(text);
+            title->setVisible(text.length() != 0);
         }
         else {
             LOG_ERROR("cant set title - it doesn't exist!");
