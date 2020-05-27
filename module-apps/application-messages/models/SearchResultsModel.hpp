@@ -24,7 +24,7 @@ namespace gui::model
         void setRecordsCount(uint32_t count);
         /// set what we need to search
         void setSearchValue(const UTF8 &search_value);
-        auto getMaxItemsOnScreen() -> unsigned int
+        auto getMaxItemsOnScreen() const -> unsigned int
         {
             return max_search_items_on_screen;
         }

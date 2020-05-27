@@ -31,7 +31,9 @@
 #include "includes/DBServiceName.hpp"
 #include "messages/QueryMessage.hpp"
 
-ServiceDB::ServiceDB() : sys::Service(service::name::db, "", 1024 * 24, sys::ServicePriority::Idle)
+static const auto service_db_stack = 1024 * 24;
+
+ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, sys::ServicePriority::Idle)
 {
     LOG_INFO("[ServiceDB] Initializing");
 }
