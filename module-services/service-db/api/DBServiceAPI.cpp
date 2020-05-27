@@ -499,7 +499,7 @@ bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, ui
     msg->offset = offset;
     msg->limit  = limit;
 
-    sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+    sys::Bus::SendUnicast(msg, service::name::db, serv);
     return true;
 }
 
