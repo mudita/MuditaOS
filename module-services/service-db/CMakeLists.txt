@@ -7,6 +7,7 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         "ServiceDB.cpp"
         "api/DBServiceAPI.cpp"
+        "api/DBServiceAPI_GetByQuery.cpp"
 
         "messages/DBAlarmMessage.cpp"
         "messages/DBCalllogMessage.cpp"
@@ -18,4 +19,5 @@ target_sources( ${PROJECT_NAME}
         "messages/DBSMSMessage.cpp"
         "messages/DBSMSTemplateMessage.cpp"
         "messages/DBThreadMessage.cpp"
+        "messages/QueryMessage.cpp"
 )

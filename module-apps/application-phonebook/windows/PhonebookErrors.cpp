@@ -92,7 +92,7 @@ bool NoResults::handleSwitchData(SwitchData *data)
 
 void NoResults::setContactData()
 {
-    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() +
+    setTitle(utils::localize.get(style::strings::common::search_results) + std::string(":\"") + searchQuery +
              std::string("\""));
 }
 
@@ -170,7 +170,7 @@ bool ContactBlocked::handleSwitchData(SwitchData *data)
 
 void ContactBlocked::setContactData()
 {
-    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() +
+    setTitle(utils::localize.get(style::strings::common::search_results) + std::string(":\"") + searchQuery +
              std::string("\""));
 }
 

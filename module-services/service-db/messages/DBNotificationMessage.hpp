@@ -1,42 +1,26 @@
 #pragma once
 
 #include "DBMessage.hpp"
-#include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include <memory>
+#include <module-db/Interface/BaseInterface.hpp>
 
-namespace DB
+namespace db
 {
-    enum class NotificationType
+    class NotificationMessage : public sys::DataMessage
     {
-        Updated,
-        Added,
-        Removed
+      public:
+        /// made it CRUD
+        enum class Type
+        {
+            Create,
+            Read,
+            Update,
+            Delete
+        };
+
+        NotificationMessage(db::Interface::Name interface, Type type);
+        db::Interface::Name interface;
+        const Type type;
     };
-    enum class BaseType
-    {
-        AlarmDB,
-        CalllogDB,
-        ContacstDB,
-        NotesDB,
-        SettingsDB,
-        SmsDB
-    };
-} // namespace DB
-
-class DBNotificationMessage : public sys::DataMessage
-{
-  public:
-    DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType);
-
-    DB::NotificationType notificationType;
-    DB::BaseType baseType;
-};
-
-class DBNotificationResponseMessage : public sys::ResponseMessage
-{
-  public:
-    DBNotificationResponseMessage(uint32_t retCode);
-
-    uint32_t retCode;
-};
+} // namespace db

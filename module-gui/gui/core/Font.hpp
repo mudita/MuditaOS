@@ -12,6 +12,7 @@
 #include "utf8/UTF8.hpp"
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>

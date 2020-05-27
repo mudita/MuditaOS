@@ -75,6 +75,7 @@ enum class MessageType
     DBAlarmGetNext,        // Get alarm, closest or equal to current timestamp.
 
     DBCountryCode,
+    DBQuery,
 
     // Cellular messages
     CellularStateRequest,       /// cellular change state request, only for use by cellular
