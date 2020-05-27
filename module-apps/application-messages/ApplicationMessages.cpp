@@ -209,7 +209,7 @@ namespace app
         return true;
     }
 
-    bool ApplicationMessages::smsErrorNotification(std::function<bool()> action)
+    bool ApplicationMessages::showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack)
     {
         auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
         assert(dialog);
@@ -220,7 +220,10 @@ namespace app
         meta.options = gui::Dialog::Options::onlyOk;
         meta.action  = action;
         dialog->update(meta);
-        return switchWindow(gui::name::window::dialog, nullptr);
+        auto switchData                        = std::make_unique<gui::SwitchData>();
+        switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
+        switchWindow(gui::name::window::dialog, std::move(switchData));
+        return true;
     }
 
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
@@ -236,6 +239,23 @@ namespace app
         auto time     = utils::time::Timestamp();
         record.date   = time.getTime();
         return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
+    }
+
+    bool ApplicationMessages::handleSendSmsFromThread(const UTF8 &number, const UTF8 &body)
+    {
+        if (!sendSms(number, body)) {
+            return false;
+        }
+
+        if (!Store::GSM::get()->simCardInserted()) {
+            auto action = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            return showNotification(action);
+        }
+
+        return true;
     }
 
     bool ApplicationMessages::newMessageOptions(const std::string &requestingWindow, gui::Text *text)
