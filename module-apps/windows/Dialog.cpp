@@ -68,6 +68,9 @@ void Dialog::update(const Meta &meta)
 DialogConfirm::DialogConfirm(app::Application *app, const std::string &name, const Dialog::Meta &meta)
     : Dialog(app, name, meta)
 {
+    topBar->setActive(TopBar::Elements::BATTERY, true);
+    topBar->setActive(TopBar::Elements::SIGNAL, true);
+
     bottomBar->setActive(BottomBar::Side::RIGHT, false);
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
     setFocusItem(icon);
