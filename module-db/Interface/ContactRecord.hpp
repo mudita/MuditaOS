@@ -5,6 +5,11 @@
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
 
+#include <PhoneNumber.hpp>
+#include <NumberHolderMatcher.hpp>
+
+#include <optional>
+
 struct ContactRecord
 {
     uint32_t ID             = DB_ID_NONE;
@@ -14,12 +19,13 @@ struct ContactRecord
 
     struct Number
     {
-        UTF8 numberUser              = "";
-        UTF8 numberE164              = "";
+        utils::PhoneNumber::View number;
         ContactNumberType numberType = ContactNumberType::OTHER;
-        Number(UTF8 n_user = "", UTF8 n_e164 = "", ContactNumberType n_type = ContactNumberType::CELL)
-            : numberUser(n_user), numberE164(n_e164), numberType(n_type)
-        {}
+        Number();
+        explicit Number(const utils::PhoneNumber::View &number, ContactNumberType = ContactNumberType::CELL);
+        explicit Number(const std::string &entered,
+                        const std::string &e164,
+                        ContactNumberType n_type = ContactNumberType::CELL);
     };
     std::vector<Number> numbers = {};
 
@@ -44,11 +50,11 @@ struct ContactRecord
 
     inline auto getNumberAsName() const -> UTF8
     {
-        if (numbers.size() > 0 && numbers[0].numberUser.length() > 0) {
-            return numbers[0].numberUser;
+        if (numbers.size() > 0 && numbers[0].number.getEntered().size() > 0) {
+            return numbers[0].number.getFormatted();
         }
-        if (numbers.size() > 1 && numbers[1].numberUser.length() > 0) {
-            return numbers[1].numberUser;
+        if (numbers.size() > 1 && numbers[1].number.getEntered().size() > 0) {
+            return numbers[1].number.getFormatted();
         }
         return "";
     }
@@ -75,8 +81,21 @@ enum class ContactRecordField
 {
     PrimaryName,
     NumberE164,
+    NumberUser,
     SpeedDial,
     Favourite,
+};
+
+class ContactNumberHolder
+{
+  private:
+    ContactsNumberTableRow row;
+    utils::PhoneNumber number;
+
+  public:
+    ContactNumberHolder(const ContactsNumberTableRow &numberRow);
+    const utils::PhoneNumber &getNumber() const;
+    std::uint32_t getContactID() const;
 };
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField>
@@ -118,6 +137,14 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
         const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
 
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
+        const utils::PhoneNumber::View &numberView, CreateTempContact createTempContact = CreateTempContact::False);
+
+    std::optional<ContactRecord> MatchByNumber(
+        const utils::PhoneNumber::View &numberView,
+        CreateTempContact createTempContact  = CreateTempContact::False,
+        utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE);
+
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(UTF8 speedDial);
 
     std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName,
@@ -126,8 +153,14 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
   private:
     ContactsDB *contactDB;
+    bool numbersDirty = true;
+    utils::NumberHolderMatcher<std::vector, ContactNumberHolder> numberMatcher;
+    std::vector<ContactNumberHolder> contactNumberHolders;
+
     /// get multiple numbers by split numbers_id
     std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
 
     std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
+
+    std::vector<ContactsNumberTableRow> getAllNumbers();
 };

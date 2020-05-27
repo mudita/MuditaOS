@@ -15,8 +15,9 @@ TEST_CASE("Contact Record tests")
 
     const char *primaryNameTest                   = "PrimaryNameTest";
     const char *alternativeNameTest               = "AlternativeNameTest";
-    const char *numberUserTest                    = "111222333";
-    const char *numberE164Test                    = "333222111";
+    const char *numberUserTest                    = "600123456";
+    const char *numberE164Test                    = "+48600123456";
+    const char *numberFormattedTest               = "600 123 456";
     const char *addressTest                       = "6 Czeczota St.\n02600 Warsaw";
     const char *noteTest                          = "TestNote";
     const char *mailTest                          = "TestMail";
@@ -56,8 +57,8 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordOUT.primaryName == primaryNameTest);
         REQUIRE(recordOUT.alternativeName == alternativeNameTest);
         REQUIRE(recordOUT.numbers.size() == 1);
-        REQUIRE(recordOUT.numbers[0].numberUser == numberUserTest);
-        REQUIRE(recordOUT.numbers[0].numberE164 == numberE164Test);
+        REQUIRE(recordOUT.numbers[0].number.getEntered() == numberUserTest);
+        REQUIRE(recordOUT.numbers[0].number.getE164() == numberE164Test);
         REQUIRE(recordOUT.numbers[0].numberType == contactNumberTypeTest);
         REQUIRE(recordOUT.contactType == contactTypeTest);
         REQUIRE(recordOUT.address == addressTest);
@@ -81,8 +82,8 @@ TEST_CASE("Contact Record tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numbers[0].numberUser == numberUserTest);
-            REQUIRE(w.numbers[0].numberE164 == numberE164Test);
+            REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
+            REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.address == addressTest);
@@ -106,8 +107,8 @@ TEST_CASE("Contact Record tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numbers[0].numberUser == numberUserTest);
-            REQUIRE(w.numbers[0].numberE164 == numberE164Test);
+            REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
+            REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.address == addressTest);
@@ -130,8 +131,8 @@ TEST_CASE("Contact Record tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numbers[0].numberUser == numberUserTest);
-            REQUIRE(w.numbers[0].numberE164 == numberE164Test);
+            REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
+            REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.address == addressTest);
@@ -176,8 +177,8 @@ TEST_CASE("Contact Record tests")
 
         testRecord.primaryName = "";
 
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberUserTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberUserTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberFormattedTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
                 utils::localize.get("app_phonebook_contact_no_name"));
 
@@ -187,8 +188,8 @@ TEST_CASE("Contact Record tests")
             ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
         });
 
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberUserTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberUserTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberFormattedTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
                 utils::localize.get("app_phonebook_contact_no_name"));
 

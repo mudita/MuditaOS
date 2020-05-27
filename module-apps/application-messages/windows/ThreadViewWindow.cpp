@@ -89,7 +89,7 @@ namespace gui
         text->activatedCallback = [&](gui::Item &item) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            if (app->handleSendSmsFromThread(contact->numbers[0].numberE164.c_str(), text->getText())) {
+            if (app->handleSendSmsFromThread(contact->numbers[0].number.getE164().c_str(), text->getText())) {
                 LOG_ERROR("handleSendSmsFromThread failed");
             }
             text->clear();

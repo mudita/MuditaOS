@@ -379,6 +379,17 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumbe
     }
 }
 
+std::unique_ptr<ContactRecord> DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv,
+                                                                       const utils::PhoneNumber::View &numberView)
+{
+    auto msg = std::make_shared<DBContactNumberMessage>(numberView);
+
+    auto ret              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
+    auto *contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
+    assert(contactResponse);
+    return std::move(contactResponse->contact);
+}
+
 DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service *serv,
                                                                    const ContactRecord &rec,
                                                                    ContactRecord &errNumPrim,
@@ -391,18 +402,18 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
         return (speedDialError);
     }
 
-    if (rec.numbers.size() > 0 && rec.numbers[0].numberE164.length() > 0) {
-        auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
-        if (!retPhone1->empty()) {
-            errNumPrim = retPhone1->operator[](0);
+    if (rec.numbers.size() > 0 && rec.numbers[0].number.getEntered().size() > 0) {
+        auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number);
+        if (retPhone1) {
+            errNumPrim = *retPhone1;
             return (primaryNumberError);
         }
     }
 
-    if (rec.numbers.size() > 1 && rec.numbers[1].numberE164.length() > 0) {
-        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberE164);
-        if (!retPhone2->empty()) {
-            errNumAlt = retPhone2->operator[](0);
+    if (rec.numbers.size() > 1 && rec.numbers[1].number.getEntered().size() > 0) {
+        auto retPhone2 = MatchContactByPhoneNumber(serv, rec.numbers[1].number);
+        if (retPhone2) {
+            errNumAlt = *retPhone2;
             return (secondaryNumberError);
         }
     }

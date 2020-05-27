@@ -32,16 +32,6 @@ namespace app
     /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
-    bool call(Application *app, const std::string &number);
-
-    /// @brief requests selected call operation
-    ///
-    /// @param app - requesting application
-    /// @param CallOperation - selected call operation.
-    ///
-    /// @param number - phone number (assigned to contact) on which the operation is requested
-    ///
-    /// @return true if succeed
     bool call(Application *app, const utils::PhoneNumber::View &number);
 
     /// @brief prepares for a call (displays number to the user)

@@ -31,6 +31,7 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.c
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
 )
 

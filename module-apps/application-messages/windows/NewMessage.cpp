@@ -41,14 +41,14 @@ namespace gui
         }
         if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
             LOG_INFO("recieved sms send request");
-            auto number  = pdata->getPhoneNumber().getEntered();
-            auto records = DBServiceAPI::ContactGetByPhoneNumber(application, number);
-            if (records->empty()) {
-                LOG_WARN("not valid contact for number %s", number.c_str());
-                recipient->setText(number);
+            auto number     = pdata->getPhoneNumber();
+            auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, number);
+            if (!retContact) {
+                LOG_WARN("not valid contact for number %s", number.getEntered().c_str());
+                recipient->setText(number.getFormatted());
                 return;
             }
-            contact = std::make_shared<ContactRecord>((*records)[0]);
+            contact = std::move(retContact);
             recipient->setText(contact->getFormattedName());
         }
     }
@@ -71,8 +71,9 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
         // if a valid contact was found, choose it. Otherwise, get a raw entered number
-        UTF8 number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].numberE164 : recipient->getText();
-        auto ret    = app->sendSms(number, message->getText());
+        auto &&number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].number
+                                                                  : utils::PhoneNumber(recipient->getText());
+        auto ret = app->sendSms(number.toE164(), message->getText());
         if (!ret) {
             LOG_ERROR("sendSms failed");
             return false;
@@ -80,7 +81,7 @@ namespace gui
 
         if (!Store::GSM::get()->simCardInserted()) {
             auto action = [=]() -> bool {
-                if (!switchToThreadWindow(number)) {
+                if (!switchToThreadWindow(number.toE164())) {
                     LOG_ERROR("switchToThreadWindow failed");
                 }
                 return true;
@@ -89,7 +90,7 @@ namespace gui
             return true;
         }
 
-        return switchToThreadWindow(number);
+        return switchToThreadWindow(number.toE164());
     }
 
     bool NewSMS_Window::switchToThreadWindow(UTF8 number)
@@ -97,12 +98,13 @@ namespace gui
         uint32_t contactId;
         if (!contact || contact->numbers.size() == 0) {
             // once the sms is send, there is assumption that contact exists
-            auto records = DBServiceAPI::ContactGetByPhoneNumber(application, number);
-            if (records->empty()) {
+            auto retContact =
+                DBServiceAPI::MatchContactByPhoneNumber(application, utils::PhoneNumber(number).getView());
+            if (!retContact) {
                 LOG_ERROR("not valid contact for number %s", number.c_str());
                 return false;
             }
-            contact = std::make_shared<ContactRecord>(records->operator[](0));
+            contact = std::move(retContact);
         }
         contactId = contact->ID;
 
