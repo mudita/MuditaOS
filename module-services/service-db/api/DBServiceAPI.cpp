@@ -10,7 +10,8 @@
 #include <messages/DBCalllogMessage.hpp>
 #include <messages/DBCountryCodeMessage.hpp>
 
-#include "../ServiceDB.hpp"
+#include <ServiceDB.hpp>
+#include <includes/DBServiceName.hpp>
 
 #include <Utils.hpp>
 
@@ -21,7 +22,7 @@ SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
 
     std::shared_ptr<DBSettingsMessage> msg = std::make_shared<DBSettingsMessage>(MessageType::DBSettingsGet);
 
-    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto respMsg                                = ret.second;
         DBSettingsResponseMessage *settingsResponse = reinterpret_cast<DBSettingsResponseMessage *>(respMsg.get());
@@ -42,7 +43,7 @@ bool DBServiceAPI::SettingsUpdate(sys::Service *serv, const SettingsRecord &rec)
 {
     std::shared_ptr<DBSettingsMessage> msg = std::make_shared<DBSettingsMessage>(MessageType::DBSettingsUpdate, rec);
 
-    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     if (ret.first == sys::ReturnCodes::Success) {
         return true;
     }
@@ -55,7 +56,7 @@ uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSAdd, rec);
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)) {
         return (*smsResponse->records)[0].ID;
@@ -70,7 +71,7 @@ bool DBServiceAPI::SMSRemove(sys::Service *serv, uint32_t id)
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSRemove);
     msg->id                           = id;
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)) {
         return true;
@@ -84,7 +85,7 @@ bool DBServiceAPI::SMSUpdate(sys::Service *serv, const SMSRecord &rec)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSUpdate, rec);
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)) {
         return true;
@@ -98,7 +99,7 @@ SMSRecord DBServiceAPI::SMSGetLastRecord(sys::Service *serv)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSGetLastRecord);
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)) {
         return (*smsResponse->records)[0];
@@ -118,7 +119,7 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffset(sys::Ser
     msg->offset                       = offset;
     msg->limit                        = limit;
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)) {
         return std::move(smsResponse->records);
@@ -138,7 +139,7 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffsetByThreadI
     msg->limit                        = limit;
     msg->id                           = id;
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)) {
         return std::move(smsResponse->records);
@@ -152,7 +153,7 @@ uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv, EntryState state)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSGetCount>(state);
 
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto *sms = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (sms->retCode == true)) {
         return sms->count;
@@ -167,7 +168,7 @@ std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGet(sys::Service *serv, uint32
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGet);
     msg->id                              = id;
 
-    auto ret                                = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBThreadResponseMessage *threadResponse = reinterpret_cast<DBThreadResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)) {
         return std::make_unique<ThreadRecord>((*threadResponse->records)[0]);
@@ -181,7 +182,7 @@ std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGetByContact(sys::Service *ser
 {
     std::shared_ptr<DBThreadMessageGet> msg =
         std::make_shared<DBThreadMessageGet>(MessageType::DBThreadGetForContact, contact);
-    auto ret                                = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBThreadResponseMessage *threadResponse = reinterpret_cast<DBThreadResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)) {
         return std::make_unique<ThreadRecord>((*threadResponse->records)[0]);
@@ -196,7 +197,7 @@ bool DBServiceAPI::ThreadRemove(sys::Service *serv, uint32_t id)
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadRemove);
     msg->id                              = id;
 
-    auto ret                                = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBThreadResponseMessage *threadResponse = reinterpret_cast<DBThreadResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)) {
         return true;
@@ -212,7 +213,7 @@ bool DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uin
     msg->offset                          = offset;
     msg->limit                           = limit;
 
-    sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+    sys::Bus::SendUnicast(msg, service::name::db, serv);
 
     return true;
 }
@@ -221,7 +222,7 @@ uint32_t DBServiceAPI::ThreadGetCount(sys::Service *serv)
 {
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGetCount);
 
-    auto ret                                = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBThreadResponseMessage *threadResponse = reinterpret_cast<DBThreadResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)) {
         return threadResponse->count;
@@ -235,7 +236,7 @@ bool DBServiceAPI::SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &r
 {
     auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateAdd, rec);
 
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->retCode;
@@ -249,7 +250,7 @@ bool DBServiceAPI::SMSTemplateRemove(sys::Service *serv, uint32_t id)
     auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateRemove);
     msg->id  = id;
 
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->retCode;
@@ -262,7 +263,7 @@ bool DBServiceAPI::SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord
 {
     auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateUpdate, rec);
 
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->retCode;
@@ -275,7 +276,7 @@ uint32_t DBServiceAPI::SMSTemplateGetCount(sys::Service *serv)
 {
     auto msg = std::make_shared<DBSMSTemplateGetCount>();
 
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->count;
@@ -290,7 +291,7 @@ bool DBServiceAPI::SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset
     msg->offset = offset;
     msg->limit  = limit;
 
-    return sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+    return sys::Bus::SendUnicast(msg, service::name::db, serv);
 }
 
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::Service *serv,
@@ -304,7 +305,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByName, rec);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
@@ -321,7 +322,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Se
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
@@ -342,7 +343,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(
     std::shared_ptr<DBContactMessage> msg =
         std::make_shared<DBContactMessage>(MessageType::DBContactGetBySpeedDial, rec);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
@@ -359,7 +360,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumbe
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber, rec);
 
-    auto ret              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto *contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     assert(contactResponse);
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
@@ -431,7 +432,7 @@ bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec)
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd, rec);
     msg->record.contactType               = ContactType::USER;
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return true;
@@ -446,7 +447,7 @@ bool DBServiceAPI::ContactRemove(sys::Service *serv, uint32_t id)
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactRemove);
     msg->id                               = id;
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return true;
@@ -460,7 +461,7 @@ bool DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec)
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactUpdate, rec);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return true;
@@ -475,7 +476,7 @@ bool DBServiceAPI::ContactBlock(sys::Service *serv, uint32_t id, const bool shou
     std::shared_ptr<DBContactBlock> msg =
         std::make_shared<DBContactBlock>(MessageType::DBContactBlock, id, shouldBeBlocked);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return true;
@@ -490,7 +491,7 @@ uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv, bool favourites)
     std::shared_ptr<DBContactMessage> msg =
         std::make_shared<DBContactMessage>(MessageType::DBContactGetCount, ContactRecord{}, favourites);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return contactResponse->count;
@@ -508,7 +509,7 @@ bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, ui
     msg->offset = offset;
     msg->limit  = limit;
 
-    //    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    //    auto ret = sys::Bus::SendUnicast(msg,service::name::db,serv,5000);
     //    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
     //    contactResponse->offset = msg->offset;
     //    contactResponse->limit = msg->limit;
@@ -521,7 +522,7 @@ bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, ui
     //        return std::make_unique<std::vector<ContactRecord>>();
     //    }
 
-    sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+    sys::Bus::SendUnicast(msg, service::name::db, serv);
     return true;
 }
 
@@ -536,7 +537,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactSearch(sys::Ser
                                                  (alternativeName.length() > 0) ? alternativeName.c_str() : "",
                                                  (number.length() > 0) ? number.c_str() : "");
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
@@ -550,7 +551,7 @@ bool DBServiceAPI::AlarmAdd(sys::Service *serv, const AlarmsRecord &rec)
 {
     std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmAdd, rec);
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBAlarmResponseMessage *alarmResponse = reinterpret_cast<DBAlarmResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)) {
         return true;
@@ -565,7 +566,7 @@ bool DBServiceAPI::AlarmRemove(sys::Service *serv, uint32_t id)
     std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmRemove);
     msg->id                             = id;
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBAlarmResponseMessage *alarmResponse = reinterpret_cast<DBAlarmResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)) {
         return true;
@@ -579,7 +580,7 @@ bool DBServiceAPI::AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec)
 {
     std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmUpdate, rec);
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBAlarmResponseMessage *alarmResponse = reinterpret_cast<DBAlarmResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)) {
         return true;
@@ -593,7 +594,7 @@ uint32_t DBServiceAPI::AlarmGetCount(sys::Service *serv)
 {
     std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmGetCount);
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBAlarmResponseMessage *alarmResponse = reinterpret_cast<DBAlarmResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)) {
         return alarmResponse->count;
@@ -611,7 +612,7 @@ std::unique_ptr<std::vector<AlarmsRecord>> DBServiceAPI::AlarmGetLimitOffset(sys
     msg->offset                         = offset;
     msg->limit                          = limit;
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBAlarmResponseMessage *alarmResponse = reinterpret_cast<DBAlarmResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)) {
         return std::move(alarmResponse->records);
@@ -626,7 +627,7 @@ AlarmsRecord DBServiceAPI::AlarmGetNext(sys::Service *serv, time_t time)
 
     std::shared_ptr<DBAlarmMessage> msg   = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmGetNext);
     msg->time                             = time;
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBAlarmResponseMessage *alarmResponse = reinterpret_cast<DBAlarmResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)) {
         return std::move((*alarmResponse->records)[0]);
@@ -640,7 +641,7 @@ bool DBServiceAPI::NotesAdd(sys::Service *serv, const NotesRecord &rec)
 {
     std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesAdd, rec);
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBNotesResponseMessage *notesResponse = reinterpret_cast<DBNotesResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)) {
         return true;
@@ -655,7 +656,7 @@ bool DBServiceAPI::NotesRemove(sys::Service *serv, uint32_t id)
     std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesRemove);
     msg->id                             = id;
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBNotesResponseMessage *notesResponse = reinterpret_cast<DBNotesResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)) {
         return true;
@@ -669,7 +670,7 @@ bool DBServiceAPI::NotesUpdate(sys::Service *serv, const NotesRecord &rec)
 {
     std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesUpdate, rec);
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBNotesResponseMessage *notesResponse = reinterpret_cast<DBNotesResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)) {
         return true;
@@ -683,7 +684,7 @@ uint32_t DBServiceAPI::NotesGetCount(sys::Service *serv)
 {
     std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesGetCount);
 
-    auto ret                              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBNotesResponseMessage *notesResponse = reinterpret_cast<DBNotesResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)) {
         return notesResponse->count;
@@ -699,7 +700,7 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
     msg->offset                         = offset;
     msg->limit                          = limit;
 
-    sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+    sys::Bus::SendUnicast(msg, service::name::db, serv);
     return true;
 }
 
@@ -709,7 +710,7 @@ CalllogRecord DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &
 
     LOG_DEBUG("CalllogAdd %s", utils::to_string(rec).c_str());
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)) {
         auto records = *calllogResponse->records;
@@ -726,7 +727,7 @@ bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogRemove);
     msg->id                               = id;
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)) {
         return true;
@@ -742,7 +743,7 @@ bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec)
 
     LOG_DEBUG("CalllogUpdate %s", utils::to_string(rec).c_str());
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)) {
         return true;
@@ -756,7 +757,7 @@ uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv, EntryState state)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogGetCount>(state);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)) {
         return calllogResponse->count;
@@ -772,7 +773,7 @@ bool DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, ui
     msg->offset                           = offset;
     msg->limit                            = limit;
 
-    sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+    sys::Bus::SendUnicast(msg, service::name::db, serv);
     return true;
 }
 
@@ -781,7 +782,7 @@ uint32_t DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc)
     std::shared_ptr<DBCountryCodeMessage> msg =
         std::make_shared<DBCountryCodeMessage>(MessageType::DBCountryCode, mcc, 0);
 
-    auto ret                               = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto ret                               = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBCountryCodeResponseMessage *response = reinterpret_cast<DBCountryCodeResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success) {
         return (response->row.country_code);

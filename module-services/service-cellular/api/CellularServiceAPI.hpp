@@ -1,14 +1,4 @@
-/*
- *  @file CellularServiceAPI.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 09.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_CELLULARSERVICEAPI_HPP
-#define PUREPHONE_CELLULARSERVICEAPI_HPP
+#pragma once
 
 #include "../messages/CellularMessage.hpp"
 #include "utf8/UTF8.hpp"
@@ -57,5 +47,3 @@ namespace CellularServiceAPI
     bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
 }; // namespace CellularServiceAPI
-
-#endif // PUREPHONE_CELLULARSERVICEAPI_HPP
