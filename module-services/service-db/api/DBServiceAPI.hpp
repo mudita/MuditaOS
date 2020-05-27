@@ -9,7 +9,9 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Bus.hpp"
+
 #include <Common/Query.hpp>
+#include <PhoneNumber.hpp>
 
 class DBServiceAPI
 {
@@ -87,6 +89,16 @@ class DBServiceAPI
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
+
+    /**
+     * @brief Matches single Contact by a provided phone number
+     *
+     * @param serv - calling service
+     * @param numberView - number to match contact with
+     * @return std::unique_ptr<ContactRecord>
+     */
+    static std::unique_ptr<ContactRecord> MatchContactByPhoneNumber(sys::Service *serv,
+                                                                    const utils::PhoneNumber::View &numberView);
     static bool ContactAdd(sys::Service *serv, const ContactRecord &rec);
     static bool ContactRemove(sys::Service *serv, uint32_t id);
     static bool ContactUpdate(sys::Service *serv, const ContactRecord &rec);

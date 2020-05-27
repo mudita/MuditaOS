@@ -132,7 +132,7 @@ namespace gui
                                       Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
         numberPrimaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
-                return app::call(application, contact->numbers[0].numberE164);
+                return app::call(application, contact->numbers[0].number);
             }
             LOG_DEBUG("numberPrimayLabel->inputCallback just return false");
             return (false);
@@ -158,9 +158,7 @@ namespace gui
         numberPrimaryMessageLabel->setPenFocusWidth(3);
         numberPrimaryMessageLabel->setPenWidth(0);
         numberPrimaryMessageLabel->activatedCallback = [=](Item &item) {
-            LOG_ERROR("TODO missing support for libphonenumber in phonebook, simply open new messagew window");
-            return app::sms(
-                application, app::SmsOperation::New, utils::PhoneNumber::View()); // get number from primary number
+            return app::sms(application, app::SmsOperation::New, contact->numbers[0].number);
         };
 
         numberPrimaryMessage = new Image(this, 401, 248, 32, 32, "mail");
@@ -191,7 +189,7 @@ namespace gui
         numberSecondaryLabel->setPenWidth(0);
         numberSecondaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER) {
-                return app::call(application, contact->numbers[1].numberE164);
+                return app::call(application, contact->numbers[1].number);
             }
             return (false);
         };
@@ -212,9 +210,7 @@ namespace gui
         numberSecondaryMessageLabel->setPenFocusWidth(3);
         numberSecondaryMessageLabel->setPenWidth(0);
         numberSecondaryMessageLabel->activatedCallback = [=](Item &item) {
-            LOG_ERROR("TODO missing support for libphonenumber in phonebook, simply open new messagew window");
-            return app::sms(
-                application, app::SmsOperation::New, utils::PhoneNumber::View()); // get number from secondary number
+            return app::sms(application, app::SmsOperation::New, contact->numbers[1].number);
         };
 
         numberSecondaryMessage = new Image(this, 401, 306, 32, 32, "mail");
@@ -388,7 +384,7 @@ namespace gui
         }
 
         if (contact->numbers.size() == 1) {
-            numberPrimary->setText(contact->numbers[0].numberUser);
+            numberPrimary->setText(contact->numbers[0].number.getFormatted());
 
             numberSecondary->setVisible(false);
             numberSecondaryLabel->setVisible(false);
@@ -408,8 +404,8 @@ namespace gui
 
         if (contact->numbers.size() == 2) {
 
-            numberPrimary->setText(contact->numbers[0].numberUser);
-            numberSecondary->setText(contact->numbers[1].numberUser);
+            numberPrimary->setText(contact->numbers[0].number.getFormatted());
+            numberSecondary->setText(contact->numbers[1].number.getFormatted());
             email->setY(363);
             addressLabel->setY(429);
             address->setY(475);

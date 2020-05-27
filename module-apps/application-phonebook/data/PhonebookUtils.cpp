@@ -2,8 +2,8 @@
 
 auto PhonebookUtils::formatVCard(const ContactRecord &contact) -> const std::string
 {
-    const std::string priNumber = (contact.numbers.size() > 0) ? contact.numbers[0].numberE164.c_str() : "";
-    const std::string secNumber = (contact.numbers.size() > 1) ? contact.numbers[1].numberE164.c_str() : "";
+    const std::string priNumber = (contact.numbers.size() > 0) ? contact.numbers[0].number.getE164().c_str() : "";
+    const std::string secNumber = (contact.numbers.size() > 1) ? contact.numbers[1].number.getE164().c_str() : "";
     std::ostringstream vcard;
     vcard << "BEGIN:VCARD\n"
           << "VERSION:3.0\n"

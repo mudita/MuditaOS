@@ -2,6 +2,7 @@
 
 #include "application-phonebook/data/PhonebookItemData.hpp"
 
+#include <PhoneNumber.hpp>
 #include <Text.hpp>
 
 namespace gui
@@ -97,7 +98,8 @@ namespace gui
         void setContactData();
         void saveStateChanged();
         const std::string getCountryPrefix();
-        void showDialogDuplicatedNumber(ContactRecord &newContactRecord, const UTF8 duplicatedNumber);
+        void showDialogDuplicatedNumber(ContactRecord &newContactRecord,
+                                        const utils::PhoneNumber::View &duplicatedNumber);
         void showDialogDuplicatedSpeedDialNumber(ContactRecord &newContactRecord);
     };
 

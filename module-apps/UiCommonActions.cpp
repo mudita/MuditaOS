@@ -24,7 +24,7 @@ namespace app
         assert(app != nullptr);
 
         if (contact.numbers.size() != 0) {
-            return call(app, std::string(contact.numbers[0].numberE164));
+            return call(app, contact.numbers[0].number);
         }
         else {
             LOG_ERROR("No contact numbers!");
@@ -39,11 +39,6 @@ namespace app
 
         return sapm::ApplicationManager::messageSwitchApplication(
             app, name_call, window::name_enterNumber, std::move(data));
-    }
-
-    bool call(Application *app, const std::string &e164number)
-    {
-        return call(app, utils::PhoneNumber::parse(e164number));
     }
 
     bool prepare_call(Application *app, const std::string &number)

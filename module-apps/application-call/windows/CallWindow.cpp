@@ -270,21 +270,14 @@ namespace gui
             return false;
         }
 
-        auto records            = DBServiceAPI::ContactGetByPhoneNumber(this->application, phoneNumber.getEntered());
+        auto contact            = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
         std::string displayName = phoneNumber.getFormatted();
-        if (records->size() == 1) {
-            auto rec = records->operator[](0);
+        if (contact) {
             LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
                      phoneNumber.getEntered().c_str(),
-                     rec.ID,
-                     rec.getFormattedName().c_str());
-            displayName = rec.getFormattedName();
-        }
-        else if (records->size() > 1) {
-            LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.getEntered().c_str());
-            for (auto i : *records) {
-                LOG_ERROR("contact id = %" PRIu32 ", name = %s", i.ID, i.getFormattedName().c_str());
-            }
+                     contact->ID,
+                     contact->getFormattedName().c_str());
+            displayName = contact->getFormattedName();
         }
         else {
             LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());

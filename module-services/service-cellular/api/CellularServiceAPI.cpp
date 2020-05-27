@@ -21,7 +21,7 @@
 
 bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {
-    auto msg                          = std::make_shared<CellularCallRequestMessage>(number.makeView());
+    auto msg                          = std::make_shared<CellularCallRequestMessage>(number.getView());
     auto ret                          = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
     CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {

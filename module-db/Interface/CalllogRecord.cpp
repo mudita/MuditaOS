@@ -23,7 +23,7 @@
 CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
     : Record{tableRow.ID}, presentation(tableRow.presentation), date(tableRow.date), duration(tableRow.duration),
       type(tableRow.type), name(tableRow.name), contactId(tableRow.contactId),
-      phoneNumber(utils::PhoneNumber::validateNumber(tableRow.e164number, tableRow.number))
+      phoneNumber(utils::PhoneNumber(tableRow.number, tableRow.e164number).getView())
 {}
 
 uint32_t CalllogRecord::getContactId() const
@@ -57,16 +57,14 @@ CalllogRecordInterface::~CalllogRecordInterface()
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec =
-        contactInterface.GetByNumber(rec.phoneNumber.getNonEmpty(), ContactRecordInterface::CreateTempContact::True);
-    if (contactRec->size() == 0) {
+    auto contactRec = contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
+    if (!contactRec) {
         LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
         return false;
     }
     auto localRec      = rec;
-    auto contact       = (*contactRec)[0];
-    localRec.contactId = std::to_string(contact.ID);
-    localRec.name      = contact.getFormattedName();
+    localRec.contactId = std::to_string(contactRec->ID);
+    localRec.name      = contactRec->getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
     return calllogDB->calls.Add(CalllogTableRow{.ID           = localRec.ID, // this is only to remove warning
