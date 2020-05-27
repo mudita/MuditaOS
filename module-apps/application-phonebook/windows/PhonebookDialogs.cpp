@@ -184,17 +184,17 @@ void PhonebookBlockContact::setContactData()
 }
 
 DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)
-    : Dialog(app,
-             gui::window::name::duplicatedContact,
-             {
-                 .title  = "",
-                 .icon   = "info_big_circle_W_G",
-                 .text   = utils::localize.get("app_phonebook_duplicate_speed_dial"),
-                 .action = []() -> bool {
-                     LOG_INFO("!");
-                     return true;
-                 },
-             })
+    : DialogYesNo(app,
+                  gui::window::name::duplicatedContact,
+                  {
+                      .title  = "",
+                      .icon   = "info_big_circle_W_G",
+                      .text   = utils::localize.get("app_phonebook_duplicate_speed_dial"),
+                      .action = []() -> bool {
+                          LOG_INFO("!");
+                          return true;
+                      },
+                  })
 {}
 
 bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)

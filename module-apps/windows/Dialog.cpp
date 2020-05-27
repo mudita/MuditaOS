@@ -39,11 +39,8 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     : gui::AppWindow(app, name), meta(meta)
 {
     AppWindow::buildInterface();
-    // TODO fix elements positioning with styles ready, right now copied from Phonebook as it is
 
-    topBar->setActive(TopBar::Elements::TIME, true); // TODO: alek: to be or not to be?
-    bottomBar->setActive(BottomBar::Side::LEFT, false);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
+    topBar->setActive(TopBar::Elements::TIME, true);
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
     setTitle(meta.title);
@@ -59,57 +56,40 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 }
 
-bool Dialog::onInput(const InputEvent &inputEvent)
-{
-    return AppWindow::onInput(inputEvent);
-}
-
-void Dialog::buildInterface()
-{}
-
 void Dialog::update(const Meta &meta)
 {
-    erase(no);
-    erase(yes);
-    setFocusItem(nullptr);
-
     this->meta = meta;
     setTitle(meta.title);
     text->setText(meta.text);
     icon->set(meta.icon);
-
-    switch (meta.options) {
-    case Options::onlyOk: {
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
-        setFocusItem(icon);
-        icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
-                return true;
-            }
-            return false;
-        };
-        icon->activatedCallback = [=](Item &) -> bool { return meta.action(); };
-    } break;
-    case Options::onlyBack: {
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-    } break;
-    case Options::haveChoice: {
-        setupChoice();
-    } break;
-    default:
-        LOG_ERROR("Not supported option");
-    }
+    // meta.action not used
 }
 
-void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
+DialogConfirm::DialogConfirm(app::Application *app, const std::string &name, const Dialog::Meta &meta)
+    : Dialog(app, name, meta)
 {
+    bottomBar->setActive(BottomBar::Side::RIGHT, false);
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+    setFocusItem(icon);
+    icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
+        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
+            return true;
+        }
+        return false;
+    };
+    // Title not set
+    setTitle("");
 }
 
-void Dialog::setupChoice()
+void DialogConfirm::update(const Meta &meta)
 {
-    erase(no);
+    Dialog::update(meta);
+
+    icon->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+}
+
+DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const Meta &meta) : Dialog(app, name, meta)
+{
     no = new Label(
         this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get(style::strings::common::no));
     no->setPenWidth(0);
@@ -124,7 +104,6 @@ void Dialog::setupChoice()
         return true;
     };
 
-    erase(yes);
     yes = new Label(this,
                     style::yes::x,
                     style::yes::y,
@@ -146,6 +125,15 @@ void Dialog::setupChoice()
     yes->setNavigationItem(NavigationDirection::RIGHT, no);
 
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
+
+    setFocusItem(no);
+}
+
+void DialogYesNo::update(const Meta &meta)
+{
+    Dialog::update(meta);
+
+    yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
 
     setFocusItem(no);
 }

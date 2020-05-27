@@ -14,12 +14,13 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string dialog             = "Dialog";
-            inline const std::string thread_search_none = "SearchNone";
-            inline const std::string new_sms            = "NewSMS";
-            inline const std::string thread_sms_search  = "SMSSearch";
-            inline const std::string sms_templates      = "SMSTemplates";
-            inline const std::string thread_view        = "ThreadViewWindow";
+            inline const std::string dialog_yes_no     = "DialogYesNo";
+            inline const std::string dialog_confirm    = "DialogConfirm";
+            inline const std::string dialog            = "Dialog";
+            inline const std::string new_sms           = "NewSMS";
+            inline const std::string thread_sms_search = "SMSSearch";
+            inline const std::string sms_templates     = "SMSTemplates";
+            inline const std::string thread_view       = "ThreadViewWindow";
 
         }; // namespace window
     };     // namespace name
