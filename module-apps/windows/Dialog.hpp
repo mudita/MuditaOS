@@ -18,7 +18,7 @@ namespace gui
       public:
         struct Meta
         {
-            std::string title            = "No title";
+            std::string title;
             UTF8 icon                    = "";
             UTF8 text                    = "No text";
             std::function<bool()> action = []() -> bool { return false; };
