@@ -82,13 +82,12 @@ namespace gui
         text->setPenWidth(style::window::default_border_focucs_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         text->activatedCallback = [&](gui::Item &item) {
-            if (text->getText().length() == 0) {
-                LOG_DEBUG("No text to send in SMS");
-                return true;
-            }
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            return app->sendSms(contact->numbers[0].numberE164.c_str(), text->getText());
+            if (app->handleSendSmsFromThread(contact->numbers[0].numberE164.c_str(), text->getText())) {
+                LOG_ERROR("handleSendSmsFromThread failed");
+            }
+            return true;
         };
         text->inputCallback = [=](Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {

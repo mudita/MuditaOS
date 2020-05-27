@@ -57,7 +57,8 @@ namespace app
         bool showSearchResults(const UTF8 &title, const UTF8 &search_text);
         bool sendSms(const UTF8 &number, const UTF8 &body);
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
-        bool smsErrorNotification(std::function<bool()> action);
+        bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
+        bool handleSendSmsFromThread(const UTF8 &number, const UTF8 &body);
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;
