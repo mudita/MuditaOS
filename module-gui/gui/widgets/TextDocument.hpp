@@ -10,7 +10,6 @@ namespace gui
       public:
         TextDocument(const UTF8 &text = "");
 
-        // TODO use TextBlock and TextBlocks instead, make some "logic"
         std::list<TextBlock *> splitToTextBlock(const UTF8 &text) // text
         {
             std::list<TextBlock *> lines;
@@ -32,7 +31,6 @@ namespace gui
         // pointer to the last visible line.
         std::list<TextBlock *>::iterator lastLine = lines.end();
 
-        // TODO make private
         std::list<TextBlock *>::iterator getTextBlockByCursorRow(unsigned int row)
         {
             if (row >= std::distance(firstLine, lines.end())) {
@@ -43,7 +41,6 @@ namespace gui
 
         unsigned int getVisibleRowCount()
         {
-            // TODO FIX IT!!!!!!!!!!
             if (*firstLine >= *lastLine) {
                 return 0;
             }
@@ -63,11 +60,5 @@ namespace gui
             destroy();
         }
 
-        // Instead working on TextBlock -> work on TextBlock ( Text & it's params (underline, bold, size etc) )
-        //        // TODO -> add whole chunk
-        //        void addTextBlock();
-        //
-        //        // TODO -> append to current chunk
-        //        void addTextChar();
     };
 }; // namespace gui

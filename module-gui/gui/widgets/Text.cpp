@@ -34,7 +34,6 @@ namespace gui
         cursor          = new TextCursor(this);
 
         document = std::make_unique<TextDocument>(text);
-        // TODO move to TextDocument
         splitTextToLines(text);
 
         setBorderColor(gui::ColorFullBlack);
@@ -143,7 +142,6 @@ namespace gui
         recalculateDrawParams();
     }
 
-    // TODO full separation TextDocument <>--TextBlock <==> TextBlock (sick)
     void Text::splitTextToLines(const UTF8 &text)
     {
         if (text.length() == 0) {
