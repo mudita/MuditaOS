@@ -5,7 +5,7 @@
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName)
+ServiceDesktop::ServiceDesktop() : sys::Service(serviceName, "", 8192)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 
@@ -44,7 +44,9 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
 {
     sdesktop::UpdateOsMessage *updateOs = static_cast<sdesktop::UpdateOsMessage *>(msg);
     if (updateOs) {
-        LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "", updateOs->updateFile.c_str(), updateOs->uuid);
+        LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
+                  updateOs->updateFile.c_str(),
+                  updateOs->uuid);
         updateOS->runUpdate(updateOs->updateFile);
     }
     return std::make_shared<sys::ResponseMessage>();

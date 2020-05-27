@@ -47,7 +47,9 @@ namespace updateos
         CantOpenUpdateFile,
         CantDeletePreviousOS,
         CantRenameCurrentToPrevious,
-        CantRenameTempToCurrent
+        CantRenameTempToCurrent,
+        CantUpdateINI,
+        CantSaveINI
     };
 }; // namespace updateos
 

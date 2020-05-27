@@ -88,9 +88,9 @@ const fs::path vfs::getCurrentBootIni()
     return ("");
 }
 
-vfs::FILE *vfs::fopen(const char *filename, const char *mode)
+vfs::FILE *vfs::fopen(const char *filename, const char *mode, const bool bypassRootCheck)
 {
-    return ff_fopen(relativeToRoot(filename).c_str(), mode);
+    return ff_fopen(bypassRootCheck ? filename : relativeToRoot(filename).c_str(), mode);
 }
 
 int vfs::fclose(FILE *stream)
@@ -330,7 +330,7 @@ bool vfs::fileExists(const char *path)
 
 int vfs::deltree(const char *path)
 {
-    return (deltree(path));
+    return (ff_deltree(path));
 }
 
 int vfs::mkdir(const char *dir)
@@ -341,4 +341,9 @@ int vfs::mkdir(const char *dir)
 int vfs::rename(const char *oldname, const char *newname)
 {
     return (ff_rename(oldname, newname, true));
+}
+
+std::string vfs::lastErrnoToStr()
+{
+    return (strerror(stdioGET_ERRNO()));
 }

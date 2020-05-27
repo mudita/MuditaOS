@@ -22,6 +22,8 @@
 #include <string.h>
 #include <log/log.hpp>
 
+extern int errno;
+
 namespace fs = std::filesystem;
 
 vfs::vfs()
@@ -41,9 +43,9 @@ std::string vfs::relativeToRoot(const std::string path)
     return ((osRootPath / fs::path(path).relative_path()).relative_path());
 }
 
-FILE *vfs::fopen(const char *filename, const char *mode)
+vfs::FILE *vfs::fopen(const char *filename, const char *mode, const bool bypassRootCheck)
 {
-    return std::fopen(relativeToRoot(filename).c_str(), mode);
+    return std::fopen(bypassRootCheck ? filename : relativeToRoot(filename).c_str(), mode);
 }
 
 int vfs::fclose(FILE *stream)
@@ -127,7 +129,7 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 {
     std::vector<DirectoryEntry> dir_list;
     FileAttributes attribute = FileAttributes::ReadOnly;
-    size_t fileSize = 0;
+    size_t fileSize          = 0;
 
     for (auto &p : fs::directory_iterator(relativeToRoot(path))) {
         if (fs::is_directory(p)) {
@@ -191,4 +193,47 @@ std::string vfs::getline(FILE *stream, uint32_t length)
 vfs::FilesystemStats vfs::getFilesystemStats()
 {
     return (vfs::FilesystemStats());
+}
+
+bool vfs::isDir(const char *path)
+{
+    struct stat fileStatus;
+
+    const int ret = stat(path, &fileStatus);
+    if (ret == 0) {
+        return (S_ISDIR(fileStatus.st_mode));
+    }
+    else {
+        return (false);
+    }
+}
+
+bool vfs::fileExists(const char *path)
+{
+    struct stat fileStatus;
+    const int ret = stat(path, &fileStatus);
+    if (ret == 0) {
+        return (true);
+    }
+    return (false);
+}
+
+int vfs::deltree(const char *path)
+{
+    return (deltree(path));
+}
+
+int vfs::mkdir(const char *dir)
+{
+    return (mkdir(dir));
+}
+
+int vfs::rename(const char *oldname, const char *newname)
+{
+    return (rename(oldname, newname));
+}
+
+std::string vfs::lastErrnoToStr()
+{
+    return (strerror(errno));
 }

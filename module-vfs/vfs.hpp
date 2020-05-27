@@ -40,12 +40,6 @@ namespace fs = std::filesystem;
 
 namespace purefs
 {
-    namespace file
-    {
-        const inline fs::path boot_ini     = ".boot.ini";
-        const inline fs::path boot_ini_bak = ".boot.ini.bak";
-    }; // namespace file
-
     namespace dir
     {
         const inline fs::path eMMC_disk   = PATH_SYS;
@@ -54,6 +48,12 @@ namespace purefs
         const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
         const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
     } // namespace dir
+
+    namespace file
+    {
+        const inline fs::path boot_ini     = ".boot.ini";
+        const inline fs::path boot_ini_bak = ".boot.ini.bak";
+    }; // namespace file
 
     namespace extension
     {
@@ -72,6 +72,10 @@ namespace purefs
     {
         const inline std::string main    = "main";
         const inline std::string os_type = "ostype";
+
+        const inline std::string os_git_tag      = "git_tag";
+        const inline std::string os_git_revision = "git_commit";
+        const inline std::string os_git_branch   = "git_branch";
     } // namespace ini
 };    // namespace purefs
 
@@ -98,8 +102,7 @@ class vfs
         uint32_t fileSize;
         json11::Json to_json() const
         {
-            return (json11::Json::object{
-                {"name", fileName}, {"size", std::to_string(fileSize)}});
+            return (json11::Json::object{{"name", fileName}, {"size", std::to_string(fileSize)}});
         }
     };
 
@@ -116,7 +119,7 @@ class vfs
 
     void Init();
 
-    FILE *fopen(const char *filename, const char *mode);
+    FILE *fopen(const char *filename, const char *mode, const bool bypassRootCheck = false);
 
     int fclose(FILE *stream);
 
@@ -159,6 +162,7 @@ class vfs
     FilesystemStats getFilesystemStats();
 
     std::string relativeToRoot(const std::string path);
+    std::string lastErrnoToStr();
     bool isDir(const char *path);
     bool fileExists(const char *path);
     int deltree(const char *path);

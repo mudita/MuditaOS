@@ -23,14 +23,13 @@ namespace sdesktop
     {
       public:
         UpdateOsMessage(MessageType messageType, const std::string updateFilePath, const uint32_t requestUUID)
-            : sys::DataMessage(messageType), updateFile(updateFilePath), uuid(requestUUID)
-            {};
+            : sys::DataMessage(messageType), updateFile(updateFilePath), uuid(requestUUID){};
         virtual ~UpdateOsMessage(){};
 
         std::string updateFile;
         uint32_t uuid;
     };
-}; // namespace ServiceDesktop
+}; // namespace sdesktop
 
 class ServiceDesktop : public sys::Service
 {
