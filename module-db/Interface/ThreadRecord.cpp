@@ -10,6 +10,7 @@
 
 #include "ThreadRecord.hpp"
 #include "SMSRecord.hpp"
+#include "queries/sms/QuerySMSSearch.hpp"
 #include <cassert>
 #include <log/log.hpp>
 
@@ -126,4 +127,18 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
     }
     ThreadRecord a = ret[0];
     return a;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(const db::Query *query)
+{
+    if (const auto local_query = dynamic_cast<const db::query::SMSSearch *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<db::query::SMSSearchResult> ThreadRecordInterface::runQueryImpl(const db::query::SMSSearch *query)
+{
+    auto db_result = smsDB->threads.getBySMSQuery(query->text, query->starting_postion, query->depth);
+    return std::make_unique<db::query::SMSSearchResult>(db_result.first, db_result.second);
 }

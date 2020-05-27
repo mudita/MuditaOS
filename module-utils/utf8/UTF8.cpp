@@ -82,7 +82,7 @@ UTF8::UTF8()
 {
     data
 }
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
 , operator_index_iterations
 {
     0
@@ -107,7 +107,7 @@ UTF8::UTF8(const char *str)
     }
     strLength = getCharactersCount(reinterpret_cast<const char *>(data));
     lastIndex = 0;
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
     operator_index_iterations = 0;
 #endif
 }
@@ -125,7 +125,7 @@ UTF8::UTF8(const std::string &str)
     }
     strLength = getCharactersCount(reinterpret_cast<const char *>(data));
     lastIndex = 0;
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
     operator_index_iterations = 0;
 #endif
 }
@@ -155,7 +155,7 @@ UTF8::UTF8(const UTF8 &utf)
     }
     lastIndex     = 0;
     lastIndexData = data;
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
     operator_index_iterations = 0;
 #endif
 }
@@ -179,7 +179,7 @@ UTF8::UTF8(const uint8_t *data, const uint32_t allocated, const uint32_t used, c
     }
     memcpy(this->data, data, allocated);
     lastIndexData = this->data;
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
     operator_index_iterations = 0;
 #endif
 }
@@ -293,13 +293,13 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
         dataPtr = data;
         charCnt = 0;
     }
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
     operator_index_iterations = 0;
 #endif
     while (charCnt != idx) {
         dataPtr += charLength(reinterpret_cast<const char *>(dataPtr));
         charCnt++;
-#ifdef BUILD_GTEST_TESTS
+#ifdef UNIT_TESTS
         operator_index_iterations++;
 #endif
     }
@@ -457,8 +457,8 @@ uint32_t UTF8::findLast(const char *s, uint32_t pos)
     if (pos < stringCount - 1)
         return npos;
 
-    uint32_t position         = 0;
-    uint8_t *dataPtr          = this->data;
+    uint32_t position          = 0;
+    uint8_t *dataPtr           = this->data;
     uint32_t lastFoundPosition = npos;
 
     // calculate position of last string to compare

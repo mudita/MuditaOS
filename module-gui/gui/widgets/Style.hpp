@@ -112,21 +112,22 @@ namespace style
     {
         namespace common
         {
-            const inline std::string open        = "common_open";
-            const inline std::string call        = "common_call";
-            const inline std::string send        = "common_send";
-            const inline std::string confirm     = "common_confirm";
-            const inline std::string select      = "common_select";
-            const inline std::string use         = "common_use";
-            const inline std::string ok          = "common_ok";
-            const inline std::string back        = "common_back";
-            const inline std::string set         = "common_set";
-            const inline std::string yes         = "common_yes";
-            const inline std::string no          = "common_no";
-            const inline std::string Switch      = "common_switch";
-            const inline std::string options     = "common_options";
-            const inline std::string information = "common_information";
-            const inline std::string search      = "common_search";
+            const inline std::string open           = "common_open";
+            const inline std::string call           = "common_call";
+            const inline std::string send           = "common_send";
+            const inline std::string confirm        = "common_confirm";
+            const inline std::string select         = "common_select";
+            const inline std::string use            = "common_use";
+            const inline std::string ok             = "common_ok";
+            const inline std::string back           = "common_back";
+            const inline std::string set            = "common_set";
+            const inline std::string yes            = "common_yes";
+            const inline std::string no             = "common_no";
+            const inline std::string Switch         = "common_switch";
+            const inline std::string options        = "common_options";
+            const inline std::string information    = "common_information";
+            const inline std::string search         = "common_search";
+            const inline std::string search_results = "common_search_results";
             // days
             const inline std::string Monday    = "common_monday";
             const inline std::string Tuesday   = "common_tuesday";

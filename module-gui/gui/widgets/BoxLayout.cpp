@@ -63,8 +63,10 @@ namespace gui
     {
         Rect::setSize(w, h);
 
-        for (auto it : outOfDrawAreaItems) {
-            it->setVisible(true);
+        if (children.size() != 0u) {
+            for (auto it : outOfDrawAreaItems) {
+                it->setVisible(true);
+            }
         }
         outOfDrawAreaItems.clear();
 

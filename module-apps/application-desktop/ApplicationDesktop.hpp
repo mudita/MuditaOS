@@ -53,7 +53,7 @@ namespace app
         bool getPinLocked();
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
         // done
-        bool handle(DBNotificationMessage *msg);
+        bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
         /**
          * This static method will be used to lock the phone

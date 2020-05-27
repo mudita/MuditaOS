@@ -1,5 +1,6 @@
 #include "ApplicationMessages.hpp"
 
+#include "application-messages/data/SMSTextToSearch.hpp"
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
@@ -39,9 +40,10 @@ namespace app
         }
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
-            DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
-            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB)) {
+            if ((msg != nullptr) &&
+                ((msg->interface == db::Interface::Name::SMS) || (msg->interface == db::Interface::Name::SMSThread))) {
                 this->windows[gui::name::window::thread_view]->rebuild();
                 this->windows[gui::name::window::main_window]->rebuild();
                 return std::make_shared<sys::ResponseMessage>();
@@ -55,6 +57,7 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBThreadGetLimitOffset:
+            case MessageType::DBQuery:
             case MessageType::DBSMSTemplateGetLimitOffset: {
                 if (getCurrentWindow()->onDatabaseMessage(resp))
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -138,14 +141,16 @@ namespace app
                         LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->dbID);
                         return false;
                     }
-                    return this->switchWindow(gui::name::window::main_window);
+                    this->switchWindow(gui::name::window::main_window);
+                    return true;
                 };
                 meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
                 auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
                 auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
                 meta.title      = cont.getFormattedName();
                 dialog->update(meta);
-                return switchWindow(gui::name::window::dialog, nullptr);
+                switchWindow(gui::name::window::dialog, nullptr);
+                return true;
             }
             else {
                 LOG_ERROR("Dialog bad type!");
@@ -165,12 +170,14 @@ namespace app
                     LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
                     return false;
                 }
-                return this->switchWindow(gui::name::window::thread_view);
+                this->switchWindow(gui::name::window::thread_view);
+                return true;
             };
             meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
             meta.title = record.body;
             dialog->update(meta);
-            return switchWindow(gui::name::window::dialog, nullptr);
+            switchWindow(gui::name::window::dialog, nullptr);
+            return true;
         }
         else {
             LOG_ERROR("Dialog bad type!");
@@ -186,14 +193,18 @@ namespace app
         meta.text  = utils::localize.get("app_messages_thread_no_result");
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
-        return switchWindow(gui::name::window::thread_search_none, nullptr);
+        auto data                        = std::make_unique<gui::SwitchData>();
+        data->ignoreCurrentWindowOnStack = true;
+        switchWindow(gui::name::window::thread_search_none, std::move(data));
+        return true;
     }
 
-    bool ApplicationMessages::showSearchResults(const UTF8 &title)
+    bool ApplicationMessages::showSearchResults(const UTF8 &title, const UTF8 &search_text)
     {
         auto name = gui::name::window::search_results;
         windows[name]->setTitle(title);
-        return switchWindow(name, nullptr);
+        switchWindow(name, std::make_unique<SMSTextToSearch>(search_text));
+        return true;
     }
 
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)

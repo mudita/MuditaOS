@@ -1,161 +1,275 @@
-/*
- * unittest_utf8.cpp
- *
- *  Created on: 29 kwi 2019
- *      Author: robert
- */
-
-#include <iostream>
-#include <string>
-#include <cstring>
-
-using namespace std;
+#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
 
 #include "utf8/UTF8.hpp"
 
-const char *strings[] = {
-    "TEST", "Rąbać", "I want to have pure phone", "Мой адрес: улица Тверская, дом пять, квартира семнадцать"};
-
-const char *strings2[] = {
-    "TEST\r", "Rąbać\n", "I want to have \rpure phone", "Мой адрес: улица Тверская, дом пять,\n квартира семнадцать"};
-
-void test_raw_char_constructor(const char *str)
+TEST_CASE("UTF8: operator index returns value")
 {
-    UTF8 ustr = UTF8{str};
-    cout << "    " << ustr.c_str() << " len: " << ustr.length() << " used bytes: " << ustr.used() << endl;
+    UTF8 ustr = UTF8("Rąbać");
+
+    REQUIRE((uint32_t)('R') == ustr[0]);
+    // Test "ą"
+    REQUIRE(0x00000105 == ustr[1]);
 }
 
-void test_string_constructor(const std::string &str)
+TEST_CASE("UTF8: operator index exceeds string size")
 {
-    UTF8 ustr = UTF8{str};
-    cout << "    " << ustr.c_str() << " len: " << ustr.length() << " used bytes: " << ustr.used() << endl;
+    UTF8 ustr = UTF8("Rąbać");
+
+    REQUIRE(0 == ustr[ustr.length() + 1]);
 }
 
-void test_copy_constructor(const std::string &str)
+TEST_CASE("UTF8: operator index last index clears")
 {
-    UTF8 bstr = UTF8{str};
-    UTF8 ustr = UTF8{bstr};
-    cout << "    " << ustr.c_str() << " len: " << ustr.length() << " used bytes: " << ustr.used() << endl;
+    UTF8 ustr = UTF8("Rąbać");
+
+    // last element - operator_index_iterations should be equal ustr.strLength - 1
+    ustr[ustr.length() - 1];
+    REQUIRE(ustr.length() - 1 == ustr.operator_index_iterations);
+    // next to last element - operator_index_iterations should be equal ustr.strLength - 2
+    // lastIndex should clear, lastIndex is lower than last time
+    ustr[ustr.length() - 2];
+    REQUIRE(ustr.length() - 2 == ustr.operator_index_iterations);
 }
 
-void test_operator_index(const std::string &str)
+TEST_CASE("UTF8: operator index last index increments")
 {
-    UTF8 ustr = UTF8{str};
-    char s[4] = {0, 0, 0, 0};
+    UTF8 ustr = UTF8("Rąbać");
 
-    cout << "    ";
-    for (uint32_t i = 0; i < ustr.length(); i++) {
-        uint32_t value = ustr[i];
-        memcpy(s, &value, 4);
-        cout << s;
+    for (uint32_t i = 1; i < ustr.length(); i++) {
+        ustr[i];
+        REQUIRE(1 == ustr.operator_index_iterations);
     }
-    cout << endl;
 }
 
-void test_split(const std::string &str)
+TEST_CASE("UTF8: operator index last index counting")
 {
-    UTF8 sourceString = UTF8{str};
+    UTF8 ustr = UTF8("Rąbać");
 
-    uint32_t divisionIdx = sourceString.length() / 2;
-
-    cout << "    "
-         << "Before split." << endl;
-    cout << "        "
-         << "srcString:    [" << sourceString.c_str() << "]    len: " << sourceString.length()
-         << " used bytes: " << sourceString.used() << endl;
-    char s[4]      = {0, 0, 0, 0};
-    uint32_t value = sourceString[divisionIdx];
-    memcpy(s, &value, 4);
-    cout << "        "
-         << "division character: [" << s << "] division index: " << divisionIdx << endl;
-
-    UTF8 splitString = sourceString.split(divisionIdx);
-
-    cout << "    "
-         << "After split." << endl;
-    cout << "        "
-         << "srcString:    [" << sourceString.c_str() << "]    len: " << sourceString.length()
-         << " used bytes: " << sourceString.used() << endl;
-    cout << "        "
-         << "sptString:    [" << splitString.c_str() << "]    len: " << splitString.length()
-         << " used bytes: " << splitString.used() << endl;
-    cout << "        "
-         << "summary len: " << splitString.length() + sourceString.length()
-         << " summary used bytes : " << splitString.used() + sourceString.used() << endl;
-    cout << endl;
-}
-void test_getLine(const std::string &str)
-{
-    UTF8 ustr = UTF8{str};
-
-    UTF8 dstr = ustr.getLine();
-
-    cout << "    " << dstr.c_str() << endl;
+    // first element - operator_index_iterations should be equal 0
+    ustr[0];
+    REQUIRE(0 == ustr.operator_index_iterations);
+    // third element - operator_index_iterations should be equal 2
+    ustr[2];
+    REQUIRE(2 == ustr.operator_index_iterations);
+    // first element - operator_index_iterations should be equal 0
+    ustr[0];
+    REQUIRE(0 == ustr.operator_index_iterations);
+    // last element - operator_index_iterations should be equal ustr.strLength - 1
+    ustr[ustr.length() - 1];
+    REQUIRE(ustr.length() - 1 == ustr.operator_index_iterations);
 }
 
-void test_removeChar(const std::string &str, uint32_t i)
+TEST_CASE("UTF8: substr returns empty string when zero length is passed")
 {
-    UTF8 ustr(str);
+    UTF8 sourceString = UTF8("Rąbać drewno siekierą");
 
-    cout << "    Source: " << endl;
-    cout << "    " << ustr.c_str() << " len: " << ustr.length() << " used bytes: " << ustr.used() << endl;
-    // remove 'ś'
-    bool retVal = ustr.removeChar(i, i * 2);
-    cout << "    After remove: "
-         << " remove pos: " << i << " remove count: " << i * 2 << endl;
-    cout << "    " << ustr.c_str() << " len: " << ustr.length() << " used bytes: " << ustr.used()
-         << " returned value: " << retVal << endl;
+    UTF8 destinationString = sourceString.substr(1, 0);
+
+    REQUIRE(destinationString.length() == 0);
 }
 
-int main()
+TEST_CASE("UTF8: substr returns empty string when length is exceeded")
 {
+    UTF8 sourceString = UTF8("Rąbać drewno siekierą");
 
-    cout << "RUNNING UNIT TEST FOR UTF8" << endl;
+    uint32_t length        = sourceString.length() + 5;
+    UTF8 destinationString = sourceString.substr(1, length);
 
-    cout << "UTF8( const char* str )" << endl;
-    for (uint32_t i = 0; i < sizeof(strings) / sizeof(char *); ++i)
-        test_raw_char_constructor(strings[i]);
-    cout << endl;
+    REQUIRE(destinationString.length() == 0);
+}
 
-    cout << "UTF8( const std::string& str )" << endl;
-    for (uint32_t i = 0; i < sizeof(strings) / sizeof(char *); ++i)
-        test_string_constructor(std::string{strings[i]});
-    cout << endl;
-
-    // copy constructor
-    cout << "UTF8( const UTF8& utf )" << endl;
-    for (uint32_t i = 0; i < sizeof(strings) / sizeof(char *); ++i) {
-        test_copy_constructor(std::string{strings[i]});
-    }
-    cout << endl;
-
-    cout << "uint32_t operator[]( const uint32_t& idx ) " << endl;
-    for (uint32_t i = 0; i < sizeof(strings) / sizeof(char *); ++i) {
-        test_operator_index(std::string{strings[i]});
-    }
-    cout << endl;
-
-    cout << "UTF8 split( uint32_t idx ) " << endl;
-    for (uint32_t i = 0; i < sizeof(strings) / sizeof(char *); ++i) {
-        test_split(std::string{strings[i]});
-    }
-    cout << "UTF8 getLine( void ) " << endl;
-    for (uint32_t i = 0; i < sizeof(strings2) / sizeof(char *); ++i) {
-        test_getLine(std::string{strings2[i]});
-    }
-    cout << endl;
-    cout << "bool removeChar(uint32_t pos, uint32_t count) " << endl;
-    for (uint32_t i = 0; i < sizeof(strings) / sizeof(char *); ++i) {
-        test_removeChar(std::string{strings[i]}, i);
-    }
-    cout << endl;
-
+TEST_CASE("UTF8: substr returns proper begin char")
+{
     UTF8 sourceString      = UTF8("Rąbać drewno siekierą");
     UTF8 destinationString = sourceString.substr(0, 5);
 
-    cout << "UTF8 : " << '[' << sourceString.c_str() << ']' << endl;
-    cout << "UTF8 substr: " << '[' << destinationString.c_str() << ']' << endl;
+    REQUIRE(destinationString[0] == sourceString[0]);
+}
 
-    cout << "" << endl; // prints
-    return 0;
+TEST_CASE("UTF8: substr returns proper string length")
+{
+    UTF8 sourceString = UTF8("Rąbać drewno siekierą");
+    uint32_t length   = sourceString.length();
+    uint32_t position = 0;
+    while (length > 1) {
+        UTF8 destinationString = sourceString.substr(position, length);
+        REQUIRE(destinationString.length() == length);
+        position++;
+        length--;
+    }
+}
+
+TEST_CASE("UTF8: find returns npos if not found")
+{
+    UTF8 sourceString   = UTF8("AaBbCcŃń");
+    const char *to_find = "E";
+    REQUIRE(-1 == sourceString.find(to_find));
+}
+
+TEST_CASE("UTF8: find returns npos if pos exceeds string length")
+{
+    UTF8 sourceString   = UTF8("AaBbCcŃń");
+    const char *to_find = "A";
+    REQUIRE(-1 == sourceString.find(to_find, sourceString.length() + 5));
+}
+
+TEST_CASE("UTF8: find returns position of passed string")
+{
+    std::string base("AaBbCcŃń");
+    UTF8 sourceString = UTF8("AaBbCcŃń");
+
+    const char *to_find   = "Ń";
+    int32_t base_position = base.find(to_find);
+
+    REQUIRE(base_position == sourceString.find(to_find));
+}
+
+TEST_CASE("UTF8: find returns position of passed string when pos is passed")
+{
+    std::string base("Aa Bb aCcŃń");
+    UTF8 sourceString = UTF8("Aa Bb aCcŃń");
+
+    const char *to_find   = "a";
+    int32_t base_position = base.find(to_find, 3);
+
+    REQUIRE(base_position == sourceString.find(to_find, 3));
+}
+
+TEST_CASE("UTF8: findLast returns npos if not found")
+{
+    UTF8 sourceString   = UTF8("AaBbCcŃń");
+    const char *to_find = "E";
+    REQUIRE(-1 == sourceString.findLast(to_find, sourceString.length() - 1));
+}
+
+TEST_CASE("UTF8: findLast returns npos if pos exceeds string length")
+{
+    UTF8 sourceString   = UTF8("AaBbCcŃń");
+    const char *to_find = "A";
+    REQUIRE(-1 == sourceString.findLast(to_find, sourceString.length() + 5));
+}
+
+TEST_CASE("UTF8: findLast returns position of passed string")
+{
+    std::string base("AaBbCcŃń");
+    UTF8 sourceString = UTF8("AaBbCcŃń");
+
+    const char *to_find   = "Ń";
+    int32_t base_position = base.find(to_find);
+
+    REQUIRE(base_position == sourceString.findLast(to_find, sourceString.length() - 1));
+}
+
+TEST_CASE("UTF8: findLast returns position of passed string when pos is passed")
+{
+    std::string base("Aa Bb aCcŃń");
+    UTF8 sourceString = UTF8("Aa Bb aCcŃń");
+
+    const char *to_find   = "a";
+    int32_t base_position = 1;
+
+    REQUIRE(base_position == sourceString.findLast(to_find, 3));
+}
+
+TEST_CASE("UTF8: split returns empty object if idx exceeds string length")
+{
+    UTF8 sourceString("String testowy PODZIAŁ string testowy");
+
+    UTF8 destinationString = sourceString.split(sourceString.length() + 10);
+    REQUIRE(0 == destinationString.length());
+}
+
+TEST_CASE("UTF8: split returns propper string")
+{
+    UTF8 sourceString("String testowy PODZIAŁ string testowy");
+    UTF8 expected("PODZIAŁ string testowy");
+
+    int32_t divisionIdx    = sourceString.find("PODZIAŁ");
+    UTF8 destinationString = sourceString.split(divisionIdx);
+    REQUIRE(expected == destinationString);
+}
+
+TEST_CASE("UTF8: split strings have propper length after split")
+{
+    UTF8 sourceString("String testowy Ąą Ćć ńźżę PODZIAŁ string testowy Łłódź ");
+    UTF8 expectedSource("String testowy Ąą Ćć ńźżę ");
+    UTF8 expectedDestination("PODZIAŁ string testowy Łłódź ");
+
+    int32_t divisionIdx = sourceString.find("PODZIAŁ");
+
+    UTF8 destinationString = sourceString.split(divisionIdx);
+
+    REQUIRE(expectedSource.length() == sourceString.length());
+    REQUIRE(expectedDestination.length() == destinationString.length());
+}
+
+TEST_CASE("UTF8: split summary length is equal after split")
+{
+    UTF8 sourceString("String testowy Ąą Ćć ńźżę PODZIAŁ string testowy Łłódź ");
+    int32_t divisionIdx = sourceString.find("PODZIAŁ");
+
+    uint32_t lengthBeforeSplit = sourceString.length();
+
+    UTF8 destinationString = sourceString.split(divisionIdx);
+
+    uint32_t destinationStringLength = destinationString.length();
+    uint32_t sourceStringLesngth     = sourceString.length();
+
+    REQUIRE(lengthBeforeSplit == destinationStringLength + sourceStringLesngth);
+}
+
+TEST_CASE("UTF8: getLine returns empty string if its not line")
+{
+    UTF8 sourceString("ĄŚĆćśą Pierwsza linia Druga linia ");
+
+    UTF8 destinationString = sourceString.getLine();
+
+    REQUIRE(destinationString == UTF8(""));
+    REQUIRE(destinationString.length() == 0);
+}
+
+TEST_CASE("UTF8: getLine returns proper string when line ends with n")
+{
+    UTF8 sourceString("ĄŚĆćśą Pierwsza linia\n Druga linia ");
+
+    UTF8 destinationString = sourceString.getLine();
+
+    REQUIRE(destinationString == "ĄŚĆćśą Pierwsza linia");
+}
+
+TEST_CASE("UTF8: getLine returns proper string when line ends with r")
+{
+    UTF8 sourceString("ĄŚĆćśą Pierwsza linia\r Druga linia ");
+
+    UTF8 destinationString = sourceString.getLine();
+
+    REQUIRE(destinationString == "ĄŚĆćśą Pierwsza linia");
+}
+
+TEST_CASE("UTF8: removeChar returns false when string to remove exceed")
+{
+    UTF8 sourceString("Teścik");
+
+    bool retVal = sourceString.removeChar(2, sourceString.length() + 1);
+    REQUIRE_FALSE(retVal);
+}
+
+TEST_CASE("UTF8: removeChar returns false when pos to remove exceed")
+{
+    UTF8 sourceString("Teścik");
+
+    bool retVal = sourceString.removeChar(sourceString.length() + 1, 2);
+    REQUIRE_FALSE(retVal);
+}
+
+TEST_CASE("UTF8: removeChar returns propper string")
+{
+    UTF8 sourceString("Teścik");
+    UTF8 toCompare("Tecik");
+    // remove 'ś'
+    bool retVal = sourceString.removeChar(2, 1);
+    REQUIRE(retVal);
+    REQUIRE(toCompare.length() == sourceString.length());
+    REQUIRE(toCompare.used() == sourceString.used());
 }

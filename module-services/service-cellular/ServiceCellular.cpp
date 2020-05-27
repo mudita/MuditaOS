@@ -577,14 +577,14 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     } break;
     case MessageType::DBServiceNotification: {
-        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg == nullptr) {
             responseMsg = std::make_shared<CellularResponseMessage>(false);
             break;
         }
         LOG_DEBUG("Received multicast");
-        if ((msg->baseType == DB::BaseType::SmsDB) && ((msg->notificationType == DB::NotificationType::Updated) ||
-                                                       (msg->notificationType == DB::NotificationType::Added))) {
+        if (msg->interface == db::Interface::Name::SMS && (msg->type == db::NotificationMessage::Type::Create ||
+                                                           msg->type == db::NotificationMessage::Type::Update)) {
             sendSMS();
             return std::make_shared<sys::ResponseMessage>();
         }

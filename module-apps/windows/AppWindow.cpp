@@ -133,13 +133,16 @@ namespace gui
 
         switch (inputEvent.keyCode) {
         case KeyCode::KEY_VOLUP: {
-            return application->increaseCurrentVolume();
+            application->increaseCurrentVolume();
+            return true;
         }
         case KeyCode::KEY_VOLDN: {
-            return application->decreaseCurrentVolume();
+            application->decreaseCurrentVolume();
+            return true;
         }
         case KeyCode::KEY_RF: {
-            return application->returnToPreviousWindow();
+            application->returnToPreviousWindow();
+            return true;
         }
         default:
             break;

@@ -134,7 +134,8 @@ namespace app
             };
             meta.title = record.name;
             dialog->update(meta);
-            return switchWindow(calllog::settings::CallDeleteWindowStr, nullptr);
+            switchWindow(calllog::settings::CallDeleteWindowStr, nullptr);
+            return true;
         }
         else {
             LOG_ERROR("Dialog bad type!");
