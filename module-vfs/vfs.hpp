@@ -18,6 +18,7 @@
 #include <sbini/sbini.h>
 #include <crc32/crc32.h>
 #include <log/log.hpp>
+#include <json/json11.hpp>
 
 namespace fs = std::filesystem;
 
@@ -28,25 +29,32 @@ namespace fs = std::filesystem;
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
 
-#define PATH_USER "/user/"
-#define PATH_SYS  "/sys"
+#define PATH_USER     "/user/"
+#define PATH_SYS      "/sys"
+#define PATH_CURRENT  "current"
+#define PATH_PREVIOUS "previous"
+#define PATH_UPDATES  "updates"
 
 // this just concatenates two strings and creates a /user/ subdirectory filename
 #define USER_PATH(file) PATH_USER file
 
 namespace purefs
 {
+    namespace dir
+    {
+        const inline fs::path eMMC_disk   = PATH_SYS;
+        const inline fs::path user_disk   = PATH_USER;
+        const inline fs::path os_current  = eMMC_disk / PATH_CURRENT;
+        const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
+        const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
+    } // namespace dir
+
     namespace file
     {
         const inline fs::path boot_ini     = ".boot.ini";
         const inline fs::path boot_ini_bak = ".boot.ini.bak";
+        const inline fs::path boot_bin     = "boot.bin";
     }; // namespace file
-
-    namespace dir
-    {
-        const inline fs::path eMMC_disk = PATH_SYS;
-        const inline fs::path user_disk = PATH_USER;
-    } // namespace dir
 
     namespace extension
     {
@@ -56,14 +64,20 @@ namespace purefs
     namespace buffer
     {
         const inline int crc_buf       = 1024;
-        const inline int crc_char_size = 9;
+        const inline int crc_char_size = 9; // 9 ascii characters to store crc32 checksum
         const inline int crc_radix     = 16;
+        const inline int tar_buf       = 8192 * 4;
     } // namespace buffer
 
     namespace ini
     {
-        const inline std::string main    = "main";
-        const inline std::string os_type = "ostype";
+        const inline std::string main     = "main";
+        const inline std::string os_type  = "ostype";
+        const inline std::string os_image = "imagename";
+
+        const inline std::string os_git_tag      = "git_tag";
+        const inline std::string os_git_revision = "git_commit";
+        const inline std::string os_git_branch   = "git_branch";
     } // namespace ini
 };    // namespace purefs
 
@@ -88,6 +102,10 @@ class vfs
         std::string fileName;
         FileAttributes attributes;
         uint32_t fileSize;
+        json11::Json to_json() const
+        {
+            return (json11::Json::object{{"name", fileName}, {"size", std::to_string(fileSize)}});
+        }
     };
 
     struct FilesystemStats
@@ -103,7 +121,7 @@ class vfs
 
     void Init();
 
-    FILE *fopen(const char *filename, const char *mode);
+    FILE *fopen(const char *filename, const char *mode, const bool bypassRootCheck = false);
 
     int fclose(FILE *stream);
 
@@ -145,16 +163,23 @@ class vfs
 
     FilesystemStats getFilesystemStats();
 
+    std::string relativeToRoot(const std::string path);
+    std::string lastErrnoToStr();
+    bool isDir(const char *path);
+    bool fileExists(const char *path);
+    int deltree(const char *path);
+    int mkdir(const char *dir);
+    int rename(const char *oldname, const char *newname);
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
     FF_Disk_t *emmcFFDisk;
 #endif
-    std::string relativeToRoot(const std::string path);
 
     static void computeCRC32(FILE *file, unsigned long *outCrc32);
     static bool verifyCRC(const std::string filePath, const unsigned long crc32);
     static bool verifyCRC(const fs::path filePath);
+    static std::string generateRandomId(size_t length);
 
   private:
     bool getOSRootFromIni();
