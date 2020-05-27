@@ -61,6 +61,6 @@ namespace app
         void handleCallEvent(const std::string &number);
         void handleAddContactEvent(const std::string &number);
 
-        bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
+        bool showNotification(std::function<bool()> action);
     };
 } /* namespace app */
