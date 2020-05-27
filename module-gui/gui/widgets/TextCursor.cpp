@@ -4,6 +4,48 @@
 namespace gui
 {
 
+    TextCursor::TextCursor(gui::Item *parent) : Rect(parent, 0, 0, 1, 1)
+    {
+        setFilled(true);
+        setVisible(false);
+    }
+
+    [[nodiscard]] unsigned int TextCursor::getRow() const
+    {
+        return row;
+    }
+
+    [[nodiscard]] unsigned int TextCursor::getColumn() const
+    {
+        return column;
+    }
+
+    void TextCursor::setRow(unsigned int row)
+    {
+        this->row = row;
+    }
+
+    void TextCursor::setColumn(unsigned int column)
+    {
+        this->column = column;
+    }
+
+    void TextCursor::update(unsigned int row, unsigned int col)
+    {
+        this->row    = row;
+        this->column = col;
+    }
+
+    void TextCursor::reset()
+    {
+        update(0, 0);
+    }
+
+    [[nodiscard]] auto TextCursor::atTextBegin() const -> bool
+    {
+        return row == 0 && column == 0;
+    }
+
     bool TextCursor::move(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document, TextType type)
     {
 

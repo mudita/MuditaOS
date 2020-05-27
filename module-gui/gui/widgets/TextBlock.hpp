@@ -15,21 +15,7 @@ namespace gui
         uint32_t pixelLength = 0;
 
         TextBlock(const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength);
-        /**
-         * Returns text with appropriate ending.
-         */
-        UTF8 getText()
-        {
-            return text;
-        }
-        UTF8 getTextWithEnding()
-        {
-            UTF8 retText = text;
-            if (endType == LineEndType::BREAK)
-                retText.insert("\n");
-            else if (endType == LineEndType::CONTINUE_SPACE)
-                retText.insert(" ");
-            return retText;
-        }
+        UTF8 getText();
+        UTF8 getTextWithEnding();
     };
 } // namespace gui
