@@ -79,7 +79,14 @@ namespace gui
         }
 
         if (!Store::GSM::get()->simCardInserted()) {
-            return app->smsErrorNotification([=]() -> bool { return switchToThreadWindow(number); });
+            auto action = [=]() -> bool {
+                if (!switchToThreadWindow(number)) {
+                    LOG_ERROR("switchToThreadWindow failed");
+                }
+                return true;
+            };
+            app->showNotification(action, true);
+            return true;
         }
 
         return switchToThreadWindow(number);
@@ -186,7 +193,12 @@ namespace gui
         message->setPenWidth(style::window::messages::sms_border_no_focus);
         message->setFont(style::window::font::medium);
         message->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
-        message->activatedCallback    = [=](Item &) -> bool { return sendSms(); };
+        message->activatedCallback = [=](Item &) -> bool {
+            if (!sendSms()) {
+                LOG_ERROR("sendSms failed");
+            }
+            return true;
+        };
         message->focusChangedCallback = [=](Item &) -> bool {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
             bottomBar->setActive(BottomBar::Side::LEFT, true);
