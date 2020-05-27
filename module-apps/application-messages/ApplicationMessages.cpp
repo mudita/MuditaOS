@@ -214,7 +214,7 @@ namespace app
         auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
         assert(dialog);
         auto meta    = dialog->meta;
-        meta.icon    = "search_big";
+        meta.icon    = "info_big_circle_W_G";
         meta.text    = utils::localize.get("app_messages_no_sim");
         meta.title   = "";
         meta.options = gui::Dialog::Options::onlyOk;
