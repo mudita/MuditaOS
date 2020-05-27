@@ -5,45 +5,46 @@ project(module-db VERSION 1.0
 
 set(SOURCES
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/Database/Field.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Database/QueryResult.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Database/Database.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp
+        Database/Field.cpp
+        Database/QueryResult.cpp
+        Database/Database.cpp
+        Database/sqlite3.c
+        Database/sqlite3vfs.cpp
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/ContactsDB.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SmsDB.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SettingsDB.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/AlarmsDB.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/NotesDB.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/CalllogDB.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/CountryCodesDB.cpp
+        Databases/ContactsDB.cpp
+        Databases/SmsDB.cpp
+        Databases/SettingsDB.cpp
+        Databases/AlarmsDB.cpp
+        Databases/NotesDB.cpp
+        Databases/CalllogDB.cpp
+        Databases/CountryCodesDB.cpp
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ThreadsTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsNameTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsNumberTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsRingtonesTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsAddressTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SettingsTable.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/Tables/AlarmsTable.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/Tables/NotesTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/CalllogTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/CountryCodesTable.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTemplateTable.cpp
+        Tables/Table.cpp
+        Tables/SMSTable.cpp
+        Tables/ThreadsTable.cpp
+        Tables/ContactsTable.cpp
+        Tables/ContactsNameTable.cpp
+        Tables/ContactsNumberTable.cpp
+        Tables/ContactsRingtonesTable.cpp
+        Tables/ContactsAddressTable.cpp
+        Tables/SettingsTable.cpp
+		Tables/AlarmsTable.cpp
+		Tables/NotesTable.cpp
+        Tables/CalllogTable.cpp
+        Tables/CountryCodesTable.cpp
+        Tables/SMSTemplateTable.cpp
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ContactRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ThreadRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SettingsRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/AlarmsRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/NotesRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/CalllogRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSTemplateRecord.cpp
+        Interface/Record.cpp
+        Interface/SMSRecord.cpp
+        Interface/ContactRecord.cpp
+        Interface/ThreadRecord.cpp
+        Interface/SettingsRecord.cpp
+        Interface/AlarmsRecord.cpp
+        Interface/NotesRecord.cpp
+        Interface/CalllogRecord.cpp
+        Interface/SMSTemplateRecord.cpp
 
+        queries/sms/QuerySMSSearch.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

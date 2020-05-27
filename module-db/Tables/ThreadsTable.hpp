@@ -56,6 +56,9 @@ class ThreadsTable : public Table<ThreadsTableRow, ThreadsTableFields>
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
     ThreadsTableRow getByContact(uint32_t contact_id);
 
+    /// returns: { maximum_query_depth, vector {requested amount of data which match} }
+    std::pair<uint32_t, std::vector<ThreadsTableRow>> getBySMSQuery(std::string text, uint32_t offset, uint32_t limit);
+
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS threads("
                                    "_id INTEGER PRIMARY KEY,"

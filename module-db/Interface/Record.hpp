@@ -1,23 +1,14 @@
-
-/*
- * @file Record.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
-#include <memory>
 #include "../Database/Database.hpp"
+#include "BaseInterface.hpp"
 
-template <typename T, typename F> class RecordInterface
+template <typename T, typename F> class RecordInterface : public db::Interface
 {
   public:
-    RecordInterface(){};
+    RecordInterface() = default;
 
-    virtual ~RecordInterface(){};
+    virtual ~RecordInterface() = default;
 
     virtual bool Add(const T &)
     {

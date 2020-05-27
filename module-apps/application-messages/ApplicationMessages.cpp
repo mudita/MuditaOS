@@ -1,5 +1,6 @@
 #include "ApplicationMessages.hpp"
 
+#include "application-messages/data/SMSTextToSearch.hpp"
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
@@ -39,9 +40,10 @@ namespace app
         }
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
-            DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
-            if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB)) {
+            if ((msg != nullptr) &&
+                ((msg->interface == db::Interface::Name::SMS) || (msg->interface == db::Interface::Name::SMSThread))) {
                 this->windows[gui::name::window::thread_view]->rebuild();
                 this->windows[gui::name::window::main_window]->rebuild();
                 return std::make_shared<sys::ResponseMessage>();
@@ -55,6 +57,7 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBThreadGetLimitOffset:
+            case MessageType::DBQuery:
             case MessageType::DBSMSTemplateGetLimitOffset: {
                 if (getCurrentWindow()->onDatabaseMessage(resp))
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -190,15 +193,17 @@ namespace app
         meta.text  = utils::localize.get("app_messages_thread_no_result");
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
-        switchWindow(gui::name::window::thread_search_none, nullptr);
+        auto data                        = std::make_unique<gui::SwitchData>();
+        data->ignoreCurrentWindowOnStack = true;
+        switchWindow(gui::name::window::thread_search_none, std::move(data));
         return true;
     }
 
-    bool ApplicationMessages::showSearchResults(const UTF8 &title)
+    bool ApplicationMessages::showSearchResults(const UTF8 &title, const UTF8 &search_text)
     {
         auto name = gui::name::window::search_results;
         windows[name]->setTitle(title);
-        switchWindow(name, nullptr);
+        switchWindow(name, std::make_unique<SMSTextToSearch>(search_text));
         return true;
     }
 
