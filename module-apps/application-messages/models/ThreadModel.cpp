@@ -11,7 +11,7 @@ gui::ListItem *ThreadModel::getItem(gui::Order order)
 {
     auto index = modelIndex;
     if (order == gui::Order::Previous) {
-        modelIndex = records.size() - 1 - modelIndex;
+        index = records.size() - 1 - modelIndex;
     }
 
     std::shared_ptr<ThreadRecord> thread = getRecord(index);

@@ -130,6 +130,11 @@ namespace gui
         reverseOrder = value;
     }
 
+    void BoxLayout::setAxisAlignment(bool value)
+    {
+        axisAlignment = value;
+    }
+
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
     {
         if (it->visible) {
@@ -169,7 +174,7 @@ namespace gui
             pos_update(el, pos, size_left);
         }
 
-        if (reverseOrder)
+        if (reverseOrder && axisAlignment)
             moveBySizeLeft<axis>();
     }
 
