@@ -1,11 +1,3 @@
-/*
- * @file ApplicationCall.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "ApplicationCall.hpp"
 
 #include "data/CallSwitchData.hpp"
@@ -18,7 +10,7 @@
 #include <MessageType.hpp>
 #include <PhoneNumber.hpp>
 #include <UiCommonActions.hpp>
-
+#include <Dialog.hpp>
 #include <log/log.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
@@ -235,6 +227,24 @@ namespace app
 
         window = new gui::EmergencyCallWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::DialogConfirm(this, app::window::name_dialogConfirm);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(app::window::name_dialogConfirm, window));
+    }
+
+    bool ApplicationCall::showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack)
+    {
+        auto dialog = dynamic_cast<gui::DialogConfirm *>(windows[app::window::name_dialogConfirm]);
+        assert(dialog);
+        auto meta   = dialog->meta;
+        meta.icon   = "info_big_circle_W_G";
+        meta.text   = utils::localize.get("app_messages_no_sim"); // TODO: alek:chage it
+        meta.action = action;
+        dialog->update(meta);
+        auto switchData                        = std::make_unique<gui::SwitchData>();
+        switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
+        switchWindow(dialog->getName(), std::move(switchData));
+        return true;
     }
 
     void ApplicationCall::runCallTimer()
@@ -258,6 +268,15 @@ namespace app
 
     void ApplicationCall::handleCallEvent(const std::string &number)
     {
+        if (!Store::GSM::get()->simCardInserted()) {
+            auto action = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            showNotification(action);
+            return;
+        }
+
         LOG_INFO("number: [%s]", number.c_str());
         auto ret = CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
         LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
