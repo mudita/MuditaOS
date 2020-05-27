@@ -188,7 +188,7 @@ DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *a
              gui::window::name::duplicatedContact,
              {
                  .title  = "",
-                 .icon   = "phonebook_info",
+                 .icon   = "info_big_circle_W_G",
                  .text   = utils::localize.get("app_phonebook_duplicate_speed_dial"),
                  .action = []() -> bool {
                      LOG_INFO("!");
