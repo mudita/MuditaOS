@@ -73,8 +73,6 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
 
     modelIndex++;
 
-    LOG_DEBUG("Model index: %d", index);
-
     SettingsRecord &settings = application->getSettings();
     if (call.get() == nullptr) {
         // LOG_ERROR("getItem nullptr");

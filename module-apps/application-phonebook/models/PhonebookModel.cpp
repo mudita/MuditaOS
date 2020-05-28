@@ -17,15 +17,11 @@ void PhonebookModel::requestRecordsCount()
 
     recordsCount = DBServiceAPI::ContactGetCount(application);
 
-    LOG_DEBUG("Fav: %u, Contact: %u", favouriteCount, recordsCount);
-
     DBServiceAPI::ContactGetLimitOffset(application, 0, phonebookStyle::mainWindow::contactsList::pageSize);
 }
 
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-
-    //    LOG_DEBUG("REQUESTED!!!!!!!!!!!!! eq off: %u, limit: %u", offset, limit);
 
     DBServiceAPI::ContactGetLimitOffset(application, offset, limit);
 }
@@ -77,6 +73,7 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
         item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("activatedCallback");
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+
             application->switchWindow(gui::window::name::contact, std::move(data));
             return true;
         };
