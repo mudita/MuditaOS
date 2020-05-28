@@ -59,6 +59,7 @@ namespace gui
     {
         Rect::setPosition(x, y);
     }
+
     void BoxLayout::setSize(const unsigned short w, const unsigned short h)
     {
         Rect::setSize(w, h);
@@ -73,11 +74,13 @@ namespace gui
         resizeItems();
         setNavigation();
     }
+
     void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
         resizeItems();
     }
+
     bool BoxLayout::removeWidget(Item *item)
     {
         bool ret = Rect::removeWidget(item);
@@ -86,6 +89,16 @@ namespace gui
 
         return ret;
     }
+
+    bool BoxLayout::eraseWidget(Item *item)
+    {
+        auto ret = erase(item);
+
+        resizeItems();
+
+        return ret;
+    }
+
     std::list<DrawCommand *> BoxLayout::buildDrawList()
     {
         auto el = Rect::buildDrawList();
@@ -241,7 +254,6 @@ namespace gui
 
     template <Axis axis> void BoxLayout::moveBySizeLeft()
     {
-
         for (auto &it : children) {
             it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
         }

@@ -64,6 +64,7 @@ namespace gui
         void setSize(const unsigned short w, const unsigned short h) override;
         void addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
+        bool eraseWidget(Item *item);
         std::list<DrawCommand *> buildDrawList() override;
         /// add item if it will fit in box, return true on success
         /// axis sets direction to define space left in container

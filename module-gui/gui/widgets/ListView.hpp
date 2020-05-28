@@ -25,7 +25,6 @@ namespace gui
       protected:
         int startIndex             = 0;
         int elementsCount          = 1;
-        int minimalPageSize        = 8;
         ListItemProvider *provider = nullptr;
         VBox *body                 = nullptr;
         ListViewScroll *scroll     = nullptr;
@@ -56,7 +55,6 @@ namespace gui
         void setProvider(ListItemProvider *provider);
         void setListViewType(style::listview::Type type);
         void setItemSpanSize(int size);
-        void setMinimalPageSize(int size);
         void onProviderDataUpdate();
         void clear();
 
