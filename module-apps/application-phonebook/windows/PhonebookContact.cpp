@@ -16,6 +16,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include <log/log.hpp>
 #include <limits.h>
+#include "PhonebookContactOptions.hpp"
 
 namespace gui
 {
@@ -462,11 +463,36 @@ namespace gui
 
     bool PhonebookContact::onInput(const InputEvent &inputEvent)
     {
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
-            ((inputEvent.state != InputEvent::State::keyReleasedLong)) && inputEvent.keyCode == KeyCode::KEY_LF) {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return (true);
+//        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
+//            ((inputEvent.state != InputEvent::State::keyReleasedLong)) && inputEvent.keyCode == KeyCode::KEY_LF) {
+//            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+//            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+//            return (true);
+//        }
+        // check if any of the lower inheritance onInput methods catch the event
+        if (AppWindow::onInput(inputEvent)) {
+            // refresh window only when key is other than enter
+            if (inputEvent.keyCode != KeyCode::KEY_ENTER) {
+                application->render(RefreshModes::GUI_REFRESH_FAST);
+            }
+
+            return true;
+        }
+
+        // process only if key is released
+        if (((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+             ((inputEvent.state == InputEvent::State::keyReleasedLong))) &&
+            (inputEvent.keyCode == KeyCode::KEY_LF)) {
+            auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
+            assert(app != nullptr);
+
+            if (app->windowOptions != nullptr) {
+                app->windowOptions->clearOptions();
+                app->windowOptions->addOptions(contactOptions(app, contact->ID));
+                app->switchWindow(app->windowOptions->getName(), nullptr);
+            }
+
+            return true;
         }
 
         if (inputEvent.keyCode == KeyCode::KEY_RF) {

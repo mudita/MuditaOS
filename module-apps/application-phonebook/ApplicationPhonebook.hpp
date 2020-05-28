@@ -1,4 +1,9 @@
+#pragma once
+
 #include "Application.hpp"
+#include <Interface/ContactRecord.hpp>
+#include <OptionWindow.hpp>
+
 
 namespace app
 {
@@ -14,6 +19,8 @@ namespace app
         ApplicationPhonebook(std::string name = name_phonebook, std::string parent = "", bool startBackgound = false);
         virtual ~ApplicationPhonebook();
 
+        gui::OptionWindow *windowOptions = nullptr;
+
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -25,6 +32,9 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+
+        bool blockContact(const uint32_t contactId);
+        bool removeContact(const uint32_t contactId);
     };
 
 } // namespace app
