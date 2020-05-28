@@ -832,7 +832,7 @@ bool ServiceCellular::sendSMS(void)
                 result = true;
             }
             else {
-                LOG_INFO("SMS sending failed.");
+                result = false;
             }
         }
     }
@@ -869,16 +869,20 @@ bool ServiceCellular::sendSMS(void)
                 }
                 else {
                     result = false;
-                    LOG_INFO("SMS sending failed.");
                 }
             }
         }
     }
     if (result) {
-        LOG_INFO("SMS sended.");
+        LOG_INFO("SMS sent ok.");
         record.type = SMSType::OUTBOX;
-        DBServiceAPI::SMSUpdate(this, record);
     }
+    else{
+        LOG_INFO("SMS sending failed.");
+        record.type = SMSType::FAILED;
+    }
+    DBServiceAPI::SMSUpdate(this, record);
+
     return result;
 }
 
