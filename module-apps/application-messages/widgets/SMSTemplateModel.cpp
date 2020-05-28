@@ -36,8 +36,8 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
     LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
 
     if (DatabaseModel::updateRecords(std::move(records), offset, limit, count)) {
-        list->onProviderDataUpdate();
         modelIndex = 0;
+        list->onProviderDataUpdate();
         return true;
     }
     return false;

@@ -74,9 +74,9 @@ namespace gui
                     }
                     else {
 
-                        body->removeWidget(item);
-                        body->removeWidget(previousListItem);
-                        body->removeWidget(listSpanItem);
+                        body->eraseWidget(item);
+                        body->eraseWidget(previousListItem);
+                        body->eraseWidget(listSpanItem);
 
                         gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
 

@@ -65,7 +65,6 @@ namespace gui
     {
 
         this->setBorderColor(ColorNoColor);
-        //        this->setListViewType(style::listview::Type::Continuous);
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
@@ -110,11 +109,6 @@ namespace gui
     void ListView::setListViewType(style::listview::Type type)
     {
         listType = type;
-    }
-
-    void ListView::setMinimalPageSize(int size)
-    {
-        minimalPageSize = size;
     }
 
     void ListView::setItemSpanSize(int size)
@@ -207,7 +201,6 @@ namespace gui
             body->addWidget(item);
 
             if (item->visible != true) {
-                body->removeWidget(listSpanItem);
                 break;
             }
 
@@ -216,8 +209,9 @@ namespace gui
             addSpanItem();
         }
 
-        if (listSpanItem != nullptr)
-            body->removeWidget(listSpanItem);
+        if (listSpanItem != nullptr) {
+            body->eraseWidget(listSpanItem);
+        }
 
         recalculateStartIndex();
     }
@@ -252,11 +246,11 @@ namespace gui
 
     bool ListView::listPageEndReached()
     {
-        auto minLimit = (2 * currentPageSize > minimalPageSize ? 2 * currentPageSize : minimalPageSize);
+        auto minLimit = (2 * currentPageSize > 8 ? 2 * currentPageSize : 8);
 
         auto calculateLimit = [&]() {
             // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
-            // before it gets them, requests twice size of current page with down limit of at least 8 (minimalPageSize).
+            // before it gets them, requests twice size of current page with down limit of at least 8.
             if (direction == style::listview::Direction::Bottom)
                 return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
             else
@@ -282,12 +276,6 @@ namespace gui
                                  : elementsCount - (elementsCount - startIndex);
             }
 
-            LOG_DEBUG("BOTTOM ---------- Start off: %u, offset send: %u, limit: %u, page: %u",
-                      startIndex,
-                      startIndex,
-                      calculateLimit(),
-                      currentPageSize);
-
             provider->requestRecords(startIndex, calculateLimit());
         }
 
@@ -306,16 +294,19 @@ namespace gui
                 return true;
             }
             else {
+
                 topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
             }
 
-            LOG_DEBUG("TOP ---------------- Start off: %u, offset send: %u, limit: %u, page: %u",
-                      startIndex,
-                      topFetchIndex,
-                      calculateLimit(),
-                      currentPageSize);
+            // If starting page size smaller than last page - fill first page with last page size.
+            if (startIndex < currentPageSize) {
 
-            provider->requestRecords(topFetchIndex, calculateLimit());
+                provider->requestRecords(0, currentPageSize);
+            }
+            else {
+
+                provider->requestRecords(topFetchIndex, calculateLimit());
+            }
         }
 
         return true;
