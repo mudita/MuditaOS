@@ -16,11 +16,13 @@ namespace cellular
             CellularConfProcedure,       /// configuration procedure
             AudioConfigurationProcedure, /// audio configuration for modem (could be in ModemConfiguration)
             SanityCheck,                 /// prior to ModemOn last sanity checks for one time configurations etc
-            SimInit,                     /// initialize sim card
-            ModemOn, /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
+            ModemOn,   /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
+            URCReady,  /// State indicates that URC handling is enabled
+            SimInit,   /// initialize sim card
+            SimSelect, /// triggers hw SIM selection (! state now will be **changed on URC** )
             ModemFatalFailure, /// modem full shutdown need
-            SimSelect,         /// triggers hw SIM selection (! state now will be **changed on URC** )
             Failed,
+            Ready, /// Service is fully initalized
         };
 
       private:
@@ -28,6 +30,7 @@ namespace cellular
 
       public:
         [[nodiscard]] static const char *c_str(ST state);
+        [[nodiscard]] const char *c_str();
 
         /// 1. sets state of ServiceCellular
         /// 2. sends Multicast notification of ServiceCellular state
