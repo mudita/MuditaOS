@@ -877,7 +877,7 @@ bool ServiceCellular::sendSMS(void)
         LOG_INFO("SMS sent ok.");
         record.type = SMSType::OUTBOX;
     }
-    else{
+    else {
         LOG_INFO("SMS sending failed.");
         record.type = SMSType::FAILED;
     }
