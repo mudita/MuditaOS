@@ -42,11 +42,14 @@ namespace app
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
-            if ((msg != nullptr) &&
-                ((msg->interface == db::Interface::Name::SMS) || (msg->interface == db::Interface::Name::SMSThread))) {
-                this->windows[gui::name::window::thread_view]->rebuild();
-                this->windows[gui::name::window::main_window]->rebuild();
-                return std::make_shared<sys::ResponseMessage>();
+            if (msg != nullptr) {
+                if ((msg->interface == db::Interface::Name::SMS) ||
+                    (msg->interface == db::Interface::Name::SMSThread)) {
+                    this->windows[gui::name::window::thread_view]->rebuild();
+                    this->windows[gui::name::window::main_window]->rebuild();
+                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    return std::make_shared<sys::ResponseMessage>();
+                }
             }
         }
         // this variable defines whether message was processed.
