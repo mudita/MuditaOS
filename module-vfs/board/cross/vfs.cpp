@@ -307,6 +307,9 @@ std::string vfs::relativeToRoot(const std::string path)
 
 bool vfs::isDir(const char *path)
 {
+    if (path == nullptr)
+        return (false);
+
     FF_Stat_t fileStatus;
 
     const int ret = ff_stat(path, &fileStatus);
@@ -320,6 +323,9 @@ bool vfs::isDir(const char *path)
 
 bool vfs::fileExists(const char *path)
 {
+    if (path == nullptr)
+        return (false);
+
     FF_Stat_t fileStatus;
     const int ret = ff_stat(path, &fileStatus);
     if (ret == 0) {
@@ -330,17 +336,26 @@ bool vfs::fileExists(const char *path)
 
 int vfs::deltree(const char *path)
 {
-    return (ff_deltree(path));
+    if (path != nullptr)
+        return (ff_deltree(path));
+    else
+        return (-1);
 }
 
 int vfs::mkdir(const char *dir)
 {
-    return (ff_mkdir(dir));
+    if (dir != nullptr)
+        return (ff_mkdir(dir));
+    else
+        return (-1);
 }
 
 int vfs::rename(const char *oldname, const char *newname)
 {
-    return (ff_rename(oldname, newname, true));
+    if (oldname != nullptr && newname != nullptr)
+        return (ff_rename(oldname, newname, true));
+    else
+        return (-1);
 }
 
 std::string vfs::lastErrnoToStr()
@@ -350,5 +365,8 @@ std::string vfs::lastErrnoToStr()
 
 vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
 {
-    return ff_fopen(filename, mode);
+    if (filename != nullptr && mode != nullptr)
+        return ff_fopen(filename, mode);
+    else
+        return (nullptr);
 }
