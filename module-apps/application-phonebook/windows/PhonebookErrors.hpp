@@ -11,10 +11,16 @@
 #include <string>
 #include <widgets/BoxLayout.hpp>
 
-using namespace gui;
-
-namespace ErrorWindows
+namespace gui
 {
+    namespace window
+    {
+        namespace name
+        {
+            inline std::string noResults = "NoResults";
+            inline std::string contactBlocked = "ContactBlocked";
+        }
+    } // namespace window
 
     class NoResults : public AppWindow
     {
@@ -59,4 +65,4 @@ namespace ErrorWindows
       private:
         void setContactData();
     };
-}; // namespace ErrorWindows
+}; // namespace gui

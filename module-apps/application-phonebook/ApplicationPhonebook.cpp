@@ -8,7 +8,6 @@
 #include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
-#include "windows/PhonebookOptions.hpp"
 #include "windows/PhonebookOptionsNamecard.hpp"
 #include "windows/PhonebookContactOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
@@ -77,76 +76,19 @@ namespace app
     {
         windowOptions = gui::newOptionWindow(this);
 
-        gui::AppWindow *window = nullptr;
-
-        window = new PhonebookMainWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new PhonebookNewContact(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new PhonebookContact(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new PhonebookDeleteContact(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new PhonebookBlockContact(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new PhonebookDuplicateSpeedDial(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new DuplicatedContactDialogWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new PhonebookSearch(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new ErrorWindows::NoResults(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new ErrorWindows::ContactBlocked(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new ErrorWindows::ContactBlocked(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::PhonebookSearchResults(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        // window = new PhonebookOptions(this);
-        // windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
+        windows.insert({gui::name::window::main_window, new PhonebookMainWindow(this)});
+        windows.insert({gui::window::name::newContact, new PhonebookNewContact(this)});
+        windows.insert({gui::window::name::contact, new PhonebookContact(this)});
+        windows.insert({gui::window::name::duplicatedContact, new PhonebookDuplicateSpeedDial(this)});
+        windows.insert({gui::window::name::duplicatedContact, new DuplicatedContactDialogWindow(this)});
+        windows.insert({gui::window::name::search, new PhonebookSearch(this)});
+        windows.insert({gui::window::name::noResults, new NoResults(this)});
+        windows.insert({gui::window::name::contactBlocked, new ContactBlocked(this)});
+        windows.insert({gui::window::name::search_results, new PhonebookSearchResults(this)});
         windows.insert({windowOptions->getName(), windowOptions});
-
-        windows.insert({"Block dialog",
-                        new gui::Dialog(this,
-                                        "Block dialog",
-                                        {
-                                            .title  = "",
-                                            .icon   = "phonebook_contact_delete_trashcan",
-                                            .text   = "",
-                                            .action = []() -> bool {
-                                              LOG_INFO("!");
-                                              return true;
-                                            },
-                                        })});
-        windows.insert({"Dialog",
-                        new gui::Dialog(this,
-                                        "Dialog",
-                                        {
-                                            .title  = "",
-                                            .icon   = "phonebook_contact_delete_trashcan",
-                                            .text   = "",
-                                            .action = []() -> bool {
-                                                LOG_INFO("!");
-                                                return true;
-                                            },
-                                        })});
-
-        window = new PhonebookOptionsNamecard(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        windows.insert(
+            {gui::name::window::dialogYesNo, new gui::DialogYesNo(this, gui::name::window::dialogYesNo)});
+        windows.insert({gui::window::name::options_namecard, new PhonebookOptionsNamecard(this)});
     }
 
     void ApplicationPhonebook::destroyUserInterface()
@@ -155,53 +97,49 @@ namespace app
     bool ApplicationPhonebook::blockContact(const uint32_t contactId)
     {
         LOG_DEBUG("Blocking contact: %" PRIu32, contactId);
-        auto dialog = dynamic_cast<gui::Dialog *>(windows["Block dialog"]);
-        if (dialog != nullptr) {
-            auto meta   = dialog->meta;
-            meta.action = [=]() -> bool {
-              if (!DBServiceAPI::ContactBlock(this, contactId)) {
-                  LOG_ERROR("Contact id=%" PRIu32 "  block failed", contactId);
-                  return false;
-              }
-              return this->switchWindow(gui::name::window::main_window);
-            };
-            meta.text       = utils::localize.get("app_phonebook_options_block_confirm");
-            auto contactRec = DBServiceAPI::ContactGetByID(this, contactId);
-            auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-            meta.title      = cont.getFormattedName();
-            dialog->update(meta);
-            return switchWindow("Block dialog", nullptr);
-        }
-        else {
-            LOG_ERROR("Dialog bad type!");
-            return false;
-        }
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialogYesNo]);
+        assert(dialog != nullptr);
+        auto meta   = dialog->meta;
+        meta.action = [=]() -> bool {
+            if (!DBServiceAPI::ContactBlock(this, contactId)) {
+                LOG_ERROR("Contact id=%" PRIu32 "  block failed", contactId);
+                return false;
+            }
+            this->switchWindow(gui::name::window::main_window);
+            return true;
+        };
+        meta.text       = utils::localize.get("app_phonebook_options_block_confirm");
+        auto contactRec = DBServiceAPI::ContactGetByID(this, contactId);
+        auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
+        meta.title      = cont.getFormattedName();
+        meta.icon       = "phonebook_contact_delete_trashcan";
+        dialog->update(meta);
+        switchWindow(dialog->getName());
+        return true;
     }
 
     bool ApplicationPhonebook::removeContact(const uint32_t contactId)
     {
         LOG_DEBUG("Removing contact: %" PRIu32, contactId);
-        auto dialog = dynamic_cast<gui::Dialog *>(windows["Dialog"]);
-        if (dialog != nullptr) {
-            auto meta   = dialog->meta;
-            meta.action = [=]() -> bool {
-                if (!DBServiceAPI::ContactRemove(this, contactId)) {
-                    LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contactId);
-                    return false;
-                }
-                return this->switchWindow(gui::name::window::main_window);
-            };
-            meta.text       = utils::localize.get("app_phonebook_options_delete_confirm");
-            auto contactRec = DBServiceAPI::ContactGetByID(this, contactId);
-            auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-            meta.title      = cont.getFormattedName();
-            dialog->update(meta);
-            return switchWindow("Dialog", nullptr);
-        }
-        else {
-            LOG_ERROR("Dialog bad type!");
-            return false;
-        }
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialogYesNo]);
+        assert(dialog != nullptr);
+        auto meta   = dialog->meta;
+        meta.action = [=]() -> bool {
+            if (!DBServiceAPI::ContactRemove(this, contactId)) {
+                LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contactId);
+                return false;
+            }
+            this->switchWindow(gui::name::window::main_window);
+            return true;
+        };
+        meta.text       = utils::localize.get("app_phonebook_options_delete_confirm");
+        auto contactRec = DBServiceAPI::ContactGetByID(this, contactId);
+        auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
+        meta.title      = cont.getFormattedName();
+        meta.icon       = "phonebook_contact_delete_trashcan";
+        dialog->update(meta);
+        switchWindow(dialog->getName());
+        return true;
     }
 
 } /* namespace app */

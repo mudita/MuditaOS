@@ -98,7 +98,7 @@ class PhonebookDuplicateSpeedDial : public PhonebookDialog
     Label *dialValue = nullptr;
 
   public:
-    PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, "SpeedDialAlreadyAssigned")
+    PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, gui::window::name::duplicatedContact)
     {}
     virtual ~PhonebookDuplicateSpeedDial() = default;
     void onBeforeShow(ShowMode mode, SwitchData *data);

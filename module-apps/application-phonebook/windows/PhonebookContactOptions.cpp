@@ -3,6 +3,7 @@
 #include "../data/PhonebookItemData.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
+#include "PhonebookOptionsNamecard.hpp"
 #include <Options.hpp>
 
 std::list<gui::Option> contactOptions(app::ApplicationPhonebook *app, const uint32_t contactId)
@@ -23,7 +24,7 @@ std::list<gui::Option> contactOptions(app::ApplicationPhonebook *app, const uint
                         std::shared_ptr<ContactRecord> contactSharedPtr(
                             new ContactRecord(DBServiceAPI::ContactGetByID(app, contactId)->front()));
                         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contactSharedPtr);
-                        app->switchWindow("OptionsNamecard", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                        app->switchWindow(gui::window::name::options_namecard, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                         return true;
                     },
                     gui::Arrow::Enabled},

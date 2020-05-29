@@ -1,27 +1,23 @@
-#include "PhonebookContact.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "../data/PhonebookInternals.hpp"
 #include "InputEvent.hpp"
+
+#include "PhonebookContact.hpp"
+#include "PhonebookContactOptions.hpp"
+#include "../data/PhonebookInternals.hpp"
 #include "Label.hpp"
-#include "Margins.hpp"
-#include "PhonebookNewContact.hpp"
 #include "Text.hpp"
 #include "UiCommonActions.hpp"
-#include "Utils.hpp"
-#include "application-call/ApplicationCall.hpp"
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/windows/ThreadViewWindow.hpp"
-#include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+
+#include <i18/i18.hpp>
 #include <log/log.hpp>
+
 #include <limits.h>
-#include "PhonebookContactOptions.hpp"
 
 namespace gui
 {
 
-    PhonebookContact::PhonebookContact(app::Application *app) : AppWindow(app, window::name::contact)
+    PhonebookContact::PhonebookContact(app::Application *app) : AppWindow(app, gui::window::name::contact)
     {
         buildInterface();
     }
@@ -463,13 +459,6 @@ namespace gui
 
     bool PhonebookContact::onInput(const InputEvent &inputEvent)
     {
-//        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
-//            ((inputEvent.state != InputEvent::State::keyReleasedLong)) && inputEvent.keyCode == KeyCode::KEY_LF) {
-//            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-//            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-//            return (true);
-//        }
-        // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             // refresh window only when key is other than enter
             if (inputEvent.keyCode != KeyCode::KEY_ENTER) {
