@@ -1,41 +1,31 @@
-#include "PhonebookOptionsNamecard.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "InputEvent.hpp"
-#include "Label.hpp"
-#include "Margins.hpp"
-#include "PhonebookContact.hpp"
-#include "Text.hpp"
-#include "application-call/data/CallSwitchData.hpp"
-#include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <log/log.hpp>
+#include "../data/PhonebookItemData.hpp"
+#include "PhonebookNamecardOptions.hpp"
 
 namespace gui
 {
 
-    PhonebookOptionsNamecard::PhonebookOptionsNamecard(app::Application *app) : OptionWindow(app, gui::window::name::options_namecard)
+    PhonebookNamecardOptions::PhonebookNamecardOptions(app::Application *app)
+        : OptionWindow(app, gui::window::name::options_namecard)
     {
         buildInterface();
         this->addOptions(namecardOptionsList());
     }
 
-    PhonebookOptionsNamecard::~PhonebookOptionsNamecard()
-    {}
+    PhonebookNamecardOptions::~PhonebookNamecardOptions() = default;
 
-    bool PhonebookOptionsNamecard::handleSwitchData(SwitchData *data)
+    auto PhonebookNamecardOptions::handleSwitchData(SwitchData *data) -> bool
     {
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
             return false;
         }
 
-        PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
-        contact                 = item->getContact();
+        auto *item = dynamic_cast<PhonebookItemData *>(data);
+        contact    = item->getContact();
         return true;
     }
 
-    bool PhonebookOptionsNamecard::onInput(const InputEvent &inputEvent)
+    auto PhonebookNamecardOptions::onInput(const InputEvent &inputEvent) -> bool
     {
         if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
@@ -46,17 +36,17 @@ namespace gui
         return (AppWindow::onInput(inputEvent));
     }
 
-    void PhonebookOptionsNamecard::sendViaSms()
+    void PhonebookNamecardOptions::sendViaSms()
     {
         const std::string vcard = formatVCARD();
     }
 
-    void PhonebookOptionsNamecard::sendViaBluetooth()
+    void PhonebookNamecardOptions::sendViaBluetooth()
     {
         const std::string vcard = formatVCARD();
     }
 
-    const std::string PhonebookOptionsNamecard::formatVCARD()
+    auto PhonebookNamecardOptions::formatVCARD() -> const std::string
     {
         const std::string priNumber = (contact->numbers.size() > 0) ? contact->numbers[0].numberE164.c_str() : "";
         const std::string secNumber = (contact->numbers.size() > 1) ? contact->numbers[1].numberE164.c_str() : "";
@@ -80,20 +70,20 @@ namespace gui
         return (vcard.str());
     }
 
-    std::list<gui::Option> PhonebookOptionsNamecard::namecardOptionsList()
+    auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>
     {
         return {
             gui::Option{utils::localize.get("app_phonebook_options_send_bt"),
                         [=](gui::Item &item) {
-                          LOG_INFO("Editing contact!");
-                          sendViaBluetooth();
-                          return true;
+                            LOG_INFO("Sending namecard via bluetooth!");
+                            sendViaBluetooth();
+                            return true;
                         }},
             gui::Option{utils::localize.get("app_phonebook_options_send_sms"),
                         [=](gui::Item &item) {
-                          LOG_INFO("Forwarding namecard!");
-                          sendViaSms();
-                          return true;
+                            LOG_INFO("Sending namecard via SMS!");
+                            sendViaSms();
+                            return true;
                         }},
         };
     }
