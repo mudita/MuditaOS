@@ -7,19 +7,11 @@
 
 namespace gui
 {
-    namespace window
-    {
-        namespace name
-        {
-            inline std::string search = "Search";
-        }
-    } // namespace window
-
     class PhonebookSearch : public AppWindow
     {
       protected:
         /** labels */
-        Text *inputField    = nullptr;
+        Text *inputField = nullptr;
 
         PhonebookModel *phonebookModel = nullptr;
 
@@ -37,7 +29,6 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-
     };
 
 } /* namespace gui */

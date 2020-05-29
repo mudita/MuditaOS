@@ -5,11 +5,6 @@
 
 namespace gui
 {
-    namespace window::name
-    {
-        inline std::string options_namecard = "Options Namecard";
-    } // namespace window::name
-
     class PhonebookNamecardOptions : public OptionWindow
     {
       public:

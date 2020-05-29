@@ -74,72 +74,22 @@ namespace app
 
     void ApplicationPhonebook::createUserInterface()
     {
-        windowOptions = gui::newOptionWindow(this);
-
         windows.insert({gui::name::window::main_window, new PhonebookMainWindow(this)});
-        windows.insert({gui::window::name::newContact, new PhonebookNewContact(this)});
+        windows.insert({gui::window::name::new_contact, new PhonebookNewContact(this)});
         windows.insert({gui::window::name::contact, new PhonebookContact(this)});
-        windows.insert({gui::window::name::duplicatedContact, new PhonebookDuplicateSpeedDial(this)});
-        windows.insert({gui::window::name::duplicatedContact, new DuplicatedContactDialogWindow(this)});
+        windows.insert({gui::window::name::duplicated_contact, new PhonebookDuplicateSpeedDial(this)});
+        windows.insert({gui::window::name::duplicated_contact, new DuplicatedContactDialogWindow(this)});
         windows.insert({gui::window::name::search, new PhonebookSearch(this)});
-        windows.insert({gui::window::name::noResults, new NoResults(this)});
-        windows.insert({gui::window::name::contactBlocked, new ContactBlocked(this)});
+        windows.insert({gui::window::name::no_results, new NoResults(this)});
+        windows.insert({gui::window::name::contact_blocked, new ContactBlocked(this)});
         windows.insert({gui::window::name::search_results, new PhonebookSearchResults(this)});
-        windows.insert({windowOptions->getName(), windowOptions});
         windows.insert(
-            {gui::name::window::dialogYesNo, new gui::DialogYesNo(this, gui::name::window::dialogYesNo)});
-        windows.insert({gui::window::name::options_namecard, new PhonebookNamecardOptions(this)});
+            {gui::window::name::dialog_yes_no, new gui::DialogYesNo(this, gui::window::name::dialog_yes_no)});
+        windows.insert({gui::window::name::contact_options, new PhonebookContactOptions(this)});
+        windows.insert({gui::window::name::namecard_options, new PhonebookNamecardOptions(this)});
     }
 
     void ApplicationPhonebook::destroyUserInterface()
     {}
-
-    bool ApplicationPhonebook::blockContact(const uint32_t contactId)
-    {
-        LOG_DEBUG("Blocking contact: %" PRIu32, contactId);
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialogYesNo]);
-        assert(dialog != nullptr);
-        auto meta   = dialog->meta;
-        meta.action = [=]() -> bool {
-            if (!DBServiceAPI::ContactBlock(this, contactId)) {
-                LOG_ERROR("Contact id=%" PRIu32 "  block failed", contactId);
-                return false;
-            }
-            this->switchWindow(gui::name::window::main_window);
-            return true;
-        };
-        meta.text       = utils::localize.get("app_phonebook_options_block_confirm");
-        auto contactRec = DBServiceAPI::ContactGetByID(this, contactId);
-        auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-        meta.title      = cont.getFormattedName();
-        meta.icon       = "phonebook_contact_delete_trashcan";
-        dialog->update(meta);
-        switchWindow(dialog->getName());
-        return true;
-    }
-
-    bool ApplicationPhonebook::removeContact(const uint32_t contactId)
-    {
-        LOG_DEBUG("Removing contact: %" PRIu32, contactId);
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialogYesNo]);
-        assert(dialog != nullptr);
-        auto meta   = dialog->meta;
-        meta.action = [=]() -> bool {
-            if (!DBServiceAPI::ContactRemove(this, contactId)) {
-                LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contactId);
-                return false;
-            }
-            this->switchWindow(gui::name::window::main_window);
-            return true;
-        };
-        meta.text       = utils::localize.get("app_phonebook_options_delete_confirm");
-        auto contactRec = DBServiceAPI::ContactGetByID(this, contactId);
-        auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-        meta.title      = cont.getFormattedName();
-        meta.icon       = "phonebook_contact_delete_trashcan";
-        dialog->update(meta);
-        switchWindow(dialog->getName());
-        return true;
-    }
 
 } /* namespace app */

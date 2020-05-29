@@ -1,7 +1,22 @@
 #pragma once
 
-#include "../ApplicationPhonebook.hpp"
-#include "Interface/ContactRecord.hpp"
+#include "ContactRecord.hpp"
 #include "OptionWindow.hpp"
 
-std::list<gui::Option> contactOptions(app::ApplicationPhonebook *app, const uint32_t contactId);
+namespace gui
+{
+    class PhonebookContactOptions : public OptionWindow
+    {
+      public:
+        PhonebookContactOptions(app::Application *app);
+        ~PhonebookContactOptions() override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
+
+      private:
+        std::shared_ptr<ContactRecord> contact = nullptr;
+        auto contactOptionsList() -> std::list<gui::Option>;
+        bool contactBlock();
+        bool contactRemove();
+    };
+}; // namespace gui

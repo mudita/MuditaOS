@@ -86,7 +86,7 @@ namespace app
             return sapm::ApplicationManager::messageSwitchApplication(
                 app,
                 name_phonebook,
-                gui::window::name::newContact,
+                gui::window::name::new_contact,
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         } break;
         case ContactOperation::Details: {
@@ -100,7 +100,7 @@ namespace app
             return sapm::ApplicationManager::messageSwitchApplication(
                 app,
                 name_phonebook,
-                gui::window::name::newContact, // TODO: need to be fixed when contact edition is working
+                gui::window::name::new_contact, // TODO: need to be fixed when contact edition is working
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         } break;
         default: {
@@ -129,7 +129,7 @@ namespace app
                 return sapm::ApplicationManager::messageSwitchApplication(
                     app,
                     name_phonebook,
-                    gui::window::name::duplicatedContact,
+                    gui::window::name::duplicated_contact,
                     std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contactRec)),
                                                         number));
             }
