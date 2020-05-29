@@ -1,10 +1,9 @@
-#include "PhonebookMainWindow.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "PhonebookNewContact.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include "application-phonebook/widgets/PhonebookItem.hpp"
+#include "PhonebookMainWindow.hpp"
 
-#include <i18/i18.hpp>
 #include <service-db/messages/DBContactMessage.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 

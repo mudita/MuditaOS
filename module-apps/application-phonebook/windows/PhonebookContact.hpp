@@ -1,15 +1,10 @@
 #pragma once
 
-#include "../data/PhonebookItemData.hpp"
-#include "AppWindow.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+
 #include "ContactRecord.hpp"
-#include "Label.hpp"
-#include "Style.hpp"
 #include "Text.hpp"
-#include <memory>
-#include <string>
-#include <widgets/BoxLayout.hpp>
-#include <Utils.hpp>
+#include "Utils.hpp"
 
 static inline bool isValidName(const UTF8 name)
 {

@@ -16,7 +16,7 @@ namespace gui
       private:
         std::shared_ptr<ContactRecord> contact = nullptr;
         auto contactOptionsList() -> std::list<gui::Option>;
-        bool contactBlock();
-        bool contactRemove();
+        auto contactBlock() -> bool;
+        auto contactRemove() -> bool;
     };
 }; // namespace gui

@@ -6,12 +6,6 @@
 
 namespace gui
 {
-    namespace window
-    {
-        namespace name
-        {};
-    }; // namespace window
-
     class PhonebookSearchResults : public AppWindow
     {
       protected:
