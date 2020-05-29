@@ -1,3 +1,4 @@
+#include "../ApplicationPhonebook.hpp"
 #include "PhonebookSearch.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "Utils.hpp"

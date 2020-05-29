@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "../ApplicationPhonebook.hpp"
 #include "PhonebookListView.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "../windows/PhonebookContact.hpp"

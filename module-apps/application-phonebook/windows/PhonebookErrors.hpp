@@ -13,15 +13,6 @@
 
 namespace gui
 {
-    namespace window
-    {
-        namespace name
-        {
-            inline std::string noResults = "NoResults";
-            inline std::string contactBlocked = "ContactBlocked";
-        }
-    } // namespace window
-
     class NoResults : public AppWindow
     {
       protected:

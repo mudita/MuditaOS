@@ -1,3 +1,4 @@
+#include "../ApplicationPhonebook.hpp"
 #include "PhonebookSearchResults.hpp"
 #include "PhonebookNewContact.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -80,7 +81,7 @@ namespace gui
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LEFT:
                 LOG_INFO("Adding new contact");
-                application->switchWindow(gui::window::name::newContact);
+                application->switchWindow(gui::window::name::new_contact);
                 return true;
             case KeyCode::KEY_RIGHT:
                 LOG_INFO("Searching contact");

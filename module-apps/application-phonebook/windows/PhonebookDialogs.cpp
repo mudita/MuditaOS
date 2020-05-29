@@ -185,7 +185,7 @@ void PhonebookBlockContact::setContactData()
 
 DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)
     : DialogYesNo(app,
-                  gui::window::name::duplicatedContact,
+                  gui::window::name::duplicated_contact,
                   {
                       .title  = "",
                       .icon   = "info_big_circle_W_G",
@@ -209,13 +209,13 @@ bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)
 
         auto meta   = this->meta;
         meta.action = [=]() -> bool {
-            application->switchWindow(gui::window::name::newContact, std::make_unique<PhonebookItemData>(record));
+            application->switchWindow(gui::window::name::new_contact, std::make_unique<PhonebookItemData>(record));
             return true;
         };
         meta.title = item->text;
         meta.text  = updateText(meta.text, *record);
         this->update(meta);
-        application->switchWindow(gui::window::name::duplicatedContact, nullptr);
+        application->switchWindow(gui::window::name::duplicated_contact, nullptr);
         return true;
     }
     return false;
@@ -248,7 +248,7 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong))) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         return (false);
     };

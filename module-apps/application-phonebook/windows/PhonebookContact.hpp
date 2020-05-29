@@ -44,14 +44,6 @@ static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRec
 
 namespace gui
 {
-    namespace window
-    {
-        namespace name
-        {
-            inline std::string contact = "Contact";
-        }
-    } // namespace window
-
     class PhonebookContact : public AppWindow
     {
       protected:
