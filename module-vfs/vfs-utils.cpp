@@ -1,6 +1,7 @@
 #include <vfs.hpp>
 #include <time/time_conversion.hpp>
 #include <random>
+#include <ticks.hpp>
 
 std::string vfs::generateRandomId(size_t length = 0)
 {
@@ -8,7 +9,12 @@ std::string vfs::generateRandomId(size_t length = 0)
 
     std::random_device random_device;
     std::mt19937 generator(random_device());
-    generator.seed(utils::time::Time().getTime());
+#ifndef TARGET_Linux
+    generator.seed(cpp_freertos::Ticks::GetTicks());
+#else
+    generator.seed(clock());
+#endif
+
     std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
 
     std::string random_string;
