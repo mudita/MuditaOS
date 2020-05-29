@@ -14,12 +14,13 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string dialog             = "Dialog";
-            inline const std::string thread_search_none = "SearchNone";
-            inline const std::string new_sms            = "NewSMS";
-            inline const std::string thread_sms_search  = "SMSSearch";
-            inline const std::string sms_templates      = "SMSTemplates";
-            inline const std::string thread_view        = "ThreadViewWindow";
+            inline const std::string dialog_yes_no     = "DialogYesNo";
+            inline const std::string dialog_confirm    = "DialogConfirm";
+            inline const std::string dialog            = "Dialog";
+            inline const std::string new_sms           = "NewSMS";
+            inline const std::string thread_sms_search = "SMSSearch";
+            inline const std::string sms_templates     = "SMSTemplates";
+            inline const std::string thread_view       = "ThreadViewWindow";
 
         }; // namespace window
     };     // namespace name
@@ -57,6 +58,8 @@ namespace app
         bool showSearchResults(const UTF8 &title, const UTF8 &search_text);
         bool sendSms(const UTF8 &number, const UTF8 &body);
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
+        bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
+        bool handleSendSmsFromThread(const UTF8 &number, const UTF8 &body);
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;

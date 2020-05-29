@@ -27,10 +27,10 @@ namespace sys
                                         uint32_t timeout);
 
         // Send message to specific channel
-        static void SendMulticast(std::shared_ptr<Message> msg, BusChannels channel, Service *s);
+        static void SendMulticast(std::shared_ptr<Message> msg, BusChannels channel, Service *source);
 
         // Send message to all registered services ()
-        static void SendBroadcast(std::shared_ptr<Message> msg, Service *s);
+        static void SendBroadcast(std::shared_ptr<Message> msg, Service *source);
 
         // Register new service
         static void Add(std::shared_ptr<Service> service);

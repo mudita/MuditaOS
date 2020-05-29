@@ -126,6 +126,8 @@
     "app_call_speaker": "SPEAKER",
     "app_call_speaker_on": "SPEAKER ON",
     "app_call_bluetooth": "BLUETOOTH",
+    "app_call_no_sim" : "No SIM.\n\nTo make a call,\nplease insert a SIM card.",
+    "app_call_offline" : "You're offline.\n\nTo make a call\n switch to the Connected mode.",
     
     "app_messages_title_main": "Messages",
     "app_messages_new_message": "New Message",
@@ -135,6 +137,8 @@
     "app_messages_thread_no_result" : "There are no results",
     "app_messages_message": "Message",
     "app_messages_templates": "Templates",
+    "app_messages_no_sim" : "No SIM.\n\nTo send a SMS,\nplease insert a SIM card.",
+    "app_messages_offline" : "You're offline.\n\nTo send a SMS\n switch to the Connected mode.",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
