@@ -3,7 +3,7 @@
 #include "../data/PhonebookItemData.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
-#include "PhonebookOptionsNamecard.hpp"
+#include "PhonebookNamecardOptions.hpp"
 #include <Options.hpp>
 
 std::list<gui::Option> contactOptions(app::ApplicationPhonebook *app, const uint32_t contactId)
