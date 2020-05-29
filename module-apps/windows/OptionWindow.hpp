@@ -47,7 +47,7 @@ namespace gui
         /// add options as {text, on click callback }
         void addOptions(std::list<Option> options);
         /// add options as list of items on heap
-        /// [!] ovnership on item will be moved to OptionWindow (so it will clean created kids on heap)
+        /// [!] ownership on item will be moved to OptionWindow (so it will clean created kids on heap)
         void addOptions(std::list<Item *> items);
         void clearOptions();
 

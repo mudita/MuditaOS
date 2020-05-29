@@ -17,7 +17,7 @@
 namespace gui
 {
 
-    PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, window::name::newContact)
+    PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, gui::window::name::newContact)
     {
         buildInterface();
     }

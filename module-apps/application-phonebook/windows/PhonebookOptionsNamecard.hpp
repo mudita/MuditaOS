@@ -8,25 +8,31 @@
 #include <memory>
 #include <string>
 #include <widgets/BoxLayout.hpp>
+#include "OptionWindow.hpp"
 
-using namespace gui;
-
-class PhonebookOptionsNamecard : public AppWindow
+namespace gui
 {
-  public:
-    PhonebookOptionsNamecard(app::Application *app);
-    virtual ~PhonebookOptionsNamecard();
-    void buildInterface();
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool onInput(const InputEvent &inputEvent) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void sendViaSms();
-    void sendViaBluetooth();
-    const std::string formatVCARD();
+    namespace window
+    {
+        namespace name
+        {
+            inline std::string options_namecard = "Options Namecard";
+        }
+    } // namespace window
 
-  protected:
-    Text *dbg = nullptr;
-    std::vector<gui::Item *> options;
-    std::shared_ptr<ContactRecord> contact = nullptr;
-    Item *addOptionLabel(const std::string &text, bool hasSubOptions, std::function<bool(Item &)> activatedCallback);
-};
+    class PhonebookOptionsNamecard : public OptionWindow
+    {
+      public:
+        PhonebookOptionsNamecard(app::Application *app);
+        virtual ~PhonebookOptionsNamecard();
+        bool onInput(const InputEvent &inputEvent) override;
+        bool handleSwitchData(SwitchData *data) override;
+
+      private:
+        std::shared_ptr<ContactRecord> contact = nullptr;
+        std::list<gui::Option> namecardOptionsList();
+        void sendViaSms();
+        void sendViaBluetooth();
+        const std::string formatVCARD();
+    };
+}; // namespace gui

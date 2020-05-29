@@ -7,7 +7,7 @@
 namespace gui
 {
     PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
-        : AppWindow(app, name::window::search_results), searchResultsModel{new SearchResultsModel(app)}
+        : AppWindow(app, gui::window::name::search_results), searchResultsModel{new SearchResultsModel(app)}
     {
         buildInterface();
     }

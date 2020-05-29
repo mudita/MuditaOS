@@ -4,6 +4,16 @@
 #include <Interface/ContactRecord.hpp>
 #include <OptionWindow.hpp>
 
+namespace gui
+{
+    namespace name
+    {
+        namespace window
+        {
+            inline const std::string dialogYesNo = "DialogYesNo";
+        }; // namespace window
+    };     // namespace name
+};         // namespace gui
 
 namespace app
 {
