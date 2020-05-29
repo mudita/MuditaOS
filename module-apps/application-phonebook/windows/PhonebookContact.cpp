@@ -1,19 +1,7 @@
-#include "InputEvent.hpp"
-
-#include "../ApplicationPhonebook.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookInternals.hpp"
 #include "PhonebookContact.hpp"
-#include "PhonebookContactOptions.hpp"
-#include "../data/PhonebookInternals.hpp"
-#include "Label.hpp"
-#include "Text.hpp"
 #include "UiCommonActions.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-
-#include <i18/i18.hpp>
-#include <log/log.hpp>
-
-#include <limits.h>
 
 namespace gui
 {
