@@ -161,7 +161,6 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
 std::string vfs::getline(FILE *stream, uint32_t length)
 {
-
     uint32_t currentPosition = ftell(stream);
 
     // allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add string's
@@ -197,6 +196,9 @@ vfs::FilesystemStats vfs::getFilesystemStats()
 
 bool vfs::isDir(const char *path)
 {
+    if (path == nullptr)
+        return (false);
+
     struct stat fileStatus;
 
     const int ret = stat(path, &fileStatus);
@@ -210,6 +212,9 @@ bool vfs::isDir(const char *path)
 
 bool vfs::fileExists(const char *path)
 {
+    if (path == nullptr)
+        return (false);
+
     struct stat fileStatus;
     const int ret = stat(path, &fileStatus);
     if (ret == 0) {
@@ -220,17 +225,26 @@ bool vfs::fileExists(const char *path)
 
 int vfs::deltree(const char *path)
 {
-    return (deltree(path));
+    if (path != nullptr)
+        return (deltree(path));
+    else
+        return (-1);
 }
 
 int vfs::mkdir(const char *dir)
 {
-    return (mkdir(dir));
+    if (dir != nullptr)
+        return (mkdir(dir));
+    else
+        return (-1);
 }
 
 int vfs::rename(const char *oldname, const char *newname)
 {
-    return (rename(oldname, newname));
+    if (oldname != nullptr && newname != nullptr)
+        return (rename(oldname, newname));
+    else
+        return (-1);
 }
 
 std::string vfs::lastErrnoToStr()
@@ -240,5 +254,8 @@ std::string vfs::lastErrnoToStr()
 
 vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
 {
-    return std::fopen(filename, mode);
+    if (filename != nullptr && mode != nullptr)
+        return (std::fopen(filename, mode));
+    else
+        return (nullptr);
 }
