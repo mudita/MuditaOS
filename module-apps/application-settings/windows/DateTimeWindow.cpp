@@ -158,7 +158,6 @@ namespace gui
 
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        //	setFocusItem( options[0] );
     }
 
     gui::Label *DateTimeWindow::addSpacer(const UTF8 &text)
@@ -237,6 +236,9 @@ namespace gui
                             auto len       = itemValue.length();
                             if (len > 0) {
                                 itemValue.removeChar(len - 1);
+                                if (itemValue.length() == 0) {
+                                    itemValue = "0";
+                                }
                                 item->setText(itemValue);
                                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
                             }
@@ -281,7 +283,12 @@ namespace gui
         if (item != nullptr) {
             auto itemValue = item->getText();
             auto key       = std::to_string(keyValue);
-            itemValue += key;
+            if (itemValue == "0") {
+                itemValue = key;
+            }
+            else {
+                itemValue += key;
+            }
             item->setText(itemValue);
 
             if (utils::time::validateDate(getDateTimeItemValue(DateTimeItems::Day),
