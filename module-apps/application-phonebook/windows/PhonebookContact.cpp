@@ -1,5 +1,6 @@
 #include "InputEvent.hpp"
 
+#include "../ApplicationPhonebook.hpp"
 #include "PhonebookContact.hpp"
 #include "PhonebookContactOptions.hpp"
 #include "../data/PhonebookInternals.hpp"
@@ -472,14 +473,8 @@ namespace gui
         if (((inputEvent.state == InputEvent::State::keyReleasedShort) ||
              ((inputEvent.state == InputEvent::State::keyReleasedLong))) &&
             (inputEvent.keyCode == KeyCode::KEY_LF)) {
-            auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
-            assert(app != nullptr);
-
-            if (app->windowOptions != nullptr) {
-                app->windowOptions->clearOptions();
-                app->windowOptions->addOptions(contactOptions(app, contact->ID));
-                app->switchWindow(app->windowOptions->getName(), nullptr);
-            }
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 
             return true;
         }

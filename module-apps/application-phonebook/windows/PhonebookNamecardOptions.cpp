@@ -1,3 +1,4 @@
+#include "../ApplicationPhonebook.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "PhonebookNamecardOptions.hpp"
 
@@ -5,7 +6,7 @@ namespace gui
 {
 
     PhonebookNamecardOptions::PhonebookNamecardOptions(app::Application *app)
-        : OptionWindow(app, gui::window::name::options_namecard)
+        : OptionWindow(app, gui::window::name::namecard_options)
     {
         buildInterface();
         this->addOptions(namecardOptionsList());

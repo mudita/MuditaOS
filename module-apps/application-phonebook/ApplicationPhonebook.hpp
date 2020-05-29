@@ -6,14 +6,20 @@
 
 namespace gui
 {
-    namespace name
+    namespace window::name
     {
-        namespace window
-        {
-            inline const std::string dialogYesNo = "DialogYesNo";
-        }; // namespace window
-    };     // namespace name
-};         // namespace gui
+        inline const std::string contact            = "Contact";
+        inline const std::string contact_options    = "Options";
+        inline const std::string duplicated_contact = "DuplicatedContactWindow";
+        inline const std::string no_results         = "NoResults";
+        inline const std::string contact_blocked    = "ContactBlocked";
+        inline const std::string namecard_options   = "Namecard Options";
+        inline const std::string new_contact        = "New";
+        inline const std::string search             = "Search";
+        inline const std::string search_results     = "SearchResults";
+        inline const std::string dialog_yes_no      = "DialogYesNo";
+    } // namespace window::name
+} // namespace gui
 
 namespace app
 {
@@ -29,8 +35,6 @@ namespace app
         ApplicationPhonebook(std::string name = name_phonebook, std::string parent = "", bool startBackgound = false);
         virtual ~ApplicationPhonebook();
 
-        gui::OptionWindow *windowOptions = nullptr;
-
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -42,9 +46,6 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-
-        bool blockContact(const uint32_t contactId);
-        bool removeContact(const uint32_t contactId);
     };
 
 } // namespace app

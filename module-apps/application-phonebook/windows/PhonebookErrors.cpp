@@ -35,7 +35,7 @@ namespace gui
         return (l);
     }
 
-    NoResults::NoResults(app::Application *app) : AppWindow(app, gui::window::name::noResults)
+    NoResults::NoResults(app::Application *app) : AppWindow(app, gui::window::name::no_results)
     {
         buildInterface();
     }
@@ -115,9 +115,9 @@ namespace gui
     }
 
     /*
- * contact blocked window
+     * contact blocked window
      */
-    ContactBlocked::ContactBlocked(app::Application *app) : AppWindow(app, gui::window::name::contactBlocked)
+    ContactBlocked::ContactBlocked(app::Application *app) : AppWindow(app, gui::window::name::contact_blocked)
     {
         buildInterface();
     }
@@ -197,4 +197,4 @@ namespace gui
 
         return (AppWindow::onInput(inputEvent));
     }
-} //namespace gui
+} // namespace gui
