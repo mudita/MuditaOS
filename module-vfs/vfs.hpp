@@ -121,7 +121,7 @@ class vfs
 
     void Init();
 
-    FILE *fopen(const char *filename, const char *mode, const bool bypassRootCheck = false);
+    FILE *fopen(const char *filename, const char *mode);
 
     int fclose(FILE *stream);
 
@@ -162,7 +162,7 @@ class vfs
     std::string getline(FILE *stream, uint32_t length = 1024);
 
     FilesystemStats getFilesystemStats();
-
+    FILE *openAbsolute(const char *filename, const char *mode);
     std::string relativeToRoot(const std::string path);
     std::string lastErrnoToStr();
     bool isDir(const char *path);
