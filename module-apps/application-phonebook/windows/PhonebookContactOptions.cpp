@@ -1,10 +1,9 @@
-#include <module-apps/windows/Dialog.hpp>
-#include <module-apps/application-phonebook/ApplicationPhonebook.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
-#include "../data/PhonebookItemData.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "Dialog.hpp"
 #include "PhonebookContactOptions.hpp"
-#include "PhonebookNewContact.hpp"
-#include "PhonebookNamecardOptions.hpp"
+
+#include "service-db/api/DBServiceAPI.hpp"
 
 namespace gui
 {
@@ -34,7 +33,7 @@ namespace gui
     {
         if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::name::window::main_window, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
 
@@ -74,7 +73,7 @@ namespace gui
         };
     }
 
-    bool PhonebookContactOptions::contactBlock()
+    auto PhonebookContactOptions::contactBlock() -> bool
     {
         LOG_DEBUG("Blocking contact: %" PRIu32, contact->ID);
         auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
@@ -98,7 +97,7 @@ namespace gui
         return true;
     }
 
-    bool PhonebookContactOptions::contactRemove()
+    auto PhonebookContactOptions::contactRemove() -> bool
     {
         LOG_DEBUG("Removing contact: %" PRIu32, contact->ID);
         auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));

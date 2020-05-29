@@ -1,9 +1,10 @@
-#include "../ApplicationPhonebook.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookStyle.hpp"
+#include "application-phonebook/widgets/PhonebookItem.hpp"
 #include "PhonebookSearchResults.hpp"
-#include "PhonebookNewContact.hpp"
+
 #include "service-appmgr/ApplicationManager.hpp"
-#include <application-phonebook/data/PhonebookStyle.hpp>
-#include "../widgets/PhonebookItem.hpp"
+
 
 namespace gui
 {

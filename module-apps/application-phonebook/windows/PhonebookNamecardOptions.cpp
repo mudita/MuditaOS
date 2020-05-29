@@ -1,5 +1,5 @@
-#include "../ApplicationPhonebook.hpp"
-#include "../data/PhonebookItemData.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "PhonebookNamecardOptions.hpp"
 
 namespace gui

@@ -49,28 +49,6 @@ class PhonebookDialog : public AppWindow
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
 
-class PhonebookDeleteContact : public PhonebookDialog
-{
-  public:
-    PhonebookDeleteContact(app::Application *app) : PhonebookDialog(app, "Delete")
-    {
-        LOG_INFO("PhonebookDeleteContact::ctor");
-    }
-    virtual ~PhonebookDeleteContact() = default;
-    void onBeforeShow(ShowMode mode, SwitchData *data);
-    void setContactData();
-};
-
-class PhonebookBlockContact : public PhonebookDialog
-{
-  public:
-    PhonebookBlockContact(app::Application *app) : PhonebookDialog(app, "Block")
-    {}
-    virtual ~PhonebookBlockContact() = default;
-    void onBeforeShow(ShowMode mode, SwitchData *data);
-    void setContactData();
-};
-
 class DuplicatedContactDialogWindow : public DialogYesNo
 {
   public:

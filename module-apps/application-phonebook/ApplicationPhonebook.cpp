@@ -1,17 +1,14 @@
-#include "Application.hpp"
-
 #include "ApplicationPhonebook.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "MessageType.hpp"
 #include "windows/PhonebookContact.hpp"
+#include "windows/PhonebookContactOptions.hpp"
 #include "windows/PhonebookDialogs.hpp"
 #include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
 #include "windows/PhonebookNamecardOptions.hpp"
-#include "windows/PhonebookContactOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
+
 namespace app
 {
 
