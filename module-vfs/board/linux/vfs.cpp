@@ -43,9 +43,9 @@ std::string vfs::relativeToRoot(const std::string path)
     return ((osRootPath / fs::path(path).relative_path()).relative_path());
 }
 
-vfs::FILE *vfs::fopen(const char *filename, const char *mode, const bool bypassRootCheck)
+vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
-    return std::fopen(bypassRootCheck ? filename : relativeToRoot(filename).c_str(), mode);
+    return std::fopen(relativeToRoot(filename).c_str(), mode);
 }
 
 int vfs::fclose(FILE *stream)
@@ -236,4 +236,9 @@ int vfs::rename(const char *oldname, const char *newname)
 std::string vfs::lastErrnoToStr()
 {
     return (strerror(errno));
+}
+
+vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
+{
+    return std::fopen(filename, mode);
 }
