@@ -19,4 +19,31 @@ namespace gui
             return thread;
         }
     };
+
+    class ThreadItemWithIndicator : public ThreadItem
+    {
+        gui::Image *indicator = nullptr;
+
+      public:
+        ThreadItemWithIndicator(ThreadModel *model, const UTF8 &indicatorName);
+
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+    };
+
+    class ThreadItemNotSent : public ThreadItemWithIndicator
+    {
+        static const inline UTF8 indicatorName = "messages_error_W_M";
+
+      public:
+        ThreadItemNotSent(ThreadModel *model);
+    };
+
+    class ThreadItemNotRead : public ThreadItemWithIndicator
+    {
+        static const inline UTF8 indicatorName = " ";
+
+      public:
+        ThreadItemNotRead(ThreadModel *model);
+    };
+
 } /*namespace gui*/

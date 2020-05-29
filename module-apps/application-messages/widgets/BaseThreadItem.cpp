@@ -45,14 +45,14 @@ namespace gui
     {
         namespace msgStyle = style::messages::threadItem;
 
-        contact->setPosition(msgStyle::contactPositionX, msgStyle::contactPositionY);
-        contact->setSize(newDim.w - msgStyle::cotactWidthOffset, newDim.h / 2);
+        contact->setPosition(msgStyle::leftMargin, msgStyle::topMargin);
+        contact->setSize(newDim.w - msgStyle::cotactWidthOffset, newDim.h / 2 - msgStyle::topMargin);
 
-        timestamp->setPosition(newDim.w - msgStyle::timestampWidth, 0);
-        timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2);
+        timestamp->setPosition(newDim.w - msgStyle::timestampWidth, msgStyle::topMargin);
+        timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2 - msgStyle::topMargin);
 
-        preview->setPosition(14, newDim.h / 2);
-        preview->setSize(newDim.w - msgStyle::previewWidthOffset, newDim.h / 2);
+        preview->setPosition(msgStyle::leftMargin, newDim.h / 2);
+        preview->setSize(newDim.w - msgStyle::previewWidthOffset, newDim.h / 2 - msgStyle::bottomMargin);
 
         return true;
     }

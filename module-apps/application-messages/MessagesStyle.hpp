@@ -16,15 +16,17 @@ namespace style
 
         namespace threadItem
         {
+            constexpr auto topMargin    = 16;
+            constexpr auto bottomMargin = 13;
 
-            constexpr auto contactPositionX  = 14;
-            constexpr auto contactPositionY  = 10;
-            constexpr auto cotactWidthOffset = 133;
+            constexpr auto leftMargin  = 10;
+            constexpr auto rightMargin = 10;
 
+            constexpr auto cotactWidthOffset = 120;
             constexpr auto timestampWidth = 100;
+            constexpr auto notSentIconWidth  = 40;
 
-            constexpr auto prewievPositionX   = 14;
-            constexpr auto previewWidthOffset = 20;
+            constexpr auto previewWidthOffset = leftMargin + rightMargin + 10;
         } // namespace threadItem
 
         namespace newMessage
