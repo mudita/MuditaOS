@@ -6,9 +6,9 @@
 
 namespace gui
 {
-    namespace name
+    namespace window
     {
-        namespace window
+        namespace name
         {
             const inline std::string search_results = "SearchResults";
         };

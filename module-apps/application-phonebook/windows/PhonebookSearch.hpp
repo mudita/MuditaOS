@@ -7,6 +7,13 @@
 
 namespace gui
 {
+    namespace window
+    {
+        namespace name
+        {
+            inline std::string search = "Search";
+        }
+    } // namespace window
 
     class PhonebookSearch : public AppWindow
     {

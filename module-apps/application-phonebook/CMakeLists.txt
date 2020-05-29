@@ -21,8 +21,7 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookDialogs.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearch.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptions.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptionsNamecard.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactOptions.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookErrors.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearchResults.cpp"
@@ -36,7 +35,6 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptions.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactOptions.hpp"
 )
 
