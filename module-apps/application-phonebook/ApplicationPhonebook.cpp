@@ -8,7 +8,7 @@
 #include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
-#include "windows/PhonebookOptionsNamecard.hpp"
+#include "windows/PhonebookNamecardOptions.hpp"
 #include "windows/PhonebookContactOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
@@ -88,7 +88,7 @@ namespace app
         windows.insert({windowOptions->getName(), windowOptions});
         windows.insert(
             {gui::name::window::dialogYesNo, new gui::DialogYesNo(this, gui::name::window::dialogYesNo)});
-        windows.insert({gui::window::name::options_namecard, new PhonebookOptionsNamecard(this)});
+        windows.insert({gui::window::name::options_namecard, new PhonebookNamecardOptions(this)});
     }
 
     void ApplicationPhonebook::destroyUserInterface()
