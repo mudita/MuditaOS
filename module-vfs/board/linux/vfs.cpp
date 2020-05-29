@@ -99,9 +99,10 @@ size_t vfs::filelength(FILE *stream)
 
     return size;
 }
+
 char *vfs::fgets(char *buffer, size_t count, FILE *stream)
 {
-    return (fgets(buffer, count, stream));
+    return (std::fgets(buffer, count, stream));
 }
 
 std::string vfs::getcurrdir()
