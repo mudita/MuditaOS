@@ -75,7 +75,6 @@ namespace app
         windows.insert({gui::window::name::new_contact, new PhonebookNewContact(this)});
         windows.insert({gui::window::name::contact, new PhonebookContact(this)});
         windows.insert({gui::window::name::duplicated_contact, new PhonebookDuplicateSpeedDial(this)});
-        windows.insert({gui::window::name::duplicated_contact, new DuplicatedContactDialogWindow(this)});
         windows.insert({gui::window::name::search, new PhonebookSearch(this)});
         windows.insert({gui::window::name::no_results, new NoResults(this)});
         windows.insert({gui::window::name::contact_blocked, new ContactBlocked(this)});
