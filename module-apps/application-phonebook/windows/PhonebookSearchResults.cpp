@@ -5,7 +5,6 @@
 
 #include "service-appmgr/ApplicationManager.hpp"
 
-
 namespace gui
 {
     PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
