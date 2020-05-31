@@ -35,6 +35,7 @@
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
+#include "service-fota/ServiceFota.hpp"
 
 // module-bsp
 #include "bsp/bsp.hpp"
@@ -130,7 +131,7 @@ class BlinkyService : public sys::Service
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode /*mode*/) override final
     {
         return sys::ReturnCodes::Success;
     }
@@ -178,6 +179,7 @@ int main()
 #else
         LOG_INFO("ServiceCellular (GSM) - Enabling");
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<FotaService::Service>(), sysmgr.get());
 #endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
