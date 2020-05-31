@@ -186,6 +186,17 @@ enum class MessageType
     LwIP_request,
     EVM_GPIO,
     SIMTrayEvent,
+
+    HttpRequest,
+    HttpResponse,
+    FotaConfigureAPN,
+    FotaInternetConnect,
+    FotaInternetDisconnect,
+    FotaInternetNotification,
+    FotaStart,
+    FotaProgress,
+    FotaFinished,
+
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
