@@ -9,12 +9,7 @@ std::string vfs::generateRandomId(size_t length = 0)
 
     std::random_device random_device;
     std::mt19937 generator(random_device());
-#ifndef TARGET_Linux
-    generator.seed(cpp_freertos::Ticks::GetTicks());
-#else
-    generator.seed(clock());
-#endif
-
+    generator.seed(utils::time::Timestamp().getTime());
     std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
 
     std::string random_string;
