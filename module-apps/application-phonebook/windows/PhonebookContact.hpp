@@ -6,21 +6,6 @@
 #include <Text.hpp>
 #include <Utils.hpp>
 
-static inline bool isValidName(const UTF8 name)
-{
-    return (name.length() > 0);
-}
-
-static inline bool isValidNumber(const UTF8 number)
-{
-    return (number.length() > 3);
-}
-
-static inline bool isValidEmail(const UTF8 email)
-{
-    return (email.length() > 4);
-}
-
 static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
 {
     if (contact.get() == nullptr) {
