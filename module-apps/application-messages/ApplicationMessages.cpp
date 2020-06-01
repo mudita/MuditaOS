@@ -47,7 +47,10 @@ namespace app
                     (msg->interface == db::Interface::Name::SMSThread)) {
                     this->windows[gui::name::window::thread_view]->rebuild();
                     this->windows[gui::name::window::main_window]->rebuild();
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    if (this->getCurrentWindow() == this->windows[gui::name::window::main_window] ||
+                        this->getCurrentWindow() == this->windows[gui::name::window::thread_view]) {
+                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    }
                     return std::make_shared<sys::ResponseMessage>();
                 }
             }
