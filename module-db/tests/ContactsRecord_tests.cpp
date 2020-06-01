@@ -182,6 +182,17 @@ TEST_CASE("Contact Record tests")
                 utils::localize.get("app_phonebook_contact_no_name"));
 
         testRecord.numbers.clear();
+        testRecord.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(),
+            ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
+        });
+
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberUserTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberUserTest);
+        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+                utils::localize.get("app_phonebook_contact_no_name"));
+
+        testRecord.numbers.clear();
 
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == "");
         REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) ==

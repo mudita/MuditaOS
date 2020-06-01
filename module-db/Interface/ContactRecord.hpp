@@ -44,10 +44,10 @@ struct ContactRecord
 
     inline auto getNumberAsName() const -> UTF8
     {
-        if(numbers.size() > 0 && numbers[0].numberUser.length() > 0){
+        if (numbers.size() > 0 && numbers[0].numberUser.length() > 0) {
             return numbers[0].numberUser;
         }
-        if(numbers.size() > 1 && numbers[1].numberUser.length() > 0){
+        if (numbers.size() > 1 && numbers[1].numberUser.length() > 0) {
             return numbers[1].numberUser;
         }
         return "";
