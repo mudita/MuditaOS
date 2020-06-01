@@ -22,8 +22,7 @@ gui::ListItem *ThreadModel::getItem(gui::Order order)
         return nullptr;
     }
 
-    auto item = new gui::ThreadItem(this);
-
+    auto item = gui::ThreadItem::makeThreadItem(this, gui::ThreadItem::Type::NotSent);
     item->setThreadItem(thread);
     item->activatedCallback = [=](gui::Item &item) {
         LOG_INFO("ThreadItem ActivatedCallback");

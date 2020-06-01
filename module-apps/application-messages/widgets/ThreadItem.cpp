@@ -8,6 +8,18 @@
 
 namespace gui
 {
+    ThreadItem *ThreadItem::makeThreadItem(ThreadModel *model, Type type)
+    {
+        switch (type) {
+        case Type::NotSent:
+            return new ThreadItemNotSent(model);
+        case Type::NotRead:
+            return new ThreadItemNotRead(model);
+        case Type::Regular:
+        default:
+            return new ThreadItem(model);
+        }
+    }
 
     ThreadItem::ThreadItem(ThreadModel *model)
     {

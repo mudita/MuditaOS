@@ -18,6 +18,14 @@ namespace gui
         {
             return thread;
         }
+
+        enum class Type
+        {
+            Regular,
+            NotSent,
+            NotRead
+        };
+        static ThreadItem *makeThreadItem(ThreadModel *model, Type type);
     };
 
     class ThreadItemWithIndicator : public ThreadItem
