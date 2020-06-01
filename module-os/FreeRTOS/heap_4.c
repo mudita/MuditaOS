@@ -356,7 +356,7 @@ BlockLink_t *pxLink;
 
 #if (configSYSTEM_HEAP_STATS == 1)
 					/* Update taken list */
-					pxLink->pxPrevTakenBlock                   = pxLink->pxNextTakenBlock;
+					pxLink->pxPrevTakenBlock->pxNextTakenBlock = pxLink->pxNextTakenBlock;
 					pxLink->pxNextTakenBlock->pxPrevTakenBlock = pxLink->pxPrevTakenBlock;
 					pxLink->pxPrevTakenBlock                   = NULL;
 					pxLink->pxNextTakenBlock                   = NULL;
