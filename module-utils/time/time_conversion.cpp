@@ -28,10 +28,10 @@ namespace utils
             UTF8 retval = "";
             switch (val) {
             case DayLong:
-                retval = Locale::get_day(Locale::Day(timeinfo.tm_wday - 1));
+                retval = Locale::get_day(Locale::Day(timeinfo.tm_wday));
                 break;
             case DayAbbrev:
-                retval = Locale::get_day(Locale::Day(timeinfo.tm_wday - 1)).substr(0, abbrev_len);
+                retval = Locale::get_day(Locale::Day(timeinfo.tm_wday)).substr(0, abbrev_len);
                 break;
             case MonthLong:
                 retval = Locale::get_month(Locale::Month(timeinfo.tm_mon));
