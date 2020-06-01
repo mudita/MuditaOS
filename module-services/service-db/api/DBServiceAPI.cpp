@@ -373,27 +373,20 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumbe
 
 DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service *serv,
                                                                    const ContactRecord &rec,
-                                                                   ContactRecord &errName,
-                                                                   ContactRecord &errPhone1,
-                                                                   ContactRecord &errPhone2,
-                                                                   ContactRecord &speedDial)
+                                                                   ContactRecord &errNumPrim,
+                                                                   ContactRecord &errNumAlt,
+                                                                   ContactRecord &errSpeedDial)
 {
-    auto retName = ContactGetByName(serv, rec.primaryName, rec.alternativeName);
-    if (!retName->empty()) {
-        errName = retName->operator[](0);
-        return (nameError);
-    }
-
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
     if (!retSpeedDial->empty()) {
-        speedDial = retSpeedDial->operator[](0);
+        errSpeedDial = retSpeedDial->operator[](0);
         return (speedDialError);
     }
 
     if (rec.numbers.size() > 0 && rec.numbers[0].numberE164.length() > 0) {
         auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
         if (!retPhone1->empty()) {
-            errPhone1 = retPhone1->operator[](0);
+            errNumPrim = retPhone1->operator[](0);
             return (primaryNumberError);
         }
     }
@@ -401,7 +394,7 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
     if (rec.numbers.size() > 1 && rec.numbers[1].numberE164.length() > 0) {
         auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberE164);
         if (!retPhone2->empty()) {
-            errPhone2 = retPhone2->operator[](0);
+            errNumAlt = retPhone2->operator[](0);
             return (secondaryNumberError);
         }
     }
@@ -414,8 +407,6 @@ std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationEr
     switch (err) {
     case noError:
         return ("No error occured");
-    case nameError:
-        return ("Invalid name format");
     case speedDialError:
         return ("Invalid or duplicate speed dial number");
     case primaryNumberError:
