@@ -42,6 +42,17 @@ struct ContactRecord
         Title,
     };
 
+    inline auto getNumberAsName() const -> UTF8
+    {
+        if(numbers.size() > 0 && numbers[0].numberUser.length() > 0){
+            return numbers[0].numberUser;
+        }
+        if(numbers.size() > 1 && numbers[1].numberUser.length() > 0){
+            return numbers[1].numberUser;
+        }
+        return "";
+    }
+
     inline auto getFormattedName(const NameFormatType type = NameFormatType::Default) const -> UTF8
     {
         if (primaryName.length() > 0) {
@@ -50,8 +61,8 @@ struct ContactRecord
         if (alternativeName.length() > 0) {
             return alternativeName;
         }
-        if ((type == NameFormatType::Default || type == NameFormatType::List) && numbers.size() > 0) {
-            return numbers[0].numberUser;
+        if ((type == NameFormatType::Default || type == NameFormatType::List) && getNumberAsName().length() > 0) {
+            return getNumberAsName();
         }
         if (type == NameFormatType::List || type == NameFormatType::Title) {
             return utils::localize.get("app_phonebook_contact_no_name");
