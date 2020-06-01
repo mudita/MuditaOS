@@ -60,32 +60,27 @@ TEST_CASE("Test case 1")
     }
 }
 
-#define RANDDOM_TESTS 128
+#define RANDDOM_TESTS 4
 TEST_CASE("Random strings")
 {
     vfs.Init();
+    const std::string allowedChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    std::string randomIds8, randomIds16, randomIds32;
+    randomIds8  = vfs.generateRandomId(8);
+    randomIds16 = vfs.generateRandomId(16);
+    randomIds32 = vfs.generateRandomId(32);
 
-    std::vector<std::string> randomIds8, randomIds16, randomIds32;
+    REQUIRE(randomIds8.size() == 8);
+    for (unsigned int i = 0; i < randomIds8.size(); i++)
+        REQUIRE(allowedChars.find_first_of(randomIds8[i]) != std::string::npos);
 
-    for (int i = 0; i < RANDDOM_TESTS; i++)
-        randomIds8.push_back(vfs.generateRandomId(8));
+    REQUIRE(randomIds16.size() == 16);
+    for (unsigned int i = 0; i < randomIds16.size(); i++)
+        REQUIRE(allowedChars.find_first_of(randomIds16[i]) != std::string::npos);
 
-    for (int i = 0; i < RANDDOM_TESTS; i++)
-        randomIds16.push_back(vfs.generateRandomId(16));
-
-    for (int i = 0; i < RANDDOM_TESTS; i++)
-        randomIds32.push_back(vfs.generateRandomId(32));
-
-    for (int k = 0; k < RANDDOM_TESTS; k++) {
-        for (int i = 0; i < RANDDOM_TESTS; i++) {
-            if (k == i)
-                continue;
-
-            REQUIRE(randomIds8[k] != randomIds8[i]);
-            REQUIRE(randomIds16[k] != randomIds16[i]);
-            REQUIRE(randomIds32[k] != randomIds32[i]);
-        }
-    }
+    REQUIRE(randomIds32.size() == 32);
+    for (unsigned int i = 0; i < randomIds32.size(); i++)
+        REQUIRE(allowedChars.find_first_of(randomIds32[i]) != std::string::npos);
 }
 
 TEST_CASE("CRC32 tests")
