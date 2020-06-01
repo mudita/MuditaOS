@@ -66,7 +66,7 @@ namespace app
             switchWindow(window::name_call);
             return;
         }
-        else {
+        else if (getState() == State::ACTIVE_BACKGROUND) {
             // it means we have switched to different application during call and the call was aborted
             // hence we need to switch back to call application
             sapm::ApplicationManager::messageSwitchPreviousApplication(this);
@@ -267,6 +267,7 @@ namespace app
     void ApplicationCall::handleCallEvent(const std::string &number)
     {
         if (!Store::GSM::get()->simCardInserted()) {
+            LOG_INFO("No SIM card");
             auto action = [=]() -> bool {
                 returnToPreviousWindow();
                 return true;
