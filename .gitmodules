@@ -36,3 +36,7 @@
 	url = ../libphonenumber.git
 	branch = rt1051
 	shallow = true
+[submodule "test/googletest"]
+	path = test/googletest
+	url = https://github.com/google/googletest
+	branch = 703bd9caab50b139428cea1aaff9974ebee5742e
