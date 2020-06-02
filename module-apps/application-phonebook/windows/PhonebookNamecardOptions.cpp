@@ -20,7 +20,7 @@ namespace gui
             return false;
         }
 
-        contact    = item->getContact();
+        contact = item->getContact();
         return true;
     }
 

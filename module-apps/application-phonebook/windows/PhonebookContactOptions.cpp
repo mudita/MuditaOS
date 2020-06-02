@@ -79,10 +79,6 @@ namespace gui
         assert(dialog != nullptr);
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
-            if (!DBServiceAPI::ContactBlock(this->application, contact->ID)) {
-                LOG_ERROR("Contact id=%" PRIu32 "  block failed", contact->ID);
-                return false;
-            }
             this->application->switchWindow(gui::name::window::main_window);
             return true;
         };
