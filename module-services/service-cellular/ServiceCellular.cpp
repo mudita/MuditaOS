@@ -91,6 +91,10 @@ const char *State::c_str(State::ST state)
         return "CellularStartConfProcedure";
     case ST::Ready:
         return "Ready";
+    case ST::PowerDown:
+        return "PowerDown";
+    case ST::PowerDownInProgress:
+        return "PowerDownInProgress";
     }
     return "";
 }
@@ -142,7 +146,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         auto msg = identifyNotification(frame.getFrame().data);
 
         if (msg == std::nullopt) {
-            LOG_INFO("Skipped uknown notification");
+            LOG_INFO("Skipped unknown notification");
             return;
         }
 
@@ -273,6 +277,12 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
     case State::ST::Ready:
         handle_ready();
         break;
+    case State::ST::PowerDownInProgress:
+        handle_power_down_in_progress();
+        break;
+    case State::ST::PowerDown:
+        handle_power_down();
+        break;
     };
 }
 
@@ -288,7 +298,7 @@ bool ServiceCellular::handle_power_up_procedure()
     case bsp::Board::T4: {
         LOG_DEBUG("T4 - cold start");
         cmux->TurnOnModem();
-        state.set(this, State::ST::PowerUpInProgress);
+        // wait for status pin change to change state
         break;
     }
     case bsp::Board::T3: {
@@ -351,6 +361,33 @@ bool ServiceCellular::handle_power_up_in_progress_procedure(void)
         state.set(this, cellular::State::ST::ModemFatalFailure);
         return false;
     }
+}
+
+bool ServiceCellular::handle_power_down_in_progress()
+{
+    switch (board) {
+    case bsp::Board::T4:
+        // wait for pin status become inactive (handled elsewhere)
+        break;
+    case bsp::Board::Linux:
+    case bsp::Board::T3:
+        // if it's T3, then wait for status pin to become inactive, to align with T4
+        vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn't be needed, but better be safe than Quectel
+        state.set(this, cellular::State::ST::PowerDown);
+        break;
+    default:
+        break;
+    }
+    return true;
+}
+
+bool ServiceCellular::handle_power_down()
+{
+    LOG_DEBUG("Powered Down");
+    cmux.reset();
+    cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    InitHandler();
+    return true;
 }
 
 bool ServiceCellular::handle_start_conf_procedure()
@@ -711,9 +748,14 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         using namespace bsp::cellular::status;
         auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
         if (msg != nullptr) {
-            auto status_pin = msg->state;
-            if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == bsp::Board::T4) {
-                state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+            if (board == bsp::Board::T4) {
+                auto status_pin = msg->state;
+                if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure) {
+                    state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+                }
+                else if (status_pin == value::INACTIVE && state.get() == State::ST::PowerDownInProgress) {
+                    state.set(this, State::ST::PowerDown);
+                }
             }
         }
         break;
@@ -811,6 +853,12 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
                     CellularNotificationMessage::Type::SignalStrengthUpdate);
             }
         }
+    }
+
+    // Power Down
+    if (str.find("POWERED DOWN") != std::string::npos) {
+        state.set(this, State::ST::PowerDownInProgress);
+        return std::nullopt;
     }
 
     LOG_WARN("Unhandled notification: %s", str.c_str());

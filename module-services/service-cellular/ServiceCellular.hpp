@@ -90,6 +90,10 @@ class ServiceCellular : public sys::Service
 
     /// @defgroup state_handlers     all functions on State::ST:: change requests
     /// @{
+    /// cellular after power down handler
+    bool handle_power_down();
+    /// cellular on power down handler
+    bool handle_power_down_in_progress();
     /// idle handler
     bool handle_idle();
     /// cellular power up procedure
