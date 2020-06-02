@@ -22,11 +22,16 @@ void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t li
     list->onProviderDataUpdate();
 }
 
+int SearchResultsModel::getMinimalItemHeight()
+{
+    return phonebookStyle::contactItem::h;
+}
+
 gui::ListItem *SearchResultsModel::getItem(gui::Order order)
 {
     auto index = 0;
     if (order == gui::Order::Previous) {
-        index = internalOffset + internalLimit;
+        index = internalOffset + internalLimit - 1;
     }
     if (order == gui::Order::Next) {
         index = internalOffset;
@@ -34,7 +39,14 @@ gui::ListItem *SearchResultsModel::getItem(gui::Order order)
 
     if (results != nullptr && index < static_cast<int>(results->size()) && index >= 0) {
         auto contact = std::make_shared<ContactRecord>(results->at(index));
-        //    std::shared_ptr<ContactRecord> contact = getRecord(index);
+
+        LOG_DEBUG("index: %d, id: %d, limit: %d, name: %s %s, fav: %d",
+                  index,
+                  internalOffset,
+                  internalLimit,
+                  contact->primaryName.c_str(),
+                  contact->alternativeName.c_str(),
+                  contact->isOnFavourites);
 
         if (order == gui::Order::Previous) {
             internalOffset--;
@@ -47,35 +59,26 @@ gui::ListItem *SearchResultsModel::getItem(gui::Order order)
             return nullptr;
         }
 
-        LOG_DEBUG("index: %d, id: %d, name: %s %s, fav: %d",
-                  index,
-                  internalOffset,
-                  contact->primaryName.c_str(),
-                  contact->alternativeName.c_str(),
-                  contact->isOnFavourites);
         gui::PhonebookItem *item = new gui::PhonebookItem();
 
-        if (item != nullptr) {
-            item->setContact(contact);
-            item->setID(internalOffset);
-            item->activatedCallback = [=](gui::Item &item) {
-                LOG_INFO("activatedCallback");
-                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-                application->switchWindow(gui::window::name::contact, std::move(data));
-                return true;
-            };
+        item->setContact(contact);
+        item->activatedCallback = [=](gui::Item &item) {
+            LOG_INFO("activatedCallback");
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow(gui::window::name::contact, std::move(data));
+            return true;
+        };
 
-            item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-                if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                    return false;
-                }
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    LOG_DEBUG("calling");
-                    return app::call(application, *item->contact);
-                }
+        item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
-            };
-        }
+            }
+            if (event.keyCode == gui::KeyCode::KEY_LF) {
+                LOG_DEBUG("calling");
+                return app::call(application, *item->contact);
+            }
+            return false;
+        };
 
         return item;
     }

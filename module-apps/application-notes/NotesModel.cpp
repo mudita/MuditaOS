@@ -52,16 +52,16 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
     return true;
 }
 
+int NotesModel::getMinimalItemHeight()
+{
+
+    // refactor Notes Item!!!
+    return 146;
+}
+
 gui::ListItem *NotesModel::getItem(gui::Order order)
 {
-    auto index = modelIndex;
-    if (order == gui::Order::Previous) {
-        index = records.size() - 1 - modelIndex;
-    }
-
-    std::shared_ptr<NotesRecord> note = getRecord(index);
-
-    modelIndex++;
+    std::shared_ptr<NotesRecord> note = getRecord(order);
 
     SettingsRecord &settings = application->getSettings();
 
@@ -69,11 +69,7 @@ gui::ListItem *NotesModel::getItem(gui::Order order)
         return nullptr;
 
     gui::NotesItem *item = new gui::NotesItem(this, !settings.timeFormat12);
-    if (item != nullptr) {
-        item->setNote(note);
-        item->setID(index);
-        return item;
-    }
 
-    return nullptr;
+    item->setNote(note);
+    return item;
 }

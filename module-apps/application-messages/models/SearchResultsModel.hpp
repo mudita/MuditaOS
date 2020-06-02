@@ -15,6 +15,8 @@ namespace gui::model
 
       public:
         SearchResultsModel(app::Application *app);
+
+        int getMinimalItemHeight() override;
         ListItem *getItem(Order order) override;
         /// resquest data for model - not needed
         void requestRecordsCount() override;

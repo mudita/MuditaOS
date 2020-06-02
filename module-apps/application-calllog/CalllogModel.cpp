@@ -11,8 +11,8 @@
 #include "data/CallLogSwitchData.hpp"
 #include "data/CallLogInternals.hpp"
 #include "CalllogModel.hpp"
-#include "UiCommonActions.hpp"
 #include "ListView.hpp"
+#include "UiCommonActions.hpp"
 
 using namespace calllog;
 
@@ -62,16 +62,16 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
     return true;
 }
 
+int CalllogModel::getMinimalItemHeight()
+{
+
+    return gui::clItemStyle::h;
+}
+
 gui::ListItem *CalllogModel::getItem(gui::Order order)
 {
-    auto index = modelIndex;
-    if (order == gui::Order::Previous) {
-        index = records.size() - 1 - modelIndex;
-    }
 
-    std::shared_ptr<CalllogRecord> call = getRecord(index);
-
-    modelIndex++;
+    std::shared_ptr<CalllogRecord> call = getRecord(order);
 
     SettingsRecord &settings = application->getSettings();
     if (call.get() == nullptr) {
@@ -80,27 +80,24 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
     }
 
     auto item = new gui::CalllogItem(this, !settings.timeFormat12);
-    if (item != nullptr) {
-        item->setCall(call);
-        item->setID(index);
-        item->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("activatedCallback");
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
-            application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
-            return true;
-        };
 
-        item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
-                LOG_DEBUG("calling");
-                return app::call(application, item->getCall().phoneNumber);
-            }
+    item->setCall(call);
+    item->activatedCallback = [=](gui::Item &item) {
+        LOG_INFO("activatedCallback");
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
+        application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
+        return true;
+    };
+
+    item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+        if (event.state != gui::InputEvent::State::keyReleasedShort) {
             return false;
-        };
-        return item;
-    }
-    return nullptr;
+        }
+        if (event.keyCode == gui::KeyCode::KEY_LF) {
+            LOG_DEBUG("calling");
+            return app::call(application, item->getCall().phoneNumber);
+        }
+        return false;
+    };
+    return item;
 }

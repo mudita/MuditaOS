@@ -6,8 +6,8 @@ namespace gui
 
     PhonebookItem::PhonebookItem()
     {
-        setMinimumSize(style::window::default_body_width, style::window::label::big_h);
-        setMaximumSize(style::window::default_body_width, style::window::label::big_h);
+        setMinimumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
+        setMaximumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
 
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
@@ -25,7 +25,7 @@ namespace gui
 
     bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        value->setPosition(10, 0);
+        value->setPosition(phonebookStyle::contactItem::left_margin, 0);
         value->setSize(newDim.w, newDim.h);
 
         return true;
@@ -51,9 +51,11 @@ namespace gui
     UTF8 PhonebookItem::getLabelMarker()
     {
         if (favourite) {
-            return "Favourites";
+            // If contact is favorite return proper UTF string
+            return phonebookStyle::contactItem::favourites_string;
         }
         else {
+            // else return first surname contact letter
             return contact->alternativeName.substr(0, 1);
         }
     }

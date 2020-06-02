@@ -1,5 +1,6 @@
 #pragma once
 #include <Style.hpp>
+#include "utf8/UTF8.hpp"
 
 namespace phonebookStyle
 {
@@ -49,6 +50,15 @@ namespace phonebookStyle
             constexpr uint32_t penWidth      = 0;
         } // namespace contactsList
     }     // namespace mainWindow
+
+    namespace contactItem
+    {
+        constexpr uint32_t w           = style::window::default_body_width;
+        constexpr uint32_t h           = style::window::label::big_h;
+        constexpr uint32_t left_margin = 10;
+        const UTF8 favourites_string   = "Favourites";
+    } // namespace contactItem
+
     namespace searchResults
     {
         namespace searchResultList

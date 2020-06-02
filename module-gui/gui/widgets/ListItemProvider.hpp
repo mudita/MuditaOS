@@ -21,6 +21,8 @@ namespace gui
 
         virtual int getItemCount() const = 0;
 
+        virtual int getMinimalItemHeight() = 0;
+
         virtual ListItem *getItem(Order order) = 0;
 
         virtual void requestRecords(const uint32_t offset, const uint32_t limit) = 0;
