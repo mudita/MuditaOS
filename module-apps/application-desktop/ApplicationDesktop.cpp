@@ -77,7 +77,7 @@ namespace app
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
     {
         assert(msg);
-        if (msg->request == cellular::State::ST::ModemOn) {
+        if (msg->request == cellular::State::ST::URCReady) {
             if (need_sim_select && !screenLocked) {
                 sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
