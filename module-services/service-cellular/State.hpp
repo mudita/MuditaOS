@@ -10,7 +10,7 @@ namespace cellular
         enum class ST
         {
             Idle,                        /// does nothing
-            StatusCheck,                 /// set on service start - cheek for modem status - skipped on T3 board
+            StatusCheck,                 /// set on service start - check for modem status - skipped on T3 board
             PowerUpProcedure,            /// due to lack of Status pin on T3, we don't know whether is on or off
             PowerUpInProgress,           /// waiting for modem powered up by polling various bauds
             CellularConfProcedure,       /// configuration procedure
@@ -22,7 +22,9 @@ namespace cellular
             SimSelect, /// triggers hw SIM selection (! state now will be **changed on URC** )
             ModemFatalFailure, /// modem full shutdown need
             Failed,
-            Ready, /// Service is fully initalized
+            Ready,               /// Service is fully initalized
+            PowerDownInProgress, /// modem is in the process of turining off
+            PowerDown,           /// modem is known to be turned off
         };
 
       private:
