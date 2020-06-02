@@ -201,6 +201,8 @@ enum class MessageType
     FotaStart,
     FotaProgress,
     FotaFinished,
+
+StateChange,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
