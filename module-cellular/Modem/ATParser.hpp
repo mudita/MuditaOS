@@ -34,6 +34,7 @@ class ATParser : public at::Chanel
         SimCardReady,
         SMSInitializationComplete,
         PhonebookInitializationComplete,
+        Fota,
         NotHandled,
     };
 

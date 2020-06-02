@@ -12,6 +12,7 @@
 #include "Service/Bus.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
+#include "service-fota/api/FotaServiceAPI.hpp"
 #include "ticks.hpp"
 #include <Utils.hpp>
 #include <utility>
@@ -43,6 +44,12 @@ std::vector<ATParser::Urc> ATParser::ParseURC()
             maxPos = std::max(pos + el.first.length(), maxPos);
             LOG_DEBUG("%s", ("[URC]: " + el.first).c_str());
         }
+    }
+
+    if (responseBuffer.find("+QIND: \"FOTA\"") != std::string::npos) {
+        LOG_DEBUG("%s", responseBuffer.c_str());
+        resp.push_back(ATParser::Urc::Fota);
+        return resp;
     }
 
     // manage string buffer
@@ -78,7 +85,15 @@ int ATParser::ProcessNewData(sys::Service *service)
         xTaskNotifyGive(blockedTaskHandle);
     }
     else if (ret.size()) {
-        urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
+        if (ret.size() == 1 && ret[0] == ATParser::Urc::Fota) {
+            std::string fotaData(responseBuffer);
+            LOG_DEBUG("parsing FOTA:\"%s\"", fotaData.c_str());
+            FotaService::API::sendRawProgress(service, fotaData);
+            responseBuffer.erase();
+        }
+        else {
+            urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
+        }
         // GSM modem is considered as operational when it outputs URCs specified below:
         // 1) RDY
         // 2) +CFUN: 1

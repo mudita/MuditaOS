@@ -246,8 +246,16 @@ class TS0710
         }
         return "";
     }
+    enum class Mode
+    {
+        AT,         /// AT raw text mode
+        CMUX_SETUP, /// Modem is switching from AT to CMUX
+        CMUX        /// multiplexer mode enabled
+    };
+    void setMode(Mode mode);
 
   private:
+    Mode mode = Mode::AT;
     std::vector<DLC_channel *> channels;
     friend void workerTaskFunction(void *ptr);
     // worker's task handle
@@ -256,14 +264,6 @@ class TS0710
     std::unique_ptr<bsp::Cellular> pv_cellular;
     PortSpeed_e pv_portSpeed;
     ATParser *parser;
-
-    enum class Mode
-    {
-        AT,
-        CMUX_SETUP,
-        CMUX
-    };
-    Mode mode = Mode::AT;
 
     int CloseMultiplexer();
     const static bool hardwareControlFlowEnable = false;
