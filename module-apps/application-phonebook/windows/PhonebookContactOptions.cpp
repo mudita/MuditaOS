@@ -28,17 +28,6 @@ namespace gui
         return true;
     }
 
-    auto PhonebookContactOptions::onInput(const InputEvent &inputEvent) -> bool
-    {
-        if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow(gui::name::window::main_window, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return true;
-        }
-
-        return (AppWindow::onInput(inputEvent));
-    }
-
     auto PhonebookContactOptions::contactOptionsList() -> std::list<gui::Option>
     {
         return {

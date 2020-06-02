@@ -11,7 +11,6 @@ namespace gui
       public:
         PhonebookContactOptions(app::Application *app);
         ~PhonebookContactOptions() override;
-        auto onInput(const InputEvent &inputEvent) -> bool override;
         auto handleSwitchData(SwitchData *data) -> bool override;
 
       private:
