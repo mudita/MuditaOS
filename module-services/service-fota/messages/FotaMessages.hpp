@@ -123,6 +123,14 @@ namespace FotaService
         unsigned char progress = 0;
     };
 
+    class FOTARawProgress : public FotaMessage
+    {
+      public:
+        FOTARawProgress() : FotaMessage(MessageType::FotaProgress)
+        {}
+        std::string qindRaw;
+    };
+
     class FOTAFinished : public FotaMessage
     {
       public:
@@ -150,11 +158,11 @@ namespace FotaService
         unsigned char contextId;
     };
 
-    class InternetResponseMessage : public sys::ResponseMessage
+    class FotaResponseMessage : public sys::ResponseMessage
     {
       public:
-        InternetResponseMessage(uint32_t retCode) : sys::ResponseMessage(), retCode(retCode){};
-        virtual ~InternetResponseMessage() = default;
+        FotaResponseMessage(uint32_t retCode) : sys::ResponseMessage(), retCode(retCode){};
+        virtual ~FotaResponseMessage() = default;
 
         uint32_t retCode = 0;
         std::vector<std::string> retData;

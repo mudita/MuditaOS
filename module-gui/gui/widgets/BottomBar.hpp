@@ -69,6 +69,7 @@ namespace gui
         virtual ~BottomBar();
 
         void setActive(BottomBar::Side side, bool active);
+        bool isActive(BottomBar::Side side);
         void setText(BottomBar::Side side, const UTF8 &str, bool active = true);
         UTF8 getText(BottomBar::Side side);
 

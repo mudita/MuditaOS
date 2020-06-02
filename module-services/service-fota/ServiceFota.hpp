@@ -53,15 +53,26 @@ namespace FotaService
         static const char *serviceName;
 
       private:
+        /** Get access to data channel
+         */
         sys::Message_t handleCellularGetChannelResponseMessage(sys::DataMessage *req, sys::ResponseMessage *response);
+        /** Do nothing until celular finishes it's startup
+         */
         sys::Message_t handleServiceCellularNotifications(sys::DataMessage *req, sys::ResponseMessage *response);
         sys::Message_t handleConfigureAPN(sys::DataMessage *req, sys::ResponseMessage *response);
         sys::Message_t handleConnect(sys::DataMessage *req, sys::ResponseMessage *response);
         sys::Message_t handleHttpGet(sys::DataMessage *req, sys::ResponseMessage *response);
+        /** Send fota update command to modem
+         */
         sys::Message_t handleFotaStart(sys::DataMessage *req, sys::ResponseMessage *response);
+        /** Handle URC from modem, support for asynchronious commands
+         */
         void handleChannelNotifications(std::vector<uint8_t> &data);
+        /** Handle fota progress notification (in cellular)
+         */
+        sys::Message_t handleRawProgress(sys::DataMessage *req, sys::ResponseMessage *response);
+
         uint32_t connectionTimer = 0;
-        //    NotificationMuxChannel::NotificationCallback_t notificationCallback = nullptr;
         void getApnConfiguration();
         void getConfig();
         void getActiveCotext();
@@ -69,17 +80,11 @@ namespace FotaService
         void setState();
         bool isHTTPS(const std::string &url) const;
         void normalizeUrl(std::string &url) const;
-        /// activate apn context
         std::string prepareQIACT(unsigned char contextId);
-        /// configure TCP/IP context
         std::string prepareQICSGPcmd(const APN::Config &apn);
-        /// deactivate TCP/IP context
+        std::string prepareQICSGPquery(const APN::Config &apn);
         std::string prepareQIDEACT(unsigned char contextId);
-        /// download fota
         std::string prepareQFOTADLcmd(const std::string &url);
-        /* prepare AT+QHTTPGET with timeout
-         * timeout in seconds, default 20
-         */
         std::string prepareQHTTPGET(unsigned int timeout = 20);
         std::string prepareQHTTPREAD(unsigned int timeout = 20);
         std::string prepareQHTTPURL(const std::string &url);
