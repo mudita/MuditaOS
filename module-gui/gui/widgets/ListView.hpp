@@ -43,7 +43,7 @@ namespace gui
         void resizeWithScroll();
         void recalculateStartIndex();
         void addSpanItem();
-        int calculateMinimalItemsCount();
+        int calculateMaxItemsOnPage();
         Order getOrderFromDirection();
         bool listPageEndReached();
 

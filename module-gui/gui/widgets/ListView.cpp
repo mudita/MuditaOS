@@ -26,23 +26,15 @@ namespace gui
     {
         if (shouldShowScroll(currentPageSize, elementsCount)) {
 
-            uint32_t pagesCount = 1;
-            if (currentPageSize) {
-                pagesCount = (elementsCount % currentPageSize == 0) ? elementsCount / currentPageSize
-                                                                    : elementsCount / currentPageSize + 1;
-                if (pagesCount == 0) {
-                    return;
-                }
-            }
+            double scrollStep = static_cast<double>(parent->widgetArea.h) / static_cast<double>(elementsCount);
 
-            if (currentPageSize != 0 && pagesCount != 0) {
-                uint32_t currentPage = startIndex / currentPageSize;
-                uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
+            auto scrollH = scrollStep * currentPageSize;
+            auto scrollY = scrollStep * startIndex;
 
-                setPosition(parent->widgetArea.w - style::listview::scroll::margin, pageHeight * currentPage);
-                setSize(style::listview::scroll::w, pageHeight);
-                setVisible(true);
-            }
+            setPosition(parent->widgetArea.w - style::listview::scroll::margin, scrollY);
+            setSize(style::listview::scroll::w, scrollH);
+
+            setVisible(true);
         }
         else
             setVisible(false);
@@ -244,23 +236,19 @@ namespace gui
         return body->onInput(inputEvent);
     }
 
-    int ListView::calculateMinimalItemsCount()
+    int ListView::calculateMaxItemsOnPage()
     {
-        auto minimalPageSize = widgetArea.h / provider->getMinimalItemHeight();
+        auto count = widgetArea.h / provider->getMinimalItemHeight();
 
-        LOG_DEBUG("minimalPageSize: %d", minimalPageSize);
-
-        return minimalPageSize;
+        return count;
     }
 
     bool ListView::listPageEndReached()
     {
         auto minLimit =
-            (2 * currentPageSize > calculateMinimalItemsCount() ? 2 * currentPageSize : calculateMinimalItemsCount());
+            (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
 
         auto calculateLimit = [&]() {
-            // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
-            // before it gets them, requests twice size of current page with down limit of at least minimalPageSize.
             if (direction == style::listview::Direction::Bottom)
                 return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
             else
