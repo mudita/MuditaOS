@@ -14,6 +14,7 @@ target_sources( ${PROJECT_NAME}
 
         PRIVATE
                 "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/data/PhonebookUtils.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
