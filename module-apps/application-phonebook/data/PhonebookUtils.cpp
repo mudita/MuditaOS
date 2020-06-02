@@ -1,6 +1,5 @@
 #include "PhonebookUtils.hpp"
 
-
 auto PhonebookUtils::formatVCard(const ContactRecord &contact) -> const std::string
 {
     const std::string priNumber = (contact.numbers.size() > 0) ? contact.numbers[0].numberE164.c_str() : "";
