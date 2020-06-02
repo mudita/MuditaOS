@@ -1,6 +1,7 @@
 #include "PhonebookNamecardOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/data/PhonebookUtils.hpp"
 
 namespace gui
 {
@@ -28,7 +29,8 @@ namespace gui
     {
         if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(
+                gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
 
@@ -37,36 +39,12 @@ namespace gui
 
     void PhonebookNamecardOptions::sendViaSms()
     {
-        const std::string vcard = formatVCARD();
+        const std::string vcard = PhonebookUtils::formatVCard(*contact);
     }
 
     void PhonebookNamecardOptions::sendViaBluetooth()
     {
-        const std::string vcard = formatVCARD();
-    }
-
-    auto PhonebookNamecardOptions::formatVCARD() -> const std::string
-    {
-        const std::string priNumber = (contact->numbers.size() > 0) ? contact->numbers[0].numberE164.c_str() : "";
-        const std::string secNumber = (contact->numbers.size() > 1) ? contact->numbers[1].numberE164.c_str() : "";
-        std::ostringstream vcard;
-        vcard << "BEGIN:VCARD\n"
-              << "VERSION:3.0\n"
-              << "N:" << contact->alternativeName.c_str() << ";" << contact->primaryName.c_str() << ";;;\n"
-              << "FN:" << contact->primaryName.c_str() << " " << contact->alternativeName.c_str() << "\n"
-              << "TEL;TYPE=HOME,VOICE:" << priNumber << "\n";
-
-        if (secNumber.length() > 0) {
-            vcard << "TEL;TYPE=HOME,VOICE:" << secNumber << "\n";
-        }
-
-        vcard << "ADR;TYPE=HOME:;;" << contact->address.c_str() << "\n"
-              << "EMAIL:" << contact->mail.c_str() << "\n"
-              << "END:VCARD";
-
-        LOG_INFO("formatted vcard:");
-        LOG_INFO("%s", vcard.str().c_str());
-        return (vcard.str());
+        const std::string vcard = PhonebookUtils::formatVCard(*contact);
     }
 
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>
