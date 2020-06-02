@@ -19,6 +19,5 @@ namespace gui
         auto namecardOptionsList() -> std::list<gui::Option>;
         void sendViaSms();
         void sendViaBluetooth();
-        auto formatVCARD() -> const std::string;
     };
 }; // namespace gui
