@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ApplicationPhonebook.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"

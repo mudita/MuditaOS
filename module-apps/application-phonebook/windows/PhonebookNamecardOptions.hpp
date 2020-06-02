@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ContactRecord.hpp"
 #include "OptionWindow.hpp"
+
+#include <ContactRecord.hpp>
 
 namespace gui
 {
@@ -9,7 +10,7 @@ namespace gui
     {
       public:
         PhonebookNamecardOptions(app::Application *app);
-        ~PhonebookNamecardOptions() override;
+        ~PhonebookNamecardOptions() override = default;
         auto onInput(const InputEvent &inputEvent) -> bool override;
         auto handleSwitchData(SwitchData *data) -> bool override;
 

@@ -1,6 +1,6 @@
+#include "PhonebookContact.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookInternals.hpp"
-#include "PhonebookContact.hpp"
 #include "UiCommonActions.hpp"
 
 namespace gui

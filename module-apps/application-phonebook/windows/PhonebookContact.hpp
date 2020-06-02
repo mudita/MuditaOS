@@ -2,9 +2,9 @@
 
 #include "application-phonebook/data/PhonebookItemData.hpp"
 
-#include "ContactRecord.hpp"
-#include "Text.hpp"
-#include "Utils.hpp"
+#include <ContactRecord.hpp>
+#include <Text.hpp>
+#include <Utils.hpp>
 
 static inline bool isValidName(const UTF8 name)
 {
