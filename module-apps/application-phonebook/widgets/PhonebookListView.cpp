@@ -1,13 +1,5 @@
-/*
- * @file PhonebookListView.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 11 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#include "../ApplicationPhonebook.hpp"
 #include "PhonebookListView.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "../windows/PhonebookContact.hpp"
 #include "PhonebookItem.hpp"

@@ -1,5 +1,5 @@
-#include "../ApplicationPhonebook.hpp"
 #include "PhonebookSearch.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "Utils.hpp"
 #include "service-db/api/DBServiceAPI.hpp"

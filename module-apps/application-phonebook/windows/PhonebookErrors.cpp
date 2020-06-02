@@ -84,13 +84,13 @@ namespace gui
 
     bool NoResults::handleSwitchData(SwitchData *data)
     {
-        if (data == nullptr) {
-            LOG_ERROR("Received null pointer");
+        PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
+        if (item == nullptr) {
+            LOG_WARN("Received null pointer");
             return false;
         }
 
-        PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
-        searchQuery                = item->getQuery();
+        searchQuery = item->getQuery();
 
         setContactData();
 
@@ -168,13 +168,13 @@ namespace gui
 
     bool ContactBlocked::handleSwitchData(SwitchData *data)
     {
-        if (data == nullptr) {
-            LOG_ERROR("Received null pointer");
+        PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
+        if (item == nullptr) {
+            LOG_WARN("Received null pointer");
             return false;
         }
 
-        PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
-        searchQuery                = item->getQuery();
+        searchQuery = item->getQuery();
 
         setContactData();
 
