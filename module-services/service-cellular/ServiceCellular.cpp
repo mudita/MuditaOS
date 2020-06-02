@@ -898,6 +898,10 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             }
         }
     }
+    if (str.find("\"FOTA\",\"HTTPEND\",0") != std::string::npos) {
+        LOG_DEBUG("Fota UPDATE, switching to AT mode");
+        cmux->setMode(TS0710::Mode::AT);
+    }
 
     // Power Down
     if (powerdown::isNormalPowerDown(str)) {

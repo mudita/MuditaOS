@@ -140,6 +140,11 @@ void CloseCmux(std::unique_ptr<bsp::Cellular> &pv_cellular)
     vTaskDelay(1000); // GSM module needs some time to close multiplexer
 }
 
+void TS0710::setMode(TS0710::Mode mode)
+{
+    this->mode = mode;
+}
+
 TS0710::ConfState TS0710::BaudDetectOnce()
 {
     bool result           = false;

@@ -1,5 +1,12 @@
 # Mudita PurePhone changelog
 
+## Current Release
+
+### Added
+
+* `[fota]` UI for FOTA
+* `[doc]` Added release process documentation.
+
 ## [0.26.1] - 2020-06-22
 
 ### Added
@@ -19,7 +26,6 @@
 ### Other
 * `[vfs]` Technical improvements and enhancements.
 * `[doc]` FOTA implementation and testing report which is required by Verizon certification process.
-* `[doc]` Added release process documentation.
 
 ## [0.25.1] - 2020-06-16
 

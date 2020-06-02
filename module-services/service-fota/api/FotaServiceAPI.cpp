@@ -52,6 +52,14 @@ namespace FotaService
         sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
     }
 
+    void API::sendRawProgress(sys::Service *serv, const string &rawQind)
+    {
+        LOG_DEBUG("Fota sending Raw progress");
+        std::shared_ptr<FotaService::FOTARawProgress> msg = std::make_shared<FotaService::FOTARawProgress>();
+        msg->qindRaw                                      = rawQind;
+        sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+    }
+
     std::string APN::toString(APN::AuthMethod authMethod)
     {
         switch (authMethod) {
