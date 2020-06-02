@@ -57,7 +57,7 @@ namespace gui
 
             // if direction bot add label mark before adding item
             if (direction == style::listview::Direction::Bottom) {
-                addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
+                addLabelMarker(dynamic_cast<gui::PhonebookItem *>(item));
             }
 
             body->addWidget(item);
@@ -74,9 +74,9 @@ namespace gui
                     }
                     else {
 
-                        body->eraseWidget(item);
-                        body->eraseWidget(previousListItem);
-                        body->eraseWidget(listSpanItem);
+                        body->erase(item);
+                        body->erase(previousListItem);
+                        body->erase(listSpanItem);
 
                         gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
 
@@ -92,7 +92,7 @@ namespace gui
             // if direction top add label mark after adding item
             if (direction == style::listview::Direction::Top) {
                 previousItemIsLabel = false;
-                addLabelMarker(reinterpret_cast<gui::PhonebookItem *>(item));
+                addLabelMarker(dynamic_cast<gui::PhonebookItem *>(item));
             }
 
             previousListItem = item;

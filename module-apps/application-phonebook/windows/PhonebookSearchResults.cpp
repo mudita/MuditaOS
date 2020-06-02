@@ -112,20 +112,6 @@ namespace gui
             fill_results(searchResults->getResults(), searchResults->getQuery());
             return (true);
         }
-        //
-        //        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
-        //        if (contactRequest) {
-        //            searchResultList->cb_ENTER = [=](gui::PhonebookItem *item) {
-        //                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
-        //                data->result                                 = item->getContact();
-        //                data->setDescription("PhonebookSearchRequest");
-        //                return sapm::ApplicationManager::messageSwitchPreviousApplication(
-        //                    application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(),
-        //                    std::move(data)));
-        //            };
-        //            fill_results(contactRequest->results, contactRequest->request);
-        //            setTitle(utils::localize.get("common_results_prefix") + "\"" + contactRequest->request + "\"");
-        //        }
 
         return (false);
     }

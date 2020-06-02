@@ -17,6 +17,26 @@
 namespace gui
 {
 
+    namespace clItemStyle
+    {
+        constexpr uint32_t w = style::window::default_body_width;
+        constexpr uint32_t h = style::window::label::big_h;
+        namespace img
+        {
+            constexpr uint32_t x = 11; // TODO: alek:: change to good values
+            constexpr uint32_t y = 22;
+        } // namespace img
+        namespace text
+        {
+            constexpr uint32_t x = 37;
+            constexpr uint32_t w = 280;
+        } // namespace text
+        namespace timestamp
+        {
+            constexpr uint32_t w = 115;
+        }
+    } // namespace clItemStyle
+
     /*
      * @brief Widget used to display information about calllog entry in the calllog list view.
      */
@@ -34,7 +54,7 @@ namespace gui
 
       public:
         CalllogItem(CalllogModel *model, bool mode24H);
-        virtual ~CalllogItem();
+        virtual ~CalllogItem() = default;
         // sets copy of alarm's
         void setCall(std::shared_ptr<CalllogRecord> &);
         CalllogRecord getCall() const

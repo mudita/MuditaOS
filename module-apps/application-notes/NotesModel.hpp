@@ -35,6 +35,7 @@ class NotesModel : public app::DatabaseModel<NotesRecord>, public gui::ListItemP
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
+    int getMinimalItemHeight() override;
     gui::ListItem *getItem(gui::Order order) override;
     int getItemCount() const override
     {
