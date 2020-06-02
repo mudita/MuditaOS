@@ -22,8 +22,6 @@
 #include <string.h>
 #include <log/log.hpp>
 
-extern int errno;
-
 namespace fs = std::filesystem;
 
 vfs::vfs()
