@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ContactRecord.hpp"
 #include "OptionWindow.hpp"
+
+#include <ContactRecord.hpp>
 
 namespace gui
 {

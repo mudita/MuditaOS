@@ -1,9 +1,9 @@
+#include "PhonebookContactOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "Dialog.hpp"
-#include "PhonebookContactOptions.hpp"
 
-#include "service-db/api/DBServiceAPI.hpp"
+#include <service-db/api/DBServiceAPI.hpp>
 
 namespace gui
 {
@@ -19,13 +19,12 @@ namespace gui
 
     auto PhonebookContactOptions::handleSwitchData(SwitchData *data) -> bool
     {
-        if (data == nullptr) {
-            LOG_ERROR("Received null pointer");
+        auto *item = dynamic_cast<PhonebookItemData *>(data);
+        if (item == nullptr) {
+            LOG_WARN("Received null pointer");
             return false;
         }
-
-        auto *item = dynamic_cast<PhonebookItemData *>(data);
-        contact    = item->getContact();
+        contact = item->getContact();
         return true;
     }
 
