@@ -210,7 +210,7 @@ namespace gui
         }
 
         if (listSpanItem != nullptr) {
-            body->eraseWidget(listSpanItem);
+            body->erase(listSpanItem);
         }
 
         recalculateStartIndex();
@@ -244,13 +244,23 @@ namespace gui
         return body->onInput(inputEvent);
     }
 
+    int ListView::calculateMinimalItemsCount()
+    {
+        auto minimalPageSize = widgetArea.h / provider->getMinimalItemHeight();
+
+        LOG_DEBUG("minimalPageSize: %d", minimalPageSize);
+
+        return minimalPageSize;
+    }
+
     bool ListView::listPageEndReached()
     {
-        auto minLimit = (2 * currentPageSize > 8 ? 2 * currentPageSize : 8);
+        auto minLimit =
+            (2 * currentPageSize > calculateMinimalItemsCount() ? 2 * currentPageSize : calculateMinimalItemsCount());
 
         auto calculateLimit = [&]() {
             // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
-            // before it gets them, requests twice size of current page with down limit of at least 8.
+            // before it gets them, requests twice size of current page with down limit of at least minimalPageSize.
             if (direction == style::listview::Direction::Bottom)
                 return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
             else

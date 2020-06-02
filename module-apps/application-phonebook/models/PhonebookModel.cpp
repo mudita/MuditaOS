@@ -1,11 +1,11 @@
 #include <module-apps/application-phonebook/windows/PhonebookContact.hpp>
+#include "ListView.hpp"
 #include "PhonebookModel.hpp"
 #include "i18/i18.hpp"
 
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "UiCommonActions.hpp"
-#include "ListView.hpp"
 
 PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel(app)
 {}
@@ -50,16 +50,15 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
     return true;
 }
 
+int PhonebookModel::getMinimalItemHeight()
+{
+    return phonebookStyle::contactItem::h;
+}
+
 gui::ListItem *PhonebookModel::getItem(gui::Order order)
 {
-    auto index = modelIndex;
-    if (order == gui::Order::Previous) {
-        index = records.size() - 1 - modelIndex;
-    }
 
-    std::shared_ptr<ContactRecord> contact = getRecord(index);
-
-    modelIndex++;
+    std::shared_ptr<ContactRecord> contact = getRecord(order);
 
     if (contact == nullptr) {
         return nullptr;
@@ -67,28 +66,25 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
 
     gui::PhonebookItem *item = new gui::PhonebookItem();
 
-    if (item != nullptr) {
-        item->setContact(contact);
-        item->setID(index);
-        item->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("activatedCallback");
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+    item->setContact(contact);
+    item->activatedCallback = [=](gui::Item &item) {
+        LOG_INFO("activatedCallback");
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
 
-            application->switchWindow(gui::window::name::contact, std::move(data));
-            return true;
-        };
+        application->switchWindow(gui::window::name::contact, std::move(data));
+        return true;
+    };
 
-        item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
-                LOG_DEBUG("calling");
-                return app::call(application, *item->contact);
-            }
+    item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+        if (event.state != gui::InputEvent::State::keyReleasedShort) {
             return false;
-        };
-    }
+        }
+        if (event.keyCode == gui::KeyCode::KEY_LF) {
+            LOG_DEBUG("calling");
+            return app::call(application, *item->contact);
+        }
+        return false;
+    };
 
     return item;
 }

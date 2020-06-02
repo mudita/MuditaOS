@@ -1,9 +1,9 @@
 #include "BaseThreadRecordModel.hpp"
+#include "ListView.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/MessagesStyle.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <cassert>
-#include "ListView.hpp"
 
 BaseThreadRecordModel::BaseThreadRecordModel(app::Application *app) : DatabaseModel(app)
 {}

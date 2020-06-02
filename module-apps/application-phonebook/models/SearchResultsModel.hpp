@@ -17,12 +17,16 @@ class SearchResultsModel : public gui::ListItemProvider
 
   public:
     SearchResultsModel(app::Application *app);
+
     virtual ~SearchResultsModel();
 
     // virtual methods for ListViewProvider
+    int getMinimalItemHeight() override;
     gui::ListItem *getItem(gui::Order order) override;
 
     int getItemCount() const override;
+
     void setResults(std::shared_ptr<std::vector<ContactRecord>> _results);
+
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 };

@@ -170,7 +170,7 @@ namespace gui
         /// call removeWidget on item and delete on item
         virtual bool erase(Item *item);
         /// remove all children and destroy them
-        virtual void erase() final;
+        virtual void erase();
         /// sets `visible` flag
         virtual void setVisible(bool value);
         void setArea(BoundingBox area);

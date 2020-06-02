@@ -1,5 +1,6 @@
 #pragma once
 
+#include <module-gui/gui/widgets/ListItemProvider.hpp>
 #include <cstdint>
 #include <vector>
 #include <utility>
@@ -17,7 +18,7 @@ namespace app
         Application *application = nullptr;
         uint32_t recordsCount;
         std::vector<std::shared_ptr<T>> records;
-        int modelIndex = 0;
+        uint32_t modelIndex = 0;
 
       public:
         DatabaseModel(Application *app) : application{app}, recordsCount{0}
@@ -58,14 +59,23 @@ namespace app
             recordsCount = 0;
         }
 
-        std::shared_ptr<T> getRecord(uint32_t index)
+        std::shared_ptr<T> getRecord(gui::Order order)
         {
+            auto index = modelIndex;
 
             if ((index < 0) || (index >= records.size())) {
                 return nullptr;
             }
 
-            return records[index];
+            if (order == gui::Order::Previous) {
+                index = records.size() - 1 - modelIndex;
+            }
+
+            auto item = records[index];
+
+            modelIndex++;
+
+            return item;
         }
     };
 

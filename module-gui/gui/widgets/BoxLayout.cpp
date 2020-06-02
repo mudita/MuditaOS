@@ -90,13 +90,19 @@ namespace gui
         return ret;
     }
 
-    bool BoxLayout::eraseWidget(Item *item)
+    bool BoxLayout::erase(Item *item)
     {
-        auto ret = erase(item);
+        auto ret = Item::erase(item);
 
+        outOfDrawAreaItems.clear();
         resizeItems();
 
         return ret;
+    }
+
+    void BoxLayout::erase()
+    {
+        Item::erase();
     }
 
     std::list<DrawCommand *> BoxLayout::buildDrawList()
@@ -188,7 +194,7 @@ namespace gui
         }
 
         if (reverseOrder && axisAlignment)
-            moveBySizeLeft<axis>();
+            reverseAlignment<axis>();
     }
 
     // space left distposition `first is better` tactics
@@ -252,7 +258,7 @@ namespace gui
         });
     }
 
-    template <Axis axis> void BoxLayout::moveBySizeLeft()
+    template <Axis axis> void BoxLayout::reverseAlignment()
     {
         for (auto &it : children) {
             it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
