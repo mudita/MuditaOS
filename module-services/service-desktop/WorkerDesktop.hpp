@@ -26,5 +26,6 @@ class WorkerDesktop : public sys::Worker
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
     bool handleMessage(uint32_t queueID) override final;
+    bool sendMessage(const std::string messageToSend);
     sys::Service *ownerService = nullptr;
 };
