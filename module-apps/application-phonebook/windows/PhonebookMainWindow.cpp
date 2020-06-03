@@ -1,11 +1,11 @@
 #include "PhonebookMainWindow.hpp"
-
-#include "PhonebookNewContact.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/data/PhonebookStyle.hpp"
 #include "application-phonebook/widgets/PhonebookItem.hpp"
 
-#include <i18/i18.hpp>
-#include <service-db/messages/DBContactMessage.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBContactMessage.hpp>
 
 namespace gui
 {
@@ -99,7 +99,8 @@ namespace gui
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LEFT: {
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
-                application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                application->switchWindow(
+                    gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             }
                 return true;
             case KeyCode::KEY_RIGHT:
