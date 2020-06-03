@@ -69,6 +69,7 @@ namespace parserutils
         const inline std::string gitBranch      = "gitBranch";
         const inline std::string gitTag         = "gitTag";
         const inline std::string currentRTCTime = "currentRTCTime";
-
+        const inline std::string updateReady    = "updateReady";
+        const inline std::string updateFileList = "updateFileList";
     } // namespace json
 };    // namespace parserutils
