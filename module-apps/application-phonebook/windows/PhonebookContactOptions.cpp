@@ -15,8 +15,6 @@ namespace gui
         this->addOptions(contactOptionsList());
     }
 
-    PhonebookContactOptions::~PhonebookContactOptions() = default;
-
     auto PhonebookContactOptions::handleSwitchData(SwitchData *data) -> bool
     {
         auto *item = dynamic_cast<PhonebookItemData *>(data);

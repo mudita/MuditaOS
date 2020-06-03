@@ -10,7 +10,7 @@ namespace gui
     {
       public:
         PhonebookContactOptions(app::Application *app);
-        ~PhonebookContactOptions() override;
+        ~PhonebookContactOptions() override = default;
         auto handleSwitchData(SwitchData *data) -> bool override;
 
       private:
