@@ -6,14 +6,14 @@
 #include <Image.hpp>
 #include <ListItem.hpp>
 
+namespace style::smsTemplItem
+{
+    constexpr uint32_t w = style::window::default_body_width;
+    constexpr uint32_t h = style::window::label::big_h;
+} // namespace style::smsTemplItem
+
 namespace gui
 {
-    namespace smsTemplItemStyle
-    {
-        constexpr uint32_t w = style::window::default_body_width;
-        constexpr uint32_t h = style::window::label::big_h;
-    } // namespace smsTemplItemStyle
-
     class SMSTemplateItem : public ListItem
     {
         std::shared_ptr<SMSTemplateRecord> templ = nullptr;
