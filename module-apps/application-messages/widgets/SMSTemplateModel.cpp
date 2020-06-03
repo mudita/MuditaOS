@@ -43,10 +43,10 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
     return false;
 }
 
-int SMSTemplateModel::getMinimalItemHeight()
+unsigned int SMSTemplateModel::getMinimalItemHeight()
 {
 
-    return gui::smsTemplItemStyle::h;
+    return style::smsTemplItem::h;
 }
 
 gui::ListItem *SMSTemplateModel::getItem(gui::Order order)

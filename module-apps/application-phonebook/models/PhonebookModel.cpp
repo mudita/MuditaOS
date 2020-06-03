@@ -50,7 +50,7 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
     return true;
 }
 
-int PhonebookModel::getMinimalItemHeight()
+unsigned int PhonebookModel::getMinimalItemHeight()
 {
     return phonebookStyle::contactItem::h;
 }

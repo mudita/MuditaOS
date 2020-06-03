@@ -62,7 +62,7 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
     return true;
 }
 
-int CalllogModel::getMinimalItemHeight()
+unsigned int CalllogModel::getMinimalItemHeight()
 {
 
     return gui::clItemStyle::h;

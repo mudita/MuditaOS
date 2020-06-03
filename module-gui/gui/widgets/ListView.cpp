@@ -1,7 +1,7 @@
-#include <algorithm>
-
 #include "ListView.hpp"
 #include <log/log.hpp>
+#include "cassert"
+#include <algorithm>
 
 namespace gui
 {
@@ -18,6 +18,7 @@ namespace gui
 
     bool ListViewScroll::shouldShowScroll(int currentPageSize, int elementsCount)
     {
+
         return ((parent->widgetArea.w > style::listview::scroll::min_space) &&
                 (parent->widgetArea.h > style::listview::scroll::min_space) && currentPageSize < elementsCount);
     }
@@ -26,6 +27,7 @@ namespace gui
     {
         if (shouldShowScroll(currentPageSize, elementsCount)) {
 
+            assert(elementsCount != 0);
             double scrollStep = static_cast<double>(parent->widgetArea.h) / static_cast<double>(elementsCount);
 
             auto scrollH = scrollStep * currentPageSize;
@@ -238,6 +240,8 @@ namespace gui
 
     int ListView::calculateMaxItemsOnPage()
     {
+
+        assert(provider->getMinimalItemHeight() != 0);
         auto count = widgetArea.h / provider->getMinimalItemHeight();
 
         return count;
