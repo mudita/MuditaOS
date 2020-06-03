@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../data/PhonebookItemData.hpp"
-#include "../models/SearchResultsModel.hpp"
-#include "../widgets/PhonebookListView.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/models/SearchResultsModel.hpp"
+#include "application-phonebook/widgets/PhonebookListView.hpp"
 
 namespace gui
 {
@@ -12,16 +12,13 @@ namespace gui
         SearchResultsModel *searchResultsModel = nullptr;
         PhonebookListView *searchResultList    = nullptr;
 
-        Image *newContactImage = nullptr;
-
       public:
         PhonebookSearchResults(app::Application *app);
-        virtual ~PhonebookSearchResults();
+        ~PhonebookSearchResults() override;
 
-        // virtual methods
-        bool onInput(const InputEvent &inputEvent) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        bool handleSwitchData(SwitchData *data) override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
