@@ -155,7 +155,7 @@ static inline bool hasEnding(std::string const &fullString, std::string const &e
     }
 }
 
-std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext)
+std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext, const bool bypassRootCheck)
 {
     std::vector<DirectoryEntry> dir_list;
 
@@ -171,7 +171,8 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
     /* The first parameter to ff_findfist() is the directory being searched.  Do
     not add wildcards to the end of the directory name. */
-    if (ff_findfirst(relativeToRoot(path).c_str(), pxFindStruct) == 0 && pxFindStruct != nullptr) {
+    if (ff_findfirst(bypassRootCheck ? path : relativeToRoot(path).c_str(), pxFindStruct) == 0 &&
+        pxFindStruct != nullptr) {
         do {
             if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_HIDDEN) ||
                 (pxFindStruct->ucAttributes & FF_FAT_ATTR_SYSTEM) || (pxFindStruct->ucAttributes & FF_FAT_ATTR_VOLID) ||

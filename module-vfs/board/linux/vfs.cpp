@@ -124,13 +124,13 @@ static inline bool hasEnding(std::string const &fullString, std::string const &e
     }
 }
 
-std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext)
+std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext, const bool bypassRootCheck)
 {
     std::vector<DirectoryEntry> dir_list;
     FileAttributes attribute = FileAttributes::ReadOnly;
     size_t fileSize          = 0;
 
-    for (auto &p : fs::directory_iterator(relativeToRoot(path))) {
+    for (auto &p : fs::directory_iterator(bypassRootCheck ? path : relativeToRoot(path))) {
         if (fs::is_directory(p)) {
             attribute = FileAttributes ::Directory;
         }
