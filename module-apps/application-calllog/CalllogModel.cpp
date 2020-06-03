@@ -75,7 +75,6 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
 
     SettingsRecord &settings = application->getSettings();
     if (call.get() == nullptr) {
-        // LOG_ERROR("getItem nullptr");
         return nullptr;
     }
 

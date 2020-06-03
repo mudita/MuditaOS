@@ -61,18 +61,16 @@ namespace gui
         setFocusItem(searchResultList);
     }
 
-    bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)
+    auto PhonebookSearchResults::onInput(const InputEvent &inputEvent) -> bool
     {
-        bool ret = false;
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
 
         // process only if key is released
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
-            ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
             return false;
-
+        }
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LEFT:
@@ -88,16 +86,16 @@ namespace gui
             }
         }
 
-        // check if any of the lower inheritance onInput methods catch the event
-        return ret;
+        return false;
     }
 
-    bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
+    auto PhonebookSearchResults::handleSwitchData(SwitchData *data) -> bool
     {
-        if (data == nullptr)
+        if (data == nullptr) {
             return false;
+        }
 
-        auto fill_results = [=](std::shared_ptr<std::vector<ContactRecord>> res, const std::string &title) {
+        auto fillResults = [=](std::shared_ptr<std::vector<ContactRecord>> res, const std::string &title) {
             if (res == nullptr || res->size() == 0) {
                 return;
             }
@@ -108,11 +106,11 @@ namespace gui
         };
 
         auto searchResults = dynamic_cast<PhonebookSearchResultsData *>(data);
-        if (searchResults) {
-            fill_results(searchResults->getResults(), searchResults->getQuery());
-            return (true);
+        if (searchResults != nullptr) {
+            fillResults(searchResults->getResults(), searchResults->getQuery());
+            return true;
         }
 
-        return (false);
+        return false;
     }
 } /* namespace gui */

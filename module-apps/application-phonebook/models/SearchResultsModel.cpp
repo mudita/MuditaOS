@@ -1,3 +1,4 @@
+#include <application-phonebook/ApplicationPhonebook.hpp>
 #include <module-apps/application-phonebook/windows/PhonebookContact.hpp>
 #include "SearchResultsModel.hpp"
 #include "i18/i18.hpp"
