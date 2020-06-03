@@ -22,9 +22,10 @@ namespace cellular
             SimSelect, /// triggers hw SIM selection (! state now will be **changed on URC** )
             ModemFatalFailure, /// modem full shutdown need
             Failed,
-            Ready,               /// Service is fully initalized
-            PowerDownInProgress, /// modem is in the process of turining off
-            PowerDown,           /// modem is known to be turned off
+            Ready,            /// Service is fully initialized
+            PowerDownStarted, /// modem is disconnecting from network. It might take a while if poor coverage
+            PowerDownWaiting, /// modem has deregistered and is now approaching low power state
+            PowerDown,        /// modem is known to be turned off
         };
 
       private:

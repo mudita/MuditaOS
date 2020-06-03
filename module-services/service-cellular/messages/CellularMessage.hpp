@@ -66,6 +66,8 @@ class CellularNotificationMessage : public CellularMessage
                                   // cold start)
         SIM,                      // change on SIM from URC
         RawCommand,               // send raw command to modem -> returns raw, tokenised result
+        PowerDownDeregistering,   // modem informed it has started to disconnect from network
+        PowerDownDeregistered,    // modem informed it has disconnected from network
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
