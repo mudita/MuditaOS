@@ -152,7 +152,9 @@ class vfs
     /**
      * ext is an optional extension
      */
-    std::vector<DirectoryEntry> listdir(const char *path, const std::string &ext = "");
+    std::vector<DirectoryEntry> listdir(const char *path,
+                                        const std::string &ext     = "",
+                                        const bool bypassRootCheck = false);
 
     /**
      * @brief Reads line of text from opened file.
