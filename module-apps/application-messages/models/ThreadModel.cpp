@@ -7,7 +7,7 @@
 ThreadModel::ThreadModel(app::Application *app) : BaseThreadRecordModel(app)
 {}
 
-int ThreadModel::getMinimalItemHeight()
+unsigned int ThreadModel::getMinimalItemHeight()
 {
 
     return style::window::messages::sms_thread_item_h;

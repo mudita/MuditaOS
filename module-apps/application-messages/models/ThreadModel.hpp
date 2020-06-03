@@ -7,6 +7,6 @@ class ThreadModel : public BaseThreadRecordModel
   public:
     ThreadModel(app::Application *app);
 
-    int getMinimalItemHeight() override;
+    unsigned int getMinimalItemHeight() override;
     gui::ListItem *getItem(gui::Order order) override;
 };

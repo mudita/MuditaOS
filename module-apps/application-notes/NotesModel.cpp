@@ -52,10 +52,9 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
     return true;
 }
 
-int NotesModel::getMinimalItemHeight()
+unsigned int NotesModel::getMinimalItemHeight()
 {
 
-    // refactor Notes Item!!!
     return 146;
 }
 
