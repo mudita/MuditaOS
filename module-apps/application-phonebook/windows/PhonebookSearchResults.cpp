@@ -65,18 +65,16 @@ namespace gui
         searchResultsModel->requestFavouritesCount();
     }
 
-    bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)
+    auto PhonebookSearchResults::onInput(const InputEvent &inputEvent) -> bool
     {
-        bool ret = false;
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
 
         // process only if key is released
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
-            ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
             return false;
-
+        }
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LEFT:
@@ -92,16 +90,16 @@ namespace gui
             }
         }
 
-        // check if any of the lower inheritance onInput methods catch the event
-        return ret;
+        return false;
     }
 
-    bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
+    auto PhonebookSearchResults::handleSwitchData(SwitchData *data) -> bool
     {
-        if (data == nullptr)
+        if (data == nullptr) {
             return false;
+        }
 
-        auto fill_results = [=](std::shared_ptr<std::vector<ContactRecord>> res, const std::string &title) {
+        auto fillResults = [=](std::shared_ptr<std::vector<ContactRecord>> res, const std::string &title) {
             if (res == nullptr || res->size() == 0) {
                 return;
             }
@@ -112,13 +110,13 @@ namespace gui
         };
 
         auto searchResults = dynamic_cast<PhonebookSearchResultsData *>(data);
-        if (searchResults) {
-            fill_results(searchResults->getResults(), searchResults->getQuery());
-            return (true);
+        if (searchResults != nullptr) {
+            fillResults(searchResults->getResults(), searchResults->getQuery());
+            return true;
         }
 
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
-        if (contactRequest) {
+        if (contactRequest != nullptr) {
             searchResultList->cb_ENTER = [=](gui::PhonebookItem *item) {
                 std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
                 data->result                                 = item->getContact();
@@ -126,10 +124,10 @@ namespace gui
                 return sapm::ApplicationManager::messageSwitchPreviousApplication(
                     application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
             };
-            fill_results(contactRequest->results, contactRequest->request);
+            fillResults(contactRequest->results, contactRequest->request);
             setTitle(utils::localize.get("common_results_prefix") + "\"" + contactRequest->request + "\"");
         }
 
-        return (false);
+        return false;
     }
 } /* namespace gui */
