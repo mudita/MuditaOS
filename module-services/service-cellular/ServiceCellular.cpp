@@ -91,10 +91,12 @@ const char *State::c_str(State::ST state)
         return "CellularStartConfProcedure";
     case ST::Ready:
         return "Ready";
+    case ST::PowerDownStarted:
+        return "PowerDownStarted";
+    case ST::PowerDownWaiting:
+        return "PowerDownWaiting";
     case ST::PowerDown:
         return "PowerDown";
-    case ST::PowerDownInProgress:
-        return "PowerDownInProgress";
     }
     return "";
 }
@@ -277,8 +279,11 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
     case State::ST::Ready:
         handle_ready();
         break;
-    case State::ST::PowerDownInProgress:
-        handle_power_down_in_progress();
+    case State::ST::PowerDownStarted:
+        handle_power_down_started();
+        break;
+    case State::ST::PowerDownWaiting:
+        handle_power_down_waiting();
         break;
     case State::ST::PowerDown:
         handle_power_down();
@@ -363,7 +368,13 @@ bool ServiceCellular::handle_power_up_in_progress_procedure(void)
     }
 }
 
-bool ServiceCellular::handle_power_down_in_progress()
+bool ServiceCellular::handle_power_down_started()
+{
+    /// we should not send anything to the modem from now on
+    return true;
+}
+
+bool ServiceCellular::handle_power_down_waiting()
 {
     switch (board) {
     case bsp::Board::T4:
@@ -376,7 +387,8 @@ bool ServiceCellular::handle_power_down_in_progress()
         state.set(this, cellular::State::ST::PowerDown);
         break;
     default:
-        break;
+        LOG_ERROR("Powering `down an unknown device not handled");
+        return false;
     }
     return true;
 }
@@ -495,6 +507,19 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     state.set(this, State::ST::CellularConfProcedure);
                     responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
+                break;
+            }
+            case CellularNotificationMessage::Type::PowerDownDeregistering: {
+                if (state.get() != State::ST::PowerDownWaiting) {
+                    state.set(this, State::ST::PowerDownStarted);
+                    responseMsg = std::make_shared<CellularResponseMessage>(true);
+                }
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                break;
+            }
+            case CellularNotificationMessage::Type::PowerDownDeregistered: {
+                state.set(this, State::ST::PowerDownWaiting);
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
@@ -753,7 +778,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure) {
                     state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
                 }
-                else if (status_pin == value::INACTIVE && state.get() == State::ST::PowerDownInProgress) {
+                else if (status_pin == value::INACTIVE && state.get() == State::ST::PowerDownWaiting) {
                     state.set(this, State::ST::PowerDown);
                 }
             }
@@ -778,6 +803,22 @@ namespace
                 (str.find(at::Chanel::BUSY) != std::string::npos) ||
                 (str.find(at::Chanel::NO_ANSWER) != std::string::npos));
     }
+    namespace powerdown
+    {
+        static const string powerDownNormal = "NORMAL POWER DOWN";
+        static const string poweredDown     = "POWERED DOWN";
+
+        bool isNormalPowerDown(const string str)
+        {
+            std::string stripped = utils::removeNewLines(str);
+            return stripped.find(powerDownNormal) == 0;
+        }
+        bool isPoweredDown(const string str)
+        {
+            std::string stripped = utils::removeNewLines(str);
+            return stripped.find(poweredDown) == 0;
+        }
+    } // namespace powerdown
 } // namespace
 
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
@@ -809,6 +850,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         }
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, service::name::evt_manager, this);
+        return std::nullopt;
     }
 
     // Incoming call
@@ -856,9 +898,11 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     }
 
     // Power Down
-    if (str.find("POWERED DOWN") != std::string::npos) {
-        state.set(this, State::ST::PowerDownInProgress);
-        return std::nullopt;
+    if (powerdown::isNormalPowerDown(str)) {
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistering);
+    }
+    if (powerdown::isPoweredDown(str)) {
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistered);
     }
 
     LOG_WARN("Unhandled notification: %s", str.c_str());
