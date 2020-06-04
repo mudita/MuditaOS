@@ -343,7 +343,11 @@ namespace gui
 
     Item *Item::getFocusItem()
     {
-        return focusItem;
+        if (focusItem) {
+            auto subFocusItem = focusItem->getFocusItem();
+            return subFocusItem == nullptr ? focusItem : subFocusItem;
+        }
+        return nullptr;
     }
 
     bool Item::onFocus(bool state)
