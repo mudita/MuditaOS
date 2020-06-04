@@ -11,6 +11,7 @@
 #define PUREPHONE_RT1051DRIVERPLL_HPP
 
 #include "drivers/pll/DriverPLL.hpp"
+#include <string>
 
 namespace drivers
 {
