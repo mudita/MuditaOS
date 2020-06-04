@@ -130,21 +130,24 @@ namespace gui
 
     void BottomBar::store()
     {
-        if (!stored) {
-            storedLeft   = left->getText();
-            storedCenter = center->getText();
-            storedRight  = right->getText();
-            stored       = true;
+        if (!tempStore.stored) {
+            tempStore.left.text        = left->getText();
+            tempStore.left.isVisible   = left->visible;
+            tempStore.center.text      = center->getText();
+            tempStore.center.isVisible = center->visible;
+            tempStore.right.text       = right->getText();
+            tempStore.right.isVisible  = right->visible;
+            tempStore.stored           = true;
         }
     }
 
     void BottomBar::restore()
     {
-        if (stored) {
-            left->setText(storedLeft);
-            center->setText(storedCenter);
-            right->setText(storedRight);
-            stored = false;
+        if (tempStore.stored) {
+            setText(Side::LEFT, tempStore.left.text, tempStore.left.isVisible);
+            setText(Side::CENTER, tempStore.center.text, tempStore.center.isVisible);
+            setText(Side::RIGHT, tempStore.right.text, tempStore.right.isVisible);
+            tempStore.stored = false;
         }
     }
 
