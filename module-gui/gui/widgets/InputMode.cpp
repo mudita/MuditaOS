@@ -28,9 +28,11 @@ static std::string getInputName(InputMode::Mode m)
 
 InputMode::InputMode(std::list<InputMode::Mode> mode_list,
                      std::function<void(const UTF8 &text)> show_type_cb,
+                     std::function<void()> restore_after_show_type_cb,
                      std::function<void()> show_special_char_selector,
                      const UTF8 &prev_text)
-    : input_mode_list(mode_list), show_type_cb(show_type_cb), show_special_char_selector(show_special_char_selector)
+    : input_mode_list(mode_list), show_type_cb(show_type_cb), restore_after_show_type_cb(restore_after_show_type_cb),
+      show_special_char_selector(show_special_char_selector)
 {
     // failsafe
     if (input_mode_list.size() == 0) {
@@ -69,8 +71,8 @@ void InputMode::show_input_type()
 
 void InputMode::show_restore()
 {
-    if (show_type_cb) {
-        show_type_cb(restore_text);
+    if (restore_after_show_type_cb) {
+        restore_after_show_type_cb();
     }
 }
 

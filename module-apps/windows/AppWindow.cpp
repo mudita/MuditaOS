@@ -156,9 +156,22 @@ namespace gui
         if (bottomBar == nullptr) {
             return;
         }
-        bottomBar->setText(BottomBar::Side::CENTER, text);
+
+        bottomBar->store();
+        bottomBar->setText(BottomBar::Side::LEFT, text);
+        bottomBar->setText(BottomBar::Side::CENTER, "");
+        bottomBar->setText(BottomBar::Side::RIGHT, "");
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        bottomBar->getText(BottomBar::Side::CENTER);
+    }
+
+    void AppWindow::textModeAfterShowCB()
+    {
+        if (bottomBar == nullptr) {
+            return;
+        }
+
+        bottomBar->restore();
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
     bool AppWindow::textSelectSpecialCB()
