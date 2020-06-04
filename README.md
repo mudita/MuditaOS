@@ -76,6 +76,9 @@ git commit
 <commit accepted>
 ```
 
+To fix style for Pull Request CI:
+`./config/pre-commit.hook --branch-fix`
+
 ## Super quick and dirty to run app on linux:
 ```
 git submodule update --init --recursive                                     # initialize submodules
@@ -122,6 +125,13 @@ Catch logs from PurePhone from JLink RTT and write them to /tmp/log.txt
 ```
 JLinkRTTClient | tee /tmp/log.txt
 ```
+
+Catch logs from PurePhone from UART:
+1. in `config/ProjectConfig.cmake` change `RTT_JLINK` to `RTT_LUART`
+2. rebuild project
+3. catch log: `picocom /dev/ttyACM0 -b 115200  --imap lfcrlf`
+Please mind that logs on uart are more costly, so these might show unseen before timing issues.
+These might slow down phone too - to avoid that consider `release` build for tests with `uart` enabled
 
 # Longstart
 

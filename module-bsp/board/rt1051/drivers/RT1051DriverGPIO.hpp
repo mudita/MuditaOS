@@ -13,6 +13,7 @@
 
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "../common/fsl_drivers/fsl_gpio.h"
+#include <string>
 
 namespace drivers
 {
