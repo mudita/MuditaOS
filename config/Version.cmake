@@ -15,10 +15,14 @@ if ("${GIT_REV}" STREQUAL "")
 else()
     execute_process(
         COMMAND bash -c "git diff --quiet --exit-code || echo +"
-        OUTPUT_VARIABLE GIT_DIFF)
+        OUTPUT_VARIABLE GIT_DIFF
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
     execute_process(
         COMMAND git describe --exact-match --tags
-        OUTPUT_VARIABLE GIT_TAG ERROR_QUIET RESULT_VARIABLE ret)
+        OUTPUT_VARIABLE GIT_TAG ERROR_QUIET RESULT_VARIABLE ret
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
         if(NOT ret EQUAL "0")
             set(GIT_TAG "none")
         endif()
@@ -33,16 +37,13 @@ else()
     string(STRIP "${GIT_BRANCH}" GIT_BRANCH)
 endif()
 
-set(VERSION "inline const char* GIT_REV=\"${GIT_REV}${GIT_DIFF}\";
-inline const char* GIT_TAG=\"${GIT_TAG}\";
-inline const char* GIT_BRANCH=\"${GIT_BRANCH}\";")
+string(REGEX MATCH "release-([0-9]*)\.([0-9]*)\.([0-9]*)" VERSION_RAW ${GIT_TAG})
 
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/source/version.hpp)
-    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/source/version.hpp VERSION_)
-else()
-    set(VERSION_ "")
-endif()
+set(CMAKE_PROJECT_VERSION_MAJOR "${CMAKE_MATCH_1}")
+set(CMAKE_PROJECT_VERSION_MINOR "${CMAKE_MATCH_2}")
+set(CMAKE_PROJECT_VERSION_PATCH "${CMAKE_MATCH_3}")
 
-if (NOT "${VERSION}" STREQUAL "${VERSION_}")
-    file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/source/version.hpp "${VERSION}")
-endif()
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/version.hpp.template
+    ${CMAKE_BINARY_DIR}/source/version.hpp
+    )

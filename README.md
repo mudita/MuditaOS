@@ -179,6 +179,44 @@ We use JLink driver in version JLink v634f, for ubuntu download from here:
 
 To install this driver on linux: `sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
 
+## Preparing Packages
+
+If you need a package, containing everything needed to run application (on target device or on linux)
+in the build directory call
+```bash
+make package
+```
+on finish command will display the name of the package that was created.
+
+Package name is: *PurePhone-<version>-<target>.<extension>*
+where:
+    <version>   - is readed from the latest "release-x.y.z" tag
+    <target>    - RT1051 or Linux 
+    <extension> - `zip` for RT1051 and `tar.gz` for Linux
+
+## Preparing a Release
+
+After testing the commit first you have to tag it:
+```bash
+git tag release-x.y.z
+```
+
+Then you have to push the tag to the repository:
+```bash
+git push origin release-x.y.z
+```
+this will do few things:
+- check the style
+- build linux UT and run them
+- build RT1051 and package it
+- create draft release on Github
+- upload RT1051 package to the release
+
+To track the progress you can look at actions: https://github.com/muditacom/PurePhone/actions
+After release is successfully build you have to manually publish it on github:
+https://github.com/muditacom/PurePhone/releases
+
+
 # Documentation
 
 * [doc/development_workflow](./doc/development_workflow.md)

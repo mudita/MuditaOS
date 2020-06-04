@@ -34,5 +34,8 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         void set_navigation();
+
+      private:
+        void addAllignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText);
     };
 } // namespace gui

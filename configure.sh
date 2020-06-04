@@ -50,6 +50,13 @@ function check_build_type() {
     esac
 }
 
+function github_return_build_dir() {
+    if [[ -n "${GITHUB_WORKSPACE}" ]]; then
+        echo "setting out package_path:$1"
+        echo "::set-output name=package_path::$1"
+    fi
+}
+
 TARGET=$1
 BUILD_TYPE=$2
 
@@ -66,6 +73,7 @@ if check_target && check_build_type ; then
         echo "couldn't delete: ${BUILD_DIR}"
         exit 6
     fi
+    github_return_build_dir ${BUILD_DIR}
     mkdir -p ${BUILD_DIR}
     if cd ${BUILD_DIR} ; then
         CMAKE_CMD="cmake \

@@ -29,6 +29,7 @@ printVar GITHUB_BASE_REF
 echo "======================"
 
 GENERATOR=${INPUT_BUILD_GENERATOR,,}
+CHANGELOG_FILE="changelog.md"
 
 case ${GENERATOR} in
     "ninja")
@@ -59,12 +60,29 @@ function configure() {
 
 function build() {
     echo "build"
-    cd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} && ${BUILD_CMD} -j ${JOBS}
+    pushd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} 
+    ${BUILD_CMD} -j ${JOBS}
+    popd
+}
+
+function package() {
+    echo "package"
+    pushd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} 
+    ${BUILD_CMD} -j ${JOBS} package
+    popd
 }
 
 function check() {
     echo "check"
     cd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} && ${BUILD_CMD} check -j ${JOBS}
+}
+
+function printChangeLogForGH() {
+    CHANGELOG="$(cat ${CHANGELOG_FILE})"
+    CHANGELOG="${CHANGELOG//'%'/'%25'}"
+    CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+    CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+    echo "::set-output name=release_notes::${CHANGELOG}"
 }
 
 pushd ${GITHUB_WORKSPACE}
@@ -86,6 +104,12 @@ case ${INPUT_ACTION} in
         configure
         check
         ;;
+    "package")
+        configure
+        build
+        package
+        printChangeLogForGH
+        ;;
     "*")
         echo "wrong action \"${INPUT_ACTION}\""
         exit 1
@@ -93,4 +117,4 @@ case ${INPUT_ACTION} in
 esac
 
 uptime 
-echo "procesor count: `nproc`"
+echo "processor count: `nproc`"

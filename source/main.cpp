@@ -6,7 +6,7 @@
 #include "log/log.hpp"
 #include "memory/usermem.h"
 #include "ticks.hpp"
-#include "version.hpp"
+#include <source/version.hpp>
 
 // module-applications
 #include "application-antenna/ApplicationAntenna.hpp"
