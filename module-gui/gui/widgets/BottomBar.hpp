@@ -33,10 +33,16 @@ namespace gui
         };
 
       protected:
-        bool stored = false;
-        UTF8 storedLeft;
-        UTF8 storedCenter;
-        UTF8 storedRight;
+        struct Store
+        {
+            bool stored = false;
+            struct
+            {
+                bool isVisible = false;
+                UTF8 text;
+            } left, center, right;
+        } tempStore;
+
         Label *left   = nullptr;
         Label *center = nullptr;
         Label *right  = nullptr;
