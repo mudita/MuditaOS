@@ -44,6 +44,12 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    -Wno-error=format
+    -Wno-error=maybe-uninitialized
+)
+
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os module-bsp module-utils)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
