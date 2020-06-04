@@ -24,13 +24,15 @@ namespace fs = std::filesystem;
 
 #ifdef TARGET_Linux
 #include <cstdio>
+#define PATH_USER "user/"
+#define PATH_SYS  "sys/"
 #else
 #include "ff_stdio.h"
 #include "board/cross/eMMC/eMMC.hpp"
+#define PATH_USER "/user/"
+#define PATH_SYS  "/sys/"
 #endif
 
-#define PATH_USER     "/user/"
-#define PATH_SYS      "/sys"
 #define PATH_CURRENT  "current"
 #define PATH_PREVIOUS "previous"
 #define PATH_UPDATES  "updates"

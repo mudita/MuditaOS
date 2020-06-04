@@ -104,6 +104,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR})
 
 
 message("${PROJECT_NAME}: add_subdirectory module-sys")
@@ -177,19 +178,56 @@ target_link_libraries(${PROJECT_NAME}
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
-set(HEX_FILE ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex)
-set(BIN_FILE ${CMAKE_BINARY_DIR}/boot.bin)
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${HEX_FILE}
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION "./")
+endif()
+
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(HEX_FILE ${CMAKE_PROJECT_NAME}.hex)
+    set(BIN_FILE boot.bin)
+
+    add_custom_command(
+        COMMENT "Generate boot.bin"
+        OUTPUT ${CMAKE_BINARY_DIR}/${BIN_FILE}
+        DEPENDS ${CMAKE_PROJECT_NAME}
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${BIN_FILE}
         )
 
+    add_custom_command(
+        COMMENT "Generate ${CMAKE_PROJECT_NAME}.hex"
+        OUTPUT ${CMAKE_BINARY_DIR}/${HEX_FILE}
+        DEPENDS ${CMAKE_PROJECT_NAME}
+        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${HEX_FILE}
+        )
+
+    add_custom_target(
+        ${BIN_FILE}-target ALL
+        DEPENDS ${CMAKE_BINARY_DIR}/${BIN_FILE}
+        )
+
+    add_custom_target(
+        ${HEX_FILE}-target ALL
+        DEPENDS ${CMAKE_BINARY_DIR}/${HEX_FILE}
+        )
+    install(FILES ${CMAKE_BINARY_DIR}/${BIN_FILE}
+        DESTINATION "./"
+        PERMISSIONS
+            OWNER_READ OWNER_WRITE OWNER_EXECUTE
+            GROUP_READ GROUP_EXECUTE
+            WORLD_READ WORLD_EXECUTE
+            )
+    set(CPACK_SYSTEM_NAME "RT1051")
+endif()
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
         )
 endif()
+
+install(FILES ${PROJECT_SOURCE_DIR}/changelog.md
+    DESTINATION "./"
+    )
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
@@ -236,3 +274,24 @@ else ()
                 message (WARNING ${BoldYellow} "Install doxygen and graphviz to be able to build code documentation" ${ColourReset})
         endif()
 endif ()
+
+message("Version: ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_VENDOR "Mudita")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://mudita.com/products/pure/")
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(CPACK_GENERATOR "ZIP")
+    set(PACKAGE_EXTENSION ".zip")
+    set(PACKAGE_MIME "application/zip")
+else()
+    set(CPACK_GENERATOR "TGZ")
+    set(PACKAGE_EXTENSION ".tar.gz")
+    set(PACKAGE_MIME "application/x-compressed-tar")
+endif()
+
+include(CPack)
+
+if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
+    set(PACKAGE_FILE ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}${PACKAGE_EXTENSION})
+    message("::set-output name=package::${PACKAGE_FILE}")
+    message("::set-output name=mime_type::${PACKAGE_MIME}")
+endif()

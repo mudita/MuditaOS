@@ -1,5 +1,5 @@
 set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(ASSETS_DEST_DIR "${CMAKE_BINARY_DIR}/")
+set(ASSETS_DEST_DIR "${CMAKE_BINARY_DIR}")
 
 file (GLOB_RECURSE ASSETS_LIST
     LIST_DIRECTORIES false
@@ -14,8 +14,19 @@ foreach(ASSET ${ASSETS_LIST})
     get_filename_component(filename "${ASSET}" NAME)
     get_filename_component(dir "${ASSET}" DIRECTORY)
 
-    set(destdir "${ASSETS_DEST_DIR}/${dir}")
+    if(dir)
+        set(destdir "${ASSETS_DEST_DIR}/${dir}")
+        install(FILES ${ASSET} DESTINATION ${dir})
+    else()
+        set(destdir "${ASSETS_DEST_DIR}")
+        install(FILES ${ASSET} DESTINATION "./" )
+    endif()
+
     set(outfile "${destdir}/${filename}")
+    string(REPLACE "/" "-" target_name ${ASSET})
+    if(${target_name} STREQUAL ${ASSET})
+        set(target_name "file-${target_name}")
+    endif()
 
     add_custom_command(
         COMMENT "Copying resource: ${ASSET}"
@@ -25,6 +36,6 @@ foreach(ASSET ${ASSETS_LIST})
             ${asset_source}
             ${outfile}
         )
-    add_custom_target(${filename} ALL DEPENDS ${ASSET} ${outfile})
-    add_dependencies(check ${filename})
+    add_custom_target(${target_name} ALL DEPENDS ${outfile})
+    add_dependencies(check ${target_name})
 endforeach()

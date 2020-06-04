@@ -62,6 +62,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/messages
         ${CMAKE_CURRENT_SOURCE_DIR}/windows
+        ${CMAKE_BINARY_DIR}
 )
 
 

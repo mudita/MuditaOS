@@ -14,6 +14,8 @@ add_executable( ${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RArea.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RWindow.hpp )
 
+install(TARGETS ${PROJECT_NAME} DESTINATION "./")
+
 target_link_libraries( ${PROJECT_NAME}  ${GTKMM_LIBRARIES}  )
 target_include_directories(${PROJECT_NAME} PUBLIC ${GTKMM_LIBRARY_DIRS} )
 target_include_directories( ${PROJECT_NAME}  PUBLIC ${GTKMM_INCLUDE_DIRS}  )
