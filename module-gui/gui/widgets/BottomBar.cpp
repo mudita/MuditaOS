@@ -128,4 +128,24 @@ namespace gui
         return true;
     }
 
+    void BottomBar::store()
+    {
+        if (!stored) {
+            storedLeft   = left->getText();
+            storedCenter = center->getText();
+            storedRight  = right->getText();
+            stored       = true;
+        }
+    }
+
+    void BottomBar::restore()
+    {
+        if (stored) {
+            left->setText(storedLeft);
+            center->setText(storedCenter);
+            right->setText(storedRight);
+            stored = false;
+        }
+    }
+
 } /* namespace gui */
