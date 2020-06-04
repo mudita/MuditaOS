@@ -8,6 +8,7 @@ Additional info, one feature at the time:
     * for WIP and FIX - this should be too added in commit message `[EGD-<NUM>]` i.e
         * `[WIP] [EGD-123] Progress on progressbar`
         * `[FIX] [EGD-123] Progress on progressbar`
+* 2.5: Add proper PR description to changelog
 * 3: rebase to master
     * When updating own branch one should rather rebase (which moves own commits on top) then merge (which puts changes by dates as it is)
     * This will provide better history and git conflict solving
