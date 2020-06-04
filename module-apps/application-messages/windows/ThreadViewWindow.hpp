@@ -23,6 +23,7 @@ namespace gui
         enum class Action
         {
             Start,   /// first load of sms
+            Refresh, /// refresh from start, do not loose text
             Next,    /// load previous sms
             Previous /// load next sms
         };
@@ -44,6 +45,9 @@ namespace gui
             int dbsize                                  = 0;       // size of elements in db
             std::unique_ptr<std::vector<SMSRecord>> sms = nullptr; // loaded sms from db
         } SMS;
+
+        gui::Text *text = nullptr;
+
       public:
         ThreadViewWindow(app::Application *app);
 
@@ -58,8 +62,8 @@ namespace gui
         void buildInterface() override;
 
         void destroyInterface() override;
-        gui::Text *text = nullptr;
-        void rebuildText();
+        void destroyTextItem();
+        void refreshTextItem();
         void addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const;
         void addErrorLabel(HBox *layout, uint16_t widthAvailable) const;
     };
