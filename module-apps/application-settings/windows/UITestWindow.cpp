@@ -35,9 +35,9 @@ namespace gui
         text->setFont(style::window::font::medium);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { textModeShowCB(text); },
-            [=]() { textModeAfterShowCB(); },
-            [=]() { textSelectSpecialCB(); }));
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
+            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=]() { selectSpecialCharacter(); }));
         text->setPenFocusWidth(0);
         setFocusItem(text);
     }
