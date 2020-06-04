@@ -1,14 +1,21 @@
 #include "Info.hpp"
-#include "../ApplicationSettings.hpp"
-#include "Label.hpp"
-#include "Margins.hpp"
-#include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include <Style.hpp>
-#include <memory>
+
+#include <application-settings/ApplicationSettings.hpp>
+
+#include <service-appmgr/ApplicationManager.hpp>
+#include <module-services/service-cellular/api/CellularServiceAPI.hpp>
 
 #include <source/version.hpp>
-#include <module-services/service-cellular/api/CellularServiceAPI.hpp>
+
+#include <gui/widgets/BoxLayout.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/Margins.hpp>
+#include <gui/widgets/Style.hpp>
+
+#include <i18/i18.hpp>
+
+#include <memory>
+
 namespace gui
 {
 
@@ -45,9 +52,10 @@ namespace gui
         box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
         box->setPenWidth(style::window::default_border_no_focus_w);
 
-        add_box_label(box, "GIT revision: " + std::string(GIT_REV));
-        add_box_label(box, "GIT tag:      " + std::string(GIT_TAG));
-        add_box_label(box, "GIT branch:   " + std::string(GIT_BRANCH));
+        addAllignedLabelWithValue(box, "GIT revision:", std::string(GIT_REV));
+        addAllignedLabelWithValue(box, "GIT tag:", std::string(GIT_TAG));
+        addAllignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
+        addAllignedLabelWithValue(box, "Version:", std::string(VERSION));
         add_box_label(box, "Modem Firmware:");
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
@@ -63,7 +71,26 @@ namespace gui
         erase();
     }
 
-    void Info::onBeforeShow(ShowMode mode, SwitchData *data)
+    void Info::addAllignedLabelWithValue(BoxLayout *layout, const string &labelText, const string &valueText)
+    {
+        auto lineBox = new gui::HBox(layout, 0, 0, style::window_width, style::window::label::default_h);
+
+        lineBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        auto label = new gui::Label(nullptr, 0, 0, style::window_width * 0.35, style::window::label::default_h);
+        style::window::decorateOption(label);
+        label->setText(labelText);
+
+        auto value = new gui::Label(nullptr, 0, 0, style::window_width * 0.64, style::window::label::default_h);
+        style::window::decorateOption(value);
+        value->setText(valueText);
+
+        lineBox->addWidget(label);
+        lineBox->addWidget(value);
+
+        LOG_DEBUG("%s:%s", labelText.c_str(), valueText.c_str());
+    }
+
+    void Info::onBeforeShow(ShowMode /*mode*/, SwitchData * /*data*/)
     {}
 
 } // namespace gui

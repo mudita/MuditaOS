@@ -1,0 +1,60 @@
+name: Build Release
+on:
+  push:
+    tags:
+    - 'release-*'
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: "Check Out"
+      uses: actions/checkout@v1
+      with:
+        token: ${{ secrets.GitHub_PAT }}
+        submodules: recursive
+        fetch-depth: 0
+    - name: "Style checking"
+      uses: ./.github/actions/build
+      with:
+        action: "style"
+    - name: "Unit Tests"
+      uses: ./.github/actions/build
+      with:
+        action: check
+        target: linux
+        build_type: Debug
+        build_generator: ninja
+    - name: "Build and package for RT1051"
+      id: build_release_package
+      uses: ./.github/actions/build
+      with:
+        action: "package"
+        target: rt1051
+        #build_type: RelWithDebInfo
+        build_type: Debug
+        build_generator: ninja
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: true
+        body: ${{steps.build_release_package.outputs.release_notes }}
+
+    - name: Upload Release Package
+      id: upload-release-package
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        # here we have to use relative path with starting "./"
+        asset_path: ./${{ steps.build_release_package.outputs.package_path }}/${{steps.build_release_package.outputs.package}}
+        asset_name: ${{ steps.build_release_package.outputs.package }}
+        asset_content_type: ${{ steps.build_release_package.outputs.mime_type }}
+

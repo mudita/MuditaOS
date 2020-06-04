@@ -5,7 +5,7 @@ branding:
   color: 'white'
 inputs:
   action:
-    description: 'Describes action to be taken: style|configure|build|c&b|check'
+    description: 'Describes action to be taken: style|configure|build|c&b|check|package'
     required: true
     default: 'style'
   target:
@@ -24,6 +24,17 @@ inputs:
     description: 'Defines how many parallel jobs to run, default is to number of cpus'
     required: false
     default: 'nproc'
+outputs:
+  build_dir: # name of the vaiable
+    description: "Build directory name"
+  package:
+    description: "Name of the package"
+  package_path:
+    description: "Full path to the package"
+  mime_type:
+    description: "Mime type of the package"
+  release_notes:
+    description: "Content of changelog.md"
 runs:
   using: 'docker'
   image: 'docker://rwicik/pure_phone_build:v1.2'
