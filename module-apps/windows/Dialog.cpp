@@ -9,14 +9,14 @@ namespace style
     namespace image
     {
         constexpr uint32_t x = 176;
-        constexpr uint32_t y = 135;
+        constexpr uint32_t y = 132;
     } // namespace image
     namespace text
     {
-        constexpr uint32_t x = 45;
-        constexpr uint32_t y = 293;
+        constexpr uint32_t x = 40;
+        constexpr uint32_t y = 290;
         constexpr uint32_t w = 400;
-        constexpr uint32_t h = 66;
+        constexpr uint32_t h = 132;
     } // namespace text
     namespace no
     {
@@ -39,13 +39,9 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     : gui::AppWindow(app, name), meta(meta)
 {
     AppWindow::buildInterface();
-    // TODO fix elements positioning with styles ready, right now copied from Phonebook as it is
 
     topBar->setActive(TopBar::Elements::TIME, true);
-    bottomBar->setActive(BottomBar::Side::LEFT, false);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
     setTitle(meta.title);
 
@@ -60,32 +56,43 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 }
 
-bool Dialog::onInput(const InputEvent &inputEvent)
-{
-    return AppWindow::onInput(inputEvent);
-}
-
-void Dialog::buildInterface()
-{}
-
 void Dialog::update(const Meta &meta)
 {
     this->meta = meta;
     setTitle(meta.title);
     text->setText(meta.text);
-    if (meta.have_choice) {
-        setupChoice();
-    }
+    icon->set(meta.icon);
+    // meta.action not used
 }
 
-void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
+DialogConfirm::DialogConfirm(app::Application *app, const std::string &name, const Dialog::Meta &meta)
+    : Dialog(app, name, meta)
 {
-    setFocusItem(no);
+    topBar->setActive(TopBar::Elements::BATTERY, true);
+    topBar->setActive(TopBar::Elements::SIGNAL, true);
+
+    bottomBar->setActive(BottomBar::Side::RIGHT, false);
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+    setFocusItem(icon);
+    icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
+        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
+            return true;
+        }
+        return false;
+    };
+    // Title not set
+    setTitle("");
 }
 
-void Dialog::setupChoice()
+void DialogConfirm::update(const Meta &meta)
 {
-    erase(no);
+    Dialog::update(meta);
+
+    icon->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+}
+
+DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const Meta &meta) : Dialog(app, name, meta)
+{
     no = new Label(
         this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get(style::strings::common::no));
     no->setPenWidth(0);
@@ -100,7 +107,6 @@ void Dialog::setupChoice()
         return true;
     };
 
-    erase(yes);
     yes = new Label(this,
                     style::yes::x,
                     style::yes::y,
@@ -122,6 +128,15 @@ void Dialog::setupChoice()
     yes->setNavigationItem(NavigationDirection::RIGHT, no);
 
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
+
+    setFocusItem(no);
+}
+
+void DialogYesNo::update(const Meta &meta)
+{
+    Dialog::update(meta);
+
+    yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
 
     setFocusItem(no);
 }

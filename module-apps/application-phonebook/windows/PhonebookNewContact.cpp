@@ -17,7 +17,7 @@
 namespace gui
 {
 
-    PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, window::name::newContact)
+    PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, gui::window::name::new_contact)
     {
         buildInterface();
     }
@@ -271,12 +271,7 @@ namespace gui
 
     void PhonebookNewContact::saveStateChanged()
     {
-        if (isValidName(page1.text[0]->getText()) > 0 && isValidNumber(page1.text[2]->getText())) {
-            bottomBar->setActive(BottomBar::Side::CENTER, true);
-        }
-        else {
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
-        }
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
     }
 
     void PhonebookNewContact::copyInputData(ContactRecord &contactRecord)
@@ -421,25 +416,15 @@ namespace gui
 
     bool PhonebookNewContact::verifyAndSave()
     {
-        ContactRecord record, errName, errPhone, errSpeed, errFav;
+        ContactRecord record, errNumPrim, errNumAlt, errSpeedDial;
         copyInputData(record);
 
         /** basic sanity checks */
-        if (!isValidName(record.primaryName)) {
-            LOG_ERROR("verifyAndSave name not valid");
-            return (false);
-        }
-
-        if (record.numbers.size() > 0 && isValidNumber(record.numbers[0].numberUser) == false) {
-            LOG_ERROR("verifyAndSave primaryNumber not valid");
-            return (false);
-        }
-
         if (contact == nullptr) // new contact
         {
             /** secondary verification against database data */
             DBServiceAPI::ContactVerificationError err =
-                DBServiceAPI::verifyContact(application, record, errName, errPhone, errSpeed, errFav);
+                DBServiceAPI::verifyContact(application, record, errNumPrim, errNumAlt, errSpeedDial);
             if (err != DBServiceAPI::noError) {
                 if (err == DBServiceAPI::primaryNumberError) {
                     std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);

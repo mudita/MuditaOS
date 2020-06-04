@@ -41,7 +41,7 @@ std::string vfs::relativeToRoot(const std::string path)
     return ((osRootPath / fs::path(path).relative_path()).relative_path());
 }
 
-FILE *vfs::fopen(const char *filename, const char *mode)
+vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
     return std::fopen(relativeToRoot(filename).c_str(), mode);
 }
@@ -97,9 +97,10 @@ size_t vfs::filelength(FILE *stream)
 
     return size;
 }
+
 char *vfs::fgets(char *buffer, size_t count, FILE *stream)
 {
-    return (fgets(buffer, count, stream));
+    return (std::fgets(buffer, count, stream));
 }
 
 std::string vfs::getcurrdir()
@@ -123,13 +124,13 @@ static inline bool hasEnding(std::string const &fullString, std::string const &e
     }
 }
 
-std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext)
+std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext, const bool bypassRootCheck)
 {
     std::vector<DirectoryEntry> dir_list;
     FileAttributes attribute = FileAttributes::ReadOnly;
-    size_t fileSize = 0;
+    size_t fileSize          = 0;
 
-    for (auto &p : fs::directory_iterator(relativeToRoot(path))) {
+    for (auto &p : fs::directory_iterator(bypassRootCheck ? path : relativeToRoot(path))) {
         if (fs::is_directory(p)) {
             attribute = FileAttributes ::Directory;
         }
@@ -159,7 +160,6 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
 std::string vfs::getline(FILE *stream, uint32_t length)
 {
-
     uint32_t currentPosition = ftell(stream);
 
     // allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add string's
@@ -191,4 +191,70 @@ std::string vfs::getline(FILE *stream, uint32_t length)
 vfs::FilesystemStats vfs::getFilesystemStats()
 {
     return (vfs::FilesystemStats());
+}
+
+bool vfs::isDir(const char *path)
+{
+    if (path == nullptr)
+        return (false);
+
+    struct stat fileStatus;
+
+    const int ret = stat(path, &fileStatus);
+    if (ret == 0) {
+        return (S_ISDIR(fileStatus.st_mode));
+    }
+    else {
+        return (false);
+    }
+}
+
+bool vfs::fileExists(const char *path)
+{
+    if (path == nullptr)
+        return (false);
+
+    struct stat fileStatus;
+    const int ret = stat(path, &fileStatus);
+    if (ret == 0) {
+        return (true);
+    }
+    return (false);
+}
+
+int vfs::deltree(const char *path)
+{
+    if (path != nullptr)
+        return (deltree(path));
+    else
+        return (-1);
+}
+
+int vfs::mkdir(const char *dir)
+{
+    if (dir != nullptr)
+        return (mkdir(dir));
+    else
+        return (-1);
+}
+
+int vfs::rename(const char *oldname, const char *newname)
+{
+    if (oldname != nullptr && newname != nullptr)
+        return (rename(oldname, newname));
+    else
+        return (-1);
+}
+
+std::string vfs::lastErrnoToStr()
+{
+    return (strerror(errno));
+}
+
+vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
+{
+    if (filename != nullptr && mode != nullptr)
+        return (std::fopen(filename, mode));
+    else
+        return (nullptr);
 }

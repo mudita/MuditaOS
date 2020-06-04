@@ -20,7 +20,8 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gu
                        uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
-    gui::ListItem *getItem(int index) override;
+    unsigned int getMinimalItemHeight() override;
+    gui::ListItem *getItem(gui::Order order) override;
 
     int getItemCount() const override
     {

@@ -77,3 +77,26 @@ inline const char *c_str(sys::ServicePowerMode code)
     }
     return "";
 }
+
+inline const char *c_str(sys::BusChannels channel)
+{
+    switch (channel) {
+    case sys::BusChannels::System:
+        return "System";
+    case sys::BusChannels::SystemManagerRequests:
+        return "SystemManagerRequests";
+    case sys::BusChannels::PowerManagerRequests:
+        return "PowerManagerRequests";
+    case sys::BusChannels::ServiceCellularNotifications:
+        return "ServiceCellularNotifications,";
+    case sys::BusChannels::Test2CustomBusChannel:
+        return "Test2CustomBusChannel,";
+    case sys::BusChannels::ServiceDBNotifications:
+        return "ServiceDBNotifications,";
+    case sys::BusChannels::ServiceAudioNotifications:
+        return "ServiceAudioNotifications";
+    case sys::BusChannels::AppManagerNotifications:
+        return "AppManagerNotifications,";
+    }
+    return "";
+}

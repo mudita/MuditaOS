@@ -1,38 +1,27 @@
 #pragma once
 
-#include "../data/PhonebookItemData.hpp"
-#include "../models/SearchResultsModel.hpp"
-#include "../widgets/PhonebookListView.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/models/SearchResultsModel.hpp"
+#include "application-phonebook/widgets/PhonebookListView.hpp"
 
 namespace gui
 {
-    namespace name
+    class PhonebookSearchResults : public AppWindow
     {
-        namespace window
-        {
-            const inline std::string search_results = "SearchResults";
-        };
-    }; // namespace name
+      protected:
+        SearchResultsModel *searchResultsModel = nullptr;
+        PhonebookListView *searchResultList    = nullptr;
 
-class PhonebookSearchResults : public AppWindow
-{
-  protected:
-    SearchResultsModel *searchResultsModel = nullptr;
-    PhonebookListView *searchResultList    = nullptr;
+      public:
+        PhonebookSearchResults(app::Application *app);
+        ~PhonebookSearchResults() override;
 
-    Image *newContactImage = nullptr;
-
-  public:
-    PhonebookSearchResults(app::Application *app);
-    virtual ~PhonebookSearchResults();
-
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
     };
 
 } /* namespace gui */

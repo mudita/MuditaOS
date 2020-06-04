@@ -1,25 +1,15 @@
-/*
- * @file PhonebookModel.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 10 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_
-#define MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_
+#pragma once
 
 #include <vector>
 
+#include "application-phonebook/data/PhonebookStyle.hpp"
 #include "Application.hpp"
-#include "DatabaseModel_old.hpp"
+#include "DatabaseModel.hpp"
 #include "Interface/ContactRecord.hpp"
-#include "ListItemProvider_old.hpp"
+#include "ListItemProvider.hpp"
 #include "NotesRecord.hpp"
-/*
- *
- */
-class PhonebookModel : public gui::ListItemProvider_old, public app::DatabaseModel_old<ContactRecord>
+
+class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider
 {
     /**
      * Number of favourite records in the database.
@@ -35,17 +25,15 @@ class PhonebookModel : public gui::ListItemProvider_old, public app::DatabaseMod
     bool updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
                        const uint32_t offset,
                        const uint32_t limit,
-                       uint32_t count,
-                       bool favourite);
+                       uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    gui::ListItem *getItem(
-        int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
+    unsigned int getMinimalItemHeight() override;
+    gui::ListItem *getItem(gui::Order order) override;
+
     int getItemCount() const override
     {
         return recordsCount;
     };
 };
-
-#endif /* MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_ */

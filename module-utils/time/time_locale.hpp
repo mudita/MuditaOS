@@ -21,13 +21,13 @@ namespace utils
             static const int num_formatters = 4;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
-            const std::array<std::string, num_days> days = {"common_monday",
+            const std::array<std::string, num_days> days = {"common_sunday",
+                                                            "common_monday",
                                                             "common_tuesday",
                                                             "common_wendesday",
                                                             "common_thursday",
                                                             "common_friday",
-                                                            "common_saturday",
-                                                            "common_sunday"};
+                                                            "common_saturday"};
 
             const std::array<std::string, num_monts> months = {"common_january",
                                                                "common_february",
@@ -56,13 +56,13 @@ namespace utils
           public:
             enum Day
             {
-                Mon = 0,
+                Sun = 0,
+                Mon,
                 Tue,
                 Wed,
                 Thu,
                 Fri,
                 Sat,
-                Sun,
             };
 
             enum Month

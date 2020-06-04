@@ -1,7 +1,7 @@
-#include <algorithm>
-
 #include "ListView.hpp"
 #include <log/log.hpp>
+#include "cassert"
+#include <algorithm>
 
 namespace gui
 {
@@ -18,6 +18,7 @@ namespace gui
 
     bool ListViewScroll::shouldShowScroll(int currentPageSize, int elementsCount)
     {
+
         return ((parent->widgetArea.w > style::listview::scroll::min_space) &&
                 (parent->widgetArea.h > style::listview::scroll::min_space) && currentPageSize < elementsCount);
     }
@@ -26,23 +27,16 @@ namespace gui
     {
         if (shouldShowScroll(currentPageSize, elementsCount)) {
 
-            uint32_t pagesCount = 1;
-            if (currentPageSize) {
-                pagesCount = (elementsCount % currentPageSize == 0) ? elementsCount / currentPageSize
-                                                                    : elementsCount / currentPageSize + 1;
-                if (pagesCount == 0) {
-                    return;
-                }
-            }
+            assert(elementsCount != 0);
+            double scrollStep = static_cast<double>(parent->widgetArea.h) / static_cast<double>(elementsCount);
 
-            if (currentPageSize != 0 && pagesCount != 0) {
-                uint32_t currentPage = startIndex / currentPageSize;
-                uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
+            auto scrollH = scrollStep * currentPageSize;
+            auto scrollY = scrollStep * startIndex;
 
-                setPosition(parent->widgetArea.w - style::listview::scroll::margin, pageHeight * currentPage);
-                setSize(style::listview::scroll::w, pageHeight);
-                setVisible(true);
-            }
+            setPosition(parent->widgetArea.w - style::listview::scroll::margin, scrollY);
+            setSize(style::listview::scroll::w, scrollH);
+
+            setVisible(true);
         }
         else
             setVisible(false);
@@ -68,17 +62,18 @@ namespace gui
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
+        body->setAxisAlignment(true);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP) {
-                direction = Direction::Top;
+                direction = style::listview::Direction::Top;
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
-                direction = Direction::Bottom;
+                direction = style::listview::Direction::Bottom;
                 return this->listPageEndReached();
             }
             else {
@@ -105,7 +100,7 @@ namespace gui
         elementsCount = count;
     }
 
-    void ListView::setListViewType(ListViewType type)
+    void ListView::setListViewType(style::listview::Type type)
     {
         listType = type;
     }
@@ -117,7 +112,7 @@ namespace gui
 
     void ListView::setProvider(ListItemProvider *prov)
     {
-        provider       = prov;
+        provider = prov;
         if (provider != nullptr) {
             provider->list = this;
             setElementsCount(provider->getItemCount());
@@ -158,6 +153,27 @@ namespace gui
         refresh();
     }
 
+    Order ListView::getOrderFromDirection()
+    {
+        if (direction == style::listview::Direction::Bottom)
+            return Order::Next;
+
+        return Order::Previous;
+    }
+
+    void ListView::recalculateStartIndex()
+    {
+        if (direction == style::listview::Direction::Top) {
+            startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
+        }
+    }
+
+    void ListView::addSpanItem()
+    {
+        listSpanItem = new Span(Axis::Y, itemSpanSize);
+        body->addWidget(listSpanItem);
+    }
+
     void ListView::resizeWithScroll()
     {
         if (scroll->shouldShowScroll(currentPageSize, elementsCount)) {
@@ -170,38 +186,33 @@ namespace gui
 
     void ListView::addItemsOnPage()
     {
-        auto itemsOnPage = 0;
+        currentPageSize = 0;
 
         ListItem *item = nullptr;
 
-        while ((item = provider->getItem(itemsOnPage)) != nullptr) {
+        while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
 
             body->addWidget(item);
 
             if (item->visible != true) {
-                currentPageSize = itemsOnPage;
                 break;
             }
 
-            itemsOnPage++;
+            currentPageSize++;
 
-            listSpanItem = new Span(Axis::Y, itemSpanSize);
-            body->addWidget(listSpanItem);
+            addSpanItem();
         }
 
-        if (currentPageSize == 0)
-            currentPageSize = itemsOnPage;
+        if (listSpanItem != nullptr) {
+            body->erase(listSpanItem);
+        }
+
+        recalculateStartIndex();
     }
 
     void ListView::setFocus()
     {
-        if (direction == Direction::Top) {
-            setFocusItem(body);
-            body->setFocusOnLastElement();
-        }
-        if (direction == Direction::Bottom) {
-            setFocusItem(body);
-        }
+        setFocusItem(body);
     };
 
     std::list<DrawCommand *> ListView::buildDrawList()
@@ -227,23 +238,36 @@ namespace gui
         return body->onInput(inputEvent);
     }
 
+    int ListView::calculateMaxItemsOnPage()
+    {
+
+        assert(provider->getMinimalItemHeight() != 0);
+        auto count = widgetArea.h / provider->getMinimalItemHeight();
+
+        return count;
+    }
+
     bool ListView::listPageEndReached()
     {
-        auto calculateLimit = [&]() {
-            // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
-            // before it gets them, requests twice size of current page with down limit of at least 4.
-            auto minLimit = (2 * currentPageSize > 4 ? 2 * currentPageSize : 4);
+        auto minLimit =
+            (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
 
-            return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
+        auto calculateLimit = [&]() {
+            if (direction == style::listview::Direction::Bottom)
+                return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
+            else
+                return minLimit < startIndex ? minLimit : startIndex;
         };
 
-        if (direction == Direction::Bottom) {
+        if (direction == style::listview::Direction::Bottom) {
 
-            if (startIndex + currentPageSize >= elementsCount && listType == ListViewType::Continuous) {
+            body->setReverseOrder(false);
+
+            if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::Continuous) {
 
                 startIndex = 0;
             }
-            else if (startIndex + currentPageSize >= elementsCount && listType == ListViewType::TopDown) {
+            else if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::TopDown) {
 
                 return true;
             }
@@ -257,21 +281,34 @@ namespace gui
             provider->requestRecords(startIndex, calculateLimit());
         }
 
-        if (direction == Direction::Top) {
+        if (direction == style::listview::Direction::Top) {
 
-            if (startIndex == 0 && listType == ListViewType::Continuous) {
+            body->setReverseOrder(true);
+            auto topFetchIndex = 0;
 
-                startIndex = elementsCount - (elementsCount % currentPageSize);
+            if (startIndex == 0 && listType == style::listview::Type::Continuous) {
+
+                topFetchIndex = elementsCount - (elementsCount % currentPageSize);
+                startIndex    = elementsCount;
             }
-            else if (startIndex == 0 && listType == ListViewType::TopDown) {
+            else if (startIndex == 0 && listType == style::listview::Type::TopDown) {
 
                 return true;
             }
             else {
-                startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
+
+                topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
             }
 
-            provider->requestRecords(startIndex, calculateLimit());
+            // If starting page size smaller than last page - fill first page with last page size.
+            if (startIndex < currentPageSize) {
+
+                provider->requestRecords(0, currentPageSize);
+            }
+            else {
+
+                provider->requestRecords(topFetchIndex, calculateLimit());
+            }
         }
 
         return true;

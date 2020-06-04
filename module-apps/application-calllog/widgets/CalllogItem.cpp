@@ -18,26 +18,6 @@ using namespace calllog;
 namespace gui
 {
 
-    namespace clItemStyle
-    {
-        constexpr uint32_t w = style::window::default_body_width;
-        constexpr uint32_t h = style::window::label::big_h;
-        namespace img
-        {
-            constexpr uint32_t x = 11; // TODO: alek:: change to good values
-            constexpr uint32_t y = 22;
-        } // namespace img
-        namespace text
-        {
-            constexpr uint32_t x = 37;
-            constexpr uint32_t w = 280;
-        } // namespace text
-        namespace timestamp
-        {
-            constexpr uint32_t w = 115;
-        }
-    } // namespace clItemStyle
-
     CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
     {
         setMinimumSize(clItemStyle::w, clItemStyle::h);
@@ -68,28 +48,6 @@ namespace gui
         style::window::decorate(text);
         text->setFont(style::window::font::big);
         text->setEllipsis(Ellipsis::Right);
-    }
-
-    CalllogItem::~CalllogItem()
-    {
-        call = nullptr;
-        if (timestamp) {
-            removeWidget(timestamp);
-            delete timestamp;
-            timestamp = nullptr;
-        }
-        for (auto &img : imageCallType) {
-            if (img) {
-                removeWidget(img);
-                delete img;
-                img = nullptr;
-            }
-        }
-        if (text) {
-            removeWidget(text);
-            delete text;
-            text = nullptr;
-        }
     }
 
     bool CalllogItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

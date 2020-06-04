@@ -42,11 +42,13 @@ namespace gui
 
         template <Axis axis> void resizeItems();
         template <Axis axis> void updatePosition();
+        template <Axis axis> void reverseAlignment();
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
         virtual void resizeItems();
-        bool reverseOrder = false;
+        bool reverseOrder  = false;
+        bool axisAlignment = false;
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items
         std::list<Item *>::iterator nextNavigationItem(std::list<Item *>::iterator from);
 
@@ -62,6 +64,8 @@ namespace gui
         void setSize(const unsigned short w, const unsigned short h) override;
         void addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
+        bool erase(Item *item) override;
+        void erase() override;
         std::list<DrawCommand *> buildDrawList() override;
         /// add item if it will fit in box, return true on success
         /// axis sets direction to define space left in container
@@ -72,6 +76,7 @@ namespace gui
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
         void setReverseOrder(bool value);
+        void setAxisAlignment(bool value);
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;

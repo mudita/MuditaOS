@@ -353,11 +353,9 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto time             = utils::time::Scoped("DBContactGetLimitOffset");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         std::unique_ptr<std::vector<ContactRecord>> ret;
-        if (msg->favourite)
-            ret = contactRecordInterface->GetLimitOffsetByField(
-                msg->offset, msg->limit, ContactRecordField::Favourite, "1");
-        else
-            ret = contactRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+
+        ret = contactRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret),
                                                                  true,
                                                                  msg->limit,
@@ -365,6 +363,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
                                                                  msg->favourite,
                                                                  ret->size(),
                                                                  MessageType::DBContactGetLimitOffset);
+
     } break;
 
     case MessageType::DBAlarmAdd: {

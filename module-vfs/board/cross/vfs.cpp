@@ -155,7 +155,7 @@ static inline bool hasEnding(std::string const &fullString, std::string const &e
     }
 }
 
-std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext)
+std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext, const bool bypassRootCheck)
 {
     std::vector<DirectoryEntry> dir_list;
 
@@ -171,7 +171,8 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
     /* The first parameter to ff_findfist() is the directory being searched.  Do
     not add wildcards to the end of the directory name. */
-    if (ff_findfirst(relativeToRoot(path).c_str(), pxFindStruct) == 0 && pxFindStruct != nullptr) {
+    if (ff_findfirst(bypassRootCheck ? path : relativeToRoot(path).c_str(), pxFindStruct) == 0 &&
+        pxFindStruct != nullptr) {
         do {
             if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_HIDDEN) ||
                 (pxFindStruct->ucAttributes & FF_FAT_ATTR_SYSTEM) || (pxFindStruct->ucAttributes & FF_FAT_ATTR_VOLID) ||
@@ -303,4 +304,70 @@ std::string vfs::relativeToRoot(const std::string path)
         return (osRootPath);
     else
         return (osRootPath / fsPath);
+}
+
+bool vfs::isDir(const char *path)
+{
+    if (path == nullptr)
+        return (false);
+
+    FF_Stat_t fileStatus;
+
+    const int ret = ff_stat(path, &fileStatus);
+    if (ret == 0) {
+        return (fileStatus.st_mode == FF_IFDIR);
+    }
+    else {
+        return (false);
+    }
+}
+
+bool vfs::fileExists(const char *path)
+{
+    if (path == nullptr)
+        return (false);
+
+    FF_Stat_t fileStatus;
+    const int ret = ff_stat(path, &fileStatus);
+    if (ret == 0) {
+        return (true);
+    }
+    return (false);
+}
+
+int vfs::deltree(const char *path)
+{
+    if (path != nullptr)
+        return (ff_deltree(path));
+    else
+        return (-1);
+}
+
+int vfs::mkdir(const char *dir)
+{
+    if (dir != nullptr)
+        return (ff_mkdir(dir));
+    else
+        return (-1);
+}
+
+int vfs::rename(const char *oldname, const char *newname)
+{
+    if (oldname != nullptr && newname != nullptr)
+        return (ff_rename(oldname, newname, true));
+    else
+        return (-1);
+}
+
+std::string vfs::lastErrnoToStr()
+{
+    return (strerror(stdioGET_ERRNO()));
+}
+
+vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
+{
+    if (filename != nullptr && mode != nullptr)
+        return ff_fopen(filename, mode);
+    else
+        return (nullptr);
 }

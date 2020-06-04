@@ -1,12 +1,11 @@
 #include "PhonebookMainWindow.hpp"
-
-#include "PhonebookNewContact.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include "application-phonebook/widgets/PhonebookItem.hpp"
 
-#include <i18/i18.hpp>
-#include <service-db/messages/DBContactMessage.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBContactMessage.hpp>
 
 namespace gui
 {
@@ -58,12 +57,9 @@ namespace gui
                                                   phonebookStyle::mainWindow::contactsList::y,
                                                   phonebookStyle::mainWindow::contactsList::w,
                                                   phonebookStyle::mainWindow::contactsList::h);
-        contactsList->setMaxElements(phonebookStyle::mainWindow::contactsList::maxElements);
-        contactsList->setPageSize(phonebookStyle::mainWindow::contactsList::pageSize);
         contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
         contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
         contactsList->setProvider(phonebookModel);
-        contactsList->setApplication(application);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -94,17 +90,6 @@ namespace gui
 
         contactsList->clear();
         contactsList->setElementsCount(phonebookModel->getItemCount());
-
-        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
-        if (contactRequest) {
-            contactsList->cb_ENTER = [=](gui::PhonebookItem *item) {
-                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
-                data->result                                 = item->getContact();
-                data->setDescription("PhonebookSearchRequest");
-                return sapm::ApplicationManager::messageSwitchPreviousApplication(
-                    application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
-            };
-        }
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
@@ -114,7 +99,8 @@ namespace gui
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LEFT: {
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
-                application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                application->switchWindow(
+                    gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             }
                 return true;
             case KeyCode::KEY_RIGHT:
@@ -132,7 +118,7 @@ namespace gui
     bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         DBContactResponseMessage *msg = reinterpret_cast<DBContactResponseMessage *>(msgl);
-        if (phonebookModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite))
+        if (phonebookModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
             return true;
 
         return false;

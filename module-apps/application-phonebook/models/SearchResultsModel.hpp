@@ -3,26 +3,30 @@
 #include <vector>
 
 #include "Application.hpp"
-#include "DatabaseModel_old.hpp"
 #include "Interface/ContactRecord.hpp"
-#include "ListItemProvider_old.hpp"
+#include "ListItemProvider.hpp"
 #include "NotesRecord.hpp"
 
-class SearchResultsModel : public gui::ListItemProvider_old, public app::DatabaseModel_old<ContactRecord>
+class SearchResultsModel : public gui::ListItemProvider
 {
+
+    int internalOffset            = 0;
+    int internalLimit             = 0;
+    app::Application *application = nullptr;
+    std::shared_ptr<std::vector<ContactRecord>> results;
+
   public:
     SearchResultsModel(app::Application *app);
+
     virtual ~SearchResultsModel();
 
-    gui::ListItem *getItem(
-        int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
-    int getItemCount() const override;
-    void setResults(std::shared_ptr<std::vector<ContactRecord>> _results);
-    void requestFavouritesCount();
-    void requestRecordsCount() override;
-    void requestRecords(const uint32_t offset, const uint32_t limit) override;
+    // virtual methods for ListViewProvider
+    unsigned int getMinimalItemHeight() override;
+    gui::ListItem *getItem(gui::Order order) override;
 
-  private:
-    std::shared_ptr<std::vector<ContactRecord>> results;
-    uint32_t favouriteCount = 0;
+    int getItemCount() const override;
+
+    void setResults(std::shared_ptr<std::vector<ContactRecord>> _results);
+
+    void requestRecords(const uint32_t offset, const uint32_t limit) override;
 };

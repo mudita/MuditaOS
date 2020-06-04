@@ -59,6 +59,7 @@ namespace gui
     {
         Rect::setPosition(x, y);
     }
+
     void BoxLayout::setSize(const unsigned short w, const unsigned short h)
     {
         Rect::setSize(w, h);
@@ -73,11 +74,13 @@ namespace gui
         resizeItems();
         setNavigation();
     }
+
     void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
         resizeItems();
     }
+
     bool BoxLayout::removeWidget(Item *item)
     {
         bool ret = Rect::removeWidget(item);
@@ -86,6 +89,22 @@ namespace gui
 
         return ret;
     }
+
+    bool BoxLayout::erase(Item *item)
+    {
+        auto ret = Item::erase(item);
+
+        outOfDrawAreaItems.clear();
+        resizeItems();
+
+        return ret;
+    }
+
+    void BoxLayout::erase()
+    {
+        Item::erase();
+    }
+
     std::list<DrawCommand *> BoxLayout::buildDrawList()
     {
         auto el = Rect::buildDrawList();
@@ -128,7 +147,11 @@ namespace gui
     void BoxLayout::setReverseOrder(bool value)
     {
         reverseOrder = value;
-        resizeItems();
+    }
+
+    void BoxLayout::setAxisAlignment(bool value)
+    {
+        axisAlignment = value;
     }
 
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
@@ -170,7 +193,8 @@ namespace gui
             pos_update(el, pos, size_left);
         }
 
-        Rect::updateDrawArea();
+        if (reverseOrder && axisAlignment)
+            reverseAlignment<axis>();
     }
 
     // space left distposition `first is better` tactics
@@ -232,6 +256,13 @@ namespace gui
             }
             return false;
         });
+    }
+
+    template <Axis axis> void BoxLayout::reverseAlignment()
+    {
+        for (auto &it : children) {
+            it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
+        }
     }
 
     void BoxLayout::setNavigation()

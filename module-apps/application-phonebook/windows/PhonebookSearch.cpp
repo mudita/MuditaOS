@@ -1,4 +1,5 @@
 #include "PhonebookSearch.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "Utils.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
@@ -7,7 +8,7 @@
 namespace gui
 {
     PhonebookSearch::PhonebookSearch(app::Application *app)
-        : AppWindow(app, "Search"), phonebookModel{new PhonebookModel(app)}
+        : AppWindow(app, gui::window::name::search), phonebookModel{new PhonebookModel(app)}
     {
         buildInterface();
     }

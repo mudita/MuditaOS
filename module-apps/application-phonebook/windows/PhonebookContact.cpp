@@ -1,26 +1,12 @@
 #include "PhonebookContact.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "../data/PhonebookInternals.hpp"
-#include "InputEvent.hpp"
-#include "Label.hpp"
-#include "Margins.hpp"
-#include "PhonebookNewContact.hpp"
-#include "Text.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookInternals.hpp"
 #include "UiCommonActions.hpp"
-#include "Utils.hpp"
-#include "application-call/ApplicationCall.hpp"
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/windows/ThreadViewWindow.hpp"
-#include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <log/log.hpp>
-#include <limits.h>
 
 namespace gui
 {
 
-    PhonebookContact::PhonebookContact(app::Application *app) : AppWindow(app, window::name::contact)
+    PhonebookContact::PhonebookContact(app::Application *app) : AppWindow(app, gui::window::name::contact)
     {
         buildInterface();
     }
@@ -462,11 +448,13 @@ namespace gui
 
     bool PhonebookContact::onInput(const InputEvent &inputEvent)
     {
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
-            ((inputEvent.state != InputEvent::State::keyReleasedLong)) && inputEvent.keyCode == KeyCode::KEY_LF) {
+        // process only if key is released
+        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_LF)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return (true);
+            application->switchWindow(
+                gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+
+            return true;
         }
 
         if (inputEvent.keyCode == KeyCode::KEY_RF) {

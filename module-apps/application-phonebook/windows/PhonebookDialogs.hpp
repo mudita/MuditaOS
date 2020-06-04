@@ -1,5 +1,6 @@
 #pragma once
 
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"
@@ -48,40 +49,7 @@ class PhonebookDialog : public AppWindow
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
 
-namespace gui
-{
-    namespace window
-    {
-        namespace name
-        {
-            inline const std::string duplicatedContact = "DuplicatedContactWindow";
-        }
-    } // namespace window
-} // namespace gui
-
-class PhonebookDeleteContact : public PhonebookDialog
-{
-  public:
-    PhonebookDeleteContact(app::Application *app) : PhonebookDialog(app, "Delete")
-    {
-        LOG_INFO("PhonebookDeleteContact::ctor");
-    }
-    virtual ~PhonebookDeleteContact() = default;
-    void onBeforeShow(ShowMode mode, SwitchData *data);
-    void setContactData();
-};
-
-class PhonebookBlockContact : public PhonebookDialog
-{
-  public:
-    PhonebookBlockContact(app::Application *app) : PhonebookDialog(app, "Block")
-    {}
-    virtual ~PhonebookBlockContact() = default;
-    void onBeforeShow(ShowMode mode, SwitchData *data);
-    void setContactData();
-};
-
-class DuplicatedContactDialogWindow : public Dialog
+class DuplicatedContactDialogWindow : public DialogYesNo
 {
   public:
     DuplicatedContactDialogWindow(app::Application *app);
@@ -98,7 +66,7 @@ class PhonebookDuplicateSpeedDial : public PhonebookDialog
     Label *dialValue = nullptr;
 
   public:
-    PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, "SpeedDialAlreadyAssigned")
+    PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, gui::window::name::duplicated_contact)
     {}
     virtual ~PhonebookDuplicateSpeedDial() = default;
     void onBeforeShow(ShowMode mode, SwitchData *data);

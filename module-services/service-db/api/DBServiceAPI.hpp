@@ -16,7 +16,6 @@ class DBServiceAPI
   public:
     enum ContactVerificationError
     {
-        nameError,
         speedDialError,
         primaryNumberError,
         secondaryNumberError,
@@ -66,20 +65,20 @@ class DBServiceAPI
      * @brief Function is checking if new contact can be added to database. Function is blocking.
      * @param serv Pointer to Service based object that is sending request.
      * @param rec Reference to the contact to be added to database.
-     * @param errName in case of existing contact with same name this record will be filled with data.
-     * @param errName in case of existing contact with same primary phone number this record will be filled with data.
-     * @param errName in case of existing contact with same alternative phone number this record will be filled with
+     * @param errNumPrim in case of existing contact with same primary phone number this record will be filled with
      * data.
-     * @param errName in case of existing contact with same speed dial assigned this record will be filled with data.
+     * @param errNumAlt in case of existing contact with same alternative phone number this record will be filled with
+     * data.
+     * @param errSpeedDial in case of existing contact with same speed dial assigned this record will be filled with
+     * data.
      *
      * @note This function is blocking. It's checking until first error.
      */
     static ContactVerificationError verifyContact(sys::Service *serv,
                                                   const ContactRecord &rec,
-                                                  ContactRecord &errName,
-                                                  ContactRecord &errPhone1,
-                                                  ContactRecord &errPhone2,
-                                                  ContactRecord &speedDial);
+                                                  ContactRecord &errNumPrim,
+                                                  ContactRecord &errNumAlt,
+                                                  ContactRecord &errSpeedDial);
     static std::string getVerificationErrorString(const ContactVerificationError err);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv,
                                                                         UTF8 primaryName,
@@ -92,7 +91,7 @@ class DBServiceAPI
     static bool ContactUpdate(sys::Service *serv, const ContactRecord &rec);
     static bool ContactBlock(sys::Service *serv, uint32_t id, const bool shouldBeBlocked = true);
     static uint32_t ContactGetCount(sys::Service *serv, bool favourites = false);
-    static bool ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit, bool favourites = false);
+    static bool ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static std::unique_ptr<std::vector<ContactRecord>> ContactSearch(sys::Service *serv,
                                                                      UTF8 primaryName,
                                                                      UTF8 alternativeName,

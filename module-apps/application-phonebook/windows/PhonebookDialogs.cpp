@@ -96,105 +96,18 @@ bool PhonebookDialog::onInput(const InputEvent &inputEvent)
     return (AppWindow::onInput(inputEvent));
 }
 
-void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    LOG_INFO("PhonebookDeleteContact::initialize");
-    icon = new Image(this, 176, 135, 128, 128, "phonebook_contact_delete_trashcan");
-
-    noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
-                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return (true);
-        }
-        return (false);
-    };
-
-    yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
-                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
-
-            if (DBServiceAPI::ContactRemove(application, contact->ID)) {
-                LOG_INFO("contact %" PRIu32 " removed, switch to MainWindow", contact->ID);
-            }
-            else {
-                LOG_ERROR("failed to delete contact with id %" PRIu32, contact->ID);
-            }
-
-            application->switchWindow(gui::name::window::main_window, gui::ShowMode::GUI_SHOW_INIT, nullptr);
-            return (true);
-        }
-        return (false);
-    };
-}
-
-void PhonebookDeleteContact::setContactData()
-{
-    if (contact != nullptr)
-        setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
-}
-
-void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    if (icon == nullptr)
-        icon = new Image(this, 176, 135, 128, 128, "phonebook_blocked_large");
-
-    confirmationLabel->setText(utils::localize.get("app_phonebook_options_block_confirm"));
-
-    noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
-                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
-            if (DBServiceAPI::ContactBlock(application, contact->ID, false)) {
-                LOG_INFO("contact %" PRIu32 " unblocked, switch to MainWindow", contact->ID);
-            }
-            else {
-                LOG_ERROR("failed to unblock contact with id %" PRIu32, contact->ID);
-            }
-
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return (true);
-        }
-        return (false);
-    };
-
-    yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
-                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
-            if (DBServiceAPI::ContactBlock(application, contact->ID, true)) {
-                LOG_INFO("contact %" PRIu32 " blocked, switch to MainWindow", contact->ID);
-            }
-            else {
-                LOG_ERROR("failed to block contact with id %" PRIu32, contact->ID);
-            }
-
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return (true);
-        }
-        return (false);
-    };
-}
-
-void PhonebookBlockContact::setContactData()
-{
-    if (contact != nullptr)
-        setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
-}
-
 DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)
-    : Dialog(app,
-             gui::window::name::duplicatedContact,
-             {
-                 .title  = "",
-                 .icon   = "phonebook_info",
-                 .text   = utils::localize.get("app_phonebook_duplicate_speed_dial"),
-                 .action = []() -> bool {
-                     LOG_INFO("!");
-                     return true;
-                 },
-             })
+    : DialogYesNo(app,
+                  gui::window::name::duplicated_contact,
+                  {
+                      .title  = "",
+                      .icon   = "info_big_circle_W_G",
+                      .text   = utils::localize.get("app_phonebook_duplicate_speed_dial"),
+                      .action = []() -> bool {
+                          LOG_INFO("!");
+                          return true;
+                      },
+                  })
 {}
 
 bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)
@@ -209,13 +122,13 @@ bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)
 
         auto meta   = this->meta;
         meta.action = [=]() -> bool {
-            application->switchWindow(gui::window::name::newContact, std::make_unique<PhonebookItemData>(record));
+            application->switchWindow(gui::window::name::new_contact, std::make_unique<PhonebookItemData>(record));
             return true;
         };
         meta.title = item->text;
         meta.text  = updateText(meta.text, *record);
         this->update(meta);
-        application->switchWindow(gui::window::name::duplicatedContact, nullptr);
+        application->switchWindow(gui::window::name::duplicated_contact, nullptr);
         return true;
     }
     return false;
@@ -248,7 +161,7 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong))) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         return (false);
     };

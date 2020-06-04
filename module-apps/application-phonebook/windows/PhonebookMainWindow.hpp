@@ -1,5 +1,7 @@
 #pragma once
 
+#include "application-phonebook/data/PhonebookStyle.hpp"
+#include "gui/widgets/ListView.hpp"
 #include "../models/PhonebookModel.hpp"
 #include "../widgets/PhonebookListView.hpp"
 
@@ -9,8 +11,8 @@ namespace gui
     class PhonebookMainWindow : public AppWindow
     {
       protected:
-        PhonebookModel *phonebookModel  = nullptr;
-        PhonebookListView *contactsList = nullptr;
+        PhonebookModel *phonebookModel = nullptr;
+        ListView *contactsList         = nullptr;
 
         Image *leftArrowImage  = nullptr;
         Image *rightArrowImage = nullptr;

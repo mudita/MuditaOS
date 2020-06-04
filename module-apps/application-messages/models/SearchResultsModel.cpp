@@ -11,9 +11,17 @@ namespace gui::model
     SearchResultsModel::SearchResultsModel(app::Application *app) : BaseThreadRecordModel(app)
     {}
 
-    gui::ListItem *SearchResultsModel::getItem(int index)
+    unsigned int SearchResultsModel::getMinimalItemHeight()
     {
-        std::shared_ptr<ThreadRecord> thread = getRecord(index);
+
+        return style::window::messages::sms_thread_item_h;
+    }
+
+    gui::ListItem *SearchResultsModel::getItem(gui::Order order)
+    {
+
+        std::shared_ptr<ThreadRecord> thread = getRecord(order);
+
         if (thread.get() == nullptr) {
             return nullptr;
         }
@@ -29,7 +37,7 @@ namespace gui::model
             // The only thing that differs with ThreadModel actually - here show what was found
             ret->setPreview(thread->snippet);
         }
-        ret->setID(index);
+
         return ret;
     }
 

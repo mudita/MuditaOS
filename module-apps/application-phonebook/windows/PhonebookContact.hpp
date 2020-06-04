@@ -1,30 +1,10 @@
 #pragma once
 
-#include "../data/PhonebookItemData.hpp"
-#include "AppWindow.hpp"
-#include "ContactRecord.hpp"
-#include "Label.hpp"
-#include "Style.hpp"
-#include "Text.hpp"
-#include <memory>
-#include <string>
-#include <widgets/BoxLayout.hpp>
+#include "application-phonebook/data/PhonebookItemData.hpp"
+
+#include <ContactRecord.hpp>
+#include <Text.hpp>
 #include <Utils.hpp>
-
-static inline bool isValidName(const UTF8 name)
-{
-    return (name.length() > 0);
-}
-
-static inline bool isValidNumber(const UTF8 number)
-{
-    return (number.length() > 3);
-}
-
-static inline bool isValidEmail(const UTF8 email)
-{
-    return (email.length() > 4);
-}
 
 static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
 {
@@ -44,14 +24,6 @@ static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRec
 
 namespace gui
 {
-    namespace window
-    {
-        namespace name
-        {
-            inline std::string contact = "Contact";
-        }
-    } // namespace window
-
     class PhonebookContact : public AppWindow
     {
       protected:

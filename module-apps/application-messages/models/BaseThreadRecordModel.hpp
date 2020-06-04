@@ -1,11 +1,12 @@
 #pragma once
 
-#include <vector>
 
 #include "DatabaseModel.hpp"
 #include "Application.hpp"
 #include "ListItemProvider.hpp"
 #include "Interface/ThreadRecord.hpp"
+
+#include <vector>
 
 class BaseThreadRecordModel : public app::DatabaseModel<ThreadRecord>, public gui::ListItemProvider
 {

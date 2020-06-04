@@ -41,6 +41,10 @@ class ServiceCellular : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
+    /** Register message handlers.
+     */
+    void registerMessageHandlers();
+
     static const char *serviceName;
 
     bool sendSMS(UTF8 &number, UTF8 &text);
@@ -100,6 +104,8 @@ class ServiceCellular : public sys::Service
     bool handle_audio_conf_procedure();
     /// modem on event is used in desktop to follow up sim selection
     bool handle_modem_on();
+    /// URCReady event is set when serwice is ready to handle URC notifications
+    bool handle_URCReady();
     /// check one time modem configuration for sim (hot swap)
     /// if hot swap is not enabled full modem restart is needed (right now at best reboot)
     bool handle_sim_sanity_check();
@@ -112,8 +118,12 @@ class ServiceCellular : public sys::Service
     /// fatal failure handler, if we have power switch - we could handle it here
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
+    bool handle_ready();
 
     /// @}
+
+    /// Handle message CellularGetChannelMessage
+    void handle_CellularGetChannelMessage();
 
     bool SetScanMode(std::string mode);
     std::string GetScanMode(void);

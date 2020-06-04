@@ -5,16 +5,10 @@
 
 namespace gui
 {
-    namespace smsTemplItemStyle
-    {
-        constexpr uint32_t w = style::window::default_body_width;
-        constexpr uint32_t h = style::window::label::big_h;
-    } // namespace smsTemplItemStyle
-
     SMSTemplateItem::SMSTemplateItem()
     {
-        setMinimumSize(smsTemplItemStyle::w, smsTemplItemStyle::h);
-        setMaximumSize(smsTemplItemStyle::w, smsTemplItemStyle::h);
+        setMinimumSize(style::smsTemplItem::w, style::smsTemplItem::h);
+        setMaximumSize(style::smsTemplItem::w, style::smsTemplItem::h);
 
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorateOption(text);

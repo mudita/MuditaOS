@@ -97,8 +97,10 @@ enum class MessageType
     CellularSetScanMode,
     CellularGetScanMode,
     CellularGetScanModeResult,
-    CellularGetFirmwareVersion,
-    CellularGetFirmwareVersionResult,
+    CellularGetFirmwareVersion,       ///< Asks for current firmware version
+    CellularGetFirmwareVersionResult, ///< Returns current firmware version
+    CellularGetChannel,               ///< Asks for channel, requres chnnel name
+    CellularGetChannelResponse,       ///< Returns channel (and it's name)
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record

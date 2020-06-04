@@ -205,7 +205,7 @@ static void _log_Log(
     ptr += sprintf(ptr, "%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
     ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
-    ptr += sprintf(ptr, "\r\n");
+    ptr += sprintf(ptr, "\n");
 
     log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
 

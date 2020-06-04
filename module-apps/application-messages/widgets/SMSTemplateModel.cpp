@@ -1,6 +1,7 @@
 
 #include "SMSTemplateModel.hpp"
 #include "SMSTemplateItem.hpp"
+#include "ListView.hpp"
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/MessagesStyle.hpp"
 #include "application-messages/ApplicationMessages.hpp"
@@ -16,7 +17,7 @@ void SMSTemplateModel::requestRecordsCount()
     // request first
     if (recordsCount > 0) {
         LOG_DEBUG("SMSTemplateGetLimitOffset");
-        auto pageSize = messages::templates::list::pageSize;
+        auto pageSize = style::messages::templates::list::pageSize;
         DBServiceAPI::SMSTemplateGetLimitOffset(application, 0, pageSize);
     }
 }
@@ -35,22 +36,29 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
     LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
 
     if (DatabaseModel::updateRecords(std::move(records), offset, limit, count)) {
+        modelIndex = 0;
         list->onProviderDataUpdate();
         return true;
     }
     return false;
 }
 
-gui::ListItem *SMSTemplateModel::getItem(int index)
+unsigned int SMSTemplateModel::getMinimalItemHeight()
 {
-    auto templ = getRecord(index);
+
+    return style::smsTemplItem::h;
+}
+
+gui::ListItem *SMSTemplateModel::getItem(gui::Order order)
+{
+    auto templ = getRecord(order);
+
     if (!templ) {
         return nullptr;
     }
 
     auto item = new gui::SMSTemplateItem();
     item->setTemplate(templ);
-    item->setID(index);
     item->activatedCallback = [=](gui::Item &it) {
         LOG_INFO("activatedCallback");
         if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {

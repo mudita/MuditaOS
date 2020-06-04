@@ -543,6 +543,11 @@ namespace sapm
             return false;
         }
 
+        if (appStack.empty()) {
+            LOG_ERROR("appStack is empty");
+            return false;
+        }
+
         previousApplicationName = appStack.back();
         appStack.pop_back();
         if (previousApplicationName == app::name_desktop && appStack.size()) {

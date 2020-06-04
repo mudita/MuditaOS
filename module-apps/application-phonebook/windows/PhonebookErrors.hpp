@@ -11,11 +11,8 @@
 #include <string>
 #include <widgets/BoxLayout.hpp>
 
-using namespace gui;
-
-namespace ErrorWindows
+namespace gui
 {
-
     class NoResults : public AppWindow
     {
       protected:
@@ -59,4 +56,4 @@ namespace ErrorWindows
       private:
         void setContactData();
     };
-}; // namespace ErrorWindows
+}; // namespace gui

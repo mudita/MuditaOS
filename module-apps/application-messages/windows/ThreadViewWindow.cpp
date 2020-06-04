@@ -82,13 +82,12 @@ namespace gui
         text->setPenWidth(style::window::default_border_focucs_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         text->activatedCallback = [&](gui::Item &item) {
-            if (text->getText().length() == 0) {
-                LOG_DEBUG("No text to send in SMS");
-                return true;
-            }
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            return app->sendSms(contact->numbers[0].numberE164.c_str(), text->getText());
+            if (app->handleSendSmsFromThread(contact->numbers[0].numberE164.c_str(), text->getText())) {
+                LOG_ERROR("handleSendSmsFromThread failed");
+            }
+            return true;
         };
         text->inputCallback = [=](Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
@@ -195,20 +194,23 @@ namespace gui
         labelSpan->setMinimumWidth(elements_width);
         labelSpan->setMinimumHeight(smsBubble->getHeight());
         labelSpan->setFillColor(gui::Color(11, 0));
-        labelSpan->addWidget(smsBubble);
 
         LOG_DEBUG("ADD SMS TYPE: %d", static_cast<int>(el.type));
         switch (el.type) {
+        case SMSType::QUEUED:
+            // Handle in the same way as case below. (pending sending display as already sent)
         case SMSType::OUTBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
             smsBubble->setX(body->getWidth() - smsBubble->getWidth());
             labelSpan->setReverseOrder(true);
+            labelSpan->addWidget(smsBubble);
             addTimeLabel(
                 labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
             break;
         case SMSType::INBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
             labelSpan->setReverseOrder(false);
+            labelSpan->addWidget(smsBubble);
             addTimeLabel(
                 labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
             break;
@@ -217,6 +219,7 @@ namespace gui
             smsBubble->setX(body->getWidth() - smsBubble->getWidth());
             labelSpan->setReverseOrder(true);
             addErrorLabel(labelSpan, elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
+            labelSpan->addWidget(smsBubble);
         default:
             break;
         }
@@ -235,14 +238,11 @@ namespace gui
         errorIcon->setY((layout->getHeight() - errorIcon->getHeight()) / 2);
         errorIcon->activeItem = false; // make it non-focusable
 
-        uint16_t errorIconSpacerWidth = widthAvailable - errorIcon->getWidth();
-
-        auto errorIconSpacer        = new gui::Label(nullptr, 0, 0, errorIconSpacerWidth, layout->getHeight());
-        errorIconSpacer->activeItem = false;
-        errorIconSpacer->setPenWidth(0);
-
-        layout->addWidget(errorIconSpacer);
+        layout->addWidget(new Span(Axis::X, style::window::messages::sms_error_icon_offset));
         layout->addWidget(errorIcon);
+        layout->addWidget(new Span(Axis::X,
+                                   style::window::messages::sms_failed_offset -
+                                       (errorIcon->getWidth() + style::window::messages::sms_error_icon_offset)));
     }
 
     void ThreadViewWindow::addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const
@@ -299,7 +299,7 @@ namespace gui
                                           style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding));
 
-        smsLabel->inputCallback = [=](Item &, const InputEvent &event) {
+        smsLabel->inputCallback = [=, &smsRecord](Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);

@@ -373,27 +373,20 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumbe
 
 DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service *serv,
                                                                    const ContactRecord &rec,
-                                                                   ContactRecord &errName,
-                                                                   ContactRecord &errPhone1,
-                                                                   ContactRecord &errPhone2,
-                                                                   ContactRecord &speedDial)
+                                                                   ContactRecord &errNumPrim,
+                                                                   ContactRecord &errNumAlt,
+                                                                   ContactRecord &errSpeedDial)
 {
-    auto retName = ContactGetByName(serv, rec.primaryName, rec.alternativeName);
-    if (!retName->empty()) {
-        errName = retName->operator[](0);
-        return (nameError);
-    }
-
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
     if (!retSpeedDial->empty()) {
-        speedDial = retSpeedDial->operator[](0);
+        errSpeedDial = retSpeedDial->operator[](0);
         return (speedDialError);
     }
 
     if (rec.numbers.size() > 0 && rec.numbers[0].numberE164.length() > 0) {
         auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
         if (!retPhone1->empty()) {
-            errPhone1 = retPhone1->operator[](0);
+            errNumPrim = retPhone1->operator[](0);
             return (primaryNumberError);
         }
     }
@@ -401,7 +394,7 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
     if (rec.numbers.size() > 1 && rec.numbers[1].numberE164.length() > 0) {
         auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberE164);
         if (!retPhone2->empty()) {
-            errPhone2 = retPhone2->operator[](0);
+            errNumAlt = retPhone2->operator[](0);
             return (secondaryNumberError);
         }
     }
@@ -414,8 +407,6 @@ std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationEr
     switch (err) {
     case noError:
         return ("No error occured");
-    case nameError:
-        return ("Invalid name format");
     case speedDialError:
         return ("Invalid or duplicate speed dial number");
     case primaryNumberError:
@@ -501,26 +492,12 @@ uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv, bool favourites)
     }
 }
 
-// std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset,
-bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit, bool favourites)
+bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit)
 {
     std::shared_ptr<DBContactMessage> msg =
-        std::make_shared<DBContactMessage>(MessageType::DBContactGetLimitOffset, ContactRecord{}, favourites);
+        std::make_shared<DBContactMessage>(MessageType::DBContactGetLimitOffset, ContactRecord{});
     msg->offset = offset;
     msg->limit  = limit;
-
-    //    auto ret = sys::Bus::SendUnicast(msg,service::name::db,serv,5000);
-    //    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
-    //    contactResponse->offset = msg->offset;
-    //    contactResponse->limit = msg->limit;
-    //    contactResponse->favourite = favourites;
-    //
-    //    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
-    //        return std::move(contactResponse->records);
-    //    }
-    //    else{
-    //        return std::make_unique<std::vector<ContactRecord>>();
-    //    }
 
     sys::Bus::SendUnicast(msg, service::name::db, serv);
     return true;
