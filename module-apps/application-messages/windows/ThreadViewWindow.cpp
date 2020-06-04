@@ -4,6 +4,7 @@
 #include "../data/SMSdata.hpp"
 #include "../models/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
+#include "Service/Message.hpp"
 #include "Span.hpp"
 
 #include <Text.hpp>
@@ -15,6 +16,7 @@
 #include <service-db/api/DBServiceAPI.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBMessage.hpp>
+#include <service-db/messages/DBNotificationMessage.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <i18/i18.hpp>
@@ -61,16 +63,18 @@ namespace gui
             }
         };
 
-        rebuildText();
+        refreshTextItem();
         /// setup
         body->setReverseOrder(true);
         body->setVisible(true);
         setFocusItem(body);
     }
 
-    void ThreadViewWindow::rebuildText()
+    void ThreadViewWindow::refreshTextItem()
     {
-        body->erase(text);
+        if (text != nullptr) {
+            return;
+        }
         text = new gui::Text(
             this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
@@ -87,6 +91,7 @@ namespace gui
             if (app->handleSendSmsFromThread(contact->numbers[0].numberE164.c_str(), text->getText())) {
                 LOG_ERROR("handleSendSmsFromThread failed");
             }
+            text->clear();
             return true;
         };
         text->inputCallback = [=](Item &, const InputEvent &event) {
@@ -101,6 +106,12 @@ namespace gui
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("sms_reply"));
             return true;
         };
+    }
+
+    void ThreadViewWindow::destroyTextItem()
+    {
+        body->erase(text);
+        text = nullptr;
     }
 
     void ThreadViewWindow::cleanView()
@@ -127,10 +138,13 @@ namespace gui
         // 1. load elements to tmp vector
         SMS.dbsize = DBServiceAPI::SMSGetCount(this->application);
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
-        if (what == Action::Start) {
+        if (what == Action::Start || what == Action::Refresh) {
             SMS.start = 0;
             SMS.end   = maxsmsinwindow;
-            rebuildText();
+            if (what == Action::Start) {
+                destroyTextItem();
+            }
+            refreshTextItem();
         }
 
         // TODO 2. check how many of these will fit in box
@@ -380,11 +394,8 @@ namespace gui
 
     bool ThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        //	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
-        //	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count,
-        // msg->favourite ) ) 		return true;
-
-        return false;
+        addSMS(ThreadViewWindow::Action::Refresh);
+        return true;
     }
 
 } /* namespace gui */
