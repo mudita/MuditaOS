@@ -36,6 +36,7 @@ namespace gui
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { textModeShowCB(text); },
+            [=]() { textModeAfterShowCB(); },
             [=]() { textSelectSpecialCB(); }));
         text->setPenFocusWidth(0);
         setFocusItem(text);

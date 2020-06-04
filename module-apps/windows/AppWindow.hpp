@@ -75,6 +75,7 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         std::list<DrawCommand *> buildDrawList() override;
         void textModeShowCB(const UTF8 &text);
+        void textModeAfterShowCB();
         bool textSelectSpecialCB();
         /// get BoundingBox size of Window "body" area
         /// @note it would be much better to just have "body item" instead

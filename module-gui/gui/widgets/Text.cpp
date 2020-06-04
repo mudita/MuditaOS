@@ -583,6 +583,10 @@ namespace gui
             }
         }
 
+        if (mode) {
+            mode->show_restore();
+        }
+
         // it there is no key char it means that translator didn't handled the key and this key
         if (code == 0) {
             LOG_DEBUG("Key not handled! %d", static_cast<int>(inputEvent.keyCode));
