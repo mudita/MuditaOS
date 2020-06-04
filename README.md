@@ -192,7 +192,7 @@ To install this driver on linux: `sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
 * [doc/database](./doc/database_v2.md)
 * [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
 * [test/harness](./test/README.md)
-* [changelog](./changelog.md)
+* [changelog](./changelog.md) and [changelog howto](./doc/changelog_howto.md)
 
 ## Code documentation (doxygen)
 
