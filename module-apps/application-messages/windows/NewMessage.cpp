@@ -187,9 +187,9 @@ namespace gui
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { textModeShowCB(text); },
-            [=]() { textModeAfterShowCB(); },
-            [=]() { textSelectSpecialCB(); }));
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
+            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=]() { selectSpecialCharacter(); }));
         message->setPenFocusWidth(style::window::default_border_focucs_w);
         message->setPenWidth(style::window::messages::sms_border_no_focus);
         message->setFont(style::window::font::medium);

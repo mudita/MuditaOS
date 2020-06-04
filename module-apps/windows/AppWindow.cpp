@@ -151,7 +151,7 @@ namespace gui
         return false;
     }
 
-    void AppWindow::textModeShowCB(const UTF8 &text)
+    void AppWindow::bottomBarTemporaryMode(const UTF8 &text)
     {
         if (bottomBar == nullptr) {
             return;
@@ -164,7 +164,7 @@ namespace gui
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
-    void AppWindow::textModeAfterShowCB()
+    void AppWindow::bottomBarRestoreFromTemporaryMode()
     {
         if (bottomBar == nullptr) {
             return;
@@ -174,7 +174,7 @@ namespace gui
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
-    bool AppWindow::textSelectSpecialCB()
+    bool AppWindow::selectSpecialCharacter()
     {
         return sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
