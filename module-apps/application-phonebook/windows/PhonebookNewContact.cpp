@@ -428,8 +428,7 @@ namespace gui
                 showDialogDuplicatedNumber(record, record.numbers[1].numberE164);
                 return false;
             case DBServiceAPI::speedDialError:
-                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-                application->switchWindow("SpeedDialAlreadyAssigned", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                showDialogDuplicatedSpeedDialNumber(record);
                 return false;
             }
 
@@ -493,7 +492,7 @@ namespace gui
         newContactRecord.ID    = oldContactRecord.ID;
         meta.action            = [=]() -> bool {
             if (!DBServiceAPI::ContactUpdate(this->application, newContactRecord)) {
-                LOG_ERROR("Contact id=%" PRIu32 "  update failed", newContactRecord.ID);
+                LOG_ERROR("Contact id=%" PRIu32 " update failed", newContactRecord.ID);
                 return false;
             }
             this->application->switchWindow(gui::name::window::main_window);
@@ -503,6 +502,33 @@ namespace gui
         fillContactData(duplicatedNumberPhrase, oldContactRecord);
         meta.text  = duplicatedNumberPhrase;
         meta.title = duplicatedNumber;
+        meta.icon  = "info_big_circle_W_G";
+        dialog->update(meta);
+        this->application->switchWindow(dialog->getName());
+    }
+
+    void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber(ContactRecord &newContactRecord)
+    {
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
+        assert(dialog != nullptr);
+        auto meta              = dialog->meta;
+        auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(this->application, newContactRecord.speeddial);
+        auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
+        newContactRecord.ID    = oldContactRecord.ID;
+        meta.action            = [=]() -> bool {
+            if (!DBServiceAPI::ContactUpdate(this->application, newContactRecord)) {
+                LOG_ERROR("Contact id=%" PRIu32 " update failed", newContactRecord.ID);
+                return false;
+            }
+            this->application->switchWindow(gui::name::window::main_window);
+            return true;
+        };
+        std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_speed_dial");
+        fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
+        std::string duplicatedSpeedDialTitle = utils::localize.get("app_phonebook_duplicate_speed_dial_title");
+        fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
+        meta.text  = duplicatedSpeedDialPhrase;
+        meta.title = duplicatedSpeedDialTitle;
         meta.icon  = "info_big_circle_W_G";
         dialog->update(meta);
         this->application->switchWindow(dialog->getName());

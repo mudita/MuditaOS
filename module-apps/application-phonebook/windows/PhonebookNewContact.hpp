@@ -97,7 +97,8 @@ namespace gui
         void setContactData();
         void saveStateChanged();
         const std::string getCountryPrefix();
-        void showDialogDuplicatedNumber(ContactRecord &record, const UTF8 duplicatedNumber);
+        void showDialogDuplicatedNumber(ContactRecord &newContactRecord, const UTF8 duplicatedNumber);
+        void showDialogDuplicatedSpeedDialNumber(ContactRecord &newContactRecord);
     };
 
 } /* namespace gui */
