@@ -1,7 +1,7 @@
-#include "catch.hpp"
-#include "mock/TestListViewProvider.hpp"
+#include "gtest/gtest.h"
+#include "../mock/TestListViewProvider.hpp"
 
-TEST_CASE("List creation and deletion", "[ListView]")
+TEST(ListView, Constructor_Destructor)
 {
 
     auto testProvider = new gui::TestListViewProvider();
@@ -10,8 +10,6 @@ TEST_CASE("List creation and deletion", "[ListView]")
         new gui::ListView(nullptr, testStyle::list_x, testStyle::list_y, testStyle::list_w, testStyle::list_h);
 
     testListView->setProvider(testProvider);
-
-    REQUIRE(true);
 
     delete testListView;
     delete testProvider;
