@@ -151,17 +151,30 @@ namespace gui
         return false;
     }
 
-    void AppWindow::textModeShowCB(const UTF8 &text)
+    void AppWindow::bottomBarTemporaryMode(const UTF8 &text)
     {
         if (bottomBar == nullptr) {
             return;
         }
-        bottomBar->setText(BottomBar::Side::CENTER, text);
+
+        bottomBar->store();
+        bottomBar->setText(BottomBar::Side::LEFT, text);
+        bottomBar->setText(BottomBar::Side::CENTER, "");
+        bottomBar->setText(BottomBar::Side::RIGHT, "");
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        bottomBar->getText(BottomBar::Side::CENTER);
     }
 
-    bool AppWindow::textSelectSpecialCB()
+    void AppWindow::bottomBarRestoreFromTemporaryMode()
+    {
+        if (bottomBar == nullptr) {
+            return;
+        }
+
+        bottomBar->restore();
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
+
+    bool AppWindow::selectSpecialCharacter()
     {
         return sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
