@@ -406,15 +406,15 @@ std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationEr
 {
     switch (err) {
     case noError:
-        return ("No error occured");
+        return "No error occurred";
     case speedDialError:
-        return ("Invalid or duplicate speed dial number");
+        return "Invalid or duplicate speed dial number";
     case primaryNumberError:
-        return ("Invalid or duplicate primary number");
+        return "Invalid or duplicate primary number";
     case secondaryNumberError:
-        return ("Invalid or duplicate secondary number");
+        return "Invalid or duplicate secondary number";
     default:
-        return "(Unknonw error)";
+        return "Unknown error";
     }
 }
 

@@ -1,18 +1,10 @@
 #include "PhonebookNewContact.hpp"
 
-#include "../ApplicationPhonebook.hpp"
-#include "InputEvent.hpp"
-#include "Label.hpp"
-#include "Margins.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "PhonebookContact.hpp"
-#include "PhonebookNewContact.hpp"
-#include "Text.hpp"
-#include "Utils.hpp"
-#include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <log/log.hpp>
+
+#include <Dialog.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
 
 namespace gui
 {
@@ -414,7 +406,7 @@ namespace gui
         return (false);
     }
 
-    bool PhonebookNewContact::verifyAndSave()
+    auto PhonebookNewContact::verifyAndSave() -> bool
     {
         ContactRecord record, errNumPrim, errNumAlt, errSpeedDial;
         copyInputData(record);
@@ -425,20 +417,20 @@ namespace gui
             /** secondary verification against database data */
             DBServiceAPI::ContactVerificationError err =
                 DBServiceAPI::verifyContact(application, record, errNumPrim, errNumAlt, errSpeedDial);
-            if (err != DBServiceAPI::noError) {
-                if (err == DBServiceAPI::primaryNumberError) {
-                    std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-                    application->switchWindow("NumberAlreadyExists", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-                }
-
-                if (err == DBServiceAPI::speedDialError) {
-                    std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-                    application->switchWindow(
-                        "SpeedDialAlreadyAssigned", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-                }
-                LOG_ERROR("failed to verify contact data reason: \"%s\"",
-                          DBServiceAPI::getVerificationErrorString(err).c_str());
-                return (false);
+            LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
+            switch (err) {
+            case DBServiceAPI::noError:
+                break;
+            case DBServiceAPI::primaryNumberError:
+                showDialogDuplicatedNumber(record, record.numbers[0].numberE164);
+                return false;
+            case DBServiceAPI::secondaryNumberError:
+                showDialogDuplicatedNumber(record, record.numbers[1].numberE164);
+                return false;
+            case DBServiceAPI::speedDialError:
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+                application->switchWindow("SpeedDialAlreadyAssigned", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                return false;
             }
 
             if (DBServiceAPI::ContactAdd(application, record) == false) {
@@ -489,6 +481,31 @@ namespace gui
 
         LOG_DEBUG("getCountryPrefix return: \"%s\"", buf.c_str());
         return (buf);
+    }
+
+    void PhonebookNewContact::showDialogDuplicatedNumber(ContactRecord &newContactRecord, const UTF8 duplicatedNumber)
+    {
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
+        assert(dialog != nullptr);
+        auto meta              = dialog->meta;
+        auto contactRecordsPtr = DBServiceAPI::ContactGetByPhoneNumber(this->application, duplicatedNumber);
+        auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
+        newContactRecord.ID    = oldContactRecord.ID;
+        meta.action            = [=]() -> bool {
+            if (!DBServiceAPI::ContactUpdate(this->application, newContactRecord)) {
+                LOG_ERROR("Contact id=%" PRIu32 "  update failed", newContactRecord.ID);
+                return false;
+            }
+            this->application->switchWindow(gui::name::window::main_window);
+            return true;
+        };
+        std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
+        fillContactData(duplicatedNumberPhrase, oldContactRecord);
+        meta.text  = duplicatedNumberPhrase;
+        meta.title = duplicatedNumber;
+        meta.icon  = "info_big_circle_W_G";
+        dialog->update(meta);
+        this->application->switchWindow(dialog->getName());
     }
 
 } // namespace gui
