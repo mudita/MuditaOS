@@ -2,8 +2,8 @@
 
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "PhonebookContact.hpp"
+#include "Dialog.hpp"
 
-#include <Dialog.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
 namespace gui
