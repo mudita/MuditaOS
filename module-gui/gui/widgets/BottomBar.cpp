@@ -128,4 +128,27 @@ namespace gui
         return true;
     }
 
+    void BottomBar::store()
+    {
+        if (!cache.stored) {
+            cache.left.text        = left->getText();
+            cache.left.isVisible   = left->visible;
+            cache.center.text      = center->getText();
+            cache.center.isVisible = center->visible;
+            cache.right.text       = right->getText();
+            cache.right.isVisible  = right->visible;
+            cache.stored           = true;
+        }
+    }
+
+    void BottomBar::restore()
+    {
+        if (cache.stored) {
+            setText(Side::LEFT, cache.left.text, cache.left.isVisible);
+            setText(Side::CENTER, cache.center.text, cache.center.isVisible);
+            setText(Side::RIGHT, cache.right.text, cache.right.isVisible);
+            cache.stored = false;
+        }
+    }
+
 } /* namespace gui */

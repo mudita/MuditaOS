@@ -79,8 +79,9 @@ namespace gui
             this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) {},
-            [=]() { textSelectSpecialCB(); }));
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
+            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=]() { selectSpecialCharacter(); }));
         text->setBorderColor(ColorNoColor);
         text->setPenFocusWidth(style::window::default_border_focucs_w);
         text->setPenWidth(style::window::default_border_focucs_w);
