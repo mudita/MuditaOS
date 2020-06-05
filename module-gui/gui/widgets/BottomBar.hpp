@@ -33,7 +33,7 @@ namespace gui
         };
 
       protected:
-        struct Store
+        struct Cache
         {
             bool stored = false;
             struct
@@ -41,7 +41,7 @@ namespace gui
                 bool isVisible = false;
                 UTF8 text;
             } left, center, right;
-        } tempStore;
+        } cache;
 
         Label *left   = nullptr;
         Label *center = nullptr;
