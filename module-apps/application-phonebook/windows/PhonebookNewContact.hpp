@@ -1,16 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <string>
+#include "application-phonebook/data/PhonebookItemData.hpp"
 
-#include "../data/PhonebookItemData.hpp"
-#include "../Application.hpp"
-#include "AppWindow.hpp"
-#include "ContactRecord.hpp"
-#include "Label.hpp"
-#include "Style.hpp"
-#include "Text.hpp"
-#include <widgets/BoxLayout.hpp>
+#include <Text.hpp>
 
 namespace gui
 {
@@ -100,11 +92,12 @@ namespace gui
         void destroyInterface() override;
 
       private:
-        bool verifyAndSave();
+        auto verifyAndSave() -> bool;
         void copyInputData(ContactRecord &contactRecord);
         void setContactData();
         void saveStateChanged();
         const std::string getCountryPrefix();
+        void showDialogDuplicatedNumber(ContactRecord &record, const UTF8 duplicatedNumber);
     };
 
 } /* namespace gui */
