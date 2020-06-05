@@ -24,6 +24,8 @@ namespace sdesktop
       public:
         UpdateOsMessage(MessageType messageType, const std::string updateFilePath, const uint32_t requestUUID)
             : sys::DataMessage(messageType), updateFile(updateFilePath), uuid(requestUUID){};
+        UpdateOsMessage(MessageType type = MessageType::UpdateOS) : sys::DataMessage(type)
+        {}
         virtual ~UpdateOsMessage(){};
 
         std::string updateFile;
