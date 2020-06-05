@@ -1,7 +1,7 @@
 #include "ApplicationPhonebook.hpp"
+#include "Dialog.hpp"
 #include "windows/PhonebookContact.hpp"
 #include "windows/PhonebookContactOptions.hpp"
-#include "windows/PhonebookDialogs.hpp"
 #include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
@@ -71,18 +71,17 @@ namespace app
 
     void ApplicationPhonebook::createUserInterface()
     {
-        windows.insert({gui::name::window::main_window, new PhonebookMainWindow(this)});
-        windows.insert({gui::window::name::new_contact, new PhonebookNewContact(this)});
-        windows.insert({gui::window::name::contact, new PhonebookContact(this)});
-        windows.insert({gui::window::name::duplicated_contact, new PhonebookDuplicateSpeedDial(this)});
-        windows.insert({gui::window::name::search, new PhonebookSearch(this)});
-        windows.insert({gui::window::name::no_results, new NoResults(this)});
-        windows.insert({gui::window::name::contact_blocked, new ContactBlocked(this)});
-        windows.insert({gui::window::name::search_results, new PhonebookSearchResults(this)});
+        windows.insert({gui::name::window::main_window, new gui::PhonebookMainWindow(this)});
+        windows.insert({gui::window::name::new_contact, new gui::PhonebookNewContact(this)});
+        windows.insert({gui::window::name::contact, new gui::PhonebookContact(this)});
+        windows.insert({gui::window::name::search, new gui::PhonebookSearch(this)});
+        windows.insert({gui::window::name::no_results, new gui::NoResults(this)});
+        windows.insert({gui::window::name::contact_blocked, new gui::ContactBlocked(this)});
+        windows.insert({gui::window::name::search_results, new gui::PhonebookSearchResults(this)});
         windows.insert(
             {gui::window::name::dialog_yes_no, new gui::DialogYesNo(this, gui::window::name::dialog_yes_no)});
-        windows.insert({gui::window::name::contact_options, new PhonebookContactOptions(this)});
-        windows.insert({gui::window::name::namecard_options, new PhonebookNamecardOptions(this)});
+        windows.insert({gui::window::name::contact_options, new gui::PhonebookContactOptions(this)});
+        windows.insert({gui::window::name::namecard_options, new gui::PhonebookNamecardOptions(this)});
     }
 
     void ApplicationPhonebook::destroyUserInterface()
