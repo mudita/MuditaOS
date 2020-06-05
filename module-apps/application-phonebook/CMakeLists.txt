@@ -20,7 +20,6 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookDialogs.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearch.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactOptions.cpp"

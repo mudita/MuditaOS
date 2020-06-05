@@ -10,7 +10,6 @@ namespace gui
     {
         inline const std::string contact            = "Contact";
         inline const std::string contact_options    = "Options";
-        inline const std::string duplicated_contact = "DuplicatedContactWindow";
         inline const std::string no_results         = "NoResults";
         inline const std::string contact_blocked    = "ContactBlocked";
         inline const std::string namecard_options   = "Namecard Options";
