@@ -55,31 +55,12 @@ namespace updateos
 
 struct FileInfo
 {
+    FileInfo(mtar_header_t &h, unsigned long crc32);
+    json11::Json to_json() const;
+
     std::string fileName;
     std::size_t fileSize;
     unsigned long fileCRC32;
-
-#ifndef TARGET_Linux
-    FileInfo(FF_FindData_t *other) : fileName(other->pcFileName), fileSize(other->ulFileSize), fileCRC32(0)
-    {}
-#endif
-
-    FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
-    {
-        if (h.name[0] == '.' && h.name[1] == '/') {
-            // microtar relative paths, strip the leading ./away
-            fileName = std::string(h.name).substr(2);
-        }
-        else {
-            fileName = std::string(h.name);
-        }
-    }
-
-    json11::Json to_json() const
-    {
-        return (json11::Json::object{
-            {"name", fileName}, {"size", std::to_string(fileSize)}, {"crc32", std::to_string(fileCRC32)}});
-    }
 };
 
 class UpdatePureOS
@@ -100,7 +81,6 @@ class UpdatePureOS
     bool unpackFileToTemp(mtar_header_t &header, unsigned long *crc32);
 
     void cleanupAfterUpdate();
-    static std::string generateRandomId(size_t length);
     const fs::path getUpdateTmpChild(const fs::path childPath);
     static void printDir(const char *pcDirectoryToScan);
 

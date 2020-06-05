@@ -1,11 +1,11 @@
 #include "ServiceDesktop.hpp"
-#include <random>
-#include <../module-vfs/vfs.hpp>
 #include <time/time_conversion.hpp>
+#include <vfs.hpp>
+#include <random>
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName, "", 8192)
+ServiceDesktop::ServiceDesktop() : sys::Service(serviceName, "", sdesktop::service_stack)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 
@@ -23,8 +23,9 @@ ServiceDesktop::~ServiceDesktop()
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
     desktopWorker = std::make_unique<WorkerDesktop>(this);
-    desktopWorker->init({{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1},
-                         {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
+    desktopWorker->init(
+        {{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+         {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
     desktopWorker->run();
 
     connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
