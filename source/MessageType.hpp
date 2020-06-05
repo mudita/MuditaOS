@@ -104,6 +104,9 @@ enum class MessageType
     CellularGetFirmwareVersionResult, ///< Returns current firmware version
     CellularGetChannel,               ///< Asks for channel, requres chnnel name
     CellularGetChannelResponse,       ///< Returns channel (and it's name)
+    CellularGetCSQ,
+    CellularGetCREG,
+    CellularGetNWINFO,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record

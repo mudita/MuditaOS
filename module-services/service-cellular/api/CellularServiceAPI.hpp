@@ -49,4 +49,7 @@ namespace CellularServiceAPI
     bool GetChannel(sys::Service *serv,
                     TS0710::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
     bool GetDataChannel(sys::Service *serv);
+    bool GetCSQ(sys::Service *serv, std::string &response);
+    bool GetCREG(sys::Service *serv, std::string &response);
+    bool GetQNWINFO(sys::Service *serv, std::string &response);
 }; // namespace CellularServiceAPI

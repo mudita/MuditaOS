@@ -4,6 +4,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <module-utils/state/ServiceState.hpp>
+#include <at/response.hpp>
 
 #include <cassert>
 
@@ -112,6 +113,11 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
 bool ServiceAntenna::InitStateHandler(void)
 {
     LOG_INFO("State Init");
+    std::string teststring;
+    auto test = CellularServiceAPI::GetQNWINFO(this, teststring);
+    LOG_INFO("String %s", teststring.c_str());
+    at::response::qnwinfo::parseNetworkFrequency(teststring);
+    test = test;
     state->set(antenna::State::none);
     return true;
 }
@@ -119,6 +125,6 @@ bool ServiceAntenna::InitStateHandler(void)
 bool ServiceAntenna::NoneStateHandler(void)
 {
     LOG_INFO("State Init");
-    state->set(antenna::State::none);
+    //    state->set(antenna::State::none);
     return true;
 }

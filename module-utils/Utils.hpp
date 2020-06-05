@@ -97,4 +97,17 @@ namespace utils
             pos = data.find(toSearch, pos + replaceStr.size());
         }
     }
+    static inline bool toNumeric(std::string &text, uint32_t &value)
+    {
+        try {
+            value = std::stoi(text);
+            return true;
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR("ServiceCellular::GetNetworkInfo exception %s", e.what());
+            return false;
+        }
+
+        return false;
+    }
 } // namespace utils

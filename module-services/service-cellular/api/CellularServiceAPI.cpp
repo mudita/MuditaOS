@@ -192,3 +192,44 @@ bool CellularServiceAPI::GetDataChannel(sys::Service *serv)
 {
     return GetChannel(serv, TS0710::Channel::Data);
 }
+
+bool CellularServiceAPI::GetCSQ(sys::Service *serv, std::string &response)
+{
+
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetCSQ);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto responseMsg = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
+        if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
+            response = responseMsg->data;
+            return true;
+        }
+    }
+    return false;
+}
+bool CellularServiceAPI::GetCREG(sys::Service *serv, std::string &response)
+{
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetCREG);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto responseMsg = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
+        if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
+            response = responseMsg->data;
+            return true;
+        }
+    }
+    return false;
+}
+bool CellularServiceAPI::GetQNWINFO(sys::Service *serv, std::string &response)
+{
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetNWINFO);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto responseMsg = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
+        if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
+            response = responseMsg->data;
+            return true;
+        }
+    }
+    return false;
+}
