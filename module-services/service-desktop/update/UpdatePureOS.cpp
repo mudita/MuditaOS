@@ -6,6 +6,23 @@
 
 #include "version.hpp"
 
+FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
+{
+    if (h.name[0] == '.' && h.name[1] == '/') {
+        // microtar relative paths, strip the leading ./away
+        fileName = std::string(h.name).substr(2);
+    }
+    else {
+        fileName = std::string(h.name);
+    }
+}
+
+json11::Json FileInfo::to_json() const
+{
+    return (json11::Json::object{
+        {"name", fileName}, {"size", std::to_string(fileSize)}, {"crc32", std::to_string(fileCRC32)}});
+}
+
 UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
 {}
 
@@ -13,6 +30,7 @@ updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
 {
     LOG_INFO("runUpdate fileName:%s", fileName.c_str());
 
+    owner->desktopWorker->sendMessage("start update");
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
         LOG_ERROR("runUpdate can't prepare temp directory for update");
@@ -52,6 +70,7 @@ updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
         return (updateos::UpdateError::CantOpenUpdateFile);
     }
 
+    owner->desktopWorker->sendMessage("end update no error");
     return (updateos::UpdateError::NoError);
 }
 
