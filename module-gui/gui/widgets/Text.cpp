@@ -506,6 +506,18 @@ namespace gui
             return true;
         }
 
+        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+            if (mode) {
+                mode->next();
+                return true;
+            }
+        }
+
+        if (mode && (inputEvent.state == InputEvent::State::keyReleasedShort ||
+                     inputEvent.state == InputEvent::State::keyReleasedLong)) {
+            mode->show_restore();
+        }
+
         if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
             if (mode) {
                 mode->select_special_char();
@@ -574,13 +586,6 @@ namespace gui
         // process only short release events
         if (inputEvent.state != InputEvent::State::keyReleasedShort) {
             return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_AST) {
-            if (mode) {
-                mode->next();
-                return true;
-            }
         }
 
         // it there is no key char it means that translator didn't handled the key and this key
