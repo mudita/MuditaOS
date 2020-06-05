@@ -30,7 +30,6 @@ updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
 {
     LOG_INFO("runUpdate fileName:%s", fileName.c_str());
 
-    owner->desktopWorker->sendMessage("start update");
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
         LOG_ERROR("runUpdate can't prepare temp directory for update");
@@ -70,7 +69,6 @@ updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
         return (updateos::UpdateError::CantOpenUpdateFile);
     }
 
-    owner->desktopWorker->sendMessage("end update no error");
     return (updateos::UpdateError::NoError);
 }
 
