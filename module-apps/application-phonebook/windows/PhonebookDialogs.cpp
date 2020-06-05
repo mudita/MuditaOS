@@ -137,7 +137,6 @@ bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)
 std::string DuplicatedContactDialogWindow::updateText(const std::string &text, const ContactRecord &rec)
 {
     std::string str = text;
-    fillContactData(str, std::make_shared<ContactRecord>(rec));
     return str;
 }
 
@@ -186,8 +185,7 @@ void PhonebookDuplicateSpeedDial::setContactData()
 {
     /* for name formatting */
     std::string t = utils::localize.get("app_phonebook_duplicate_speed_dial");
-    if (!fillContactData(t, contact))
-        return;
+
     confirmationLabel->setText(t);
     if (contact->speeddial.length() > 0)
         dialValue->setText(contact->speeddial);
