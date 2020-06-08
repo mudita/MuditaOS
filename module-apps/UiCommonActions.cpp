@@ -120,16 +120,24 @@ namespace app
                      contactRec.ID,
                      contactRec.primaryName.c_str(),
                      contactRec.alternativeName.c_str());
+
+            if (contactOperation == ContactOperation::Add) {
+                return sapm::ApplicationManager::messageSwitchApplication(
+                    app,
+                    name_phonebook,
+                    gui::window::name::new_contact,
+                    std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRec)));
+            }
         }
         else if (searchResults.get()->size() > 1) {
-            LOG_FATAL("Found more than one contact for numer %s", number.c_str());
+            LOG_FATAL("Found more than one contact for number %s", number.c_str());
             for (auto i : *searchResults) {
                 LOG_FATAL("ContactID = %" PRIu32, i.ID);
             }
             return false;
         }
         else if (contactOperation != ContactOperation::Add) {
-            LOG_ERROR("Invalid operation for not existing contact for numer %s", number.c_str());
+            LOG_ERROR("Invalid operation for not existing contact for number %s", number.c_str());
             return false;
         }
 
