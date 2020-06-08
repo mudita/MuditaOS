@@ -6,7 +6,6 @@ namespace gui
 
     TestListItem::TestListItem()
     {
-
         setMinimumSize(testStyle::item_w, testStyle::item_h);
         setMaximumSize(testStyle::item_w, testStyle::item_h);
     };
@@ -25,6 +24,7 @@ namespace gui
 
     void TestListViewProvider::requestRecords(const uint32_t offset, const uint32_t limit)
     {
+        modelIndex     = 0;
         internalOffset = offset;
         internalLimit  = limit;
         list->onProviderDataUpdate();
@@ -33,26 +33,31 @@ namespace gui
     gui::ListItem *TestListViewProvider::getItem(gui::Order order)
     {
 
-        auto index = 0;
+        unsigned int index = 0;
         if (order == gui::Order::Previous) {
-            index = internalOffset + internalLimit - 1;
+            index = internalLimit - modelIndex - 1;
         }
         if (order == gui::Order::Next) {
-            index = internalOffset;
+            index = internalOffset + modelIndex;
         }
 
-        LOG_DEBUG("tests: %d", index);
+        if (index < testItemCount) {
 
-        auto testItem = new TestListItem();
+            if (order == gui::Order::Previous && index < internalOffset) {
+                return nullptr;
+            }
 
-        if (order == gui::Order::Previous) {
-            internalOffset--;
+            LOG_DEBUG("tests: %d", index);
+
+            auto testItem = new TestListItem();
+            testItem->ID  = index;
+
+            modelIndex++;
+
+            return testItem;
         }
-        if (order == gui::Order::Next) {
-            internalOffset++;
-        }
 
-        return testItem;
+        return nullptr;
     }
 
 }; // namespace gui
