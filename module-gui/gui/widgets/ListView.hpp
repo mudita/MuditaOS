@@ -45,7 +45,7 @@ namespace gui
         void addSpanItem();
         int calculateMaxItemsOnPage();
         Order getOrderFromDirection();
-        bool listPageEndReached();
+        virtual bool listPageEndReached();
 
       public:
         ListView();

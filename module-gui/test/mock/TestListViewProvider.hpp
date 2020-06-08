@@ -22,17 +22,20 @@ namespace gui
     {
 
       public:
+        unsigned int ID = 0;
+
         TestListItem();
         ~TestListItem() = default;
     };
 
     class TestListViewProvider : public ListItemProvider
     {
+        int modelIndex              = 0;
         unsigned int internalOffset = 0;
         unsigned int internalLimit  = 0;
 
       public:
-        int testItemCount                  = 10;
+        unsigned int testItemCount         = 10;
         unsigned int testItemMinimalHeight = 100;
 
         TestListViewProvider() = default;
