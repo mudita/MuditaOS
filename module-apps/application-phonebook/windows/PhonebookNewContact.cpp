@@ -523,7 +523,7 @@ namespace gui
             this->application->switchWindow(gui::name::window::main_window);
             return true;
         };
-        std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_speed_dial");
+        std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
         fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
         std::string duplicatedSpeedDialTitle = utils::localize.get("app_phonebook_duplicate_speed_dial_title");
         fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
