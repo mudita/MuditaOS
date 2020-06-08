@@ -18,5 +18,6 @@ namespace gui
         auto contactOptionsList() -> std::list<gui::Option>;
         auto contactBlock() -> bool;
         auto contactRemove() -> bool;
+        auto showNotification() -> bool;
     };
 }; // namespace gui
