@@ -90,7 +90,7 @@ namespace gui
                 LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
                 return false;
             }
-            this->application->switchWindow(gui::name::window::main_window);
+            showNotification();
             return true;
         };
         meta.text       = utils::localize.get("app_phonebook_options_delete_confirm");
@@ -98,6 +98,23 @@ namespace gui
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
         meta.title      = cont.getFormattedName();
         meta.icon       = "phonebook_contact_delete_trashcan";
+        dialog->update(meta);
+        this->application->switchWindow(dialog->getName());
+        return true;
+    }
+
+    auto PhonebookContactOptions::showNotification() -> bool
+    {
+        auto dialog =
+            dynamic_cast<gui::DialogConfirm *>(this->application->getWindow(gui::window::name::dialog_confirm));
+        assert(dialog != nullptr);
+        auto meta   = dialog->meta;
+        meta.icon   = "info_big_circle_W_G";
+        meta.text   = utils::localize.get("app_phonebook_options_delete_notification");
+        meta.action = [=]() -> bool {
+            this->application->switchWindow(gui::name::window::main_window);
+            return true;
+        };
         dialog->update(meta);
         this->application->switchWindow(dialog->getName());
         return true;
