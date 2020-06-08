@@ -4,7 +4,6 @@ add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
         test-gui.cpp
         test-context.cpp
         test-gui-callbacks.cpp
-        test-gui-listview.cpp
         test-gui-resizes.cpp
         ../mock/TestWindow.cpp
         ../mock/TestListViewProvider.cpp
