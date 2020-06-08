@@ -80,6 +80,8 @@ namespace app
         windows.insert({gui::window::name::search_results, new gui::PhonebookSearchResults(this)});
         windows.insert(
             {gui::window::name::dialog_yes_no, new gui::DialogYesNo(this, gui::window::name::dialog_yes_no)});
+        windows.insert(
+            {gui::window::name::dialog_confirm, new gui::DialogConfirm(this, gui::window::name::dialog_confirm)});
         windows.insert({gui::window::name::contact_options, new gui::PhonebookContactOptions(this)});
         windows.insert({gui::window::name::namecard_options, new gui::PhonebookNamecardOptions(this)});
     }
