@@ -23,7 +23,7 @@
 #include <module-gui/gui/widgets/Image.hpp>
 #include <vfs.hpp>
 
-#include "../mock/TestWindow.hpp"
+#include <mock/TestWindow.hpp>
 
 using namespace std;
 
