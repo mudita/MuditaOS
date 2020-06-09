@@ -12,7 +12,6 @@ namespace gui
 
     int TestListViewProvider::getItemCount() const
     {
-
         return testItemCount;
     }
 
@@ -32,7 +31,6 @@ namespace gui
 
     gui::ListItem *TestListViewProvider::getItem(gui::Order order)
     {
-
         unsigned int index = 0;
         if (order == gui::Order::Previous) {
             index = internalLimit - modelIndex - 1;
@@ -47,10 +45,12 @@ namespace gui
                 return nullptr;
             }
 
-            LOG_DEBUG("tests: %d", index);
-
             auto testItem = new TestListItem();
             testItem->ID  = index;
+
+            if (notEqualItems) {
+                testItem->setMinimumSize(testStyle::item_w, testStyle::item_h + testStyle::item_h * index);
+            }
 
             modelIndex++;
 

@@ -6,7 +6,6 @@ add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
         test-gui-callbacks.cpp
         test-gui-resizes.cpp
         ../mock/TestWindow.cpp
-        ../mock/TestListViewProvider.cpp
         )
 
 target_include_directories(${PROJECT_NAME}
@@ -14,6 +13,7 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}"
         "${CMAKE_SOURCE_DIR}/module-utils"
         "${CMAKE_SOURCE_DIR}/module-vfs"
+        "${CMAKE_SOURCE_DIR}/module-gui/test/"
         )
 
 target_link_directories(${PROJECT_NAME} PUBLIC "${PROJECT_LIB_DIRECTORY}")

@@ -37,6 +37,7 @@ namespace gui
       public:
         unsigned int testItemCount         = 10;
         unsigned int testItemMinimalHeight = 100;
+        bool notEqualItems                 = false;
 
         TestListViewProvider() = default;
 
