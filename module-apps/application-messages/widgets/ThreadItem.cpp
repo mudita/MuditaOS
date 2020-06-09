@@ -8,17 +8,14 @@
 
 namespace gui
 {
-    ThreadItem *ThreadItem::makeThreadItem(ThreadModel *model, Type type)
+    ThreadItem *ThreadItem::makeThreadItem(ThreadModel *model, std::shared_ptr<ThreadRecord> thread)
     {
-        switch (type) {
-        case Type::NotSent:
-            return new ThreadItemNotSent(model);
-        case Type::NotRead:
-            return new ThreadItemNotRead(model);
-        case Type::Regular:
-        default:
-            return new ThreadItem(model);
-        }
+        ThreadItem *threadItem = nullptr;
+        threadItem             = !thread->msgRead ? new ThreadItemNotRead(model) : new ThreadItem(model);
+
+        threadItem->setThreadItem(thread);
+
+        return threadItem;
     }
 
     ThreadItem::ThreadItem(ThreadModel *model)
@@ -26,7 +23,7 @@ namespace gui
         this->model = model;
     }
 
-    void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> &thread)
+    void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> thread)
     {
         this->thread = thread;
 
@@ -48,6 +45,7 @@ namespace gui
 
     bool ThreadItemWithIndicator::onDimensionChanged(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
     {
+        LOG_DEBUG("onDimensionChanged this %lx", (uint64_t)this);
         namespace msgStyle = style::messages::threadItem;
 
         contact->setPosition(msgStyle::leftMargin, msgStyle::topMargin);
@@ -57,17 +55,20 @@ namespace gui
         timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2 - msgStyle::topMargin);
 
         preview->setPosition(msgStyle::leftMargin + msgStyle::notSentIconWidth, newDim.h / 2);
-        preview->setSize(newDim.w - msgStyle::previewWidthOffset - indicator->getSize(gui::Axis::X),
+        preview->setSize(newDim.w - msgStyle::previewWidthOffset - msgStyle::notSentIconWidth,
                          newDim.h / 2 - msgStyle::bottomMargin);
 
-        indicator->setPosition(msgStyle::leftMargin, newDim.h / 2);
+        LOG_FATAL("newDim.h2 %u, preview Y %u, indicator Y%u, Y %u",
+                  newDim.h / 2,
+                  preview->getSize(gui::Axis::Y),
+                  indicator->getSize(gui::Axis::Y),
+                  newDim.h / 2 + preview->getSize(gui::Axis::Y) - indicator->getSize(gui::Axis::Y));
+        indicator->setPosition(msgStyle::leftMargin,
+                               newDim.h / 2 + preview->getSize(gui::Axis::Y) / 2 -
+                                   indicator->getSize(gui::Axis::Y) / 2);
 
         return true;
     }
-
-    ThreadItemNotSent::ThreadItemNotSent(ThreadModel *model)
-        : ThreadItemWithIndicator(model, ThreadItemNotSent::indicatorName)
-    {}
 
     ThreadItemNotRead::ThreadItemNotRead(ThreadModel *model)
         : ThreadItemWithIndicator(model, ThreadItemNotRead::indicatorName)

@@ -13,19 +13,13 @@ namespace gui
 
       public:
         ThreadItem(ThreadModel *model);
-        void setThreadItem(std::shared_ptr<ThreadRecord> &thread);
+        void setThreadItem(std::shared_ptr<ThreadRecord> thread);
         std::shared_ptr<ThreadRecord> getThreadItem()
         {
             return thread;
         }
 
-        enum class Type
-        {
-            Regular,
-            NotSent,
-            NotRead
-        };
-        static ThreadItem *makeThreadItem(ThreadModel *model, Type type);
+        static ThreadItem *makeThreadItem(ThreadModel *model, std::shared_ptr<ThreadRecord> thread);
     };
 
     class ThreadItemWithIndicator : public ThreadItem
@@ -38,17 +32,9 @@ namespace gui
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
-    class ThreadItemNotSent : public ThreadItemWithIndicator
-    {
-        static const inline UTF8 indicatorName = "messages_error_W_M";
-
-      public:
-        ThreadItemNotSent(ThreadModel *model);
-    };
-
     class ThreadItemNotRead : public ThreadItemWithIndicator
     {
-        static const inline UTF8 indicatorName = " ";
+        static const inline UTF8 indicatorName = "dot_12px_soft";
 
       public:
         ThreadItemNotRead(ThreadModel *model);

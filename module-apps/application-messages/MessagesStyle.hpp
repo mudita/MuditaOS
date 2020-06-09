@@ -24,7 +24,7 @@ namespace style
 
             constexpr auto cotactWidthOffset = 120;
             constexpr auto timestampWidth = 100;
-            constexpr auto notSentIconWidth  = 40;
+            constexpr auto notSentIconWidth  = 20;
 
             constexpr auto previewWidthOffset = leftMargin + rightMargin + 10;
         } // namespace threadItem
