@@ -137,7 +137,11 @@ namespace gui
         // if there was text - then remove it temp
         gui::Alignment align;
         // 1. load elements to tmp vector
-        SMS.dbsize = DBServiceAPI::SMSGetCount(this->application);
+        std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
+        if (threadDetails != nullptr) {
+            SMS.dbsize = threadDetails->msgCount;
+        }
+
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Start || what == Action::Refresh) {
             SMS.start = 0;
