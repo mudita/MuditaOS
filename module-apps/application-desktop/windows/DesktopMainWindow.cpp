@@ -223,7 +223,7 @@ namespace gui
             }
             // long press of '0' key is translated to '+'
             else if (inputEvent.keyCode == KeyCode::KEY_0) {
-                return app::prepare_call(application, std::to_string('+'));
+                return app::prepare_call(application, "+");
             }
         }
 
