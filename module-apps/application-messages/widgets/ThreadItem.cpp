@@ -45,7 +45,6 @@ namespace gui
 
     bool ThreadItemWithIndicator::onDimensionChanged(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
     {
-        LOG_DEBUG("onDimensionChanged this %lx", (uint64_t)this);
         namespace msgStyle = style::messages::threadItem;
 
         contact->setPosition(msgStyle::leftMargin, msgStyle::topMargin);
@@ -58,11 +57,6 @@ namespace gui
         preview->setSize(newDim.w - msgStyle::previewWidthOffset - msgStyle::notSentIconWidth,
                          newDim.h / 2 - msgStyle::bottomMargin);
 
-        LOG_FATAL("newDim.h2 %u, preview Y %u, indicator Y%u, Y %u",
-                  newDim.h / 2,
-                  preview->getSize(gui::Axis::Y),
-                  indicator->getSize(gui::Axis::Y),
-                  newDim.h / 2 + preview->getSize(gui::Axis::Y) - indicator->getSize(gui::Axis::Y));
         indicator->setPosition(msgStyle::leftMargin,
                                newDim.h / 2 + preview->getSize(gui::Axis::Y) / 2 -
                                    indicator->getSize(gui::Axis::Y) / 2);
