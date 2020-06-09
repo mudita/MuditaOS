@@ -3,6 +3,10 @@
 ## **11-06-2020**
 
 * [EGD-3276] Fix plus sign input on a 0 key longpress.
+* [EGD-3267] Add new implementation of duplicate number/speedDialNumber dialogs.
+* [EGD-3137] Add handling for contact number duplicate window.
+* [EGD-3138] Add handling for speed dial number duplicate window.
+* [EGD-3275] Add confirmation windows after deleting/blocking contact.
 
 ## **04-06-2020**
 * Initial changelog file created
