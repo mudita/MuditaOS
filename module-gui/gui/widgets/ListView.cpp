@@ -123,7 +123,9 @@ namespace gui
     void ListView::clear()
     {
         clearItems();
+        body->setReverseOrder(false);
         startIndex = 0;
+        direction  = style::listview::Direction::Bottom;
     }
 
     void ListView::clearItems()
