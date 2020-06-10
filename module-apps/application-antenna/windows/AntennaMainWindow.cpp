@@ -61,19 +61,19 @@ namespace gui
         }
 
         buttons.push_back(addLabel("Antenna A", [=](gui::Item &) {
-            bool changed = CellularServiceAPI::SelectAntenna(application, bsp::cellular::antenna::lowBand);
-            if (changed) {
-                buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::mediumbold);
-                buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::medium);
-            }
+            CellularServiceAPI::SelectAntenna(application, bsp::cellular::antenna::lowBand);
+            //            if (changed) {
+            //                buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::mediumbold);
+            //                buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::medium);
+            //            }
             return true;
         }));
         buttons.push_back(addLabel("Antenna B", [=](gui::Item &) {
-            bool changed = CellularServiceAPI::SelectAntenna(application, bsp::cellular::antenna::highBand);
-            if (changed) {
-                buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::medium);
-                buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::mediumbold);
-            }
+            CellularServiceAPI::SelectAntenna(application, bsp::cellular::antenna::highBand);
+            //            if (changed) {
+            //                buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::medium);
+            //                buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::mediumbold);
+            //            }
             return true;
         }));
 
@@ -156,8 +156,10 @@ namespace gui
                                                                 buttons[buttonDescriotion::StartScan]);
 
         setFocusItem(buttons[buttonDescriotion::AntennaA]);
-        buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::mediumbold);
-        //        CellularServiceAPI::SelectAntenna(application, 0);
+        bsp::cellular::antenna antenna;
+        if (CellularServiceAPI::GetAntenna(this->application, antenna)) {
+            updateAntennaButtons(antenna);
+        }
     }
     void AntennaMainWindow::destroyInterface()
     {
@@ -228,5 +230,22 @@ namespace gui
         std::replace(formattedString.begin(), formattedString.end(), '\"', ' ');
         operators->setText(formattedString);
         this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
+    void AntennaMainWindow::updateAntennaButtons(bsp::cellular::antenna antenna)
+    {
+        bool updated = false;
+        if (antenna == bsp::cellular::antenna::lowBand) {
+            buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::mediumbold);
+            buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::medium);
+            updated = true;
+        }
+        else if (antenna == bsp::cellular::antenna::highBand) {
+            buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::medium);
+            buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::mediumbold);
+            updated = true;
+        }
+        if (updated) {
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+        }
     }
 } // namespace gui

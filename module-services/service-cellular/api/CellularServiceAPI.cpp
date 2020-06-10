@@ -232,3 +232,17 @@ bool CellularServiceAPI::GetQNWINFO(sys::Service *serv, std::string &response)
     }
     return false;
 }
+
+bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &response)
+{
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetAntenna);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto responseMsg = std::dynamic_pointer_cast<CellularAntennaResponseMessage>(ret.second);
+        if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
+            response = responseMsg->antenna;
+            return true;
+        }
+    }
+    return false;
+}

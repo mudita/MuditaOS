@@ -37,6 +37,8 @@ namespace app
           appTimer(CreateAppTimer(2000, true, [=]() { timerHandler(); }))
 
     {
+        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+
         appTimer.restart();
     }
 
@@ -99,6 +101,20 @@ namespace app
                     }
                 }
                 cellularRequestInProgress = false;
+            }
+            handled = true;
+        }
+        if (msgl->messageType == MessageType::AntennaChanged) {
+            bsp::cellular::antenna antenna;
+            CellularServiceAPI::GetAntenna(this, antenna);
+            auto win = getCurrentWindow();
+
+            if (win->getName() == gui::name::window::main_window) {
+                auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
+                if (window != nullptr) {
+
+                    window->updateAntennaButtons(antenna);
+                }
             }
             handled = true;
         }

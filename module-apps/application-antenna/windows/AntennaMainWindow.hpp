@@ -47,6 +47,7 @@ namespace gui
         void destroyInterface() override;
         void updateDebugInfo(std::vector<std::string> &data);
         void updateOperatorsScan(std::vector<std::string> &data);
+        void updateAntennaButtons(bsp::cellular::antenna antenna);
     };
 
 } /* namespace gui */

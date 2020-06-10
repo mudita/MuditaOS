@@ -52,4 +52,5 @@ namespace CellularServiceAPI
     bool GetCSQ(sys::Service *serv, std::string &response);
     bool GetCREG(sys::Service *serv, std::string &response);
     bool GetQNWINFO(sys::Service *serv, std::string &response);
+    bool GetAntenna(sys::Service *serv, bsp::cellular::antenna &response);
 }; // namespace CellularServiceAPI

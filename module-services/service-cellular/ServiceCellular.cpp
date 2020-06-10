@@ -731,6 +731,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             auto actualAntenna    = cmux->GetAntenna();
             bool changedAntenna   = (actualAntenna == msg->antenna);
             responseMsg           = std::make_shared<CellularResponseMessage>(changedAntenna);
+
+            auto notification = std::make_shared<sys::DataMessage>(MessageType::AntennaChanged);
+            sys::Bus::SendMulticast(notification, sys::BusChannels::AntennaNotifications, this);
         }
         else {
             responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -826,6 +829,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
         }
+    } break;
+    case MessageType::CellularGetAntenna: {
+        auto antenna = cmux->GetAntenna();
+        responseMsg  = std::make_shared<CellularAntennaResponseMessage>(true, antenna, MessageType::CellularGetAntenna);
     } break;
     default:
         break;

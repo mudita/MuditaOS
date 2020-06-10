@@ -149,6 +149,19 @@ class CellularResponseMessage : public sys::ResponseMessage
     std::string data;
 };
 
+class CellularAntennaResponseMessage : public sys::ResponseMessage
+{
+  public:
+    CellularAntennaResponseMessage(bool retCode, bsp::cellular::antenna retAntenna, MessageType responseTo)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode)
+    {
+        antenna = retAntenna;
+    };
+    virtual ~CellularAntennaResponseMessage(){};
+
+    bool retCode;
+    bsp::cellular::antenna antenna;
+};
 namespace cellular
 {
 

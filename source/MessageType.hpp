@@ -107,6 +107,7 @@ enum class MessageType
     CellularGetCSQ,
     CellularGetCREG,
     CellularGetNWINFO,
+    CellularGetAntenna,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -206,6 +207,8 @@ enum class MessageType
     FotaFinished,
 
 StateChange,
+    // antenna messages
+    AntennaChanged,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
