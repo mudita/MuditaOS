@@ -28,7 +28,7 @@ namespace gui
     {
         gui::Image *indicator = nullptr;
 
-        void onDimensionChanged_bottom(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        void onDimensionChangedBottom(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       public:
         ThreadItemWithIndicator(ThreadModel *model, const UTF8 &indicatorName);

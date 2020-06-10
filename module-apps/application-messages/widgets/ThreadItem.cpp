@@ -63,7 +63,7 @@ namespace gui
         indicator = new gui::Image(this, 0, 0, indicatorName);
     }
 
-    void ThreadItemWithIndicator::onDimensionChanged_bottom(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
+    void ThreadItemWithIndicator::onDimensionChangedBottom(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
     {
         namespace msgStyle = style::messages::threadItem;
 

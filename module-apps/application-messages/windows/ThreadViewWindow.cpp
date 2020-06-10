@@ -391,11 +391,9 @@ namespace gui
         }
 
         std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
-        if (threadDetails != nullptr) {
-            if (threadDetails->msgRead > 0) {
-                threadDetails->msgRead = 0;
-                DBServiceAPI::ThreadUpdate(application, *threadDetails);
-            }
+        if (threadDetails != nullptr && threadDetails->msgRead > 0) {
+            threadDetails->msgRead = 0;
+            DBServiceAPI::ThreadUpdate(application, *threadDetails);
         }
     }
 
