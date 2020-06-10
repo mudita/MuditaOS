@@ -232,6 +232,14 @@ uint32_t DBServiceAPI::ThreadGetCount(sys::Service *serv)
     }
 }
 
+bool DBServiceAPI::ThreadUpdate(sys::Service *serv, const ThreadRecord &rec)
+{
+    std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadUpdate, rec);
+
+    sys::Bus::SendUnicast(msg, service::name::db, serv);
+    return true;
+}
+
 bool DBServiceAPI::SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &rec)
 {
     auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateAdd, rec);

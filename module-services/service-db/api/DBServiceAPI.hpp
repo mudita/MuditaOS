@@ -53,6 +53,7 @@ class DBServiceAPI
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
     static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static uint32_t ThreadGetCount(sys::Service *serv);
+    static bool ThreadUpdate(sys::Service *serv, const ThreadRecord &rec);
 
     static bool SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &rec);
     static bool SMSTemplateRemove(sys::Service *serv, uint32_t id);
