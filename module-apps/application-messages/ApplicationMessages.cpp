@@ -46,9 +46,13 @@ namespace app
                 if ((msg->interface == db::Interface::Name::SMS) ||
                     (msg->interface == db::Interface::Name::SMSThread)) {
                     this->windows[gui::name::window::main_window]->rebuild();
-                    if (getCurrentWindow() == windows[gui::name::window::main_window]) {
+                    this->windows[gui::name::window::thread_view]->rebuild();
+
+                    if (getCurrentWindow() == windows[gui::name::window::main_window] ||
+                        getCurrentWindow() == windows[gui::name::window::thread_view]) {
                         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                     }
+
                     return std::make_shared<sys::ResponseMessage>();
                 }
                 if (windows[gui::name::window::thread_view]->onDatabaseMessage(msg)) {
