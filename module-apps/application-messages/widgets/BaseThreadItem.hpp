@@ -14,6 +14,9 @@ namespace gui
         gui::Label *timestamp = nullptr;
         gui::Label *preview   = nullptr;
 
+        virtual void onDimensionChanged_top(const BoundingBox &oldDim, const BoundingBox &newDim);
+        virtual void onDimensionChanged_bottom(const BoundingBox &oldDim, const BoundingBox &newDim);
+
       public:
         BaseThreadItem();
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;

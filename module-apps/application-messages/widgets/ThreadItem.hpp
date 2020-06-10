@@ -28,10 +28,10 @@ namespace gui
     {
         gui::Image *indicator = nullptr;
 
+        void onDimensionChanged_bottom(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+
       public:
         ThreadItemWithIndicator(ThreadModel *model, const UTF8 &indicatorName);
-
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
     class ThreadItemNotRead : public ThreadItemWithIndicator

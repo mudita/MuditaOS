@@ -63,15 +63,9 @@ namespace gui
         indicator = new gui::Image(this, 0, 0, indicatorName);
     }
 
-    bool ThreadItemWithIndicator::onDimensionChanged(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
+    void ThreadItemWithIndicator::onDimensionChanged_bottom(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
     {
         namespace msgStyle = style::messages::threadItem;
-
-        contact->setPosition(msgStyle::leftMargin, msgStyle::topMargin);
-        contact->setSize(newDim.w - msgStyle::cotactWidthOffset, newDim.h / 2 - msgStyle::topMargin);
-
-        timestamp->setPosition(newDim.w - msgStyle::timestampWidth, msgStyle::topMargin);
-        timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2 - msgStyle::topMargin);
 
         const auto indicatorWidth = indicator->getSize(gui::Axis::X) + 6;
         preview->setPosition(msgStyle::leftMargin + indicatorWidth, newDim.h / 2);
@@ -81,7 +75,6 @@ namespace gui
         indicator->setPosition(msgStyle::leftMargin,
                                newDim.h / 2 + preview->getSize(gui::Axis::Y) / 2 -
                                    indicator->getSize(gui::Axis::Y) / 2); // align with text
-        return true;
     }
 
     ThreadItemNotRead::ThreadItemNotRead(ThreadModel *model)
