@@ -216,6 +216,13 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, 0, 0, ret);
     } break;
 
+    case MessageType::DBThreadUpdate: {
+        auto time   = utils::time::Scoped("DBThreadUpdate");
+        auto msg    = static_cast<DBThreadMessage *>(msgl);
+        auto ret    = threadRecordInterface->Update(msg->record);
+        responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, 0, 0, ret);
+    } break;
+
         /**
          * SMS templates records
          */

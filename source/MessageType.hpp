@@ -47,6 +47,7 @@ enum class MessageType
     DBThreadRemove,         // Remove thread by ID
     DBThreadGetLimitOffset, // Get Thread record by limit,offset
     DBThreadGetCount,       // get Thread count
+    DBThreadUpdate,         // Thread update
 
     DBSMSTemplateAdd,            // Add new sms template record
     DBSMSTemplateRemove,         // Remove selected sms template record

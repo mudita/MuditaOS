@@ -382,13 +382,18 @@ namespace gui
                 contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
                 setTitle(ret->front().getFormattedName());
-                return;
             }
         }
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
             LOG_INFO("received sms templates data \"%s\"", txt.c_str());
             text->setText(text->getText() + txt);
+        }
+
+        std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
+        if (threadDetails != nullptr && threadDetails->msgRead > 0) {
+            threadDetails->msgRead = 0;
+            DBServiceAPI::ThreadUpdate(application, *threadDetails);
         }
     }
 

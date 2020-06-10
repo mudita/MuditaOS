@@ -6,7 +6,6 @@
  */
 
 #include "AlarmsRecord.hpp"
-#include "ThreadRecord.hpp"
 #include "AlarmsTable.hpp"
 
 AlarmsRecordInterface::AlarmsRecordInterface(AlarmsDB *alarmsDb) : alarmsDB(alarmsDb)
