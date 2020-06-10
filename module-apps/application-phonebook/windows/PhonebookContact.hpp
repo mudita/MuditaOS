@@ -6,20 +6,16 @@
 #include <Text.hpp>
 #include <Utils.hpp>
 
-static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
+static inline void fillContactData(std::string &data, ContactRecord &contact)
 {
-    if (contact.get() == nullptr) {
-        return false;
-    }
-    utils::findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName);
-    utils::findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
-    utils::findAndReplaceAll(data, "$CONTACT_NAME$", contact->getFormattedName(ContactRecord::NameFormatType::Title));
+    utils::findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact.primaryName);
+    utils::findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact.alternativeName);
+    utils::findAndReplaceAll(data, "$CONTACT_NAME$", contact.getFormattedName(ContactRecord::NameFormatType::Title));
     utils::findAndReplaceAll(
-        data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberUser : "");
+        data, "$CONTACT_NUMBER1$", (contact.numbers.size() == 1) ? contact.numbers[0].numberUser : "");
     utils::findAndReplaceAll(
-        data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberUser : "");
-    utils::findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", contact->speeddial);
-    return true;
+        data, "$CONTACT_NUMBER2$", (contact.numbers.size() == 2) ? contact.numbers[1].numberUser : "");
+    utils::findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", contact.speeddial);
 }
 
 namespace gui

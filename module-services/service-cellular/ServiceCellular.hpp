@@ -90,6 +90,12 @@ class ServiceCellular : public sys::Service
 
     /// @defgroup state_handlers     all functions on State::ST:: change requests
     /// @{
+    /// modem has started to turn off
+    bool handle_power_down_started();
+    /// wait some time or for change of a status pin
+    bool handle_power_down_waiting();
+    /// what to do after a full power down
+    bool handle_power_down();
     /// idle handler
     bool handle_idle();
     /// cellular power up procedure

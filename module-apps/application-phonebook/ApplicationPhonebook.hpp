@@ -8,16 +8,17 @@ namespace gui
 {
     namespace window::name
     {
-        inline const std::string contact            = "Contact";
-        inline const std::string contact_options    = "Options";
-        inline const std::string duplicated_contact = "DuplicatedContactWindow";
-        inline const std::string no_results         = "NoResults";
-        inline const std::string contact_blocked    = "ContactBlocked";
-        inline const std::string namecard_options   = "Namecard Options";
-        inline const std::string new_contact        = "New";
-        inline const std::string search             = "Search";
-        inline const std::string search_results     = "SearchResults";
-        inline const std::string dialog_yes_no      = "DialogYesNo";
+        inline const std::string contact          = "Contact";
+        inline const std::string contact_options  = "Options";
+        inline const std::string no_results       = "NoResults";
+        inline const std::string contact_blocked  = "ContactBlocked";
+        inline const std::string namecard_options = "Namecard Options";
+        inline const std::string new_contact      = "New";
+        inline const std::string search           = "Search";
+        inline const std::string search_results   = "SearchResults";
+        inline const std::string dialog_yes_no    = "DialogYesNo";
+        inline const std::string dialog_confirm   = "DialogConfirm";
+
     } // namespace window::name
 } // namespace gui
 

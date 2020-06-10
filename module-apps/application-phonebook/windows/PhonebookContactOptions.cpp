@@ -66,7 +66,7 @@ namespace gui
         assert(dialog != nullptr);
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
-            this->application->switchWindow(gui::name::window::main_window);
+            showNotification(NotificationType::Block);
             return true;
         };
         meta.text       = utils::localize.get("app_phonebook_options_block_confirm");
@@ -90,7 +90,7 @@ namespace gui
                 LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
                 return false;
             }
-            this->application->switchWindow(gui::name::window::main_window);
+            showNotification(NotificationType::Delete);
             return true;
         };
         meta.text       = utils::localize.get("app_phonebook_options_delete_confirm");
@@ -98,6 +98,30 @@ namespace gui
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
         meta.title      = cont.getFormattedName();
         meta.icon       = "phonebook_contact_delete_trashcan";
+        dialog->update(meta);
+        this->application->switchWindow(dialog->getName());
+        return true;
+    }
+
+    auto PhonebookContactOptions::showNotification(NotificationType notificationType) -> bool
+    {
+        auto dialog =
+            dynamic_cast<gui::DialogConfirm *>(this->application->getWindow(gui::window::name::dialog_confirm));
+        assert(dialog != nullptr);
+        auto meta = dialog->meta;
+        meta.icon = "info_big_circle_W_G";
+        switch (notificationType) {
+        case NotificationType::Block:
+            meta.text = utils::localize.get("app_phonebook_options_block_notification");
+            break;
+        case NotificationType::Delete:
+            meta.text = utils::localize.get("app_phonebook_options_delete_notification");
+            break;
+        }
+        meta.action = [=]() -> bool {
+            this->application->switchWindow(gui::name::window::main_window);
+            return true;
+        };
         dialog->update(meta);
         this->application->switchWindow(dialog->getName());
         return true;

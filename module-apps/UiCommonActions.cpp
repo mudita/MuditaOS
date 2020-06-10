@@ -6,9 +6,6 @@
 #include "application-messages/windows/ThreadViewWindow.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "application-phonebook/windows/PhonebookContact.hpp"
-#include "application-phonebook/windows/PhonebookDialogs.hpp"
-#include "application-phonebook/windows/PhonebookNewContact.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include <i18/i18.hpp>
@@ -125,24 +122,22 @@ namespace app
                      contactRec.alternativeName.c_str());
 
             if (contactOperation == ContactOperation::Add) {
-                // trying to add new contact for number already assigned to existing contact, display warning
                 return sapm::ApplicationManager::messageSwitchApplication(
                     app,
                     name_phonebook,
-                    gui::window::name::duplicated_contact,
-                    std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contactRec)),
-                                                        number));
+                    gui::window::name::new_contact,
+                    std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRec)));
             }
         }
         else if (searchResults.get()->size() > 1) {
-            LOG_FATAL("Found more than one contact for numer %s", number.c_str());
+            LOG_FATAL("Found more than one contact for number %s", number.c_str());
             for (auto i : *searchResults) {
                 LOG_FATAL("ContactID = %" PRIu32, i.ID);
             }
             return false;
         }
         else if (contactOperation != ContactOperation::Add) {
-            LOG_ERROR("Invalid operation for not existing contact for numer %s", number.c_str());
+            LOG_ERROR("Invalid operation for not existing contact for number %s", number.c_str());
             return false;
         }
 

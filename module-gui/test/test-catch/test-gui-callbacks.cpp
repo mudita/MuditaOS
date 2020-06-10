@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include <module-gui/gui/widgets/Item.hpp>
-#include "mock/TestWindow.hpp"
+#include <mock/TestWindow.hpp>
 
 // there is strict order on which callbacks should be called
 TEST_CASE("gui::Item on input flow test")
