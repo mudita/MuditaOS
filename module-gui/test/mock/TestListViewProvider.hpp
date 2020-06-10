@@ -50,5 +50,7 @@ namespace gui
         ListItem *getItem(Order order) override;
 
         void requestRecords(const uint32_t offset, const uint32_t limit) override;
+
+        void refreshList();
     };
 } // namespace gui

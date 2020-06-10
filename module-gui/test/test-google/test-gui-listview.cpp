@@ -11,6 +11,7 @@ class TestListView : public gui::ListView
     FRIEND_TEST(ListViewTesting, Constructor_Destructor_Test);
     FRIEND_TEST(ListViewTesting, Fill_List_And_Span_Test);
     FRIEND_TEST(ListViewTesting, Not_Equal_Items_Test);
+    FRIEND_TEST(ListViewTesting, List_Clear_Test);
     FRIEND_TEST(ListViewTesting, Scroll_Test);
     FRIEND_TEST(ListViewTesting, Navigate_Test);
     FRIEND_TEST(ListViewTesting, Continuous_Type_Test);
@@ -41,8 +42,6 @@ class ListViewTesting : public ::testing::Test
 
         // Set span size to 0 for easy test calculation.
         testListView->setItemSpanSize(0);
-
-        LOG_INFO("KURWA MAC");
     }
 
     void TearDown() override
@@ -105,6 +104,32 @@ TEST_F(ListViewTesting, Not_Equal_Items_Test)
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(3, testListView->currentPageSize) << "3 elements should fit into list (100+200+300)";
+}
+
+TEST_F(ListViewTesting, List_Clear_Test)
+{
+    // Assign list to provider and request data - span set to 0, element height at 100, list height 600
+    testListView->provider->requestRecords(0, 10);
+
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
+    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
+        << "First element ID should be 0";
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+        << "Last element ID should be 0";
+
+    // Change pages
+    moveNTimes(6, style::listview::Direction::Bottom);
+    moveNTimes(1, style::listview::Direction::Top);
+
+    // Clear list and request same data as before -> page should refresh with same data.
+    testListView->clear();
+    testProvider->refreshList();
+
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
+    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
+        << "First element ID should be 0";
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+        << "Last element ID should be 0";
 }
 
 TEST_F(ListViewTesting, Scroll_Test)
