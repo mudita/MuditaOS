@@ -21,6 +21,12 @@ namespace gui
         return testItemMinimalHeight;
     }
 
+    void TestListViewProvider::refreshList()
+    {
+        modelIndex = 0;
+        list->onProviderDataUpdate();
+    }
+
     void TestListViewProvider::requestRecords(const uint32_t offset, const uint32_t limit)
     {
         modelIndex     = 0;
