@@ -11,6 +11,8 @@ namespace gui
         ThreadModel *model = nullptr;
         std::shared_ptr<ThreadRecord> thread = nullptr;
 
+        void setPreview();
+
       public:
         ThreadItem(ThreadModel *model);
         void setThreadItem(std::shared_ptr<ThreadRecord> thread);
