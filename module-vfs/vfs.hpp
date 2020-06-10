@@ -30,7 +30,7 @@ namespace fs = std::filesystem;
 #include "ff_stdio.h"
 #include "board/cross/eMMC/eMMC.hpp"
 #define PATH_USER "/user/"
-#define PATH_SYS  "/sys/"
+#define PATH_SYS  "/sys"
 #endif
 
 #define PATH_CURRENT  "current"
