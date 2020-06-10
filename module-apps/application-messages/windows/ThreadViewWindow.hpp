@@ -22,10 +22,11 @@ namespace gui
         void cleanView();
         enum class Action
         {
-            Start,   /// first load of sms
-            Refresh, /// refresh from start, do not loose text
-            Next,    /// load previous sms
-            Previous /// load next sms
+            Init,        /// first load of sms thread view
+            NewestPage,  /// show a sms thread page from the latest sms
+            Refresh,     /// just refresh current view
+            NextPage,    /// load previous page
+            PreviousPage /// load next page
         };
         /// return if request was handled
         bool showMessages(Action what);

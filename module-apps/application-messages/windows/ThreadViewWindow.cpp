@@ -53,10 +53,10 @@ namespace gui
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP) {
-                return this->showMessages(Action::Next);
+                return this->showMessages(Action::NextPage);
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
-                return this->showMessages(Action::Previous);
+                return this->showMessages(Action::PreviousPage);
             }
             else {
                 return false;
@@ -145,10 +145,12 @@ namespace gui
         SMS.dbsize = threadDetails->msgCount;
 
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
-        if (what == Action::Start || what == Action::Refresh) {
-            SMS.start = 0;
-            SMS.end   = maxsmsinwindow;
-            if (what == Action::Start) {
+        if (what == Action::Init || what == Action::NewestPage) {
+            if (what == Action::NewestPage) {
+                SMS.start = 0;
+                SMS.end   = maxsmsinwindow;
+            }
+            if (what == Action::Init) {
                 destroyTextItem();
             }
             refreshTextItem();
@@ -156,7 +158,7 @@ namespace gui
 
         // TODO 2. check how many of these will fit in box
         //         update begin / end in `SMS`
-        if (what == Action::Next) {
+        if (what == Action::NextPage) {
             if (SMS.end != SMS.dbsize) {
                 SMS.start = SMS.end;
             }
@@ -165,7 +167,7 @@ namespace gui
                 return;
             }
         }
-        else if (what == Action::Previous) {
+        else if (what == Action::PreviousPage) {
             if (SMS.start == 0) {
                 return;
             }
@@ -189,6 +191,7 @@ namespace gui
             body->addWidget(text);
         }
 
+        // rebuild bubbles
         SMS.end = SMS.start;
         for (auto &el : *SMS.sms) {
             LOG_DEBUG("...");
@@ -199,7 +202,7 @@ namespace gui
         }
         body->setNavigation();
         setFocusItem(body);
-        if (Action::Previous == what) {
+        if (Action::PreviousPage == what) {
             body->setVisible(true, true);
         }
         LOG_DEBUG("sms built");
@@ -355,7 +358,7 @@ namespace gui
 
     void ThreadViewWindow::rebuild()
     {
-        addSMS(ThreadViewWindow::Action::Start);
+        addSMS(ThreadViewWindow::Action::Init);
     }
 
     void ThreadViewWindow::buildInterface()
@@ -379,7 +382,7 @@ namespace gui
                 LOG_INFO("We have it! %" PRIu32, pdata->thread->dbID);
                 cleanView();
                 SMS.thread = pdata->thread->dbID;
-                showMessages(Action::Start);
+                showMessages(Action::Init);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
@@ -406,7 +409,23 @@ namespace gui
 
     bool ThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        addSMS(ThreadViewWindow::Action::Refresh);
+        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            switch (msg->type) {
+            case db::Query::Type::Create:
+                // jump to the latest SMS
+                addSMS(ThreadViewWindow::Action::NewestPage);
+                break;
+            case db::Query::Type::Update:
+            case db::Query::Type::Delete:
+                // refresh view in place (current page)
+                addSMS(ThreadViewWindow::Action::Refresh);
+                break;
+            case db::Query::Type::Read:
+                // do not update view, as we don't have visual representation for read status
+                break;
+            }
+        }
         return true;
     }
 

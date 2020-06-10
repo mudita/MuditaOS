@@ -45,8 +45,10 @@ namespace app
             if (msg != nullptr) {
                 if ((msg->interface == db::Interface::Name::SMS) ||
                     (msg->interface == db::Interface::Name::SMSThread)) {
+
                     this->windows[gui::name::window::main_window]->rebuild();
-                    this->windows[gui::name::window::thread_view]->rebuild();
+                    // de facto parameterized rebuild
+                    this->windows[gui::name::window::thread_view]->onDatabaseMessage(msg);
 
                     if (getCurrentWindow() == windows[gui::name::window::main_window] ||
                         getCurrentWindow() == windows[gui::name::window::thread_view]) {
