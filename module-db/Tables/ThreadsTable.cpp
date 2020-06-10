@@ -192,7 +192,7 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                 .ID        = (*retQuery)[0].GetUInt32(),
                 .date      = (*retQuery)[3].GetUInt32(),
                 .msgCount  = 0,
-                .msgRead   = (*retQuery)[7].GetBool(),
+                .msgRead   = (*retQuery)[7].GetUInt32(),
                 .contactID = (*retQuery)[2].GetUInt32(),
                 .snippet   = (*retQuery)[6].GetString(),
                 .type      = static_cast<SMSType>((*retQuery)[8].GetUInt32()),

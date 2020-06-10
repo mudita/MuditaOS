@@ -173,14 +173,6 @@ bool SMSRecordInterface::Update(const SMSRecord &rec)
                                   .isRead    = rec.isRead,
                                   .type      = rec.type});
 
-    // Update messages read count if necessary
-    if (!sms.isRead && rec.isRead) {
-        ThreadRecordInterface threadInterface(smsDB, contactsDB);
-        auto threadRec = threadInterface.GetByID(sms.threadID);
-        threadRec.msgRead--;
-        threadInterface.Update(threadRec);
-    }
-
     return true;
 }
 

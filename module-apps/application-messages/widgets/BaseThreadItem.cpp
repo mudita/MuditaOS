@@ -41,18 +41,29 @@ namespace gui
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
     }
 
-    bool BaseThreadItem::onDimensionChanged(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
+    void BaseThreadItem::onDimensionChangedTop(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
     {
         namespace msgStyle = style::messages::threadItem;
 
-        contact->setPosition(msgStyle::contactPositionX, msgStyle::contactPositionY);
-        contact->setSize(newDim.w - msgStyle::cotactWidthOffset, newDim.h / 2);
+        contact->setPosition(msgStyle::leftMargin, msgStyle::topMargin);
+        contact->setSize(newDim.w - msgStyle::cotactWidthOffset, newDim.h / 2 - msgStyle::topMargin);
 
-        timestamp->setPosition(newDim.w - msgStyle::timestampWidth, 0);
-        timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2);
+        timestamp->setPosition(newDim.w - msgStyle::timestampWidth, msgStyle::topMargin);
+        timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2 - msgStyle::topMargin);
+    }
 
-        preview->setPosition(14, newDim.h / 2);
-        preview->setSize(newDim.w - msgStyle::previewWidthOffset, newDim.h / 2);
+    void BaseThreadItem::onDimensionChangedBottom(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
+    {
+        namespace msgStyle = style::messages::threadItem;
+
+        preview->setPosition(msgStyle::leftMargin, newDim.h / 2);
+        preview->setSize(newDim.w - msgStyle::previewWidthOffset, newDim.h / 2 - msgStyle::bottomMargin);
+    }
+
+    bool BaseThreadItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    {
+        onDimensionChangedTop(oldDim, newDim);
+        onDimensionChangedBottom(oldDim, newDim);
 
         return true;
     }

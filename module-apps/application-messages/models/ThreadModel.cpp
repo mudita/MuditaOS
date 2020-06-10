@@ -9,21 +9,18 @@ ThreadModel::ThreadModel(app::Application *app) : BaseThreadRecordModel(app)
 
 unsigned int ThreadModel::getMinimalItemHeight()
 {
-
     return style::window::messages::sms_thread_item_h;
 }
 
 gui::ListItem *ThreadModel::getItem(gui::Order order)
 {
-
     std::shared_ptr<ThreadRecord> thread = getRecord(order);
 
     if (thread.get() == nullptr) {
         return nullptr;
     }
 
-    auto item = new gui::ThreadItem(this);
-
+    auto item = gui::ThreadItem::makeThreadItem(this, thread);
     item->setThreadItem(thread);
     item->activatedCallback = [=](gui::Item &item) {
         LOG_INFO("ThreadItem ActivatedCallback");

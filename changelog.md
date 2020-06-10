@@ -10,6 +10,7 @@
 * [EGD-3275] Add confirmation windows after deleting/blocking contact.
 * [EGD-3261] Empty screen at the top fix in SMS thread view 
 * [EGD-3278] Fix ListView on page refresh item order after page change. 
+* [EGD-2799] SMS - thread read/unread and last thread message (Not sent, You, Draft) status indicators 
 
 ## **04-06-2020**
 * Initial changelog file created

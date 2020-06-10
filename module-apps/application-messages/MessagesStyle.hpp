@@ -6,25 +6,27 @@ namespace style
     {
         namespace threads
         {
-            constexpr auto pageSize = 5;
+            constexpr uint32_t pageSize = 5;
 
-            constexpr auto listPositionX = style::window::default_left_margin;
-            constexpr auto ListPositionY = style::header::height + style::listview::top_margin_small;
-            constexpr auto listHeight    = style::window_height - ListPositionY - style::footer::height;
-            constexpr auto listWidth     = style::listview::body_width_with_scroll;
+            constexpr uint32_t listPositionX = style::window::default_left_margin;
+            constexpr uint32_t ListPositionY = style::header::height + style::listview::top_margin_small;
+            constexpr uint32_t listHeight    = style::window_height - ListPositionY - style::footer::height;
+            constexpr uint32_t listWidth     = style::listview::body_width_with_scroll;
         } // namespace threads
 
         namespace threadItem
         {
+            constexpr uint32_t topMargin    = 16;
+            constexpr uint32_t bottomMargin = 13;
 
-            constexpr auto contactPositionX  = 14;
-            constexpr auto contactPositionY  = 10;
-            constexpr auto cotactWidthOffset = 133;
+            constexpr uint32_t leftMargin  = 10;
+            constexpr uint32_t rightMargin = 10;
 
-            constexpr auto timestampWidth = 100;
+            constexpr uint32_t timestampWidth    = 100;
+            constexpr uint32_t cotactWidthOffset = timestampWidth + leftMargin + rightMargin;
+            constexpr uint32_t notSentIconWidth  = 20;
 
-            constexpr auto prewievPositionX   = 14;
-            constexpr auto previewWidthOffset = 20;
+            constexpr uint32_t previewWidthOffset = leftMargin + rightMargin + 10;
         } // namespace threadItem
 
         namespace newMessage
@@ -51,12 +53,12 @@ namespace style
         {
             namespace list
             {
-                constexpr auto pageSize = 7;
+                constexpr uint32_t pageSize = 7;
 
-                constexpr auto x = style::window::default_left_margin;
-                constexpr auto y = style::header::height + style::listview::top_margin_small;
-                constexpr auto h = style::window_height - y - style::footer::height;
-                constexpr auto w = style::listview::body_width_with_scroll;
+                constexpr uint32_t x = style::window::default_left_margin;
+                constexpr uint32_t y = style::header::height + style::listview::top_margin_small;
+                constexpr uint32_t h = style::window_height - y - style::footer::height;
+                constexpr uint32_t w = style::listview::body_width_with_scroll;
 
             } // namespace list
         }     // namespace templates

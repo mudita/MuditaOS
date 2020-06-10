@@ -13,7 +13,9 @@ namespace gui
         gui::Label *contact   = nullptr;
         gui::Label *timestamp = nullptr;
         gui::Label *preview   = nullptr;
-        gui::Image *dot       = nullptr;
+
+        virtual void onDimensionChangedTop(const BoundingBox &oldDim, const BoundingBox &newDim);
+        virtual void onDimensionChangedBottom(const BoundingBox &oldDim, const BoundingBox &newDim);
 
       public:
         BaseThreadItem();
