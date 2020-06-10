@@ -63,7 +63,7 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
 sys::ReturnCodes ServiceAntenna::InitHandler()
 {
     //    stateMachine->addState(antenna::State::init, InitStateHandler);
-    vTaskDelay(10000);
+    vTaskDelay(30000);
     state->set(antenna::State::init);
 
     return sys::ReturnCodes::Success;

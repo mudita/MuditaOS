@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
+
 class CellularMessage : public sys::DataMessage
 {
   public:
@@ -92,6 +94,17 @@ class CellularRequestMessage : public CellularMessage
     {}
 
     std::string data;
+};
+
+class CellularAntennaRequestMessage : public CellularMessage
+{
+  public:
+    CellularAntennaRequestMessage(MessageType messageType) : CellularMessage(messageType)
+    {}
+    ~CellularAntennaRequestMessage()
+    {}
+
+    bsp::cellular::antenna antenna;
 };
 
 class CellularCallRequestMessage : public CellularMessage

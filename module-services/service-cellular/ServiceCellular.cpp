@@ -723,19 +723,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         sys::Bus::SendUnicast(msg, msgl->sender, this);
     } break;
     case MessageType::CellularSelectAntenna: {
-        uint8_t value = 0;
-        auto msg      = dynamic_cast<CellularRequestMessage *>(msgl);
+        auto msg = dynamic_cast<CellularAntennaRequestMessage *>(msgl);
         if (msg != nullptr) {
-            try {
-                value = std::stoi(msg->data);
-            }
-            catch (std::exception &e) {
-                LOG_INFO("Service cellular CellularSelectAntenna exception occured: %s", e.what());
-            }
-            cmux->SelectAntenna(value);
+
+            cmux->SelectAntenna(msg->antenna);
             vTaskDelay(50); // sleep for 50 ms...
-            uint8_t actualAntenna = cmux->GetAntenna();
-            bool changedAntenna   = (actualAntenna == value);
+            auto actualAntenna    = cmux->GetAntenna();
+            bool changedAntenna   = (actualAntenna == msg->antenna);
             responseMsg           = std::make_shared<CellularResponseMessage>(changedAntenna);
         }
         else {

@@ -75,36 +75,65 @@ namespace at
                 auto constexpr qnwinfoResponseSize = 4;
                 auto constexpr bandTokenPos        = 2;
                 if (tokens.size() == qnwinfoResponseSize) {
-                    auto constexpr gsmString   = "GSM";
-                    auto constexpr wcdmaString = "WCDMA";
+
                     auto constexpr lteString   = "LTE";
                     if (tokens[bandTokenPos].find(gsmString) != std::string::npos ||
                         tokens[bandTokenPos].find(wcdmaString) != std::string::npos) {
-                        LOG_INFO("Numeric band value.");
+                        parseNumericBandString(tokens[bandTokenPos]);
                     }
                     else if (tokens[bandTokenPos].find(lteString) != std::string::npos) {
-                        LOG_INFO("String band value.");
-                        parseLteBand(tokens[bandTokenPos]);
+
+                        parseLteBandString(tokens[bandTokenPos]);
                     }
                 }
             }
-            uint32_t parseLteBand(std::string &band)
+            uint32_t parseNumericBandString(std::string &string)
+            {
+                utils::findAndReplaceAll(string, gsmString, "");
+                utils::findAndReplaceAll(string, wcdmaString, "");
+                utils::findAndReplaceAll(string, " ", "");
+                utils::findAndReplaceAll(string, "\"", "");
+                LOG_INFO("Numeric band value. %s", string.c_str());
+
+                uint32_t freq = 0;
+                utils::toNumeric(string, freq);
+                LOG_INFO("Freq = %lu", freq);
+                return freq;
+            }
+            uint32_t parseLteBandString(std::string &string)
             {
 
                 std::map<uint32_t, uint32_t> lteFreqs;
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_1, band_1_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_2, band_2_freq));
                 lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_3, band_3_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_4, band_4_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_5, band_5_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_7, band_7_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_8, band_8_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_12, band_12_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_13, band_13_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_18, band_18_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_20, band_20_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_25, band_25_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_26, band_26_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_28, band_28_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_38, band_38_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_40, band_40_freq));
+                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_41, band_41_freq));
 
                 auto constexpr toRemove    = "LTE BAND ";
                 auto constexpr emptyString = "";
-                utils::findAndReplaceAll(band, "\"", emptyString);
-                utils::findAndReplaceAll(band, toRemove, emptyString);
-                LOG_INFO("Band : %s", band.c_str());
-                uint32_t bandValue;
-                utils::toNumeric(band, bandValue);
-                LOG_INFO("Band value: %lu", bandValue);
-                auto freq = lteFreqs.find(bandValue);
+                utils::findAndReplaceAll(string, "\"", emptyString);
+                utils::findAndReplaceAll(string, toRemove, emptyString);
+                LOG_INFO("Band : %s", string.c_str());
+                uint32_t band;
+                utils::toNumeric(string, band);
+                LOG_INFO("Band value: %lu", band);
+                auto freq = lteFreqs.find(band);
                 if (freq != lteFreqs.end()) {
                     LOG_INFO("Freq = %lu", freq->second);
+                    return freq->second;
                 }
 
                 return 1;

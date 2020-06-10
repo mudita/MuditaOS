@@ -116,11 +116,10 @@ void CellularServiceAPI::StartOperatorsScan(sys::Service *serv)
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 185000);
 }
 
-bool CellularServiceAPI::SelectAntenna(sys::Service *serv, uint8_t antenna)
+bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenna antenna)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularSelectAntenna);
-    msg->data = std::to_string(antenna);
+    auto msg     = std::make_shared<CellularAntennaRequestMessage>(MessageType::CellularSelectAntenna);
+    msg->antenna = antenna;
     auto ret  = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
 
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());

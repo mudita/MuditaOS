@@ -4,7 +4,7 @@
 #include <Modem/TS0710/TS0710.h>
 
 #include <PhoneNumber.hpp>
-
+#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
 class Service;
 
 namespace CellularServiceAPI
@@ -39,9 +39,9 @@ namespace CellularServiceAPI
     /*
      * @brief It calls service-cellulat to switch antenna
      * @param serv pointer to caller service.
-     * @param antenna selected antenna. 0 to select antenna A, 1 to select antenna B
+     * @param antenna selected antenna.
      */
-    bool SelectAntenna(sys::Service *serv, uint8_t antenna);
+    bool SelectAntenna(sys::Service *serv, bsp::cellular::antenna antenna);
 
     bool SetScanMode(sys::Service *serv, std::string mode);
     bool GetScanMode(sys::Service *serv);
