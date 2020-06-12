@@ -46,7 +46,7 @@ namespace gui
         desc->setText(utils::localize.get(title));
 
         if (notifications > 0) {
-            auto thumbnail = new gui::Image("dot_12px_soft");
+            auto thumbnail = new gui::Image("dot_12px_hard_alpha_W_G");
             thumbnail->setPosition(style::design::notify_dot_x, style::design::notify_dot_y);
             it->addWidget(thumbnail);
         }
