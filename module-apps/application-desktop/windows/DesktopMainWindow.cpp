@@ -294,7 +294,7 @@ namespace gui
         add_box_icon(el, icon);
         new gui::Span(el, Axis::X, style::design_border_offset);
         el->addWidget(text);
-        add_box_icon(el, "dot_12px_soft");
+        add_box_icon(el, "dot_12px_hard_alpha_W_G");
         el->addWidget(number);
         // box right inner margin
         new gui::Span(el, Axis::X, style::design_border_offset);
