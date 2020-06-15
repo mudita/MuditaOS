@@ -122,6 +122,7 @@ namespace gui
             this->application->switchWindow(gui::name::window::main_window);
             return true;
         };
+        meta.title = contact->getFormattedName(ContactRecord::NameFormatType::Title);
         dialog->update(meta);
         this->application->switchWindow(dialog->getName());
         return true;
