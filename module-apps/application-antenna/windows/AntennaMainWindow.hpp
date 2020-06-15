@@ -33,7 +33,8 @@ namespace gui
             AntennaA = 0,
             AntennaB,
             StartScan,
-            ScanMode
+            ScanMode,
+            LockAntennaManager
         };
 
       public:

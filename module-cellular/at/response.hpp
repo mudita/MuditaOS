@@ -62,7 +62,7 @@ namespace at
             auto constexpr band_40_freq = 2300;
             auto constexpr band_41_freq = 2500;
 
-            void parseNetworkFrequency(std::string &response);
+            uint32_t parseNetworkFrequency(std::string &response);
             uint32_t parseNumericBandString(std::string &string);
             uint32_t parseLteBandString(std::string &string);
         } // namespace qnwinfo

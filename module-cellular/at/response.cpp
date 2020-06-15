@@ -66,7 +66,7 @@ namespace at
 
         namespace qnwinfo
         {
-            void parseNetworkFrequency(std::string &response)
+            uint32_t parseNetworkFrequency(std::string &response)
             {
                 auto tokens = utils::split(response, ",");
                 for (auto el : tokens) {
@@ -79,13 +79,14 @@ namespace at
                     auto constexpr lteString   = "LTE";
                     if (tokens[bandTokenPos].find(gsmString) != std::string::npos ||
                         tokens[bandTokenPos].find(wcdmaString) != std::string::npos) {
-                        parseNumericBandString(tokens[bandTokenPos]);
+                        return parseNumericBandString(tokens[bandTokenPos]);
                     }
                     else if (tokens[bandTokenPos].find(lteString) != std::string::npos) {
 
-                        parseLteBandString(tokens[bandTokenPos]);
+                        return parseLteBandString(tokens[bandTokenPos]);
                     }
                 }
+                return 0;
             }
             uint32_t parseNumericBandString(std::string &string)
             {
@@ -136,7 +137,7 @@ namespace at
                     return freq->second;
                 }
 
-                return 1;
+                return 0;
             }
         } // namespace qnwinfo
     }     // namespace response

@@ -17,7 +17,7 @@
 #include "ScanModesWindow.hpp"
 #include "../ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
-
+#include <at/response.hpp>
 namespace gui
 {
 
@@ -62,18 +62,11 @@ namespace gui
 
         buttons.push_back(addLabel("Antenna A", [=](gui::Item &) {
             CellularServiceAPI::SelectAntenna(application, bsp::cellular::antenna::lowBand);
-            //            if (changed) {
-            //                buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::mediumbold);
-            //                buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::medium);
-            //            }
             return true;
         }));
+
         buttons.push_back(addLabel("Antenna B", [=](gui::Item &) {
             CellularServiceAPI::SelectAntenna(application, bsp::cellular::antenna::highBand);
-            //            if (changed) {
-            //                buttons[buttonDescriotion::AntennaA]->setFont(style::window::font::medium);
-            //                buttons[buttonDescriotion::AntennaB]->setFont(style::window::font::mediumbold);
-            //            }
             return true;
         }));
 
@@ -88,10 +81,17 @@ namespace gui
             CellularServiceAPI::StartOperatorsScan(this->application);
             return true;
         }));
+
         buttons.push_back(addLabel("Scan mode", [=](gui::Item &) {
             this->application->switchWindow(gui::name::window::scan_window, nullptr);
             return true;
         }));
+
+        buttons.push_back(addLabel("Lock antenna", [=](gui::Item &) {
+            LOG_INFO("Lock antenna");
+            return true;
+        }));
+
         uint32_t posX = antenna::main_window::commonXPos;
         for (uint32_t i = 0; i < buttons.size(); i++) {
             buttons[i]->setFont(style::window::font::medium);
@@ -120,6 +120,11 @@ namespace gui
         buttons[buttonDescriotion::ScanMode]->setSize(antenna::main_window::buttonSmallW,
                                                       antenna::main_window::buttonH);
 
+        buttons[buttonDescriotion::LockAntennaManager]->setPosition(antenna::main_window::buttonPosXLeft,
+                                                                    antenna::main_window::buttonPosYRow3);
+        buttons[buttonDescriotion::LockAntennaManager]->setSize(antenna::main_window::buttonBigW,
+                                                                antenna::main_window::buttonH);
+
         operators = new gui::Text(this,
                                   antenna::main_window::commonXPos,
                                   antenna::main_window::scanListPosY,
@@ -140,6 +145,8 @@ namespace gui
                                                                 buttons[buttonDescriotion::ScanMode]);
         buttons[buttonDescriotion::AntennaA]->setNavigationItem(NavigationDirection::UP,
                                                                 buttons[buttonDescriotion::StartScan]);
+        buttons[buttonDescriotion::AntennaA]->setNavigationItem(NavigationDirection::DOWN,
+                                                                buttons[buttonDescriotion::LockAntennaManager]);
 
         buttons[buttonDescriotion::AntennaB]->setNavigationItem(NavigationDirection::RIGHT,
                                                                 buttons[buttonDescriotion::ScanMode]);
@@ -147,6 +154,8 @@ namespace gui
                                                                 buttons[buttonDescriotion::AntennaA]);
         buttons[buttonDescriotion::AntennaB]->setNavigationItem(NavigationDirection::UP,
                                                                 buttons[buttonDescriotion::StartScan]);
+        buttons[buttonDescriotion::AntennaB]->setNavigationItem(NavigationDirection::DOWN,
+                                                                buttons[buttonDescriotion::LockAntennaManager]);
 
         buttons[buttonDescriotion::ScanMode]->setNavigationItem(NavigationDirection::RIGHT,
                                                                 buttons[buttonDescriotion::AntennaA]);
@@ -154,7 +163,11 @@ namespace gui
                                                                 buttons[buttonDescriotion::AntennaB]);
         buttons[buttonDescriotion::ScanMode]->setNavigationItem(NavigationDirection::UP,
                                                                 buttons[buttonDescriotion::StartScan]);
+        buttons[buttonDescriotion::ScanMode]->setNavigationItem(NavigationDirection::DOWN,
+                                                                buttons[buttonDescriotion::LockAntennaManager]);
 
+        buttons[buttonDescriotion::LockAntennaManager]->setNavigationItem(NavigationDirection::UP,
+                                                                          buttons[buttonDescriotion::AntennaA]);
         setFocusItem(buttons[buttonDescriotion::AntennaA]);
         bsp::cellular::antenna antenna;
         if (CellularServiceAPI::GetAntenna(this->application, antenna)) {
@@ -215,8 +228,11 @@ namespace gui
                 titlesText[static_cast<uint32_t>(labelDescripion::csq)] + data[0]);
             titles[static_cast<uint32_t>(labelDescripion::status)]->setText(
                 titlesText[static_cast<uint32_t>(labelDescripion::status)] + data[1]);
+
+            auto bandFrequency = at::response::qnwinfo::parseNetworkFrequency(data[2]);
             titles[static_cast<uint32_t>(labelDescripion::band)]->setText(
-                titlesText[static_cast<uint32_t>(labelDescripion::band)] + data[2]);
+                titlesText[static_cast<uint32_t>(labelDescripion::band)] + data[2] + "   " +
+                std::to_string(bandFrequency));
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
     }
