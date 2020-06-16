@@ -21,6 +21,7 @@
 #include "messages/DBNotesMessage.hpp"
 #include "messages/DBCalllogMessage.hpp"
 #include "messages/DBCountryCodeMessage.hpp"
+#include <messages/DBServiceMessage.hpp>
 
 #include "Database/Database.hpp"
 
@@ -388,6 +389,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
     } break;
 
+        /**
+         * Alarm records
+         */
+
     case MessageType::DBAlarmAdd: {
         auto time           = utils::time::Scoped("DBAlarmAdd");
         DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
@@ -433,7 +438,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         responseMsg = std::make_shared<DBAlarmResponseMessage>(std::move(records), ret.ID == 0 ? false : true);
     } break;
 
-        /****** Notes */
+        /**
+         * Notes records
+         */
+
     case MessageType::DBNotesAdd: {
         auto time           = utils::time::Scoped("DBNotesAdd");
         DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
@@ -469,7 +477,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
             std::make_shared<DBNotesResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
     } break;
 
-        /****** Calllog */
+        /**
+         * Calllog records
+         */
+
     case MessageType::DBCalllogAdd: {
         auto time             = utils::time::Scoped("DBCalllogAdd");
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
@@ -532,6 +543,13 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         sendUpdateNotification(msg->getInterface(), db::NotificationMessage::Type::Read);
     } break;
 
+    case MessageType::DBServiceBackup: {
+        auto time                   = utils::time::Scoped("DBServiceBackup");
+        DBServiceMessageBackup *msg = reinterpret_cast<DBServiceMessageBackup *>(msgl);
+        auto ret                    = StoreIntoBackup({msg->backupPath});
+        responseMsg                 = std::make_shared<DBServiceResponseMessage>(ret);
+    } break;
+
     default:
         break;
     }
@@ -592,4 +610,15 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Notifi
 {
     auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
     sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+}
+
+bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
+{
+    bool rc = settingsDB.get()->StoreIntoFile(backupPath + "settings.db");
+    rc |= contactsDB.get()->StoreIntoFile(backupPath + "contacts.db");
+    rc |= smsDB.get()->StoreIntoFile(backupPath + "sms.db");
+    rc |= alarmsDB.get()->StoreIntoFile(backupPath + "alarms.db");
+    rc |= notesDB.get()->StoreIntoFile(backupPath + "notes.db");
+    rc |= calllogDB.get()->StoreIntoFile(backupPath + "calllog.db");
+    return rc;
 }

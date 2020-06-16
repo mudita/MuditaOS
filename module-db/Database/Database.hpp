@@ -36,6 +36,8 @@ class Database
         return isInitialized;
     }
 
+    bool StoreIntoFile(const std::string &backupPath);
+
     uint32_t GetLastInsertRowID();
 
   private:

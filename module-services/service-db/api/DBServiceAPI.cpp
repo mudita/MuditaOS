@@ -9,6 +9,7 @@
 #include <messages/DBNotesMessage.hpp>
 #include <messages/DBCalllogMessage.hpp>
 #include <messages/DBCountryCodeMessage.hpp>
+#include <messages/DBServiceMessage.hpp>
 
 #include <ServiceDB.hpp>
 #include <includes/DBServiceName.hpp>
@@ -785,5 +786,21 @@ uint32_t DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc)
     }
     else {
         return (0);
+    }
+}
+
+bool DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath)
+{
+    LOG_INFO("DBBackup %s", backupPath.c_str());
+
+    std::shared_ptr<DBServiceMessageBackup> msg =
+        std::make_shared<DBServiceMessageBackup>(MessageType::DBServiceBackup, backupPath);
+
+    auto ret = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        return true;
+    }
+    else {
+        return false;
     }
 }
