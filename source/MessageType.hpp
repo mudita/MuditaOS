@@ -188,6 +188,8 @@ enum class MessageType
     EVM_GPIO,
     SIMTrayEvent,
 
+    // service-desktop  messages
+    UpdateOS,
     HttpRequest,
     HttpResponse,
     FotaConfigureAPN,
@@ -197,7 +199,6 @@ enum class MessageType
     FotaStart,
     FotaProgress,
     FotaFinished,
-
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

@@ -1,21 +1,18 @@
 # Mudita PurePhone changelog
 
-## **11-06-2020**
+## [0.24.1] - 2020-06-16
 
-* [EGD-3254] Detect modem shutdown (easier routine modem testing procedure)  
-* [EGD-3276] Fix plus sign input on a 0 key longpress.
-* [EGD-3267] Add new implementation of duplicate number/speedDialNumber dialogs.
-* [EGD-3137] Add handling for contact number duplicate window.
-* [EGD-3138] Add handling for speed dial number duplicate window.
-* [EGD-3275] Add confirmation windows after deleting/blocking contact.
-* [EGD-3261] Empty screen at the top fix in SMS thread view 
-* [EGD-3278] Fix ListView on page refresh item order after page change. 
-* [EGD-2799] SMS - thread read/unread and last thread message (Not sent, You, Draft) status indicators
-* [EGD-3277] SMS - thread view update on incoming SMS fix 
+### Added
+* `[phonebook]` Add duplicated contact and speed dial numbers handling.
+* `[phonebook]` Add confirmation windows after deleting/blocking contact. 
+* `[sms]` Add thread message status indicators: read/unread and last thread message (Not sent, You, Draft).
 
-## **04-06-2020**
-* Initial changelog file created
+### Fixed
+* `[desktop]` Fix plus sign input on a 0 key longpress.
+* `[sms]` Fix thread view refresh on a new message.
+* `[sms]` Fix message reordering on page change.
+* `[sms]` Remove empty screen view at the top of a thread view.
 
-## **04-06-2020**
-* added a simple script to generate TAR update packages
-  config/genupdatepkg.sh, resulting package is found in update/
+### Other
+* `[test]` Improved modem testing with modem shutdown detection.
+* `[build]` Add support for auto-releases.
