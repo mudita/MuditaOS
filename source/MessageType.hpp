@@ -30,6 +30,7 @@ enum class MessageType
 
     // DB messages
     DBServiceNotification, // Common service-db notification message.
+    DBServiceBackup,
 
     DBSettingsGet,    // get current settings from database
     DBSettingsUpdate, // update settings

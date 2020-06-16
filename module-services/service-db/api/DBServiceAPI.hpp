@@ -132,4 +132,6 @@ class DBServiceAPI
 
     /* country codes */
     static uint32_t GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc);
+
+    static bool DBBackup(sys::Service *serv, std::string backupPath);
 };
