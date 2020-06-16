@@ -33,7 +33,6 @@ vfs::~vfs()
 
 void vfs::Init()
 {
-    LOG_INFO("vfs::Init");
     emmc.Init();
 
     emmcFFDisk = FF_eMMC_user_DiskInit(purefs::dir::eMMC_disk.c_str(), &emmc);
@@ -53,10 +52,18 @@ void vfs::Init()
         LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", osRootPath.c_str());
     }
 
+    LOG_INFO("vfs::Init running on ARM osRootPath: %s", osRootPath.c_str());
+
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
-    if (ff_mkdir(relativeToRoot(PATH_USER).c_str()) != 0) {
-        LOG_ERROR("vfs::Init can't find a valid USER=%s path", relativeToRoot(PATH_USER).c_str());
+    if (isDir(purefs::dir::user_disk.c_str()) == false) {
+        LOG_ERROR("vfs::Init looks like %s does not exist, try to create it", purefs::dir::user_disk.c_str());
+        if (ff_mkdir(purefs::dir::user_disk.c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't create %s directory", purefs::dir::user_disk.c_str());
+        }
+    }
+    else {
+        LOG_INFO("vfs::Init looks like %s exists", purefs::dir::user_disk.c_str());
     }
 }
 
@@ -293,8 +300,9 @@ vfs::FilesystemStats vfs::getFilesystemStats()
 std::string vfs::relativeToRoot(const std::string path)
 {
     fs::path fsPath(path);
+
     if (fsPath.is_absolute()) {
-        if (osRootPath.parent_path() == fsPath.parent_path())
+        if (osRootPath.root_directory() == fsPath.root_directory())
             return (fsPath);
         else
             return (purefs::dir::eMMC_disk / fsPath.relative_path()).c_str();
@@ -313,7 +321,7 @@ bool vfs::isDir(const char *path)
 
     FF_Stat_t fileStatus;
 
-    const int ret = ff_stat(path, &fileStatus);
+    const int ret = ff_stat(relativeToRoot(path).c_str(), &fileStatus);
     if (ret == 0) {
         return (fileStatus.st_mode == FF_IFDIR);
     }
@@ -328,7 +336,7 @@ bool vfs::fileExists(const char *path)
         return (false);
 
     FF_Stat_t fileStatus;
-    const int ret = ff_stat(path, &fileStatus);
+    const int ret = ff_stat(relativeToRoot(path).c_str(), &fileStatus);
     if (ret == 0) {
         return (true);
     }
@@ -338,15 +346,17 @@ bool vfs::fileExists(const char *path)
 int vfs::deltree(const char *path)
 {
     if (path != nullptr)
-        return (ff_deltree(path));
+        return (ff_deltree(relativeToRoot(path).c_str()));
     else
         return (-1);
 }
 
 int vfs::mkdir(const char *dir)
 {
-    if (dir != nullptr)
-        return (ff_mkdir(dir));
+    if (dir != nullptr) {
+        LOG_DEBUG("vfs::mkdir %s->%s", dir, relativeToRoot(dir).c_str());
+        return (ff_mkdir(relativeToRoot(dir).c_str()));
+    }
     else
         return (-1);
 }
@@ -354,7 +364,7 @@ int vfs::mkdir(const char *dir)
 int vfs::rename(const char *oldname, const char *newname)
 {
     if (oldname != nullptr && newname != nullptr)
-        return (ff_rename(oldname, newname, true));
+        return (ff_rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str(), true));
     else
         return (-1);
 }
@@ -364,10 +374,34 @@ std::string vfs::lastErrnoToStr()
     return (strerror(stdioGET_ERRNO()));
 }
 
-vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
+size_t vfs::fprintf(FILE *stream, const char *format, ...)
 {
-    if (filename != nullptr && mode != nullptr)
-        return ff_fopen(filename, mode);
-    else
-        return (nullptr);
+    int count;
+    size_t result;
+    char *buffer;
+    va_list args;
+
+    buffer = (char *)ffconfigMALLOC(ffconfigFPRINTF_BUFFER_LENGTH);
+    if (buffer == NULL) {
+        /* Store the errno to thread local storage. */
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_ENOMEM);
+        count = -1;
+    }
+    else {
+        va_start(args, format);
+        count = vsnprintf(buffer, ffconfigFPRINTF_BUFFER_LENGTH, format, args);
+        va_end(args);
+
+        /* ff_fwrite() will set ff_errno. */
+        if (count > 0) {
+            result = ff_fwrite(buffer, (size_t)1, (size_t)count, stream);
+            if (result < (size_t)count) {
+                count = -1;
+            }
+        }
+
+        ffconfigFREE(buffer);
+    }
+
+    return count;
 }

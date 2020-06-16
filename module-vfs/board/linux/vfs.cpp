@@ -34,6 +34,7 @@ void vfs::Init()
 {
     // whatever current path on Linux we treat that as the root for our app
     osRootPath = "./";
+    LOG_DEBUG("vfs::Iinit running on Linux osRootPath: %s", osRootPath.c_str());
 }
 
 std::string vfs::relativeToRoot(const std::string path)
@@ -200,7 +201,7 @@ bool vfs::isDir(const char *path)
 
     struct stat fileStatus;
 
-    const int ret = stat(path, &fileStatus);
+    const int ret = stat(relativeToRoot(path).c_str(), &fileStatus);
     if (ret == 0) {
         return (S_ISDIR(fileStatus.st_mode));
     }
@@ -215,7 +216,7 @@ bool vfs::fileExists(const char *path)
         return (false);
 
     struct stat fileStatus;
-    const int ret = stat(path, &fileStatus);
+    const int ret = stat(relativeToRoot(path).c_str(), &fileStatus);
     if (ret == 0) {
         return (true);
     }
@@ -224,16 +225,20 @@ bool vfs::fileExists(const char *path)
 
 int vfs::deltree(const char *path)
 {
-    if (path != nullptr)
-        return (deltree(path));
+    if (path != nullptr) {
+        std::error_code ec;
+        std::filesystem::remove_all(relativeToRoot(path), ec);
+        return (ec.value());
+    }
     else
         return (-1);
 }
 
 int vfs::mkdir(const char *dir)
 {
-    if (dir != nullptr)
-        return (mkdir(dir));
+    if (dir != nullptr) {
+        return (::mkdir(relativeToRoot(dir).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH));
+    }
     else
         return (-1);
 }
@@ -241,7 +246,7 @@ int vfs::mkdir(const char *dir)
 int vfs::rename(const char *oldname, const char *newname)
 {
     if (oldname != nullptr && newname != nullptr)
-        return (rename(oldname, newname));
+        return (std::rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str()));
     else
         return (-1);
 }
@@ -251,10 +256,12 @@ std::string vfs::lastErrnoToStr()
     return (strerror(errno));
 }
 
-vfs::FILE *vfs::openAbsolute(const char *filename, const char *mode)
+size_t vfs::fprintf(FILE *stream, const char *format, ...)
 {
-    if (filename != nullptr && mode != nullptr)
-        return (std::fopen(filename, mode));
-    else
-        return (nullptr);
+    va_list argList;
+    size_t ret;
+    va_start(argList, format);
+    ret = std::vfprintf(stream, format, argList);
+    va_end(argList);
+    return (ret);
 }
