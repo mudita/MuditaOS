@@ -1,5 +1,8 @@
 # Mudita PurePhone changelog
 
+## **16-06-2020**
+* vfs updates and fixes, removed obsolete methods for absolute paths
+
 ## **11-06-2020**
 
 * [EGD-3254] Detect modem shutdown (easier routine modem testing procedure)  
