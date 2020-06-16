@@ -57,7 +57,7 @@ void RWindow::updateDrawBuffer()
 {
     for (ssize_t i = 0; i < width * height; i++)
         for (size_t j = 0; j < 3; j++) {
-            uint8_t c            = shmMemPtr[i] << 4;
+            uint8_t c            = shmMemPtr[i] * 17; // scales 0-15 eink colours indices to 0-255 RGB range
             rgbMemPtr[i * 3 + j] = c;
         }
     queue_draw();
