@@ -73,26 +73,26 @@ bool vfs::getOSRootFromIni()
     sbini_t *ini                  = sbini_load(currentBootIni.c_str());
     if (!ini) {
         LOG_ERROR("getOSRootFromIni can't load ini file %s", currentBootIni.c_str());
-        return (false);
+        return false;
     }
     else {
         osType     = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
         osRootPath = purefs::dir::eMMC_disk / osType;
         sbini_free(ini);
-        return (true);
+        return true;
     }
 }
 
 const fs::path vfs::getCurrentBootIni()
 {
     if (verifyCRC(purefs::file::boot_ini)) {
-        return (relativeToRoot(purefs::file::boot_ini));
+        return relativeToRoot(purefs::file::boot_ini);
     }
     else if (verifyCRC(purefs::file::boot_ini_bak)) {
-        return (relativeToRoot(purefs::file::boot_ini_bak));
+        return relativeToRoot(purefs::file::boot_ini_bak);
     }
 
-    return ("");
+    return "";
 }
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
@@ -294,7 +294,7 @@ vfs::FilesystemStats vfs::getFilesystemStats()
         filesystemStats.freePercent = iPercentageFree;
     }
 
-    return (filesystemStats);
+    return filesystemStats;
 }
 
 std::string vfs::relativeToRoot(const std::string path)
@@ -303,21 +303,21 @@ std::string vfs::relativeToRoot(const std::string path)
 
     if (fsPath.is_absolute()) {
         if (osRootPath.root_directory() == fsPath.root_directory())
-            return (fsPath);
+            return fsPath;
         else
             return (purefs::dir::eMMC_disk / fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
-        return (osRootPath);
+        return osRootPath;
     else
-        return (osRootPath / fsPath);
+        return osRootPath / fsPath;
 }
 
 bool vfs::isDir(const char *path)
 {
     if (path == nullptr)
-        return (false);
+        return false;
 
     FF_Stat_t fileStatus;
 
@@ -326,47 +326,45 @@ bool vfs::isDir(const char *path)
         return (fileStatus.st_mode == FF_IFDIR);
     }
     else {
-        return (false);
+        return false;
     }
 }
 
 bool vfs::fileExists(const char *path)
 {
     if (path == nullptr)
-        return (false);
+        return false;
 
     FF_Stat_t fileStatus;
     const int ret = ff_stat(relativeToRoot(path).c_str(), &fileStatus);
     if (ret == 0) {
-        return (true);
+        return true;
     }
-    return (false);
+    return false;
 }
 
 int vfs::deltree(const char *path)
 {
     if (path != nullptr)
-        return (ff_deltree(relativeToRoot(path).c_str()));
+        return ff_deltree(relativeToRoot(path).c_str());
     else
-        return (-1);
+        return -1;
 }
 
 int vfs::mkdir(const char *dir)
 {
-    if (dir != nullptr) {
-        LOG_DEBUG("vfs::mkdir %s->%s", dir, relativeToRoot(dir).c_str());
-        return (ff_mkdir(relativeToRoot(dir).c_str()));
-    }
+    if (dir != nullptr)
+        return ff_mkdir(relativeToRoot(dir).c_str());
     else
-        return (-1);
+        return -1;
 }
 
 int vfs::rename(const char *oldname, const char *newname)
 {
     if (oldname != nullptr && newname != nullptr)
-        return (ff_rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str(), true));
+        return ff_rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str(), true);
     else
-        return (-1);
+        return -1;
 }
 
 std::string vfs::lastErrnoToStr()
@@ -376,32 +374,28 @@ std::string vfs::lastErrnoToStr()
 
 size_t vfs::fprintf(FILE *stream, const char *format, ...)
 {
-    int count;
+    size_t count;
     size_t result;
-    char *buffer;
+    char *buffer = nullptr;
     va_list args;
 
-    buffer = (char *)ffconfigMALLOC(ffconfigFPRINTF_BUFFER_LENGTH);
-    if (buffer == NULL) {
-        /* Store the errno to thread local storage. */
+    buffer = static_cast<char *>(ffconfigMALLOC(ffconfigFPRINTF_BUFFER_LENGTH));
+    if (buffer == nullptr) {
         stdioSET_ERRNO(pdFREERTOS_ERRNO_ENOMEM);
-        count = -1;
+        return -1;
     }
-    else {
-        va_start(args, format);
-        count = vsnprintf(buffer, ffconfigFPRINTF_BUFFER_LENGTH, format, args);
-        va_end(args);
 
-        /* ff_fwrite() will set ff_errno. */
-        if (count > 0) {
-            result = ff_fwrite(buffer, (size_t)1, (size_t)count, stream);
-            if (result < (size_t)count) {
-                count = -1;
-            }
+    va_start(args, format);
+    count = vsnprintf(buffer, ffconfigFPRINTF_BUFFER_LENGTH, format, args);
+    va_end(args);
+
+    if (count > 0) {
+        result = ff_fwrite(buffer, 1, count, stream);
+        if (result < count) {
+            count = -1;
         }
-
-        ffconfigFREE(buffer);
     }
 
+    ffconfigFREE(buffer);
     return count;
 }

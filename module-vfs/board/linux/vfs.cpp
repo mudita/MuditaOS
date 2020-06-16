@@ -39,7 +39,7 @@ void vfs::Init()
 
 std::string vfs::relativeToRoot(const std::string path)
 {
-    return ((osRootPath / fs::path(path).relative_path()).relative_path());
+    return (osRootPath / fs::path(path).relative_path()).relative_path();
 }
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
@@ -101,7 +101,7 @@ size_t vfs::filelength(FILE *stream)
 
 char *vfs::fgets(char *buffer, size_t count, FILE *stream)
 {
-    return (std::fgets(buffer, count, stream));
+    return std::fgets(buffer, count, stream);
 }
 
 std::string vfs::getcurrdir()
@@ -191,13 +191,13 @@ std::string vfs::getline(FILE *stream, uint32_t length)
 
 vfs::FilesystemStats vfs::getFilesystemStats()
 {
-    return (vfs::FilesystemStats());
+    return vfs::FilesystemStats();
 }
 
 bool vfs::isDir(const char *path)
 {
     if (path == nullptr)
-        return (false);
+        return false;
 
     struct stat fileStatus;
 
@@ -206,21 +206,21 @@ bool vfs::isDir(const char *path)
         return (S_ISDIR(fileStatus.st_mode));
     }
     else {
-        return (false);
+        return false;
     }
 }
 
 bool vfs::fileExists(const char *path)
 {
     if (path == nullptr)
-        return (false);
+        return false;
 
     struct stat fileStatus;
     const int ret = stat(relativeToRoot(path).c_str(), &fileStatus);
     if (ret == 0) {
-        return (true);
+        return true;
     }
-    return (false);
+    return false;
 }
 
 int vfs::deltree(const char *path)
@@ -228,32 +228,32 @@ int vfs::deltree(const char *path)
     if (path != nullptr) {
         std::error_code ec;
         std::filesystem::remove_all(relativeToRoot(path), ec);
-        return (ec.value());
+        return ec.value();
     }
     else
-        return (-1);
+        return -1;
 }
 
 int vfs::mkdir(const char *dir)
 {
     if (dir != nullptr) {
-        return (::mkdir(relativeToRoot(dir).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH));
+        return ::mkdir(relativeToRoot(dir).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     }
     else
-        return (-1);
+        return -1;
 }
 
 int vfs::rename(const char *oldname, const char *newname)
 {
     if (oldname != nullptr && newname != nullptr)
-        return (std::rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str()));
+        return std::rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str());
     else
-        return (-1);
+        return -1;
 }
 
 std::string vfs::lastErrnoToStr()
 {
-    return (strerror(errno));
+    return strerror(errno);
 }
 
 size_t vfs::fprintf(FILE *stream, const char *format, ...)
@@ -263,5 +263,5 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
     va_start(argList, format);
     ret = std::vfprintf(stream, format, argList);
     va_end(argList);
-    return (ret);
+    return ret;
 }
