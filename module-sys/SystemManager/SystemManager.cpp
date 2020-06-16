@@ -184,7 +184,7 @@ namespace sys
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)) {
-            LOG_FATAL("Service %s failed to exit low-power mode", name.c_str());
+            LOG_FATAL("Service %s failed to enter low-power mode", name.c_str());
         }
         return true;
     }

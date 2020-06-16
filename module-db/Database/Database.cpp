@@ -167,3 +167,19 @@ uint32_t Database::GetLastInsertRowID()
 {
     return sqlite3_last_insert_rowid(dbConnection);
 }
+
+bool Database::StoreIntoFile(const std::string &backupPath)
+{
+    LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName, backupPath.c_str());
+
+    auto rc = Execute("VACUUM INTO '%q';", backupPath.c_str());
+
+    if (rc == true) {
+        LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName, backupPath.c_str());
+    }
+    else {
+        LOG_ERROR("Backup database: %s, into file: %s - FAILED", dbName, backupPath.c_str());
+    }
+
+    return rc;
+}

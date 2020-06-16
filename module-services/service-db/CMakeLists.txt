@@ -16,6 +16,7 @@ target_sources( ${PROJECT_NAME}
         "messages/DBNotesMessage.cpp"
         "messages/DBNotificationMessage.cpp"
         "messages/DBSettingsMessage.cpp"
+        "messages/DBServiceMessage.cpp"
         "messages/DBSMSMessage.cpp"
         "messages/DBSMSTemplateMessage.cpp"
         "messages/DBThreadMessage.cpp"
