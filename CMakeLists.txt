@@ -10,7 +10,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config")
 include(Colours)
 include(CCacheConfig)
 include(ProjectConfig)
-include(Version)
 include(ModuleConfig)
 include(module-lwip/lwip-includes.cmake)
 include(SerialPort)
@@ -275,7 +274,6 @@ else ()
         endif()
 endif ()
 
-message("Version: ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_VENDOR "Mudita")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://mudita.com/products/pure/")
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
@@ -295,3 +293,17 @@ if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
     message("::set-output name=package::${PACKAGE_FILE}")
     message("::set-output name=mime_type::${PACKAGE_MIME}")
 endif()
+
+message("SRC DIR: ${CMAKE_SOURCE_DIR}")
+add_custom_target(
+    version ALL
+    COMMAND
+        ${CMAKE_COMMAND} -DSRC_DIR=${CMAKE_SOURCE_DIR} -B ${CMAKE_BINARY_DIR}  -P ${CMAKE_SOURCE_DIR}/config/Version.cmake
+    DEPENDS
+        ${PROJECT_SOURCE_DIR}/.git/HEAD
+        ${PROJECT_SOURCE_DIR}/.git/index
+    COMMENT
+        "Generationg version info"
+    )
+
+add_dependencies(${PROJECT_NAME} version)
