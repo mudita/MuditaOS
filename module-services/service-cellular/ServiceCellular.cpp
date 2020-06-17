@@ -48,6 +48,8 @@
 #include <at/URC_QIND.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <country.hpp>
+#include <PhoneNumber.hpp>
 
 #include <vector>
 #include <utility>
@@ -930,10 +932,11 @@ bool ServiceCellular::sendSMS(void)
 
         if (cmux->CheckATCommandPrompt(
                 cmux->get(TS0710::Channel::Commands)
-                    ->SendCommandPrompt(
-                        (std::string(at::factory(at::AT::CMGS)) + UCS2(record.number).modemStr() + "\"\r").c_str(),
-                        1,
-                        2000))) {
+                    ->SendCommandPrompt((std::string(at::factory(at::AT::CMGS)) +
+                                         UCS2(UTF8(record.number.getEntered())).modemStr() + "\"\r")
+                                            .c_str(),
+                                        1,
+                                        2000))) {
 
             if (cmux->get(TS0710::Channel::Commands)->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                 result = true;
@@ -964,8 +967,8 @@ bool ServiceCellular::sendSMS(void)
             }
             UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
-            std::string command(at::factory(at::AT::QCMGS) + UCS2(record.number).modemStr() + "\",120," +
-                                std::to_string(i + 1) + "," + std::to_string(messagePartsCount) + "\r");
+            std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).modemStr() +
+                                "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount) + "\r");
 
             if (cmux->CheckATCommandPrompt(
                     cmux->get(TS0710::Channel::Commands)->SendCommandPrompt(command.c_str(), 1, 5000))) {
@@ -1075,7 +1078,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 
                     SMSRecord record;
                     record.body   = decodedMessage;
-                    record.number = receivedNumber;
+                    record.number = utils::PhoneNumber(receivedNumber, utils::country::Id::UNKNOWN).getView();
                     record.type   = SMSType::INBOX;
                     record.date   = messageDate;
 

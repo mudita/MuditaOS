@@ -220,9 +220,9 @@ namespace app
         return true;
     }
 
-    bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
+    bool ApplicationMessages::sendSms(const utils::PhoneNumber::View &number, const UTF8 &body)
     {
-        if (number.length() == 0 || body.length() == 0) {
+        if (number.getEntered().size() == 0 || body.length() == 0) {
             LOG_WARN("Number or sms body is empty");
             return false;
         }
@@ -244,7 +244,7 @@ namespace app
         return DBServiceAPI::SMSUpdate(this, resendRecord) != DB_ID_NONE;
     }
 
-    bool ApplicationMessages::handleSendSmsFromThread(const UTF8 &number, const UTF8 &body)
+    bool ApplicationMessages::handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body)
     {
         if (!sendSms(number, body)) {
             return false;

@@ -72,9 +72,9 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
         // if a valid contact was found, choose it. Otherwise, get a raw entered number
-        auto &&number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].number
-                                                                  : utils::PhoneNumber(recipient->getText());
-        auto ret = app->sendSms(number.toE164(), message->getText());
+        auto number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].number
+                                                                : utils::PhoneNumber(recipient->getText()).getView();
+        auto ret = app->sendSms(number, message->getText());
         if (!ret) {
             LOG_ERROR("sendSms failed");
             return false;
@@ -82,7 +82,7 @@ namespace gui
 
         if (!Store::GSM::get()->simCardInserted()) {
             auto action = [=]() -> bool {
-                if (!switchToThreadWindow(number.toE164())) {
+                if (!switchToThreadWindow(number)) {
                     LOG_ERROR("switchToThreadWindow failed");
                 }
                 return true;
@@ -91,18 +91,17 @@ namespace gui
             return true;
         }
 
-        return switchToThreadWindow(number.toE164());
+        return switchToThreadWindow(number);
     }
 
-    bool NewSMS_Window::switchToThreadWindow(UTF8 number)
+    bool NewSMS_Window::switchToThreadWindow(const utils::PhoneNumber::View &number)
     {
         uint32_t contactId;
         if (!contact || contact->numbers.size() == 0) {
             // once the sms is send, there is assumption that contact exists
-            auto retContact =
-                DBServiceAPI::MatchContactByPhoneNumber(application, utils::PhoneNumber(number).getView());
+            auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, number);
             if (!retContact) {
-                LOG_ERROR("not valid contact for number %s", number.c_str());
+                LOG_ERROR("not valid contact for number %s", number.getFormatted().c_str());
                 return false;
             }
             contact = std::move(retContact);
