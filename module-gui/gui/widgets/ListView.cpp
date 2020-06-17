@@ -2,6 +2,7 @@
 #include <log/log.hpp>
 #include "cassert"
 #include <algorithm>
+#include <time/ScopedTime.hpp>
 
 namespace gui
 {
@@ -152,7 +153,10 @@ namespace gui
 
     void ListView::onProviderDataUpdate()
     {
-        refresh();
+        {
+            auto time = utils::time::Scoped("Refresh na liscie");
+            refresh();
+        }
     }
 
     Order ListView::getOrderFromDirection()
@@ -210,6 +214,7 @@ namespace gui
         }
 
         recalculateStartIndex();
+        body->axisAlignment();
     }
 
     void ListView::setFocus()
