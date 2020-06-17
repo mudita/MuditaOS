@@ -76,9 +76,9 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
-        auto phoneNumber       = switchData->getPhoneNumber().getEntered();
+        auto phoneNumber       = switchData->getPhoneNumber();
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
-            LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.c_str());
+            LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.getFormatted().c_str());
             app->sendSms(phoneNumber, templ->text);
             sapm::ApplicationManager::messageSwitchPreviousApplication(
                 app,

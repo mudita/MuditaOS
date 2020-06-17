@@ -16,20 +16,22 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
+#include <PhoneNumber.hpp>
+
 struct SMSRecord : public Record
 {
     uint32_t date      = 0;
     uint32_t dateSent  = 0;
     uint32_t errorCode = 0;
-    UTF8 number        = "";
     UTF8 body          = "";
     bool isRead        = false;
     SMSType type       = SMSType::ALL;
     uint32_t threadID  = 0;
     uint32_t contactID = 0;
+    utils::PhoneNumber::View number;
 
     SMSRecord() = default;
-    SMSRecord(const SMSTableRow &, const UTF8 & = "");
+    SMSRecord(const SMSTableRow &, const utils::PhoneNumber::View &);
 };
 
 enum class SMSRecordField

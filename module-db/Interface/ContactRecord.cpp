@@ -83,7 +83,6 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
                                                       .isOnBlacklist  = rec.isOnBlacklist,
                                                       .isOnFavourites = rec.isOnFavourites,
                                                       .speedDial      = rec.speeddial});
-    numbersDirty |= ret;
 
     return ret;
 }
@@ -173,8 +172,6 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
         return ret;
 
     ret = contactDB->ringtones.Update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
-
-    numbersDirty |= ret;
 
     return ret;
 }
@@ -662,26 +659,24 @@ std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::
                                                                    CreateTempContact createTempContact,
                                                                    utils::PhoneNumber::Match matchLevel)
 {
-    if (numbersDirty) {
-        auto numbers = getAllNumbers();
-        contactNumberHolders.clear();
+    utils::NumberHolderMatcher<std::vector, ContactNumberHolder> numberMatcher;
+    std::vector<ContactNumberHolder> contactNumberHolders;
 
-        for (const auto &number : numbers) {
-            try {
-                contactNumberHolders.push_back(ContactNumberHolder(number));
-            }
-            catch (const utils::PhoneNumber::Error &e) {
-                LOG_WARN("Skipping invalid phone number pair: (%s, %s)",
-                         number.numberUser.c_str(),
-                         number.numbere164.c_str());
-                continue;
-            }
+    auto numbers = getAllNumbers();
+
+    for (const auto &number : numbers) {
+        try {
+            contactNumberHolders.push_back(ContactNumberHolder(number));
         }
-
-        numberMatcher = utils::NumberHolderMatcher<std::vector, ContactNumberHolder>(std::cbegin(contactNumberHolders),
-                                                                                     std::cend(contactNumberHolders));
-        numbersDirty  = false;
+        catch (const utils::PhoneNumber::Error &e) {
+            LOG_WARN(
+                "Skipping invalid phone number pair: (%s, %s)", number.numberUser.c_str(), number.numbere164.c_str());
+            continue;
+        }
     }
+
+    numberMatcher = utils::NumberHolderMatcher<std::vector, ContactNumberHolder>(std::cbegin(contactNumberHolders),
+                                                                                 std::cend(contactNumberHolders));
 
     auto matchedNumber = numberMatcher.bestMatch(utils::PhoneNumber(numberView), matchLevel);
 
