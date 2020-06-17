@@ -32,6 +32,7 @@ namespace gui
         Span *listSpanItem         = nullptr;
 
         int currentPageSize = 0;
+        bool pageLoaded     = false;
 
         style::listview::Type listType       = style::listview::Type::TopDown;
         style::listview::Direction direction = style::listview::Direction::Bottom;
