@@ -1,6 +1,7 @@
 #pragma once
 
 #include <AppWindow.hpp>
+#include <PhoneNumber.hpp>
 #include <widgets/Text.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
@@ -18,7 +19,7 @@ namespace gui
 
         bool selectContact();
         bool sendSms();
-        bool switchToThreadWindow(UTF8 number);
+        bool switchToThreadWindow(const utils::PhoneNumber::View &number);
         void updateBottomBar();
 
       public:

@@ -6,7 +6,7 @@
 * `[notifications]` Added bottom bar action indicators.
 
 ### Changed
-* `[phonebook]` Improved contact matching by phone number.
+* `[phonebook]``[sms]` Improved contact matching by phone number.
 * `[sms]` Contact Add/Contact details option.
 
 ### Fixed
