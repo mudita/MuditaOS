@@ -11,7 +11,6 @@
 #include "Navigation.hpp"
 #include "Item.hpp"
 #include "BoundingBox.hpp"
-#include "log/log.hpp"
 
 namespace gui
 {
@@ -169,7 +168,6 @@ namespace gui
         }
         else {
             auto box = BoundingBox(posOnOrthogonalAxis, posOnAxis, sizeOnOrthogonalAxis, sizeOnAxis);
-
             if (!(widgetArea == box))
                 setArea(box);
         }

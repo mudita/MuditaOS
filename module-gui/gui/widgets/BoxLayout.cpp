@@ -336,7 +336,6 @@ namespace gui
 
     void HBox::axisAlignment()
     {
-
         if (reverseOrder && BoxLayout::axisAlignment) {
             reverseAlignment<Axis::X>();
         }
@@ -364,7 +363,6 @@ namespace gui
 
     void VBox::axisAlignment()
     {
-
         if (reverseOrder && BoxLayout::axisAlignment) {
             reverseAlignment<Axis::Y>();
         }

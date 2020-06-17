@@ -2,7 +2,6 @@
 #include <log/log.hpp>
 #include "cassert"
 #include <algorithm>
-#include <time/ScopedTime.hpp>
 
 namespace gui
 {
@@ -69,11 +68,11 @@ namespace gui
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (inputEvent.keyCode == KeyCode::KEY_UP) {
+            if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
                 direction = style::listview::Direction::Top;
                 return this->listPageEndReached();
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
+            else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
                 direction = style::listview::Direction::Bottom;
                 return this->listPageEndReached();
             }
@@ -149,14 +148,12 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount);
         resizeWithScroll();
+        pageLoaded = true;
     }
 
     void ListView::onProviderDataUpdate()
     {
-        {
-            auto time = utils::time::Scoped("Refresh na liscie");
-            refresh();
-        }
+        refresh();
     }
 
     Order ListView::getOrderFromDirection()
@@ -247,7 +244,6 @@ namespace gui
 
     int ListView::calculateMaxItemsOnPage()
     {
-
         assert(provider->getMinimalItemHeight() != 0);
         auto count = widgetArea.h / provider->getMinimalItemHeight();
 
@@ -285,6 +281,7 @@ namespace gui
                                  : elementsCount - (elementsCount - startIndex);
             }
 
+            pageLoaded = false;
             provider->requestRecords(startIndex, calculateLimit());
         }
 
@@ -306,6 +303,8 @@ namespace gui
 
                 topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
             }
+
+            pageLoaded = false;
 
             // If starting page size smaller than last page - fill first page with last page size.
             if (startIndex < currentPageSize) {
