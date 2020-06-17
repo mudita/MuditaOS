@@ -174,6 +174,11 @@ namespace gui
         /// sets `visible` flag
         virtual void setVisible(bool value);
         void setArea(BoundingBox area);
+        void setAreaInAxis(Axis axis,
+                           uint32_t posOnAxis,
+                           uint32_t posOnOrthogonalAxis,
+                           uint32_t sizeOnAxis,
+                           uint32_t sizeOnOrthogonalAxis);
         /// sets position of element - this is sets area().x and area().y of item
         /// calls onDimensionChanged callback & updateDrawArea for item
         /// @attention should be bind to area

@@ -41,7 +41,6 @@ namespace gui
         };
 
         template <Axis axis> void resizeItems();
-        template <Axis axis> void updatePosition();
         template <Axis axis> void reverseAlignment();
 
         std::list<Item *> outOfDrawAreaItems;
@@ -93,6 +92,7 @@ namespace gui
         HBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
+        virtual void axisAlignment();
     };
 
     class VBox : public BoxLayout
@@ -103,6 +103,7 @@ namespace gui
         VBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
+        virtual void axisAlignment();
     };
 
 } /* namespace gui */
