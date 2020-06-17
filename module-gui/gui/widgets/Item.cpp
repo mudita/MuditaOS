@@ -11,6 +11,7 @@
 #include "Navigation.hpp"
 #include "Item.hpp"
 #include "BoundingBox.hpp"
+#include "log/log.hpp"
 
 namespace gui
 {
@@ -154,6 +155,23 @@ namespace gui
         }
         else {
             area.h = size;
+        }
+    }
+
+    void Item::setAreaInAxis(
+        Axis axis, uint32_t posOnAxis, uint32_t posOnOrthogonalAxis, uint32_t sizeOnAxis, uint32_t sizeOnOrthogonalAxis)
+    {
+        if (axis == Axis::X) {
+
+            auto box = BoundingBox(posOnAxis, posOnOrthogonalAxis, sizeOnAxis, sizeOnOrthogonalAxis);
+            if (!(widgetArea == box))
+                setArea(box);
+        }
+        else {
+            auto box = BoundingBox(posOnOrthogonalAxis, posOnAxis, sizeOnOrthogonalAxis, sizeOnAxis);
+
+            if (!(widgetArea == box))
+                setArea(box);
         }
     }
 

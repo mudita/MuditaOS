@@ -115,4 +115,14 @@ namespace gui
         h = box.h > h ? box.h : h;
     }
 
+    bool BoundingBox::operator==(BoundingBox &box)
+    {
+        if (x != box.x || y != box.y || w != box.w || h != box.h) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
 } /* namespace gui */

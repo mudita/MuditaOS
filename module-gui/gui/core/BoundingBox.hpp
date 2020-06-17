@@ -40,6 +40,7 @@ namespace gui
         std::string str() const;
         /// logical sum of bounding box by another bounding box values
         void sum(const BoundingBox &box);
+        bool operator==(BoundingBox &box);
     };
 
 } /* namespace gui */
