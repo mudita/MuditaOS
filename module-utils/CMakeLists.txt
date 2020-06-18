@@ -66,4 +66,7 @@ target_include_directories(${PROJECT_NAME}
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
     add_subdirectory(segger/systemview)
 endif()
-add_subdirectory( test )
+
+if (${ENABLE_TESTS})
+    add_subdirectory( test )
+endif()

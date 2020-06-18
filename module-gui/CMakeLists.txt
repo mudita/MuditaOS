@@ -42,5 +42,8 @@ target_include_directories(${PROJECT_NAME}
 
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC )
-add_subdirectory(test/test-catch)
-add_subdirectory(test/test-google)
+
+if (${ENABLE_TESTS})
+    add_subdirectory(test/test-catch)
+    add_subdirectory(test/test-google)
+endif ()

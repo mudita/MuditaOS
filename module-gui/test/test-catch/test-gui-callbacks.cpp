@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 #include <module-gui/gui/widgets/Item.hpp>
 #include <mock/TestWindow.hpp>
 

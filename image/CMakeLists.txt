@@ -37,5 +37,7 @@ foreach(ASSET ${ASSETS_LIST})
             ${outfile}
         )
     add_custom_target(${target_name} ALL DEPENDS ${outfile})
-    add_dependencies(check ${target_name})
+    if (${ENABLE_TESTS})
+        add_dependencies(check ${target_name})
+    endif ()
 endforeach()

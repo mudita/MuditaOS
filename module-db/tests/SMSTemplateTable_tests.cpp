@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
@@ -6,10 +6,12 @@
 #include "Tables/SMSTemplateTable.hpp"
 
 #include <vfs.hpp>
-#include <stdint.h>
-#include <string>
+
 #include <algorithm>
 #include <iostream>
+#include <string>
+
+#include <cstdint>
 
 TEST_CASE("SMS Templates Table tests")
 {

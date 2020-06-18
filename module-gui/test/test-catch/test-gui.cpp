@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 #include <log/log.hpp>
 #include <utf8/UTF8.hpp>
