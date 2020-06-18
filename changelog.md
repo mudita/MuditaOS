@@ -13,6 +13,7 @@
 
 ### Changed
 * `[phonebook]` Improved contact matching by phone number.
+* `[sms]` Contact Add/Contact details option
 
 ### Fixed
 * `[development]` Fixed colour accuracy in Linux simulator. 

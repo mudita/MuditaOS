@@ -86,7 +86,9 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
                                             }}));
     }
     options.push_back(gui::newOptionLabel(gui::options::call(app, app::CallOperation::ExecuteCall, contact)));
-    options.push_back(gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)));
+    auto contactOperation =
+        contact.contactType == ContactType::TEMPORARY ? app::ContactOperation::Add : app::ContactOperation::Details;
+    options.push_back(gui::newOptionLabel(gui::options::contact(app, contactOperation, contact)));
     options.push_back(gui::newOptionLabel(
         gui::Option{UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) {
                         std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
