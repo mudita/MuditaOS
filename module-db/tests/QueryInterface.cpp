@@ -1,11 +1,13 @@
+#include <catch2/catch.hpp>
+
 #include "Common/Query.hpp"
 #include "Databases/ContactsDB.hpp"
+#include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 #include "SMSRecord.hpp"
 #include "ThreadRecord.hpp"
-#include "catch.hpp"
-#include "../Database/Database.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
+
 #include <memory>
 
 namespace db

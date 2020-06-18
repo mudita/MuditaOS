@@ -6,19 +6,18 @@
  */
 #include "vfs.hpp"
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "Database/Database.hpp"
+#include "Databases/AlarmsDB.hpp"
+#include "Tables/AlarmsTable.hpp"
+
 #include <algorithm>
-
 #include <iostream>
 
-#include "../Database/Database.hpp"
-#include "../Databases/AlarmsDB.hpp"
-
-#include "Tables/AlarmsTable.hpp"
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 TEST_CASE("Alarms Table tests")
 {

@@ -56,5 +56,6 @@ if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} -lstdc++fs)
 endif()
 
-add_subdirectory(tests)
-
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

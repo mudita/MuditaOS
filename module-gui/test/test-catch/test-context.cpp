@@ -1,7 +1,7 @@
 // Right now there are no asserts here, each test/section / test should have asserts
 // these tests check memory sanity only
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 #include <module-gui/gui/core/Context.hpp>
 #include <log/log.hpp>
 

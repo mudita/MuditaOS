@@ -1,16 +1,17 @@
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 
-#include <vfs.hpp>
+#include "vfs.hpp"
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 #include <algorithm>
 #include <iostream>
+
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 TEST_CASE("SMS templates Record tests")
 {

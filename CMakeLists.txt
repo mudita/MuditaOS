@@ -23,9 +23,15 @@ message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
 add_executable(${PROJECT_NAME} "")
 
-enable_testing()
-add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
-add_subdirectory(test)
+if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+	set(ENABLE_TESTS ON)
+endif()
+
+if (${ENABLE_TESTS})
+	enable_testing()
+	add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+	add_subdirectory(test)
+endif ()
 
 # setting build flags
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
