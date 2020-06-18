@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../models/PhonebookModel.hpp"
+#include "Interface/ContactRecord.hpp"
 #include "Label.hpp"
 #include "ListItem.hpp"
 
