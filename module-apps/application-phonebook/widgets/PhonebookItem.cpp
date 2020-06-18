@@ -1,4 +1,5 @@
 #include "PhonebookItem.hpp"
+#include "application-phonebook/data/PhonebookStyle.hpp"
 #include <Style.hpp>
 
 namespace gui

@@ -4,7 +4,6 @@
 #include "PhonebookModel.hpp"
 #include "i18/i18.hpp"
 
-#include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "UiCommonActions.hpp"
 
@@ -68,7 +67,11 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
     gui::PhonebookItem *item = new gui::PhonebookItem();
 
     item->setContact(contact);
-    item->activatedCallback = [=](gui::Item &item) {
+    item->activatedCallback = [this, item, contact](gui::Item &) {
+        if (externalActivatedCB && externalActivatedCB(item)) {
+            return true;
+        }
+
         LOG_INFO("activatedCallback");
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
 
