@@ -2,7 +2,6 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
-#include "application-phonebook/widgets/PhonebookItem.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBContactMessage.hpp>
@@ -90,6 +89,21 @@ namespace gui
 
         contactsList->clear();
         contactsList->setElementsCount(phonebookModel->getItemCount());
+
+        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
+        if (contactRequest) {
+            phonebookModel->externalActivatedCB = [=](gui::PhonebookItem *item) {
+                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                data->result                                 = item->contact;
+                data->setDescription("PhonebookSearchRequest");
+                return sapm::ApplicationManager::messageSwitchPreviousApplication(
+                    application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
+            };
+
+            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(""));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        }
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
