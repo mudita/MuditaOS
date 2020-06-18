@@ -149,11 +149,6 @@ namespace gui
         reverseOrder = value;
     }
 
-    void BoxLayout::setAxisAlignment(bool value)
-    {
-        axisAlignment = value;
-    }
-
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
     {
         if (it->visible) {
@@ -167,16 +162,14 @@ namespace gui
     // not needed now == not implemented
     template <Axis axis> void BoxLayout::resizeItems()
     {
-
-        // we want to split to interested parties what's left, as much as they can fit
         int32_t pos      = reverseOrder ? this->area().size(axis) : 0;
         int32_t pos_left = this->getSize(axis);
         int32_t to_split = sizeLeft<axis>(this);
 
-        auto set_size_and_pos = [this](Item *it, int32_t &to_split, int32_t &pos, int32_t &pos_left) {
-            if (it == nullptr) {
-                return;
-            }
+        for (auto &el : children) {
+
+            if (!el->visible)
+                continue;
 
             auto axisItemPosition       = 0;
             auto orthogonalItemPosition = 0;
@@ -184,18 +177,18 @@ namespace gui
             auto orthogonalItemSize     = 0;
 
             // Check if item can be resized
-            int32_t left_in_el = it->area(Area::Max).size(axis) - it->area(Area::Min).size(axis);
+            int32_t left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
             if (to_split > 0 && left_in_el > 0) {
                 int32_t resize = std::min(left_in_el, to_split);
-                axisItemSize   = it->area(Area::Min).size(axis) + resize;
+                axisItemSize   = el->area(Area::Min).size(axis) + resize;
                 to_split -= resize;
             }
             else {
-                axisItemSize = it->area(Area::Min).size(axis);
+                axisItemSize = el->area(Area::Min).size(axis);
             }
 
             orthogonalItemSize =
-                std::min(this->area(Area::Normal).size(orthogonal(axis)), it->area(Area::Max).size(orthogonal(axis)));
+                std::min(this->area(Area::Normal).size(orthogonal(axis)), el->area(Area::Max).size(orthogonal(axis)));
 
             // Check if there is still position left
             if (axisItemSize <= pos_left) {
@@ -212,19 +205,11 @@ namespace gui
                 pos_left -= axisItemSize;
             }
             else {
-                addToOutOfDrawAreaList(it);
+                addToOutOfDrawAreaList(el);
             }
 
-            if (it->visible)
-                it->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
-        };
-
-        for (auto &el : children) {
-
-            if (!el->visible)
-                continue;
-
-            set_size_and_pos(el, to_split, pos, pos_left);
+            if (el->visible)
+                el->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
         }
 
         Rect::updateDrawArea();
@@ -336,7 +321,7 @@ namespace gui
 
     void HBox::axisAlignment()
     {
-        if (reverseOrder && BoxLayout::axisAlignment) {
+        if (reverseOrder) {
             reverseAlignment<Axis::X>();
         }
     }
@@ -363,7 +348,7 @@ namespace gui
 
     void VBox::axisAlignment()
     {
-        if (reverseOrder && BoxLayout::axisAlignment) {
+        if (reverseOrder) {
             reverseAlignment<Axis::Y>();
         }
     }
