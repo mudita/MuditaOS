@@ -9,18 +9,18 @@
 
 #include "vfs.hpp"
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <algorithm>
-
-#include <iostream>
-
-#include "../Database/Database.hpp"
+#include "Database/Database.hpp"
 
 #include "Tables/SMSTable.hpp"
+
+#include <algorithm>
+#include <iostream>
+
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 class vfs vfs;
 

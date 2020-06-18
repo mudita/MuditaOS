@@ -40,3 +40,6 @@
 	path = test/googletest
 	url = https://github.com/google/googletest
 	branch = 703bd9caab50b139428cea1aaff9974ebee5742e
+[submodule "test/Catch2"]
+	path = test/Catch2
+	url = https://github.com/catchorg/Catch2

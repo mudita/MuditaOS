@@ -1,7 +1,7 @@
-#include "../Databases/ContactsDB.hpp"
-#include "vfs.hpp"
+#include <catch2/catch.hpp>
 
-#include "catch.hpp"
+#include "Databases/ContactsDB.hpp"
+#include "vfs.hpp"
 
 TEST_CASE("Contacts Address Table tests")
 {

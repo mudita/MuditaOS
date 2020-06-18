@@ -8,23 +8,22 @@
  * @details
  */
 
+#include <catch2/catch.hpp>
+
+#include "Database/Database.hpp"
+#include "Databases/ContactsDB.hpp"
+#include "Databases/SmsDB.hpp"
+#include "Interface/ContactRecord.hpp"
+#include "Interface/SMSRecord.hpp"
+#include "Interface/ThreadRecord.hpp"
 #include "vfs.hpp"
 
-#include "catch.hpp"
-
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 #include <algorithm>
-
 #include <iostream>
-#include <Interface/ContactRecord.hpp>
 
-#include "../Database/Database.hpp"
-#include "../Databases/ContactsDB.hpp"
-#include "../Databases/SmsDB.hpp"
-#include "../Interface/SMSRecord.hpp"
-#include "../Interface/ThreadRecord.hpp"
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 TEST_CASE("Thread Record tests")
 {
@@ -33,7 +32,7 @@ TEST_CASE("Thread Record tests")
     vfs.remove(ContactsDB::GetDBName());
     vfs.remove(SmsDB::GetDBName());
 
-    auto smsDB      = std::make_unique<SmsDB>();
+    auto smsDB = std::make_unique<SmsDB>();
     REQUIRE(smsDB->IsInitialized());
     auto contactsDB = std::make_unique<ContactsDB>();
     REQUIRE(contactsDB->IsInitialized());

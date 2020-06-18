@@ -214,9 +214,6 @@ class UTF8
      */
     static bool getStreamLength(const char *stream, uint32_t &size, uint32_t &count);
     static UTF8 deserialize(uint8_t *stream);
-#ifdef UNIT_TESTS
-    mutable uint32_t operator_index_iterations;
-#endif
 };
 
 #endif /* UTF8_HPP_ */

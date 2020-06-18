@@ -1,8 +1,8 @@
-#include "../Interface/ContactRecord.hpp"
+#include <catch2/catch.hpp>
+
+#include "Interface/ContactRecord.hpp"
 #include "i18/i18.hpp"
 #include "vfs.hpp"
-
-#include "catch.hpp"
 
 TEST_CASE("Contact Record tests")
 {

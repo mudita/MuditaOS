@@ -78,16 +78,7 @@ const uint32_t UTF8::stringExpansion = 32;
 
 UTF8::UTF8()
     : data{new uint8_t[stringExpansion]}, sizeAllocated{stringExpansion}, sizeUsed{1}, strLength{0}, lastIndex{0},
-      lastIndexData
-{
-    data
-}
-#ifdef UNIT_TESTS
-, operator_index_iterations
-{
-    0
-}
-#endif
+      lastIndexData{data}
 {
     if (data != nullptr) {
         memset(data, 0, sizeAllocated);
@@ -107,9 +98,6 @@ UTF8::UTF8(const char *str)
     }
     strLength = getCharactersCount(reinterpret_cast<const char *>(data));
     lastIndex = 0;
-#ifdef UNIT_TESTS
-    operator_index_iterations = 0;
-#endif
 }
 
 UTF8::UTF8(const std::string &str)
@@ -125,9 +113,6 @@ UTF8::UTF8(const std::string &str)
     }
     strLength = getCharactersCount(reinterpret_cast<const char *>(data));
     lastIndex = 0;
-#ifdef UNIT_TESTS
-    operator_index_iterations = 0;
-#endif
 }
 
 UTF8::UTF8(const UTF8 &utf)
@@ -155,9 +140,6 @@ UTF8::UTF8(const UTF8 &utf)
     }
     lastIndex     = 0;
     lastIndexData = data;
-#ifdef UNIT_TESTS
-    operator_index_iterations = 0;
-#endif
 }
 
 UTF8::UTF8(UTF8 &&utf)
@@ -179,9 +161,6 @@ UTF8::UTF8(const uint8_t *data, const uint32_t allocated, const uint32_t used, c
     }
     memcpy(this->data, data, allocated);
     lastIndexData = this->data;
-#ifdef UNIT_TESTS
-    operator_index_iterations = 0;
-#endif
 }
 
 UTF8::~UTF8()
@@ -293,15 +272,9 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
         dataPtr = data;
         charCnt = 0;
     }
-#ifdef UNIT_TESTS
-    operator_index_iterations = 0;
-#endif
     while (charCnt != idx) {
         dataPtr += charLength(reinterpret_cast<const char *>(dataPtr));
         charCnt++;
-#ifdef UNIT_TESTS
-        operator_index_iterations++;
-#endif
     }
 
     lastIndex     = charCnt;
