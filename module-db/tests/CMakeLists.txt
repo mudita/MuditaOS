@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.12)
 project(unittest_module-db VERSION 1.0
         DESCRIPTION "Database module library unit tests")
 
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
+
 add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
         "${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
