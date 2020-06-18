@@ -199,6 +199,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
+    cmux->SelectAntenna(bsp::cellular::antenna::highBand);
     switch (board) {
     case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);

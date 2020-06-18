@@ -19,6 +19,34 @@ namespace at
             }
             return false;
         }
+        bool parseCSQ(std::string &cellularResponse, uint32_t result)
+        {
+
+            std::string CSQstring;
+            if (parseCSQ(cellularResponse, CSQstring)) {
+                auto pos = CSQstring.find(',');
+                if (pos != std::string::npos) {
+                    CSQstring = CSQstring.substr(0, pos);
+                    return utils::toNumeric(CSQstring, result);
+                }
+            }
+            return false;
+        }
+        namespace creg
+        {
+            bool isRegistered(uint32_t commandData)
+            {
+
+                // CREG command returns 1 when registered in home network, 5 when registered in roaming
+                constexpr uint32_t registeredHome    = 1;
+                constexpr uint32_t registeredRoaming = 5;
+
+                if (commandData == registeredHome || commandData == registeredRoaming) {
+                    return true;
+                }
+                return false;
+            }
+        } // namespace creg
         bool parseCREG(std::string &response, uint32_t &result)
         {
             auto pos = response.find(',');
@@ -32,12 +60,12 @@ namespace at
         bool parseCREG(std::string &response, std::string &result)
         {
             std::map<uint32_t, std::string> cregCodes;
-            cregCodes.insert(std::pair<uint32_t, std::string>(0, "Not registred"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(0, "Not registered"));
             cregCodes.insert(std::pair<uint32_t, std::string>(1, "Registered, home network"));
             cregCodes.insert(std::pair<uint32_t, std::string>(2, "Not registered, searching"));
             cregCodes.insert(std::pair<uint32_t, std::string>(3, "Registration denied"));
             cregCodes.insert(std::pair<uint32_t, std::string>(4, "Unknown"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(5, "Registerd, roaming"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(5, "Registered, roaming"));
 
             uint32_t cregValue = 0;
             if (parseCREG(response, cregValue)) {
@@ -69,9 +97,7 @@ namespace at
             uint32_t parseNetworkFrequency(std::string &response)
             {
                 auto tokens = utils::split(response, ",");
-                for (auto el : tokens) {
-                    LOG_INFO("token: %s", el.c_str());
-                }
+
                 auto constexpr qnwinfoResponseSize = 4;
                 auto constexpr bandTokenPos        = 2;
                 if (tokens.size() == qnwinfoResponseSize) {
@@ -94,11 +120,9 @@ namespace at
                 utils::findAndReplaceAll(string, wcdmaString, "");
                 utils::findAndReplaceAll(string, " ", "");
                 utils::findAndReplaceAll(string, "\"", "");
-                LOG_INFO("Numeric band value. %s", string.c_str());
 
                 uint32_t freq = 0;
                 utils::toNumeric(string, freq);
-                LOG_INFO("Freq = %lu", freq);
                 return freq;
             }
             uint32_t parseLteBandString(std::string &string)
@@ -127,13 +151,12 @@ namespace at
                 auto constexpr emptyString = "";
                 utils::findAndReplaceAll(string, "\"", emptyString);
                 utils::findAndReplaceAll(string, toRemove, emptyString);
-                LOG_INFO("Band : %s", string.c_str());
+
                 uint32_t band;
                 utils::toNumeric(string, band);
-                LOG_INFO("Band value: %lu", band);
+
                 auto freq = lteFreqs.find(band);
                 if (freq != lteFreqs.end()) {
-                    LOG_INFO("Freq = %lu", freq->second);
                     return freq->second;
                 }
 
