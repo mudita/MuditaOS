@@ -1,5 +1,12 @@
 # Mudita PurePhone changelog
 
+## [0.24.1] - 2020-06-17
+
+### Added
+* `[vfs]` improvements and enhancements
+
+## [0.24.1] - 2020-06-16
+=======
 ## Current release
 
 ### Added

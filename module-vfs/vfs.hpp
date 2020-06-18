@@ -15,7 +15,7 @@
 #include <vector>
 #include <sstream>
 #include <filesystem>
-#include <sbini/sbini.h>
+#include <sbini/sbini.hpp>
 #include <crc32/crc32.h>
 #include <log/log.hpp>
 #include <json/json11.hpp>
@@ -24,31 +24,31 @@ namespace fs = std::filesystem;
 
 #ifdef TARGET_Linux
 #include <cstdio>
-#define PATH_USER "user/"
-#define PATH_SYS  "sys/"
 #else
 #include "ff_stdio.h"
 #include "board/cross/eMMC/eMMC.hpp"
-#define PATH_USER "/user/"
-#define PATH_SYS  "/sys"
 #endif
 
+#define PATH_SYS      "/sys"
+#define PATH_USER     "user"
 #define PATH_CURRENT  "current"
 #define PATH_PREVIOUS "previous"
 #define PATH_UPDATES  "updates"
+#define PATH_TMP      "tmp"
 
 // this just concatenates two strings and creates a /user/ subdirectory filename
-#define USER_PATH(file) PATH_USER file
+#define USER_PATH(file) PATH_SYS "/" PATH_USER "/" file
 
 namespace purefs
 {
     namespace dir
     {
         const inline fs::path eMMC_disk   = PATH_SYS;
-        const inline fs::path user_disk   = PATH_USER;
+        const inline fs::path user_disk   = eMMC_disk / PATH_USER;
         const inline fs::path os_current  = eMMC_disk / PATH_CURRENT;
         const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
         const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
+        const inline fs::path tmp         = eMMC_disk / PATH_TMP;
     } // namespace dir
 
     namespace file
@@ -165,8 +165,10 @@ class vfs
      */
     std::string getline(FILE *stream, uint32_t length = 1024);
 
+    size_t fprintf(FILE *stream, const char *format, ...);
+
     FilesystemStats getFilesystemStats();
-    FILE *openAbsolute(const char *filename, const char *mode);
+
     std::string relativeToRoot(const std::string path);
     std::string lastErrnoToStr();
     bool isDir(const char *path);
