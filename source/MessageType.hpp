@@ -62,6 +62,7 @@ enum class MessageType
     DBContactGetByID,        // used to ask for a contact with specified id
     DBContactGetBySpeedDial, // used to ask for a contact with specified speed dial key assigned
     DBContactGetByNumber,    // used to ask for a contact with specified primary or secondary phone number
+    DBContactMatchByNumber,  // used to best match with a single contact using a phone number (primary or secondary)
     DBContactAdd,            // Add contact record
     DBContactRemove,         // Remove contact remove
     DBContactUpdate,         // Update contact remove

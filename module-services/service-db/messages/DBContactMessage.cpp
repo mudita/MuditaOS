@@ -1,4 +1,8 @@
 #include "DBContactMessage.hpp"
+#include "MessageType.hpp"
+
+#include <memory>
+#include <utility>
 
 DBContactMessage ::DBContactMessage(MessageType messageType, const ContactRecord &rec, bool favourite)
     : DBMessage(messageType), record(rec), favourite{favourite}
@@ -24,4 +28,19 @@ DBContactResponseMessage ::DBContactResponseMessage(std::unique_ptr<std::vector<
                                                     MessageType respTo)
     : DBResponseMessage(retCode, count, respTo),
       records(std::move(rec)), favourite{favourite}, limit{limit}, offset{offset}
+{}
+
+DBContactNumberMessage::DBContactNumberMessage(const utils::PhoneNumber::View &numberView)
+    : sys::DataMessage(MessageType::DBContactMatchByNumber), numberView(numberView)
+{}
+
+DBContactNumberMessage::~DBContactNumberMessage()
+{}
+
+DBContactNumberResponseMessage::DBContactNumberResponseMessage(sys::ReturnCodes retCode,
+                                                               std::unique_ptr<ContactRecord> contact)
+    : sys::ResponseMessage(retCode, MessageType::DBContactMatchByNumber), contact(std::move(contact))
+{}
+
+DBContactNumberResponseMessage::~DBContactNumberResponseMessage()
 {}

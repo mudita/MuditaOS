@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 
 namespace utils::country
 {
@@ -542,4 +543,22 @@ namespace utils::country
     {
         return map[static_cast<std::size_t>(id)].un_number;
     }
+
+    /**
+     * @brief Get the country Id By its Alpha2 code value, e.g. "PL" marches Id::POLAND
+     *
+     * @param alpha2Code
+     * @return Id
+     */
+    inline Id getIdByAlpha2Code(const std::string &alpha2Code)
+    {
+        for (std::size_t i = 0; i < count; i++) {
+            if (std::string(map[i].alpha2) == alpha2Code) {
+                return static_cast<Id>(i);
+            }
+        }
+
+        return Id::UNKNOWN;
+    }
+
 } // namespace utils::country

@@ -132,7 +132,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
 
         auto contactRec = contactInterface.GetByID(w.contactID);
         // TODO: or numberUser? or other number?
-        records->push_back({w, contactRec.numbers[0].numberE164});
+        records->push_back({w, contactRec.numbers[0].number.getEntered()});
     }
 
     return records;
@@ -149,7 +149,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 
         auto contactRec = contactInterface.GetByID(w.contactID);
         // TODO: or numberUser? or other number
-        records->push_back({w, contactRec.numbers[0].numberE164});
+        records->push_back({w, contactRec.numbers[0].number.getEntered()});
     }
 
     return records;
@@ -239,5 +239,5 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id)
     ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetByID(sms.contactID);
     // TODO: or numberUser?
-    return SMSRecord{sms, contactRec.numbers[0].numberE164};
+    return SMSRecord{sms, contactRec.numbers[0].number.getEntered()};
 }

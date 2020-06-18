@@ -6,6 +6,8 @@
 
 #include <service-db/api/DBServiceAPI.hpp>
 
+#include <PhoneNumber.hpp>
+
 namespace gui
 {
 
@@ -270,8 +272,7 @@ namespace gui
     {
         contactRecord.primaryName     = page1.text[0]->getText();
         contactRecord.alternativeName = page1.text[1]->getText();
-        // Temporary use numberUser also as numberE164, to be changed with libphonenumber
-        contactRecord.numbers.push_back(ContactRecord::Number(page1.text[2]->getText(), page1.text[2]->getText()));
+        contactRecord.numbers.push_back(ContactRecord::Number(utils::PhoneNumber(page1.text[2]->getText()).getView()));
         // Temporary disable saving secondary number since multiple numbers are not supported yet, and this could lead
         // to confusing errors
         // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
@@ -288,19 +289,19 @@ namespace gui
             page1.text[0]->setText(contact->primaryName);
             page1.text[1]->setText(contact->alternativeName);
             if (contact->numbers.size() > 0) {
-                if (contact->numbers[0].numberUser.length() == 0) {
+                if (contact->numbers[0].number.getEntered().size() == 0) {
                     page1.text[2]->setText(getCountryPrefix());
                 }
                 else {
-                    page1.text[2]->setText(contact->numbers[0].numberUser);
+                    page1.text[2]->setText(contact->numbers[0].number.getEntered());
                 }
             }
             if (contact->numbers.size() > 1) {
-                if (contact->numbers[1].numberUser.length() == 0) {
+                if (contact->numbers[1].number.getEntered().size() == 0) {
                     page1.text[3]->setText(getCountryPrefix());
                 }
                 else {
-                    page1.text[3]->setText(contact->numbers[1].numberUser);
+                    page1.text[3]->setText(contact->numbers[1].number.getEntered());
                 }
             }
             page1.text[4]->setText(contact->mail);
@@ -422,10 +423,10 @@ namespace gui
             case DBServiceAPI::noError:
                 break;
             case DBServiceAPI::primaryNumberError:
-                showDialogDuplicatedNumber(record, record.numbers[0].numberE164);
+                showDialogDuplicatedNumber(record, record.numbers[0].number);
                 return false;
             case DBServiceAPI::secondaryNumberError:
-                showDialogDuplicatedNumber(record, record.numbers[1].numberE164);
+                showDialogDuplicatedNumber(record, record.numbers[1].number);
                 return false;
             case DBServiceAPI::speedDialError:
                 showDialogDuplicatedSpeedDialNumber(record);
@@ -482,15 +483,16 @@ namespace gui
         return (buf);
     }
 
-    void PhonebookNewContact::showDialogDuplicatedNumber(ContactRecord &newContactRecord, const UTF8 duplicatedNumber)
+    void PhonebookNewContact::showDialogDuplicatedNumber(ContactRecord &newContactRecord,
+                                                         const utils::PhoneNumber::View &duplicatedNumber)
     {
         auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
         assert(dialog != nullptr);
-        auto meta              = dialog->meta;
-        auto contactRecordsPtr = DBServiceAPI::ContactGetByPhoneNumber(this->application, duplicatedNumber);
-        auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
-        newContactRecord.ID    = oldContactRecord.ID;
-        meta.action            = [=]() -> bool {
+        auto meta             = dialog->meta;
+        auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(this->application, duplicatedNumber);
+        auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
+        newContactRecord.ID   = oldContactRecord.ID;
+        meta.action           = [=]() -> bool {
             if (!DBServiceAPI::ContactUpdate(this->application, newContactRecord)) {
                 LOG_ERROR("Contact id=%" PRIu32 " update failed", newContactRecord.ID);
                 return false;
@@ -501,7 +503,7 @@ namespace gui
         std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
         fillContactData(duplicatedNumberPhrase, oldContactRecord);
         meta.text  = duplicatedNumberPhrase;
-        meta.title = duplicatedNumber;
+        meta.title = duplicatedNumber.getFormatted();
         meta.icon  = "info_big_circle_W_G";
         dialog->update(meta);
         this->application->switchWindow(dialog->getName());

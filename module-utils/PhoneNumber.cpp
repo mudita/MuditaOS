@@ -6,57 +6,209 @@
 #include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>
 
-#include <stdexcept>
+#include <exception>
 #include <string>
 
 using namespace utils;
 
-PhoneNumber::PhoneNumber(const std::string &phoneNumber, country::Id defaultCountryCode)
-    : countryCode(defaultCountryCode), util(*phn_util::GetInstance()), rawInput(phoneNumber)
+PhoneNumber::Error::Error(const std::string &number, const std::string &reason) : number(number), reason(reason)
+{}
+
+const char *PhoneNumber::Error::what() const noexcept
 {
+    return reason.c_str();
+}
+
+const std::string &PhoneNumber::Error::getNumber() const
+{
+    return number;
+}
+
+PhoneNumber::PhoneNumber(const std::string &phoneNumber, country::Id defaultCountryCode)
+    : countryCode(defaultCountryCode)
+{
+    auto &util = *phn_util::GetInstance();
     util.ParseAndKeepRawInput(phoneNumber, country::getAlpha2Code(countryCode), &pbNumber);
+
+    // determine real country code from number
+    std::string regionCode;
+    util.GetRegionCodeForNumber(pbNumber, &regionCode);
+    countryCode = country::getIdByAlpha2Code(regionCode);
+
+    // create view representation
+    viewSelf = makeView(phoneNumber);
+}
+
+PhoneNumber::PhoneNumber(const View &numberView)
+{
+    auto &util = *phn_util::GetInstance();
+
+    if (numberView.isValid()) {
+        // parse E164 number
+        i18n::phonenumbers::PhoneNumber pbNumberE164;
+        if (util.Parse(numberView.getE164(), country::getAlpha2Code(country::Id::UNKNOWN), &pbNumberE164) !=
+            errCode::NO_PARSING_ERROR) {
+            throw PhoneNumber::Error(numberView.getE164(), "Can't parse E164 number");
+        }
+
+        // get region code from E164 number
+        std::string regionCode;
+        util.GetRegionCodeForNumber(pbNumberE164, &regionCode);
+        if (regionCode == country::getAlpha2Code(country::Id::UNKNOWN)) {
+            throw PhoneNumber::Error(numberView.getE164(), "Can't get country code");
+        }
+        countryCode = country::getIdByAlpha2Code(regionCode);
+
+        // reparse entered number
+        util.ParseAndKeepRawInput(numberView.getEntered(), country::getAlpha2Code(countryCode), &pbNumber);
+    }
+    else {
+        util.ParseAndKeepRawInput(numberView.getEntered(), country::getAlpha2Code(countryCode), &pbNumber);
+
+        // update country code
+        std::string regionCode;
+        util.GetRegionCodeForNumber(pbNumber, &regionCode);
+        countryCode = country::getIdByAlpha2Code(regionCode);
+    }
+
+    // save original view without recalculating
+    viewSelf = numberView;
+}
+
+PhoneNumber::PhoneNumber(const std::string &phoneNumber, const std::string &e164number)
+{
+    auto &util = *phn_util::GetInstance();
+
+    // parse E164 number
+    i18n::phonenumbers::PhoneNumber pbNumberE164;
+    if (util.Parse(e164number, country::getAlpha2Code(country::Id::UNKNOWN), &pbNumberE164) !=
+        errCode::NO_PARSING_ERROR) {
+        throw PhoneNumber::Error(e164number, "Can't parse E164 number");
+    }
+
+    // get region code from E164 number
+    std::string regionCode;
+    util.GetRegionCodeForNumber(pbNumberE164, &regionCode);
+    if (regionCode == country::getAlpha2Code(country::Id::UNKNOWN)) {
+        throw PhoneNumber::Error(e164number, "Can't get country code");
+    }
+
+    // update country code information
+    countryCode = country::getIdByAlpha2Code(regionCode);
+
+    // use region code to parse number originally entered by the user
+    // keep raw input in order to be able to use original format in formatting
+    if (util.ParseAndKeepRawInput(phoneNumber, regionCode, &pbNumber) != errCode::NO_PARSING_ERROR) {
+        throw PhoneNumber::Error(phoneNumber, "Can't parse phone number");
+    }
+
+    // check if numbers match
+    if (util.IsNumberMatch(pbNumberE164, pbNumber) != phn_util::EXACT_MATCH) {
+        throw PhoneNumber::Error(phoneNumber, "Can't match number with E164 format");
+    }
+
+    // get formatted number
+    std::string formatted;
+    util.FormatInOriginalFormat(pbNumber, regionCode, &formatted);
+
+    // create view representation
+    viewSelf = View(phoneNumber, formatted, e164number, true);
 }
 
 bool PhoneNumber::isValid() const
 {
-    return util.IsValidNumber(pbNumber);
+    return viewSelf.isValid();
 }
 
 const std::string &PhoneNumber::get() const
 {
-    /// raw input can also be returned directly from pbNumber::rawInput() but
-    /// unfortunately if number parsing failed raw input is not preserved so
-    /// additional field had to be added in order to be able to always return
-    /// raw input
-    return rawInput;
+    return viewSelf.getEntered();
 }
 
 std::string PhoneNumber::getFormatted() const
 {
-    if (!isValid()) {
-        return rawInput;
-    }
-
-    std::string formatted;
-    util.FormatInOriginalFormat(pbNumber, country::getAlpha2Code(countryCode), &formatted);
-    return formatted;
+    return viewSelf.getFormatted();
 }
 
 std::string PhoneNumber::toE164() const
 {
-    if (!isValid()) {
-        throw std::runtime_error("Can't create E164 format from an invalid number.");
+    return viewSelf.getE164();
+}
+
+PhoneNumber::Match PhoneNumber::match(const PhoneNumber &other) const
+{
+    auto &util = *phn_util::GetInstance();
+
+    bool valid      = isValid();
+    bool otherValid = other.isValid();
+
+    // both numbers are invalid
+    if (!valid && !otherValid) {
+        if (get() == other.get()) {
+            return Match::EXACT;
+        }
     }
 
-    std::string e164number;
-    util.Format(pbNumber, formatType::E164, &e164number);
+    // one is valid
+    if (valid ^ otherValid) {
+        // determine which number is valid and which is not
+        const PhoneNumber *validNumber   = nullptr;
+        const PhoneNumber *invalidNumber = nullptr;
+        if (valid) {
+            validNumber   = this;
+            invalidNumber = &other;
+        }
+        else {
+            validNumber   = &other;
+            invalidNumber = this;
+        }
 
-    return e164number;
+        // longer is E164 because on of the numbers is valid
+        // get country from E164 and try to format an invalid to E164
+        PhoneNumber invalidCheck(invalidNumber->get(), validNumber->getCountryCode());
+        if (validNumber->toE164() == invalidCheck.toE164()) {
+            return Match::POSSIBLE;
+        }
+    }
+
+    // match with libphonenumber if both valid
+    if (valid && otherValid) {
+        auto matchResult = util.IsNumberMatch(pbNumber, other.pbNumber);
+        switch (matchResult) {
+        case phn_util::EXACT_MATCH:
+            return Match::EXACT;
+        case phn_util::SHORT_NSN_MATCH:
+        case phn_util::NSN_MATCH:
+            return Match::POSSIBLE;
+
+        // fallthrough to last case resort checks
+        case phn_util::NO_MATCH:
+        case phn_util::INVALID_NUMBER:
+            break;
+        }
+    }
+
+    // try harder than libphonenumber
+    if (!valid || !otherValid) {
+        // determine longer and shorter number - check if one is an ending of another
+        std::string otherEntered = other.getView().getNonEmpty();
+        std::string mineEntered  = viewSelf.getNonEmpty();
+        auto &longer             = mineEntered.size() > otherEntered.size() ? mineEntered : otherEntered;
+        auto &shorter            = mineEntered.size() < otherEntered.size() ? mineEntered : otherEntered;
+        auto compareSize         = shorter.size();
+        auto compareOffset       = longer.size() - shorter.size();
+
+        if (compareSize > 0 && longer.compare(compareOffset, compareSize, shorter) == 0) {
+            return Match::PROBABLE;
+        }
+    }
+
+    return Match::NO_MATCH;
 }
 
 bool PhoneNumber::operator==(const PhoneNumber &right) const
 {
-    return util.IsNumberMatch(pbNumber, right.pbNumber) == phn_util::EXACT_MATCH;
+    return match(right) == Match::EXACT;
 }
 
 bool PhoneNumber::operator==(const View &view) const
@@ -65,11 +217,12 @@ bool PhoneNumber::operator==(const View &view) const
         return false;
     }
 
-    return isValid() ? toE164() == view.getE164() : rawInput == view.getEntered();
+    return isValid() ? toE164() == view.getE164() : get() == view.getEntered();
 }
 
 PhoneNumber::numberType PhoneNumber::getType() const
 {
+    auto &util = *phn_util::GetInstance();
     return util.GetNumberType(pbNumber);
 }
 
@@ -88,45 +241,21 @@ bool PhoneNumber::e164format(const std::string &number, std::string &e164, count
     return true;
 }
 
-PhoneNumber::View PhoneNumber::makeView() const
-{
-    return PhoneNumber::View(get(), getFormatted(), isValid() ? toE164() : "", isValid());
-}
-
-PhoneNumber::View PhoneNumber::validateNumber(const std::string &e164, const std::string &entered)
+PhoneNumber::View PhoneNumber::makeView(const std::string &rawInput) const
 {
     auto &util = *phn_util::GetInstance();
 
-    // parse E164 number
-    i18n::phonenumbers::PhoneNumber pbNumberE164;
-    if (util.Parse(e164, country::getAlpha2Code(country::Id::UNKNOWN), &pbNumberE164) != errCode::NO_PARSING_ERROR) {
-        return PhoneNumber::View(entered, entered, e164, false);
+    if (!util.IsValidNumber(pbNumber)) {
+        return PhoneNumber::View(rawInput, rawInput, "", false);
     }
 
-    // get region code from E164 number
-    std::string regionCode;
-    util.GetRegionCodeForNumber(pbNumberE164, &regionCode);
-    if (regionCode == country::getAlpha2Code(country::Id::UNKNOWN)) {
-        return PhoneNumber::View(entered, entered, e164, false);
-    }
-
-    // use region code to parse number originally entered by the user
-    // keep raw input in order to be able to use original format in formatting
-    i18n::phonenumbers::PhoneNumber pbNumberEntered;
-    if (util.ParseAndKeepRawInput(entered, regionCode, &pbNumberEntered) != errCode::NO_PARSING_ERROR) {
-        return PhoneNumber::View(entered, entered, e164, false);
-    }
-
-    // check if numbers match
-    if (util.IsNumberMatch(pbNumberE164, pbNumberEntered) != phn_util::EXACT_MATCH) {
-        return PhoneNumber::View(entered, entered, e164, false);
-    }
-
-    // format number to generate full view of the number
     std::string formatted;
-    util.FormatInOriginalFormat(pbNumberEntered, regionCode, &formatted);
+    util.FormatInOriginalFormat(pbNumber, country::getAlpha2Code(countryCode), &formatted);
 
-    return PhoneNumber::View(entered, formatted, e164, true);
+    std::string e164number;
+    util.Format(pbNumber, formatType::E164, &e164number);
+
+    return PhoneNumber::View(rawInput, formatted, e164number, true);
 }
 
 void PhoneNumber::View::clear()
@@ -137,7 +266,7 @@ void PhoneNumber::View::clear()
 PhoneNumber::View PhoneNumber::parse(const std::string &inputNumber)
 {
     PhoneNumber number(inputNumber);
-    return number.makeView();
+    return number.getView();
 }
 
 const std::string &PhoneNumber::View::getEntered() const
@@ -175,4 +304,14 @@ bool PhoneNumber::View::operator==(const View &rhs) const
 const std::string &PhoneNumber::View::getNonEmpty() const
 {
     return valid ? e164 : entered;
+}
+
+country::Id PhoneNumber::getCountryCode() const noexcept
+{
+    return countryCode;
+}
+
+const PhoneNumber::View &PhoneNumber::getView() const
+{
+    return viewSelf;
 }
