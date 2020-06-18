@@ -46,8 +46,7 @@ namespace gui
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
         virtual void resizeItems();
-        bool reverseOrder  = false;
-        bool axisAlignment = false;
+        bool reverseOrder = false;
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items
         std::list<Item *>::iterator nextNavigationItem(std::list<Item *>::iterator from);
 

@@ -4,6 +4,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
         test-gui-listview.cpp
+        test-gui-boxlayout.cpp
         ../mock/TestListViewProvider.cpp
         )
 
