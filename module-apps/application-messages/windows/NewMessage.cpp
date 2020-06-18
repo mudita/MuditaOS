@@ -51,6 +51,7 @@ namespace gui
             contact = std::move(retContact);
             recipient->setText(contact->getFormattedName());
         }
+        updateBottomBar();
     }
 
     bool NewSMS_Window::selectContact()
@@ -127,6 +128,12 @@ namespace gui
         return true;
     }
 
+    void NewSMS_Window::updateBottomBar()
+    {
+        UTF8 text = recipient->getText().length() == 0 ? utils::localize.get(style::strings::common::select) : "";
+        bottomBar->setText(BottomBar::Side::CENTER, text);
+    };
+
     void NewSMS_Window::buildInterface()
     {
         namespace msgStyle = style::messages::newMessage;
@@ -169,8 +176,12 @@ namespace gui
         recipient->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         recipient->activatedCallback    = [=](Item &) -> bool { return selectContact(); };
         recipient->focusChangedCallback = [=](Item &) -> bool {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+            updateBottomBar();
             bottomBar->setActive(BottomBar::Side::LEFT, false);
+            return true;
+        };
+        recipient->contentCallback = [=](Item &) -> bool {
+            updateBottomBar();
             return true;
         };
 
