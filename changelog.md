@@ -12,6 +12,8 @@
 ### Fixed
 * `[development]` Fixed colour accuracy in Linux simulator. 
 * `[phonebook]` Fixed phonebook contact select from new SMS window.
+* `[listview]` Fixed double click on last ListView element switching two pages.
+* `[boxlayout]` Performance improvements to BoxLayout - hence ListView.
 
 ### Other
 * `[vfs]` Technical improvements and enhancements.

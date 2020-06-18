@@ -163,18 +163,20 @@ namespace gui
         if (axis == Axis::X) {
 
             auto box = BoundingBox(posOnAxis, posOnOrthogonalAxis, sizeOnAxis, sizeOnOrthogonalAxis);
-            if (!(widgetArea == box))
+
+            if (widgetArea != box)
                 setArea(box);
         }
         else {
+
             auto box = BoundingBox(posOnOrthogonalAxis, posOnAxis, sizeOnOrthogonalAxis, sizeOnAxis);
-            if (!(widgetArea == box))
+
+            if (widgetArea != box)
                 setArea(box);
         }
     }
 
     /// set maximum
-
     void Item::setMaximumSize(uint32_t val, Axis axis)
     {
         setAreaSizeInAxis(area(Area::Max), axis, val);

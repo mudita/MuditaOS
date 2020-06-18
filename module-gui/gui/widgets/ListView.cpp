@@ -62,7 +62,6 @@ namespace gui
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
-        body->setAxisAlignment(true);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
