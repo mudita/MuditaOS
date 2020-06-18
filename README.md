@@ -7,17 +7,27 @@ You can build project in docker container, to that
 1. Get docker
 `./config/bootstrap.sh 8`
 
-2. configure for linux Debug
+2. Add yourself to a `docker` group
+```bash
+NAME=$(wohami)
+sudo usermod -aG docker ${NAME}
+```
+After that you have to logo out and login back, groups are set during the login process.
+To make sure you are in docker group call:
+`groups`
+you will see the list of groups your login is assigned to.
+
+3. configure for linux Debug
 `./in_docker.sh config linux Debug`
 
-3. build linux Debug
+4. build linux Debug
 `./in_docker.sh make build-linux-Debug`
 
-4. build rt1051 Release
+5. build rt1051 Release
 `./in_docker.sh config rt1051 Release`
 `./in_docker.sh make build-rt1051-Release`
 
-5. build & run tests (linux only)
+6. build & run tests (linux only)
 `./in_docker.sh make build-linux-Debug`
 `./in_docker.sh make check`
 __do not call `make test` it will make fool of you__
