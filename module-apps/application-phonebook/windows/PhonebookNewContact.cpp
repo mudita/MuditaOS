@@ -356,7 +356,7 @@ namespace gui
         if (item) {
             contact = item->getContact();
 
-            if (contact != nullptr && contact->ID != DB_ID_NONE) {
+            if (contact != nullptr && contact->ID != DB_ID_NONE && contact->contactType != ContactType::USER) {
                 title->setText(utils::localize.get("app_phonebook_options_edit"));
             }
             else {
@@ -446,7 +446,11 @@ namespace gui
             }
         }
         else if (contact->ID != DB_ID_NONE) {
+            assert(contact != nullptr);
             copyInputData(*contact);
+            if (contact->contactType == ContactType::TEMPORARY) {
+                contact->contactType = ContactType::USER;
+            }
             if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return (false);
