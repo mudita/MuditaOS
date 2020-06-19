@@ -78,41 +78,48 @@ PhoneNumber::PhoneNumber(const View &numberView)
 PhoneNumber::PhoneNumber(const std::string &phoneNumber, const std::string &e164number)
 {
     auto &util = *phn_util::GetInstance();
-
-    // parse E164 number
-    i18n::phonenumbers::PhoneNumber pbNumberE164;
-    if (util.Parse(e164number, country::getAlpha2Code(country::Id::UNKNOWN), &pbNumberE164) !=
-        errCode::NO_PARSING_ERROR) {
-        throw PhoneNumber::Error(e164number, "Can't parse E164 number");
-    }
-
-    // get region code from E164 number
     std::string regionCode;
-    util.GetRegionCodeForNumber(pbNumberE164, &regionCode);
-    if (regionCode == country::getAlpha2Code(country::Id::UNKNOWN)) {
-        throw PhoneNumber::Error(e164number, "Can't get country code");
+
+    // non empty E164 format: match numbers, throw on error
+    if (e164number.size() > 0) {
+        // parse E164 number
+        i18n::phonenumbers::PhoneNumber pbNumberE164;
+        if (util.Parse(e164number, country::getAlpha2Code(country::Id::UNKNOWN), &pbNumberE164) !=
+            errCode::NO_PARSING_ERROR) {
+            throw PhoneNumber::Error(e164number, "Can't parse E164 number");
+        }
+
+        // get region code from E164 number
+        util.GetRegionCodeForNumber(pbNumberE164, &regionCode);
+        if (regionCode == country::getAlpha2Code(country::Id::UNKNOWN)) {
+            throw PhoneNumber::Error(e164number, "Can't get country code");
+        }
+
+        // update country code information
+        countryCode = country::getIdByAlpha2Code(regionCode);
+
+        // use region code to parse number originally entered by the user
+        // keep raw input in order to be able to use original format in formatting
+        if (util.ParseAndKeepRawInput(phoneNumber, regionCode, &pbNumber) != errCode::NO_PARSING_ERROR) {
+            throw PhoneNumber::Error(phoneNumber, "Can't parse phone number");
+        }
+
+        // check if numbers match
+        if (util.IsNumberMatch(pbNumberE164, pbNumber) != phn_util::EXACT_MATCH) {
+            throw PhoneNumber::Error(phoneNumber, "Can't match number with E164 format");
+        }
     }
+    // empty E164: use entered number
+    else {
+        util.ParseAndKeepRawInput(phoneNumber, country::getAlpha2Code(countryCode), &pbNumber);
 
-    // update country code information
-    countryCode = country::getIdByAlpha2Code(regionCode);
-
-    // use region code to parse number originally entered by the user
-    // keep raw input in order to be able to use original format in formatting
-    if (util.ParseAndKeepRawInput(phoneNumber, regionCode, &pbNumber) != errCode::NO_PARSING_ERROR) {
-        throw PhoneNumber::Error(phoneNumber, "Can't parse phone number");
+        // determine real country code from number
+        util.GetRegionCodeForNumber(pbNumber, &regionCode);
+        countryCode = country::getIdByAlpha2Code(regionCode);
     }
-
-    // check if numbers match
-    if (util.IsNumberMatch(pbNumberE164, pbNumber) != phn_util::EXACT_MATCH) {
-        throw PhoneNumber::Error(phoneNumber, "Can't match number with E164 format");
-    }
-
-    // get formatted number
-    std::string formatted;
-    util.FormatInOriginalFormat(pbNumber, regionCode, &formatted);
 
     // create view representation
-    viewSelf = View(phoneNumber, formatted, e164number, true);
+    viewSelf = makeView(phoneNumber);
 }
 
 bool PhoneNumber::isValid() const
