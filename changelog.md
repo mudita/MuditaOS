@@ -1,30 +1,19 @@
 # Mudita PurePhone changelog
 
-## [0.24.1] - 2020-06-19
-
-### Added
-
-* `[notifications]` - Added notifications bottom bar action indicators
-
-## [0.24.1] - 2020-06-17
-
-### Added
-* `[vfs]` improvements and enhancements
-
-## [0.24.1] - 2020-06-16
-=======
 ## Current release
 
 ### Added
+* `[notifications]` Added bottom bar action indicators.
 
 ### Changed
 * `[phonebook]` Improved contact matching by phone number.
-* `[sms]` Contact Add/Contact details option
+* `[sms]` Contact Add/Contact details option.
 
 ### Fixed
 * `[development]` Fixed colour accuracy in Linux simulator. 
 
 ### Other
+* `[vfs]` Technical improvements and enhancements.
 
 ## [0.25.1] - 2020-06-16
 
