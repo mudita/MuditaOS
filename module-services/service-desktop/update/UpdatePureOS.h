@@ -63,14 +63,12 @@ class UpdatePureOS
     updateos::UpdateError prepareRoot();
     updateos::UpdateError updateBootINI();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
+    updateos::UpdateError cleanupAfterUpdate();
 
-    void getChecksumInfo(const std::string infoLine, std::string &filePath, unsigned long *fileCRC32Long);
-    unsigned long getExtractedFileCRC32(const std::string filePath);
+    void getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long);
+    unsigned long getExtractedFileCRC32(const std::string &filePath);
     bool unpackFileToTemp(mtar_header_t &header, unsigned long *crc32);
-
-    void cleanupAfterUpdate();
-    const fs::path getUpdateTmpChild(const fs::path childPath);
-    static void printDir(const char *pcDirectoryToScan);
+    const fs::path getUpdateTmpChild(const fs::path &childPath);
 
   private:
     fs::path updateTempDirectory;
