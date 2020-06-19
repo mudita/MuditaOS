@@ -15,8 +15,8 @@ FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fi
 
 json11::Json FileInfo::to_json() const
 {
-    return (json11::Json::object{
-        {"name", fileName}, {"size", std::to_string(fileSize)}, {"crc32", std::to_string(fileCRC32)}});
+    return json11::Json::object{
+        {"name", fileName}, {"size", std::to_string(fileSize)}, {"crc32", std::to_string(fileCRC32)}};
 }
 
 UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
@@ -33,14 +33,14 @@ updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
         }
         else {
             LOG_ERROR("UpdatePureOS::setUpdateFile can't open TAR file %s", updateFile.c_str());
-            return (updateos::UpdateError::CantOpenUpdateFile);
+            return updateos::UpdateError::CantOpenUpdateFile;
         }
     }
     else {
         LOG_ERROR("UpdatePureOS::setUpdateFile %s does not exist", updateFile.c_str());
-        return (updateos::UpdateError::CantOpenUpdateFile);
+        return updateos::UpdateError::CantOpenUpdateFile;
     }
-    return (updateos::UpdateError::NoError);
+    return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdatePureOS::runUpdate()
@@ -50,7 +50,7 @@ updateos::UpdateError UpdatePureOS::runUpdate()
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
         LOG_ERROR("runUpdate can't prepare temp directory for update");
-        return (err);
+        return err;
     }
 
     if ((err = unpackUpdate()) == updateos::UpdateError::NoError) {
@@ -58,7 +58,7 @@ updateos::UpdateError UpdatePureOS::runUpdate()
     }
     else {
         LOG_ERROR("runUpdate %s can't be unpacked", updateFile.c_str());
-        return (err);
+        return err;
     }
 
     if ((err = verifyChecksums()) == updateos::UpdateError::NoError) {
@@ -66,7 +66,7 @@ updateos::UpdateError UpdatePureOS::runUpdate()
     }
     else {
         LOG_ERROR("runUpdate %s checksum verification failed", updateFile.c_str());
-        return (err);
+        return err;
     }
 
     if ((err = prepareRoot()) == updateos::UpdateError::NoError) {
@@ -76,7 +76,7 @@ updateos::UpdateError UpdatePureOS::runUpdate()
         LOG_ERROR("runUpdate %s can't prepare root dir for reset", updateFile.c_str());
     }
 
-    return (updateos::UpdateError::NoError);
+    return cleanupAfterUpdate();
 }
 
 updateos::UpdateError UpdatePureOS::unpackUpdate()
@@ -103,7 +103,7 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
         }
         mtar_next(&updateTar);
     }
-    return (updateos::UpdateError::NoError);
+    return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdatePureOS::verifyChecksums()
@@ -132,7 +132,7 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
                                   fileCRC32,
                                   computedCRC32);
                         vfs.fclose(fpChecksums);
-                        return (updateos::UpdateError::VerifyChecksumsFailure);
+                        return updateos::UpdateError::VerifyChecksumsFailure;
                     }
                     else {
                         LOG_DEBUG(
@@ -145,22 +145,22 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
     }
     else {
         LOG_ERROR("verifyChecksums can't open checksums file %s", checksumsFile.c_str());
-        return (updateos::UpdateError::CantOpenChecksumsFile);
+        return updateos::UpdateError::CantOpenChecksumsFile;
     }
-    return (updateos::UpdateError::NoError);
+    return updateos::UpdateError::NoError;
 }
 
-unsigned long UpdatePureOS::getExtractedFileCRC32(const std::string filePath)
+unsigned long UpdatePureOS::getExtractedFileCRC32(const std::string &filePath)
 {
     for (auto file : filesInUpdatePackage) {
         if (file.fileName == filePath) {
-            return (file.fileCRC32);
+            return file.fileCRC32;
         }
     }
-    return (0);
+    return 0;
 }
 
-void UpdatePureOS::getChecksumInfo(const std::string infoLine, std::string &filePath, unsigned long *fileCRC32Long)
+void UpdatePureOS::getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long)
 {
     std::size_t lastSpacePos = infoLine.find_last_of(' ');
     if (lastSpacePos > 0) {
@@ -201,7 +201,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
 
     if (vfs.isDir(purefs::dir::os_previous.c_str())) {
         LOG_ERROR("prepareRoot %s still exists, we can't continue", purefs::dir::os_previous.c_str());
-        return (updateos::UpdateError::CantDeletePreviousOS);
+        return updateos::UpdateError::CantDeletePreviousOS;
     }
     // rename the current OS to previous on partition
     LOG_DEBUG("prepareRoot rename: %s->%s", purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str());
@@ -212,7 +212,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
                   purefs::dir::os_current.c_str(),
                   purefs::dir::os_previous.c_str(),
                   vfs.lastErrnoToStr().c_str());
-        return (updateos::UpdateError::CantRenameCurrentToPrevious);
+        return updateos::UpdateError::CantRenameCurrentToPrevious;
     }
 
     // rename the temp directory to current (extracted update)
@@ -224,11 +224,11 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
                   updateTempDirectory.c_str(),
                   purefs::dir::os_current.c_str(),
                   vfs.lastErrnoToStr().c_str());
-        return (updateos::UpdateError::CantRenameTempToCurrent);
+        return updateos::UpdateError::CantRenameTempToCurrent;
     }
     // make sure that boot.ini points to the current version
 
-    return (updateBootINI());
+    return updateBootINI();
 }
 
 updateos::UpdateError UpdatePureOS::updateBootINI()
@@ -255,13 +255,13 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
                   purefs::ini::main.c_str(),
                   purefs::ini::os_type.c_str());
         sbini_free(ini);
-        return (updateos::UpdateError::CantUpdateINI);
+        return updateos::UpdateError::CantUpdateINI;
     }
 
     if (sbini_save(ini, bootIniAbsoulte.c_str())) {
         LOG_ERROR("updateBootINI can't save ini file at: %s", bootIniAbsoulte.c_str());
         sbini_free(ini);
-        return (updateos::UpdateError::CantSaveINI);
+        return updateos::UpdateError::CantSaveINI;
     }
 
     sbini_free(ini);
@@ -282,7 +282,7 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
     }
 
     LOG_DEBUG("updateBootINI no error");
-    return (updateos::UpdateError::NoError);
+    return updateos::UpdateError::NoError;
 }
 
 bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
@@ -302,7 +302,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     vfs::FILE *fp = vfs.fopen(fullPath.c_str(), "w+");
     if (fp == NULL) {
         LOG_ERROR("unpackFileToTemp %s can't open for writing", fullPath.c_str());
-        return (false);
+        return false;
     }
 
     for (uint32_t i = 0; i < blocksToRead; i++) {
@@ -315,7 +315,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 
         if ((errCode = mtar_read_data(&updateTar, readBuf.get(), sizeToRead)) != MTAR_ESUCCESS) {
             LOG_ERROR("unpackFileToTemp mtar_read_data failed, errCode=%d", errCode);
-            return (false);
+            return false;
         }
 
         const uint32_t dataWritten = vfs.fwrite(readBuf.get(), 1, sizeToRead, fp);
@@ -323,28 +323,28 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
             LOG_ERROR(
                 "unpackFileToTemp %s can't write to file error: %s", fullPath.c_str(), vfs.lastErrnoToStr().c_str());
             vfs.fclose(fp);
-            return (false);
+            return false;
         }
 
         if (crc32 != nullptr)
             *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
     }
     vfs.fclose(fp);
-    return (true);
+    return true;
 }
 
-void UpdatePureOS::cleanupAfterUpdate()
+updateos::UpdateError UpdatePureOS::cleanupAfterUpdate()
 {
-    if (vfs.isDir(updateTempDirectory.c_str())) {
-        if (vfs.deltree(updateTempDirectory.c_str()) != 0) {
-            LOG_ERROR("ff_deltree failed on %s", updateTempDirectory.c_str());
-        }
+    if (vfs.isDir(updateTempDirectory.c_str()) && vfs.deltree(updateTempDirectory.c_str())) {
+        LOG_ERROR("ff_deltree failed on %s", updateTempDirectory.c_str());
+        return updateos::UpdateError::CantRemoveUniqueTmpDir;
     }
+    return updateos::UpdateError::NoError;
 }
 
-const fs::path UpdatePureOS::getUpdateTmpChild(const fs::path childPath)
+const fs::path UpdatePureOS::getUpdateTmpChild(const fs::path &childPath)
 {
-    return (updateTempDirectory / childPath);
+    return updateTempDirectory / childPath;
 }
 
 updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
@@ -357,7 +357,7 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
         LOG_DEBUG("prepareTempDirForUpdate %s is not a directory", purefs::dir::os_updates.c_str());
         if (vfs.mkdir(purefs::dir::os_updates.c_str()) != 0) {
             LOG_ERROR("%s can't create it %s", purefs::dir::os_updates.c_str(), vfs.lastErrnoToStr().c_str());
-            return (updateos::UpdateError::CantCreateUpdatesDir);
+            return updateos::UpdateError::CantCreateUpdatesDir;
         }
         else {
             LOG_DEBUG("prepareTempDirForUpdate %s created", purefs::dir::os_updates.c_str());
@@ -371,7 +371,7 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
         LOG_INFO("prepareTempDirForUpdate %s is not a directory", purefs::dir::tmp.c_str());
         if (vfs.mkdir(purefs::dir::tmp.c_str()) != 0) {
             LOG_ERROR("%s can't create it %s", purefs::dir::tmp.c_str(), vfs.lastErrnoToStr().c_str());
-            return (updateos::UpdateError::CantCreateTempDir);
+            return updateos::UpdateError::CantCreateTempDir;
         }
         else {
             LOG_DEBUG("prepareTempDirForUpdate %s created", purefs::dir::tmp.c_str());
@@ -385,7 +385,7 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
         LOG_DEBUG("prepareTempDirForUpdate %s exists already, try to remove it", updateTempDirectory.c_str());
         if (vfs.deltree(updateTempDirectory.c_str()) != 0) {
             LOG_ERROR("prepareTempDirForUpdate can't remove %s", updateTempDirectory.c_str());
-            return (updateos::UpdateError::CantRemoveUniqueTmpDir);
+            return updateos::UpdateError::CantRemoveUniqueTmpDir;
         }
         else {
             LOG_DEBUG("prepareTempDirForUpdate %s removed", updateTempDirectory.c_str());
@@ -397,9 +397,9 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
         LOG_ERROR("prepareTempDirForUpdate failed to create: %s error: %s",
                   updateTempDirectory.c_str(),
                   vfs.lastErrnoToStr().c_str());
-        return (updateos::UpdateError::CantCreateUniqueTmpDir);
+        return updateos::UpdateError::CantCreateUniqueTmpDir;
     }
 
     LOG_INFO("prepareTempDirForUpdate tempDir selected %s", updateTempDirectory.c_str());
-    return (updateos::UpdateError::NoError);
+    return updateos::UpdateError::NoError;
 }
