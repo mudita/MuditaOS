@@ -34,7 +34,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
             LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
                       updateOs->updateFile.c_str(),
                       updateOs->uuid);
-            updateOS->runUpdate(updateOs->updateFile);
+            if (updateOS->setUpdateFile(updateOs->updateFile) == updateos::UpdateError::NoError)
+                updateOS->runUpdate();
         }
         return std::make_shared<sys::ResponseMessage>();
     });
