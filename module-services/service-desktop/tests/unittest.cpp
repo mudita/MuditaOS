@@ -7,12 +7,11 @@
 
 class vfs vfs;
 
-
 TEST_CASE("Test case 1")
 {
     vfs.Init();
     UpdatePureOS updateOS(nullptr);
-    
+
     updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
     REQUIRE(err == updateos::UpdateError::NoError);
 
