@@ -1,0 +1,15 @@
+@startuml
+skinparam rectangle{
+    roundCorner 25
+}
+
+Actor User
+package PurePhone {
+    usecase "Check Firmware" as CF
+}
+rectangle "HTTP Server" as HTTPd
+
+User -> CF   : 1. Check firmware
+CF <-> HTTPd : 2. GET firmware info
+
+@enduml
