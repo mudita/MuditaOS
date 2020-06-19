@@ -1,10 +1,10 @@
 #include "UpdatePureOS.h"
 
-#include "module-utils/time/ScopedTime.hpp"
-#include "service-desktop/ServiceDesktop.hpp"
-#include "module-vfs/vfs.hpp"
+#include <time/ScopedTime.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <vfs.hpp>
 
-#include "version.hpp"
+#include <source/version.hpp>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
@@ -26,47 +26,58 @@ json11::Json FileInfo::to_json() const
 UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
 {}
 
-updateos::UpdateError UpdatePureOS::runUpdate(const fs::path fileName)
+updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
 {
-    LOG_INFO("runUpdate fileName:%s", fileName.c_str());
+    LOG_DEBUG("UpdatePureOS::setUpdateFile updateFileToUse:%s", updateFileToUse.c_str());
+    updateFile = purefs::dir::os_updates / updateFileToUse;
+    LOG_DEBUG("UpdatePureOS::setUpdateFile updateFile:%s", updateFile.c_str());
+    if (vfs.fileExists(updateFile.c_str())) {
+        if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
+            LOG_INFO("UpdatePureOS::setUpdateFile TAR_FILE: %s opened", updateFile.c_str());
+        }
+        else {
+            LOG_ERROR("UpdatePureOS::setUpdateFile can't open TAR file %s", updateFile.c_str());
+            return (updateos::UpdateError::CantOpenUpdateFile);
+        }
+    }
+    else {
+        LOG_ERROR("UpdatePureOS::setUpdateFile %s does not exist", updateFile.c_str());
+        return (updateos::UpdateError::CantOpenUpdateFile);
+    }
+    return (updateos::UpdateError::NoError);
+}
+
+updateos::UpdateError UpdatePureOS::runUpdate()
+{
+    LOG_INFO("runUpdate updateFile:%s", updateFile.c_str());
 
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
         LOG_ERROR("runUpdate can't prepare temp directory for update");
         return (err);
     }
-    int ret;
 
-    fs::path tarFileName(updateos::dir::updates / fileName);
-
-    if ((ret = mtar_open(&updateTar, tarFileName.c_str(), "r")) == MTAR_ESUCCESS) {
-        LOG_INFO("runUpdate TAR_FILE: %s opened", tarFileName.c_str());
-        if ((err = unpackUpdate()) == updateos::UpdateError::NoError) {
-            LOG_INFO("runUpdate %s unpacked", tarFileName.c_str());
-        }
-        else {
-            LOG_ERROR("runUpdate %s can't be unpacked", tarFileName.c_str());
-            return (err);
-        }
-
-        if ((err = verifyChecksums()) == updateos::UpdateError::NoError) {
-            LOG_INFO("runUpdate %s verifyChecksums success", tarFileName.c_str());
-        }
-        else {
-            LOG_ERROR("runUpdate %s checksum verification failed", tarFileName.c_str());
-            return (err);
-        }
-
-        if ((err = prepareRoot()) == updateos::UpdateError::NoError) {
-            LOG_INFO("runUpdate %s root ready for reset", tarFileName.c_str());
-        }
-        else {
-            LOG_ERROR("runUpdate %s can't prepare root dir for reset", tarFileName.c_str());
-        }
+    if ((err = unpackUpdate()) == updateos::UpdateError::NoError) {
+        LOG_INFO("runUpdate %s unpacked", updateFile.c_str());
     }
     else {
-        LOG_ERROR("runUpdate %s open error %s", tarFileName.c_str(), mtar_strerror(ret));
-        return (updateos::UpdateError::CantOpenUpdateFile);
+        LOG_ERROR("runUpdate %s can't be unpacked", updateFile.c_str());
+        return (err);
+    }
+
+    if ((err = verifyChecksums()) == updateos::UpdateError::NoError) {
+        LOG_INFO("runUpdate %s verifyChecksums success", updateFile.c_str());
+    }
+    else {
+        LOG_ERROR("runUpdate %s checksum verification failed", updateFile.c_str());
+        return (err);
+    }
+
+    if ((err = prepareRoot()) == updateos::UpdateError::NoError) {
+        LOG_INFO("runUpdate %s root ready for reset", updateFile.c_str());
+    }
+    else {
+        LOG_ERROR("runUpdate %s can't prepare root dir for reset", updateFile.c_str());
     }
 
     return (updateos::UpdateError::NoError);
@@ -82,13 +93,13 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
         if (h.type == MTAR_TDIR) {
             fs::path tmpPath = getUpdateTmpChild(h.name);
             if (vfs.mkdir(tmpPath.c_str()) != 0) {
-                LOG_ERROR("unpackAndMove failed to create %s when extracting update tar", tmpPath.c_str());
+                LOG_ERROR("unpackUpdate failed to create %s when extracting update tar", tmpPath.c_str());
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
         }
         else {
             if (unpackFileToTemp(h, &fileCRC32) == false) {
-                LOG_ERROR("unpackAndMove failed to extract update file %s", h.name);
+                LOG_ERROR("unpackUpdate failed to extract update file %s", h.name);
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
 
@@ -104,7 +115,7 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
     std::unique_ptr<char[]> lineBuff(
         new char[purefs::buffer::tar_buf]); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
-    vfs::FILE *fpChecksums = vfs.openAbsolute(checksumsFile.c_str(), "r");
+    vfs::FILE *fpChecksums = vfs.fopen(checksumsFile.c_str(), "r");
     if (fpChecksums != NULL) {
         while (!vfs.eof(fpChecksums)) {
             char *line = vfs.fgets(lineBuff.get(), purefs::buffer::tar_buf, fpChecksums);
@@ -259,12 +270,12 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
 
     sbini_free(ini);
 
-    vfs::FILE *fp = vfs.openAbsolute(bootIniAbsoulte.c_str(), "r");
+    vfs::FILE *fp = vfs.fopen(bootIniAbsoulte.c_str(), "r");
     if (fp != nullptr) {
         vfs.computeCRC32(fp, &bootIniAbsoulteCRC);
         bootIniAbsoulte += purefs::extension::crc32;
 
-        vfs::FILE *fpCRC = vfs.openAbsolute(bootIniAbsoulte.c_str(), "w");
+        vfs::FILE *fpCRC = vfs.fopen(bootIniAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
             char crcBuf[purefs::buffer::crc_char_size];
             sprintf(crcBuf, "%lX", bootIniAbsoulteCRC);
@@ -292,7 +303,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
         *crc32 = 0;
 
     int errCode   = MTAR_ESUCCESS;
-    vfs::FILE *fp = vfs.openAbsolute(fullPath.c_str(), "w+");
+    vfs::FILE *fp = vfs.fopen(fullPath.c_str(), "w+");
     if (fp == NULL) {
         LOG_ERROR("unpackFileToTemp %s can't open for writing", fullPath.c_str());
         return (false);
@@ -343,36 +354,36 @@ const fs::path UpdatePureOS::getUpdateTmpChild(const fs::path childPath)
 
 updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
 {
-    updateTempDirectory = updateos::dir::tmp / vfs::generateRandomId(updateos::prefix_len);
+    updateTempDirectory = purefs::dir::tmp / vfs::generateRandomId(updateos::prefix_len);
 
     LOG_DEBUG("prepareTempDirForUpdate %s", updateTempDirectory.c_str());
 
-    if (vfs.isDir(updateos::dir::updates.c_str()) == false) {
-        LOG_DEBUG("prepareTempDirForUpdate %s is not a directory", updateos::dir::updates.c_str());
-        if (vfs.mkdir(updateos::dir::updates.c_str()) != 0) {
-            LOG_ERROR("%s can't create it %s", updateos::dir::updates.c_str(), vfs.lastErrnoToStr().c_str());
+    if (vfs.isDir(purefs::dir::os_updates.c_str()) == false) {
+        LOG_DEBUG("prepareTempDirForUpdate %s is not a directory", purefs::dir::os_updates.c_str());
+        if (vfs.mkdir(purefs::dir::os_updates.c_str()) != 0) {
+            LOG_ERROR("%s can't create it %s", purefs::dir::os_updates.c_str(), vfs.lastErrnoToStr().c_str());
             return (updateos::UpdateError::CantCreateUpdatesDir);
         }
         else {
-            LOG_DEBUG("prepareTempDirForUpdate %s created", updateos::dir::updates.c_str());
+            LOG_DEBUG("prepareTempDirForUpdate %s created", purefs::dir::os_updates.c_str());
         }
     }
     else {
-        LOG_DEBUG("prepareTempDirForUpdate %s exists", updateos::dir::updates.c_str());
+        LOG_DEBUG("prepareTempDirForUpdate %s exists", purefs::dir::os_updates.c_str());
     }
 
-    if (vfs.isDir(updateos::dir::tmp.c_str()) == false) {
-        LOG_INFO("prepareTempDirForUpdate %s is not a directory", updateos::dir::tmp.c_str());
-        if (vfs.mkdir(updateos::dir::tmp.c_str()) != 0) {
-            LOG_ERROR("%s can't create it %s", updateos::dir::tmp.c_str(), vfs.lastErrnoToStr().c_str());
+    if (vfs.isDir(purefs::dir::tmp.c_str()) == false) {
+        LOG_INFO("prepareTempDirForUpdate %s is not a directory", purefs::dir::tmp.c_str());
+        if (vfs.mkdir(purefs::dir::tmp.c_str()) != 0) {
+            LOG_ERROR("%s can't create it %s", purefs::dir::tmp.c_str(), vfs.lastErrnoToStr().c_str());
             return (updateos::UpdateError::CantCreateTempDir);
         }
         else {
-            LOG_DEBUG("prepareTempDirForUpdate %s created", updateos::dir::tmp.c_str());
+            LOG_DEBUG("prepareTempDirForUpdate %s created", purefs::dir::tmp.c_str());
         }
     }
     else {
-        LOG_DEBUG("prepareTempDirForUpdate %s exists", updateos::dir::tmp.c_str());
+        LOG_DEBUG("prepareTempDirForUpdate %s exists", purefs::dir::tmp.c_str());
     }
 
     if (vfs.isDir(updateTempDirectory.c_str())) {
@@ -396,11 +407,4 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
 
     LOG_INFO("prepareTempDirForUpdate tempDir selected %s", updateTempDirectory.c_str());
     return (updateos::UpdateError::NoError);
-}
-
-const json11::Json UpdatePureOS::getUpdateFileList()
-{
-    std::vector<vfs::DirectoryEntry> updateFiles =
-        vfs.listdir(updateos::dir::updates.c_str(), updateos::extension::update);
-    return (json11::Json(updateFiles));
 }
