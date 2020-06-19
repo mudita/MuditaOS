@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
-#include "../widgets/PhonebookItem.hpp"
+#include "application-phonebook/widgets/PhonebookItem.hpp"
 #include "Application.hpp"
 #include "DatabaseModel.hpp"
 #include "Interface/ContactRecord.hpp"
@@ -39,5 +39,5 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     };
 
     // onClick callback to register
-    std::function<bool(gui::PhonebookItem *item)> externalActivatedCB = nullptr;
+    std::function<bool(gui::PhonebookItem *item)> messagesSelectCallback = nullptr;
 };
