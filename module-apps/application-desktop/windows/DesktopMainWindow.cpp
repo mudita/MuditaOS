@@ -13,8 +13,8 @@
 #include "../data/LockPhoneData.hpp"
 #include "Alignment.hpp"
 #include "Common.hpp"
+#include "BottomBar.hpp"
 #include "DesktopMainWindow.hpp"
-#include "application-calllog/ApplicationCallLog.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -135,11 +135,6 @@ namespace gui
 
     bool DesktopMainWindow::onInput(const InputEvent &inputEvent)
     {
-
-        // do nothing
-        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_RF)
-            return false;
-
         app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
         if (app == nullptr) {
             LOG_ERROR("not ApplicationDesktop");
@@ -266,8 +261,12 @@ namespace gui
 
     /// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of
     /// notifications]<span>$`
-    auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, std::function<bool()> callback)
-        -> bool
+    auto add_notification(BoxLayout *layout,
+                          UTF8 icon,
+                          UTF8 name,
+                          UTF8 indicator,
+                          std::function<bool()> showCallback,
+                          std::function<bool()> clearCallback) -> bool
     {
         const auto text_normal_size        = 200;
         const auto size_needed_for_2digits = 30;
@@ -302,9 +301,15 @@ namespace gui
         el->setPenWidth(style::window::default_border_no_focus_w);
         el->setPenFocusWidth(style::window::default_border_focucs_w);
         el->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-        el->inputCallback = [callback](Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
-                return callback();
+        el->inputCallback = [showCallback, clearCallback](Item &, const InputEvent &event) -> bool {
+            if (event.state != InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (event.keyCode == KeyCode::KEY_LF && showCallback) {
+                return showCallback();
+            }
+            if (event.keyCode == KeyCode::KEY_RF && clearCallback) {
+                return clearCallback();
             }
             return false;
         };
@@ -319,6 +324,7 @@ namespace gui
 
     auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
     {
+        bottomBar->restore(BottomBar::Side::RIGHT);
         erase(notifications);
         // 1. create notifications box
         notifications = new gui::VBox(nullptr,
@@ -335,27 +341,37 @@ namespace gui
         }
 
         // 2. actually fill it in
-        if (app->notifications.notSeenCalls) {
-            add_notification(notifications,
-                             "phone",
-                             utils::localize.get("app_desktop_missed_calls"),
-                             std::to_string(app->notifications.notSeenCalls),
-                             [this]() {
-                                 return sapm::ApplicationManager::messageSwitchApplication(
-                                     application, app::CallLogAppStr, gui::name::window::main_window, nullptr);
-                             });
+        if (app->notifications.notSeenCalls > 0) {
+            add_notification(
+                notifications,
+                "phone",
+                utils::localize.get("app_desktop_missed_calls"),
+                std::to_string(app->notifications.notSeenCalls),
+                [app]() -> bool { return app->showCalls(); },
+                [app]() -> bool { return app->clearCallsNotification(); });
         }
-        if (app->notifications.notSeenSMS) {
-            add_notification(notifications,
-                             "mail",
-                             utils::localize.get("app_desktop_unread_messages"),
-                             std::to_string(app->notifications.notSeenSMS),
-                             [this]() {
-                                 return sapm::ApplicationManager::messageSwitchApplication(
-                                     application, app::name_messages, gui::name::window::main_window, nullptr);
-                             });
+        if (app->notifications.notSeenSMS > 0) {
+            add_notification(
+                notifications,
+                "mail",
+                utils::localize.get("app_desktop_unread_messages"),
+                std::to_string(app->notifications.notSeenSMS),
+                [this]() -> bool {
+                    return sapm::ApplicationManager::messageSwitchApplication(
+                        application, app::name_messages, gui::name::window::main_window, nullptr);
+                },
+                [app]() -> bool { return app->clearMessagesNotification(); });
         }
-        setFocusItem(notifications);
+        if (app->notifications.areEmpty() != true) {
+            setFocusItem(notifications);
+            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_show"));
+            bottomBar->store(BottomBar::Side::RIGHT);
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"));
+        }
+        else {
+            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_calls"));
+            activatedCallback = [app](Item &) -> bool { return app->showCalls(); };
+        }
         return true;
     }
 

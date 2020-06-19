@@ -61,7 +61,10 @@ namespace gui
         if (inputCallback != nullptr && inputCallback(*this, inputEvent)) {
             return true;
         }
-        return handleNavigation(inputEvent);
+        if (handleNavigation(inputEvent)) {
+            return true;
+        }
+        return inputEvent.state == InputEvent::State::keyReleasedShort && onActivated(nullptr);
     }
 
 } /* namespace gui */
