@@ -22,6 +22,7 @@
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include "windows/Reboot.hpp"
+#include "application-calllog/ApplicationCallLog.hpp"
 
 namespace app
 {
@@ -93,6 +94,29 @@ namespace app
         }
 
         return false;
+    }
+
+    bool ApplicationDesktop::showCalls()
+    {
+        LOG_DEBUG("show calls!");
+        return sapm::ApplicationManager::messageSwitchApplication(
+            this, app::CallLogAppStr, gui::name::window::main_window, nullptr);
+    }
+
+    bool ApplicationDesktop::clearCallsNotification()
+    {
+        LOG_DEBUG("Notification handling db not ready - clear local count");
+        notifications.notSeenCalls = 0;
+        getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
+        return true;
+    }
+
+    bool ApplicationDesktop::clearMessagesNotification()
+    {
+        LOG_DEBUG("Notification handling db not ready - clear local count");
+        notifications.notSeenSMS = 0;
+        getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
+        return true;
     }
 
     // Invoked during initialization

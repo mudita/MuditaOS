@@ -35,12 +35,27 @@ namespace gui
       protected:
         struct Cache
         {
-            bool stored = false;
+          private:
             struct
             {
                 bool isVisible = false;
                 UTF8 text;
+                bool stored = false;
             } left, center, right;
+
+          public:
+            auto get(Side side) -> auto &
+            {
+                switch (side) {
+                case Side::LEFT:
+                    return left;
+                case Side::RIGHT:
+                    return right;
+                case Side::CENTER:
+                    return center;
+                }
+                return left;
+            }
         } cache;
 
         Label *left   = nullptr;
@@ -58,7 +73,9 @@ namespace gui
         UTF8 getText(BottomBar::Side side);
 
         void store();
+        void store(Side side);
         void restore();
+        void restore(Side side);
 
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
