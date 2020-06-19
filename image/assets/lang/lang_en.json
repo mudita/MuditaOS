@@ -108,6 +108,9 @@
     "app_desktop_tools_antenna": "ANTENNA TEST",
     "app_desktop_poweroff_title": "Turn Off",
     "app_desktop_poweroff_question": "Select Yes to power down",
+    "app_desktop_show": "SHOW",
+    "app_desktop_calls": "CALLS",
+    "app_desktop_clear": "CLEAR",
     
     "app_call_call": "CALL",
     "app_call_clear": "CLEAR",

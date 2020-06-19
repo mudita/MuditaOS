@@ -34,7 +34,12 @@ namespace app
         {
             unsigned int notSeenSMS   = 0;
             unsigned int notSeenCalls = 0;
+            auto areEmpty()
+            {
+                return notSeenCalls == 0 && notSeenSMS == 0;
+            }
         } notifications;
+
         ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
         virtual ~ApplicationDesktop();
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -60,6 +65,9 @@ namespace app
          */
         //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
         //);
+        bool showCalls();
+        bool clearCallsNotification();
+        bool clearMessagesNotification();
     };
 
 } /* namespace app */
