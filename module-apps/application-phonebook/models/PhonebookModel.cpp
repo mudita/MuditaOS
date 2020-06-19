@@ -68,7 +68,7 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
 
     item->setContact(contact);
     item->activatedCallback = [this, item, contact](gui::Item &) {
-        if (externalActivatedCB && externalActivatedCB(item)) {
+        if (messagesSelectCallback && messagesSelectCallback(item)) {
             return true;
         }
 
@@ -80,6 +80,9 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
     };
 
     item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+        if (messagesSelectCallback) {
+            return false;
+        }
         if (event.state != gui::InputEvent::State::keyReleasedShort) {
             return false;
         }
