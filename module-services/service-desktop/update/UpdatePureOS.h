@@ -1,6 +1,6 @@
 #pragma once
 
-#include <module-utils/microtar/src/microtar.h>
+#include <module-utils/microtar/src/microtar.hpp>
 #include <module-vfs/vfs.hpp>
 #include <json/json11.hpp>
 
@@ -14,12 +14,6 @@ class ServiceDesktop;
 namespace fs = std::filesystem;
 namespace updateos
 {
-    namespace dir
-    {
-        const inline fs::path updates = purefs::dir::eMMC_disk / "updates";
-        const inline fs::path tmp     = updates / "tmp";
-    } // namespace dir
-
     namespace file
     {
         const inline std::string checksums = "checksums.txt";
@@ -68,16 +62,16 @@ class UpdatePureOS
   public:
     UpdatePureOS(ServiceDesktop *ownerService);
 
-    updateos::UpdateError runUpdate(const fs::path fileName);
+    updateos::UpdateError runUpdate();
     updateos::UpdateError prepareTempDirForUpdate();
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();
     updateos::UpdateError prepareRoot();
     updateos::UpdateError updateBootINI();
+    updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
 
     void getChecksumInfo(const std::string infoLine, std::string &filePath, unsigned long *fileCRC32Long);
     unsigned long getExtractedFileCRC32(const std::string filePath);
-    const json11::Json getUpdateFileList();
     bool unpackFileToTemp(mtar_header_t &header, unsigned long *crc32);
 
     void cleanupAfterUpdate();
@@ -89,4 +83,5 @@ class UpdatePureOS
     std::vector<FileInfo> filesInUpdatePackage;
     mtar_t updateTar;
     ServiceDesktop *owner = nullptr;
+    fs::path updateFile;
 };
