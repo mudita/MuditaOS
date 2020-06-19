@@ -14,6 +14,7 @@
 * `[phonebook]` Fixed phonebook contact select from new SMS window.
 * `[listview]` Fixed double click on last ListView element switching two pages.
 * `[boxlayout]` Performance improvements to BoxLayout - hence ListView.
+* `[sms]` Removed redundant select in new sms window 
 
 ### Other
 * `[vfs]` Technical improvements and enhancements.
