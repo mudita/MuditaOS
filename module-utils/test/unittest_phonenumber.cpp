@@ -217,4 +217,22 @@ TEST_CASE("PhoneNumber - record validation")
         REQUIRE_THROWS_AS(PhoneNumber(pl_entered, "+44600123456"), utils::PhoneNumber::Error);
         REQUIRE_THROWS_AS(PhoneNumber(pl_entered, pl_entered), utils::PhoneNumber::Error);
     }
+
+    SECTION("Empty E164")
+    {
+        REQUIRE_NOTHROW(PhoneNumber(pl_entered, ""));
+        auto number = PhoneNumber(pl_entered, "");
+        REQUIRE(number.get() == pl_entered);
+        REQUIRE(number.getFormatted() == pl_entered);
+        REQUIRE_FALSE(number.isValid());
+    }
+
+    SECTION("Entered single e164")
+    {
+        REQUIRE_NOTHROW(PhoneNumber(pl_e164, ""));
+        auto number = PhoneNumber(pl_e164, pl_e164);
+        REQUIRE(number.isValid());
+        REQUIRE(number.getFormatted() == pl_formatted_int);
+        REQUIRE(number.getCountryCode() == country::Id::POLAND);
+    }
 }
