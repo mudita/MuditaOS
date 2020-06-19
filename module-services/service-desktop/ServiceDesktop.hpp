@@ -3,20 +3,6 @@
 #include "WorkerDesktop.hpp"
 #include "UpdatePureOS.h"
 
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
-#include "Service/Worker.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-db/messages/DBMessage.hpp"
-#include "vfs.hpp"
-
-#include <FreeRTOS.h>
-#include <task.h>
-#include <memory>
-#include <string.h>
-#include <sstream>
-
 namespace sdesktop
 {
     const inline int service_stack         = 8192;
