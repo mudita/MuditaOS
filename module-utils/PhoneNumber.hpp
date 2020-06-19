@@ -218,9 +218,13 @@ namespace utils
         PhoneNumber(const std::string &phoneNumber, country::Id defaultCountryCode = country::defaultCountry);
 
         /**
-         * @brief Construct a new Phone Number object from its e164
-         * representation checking if it matches entered number in the proces.
-         * Country code is retrieved from E164 number format.
+         * @brief Construct a new Phone Number object from its raw and e164
+         * representations checking if they match in the process.
+         *
+         * If e164 is empty PhoneNumber is constructed based on entered number
+         * only.
+         *
+         * Country code is retrieved from E164 number format if possible.
          *
          * @param phoneNumber - phone number provided by the user
          * @param e164number - E164 number representation
