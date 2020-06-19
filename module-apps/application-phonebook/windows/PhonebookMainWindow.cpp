@@ -92,7 +92,8 @@ namespace gui
 
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         if (contactRequest) {
-            phonebookModel->externalActivatedCB = [=](gui::PhonebookItem *item) {
+            enableNewContact                       = false;
+            phonebookModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
                 std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
                 data->result                                 = item->contact;
                 data->setDescription("PhonebookSearchRequest");
@@ -100,6 +101,12 @@ namespace gui
                     application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
             };
 
+            leftArrowImage->setVisible(false);
+            newContactImage->setVisible(false);
+
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setActive(BottomBar::Side::CENTER, true);
+            bottomBar->setActive(BottomBar::Side::RIGHT, true);
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(""));
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
             bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
@@ -111,15 +118,20 @@ namespace gui
         // process only if key is released
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             switch (inputEvent.keyCode) {
+
             case KeyCode::KEY_LEFT: {
-                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
-                application->switchWindow(
-                    gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                if (enableNewContact) {
+                    std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
+                    application->switchWindow(
+                        gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                }
             }
                 return true;
+
             case KeyCode::KEY_RIGHT:
                 application->switchWindow("Search");
                 return true;
+
             default:
                 break;
             }

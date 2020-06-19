@@ -18,6 +18,7 @@ namespace gui
         Image *rightArrowImage = nullptr;
         Image *newContactImage = nullptr;
         Image *searchImage     = nullptr;
+        bool enableNewContact  = true;
 
       public:
         PhonebookMainWindow(app::Application *app);

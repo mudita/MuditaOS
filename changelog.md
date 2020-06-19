@@ -11,6 +11,7 @@
 
 ### Fixed
 * `[development]` Fixed colour accuracy in Linux simulator. 
+* `[phonebook]` Fixed phonebook contact select from new SMS window.
 
 ### Other
 * `[vfs]` Technical improvements and enhancements.
