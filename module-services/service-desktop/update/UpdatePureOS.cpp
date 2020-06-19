@@ -1,9 +1,5 @@
 #include "UpdatePureOS.h"
-
-#include <time/ScopedTime.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <vfs.hpp>
-
 #include <source/version.hpp>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
@@ -308,7 +304,6 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
         LOG_ERROR("unpackFileToTemp %s can't open for writing", fullPath.c_str());
         return (false);
     }
-    auto time = utils::time::Scoped(std::string(fullPath));
 
     for (uint32_t i = 0; i < blocksToRead; i++) {
         if (i + 1 == blocksToRead) {
