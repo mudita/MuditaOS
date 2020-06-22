@@ -199,3 +199,8 @@ uint32_t CalllogTable::GetCountByFieldID(const char *field, uint32_t id)
 
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
+
+bool CalllogTable::SetAllRead()
+{
+    return db->Execute("UPDATE calls SET isRead = 1;");
+}

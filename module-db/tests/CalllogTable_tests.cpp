@@ -138,5 +138,22 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(callsTbl.GetCount() == 0);
     }
 
+    SECTION("Get Count")
+    {
+        REQUIRE(callsTbl.GetCount() == 4);
+        REQUIRE(callsTbl.GetCount(EntryState::ALL) == 4);
+        REQUIRE(callsTbl.GetCount(EntryState::READ) == 0);
+        REQUIRE(callsTbl.GetCount(EntryState::UNREAD) == 4);
+    }
+
+    SECTION("Set All Read")
+    {
+        REQUIRE(callsTbl.GetCount(EntryState::UNREAD) == 4);
+        REQUIRE(callsTbl.GetCount(EntryState::READ) == 0);
+        REQUIRE(callsTbl.SetAllRead());
+        REQUIRE(callsTbl.GetCount(EntryState::UNREAD) == 0);
+        REQUIRE(callsTbl.GetCount(EntryState::READ) == 4);
+    }
+
     Database::Deinitialize();
 }

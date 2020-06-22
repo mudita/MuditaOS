@@ -28,6 +28,7 @@ struct CalllogRecord : public Record
     UTF8 name                            = "";
     UTF8 contactId                       = "";
     utils::PhoneNumber::View phoneNumber = utils::PhoneNumber::View();
+    bool isRead                          = true;
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
 
@@ -58,6 +59,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);
+    bool SetAllRead();
 
     std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 

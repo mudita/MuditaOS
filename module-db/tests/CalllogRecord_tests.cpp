@@ -36,6 +36,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(testRec.name == "");
         REQUIRE(testRec.contactId == "");
         REQUIRE(!testRec.phoneNumber.isValid());
+        REQUIRE(testRec.isRead == true);
     }
 
     CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDB);
@@ -47,6 +48,7 @@ TEST_CASE("Calllog Record tests")
     testRec.name         = "Test name";
     testRec.contactId    = "2";
     testRec.phoneNumber  = utils::PhoneNumber("600123456").getView();
+    testRec.isRead       = false;
 
     // Add 4 records
     REQUIRE(calllogRecordInterface.Add(testRec));
@@ -65,6 +67,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.duration == testRec.duration);
         REQUIRE(call.type == testRec.type);
         REQUIRE(call.phoneNumber == testRec.phoneNumber);
+        REQUIRE(call.isRead == testRec.isRead);
         // below fields will be filled in with contact data
         REQUIRE_FALSE(call.contactId == testRec.contactId);
         REQUIRE(call.contactId == "1");
@@ -79,6 +82,7 @@ TEST_CASE("Calllog Record tests")
         callPre.date         = callPre.date + 100;
         callPre.duration     = callPre.duration + 100;
         callPre.type         = CallType::CT_MISSED;
+        callPre.isRead       = false;
 
         REQUIRE(calllogRecordInterface.Update(callPre));
 
@@ -87,6 +91,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(callPost.date == callPre.date);
         REQUIRE(callPost.duration == callPre.duration);
         REQUIRE(callPost.type == callPre.type);
+        REQUIRE(callPost.isRead == callPre.isRead);
         REQUIRE(callPost.phoneNumber == callPre.phoneNumber);
         REQUIRE(callPost.contactId == callPre.contactId);
         REQUIRE(callPost.name == callPre.name);
@@ -103,6 +108,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.name == "");
         REQUIRE(call.contactId == "");
         REQUIRE(!call.phoneNumber.isValid());
+        REQUIRE(call.isRead == true);
     }
 
     SECTION("Get entries")
@@ -143,6 +149,23 @@ TEST_CASE("Calllog Record tests")
 
         // Table should be empty now
         REQUIRE(calllogRecordInterface.GetCount() == 0);
+    }
+
+    SECTION("Get Count")
+    {
+        REQUIRE(calllogRecordInterface.GetCount() == 4);
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::ALL) == 4);
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::READ) == 0);
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::UNREAD) == 4);
+    }
+
+    SECTION("Set All Read")
+    {
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::UNREAD) == 4);
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::READ) == 0);
+        REQUIRE(calllogRecordInterface.SetAllRead());
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::UNREAD) == 0);
+        REQUIRE(calllogRecordInterface.GetCount(EntryState::READ) == 4);
     }
 
     Database::Deinitialize();
