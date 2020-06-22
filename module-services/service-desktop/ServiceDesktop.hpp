@@ -3,6 +3,11 @@
 #include "WorkerDesktop.hpp"
 #include "UpdatePureOS.h"
 
+namespace service::name
+{
+    const inline std::string service_desktop = "ServiceDesktop";
+};
+
 namespace sdesktop
 {
     const inline int service_stack         = 8192;
@@ -34,5 +39,4 @@ class ServiceDesktop : public sys::Service
 
     std::unique_ptr<UpdatePureOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
-    static const char *serviceName;
 };

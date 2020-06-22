@@ -1,8 +1,6 @@
 #include "ServiceDesktop.hpp"
 
-const char *ServiceDesktop::serviceName = "ServiceDesktop";
-
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName, "", sdesktop::service_stack)
+ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 
@@ -26,12 +24,12 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     desktopWorker->run();
 
     connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
-        sdesktop::UpdateOsMessage *updateOs = static_cast<sdesktop::UpdateOsMessage *>(msg);
-        if (updateOs) {
+        sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+        if (updateOsMsg != nullptr) {
             LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
-                      updateOs->updateFile.c_str(),
-                      updateOs->uuid);
-            if (updateOS->setUpdateFile(updateOs->updateFile) == updateos::UpdateError::NoError)
+                      updateOsMsg->updateFile.c_str(),
+                      updateOsMsg->uuid);
+            if (updateOS->setUpdateFile(updateOsMsg->updateFile) == updateos::UpdateError::NoError)
                 updateOS->runUpdate();
         }
         return std::make_shared<sys::ResponseMessage>();
