@@ -130,8 +130,12 @@ namespace gui
 
     void NewSMS_Window::updateBottomBar()
     {
-        UTF8 text = recipient->getText().length() == 0 ? utils::localize.get(style::strings::common::select) : "";
-        bottomBar->setText(BottomBar::Side::CENTER, text);
+        if (recipient->getText().length() == 0) {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+            return;
+        }
+
+        bottomBar->setActive(BottomBar::Side::CENTER, false);
     };
 
     void NewSMS_Window::buildInterface()
