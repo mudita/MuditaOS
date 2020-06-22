@@ -15,6 +15,7 @@
 ## [0.26.1] - 2020-06-22
 
 ### Added
+* `[database]` Add database backup feature with sqlite's VACUUM command.
 * `[notifications]` Added bottom bar action indicators.
 
 ### Changed
