@@ -172,7 +172,7 @@ namespace gui
                 continue;
 
             auto axisItemPosition       = 0;
-            auto orthogonalItemPosition = 0;
+            auto orthogonalItemPosition = el->getPosition(orthogonal(axis));
             auto axisItemSize           = 0;
             auto orthogonalItemSize     = 0;
 
