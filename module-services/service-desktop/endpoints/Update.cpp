@@ -23,7 +23,7 @@ sys::ReturnCodes EndpointHandler::update(
         responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
 
         auto msg = std::make_shared<sdesktop::UpdateOsMessage>(MessageType::UpdateOS, fileName, uuid);
-        sys::Bus::SendUnicast(msg, ServiceDesktop::serviceName, ownerService);
+        sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerService);
 
         return sys::ReturnCodes::Success;
     }
