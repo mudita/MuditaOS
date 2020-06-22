@@ -545,7 +545,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
     case MessageType::DBServiceBackup: {
         auto time                   = utils::time::Scoped("DBServiceBackup");
-        DBServiceMessageBackup *msg = reinterpret_cast<DBServiceMessageBackup *>(msgl);
+        DBServiceMessageBackup *msg = dynamic_cast<DBServiceMessageBackup *>(msgl);
         auto ret                    = StoreIntoBackup({msg->backupPath});
         responseMsg                 = std::make_shared<DBServiceResponseMessage>(ret);
     } break;
