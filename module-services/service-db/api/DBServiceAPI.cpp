@@ -801,6 +801,7 @@ bool DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath)
         return true;
     }
     else {
+        LOG_ERROR("DBBackup error, return code: %s", c_str(ret.first));
         return false;
     }
 }
