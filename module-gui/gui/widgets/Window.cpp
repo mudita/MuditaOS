@@ -64,7 +64,8 @@ namespace gui
         if (handleNavigation(inputEvent)) {
             return true;
         }
-        return inputEvent.state == InputEvent::State::keyReleasedShort && onActivated(nullptr);
+        return inputEvent.state == InputEvent::State::keyReleasedShort &&
+               inputEvent.keyCode == gui::KeyCode::KEY_ENTER && onActivated(nullptr);
     }
 
 } /* namespace gui */
