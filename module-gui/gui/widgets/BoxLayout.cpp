@@ -143,6 +143,11 @@ namespace gui
         reverseOrder = value;
     }
 
+    void BoxLayout::setOrthogonalAlignment(gui::orthogonalAlignment value)
+    {
+        orthogonalAlignment = value;
+    }
+
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
     {
         if (it->visible) {
@@ -211,6 +216,21 @@ namespace gui
             }
             else {
                 addToOutOfDrawAreaList(el);
+            }
+
+            switch (orthogonalAlignment) {
+            case (gui::orthogonalAlignment::Top_Left):
+                orthogonalItemPosition = this->getPosition(orthogonal(axis));
+                break;
+            case (gui::orthogonalAlignment::Center):
+                orthogonalItemPosition = (this->area().size(orthogonal(axis)) - orthogonalItemSize) / 2;
+                break;
+            case (gui::orthogonalAlignment::Bottom_Right):
+                orthogonalItemPosition = this->area().size(orthogonal(axis)) - orthogonalItemSize;
+                break;
+            default:
+                orthogonalItemPosition = el->getPosition(orthogonal(axis));
+                break;
             }
 
             if (el->visible)
