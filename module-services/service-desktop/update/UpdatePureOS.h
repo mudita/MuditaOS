@@ -73,7 +73,7 @@ class UpdatePureOS
   private:
     fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
-    mtar_t updateTar;
+    mtar_t updateTar      = {};
     ServiceDesktop *owner = nullptr;
     fs::path updateFile;
 };
