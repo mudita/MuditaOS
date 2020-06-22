@@ -19,15 +19,14 @@ namespace gui
         bool selectContact();
         bool sendSms();
         bool switchToThreadWindow(UTF8 number);
+        void updateBottomBar();
 
       public:
         NewSMS_Window(app::Application *app);
         virtual ~NewSMS_Window() = default;
 
-        // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         void buildInterface() override;
     };
 
