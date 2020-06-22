@@ -67,7 +67,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     localRec.name      = contactRec->getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
-    return calllogDB->calls.Add(CalllogTableRow{.ID           = localRec.ID, // this is only to remove warning
+    return calllogDB->calls.Add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
                                                 .number       = localRec.phoneNumber.getEntered(),
                                                 .e164number   = localRec.phoneNumber.getE164(),
                                                 .presentation = localRec.presentation,
@@ -134,7 +134,7 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
         return false;
     }
 
-    return calllogDB->calls.Update(CalllogTableRow{.ID           = rec.ID,
+    return calllogDB->calls.Update(CalllogTableRow{{.ID = rec.ID},
                                                    .number       = rec.phoneNumber.getEntered(),
                                                    .e164number   = rec.phoneNumber.getE164(),
                                                    .presentation = rec.presentation,
