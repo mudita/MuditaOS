@@ -162,6 +162,7 @@ namespace gui
         recipientLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
         auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
+        reciepientHbox->setOrthogonalAlignment(gui::orthogonalAlignment::Center);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         reciepientHbox->setPenFocusWidth(style::window::default_border_focus_w);
         reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
