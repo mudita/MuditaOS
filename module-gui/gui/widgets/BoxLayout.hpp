@@ -74,7 +74,6 @@ namespace gui
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
         void setReverseOrder(bool value);
-        void setAxisAlignment(bool value);
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
