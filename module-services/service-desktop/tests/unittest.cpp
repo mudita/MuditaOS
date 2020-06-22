@@ -7,7 +7,7 @@
 
 class vfs vfs;
 
-TEST_CASE("Test case 1")
+TEST_CASE("System Update Tests")
 {
     vfs.Init();
     UpdatePureOS updateOS(nullptr);
