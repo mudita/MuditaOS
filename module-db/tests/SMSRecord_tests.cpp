@@ -1,30 +1,21 @@
-
-/*
- * @file SMSRecord_tests.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 05.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
-#include "vfs.hpp"
-
 #include "catch.hpp"
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <Database/Database.hpp>
+#include <Databases/ContactsDB.hpp>
+#include <Databases/SmsDB.hpp>
+#include <Interface/ContactRecord.hpp>
+#include <Interface/SMSRecord.hpp>
+#include <Interface/ThreadRecord.hpp>
+
+#include <country.hpp>
+#include <PhoneNumber.hpp>
+#include <vfs.hpp>
+
 #include <algorithm>
 
-#include <iostream>
-#include <Interface/ContactRecord.hpp>
-
-#include "../Database/Database.hpp"
-#include "../Databases/ContactsDB.hpp"
-#include "../Databases/SmsDB.hpp"
-#include "../Interface/SMSRecord.hpp"
-#include "../Interface/ThreadRecord.hpp"
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 struct test
 {
@@ -45,8 +36,8 @@ TEST_CASE("SMS Record tests")
     const uint32_t dateTest      = 123456789;
     const uint32_t dateSentTest  = 987654321;
     const uint32_t errorCodeTest = 555;
-    const char *numberTest       = "+48600123456";
-    const char *numberTest2      = "222333444";
+    auto numberTest              = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
+    auto numberTest2             = utils::PhoneNumber("222333444", utils::country::Id::UNKNOWN).getView();
     const char *bodyTest         = "Test SMS Body";
     const char *bodyTest2        = "Test SMS Body2";
     const bool isReadTest        = true;

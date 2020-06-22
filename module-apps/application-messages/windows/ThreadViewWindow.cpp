@@ -89,7 +89,7 @@ namespace gui
         text->activatedCallback = [&](gui::Item &item) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            if (app->handleSendSmsFromThread(contact->numbers[0].number.getE164().c_str(), text->getText())) {
+            if (app->handleSendSmsFromThread(contact->numbers[0].number, text->getText())) {
                 LOG_ERROR("handleSendSmsFromThread failed");
             }
             text->clear();
@@ -346,7 +346,7 @@ namespace gui
 
         body->addWidget(new gui::Span(Axis::Y, style::window::messages::sms_vertical_spacer));
 
-        LOG_INFO("Add sms: %s %s", smsRecord.body.c_str(), smsRecord.number.c_str());
+        LOG_INFO("Add sms: %s %s", smsRecord.body.c_str(), smsRecord.number.getFormatted().c_str());
         body->addWidget(labelSpan);
         return labelSpan->visible;
     }

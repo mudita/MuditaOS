@@ -12,8 +12,11 @@
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
 #include <log/log.hpp>
+#include <PhoneNumber.hpp>
 
-SMSRecord::SMSRecord(const SMSTableRow &w, const UTF8 &num)
+#include <optional>
+
+SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
 {
     ID        = w.ID;
     date      = w.date;
@@ -36,12 +39,12 @@ SMSRecordInterface::~SMSRecordInterface()
 bool SMSRecordInterface::Add(const SMSRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.GetByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
-    if (contactRec->size() == 0) {
-        LOG_ERROR("Cannot find contact, for number %s", rec.number.c_str());
+    auto contactRec = contactInterface.MatchByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
+    if (contactRec == std::nullopt) {
+        LOG_ERROR("Cannot find contact, for number %s", rec.number.getFormatted().c_str());
         return false;
     }
-    uint32_t contactID = (*contactRec)[0].ID;
+    uint32_t contactID = contactRec->ID;
     // Search for a thread with specified contactID
     uint32_t threadID = 0;
     ThreadRecordInterface threadInterface(smsDB, contactsDB);
@@ -132,7 +135,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
 
         auto contactRec = contactInterface.GetByID(w.contactID);
         // TODO: or numberUser? or other number?
-        records->push_back({w, contactRec.numbers[0].number.getEntered()});
+        records->push_back({w, contactRec.numbers[0].number});
     }
 
     return records;
@@ -149,7 +152,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 
         auto contactRec = contactInterface.GetByID(w.contactID);
         // TODO: or numberUser? or other number
-        records->push_back({w, contactRec.numbers[0].number.getEntered()});
+        records->push_back({w, contactRec.numbers[0].number});
     }
 
     return records;
@@ -239,5 +242,5 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id)
     ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetByID(sms.contactID);
     // TODO: or numberUser?
-    return SMSRecord{sms, contactRec.numbers[0].number.getEntered()};
+    return SMSRecord{sms, contactRec.numbers[0].number};
 }

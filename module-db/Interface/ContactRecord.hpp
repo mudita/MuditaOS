@@ -153,9 +153,6 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
   private:
     ContactsDB *contactDB;
-    bool numbersDirty = true;
-    utils::NumberHolderMatcher<std::vector, ContactNumberHolder> numberMatcher;
-    std::vector<ContactNumberHolder> contactNumberHolders;
 
     /// get multiple numbers by split numbers_id
     std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
