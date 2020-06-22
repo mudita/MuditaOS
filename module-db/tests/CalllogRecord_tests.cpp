@@ -1,0 +1,149 @@
+#include "catch.hpp"
+
+#include "Interface/CalllogRecord.hpp"
+#include "Database/Database.hpp"
+#include "Databases/CalllogDB.hpp"
+
+#include <vfs.hpp>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+#include <iostream>
+
+TEST_CASE("Calllog Record tests")
+{
+    Database::Initialize();
+
+    vfs.remove(CalllogDB::GetDBName());
+    vfs.remove(ContactsDB::GetDBName());
+
+    CalllogDB calllogDb;
+    ContactsDB contactsDB;
+
+    REQUIRE(calllogDb.IsInitialized());
+    REQUIRE(contactsDB.IsInitialized());
+
+    SECTION("Default Constructor")
+    {
+        CalllogRecord testRec;
+        REQUIRE(testRec.ID == DB_ID_NONE);
+        REQUIRE(testRec.presentation == PresentationType::PR_UNKNOWN);
+        REQUIRE(testRec.date == 0);
+        REQUIRE(testRec.duration == 0);
+        REQUIRE(testRec.type == CallType::CT_NONE);
+        REQUIRE(testRec.name == "");
+        REQUIRE(testRec.contactId == "");
+        REQUIRE(!testRec.phoneNumber.isValid());
+    }
+
+    CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDB);
+    CalllogRecord testRec;
+    testRec.presentation = PresentationType::PR_ALLOWED;
+    testRec.date         = 100;
+    testRec.duration     = 100;
+    testRec.type         = CallType::CT_INCOMING;
+    testRec.name         = "Test name";
+    testRec.contactId    = "2";
+    testRec.phoneNumber  = utils::PhoneNumber("600123456").getView();
+
+    // Add 4 records
+    REQUIRE(calllogRecordInterface.Add(testRec));
+    REQUIRE(calllogRecordInterface.Add(testRec));
+    REQUIRE(calllogRecordInterface.Add(testRec));
+    REQUIRE(calllogRecordInterface.Add(testRec));
+
+    REQUIRE(calllogRecordInterface.GetCount() == 4);
+
+    SECTION("Get entry by ID")
+    {
+        auto call = calllogRecordInterface.GetByID(4);
+        REQUIRE(call.ID == 4);
+        REQUIRE(call.presentation == testRec.presentation);
+        REQUIRE(call.date == testRec.date);
+        REQUIRE(call.duration == testRec.duration);
+        REQUIRE(call.type == testRec.type);
+        REQUIRE(call.phoneNumber == testRec.phoneNumber);
+        // below fields will be filled in with contact data
+        REQUIRE_FALSE(call.contactId == testRec.contactId);
+        REQUIRE(call.contactId == "1");
+        REQUIRE_FALSE(call.name == testRec.name);
+        REQUIRE(call.name == "600 123 456");
+    }
+
+    SECTION("Entry update")
+    {
+        auto callPre         = calllogRecordInterface.GetByID(4);
+        callPre.presentation = PresentationType::PR_PAYPHONE;
+        callPre.date         = callPre.date + 100;
+        callPre.duration     = callPre.duration + 100;
+        callPre.type         = CallType::CT_MISSED;
+
+        REQUIRE(calllogRecordInterface.Update(callPre));
+
+        auto callPost = calllogRecordInterface.GetByID(4);
+        REQUIRE(callPost.presentation == callPre.presentation);
+        REQUIRE(callPost.date == callPre.date);
+        REQUIRE(callPost.duration == callPre.duration);
+        REQUIRE(callPost.type == callPre.type);
+        REQUIRE(callPost.phoneNumber == callPre.phoneNumber);
+        REQUIRE(callPost.contactId == callPre.contactId);
+        REQUIRE(callPost.name == callPre.name);
+    }
+
+    SECTION("Get entry - invalid ID")
+    {
+        auto call = calllogRecordInterface.GetByID(100);
+        REQUIRE(call.ID == DB_ID_NONE);
+        REQUIRE(call.presentation == PresentationType::PR_UNKNOWN);
+        REQUIRE(call.date == 0);
+        REQUIRE(call.duration == 0);
+        REQUIRE(call.type == CallType::CT_NONE);
+        REQUIRE(call.name == "");
+        REQUIRE(call.contactId == "");
+        REQUIRE(!call.phoneNumber.isValid());
+    }
+
+    SECTION("Get entries")
+    {
+        SECTION("Get table rows using valid offset/limit parameters")
+        {
+            auto retOffsetLimit = calllogRecordInterface.GetLimitOffset(0, 4);
+            REQUIRE(retOffsetLimit->size() == 4);
+        }
+
+        SECTION("Get table rows using invalid limit parameters(should return 4 elements instead of 100)")
+        {
+            auto retOffsetLimit = calllogRecordInterface.GetLimitOffset(0, 100);
+            REQUIRE(retOffsetLimit->size() == 4);
+        }
+
+        SECTION("Get table rows using invalid offset/limit parameters(should return empty object)")
+        {
+            auto retOffsetLimit = calllogRecordInterface.GetLimitOffset(5, 4);
+            REQUIRE(retOffsetLimit->size() == 0);
+        }
+    }
+
+    SECTION("Remove entries")
+    {
+        REQUIRE(calllogRecordInterface.RemoveByID(2));
+
+        // Table should have now 3 elements
+        REQUIRE(calllogRecordInterface.GetCount() == 3);
+
+        // Remove non existing element
+        REQUIRE(!calllogRecordInterface.RemoveByID(100));
+
+        // Remove all elements from table
+        REQUIRE(calllogRecordInterface.RemoveByID(1));
+        REQUIRE(calllogRecordInterface.RemoveByID(3));
+        REQUIRE(calllogRecordInterface.RemoveByID(4));
+
+        // Table should be empty now
+        REQUIRE(calllogRecordInterface.GetCount() == 0);
+    }
+
+    Database::Deinitialize();
+}
