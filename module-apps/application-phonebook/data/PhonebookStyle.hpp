@@ -59,6 +59,18 @@ namespace phonebookStyle
         const UTF8 favourites_string   = "Favourites";
     } // namespace contactItem
 
+    namespace newContact
+    {
+
+        constexpr uint32_t w = style::window::default_body_width;
+        constexpr uint32_t h = 80;
+
+        constexpr uint32_t title_h          = 20;
+        constexpr uint32_t value_h          = 30;
+        constexpr uint32_t title_value_span = h - value_h;
+
+    } // namespace newContact
+
     namespace searchResults
     {
         namespace searchResultList
