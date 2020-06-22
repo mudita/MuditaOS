@@ -1,12 +1,12 @@
 # Mudita PurePhone changelog
 
-## Current release
+## [0.26.1] - 2020-06-22
 
 ### Added
 * `[notifications]` Added bottom bar action indicators.
 
 ### Changed
-* `[phonebook]``[sms]` Improved contact matching by phone number.
+* `[phonebook][sms]` Improved contact matching by phone number.
 * `[sms]` Contact Add/Contact details option.
 
 ### Fixed
