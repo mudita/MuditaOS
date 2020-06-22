@@ -255,7 +255,6 @@ namespace gui
     auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
     {
         auto thumbnail = new gui::Image(icon);
-        center(layout, thumbnail, Axis::Y);
         thumbnail->activeItem = false;
         layout->addWidget(thumbnail);
     }
@@ -273,6 +272,7 @@ namespace gui
         const auto size_needed_for_2digits = 30;
         // 1. create hbox for all elements
         auto el   = new gui::HBox(nullptr, 0, 0, layout->getWidth(), style::window::label::default_h);
+        el->setOrthogonalAlignment(gui::orthogonalAlignment::Center);
         auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
         text->setMaximumSize(el->area().w, Axis::X);
         text->setText(name);
