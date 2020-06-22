@@ -25,6 +25,7 @@
 
 #include "Common.hpp"
 #include "i18/i18.hpp"
+#include "log/log.hpp"
 #include <Span.hpp>
 #include <Style.hpp>
 #include <application-settings/ApplicationSettings.hpp>
@@ -370,7 +371,13 @@ namespace gui
         }
         else {
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_calls"));
-            activatedCallback = [app](Item &) -> bool { return app->showCalls(); };
+            inputCallback = [app](Item &, const InputEvent &inputEvent) -> bool {
+                if (inputEvent.state == InputEvent::State::keyReleasedShort &&
+                    inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+                    return app->showCalls();
+                }
+                return false;
+            };
         }
         return true;
     }
