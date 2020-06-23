@@ -9,9 +9,6 @@
 NotificationsTable::NotificationsTable(Database *db) : Table(db)
 {}
 
-NotificationsTable::~NotificationsTable()
-{}
-
 bool NotificationsTable::Create()
 {
     if (!db->Execute(createTableQuery)) {

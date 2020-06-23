@@ -17,14 +17,11 @@ enum class NotificationsTableFields
     key
 };
 
-/*
- *
- */
 class NotificationsTable : public Table<NotificationsTableRow, NotificationsTableFields>
 {
   public:
     NotificationsTable(Database *db);
-    virtual ~NotificationsTable();
+    virtual ~NotificationsTable() = default;
 
     bool Create() override final;
     bool Add(NotificationsTableRow entry) override final;
