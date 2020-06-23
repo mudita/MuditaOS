@@ -6,7 +6,10 @@
 
 namespace gui
 {
-    InputLineWithLabelItem::InputLineWithLabelItem(phonebookInternals::ListItemName listItemName)
+    InputLineWithLabelItem::InputLineWithLabelItem(phonebookInternals::ListItemName listItemName,
+                                                   std::function<void(const UTF8 &)> bottomBarTemporaryMode,
+                                                   std::function<void()> bottomBarRestoreFromTemporaryMode,
+                                                   std::function<void()> selectSpecialCharacter)
         : listItemName(listItemName)
     {
         setMinimumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
@@ -25,8 +28,11 @@ namespace gui
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         inputText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         inputText->setFont(style::window::font::medium);
-        inputText->setInputMode(
-            new InputMode({InputMode::ABC, InputMode::abc, InputMode::digit}, [=](const UTF8 &) {}));
+        inputText->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
+            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=]() { selectSpecialCharacter(); }));
         inputText->setPenFocusWidth(style::window::default_border_focucs_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
         inputText->setEditMode(Text::EditMode::EDIT);
