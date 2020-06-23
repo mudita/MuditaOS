@@ -18,7 +18,7 @@ bool NotificationsTable::Create()
 
 bool NotificationsTable::Add(NotificationsTableRow entry)
 {
-    return db->Execute("INSERT or ignore INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
+    return db->Execute("INSERT INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
 }
 
 bool NotificationsTable::RemoveByID(uint32_t id)

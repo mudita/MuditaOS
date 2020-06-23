@@ -8,7 +8,7 @@ struct Record
 {
     uint32_t ID = DB_ID_NONE;
 
-    bool isValid()
+    bool isValid() const
     {
         return ID != DB_ID_NONE;
     }

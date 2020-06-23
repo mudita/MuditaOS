@@ -45,6 +45,7 @@ set(SOURCES
         Interface/NotesRecord.cpp
         Interface/CalllogRecord.cpp
         Interface/SMSTemplateRecord.cpp
+        Interface/NotificationsRecord.cpp
 
         queries/sms/QuerySMSSearch.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp

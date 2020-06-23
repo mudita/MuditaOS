@@ -123,7 +123,7 @@ TEST_CASE("Notifications Table tests")
 
     SECTION("Check uniquness")
     {
-        REQUIRE(notificationsTbl.Add({{.ID = 0}, .key = 3, .value = 100}));
+        REQUIRE_FALSE(notificationsTbl.Add({{.ID = 0}, .key = 3, .value = 100}));
         REQUIRE(notificationsTbl.GetCount() == 4);
         auto entry = notificationsTbl.GetByID(3);
         REQUIRE(entry.ID == 3);

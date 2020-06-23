@@ -28,6 +28,7 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/SettingsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateRecord_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/QueryInterface.cpp"
         
     LIBS
