@@ -84,33 +84,33 @@ namespace gui
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::FirstName:
-            label->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
-            text->setTextType(Text::TextType::SINGLE_LINE);
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
             break;
         case phonebookInternals::ListItemName::SecondName:
-            label->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
-            text->setTextType(Text::TextType::SINGLE_LINE);
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
             break;
         case phonebookInternals::ListItemName::Number:
-            label->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
-            text->setTextType(Text::TextType::SINGLE_LINE);
-            text->setInputMode(new InputMode({InputMode::phone}));
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
+            inputText->setInputMode(new InputMode({InputMode::phone}));
             break;
         case phonebookInternals::ListItemName::OtherNumber:
-            label->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
-            text->setTextType(Text::TextType::SINGLE_LINE);
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
             break;
         case phonebookInternals::ListItemName::Email:
-            label->setText(utils::localize.get("app_phonebook_new_contact_email"));
-            text->setTextType(Text::TextType::SINGLE_LINE);
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
             break;
         case phonebookInternals::ListItemName::Address:
-            label->setText(utils::localize.get("app_phonebook_new_contact_address"));
-            text->setTextType(Text::TextType::MULTI_LINE);
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
+            inputText->setTextType(Text::TextType::MULTI_LINE);
             break;
         case phonebookInternals::ListItemName::Note:
-            label->setText(utils::localize.get("app_phonebook_new_contact_note"));
-            text->setTextType(Text::TextType::MULTI_LINE);
+            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
+            inputText->setTextType(Text::TextType::MULTI_LINE);
             break;
         default:
             LOG_ERROR("Incorrect List Item Name!");
