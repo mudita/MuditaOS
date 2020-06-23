@@ -25,6 +25,7 @@ namespace gui
         LABEL,
         LIST,
         LIST_ITEM,
+        SPAN_ITEM,
         TEXT,
         IMAGE,
         LAYOUT,

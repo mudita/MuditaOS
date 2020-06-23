@@ -15,6 +15,7 @@ namespace gui
             setMinimumWidth(getWidth());
             setMinimumHeight(getHeight());
             activeItem = false;
+            type       = ItemType::SPAN_ITEM;
         }
 
         Span(Item *parent, Axis axis, unsigned int size) : Span(axis, size)
