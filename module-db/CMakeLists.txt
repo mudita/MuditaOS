@@ -49,6 +49,10 @@ set(SOURCES
 
         queries/sms/QuerySMSSearch.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
+        queries/notifications/QueryNotificationsGet.cpp
+        queries/notifications/QueryNotificationsIncrement.cpp
+        queries/notifications/QueryNotificationsClear.cpp
+        queries/notifications/QueryNotificationsGetAll.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

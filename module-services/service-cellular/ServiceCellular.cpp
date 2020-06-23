@@ -50,6 +50,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <country.hpp>
 #include <PhoneNumber.hpp>
+#include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
 
 #include <vector>
 #include <utility>
@@ -141,7 +142,15 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         return call;
     });
 
-    ongoingCall.setEndCallAction([=](const CalllogRecord &rec) { return DBServiceAPI::CalllogUpdate(this, rec); });
+    ongoingCall.setEndCallAction([=](const CalllogRecord &rec) {
+        if (DBServiceAPI::CalllogUpdate(this, rec) && rec.type == CallType::CT_MISSED) {
+            DBServiceAPI::GetQuery(
+                this,
+                db::Interface::Name::Notifications,
+                std::make_unique<db::query::notifications::QueryIncrement>(NotificationsRecord::Key::Calls));
+        }
+        return true;
+    });
 
     notificationCallback = [this](std::vector<uint8_t> &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));

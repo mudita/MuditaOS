@@ -23,7 +23,8 @@ namespace db
             Alarms,
             Notes,
             Calllog,
-            CountryCodes
+            CountryCodes,
+            Notifications
         };
     };
 }; // namespace db
@@ -49,6 +50,8 @@ constexpr const char *c_str(enum db::Interface::Name db)
         return "Callog";
     case db::Interface::Name::CountryCodes:
         return "CountryCodes";
+    case db::Interface::Name::Notifications:
+        return "Notifications";
     };
     return "";
 }

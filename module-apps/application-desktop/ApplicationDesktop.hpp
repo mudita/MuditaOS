@@ -1,24 +1,15 @@
-/*
- * @file ApplicationDesktop.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 18 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_DESKTOP_APPLICATIONDESKTOP_HPP_
-#define MODULE_APPS_APPLICATION_DESKTOP_APPLICATIONDESKTOP_HPP_
+#pragma once
 
-#include "Application.hpp"
-#include "Service/Message.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
-#include "service-db/messages/DBNotificationMessage.hpp"
 #include "windows/Names.hpp"
+
+#include <Application.hpp>
+#include <Service/Message.hpp>
+#include <service-cellular/messages/CellularMessage.hpp>
+#include <service-db/messages/DBNotificationMessage.hpp>
+#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 
 namespace app
 {
-
-
     inline const std::string name_desktop = "ApplicationDesktop";
 
     class ApplicationDesktop : public Application
@@ -32,12 +23,20 @@ namespace app
         bool need_sim_select = false;
         struct Notifications
         {
-            unsigned int notSeenSMS   = 0;
-            unsigned int notSeenCalls = 0;
-            auto areEmpty()
+            struct Counters
             {
-                return notSeenCalls == 0 && notSeenSMS == 0;
-            }
+                unsigned int SMS   = 0;
+                unsigned int Calls = 0;
+
+                auto areEmpty()
+                {
+                    return Calls == 0 && SMS == 0;
+                }
+            };
+
+            Counters notSeen;
+            Counters notRead;
+
         } notifications;
 
         ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
@@ -60,6 +59,7 @@ namespace app
         // done
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
+        auto handle(db::query::notifications::QueryGetAllResult *msg) -> bool;
         /**
          * This static method will be used to lock the phone
          */
@@ -68,8 +68,8 @@ namespace app
         bool showCalls();
         bool clearCallsNotification();
         bool clearMessagesNotification();
+        bool requestNotSeenNotifications();
+        bool requestNotReadNotifications();
     };
 
 } /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_DESKTOP_APPLICATIONDESKTOP_HPP_ */

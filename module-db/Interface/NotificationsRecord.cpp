@@ -1,4 +1,8 @@
 #include "NotificationsRecord.hpp"
+#include "module-db/queries/notifications/QueryNotificationsGet.hpp"
+#include "module-db/queries/notifications/QueryNotificationsIncrement.hpp"
+#include "module-db/queries/notifications/QueryNotificationsClear.hpp"
+#include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
 
 #include <log/log.hpp>
 #include <Utils.hpp>
@@ -63,9 +67,19 @@ std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::
 std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::GetLimitOffset(uint32_t offset,
                                                                                                uint32_t limit)
 {
-    assert(0 && "Not implemented");
+    if (limit == 0) {
+        limit = GetCount();
+    }
 
-    return std::make_unique<std::vector<NotificationsRecord>>();
+    auto rows = notificationsDb->notifications.GetLimitOffset(offset, limit);
+
+    auto records = std::make_unique<std::vector<NotificationsRecord>>();
+
+    for (auto &r : rows) {
+        records->push_back(r);
+    }
+
+    return records;
 }
 
 bool NotificationsRecordInterface::Update(const NotificationsRecord &rec)
@@ -110,4 +124,62 @@ NotificationsRecord NotificationsRecordInterface::GetByKey(NotificationsRecord::
     }
 
     return notificationsDb->notifications.GetByKey(static_cast<uint32_t>(key));
+}
+
+std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(const db::Query *query)
+{
+    if (const auto local_query = dynamic_cast<const db::query::notifications::QueryGet *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    if (const auto local_query = dynamic_cast<const db::query::notifications::QueryIncrement *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    if (const auto local_query = dynamic_cast<const db::query::notifications::QueryClear *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    if (const auto local_query = dynamic_cast<const db::query::notifications::QueryGetAll *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<db::query::notifications::QueryGetResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::QueryGet *query)
+{
+    auto value = GetByKey(query->key);
+    return std::make_unique<db::query::notifications::QueryGetResult>(value);
+}
+
+std::unique_ptr<db::query::notifications::QueryIncrementResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::QueryIncrement *query)
+{
+    auto ret = false;
+
+    auto record = GetByKey(query->key);
+    if (record.isValid() && record.key == query->key) {
+        record.value++;
+        ret = Update(record);
+    }
+    return std::make_unique<db::query::notifications::QueryIncrementResult>(ret);
+}
+
+std::unique_ptr<db::query::notifications::QueryClearResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::QueryClear *query)
+{
+    auto ret = false;
+
+    auto record = GetByKey(query->key);
+    if (record.isValid() && record.key == query->key) {
+        record.value = 0;
+        ret          = Update(record);
+    }
+    return std::make_unique<db::query::notifications::QueryClearResult>(ret);
+}
+
+std::unique_ptr<db::query::notifications::QueryGetAllResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::QueryGetAll *query)
+{
+    auto numberOfNotifications = GetCount();
+    auto records               = GetLimitOffset(0, numberOfNotifications);
+    return std::make_unique<db::query::notifications::QueryGetAllResult>(std::move(records));
 }

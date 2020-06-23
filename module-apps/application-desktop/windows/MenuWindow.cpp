@@ -139,7 +139,7 @@ namespace gui
                                       application, "ApplicationCallLog", gui::name::window::main_window, nullptr);
                                   return true;
                               },
-                              app->notifications.notSeenCalls},
+                              app->notifications.notRead.Calls},
                 new gui::Tile("menu_contacts_W_G",
                               "app_desktop_menu_contacts",
                               [=](gui::Item &item) {
@@ -157,7 +157,7 @@ namespace gui
                                       application, "ApplicationMessages", gui::name::window::main_window, nullptr);
                                   return true;
                               },
-                              app->notifications.notSeenSMS},
+                              app->notifications.notRead.SMS},
                 new gui::Tile{"menu_music_player_W_G", "app_desktop_menu_music", [=](gui::Item &item) { return true; }},
                 new gui::Tile{
                     "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},

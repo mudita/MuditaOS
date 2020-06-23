@@ -1,29 +1,21 @@
-/*
- * @file ApplicationDesktop.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 18 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
-#include "Application.hpp"
+#include "ApplicationDesktop.hpp"
 
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
 #include "windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
+#include "windows/Reboot.hpp"
 
-#include "ApplicationDesktop.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
+#include <service-db/api/DBServiceAPI.hpp>
 #include <application-settings/ApplicationSettings.hpp>
-#include <cassert>
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-cellular/ServiceCellular.hpp>
-#include "windows/Reboot.hpp"
-#include "application-calllog/ApplicationCallLog.hpp"
+#include <application-calllog/ApplicationCallLog.hpp>
+#include <messages/QueryMessage.hpp>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 
+#include <cassert>
 namespace app
 {
 
@@ -56,6 +48,15 @@ namespace app
             handled = handle(msg);
         }
 
+        // handle database response
+        if (resp != nullptr) {
+            if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+                if (auto response = dynamic_cast<db::query::notifications::QueryGetAllResult *>(msg->getResult())) {
+                    handled = handle(response);
+                }
+            }
+        }
+
         if (handled) {
             return std::make_shared<sys::ResponseMessage>();
         }
@@ -64,15 +65,47 @@ namespace app
         }
     }
 
-    auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
+    auto ApplicationDesktop::handle(db::query::notifications::QueryGetAllResult *msg) -> bool
     {
-        LOG_DEBUG("DB notification handler");
         assert(msg);
-        notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-        notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+        auto records = *msg->getResult();
+        for (auto record : records) {
+            switch (record.key) {
+            case NotificationsRecord::Key::Calls:
+                notifications.notSeen.Calls = record.value;
+                break;
+
+            case NotificationsRecord::Key::Sms:
+                notifications.notSeen.SMS = record.value;
+                break;
+
+            case NotificationsRecord::Key::NotValidKey:
+            case NotificationsRecord::Key::NumberOfKeys:
+                LOG_ERROR("Not a valid key");
+                return false;
+            }
+        }
+
         windows[app::window::name::desktop_menu]->rebuild();
         windows[app::window::name::desktop_main_window]->rebuild();
         return true;
+    }
+
+    auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
+    {
+        assert(msg);
+
+        if (msg->interface == db::Interface::Name::Notifications && msg->type == db::Query::Type::Update) {
+            return requestNotSeenNotifications();
+        }
+
+        if ((msg->interface == db::Interface::Name::Calllog || msg->interface == db::Interface::Name::SMSThread) &&
+            msg->type != db::Query::Type::Read) {
+            requestNotReadNotifications();
+            windows[app::window::name::desktop_menu]->rebuild();
+        }
+
+        return false;
     }
 
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
@@ -105,17 +138,37 @@ namespace app
 
     bool ApplicationDesktop::clearCallsNotification()
     {
-        LOG_DEBUG("Notification handling db not ready - clear local count");
-        notifications.notSeenCalls = 0;
+        LOG_DEBUG("Clear Call notifications");
+        DBServiceAPI::GetQuery(this,
+                               db::Interface::Name::Notifications,
+                               std::make_unique<db::query::notifications::QueryClear>(NotificationsRecord::Key::Calls));
+        notifications.notSeen.Calls = 0;
         getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
         return true;
     }
 
     bool ApplicationDesktop::clearMessagesNotification()
     {
-        LOG_DEBUG("Notification handling db not ready - clear local count");
-        notifications.notSeenSMS = 0;
+        LOG_DEBUG("Clear Sms notifications");
+        DBServiceAPI::GetQuery(this,
+                               db::Interface::Name::Notifications,
+                               std::make_unique<db::query::notifications::QueryClear>(NotificationsRecord::Key::Calls));
+        notifications.notSeen.SMS = 0;
         getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
+        return true;
+    }
+
+    bool ApplicationDesktop::requestNotSeenNotifications()
+    {
+        return DBServiceAPI::GetQuery(
+            this, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::QueryGetAll>());
+    }
+
+    bool ApplicationDesktop::requestNotReadNotifications()
+    {
+        notifications.notRead.Calls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+        notifications.notRead.SMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+
         return true;
     }
 
@@ -147,8 +200,8 @@ namespace app
 
         screenLocked = true;
 
-        notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-        notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+        requestNotReadNotifications();
+        requestNotSeenNotifications();
 
         createUserInterface();
 

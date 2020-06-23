@@ -55,6 +55,21 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(entry.isValid());
     }
 
+    SECTION("Get table rows")
+    {
+        auto retOffsetLimitSmaller = notificationsTbl.GetLimitOffset(0, 2);
+        REQUIRE(retOffsetLimitSmaller.size() == 2);
+
+        auto retOffsetLimit = notificationsTbl.GetLimitOffset(0, 4);
+        REQUIRE(retOffsetLimit.size() == 4);
+
+        auto retOffsetLimitBigger = notificationsTbl.GetLimitOffset(0, 100);
+        REQUIRE(retOffsetLimitBigger.size() == 4);
+
+        auto retOffsetLimitFailed = notificationsTbl.GetLimitOffset(5, 4);
+        REQUIRE(retOffsetLimitFailed.size() == 0);
+    }
+
     SECTION("Entry update")
     {
         REQUIRE(notificationsTbl.Update({{.ID = 3}, .key = 100, .value = 200}));
