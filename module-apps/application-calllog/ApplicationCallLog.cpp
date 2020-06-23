@@ -1,23 +1,17 @@
-/*
- * @file ApplicationCallLog.cpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 19.09.2019
- * @brief Application Call Log
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "ApplicationCallLog.hpp"
-#include "MessageType.hpp"
 #include "data/CallLogInternals.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-db/messages/DBMessage.hpp"
 #include "windows/CallLogDetailsWindow.hpp"
 #include "windows/CallLogMainWindow.hpp"
 #include "windows/CallLogOptionsWindow.hpp"
+
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/messages/DBMessage.hpp>
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
+#include <MessageType.hpp>
+#include <module-db/queries/calllog/QueryCalllogSetAllRead.hpp>
 
 using namespace calllog;
 
@@ -128,6 +122,12 @@ namespace app
         dialog->update(meta);
         switchWindow(dialog->getName());
         return true;
+    }
+
+    bool ApplicationCallLog::setAllEntriesRead()
+    {
+        return DBServiceAPI::GetQuery(
+            this, db::Interface::Name::Calllog, std::make_unique<db::query::calllog::SetAllRead>());
     }
 
 } /* namespace app */
