@@ -80,7 +80,7 @@ namespace gui
         return new InputLineWithLabelItem(*this);
     }
 
-    void LineEditWithLabel::applyItemNameSpecificSettings()
+    void InputLineWithLabelItem::applyItemNameSpecificSettings()
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::FirstName:
