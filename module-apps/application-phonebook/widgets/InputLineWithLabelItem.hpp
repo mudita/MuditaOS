@@ -21,7 +21,7 @@ namespace gui
         VBox *vBox        = nullptr;
         Label *titleLabel = nullptr;
         Text *inputText   = nullptr;
-        auto clone() -> ListItem * override;
+        auto clone() -> ListItem *;
     };
 
 } /* namespace gui */
