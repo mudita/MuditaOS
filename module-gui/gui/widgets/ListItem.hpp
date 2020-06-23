@@ -9,6 +9,8 @@ namespace gui
     {
 
       public:
+        bool deleteByList = true;
+
         ListItem();
     };
 

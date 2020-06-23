@@ -12,5 +12,7 @@ namespace gui
 
         setPenFocusWidth(style::window::default_border_focucs_w);
         setPenWidth(style::window::default_border_no_focus_w);
+
+        type = ItemType::LIST_ITEM;
     }
 } /* namespace gui */
