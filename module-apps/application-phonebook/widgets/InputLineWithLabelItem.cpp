@@ -43,10 +43,12 @@ namespace gui
         case phonebookInternals::ListItemName::Number:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
             inputText->setTextType(Text::TextType::SINGLE_LINE);
+            inputText->setInputMode(new InputMode({InputMode::phone}));
             break;
         case phonebookInternals::ListItemName::OtherNumber:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
             inputText->setTextType(Text::TextType::SINGLE_LINE);
+            inputText->setInputMode(new InputMode({InputMode::phone}));
             break;
         case phonebookInternals::ListItemName::Email:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
