@@ -82,18 +82,17 @@ namespace CellularCall
             call.type = type;
         }
 
+        void markUnread()
+        {
+            call.isRead = false;
+            ;
+        }
+
         void clear()
         {
-            call.ID           = 0; // 0 - Invalid
-            call.presentation = PresentationType::PR_ALLOWED;
-            call.date         = 0;
-            call.duration     = 0;
-            call.type         = CallType::CT_NONE;
-            call.name         = "";
-            call.contactId    = "";
+            call              = CalllogRecord();
             isActiveCall      = false;
             startActiveTime   = 0;
-            call.phoneNumber.clear();
         }
 
       public:

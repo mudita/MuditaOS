@@ -502,6 +502,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto ret              = calllogRecordInterface->RemoveByID(msg->id);
         responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Delete);
     } break;
 
     case MessageType::DBCalllogUpdate: {
@@ -509,6 +510,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto ret              = calllogRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update);
     } break;
 
     case MessageType::DBCalllogGetCount: {
