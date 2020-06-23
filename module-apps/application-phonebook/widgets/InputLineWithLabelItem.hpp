@@ -18,10 +18,10 @@ namespace gui
 
         ~InputLineWithLabelItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
-        gui::VBox *vBox   = nullptr;
-        gui::Label *label = nullptr;
-        gui::Text *text   = nullptr;
-        auto clone() -> gui::ListItem * override;
+        VBox *vBox        = nullptr;
+        Label *titleLabel = nullptr;
+        Text *inputText   = nullptr;
+        auto clone() -> ListItem * override;
     };
 
 } /* namespace gui */
