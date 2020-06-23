@@ -15,7 +15,6 @@
 ## [0.26.1] - 2020-06-22
 
 ### Added
-* `[database]` Add database backup feature with sqlite's VACUUM command.
 * `[notifications]` Added bottom bar action indicators.
 
 ### Changed
@@ -30,6 +29,7 @@
 * `[sms]` Removed redundant select in new sms window 
 
 ### Other
+* `[database]` Add database backup feature with sqlite's VACUUM command.
 * `[vfs]` Technical improvements and enhancements.
 * `[doc]` FOTA implementation and testing report which is required by Verizon certification process.
 
