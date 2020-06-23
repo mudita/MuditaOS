@@ -93,5 +93,14 @@ TEST_CASE("Create and destroy simple database")
         } while (queryRes->NextRow());
     }
 
+    SECTION("Store database into backup file")
+    {
+        std::string backupPathDB = USER_PATH("testbackup.db");
+        vfs.remove(backupPathDB.c_str());
+        Database testDB("test.db");
+        REQUIRE(testDB.StoreIntoFile(backupPathDB) == true);
+        REQUIRE(vfs.fileExists(backupPathDB.c_str()) == true);
+    }
+
     Database::Deinitialize();
 }
