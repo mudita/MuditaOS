@@ -47,12 +47,9 @@ NotificationsRecordInterface::NotificationsRecordInterface(NotificationsDB *noti
 
 bool NotificationsRecordInterface::Add(const NotificationsRecord &rec)
 {
-    if (!rec.gotValidKey()) {
-        return false;
-    }
+    assert(0 && "Not implemented");
 
-    return notificationsDb->notifications.Add(
-        NotificationsTableRow{{.ID = rec.ID}, .key = static_cast<uint32_t>(rec.key), .value = rec.value});
+    return false;
 }
 
 std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::GetLimitOffsetByField(
@@ -84,12 +81,9 @@ bool NotificationsRecordInterface::Update(const NotificationsRecord &rec)
 
 bool NotificationsRecordInterface::RemoveByID(uint32_t id)
 {
-    auto entry = notificationsDb->notifications.GetByID(id);
-    if (!entry.isValid()) {
-        return false;
-    }
+    assert(0 && "Not implemented");
 
-    return notificationsDb->notifications.RemoveByID(id);
+    return false;
 }
 
 bool NotificationsRecordInterface::RemoveByField(NotificationsRecordField field, const char *str)

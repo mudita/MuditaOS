@@ -46,33 +46,6 @@ TEST_CASE("Notifications Record tests")
     NotificationsRecordInterface NotificationsRecordInterface(&notificationsDb);
 
     NotificationsRecord testRec;
-    testRec.key   = NotificationsRecord::Key::Calls;
-    testRec.value = 0;
-    REQUIRE(NotificationsRecordInterface.Add(testRec));
-    testRec.key = NotificationsRecord::Key::Sms;
-    REQUIRE(NotificationsRecordInterface.Add(testRec));
-
-    REQUIRE(NotificationsRecordInterface.GetCount() == 2);
-
-    SECTION("Add duplicated entries")
-    {
-        testRec.key = NotificationsRecord::Key::Calls;
-        REQUIRE_FALSE(NotificationsRecordInterface.Add(testRec));
-
-        testRec.key = NotificationsRecord::Key::Sms;
-        REQUIRE_FALSE(NotificationsRecordInterface.Add(testRec));
-    }
-
-    SECTION("Invalid Key")
-    {
-        testRec.key = NotificationsRecord::Key::NotValidKey;
-        REQUIRE_FALSE(NotificationsRecord::isValidKey(testRec.key));
-        REQUIRE_FALSE(NotificationsRecordInterface.Add(testRec));
-
-        testRec.key = NotificationsRecord::Key::NumberOfKeys;
-        REQUIRE_FALSE(NotificationsRecord::isValidKey(testRec.key));
-        REQUIRE_FALSE(NotificationsRecordInterface.Add(testRec));
-    }
 
     SECTION("Get entry by ID")
     {
@@ -152,35 +125,6 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(entryPost.ID == entryPre.ID);
         REQUIRE_FALSE(entryPost.key == entryPre.key);
         REQUIRE(entryPost.value == entryPre.value);
-    }
-
-    SECTION("Remove entries by ID")
-    {
-        REQUIRE(NotificationsRecordInterface.GetCount() == 2);
-        REQUIRE(NotificationsRecordInterface.RemoveByID(1));
-        REQUIRE(NotificationsRecordInterface.GetCount() == 1);
-
-        // Remove non existing element
-        REQUIRE_FALSE(NotificationsRecordInterface.RemoveByID(100));
-
-        REQUIRE(NotificationsRecordInterface.RemoveByID(2));
-        REQUIRE(NotificationsRecordInterface.GetCount() == 0);
-    }
-
-    SECTION("Get not existing entry")
-    {
-        REQUIRE(NotificationsRecordInterface.RemoveByID(1));
-        auto entry = NotificationsRecordInterface.GetByID(1);
-        REQUIRE_FALSE(entry.isValidRecord());
-        REQUIRE(entry.ID == DB_ID_NONE);
-        REQUIRE(entry.key == NotificationsRecord::Key::NotValidKey);
-        REQUIRE(entry.value == 0);
-
-        entry = NotificationsRecordInterface.GetByKey(NotificationsRecord::Key::Calls);
-        REQUIRE_FALSE(entry.isValidRecord());
-        REQUIRE(entry.ID == DB_ID_NONE);
-        REQUIRE(entry.key == NotificationsRecord::Key::NotValidKey);
-        REQUIRE(entry.value == 0);
     }
 
     // SECTION("Set All Read via query")

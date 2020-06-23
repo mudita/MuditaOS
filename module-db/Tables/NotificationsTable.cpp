@@ -1,4 +1,5 @@
 #include "NotificationsTable.hpp"
+#include "module-db/Interface/NotificationsRecord.hpp"
 
 #include <log/log.hpp>
 #include <Utils.hpp>
@@ -13,12 +14,23 @@ NotificationsTable::~NotificationsTable()
 
 bool NotificationsTable::Create()
 {
-    return db->Execute(createTableQuery);
+    if (!db->Execute(createTableQuery)) {
+        return false;
+    }
+
+    if (!Add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0})) {
+        return false;
+    }
+    if (!Add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0})) {
+        return false;
+    }
+
+    return true;
 }
 
 bool NotificationsTable::Add(NotificationsTableRow entry)
 {
-    return db->Execute("INSERT INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
+    return db->Execute("INSERT or IGNORE INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
 }
 
 bool NotificationsTable::RemoveByID(uint32_t id)
