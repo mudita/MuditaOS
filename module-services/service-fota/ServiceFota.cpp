@@ -80,6 +80,7 @@ namespace FotaService
         connect(ConnectMessage(), std::bind(&Service::handleConnect, this, _1, _2));
         connect(HTTPRequestMessage(), std::bind(&Service::handleHttpGet, this, _1, _2));
         connect(FOTAStart(), std::bind(&Service::handleFotaStart, this, _1, _2));
+        connect(FOTARawProgress(), std::bind(&Service::handleRawProgress, this, _1, _2));
     }
 
     sys::Message_t Service::handleCellularGetChannelResponseMessage(sys::DataMessage *req,
@@ -87,7 +88,7 @@ namespace FotaService
     {
         LOG_DEBUG("Handling channel response");
         auto responseMessage = static_cast<CellularGetChannelResponseMessage *>(req);
-        LOG_DEBUG("chanel ptr: %p", responseMessage->dataChannelPtr);
+        LOG_DEBUG("channel ptr: %p", responseMessage->dataChannelPtr);
         dataChannel = responseMessage->dataChannelPtr;
         dataChannel->setCallback(std::bind(&Service::handleChannelNotifications, this, std::placeholders::_1));
         getApnConfiguration();
@@ -151,7 +152,7 @@ namespace FotaService
                         this);
                     LOG_DEBUG("Internet Cofiguration OK");
                 }
-                return std::make_shared<InternetResponseMessage>(true);
+                return std::make_shared<FotaResponseMessage>(true);
             }
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -159,19 +160,22 @@ namespace FotaService
 
     sys::Message_t Service::handleConnect(sys::DataMessage * /*req*/, sys::ResponseMessage * /*response*/)
     {
-        std::shared_ptr<sys::ResponseMessage> responseMsg;
         if (dataChannel) {
             LOG_DEBUG("ConnectMessage");
-            if (sendAndLogError(prepareQIACT(currentApnContext), QIACTTimeout)) {
-                sys::Bus::SendMulticast(std::make_shared<NotificationMessage>(static_cast<NotificationMessage::Type>(
-                                            NotificationMessage::Type::Connected)),
-                                        sys::BusChannels::ServiceFotaNotifications,
-                                        this);
-                LOG_DEBUG("InternetConnect OK");
-                responseMsg = std::make_shared<InternetResponseMessage>(true);
+            getApnConfiguration();
+            if (!contextMap[currentApnContext].activated) {
+                if (!sendAndLogError(prepareQIACT(currentApnContext), QIACTTimeout)) {
+                    return std::make_shared<FotaResponseMessage>(false);
+                }
             }
+            LOG_DEBUG("InternetConnect OK");
+            sys::Bus::SendMulticast(std::make_shared<NotificationMessage>(
+                                        static_cast<NotificationMessage::Type>(NotificationMessage::Type::Connected)),
+                                    sys::BusChannels::ServiceFotaNotifications,
+                                    this);
+            return std::make_shared<FotaResponseMessage>(true);
         }
-        return responseMsg;
+        return std::make_shared<FotaResponseMessage>(false);
     }
 
     sys::Message_t Service::handleHttpGet(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
@@ -192,7 +196,7 @@ namespace FotaService
             // httpGetCommands.push_back("AT+QIDNSCFG=1\r");
             for (auto &currCmd : httpGetCommands) {
                 if (!sendAndLogError(currCmd)) {
-                    return std::make_shared<InternetResponseMessage>(false);
+                    return std::make_shared<FotaResponseMessage>(false);
                 }
             }
 
@@ -200,14 +204,14 @@ namespace FotaService
                 setupSSLContext();
             }
             if (!openURL(msg->url)) {
-                return std::make_shared<InternetResponseMessage>(false);
+                return std::make_shared<FotaResponseMessage>(false);
             }
 
             switch (msg->method) {
             case HTTPMethod::GET: {
                 LOG_DEBUG("GET");
                 if (!sendAndLogError(prepareQHTTPGET())) {
-                    return std::make_shared<InternetResponseMessage>(false);
+                    return std::make_shared<FotaResponseMessage>(false);
                 }
                 break;
             }
@@ -215,9 +219,9 @@ namespace FotaService
                 LOG_DEBUG("POST - not supported yet");
                 break;
             }
-            return std::make_shared<InternetResponseMessage>(true);
+            return std::make_shared<FotaResponseMessage>(true);
         }
-        return std::make_shared<InternetResponseMessage>(false);
+        return std::make_shared<FotaResponseMessage>(false);
     }
 
     void Service::handleChannelNotifications(std::vector<uint8_t> &data)
@@ -247,9 +251,9 @@ namespace FotaService
                 // potentialy critical logs, will be removed with FOTA Window commits
                 // int timeout = 10;
                 // dataChannel->cmd("AT+QHTTPREAD=" + std::to_string(timeout) + "\r" /*, timeout * 1000*/);
-                sendAndLogError(prepareQHTTPREAD());
                 state = State::QHTTPREAD;
                 file.clear();
+                dataChannel->cmd(prepareQHTTPREAD());
             }
         }
 
@@ -276,22 +280,38 @@ namespace FotaService
             LOG_DEBUG("Starting fota update: %s", msg->url.c_str());
             receiverServiceName = msg->sender;
             state               = State::FOTAUpdate;
-            sendAndLogError(prepareQFOTADLcmd(msg->url));
+            auto result         = dataChannel->cmd(prepareQFOTADLcmd(msg->url));
+            if (!result) {
+                LOG_WARN("Starting fota error: %s",
+                         std::accumulate(result.response.begin(), result.response.end(), std::string("\n")).c_str());
+            }
         }
-        return std::make_shared<InternetResponseMessage>(true);
+        return std::make_shared<FotaResponseMessage>(true);
+    }
+
+    sys::Message_t Service::handleRawProgress(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+    {
+        LOG_DEBUG("Handle Fota RawProgress message");
+        if (auto msg = dynamic_cast<FOTARawProgress *>(req)) {
+            parseQIND(msg->qindRaw);
+        }
+        return std::make_shared<FotaResponseMessage>(true);
     }
 
     void Service::getApnConfiguration()
     {
         getActiveCotext();
         getConfig();
+        for (auto &[contextId, apn] : contextMap) {
+            LOG_DEBUG("%d: %s", contextId, apn.toString().c_str());
+        }
     }
 
     void Service::getConfig()
     {
         if (dataChannel) {
             for (auto &[contextId, apn] : contextMap) {
-                if (auto data = sendAndLogError(prepareQICSGPcmd(apn))) {
+                if (auto data = sendAndLogError(prepareQICSGPquery(apn))) {
                     const std::string QICSGP_prefix("+QICSGP:");
                     for (auto &line : data.response) {
                         if (line.find(QICSGP_prefix) != std::string::npos) {
@@ -299,7 +319,7 @@ namespace FotaService
                             std::vector<std::string> data;
                             std::string subitem;
                             while (std::getline(raw_data, subitem, ',')) {
-                                LOG_DEBUG("   %s: %s", QICSGP_prefix.c_str(), subitem.c_str());
+                                LOG_DEBUG("   %s: '%s'", QICSGP_prefix.c_str(), subitem.c_str());
                                 data.push_back(subitem);
                             }
                             try {
@@ -309,9 +329,9 @@ namespace FotaService
                                              static_cast<int>(apn.type),
                                              static_cast<int>(configuredType));
                                 }
-                                apn.apn        = data[1].substr(1, data[1].size() - 1);
-                                apn.username   = data[2].substr(1, data[2].size() - 1);
-                                apn.password   = data[3].substr(1, data[3].size() - 1);
+                                apn.apn        = data[1].substr(1, data[1].size() - 2);
+                                apn.username   = data[2].substr(1, data[2].size() - 2);
+                                apn.password   = data[3].substr(1, data[3].size() - 2);
                                 apn.authMethod = static_cast<APN::AuthMethod>(std::stoi(data[4]));
                             }
                             catch (...) {
@@ -396,7 +416,7 @@ namespace FotaService
     string Service::prepareQIACT(unsigned char contextId)
     {
         ostringstream cmd;
-        cmd << "AT+QIACT=" << contextId << "\r";
+        cmd << "AT+QIACT=" << static_cast<int>(contextId) << "\r";
         return cmd.str();
     }
 
@@ -408,10 +428,17 @@ namespace FotaService
         return cmd.str();
     }
 
+    string Service::prepareQICSGPquery(const APN::Config &apn)
+    {
+        ostringstream cmd;
+        cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId) << "\r";
+        return cmd.str();
+    }
+
     string Service::prepareQIDEACT(unsigned char contextId)
     {
         ostringstream cmd;
-        cmd << "AT+QIDEACT=" << std::to_string(contextId) << "\r";
+        cmd << "AT+QIDEACT=" << static_cast<int>(contextId) << "\r";
         return cmd.str();
     }
 
@@ -459,9 +486,13 @@ namespace FotaService
 
     bool Service::openURL(const string &url)
     {
-        auto response = sendAndLogError(prepareQHTTPURL(url));
+        auto response = dataChannel->cmd(prepareQHTTPURL(url));
         if (response.response[0] == "CONNECT") {
-            sendAndLogError(url);
+            response = dataChannel->cmd(url.c_str());
+            logIfError(response, url);
+            if (!response) {
+                return false;
+            }
         }
         else {
             return false;
@@ -484,17 +515,12 @@ namespace FotaService
     }
     void Service::logIfError(const at::Result &result, const std::string &cmdString) const
     {
-#ifdef DEBUG
         if (!result) {
             auto results = dataChannel->cmd(at::AT::QIGETERROR);
-            LOG_WARN("%s:%s",
-                     cmdString.c_str(),
+            LOG_WARN("error cmd:%s", cmdString.c_str());
+            LOG_WARN("Error str:%s",
                      std::accumulate(results.response.begin(), results.response.end(), std::string("\n")).c_str());
         }
-#else
-        (void)result;
-        (void)cmdString;
-#endif
     }
 
     void Service::parseResponse()
@@ -558,7 +584,7 @@ namespace FotaService
                     LOG_DEBUG("Downloading finished: %s", qind.tokens[2].c_str());
                 }
                 else if (qind.tokens[fotaStatusTagPosition].find("END") != std::string::npos) {
-                    LOG_DEBUG("FOTA FINISHED -> reboot");
+                    LOG_DEBUG("FOTA FINISHED -> reboot (%s)", receiverServiceName.c_str());
                     sendFotaFinshed(receiverServiceName);
                 }
                 else if (qind.tokens[fotaStatusTagPosition].find("UPDATING") != std::string::npos) {

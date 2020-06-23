@@ -15,6 +15,7 @@ target_sources( ${PROJECT_NAME}
         PRIVATE
                 "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/data/PhonebookUtils.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/widgets/InputLineWithLabelItem.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
@@ -31,6 +32,7 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/SearchResultsModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"
+                "${CMAKE_CURRENT_LIST_DIR}/widgets/InputLineWithLabelItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"

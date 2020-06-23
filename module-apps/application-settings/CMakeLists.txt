@@ -1,34 +1,35 @@
 
 include_directories( ${CMAKE_PROJECT_NAME}
 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
+    PUBLIC
+        "${CMAKE_CURRENT_LIST_DIR}"
 )
 
 include_directories( ${PROJECT_NAME}
 
-	PUBLIC
+    PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
 target_sources( ${PROJECT_NAME}
 
-	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationSettings.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/SettingsMainWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/LanguageWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/BtWindow.cpp"
+    PRIVATE
+        ApplicationSettings.cpp
+        windows/SettingsMainWindow.cpp
+        windows/LanguageWindow.cpp
+        windows/BtWindow.cpp
 
-		"${CMAKE_CURRENT_LIST_DIR}/windows/UITestWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/Info.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/SimSelectWindow.cpp"
-"${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.cpp"
+        windows/UITestWindow.cpp
+        windows/Info.cpp
+        windows/SimSelectWindow.cpp
+        windows/DateTimeWindow.cpp
+        windows/FotaWindow.cpp
+        windows/Fota.cpp
 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationSettings.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/SettingsMainWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/LanguageWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.hpp"
-		#"${CMAKE_CURRENT_LIST_DIR}/widgets/DateTimeItem.hpp"
+    PUBLIC
+        ApplicationSettings.hpp
+        windows/SettingsMainWindow.hpp
+        windows/LanguageWindow.hpp
+        windows/DateTimeWindow.hpp
 )
 

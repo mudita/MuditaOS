@@ -204,29 +204,6 @@ where:
     <target>    - RT1051 or Linux 
     <extension> - `zip` for RT1051 and `tar.gz` for Linux
 
-## Preparing a Release
-
-After testing the commit first you have to tag it:
-```bash
-git tag release-x.y.z
-```
-
-Then you have to push the tag to the repository:
-```bash
-git push origin release-x.y.z
-```
-this will do few things:
-- check the style
-- build linux UT and run them
-- build RT1051 and package it
-- create draft release on Github
-- upload RT1051 package to the release
-
-To track the progress you can look at actions: https://github.com/muditacom/PurePhone/actions
-After release is successfully build you have to manually publish it on github:
-https://github.com/muditacom/PurePhone/releases
-
-
 # Documentation
 
 * [doc/development_workflow](./doc/development_workflow.md)
@@ -241,6 +218,7 @@ https://github.com/muditacom/PurePhone/releases
 * [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
 * [test/harness](./test/README.md)
 * [changelog](./changelog.md) and [changelog howto](./doc/changelog_howto.md)
+* [Creating Release](./doc/release.md)
 
 ## Code documentation (doxygen)
 

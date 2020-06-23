@@ -13,6 +13,7 @@
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
+#include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
@@ -39,12 +40,12 @@ namespace app
     {}
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
-        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+        if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
 
@@ -100,6 +101,11 @@ namespace app
 
         window = new gui::DateTimeWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::FotaWindow(this);
+        LOG_INFO("fota name: %s", window->getName().c_str());
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
         window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }

@@ -90,5 +90,6 @@ namespace FotaService
          */
         static void HTTPGET(sys::Service *serv, const std::string &url);
         static void FotaStart(sys::Service *serv, const std::string &url);
+        static void sendRawProgress(sys::Service *serv, const std::string &rawQind);
     };
 } // namespace FotaService

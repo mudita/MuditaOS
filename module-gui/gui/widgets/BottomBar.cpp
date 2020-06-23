@@ -108,6 +108,11 @@ namespace gui
         getSide(side)->setVisible(active);
     }
 
+    bool BottomBar::isActive(BottomBar::Side side)
+    {
+        return getSide(side)->visible;
+    }
+
     void BottomBar::setText(BottomBar::Side side, const UTF8 &str, bool active)
     {
         getSide(side)->setText(str);

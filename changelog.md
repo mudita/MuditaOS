@@ -1,5 +1,17 @@
 # Mudita PurePhone changelog
 
+## Current Release
+
+### Added
+
+* `[fota]` UI for FOTA
+* `[doc]` Added release process documentation.
+* `[phonebook]` Added widget with label and text line for New/Edit Contact window.
+
+### Fixed
+
+### Other
+
 ## [0.26.1] - 2020-06-22
 
 ### Added
