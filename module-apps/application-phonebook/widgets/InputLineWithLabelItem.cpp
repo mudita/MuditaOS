@@ -27,7 +27,7 @@ namespace gui
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(
             new InputMode({InputMode::ABC, InputMode::abc, InputMode::digit}, [=](const UTF8 &) {}));
-        inputText->setPenFocusWidth(style::window::default_border_focus_w);
+        inputText->setPenFocusWidth(style::window::default_border_focucs_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
         inputText->setEditMode(Text::EditMode::EDIT);
 
@@ -83,7 +83,7 @@ namespace gui
         vBox->addWidget(inputText);
     }
 
-    InputLineWithLabelItem::InputLineWithLabeltem(const InputLineWithLabelItem &item)
+    InputLineWithLabelItem::InputLineWithLabelItem(const InputLineWithLabelItem &item)
         : InputLineWithLabelItem(item.listItemName)
     {}
 
