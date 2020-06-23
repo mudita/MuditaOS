@@ -231,9 +231,18 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     return updateBootINI();
 }
 
+bool UpdatePureOS::iniSet(sbini_t *ini, const std::string section, const std::string name, const std::string value)
+{
+    if (sbini_set_string(ini, section.c_str(), name.c_str(), value.c_str())) {
+        LOG_ERROR("iniSet can't update internal structure %s::%s::%s", section.c_str(), name.c_str(), value.c_str());
+        sbini_free(ini);
+        return false;
+    }
+    return true;
+}
+
 updateos::UpdateError UpdatePureOS::updateBootINI()
 {
-    int ret                          = 0;
     unsigned long bootIniAbsoulteCRC = 0;
     fs::path bootIniAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_ini;
     LOG_DEBUG("updateBootINI");
@@ -244,19 +253,17 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
         ini = sbini_new();
     }
 
-    ret = sbini_set_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str(), PATH_CURRENT);
-    ret =
-        sbini_set_string(ini, purefs::ini::main.c_str(), purefs::ini::os_image.c_str(), purefs::file::boot_bin.c_str());
-    ret = sbini_set_string(ini, PATH_CURRENT, purefs::ini::os_git_tag.c_str(), GIT_TAG);
-    ret = sbini_set_string(ini, PATH_CURRENT, purefs::ini::os_git_revision.c_str(), GIT_REV);
-    ret = sbini_set_string(ini, PATH_CURRENT, purefs::ini::os_git_branch.c_str(), GIT_BRANCH);
-    if (ret) {
-        LOG_ERROR("updateBootINI can't update internal structure %s::%s",
-                  purefs::ini::main.c_str(),
-                  purefs::ini::os_type.c_str());
-        sbini_free(ini);
+    /* ini will be freed in iniSet if it fails */
+    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_type, PATH_CURRENT))
         return updateos::UpdateError::CantUpdateINI;
-    }
+    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_image, purefs::file::boot_bin.c_str()))
+        return updateos::UpdateError::CantUpdateINI;
+    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_tag, GIT_TAG))
+        return updateos::UpdateError::CantUpdateINI;
+    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_revision, GIT_REV))
+        return updateos::UpdateError::CantUpdateINI;
+    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_branch, GIT_BRANCH))
+        return updateos::UpdateError::CantUpdateINI;
 
     if (sbini_save(ini, bootIniAbsoulte.c_str())) {
         LOG_ERROR("updateBootINI can't save ini file at: %s", bootIniAbsoulte.c_str());
