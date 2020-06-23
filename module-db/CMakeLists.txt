@@ -45,6 +45,7 @@ set(SOURCES
         Interface/SMSTemplateRecord.cpp
 
         queries/sms/QuerySMSSearch.cpp
+        queries/calllog/QueryCalllogSetAllRead.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

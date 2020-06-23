@@ -8,10 +8,11 @@
  */
 #pragma once
 
-#include <Common/Common.hpp>
-#include <ContactRecord.hpp>
-#include <Databases/CalllogDB.hpp>
-#include <Record.hpp>
+#include "Common/Common.hpp"
+#include "ContactRecord.hpp"
+#include "Databases/CalllogDB.hpp"
+#include "Record.hpp"
+#include "queries/calllog/QueryCalllogSetAllRead.hpp"
 #include <PhoneNumber.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -70,8 +71,12 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 
     uint32_t GetLastID();
 
+    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+
   private:
     CalllogDB *calllogDB   = nullptr;
     ContactsDB *contactsDB = nullptr;
     ContactRecord GetContactRecordByID(const UTF8 &contactId);
+
+    std::unique_ptr<db::query::calllog::SetAllReadResult> runQueryImpl(const db::query::calllog::SetAllRead *query);
 };
