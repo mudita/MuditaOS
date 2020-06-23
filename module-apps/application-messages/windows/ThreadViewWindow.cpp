@@ -138,9 +138,11 @@ namespace gui
         gui::Alignment align;
         // 1. load elements to tmp vector
         std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
-        if (threadDetails != nullptr) {
-            SMS.dbsize = threadDetails->msgCount;
+        if (threadDetails == nullptr) {
+            LOG_ERROR("cannot fetch details of selected thread (id: %d)", SMS.thread);
+            return;
         }
+        SMS.dbsize = threadDetails->msgCount;
 
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Start || what == Action::Refresh) {
