@@ -116,7 +116,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
             record->push_back(msg->record);
             LOG_INFO("SMS added, record ID: %" PRIu32, msg->record.ID);
             responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(record), ret);
-            sendUpdateNotification(db::Interface::Name::SMS, db::NotificationMessage::Type::Create);
+            sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Create);
         }
     } break;
 
@@ -125,7 +125,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
         auto ret          = smsRecordInterface->RemoveByID(msg->id);
         responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::SMS, db::NotificationMessage::Type::Delete);
+        sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Delete);
     } break;
 
     case MessageType::DBSMSUpdate: {
@@ -133,7 +133,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
         auto ret          = smsRecordInterface->Update(msg->record);
         responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::SMS, db::NotificationMessage::Type::Update);
+        sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Update);
     } break;
 
     case MessageType::DBSMSGetSMSLimitOffset: {
@@ -198,7 +198,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
         auto ret             = threadRecordInterface->RemoveByID(msg->id);
         responseMsg          = std::make_shared<DBThreadResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::SMSThread, db::NotificationMessage::Type::Delete);
+        sendUpdateNotification(db::Interface::Name::SMSThread, db::Query::Type::Delete);
     } break;
 
     case MessageType::DBThreadGetLimitOffset: {
@@ -399,7 +399,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto ret            = alarmsRecordInterface->Add(msg->record);
         responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
         if (ret == true) {
-            sendUpdateNotification(db::Interface::Name::Alarms, db::NotificationMessage::Type::Create);
+            sendUpdateNotification(db::Interface::Name::Alarms, db::Query::Type::Create);
         }
     } break;
 
@@ -494,7 +494,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         record->push_back(msg->record);
         LOG_INFO("Last ID %" PRIu32, msg->record.ID);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
-        sendUpdateNotification(db::Interface::Name::Calllog, db::NotificationMessage::Type::Create);
+        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Create);
     } break;
 
     case MessageType::DBCalllogRemove: {
@@ -540,7 +540,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         assert(interface != nullptr);
         auto result = interface->runQuery(msg->getQuery());
         responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
-        sendUpdateNotification(msg->getInterface(), db::NotificationMessage::Type::Read);
+        sendUpdateNotification(msg->getInterface(), db::Query::Type::Read);
     } break;
 
     case MessageType::DBServiceBackup: {
@@ -606,7 +606,7 @@ sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode m
     return sys::ReturnCodes::Success;
 }
 
-void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::NotificationMessage::Type type)
+void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type)
 {
     auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
     sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);

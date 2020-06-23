@@ -52,8 +52,7 @@ class ServiceDB : public sys::Service
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final;
 
-    void sendUpdateNotification(db::Interface::Name interface, db::NotificationMessage::Type type);
-
     bool StoreIntoBackup(const std::string &backupPath);
+    void sendUpdateNotification(db::Interface::Name interface, db::Query::Type type);
 };
 

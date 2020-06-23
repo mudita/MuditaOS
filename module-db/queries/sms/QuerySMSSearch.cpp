@@ -3,7 +3,7 @@
 namespace db::query
 {
     SMSSearch::SMSSearch(std::string text_to_search, unsigned int starting_position, unsigned int depth)
-        : text(text_to_search), starting_postion(starting_position), depth(depth)
+        : Query(Query::Type::Read), text(text_to_search), starting_postion(starting_position), depth(depth)
     {}
 
     auto SMSSearch::debugInfo() const -> std::string
