@@ -129,7 +129,20 @@ namespace gui
 
     void ListView::clearItems()
     {
-        body->erase();
+        while (auto el = body->children.back()) {
+
+            if (el->type == ItemType::LIST_ITEM) {
+
+                if (!dynamic_cast<ListItem *>(el)->deleteByList) {
+                    body->removeWidget(el);
+                }
+                else {
+                    body->erase(el);
+                }
+            }
+            else
+                body->erase(el);
+        }
     }
 
     void ListView::refresh()
