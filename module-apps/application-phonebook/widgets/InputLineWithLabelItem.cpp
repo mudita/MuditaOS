@@ -37,41 +37,7 @@ namespace gui
         inputText->setPenWidth(style::window::default_border_no_focus_w);
         inputText->setEditMode(Text::EditMode::EDIT);
 
-        switch (listItemName) {
-        case phonebookInternals::ListItemName::FirstName:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-            break;
-        case phonebookInternals::ListItemName::SecondName:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-            break;
-        case phonebookInternals::ListItemName::Number:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-            inputText->setInputMode(new InputMode({InputMode::phone}));
-            break;
-        case phonebookInternals::ListItemName::OtherNumber:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-            inputText->setInputMode(new InputMode({InputMode::phone}));
-            break;
-        case phonebookInternals::ListItemName::Email:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-            break;
-        case phonebookInternals::ListItemName::Address:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-            inputText->setTextType(Text::TextType::MULTI_LINE);
-            break;
-        case phonebookInternals::ListItemName::Note:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-            inputText->setTextType(Text::TextType::MULTI_LINE);
-            break;
-        default:
-            LOG_ERROR("Incorrect List Item Name!");
-            break;
-        }
+        applyItemNameSpecificSettings();
 
         this->focusChangedCallback = [&](Item &item) {
             if (this->focus) {
@@ -114,4 +80,41 @@ namespace gui
         return new InputLineWithLabelItem(*this);
     }
 
+    void LineEditWithLabel::applyItemNameSpecificSettings()
+    {
+        switch (listItemName) {
+        case phonebookInternals::ListItemName::FirstName:
+            label->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
+            text->setTextType(Text::TextType::SINGLE_LINE);
+            break;
+        case phonebookInternals::ListItemName::SecondName:
+            label->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
+            text->setTextType(Text::TextType::SINGLE_LINE);
+            break;
+        case phonebookInternals::ListItemName::Number:
+            label->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
+            text->setTextType(Text::TextType::SINGLE_LINE);
+            text->setInputMode(new InputMode({InputMode::phone}));
+            break;
+        case phonebookInternals::ListItemName::OtherNumber:
+            label->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
+            text->setTextType(Text::TextType::SINGLE_LINE);
+            break;
+        case phonebookInternals::ListItemName::Email:
+            label->setText(utils::localize.get("app_phonebook_new_contact_email"));
+            text->setTextType(Text::TextType::SINGLE_LINE);
+            break;
+        case phonebookInternals::ListItemName::Address:
+            label->setText(utils::localize.get("app_phonebook_new_contact_address"));
+            text->setTextType(Text::TextType::MULTI_LINE);
+            break;
+        case phonebookInternals::ListItemName::Note:
+            label->setText(utils::localize.get("app_phonebook_new_contact_note"));
+            text->setTextType(Text::TextType::MULTI_LINE);
+            break;
+        default:
+            LOG_ERROR("Incorrect List Item Name!");
+            break;
+        }
+    }
 } /* namespace gui */
