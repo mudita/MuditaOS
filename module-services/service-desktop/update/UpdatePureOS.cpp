@@ -112,41 +112,33 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
         new char[purefs::buffer::tar_buf]); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
     vfs::FILE *fpChecksums = vfs.fopen(checksumsFile.c_str(), "r");
-    if (fpChecksums != NULL) {
-        while (!vfs.eof(fpChecksums)) {
-            char *line = vfs.fgets(lineBuff.get(), purefs::buffer::tar_buf, fpChecksums);
 
-            if (line) {
-                if (lineBuff[0] == ';') { // lines that start with ; are comments
-                    continue;
-                }
-                else {
-                    std::string filePath;
-                    unsigned long fileCRC32;
-
-                    getChecksumInfo(line, filePath, &fileCRC32);
-                    unsigned long computedCRC32 = getExtractedFileCRC32(filePath);
-                    if (computedCRC32 != fileCRC32) {
-                        LOG_ERROR("verifyChecksums %s crc32 match FAIL %lX != %lX",
-                                  filePath.c_str(),
-                                  fileCRC32,
-                                  computedCRC32);
-                        vfs.fclose(fpChecksums);
-                        return updateos::UpdateError::VerifyChecksumsFailure;
-                    }
-                    else {
-                        LOG_DEBUG(
-                            "verifyChecksums %s crc32 match OK %lX == %lX", filePath.c_str(), fileCRC32, computedCRC32);
-                    }
-                }
-            }
-        }
-        vfs.fclose(fpChecksums);
-    }
-    else {
+    if (fpChecksums == NULL) {
         LOG_ERROR("verifyChecksums can't open checksums file %s", checksumsFile.c_str());
         return updateos::UpdateError::CantOpenChecksumsFile;
     }
+
+    while (!vfs.eof(fpChecksums)) {
+        char *line = vfs.fgets(lineBuff.get(), purefs::buffer::tar_buf, fpChecksums);
+        std::string filePath;
+        unsigned long fileCRC32;
+
+        if (line && lineBuff[0] == ';')
+            continue;
+
+        getChecksumInfo(line, filePath, &fileCRC32);
+        unsigned long computedCRC32 = getExtractedFileCRC32(filePath);
+        if (computedCRC32 != fileCRC32) {
+            LOG_ERROR("verifyChecksums %s crc32 match FAIL %lX != %lX", filePath.c_str(), fileCRC32, computedCRC32);
+            vfs.fclose(fpChecksums);
+            return updateos::UpdateError::VerifyChecksumsFailure;
+        }
+        else {
+            LOG_DEBUG("verifyChecksums %s crc32 match OK %lX == %lX", filePath.c_str(), fileCRC32, computedCRC32);
+        }
+    }
+    vfs.fclose(fpChecksums);
+
     return updateos::UpdateError::NoError;
 }
 
