@@ -24,8 +24,14 @@ namespace gui
       public:
         unsigned int ID = 0;
 
-        TestListItem();
+        TestListItem(unsigned int ID, bool deleteByList);
         ~TestListItem() = default;
+    };
+
+    enum class TestListViewDataSource
+    {
+        Internal,
+        External
     };
 
     class TestListViewProvider : public ListItemProvider
@@ -33,15 +39,17 @@ namespace gui
         int modelIndex              = 0;
         unsigned int internalOffset = 0;
         unsigned int internalLimit  = 0;
+        std::vector<ListItem *> internalData;
 
       public:
         unsigned int testItemCount         = 10;
         unsigned int testItemMinimalHeight = 100;
         bool notEqualItems                 = false;
+        TestListViewDataSource dataSource  = TestListViewDataSource::External;
 
-        TestListViewProvider() = default;
+        TestListViewProvider();
 
-        virtual ~TestListViewProvider() = default;
+        virtual ~TestListViewProvider();
 
         int getItemCount() const override;
 
