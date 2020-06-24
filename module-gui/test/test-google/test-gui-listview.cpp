@@ -15,6 +15,7 @@ class TestListView : public gui::ListView
     FRIEND_TEST(ListViewTesting, Scroll_Test);
     FRIEND_TEST(ListViewTesting, Navigate_Test);
     FRIEND_TEST(ListViewTesting, Continuous_Type_Test);
+    FRIEND_TEST(ListViewTesting, Data_Deletion_Test);
 
     bool listBorderReached = false;
 
@@ -263,4 +264,49 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
     ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
+}
+
+TEST_F(ListViewTesting, Data_Deletion_Test)
+{
+    // Internal data -> do not delete
+    testProvider->dataSource = gui::TestListViewDataSource::Internal;
+    testListView->provider->requestRecords(0, 10);
+
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
+
+    // Save pointers to first and last elements
+    auto pointerToFirst = dynamic_cast<gui::TestListItem *>(testListView->body->children.front());
+    auto pointerToLast  = dynamic_cast<gui::TestListItem *>(testListView->body->children.back());
+
+    // Clear list
+    testListView->clear();
+    ASSERT_EQ(0, testListView->body->children.size()) << "List should be empty";
+    testProvider->refreshList();
+
+    // Check if pointers match
+    ASSERT_EQ(pointerToFirst, dynamic_cast<gui::TestListItem *>(testListView->body->children.front()))
+        << "Pointer to first element should match";
+    ASSERT_EQ(pointerToLast, dynamic_cast<gui::TestListItem *>(testListView->body->children.back()))
+        << "Pointer to last element should match";
+
+    // External data -> delete
+    testProvider->dataSource = gui::TestListViewDataSource::External;
+    testListView->provider->requestRecords(0, 10);
+
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
+
+    // Save pointers to first and last elements
+    pointerToFirst = dynamic_cast<gui::TestListItem *>(testListView->body->children.front());
+    pointerToLast  = dynamic_cast<gui::TestListItem *>(testListView->body->children.back());
+
+    // Clear list
+    testListView->clear();
+    ASSERT_EQ(0, testListView->body->children.size()) << "List should be empty";
+    testProvider->refreshList();
+
+    // Check if pointers don't match
+    ASSERT_NE(pointerToFirst, dynamic_cast<gui::TestListItem *>(testListView->body->children.front()))
+        << "Pointer to first element should match";
+    ASSERT_NE(pointerToLast, dynamic_cast<gui::TestListItem *>(testListView->body->children.back()))
+        << "Pointer to last element should match";
 }
