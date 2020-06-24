@@ -160,6 +160,7 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount);
         resizeWithScroll();
+        body->axisAlignment();
         pageLoaded = true;
     }
 
@@ -223,7 +224,6 @@ namespace gui
         }
 
         recalculateStartIndex();
-        body->axisAlignment();
     }
 
     void ListView::setFocus()
