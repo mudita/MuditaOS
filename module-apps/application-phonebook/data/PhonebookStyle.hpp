@@ -68,6 +68,28 @@ namespace phonebookStyle
         constexpr uint32_t title_label_input_text_span = h - input_text_h;
     } // namespace inputLineWithLabelItem
 
+    namespace inputBoxWithLabelAndIconItem
+    {
+        constexpr uint32_t w = style::window::default_body_width;
+        constexpr uint32_t h = 65;
+
+        constexpr uint32_t input_box_w = 55;
+        constexpr uint32_t input_box_h = 40;
+
+        constexpr uint32_t description_label_x = input_box_w + 20;
+        constexpr uint32_t description_label_w = 280;
+        constexpr uint32_t description_label_h = 40;
+
+        constexpr uint32_t icon_image_x = description_label_x + description_label_w + 35;
+        constexpr uint32_t icon_image_w = 30;
+        constexpr uint32_t icon_image_h = 30;
+
+        constexpr uint32_t tick_image_x = icon_image_x + icon_image_w + 12;
+        constexpr uint32_t tick_image_w = 30;
+        constexpr uint32_t tick_image_h = 30;
+
+    } // namespace inputBoxWithLabelAndIconItem
+
     namespace searchResults
     {
         namespace searchResultList
