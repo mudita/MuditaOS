@@ -544,10 +544,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     } break;
 
     case MessageType::DBServiceBackup: {
-        auto time                   = utils::time::Scoped("DBServiceBackup");
-        auto msg                    = static_cast<DBServiceMessageBackup *>(msgl);
-        auto ret                    = StoreIntoBackup({msg->backupPath});
-        responseMsg                 = std::make_shared<DBServiceResponseMessage>(ret);
+        auto time   = utils::time::Scoped("DBServiceBackup");
+        auto msg    = static_cast<DBServiceMessageBackup *>(msgl);
+        auto ret    = StoreIntoBackup({msg->backupPath});
+        responseMsg = std::make_shared<DBServiceResponseMessage>(ret);
     } break;
 
     default:
