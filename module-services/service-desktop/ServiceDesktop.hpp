@@ -16,9 +16,9 @@ namespace sdesktop
     class UpdateOsMessage : public sys::DataMessage
     {
       public:
-        UpdateOsMessage(MessageType messageType, const std::string updateFilePath, const uint32_t requestUUID)
-            : sys::DataMessage(messageType), updateFile(updateFilePath), uuid(requestUUID){};
-        UpdateOsMessage(MessageType type = MessageType::UpdateOS) : sys::DataMessage(type)
+        UpdateOsMessage(const std::string updateFilePath, const uint32_t requestUUID)
+            : sys::DataMessage(MessageType::UpdateOS), updateFile(updateFilePath), uuid(requestUUID){};
+        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
         {}
         virtual ~UpdateOsMessage(){};
 
