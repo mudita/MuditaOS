@@ -7,7 +7,6 @@
 #include "vfs.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include <cstdint>
 #include <cstdio>

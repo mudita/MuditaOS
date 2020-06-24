@@ -17,7 +17,6 @@
 #include "Tables/ThreadsTable.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include <cstdint>
 #include <cstdio>
