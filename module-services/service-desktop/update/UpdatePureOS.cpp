@@ -296,6 +296,8 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 
     if (crc32 != nullptr)
         *crc32 = 0;
+    else
+        return false;
 
     int errCode   = MTAR_ESUCCESS;
     vfs::FILE *fp = vfs.fopen(fullPath.c_str(), "w+");
@@ -325,8 +327,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
             return false;
         }
 
-        if (crc32 != nullptr)
-            *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
+        *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
     }
     vfs.fclose(fp);
     return true;
