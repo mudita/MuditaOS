@@ -1,7 +1,9 @@
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 #include "utf8/UTF8.hpp"
+
+static const std::uint32_t notFound = static_cast<std::uint32_t>(-1);
 
 TEST_CASE("UTF8: operator index returns value")
 {
@@ -17,47 +19,6 @@ TEST_CASE("UTF8: operator index exceeds string size")
     UTF8 ustr = UTF8("Rąbać");
 
     REQUIRE(0 == ustr[ustr.length() + 1]);
-}
-
-TEST_CASE("UTF8: operator index last index clears")
-{
-    UTF8 ustr = UTF8("Rąbać");
-
-    // last element - operator_index_iterations should be equal ustr.strLength - 1
-    ustr[ustr.length() - 1];
-    REQUIRE(ustr.length() - 1 == ustr.operator_index_iterations);
-    // next to last element - operator_index_iterations should be equal ustr.strLength - 2
-    // lastIndex should clear, lastIndex is lower than last time
-    ustr[ustr.length() - 2];
-    REQUIRE(ustr.length() - 2 == ustr.operator_index_iterations);
-}
-
-TEST_CASE("UTF8: operator index last index increments")
-{
-    UTF8 ustr = UTF8("Rąbać");
-
-    for (uint32_t i = 1; i < ustr.length(); i++) {
-        ustr[i];
-        REQUIRE(1 == ustr.operator_index_iterations);
-    }
-}
-
-TEST_CASE("UTF8: operator index last index counting")
-{
-    UTF8 ustr = UTF8("Rąbać");
-
-    // first element - operator_index_iterations should be equal 0
-    ustr[0];
-    REQUIRE(0 == ustr.operator_index_iterations);
-    // third element - operator_index_iterations should be equal 2
-    ustr[2];
-    REQUIRE(2 == ustr.operator_index_iterations);
-    // first element - operator_index_iterations should be equal 0
-    ustr[0];
-    REQUIRE(0 == ustr.operator_index_iterations);
-    // last element - operator_index_iterations should be equal ustr.strLength - 1
-    ustr[ustr.length() - 1];
-    REQUIRE(ustr.length() - 1 == ustr.operator_index_iterations);
 }
 
 TEST_CASE("UTF8: substr returns empty string when zero length is passed")
@@ -104,14 +65,14 @@ TEST_CASE("UTF8: find returns npos if not found")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "E";
-    REQUIRE(-1 == sourceString.find(to_find));
+    REQUIRE(notFound == sourceString.find(to_find));
 }
 
 TEST_CASE("UTF8: find returns npos if pos exceeds string length")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "A";
-    REQUIRE(-1 == sourceString.find(to_find, sourceString.length() + 5));
+    REQUIRE(notFound == sourceString.find(to_find, sourceString.length() + 5));
 }
 
 TEST_CASE("UTF8: find returns position of passed string")
@@ -119,8 +80,8 @@ TEST_CASE("UTF8: find returns position of passed string")
     std::string base("AaBbCcŃń");
     UTF8 sourceString = UTF8("AaBbCcŃń");
 
-    const char *to_find   = "Ń";
-    int32_t base_position = base.find(to_find);
+    const char *to_find = "Ń";
+    auto base_position  = base.find(to_find);
 
     REQUIRE(base_position == sourceString.find(to_find));
 }
@@ -130,8 +91,8 @@ TEST_CASE("UTF8: find returns position of passed string when pos is passed")
     std::string base("Aa Bb aCcŃń");
     UTF8 sourceString = UTF8("Aa Bb aCcŃń");
 
-    const char *to_find   = "a";
-    int32_t base_position = base.find(to_find, 3);
+    const char *to_find = "a";
+    auto base_position  = base.find(to_find, 3);
 
     REQUIRE(base_position == sourceString.find(to_find, 3));
 }
@@ -140,14 +101,14 @@ TEST_CASE("UTF8: findLast returns npos if not found")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "E";
-    REQUIRE(-1 == sourceString.findLast(to_find, sourceString.length() - 1));
+    REQUIRE(notFound == sourceString.findLast(to_find, sourceString.length() - 1));
 }
 
 TEST_CASE("UTF8: findLast returns npos if pos exceeds string length")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "A";
-    REQUIRE(-1 == sourceString.findLast(to_find, sourceString.length() + 5));
+    REQUIRE(notFound == sourceString.findLast(to_find, sourceString.length() + 5));
 }
 
 TEST_CASE("UTF8: findLast returns position of passed string")
@@ -155,8 +116,8 @@ TEST_CASE("UTF8: findLast returns position of passed string")
     std::string base("AaBbCcŃń");
     UTF8 sourceString = UTF8("AaBbCcŃń");
 
-    const char *to_find   = "Ń";
-    int32_t base_position = base.find(to_find);
+    const char *to_find = "Ń";
+    auto base_position  = base.find(to_find);
 
     REQUIRE(base_position == sourceString.findLast(to_find, sourceString.length() - 1));
 }
@@ -166,8 +127,8 @@ TEST_CASE("UTF8: findLast returns position of passed string when pos is passed")
     std::string base("Aa Bb aCcŃń");
     UTF8 sourceString = UTF8("Aa Bb aCcŃń");
 
-    const char *to_find   = "a";
-    int32_t base_position = 1;
+    const char *to_find         = "a";
+    std::uint32_t base_position = 1;
 
     REQUIRE(base_position == sourceString.findLast(to_find, 3));
 }

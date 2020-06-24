@@ -10,19 +10,18 @@
 
 #include "vfs.hpp"
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "Database/Database.hpp"
+#include "Databases/SettingsDB.hpp"
+#include "Interface/SettingsRecord.hpp"
+#include "Interface/ContactRecord.hpp"
+
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <algorithm>
-
 #include <iostream>
-#include <Interface/ContactRecord.hpp>
-
-#include "../Database/Database.hpp"
-#include "../Databases/SettingsDB.hpp"
-#include "../Interface/SettingsRecord.hpp"
 
 TEST_CASE("Settings Record tests")
 {

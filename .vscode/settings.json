@@ -3,5 +3,7 @@
     "cmake.buildDirectory": "${workspaceFolder}/build-${buildKit}-${buildType}",
     "cmake.configureSettings": {
         "COLOR_OUTPUT": "OFF"
-    }
+    },
+    "testMate.cpp.test.executables": "build-linux-Debug/{googletest,catch2}-*",
 }
+

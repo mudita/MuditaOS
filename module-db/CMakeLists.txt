@@ -101,5 +101,6 @@ target_compile_options(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
 
 # Host target configuration(mainly used for unit testing)
-add_subdirectory(tests)
-
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

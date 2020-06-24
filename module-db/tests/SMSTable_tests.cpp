@@ -10,19 +10,19 @@
 
 #include "vfs.hpp"
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "Database/Database.hpp"
+#include "Databases/SmsDB.hpp"
+
+#include "Tables/SettingsTable.hpp"
+
 #include <algorithm>
-
 #include <iostream>
 
-#include "../Database/Database.hpp"
-#include "../Databases/SmsDB.hpp"
-
-#include "Tables/SMSTable.hpp"
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 TEST_CASE("SMS Table tests")
 {

@@ -7,15 +7,17 @@
  * @details
  */
 
+#define CATCH_CONFIG_MAIN
+
+#include <catch2/catch.hpp>
+
 #include "vfs.hpp"
 
-#include "catch.hpp"
+#include <ticks.hpp>
 
-#include <stdint.h>
 #include <algorithm>
 
-#include <iostream>
-#include <ticks.hpp>
+#include <cstdint>
 
 class vfs vfs;
 
