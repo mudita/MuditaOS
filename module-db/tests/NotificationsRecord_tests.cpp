@@ -127,20 +127,5 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(entryPost.value == entryPre.value);
     }
 
-    // SECTION("Set All Read via query")
-    // {
-    //     REQUIRE(NotificationsRecordInterface.GetCount(EntryState::UNREAD) == 4);
-    //     REQUIRE(NotificationsRecordInterface.GetCount(EntryState::READ) == 0);
-
-    //     db::query::entrylog::SetAllRead query;
-    //     auto ret    = NotificationsRecordInterface.runQuery(&query);
-    //     auto result = dynamic_cast<db::query::entrylog::SetAllReadResult *>(ret.get());
-    //     REQUIRE(result != nullptr);
-    //     REQUIRE(result->ret == true);
-
-    //     REQUIRE(NotificationsRecordInterface.GetCount(EntryState::UNREAD) == 0);
-    //     REQUIRE(NotificationsRecordInterface.GetCount(EntryState::READ) == 4);
-    // }
-
     Database::Deinitialize();
 }
