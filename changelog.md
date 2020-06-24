@@ -7,8 +7,11 @@
 * `[fota]` UI for FOTA
 * `[doc]` Added release process documentation.
 * `[phonebook]` Added widget with label and text line for New/Edit Contact window.
+* `[listview]` Added item delete or not support.
 
 ### Fixed
+
+* `[listview]` Fixed top axis alignment not working properly on lists with scrolls.
 
 ### Other
 * `[database]` Add database backup feature with sqlite's VACUUM command.
