@@ -17,11 +17,11 @@
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/ContactRecord.hpp"
 
+#include <algorithm>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <algorithm>
-#include <iostream>
 
 TEST_CASE("Settings Record tests")
 {
