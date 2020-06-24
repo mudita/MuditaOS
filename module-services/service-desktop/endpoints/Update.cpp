@@ -16,7 +16,7 @@ static sys::ReturnCodes run(uint32_t uuid, json11::Json &body, std::string &resp
 
     responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
 
-    auto msg = std::make_shared<sdesktop::UpdateOsMessage>(MessageType::UpdateOS, fileName, uuid);
+    auto msg = std::make_shared<sdesktop::UpdateOsMessage>(fileName, uuid);
     sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerService);
 
     return sys::ReturnCodes::Success;
