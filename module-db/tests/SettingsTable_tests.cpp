@@ -18,7 +18,6 @@
 #include "Tables/SettingsTable.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include <cstdint>
 #include <cstdio>

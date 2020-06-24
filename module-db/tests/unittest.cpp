@@ -86,11 +86,6 @@ TEST_CASE("Create and destroy simple database")
 
         REQUIRE(queryRes->GetFieldCount() == 2);
         REQUIRE(queryRes->GetRowCount() == 6);
-
-        do {
-            std::cout << "Artist ID: " << (*queryRes)[0].GetInt32() << "\n";
-            std::cout << "Artist name: " << (*queryRes)[1].GetString() << "\n";
-        } while (queryRes->NextRow());
     }
 
     SECTION("Store database into backup file")

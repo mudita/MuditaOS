@@ -16,7 +16,6 @@
 #include "Interface/AlarmsRecord.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include <cstdint>
 #include <cstdio>

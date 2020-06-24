@@ -8,7 +8,6 @@
 #include <vfs.hpp>
 
 #include <algorithm>
-#include <iostream>
 #include <string>
 
 #include <cstdint>

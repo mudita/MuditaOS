@@ -16,7 +16,7 @@
 #include "Databases/ContactsDB.hpp"
 
 #include <algorithm>
-#include <iostream>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
