@@ -1,3 +1,5 @@
+option (ENABLE_TEST_LOGS "Enable logs in unit tests" OFF)
+
 set(CATCH2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Catch2")
 list(APPEND CMAKE_MODULE_PATH "${CATCH2_PATH}/contrib/")
 
@@ -9,6 +11,8 @@ include(GoogleTest)
 include(Catch)
 
 add_custom_target(unittests)
+
+set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
 
 function(add_gtest_executable TESTNAME TESTSRCS)
     add_executable(${TESTNAME} EXCLUDE_FROM_ALL ${TESTSRCS})
@@ -40,6 +44,11 @@ function(add_catch2_executable)
     endif(NOT _TEST_ARGS_SRCS)
 
     add_executable(${_TESTNAME} EXCLUDE_FROM_ALL ${_TEST_ARGS_SRCS})
+
+    # disable logs in unit tests
+    if (NOT ${ENABLE_TEST_LOGS})
+    	target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
+    endif (NOT ${ENABLE_TEST_LOGS})
 
     target_link_libraries(${_TESTNAME} PRIVATE Catch2::Catch2)
     foreach(lib ${_TEST_ARGS_LIBS})
