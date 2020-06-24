@@ -6,7 +6,6 @@
 
 namespace db::query::calllog
 {
-    /// implements search for SMS by text
     class SetAllRead : public Query
     {
       public:
