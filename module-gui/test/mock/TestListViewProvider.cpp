@@ -3,12 +3,28 @@
 
 namespace gui
 {
-
-    TestListItem::TestListItem()
+    TestListItem::TestListItem(unsigned int ID, bool deleteByList) : ID(ID)
     {
         setMinimumSize(testStyle::item_w, testStyle::item_h);
         setMaximumSize(testStyle::item_w, testStyle::item_h);
+
+        this->deleteByList = deleteByList;
     };
+
+    TestListViewProvider::TestListViewProvider()
+    {
+        for (unsigned int i = 0; i < testItemCount; i++) {
+            internalData.push_back(new TestListItem(i, false));
+        }
+    }
+
+    TestListViewProvider::~TestListViewProvider()
+    {
+        for (auto item : internalData) {
+            delete item;
+        }
+        internalData.clear();
+    }
 
     int TestListViewProvider::getItemCount() const
     {
@@ -51,19 +67,32 @@ namespace gui
                 return nullptr;
             }
 
-            auto testItem = new TestListItem();
-            testItem->ID  = index;
+            if (dataSource == gui::TestListViewDataSource::External) {
 
-            if (notEqualItems) {
-                testItem->setMinimumSize(testStyle::item_w, testStyle::item_h + testStyle::item_h * index);
+                auto testItem = new TestListItem(index, true);
+
+                if (notEqualItems) {
+                    testItem->setMinimumSize(testStyle::item_w, testStyle::item_h + testStyle::item_h * index);
+                }
+
+                modelIndex++;
+
+                return testItem;
             }
+            else {
 
-            modelIndex++;
+                if (notEqualItems) {
+                    internalData[index]->setMinimumSize(testStyle::item_w,
+                                                        testStyle::item_h + testStyle::item_h * index);
+                }
 
-            return testItem;
+                internalData[index]->setVisible(true);
+
+                modelIndex++;
+
+                return internalData[index];
+            }
         }
-
         return nullptr;
     }
-
 }; // namespace gui
