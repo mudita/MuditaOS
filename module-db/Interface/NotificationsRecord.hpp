@@ -58,10 +58,7 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
                                                                             const char *str) override final;
 
     NotificationsRecord GetByKey(NotificationsRecord::Key key);
-    // std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override final;
 
   private:
     NotificationsDB *notificationsDb = nullptr;
-
-    // std::unique_ptr<db::query::calllog::SetAllReadResult> runQueryImpl(const db::query::calllog::SetAllRead *query);
 };

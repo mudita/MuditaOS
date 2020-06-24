@@ -111,18 +111,3 @@ NotificationsRecord NotificationsRecordInterface::GetByKey(NotificationsRecord::
 
     return notificationsDb->notifications.GetByKey(static_cast<uint32_t>(key));
 }
-
-// std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(const db::Query *query)
-// {
-//     // if (const auto local_query = dynamic_cast<const db::query::entrylog::SetAllRead *>(query)) {
-//     //     return runQueryImpl(local_query);
-//     // }
-//     return std::unique_ptr<db::QueryResult>();
-// }
-
-// std::unique_ptr<db::query::entrylog::SetAllReadResult> NotificationsRecordInterface::runQueryImpl(
-//     const db::query::entrylog::SetAllRead *query)
-// {
-//     auto db_result = SetAllRead();
-//     return std::make_unique<db::query::entrylog::SetAllReadResult>(db_result);
-// }

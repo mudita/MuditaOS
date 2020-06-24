@@ -1,13 +1,5 @@
-/*
- * @file CallLogMainWindow.cpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 19.09.2019
- * @brief Application Call Log Main Window
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "CallLogMainWindow.hpp"
-#include "application-calllog/data/CallLogInternals.hpp" // TODO: alek: add easier paths
+#include "application-calllog/data/CallLogInternals.hpp"
 #include "application-calllog/ApplicationCallLog.hpp"
 #include "application-calllog/widgets/CalllogItem.hpp"
 

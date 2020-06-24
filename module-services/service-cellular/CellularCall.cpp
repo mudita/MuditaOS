@@ -118,7 +118,7 @@ namespace CellularCall
                 else {
                     setType(CallType::CT_MISSED);
                 }
-                markUnread(); // TODO: or only for missed?
+                markUnread();
             } break;
 
             case CallType::CT_OUTGOING: {

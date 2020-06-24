@@ -1,11 +1,3 @@
-/*
- * @file CalllogRecord.hpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 23.09.2019
- * @brief Call Log DB Record
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
 #include "Common/Common.hpp"

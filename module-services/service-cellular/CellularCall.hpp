@@ -85,7 +85,6 @@ namespace CellularCall
         void markUnread()
         {
             call.isRead = false;
-            ;
         }
 
         void clear()

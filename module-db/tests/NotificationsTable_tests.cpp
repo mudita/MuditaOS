@@ -21,7 +21,7 @@ TEST_CASE("Notifications Table tests")
     REQUIRE(notificationsDb.IsInitialized());
 
     auto &notificationsTbl = notificationsDb.notifications;
-    REQUIRE(notificationsTbl.GetCount() == 2); // it already got some entries
+    REQUIRE(notificationsTbl.GetCount() == 2); // it already got some entries Calls(1) and Sms(2)
 
     SECTION("Default Constructor")
     {
@@ -32,8 +32,6 @@ TEST_CASE("Notifications Table tests")
         REQUIRE_FALSE(testRow.isValid());
     }
 
-    REQUIRE(notificationsTbl.Add({{.ID = 0}, .key = 1, .value = 2})); // Calls
-    REQUIRE(notificationsTbl.Add({{.ID = 0}, .key = 2, .value = 4})); // Sms
     REQUIRE(notificationsTbl.Add({{.ID = 0}, .key = 3, .value = 8}));
     REQUIRE(notificationsTbl.Add({{.ID = 0}, .key = 4, .value = 16}));
 
@@ -122,7 +120,7 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(notificationsTbl.GetCount() == 0);
     }
 
-    SECTION("Check uniquness")
+    SECTION("Check uniqueness")
     {
         REQUIRE(notificationsTbl.Add({{.ID = 0}, .key = 3, .value = 100}));
         REQUIRE(notificationsTbl.GetCount() == 4);
