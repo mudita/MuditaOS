@@ -74,7 +74,10 @@ namespace gui
         void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
         std::list<DrawCommand *> buildDrawList() override;
-        void bottomBarTemporaryMode(const UTF8 &text);
+        /// Setting bottom bar temporary text
+        /// @param text - bottomBar text
+        /// @param overwriteOthers - set or not other bottomBar texts to "" (default true)
+        void bottomBarTemporaryMode(const UTF8 &text, bool emptyOthers = true);
         void bottomBarRestoreFromTemporaryMode();
         bool selectSpecialCharacter();
         /// get BoundingBox size of Window "body" area

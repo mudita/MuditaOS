@@ -9,6 +9,7 @@
 * `[phonebook]` Added widget with label and text line for New/Edit Contact window.
 * `[listview]` Added item delete or not support.
 * `[phonebook]` Added widget with input box, description label and icon for New/Edit Contact window.
+* `[bottombar]` Added selective temporary mode.
 
 ### Changed
 
