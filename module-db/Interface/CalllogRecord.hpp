@@ -1,17 +1,10 @@
-/*
- * @file CalllogRecord.hpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 23.09.2019
- * @brief Call Log DB Record
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
-#include <Common/Common.hpp>
-#include <ContactRecord.hpp>
-#include <Databases/CalllogDB.hpp>
-#include <Record.hpp>
+#include "Common/Common.hpp"
+#include "ContactRecord.hpp"
+#include "Databases/CalllogDB.hpp"
+#include "Record.hpp"
+#include "queries/calllog/QueryCalllogSetAllRead.hpp"
 #include <PhoneNumber.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -28,6 +21,7 @@ struct CalllogRecord : public Record
     UTF8 name                            = "";
     UTF8 contactId                       = "";
     utils::PhoneNumber::View phoneNumber = utils::PhoneNumber::View();
+    bool isRead                          = true;
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
 
@@ -58,6 +52,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);
+    bool SetAllRead();
 
     std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
@@ -68,8 +63,12 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 
     uint32_t GetLastID();
 
+    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+
   private:
     CalllogDB *calllogDB   = nullptr;
     ContactsDB *contactsDB = nullptr;
     ContactRecord GetContactRecordByID(const UTF8 &contactId);
+
+    std::unique_ptr<db::query::calllog::SetAllReadResult> runQueryImpl(const db::query::calllog::SetAllRead *query);
 };

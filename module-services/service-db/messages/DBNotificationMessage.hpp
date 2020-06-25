@@ -4,23 +4,15 @@
 #include "Service/Message.hpp"
 #include <memory>
 #include <module-db/Interface/BaseInterface.hpp>
+#include <module-db/Common/Query.hpp>
 
 namespace db
 {
     class NotificationMessage : public sys::DataMessage
     {
       public:
-        /// made it CRUD
-        enum class Type
-        {
-            Create,
-            Read,
-            Update,
-            Delete
-        };
-
-        NotificationMessage(db::Interface::Name interface, Type type);
+        NotificationMessage(db::Interface::Name interface, Query::Type type);
         db::Interface::Name interface;
-        const Type type;
+        const Query::Type type;
     };
 } // namespace db

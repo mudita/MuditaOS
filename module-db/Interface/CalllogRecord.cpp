@@ -23,7 +23,7 @@
 CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
     : Record{tableRow.ID}, presentation(tableRow.presentation), date(tableRow.date), duration(tableRow.duration),
       type(tableRow.type), name(tableRow.name), contactId(tableRow.contactId),
-      phoneNumber(utils::PhoneNumber(tableRow.number, tableRow.e164number).getView())
+      phoneNumber(utils::PhoneNumber(tableRow.number, tableRow.e164number).getView()), isRead(tableRow.isRead)
 {}
 
 uint32_t CalllogRecord::getContactId() const
@@ -42,7 +42,8 @@ std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
     out << " <id> " << rec.ID << " <number> " << rec.phoneNumber.getEntered() << " <e164number> "
         << rec.phoneNumber.getE164() << " <formatted> " << rec.phoneNumber.getFormatted() << " <presentation> "
         << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date << " <duration> " << rec.duration
-        << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
+        << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId
+        << " <isRead> " << rec.isRead;
 
     return out;
 }
@@ -67,7 +68,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     localRec.name      = contactRec->getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
-    return calllogDB->calls.Add(CalllogTableRow{.ID           = localRec.ID, // this is only to remove warning
+    return calllogDB->calls.Add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
                                                 .number       = localRec.phoneNumber.getEntered(),
                                                 .e164number   = localRec.phoneNumber.getE164(),
                                                 .presentation = localRec.presentation,
@@ -75,7 +76,8 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
                                                 .duration     = localRec.duration,
                                                 .type         = localRec.type,
                                                 .name         = localRec.name,
-                                                .contactId    = localRec.contactId});
+                                                .contactId    = localRec.contactId,
+                                                .isRead       = localRec.isRead});
     ;
 }
 
@@ -130,11 +132,11 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
 {
 
     auto call = calllogDB->calls.GetByID(rec.ID);
-    if (call.ID == 0) {
+    if (call.ID == DB_ID_NONE) {
         return false;
     }
 
-    return calllogDB->calls.Update(CalllogTableRow{.ID           = rec.ID,
+    return calllogDB->calls.Update(CalllogTableRow{{.ID = rec.ID},
                                                    .number       = rec.phoneNumber.getEntered(),
                                                    .e164number   = rec.phoneNumber.getE164(),
                                                    .presentation = rec.presentation,
@@ -142,7 +144,8 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
                                                    .duration     = rec.duration,
                                                    .type         = rec.type,
                                                    .name         = rec.name,
-                                                   .contactId    = rec.contactId});
+                                                   .contactId    = rec.contactId,
+                                                   .isRead       = rec.isRead});
 }
 
 bool CalllogRecordInterface::RemoveByID(uint32_t id)
@@ -192,4 +195,24 @@ uint32_t CalllogRecordInterface::GetCount(EntryState state)
 uint32_t CalllogRecordInterface::GetCount()
 {
     return GetCount(EntryState::ALL);
+}
+
+bool CalllogRecordInterface::SetAllRead()
+{
+    return calllogDB->calls.SetAllRead();
+}
+
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::runQuery(const db::Query *query)
+{
+    if (const auto local_query = dynamic_cast<const db::query::calllog::SetAllRead *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<db::query::calllog::SetAllReadResult> CalllogRecordInterface::runQueryImpl(
+    const db::query::calllog::SetAllRead *query)
+{
+    auto db_result = SetAllRead();
+    return std::make_unique<db::query::calllog::SetAllReadResult>(db_result);
 }

@@ -34,18 +34,17 @@ enum class PresentationType
     PR_RESTRICTED = 0x03,
 };
 
-struct CalllogTableRow
+struct CalllogTableRow : public Record
 {
-    uint32_t ID = DB_ID_NONE;
     UTF8 number;
     UTF8 e164number;
-    PresentationType presentation;
-    time_t date;
-    time_t duration;
-    CallType type;
+    PresentationType presentation = PresentationType::PR_UNKNOWN;
+    time_t date                   = 0;
+    time_t duration               = 0;
+    CallType type                 = CallType::CT_NONE;
     UTF8 name;
     UTF8 contactId;
-    bool isRead = false;
+    bool isRead = true;
 };
 
 enum class CalllogTableFields
@@ -78,11 +77,18 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    bool SetAllRead();
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS calls("
                                    "_id INTEGER PRIMARY KEY,"
-                                   "date INTEGER,"
-                                   "snippet TEXT DEFAULT '',"
-                                   "path TEXT DEFAULT '')";
+                                   "number TEXT DEFAULT '',"
+                                   "e164number TEXT DEFAULT '',"
+                                   "presentation INTEGER DEFAULT 0,"
+                                   "date INTEGER DEFAULT 0,"
+                                   "duration INTEGER DEFAULT 0,"
+                                   "type INTEGER DEFAULT 0,"
+                                   "name TEXT DEFAULT '',"
+                                   "contactId TEXT DEFAULT '',"
+                                   "isRead INTEGER DEFAULT 1)";
 };

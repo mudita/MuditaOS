@@ -2,7 +2,7 @@
 
 namespace db
 {
-    NotificationMessage::NotificationMessage(db::Interface::Name interface, Type type)
+    NotificationMessage::NotificationMessage(db::Interface::Name interface, Query::Type type)
         : sys::DataMessage(MessageType::DBServiceNotification), interface(interface), type(type)
     {}
 } // namespace db

@@ -18,6 +18,7 @@ set(SOURCES
         Databases/NotesDB.cpp
         Databases/CalllogDB.cpp
         Databases/CountryCodesDB.cpp
+        Databases/NotificationsDB.cpp
 
         Tables/Table.cpp
         Tables/SMSTable.cpp
@@ -33,6 +34,7 @@ set(SOURCES
         Tables/CalllogTable.cpp
         Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp
+        Tables/NotificationsTable.cpp
 
         Interface/Record.cpp
         Interface/SMSRecord.cpp
@@ -43,8 +45,10 @@ set(SOURCES
         Interface/NotesRecord.cpp
         Interface/CalllogRecord.cpp
         Interface/SMSTemplateRecord.cpp
+        Interface/NotificationsRecord.cpp
 
         queries/sms/QuerySMSSearch.cpp
+        queries/calllog/QueryCalllogSetAllRead.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
