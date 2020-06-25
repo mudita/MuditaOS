@@ -1,9 +1,8 @@
 #pragma once
 
-#include <string>
-#include "Service/Common.hpp"
-#include "json/json11.hpp"
-#include "Service/Service.hpp"
+#include <json/json11.hpp>
+#include <Service/Service.hpp>
+
 class EndpointHandler
 {
   public:
