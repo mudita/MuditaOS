@@ -16,7 +16,7 @@ namespace gui
 
         hBox = new gui::HBox(this, 0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::w, 0);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        hBox->setPenFocusWidth(style::window::default_border_focucs_w);
+        hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::messages::sms_border_no_focus);
 
         inputBoxLabel = new gui::Label(hBox, 0, 0, 0, 0);

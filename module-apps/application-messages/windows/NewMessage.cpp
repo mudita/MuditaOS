@@ -163,7 +163,7 @@ namespace gui
 
         auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        reciepientHbox->setPenFocusWidth(style::window::default_border_focucs_w);
+        reciepientHbox->setPenFocusWidth(style::window::default_border_focus_w);
         reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
 
         recipient = new gui::Text(reciepientHbox,
@@ -206,7 +206,7 @@ namespace gui
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
-        message->setPenFocusWidth(style::window::default_border_focucs_w);
+        message->setPenFocusWidth(style::window::default_border_focus_w);
         message->setPenWidth(style::window::messages::sms_border_no_focus);
         message->setFont(style::window::font::medium);
         message->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));

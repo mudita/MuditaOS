@@ -47,7 +47,7 @@ namespace gui
             setPenWidth(style::window::default_border_no_focus_w);
             boundingRect = new Rect(this, w_margin, 0, icon::w, icon::h);
             boundingRect->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-            boundingRect->setPenFocusWidth(style::window::default_border_focucs_w);
+            boundingRect->setPenFocusWidth(style::window::default_border_focus_w);
             boundingRect->setPenWidth(style::window::default_border_no_focus_w);
 
             img   = new gui::Image(boundingRect, icon::img::x, icon::img::y, 0, 0);
