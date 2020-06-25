@@ -123,7 +123,7 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
         std::string filePath;
         unsigned long fileCRC32;
 
-        if (line && lineBuff[0] == ';')
+        if (lineBuff[0] == ';' || line == nullptr)
             continue;
 
         getChecksumInfo(line, filePath, &fileCRC32);
@@ -133,12 +133,10 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
             vfs.fclose(fpChecksums);
             return updateos::UpdateError::VerifyChecksumsFailure;
         }
-        else {
-            LOG_DEBUG("verifyChecksums %s crc32 match OK %lX == %lX", filePath.c_str(), fileCRC32, computedCRC32);
-        }
     }
     vfs.fclose(fpChecksums);
 
+    LOG_DEBUG("verifyChecksums noError");
     return updateos::UpdateError::NoError;
 }
 

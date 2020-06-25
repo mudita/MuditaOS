@@ -1,5 +1,6 @@
-#include "catch.hpp"
 #include "vfs.hpp"
+
+#include <catch2/catch.hpp>
 #include <UpdatePureOS.h>
 #include <stdint.h>
 #include <algorithm>
