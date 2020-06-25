@@ -342,28 +342,28 @@ namespace gui
         }
 
         // 2. actually fill it in
-        if (app->notifications.notSeenCalls > 0) {
+        if (app->notifications.notSeen.Calls > 0) {
             add_notification(
                 notifications,
                 "phone",
                 utils::localize.get("app_desktop_missed_calls"),
-                std::to_string(app->notifications.notSeenCalls),
+                std::to_string(app->notifications.notSeen.Calls),
                 [app]() -> bool { return app->showCalls(); },
                 [app]() -> bool { return app->clearCallsNotification(); });
         }
-        if (app->notifications.notSeenSMS > 0) {
+        if (app->notifications.notSeen.SMS > 0) {
             add_notification(
                 notifications,
                 "mail",
                 utils::localize.get("app_desktop_unread_messages"),
-                std::to_string(app->notifications.notSeenSMS),
+                std::to_string(app->notifications.notSeen.SMS),
                 [this]() -> bool {
                     return sapm::ApplicationManager::messageSwitchApplication(
                         application, app::name_messages, gui::name::window::main_window, nullptr);
                 },
                 [app]() -> bool { return app->clearMessagesNotification(); });
         }
-        if (app->notifications.areEmpty() != true) {
+        if (app->notifications.notSeen.areEmpty() != true) {
             setFocusItem(notifications);
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_show"));
             bottomBar->store(BottomBar::Side::RIGHT);

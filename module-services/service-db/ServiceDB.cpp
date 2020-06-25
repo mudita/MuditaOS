@@ -41,13 +41,13 @@ ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, s
 
 ServiceDB::~ServiceDB()
 {
-
     settingsDB.reset();
     contactsDB.reset();
     smsDB.reset();
     alarmsDB.reset();
     notesDB.reset();
     countryCodesDB.reset();
+    notificationsDB.reset();
 
     Database::Deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -74,6 +74,8 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return calllogRecordInterface.get();
     case db::Interface::Name::CountryCodes:
         return countryCodeRecordInterface.get();
+    case db::Interface::Name::Notifications:
+        return notificationsRecordInterface.get();
     }
     return nullptr;
 }
@@ -542,7 +544,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         assert(interface != nullptr);
         auto result = interface->runQuery(msg->getQuery());
         responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
-        sendUpdateNotification(msg->getInterface(), db::Query::Type::Read);
+        sendUpdateNotification(msg->getInterface(), msg->getQuery()->type);
     } break;
 
     case MessageType::DBServiceBackup: {
@@ -571,28 +573,29 @@ void ServiceDB::TickHandler(uint32_t id)
 // Invoked during initialization
 sys::ReturnCodes ServiceDB::InitHandler()
 {
-
     Database::Initialize();
 
     // Create databases
-    settingsDB     = std::make_unique<SettingsDB>();
-    contactsDB     = std::make_unique<ContactsDB>();
-    smsDB          = std::make_unique<SmsDB>();
-    alarmsDB       = std::make_unique<AlarmsDB>();
-    notesDB        = std::make_unique<NotesDB>();
-    calllogDB      = std::make_unique<CalllogDB>();
-    countryCodesDB = std::make_unique<CountryCodesDB>();
+    settingsDB      = std::make_unique<SettingsDB>();
+    contactsDB      = std::make_unique<ContactsDB>();
+    smsDB           = std::make_unique<SmsDB>();
+    alarmsDB        = std::make_unique<AlarmsDB>();
+    notesDB         = std::make_unique<NotesDB>();
+    calllogDB       = std::make_unique<CalllogDB>();
+    countryCodesDB  = std::make_unique<CountryCodesDB>();
+    notificationsDB = std::make_unique<NotificationsDB>();
 
     // Create record interfaces
-    settingsRecordInterface    = std::make_unique<SettingsRecordInterface>(settingsDB.get());
-    contactRecordInterface     = std::make_unique<ContactRecordInterface>(contactsDB.get());
-    smsRecordInterface         = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
-    threadRecordInterface      = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
-    smsTemplateRecordInterface = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
-    alarmsRecordInterface      = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
-    notesRecordInterface       = std::make_unique<NotesRecordInterface>(notesDB.get());
-    calllogRecordInterface     = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
-    countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
+    settingsRecordInterface      = std::make_unique<SettingsRecordInterface>(settingsDB.get());
+    contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
+    smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
+    threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
+    smsTemplateRecordInterface   = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
+    alarmsRecordInterface        = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
+    notesRecordInterface         = std::make_unique<NotesRecordInterface>(notesDB.get());
+    calllogRecordInterface       = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
+    countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
+    notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
     return sys::ReturnCodes::Success;
 }
 

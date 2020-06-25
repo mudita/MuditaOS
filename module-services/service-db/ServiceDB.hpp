@@ -9,6 +9,7 @@
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/SMSTemplateRecord.hpp"
+#include "Interface/NotificationsRecord.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "messages/DBNotificationMessage.hpp"
@@ -23,6 +24,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<NotesDB> notesDB;
     std::unique_ptr<CalllogDB> calllogDB;
     std::unique_ptr<CountryCodesDB> countryCodesDB;
+    std::unique_ptr<NotificationsDB> notificationsDB;
 
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
@@ -33,6 +35,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<NotesRecordInterface> notesRecordInterface;
     std::unique_ptr<CalllogRecordInterface> calllogRecordInterface;
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
+    std::unique_ptr<NotificationsRecordInterface> notificationsRecordInterface;
 
   protected:
     db::Interface *getInterface(db::Interface::Name interface);
