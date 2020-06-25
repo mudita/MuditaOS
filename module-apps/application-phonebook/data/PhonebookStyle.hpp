@@ -84,7 +84,7 @@ namespace phonebookStyle
         constexpr uint32_t icon_image_w = 30;
         constexpr uint32_t icon_image_h = 30;
 
-        constexpr uint32_t tick_image_x = icon_image_x + icon_image_w + 12;
+        constexpr uint32_t tick_image_x = 12;
         constexpr uint32_t tick_image_w = 30;
         constexpr uint32_t tick_image_h = 30;
 
