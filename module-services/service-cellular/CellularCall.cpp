@@ -118,6 +118,7 @@ namespace CellularCall
                 else {
                     setType(CallType::CT_MISSED);
                 }
+                markUnread();
             } break;
 
             case CallType::CT_OUTGOING: {

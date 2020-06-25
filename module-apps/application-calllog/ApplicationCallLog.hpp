@@ -39,6 +39,8 @@ namespace app
         void destroyUserInterface() final;
 
         bool removeCalllogEntry(const CalllogRecord &record);
+
+        bool setAllEntriesRead();
     };
 
 } /* namespace app */

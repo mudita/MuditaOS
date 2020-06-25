@@ -668,8 +668,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             break;
         }
         LOG_DEBUG("Received multicast");
-        if (msg->interface == db::Interface::Name::SMS && (msg->type == db::NotificationMessage::Type::Create ||
-                                                           msg->type == db::NotificationMessage::Type::Update)) {
+        if (msg->interface == db::Interface::Name::SMS &&
+            (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
             sendSMS();
             return std::make_shared<sys::ResponseMessage>();
         }

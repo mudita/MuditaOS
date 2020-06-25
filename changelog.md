@@ -9,6 +9,7 @@
 * `[phonebook]` Added widget with label and text line for New/Edit Contact window.
 * `[listview]` Added item delete or not support.
 * `[phonebook]` Added widget with input box, description label and icon for New/Edit Contact window.
+* `[notifications]` added notifications db
 
 ### Fixed
 
@@ -16,6 +17,7 @@
 
 ### Other
 * `[database]` Add database backup feature with sqlite's VACUUM command.
+* `[UT]` added UT for calllog and notifications.db
 
 ## [0.26.1] - 2020-06-22
 

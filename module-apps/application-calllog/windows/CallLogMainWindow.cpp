@@ -1,30 +1,20 @@
-/*
- * @file CallLogMainWindow.cpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 19.09.2019
- * @brief Application Call Log Main Window
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "CallLogMainWindow.hpp"
+#include "application-calllog/data/CallLogInternals.hpp"
+#include "application-calllog/ApplicationCallLog.hpp"
+#include "application-calllog/widgets/CalllogItem.hpp"
+
+#include <application-call/ApplicationCall.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBCalllogMessage.hpp>
+#include <i18/i18.hpp>
+#include <Label.hpp>
+#include <Margins.hpp>
+#include <UiCommonActions.hpp>
+#include <Style.hpp>
+
 #include <cassert>
 #include <functional>
 #include <memory>
-
-#include "application-call/ApplicationCall.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-
-#include "../ApplicationCallLog.hpp"
-#include "../widgets/CalllogItem.hpp"
-
-#include "service-db/messages/DBCalllogMessage.hpp"
-#include "i18/i18.hpp"
-
-#include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
-#include "Label.hpp"
-#include "Margins.hpp"
-#include "UiCommonActions.hpp"
-#include <Style.hpp>
 
 using namespace style;
 using namespace callLogStyle;
@@ -80,6 +70,9 @@ namespace gui
             list->clear();
             list->setElementsCount(calllogModel->getItemCount());
         }
+        auto app = dynamic_cast<app::ApplicationCallLog *>(application);
+        assert(app != nullptr);
+        app->setAllEntriesRead();
     }
 
     bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)

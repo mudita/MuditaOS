@@ -8,7 +8,20 @@ namespace db
     class Query
     {
       public:
+        enum class Type
+        {
+            Create,
+            Read,
+            Update,
+            Delete
+        };
+
+        Query(Type type) : type(type)
+        {}
         virtual ~Query()                                            = default;
+
+        const Type type;
+
         [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
     };
 

@@ -16,6 +16,9 @@ namespace db
     class TestQuery : public Query
     {
       public:
+        TestQuery() : Query(Query::Type::Read)
+        {}
+
         [[nodiscard]] auto debugInfo() const -> std::string override
         {
             return "Test!";
