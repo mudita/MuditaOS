@@ -182,7 +182,7 @@ namespace gui
         virtual void erase();
         /// sets `visible` flag
         virtual void setVisible(bool value);
-        void setArea(BoundingBox area);
+        virtual void setArea(BoundingBox area);
         void setAreaInAxis(Axis axis,
                            uint32_t posOnAxis,
                            uint32_t posOnOrthogonalAxis,

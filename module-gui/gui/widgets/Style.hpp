@@ -186,7 +186,16 @@ namespace style
             style::window::default_body_width - style::listview::scroll::item_margin;
         const inline uint32_t body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
+<<<<<<< HEAD
         const inline uint32_t right_margin     = 15;
+=======
+        const inline uint32_t right_margin        = 15;
+        const inline uint32_t top_margin_small    = 5;
+        const inline uint32_t top_margin_big      = 8;
+        const inline uint32_t top_margin_very_big = 12;
+        const inline uint32_t item_span_small     = 8;
+        const inline uint32_t item_span_big       = 12;
+>>>>>>> 455dee3d... [EGD-3189] OnDimensionsChanged fixes, BottomBar temporary modes refactor, InputCallbacks widget refactors.
 
     } // namespace listview
 
