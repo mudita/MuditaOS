@@ -51,12 +51,7 @@ namespace gui
 
         this->inputCallback = [&](Item &item, const InputEvent &event) { return inputText->onInput(event); };
         this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        this->deleteByList = deleteByList;
     }
-
-    InputLineWithLabelItem::InputLineWithLabelItem(const InputLineWithLabelItem &item)
-        : InputLineWithLabelItem(item.listItemName)
-    {}
 
     auto InputLineWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
