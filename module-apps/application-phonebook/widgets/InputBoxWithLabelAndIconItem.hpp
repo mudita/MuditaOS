@@ -23,7 +23,6 @@ namespace gui
         gui::Label *descriptionLabel = nullptr;
         gui::Image *iconImage        = nullptr;
         gui::Image *tickImage        = nullptr;
-        auto clone() -> gui::ListItem *;
 
       private:
         void applyItemNameSpecificSettings();

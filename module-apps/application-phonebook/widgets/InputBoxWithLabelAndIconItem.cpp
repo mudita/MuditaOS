@@ -53,8 +53,8 @@ namespace gui
         this->inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             return inputBoxLabel->onInput(event);
         };
-
         this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        this->deleteByList = deleteByList;
     }
 
     auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
@@ -81,10 +81,6 @@ namespace gui
         return true;
     }
 
-    auto InputBoxWithLabelAndIconItem::clone() -> gui::ListItem *
-    {
-        return new InputBoxWithLabelAndIconItem(*this);
-    }
     void InputBoxWithLabelAndIconItem::applyItemNameSpecificSettings()
     {
         switch (listItemName) {
