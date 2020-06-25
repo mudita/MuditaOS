@@ -10,7 +10,7 @@ namespace gui
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
 
-        setPenFocusWidth(style::window::default_border_focucs_w);
+        setPenFocusWidth(style::window::default_border_focus_w);
         setPenWidth(style::window::default_border_no_focus_w);
 
         type = ItemType::LIST_ITEM;

@@ -19,7 +19,7 @@ namespace gui
         /// number of pixels used to draw border of rectangle without focus
         uint8_t penWidth = style::window::default_border_rect_no_focus;
         /// number of pixels used to draw border of rectangle when it has focus
-        uint8_t penFocusWidth = style::window::default_border_focucs_w;
+        uint8_t penFocusWidth = style::window::default_border_focus_w;
         /// mark if rectangle should be filled with fill color.
         bool filled = false;
         /// mark how to draw borders

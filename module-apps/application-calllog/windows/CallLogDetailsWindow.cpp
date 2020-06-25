@@ -104,7 +104,7 @@ namespace gui
             rects[i] = new gui::Rect(this, 0, 0, information::imgs::w, information::imgs::h);
             rects[i]->setFilled(false);
             rects[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-            rects[i]->setPenFocusWidth(style::window::default_border_focucs_w);
+            rects[i]->setPenFocusWidth(style::window::default_border_focus_w);
             rects[i]->setPenWidth(style::window::default_border_no_focus_w);
         }
 

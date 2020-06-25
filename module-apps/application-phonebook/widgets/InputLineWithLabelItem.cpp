@@ -33,7 +33,7 @@ namespace gui
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
-        inputText->setPenFocusWidth(style::window::default_border_focucs_w);
+        inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
         inputText->setEditMode(Text::EditMode::EDIT);
 

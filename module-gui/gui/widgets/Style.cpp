@@ -10,7 +10,7 @@ namespace style::window
             return;
         }
         el->setPenWidth(default_border_no_focus_w);
-        el->setPenFocusWidth(default_border_focucs_w);
+        el->setPenFocusWidth(default_border_focus_w);
         el->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         el->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
     }

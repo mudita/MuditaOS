@@ -30,7 +30,7 @@ namespace style
         const inline uint32_t default_right_margin = 20;
         const inline uint32_t default_body_width =
             style::window_width - style::window::default_right_margin - style::window::default_left_margin;
-        const inline uint32_t default_border_focucs_w      = 2;
+        const inline uint32_t default_border_focus_w       = 2;
         const inline uint32_t default_border_rect_no_focus = 1;
         const inline uint32_t default_border_no_focus_w    = 0;
         namespace font
@@ -117,6 +117,7 @@ namespace style
             const inline std::string open           = "common_open";
             const inline std::string call           = "common_call";
             const inline std::string send           = "common_send";
+            const inline std::string save           = "common_save";
             const inline std::string confirm        = "common_confirm";
             const inline std::string select         = "common_select";
             const inline std::string use            = "common_use";
@@ -133,7 +134,7 @@ namespace style
             // days
             const inline std::string Monday    = "common_monday";
             const inline std::string Tuesday   = "common_tuesday";
-            const inline std::string Wednesday = "common_wendesday";
+            const inline std::string Wednesday = "common_wednesday";
             const inline std::string Thursday  = "common_thursday";
             const inline std::string Friday    = "common_friday";
             const inline std::string Saturday  = "common_saturday";
