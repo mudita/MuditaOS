@@ -50,11 +50,8 @@ namespace gui
         };
 
         this->inputCallback = [&](Item &item, const InputEvent &event) { return inputText->onInput(event); };
-
         this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-
-        vBox->addWidget(titleLabel);
-        vBox->addWidget(inputText);
+        this->deleteByList = deleteByList;
     }
 
     InputLineWithLabelItem::InputLineWithLabelItem(const InputLineWithLabelItem &item)
@@ -73,11 +70,6 @@ namespace gui
         inputText->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::input_text_h);
 
         return true;
-    }
-
-    auto InputLineWithLabelItem::clone() -> ListItem *
-    {
-        return new InputLineWithLabelItem(*this);
     }
 
     void InputLineWithLabelItem::applyItemNameSpecificSettings()
