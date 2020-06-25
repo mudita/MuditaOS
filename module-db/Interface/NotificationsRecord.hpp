@@ -9,6 +9,19 @@
 #include <cstdint>
 #include <vector>
 
+// fw declarations
+namespace db::query::notifications
+{
+    class Get;
+    class GetResult;
+    class Increment;
+    class IncrementResult;
+    class Clear;
+    class ClearResult;
+    class GetAll;
+    class GetAllResult;
+} // namespace db::query::notifications
+
 struct NotificationsRecord : public Record
 {
     enum class Key
@@ -59,6 +72,14 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
 
     NotificationsRecord GetByKey(NotificationsRecord::Key key);
 
+    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+
   private:
     NotificationsDB *notificationsDb = nullptr;
+
+    std::unique_ptr<db::query::notifications::GetResult> runQueryImpl(const db::query::notifications::Get *query);
+    std::unique_ptr<db::query::notifications::IncrementResult> runQueryImpl(
+        const db::query::notifications::Increment *query);
+    std::unique_ptr<db::query::notifications::ClearResult> runQueryImpl(const db::query::notifications::Clear *query);
+    std::unique_ptr<db::query::notifications::GetAllResult> runQueryImpl(const db::query::notifications::GetAll *query);
 };

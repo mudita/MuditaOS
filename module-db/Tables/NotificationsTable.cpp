@@ -91,9 +91,23 @@ NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
 
 std::vector<NotificationsTableRow> NotificationsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
-    assert(0 && "Not implemented");
+    auto retQuery = db->Query("SELECT * from notifications LIMIT %lu OFFSET %lu;", limit, offset);
 
-    return std::vector<NotificationsTableRow>();
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+        return std::vector<NotificationsTableRow>();
+    }
+
+    std::vector<NotificationsTableRow> ret;
+
+    do {
+        ret.push_back(NotificationsTableRow{
+            (*retQuery)[0].GetUInt32(), // ID
+            (*retQuery)[1].GetUInt32(), // key
+            (*retQuery)[2].GetUInt32(), // value
+        });
+    } while (retQuery->NextRow());
+
+    return ret;
 }
 
 std::vector<NotificationsTableRow> NotificationsTable::GetLimitOffsetByField(uint32_t offset,

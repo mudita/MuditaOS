@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Tables/CalllogTable.hpp>
+#include "Interface/NotificationsRecord.hpp"
 #include <Common/Query.hpp>
 #include <string>
 

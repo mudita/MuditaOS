@@ -12,6 +12,7 @@
 #include <log/log.hpp>
 #include <MessageType.hpp>
 #include <module-db/queries/calllog/QueryCalllogSetAllRead.hpp>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 
 using namespace calllog;
 
@@ -126,6 +127,11 @@ namespace app
 
     bool ApplicationCallLog::setAllEntriesRead()
     {
+        // clear also notifications
+        DBServiceAPI::GetQuery(this,
+                               db::Interface::Name::Notifications,
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
+
         return DBServiceAPI::GetQuery(
             this, db::Interface::Name::Calllog, std::make_unique<db::query::calllog::SetAllRead>());
     }
