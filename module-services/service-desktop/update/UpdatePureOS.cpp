@@ -1,4 +1,4 @@
-#include "UpdatePureOS.h"
+#include "UpdatePureOS.hpp"
 #include <service-desktop/ServiceDesktop.hpp>
 #include <source/version.hpp>
 
@@ -99,7 +99,7 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
 
-            filesInUpdatePackage.push_back(FileInfo(h, fileCRC32));
+            filesInUpdatePackage.emplace_back(FileInfo(h, fileCRC32));
         }
         mtar_next(&updateTar);
     }
@@ -113,7 +113,7 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
     vfs::FILE *fpChecksums = vfs.fopen(checksumsFile.c_str(), "r");
 
-    if (fpChecksums == NULL) {
+    if (fpChecksums == nullptr) {
         LOG_ERROR("verifyChecksums can't open checksums file %s", checksumsFile.c_str());
         return updateos::UpdateError::CantOpenChecksumsFile;
     }
@@ -244,16 +244,21 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
     }
 
     /* ini will be freed in iniSet if it fails */
-    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_type, PATH_CURRENT))
+    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_type, PATH_CURRENT)) {
         return updateos::UpdateError::CantUpdateINI;
-    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_image, purefs::file::boot_bin.c_str()))
+    }
+    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_image, purefs::file::boot_bin.c_str())) {
         return updateos::UpdateError::CantUpdateINI;
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_tag, GIT_TAG))
+    }
+    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_tag, GIT_TAG)) {
         return updateos::UpdateError::CantUpdateINI;
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_revision, GIT_REV))
+    }
+    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_revision, GIT_REV)) {
         return updateos::UpdateError::CantUpdateINI;
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_branch, GIT_BRANCH))
+    }
+    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_branch, GIT_BRANCH)) {
         return updateos::UpdateError::CantUpdateINI;
+    }
 
     if (sbini_save(ini, bootIniAbsoulte.c_str())) {
         LOG_ERROR("updateBootINI can't save ini file at: %s", bootIniAbsoulte.c_str());
@@ -270,9 +275,9 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
 
         vfs::FILE *fpCRC = vfs.fopen(bootIniAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
-            char crcBuf[purefs::buffer::crc_char_size];
-            sprintf(crcBuf, "%lX", bootIniAbsoulteCRC);
-            vfs.fwrite(crcBuf, 1, purefs::buffer::crc_char_size, fpCRC);
+            std::array<char, purefs::buffer::crc_char_size> crcBuf;
+            sprintf(crcBuf.data(), "%lX", bootIniAbsoulteCRC);
+            vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
             vfs.fclose(fpCRC);
         }
         vfs.fclose(fp);
@@ -292,24 +297,28 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
     uint32_t sizeToRead   = purefs::buffer::tar_buf;
 
-    if (crc32 != nullptr)
+    if (crc32 != nullptr) {
         *crc32 = 0;
-    else
+    }
+    else {
         return false;
+    }
 
     int errCode   = MTAR_ESUCCESS;
     vfs::FILE *fp = vfs.fopen(fullPath.c_str(), "w+");
-    if (fp == NULL) {
+    if (fp == nullptr) {
         LOG_ERROR("unpackFileToTemp %s can't open for writing", fullPath.c_str());
         return false;
     }
 
     for (uint32_t i = 0; i < blocksToRead; i++) {
         if (i + 1 == blocksToRead) {
-            if (h.size < purefs::buffer::tar_buf)
+            if (h.size < purefs::buffer::tar_buf) {
                 sizeToRead = h.size;
-            else
+            }
+            else {
                 sizeToRead = updateTar.remaining_data;
+            }
         }
 
         if ((errCode = mtar_read_data(&updateTar, readBuf.get(), sizeToRead)) != MTAR_ESUCCESS) {
