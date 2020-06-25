@@ -1,4 +1,4 @@
-#Verizon FOTA Certification notes
+# Verizon FOTA Certification notes
 
 FOTA is initialized manually by device user from system menu.
 Application starts data connection using predefined APN, then from
@@ -38,36 +38,36 @@ Finally PurePhone is rebooted.
 
 ## FOTA verification test setup diagram
 
-![alt text](./Images/fota/dfota_test_setup.png "Test setup diagram")
+![Test Setup Diagram](./Images/fota/dfota_test_setup.png "Test setup diagram")
 
 ### Architecture diagram for FOTA implementation (show device, network and server implementation)
 ![Architecture](./Images/fota/dfota_architecture.png)
 
 ### Logs/Screen captures
-![alt text](./Images/fota/Fota_001.png)
+![Fota 001](./Images/fota/Fota_001.png)
 ---
-![alt text](./Images/fota/Fota_002.png)
+![Fota 002](./Images/fota/Fota_002.png)
 ---
-![alt text](./Images/fota/Fota_003.png)
+![Fota 003](./Images/fota/Fota_003.png)
 ---
-![alt text](./Images/fota/Fota_004.png)
+![Fota 004](./Images/fota/Fota_004.png)
 ---
-![alt text](./Images/fota/Fota_005.png)
+![Fota 005](./Images/fota/Fota_005.png)
 ---
-![alt text](./Images/fota/Fota_006.png)
+![Fota 006](./Images/fota/Fota_006.png)
 ---
-![alt text](./Images/fota/Fota_007.png)
+![Fota 007](./Images/fota/Fota_007.png)
 ---
-![alt text](./Images/fota/Fota_008.png)
+![Fota 008](./Images/fota/Fota_008.png)
 ---
-![alt text](./Images/fota/Fota_009.png)
+![Fota 009](./Images/fota/Fota_009.png)
 ---
-![alt text](./Images/fota/Fota_010.png)
+![Fota 010](./Images/fota/Fota_010.png)
 ---
-![alt text](./Images/fota/Fota_011.png)
+![Fota 011](./Images/fota/Fota_011.png)
 ---
-![alt text](./Images/fota/Fota_012.png)
+![Fota 012](./Images/fota/Fota_012.png)
 ---
-![alt text](./Images/fota/Fota_013.png)
+![Fota 013](./Images/fota/Fota_013.png)
 ---
-![alt text](./Images/fota/Fota_014.png)
+![Fota 014](./Images/fota/Fota_014.png)
