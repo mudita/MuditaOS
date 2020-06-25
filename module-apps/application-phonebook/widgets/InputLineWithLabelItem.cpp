@@ -26,8 +26,8 @@ namespace gui
 
         inputText = new Text(vBox, 0, 0, 0, 0);
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        inputText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
-        inputText->setFont(style::window::font::medium);
+        inputText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+        inputText->setFont(style::window::font::big);
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
@@ -58,11 +58,12 @@ namespace gui
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
 
-        titleLabel->setPosition(0, 0);
-        titleLabel->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::title_label_h);
+        titleLabel->setArea(BoundingBox(0, 0, newDim.w, phonebookStyle::inputLineWithLabelItem::title_label_h));
 
-        inputText->setPosition(0, phonebookStyle::inputLineWithLabelItem::title_label_input_text_span);
-        inputText->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::input_text_h);
+        inputText->setArea(BoundingBox(0,
+                                       phonebookStyle::inputLineWithLabelItem::title_label_input_text_span,
+                                       newDim.w,
+                                       phonebookStyle::inputLineWithLabelItem::input_text_h));
 
         return true;
     }
@@ -72,7 +73,8 @@ namespace gui
         switch (listItemName) {
         case phonebookInternals::ListItemName::FirstName:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
-            inputText->setTextType(TextType::SINGLE_LINE);
+            inputText->setFont(style::window::font::bigbold);
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
             break;
         case phonebookInternals::ListItemName::SecondName:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
@@ -85,7 +87,8 @@ namespace gui
             break;
         case phonebookInternals::ListItemName::OtherNumber:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
-            inputText->setTextType(TextType::SINGLE_LINE);
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
+            inputText->setInputMode(new InputMode({InputMode::phone}));
             break;
         case phonebookInternals::ListItemName::Email:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
