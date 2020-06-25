@@ -238,7 +238,7 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
     LOG_DEBUG("updateBootINI");
     sbini_t *ini = sbini_load(bootIniAbsoulte.c_str());
 
-    if (!ini) {
+    if (ini == NULL) {
         LOG_INFO("updateBootINI can't load %s", purefs::file::boot_ini.c_str());
         ini = sbini_new();
     }
