@@ -2,6 +2,8 @@
 #include "vfs.hpp"
 #include "microtar/src/microtar.hpp"
 #include "api/DBServiceAPI.hpp"
+#include "service-db/includes/DBServiceName.hpp"
+#include "SystemManager/SystemManager.hpp"
 
 void BackupRestore::BackupUserFiles(sys::Service *ownerService)
 {
@@ -137,6 +139,145 @@ void BackupRestore::BackupUserFiles(sys::Service *ownerService)
         LOG_ERROR("BackupUserFiles: backup mtar_fnalize failed.");
         /* TODO: close failed file and delete from disk, report error */
     }
+}
+
+void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
+{
+    std::string tarFilePath = purefs::dir::os_backups;
+    tarFilePath += "/";
+    tarFilePath += "backup.tar";
+
+    mtar_t tarFile;
+    mtar_header_t tarHeader;
+
+    LOG_INFO("RestoreUserFiles: opening tar file %s...", tarFilePath.c_str());
+
+    int ret = mtar_open(&tarFile, tarFilePath.c_str(), "r");
+
+    if (ret != MTAR_ESUCCESS) {
+        LOG_ERROR(
+            "RestoreUserFiles: opening tar file %s failed with error: %s.", tarFilePath.c_str(), mtar_strerror(ret));
+
+        return;
+    }
+
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
+
+    do {
+        ret = mtar_read_header(&tarFile, &tarHeader);
+        LOG_INFO("RestoreUserFiles: reading tar header status %s.", mtar_strerror(ret));
+        LOG_INFO("RestoreUserFiles: reading tar header type %d.", tarHeader.type);
+        LOG_INFO("RestoreUserFiles: reading tar header name %s.", tarHeader.name);
+        LOG_INFO("RestoreUserFiles: reading tar header size %d.", tarHeader.size);
+
+        LOG_INFO("RestoreUserFiles: reading tar header %s...", tarHeader.name);
+
+        if ((tarHeader.type == MTAR_TREG) && (ret == MTAR_ESUCCESS)) {
+            std::string restoreFilePath = purefs::dir::os_backups;
+            restoreFilePath += "/";
+            restoreFilePath += tarHeader.name;
+            vfs::FILE *file = vfs.fopen(restoreFilePath.c_str(), "w");
+
+            if (file == nullptr) {
+                LOG_ERROR("RestoreUserFiles: extracting file %s failed, cannot open file.", tarHeader.name);
+                mtar_next(&tarFile);
+                continue;
+            }
+
+            uint32_t loopcount = (tarHeader.size / purefs::buffer::tar_buf) + 1u;
+            uint32_t readsize  = 0u;
+
+            for (uint32_t i = 0u; i < loopcount; i++) {
+                LOG_INFO("RestoreUserFiles: extracting file %s...", tarHeader.name);
+
+                if (i + 1u == loopcount) {
+                    readsize = tarHeader.size % purefs::buffer::tar_buf;
+                }
+                else {
+                    readsize = purefs::buffer::tar_buf;
+                }
+
+                mtar_read_data(&tarFile, buffer.get(), readsize);
+                vfs.fwrite(buffer.get(), readsize, 1, file);
+            }
+
+            vfs.fclose(file);
+            LOG_INFO("RestoreUserFiles: extracting file %s succeeded.", tarHeader.name);
+        }
+        else {
+            /* ignore all non-file contents? */
+            LOG_INFO("RestoreUserFiles: found header %d, skipping.", tarHeader.type);
+        }
+
+        ret = mtar_next(&tarFile);
+        LOG_INFO("RestoreUserFiles: reading tar next status %s.", mtar_strerror(ret));
+    } while (ret == MTAR_ESUCCESS);
+
+    LOG_INFO("RestoreUserFiles: cleaning directory from tar file...");
+    mtar_close(&tarFile);
+    vfs.remove(tarFilePath.c_str());
+
+    /* close user files to be restored */
+    LOG_INFO("RestoreUserFiles: closing ServiceDB...");
+    std::string dbServiceName = service::name::db;
+    sys::SystemManager::DestroyService(dbServiceName, ownerService);
+
+    // replace existing files that have respective backup files existing
+    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backups.c_str());
+
+    if (dirlist.size() <= 2) {
+        LOG_INFO("RestoreUserFiles: dir emtpy, nothing to restore");
+        return;
+    }
+
+    LOG_INFO("RestoreUserFiles: dir listed with %d files", dirlist.size() - 2);
+
+    std::string userFilePath = purefs::dir::user_disk;
+    userFilePath += "/";
+
+    std::string backupFilePath = purefs::dir::os_backups;
+    backupFilePath += "/";
+
+    for (auto &direntry : dirlist) {
+
+        if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
+            (direntry.fileName.compare("...") != 0)) {
+            LOG_INFO("RestoreUserFiles: restoring backup file %s...", direntry.fileName.c_str());
+
+            if (vfs.fileExists((userFilePath + direntry.fileName).c_str())) {
+                if (vfs.remove((userFilePath + direntry.fileName).c_str()) == 0) {
+                    if (vfs.rename((backupFilePath + direntry.fileName).c_str(),
+                                   (userFilePath + direntry.fileName).c_str()) == 0) {
+                        LOG_INFO("RestoreFromBackup: restoring backup file %s succeeded", direntry.fileName.c_str());
+                    }
+                    else {
+                        LOG_ERROR("RestoreFromBackup: restoring backup file %s failed on error %s",
+                                  direntry.fileName.c_str(),
+                                  vfs.lastErrnoToStr().c_str());
+                    }
+                }
+                else {
+                    LOG_ERROR("RestoreFromBackup: restoring backup file %s failed on error %s",
+                              direntry.fileName.c_str(),
+                              vfs.lastErrnoToStr().c_str());
+                }
+            }
+            else {
+                if (vfs.rename((backupFilePath + direntry.fileName).c_str(),
+                               (userFilePath + direntry.fileName).c_str()) == 0) {
+                    LOG_INFO("RestoreFromBackup: restoring backup file %s succeeded", direntry.fileName.c_str());
+                }
+                else {
+                    LOG_ERROR("RestoreFromBackup: restoring backup file %s failed on error %s",
+                              direntry.fileName.c_str(),
+                              vfs.lastErrnoToStr().c_str());
+                }
+            }
+        }
+    }
+
+    LOG_INFO("RestoreUserFiles: restoring completed, rebooting...");
+    sys::SystemManager::Reboot(ownerService);
 }
 
 bool BackupRestore::CleanBackupDir()
