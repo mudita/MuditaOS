@@ -16,8 +16,6 @@ namespace gui
 
       public:
         InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName);
-        InputBoxWithLabelAndIconItem(const InputBoxWithLabelAndIconItem &item);
-
         ~InputBoxWithLabelAndIconItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         gui::HBox *hBox              = nullptr;

@@ -57,10 +57,6 @@ namespace gui
         this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
-    InputBoxWithLabelAndIconItem::InputBoxWithLabelAndIconItem(const InputBoxWithLabelAndIconItem &item)
-        : InputBoxWithLabelAndIconItem(item.listItemName)
-    {}
-
     auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
         hBox->setPosition(0, 0);
