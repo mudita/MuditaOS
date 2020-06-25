@@ -55,10 +55,6 @@ namespace gui
         };
 
         this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-
-        hBox->addWidget(inputBoxLabel);
-        hBox->addWidget(descriptionLabel);
-        hBox->addWidget(iconImage);
     }
 
     InputBoxWithLabelAndIconItem::InputBoxWithLabelAndIconItem(const InputBoxWithLabelAndIconItem &item)
