@@ -33,11 +33,11 @@ namespace gui
         setTitle(utils::localize.get("app_phonebook_contact_title"));
 
         list = new gui::ListView(this,
-                                 phonebookStyle::mainWindow::contactsList::x,
-                                 phonebookStyle::mainWindow::contactsList::y,
-                                 phonebookStyle::mainWindow::contactsList::w,
-                                 phonebookStyle::mainWindow::contactsList::h);
-        list->setItemSpanSize(style::listview::item_span_small);
+                                 phonebookStyle::mainWindow::newContactsList::x,
+                                 phonebookStyle::mainWindow::newContactsList::y,
+                                 phonebookStyle::mainWindow::newContactsList::w,
+                                 phonebookStyle::mainWindow::newContactsList::h);
+        list->setItemSpanSize(style::listview::item_span_big);
         list->setProvider(newContactModel);
 
         setFocusItem(list);

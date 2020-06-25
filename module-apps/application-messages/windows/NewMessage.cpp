@@ -202,7 +202,7 @@ namespace gui
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
+            [=](const UTF8 &text) { bottomBarTemporaryModeForce(text, BottomBar::Side::LEFT); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         message->setPenFocusWidth(style::window::default_border_focus_w);

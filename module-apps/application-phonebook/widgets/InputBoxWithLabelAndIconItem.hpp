@@ -15,7 +15,9 @@ namespace gui
         phonebookInternals::ListItemName listItemName;
 
       public:
-        InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName);
+        InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName,
+                                     std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                                     std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         ~InputBoxWithLabelAndIconItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         gui::HBox *hBox              = nullptr;
@@ -25,6 +27,9 @@ namespace gui
         gui::Image *tickImage        = nullptr;
 
       private:
+        bool ticked                             = false;
+        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
+        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
         void applyItemNameSpecificSettings();
     };
 
