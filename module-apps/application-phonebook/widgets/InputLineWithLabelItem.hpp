@@ -16,7 +16,6 @@ namespace gui
                                std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                                std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
                                std::function<void()> selectSpecialCharacter                 = nullptr);
-        InputLineWithLabelItem(const InputLineWithLabelItem &item);
 
         ~InputLineWithLabelItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
