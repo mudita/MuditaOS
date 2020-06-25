@@ -8,6 +8,7 @@ class BackupRestore
     BackupRestore(){};
     ~BackupRestore(){};
     static void BackupUserFiles(sys::Service *ownerService);
+    static void RestoreUserFiles(sys::Service *ownerService);
 
   private:
     static bool CleanBackupDir();
