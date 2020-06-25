@@ -29,9 +29,11 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactOptions.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookErrors.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearchResults.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/models/NewContactModel.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/SearchResultsModel.cpp"
         PUBLIC
+                "${CMAKE_CURRENT_LIST_DIR}/models/NewContactModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/SearchResultsModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"

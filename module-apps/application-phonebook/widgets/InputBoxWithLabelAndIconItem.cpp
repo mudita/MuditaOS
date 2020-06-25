@@ -9,13 +9,16 @@ namespace gui
     InputBoxWithLabelAndIconItem::InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName)
         : listItemName(listItemName)
     {
+
+        setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+
         setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconItem::w,
                        phonebookStyle::inputBoxWithLabelAndIconItem::h);
         setMaximumSize(phonebookStyle::inputBoxWithLabelAndIconItem::w,
                        phonebookStyle::inputBoxWithLabelAndIconItem::h);
 
         hBox = new gui::HBox(this, 0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::w, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::messages::sms_border_no_focus);
 
@@ -54,7 +57,6 @@ namespace gui
             return inputBoxLabel->onInput(event);
         };
         this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        this->deleteByList = deleteByList;
     }
 
     auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
