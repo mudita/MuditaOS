@@ -1,17 +1,15 @@
-/*
- * Common.hpp
- *
- *  Created on: 15 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_
+#pragma once
 
 #include <cstdint>
+#include <utility>
 
 namespace gui
 {
+    using Length   = uint32_t;
+    using Position = int32_t;
+
+    using Size  = std::pair<Length, Length>;
+    using Point = std::pair<Position, Position>;
 
     enum class NavigationDirection
     {
@@ -118,5 +116,3 @@ namespace gui
     void setTimeFunction(timeSecondsFunctionPtr fptr);
 
 } // namespace gui
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_ */
