@@ -1,9 +1,7 @@
-#include "UpdatePureOS.h"
+#include "UpdatePureOS.hpp"
 
 #include <vfs.hpp>
 #include <catch2/catch.hpp>
-#include <stdint.h>
-#include <algorithm>
 #include <iostream>
 
 class vfs vfs;

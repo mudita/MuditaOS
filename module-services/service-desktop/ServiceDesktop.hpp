@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WorkerDesktop.hpp"
-#include "UpdatePureOS.h"
+#include "UpdatePureOS.hpp"
 
 namespace service::name
 {
@@ -20,7 +20,7 @@ namespace sdesktop
             : sys::DataMessage(MessageType::UpdateOS), updateFile(updateFilePath), uuid(requestUUID){};
         UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
         {}
-        virtual ~UpdateOsMessage(){};
+        ~UpdateOsMessage() override = default;
 
         std::string updateFile;
         uint32_t uuid;
@@ -31,7 +31,7 @@ class ServiceDesktop : public sys::Service
 {
   public:
     ServiceDesktop();
-    ~ServiceDesktop();
+    ~ServiceDesktop() override;
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
