@@ -30,19 +30,19 @@ void BackupRestore::BackupUserFiles(sys::Service *ownerService)
         return;
     }
 
-    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backups.c_str(), "", true);
+    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backup.c_str(), "", true);
 
     if (dirlist.size() <= 2) {
         /* vfs.listdir also lists two directories ".." and "..." by default */
-        LOG_INFO("BackupUserFiles: backup dir %s is empty, nothing to backup.", purefs::dir::os_backups.c_str());
+        LOG_INFO("BackupUserFiles: backup dir %s is empty, nothing to backup.", purefs::dir::os_backup.c_str());
         return;
     }
 
     LOG_INFO(
-        "BackupUserFiles: backup dir %s listed with %d files.", purefs::dir::os_backups.c_str(), dirlist.size() - 2);
+        "BackupUserFiles: backup dir %s listed with %d files.", purefs::dir::os_backup.c_str(), dirlist.size() - 2);
 
     /* archive files inside backup dir into .tar file */
-    std::string backupFileTAR = purefs::dir::os_backups;
+    std::string backupFileTAR = purefs::dir::os_backup;
     backupFileTAR += "/";
     backupFileTAR += "backup.tar";
 
@@ -143,7 +143,7 @@ void BackupRestore::BackupUserFiles(sys::Service *ownerService)
 
 void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
 {
-    std::string tarFilePath = purefs::dir::os_backups;
+    std::string tarFilePath = purefs::dir::os_backup;
     tarFilePath += "/";
     tarFilePath += "backup.tar";
 
@@ -173,7 +173,7 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
         LOG_INFO("RestoreUserFiles: reading tar header %s...", tarHeader.name);
 
         if ((tarHeader.type == MTAR_TREG) && (ret == MTAR_ESUCCESS)) {
-            std::string restoreFilePath = purefs::dir::os_backups;
+            std::string restoreFilePath = purefs::dir::os_backup;
             restoreFilePath += "/";
             restoreFilePath += tarHeader.name;
             vfs::FILE *file = vfs.fopen(restoreFilePath.c_str(), "w");
@@ -223,7 +223,7 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
     sys::SystemManager::DestroyService(dbServiceName, ownerService);
 
     // replace existing files that have respective backup files existing
-    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backups.c_str());
+    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backup.c_str());
 
     if (dirlist.size() <= 2) {
         LOG_INFO("RestoreUserFiles: dir emtpy, nothing to restore");
@@ -235,7 +235,7 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
     std::string userFilePath = purefs::dir::user_disk;
     userFilePath += "/";
 
-    std::string backupFilePath = purefs::dir::os_backups;
+    std::string backupFilePath = purefs::dir::os_backup;
     backupFilePath += "/";
 
     for (auto &direntry : dirlist) {
@@ -283,12 +283,12 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
 bool BackupRestore::CleanBackupDir()
 {
     /* prepare directories */
-    if (vfs.isDir(purefs::dir::os_backups.c_str())) {
-        LOG_INFO("BackupUserFiles: cleaning backup directory %s.", purefs::dir::os_backups.c_str());
+    if (vfs.isDir(purefs::dir::os_backup.c_str())) {
+        LOG_INFO("BackupUserFiles: cleaning backup directory %s.", purefs::dir::os_backup.c_str());
 
-        if (vfs.deltree(purefs::dir::os_backups.c_str()) != 0) {
+        if (vfs.deltree(purefs::dir::os_backup.c_str()) != 0) {
             LOG_ERROR("BackupUserFiles: cleaning backup directory %s failed with error: %s.",
-                      purefs::dir::os_backups.c_str(),
+                      purefs::dir::os_backup.c_str(),
                       vfs.lastErrnoToStr().c_str());
             return false;
         }
@@ -299,9 +299,9 @@ bool BackupRestore::CleanBackupDir()
 
 bool BackupRestore::CreateBackupDir()
 {
-    if (vfs.mkdir(purefs::dir::os_backups.c_str())) {
+    if (vfs.mkdir(purefs::dir::os_backup.c_str())) {
         LOG_ERROR("BackupUserFiles: creating backup directory %s failed with error: %s.",
-                  purefs::dir::os_backups.c_str(),
+                  purefs::dir::os_backup.c_str(),
                   vfs.lastErrnoToStr().c_str());
         return false;
     }

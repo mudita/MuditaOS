@@ -50,7 +50,7 @@ namespace purefs
         const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
         const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
         const inline fs::path tmp         = eMMC_disk / PATH_TMP;
-        const inline fs::path os_backups  = eMMC_disk / PATH_BACKUPS;
+        const inline fs::path os_backup   = eMMC_disk / PATH_BACKUPS;
     } // namespace dir
 
     namespace file
