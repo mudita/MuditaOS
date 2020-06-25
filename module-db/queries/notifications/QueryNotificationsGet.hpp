@@ -6,21 +6,21 @@
 
 namespace db::query::notifications
 {
-    class QueryGet : public Query
+    class Get : public Query
     {
       public:
         const NotificationsRecord::Key key;
-        QueryGet(NotificationsRecord::Key key);
+        Get(NotificationsRecord::Key key);
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class QueryGetResult : public QueryResult
+    class GetResult : public QueryResult
     {
         NotificationsRecord record;
 
       public:
-        QueryGetResult(NotificationsRecord record);
+        GetResult(NotificationsRecord record);
         [[nodiscard]] auto getResult() const -> NotificationsRecord;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

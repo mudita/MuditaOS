@@ -12,14 +12,14 @@
 // fw declarations
 namespace db::query::notifications
 {
-    class QueryGet;
-    class QueryGetResult;
-    class QueryIncrement;
-    class QueryIncrementResult;
-    class QueryClear;
-    class QueryClearResult;
-    class QueryGetAll;
-    class QueryGetAllResult;
+    class Get;
+    class GetResult;
+    class Increment;
+    class IncrementResult;
+    class Clear;
+    class ClearResult;
+    class GetAll;
+    class GetAllResult;
 } // namespace db::query::notifications
 
 struct NotificationsRecord : public Record
@@ -77,12 +77,9 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
   private:
     NotificationsDB *notificationsDb = nullptr;
 
-    std::unique_ptr<db::query::notifications::QueryGetResult> runQueryImpl(
-        const db::query::notifications::QueryGet *query);
-    std::unique_ptr<db::query::notifications::QueryIncrementResult> runQueryImpl(
-        const db::query::notifications::QueryIncrement *query);
-    std::unique_ptr<db::query::notifications::QueryClearResult> runQueryImpl(
-        const db::query::notifications::QueryClear *query);
-    std::unique_ptr<db::query::notifications::QueryGetAllResult> runQueryImpl(
-        const db::query::notifications::QueryGetAll *query);
+    std::unique_ptr<db::query::notifications::GetResult> runQueryImpl(const db::query::notifications::Get *query);
+    std::unique_ptr<db::query::notifications::IncrementResult> runQueryImpl(
+        const db::query::notifications::Increment *query);
+    std::unique_ptr<db::query::notifications::ClearResult> runQueryImpl(const db::query::notifications::Clear *query);
+    std::unique_ptr<db::query::notifications::GetAllResult> runQueryImpl(const db::query::notifications::GetAll *query);
 };

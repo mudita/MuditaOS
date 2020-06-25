@@ -6,21 +6,21 @@
 
 namespace db::query::notifications
 {
-    class QueryIncrement : public Query
+    class Increment : public Query
     {
       public:
         const NotificationsRecord::Key key;
-        QueryIncrement(NotificationsRecord::Key key);
+        Increment(NotificationsRecord::Key key);
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class QueryIncrementResult : public QueryResult
+    class IncrementResult : public QueryResult
     {
         bool ret;
 
       public:
-        QueryIncrementResult(bool ret);
+        IncrementResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

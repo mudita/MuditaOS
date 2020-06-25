@@ -2,24 +2,24 @@
 
 namespace db::query::notifications
 {
-    QueryClear::QueryClear(NotificationsRecord::Key key) : Query(Query::Type::Update), key(key)
+    Clear::Clear(NotificationsRecord::Key key) : Query(Query::Type::Update), key(key)
     {}
 
-    auto QueryClear::debugInfo() const -> std::string
+    auto Clear::debugInfo() const -> std::string
     {
-        return "QueryClear";
+        return "Clear";
     }
 
-    QueryClearResult::QueryClearResult(bool ret) : ret(ret)
+    ClearResult::ClearResult(bool ret) : ret(ret)
     {}
 
-    auto QueryClearResult::getResult() const -> bool
+    auto ClearResult::getResult() const -> bool
     {
         return ret;
     }
 
-    auto QueryClearResult::debugInfo() const -> std::string
+    auto ClearResult::debugInfo() const -> std::string
     {
-        return "QueryClearResult";
+        return "ClearResult";
     }
 } // namespace db::query::notifications

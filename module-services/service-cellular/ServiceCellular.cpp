@@ -147,7 +147,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
             DBServiceAPI::GetQuery(
                 this,
                 db::Interface::Name::Notifications,
-                std::make_unique<db::query::notifications::QueryIncrement>(NotificationsRecord::Key::Calls));
+                std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Calls));
         }
         return true;
     });

@@ -6,20 +6,20 @@
 
 namespace db::query::notifications
 {
-    class QueryGetAll : public Query
+    class GetAll : public Query
     {
       public:
-        QueryGetAll();
+        GetAll();
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class QueryGetAllResult : public QueryResult
+    class GetAllResult : public QueryResult
     {
         std::unique_ptr<std::vector<NotificationsRecord>> records;
 
       public:
-        QueryGetAllResult(std::unique_ptr<std::vector<NotificationsRecord>> records);
+        GetAllResult(std::unique_ptr<std::vector<NotificationsRecord>> records);
         [[nodiscard]] auto getResult() -> std::unique_ptr<std::vector<NotificationsRecord>>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

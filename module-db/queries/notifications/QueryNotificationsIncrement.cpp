@@ -2,24 +2,24 @@
 
 namespace db::query::notifications
 {
-    QueryIncrement::QueryIncrement(NotificationsRecord::Key key) : Query(Query::Type::Update), key(key)
+    Increment::Increment(NotificationsRecord::Key key) : Query(Query::Type::Update), key(key)
     {}
 
-    auto QueryIncrement::debugInfo() const -> std::string
+    auto Increment::debugInfo() const -> std::string
     {
-        return "QueryIncrement";
+        return "Increment";
     }
 
-    QueryIncrementResult::QueryIncrementResult(bool ret) : ret(ret)
+    IncrementResult::IncrementResult(bool ret) : ret(ret)
     {}
 
-    auto QueryIncrementResult::getResult() const -> bool
+    auto IncrementResult::getResult() const -> bool
     {
         return ret;
     }
 
-    auto QueryIncrementResult::debugInfo() const -> std::string
+    auto IncrementResult::debugInfo() const -> std::string
     {
-        return "QueryIncrementResult";
+        return "IncrementResult";
     }
 } // namespace db::query::notifications

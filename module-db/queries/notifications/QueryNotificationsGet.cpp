@@ -2,24 +2,24 @@
 
 namespace db::query::notifications
 {
-    QueryGet::QueryGet(NotificationsRecord::Key key) : Query(Query::Type::Read), key(key)
+    Get::Get(NotificationsRecord::Key key) : Query(Query::Type::Read), key(key)
     {}
 
-    auto QueryGet::debugInfo() const -> std::string
+    auto Get::debugInfo() const -> std::string
     {
-        return "QueryGet";
+        return "Get";
     }
 
-    QueryGetResult::QueryGetResult(NotificationsRecord record) : record(record)
+    GetResult::GetResult(NotificationsRecord record) : record(record)
     {}
 
-    auto QueryGetResult::getResult() const -> NotificationsRecord
+    auto GetResult::getResult() const -> NotificationsRecord
     {
         return record;
     }
 
-    auto QueryGetResult::debugInfo() const -> std::string
+    auto GetResult::debugInfo() const -> std::string
     {
-        return "QueryGetResult";
+        return "GetResult";
     }
 } // namespace db::query::notifications

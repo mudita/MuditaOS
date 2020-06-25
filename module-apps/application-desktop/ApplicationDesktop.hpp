@@ -59,7 +59,7 @@ namespace app
         // done
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
-        auto handle(db::query::notifications::QueryGetAllResult *msg) -> bool;
+        auto handle(db::query::notifications::GetAllResult *msg) -> bool;
         /**
          * This static method will be used to lock the phone
          */

@@ -130,7 +130,7 @@ namespace app
         // clear also notifications
         DBServiceAPI::GetQuery(this,
                                db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::QueryClear>(NotificationsRecord::Key::Calls));
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
 
         return DBServiceAPI::GetQuery(
             this, db::Interface::Name::Calllog, std::make_unique<db::query::calllog::SetAllRead>());

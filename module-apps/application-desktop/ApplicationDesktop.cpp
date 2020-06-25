@@ -51,7 +51,7 @@ namespace app
         // handle database response
         if (resp != nullptr) {
             if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
-                if (auto response = dynamic_cast<db::query::notifications::QueryGetAllResult *>(msg->getResult())) {
+                if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(msg->getResult())) {
                     handled = handle(response);
                 }
             }
@@ -65,7 +65,7 @@ namespace app
         }
     }
 
-    auto ApplicationDesktop::handle(db::query::notifications::QueryGetAllResult *msg) -> bool
+    auto ApplicationDesktop::handle(db::query::notifications::GetAllResult *msg) -> bool
     {
         assert(msg);
         auto records = *msg->getResult();
@@ -141,7 +141,7 @@ namespace app
         LOG_DEBUG("Clear Call notifications");
         DBServiceAPI::GetQuery(this,
                                db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::QueryClear>(NotificationsRecord::Key::Calls));
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
         notifications.notSeen.Calls = 0;
         getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
         return true;
@@ -152,7 +152,7 @@ namespace app
         LOG_DEBUG("Clear Sms notifications");
         DBServiceAPI::GetQuery(this,
                                db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::QueryClear>(NotificationsRecord::Key::Calls));
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
         notifications.notSeen.SMS = 0;
         getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
         return true;
@@ -161,7 +161,7 @@ namespace app
     bool ApplicationDesktop::requestNotSeenNotifications()
     {
         return DBServiceAPI::GetQuery(
-            this, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::QueryGetAll>());
+            this, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::GetAll>());
     }
 
     bool ApplicationDesktop::requestNotReadNotifications()
