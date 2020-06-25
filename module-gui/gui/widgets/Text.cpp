@@ -57,7 +57,7 @@ namespace gui
     {
 
         setPenWidth(style::window::default_border_no_focus_w);
-        setPenFocusWidth(style::window::default_border_focucs_w);
+        setPenFocusWidth(style::window::default_border_focus_w);
         uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
         font            = FontManager::getInstance().getFont(fontID);
 

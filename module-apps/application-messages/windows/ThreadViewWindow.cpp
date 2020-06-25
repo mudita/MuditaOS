@@ -83,8 +83,8 @@ namespace gui
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         text->setBorderColor(ColorNoColor);
-        text->setPenFocusWidth(style::window::default_border_focucs_w);
-        text->setPenWidth(style::window::default_border_focucs_w);
+        text->setPenFocusWidth(style::window::default_border_focus_w);
+        text->setPenWidth(style::window::default_border_focus_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         text->activatedCallback = [&](gui::Item &item) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
@@ -311,7 +311,7 @@ namespace gui
         smsLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         smsLabel->setRadius(style::window::messages::sms_radius);
         smsLabel->setFont(style::window::font::medium);
-        smsLabel->setPenFocusWidth(style::window::default_border_focucs_w);
+        smsLabel->setPenFocusWidth(style::window::default_border_focus_w);
         smsLabel->setPenWidth(style::window::messages::sms_border_no_focus);
         smsLabel->expandMode = Text::ExpandMode::EXPAND_DOWN;
         smsLabel->setText(smsRecord.body.length() ? smsRecord.body : " "); // text doesn't really like being empty//
