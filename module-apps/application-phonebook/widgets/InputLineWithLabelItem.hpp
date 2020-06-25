@@ -23,7 +23,6 @@ namespace gui
         VBox *vBox        = nullptr;
         Label *titleLabel = nullptr;
         Text *inputText   = nullptr;
-        auto clone() -> ListItem *;
 
       private:
         void applyItemNameSpecificSettings();
