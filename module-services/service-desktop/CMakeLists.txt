@@ -10,6 +10,8 @@ target_sources( ${PROJECT_NAME}
 	"${CMAKE_CURRENT_LIST_DIR}/WorkerDesktop.cpp"
 )
 
+add_dependencies(${PROJECT_NAME} version)
+
 # Host target configuration(mainly used for unit testing)
 if (${ENABLE_TESTS})
 	add_subdirectory(tests)
