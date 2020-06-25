@@ -151,16 +151,23 @@ namespace gui
         return false;
     }
 
-    void AppWindow::bottomBarTemporaryMode(const UTF8 &text)
+    void AppWindow::bottomBarTemporaryMode(const UTF8 &text, bool emptyOthers)
     {
         if (bottomBar == nullptr) {
             return;
         }
 
         bottomBar->store();
-        bottomBar->setText(BottomBar::Side::LEFT, text);
-        bottomBar->setText(BottomBar::Side::CENTER, "");
-        bottomBar->setText(BottomBar::Side::RIGHT, "");
+
+        if (emptyOthers) {
+            bottomBar->setText(BottomBar::Side::LEFT, text);
+            bottomBar->setText(BottomBar::Side::CENTER, "");
+            bottomBar->setText(BottomBar::Side::RIGHT, "");
+        }
+        else {
+            bottomBar->setText(BottomBar::Side::LEFT, text);
+        }
+
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
