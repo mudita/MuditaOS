@@ -1,11 +1,5 @@
 #include "EndpointHandler.hpp"
 #include "ParserUtils.hpp"
-#include "version.hpp"
-#include "vfs.hpp"
-#include <common_data/EventStore.hpp>
-#include <string>
-#include <time/time_conversion.hpp>
-#include "service-cellular/api/CellularServiceAPI.hpp"
 
 std::string EndpointHandler::buildResponseStr(std::size_t responseSize, std::string responsePayloadString)
 {

@@ -33,3 +33,4 @@ target_sources( ${PROJECT_NAME}
         windows/DateTimeWindow.hpp
 )
 
+add_dependencies(${PROJECT_NAME} version)

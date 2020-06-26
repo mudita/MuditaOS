@@ -1,28 +1,40 @@
 #include "ServiceDesktop.hpp"
 
-const char *ServiceDesktop::serviceName = "ServiceDesktop";
-
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName)
+ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
+
+    updateOS = std::make_unique<UpdatePureOS>(this);
 }
 
 ServiceDesktop::~ServiceDesktop()
 {
-
     LOG_INFO("[ServiceDesktop] Cleaning resources");
-    if (DesktopWorker != nullptr) {
-        DesktopWorker->deinit();
+    if (desktopWorker != nullptr) {
+        desktopWorker->deinit();
     }
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
+    desktopWorker = std::make_unique<WorkerDesktop>(this);
+    desktopWorker->init(
+        {{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+         {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
+    desktopWorker->run();
 
-    DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    DesktopWorker->init({{DesktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1},
-                         {DesktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
-    DesktopWorker->run();
+    connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+        if (updateOsMsg != nullptr) {
+            LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
+                      updateOsMsg->updateFile.c_str(),
+                      updateOsMsg->uuid);
+
+            if (updateOS->setUpdateFile(updateOsMsg->updateFile) == updateos::UpdateError::NoError)
+                updateOS->runUpdate();
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
 
     return (sys::ReturnCodes::Success);
 }
