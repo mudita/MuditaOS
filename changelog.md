@@ -3,6 +3,9 @@
 ## Current Release
 
 ### Added
+* `[system-update]` initial release
+
+### Added
 
 * `[fota]` UI for FOTA
 * `[doc]` Added release process documentation.
