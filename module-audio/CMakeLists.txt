@@ -64,7 +64,3 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs  module-sys )
 
-# Host target configuration(mainly used for unit testing)
-
-message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2983")
-#add_subdirectory(tests)
