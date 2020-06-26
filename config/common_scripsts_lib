@@ -1,0 +1,6 @@
+#!/bin/bash
+
+function printVar(){
+    echo "$1: '${!1}'"
+}
+

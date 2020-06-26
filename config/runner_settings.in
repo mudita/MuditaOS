@@ -1,0 +1,5 @@
+REPOSITORY_URL="https://github.com/muditacom/PurePhone"
+WORKER_TOKEN=""
+WORKER_NAME="PureBuilder"
+IMAGE_NAME="pure_builder:latest"
+JOBS=3

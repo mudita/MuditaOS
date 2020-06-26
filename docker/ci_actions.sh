@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-source /home/docker/.bashrc
+source docker/.bashrc
 
 function printVar(){
     echo "$1: '${!1}'"

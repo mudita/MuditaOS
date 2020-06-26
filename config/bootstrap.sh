@@ -83,11 +83,11 @@ function setup_arm_toolchain() {
     pushd /tmp
     echo "Download armgcc"
     [[ ! -f $ARM_GCC ]] &&
-        wget --no-verbose --show-progress -O ${ARM_GCC_PACKAGE_FILE} ${ARM_GCC_SOURCE_LINK}
+        wget --no-verbose --show-progress -O ${ARM_GCC_PKG} ${ARM_GCC_SOURCE_LINK}
     # untar to HOME
     if [[ ! -d ${HOME}/${ARM_GCC} ]]; then
-        echo "extracting: ${ARM_GCC_PACKAGE_FILE} to ${HOME}"
-        tar -xjf ${ARM_GCC_PACKAGE_FILE} -C ${HOME}/
+        echo "extracting: ${ARM_GCC_PKG} to ${HOME}"
+        tar -xjf ${ARM_GCC_PKG} -C ${HOME}/
     fi
     echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
     popd 
@@ -96,12 +96,12 @@ function setup_arm_toolchain() {
 function setup_cmake() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     pushd /tmp
-    [[ ! -f ${CMAKE_DIR}.tgz ]] &&
+    [[ ! -f ${CMAKE_NAME}.tgz ]] &&
         wget --no-verbose -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
-    [[ ! -d ${HOME}/${CMAKE_DIR} ]] &&
+    [[ ! -d ${HOME}/${CMAKE_NAME} ]] &&
         tar -xf ${CMAKE_PKG} -C ${HOME}/
     popd
-    echo "CMAKEV installed to ${HOME}/${CMAKE_DIR} and set in PATH"
+    echo "CMAKEV installed to ${HOME}/${CMAKE_NAME} and set in PATH"
 }
 
 function install_docker() {
@@ -129,7 +129,7 @@ BUILD_STEPS=(
         setup_cmake
         setup_gcc_alternatives
         "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
-        "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_DIR}/bin"
+        "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_NAME}/bin"
         install_docker
         )
 
