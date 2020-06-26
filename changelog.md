@@ -1,32 +1,28 @@
 # Mudita PurePhone changelog
 
-## Current Release
-
-### Added
-* `[system-update]` initial release
+## [0.26.2] - 2020-06-26
 
 ### Added
 
-* `[fota]` UI for FOTA
-* `[doc]` Added release process documentation.
-* `[phonebook]` Added widget with label and text line for New/Edit Contact window.
-* `[listview]` Added item delete or not support.
-* `[phonebook]` Added widget with input box, description label and icon for New/Edit Contact window.
-* `[bottombar]` Added selective temporary mode.
+* `[fota]` Added FOTA user interface.
 
 ### Changed
 
-* `[desktop]` Missed call home screen notifications
-* `[desktop]` Incoming message home screen notifications
+* `[desktop][notifications]` Improved missed call home screen notifications.
+* `[desktop][notifications]` Improved incoming message home screen notifications.
 
 ### Fixed
 
 * `[listview]` Fixed top axis alignment not working properly on lists with scrolls.
+* `[sms]` Do not jump to bottom and delete entered text on new SMS or deleted SMS.
+* `[sms]` Fixed crash when receiving SMS prior to entering any thread.
 
 ### Other
-* `[database]` Add database backup feature with sqlite's VACUUM command.
-* `[UT]` added UT for calllog and notifications.db
-* `[notifications]` added notifications db
+* `[database]` Added database backup feature.
+* `[doc]` Added release process documentation.
+* `[listview]` Added support for deletable/non deletable items. 
+* `[phonebook]` Added widget for New/Edit Contact window.
+* `[test]` Improved support for Catch2 unit testing.
 
 ## [0.26.1] - 2020-06-22
 
