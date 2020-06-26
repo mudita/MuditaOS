@@ -13,6 +13,7 @@
 ### Changed
 
 * `[desktop]` Missed call home screen notifications
+* `[desktop]` Incoming message home screen notifications
 
 ### Fixed
 

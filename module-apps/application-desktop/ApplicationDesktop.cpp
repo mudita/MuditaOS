@@ -152,7 +152,7 @@ namespace app
         LOG_DEBUG("Clear Sms notifications");
         DBServiceAPI::GetQuery(this,
                                db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
         notifications.notSeen.SMS = 0;
         getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
         return true;

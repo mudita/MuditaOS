@@ -19,6 +19,7 @@
 #include <Style.hpp>
 #include <log/log.hpp>
 #include <time/time_conversion.hpp>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 
 #include <functional>
 #include <memory>
@@ -138,6 +139,10 @@ namespace gui
             emptyListIcon->setVisible(true);
             setFocusItem(emptyListIcon);
         }
+
+        DBServiceAPI::GetQuery(application,
+                               db::Interface::Name::Notifications,
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
     }
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
