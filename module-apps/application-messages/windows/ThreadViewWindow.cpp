@@ -81,7 +81,7 @@ namespace gui
         text->setMaximumSize(body->getWidth(), body->getHeight());
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryModeForce(text, BottomBar::Side::LEFT); },
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         text->setBorderColor(ColorNoColor);

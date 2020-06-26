@@ -50,7 +50,7 @@ namespace gui
                                 TextBlock::End::None));
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryModeForce(text, BottomBar::Side::LEFT); },
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         text->setPenFocusWidth(0);
