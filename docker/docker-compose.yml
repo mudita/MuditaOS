@@ -1,0 +1,7 @@
+version: '3'
+services:
+  gh-runner:
+    image: rwicik/pure_builder:1.0
+    env_file:
+      - runner_settings
+
