@@ -67,10 +67,10 @@ uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
     }
 }
 
-bool DBServiceAPI::SMSRemove(sys::Service *serv, uint32_t id)
+bool DBServiceAPI::SMSRemove(sys::Service *serv, const SMSRecord &rec)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSRemove);
-    msg->id                           = id;
+    msg->record                       = rec;
 
     auto ret                          = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());

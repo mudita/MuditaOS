@@ -125,9 +125,14 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     case MessageType::DBSMSRemove: {
         auto time         = utils::time::Scoped("DBSMSRemove");
         DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
-        auto ret          = smsRecordInterface->RemoveByID(msg->id);
+        auto ret          = smsRecordInterface->RemoveByID(msg->record.ID);
         responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Delete);
+        auto thread = threadRecordInterface->GetByID((msg->record.threadID));
+        if (!thread.isValid()) {
+            LOG_DEBUG("also thread has been deleted");
+            sendUpdateNotification(db::Interface::Name::SMSThread, db::Query::Type::Delete);
+        }
     } break;
 
     case MessageType::DBSMSUpdate: {

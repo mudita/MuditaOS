@@ -142,3 +142,7 @@ std::unique_ptr<db::query::SMSSearchResult> ThreadRecordInterface::runQueryImpl(
     auto db_result = smsDB->threads.getBySMSQuery(query->text, query->starting_postion, query->depth);
     return std::make_unique<db::query::SMSSearchResult>(db_result.first, db_result.second);
 }
+bool ThreadRecord::isValid()
+{
+    return dbID == 0 ? false : true;
+}

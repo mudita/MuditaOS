@@ -38,6 +38,7 @@ struct ThreadRecord
         type      = rec.type;
         contactID = rec.contactID;
     }
+    bool isValid();
 };
 
 enum class ThreadRecordField
