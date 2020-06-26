@@ -42,6 +42,7 @@
 #include "service-db/messages/DBNotificationMessage.hpp"
 
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp"
+#include "service-antenna/api/AntennaServiceAPI.hpp"
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
@@ -199,7 +200,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
-    cmux->SelectAntenna(bsp::cellular::antenna::highBand);
+    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
     switch (board) {
     case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
@@ -939,6 +940,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     // Received signal strength change
     auto qind = at::urc::QIND(str);
     if (qind.is() && qind.is_csq()) {
+        AntennaServiceAPI::CSQChange(this);
         if (!qind.validate(at::urc::QIND::RSSI)) {
             LOG_INFO("Invalid csq - ignore");
         }
@@ -947,7 +949,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 return std::make_shared<CellularNotificationMessage>(
-                    CellularNotificationMessage::Type::SignalStrengthUpdate);
+                    CellularNotificationMessage::Type::SignalStrengthUpdate, str);
             }
         }
     }

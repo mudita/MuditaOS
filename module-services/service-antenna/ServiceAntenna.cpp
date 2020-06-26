@@ -33,6 +33,8 @@ namespace antenna
             return "bandCheck";
         case antenna::State::idle:
             return "idle";
+        case antenna::State::csqChange:
+            return "csqChange";
         default:
             return "";
             break;
@@ -48,6 +50,7 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
 
     state = new utils::state::State<antenna::State>(this);
 
+    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     busChannels.push_back(sys::BusChannels::AntennaNotifications);
 }
 
@@ -63,7 +66,6 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
 
     switch (msgl->messageType) {
     case MessageType::StateChange:
-        LOG_INFO("STATE MESSAGE");
         HandleStateChange(state->get());
         break;
     case MessageType::AntennaChanged: {
@@ -78,6 +80,43 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
         handled = true;
         break;
     }
+    case MessageType::CellularNotification: {
+
+        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+        if (msg != nullptr) {
+
+            //    		if(msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate){
+            //    			LOG_INFO("Cellular CSQ notification");
+            //    			std::string csqString = msg->data;
+            //    			uint32_t csq = 0;
+            //    			LOG_INFO("Notification string: %s", csqString.c_str());
+            //				if (at::response::parseCSQ(csqString, csq)) {
+            //					LOG_INFO("Csq parsed");
+            //					currentCsq = csq;
+            //					if(state->get() == antenna::State::idle)
+            //					{
+            //						state->set(antenna::State::idle);
+            //					}
+            //				}
+            //    		}
+        }
+        handled = true;
+        break;
+    }
+    case MessageType::CellularStateRequest: {
+        auto msg = dynamic_cast<cellular::StateChange *>(msgl);
+        if (msg != nullptr) {
+            if (msg->request == cellular::State::ST::Ready) {
+                state->set(antenna::State::init);
+            }
+        }
+    } break;
+    case MessageType::AntennaCSQChange:
+        LOG_WARN("CSQChange message");
+        if (state->get() == antenna::State::idle) {
+            state->set(antenna::State::csqChange);
+        }
+        break;
     default:
         break;
     }
@@ -91,9 +130,8 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
 // Invoked during initialization
 sys::ReturnCodes ServiceAntenna::InitHandler()
 {
-    //    stateMachine->addState(antenna::State::init, InitStateHandler);
-    vTaskDelay(30000);
-    state->set(antenna::State::init);
+    //    vTaskDelay(30000);
+    //    state->set(antenna::State::init);
 
     return sys::ReturnCodes::Success;
 }
@@ -180,6 +218,9 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     case antenna::State::idle:
         ret = idleStateHandler();
         break;
+    case antenna::State::csqChange:
+        ret = csqChangeStateHandler();
+        break;
     default:
         break;
     }
@@ -244,16 +285,16 @@ bool ServiceAntenna::lowBandStateHandler(void)
 }
 bool ServiceAntenna::signalCheckStateHandler(void)
 {
-
     std::string csq;
+    uint32_t csqValue = 0;
     if (CellularServiceAPI::GetCSQ(this, csq)) {
-        uint32_t csqValue = 0;
         at::response::parseCSQ(csq, csqValue);
         if (csqValue <= antenna::signalTreshold) {
             LOG_INFO("Signal strength below treshold. Switch antenna");
             state->set(antenna::State::switchAntenna);
             return true;
         }
+        lastCsq = csqValue;
         state->set(antenna::State::idle);
         return true;
     }
@@ -272,12 +313,31 @@ bool ServiceAntenna::bandCheckStateHandler(void)
         LOG_INFO("Band frequency: %lu", bandFrequency);
         constexpr uint32_t GHz = 1000;
         bool isBandSubGHz      = bandFrequency < GHz ? true : false;
-        if (isBandSubGHz && currentAntenna == bsp::cellular::antenna::highBand) {
-            LOG_INFO("sub GHz band.");
-            state->set(antenna::State::signalCheck);
-            return true;
+        if (currentAntenna == bsp::cellular::antenna::highBand) {
+            LOG_INFO("High band antenna.");
+            if (isBandSubGHz) {
+                LOG_INFO("Modem connected on sub GHz band.");
+                state->set(antenna::State::signalCheck);
+                return true;
+            }
         }
-        LOG_INFO("over GHz band.");
+
+        if (currentAntenna == bsp::cellular::antenna::lowBand) {
+            LOG_INFO("Low band antenna.");
+            if (!isBandSubGHz) {
+                LOG_INFO("Modem connected on over GHz band.");
+                state->set(antenna::State::signalCheck);
+                return true;
+            }
+        }
+
+        LOG_INFO("Band match.");
+        std::string csq;
+        uint32_t csqValue = 0;
+        if (CellularServiceAPI::GetCSQ(this, csq)) {
+            at::response::parseCSQ(csq, csqValue);
+            lastCsq = csqValue;
+        }
         state->set(antenna::State::idle);
         return true;
     }
@@ -286,6 +346,41 @@ bool ServiceAntenna::bandCheckStateHandler(void)
 
 bool ServiceAntenna::idleStateHandler(void)
 {
+    //	LOG_INFO("Iddle params: lastCsq: %lu, currentCSQ: %lu", lastCsq, currentCsq);
+    //	if(lastCsq != currentCsq && lastCsq < currentCsq)
+    //	{
+    //		LOG_INFO("CSQ change occurent, check connection.");
+    //		state->set(antenna::State::connectionStatus);
+    //	}
+    //	if(currentCsq != 0)
+    //	{
+    //		lastCsq = currentCsq;
+    //	}
 
-    return false;
+    return true;
+}
+
+bool ServiceAntenna::csqChangeStateHandler(void)
+{
+    std::string csq;
+    uint32_t csqValue = 0;
+
+    constexpr uint32_t notValidCsq = 99;
+    if (CellularServiceAPI::GetCSQ(this, csq)) {
+        at::response::parseCSQ(csq, csqValue);
+        currentCsq = csqValue;
+    }
+    LOG_INFO("csqChange params: lastCsq: %lu, currentCSQ: %lu", lastCsq, currentCsq);
+
+    auto nextState = antenna::State::idle;
+    if (lastCsq != currentCsq || currentCsq == notValidCsq) {
+        LOG_INFO("CSQ change occurent, check connection.");
+        nextState = antenna::State::connectionStatus;
+    }
+    if (currentCsq != notValidCsq) {
+        lastCsq = currentCsq;
+    }
+
+    state->set(nextState);
+    return true;
 }

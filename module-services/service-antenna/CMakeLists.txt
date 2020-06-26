@@ -16,8 +16,9 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceAntenna.cpp"
-		
+		"${CMAKE_CURRENT_LIST_DIR}/api/AntennaServiceAPI.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceAntenna.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/api/AntennaServiceAPI.hpp"
 )
 

@@ -11,6 +11,11 @@ namespace at
         bool parseCSQ(std::string &response, std::string &result)
         {
             std::string toErase = "+CSQ: ";
+
+            //            auto resp = utils::removeNewLines(response);
+            //			utils::findAndReplaceAll(resp, toErase, "");
+            //			toErase = "QIND: \"csq\": ";
+            //			utils::findAndReplaceAll(resp, toErase, "");
             auto pos            = response.find(toErase);
             if (pos != std::string::npos) {
                 response.erase(pos, toErase.length());
@@ -19,7 +24,7 @@ namespace at
             }
             return false;
         }
-        bool parseCSQ(std::string &cellularResponse, uint32_t result)
+        bool parseCSQ(std::string &cellularResponse, uint32_t &result)
         {
 
             std::string CSQstring;

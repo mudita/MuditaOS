@@ -25,8 +25,8 @@ namespace antenna
         highBand,
         lowBand,
         signalCheck,
-        idle
-
+        idle,
+        csqChange
     };
 
     const char *c_str(antenna::State state);
@@ -37,13 +37,14 @@ namespace antenna
 class ServiceAntenna : public sys::Service
 {
   private:
-    static const char *serviceName;
     utils::state::State<antenna::State> *state;
     bool HandleStateChange(antenna::State state);
 
     uint32_t timerID = 0;
 
     bsp::cellular::antenna currentAntenna;
+    uint32_t lastCsq     = 0;
+    uint32_t currentCsq  = 0;
     uint32_t storedCsq   = 0;
     bool storedRegisterd = false;
 
@@ -52,6 +53,8 @@ class ServiceAntenna : public sys::Service
     bool suspended = false;
 
   public:
+    static const char *serviceName;
+
     ServiceAntenna();
     ~ServiceAntenna();
 
@@ -77,4 +80,5 @@ class ServiceAntenna : public sys::Service
     bool signalCheckStateHandler(void);
     bool bandCheckStateHandler(void);
     bool idleStateHandler(void);
+    bool csqChangeStateHandler(void);
 };

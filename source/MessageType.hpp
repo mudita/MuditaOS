@@ -206,9 +206,10 @@ enum class MessageType
     FotaProgress,
     FotaFinished,
 
-StateChange,
+    StateChange,
     // antenna messages
     AntennaChanged,
+    AntennaCSQChange,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
