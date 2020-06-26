@@ -40,6 +40,7 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/InputBoxWithLabelAndIconItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/InputLineWithLabelItem.hpp"
+                 "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactListItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"

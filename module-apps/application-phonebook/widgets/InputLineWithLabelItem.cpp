@@ -75,7 +75,15 @@ namespace gui
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
             inputText->setFont(style::window::font::bigbold);
             inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                contact->primaryName = inputText->getText();
+            };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
+
             break;
+
         case phonebookInternals::ListItemName::SecondName:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
             inputText->setTextType(TextType::SINGLE_LINE);
@@ -107,4 +115,5 @@ namespace gui
             break;
         }
     }
+
 } /* namespace gui */

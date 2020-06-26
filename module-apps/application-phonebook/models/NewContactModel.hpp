@@ -1,9 +1,9 @@
 #pragma once
 
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "module-apps/application-phonebook/widgets/ContactListItem.hpp"
 #include "Application.hpp"
-#include "ListItem.hpp"
 #include "ListItemProvider.hpp"
-#include "module-apps/application-phonebook/widgets/InputLineWithLabelItem.hpp"
 
 class NewContactModel : public gui::ListItemProvider
 {
@@ -11,12 +11,16 @@ class NewContactModel : public gui::ListItemProvider
     int modelIndex              = 0;
     unsigned int internalOffset = 0;
     unsigned int internalLimit  = 0;
+    vector<gui::ContactListItem *> internalData;
+
+    shared_ptr<ContactRecord> contact = nullptr;
 
   public:
     NewContactModel(app::Application *app);
     ~NewContactModel();
 
-    vector<gui::ListItem *> internalData;
+    void saveData();
+    void loadData();
 
     int getItemCount() const override;
 
