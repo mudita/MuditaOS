@@ -43,8 +43,7 @@ namespace app
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
             if (msg != nullptr) {
-                if ((msg->interface == db::Interface::Name::SMS) ||
-                    (msg->interface == db::Interface::Name::SMSThread)) {
+                if (msg->interface == db::Interface::Name::SMS) {
 
                     this->windows[gui::name::window::main_window]->rebuild();
                     // de facto parameterized rebuild
@@ -57,6 +56,16 @@ namespace app
 
                     return std::make_shared<sys::ResponseMessage>();
                 }
+                if (msg->interface == db::Interface::Name::SMSThread) {
+                    this->windows[gui::name::window::main_window]->rebuild();
+
+                    if (getCurrentWindow() != windows[gui::name::window::main_window]) {
+                        // if thread has just dissapeared and we are not in converstaions (threads) view, then…
+                        this->switchWindow(gui::name::window::main_window, nullptr);
+                    }
+                    return std::make_shared<sys::ResponseMessage>();
+                }
+
                 if (windows[gui::name::window::thread_view]->onDatabaseMessage(msg)) {
                     if (getCurrentWindow() == windows[gui::name::window::thread_view]) {
                         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -169,7 +178,7 @@ namespace app
 
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
-            if (!DBServiceAPI::SMSRemove(this, record.ID)) {
+            if (!DBServiceAPI::SMSRemove(this, record)) {
                 LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
                 return false;
             }
