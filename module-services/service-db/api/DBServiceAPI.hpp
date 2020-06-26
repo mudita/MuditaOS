@@ -33,7 +33,7 @@ class DBServiceAPI
      * @return dbID of added record.
      */
     static uint32_t SMSAdd(sys::Service *serv, const SMSRecord &rec);
-    static bool SMSRemove(sys::Service *serv, uint32_t id);
+    static bool SMSRemove(sys::Service *serv, const SMSRecord &rec);
     static bool SMSUpdate(sys::Service *serv, const SMSRecord &rec);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv,
                                                                      uint32_t offset,
