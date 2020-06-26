@@ -4,14 +4,15 @@
 
 #include <module-utils/i18/i18.hpp>
 #include <module-gui/gui/widgets/BottomBar.hpp>
+#include <utility>
 
 namespace gui
 {
     InputBoxWithLabelAndIconItem::InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName,
                                                                std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                                                std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : listItemName(listItemName), bottomBarTemporaryMode(bottomBarTemporaryMode),
-          bottomBarRestoreFromTemporaryMode(bottomBarRestoreFromTemporaryMode)
+        : listItemName(listItemName), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconItem::w,
                        phonebookStyle::inputBoxWithLabelAndIconItem::h);
@@ -129,15 +130,9 @@ namespace gui
                 }
 
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    ticked = !ticked;
+                    tickImage->setVisible(!tickImage->visible);
                 }
 
-                if (ticked) {
-                    tickImage->setVisible(true);
-                }
-                else {
-                    tickImage->setVisible(false);
-                }
                 return false;
             };
 
@@ -166,15 +161,9 @@ namespace gui
                 }
 
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    ticked = !ticked;
+                    tickImage->setVisible(!tickImage->visible);
                 }
 
-                if (ticked) {
-                    tickImage->setVisible(true);
-                }
-                else {
-                    tickImage->setVisible(false);
-                }
                 return false;
             };
 

@@ -27,7 +27,6 @@ namespace gui
         gui::Image *tickImage        = nullptr;
 
       private:
-        bool ticked                             = false;
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
         void applyItemNameSpecificSettings();
