@@ -1,0 +1,23 @@
+#!/bin/bash
+SCRIPT=$(readlink -f $0)
+SCRIPT_DIR="$(dirname ${SCRIPT})"
+SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
+
+source ${SRC_ROOT}/config/common_scripsts_lib
+source ${SRC_ROOT}/config/bootstrap_config
+
+DOCKER_DIR=${SRC_ROOT}/docker
+DOCKER_TEMPLATE=${DOCKER_DIR}/Dockerfile.runner.in
+DOCKER_DEST=${DOCKER_DIR}/Dockerfile.runner
+
+function prepareDockerFile() {
+    sed -e "s#@ARM_GCC_PKG@#${ARM_GCC_PKG}#g" \
+        -e "s#@CMAKE_PKG@#${CMAKE_PKG}#g" \
+        -e "s#@GH_RUNNER_PKG@#${GH_RUNNER_PKG}#g" \
+        -e "s#@CMAKE_NAME@#${CMAKE_NAME}#g" \
+        -e "s#@ARM_GCC@#${ARM_GCC}#g;" \
+        ${DOCKER_TEMPLATE} > ${DOCKER_DEST}
+}
+
+prepareDockerFile
+docker build ${DOCKER_DIR} -f ${DOCKER_DEST} -t "pure_builder:latest" 

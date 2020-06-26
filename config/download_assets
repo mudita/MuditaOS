@@ -1,16 +1,14 @@
 #!/bin/bash
 # packages settings
 
-function printVar(){
-    echo "$1: '${!1}'"
-}
-
 SCRIPT=$(readlink -f $0)
 SCRIPT_DIR="$(dirname ${SCRIPT})"
-. ${SCRIPT_DIR}/bootstrap_config
 SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
 
-DEST_DIR="${SRC_ROOT}/docker"
+DEST_DIR="${SRC_ROOT}/docker/assets"
+
+. ${SRC_ROOT}/config/common_scripsts_lib
+. ${SRC_ROOT}/config/bootstrap_config
 
 printVar SCRIPT
 printVar SCRIPT_DIR
@@ -19,20 +17,30 @@ printVar DEST_DIR
 
 function get_arm_toolchain() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    echo "Download armgcc"
-    [[ ! -f $ARM_GCC ]] &&
-        wget --no-verbose --show-progress -O ${ARM_GCC_PACKAGE_FILE} ${ARM_GCC_SOURCE_LINK}
+    echo "Download gcc-arm"
+    SUM_FILE="${ARM_GCC_PKG}.md5"
+    wget --no-verbose --show-progress -c -O ${ARM_GCC_PKG} ${ARM_GCC_SOURCE_LINK}
+    echo "${ARM_GCC_MD5} ${ARM_GCC_PKG}" > $SUM_FILE
+    md5sum -c ${SUM_FILE}
 }
 
 function get_cmake() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    [[ ! -f ${CMAKE_DIR}.tgz ]] &&
-        wget --no-verbose -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
+    wget --no-verbose --show-progress -c -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
+    wget --no-verbose --show-progress -c ${CMAKE_SHA_LINK}
+    cat ${CMAKE_SHA_FILE} | grep ${CMAKE_PKG} > ${CMAKE_SHA_FILE}
+    sha256sum -c ${CMAKE_SHA_FILE}
+}
+
+function get_gh_runner() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    wget --no-verbose --show-progress -c -O ${GH_RUNNER_PKG} ${GH_RUNNER_LINK}
 }
 
 pushd ${DEST_DIR}
 get_arm_toolchain
 get_cmake
+get_gh_runner
 popd
 
 

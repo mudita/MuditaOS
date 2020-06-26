@@ -27,16 +27,16 @@ fi
 # check if clang-format in path is in proper version, version is 3rd column in `clang-format --version`
 CVER=$( [[ $(which clang-format) ]] && echo $(clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1) || echo "0")
 # check for either clang-format or clang-format-9
-if [[ $CVER -lt 9 && ! $(which clang-format-9) ]]; then
+if [[ $CVER -lt 10 && ! $(which clang-format-10) ]]; then
     cat << EOF > 1
 Either install:
-    clang-format in at least version 9 and set as default"
+    clang-format in at least version 10 and set as default"
     or
-    clang-format-9
+    clang-format-10
 
     Your clang format version in path used:
         $(clang-format --version):
-        $(clang-format-9 --version)
+        $(clang-format-10 --version)
     git commit aborted"
 EOF
     exit 1
@@ -45,7 +45,7 @@ fi
 get_clang_format_script() {
     local declare searchpaths=(
         $(which "clang-format-diff.py")                                 # clang-format-diff in path
-        "/usr/share/clang/clang-format-9/clang-format-diff.py"          # clang-format-diff location for clang format 9 Ubuntu/Debian 18.04
+        "/usr/share/clang/clang-format-10/clang-format-diff.py"          # clang-format-diff location for clang format 9 Ubuntu/Debian 18.04
         "/usr/share/clang/clang-format-${CVER}/clang-format-diff.py"    # clang-format-diff location on Ubuntu/Debian
         "/usr/share/clang/clang-format-diff.py"                         # clang-format_diff location on Arch last resort
     )
