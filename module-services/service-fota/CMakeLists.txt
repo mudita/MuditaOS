@@ -13,8 +13,8 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}" )
 target_sources( ${PROJECT_NAME}
     PRIVATE
         ServiceFota.cpp
-    PUBLIC
         api/FotaServiceAPI.cpp
+    PUBLIC
         messages/FotaMessages.hpp
 )
 
