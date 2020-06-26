@@ -1,13 +1,14 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookInternals.hpp"
-
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "module-apps/application-phonebook/widgets/ContactListItem.hpp"
 #include <ListItem.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 
 namespace gui
 {
-    class InputLineWithLabelItem : public ListItem
+    class InputLineWithLabelItem : public ContactListItem
     {
         phonebookInternals::ListItemName listItemName;
 

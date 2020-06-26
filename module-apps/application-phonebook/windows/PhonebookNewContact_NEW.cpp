@@ -1,5 +1,4 @@
 #include "PhonebookNewContact_NEW.hpp"
-
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "PhonebookContact.hpp"
 #include "Dialog.hpp"
@@ -63,6 +62,13 @@ namespace gui
 
     bool PhonebookNewContact_NEW::onInput(const InputEvent &inputEvent)
     {
+
+        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+
+            newContactModel->saveData();
+            return true;
+        }
+
         if (AppWindow::onInput(inputEvent)) {
             return (true);
         }

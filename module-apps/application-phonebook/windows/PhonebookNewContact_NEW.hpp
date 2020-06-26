@@ -1,11 +1,11 @@
 #pragma once
 
+#include "application-phonebook/models/NewContactModel.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 
 #include <Text.hpp>
 
 #include <gui/widgets/ListView.hpp>
-#include "application-phonebook/models/NewContactModel.hpp"
 
 namespace gui
 {
