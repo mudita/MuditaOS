@@ -8,41 +8,31 @@ NewContactModel::NewContactModel(app::Application *app)
 {
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::FirstName,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::SecondName,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::Number,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::OtherNumber,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::Email,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
@@ -50,27 +40,23 @@ NewContactModel::NewContactModel(app::Application *app)
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconItem(
         phonebookInternals::ListItemName::AddToFavourites,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconItem(
         phonebookInternals::ListItemName::AddToICE,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::Address,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::Note,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryModeForce(text, gui::BottomBar::Side::LEFT);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
