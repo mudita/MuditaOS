@@ -1096,6 +1096,10 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                     record.date   = messageDate;
 
                     DBServiceAPI::SMSAdd(this, record);
+                    DBServiceAPI::GetQuery(
+                        this,
+                        db::Interface::Name::Notifications,
+                        std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
                 }
             }
         }
