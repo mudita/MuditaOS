@@ -1,7 +1,8 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookInternals.hpp"
-
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "module-apps/application-phonebook/widgets/ContactListItem.hpp"
 #include <BoxLayout.hpp>
 #include <Image.hpp>
 #include <Label.hpp>
@@ -9,7 +10,7 @@
 
 namespace gui
 {
-    class InputBoxWithLabelAndIconItem : public ListItem
+    class InputBoxWithLabelAndIconItem : public ContactListItem
     {
 
         phonebookInternals::ListItemName listItemName;
@@ -29,6 +30,7 @@ namespace gui
       private:
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+
         void applyItemNameSpecificSettings();
     };
 

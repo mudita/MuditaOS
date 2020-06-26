@@ -1,5 +1,6 @@
 #include <module-apps/application-phonebook/widgets/InputLineWithLabelItem.hpp>
 #include <module-apps/application-phonebook/widgets/InputBoxWithLabelAndIconItem.hpp>
+#include <module-apps/application-phonebook/widgets/ContactListItem.hpp>
 #include "NewContactModel.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "ListView.hpp"
@@ -113,4 +114,36 @@ gui::ListItem *NewContactModel::getItem(gui::Order order)
     }
 
     return nullptr;
+}
+
+void NewContactModel::saveData()
+{
+    contact = std::make_shared<ContactRecord>();
+
+    for (auto item : internalData) {
+
+        if (item->onSaveCallback) {
+
+            item->onSaveCallback(contact);
+        }
+    }
+
+    LOG_INFO("I co zapisało się? %s", contact->primaryName.c_str());
+
+    loadData();
+}
+
+void NewContactModel::loadData()
+{
+    contact = std::make_shared<ContactRecord>();
+
+    contact->primaryName = "lalala";
+
+    for (auto item : internalData) {
+
+        if (item->onLoadCallback) {
+
+            item->onLoadCallback(contact);
+        }
+    }
 }
