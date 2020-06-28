@@ -25,8 +25,6 @@ target_link_libraries( ${PROJECT_NAME} ${LIBRT} rt pthread )
 target_include_directories( ${PROJECT_NAME}  PUBLIC "${CMAKE_SOURCE_DIR}/"  )
 target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-deprecated-declarations")
 target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-unused-result")
-message(WARNING "Please restore -Wno-error and -Wall flags with docker with gtk3 >= 3.24")
-target_compile_options(${PROJECT_NAME} PRIVATE -Wno-error -Wno-all)
 
 # disable sanitizier for target, due to bug in sigc
 # https://github.com/libsigcplusplus/libsigcplusplus/issues/10

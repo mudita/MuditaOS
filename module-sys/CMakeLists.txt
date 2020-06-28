@@ -45,8 +45,3 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# Host target configuration(mainly used for unit testing)
-
-message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2988")
-#add_subdirectory(tests)
-

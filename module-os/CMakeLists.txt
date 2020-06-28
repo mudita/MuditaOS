@@ -97,13 +97,5 @@ if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
             )
 endif()
 
-
 target_link_libraries(${PROJECT_NAME} module-bsp module-utils)
-
-# Host target configuration(mainly used for unit testing)
-
-message(WARNING "Tests for ${PROJECT_NAME} need update")
-if(DEFINED BUILD_UNIT_TESTS)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC LINUX_PORT_DEBUG)
-endif()
 
