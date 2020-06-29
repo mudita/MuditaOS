@@ -11,7 +11,9 @@ class BackupRestore
     static void RestoreUserFiles(sys::Service *ownerService);
 
   private:
-    static bool CleanBackupDir();
+    static bool RemoveBackupDir();
     static bool CreateBackupDir();
-    bool OpenTarFile();
+    static bool PackUserFiles();
+    static bool UnpackBackupFile();
+    static bool ReplaceUserFiles();
 };
