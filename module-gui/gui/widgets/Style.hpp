@@ -66,6 +66,16 @@ namespace style
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
 
+        namespace calendar
+        {
+            const inline uint32_t day_cell_width = 60;
+            const inline uint32_t day_cell_height = 55;
+            /// TODO: check req
+            const inline uint32_t month_year_height = 60;
+            
+        };
+        //style="top: width: 60px; height: 55px; opacity: 0;"
+
         namespace messages
         {
             inline const uint32_t sms_radius          = 7;
@@ -90,6 +100,7 @@ namespace style
             const inline std::string medium = "gt_pressura_regular_24";
         }; // namespace font
     };     // namespace footer
+    
     namespace settings
     {
         namespace date
@@ -115,6 +126,7 @@ namespace style
     {
         namespace common
         {
+            const inline std::string list           = "LIST";
             const inline std::string open           = "common_open";
             const inline std::string call           = "common_call";
             const inline std::string send           = "common_send";

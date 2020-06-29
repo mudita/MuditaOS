@@ -9,7 +9,10 @@
 
 #include <map>
 #include "windows/CalendarMainWindow.hpp"
+#include "windows/DayWindow.hpp"
+#include "windows/DayWindow.cpp"
 #include "ApplicationCalendar.hpp"
+
 
 namespace app
 {
@@ -41,7 +44,12 @@ namespace app
     void ApplicationCalendar::createUserInterface()
     {
         windows.insert(std::pair<std::string, gui::AppWindow *>(
-            gui::name::window::main_window, new CalendarMainWindow(this, gui::name::window::main_window)));
+            gui::name::window::main_window, new gui::CalendarMainWindow(this, gui::name::window::main_window)));
+
+        gui::AppWindow *window = nullptr;
+        LOG_DEBUG("CREATE DAY WINDOW");
+        window = new DayWindow(this,"Day");
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
     void ApplicationCalendar::destroyUserInterface()

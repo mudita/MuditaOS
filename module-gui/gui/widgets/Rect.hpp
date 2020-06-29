@@ -32,6 +32,7 @@ namespace gui
         RectangleYapFlags yaps = {RectangleYapFlags::GUI_RECT_YAP_NO_YAPS};
         /// yap size in horizontal width.
         unsigned short yapSize = {style::window::messages::yaps_size_default};
+      
 
       public:
         Rect();

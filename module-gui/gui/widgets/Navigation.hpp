@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common.hpp"
+#include "module-utils/log/log.hpp"
 
 namespace gui
 {

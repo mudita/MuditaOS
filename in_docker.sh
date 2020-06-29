@@ -46,7 +46,7 @@ case ${TARGET} in
     "make")
         BUILD_DIR=$1
         shift
-        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint make ${CONTAINER} -j $@"
+        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint make ${CONTAINER} -j4 $@"
         ;;
     *)
         help

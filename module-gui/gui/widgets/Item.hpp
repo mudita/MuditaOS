@@ -67,6 +67,7 @@ namespace gui
         // bounding box used for drawing. This is in coordinates of window
         BoundingBox drawArea; // drawableArea would be more accurate
                               // maximal bounding box size
+
         auto area(Area which = Area::Normal) -> BoundingBox &
         {
             switch (which) {
@@ -257,6 +258,8 @@ namespace gui
         virtual Item *getNavigationItem(NavigationDirection direction);
         /// set next navigation item in NavigationDirection
         virtual void setNavigationItem(NavigationDirection direction, Item *item);
+        /// clear next navigation item in NavigationDirection
+        virtual void clearNavigationItem(NavigationDirection direction);
 
         Item();
         virtual ~Item();

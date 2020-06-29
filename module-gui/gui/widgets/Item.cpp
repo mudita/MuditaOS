@@ -348,6 +348,13 @@ namespace gui
         navigationDirections->setDirectionItem(direction, item);
     }
 
+    void Item::clearNavigationItem(NavigationDirection direction)
+    {
+        if (navigationDirections != nullptr) {
+            navigationDirections->clearDirection(direction);
+        }
+    }
+
     bool Item::handleNavigation(const InputEvent inputEvent)
     {
         gui::Item *newFocusItem = nullptr;
