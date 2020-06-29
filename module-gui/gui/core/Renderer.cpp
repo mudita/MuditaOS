@@ -1,10 +1,3 @@
-/*
- * Renderer.cpp
- *
- *  Created on: 7 maj 2019
- *      Author: robert
- */
-
 extern "C"
 {
 #include "FreeRTOS.h"
@@ -30,16 +23,6 @@ extern "C"
 
 namespace gui
 {
-
-    Renderer::Renderer()
-    {
-        // TODO Auto-generated constructor stub
-    }
-
-    Renderer::~Renderer()
-    {
-        // TODO Auto-generated destructor stub
-    }
 
     void Renderer::drawLine(Context *ctx, CommandLine *cmd)
     {}
