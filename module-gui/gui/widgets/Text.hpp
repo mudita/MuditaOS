@@ -209,7 +209,7 @@ namespace gui
          */
         uint32_t getAvailableHPixelSpace()
         {
-            int32_t space = widgetArea.w - (margins.getAlong(Axis::X) + innerMargins.getAlong(Axis::X));
+            int32_t space = widgetArea.w - (margins.getSumInAxis(Axis::X) + padding.getSumInAxis(Axis::X));
             return (space < 0) ? 0 : space;
         }
 

@@ -216,7 +216,7 @@ namespace gui
 
             currentPageSize++;
 
-            addSpanItem();
+            //            addSpanItem();
         }
 
         if (listSpanItem != nullptr) {

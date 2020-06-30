@@ -21,7 +21,7 @@ namespace gui
     Margins::~Margins()
     {}
 
-    short Margins::getAlong(gui::Axis axis) const
+    short Margins::getSumInAxis(gui::Axis axis) const
     {
         switch (axis) {
         case Axis::X:
@@ -33,4 +33,40 @@ namespace gui
         }
     }
 
+    short Margins::getMarginInAxis(Axis axis, MarginInAxis pos) const
+    {
+        switch (axis) {
+
+        case Axis::X:
+
+            switch (pos) {
+
+            case MarginInAxis::First:
+                return left;
+
+            case MarginInAxis::Second:
+                return right;
+
+            default:
+                return 0;
+            }
+
+        case Axis::Y:
+
+            switch (pos) {
+
+            case MarginInAxis::First:
+                return top;
+
+            case MarginInAxis::Second:
+                return bottom;
+
+            default:
+                return 0;
+            }
+
+        default:
+            return 0;
+        }
+    }
 } /* namespace gui */
