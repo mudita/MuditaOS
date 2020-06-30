@@ -81,35 +81,84 @@ namespace gui
             };
 
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
-
             break;
 
         case phonebookInternals::ListItemName::SecondName:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
-            inputText->setTextType(TextType::SINGLE_LINE);
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                contact->alternativeName = inputText->getText();
+            };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                inputText->setText(contact->alternativeName);
+            };
             break;
+
         case phonebookInternals::ListItemName::Number:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
             inputText->setTextType(TextType::SINGLE_LINE);
             inputText->setInputMode(new InputMode({InputMode::phone}));
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                contact->numbers.emplace_back(utils::PhoneNumber(inputText->getText()).getView());
+            };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                if (contact->numbers.size() > 0) {
+                    inputText->setText(contact->numbers[0].number.getEntered());
+                }
+            };
             break;
+
         case phonebookInternals::ListItemName::OtherNumber:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
             inputText->setTextType(Text::TextType::SINGLE_LINE);
             inputText->setInputMode(new InputMode({InputMode::phone}));
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                contact->numbers.emplace_back(utils::PhoneNumber(inputText->getText()).getView());
+            };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                if (contact->numbers.size() > 1) {
+                    inputText->setText(contact->numbers[1].number.getEntered());
+                }
+            };
             break;
+
         case phonebookInternals::ListItemName::Email:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
-            inputText->setTextType(TextType::SINGLE_LINE);
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                if (contact->numbers.size() > 1) {
+                    inputText->setText(contact->mail);
+                }
+            };
             break;
+
         case phonebookInternals::ListItemName::Address:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-            inputText->setTextType(TextType::MULTI_LINE);
+            inputText->setTextType(Text::TextType::MULTI_LINE);
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
             break;
+
         case phonebookInternals::ListItemName::Note:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-            inputText->setTextType(TextType::MULTI_LINE);
+            inputText->setTextType(Text::TextType::MULTI_LINE);
+
+            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
+
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
             break;
+
         default:
             LOG_ERROR("Incorrect List Item Name!");
             break;
