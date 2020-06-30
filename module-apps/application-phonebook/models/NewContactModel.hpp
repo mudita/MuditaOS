@@ -13,20 +13,18 @@ class NewContactModel : public gui::ListItemProvider
     unsigned int internalLimit  = 0;
     vector<gui::ContactListItem *> internalData;
 
-    shared_ptr<ContactRecord> contact = nullptr;
-
   public:
     NewContactModel(app::Application *app);
     ~NewContactModel();
 
-    void saveData();
-    void loadData();
+    void saveData(std::shared_ptr<ContactRecord> contactRecord);
+    void loadData(std::shared_ptr<ContactRecord> contactRecord);
 
-    int getItemCount() const override;
+    [[nodiscard]] auto getItemCount() const -> int override;
 
-    unsigned int getMinimalItemHeight() override;
+    auto getMinimalItemHeight() -> unsigned int override;
 
-    gui::ListItem *getItem(gui::Order order) override;
+    auto getItem(gui::Order order) -> gui::ListItem * override;
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 };
