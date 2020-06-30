@@ -1007,8 +1007,8 @@ namespace gui
         cursor->setSize(2, font->info.line_height);
         auto it = std::next(firstLine, cursorRow);
 
-        uint32_t posX = (margins.left + innerMargins.left) + font->getPixelWidth((*it)->text, 0, cursorColumn);
-        uint32_t posY = (margins.top + innerMargins.top) + cursorRow * font->info.line_height;
+        uint32_t posX = (margins.left + padding.left) + font->getPixelWidth((*it)->text, 0, cursorColumn);
+        uint32_t posY = (margins.top + padding.top) + cursorRow * font->info.line_height;
         cursor->setPosition(posX, posY);
     }
 
@@ -1016,7 +1016,7 @@ namespace gui
     {
         if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE) {
             h = font->info.line_height * textLines.size() +
-                (margins.getAlong(Axis::Y) + innerMargins.getAlong(Axis::Y));
+                (margins.getSumInAxis(Axis::Y) + padding.getSumInAxis(Axis::Y));
             if (parent && widgetArea.h > parent->widgetArea.h) {
                 h = widgetArea.h;
             }
@@ -1030,7 +1030,7 @@ namespace gui
     {
 
         // calculate number of lines for displaying text
-        int32_t h = widgetArea.h - (margins.getAlong(Axis::Y) + innerMargins.getAlong(Axis::Y));
+        int32_t h = widgetArea.h - (margins.getSumInAxis(Axis::Y) + padding.getSumInAxis(Axis::Y));
         if (h < 0)
             h = 0;
 
@@ -1051,15 +1051,15 @@ namespace gui
         }
 
         // if there is not enough space for single line start from 0 and ignore vertical margins
-        uint16_t startY = (h < font->info.line_height) ? 0 : (margins.top + innerMargins.top);
+        uint16_t startY = (h < font->info.line_height) ? 0 : (margins.top + padding.top);
 
         // create labels to display text. There will be always at least one.
         for (uint32_t i = 0; i < rowCount; i++) {
             gui::Label *label =
                 new gui::Label(this,
-                               (margins.left + innerMargins.left),
+                               (margins.left + padding.left),
                                startY,
-                               widgetArea.w - (margins.getAlong(Axis::X) + innerMargins.getAlong(Axis::X)),
+                               widgetArea.w - (margins.getSumInAxis(Axis::X) + padding.getSumInAxis(Axis::X)),
                                font->info.line_height);
             label->setFilled(false);
             label->setPenWidth(1);

@@ -194,4 +194,11 @@ namespace style
         const inline uint32_t item_span_big    = 12;
 
     } // namespace listview
-};    // namespace style
+
+    namespace margins
+    {
+        const inline uint32_t small = 4;
+        const inline uint32_t big   = 6;
+    } // namespace margins
+
+}; // namespace style

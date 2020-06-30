@@ -10,6 +10,7 @@
 #include "CalllogItem.hpp"
 #include "time/time_conversion.hpp"
 #include "../data/CallLogInternals.hpp"
+#include "gui/widgets/BoxLayout.hpp"
 
 #include <Style.hpp>
 
@@ -20,6 +21,8 @@ namespace gui
 
     CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
     {
+        margins = Margins(0, 8, 0, 0);
+
         setMinimumSize(clItemStyle::w, clItemStyle::h);
         setMaximumSize(clItemStyle::w, clItemStyle::h);
 

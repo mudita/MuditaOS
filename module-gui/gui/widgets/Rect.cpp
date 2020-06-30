@@ -72,16 +72,16 @@ namespace gui
     {
         this->yaps = yaps;
         if (yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT | RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT)) {
-            innerMargins.left = yapSize;
+            padding.left = yapSize;
         }
         else {
-            innerMargins.left = 0;
+            padding.left = 0;
         }
         if (yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT | RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT)) {
-            innerMargins.right = yapSize;
+            padding.right = yapSize;
         }
         else {
-            innerMargins.right = 0;
+            padding.right = 0;
         }
     }
 
