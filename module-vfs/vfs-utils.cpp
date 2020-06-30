@@ -1,7 +1,9 @@
 #include <vfs.hpp>
 #include <time/time_conversion.hpp>
+#include <source/version.hpp>
 #include <random>
 #include <ticks.hpp>
+#include <module-utils/common_data/EventStore.hpp>
 
 std::string vfs::generateRandomId(size_t length = 0)
 {
@@ -73,4 +75,27 @@ bool vfs::verifyCRC(const fs::path filePath)
     }
     LOG_ERROR("verifyCRC can't open %s", crcFilePath.c_str());
     return (false);
+}
+
+void vfs::initOperatingSystemStore(sbini_t *ini)
+{
+    Store::OperatingSystem::modify().version.kernelVersionString = tskKERNEL_VERSION_NUMBER;
+
+    if (ini == nullptr) {
+        Store::OperatingSystem::modify().version.gitRev    = GIT_REV;
+        Store::OperatingSystem::modify().version.gitTag    = GIT_TAG;
+        Store::OperatingSystem::modify().version.gitBranch = GIT_BRANCH;
+        Store::OperatingSystem::modify().version.setVersionFromString(VERSION);
+    }
+    else {
+        Store::OperatingSystem::modify().version.gitRev =
+            sbini_get_string(ini, osType.c_str(), purefs::ini::os_git_revision.c_str());
+        Store::OperatingSystem::modify().version.gitBranch =
+            sbini_get_string(ini, osType.c_str(), purefs::ini::os_git_branch.c_str());
+        Store::OperatingSystem::modify().version.gitTag =
+            sbini_get_string(ini, osType.c_str(), purefs::ini::os_git_tag.c_str());
+
+        Store::OperatingSystem::modify().version.setVersionFromString(
+            sbini_get_string(ini, osType.c_str(), purefs::ini::os_version.c_str()));
+    }
 }

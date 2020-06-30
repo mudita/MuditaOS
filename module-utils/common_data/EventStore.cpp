@@ -19,6 +19,17 @@ namespace Store
         return battery;
     }
 
+    OperatingSystem operatingSystem;
+    const OperatingSystem &OperatingSystem::get()
+    {
+        return operatingSystem;
+    }
+
+    OperatingSystem &OperatingSystem::modify()
+    {
+        return operatingSystem;
+    }
+
     cpp_freertos::MutexStandard GSM::mutex;
 
     GSM *GSM::get()

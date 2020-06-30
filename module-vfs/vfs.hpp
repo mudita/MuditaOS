@@ -80,6 +80,7 @@ namespace purefs
         const inline std::string os_git_tag      = "git_tag";
         const inline std::string os_git_revision = "git_commit";
         const inline std::string os_git_branch   = "git_branch";
+        const inline std::string os_version      = "version";
     } // namespace ini
 };    // namespace purefs
 
@@ -168,6 +169,8 @@ class vfs
     size_t fprintf(FILE *stream, const char *format, ...);
 
     FilesystemStats getFilesystemStats();
+
+    void initOperatingSystemStore(sbini_t *ini);
 
     std::string relativeToRoot(const std::string path);
     std::string lastErrnoToStr();

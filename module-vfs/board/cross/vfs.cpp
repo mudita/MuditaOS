@@ -7,7 +7,7 @@
  *  @details
  */
 
-#include "../../vfs.hpp"
+#include "vfs.hpp"
 #include "ff_eMMC_user_disk.hpp"
 
 #define eMMCHIDDEN_SECTOR_COUNT 8
@@ -78,6 +78,9 @@ bool vfs::getOSRootFromIni()
     else {
         osType     = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
         osRootPath = purefs::dir::eMMC_disk / osType;
+
+        initOperatingSystemStore(ini);
+
         sbini_free(ini);
         return true;
     }

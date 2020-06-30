@@ -34,6 +34,7 @@ void vfs::Init()
 {
     // whatever current path on Linux we treat that as the root for our app
     osRootPath = "./";
+    osType     = PATH_CURRENT;
     LOG_DEBUG("vfs::Iinit running on Linux osRootPath: %s", osRootPath.c_str());
 }
 

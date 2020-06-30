@@ -7,6 +7,8 @@
 // it's not meant to serve as polling interface - rather to serve data
 
 #include <cstddef>
+#include <string>
+#include <tuple>
 
 namespace cpp_freertos
 {
@@ -27,6 +29,44 @@ namespace Store
 
         static const Battery &get();
         static Battery &modify();
+    };
+
+    struct OperatingSystem
+    {
+        struct Version
+        {
+            void setVersionFromString(const std::string &versionToSet)
+            {
+                sscanf(versionToSet.c_str(), "%d.%d.%d", &major, &minor, &patch);
+
+                versionString = versionToSet;
+            }
+
+            std::tuple<int, int, int> ToTuple() const
+            {
+                return std::tuple{major, minor, patch};
+            }
+
+            bool operator<(const Version &other)
+            {
+                return ToTuple() < other.ToTuple();
+            }
+
+            unsigned int major;
+            unsigned int minor;
+            unsigned int patch;
+
+            std::string gitBranch;
+            std::string gitTag;
+            std::string gitRev;
+            std::string codename;
+            std::string versionString;
+            std::string kernelVersionString;
+        };
+
+        Version version;
+        static const OperatingSystem &get();
+        static OperatingSystem &modify();
     };
 
     enum class RssiBar : size_t
