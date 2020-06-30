@@ -52,11 +52,6 @@ namespace gui
         progressBar->setCurrentProgress(0);
     }
 
-    ClockMainWindow::~ClockMainWindow()
-    {
-        // TODO Auto-generated destructor stub
-    }
-
     bool ClockMainWindow::handleSwitchData(SwitchData *data)
     {
         ClockData *clockData = reinterpret_cast<ClockData *>(data);

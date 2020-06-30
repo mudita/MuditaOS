@@ -63,7 +63,6 @@ namespace gui
         LOG_DEBUG("Modem Firmware: %s", firmwareVersion.c_str());
         /// TODO: make sure entire string is displayed.
         box->resizeItems();
-        // this->focusItem->setFocus(true);
     }
 
     void Info::destroyInterface()
