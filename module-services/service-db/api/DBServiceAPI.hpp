@@ -13,6 +13,8 @@
 #include <Common/Query.hpp>
 #include <PhoneNumber.hpp>
 
+#include <Service/Message.hpp>
+
 class DBServiceAPI
 {
   public:
@@ -63,6 +65,10 @@ class DBServiceAPI
     static uint32_t SMSTemplateGetCount(sys::Service *serv);
     static bool SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static auto GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query) -> bool;
+    static sys::MessageRet_t GetQueryWithReply(sys::Service *serv,
+                                               db::Interface::Name database,
+                                               std::unique_ptr<db::Query> query,
+                                               std::uint32_t timeout);
 
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.
@@ -70,8 +76,8 @@ class DBServiceAPI
      * @param rec Reference to the contact to be added to database.
      * @param errNumPrim in case of existing contact with same primary phone number this record will be filled with
      * data.
-     * @param errNumAlt in case of existing contact with same alternative phone number this record will be filled with
-     * data.
+     * @param errNumAlt in case of existing contact with same alternative phone number this record will be filled
+     * with data.
      * @param errSpeedDial in case of existing contact with same speed dial assigned this record will be filled with
      * data.
      *

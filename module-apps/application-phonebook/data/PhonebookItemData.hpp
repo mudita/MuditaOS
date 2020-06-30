@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../models/PhonebookModel.hpp"
-#include "ContactRecord.hpp"
-#include "SwitchData.hpp"
+#include <application-phonebook/models/PhonebookModel.hpp>
+#include <ContactRecord.hpp>
+#include <SwitchData.hpp>
+
 #include <memory>
 #include <string>
 
@@ -41,26 +42,20 @@ class PhonebookSearchQuery : public gui::SwitchData
 class PhonebookSearchResultsData : public gui::SwitchData
 {
   public:
-    PhonebookSearchResultsData(std::string _searchQuery) : searchQuery(_searchQuery){};
+    PhonebookSearchResultsData() = delete;
+    PhonebookSearchResultsData(std::unique_ptr<PhonebookModel> model) : model(std::move(model)){};
     virtual ~PhonebookSearchResultsData(){};
-    void setResults(std::shared_ptr<std::vector<ContactRecord>> _results)
-    {
-        results = _results;
-    }
 
-    std::shared_ptr<std::vector<ContactRecord>> getResults()
+    std::unique_ptr<PhonebookModel> consumeSearchResultsModel()
     {
-        return (results);
-    }
-
-    std::string getQuery()
-    {
-        return (searchQuery);
+        assert(!consumed);
+        consumed = true;
+        return std::move(model);
     }
 
   protected:
-    std::string searchQuery;
-    std::shared_ptr<std::vector<ContactRecord>> results;
+    std::unique_ptr<PhonebookModel> model;
+    bool consumed = false;
 };
 
 class PhonebookSearchReuqest : public gui::SwitchData

@@ -63,6 +63,10 @@ class ContactsNameTable : public Table<ContactsNameTableRow, ContactNameTableFie
 
     std::vector<ContactsNameTableRow> GetByName(const char *primaryName, const char *alternativeName);
 
+    std::size_t GetCountByName(const std::string &name);
+
+    std::vector<std::uint32_t> GetIDsByName(const std::string &name, std::uint32_t limit = 0, std::uint32_t offset = 0);
+
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_name("
                                    "_id              INTEGER PRIMARY KEY,"
