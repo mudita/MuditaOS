@@ -79,7 +79,6 @@ namespace gui
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 contact->primaryName = inputText->getText();
             };
-
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
             break;
 
@@ -90,7 +89,6 @@ namespace gui
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 contact->alternativeName = inputText->getText();
             };
-
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 inputText->setText(contact->alternativeName);
             };
@@ -104,7 +102,6 @@ namespace gui
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 contact->numbers.emplace_back(utils::PhoneNumber(inputText->getText()).getView());
             };
-
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 if (contact->numbers.size() > 0) {
                     inputText->setText(contact->numbers[0].number.getEntered());
@@ -120,7 +117,6 @@ namespace gui
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 contact->numbers.emplace_back(utils::PhoneNumber(inputText->getText()).getView());
             };
-
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 if (contact->numbers.size() > 1) {
                     inputText->setText(contact->numbers[1].number.getEntered());
@@ -133,11 +129,8 @@ namespace gui
             inputText->setTextType(Text::TextType::SINGLE_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
-
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                if (contact->numbers.size() > 1) {
                     inputText->setText(contact->mail);
-                }
             };
             break;
 
@@ -146,8 +139,9 @@ namespace gui
             inputText->setTextType(Text::TextType::MULTI_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
-
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                //inputText->setText(contact->address);
+            };
             break;
 
         case phonebookInternals::ListItemName::Note:
@@ -155,8 +149,9 @@ namespace gui
             inputText->setTextType(Text::TextType::MULTI_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
-
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                //inputText->setText(contact->note);
+            };
             break;
 
         default:
