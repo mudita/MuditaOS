@@ -5,8 +5,8 @@
 #include "service-db/includes/DBServiceName.hpp"
 #include "SystemManager/SystemManager.hpp"
 
-static const auto empty_dirlist_size = 2;
-static const auto backup_file_name   = "backup.tar";
+static const long unsigned int empty_dirlist_size = 2;
+static const auto backup_file_name                = "backup.tar";
 
 void BackupRestore::BackupUserFiles(sys::Service *ownerService)
 {
@@ -109,7 +109,7 @@ bool BackupRestore::PackUserFiles()
         return false;
     }
 
-    LOG_INFO("PackUserFiles: backup dir %s listed with %d files.",
+    LOG_INFO("PackUserFiles: backup dir %s listed with %lu files.",
              purefs::dir::os_backup.c_str(),
              dirlist.size() - empty_dirlist_size);
 
@@ -158,12 +158,12 @@ bool BackupRestore::PackUserFiles()
                 return false;
             }
 
-            uint32_t loopcount = (file->ulFileSize / purefs::buffer::tar_buf) + 1u;
+            uint32_t loopcount = (vfs.filelength(file) / purefs::buffer::tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
                 if (i + 1u == loopcount) {
-                    readsize = file->ulFileSize % purefs::buffer::tar_buf;
+                    readsize = vfs.filelength(file) % purefs::buffer::tar_buf;
                 }
                 else {
                     readsize = purefs::buffer::tar_buf;
@@ -324,7 +324,7 @@ bool BackupRestore::ReplaceUserFiles()
         return false;
     }
 
-    LOG_INFO("ReplaceUserFiles: dir listed with %d files", dirlist.size() - empty_dirlist_size);
+    LOG_INFO("ReplaceUserFiles: dir listed with %lu files", dirlist.size() - empty_dirlist_size);
 
     std::string userFilePath = purefs::dir::user_disk;
     userFilePath += "/";
