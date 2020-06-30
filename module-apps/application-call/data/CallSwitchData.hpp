@@ -27,7 +27,6 @@ namespace app
       public:
         CallSwitchData(const utils::PhoneNumber::View &phoneNumber, Type type = Type::UNDEFINED)
             : SwitchData(descriptionStr), type(type), phoneNumber(phoneNumber){};
-        virtual ~CallSwitchData(){};
 
         const Type &getType() const
         {
@@ -48,7 +47,6 @@ namespace app
 
         EnterNumberData(const std::string &phoneNumber) : SwitchData(descriptionStr), phoneNumber(phoneNumber)
         {}
-        virtual ~EnterNumberData(){};
 
         const std::string &getPhoneNumber() const
         {
@@ -61,7 +59,6 @@ namespace app
       public:
         IncommingCallData(const utils::PhoneNumber::View &phoneNumber)
             : CallSwitchData(phoneNumber, CallSwitchData::Type::INCOMMING_CALL){};
-        virtual ~IncommingCallData(){};
     };
 
     class ExecuteCallData : public CallSwitchData
@@ -70,7 +67,6 @@ namespace app
         ExecuteCallData(const utils::PhoneNumber::View &phoneNumber)
             : CallSwitchData(phoneNumber, app::CallSwitchData::Type::EXECUTE_CALL){};
 
-        virtual ~ExecuteCallData(){};
     };
 
 } /* namespace app */

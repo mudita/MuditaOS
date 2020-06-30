@@ -34,11 +34,6 @@ namespace gui
         AppWindow::destroyInterface();
     }
 
-    EmergencyCallWindow::~EmergencyCallWindow()
-    {
-        // TODO Auto-generated destructor stub
-    }
-
     bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
     {
         bool ret = EnterNumberWindow::onInput(inputEvent);

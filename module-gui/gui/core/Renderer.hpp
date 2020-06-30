@@ -1,12 +1,4 @@
-/*
- * Renderer.hpp
- *
- *  Created on: 7 maj 2019
- *      Author: robert
- */
-
-#ifndef GUI_CORE_RENDERER_HPP_
-#define GUI_CORE_RENDERER_HPP_
+#pragma once
 
 #include <vector>
 #include "DrawCommand.hpp"
@@ -106,12 +98,9 @@ namespace gui
         void drawImage(Context *ctx, CommandImage *cmd);
 
       public:
-        Renderer();
-        virtual ~Renderer();
+        virtual ~Renderer() = default;
 
         void render(Context *ctx, std::vector<DrawCommand *> &commands);
     };
 
 } /* namespace gui */
-
-#endif /* GUI_CORE_RENDERER_HPP_ */

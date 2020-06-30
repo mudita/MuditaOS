@@ -41,11 +41,6 @@ namespace app
         : Application(name, parent, false, stackDepth, priority)
     {}
 
-    ApplicationViewer::~ApplicationViewer()
-    {
-        // TODO Auto-generated destructor stub
-    }
-
     // Invoked upon receiving data message
     sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
