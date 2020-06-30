@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../Databases/ContactsDB.hpp"
+#include <Databases/ContactsDB.hpp>
+#include <Common/Query.hpp>
+
 #include "i18/i18.hpp"
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
@@ -8,6 +10,7 @@
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
 
+#include <memory>
 #include <optional>
 
 struct ContactRecord
@@ -150,6 +153,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName,
                                                        const char *alternativeName,
                                                        const char *number);
+
+    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
 
   private:
     ContactsDB *contactDB;

@@ -119,6 +119,7 @@ namespace gui
         if (provider != nullptr) {
             provider->list = this;
             setElementsCount(provider->getItemCount());
+            provider->requestRecords(0, calculateLimit());
         }
         refresh();
     }
@@ -259,18 +260,18 @@ namespace gui
         return count;
     }
 
-    bool ListView::listPageEndReached()
+    int ListView::calculateLimit()
     {
         auto minLimit =
             (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
+        if (direction == style::listview::Direction::Bottom)
+            return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
+        else
+            return minLimit < startIndex ? minLimit : startIndex;
+    }
 
-        auto calculateLimit = [&]() {
-            if (direction == style::listview::Direction::Bottom)
-                return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
-            else
-                return minLimit < startIndex ? minLimit : startIndex;
-        };
-
+    bool ListView::listPageEndReached()
+    {
         if (direction == style::listview::Direction::Bottom) {
 
             body->setReverseOrder(false);

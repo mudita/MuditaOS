@@ -133,6 +133,37 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
     return ret;
 }
 
+std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &filter,
+                                                             std::size_t limit,
+                                                             std::size_t offset)
+{
+    std::vector<std::uint32_t> ids;
+    std::string query = "SELECT DISTINCT contacts._id"
+                        " FROM contacts"
+                        " INNER JOIN contact_name ON contacts._id == contact_name.contact_id"
+                        " INNER JOIN contact_number ON contacts._id == contact_number.contact_id"
+                        " WHERE contact_number.number_user LIKE '%%" +
+                        filter +
+                        "%%'"
+                        " ORDER BY contacts.favourites DESC, name_alternative || ' ' || name_primary";
+
+    if (limit > 0) {
+        query += " LIMIT " + std::to_string(limit);
+        query += " OFFSET " + std::to_string(offset);
+    }
+
+    auto queryRet = db->Query(query.c_str());
+    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+        return ids;
+    }
+
+    do {
+        ids.push_back((*queryRet)[0].GetUInt32());
+    } while (queryRet->NextRow());
+
+    return ids;
+}
+
 std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);

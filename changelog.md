@@ -13,6 +13,9 @@
 * `[gui]` Selector for newline in special character selection
 * `[phonebook]` New implementation of Add/Edit Contact window
 
+### Changed
+ * `[phonebook]` Improved contact searching.
+
 ### Other
 * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
  

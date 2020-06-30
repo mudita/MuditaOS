@@ -2,14 +2,17 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include "application-phonebook/widgets/PhonebookItem.hpp"
+#include "application-phonebook/models/PhonebookModel.hpp"
+
+#include <messages/QueryMessage.hpp>
+#include <queries/phonebook/QueryContactGet.hpp>
 
 #include <service-appmgr/ApplicationManager.hpp>
 
 namespace gui
 {
     PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
-        : AppWindow(app, gui::window::name::search_results), searchResultsModel{
-                                                                 std::make_shared<SearchResultsModel>(app)}
+        : AppWindow(app, gui::window::name::search_results)
     {
         buildInterface();
     }
@@ -95,22 +98,34 @@ namespace gui
             return false;
         }
 
-        auto fillResults = [=](std::shared_ptr<std::vector<ContactRecord>> res, const std::string &title) {
-            if (res == nullptr || res->size() == 0) {
-                return;
-            }
-            searchResultsModel->setResults(res);
-            searchResultList->setElementsCount(res.get()->size());
-            searchResultList->onProviderDataUpdate();
-            setTitle(utils::localize.get("common_results_prefix") + "\"" + title + "\"");
-        };
+        auto searchResultsData = dynamic_cast<PhonebookSearchResultsData *>(data);
+        assert(searchResultsData != nullptr);
 
-        auto searchResults = dynamic_cast<PhonebookSearchResultsData *>(data);
-        if (searchResults != nullptr) {
-            fillResults(searchResults->getResults(), searchResults->getQuery());
-            return true;
+        searchResultsModel = searchResultsData->consumeSearchResultsModel();
+        setTitle(utils::localize.get("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
+        searchResultList->setProvider(searchResultsModel);
+
+        return true;
+    }
+
+    bool PhonebookSearchResults::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto respMsg = dynamic_cast<sys::ResponseMessage *>(msgl);
+
+        assert(respMsg != nullptr);
+        assert(respMsg->responseTo == MessageType::DBQuery);
+
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(respMsg);
+        if (queryResponse == nullptr) {
+            LOG_ERROR("Unexpected message.");
+            return false;
         }
 
-        return false;
+        auto contactsResponse = dynamic_cast<db::query::ContactGetResult *>(queryResponse->getResult());
+        assert(contactsResponse != nullptr);
+
+        auto records = std::make_unique<std::vector<ContactRecord>>(contactsResponse->getRecords());
+
+        return searchResultsModel->updateRecords(std::move(records));
     }
 } /* namespace gui */
