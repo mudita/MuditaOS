@@ -43,34 +43,18 @@ namespace app
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
             if (msg != nullptr) {
-                if (msg->interface == db::Interface::Name::SMS) {
-
-                    this->windows[gui::name::window::main_window]->rebuild();
-                    // de facto parameterized rebuild
-                    this->windows[gui::name::window::thread_view]->onDatabaseMessage(msg);
-
-                    if (getCurrentWindow() == windows[gui::name::window::main_window] ||
-                        getCurrentWindow() == windows[gui::name::window::thread_view]) {
-                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                    }
-
-                    return std::make_shared<sys::ResponseMessage>();
+                // window-specific actions
+                for (auto it = windows.begin(); it != windows.end(); it++) {
+                    it->second->onDatabaseMessage(msg);
                 }
+                // generic actions
                 if (msg->interface == db::Interface::Name::SMSThread) {
-                    this->windows[gui::name::window::main_window]->rebuild();
-
-                    if (getCurrentWindow() != windows[gui::name::window::main_window]) {
-                        // if thread has just dissapeared and we are not in converstaions (threads) view, then…
-                        this->switchWindow(gui::name::window::main_window, nullptr);
-                    }
-                    return std::make_shared<sys::ResponseMessage>();
-                }
-
-                if (windows[gui::name::window::thread_view]->onDatabaseMessage(msg)) {
-                    if (getCurrentWindow() == windows[gui::name::window::thread_view]) {
-                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    if (msg->type == db::Query::Type::Delete) {
+                        // if thread has just dissapeared, then just go to conversation view (main window)
+                        this->switchWindow(gui::name::window::main_window);
                     }
                 }
+                return std::make_shared<sys::ResponseMessage>();
             }
         }
 
@@ -156,7 +140,7 @@ namespace app
                     LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->ID);
                     return false;
                 }
-                this->switchWindow(gui::name::window::main_window);
+                //                this->switchWindow(gui::name::window::main_window);
                 return true;
             };
             meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
