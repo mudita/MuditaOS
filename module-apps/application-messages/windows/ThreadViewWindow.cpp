@@ -415,22 +415,28 @@ namespace gui
     {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {
-            switch (msg->type) {
-            case db::Query::Type::Create:
-                // jump to the latest SMS
-                addSMS(ThreadViewWindow::Action::NewestPage);
-                break;
-            case db::Query::Type::Update:
-            case db::Query::Type::Delete:
-                // refresh view in place (current page)
-                addSMS(ThreadViewWindow::Action::Refresh);
-                break;
-            case db::Query::Type::Read:
-                // do not update view, as we don't have visual representation for read status
-                break;
+            if (msg->interface == db::Interface::Name::SMS) {
+                std::unique_ptr<ThreadRecord> threadDetails;
+                switch (msg->type) {
+                case db::Query::Type::Create:
+                    // jump to the latest SMS
+                    addSMS(ThreadViewWindow::Action::NewestPage);
+                    break;
+                case db::Query::Type::Update:
+                case db::Query::Type::Delete:
+                    addSMS(ThreadViewWindow::Action::Refresh);
+                    break;
+                case db::Query::Type::Read:
+                    // do not update view, as we don't have visual representation for read status
+                    break;
+                }
+                if (this == application->getCurrentWindow()) {
+                    application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 } /* namespace gui */

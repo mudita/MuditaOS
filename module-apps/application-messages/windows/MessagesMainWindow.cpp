@@ -24,6 +24,7 @@
 #include <functional>
 #include <memory>
 #include <cassert>
+#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
 {
@@ -177,12 +178,23 @@ namespace gui
 
     bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        DBThreadResponseMessage *msg = dynamic_cast<DBThreadResponseMessage *>(msgl);
-        if (msg && threadModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count)) {
+        auto *msgResponse = dynamic_cast<DBThreadResponseMessage *>(msgl);
+        if (msgResponse &&
+            threadModel->updateRecords(
+                std::move(msgResponse->records), msgResponse->offset, msgResponse->limit, msgResponse->count)) {
             return true;
         }
 
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr) {
+            // whatever notification had happened, rebuild
+            this->rebuild();
+            if (this == application->getCurrentWindow()) {
+                application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            return true;
+        }
         return false;
-    }
+    } // namespace gui
 
 } /* namespace gui */
