@@ -12,12 +12,18 @@
 
 namespace gui
 {
+    enum class MarginInAxis
+    {
+        First,
+        Second
+    };
 
     class Margins
     {
       public:
         short left, top, right, bottom;
-        short getAlong(Axis axis) const;
+        short getSumInAxis(Axis axis) const;
+        short getMarginInAxis(Axis axis, MarginInAxis pos) const;
         Margins();
         Margins(const short left, const short top, const short right, const short bottom);
         virtual ~Margins();
