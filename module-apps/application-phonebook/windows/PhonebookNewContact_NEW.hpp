@@ -12,30 +12,35 @@ namespace gui
     class PhonebookNewContact_NEW : public AppWindow
     {
       public:
-      protected:
-        gui::Label *title = nullptr;
-
-        std::shared_ptr<ContactRecord> contact = nullptr;
-
-      public:
         PhonebookNewContact_NEW(app::Application *app);
-        virtual ~PhonebookNewContact_NEW();
+        ~PhonebookNewContact_NEW() override;
 
         // virtual methods
-        bool onInput(const InputEvent &inputEvent) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
 
+      protected:
+        std::shared_ptr<ContactRecord> contact = nullptr;
+
       private:
-        //        auto verifyAndSave() -> bool;
-        //        const std::string getCountryPrefix();
-        //        void showDialogDuplicatedNumber(ContactRecord &newContactRecord, const UTF8 duplicatedNumber);
-        //        void showDialogDuplicatedSpeedDialNumber(ContactRecord &newContactRecord);
+        enum class ContactAction
+        {
+            None,
+            Add,
+            Edit
+        };
+
+        auto verifyAndSave() -> bool;
+        void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber);
+        void showDialogDuplicatedSpeedDialNumber();
 
         gui::ListView *list              = nullptr;
         NewContactModel *newContactModel = nullptr;
+        ContactAction contactAction      = ContactAction::None;
     };
 
 } /* namespace gui */

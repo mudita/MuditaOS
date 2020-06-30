@@ -74,12 +74,12 @@ NewContactModel::~NewContactModel()
     internalData.clear();
 }
 
-int NewContactModel::getItemCount() const
+auto NewContactModel::getItemCount() const -> int
 {
     return internalData.size();
 }
 
-unsigned int NewContactModel::getMinimalItemHeight()
+auto NewContactModel::getMinimalItemHeight() -> unsigned int
 {
     return phonebookStyle::inputLineWithLabelItem::h;
 }
@@ -92,7 +92,7 @@ void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit
     list->onProviderDataUpdate();
 }
 
-gui::ListItem *NewContactModel::getItem(gui::Order order)
+auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
 {
     unsigned int index = 0;
     if (order == gui::Order::Previous) {
@@ -116,34 +116,20 @@ gui::ListItem *NewContactModel::getItem(gui::Order order)
     return nullptr;
 }
 
-void NewContactModel::saveData()
+void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
 {
-    contact = std::make_shared<ContactRecord>();
-
     for (auto item : internalData) {
-
         if (item->onSaveCallback) {
-
-            item->onSaveCallback(contact);
+            item->onSaveCallback(contactRecord);
         }
     }
-
-    LOG_INFO("I co zapisało się? %s", contact->primaryName.c_str());
-
-    loadData();
 }
 
-void NewContactModel::loadData()
+void NewContactModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
 {
-    contact = std::make_shared<ContactRecord>();
-
-    contact->primaryName = "lalala";
-
     for (auto item : internalData) {
-
         if (item->onLoadCallback) {
-
-            item->onLoadCallback(contact);
+            item->onLoadCallback(contactRecord);
         }
     }
 }
