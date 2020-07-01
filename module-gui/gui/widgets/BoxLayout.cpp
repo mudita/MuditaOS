@@ -200,7 +200,6 @@ namespace gui
                     pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
                 }
 
-
                 if (!reverseOrder) {
                     pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
                     axisItemPosition = pos;

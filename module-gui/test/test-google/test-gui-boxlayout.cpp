@@ -38,6 +38,7 @@ class TestBoxLayout : public gui::BoxLayout
     FRIEND_TEST(BoxLayoutTesting, Navigate_Test);
     FRIEND_TEST(BoxLayoutTesting, Border_Callback_Test);
     FRIEND_TEST(BoxLayoutTesting, Axis_Alignment_Test);
+    FRIEND_TEST(BoxLayoutTesting, Item_Margins_Test);
 
     TestBoxLayout(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : BoxLayout(parent, x, y, w, h){};
     ~TestBoxLayout() = default;
@@ -76,13 +77,18 @@ class BoxLayoutTesting : public ::testing::Test
         }
     }
 
-    void addNItems(gui::BoxLayout *Box, unsigned int n, uint32_t item_w, uint32_t item_h)
+    void addNItems(gui::BoxLayout *Box,
+                   unsigned int n,
+                   uint32_t item_w,
+                   uint32_t item_h,
+                   const gui::Margins &margins = gui::Margins())
     {
         for (unsigned int i = 1; i <= n; i++) {
 
             auto item     = new TestItem(nullptr, 0, 0, item_w, item_h);
             item->ID      = i;
             item->visible = true;
+            item->setMargins(margins);
 
             Box->addWidget(item);
         }
@@ -102,8 +108,8 @@ class BoxLayoutTesting : public ::testing::Test
 
     const unsigned int fillVBoxPage     = testStyle::VBox_h / testStyle::VBox_item_h;
     const unsigned int notFillVBoxPage  = fillVBoxPage - 2;
-    const unsigned int fillHVBoxPage    = testStyle::HBox_w / testStyle::HBox_item_w;
-    const unsigned int overflowHBoxPage = fillHVBoxPage + 2;
+    const unsigned int fillHBoxPage     = testStyle::HBox_w / testStyle::HBox_item_w;
+    const unsigned int overflowHBoxPage = fillHBoxPage + 2;
 };
 
 TEST_F(BoxLayoutTesting, Constructor_Destructor_Test)
@@ -148,8 +154,8 @@ TEST_F(BoxLayoutTesting, Navigate_Test)
         << "move up by 1 - second element should have focus";
 
     // Fill HBox
-    addNItems(testHBoxLayout, fillHVBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h);
-    ASSERT_EQ(fillHVBoxPage, testHBoxLayout->children.size()) << "Box should contain 4 elements";
+    addNItems(testHBoxLayout, fillHBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h);
+    ASSERT_EQ(fillHBoxPage, testHBoxLayout->children.size()) << "Box should contain 4 elements";
 
     testHBoxLayout->setFocus(true);
     ASSERT_EQ(1, dynamic_cast<TestItem *>(testHBoxLayout->getFocusItem())->ID) << "first element should have focus";
@@ -184,8 +190,8 @@ TEST_F(BoxLayoutTesting, Border_Callback_Test)
     ASSERT_TRUE(borderCallback) << "move second down time by 2 - border callback should be called";
 
     // Fill HBox
-    addNItems(testHBoxLayout, fillHVBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h);
-    ASSERT_EQ(fillHVBoxPage, testHBoxLayout->children.size()) << "Box should contain 4 elements";
+    addNItems(testHBoxLayout, fillHBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h);
+    ASSERT_EQ(fillHBoxPage, testHBoxLayout->children.size()) << "Box should contain 4 elements";
 
     testHBoxLayout->setFocus(true);
     borderCallback = false;
@@ -237,4 +243,39 @@ TEST_F(BoxLayoutTesting, Axis_Alignment_Test)
     ASSERT_EQ(300, testVBoxLayout->children.front()->getPosition(gui::Axis::Y))
         << "first element should have Y pos 300";
     ASSERT_EQ(0, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 0";
+}
+
+TEST_F(BoxLayoutTesting, Item_Margins_Test)
+{
+    auto testTopMargin    = 30;
+    auto testBottomMargin = 50;
+    auto testRightMargin  = 2;
+    auto testLeftMargin   = 5;
+
+    // Add data to VBox with custom margins top 30, bot 50.
+    addNItems(testVBoxLayout,
+              fillVBoxPage,
+              testStyle::VBox_item_w,
+              testStyle::VBox_item_h,
+              gui::Margins(0, testTopMargin, 0, testBottomMargin));
+
+    ASSERT_EQ(testTopMargin, getNItem(testVBoxLayout, 0)->widgetArea.y) << "First element y pos should be 30";
+    ASSERT_EQ(testTopMargin + testStyle::VBox_item_h + testBottomMargin + testTopMargin,
+              getNItem(testVBoxLayout, 1)->widgetArea.y)
+        << "Second element y pos should be 210";
+
+    // Add data to HBox with custom margins right 20, left 50 and with reverse order.
+    testHBoxLayout->setReverseOrder(true);
+    addNItems(testHBoxLayout,
+              fillHBoxPage,
+              testStyle::HBox_item_w,
+              testStyle::HBox_item_h,
+              gui::Margins(testLeftMargin, 0, testRightMargin, 0));
+
+    ASSERT_EQ(testStyle::HBox_w - testRightMargin - testStyle::HBox_item_w, getNItem(testHBoxLayout, 0)->widgetArea.x)
+        << "First element y pos should be 148";
+    ASSERT_EQ(testStyle::HBox_w - testRightMargin - testStyle::HBox_item_w - testLeftMargin - testRightMargin -
+                  testStyle::HBox_item_w,
+              getNItem(testHBoxLayout, 1)->widgetArea.x)
+        << "Second element y pos should be 91";
 }

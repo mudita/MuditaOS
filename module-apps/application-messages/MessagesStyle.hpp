@@ -9,7 +9,8 @@ namespace style
             constexpr uint32_t pageSize = 5;
 
             constexpr uint32_t listPositionX = style::window::default_left_margin;
-            constexpr uint32_t ListPositionY = style::header::height;
+            // Magic 1 -> discussed with Design for proper alignment.
+            constexpr uint32_t ListPositionY = style::header::height - 1;
             constexpr uint32_t listHeight    = style::window_height - ListPositionY - style::footer::height;
             constexpr uint32_t listWidth     = style::listview::body_width_with_scroll;
         } // namespace threads
