@@ -256,10 +256,11 @@ namespace gui
     }
 
     /// set and get Margins
-
     void Item::setMargins(const Margins &value)
     {
-        margins = value;
+        if (margins != value) {
+            margins = value;
+        }
     }
 
     Margins Item::getMargins()

@@ -35,6 +35,8 @@ namespace gui
 
     NavigationDirection inputToNavigation(const InputEvent &evt);
 
+    using Padding = Margins;
+
     class Item
     {
       public:
@@ -58,8 +60,8 @@ namespace gui
         };
         /// actual bounding box of the item. This is in coordinates of the parent widget.
         BoundingBox widgetArea;
-        /// bounding box of the item minimal size,
-        BoundingBox widgetMinimalArea;
+        /// bounding box of the item minimum size,
+        BoundingBox widgetMinimumArea;
         /// bounding box of the item maximal size,
         BoundingBox widgetMaximumArea;
         // bounding box used for drawing. This is in coordinates of window
@@ -69,18 +71,19 @@ namespace gui
         {
             switch (which) {
             case Area::Min:
-                return widgetMinimalArea;
+                return widgetMinimumArea;
             case Area::Normal:
                 return widgetArea;
             case Area::Draw:
                 return drawArea;
             case Area::Max:
                 return widgetMaximumArea;
+            default:
+                return widgetArea;
             }
-            return widgetArea;
         }
 
-        Margins padding;
+        Padding padding;
         Margins margins;
 
         /// radius of corner, default 0

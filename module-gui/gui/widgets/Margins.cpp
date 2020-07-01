@@ -69,4 +69,15 @@ namespace gui
             return 0;
         }
     }
+
+    bool Margins::operator==(const Margins &margins)
+    {
+        return !(left != margins.left || top != margins.top || right != margins.right || bottom != margins.bottom);
+    }
+
+    bool Margins::operator!=(const Margins &margins)
+    {
+        return (left != margins.left || top != margins.top || right != margins.right || bottom != margins.bottom);
+    }
+
 } /* namespace gui */
