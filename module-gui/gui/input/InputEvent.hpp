@@ -85,7 +85,10 @@ namespace gui
         KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
 
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
-        bool isShortPress() const { return state == State::keyReleasedShort; }
+        bool isShortPress() const
+        {
+            return state == State::keyReleasedShort;
+        }
         bool isKeyRelease() const
         {
             return state == State::keyReleasedShort || state == State::keyReleasedLong;

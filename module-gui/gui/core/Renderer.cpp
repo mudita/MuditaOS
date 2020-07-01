@@ -23,7 +23,7 @@ extern "C"
 
 #if DEBUG_FONT == 1
 #define log_warn_glyph(...) LOG_WARN(__VA_ARGS__)
-# else
+#else
 #define log_warn_glyph(...)
 #endif
 

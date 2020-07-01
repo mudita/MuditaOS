@@ -15,7 +15,7 @@
 namespace gui
 {
 
-    NavigationDirection inputToNavigation(const InputEvent& evt)
+    NavigationDirection inputToNavigation(const InputEvent &evt)
     {
         switch (evt.keyCode) {
         case gui::KeyCode::KEY_LEFT:
