@@ -18,7 +18,8 @@ namespace gui
         LEFT = 0x01,
         UP,
         RIGHT,
-        DOWN
+        DOWN,
+        NONE,
     };
 
     enum class Status
