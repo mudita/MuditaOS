@@ -56,12 +56,12 @@ namespace gui
             Draw,
             Max,
         };
-        /// bounding box of the item. This is in coordinates of the parent widget.
+        /// actual bounding box of the item. This is in coordinates of the parent widget.
         BoundingBox widgetArea;
-        /// bounding box of the item maximal size, if not specified other - the same as widget Area
-        BoundingBox widgetMaxArea;
-        /// bounding box of the item maximal size, if not specified other - the same as widget Area
-        BoundingBox widgetActualArea;
+        /// bounding box of the item minimal size,
+        BoundingBox widgetMinimalArea;
+        /// bounding box of the item maximal size,
+        BoundingBox widgetMaximumArea;
         // bounding box used for drawing. This is in coordinates of window
         BoundingBox drawArea; // drawableArea would be more accurate
                               // maximal bounding box size
@@ -69,13 +69,13 @@ namespace gui
         {
             switch (which) {
             case Area::Min:
-                return widgetActualArea;
+                return widgetMinimalArea;
             case Area::Normal:
                 return widgetArea;
             case Area::Draw:
                 return drawArea;
             case Area::Max:
-                return widgetMaxArea;
+                return widgetMaximumArea;
             }
             return widgetArea;
         }
@@ -192,6 +192,9 @@ namespace gui
         virtual void setPosition(const short &val, Axis axis);
         [[nodiscard]] uint16_t getSize(Axis axis) const;
         [[nodiscard]] uint16_t getPosition(Axis axis) const;
+
+        void setMargins(const Margins &value);
+        [[nodiscard]] Margins getMargins();
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///

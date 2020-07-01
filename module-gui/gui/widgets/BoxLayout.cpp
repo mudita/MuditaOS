@@ -194,21 +194,21 @@ namespace gui
             if (axisItemSize <= pos_left) {
 
                 if (reverseOrder) {
-                    pos -= el->margins.getMarginInAxis(axis, MarginInAxis::Second);
+                    pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
                     pos -= axisItemSize;
                     axisItemPosition = pos;
-                    pos -= el->margins.getMarginInAxis(axis, MarginInAxis::First);
+                    pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
                 }
 
 
                 if (!reverseOrder) {
-                    pos += el->margins.getMarginInAxis(axis, MarginInAxis::First);
+                    pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
                     axisItemPosition = pos;
                     pos += axisItemSize;
-                    pos += el->margins.getMarginInAxis(axis, MarginInAxis::Second);
+                    pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
                 }
 
-                pos_left -= axisItemSize + el->margins.getSumInAxis(axis);
+                pos_left -= axisItemSize + el->getMargins().getSumInAxis(axis);
             }
             else {
                 addToOutOfDrawAreaList(el);

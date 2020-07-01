@@ -7,6 +7,7 @@ namespace gui
 
     PhonebookItem::PhonebookItem()
     {
+        setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
         setMaximumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
 
