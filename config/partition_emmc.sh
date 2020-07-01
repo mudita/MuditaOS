@@ -1,6 +1,6 @@
 #!/bin/bash
 # set -e
-
+source config/common.sh
 is_root=`id -u`
 if [ "$1" == "" ] || [ $is_root != 0 ]; then
 	echo "Refuse to work with no device. Runme as root [uid=$is_root]"
@@ -29,7 +29,7 @@ else
 	echo "$dev has $pcount partitions"
 fi
 
-sfdisk --wipe always $dev < emmc_partition_table.dump
+sfdisk --wipe always $dev < config/emmc_partition_table.dump
 
 if [ $? != 0 ]; then
 	echo "partitioning device $dev failed"
@@ -40,10 +40,10 @@ part1=$(sfdisk $dev --dump | grep bootable | awk '{print $1}')
 part2=$(sfdisk $dev --dump | tail -n 1 | awk '{print $1}')
 
 echo "create FATs"
-echo "FAT: PUREOS"
-mkfs.vfat -n PUREOS $part1
-echo "FAT: BACKUP"
-mkfs.vfat -n BACKUP $part2
+echo "FAT: $PURE_PARTITION_PRIMARY $part1"
+mkfs.vfat -n $PURE_PARTITION_PRIMARY $part1
+echo "FAT: $PURE_PARTITION_RECOVERY $part2"
+mkfs.vfat -n $PURE_PARTITION_RECOVERY $part2
 
 echo "probe new partitions to OS"
 partprobe
