@@ -21,17 +21,17 @@ jobs:
       run: |
         ./configure.sh linux Debug && \
         pushd build-linux-Debug && \
-        echo "JOBS=${JOBS:-3}" &&\
-        make -j ${JOBS:-3} check && \
+        echo "JOBS=${JOBS:-8} | set to 8" &&\
+        make -j 8 check && \
         popd
     - name: "Build and package for RT1051"
       id: build_release_package 
       run: |
         ./configure.sh rt1051 Debug && \
         pushd build-rt1051-Debug && \
-        echo "JOBS=${JOBS:-3}" &&\
-        make -j ${JOBS:-3} && \
-        make -j ${JOBS:-3} package && \
+        echo "JOBS=${JOBS:-8} | set to 8" &&\
+        make -j 8 && \
+        make -j 8 package && \
         popd && \
         ./print_last_changes.sh
     - name: Create Release
