@@ -18,6 +18,8 @@
 namespace gui
 {
 
+    const uint32_t KeyProfile::none_key = 0;
+
     KeyProfile::KeyProfile()
     {}
     KeyProfile::~KeyProfile()

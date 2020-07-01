@@ -498,9 +498,14 @@ UTF8 UTF8::getLine(void)
 
 bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
 {
-
-    if ((pos + count > this->length()) || (count == 0))
+    if (count == 0) {
         return false;
+    }
+
+    if (static_cast<uint64_t>(pos) + count > length()) // used uint64_t value to avoid 32b rounding issue
+    {
+        return false;
+    }
 
     // get pointer to begin of string to remove
     uint8_t *beginPtr = this->data;

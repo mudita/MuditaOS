@@ -39,7 +39,7 @@ InputMode::InputMode(std::list<InputMode::Mode> mode_list,
     }
 }
 
-InputMode::Mode InputMode::modeNow()
+InputMode::Mode InputMode::modeNow() const
 {
     return *std::next(input_mode_list.begin(), input_mode_list_pos);
 }

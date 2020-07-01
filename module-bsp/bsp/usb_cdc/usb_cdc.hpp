@@ -8,7 +8,6 @@ extern "C"
 }
 
 #include <errno.h>
-#include <fcntl.h>
 #include <iostream>
 #include <log/log.hpp>
 #include <stdlib.h>
