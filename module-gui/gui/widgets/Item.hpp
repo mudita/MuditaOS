@@ -33,6 +33,8 @@ namespace gui
         HBOX
     };
 
+    NavigationDirection inputToNavigation(const InputEvent& evt);
+
     class Item
     {
       public:
