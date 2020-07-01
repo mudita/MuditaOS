@@ -70,6 +70,7 @@ namespace gui
             if (dataSource == gui::TestListViewDataSource::External) {
 
                 auto testItem = new TestListItem(index, true);
+                testItem->setMargins(testItemMargins);
 
                 if (notEqualItems) {
                     testItem->setMinimumSize(testStyle::item_w, testStyle::item_h + testStyle::item_h * index);
@@ -87,6 +88,7 @@ namespace gui
                 }
 
                 internalData[index]->setVisible(true);
+                internalData[index]->setMargins(testItemMargins);
 
                 modelIndex++;
 

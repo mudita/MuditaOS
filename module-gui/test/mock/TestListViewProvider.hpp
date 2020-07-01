@@ -46,6 +46,7 @@ namespace gui
         unsigned int testItemMinimalHeight = 100;
         bool notEqualItems                 = false;
         TestListViewDataSource dataSource  = TestListViewDataSource::External;
+        Margins testItemMargins            = Margins();
 
         TestListViewProvider();
 
