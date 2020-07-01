@@ -49,7 +49,7 @@ class InputMode
     void next();
     const std::string &get();
     void select_special_char();
-    [[nodiscard]] auto is(Mode mode) const -> auto
+    [[nodiscard]] bool is(Mode mode) const
     {
         return mode == modeNow();
     }

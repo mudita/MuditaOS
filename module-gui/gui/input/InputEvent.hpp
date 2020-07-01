@@ -41,7 +41,7 @@ namespace gui
     };
 
     /// if numeric - returns numeric value, else return -1
-    inline int toNumeric(KeyCode key)
+    [[nodiscard]] inline auto toNumeric(const KeyCode &key) -> int
     {
         switch (key) {
         case KeyCode::KEY_0:
@@ -85,19 +85,19 @@ namespace gui
         KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
 
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
-        bool isShortPress() const
+        [[nodiscard]] auto isShortPress() const -> bool
         {
             return state == State::keyReleasedShort;
         }
-        bool isKeyRelease() const
+        [[nodiscard]] auto isKeyRelease() const -> bool
         {
             return state == State::keyReleasedShort || state == State::keyReleasedLong;
-        };
-        bool isLongPress() const
+        }
+        [[nodiscard]] auto isLongPress() const -> bool
         {
             return state == State::keyReleasedLong;
-        };
-        bool is(KeyCode code) const
+        }
+        [[nodiscard]] auto is(KeyCode code) const -> bool
         {
             return keyCode == code;
         }
@@ -106,7 +106,7 @@ namespace gui
 
 } // namespace gui
 
-inline const char *c_str(gui::InputEvent::State state)
+[[nodiscard]] inline auto c_str(gui::InputEvent::State state) -> const char *
 {
     switch (state) {
     case gui::InputEvent::State::Undefined:
@@ -121,7 +121,7 @@ inline const char *c_str(gui::InputEvent::State state)
     return "";
 }
 
-inline const char *c_str(gui::KeyCode key)
+[[nodiscard]] inline auto c_str(gui::KeyCode key) -> const char *
 {
     switch (key) {
     case gui::KeyCode::KEY_UNDEFINED:

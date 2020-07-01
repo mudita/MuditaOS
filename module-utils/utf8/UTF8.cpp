@@ -502,7 +502,7 @@ bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
         return false;
     }
 
-    if (uint64_t(pos) + count > length()) // used uint64_t value to avoid 32b rounding issue
+    if (static_cast<uint64_t>(pos) + count > length()) // used uint64_t value to avoid 32b rounding issue
     {
         return false;
     }
