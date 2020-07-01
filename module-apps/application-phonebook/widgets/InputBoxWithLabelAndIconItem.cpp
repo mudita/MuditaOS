@@ -102,6 +102,10 @@ namespace gui
                     inputBoxLabel->setText(std::to_string(toNumeric(event.keyCode)));
                     return true;
                 }
+                if (event.keyCode == KeyCode::KEY_PND) {
+                    inputBoxLabel->clear();
+                    return true;
+                }
                 return false;
             };
 
