@@ -28,13 +28,13 @@ namespace gui
 
         inputBoxLabel = new gui::Label(hBox, 0, 0, 0, 0);
         inputBoxLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        inputBoxLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+        inputBoxLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         inputBoxLabel->setFont(style::window::font::medium);
         inputBoxLabel->activeItem = false;
 
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
         descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        descriptionLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
 

@@ -55,16 +55,14 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setText(utils::localize.get("app_desktop_poweroff_title"));
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+        titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
 
         // label with question for powering down
         infoLabel = new gui::Label(this, 0, 294, 480, 30);
         infoLabel->setFilled(false);
         infoLabel->setBorderColor(gui::ColorNoColor);
         infoLabel->setFont(style::window::font::medium);
-        infoLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+        infoLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         infoLabel->setText(utils::localize.get("app_desktop_poweroff_question"));
 
         uint32_t pinLabelX = 46;
@@ -78,8 +76,7 @@ namespace gui
             label->setRadius(5);
             label->setFont(style::window::font::medium);
             label->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-            label->setAlignment(
-                gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             selectionLabels.push_back(label);
             pinLabelX += 193;
         }
@@ -99,7 +96,7 @@ namespace gui
         eventMgrLabel->setText("TURN PWR MGR OFF");
         eventMgrLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         eventMgrLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         // define navigation between labels
         selectionLabels[0]->setNavigationItem(NavigationDirection::LEFT, selectionLabels[1]);

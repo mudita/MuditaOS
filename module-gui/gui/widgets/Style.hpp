@@ -108,7 +108,7 @@ namespace style
     namespace text
     {
         const inline gui::Alignment defaultTextAlignment =
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM);
+            gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
     };
 
     namespace strings

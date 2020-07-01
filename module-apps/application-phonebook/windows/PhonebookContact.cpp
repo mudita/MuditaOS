@@ -26,8 +26,8 @@ namespace gui
                                       const std::string text         = "",
                                       const std::string fontName     = style::window::font::small,
                                       const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                      const Alignment alignment      = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT,
-                                                                            Alignment::ALIGN_VERTICAL_BOTTOM),
+                                      const Alignment alignment      = Alignment(gui::Alignment::Horizontal::Left,
+                                                                            gui::Alignment::Vertical::Bottom),
                                       const bool lineMode            = false)
     {
         Label *l = new Label(this, x, y, w, h);
@@ -71,7 +71,7 @@ namespace gui
                                     utils::localize.get("app_phonebook_contact_information"),
                                     style::window::font::small,
                                     RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                    Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM),
+                                    Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom),
                                     true);
 
         // first number line
@@ -83,7 +83,7 @@ namespace gui
                                  "",
                                  style::window::font::bigbold,
                                  RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                 Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+                                 Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         numberPrimaryLabel                = addLabel(&page1,
                                       328,
@@ -93,7 +93,7 @@ namespace gui
                                       "",
                                       style::window::font::small,
                                       RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
-                                      Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+                                      Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         numberPrimaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
                 return app::call(application, contact->numbers[0].number);
@@ -117,7 +117,7 @@ namespace gui
                      "",
                      style::window::font::small,
                      RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
-                     Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+                     Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         numberPrimaryMessageLabel->setPenFocusWidth(3);
         numberPrimaryMessageLabel->setPenWidth(0);
@@ -137,7 +137,7 @@ namespace gui
                                    "",
                                    style::window::font::big,
                                    RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                   Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+                                   Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         numberSecondaryLabel =
             addLabel(&page1,
@@ -148,7 +148,7 @@ namespace gui
                      "",
                      style::window::font::small,
                      RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
-                     Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+                     Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         numberSecondaryLabel->setPenFocusWidth(3);
         numberSecondaryLabel->setPenWidth(0);
         numberSecondaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
@@ -170,7 +170,7 @@ namespace gui
                      "",
                      style::window::font::small,
                      RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
-                     Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+                     Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         numberSecondaryMessageLabel->setPenFocusWidth(3);
         numberSecondaryMessageLabel->setPenWidth(0);
         numberSecondaryMessageLabel->activatedCallback = [=](Item &item) {
@@ -187,7 +187,7 @@ namespace gui
                          "",
                          style::window::font::big,
                          RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                         Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+                         Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
 
         addressLabel = addLabel(&page1,
                                 30,
@@ -197,7 +197,7 @@ namespace gui
                                 utils::localize.get("app_phonebook_contact_address"),
                                 style::window::font::small,
                                 RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM),
+                                Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom),
                                 true);
 
         address = addLabel(&page1,
@@ -208,7 +208,7 @@ namespace gui
                            "",
                            style::window::font::big,
                            RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                           Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+                           Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
 
         noteLabel = addLabel(&page2,
                              30,
@@ -218,7 +218,7 @@ namespace gui
                              utils::localize.get("app_phonebook_contact_note"),
                              style::window::font::small,
                              RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                             Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM),
+                             Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom),
                              true);
 
         noteText = new Text(this, 30, 249, 422, 600 - 249 - bottomBar->getHeight());

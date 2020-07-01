@@ -69,7 +69,7 @@ namespace gui
         horizontalBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
         const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES;
-        const Alignment alignment      = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM);
+        const Alignment alignment      = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
         auto l = new Label(parent, searchHeader::x, searchHeader::y, searchHeader::w, searchHeader::h);
 
         l->setFont(style::window::font::small);

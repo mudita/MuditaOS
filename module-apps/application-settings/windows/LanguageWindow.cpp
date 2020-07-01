@@ -105,8 +105,7 @@ namespace gui
         label->setPenFocusWidth(3);
         label->setPenWidth(0);
         label->setFont(style::window::font::medium);
-        label->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         label->setRadius(11);
         label->activatedCallback = activatedCallback;
 

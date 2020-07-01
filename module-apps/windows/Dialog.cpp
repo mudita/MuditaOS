@@ -53,7 +53,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     text->setEditMode(EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     text->setFont(style::window::font::medium);
-    text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 }
 
 void Dialog::update(const Meta &meta)
@@ -101,7 +101,7 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const M
     no->setBorderColor(ColorFullBlack);
     no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     no->setFont(style::window::font::big);
-    no->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    no->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     no->activatedCallback = [=](Item &) -> bool {
         application->returnToPreviousWindow();
         return true;
@@ -119,7 +119,7 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const M
     yes->setBorderColor(ColorFullBlack);
     yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     yes->setFont(style::window::font::big);
-    yes->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    yes->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
 
     no->setNavigationItem(NavigationDirection::RIGHT, yes);
