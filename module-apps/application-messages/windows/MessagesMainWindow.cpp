@@ -62,10 +62,10 @@ namespace gui
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight);
+        list->setScrollTopMargin(style::margins::small);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);
-        list->setItemSpanSize(style::listview::item_span_big);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);

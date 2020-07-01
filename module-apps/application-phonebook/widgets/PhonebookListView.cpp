@@ -18,7 +18,6 @@ namespace gui
                 phonebookLabel->setMarkerItem(labelMark);
 
                 body->addWidget(phonebookLabel);
-                addSpanItem();
             }
         }
         if (direction == style::listview::Direction::Top) {
@@ -37,7 +36,6 @@ namespace gui
 
                 body->removeWidget(item);
                 body->addWidget(phonebookLabel);
-                addSpanItem();
                 body->addWidget(item);
 
                 previousItemIsLabel = true;
@@ -76,7 +74,6 @@ namespace gui
 
                         body->erase(item);
                         body->erase(previousListItem);
-                        body->erase(listSpanItem);
 
                         gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
 
@@ -98,8 +95,6 @@ namespace gui
             previousListItem = item;
 
             currentPageSize++;
-
-            addSpanItem();
         }
 
         recalculateStartIndex();
