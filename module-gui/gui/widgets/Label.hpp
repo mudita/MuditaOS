@@ -39,7 +39,7 @@ namespace gui
             }
             uint32_t x = 0, y = 0, w = 0, h = 0;
             std::string font = style::window::font::medium;
-            uint32_t align   = gui::Alignment::ALIGN_HORIZONTAL_LEFT | gui::Alignment::ALIGN_VERTICAL_CENTER;
+            Alignment align  = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center);
             RectangleEdgeFlags edges =
                 gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM;
         };
@@ -67,7 +67,6 @@ namespace gui
         RawFont *font              = nullptr;
         Margins margins            = {0, 0, 0, 0};
         bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
-        Alignment alignment;
 
         // area specified in pixels occupied by text inside label space.
         // This defines also position of the text considering alignment and margins.
@@ -113,11 +112,7 @@ namespace gui
         virtual void clear();
         virtual const UTF8 &getText() const;
         virtual unsigned int getTextLength() const;
-        virtual void setAlignment(const Alignment &alignment);
-        auto getAlignment() -> auto const &
-        {
-            return alignment;
-        }
+        virtual void setAlignment(const Alignment &value) override;
         virtual void setMargins(const Margins &margins);
         void setEllipsis(gui::Ellipsis ellipsis);
         /**

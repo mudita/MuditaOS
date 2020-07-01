@@ -291,6 +291,23 @@ namespace gui
         setArea({x, y, getWidth(), getHeight()});
     }
 
+    void Item::setAlignment(const Alignment &value)
+    {
+        if (alignment != value) {
+            alignment = value;
+        }
+    }
+
+    Alignment Item::getAlignment(Axis axis)
+    {
+        if (axis == Axis::X) {
+            return alignment.horizontal;
+        }
+        else {
+            return alignment.vertical;
+        }
+    }
+
     void Item::setBoundingBox(const BoundingBox &new_box)
     {
         BoundingBox oldArea = widgetArea;
@@ -431,5 +448,6 @@ namespace gui
     bool Item::onContent()
     {
         return false;
-    };
+    }
+
 } /* namespace gui */

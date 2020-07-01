@@ -315,8 +315,7 @@ namespace gui
         timeLabel->setText(utils::time::Time(timestamp));
         timeLabel->setPenWidth(style::window::default_border_no_focus_w);
         timeLabel->setVisible(false);
-        timeLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         return timeLabel;
     }
 

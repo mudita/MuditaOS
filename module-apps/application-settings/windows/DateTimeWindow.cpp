@@ -167,8 +167,7 @@ namespace gui
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         label->setText(text);
         label->setFont(style::window::font::largelight);
-        label->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         label->activeItem = false;
         label->setVisible(true);
         return label;
@@ -187,8 +186,7 @@ namespace gui
         label->setPenFocusWidth(3);
         label->setPenWidth(1);
         label->setFont(style::window::font::largelight);
-        label->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         label->activatedCallback = [=](gui::Item &) {
             this->setRTC();

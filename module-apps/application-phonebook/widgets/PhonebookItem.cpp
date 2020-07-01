@@ -21,8 +21,7 @@ namespace gui
         value->setPenFocusWidth(0);
         value->setPenWidth(0);
         value->setFont(style::window::font::small);
-        value->setAlignment(
-            gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
+        value->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
 
     bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
