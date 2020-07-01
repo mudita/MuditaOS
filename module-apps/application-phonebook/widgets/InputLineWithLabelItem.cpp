@@ -136,21 +136,21 @@ namespace gui
 
         case phonebookInternals::ListItemName::Address:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-            inputText->setTextType(Text::TextType::MULTI_LINE);
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                //inputText->setText(contact->address);
+                inputText->setText(contact->address);
             };
             break;
 
         case phonebookInternals::ListItemName::Note:
             titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-            inputText->setTextType(Text::TextType::MULTI_LINE);
+            inputText->setTextType(Text::TextType::SINGLE_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                //inputText->setText(contact->note);
+                inputText->setText(contact->note);
             };
             break;
 
