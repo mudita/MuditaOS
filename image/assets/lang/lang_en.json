@@ -203,7 +203,8 @@
     "app_phonebook_new_speed_dial_key": "Speed dial key",
     "app_phonebook_new_add_to_fav": "Add to favourites",
     "app_phonebook_new_add_to_ice": "Add to ICE",
-    "app_phonebook_check_uncheck": "CHECK / UNCHECK",
+    "app_phonebook_check": "CHECK",
+    "app_phonebook_uncheck": "UNCHECK",
 
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",

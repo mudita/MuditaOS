@@ -166,7 +166,8 @@
     "app_phonebook_new_speed_dial_key": "Szybkie wybieranie",
     "app_phonebook_new_add_to_fav": "Dodaj do ulubionych",
     "app_phonebook_new_add_to_ice": "Dodaj do ICE",
-    "app_phonebook_check_uncheck": "ZAZNACZ / ODZNACZ",
+    "app_phonebook_check": "ZAZNACZ",
+    "app_phonebook_uncheck": "ODZNACZ",
 
     "sms_call_text"  : "Call: ",
     "sms_contact_details" : "Contact details",
