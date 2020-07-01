@@ -31,7 +31,7 @@ class InputMode
     std::function<void(const UTF8 &text)> show_type_cb = nullptr;
     std::function<void()> restore_after_show_type_cb   = nullptr;
     std::function<void()> show_special_char_selector   = nullptr;
-    Mode modeNow();
+    Mode modeNow() const;
 
     void show_input_type();
 
@@ -49,4 +49,8 @@ class InputMode
     void next();
     const std::string &get();
     void select_special_char();
+    [[nodiscard]] auto is(Mode mode) const -> auto
+    {
+        return mode == modeNow();
+    }
 };

@@ -6,13 +6,11 @@
 namespace gui
 {
 
-    /*
-     *
-     */
     class KeyProfile
     {
       public:
-        uint32_t keyCode = 0;
+        static const uint32_t none_key; /// defaults to 0
+        uint32_t keyCode = none_key;
         bool cyclic      = false;
         ;
         std::vector<uint32_t> chars;
@@ -25,9 +23,6 @@ namespace gui
         void addTimeouts(const std::string &s);
     };
 
-    /*
-     *
-     */
     class Profile
     {
         std::string name;
