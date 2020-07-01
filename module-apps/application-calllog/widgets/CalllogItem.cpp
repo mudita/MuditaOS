@@ -21,8 +21,7 @@ namespace gui
 
     CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
     {
-        margins = Margins(0, 8, 0, 0);
-
+        setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(clItemStyle::w, clItemStyle::h);
         setMaximumSize(clItemStyle::w, clItemStyle::h);
 
