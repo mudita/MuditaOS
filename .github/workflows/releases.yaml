@@ -33,7 +33,8 @@ jobs:
         make -j 8 && \
         make -j 8 package && \
         popd && \
-        ./print_last_changes.sh
+        ./print_last_changes.sh && \
+        uptime
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1

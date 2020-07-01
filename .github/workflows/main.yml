@@ -28,4 +28,5 @@ jobs:
         pushd build-rt1051-Debug && \
         echo "JOBS=${JOBS:-8} | set to 8" &&\
         make -j 8 && \
-        popd 
+        popd && \
+        uptime
