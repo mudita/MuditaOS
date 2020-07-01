@@ -62,14 +62,14 @@ namespace gui
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizemelight);
         time->setText(ttime);
-        time->setAlignment(Alignment::ALIGN_HORIZONTAL_CENTER);
+        time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
         dayText = new gui::Label(this, 0, style::design_day_offset, style::window_width, style::design_day_h);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
         dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
-        dayText->setAlignment(Alignment::ALIGN_HORIZONTAL_CENTER);
+        dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
         setVisibleState();
     }
@@ -254,7 +254,7 @@ namespace gui
 
     auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
     {
-        auto thumbnail = new gui::Image(icon);
+        auto thumbnail        = new gui::Image(icon);
         thumbnail->activeItem = false;
         layout->addWidget(thumbnail);
     }
@@ -271,13 +271,13 @@ namespace gui
         const auto text_normal_size        = 200;
         const auto size_needed_for_2digits = 30;
         // 1. create hbox for all elements
-        auto el   = new gui::HBox(nullptr, 0, 0, layout->getWidth(), style::window::label::default_h);
-        el->setOrthogonalAlignment(gui::orthogonalAlignment::Center);
+        auto el = new gui::HBox(nullptr, 0, 0, layout->getWidth(), style::window::label::default_h);
+        el->setAlignment(gui::Alignment::Vertical::Center);
         auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
         text->setMaximumSize(el->area().w, Axis::X);
         text->setText(name);
         text->setFont(style::window::font::medium);
-        text->setAlignment(Alignment::ALIGN_VERTICAL_CENTER);
+        text->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         text->setPenWidth(style::window::default_border_no_focus_w);
         text->activeItem = false;
 
@@ -287,7 +287,7 @@ namespace gui
         number->setPenWidth(style::window::default_border_no_focus_w);
         number->setSize(size_needed_for_2digits, el->area().h);
         number->setMinimumWidth(size_needed_for_2digits);
-        number->setAlignment(Alignment::ALIGN_VERTICAL_CENTER | Alignment::ALIGN_HORIZONTAL_RIGHT);
+        number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         number->activeItem = false;
         // 2. Add all elements to hbox layout
         new gui::Span(el, Axis::X, style::design_border_offset);

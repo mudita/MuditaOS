@@ -101,8 +101,7 @@ namespace gui
         timeLabel->setBorderColor(gui::ColorNoColor);
         timeLabel->setFont(style::header::font::time);
         timeLabel->setText("00:00");
-        timeLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     }
 
     void TopBar::setActive(std::list<std::pair<TopBar::Elements, bool>> elements)

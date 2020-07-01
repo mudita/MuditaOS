@@ -69,8 +69,7 @@ namespace gui
         numberLabel->setPenWidth(numberLabel::borderW);
         numberLabel->setFont(style::window::font::largelight);
         numberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        numberLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
+        numberLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         numberLabel->setEllipsis(Ellipsis::Left);
 
         newContactIcon                    = new gui::AddContactIcon(this, newContactIcon::x, newContactIcon::y);

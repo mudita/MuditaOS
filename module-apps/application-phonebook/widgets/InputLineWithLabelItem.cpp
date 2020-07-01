@@ -23,7 +23,7 @@ namespace gui
 
         titleLabel = new Label(vBox);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_TOP));
+        titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         titleLabel->setFont(style::window::font::small);
         titleLabel->activeItem = false;
 
@@ -31,7 +31,7 @@ namespace gui
 
         inputText = new Text(vBox, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::input_text_h);
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        inputText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+        inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},

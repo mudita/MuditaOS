@@ -143,11 +143,6 @@ namespace gui
         reverseOrder = value;
     }
 
-    void BoxLayout::setOrthogonalAlignment(gui::orthogonalAlignment value)
-    {
-        orthogonalAlignment = value;
-    }
-
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
     {
         if (it->visible) {
@@ -218,18 +213,31 @@ namespace gui
                 addToOutOfDrawAreaList(el);
             }
 
-            switch (orthogonalAlignment) {
-            case (gui::orthogonalAlignment::Top_Left):
-                orthogonalItemPosition = this->getPosition(orthogonal(axis));
+            switch (getAlignment(orthogonal(axis)).vertical) {
+            case gui::Alignment::Vertical::Top:
+                orthogonalItemPosition = this->getPosition(axis);
                 break;
-            case (gui::orthogonalAlignment::Center):
+            case gui::Alignment::Vertical::Center:
                 orthogonalItemPosition = (this->area().size(orthogonal(axis)) - orthogonalItemSize) / 2;
                 break;
-            case (gui::orthogonalAlignment::Bottom_Right):
+            case gui::Alignment::Vertical::Bottom:
                 orthogonalItemPosition = this->area().size(orthogonal(axis)) - orthogonalItemSize;
                 break;
             default:
-                orthogonalItemPosition = el->getPosition(orthogonal(axis));
+                break;
+            }
+
+            switch (getAlignment(orthogonal(axis)).horizontal) {
+            case gui::Alignment::Horizontal::Right:
+                orthogonalItemPosition = this->getPosition(axis);
+                break;
+            case gui::Alignment::Horizontal::Center:
+                orthogonalItemPosition = (this->area().size(orthogonal(axis)) - orthogonalItemSize) / 2;
+                break;
+            case gui::Alignment::Horizontal::Left:
+                orthogonalItemPosition = this->area().size(orthogonal(axis)) - orthogonalItemSize;
+                break;
+            default:
                 break;
             }
 
