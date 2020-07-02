@@ -383,9 +383,9 @@ namespace gui
         {
             auto pdata = dynamic_cast<SMSThreadData *>(data);
             if (pdata) {
-                LOG_INFO("We have it! %" PRIu32, pdata->thread->dbID);
+                LOG_INFO("We have it! %" PRIu32, pdata->thread->ID);
                 cleanView();
-                SMS.thread = pdata->thread->dbID;
+                SMS.thread = pdata->thread->ID;
                 showMessages(Action::Init);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());

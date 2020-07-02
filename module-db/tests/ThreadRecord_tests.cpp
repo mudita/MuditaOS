@@ -86,12 +86,12 @@ TEST_CASE("Thread Record tests")
 
     // Test updating record
     REQUIRE(threadRecordInterface1.Add(recordIN));
-    recordIN.dbID    = 1;
+    recordIN.ID      = 1;
     recordIN.snippet = snippetTest2;
     REQUIRE(threadRecordInterface1.Update(recordIN));
 
     auto record = threadRecordInterface1.GetByID(1);
-    REQUIRE(record.dbID != 0);
+    REQUIRE(record.isValid());
     REQUIRE(record.snippet == snippetTest2);
 
     // SMS database should contain 1 record
