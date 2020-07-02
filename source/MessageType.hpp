@@ -210,6 +210,8 @@ enum class MessageType
     // antenna messages
     AntennaChanged,
     AntennaCSQChange,
+    AntennaLockService,
+    AntennaGetLockState
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

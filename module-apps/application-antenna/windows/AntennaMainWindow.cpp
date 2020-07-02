@@ -17,6 +17,7 @@
 #include "ScanModesWindow.hpp"
 #include "../ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include "service-antenna/api/AntennaServiceAPI.hpp"
 #include <at/response.hpp>
 namespace gui
 {
@@ -88,7 +89,12 @@ namespace gui
         }));
 
         buttons.push_back(addLabel("Lock antenna", [=](gui::Item &) {
-            LOG_INFO("Lock antenna");
+            antenna::lockState currentState;
+            if (AntennaServiceAPI::GetLockState(this->application, currentState)) {
+                auto newState = currentState == antenna::lockState::locked ? antenna::lockState::unlocked
+                                                                           : antenna::lockState::locked;
+                AntennaServiceAPI::LockRequest(this->application, newState);
+            }
             return true;
         }));
 
@@ -169,6 +175,12 @@ namespace gui
         buttons[buttonDescriotion::LockAntennaManager]->setNavigationItem(NavigationDirection::UP,
                                                                           buttons[buttonDescriotion::AntennaA]);
         setFocusItem(buttons[buttonDescriotion::AntennaA]);
+
+        antenna::lockState antennaServiceState;
+        if (AntennaServiceAPI::GetLockState(this->application, antennaServiceState)) {
+            updateLockedButton(antennaServiceState);
+        }
+
         bsp::cellular::antenna antenna;
         if (CellularServiceAPI::GetAntenna(this->application, antenna)) {
             updateAntennaButtons(antenna);
@@ -263,5 +275,18 @@ namespace gui
         if (updated) {
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
+    }
+
+    void AntennaMainWindow::updateLockedButton(antenna::lockState antennaState)
+    {
+        UTF8 buttonText;
+        if (antennaState == antenna::lockState::locked) {
+            buttonText = "Unlock antenna.";
+        }
+        else if (antennaState == antenna::lockState::unlocked) {
+            buttonText = "Lock antenna.";
+        }
+
+        buttons[buttonDescriotion::LockAntennaManager]->setText(buttonText);
     }
 } // namespace gui

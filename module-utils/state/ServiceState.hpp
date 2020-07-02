@@ -17,7 +17,13 @@ namespace utils
 
           private:
             T currentState;
+            T lastState;
             sys::Service *owner;
+
+            bool timeoutActive         = false;
+            uint32_t timeoutElapseTime = 0;
+            T timeoutState;
+
             bool notifyOwner(void)
             {
                 auto msg = std::make_shared<sys::DataMessage>(MessageType::StateChange);
@@ -34,13 +40,40 @@ namespace utils
             void set(T state)
             {
                 LOG_INFO(
-                    "%s state change: [%s] -> [ %s ]", owner->GetName().c_str(), c_str(currentState), c_str(state));
+                    "%s state change: [ %s ] -> [ %s ]", owner->GetName().c_str(), c_str(currentState), c_str(state));
+                lastState    = currentState;
                 currentState = state;
                 notifyOwner();
             }
             T get(void)
             {
                 return currentState;
+            }
+            T getLast(void)
+            {
+                return lastState;
+            }
+            T getTimeoutState(void)
+            {
+                return timeoutState;
+            }
+            void disableTimeout(void)
+            {
+                timeoutActive = false;
+            }
+            void enableStateTimeout(uint32_t currentTime, uint32_t timeout, T timeoutOccuredState)
+            {
+                timeoutElapseTime = currentTime + timeout;
+                timeoutState      = timeoutOccuredState;
+                timeoutActive     = true;
+            }
+            bool timeoutOccured(uint32_t time)
+            {
+                if (time >= timeoutElapseTime && timeoutActive) {
+                    disableTimeout();
+                    return true;
+                }
+                return false;
             }
         };
     } // namespace state

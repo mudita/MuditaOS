@@ -26,12 +26,19 @@ namespace antenna
         lowBand,
         signalCheck,
         idle,
-        csqChange
+        csqChange,
+        locked
     };
 
     const char *c_str(antenna::State state);
 
-    constexpr uint32_t signalTreshold = 25;
+    constexpr uint32_t signalTreshold = 10;
+
+    enum class lockState
+    {
+        locked,
+        unlocked
+    };
 } // namespace antenna
 
 class ServiceAntenna : public sys::Service
@@ -45,8 +52,10 @@ class ServiceAntenna : public sys::Service
     bsp::cellular::antenna currentAntenna;
     uint32_t lastCsq     = 0;
     uint32_t currentCsq  = 0;
-    uint32_t storedCsq   = 0;
-    bool storedRegisterd = false;
+
+    antenna::lockState serviceLocked = antenna::lockState::unlocked;
+
+    void handleLockRequest(antenna::lockState request);
 
   protected:
     // flag informs about suspend/resume status
@@ -81,4 +90,5 @@ class ServiceAntenna : public sys::Service
     bool bandCheckStateHandler(void);
     bool idleStateHandler(void);
     bool csqChangeStateHandler(void);
+    bool lockedStateHandler(void);
 };

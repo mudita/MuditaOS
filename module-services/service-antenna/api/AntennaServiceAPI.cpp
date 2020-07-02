@@ -1,11 +1,29 @@
 #include "AntennaServiceAPI.hpp"
-
+#include "../messages/AntennaMessage.hpp"
 namespace AntennaServiceAPI
 {
 
     void CSQChange(sys::Service *serv)
     {
-        std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(MessageType::AntennaCSQChange);
+        auto msg = std::make_shared<sys::DataMessage>(MessageType::AntennaCSQChange);
         sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv);
+    }
+    void LockRequest(sys::Service *serv, antenna::lockState request)
+    {
+        auto msg = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, request);
+        sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv);
+    }
+    bool GetLockState(sys::Service *serv, antenna::lockState &response)
+    {
+        auto msg = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaGetLockState);
+        auto ret = sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv, 5000);
+        if (ret.first == sys::ReturnCodes::Success) {
+            auto responseMsg = dynamic_cast<AntennaLockRequestResponse *>(ret.second.get());
+            if ((responseMsg != nullptr) /*&& (responseMsg->retCode == true)*/) {
+                response = responseMsg->data;
+                return true;
+            }
+        }
+        return false;
     }
 } // namespace AntennaServiceAPI

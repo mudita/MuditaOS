@@ -200,7 +200,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
-    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
+    cmux->SelectAntenna(bsp::cellular::antenna::highBand);
     switch (board) {
     case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
@@ -619,6 +619,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         LOG_INFO("CellularHangupCall");
         if (channel) {
             if (channel->cmd(at::AT::ATH)) {
+                AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
                 stopTimer(callStateTimerId);
                 if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                     LOG_ERROR("Failed to end ongoing call");
