@@ -45,6 +45,7 @@ namespace gui
     void PhonebookNewContact_NEW::destroyInterface()
     {
         erase();
+        delete newContactModel;
     }
 
     PhonebookNewContact_NEW::~PhonebookNewContact_NEW()
