@@ -24,7 +24,6 @@ namespace gui
         /// Clears Item's pointer for specified direction.
         void clearDirection(const NavigationDirection direction);
 
-        Navigation();
         virtual ~Navigation();
     };
 

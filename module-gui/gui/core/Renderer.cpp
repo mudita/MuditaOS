@@ -1,10 +1,3 @@
-/*
- * Renderer.cpp
- *
- *  Created on: 7 maj 2019
- *      Author: robert
- */
-
 extern "C"
 {
 #include "FreeRTOS.h"
@@ -28,18 +21,14 @@ extern "C"
 #include "utf8/UTF8.hpp"
 #include <cassert>
 
+#if DEBUG_FONT == 1
+#define log_warn_glyph(...) LOG_WARN(__VA_ARGS__)
+#else
+#define log_warn_glyph(...)
+#endif
+
 namespace gui
 {
-
-    Renderer::Renderer()
-    {
-        // TODO Auto-generated constructor stub
-    }
-
-    Renderer::~Renderer()
-    {
-        // TODO Auto-generated destructor stub
-    }
 
     void Renderer::drawLine(Context *ctx, CommandLine *cmd)
     {}
@@ -896,7 +885,8 @@ namespace gui
                 glyph = glyph_found->second;
             }
             else {
-                LOG_WARN("no glyph for character id:%" PRIu32 " in font \"%s\"", idCurrent, font->info.face.c_str());
+                log_warn_glyph(
+                    "no glyph for character id:%" PRIu32 " in font \"%s\"", idCurrent, font->info.face.c_str());
                 unique_glyph = font->getGlyphUnsupported();
                 glyph        = unique_glyph.get();
             }

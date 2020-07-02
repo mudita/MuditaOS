@@ -164,8 +164,17 @@ namespace app
         void blockEvents(bool isBlocked);
 
         /// Method sending switch command for another window. It will switch window within active application.
-        /// to switch windows between applications use sapm::ApplicationManager::messageSwitchApplication
-        /// it will effectivelly trigger setActiveWindow and change on windows stack
+        /// To switch windows between applications use sapm::ApplicationManager::messageSwitchApplication
+        /// it will effectively trigger setActiveWindow and change on windows stack
+        ///
+        /// @param windowName name of window to show, only required parameter, our windows stack uses string names as
+        /// id's
+        /// @param cmd command for Application, right now it's either: Start or Return. As user only Start is used.
+        /// @param data contextual data for UI Windows flow steering. Base SwitchData enables user to:
+        ///        1. ignoreCurrentWindowOnStack: omit window from windows stack, so that it won't be shown when back (
+        ///        RF key) is used
+        ///        2. disableAppClose: for use with messageSwitchApplication(...) when switching through app to inform
+        ///        that we dont want to close app calling
         void switchWindow(const std::string &windowName,
                           gui::ShowMode cmd                     = gui::ShowMode::GUI_SHOW_INIT,
                           std::unique_ptr<gui::SwitchData> data = nullptr);

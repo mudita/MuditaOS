@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
     steps:
     - name: "Check Out"
       uses: actions/checkout@v1
@@ -15,25 +15,26 @@ jobs:
         submodules: recursive
         fetch-depth: 0
     - name: "Style checking"
-      uses: ./.github/actions/build
-      with:
-        action: "style"
+      run: |
+        ./config/pre-commit.hook --last
     - name: "Unit Tests"
-      uses: ./.github/actions/build
-      with:
-        action: check
-        target: linux
-        build_type: Debug
-        build_generator: ninja
+      run: |
+        ./configure.sh linux Debug && \
+        pushd build-linux-Debug && \
+        echo "JOBS=${JOBS:-8} | set to 8" &&\
+        make -j 8 check && \
+        popd
     - name: "Build and package for RT1051"
-      id: build_release_package
-      uses: ./.github/actions/build
-      with:
-        action: "package"
-        target: rt1051
-        #build_type: RelWithDebInfo
-        build_type: Debug
-        build_generator: ninja
+      id: build_release_package 
+      run: |
+        ./configure.sh rt1051 Debug && \
+        pushd build-rt1051-Debug && \
+        echo "JOBS=${JOBS:-8} | set to 8" &&\
+        make -j 8 && \
+        make -j 8 package && \
+        popd && \
+        ./print_last_changes.sh && \
+        uptime
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -45,7 +46,6 @@ jobs:
         draft: true
         prerelease: true
         body: ${{steps.build_release_package.outputs.release_notes }}
-
     - name: Upload Release Package
       id: upload-release-package
       uses: actions/upload-release-asset@v1.0.2

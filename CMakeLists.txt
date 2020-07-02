@@ -280,6 +280,24 @@ else ()
         endif()
 endif ()
 
+if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
+    set(PACKAGE_FILE ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}${PACKAGE_EXTENSION})
+    message("::set-output name=package::${PACKAGE_FILE}")
+    message("::set-output name=mime_type::${PACKAGE_MIME}")
+endif()
+
+message("SRC DIR: ${CMAKE_SOURCE_DIR}")
+include(Version)
+add_custom_target(
+    version ALL
+    COMMAND
+        ${CMAKE_COMMAND} -DSRC_DIR=${CMAKE_SOURCE_DIR} -B ${CMAKE_BINARY_DIR}  -P ${CMAKE_SOURCE_DIR}/config/Version.cmake
+    COMMENT
+        "Generationg version info"
+    )
+
+add_dependencies(${PROJECT_NAME} version)
+
 set(CPACK_PACKAGE_VENDOR "Mudita")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://mudita.com/products/pure/")
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
@@ -294,22 +312,4 @@ endif()
 
 include(CPack)
 
-if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
-    set(PACKAGE_FILE ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}${PACKAGE_EXTENSION})
-    message("::set-output name=package::${PACKAGE_FILE}")
-    message("::set-output name=mime_type::${PACKAGE_MIME}")
-endif()
 
-message("SRC DIR: ${CMAKE_SOURCE_DIR}")
-add_custom_target(
-    version ALL
-    COMMAND
-        ${CMAKE_COMMAND} -DSRC_DIR=${CMAKE_SOURCE_DIR} -B ${CMAKE_BINARY_DIR}  -P ${CMAKE_SOURCE_DIR}/config/Version.cmake
-    DEPENDS
-        ${PROJECT_SOURCE_DIR}/.git/HEAD
-        ${PROJECT_SOURCE_DIR}/.git/index
-    COMMENT
-        "Generationg version info"
-    )
-
-add_dependencies(${PROJECT_NAME} version)

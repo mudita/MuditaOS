@@ -139,6 +139,9 @@ namespace gui
             emptyListIcon->setVisible(true);
             setFocusItem(emptyListIcon);
         }
+        else {
+            emptyListIcon->setVisible(false);
+        }
 
         DBServiceAPI::GetQuery(application,
                                db::Interface::Name::Notifications,

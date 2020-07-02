@@ -1,20 +1,17 @@
-/*
- * @file SwitchData.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 15 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_SWITCHDATA_HPP_
-#define MODULE_APPS_SWITCHDATA_HPP_
+#pragma once
 
 #include <string>
 
 namespace gui
 {
 
-    // class template that stores information that was sent along with switch message
+    /// base class storing information sent along with switch message
+    /// for extended use with windows please inherit from this class to extend it
+    ///
+    /// used combined with:
+    /// * Application->switchWindow(...) function changing window within current application
+    /// * Application::handleSwitchWindow(...) ApplicationManager call changing window between apps (and within current
+    /// if requested)
     class SwitchData
     {
       protected:
@@ -32,7 +29,14 @@ namespace gui
         {
             description = desc;
         };
+        /// informs ApplicationManager to not close caller application when switching from app to app
         bool disableAppClose = false;
+        /// informs App window stack that requested window should be ignored on windows stack.
+        ///
+        /// This affects window back mechanics. Having switchWindow calls like that:
+        /// `WinA = { ignoreCurrentWindowOnStack = true } => WinB  => WinC`
+        /// requesting getting back in WinC will result in:
+        /// `WinC => WinA`
         bool ignoreCurrentWindowOnStack = false;
     };
 
@@ -52,5 +56,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_SWITCHDATA_HPP_ */

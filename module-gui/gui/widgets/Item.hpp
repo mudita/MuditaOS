@@ -33,6 +33,8 @@ namespace gui
         HBOX
     };
 
+    NavigationDirection inputToNavigation(const InputEvent &evt);
+
     class Item
     {
       public:
@@ -206,6 +208,27 @@ namespace gui
         void setMinimumHeight(uint32_t h);
         /// @}
 
+        /// requests bigger size from parent if parent available
+        /// if no parent available - sets size
+        /// @return true if handled positively
+        virtual auto requestSize(unsigned short request_w, unsigned short request_h) -> Size final;
+        /// handle for layouts to implement to resize on demand ( i.e. when it needs to expand after addition/removal of
+        /// chars )
+        ///
+        /// by default items do not resize of it's childrem so it's safe for them to pass handleRequestSize
+        /// straight to setSize. Layout manages size of it's item in range { Area::Min <= size <= Area::Max } so for
+        /// that case layout should to i.e. store request size and than handle resizes appropriately
+        /// i.e. Text => text->requestSize => layout->storeRequest => layout use it in resizes
+        /// with this both:
+        /// 1. user setSize
+        /// 2. resize requests from UI element
+        /// should be handled without infinite loop on resize ( item->setSize -> notify Layout -> layout: item->setSize
+        /// )
+        ///
+        /// @return bool requested size granted {w,h}
+        virtual auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
+
+        /// sets size of item
         virtual void setSize(const unsigned short w, const unsigned short h);
         void setSize(uint32_t val, Axis axis);
         /// used in ListView to position element sets area() = WidgetArea(params)

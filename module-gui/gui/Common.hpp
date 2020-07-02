@@ -1,24 +1,51 @@
-/*
- * Common.hpp
- *
- *  Created on: 15 mar 2019
- *      Author: robert
- */
+#pragma once
 
-#ifndef MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_
-
+#include "Axes.hpp"
 #include <cstdint>
+#include <utility>
 
 namespace gui
 {
+    using Length   = uint32_t;
+    using Position = int32_t;
+
+    struct Size
+    {
+        Length width = 0, height = 0;
+        Size(Length w = 0, Length h = 0) : width(w), height(h)
+        {}
+        [[nodiscard]] auto get(Axis axis) const -> Length
+        {
+            return Axis::X == axis ? width : height;
+        }
+        [[nodiscard]] auto isZero() const -> bool
+        {
+            return 0 == width && 0 == height;
+        }
+    };
+
+    struct Point
+    {
+        Position x = 0, y = 0;
+        Point(Position x = 0, Position y = 0) : x(x), y(y)
+        {}
+        [[nodiscard]] auto get(Axis axis) const -> Length
+        {
+            return Axis::X == axis ? x : y;
+        }
+        [[nodiscard]] auto isZero() const -> bool
+        {
+            return 0 == x && 0 == y;
+        }
+    };
 
     enum class NavigationDirection
     {
         LEFT = 0x01,
         UP,
         RIGHT,
-        DOWN
+        DOWN,
+        NONE,
     };
 
     enum class Status
@@ -117,5 +144,3 @@ namespace gui
     void setTimeFunction(timeSecondsFunctionPtr fptr);
 
 } // namespace gui
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_ */

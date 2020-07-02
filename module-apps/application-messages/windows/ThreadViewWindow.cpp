@@ -156,7 +156,7 @@ namespace gui
             refreshTextItem();
         }
 
-        // TODO 2. check how many of these will fit in box
+        // 2. check how many of these will fit in box
         //         update begin / end in `SMS`
         if (what == Action::NextPage) {
             if (SMS.end != SMS.dbsize) {

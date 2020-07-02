@@ -14,17 +14,19 @@ namespace gui
     void Navigation::setDirectionItem(NavigationDirection direction, Item *item)
     {
         switch (direction) {
-        case (NavigationDirection::LEFT):
+        case NavigationDirection::LEFT:
             left = item;
             break;
-        case (NavigationDirection::UP):
+        case NavigationDirection::UP:
             up = item;
             break;
-        case (NavigationDirection::RIGHT):
+        case NavigationDirection::RIGHT:
             right = item;
             break;
-        case (NavigationDirection::DOWN):
+        case NavigationDirection::DOWN:
             down = item;
+            break;
+        case NavigationDirection::NONE:
             break;
         }
     }
@@ -44,6 +46,8 @@ namespace gui
         case (NavigationDirection::DOWN):
             down = nullptr;
             break;
+        case NavigationDirection::NONE:
+            break;
         }
     }
 
@@ -58,12 +62,11 @@ namespace gui
             return right;
         case (NavigationDirection::DOWN):
             return down;
+        case NavigationDirection::NONE:
+            break;
         }
         return nullptr;
     }
-
-    Navigation::Navigation()
-    {}
 
     Navigation::~Navigation()
     {

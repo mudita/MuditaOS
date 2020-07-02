@@ -35,11 +35,6 @@ namespace app
         timerClock.restart();
     }
 
-    ApplicationClock::~ApplicationClock()
-    {
-        // TODO Auto-generated destructor stub
-    }
-
     void ApplicationClock::timerClockCallback()
     {
         auto it                   = windows.find("MainWindow");

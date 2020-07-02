@@ -68,7 +68,6 @@ namespace gui
         infoLabel->setText(utils::localize.get("app_desktop_poweroff_question"));
 
         uint32_t pinLabelX = 46;
-        // TODO change this to 397 after power manager is finished
         uint32_t pinLabelY = 350;
         for (uint32_t i = 0; i < 4; i++) {
             gui::Label *label = new gui::Label(this, pinLabelX, pinLabelY, 193, 75);
@@ -186,10 +185,7 @@ namespace gui
 
         // if enter was pressed check state and power down or return to main desktop's window
         if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-            if (state == State::PowerDown) {
-                // TODO start powering down procedure
-            }
-            else {
+            if (state != State::PowerDown) {
                 application->switchWindow("MainWindow");
             }
         }
