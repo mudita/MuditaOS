@@ -61,7 +61,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
         threadRec = threadInterface.GetLimitOffsetByField(
             0, 1, ThreadRecordField::ContactID, std::to_string(contactID).c_str());
     }
-    threadID = (*threadRec)[0].dbID;
+    threadID = (*threadRec)[0].ID;
 
     // Create SMS
     smsDB->sms.Add(SMSTableRow{.threadID  = threadID,
@@ -191,7 +191,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     auto threadRec = threadInterface.GetByID(sms.threadID);
 
     // If thread not found
-    if (threadRec.dbID == 0) {
+    if (!threadRec.isValid()) {
         if (smsDB->sms.RemoveByID(id) == false) {
             return false;
         }
