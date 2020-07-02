@@ -138,13 +138,13 @@ namespace app
             return false;
         }
         else {
-            LOG_DEBUG("Removing thread: %" PRIu32, record->dbID);
+            LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
             auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialog_yes_no]);
             assert(dialog != nullptr);
             auto meta   = dialog->meta;
             meta.action = [=]() -> bool {
-                if (!DBServiceAPI::ThreadRemove(this, record->dbID)) {
-                    LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->dbID);
+                if (!DBServiceAPI::ThreadRemove(this, record->ID)) {
+                    LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->ID);
                     return false;
                 }
                 this->switchWindow(gui::name::window::main_window);

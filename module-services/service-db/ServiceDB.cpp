@@ -180,7 +180,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto ret             = threadRecordInterface->GetByID(msg->id);
         auto records         = std::make_unique<std::vector<ThreadRecord>>();
         records->push_back(ret);
-        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.dbID == 0 ? false : true);
+        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.isValid());
     } break;
 
     case MessageType::DBThreadGetForContact: {
@@ -192,7 +192,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto ret     = threadRecordInterface->GetByContact(msg->contactID);
         auto records = std::make_unique<std::vector<ThreadRecord>>();
         records->push_back(ret);
-        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.dbID == 0 ? false : true);
+        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.isValid());
     }; break;
 
     case MessageType::DBThreadRemove: {
