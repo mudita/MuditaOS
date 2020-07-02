@@ -22,8 +22,6 @@ namespace antenna
         connectionStatus,
         bandCheck,
         switchAntenna,
-        highBand,
-        lowBand,
         signalCheck,
         idle,
         csqChange,
@@ -33,6 +31,7 @@ namespace antenna
     const char *c_str(antenna::State state);
 
     constexpr uint32_t signalTreshold = 10;
+    constexpr uint32_t connectionStatusTimeout = 60000;
 
     enum class lockState
     {
@@ -84,8 +83,6 @@ class ServiceAntenna : public sys::Service
     bool noneStateHandler(void);
     bool connectionStatusStateHandler(void);
     bool switchAntennaStateHandler(void);
-    bool highBandStateHandler(void);
-    bool lowBandStateHandler(void);
     bool signalCheckStateHandler(void);
     bool bandCheckStateHandler(void);
     bool idleStateHandler(void);

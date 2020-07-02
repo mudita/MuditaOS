@@ -28,10 +28,6 @@ namespace antenna
             return "connectionStatus";
         case antenna::State::switchAntenna:
             return "switchAntenna";
-        case antenna::State::highBand:
-            return "highBand";
-        case antenna::State::lowBand:
-            return "lowBand";
         case antenna::State::signalCheck:
             return "signalCheck";
         case antenna::State::bandCheck:
@@ -79,6 +75,10 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
             currentAntenna = antenna;
             if (state->get() == antenna::State::switchAntenna) {
                 LOG_INFO("Antena switched.");
+
+                state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
+                                          pdMS_TO_TICKS(antenna::connectionStatusTimeout),
+                                          antenna::State::switchAntenna);
                 state->set(antenna::State::connectionStatus);
             }
         }
@@ -89,8 +89,6 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
 
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
-            LOG_INFO("--------------------------------------------------------Cellular notification: %lu",
-                     static_cast<uint32_t>(msg->type));
             if (msg->type == CellularNotificationMessage::Type::CallAborted) {
                 AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
             }
@@ -101,9 +99,6 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
     case MessageType::CellularCall: {
         auto msg = dynamic_cast<CellularCallMessage *>(msgl);
         if (msg != nullptr) {
-
-            LOG_INFO("--------------------------------------------------------Cellular call message: %lu",
-                     static_cast<uint32_t>(msg->type));
             AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
         }
     } break;
@@ -182,25 +177,6 @@ void ServiceAntenna::TickHandler(uint32_t id)
     }
     state->set(stateToSet);
 }
-//
-// void ServiceAntenna::storeCurrentState(void)
-//{
-//
-//    std::string cellularResponse;
-//    if (CellularServiceAPI::GetCSQ(this, cellularResponse)) {
-//        uint32_t csq = 0;
-//        if (at::response::parseCSQ(cellularResponse, csq)) {
-//            storedCsq = csq;
-//        }
-//    }
-//
-//    if (CellularServiceAPI::GetCREG(this, cellularResponse)) {
-//        uint32_t creg = 0;
-//        if (at::response::parseCREG(cellularResponse, creg)) {
-//            storedRegisterd = at::response::creg::isRegistered(creg);
-//        }
-//    }
-//}
 
 void ServiceAntenna::handleLockRequest(antenna::lockState request)
 {
@@ -245,12 +221,6 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     case antenna::State::switchAntenna:
         ret = switchAntennaStateHandler();
         break;
-    case antenna::State::highBand:
-        ret = highBandStateHandler();
-        break;
-    case antenna::State::lowBand:
-        ret = lowBandStateHandler();
-        break;
     case antenna::State::signalCheck:
         ret = signalCheckStateHandler();
         break;
@@ -280,8 +250,9 @@ bool ServiceAntenna::initStateHandler(void)
     bsp::cellular::antenna antenna;
     if (CellularServiceAPI::GetAntenna(this, antenna)) {
         currentAntenna = antenna;
-
-        state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(), pdMS_TO_TICKS(10000), antenna::State::switchAntenna);
+        state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
+                                  pdMS_TO_TICKS(antenna::connectionStatusTimeout),
+                                  antenna::State::switchAntenna);
         state->set(antenna::State::connectionStatus);
         return true;
     }
@@ -320,14 +291,7 @@ bool ServiceAntenna::switchAntennaStateHandler(void)
     }
     return false;
 }
-bool ServiceAntenna::highBandStateHandler(void)
-{
-    return true;
-}
-bool ServiceAntenna::lowBandStateHandler(void)
-{
-    return true;
-}
+
 bool ServiceAntenna::signalCheckStateHandler(void)
 {
     std::string csq;
@@ -391,17 +355,6 @@ bool ServiceAntenna::bandCheckStateHandler(void)
 
 bool ServiceAntenna::idleStateHandler(void)
 {
-    //	LOG_INFO("Iddle params: lastCsq: %lu, currentCSQ: %lu", lastCsq, currentCsq);
-    //	if(lastCsq != currentCsq && lastCsq < currentCsq)
-    //	{
-    //		LOG_INFO("CSQ change occurent, check connection.");
-    //		state->set(antenna::State::connectionStatus);
-    //	}
-    //	if(currentCsq != 0)
-    //	{
-    //		lastCsq = currentCsq;
-    //	}
-
     return true;
 }
 
