@@ -8,5 +8,5 @@ add_catch2_executable(
 		"${CMAKE_CURRENT_LIST_DIR}/tests-main.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/../update/UpdatePureOS.cpp"
 	LIBS
-		module-services
+		module-services module-utils
 )
