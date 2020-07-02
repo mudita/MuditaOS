@@ -1,23 +1,17 @@
-/*
- * BoxLayout.cpp
- *
- *  Created on: 16 maj 2019
- *      Author: robert
- */
-
 #include "BoxLayout.hpp"
 #include <log/log.hpp>
-
 #include <Label.hpp>
+#include "BoxLayoutSizeStore.hpp"
 
 namespace gui
 {
-
-    BoxLayout::BoxLayout() : BoxLayout(nullptr, 0, 0, 0, 0)
-    {}
-
     BoxLayout::BoxLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
         : Rect(parent, x, y, w, h)
+    {
+        sizeStore = std::make_unique<BoxLayoutSizeStore>();
+    }
+
+    BoxLayout::BoxLayout() : BoxLayout(nullptr, 0, 0, 0, 0)
     {}
 
     bool BoxLayout::onInput(const InputEvent &inputEvent)
@@ -175,9 +169,15 @@ namespace gui
             auto orthogonalItemPosition = el->getPosition(orthogonal(axis));
             auto axisItemSize           = 0;
             auto orthogonalItemSize     = 0;
-
+            auto grantedSize            = sizeStore->get(el);
             // Check if item can be resized
-            int32_t left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
+            int32_t left_in_el = 0;
+            if (!grantedSize.isZero()) {
+                left_in_el = grantedSize.get(axis) - el->area(Area::Min).size(axis);
+            }
+            else {
+                left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
+            }
             if (to_split > 0 && left_in_el > 0) {
                 int32_t resize = std::min(left_in_el, to_split);
                 axisItemSize   = el->area(Area::Min).size(axis) + resize;
@@ -283,6 +283,19 @@ namespace gui
         }
     }
 
+    template <Axis axis>
+    auto BoxLayout::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
+    {
+        auto el = std::find(children.begin(), children.end(), child);
+        if (el == std::end(children)) {
+            return {0, 0};
+        }
+        Size granted = {std::min((*el)->area(Area::Max).w, request_w), std::min((*el)->area(Area::Max).h, request_h)};
+        sizeStore->store(*el, granted);
+        BoxLayout::resizeItems<axis>(); // vs mark dirty
+        return granted;
+    }
+
     void BoxLayout::setFocusOnLastElement()
     {
         auto last = true;
@@ -326,6 +339,11 @@ namespace gui
         }
     }
 
+    auto HBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
+    {
+        return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
+    }
+
     VBox::VBox() : BoxLayout()
     {
         type = ItemType::VBOX;
@@ -351,6 +369,11 @@ namespace gui
         if (reverseOrder) {
             reverseAlignment<Axis::Y>();
         }
+    }
+
+    auto VBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
+    {
+        return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }
 
 } /* namespace gui */

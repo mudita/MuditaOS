@@ -1,15 +1,12 @@
-/*
- * Layout.hpp
- *
- *  Created on: 15 maj 2019
- *      Author: robert
- */
+#pragma once
 
-#ifndef GUI_WIDGETS_LAYOUT_HPP_
-#define GUI_WIDGETS_LAYOUT_HPP_
+#include <memory>
+#include "LayoutSizeStore.hpp"
 
 namespace gui
 {
+
+    class Item;
 
     enum class LayoutHorizontalPolicy
     {
@@ -28,10 +25,8 @@ namespace gui
     class Layout
     {
       public:
-        Layout();
-        virtual ~Layout();
+        virtual ~Layout()                          = default;
+        std::unique_ptr<LayoutSizeStore> sizeStore = nullptr;
     };
 
 } /* namespace gui */
-
-#endif /* GUI_WIDGETS_LAYOUT_HPP_ */
