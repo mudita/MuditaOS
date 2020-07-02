@@ -16,7 +16,7 @@ namespace at
             //			utils::findAndReplaceAll(resp, toErase, "");
             //			toErase = "QIND: \"csq\": ";
             //			utils::findAndReplaceAll(resp, toErase, "");
-            auto pos            = response.find(toErase);
+            auto pos = response.find(toErase);
             if (pos != std::string::npos) {
                 response.erase(pos, toErase.length());
                 result = response;
@@ -107,7 +107,7 @@ namespace at
                 auto constexpr bandTokenPos        = 2;
                 if (tokens.size() == qnwinfoResponseSize) {
 
-                    auto constexpr lteString   = "LTE";
+                    auto constexpr lteString = "LTE";
                     if (tokens[bandTokenPos].find(gsmString) != std::string::npos ||
                         tokens[bandTokenPos].find(wcdmaString) != std::string::npos) {
                         return parseNumericBandString(tokens[bandTokenPos]);

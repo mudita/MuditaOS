@@ -30,7 +30,7 @@ namespace at
 
             auto constexpr band_1  = 1;
             auto constexpr band_2  = 2;
-            auto constexpr band_3 = 3;
+            auto constexpr band_3  = 3;
             auto constexpr band_4  = 4;
             auto constexpr band_5  = 5;
             auto constexpr band_7  = 7;

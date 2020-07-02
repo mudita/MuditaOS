@@ -30,7 +30,7 @@ namespace antenna
 
     const char *c_str(antenna::State state);
 
-    constexpr uint32_t signalTreshold = 10;
+    constexpr uint32_t signalTreshold          = 10;
     constexpr uint32_t connectionStatusTimeout = 60000;
 
     enum class lockState
@@ -49,8 +49,8 @@ class ServiceAntenna : public sys::Service
     uint32_t timerID = 0;
 
     bsp::cellular::antenna currentAntenna;
-    uint32_t lastCsq     = 0;
-    uint32_t currentCsq  = 0;
+    uint32_t lastCsq    = 0;
+    uint32_t currentCsq = 0;
 
     antenna::lockState serviceLocked = antenna::lockState::unlocked;
 
