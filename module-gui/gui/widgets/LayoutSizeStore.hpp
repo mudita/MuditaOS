@@ -2,7 +2,8 @@
 
 #include "Common.hpp"
 
-namespace gui {
+namespace gui
+{
 
     class Item;
 
@@ -11,8 +12,8 @@ namespace gui {
     class LayoutSizeStore
     {
       public:
-        virtual ~LayoutSizeStore()                 = default;
+        virtual ~LayoutSizeStore()                    = default;
         virtual auto store(Item *, Size size) -> bool = 0;
         virtual auto get(Item *) -> Size              = 0;
     };
-}
+} // namespace gui

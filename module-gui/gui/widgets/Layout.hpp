@@ -25,7 +25,7 @@ namespace gui
     class Layout
     {
       public:
-        virtual ~Layout()                  = default;
+        virtual ~Layout()                          = default;
         std::unique_ptr<LayoutSizeStore> sizeStore = nullptr;
     };
 

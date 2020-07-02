@@ -1,6 +1,7 @@
 #include "BoxLayoutSizeStore.hpp"
 
-namespace gui {
+namespace gui
+{
     bool BoxLayoutSizeStore::store(Item *it, Size size)
     {
         if (it == nullptr) {
@@ -22,4 +23,4 @@ namespace gui {
         }
         return {0, 0};
     }
-}
+} // namespace gui
