@@ -23,19 +23,19 @@ namespace gui
                 (parent->widgetArea.h > style::listview::scroll::min_space) && currentPageSize < elementsCount);
     }
 
-    void ListViewScroll::update(int startIndex, int currentPageSize, int elementsCount)
+    void ListViewScroll::update(int startIndex, int currentPageSize, int elementsCount, int topMargin)
     {
         if (shouldShowScroll(currentPageSize, elementsCount)) {
 
             assert(elementsCount != 0);
-            double scrollStep = static_cast<double>(parent->widgetArea.h) / static_cast<double>(elementsCount);
+            double scrollStep =
+                static_cast<double>((parent->widgetArea.h - topMargin)) / static_cast<double>(elementsCount);
 
             auto scrollH = scrollStep * currentPageSize;
-            auto scrollY = scrollStep * startIndex;
+            auto scrollY = scrollStep * startIndex > 0 ? scrollStep * startIndex : topMargin;
 
-            setPosition(parent->widgetArea.w - style::listview::scroll::margin, scrollY);
-            setSize(style::listview::scroll::w, scrollH);
-
+            setArea(BoundingBox(
+                parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
             setVisible(true);
         }
         else
@@ -104,9 +104,9 @@ namespace gui
         listType = type;
     }
 
-    void ListView::setItemSpanSize(int size)
+    void ListView::setScrollTopMargin(int value)
     {
-        itemSpanSize = size;
+        scrollTopMargin = value;
     }
 
     void ListView::setProvider(ListItemProvider *prov)
@@ -158,7 +158,7 @@ namespace gui
         addItemsOnPage();
 
         setFocus();
-        scroll->update(startIndex, currentPageSize, elementsCount);
+        scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
         body->axisAlignment();
         pageLoaded = true;
@@ -182,12 +182,6 @@ namespace gui
         if (direction == style::listview::Direction::Top) {
             startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
         }
-    }
-
-    void ListView::addSpanItem()
-    {
-        listSpanItem = new Span(Axis::Y, itemSpanSize);
-        body->addWidget(listSpanItem);
     }
 
     void ListView::resizeWithScroll()
@@ -215,12 +209,6 @@ namespace gui
             }
 
             currentPageSize++;
-
-            addSpanItem();
-        }
-
-        if (listSpanItem != nullptr) {
-            body->erase(listSpanItem);
         }
 
         recalculateStartIndex();

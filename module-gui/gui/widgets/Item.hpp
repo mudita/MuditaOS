@@ -35,6 +35,8 @@ namespace gui
 
     NavigationDirection inputToNavigation(const InputEvent &evt);
 
+    using Padding = Margins;
+
     class Item
     {
       public:
@@ -56,12 +58,12 @@ namespace gui
             Draw,
             Max,
         };
-        /// bounding box of the item. This is in coordinates of the parent widget.
+        /// actual bounding box of the item. This is in coordinates of the parent widget.
         BoundingBox widgetArea;
-        /// bounding box of the item maximal size, if not specified other - the same as widget Area
-        BoundingBox widgetMaxArea;
-        /// bounding box of the item maximal size, if not specified other - the same as widget Area
-        BoundingBox widgetActualArea;
+        /// bounding box of the item minimum size,
+        BoundingBox widgetMinimumArea;
+        /// bounding box of the item maximal size,
+        BoundingBox widgetMaximumArea;
         // bounding box used for drawing. This is in coordinates of window
         BoundingBox drawArea; // drawableArea would be more accurate
                               // maximal bounding box size
@@ -69,21 +71,25 @@ namespace gui
         {
             switch (which) {
             case Area::Min:
-                return widgetActualArea;
+                return widgetMinimumArea;
             case Area::Normal:
                 return widgetArea;
             case Area::Draw:
                 return drawArea;
             case Area::Max:
-                return widgetMaxArea;
+                return widgetMaximumArea;
+            default:
+                return widgetArea;
             }
-            return widgetArea;
         }
-        Margins innerMargins;
+
+        Padding padding;
+        Margins margins;
+
         /// radius of corner, default 0
         short radius = 0;
         /// flag that defines if item is active
-        /// if false -> than it shouldn't be used witn onInput, navitagion etc.
+        /// if false -> than it shouldn't be used with onInput, navigation etc.
         bool activeItem = true;
         /// flag that defines whether widget is visible (this is - should be rendered)
         bool visible;
@@ -98,7 +104,7 @@ namespace gui
 
         /// @defgroup callbacks     Item callback functions
         /// callback functors are meant to emulate signal <-> slot actions where you bind element instance to in code
-        /// defined lambda function all Items have functions coresponding to callback
+        /// defined lambda function all Items have functions corresponding to callback
         /// 1. if you wish to create new item which does something new in action function - override it
         /// 2. if you wish to call function on item - set callback for it
         /// @attention all callbacks return true if handled, return true means end of event processing, i.e. if you
@@ -132,7 +138,7 @@ namespace gui
         /// sets/resets focus on `this` Item and runs focusChangedCallback for it
         bool setFocus(bool state);
         /// sets/resets child with focus in `this` Item
-        /// runs focusChangledCallback on item which changes
+        /// runs focusChangedCallback on item which changes
         /// @attention focusItem is just a pointer, might crash if item with focus was removed
         void setFocusItem(Item *item);
         /// gettter for focus item
@@ -143,7 +149,7 @@ namespace gui
         /// @defgroup callbackCallers   functions which should call functors from callbacks group
         /// @{
 
-        /// called from setFocus, does nothing (which means it doesn't call focusChagedCallback
+        /// called from setFocus, does nothing (which means it doesn't call focusChangedCallback
         virtual bool onFocus(bool state);
         /// called when `this` Item was pressed with enter (middle key on phone action keys), used for callback input
         /// handling calls activatedCallback
@@ -189,6 +195,9 @@ namespace gui
         virtual void setPosition(const short &val, Axis axis);
         [[nodiscard]] uint16_t getSize(Axis axis) const;
         [[nodiscard]] uint16_t getPosition(Axis axis) const;
+
+        void setMargins(const Margins &value);
+        [[nodiscard]] Margins getMargins();
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///

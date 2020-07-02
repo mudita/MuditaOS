@@ -9,7 +9,7 @@ class TestListView : public gui::ListView
   public:
     friend class ListViewTesting;
     FRIEND_TEST(ListViewTesting, Constructor_Destructor_Test);
-    FRIEND_TEST(ListViewTesting, Fill_List_And_Span_Test);
+    FRIEND_TEST(ListViewTesting, Fill_List_And_Item_Magin_Test);
     FRIEND_TEST(ListViewTesting, Not_Equal_Items_Test);
     FRIEND_TEST(ListViewTesting, List_Clear_Test);
     FRIEND_TEST(ListViewTesting, Scroll_Test);
@@ -40,9 +40,6 @@ class ListViewTesting : public ::testing::Test
 
         ASSERT_EQ(0, testListView->currentPageSize) << "List should be empty";
         testListView->setProvider(testProvider);
-
-        // Set span size to 0 for easy test calculation.
-        testListView->setItemSpanSize(0);
     }
 
     void TearDown() override
@@ -74,14 +71,14 @@ TEST_F(ListViewTesting, Constructor_Destructor_Test)
     // Check that there are no memory leaks - done by fixture setup and teardown.
 }
 
-TEST_F(ListViewTesting, Fill_List_And_Span_Test)
+TEST_F(ListViewTesting, Fill_List_And_Item_Magin_Test)
 {
-    // Assign list to provider and request data - span set to 0, element height at 100, list height 600
+    // Assign list to provider and request data - item margins set to 0, element height at 100, list height 600
     testListView->provider->requestRecords(0, 10);
 
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list";
 
-    testListView->setItemSpanSize(50);
+    testProvider->testItemMargins = gui::Margins(0, 50, 0, 0);
     testListView->provider->requestRecords(0, 10);
 
     ASSERT_EQ(4, testListView->currentPageSize) << "Change span size to 50 so there will be space for 4 elements";
@@ -89,8 +86,8 @@ TEST_F(ListViewTesting, Fill_List_And_Span_Test)
 
 TEST_F(ListViewTesting, Not_Equal_Items_Test)
 {
-    // Assign list to provider and request data - span set to 0, elements height set to 100,200,300,400... , list height
-    // 600
+    // Assign list to provider and request data - item margins set to 0, elements height set to 100,200,300,400... ,
+    // list height 600
     testProvider->notEqualItems = true;
     testListView->provider->requestRecords(0, 10);
 
@@ -109,7 +106,7 @@ TEST_F(ListViewTesting, Not_Equal_Items_Test)
 
 TEST_F(ListViewTesting, List_Clear_Test)
 {
-    // Assign list to provider and request data - span set to 0, element height at 100, list height 600
+    // Assign list to provider and request data - item margins set to 0, element height at 100, list height 600
     testListView->provider->requestRecords(0, 10);
 
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";

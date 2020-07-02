@@ -192,17 +192,22 @@ namespace gui
 
             // Check if there is still position left
             if (axisItemSize <= pos_left) {
-                if (reverseOrder) {
-                    pos -= axisItemSize;
-                }
 
-                axisItemPosition = pos;
+                if (reverseOrder) {
+                    pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
+                    pos -= axisItemSize;
+                    axisItemPosition = pos;
+                    pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
+                }
 
                 if (!reverseOrder) {
+                    pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
+                    axisItemPosition = pos;
                     pos += axisItemSize;
+                    pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
                 }
 
-                pos_left -= axisItemSize;
+                pos_left -= axisItemSize + el->getMargins().getSumInAxis(axis);
             }
             else {
                 addToOutOfDrawAreaList(el);

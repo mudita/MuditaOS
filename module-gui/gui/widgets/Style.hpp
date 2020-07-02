@@ -188,10 +188,13 @@ namespace style
         const inline uint32_t body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
         const inline uint32_t right_margin     = 15;
-        const inline uint32_t top_margin_small = 5;
-        const inline uint32_t top_margin_big   = 8;
-        const inline uint32_t item_span_small  = 8;
-        const inline uint32_t item_span_big    = 12;
 
     } // namespace listview
-};    // namespace style
+
+    namespace margins
+    {
+        const inline uint32_t small = 6;
+        const inline uint32_t big   = 8;
+    } // namespace margins
+
+}; // namespace style

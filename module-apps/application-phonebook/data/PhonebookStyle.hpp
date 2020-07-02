@@ -41,7 +41,7 @@ namespace phonebookStyle
         namespace contactsList
         {
             constexpr uint32_t x = style::window::default_left_margin;
-            constexpr uint32_t y = style::header::height + style::listview::top_margin_big;
+            constexpr uint32_t y = style::header::height;
             constexpr uint32_t w = style::listview::body_width_with_scroll;
             constexpr uint32_t h = style::window_height - y - style::footer::height;
 
@@ -95,7 +95,7 @@ namespace phonebookStyle
         namespace searchResultList
         {
             constexpr uint32_t x = style::window::default_left_margin;
-            constexpr uint32_t y = style::header::height + style::listview::top_margin_big;
+            constexpr uint32_t y = style::header::height;
             constexpr uint32_t w = style::listview::body_width_with_scroll;
             constexpr uint32_t h = style::window_height - y - style::footer::height;
 

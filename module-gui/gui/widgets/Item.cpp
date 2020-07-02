@@ -126,7 +126,7 @@ namespace gui
     {
         BoundingBox oldArea = widgetArea;
         widgetArea          = area;
-        widgetMaxArea.sum(widgetArea);
+        widgetMaximumArea.sum(widgetArea);
         updateDrawArea();
         onDimensionChanged(oldArea, widgetArea);
     }
@@ -253,6 +253,19 @@ namespace gui
     {
         setMinimumWidth(w);
         setMinimumHeight(h);
+    }
+
+    /// set and get Margins
+    void Item::setMargins(const Margins &value)
+    {
+        if (margins != value) {
+            margins = value;
+        }
+    }
+
+    Margins Item::getMargins()
+    {
+        return margins;
     }
 
     uint16_t Item::getSize(Axis axis) const

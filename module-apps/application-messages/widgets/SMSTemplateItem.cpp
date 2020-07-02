@@ -7,6 +7,7 @@ namespace gui
 {
     SMSTemplateItem::SMSTemplateItem()
     {
+        setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(style::smsTemplItem::w, style::smsTemplItem::h);
         setMaximumSize(style::smsTemplItem::w, style::smsTemplItem::h);
 

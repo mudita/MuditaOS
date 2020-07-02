@@ -23,7 +23,7 @@ namespace gui
         {
             uint32_t sum = 0;
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area(Area::Min).size(axis) : 0;
+                sum += el->visible ? el->area(Area::Min).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
             });
             return sum;
         };
