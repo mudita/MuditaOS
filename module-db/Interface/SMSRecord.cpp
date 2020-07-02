@@ -191,7 +191,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     auto threadRec = threadInterface.GetByID(sms.threadID);
 
     // If thread not found
-    if (threadRec.dbID == 0) {
+    if (threadRec.isValid()) {
         if (smsDB->sms.RemoveByID(id) == false) {
             return false;
         }
