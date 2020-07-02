@@ -26,7 +26,7 @@ namespace app
                 if (!cellularRequestInProgress) {
                     LOG_INFO("Get Network info");
                     cellularRequestInProgress = true;
-                    //                    CellularServiceAPI::GetNetworkInfo(this);
+                    CellularServiceAPI::GetNetworkInfo(this);
                 }
             }
         }
