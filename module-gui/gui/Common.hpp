@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Axes.hpp"
 #include <cstdint>
 #include <utility>
 
@@ -8,8 +9,25 @@ namespace gui
     using Length   = uint32_t;
     using Position = int32_t;
 
-    using Size  = std::pair<Length, Length>;
-    using Point = std::pair<Position, Position>;
+    struct Size 
+    {
+        Length width = 0, height = 0;
+        Size(Length w = 0,Length h = 0) : width(w), height(h) {}
+        [[nodiscard]] auto get(Axis axis) const -> Length {
+            return Axis::X == axis ? width : height;
+        }
+        [[nodiscard]] auto isZero() const -> bool { return 0 == width && 0 == height; }
+    };
+
+    struct Point
+    {
+        Position x =0 , y = 0;
+        Point(Position x = 0, Position y = 0) : x(x), y(y) {}
+        [[nodiscard]] auto get(Axis axis) const -> Length {
+            return Axis::X == axis ? x : y;
+        }
+        [[nodiscard]] auto isZero() const -> bool { return 0 == x && 0 == y; }
+    };
 
     enum class NavigationDirection
     {

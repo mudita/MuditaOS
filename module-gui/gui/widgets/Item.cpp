@@ -11,6 +11,7 @@
 #include "Navigation.hpp"
 #include "Item.hpp"
 #include "BoundingBox.hpp"
+#include "log/log.hpp"
 
 namespace gui
 {
@@ -143,6 +144,23 @@ namespace gui
     void Item::setY(const int32_t y)
     {
         setArea({widgetArea.x, y, widgetArea.w, widgetArea.h});
+    }
+
+    auto Item::requestSize(unsigned short request_w, unsigned short request_h) -> Size
+    {
+        if (parent == nullptr) {
+            setSize(request_w, request_h);
+            return {request_w, request_h};
+        }
+        return parent->handleRequestResize(this, request_w, request_h);
+    }
+
+    auto Item::handleRequestResize(const Item *it, unsigned short request_w, unsigned short request_h) -> Size
+    {
+        if (it == nullptr) {
+            return {0, 0};
+        }
+        return {it->getWidth(), it->getHeight()};
     }
 
     void Item::setSize(const unsigned short w, const unsigned short h)

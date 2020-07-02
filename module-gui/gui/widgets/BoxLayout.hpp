@@ -1,23 +1,15 @@
-/*
- * BoxLayout.hpp
- *
- *  Created on: 16 maj 2019
- *      Author: robert
- */
-
-#ifndef GUI_WIDGETS_BOXLAYOUT_HPP_
-#define GUI_WIDGETS_BOXLAYOUT_HPP_
+#pragma once
 
 #include <cstdint>
 
 #include "Layout.hpp"
 #include "Rect.hpp"
 #include <Alignment.hpp>
+#include "LayoutSizeStore.hpp"
 
 namespace gui
 {
-
-    class BoxLayout : public Rect
+    class BoxLayout : public Rect, Layout
     {
       protected:
         struct BoxElement
@@ -80,6 +72,8 @@ namespace gui
         // set focus on specified box element
         void setFocusOnElement(uint32_t elementNumber);
         void setFocusOnLastElement();
+        template <Axis axis>
+        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
     };
 
     class HBox : public BoxLayout
@@ -91,6 +85,7 @@ namespace gui
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
         virtual void axisAlignment();
+        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 
     class VBox : public BoxLayout
@@ -102,8 +97,7 @@ namespace gui
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
         virtual void axisAlignment();
+        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 
 } /* namespace gui */
-
-#endif /* GUI_WIDGETS_BOXLAYOUT_HPP_ */

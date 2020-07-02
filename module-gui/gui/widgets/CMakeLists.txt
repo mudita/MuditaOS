@@ -14,6 +14,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Rect.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Window.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayout.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/BoxLayoutSizeStore.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/PageLayout.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Layout.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
