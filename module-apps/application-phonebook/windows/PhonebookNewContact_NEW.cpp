@@ -56,7 +56,6 @@ namespace gui
     void PhonebookNewContact_NEW::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            //            list->clear();
             list->setElementsCount(newContactModel->getItemCount());
         }
 
@@ -104,18 +103,18 @@ namespace gui
 
     auto PhonebookNewContact_NEW::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            newContactModel->saveData(contact);
-            verifyAndSave();
-            return true;
-        }
-
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
 
         if (inputEvent.state != InputEvent::State::keyReleasedShort) {
             return false;
+        }
+
+        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+            newContactModel->saveData(contact);
+            verifyAndSave();
+            return true;
         }
 
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
