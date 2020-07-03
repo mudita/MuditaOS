@@ -114,6 +114,9 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+            auto tmpId = contact->ID;
+            contact = std::make_shared<ContactRecord>();
+            contact->ID = tmpId;
             newContactModel->saveData(contact);
             verifyAndSave();
             return true;
