@@ -116,6 +116,14 @@ auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
     return nullptr;
 }
 
+void NewContactModel::clearData()
+{
+    auto emptyContact = make_shared<ContactRecord>();
+    emptyContact->numbers.emplace_back();
+    emptyContact->numbers.emplace_back();
+    loadData(emptyContact);
+}
+
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
 {
     for (auto item : internalData) {
