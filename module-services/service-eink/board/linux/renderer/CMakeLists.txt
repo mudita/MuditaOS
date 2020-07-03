@@ -25,6 +25,8 @@ target_link_libraries( ${PROJECT_NAME} ${LIBRT} rt pthread )
 target_include_directories( ${PROJECT_NAME}  PUBLIC "${CMAKE_SOURCE_DIR}/"  )
 target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-deprecated-declarations")
 target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-unused-result")
+target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-parentheses")
+target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-cast-function-type")
 
 # disable sanitizier for target, due to bug in sigc
 # https://github.com/libsigcplusplus/libsigcplusplus/issues/10
