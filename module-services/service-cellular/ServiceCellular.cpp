@@ -43,6 +43,7 @@
 
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp"
 #include "service-antenna/api/AntennaServiceAPI.hpp"
+#include "service-antenna/messages/AntennaMessage.hpp"
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
@@ -680,7 +681,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             responseMsg = std::make_shared<CellularResponseMessage>(false);
             break;
         }
-        LOG_DEBUG("Received multicast");
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
             sendSMS();
@@ -735,7 +735,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             bool changedAntenna   = (actualAntenna == msg->antenna);
             responseMsg           = std::make_shared<CellularResponseMessage>(changedAntenna);
 
-            auto notification = std::make_shared<sys::DataMessage>(MessageType::AntennaChanged);
+            auto notification = std::make_shared<AntennaChangedMessage>();
             sys::Bus::SendMulticast(notification, sys::BusChannels::AntennaNotifications, this);
         }
         else {

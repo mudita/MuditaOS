@@ -101,8 +101,6 @@ class CellularAntennaRequestMessage : public CellularMessage
   public:
     CellularAntennaRequestMessage(MessageType messageType) : CellularMessage(messageType)
     {}
-    ~CellularAntennaRequestMessage()
-    {}
 
     bsp::cellular::antenna antenna;
 };
@@ -157,7 +155,6 @@ class CellularAntennaResponseMessage : public sys::ResponseMessage
     {
         antenna = retAntenna;
     };
-    virtual ~CellularAntennaResponseMessage(){};
 
     bool retCode;
     bsp::cellular::antenna antenna;

@@ -318,8 +318,6 @@ bool ServiceAntenna::bandCheckStateHandler(void)
         at::response::parseQNWINFO(cellularResponse, band);
 
         auto bandFrequency = at::response::qnwinfo::parseNetworkFrequency(band);
-
-        LOG_INFO("Band frequency: %lu", bandFrequency);
         constexpr uint32_t GHz = 1000;
         bool isBandSubGHz      = bandFrequency < GHz ? true : false;
         if (currentAntenna == bsp::cellular::antenna::highBand) {
@@ -368,7 +366,6 @@ bool ServiceAntenna::csqChangeStateHandler(void)
         at::response::parseCSQ(csq, csqValue);
         currentCsq = csqValue;
     }
-    LOG_INFO("csqChange params: lastCsq: %lu, currentCSQ: %lu", lastCsq, currentCsq);
 
     auto nextState = antenna::State::idle;
     if (lastCsq != currentCsq || currentCsq == notValidCsq) {

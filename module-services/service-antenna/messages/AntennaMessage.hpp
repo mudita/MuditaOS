@@ -13,10 +13,14 @@ class AntennaLockRequestMessage : public sys::DataMessage
     {}
     AntennaLockRequestMessage(MessageType messageType) : sys::DataMessage(messageType)
     {}
-    ~AntennaLockRequestMessage()
-    {}
-
     antenna::lockState request = antenna::lockState::unlocked;
+};
+
+class AntennaChangedMessage : public sys::DataMessage
+{
+  public:
+    AntennaChangedMessage(void) : sys::DataMessage(MessageType::AntennaChanged)
+    {}
 };
 
 class AntennaLockRequestResponse : public sys::ResponseMessage
@@ -26,7 +30,6 @@ class AntennaLockRequestResponse : public sys::ResponseMessage
                                antenna::lockState response,
                                MessageType responseTo = MessageType::MessageTypeUninitialized)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(response){};
-    virtual ~AntennaLockRequestResponse(){};
 
     bool retCode;
     antenna::lockState data;
