@@ -1,5 +1,10 @@
 # Mudita PurePhone changelog
 
+## Current Release
+
+### Other
+ * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
+ 
 ## [0.27.1] - 2020-07-03
 
 ### Fixed
