@@ -280,12 +280,6 @@ else ()
         endif()
 endif ()
 
-if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
-    set(PACKAGE_FILE ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}${PACKAGE_EXTENSION})
-    message("::set-output name=package::${PACKAGE_FILE}")
-    message("::set-output name=mime_type::${PACKAGE_MIME}")
-endif()
-
 message("SRC DIR: ${CMAKE_SOURCE_DIR}")
 include(Version)
 add_custom_target(
@@ -311,5 +305,15 @@ else()
 endif()
 
 include(CPack)
+
+if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
+    set(PACKAGE_FILE ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}${PACKAGE_EXTENSION})
+
+    message("set-output name=package::${PACKAGE_FILE}")
+    message("::set-output name=package::${PACKAGE_FILE}")
+
+    message("set-output name=mime_type::${PACKAGE_MIME}")
+    message("::set-output name=mime_type::${PACKAGE_MIME}")
+endif()
 
 
