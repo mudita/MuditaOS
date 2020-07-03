@@ -73,6 +73,8 @@ namespace gui
 
     auto PhonebookNewContact_NEW::handleSwitchData(SwitchData *data) -> bool
     {
+        newContactModel->clearData();
+
         if (data == nullptr) {
             return false;
         }

@@ -17,6 +17,7 @@ class NewContactModel : public gui::ListItemProvider
     NewContactModel(app::Application *app);
     virtual ~NewContactModel();
 
+    void clearData();
     void saveData(std::shared_ptr<ContactRecord> contactRecord);
     void loadData(std::shared_ptr<ContactRecord> contactRecord);
 
