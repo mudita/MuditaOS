@@ -2,6 +2,7 @@
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
+#include <module-db/Interface/ContactRecord.hpp>
 #include <module-utils/i18/i18.hpp>
 
 namespace gui
@@ -100,7 +101,10 @@ namespace gui
             inputText->setInputMode(new InputMode({InputMode::phone}));
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                contact->numbers.emplace_back(utils::PhoneNumber(inputText->getText()).getView());
+                if (inputText->getText().length() > 0) {
+                    contact->numbers.emplace_back(
+                        ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
+                }
             };
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 if (contact->numbers.size() > 0) {
@@ -115,7 +119,11 @@ namespace gui
             inputText->setInputMode(new InputMode({InputMode::phone}));
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                contact->numbers.emplace_back(utils::PhoneNumber(inputText->getText()).getView());
+                if (inputText->getText().length() > 0) {
+                    // Temporary disable saving secondary number since multiple numbers are not supported yet, and this
+                    // could lead to confusing errors
+                    // contact->numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
+                }
             };
             onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
                 if (contact->numbers.size() > 1) {
@@ -129,9 +137,7 @@ namespace gui
             inputText->setTextType(Text::TextType::SINGLE_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                    inputText->setText(contact->mail);
-            };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
             break;
 
         case phonebookInternals::ListItemName::Address:
@@ -139,9 +145,7 @@ namespace gui
             inputText->setTextType(Text::TextType::SINGLE_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                inputText->setText(contact->address);
-            };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
             break;
 
         case phonebookInternals::ListItemName::Note:
@@ -149,9 +153,7 @@ namespace gui
             inputText->setTextType(Text::TextType::SINGLE_LINE);
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                inputText->setText(contact->note);
-            };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
             break;
 
         default:
