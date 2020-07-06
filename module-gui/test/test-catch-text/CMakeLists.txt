@@ -19,4 +19,6 @@ add_catch2_executable(
         LIBS
                 module-gui
                 module-vfs
+        DEPS
+                assets
 )

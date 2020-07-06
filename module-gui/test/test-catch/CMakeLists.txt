@@ -13,4 +13,6 @@ add_catch2_executable(
                 ..
         LIBS
                 module-gui
+        DEPS
+                assets
 )
