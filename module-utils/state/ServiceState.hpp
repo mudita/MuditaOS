@@ -18,7 +18,7 @@ namespace utils
           private:
             T currentState;
             T lastState;
-            sys::Service *owner;
+            sys::Service *owner = nullptr;
 
             bool timeoutActive         = false;
             uint32_t timeoutElapseTime = 0;

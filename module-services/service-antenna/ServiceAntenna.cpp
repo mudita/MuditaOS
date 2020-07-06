@@ -208,12 +208,11 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     bool ret = false;
     switch (state) {
     case antenna::State::none:
-        noneStateHandler();
-        ret = true;
+        ret = noneStateHandler();
+        ;
         break;
     case antenna::State::init:
-        initStateHandler();
-        ret = true;
+        ret = initStateHandler();
         break;
     case antenna::State::connectionStatus:
         ret = connectionStatusStateHandler();
@@ -261,7 +260,7 @@ bool ServiceAntenna::initStateHandler(void)
 
 bool ServiceAntenna::noneStateHandler(void)
 {
-    return false;
+    return true;
 }
 
 bool ServiceAntenna::connectionStatusStateHandler(void)
