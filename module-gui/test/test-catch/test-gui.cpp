@@ -1,5 +1,6 @@
 /// These are random tests what could be salvaged from old tests
 
+#include "mock/InitializedFontManager.hpp"
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
 #include <memory>
@@ -61,9 +62,7 @@ TEST_CASE("Are fonts loaded")
 
 TEST_CASE("Draw window with labels")
 {
-    /// TO LOAD FONTS
-    gui::FontManager::getInstance();
-
+    mockup::fontManager(); // To load fonts
     auto win = new gui::TestWindow("MAIN");
     win->setSize(480, 600);
 
@@ -147,15 +146,9 @@ TEST_CASE("Draw window with box layouts")
     maxH4->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     maxH4->setMaximumSize(75, 60);
 
-    // TODO:M.P unit test for GUI should be fixed/updated gui::Image* img1 = new gui::Image();
-    // TODO:M.P unit test for GUI should be fixed/updated uint16_t id =
-    // gui::ImageManager::getInstance().load("loudspeaker.mpi");
-    // TODO:M.P unit test for GUI should be fixed/updated img1->setImageWithID( id );
-
     vBox->addWidget(maxH1);
     vBox->addWidget(maxH2);
     vBox->addWidget(maxH4);
-    // TODO:M.P unit test for GUI should be fixed/updated vBox->addWidget( img1 );
     vBox->addWidget(maxH3);
 
     hBox->addWidget(maxW3);
