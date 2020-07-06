@@ -10,6 +10,7 @@
 #include "InitializedFontManager.hpp"
 #include "TextParse.hpp"
 #include "i18/i18.hpp"
+#include "mock/InitializedFontManager.hpp"
 #include <catch2/catch.hpp>
 #include <limits>
 
@@ -209,6 +210,7 @@ TEST_CASE("handle longpress for digit in ABC mode")
 
 TEST_CASE("handle text expand")
 {
+    mockup::fontManager();
     using namespace gui;
     Length w         = 10;
     Length h         = 100;
