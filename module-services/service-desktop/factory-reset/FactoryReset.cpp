@@ -9,6 +9,11 @@ static const int empty_dirlist_size   = 2;   /* vfs.listdir lists "." and ".." b
 static const int max_recurse_depth    = 120; /* 120 is just an arbitrary value of max number of recursive calls.
                                               * If more then error is assumed, not the real depth of directories."
                                               */
+#ifdef TARGET_Linux
+static const int max_filepath_length = 4096;
+#else
+static const int max_filepath_length = ffconfigMAX_FILENAME;
+#endif
 
 bool FactoryReset::Run(sys::Service *ownerService)
 {
@@ -43,7 +48,7 @@ bool FactoryReset::Run(sys::Service *ownerService)
         return false;
     }
 
-    LOG_INFO("DoFactoryReset: restoring factory state finished, rebooting...");
+    LOG_INFO("FactoryReset: restoring factory state finished, rebooting...");
     sys::SystemManager::Reboot(ownerService);
     return true;
 }
@@ -103,7 +108,7 @@ bool FactoryReset::CopyDirContent(std::string sourcedir, std::string targetdir)
                 targetpath += "/";
                 targetpath += direntry.fileName.c_str();
 
-                if ((sourcepath.size() < ffconfigMAX_FILENAME) && (targetpath.size() < ffconfigMAX_FILENAME)) {
+                if ((sourcepath.size() < max_filepath_length) && (targetpath.size() < max_filepath_length)) {
                     if (direntry.attributes == vfs::FileAttributes::Directory) {
                         if (targetpath.compare(purefs::dir::os_factory.c_str()) != 0) {
                             LOG_INFO(
@@ -132,7 +137,7 @@ bool FactoryReset::CopyDirContent(std::string sourcedir, std::string targetdir)
                 }
                 else {
                     LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d",
-                              ffconfigMAX_FILENAME);
+                              max_filepath_length);
                     LOG_ERROR(
                         "FactoryReset: skipping restore of dir %s into %s", sourcepath.c_str(), targetpath.c_str());
                     ret = false;
