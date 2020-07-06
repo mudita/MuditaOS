@@ -197,8 +197,9 @@ namespace style
 
     namespace margins
     {
-        const inline uint32_t small = 6;
-        const inline uint32_t big   = 8;
+        const inline uint32_t small    = 6;
+        const inline uint32_t big      = 8;
+        const inline uint32_t very_big = 12;
     } // namespace margins
 
 }; // namespace style

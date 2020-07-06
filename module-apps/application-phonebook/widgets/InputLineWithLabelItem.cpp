@@ -15,6 +15,7 @@ namespace gui
     {
         setMinimumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
         setMaximumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
+        setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
