@@ -104,7 +104,7 @@ namespace utils
             return true;
         }
         catch (const std::exception &e) {
-            LOG_ERROR("ServiceCellular::GetNetworkInfo exception %s", e.what());
+            LOG_ERROR("toNumeric exception %s", e.what());
             return false;
         }
 

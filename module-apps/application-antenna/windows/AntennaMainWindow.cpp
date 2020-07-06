@@ -93,7 +93,11 @@ namespace gui
             if (AntennaServiceAPI::GetLockState(this->application, currentState)) {
                 auto newState = currentState == antenna::lockState::locked ? antenna::lockState::unlocked
                                                                            : antenna::lockState::locked;
-                AntennaServiceAPI::LockRequest(this->application, newState);
+                if (AntennaServiceAPI::LockRequest(this->application, newState)) {
+                    if (AntennaServiceAPI::GetLockState(this->application, currentState)) {
+                        updateLockedButton(currentState);
+                    }
+                }
             }
             return true;
         }));
@@ -288,5 +292,6 @@ namespace gui
         }
 
         buttons[buttonDescriotion::LockAntennaManager]->setText(buttonText);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
 } // namespace gui

@@ -12,10 +12,6 @@ namespace at
         {
             std::string toErase = "+CSQ: ";
 
-            //            auto resp = utils::removeNewLines(response);
-            //			utils::findAndReplaceAll(resp, toErase, "");
-            //			toErase = "QIND: \"csq\": ";
-            //			utils::findAndReplaceAll(resp, toErase, "");
             auto pos = response.find(toErase);
             if (pos != std::string::npos) {
                 response.erase(pos, toErase.length());

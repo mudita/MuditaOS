@@ -9,6 +9,6 @@ namespace AntennaServiceAPI
 {
 
     void CSQChange(sys::Service *serv);
-    void LockRequest(sys::Service *serv, antenna::lockState request);
+    bool LockRequest(sys::Service *serv, antenna::lockState request);
     bool GetLockState(sys::Service *serv, antenna::lockState &state);
 } // namespace AntennaServiceAPI

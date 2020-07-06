@@ -8,10 +8,16 @@ namespace AntennaServiceAPI
         auto msg = std::make_shared<sys::DataMessage>(MessageType::AntennaCSQChange);
         sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv);
     }
-    void LockRequest(sys::Service *serv, antenna::lockState request)
+    bool LockRequest(sys::Service *serv, antenna::lockState request)
     {
         auto msg = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, request);
-        sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv);
+        auto ret = sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv, 5000);
+        if (ret.first == sys::ReturnCodes::Success) {
+
+            return true;
+        }
+
+        return false;
     }
     bool GetLockState(sys::Service *serv, antenna::lockState &response)
     {
@@ -19,7 +25,7 @@ namespace AntennaServiceAPI
         auto ret = sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv, 5000);
         if (ret.first == sys::ReturnCodes::Success) {
             auto responseMsg = dynamic_cast<AntennaLockRequestResponse *>(ret.second.get());
-            if ((responseMsg != nullptr) /*&& (responseMsg->retCode == true)*/) {
+            if (responseMsg != nullptr) {
                 response = responseMsg->data;
                 return true;
             }
