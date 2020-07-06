@@ -12,6 +12,7 @@ class NewContactModel : public gui::ListItemProvider
     unsigned int internalOffset = 0;
     unsigned int internalLimit  = 0;
     vector<gui::ContactListItem *> internalData;
+    app::Application *application;
 
   public:
     NewContactModel(app::Application *app);
@@ -20,6 +21,7 @@ class NewContactModel : public gui::ListItemProvider
     void clearData();
     void saveData(std::shared_ptr<ContactRecord> contactRecord);
     void loadData(std::shared_ptr<ContactRecord> contactRecord);
+    void createData();
 
     [[nodiscard]] auto getItemCount() const -> int override;
 
