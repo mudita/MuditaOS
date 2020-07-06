@@ -1,5 +1,6 @@
 #!/bin/bash
-# set -e
+# set -eo pipefail
+
 source config/common.sh
 is_root=`id -u`
 if [ "$1" == "" ] || [ $is_root != 0 ]; then
