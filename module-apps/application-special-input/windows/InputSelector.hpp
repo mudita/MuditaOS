@@ -27,6 +27,9 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
+        Item *buildNewline();
     };
 
 }; // namespace gui

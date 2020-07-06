@@ -1,6 +1,7 @@
 #include "InputSelector.hpp"
 #include "../AppSpecialInput.hpp"
 #include "Style.hpp"
+#include "TextConstants.hpp"
 #include "messages/AppMessage.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <InputMode.hpp>
@@ -23,6 +24,7 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, app::char
                          style::window_width - style::window::default_left_margin - style::window::default_right_margin,
                          bottomBar->offset_h() - title->offset_h(),
                          {style::design::char_grid_w, style::design::char_grid_h});
+    box->addWidget(buildNewline());
     for (auto schar : gui::special_chars) {
         auto el = new gui::Label(box, 0, 0, style::design::char_label_w, style::design::char_label_h);
         style::window::decorate(el);
@@ -40,6 +42,7 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, app::char
             return true;
         };
     }
+
     addWidget(box);
     setFocusItem(box);
 }
@@ -61,4 +64,23 @@ void UiCharSelector::buildInterface()
 void UiCharSelector::destroyInterface()
 {
     setFocusItem(nullptr);
+}
+
+Item *UiCharSelector::buildNewline()
+{
+    auto rect = new Rect(nullptr, 0, 0, style::design::char_label_w, style::design::char_label_h);
+    rect->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    rect->setPenWidth(0);
+    rect->activatedCallback = [=](Item &it) {
+        auto name = dynamic_cast<app::AppSpecialInput *>(application)->requester;
+        LOG_INFO("handled enter");
+        setFocusItem(nullptr);
+        sapm::ApplicationManager::messageSwitchSpecialInput(
+            application,
+            std::make_unique<gui::SwitchSpecialChar>(
+                gui::SwitchSpecialChar::Type::Response, name, std::string(&text::newline, 1)));
+        return true;
+    };
+    new gui::Image(rect, 20, 20, style::design::char_label_w, style::design::char_label_h, "enter_icon_alpha_W_M");
+    return rect;
 }

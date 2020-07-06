@@ -27,12 +27,27 @@ namespace gui
                              style::window::default_left_margin,
                              title->offset_h(),
                              style::window_width - 2 * style::window::default_left_margin,
-                             300,
-                             "Add text, long press * adds special char, long press # changes input (and shows it in "
-                             "bottom bar) arrows walk, 1 in text mode "
-                             "adds special chars too");
-        text->setEditMode(gui::Text::EditMode::EDIT);
+                             300);
+        text->setEditMode(EditMode::EDIT);
         text->setFont(style::window::font::medium);
+        text->addText(TextBlock(
+            "Add text,", FontManager::getInstance().getFont(style::window::font::medium), TextBlock::End::None));
+        text->addText(TextBlock("long press * ",
+                                FontManager::getInstance().getFont(style::window::font::mediumbold),
+                                TextBlock::End::None));
+        text->addText(TextBlock("adds special char, long press # changes input",
+                                FontManager::getInstance().getFont(style::window::font::medium),
+                                TextBlock::End::Newline));
+        text->addText(TextBlock("(and shows it in bottom bar) arrows walk",
+                                FontManager::getInstance().getFont(style::window::font::medium),
+                                TextBlock::End::Newline));
+        text->addText(TextBlock(
+            "1 in text mode ", FontManager::getInstance().getFont(style::window::font::medium), TextBlock::End::None));
+        text->addText(TextBlock(
+            "adds ", FontManager::getInstance().getFont(style::window::font::largelight), TextBlock::End::None));
+        text->addText(TextBlock("special chars too",
+                                FontManager::getInstance().getFont(style::window::font::medium),
+                                TextBlock::End::None));
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
