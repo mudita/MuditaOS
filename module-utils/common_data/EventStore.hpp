@@ -62,9 +62,8 @@ namespace Store
             std::string codename;
             std::string versionString;
             std::string kernelVersionString;
-        };
+        } version;
 
-        Version version;
         static const OperatingSystem &get();
         static OperatingSystem &modify();
     };

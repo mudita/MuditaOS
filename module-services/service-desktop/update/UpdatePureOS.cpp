@@ -1,7 +1,7 @@
 #include "UpdatePureOS.hpp"
 #include <service-desktop/ServiceDesktop.hpp>
 #include <source/version.hpp>
-
+#include <time/time_conversion.hpp>
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
     if (h.name[0] == '.' && h.name[1] == '/') {
@@ -250,16 +250,9 @@ updateos::UpdateError UpdatePureOS::updateBootINI()
     if (!iniSet(ini, purefs::ini::main, purefs::ini::os_image, purefs::file::boot_bin.c_str())) {
         return updateos::UpdateError::CantUpdateINI;
     }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_tag, GIT_TAG)) {
+    if (!iniSet(ini, purefs::ini::main, purefs::ini::timestamp, std::to_string(utils::time::Time().getTime()))) {
         return updateos::UpdateError::CantUpdateINI;
     }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_revision, GIT_REV)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_branch, GIT_BRANCH)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-
     if (sbini_save(ini, bootIniAbsoulte.c_str())) {
         LOG_ERROR("updateBootINI can't save ini file at: %s", bootIniAbsoulte.c_str());
         sbini_free(ini);

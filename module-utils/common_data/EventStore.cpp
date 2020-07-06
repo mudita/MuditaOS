@@ -20,13 +20,12 @@ namespace Store
     }
 
     OperatingSystem operatingSystem;
-    const OperatingSystem &OperatingSystem::get()
-    {
+
+    const OperatingSystem &OperatingSystem::get() {
         return operatingSystem;
     }
 
-    OperatingSystem &OperatingSystem::modify()
-    {
+    OperatingSystem &OperatingSystem::modify() {
         return operatingSystem;
     }
 

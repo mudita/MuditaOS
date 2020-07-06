@@ -79,7 +79,7 @@ bool vfs::getOSRootFromIni()
         osType     = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
         osRootPath = purefs::dir::eMMC_disk / osType;
 
-        initOperatingSystemStore(ini);
+        initOperatingSystemStore();
 
         sbini_free(ini);
         return true;

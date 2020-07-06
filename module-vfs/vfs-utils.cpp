@@ -77,25 +77,11 @@ bool vfs::verifyCRC(const fs::path filePath)
     return (false);
 }
 
-void vfs::initOperatingSystemStore(sbini_t *ini)
+void vfs::initOperatingSystemStore()
 {
     Store::OperatingSystem::modify().version.kernelVersionString = tskKERNEL_VERSION_NUMBER;
-
-    if (ini == nullptr) {
-        Store::OperatingSystem::modify().version.gitRev    = GIT_REV;
-        Store::OperatingSystem::modify().version.gitTag    = GIT_TAG;
-        Store::OperatingSystem::modify().version.gitBranch = GIT_BRANCH;
-        Store::OperatingSystem::modify().version.setVersionFromString(VERSION);
-    }
-    else {
-        Store::OperatingSystem::modify().version.gitRev =
-            sbini_get_string(ini, osType.c_str(), purefs::ini::os_git_revision.c_str());
-        Store::OperatingSystem::modify().version.gitBranch =
-            sbini_get_string(ini, osType.c_str(), purefs::ini::os_git_branch.c_str());
-        Store::OperatingSystem::modify().version.gitTag =
-            sbini_get_string(ini, osType.c_str(), purefs::ini::os_git_tag.c_str());
-
-        Store::OperatingSystem::modify().version.setVersionFromString(
-            sbini_get_string(ini, osType.c_str(), purefs::ini::os_version.c_str()));
-    }
+    Store::OperatingSystem::modify().version.gitRev    = GIT_REV;
+    Store::OperatingSystem::modify().version.gitTag    = GIT_TAG;
+    Store::OperatingSystem::modify().version.gitBranch = GIT_BRANCH;
+    Store::OperatingSystem::modify().version.setVersionFromString(VERSION);
 }
