@@ -1,7 +1,7 @@
-#include "InitializedFontManager.hpp"
 #include <catch2/catch.hpp>
 #include <limits>
 #include <module-gui/gui/widgets/TextBlock.hpp>
+#include "InitializedFontManager.hpp"
 
 TEST_CASE("TextBlock Ctor/Dtor ")
 {
@@ -29,7 +29,7 @@ TEST_CASE("Text block - set/update/get text")
 {
     using namespace gui;
     const std::string starting_text = "lol";
-    auto &fontmanager               = FontManager::getInstance();
+    auto &fontmanager               = mockup::fontManager();
     REQUIRE(fontmanager.getFont(0) != nullptr);
     auto block = TextBlock(starting_text, fontmanager.getFont(0), TextBlock::End::None);
 
@@ -115,6 +115,7 @@ TEST_CASE("Text block - set/update/get text")
 
 TEST_CASE("Text block - remove text")
 {
+    mockup::fontManager();
     using namespace gui;
     const std::string starting_text = "lol";
     auto &fontmanager               = FontManager::getInstance();
