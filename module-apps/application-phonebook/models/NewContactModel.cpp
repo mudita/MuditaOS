@@ -4,9 +4,67 @@
 #include "NewContactModel.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "ListView.hpp"
+#include <time/ScopedTime.hpp>
 
-NewContactModel::NewContactModel(app::Application *app)
+NewContactModel::NewContactModel(app::Application *app) : application(app)
 {
+    createData();
+}
+
+NewContactModel::~NewContactModel()
+{
+    for (auto item : internalData) {
+        delete item;
+    }
+    internalData.clear();
+}
+
+auto NewContactModel::getItemCount() const -> int
+{
+    return internalData.size();
+}
+
+auto NewContactModel::getMinimalItemHeight() -> unsigned int
+{
+    return phonebookStyle::inputLineWithLabelItem::h;
+}
+
+void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit)
+{
+    modelIndex     = 0;
+    internalOffset = offset;
+    internalLimit  = limit;
+    list->onProviderDataUpdate();
+}
+
+auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
+{
+    unsigned int index = 0;
+    if (order == gui::Order::Previous) {
+        index = internalLimit - modelIndex - 1;
+    }
+    if (order == gui::Order::Next) {
+        index = internalOffset + modelIndex;
+    }
+
+    if (index < internalData.size()) {
+
+        if (order == gui::Order::Previous && index < internalOffset) {
+            return nullptr;
+        }
+
+        modelIndex++;
+        internalData[index]->setVisible(true);
+        return internalData[index];
+    }
+
+    return nullptr;
+}
+
+void NewContactModel::createData()
+{
+    auto app = application;
+
     internalData.push_back(new gui::InputLineWithLabelItem(
         phonebookInternals::ListItemName::FirstName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
@@ -66,62 +124,18 @@ NewContactModel::NewContactModel(app::Application *app)
     }
 }
 
-NewContactModel::~NewContactModel()
+void NewContactModel::clearData()
 {
+    list->clear();
+
     for (auto item : internalData) {
         delete item;
     }
     internalData.clear();
-}
 
-auto NewContactModel::getItemCount() const -> int
-{
-    return internalData.size();
-}
+    createData();
 
-auto NewContactModel::getMinimalItemHeight() -> unsigned int
-{
-    return phonebookStyle::inputLineWithLabelItem::h;
-}
-
-void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit)
-{
-    modelIndex     = 0;
-    internalOffset = offset;
-    internalLimit  = limit;
-    list->onProviderDataUpdate();
-}
-
-auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
-{
-    unsigned int index = 0;
-    if (order == gui::Order::Previous) {
-        index = internalLimit - modelIndex - 1;
-    }
-    if (order == gui::Order::Next) {
-        index = internalOffset + modelIndex;
-    }
-
-    if (index < internalData.size()) {
-
-        if (order == gui::Order::Previous && index < internalOffset) {
-            return nullptr;
-        }
-
-        modelIndex++;
-        internalData[index]->setVisible(true);
-        return internalData[index];
-    }
-
-    return nullptr;
-}
-
-void NewContactModel::clearData()
-{
-    auto emptyContact = make_shared<ContactRecord>();
-    emptyContact->numbers.emplace_back();
-    emptyContact->numbers.emplace_back();
-    loadData(emptyContact);
+    requestRecords(0, internalData.size());
 }
 
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
