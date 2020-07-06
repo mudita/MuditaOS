@@ -36,7 +36,6 @@ namespace gui
                                  phonebookStyle::mainWindow::newContactsList::y,
                                  phonebookStyle::mainWindow::newContactsList::w,
                                  phonebookStyle::mainWindow::newContactsList::h);
-        list->setItemSpanSize(style::listview::item_span_big);
         list->setProvider(newContactModel);
 
         setFocusItem(list);
