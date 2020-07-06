@@ -33,6 +33,8 @@ if (${ENABLE_TESTS})
 	add_subdirectory(test)
 endif ()
 
+add_custom_target(assets)
+
 # setting build flags
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
