@@ -201,8 +201,15 @@ namespace gui
 
         virtual ~FontManager();
 
-        Font *getFont(uint32_t id);
-        uint32_t getFontID(const std::string &name);
+        [[nodiscard]] auto getFont(const std::string &name) const -> Font *;
+        [[nodiscard]] auto getFont(uint32_t num) const -> Font *;
+        [[nodiscard]] auto isInitialized() const
+        {
+            return initialized;
+        }
+
+      private:
+        [[nodiscard]] auto find(const std::string &name) const -> Font *;
     };
 
 } /* namespace gui */

@@ -115,12 +115,12 @@ namespace gui
         h = box.h > h ? box.h : h;
     }
 
-    bool BoundingBox::operator==(const BoundingBox &box)
+    bool BoundingBox::operator==(const BoundingBox &box) const
     {
         return !(x != box.x || y != box.y || w != box.w || h != box.h);
     }
 
-    bool BoundingBox::operator!=(const BoundingBox &box)
+    bool BoundingBox::operator!=(const BoundingBox &box) const
     {
         return (x != box.x || y != box.y || w != box.w || h != box.h);
     }

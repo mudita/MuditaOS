@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
+
 project(module-gui VERSION 1.0
         DESCRIPTION "GUI library dedicated for pure phone.")
 
@@ -45,5 +46,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC )
 
 if (${ENABLE_TESTS})
     add_subdirectory(test/test-catch)
+    add_subdirectory(test/test-catch-text)
     add_subdirectory(test/test-google)
 endif ()

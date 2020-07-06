@@ -7,3 +7,6 @@
 #define DEBUG_SERVICE_MESSAGES       0 /// show messages prior to handling in service
 #define DEBUG_DB_MODEL_DATA          0 /// show messages prior to handling in service
 #define DEBUG_FONT                   0 /// show Font debug messages
+#define DEBUG_GUI_TEXT               0 /// show basic debug messages for gui::Text - warning this can be hard on cpu
+#define DEBUG_GUI_TEXT_LINES         0 /// show extended debug messages for gui::Text - lines building
+#define DEBUG_GUI_TEXT_CURSOR        0 /// show extended debug messages for gui::Text - cursor handling
