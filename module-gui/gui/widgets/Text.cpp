@@ -29,7 +29,7 @@ namespace gui
     {
         setPenWidth(1);
         setPenFocusWidth(3);
-        font            = FontManager::getInstance().getFont(style::window::font::small);
+        font = FontManager::getInstance().getFont(style::window::font::small);
 
         cursor = new Rect(this, 0, 0, 1, 1);
         cursor->setFilled(true);
@@ -57,7 +57,7 @@ namespace gui
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
-        font            = FontManager::getInstance().getFont(style::window::font::small);
+        font = FontManager::getInstance().getFont(style::window::font::small);
 
         cursor = new Rect(this, 0, 0, 1, 1);
         cursor->setFilled(true);
@@ -245,7 +245,7 @@ namespace gui
     void Text::setFont(const UTF8 &fontName)
     {
 
-        Font *newFont   = FontManager::getInstance().getFont(fontName.c_str());
+        Font *newFont = FontManager::getInstance().getFont(fontName.c_str());
         if (newFont != nullptr) {
             font = newFont;
             //		calculateDisplayText();
