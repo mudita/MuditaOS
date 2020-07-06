@@ -76,6 +76,11 @@ namespace gui
     {
         auto file = vfs.fopen(filename.c_str(), "rb");
 
+        if (file == nullptr) {
+            LOG_FATAL("no KeyProfile file: %s", filename.c_str());
+            return false;
+        }
+
         enum class LineType
         {
             KEY_CODE = 0,

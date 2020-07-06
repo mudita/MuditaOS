@@ -117,8 +117,13 @@ namespace gui
         // Label's specific methods
         virtual void setText(const UTF8 &text);
         virtual void clear();
-        virtual UTF8 getText();
+        virtual const UTF8 &getText() const;
+        virtual unsigned int getTextLength() const;
         virtual void setAlignment(const Alignment &alignment);
+        auto getAlignment() -> auto const &
+        {
+            return alignment;
+        }
         virtual void setMargins(const Margins &margins);
         void setEllipsis(gui::Ellipsis ellipsis);
         /**
@@ -128,12 +133,15 @@ namespace gui
         void setTextColor(Color color);
 
         void setFont(const UTF8 &fontName);
+        void setFont(Font *font);
+        Font *getFont() const;
         // virtual methods
         std::list<DrawCommand *> buildDrawList() override;
-        void setPosition(const short &x, const short &y) override;
+        uint32_t getTextNeedSpace() const;
+        /// line: height
+        uint32_t getTextHeight() const;
 
-        void setSize(const unsigned short w, const unsigned short h) override;
-        uint32_t getTextNeedSpace();
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

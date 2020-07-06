@@ -40,8 +40,10 @@ namespace gui
         SWITCH_DN  = static_cast<int>(bsp::KeyCodes::SSwitchDown),
     };
 
-    /// if numeric - returns numeric value, else return -1
-    [[nodiscard]] inline auto toNumeric(const KeyCode &key) -> int
+    static const int InvalidNumericKeyCode = -1;
+
+    /// if numeric - returns numeric value, else return: InvalidNumericKeyCode ( -1 )
+    [[nodiscard]] inline auto toNumeric(KeyCode key) -> int
     {
         switch (key) {
         case KeyCode::KEY_0:
@@ -65,7 +67,7 @@ namespace gui
         case KeyCode::KEY_9:
             return 9;
         default:
-            return -1;
+            return InvalidNumericKeyCode;
         }
     }
 
