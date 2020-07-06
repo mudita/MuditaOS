@@ -23,7 +23,6 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactFlagIconWidget.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact_NEW.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearch.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.cpp"
@@ -44,7 +43,6 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact_NEW.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.hpp"
 )
