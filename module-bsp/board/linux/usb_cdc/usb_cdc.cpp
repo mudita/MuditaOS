@@ -1,5 +1,6 @@
 #include "bsp/usb_cdc/usb_cdc.hpp"
 #include <termios.h>
+#include <fcntl.h>
 
 namespace bsp
 {

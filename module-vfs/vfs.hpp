@@ -35,6 +35,7 @@ namespace fs = std::filesystem;
 #define PATH_PREVIOUS "previous"
 #define PATH_UPDATES  "updates"
 #define PATH_TMP      "tmp"
+#define PATH_BACKUP   "backup"
 
 // this just concatenates two strings and creates a /user/ subdirectory filename
 #define USER_PATH(file) PATH_SYS "/" PATH_USER "/" file
@@ -49,6 +50,7 @@ namespace purefs
         const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
         const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
         const inline fs::path tmp         = eMMC_disk / PATH_TMP;
+        const inline fs::path os_backup   = eMMC_disk / PATH_BACKUP;
     } // namespace dir
 
     namespace file

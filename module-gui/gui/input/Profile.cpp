@@ -18,6 +18,8 @@
 namespace gui
 {
 
+    const uint32_t KeyProfile::none_key = 0;
+
     KeyProfile::KeyProfile()
     {}
     KeyProfile::~KeyProfile()
@@ -73,6 +75,11 @@ namespace gui
     bool Profile::load(std::string filename)
     {
         auto file = vfs.fopen(filename.c_str(), "rb");
+
+        if (file == nullptr) {
+            LOG_FATAL("no KeyProfile file: %s", filename.c_str());
+            return false;
+        }
 
         enum class LineType
         {

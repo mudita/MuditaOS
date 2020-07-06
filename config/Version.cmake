@@ -6,6 +6,9 @@ execute_process(COMMAND git log --pretty=format:'%h' -n 1
                 OUTPUT_VARIABLE GIT_REV
                 ERROR_QUIET)
 
+if ( NOT SRC_DIR )
+    set(SRC_DIR ${CMAKE_SOURCE_DIR})
+endif()
 # Check whether we got any revision (which isn't
 # always the case, e.g. when someone downloaded a zip
 # file from Github instead of a checkout)

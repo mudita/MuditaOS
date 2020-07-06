@@ -1,5 +1,21 @@
 # Mudita PurePhone changelog
 
+## Current Release
+
+### Other
+ * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
+ 
+## [0.27.1] - 2020-07-03
+
+### Fixed
+* `[sms]` Do not show "no message" prompt where there is an SMS.
+
+### Other
+* `[build]` CI improvements.
+* `[doc]` GUI documentation update on window switching.
+* `[gui]` Improved widget resizing support.
+* `[gui]` Add layout margins support.
+
 ## [0.26.2] - 2020-06-26
 
 ### Added

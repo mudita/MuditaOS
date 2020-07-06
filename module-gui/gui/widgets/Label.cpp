@@ -7,6 +7,7 @@
 #include "Label.hpp"
 #include <Style.hpp>
 #include <cassert>
+#include "TextConstants.hpp"
 
 namespace gui
 {
@@ -46,7 +47,12 @@ namespace gui
         }
         charDrawableCount       = font->getCharCountInSpace(text, availableSpace);
         textArea.w              = font->getPixelWidth(text.substr(0, charDrawableCount));
-        textDisplayed           = font->getTextWithElipsis(text, availableSpace, ellipsis);
+        textDisplayed           = text;
+        /// do not try to draw text::newline in label
+        if (text.length() > 0 && text[text.length() - 1] == text::newline) {
+            textDisplayed.removeChar(textDisplayed.length() - 1);
+        }
+        textDisplayed           = font->getTextWithElipsis(textDisplayed, availableSpace, ellipsis);
         stringPixelWidth        = font->getPixelWidth(textDisplayed, 0, textDisplayed.length());
         textArea.h              = font->info.line_height;
 
@@ -143,9 +149,14 @@ namespace gui
         calculateDisplayText();
     }
 
-    UTF8 Label::getText()
+    const UTF8 &Label::getText() const
     {
         return text;
+    }
+
+    unsigned int Label::getTextLength() const
+    {
+        return text.length();
     }
 
     void Label::setAlignment(const Alignment &alignment)
@@ -237,30 +248,29 @@ namespace gui
         return commands;
     }
 
-    void Label::setPosition(const short &x, const short &y)
+    bool Label::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        gui::Rect::setPosition(x, y);
         calculateDisplayText();
-    }
-
-    void Label::setSize(const unsigned short w, const unsigned short h)
-    {
-        gui::Rect::setSize(w, h);
-        calculateDisplayText();
+        return true;
     }
 
     void Label::setFont(const UTF8 &fontName)
     {
+        Font *newFont = FontManager::getInstance().getFont(fontName);
+        setFont(newFont);
+    }
 
-        uint32_t fontID = FontManager::getInstance().getFontID(fontName.c_str());
-        Font *newFont   = FontManager::getInstance().getFont(fontID);
-        if (newFont != nullptr) {
-            font = newFont;
+    void Label::setFont(Font *font)
+    {
+        this->font = font;
+        if (font != nullptr) {
             calculateDisplayText();
         }
-        else {
-            LOG_ERROR("Font not found!");
-        }
+    }
+
+    Font *Label::getFont() const
+    {
+        return font;
     }
 
     void Label::setTextColor(Color color)
@@ -268,12 +278,20 @@ namespace gui
         textColor = color;
     }
 
-    uint32_t Label::getTextNeedSpace()
+    uint32_t Label::getTextNeedSpace() const
     {
         if (font == nullptr) {
             return 0;
         }
         return font->getPixelWidth(text);
+    }
+
+    uint32_t Label::getTextHeight() const
+    {
+        if (font == nullptr) {
+            return 0;
+        }
+        return font->info.line_height;
     }
 
 } /* namespace gui */

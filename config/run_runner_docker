@@ -1,0 +1,36 @@
+#!/bin/bash
+
+SCRIPT=$(readlink -f $0)
+SCRIPT_DIR="$(dirname ${SCRIPT})"
+SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
+
+. ${SRC_ROOT}/config/common_scripsts_lib
+. ${SRC_ROOT}/config/bootstrap_config
+. ${SRC_ROOT}/config/runner_settings
+
+VARS_TO_CHECK=(
+        REPOSITORY_URL
+        WORKER_TOKEN
+        WORKER_NAME
+        IMAGE_NAME
+    )
+
+IMAGE_NAME="pure_builder"
+
+function checkVariables() {
+    I=0
+    while [[ $I -lt ${#VARS_TO_CHECK[@]} ]]
+    do
+        printVar ${VARS_TO_CHECK[$I]}
+        if [[ -z "${!VARS_TO_CHECK[$I]}" ]]; then
+            echo "${VARS_TO_CHECK[$I]} is not set - aborting" 1>&2
+            exit 1
+        fi
+        I=$(( I + 1 ))
+    done
+}
+
+checkVariables
+CMD="docker run -e REPOSITORY_URL=${REPOSITORY_URL} -e WORKER_TOKEN=${WORKER_TOKEN} -e WORKER_NAME=${WORKER_NAME} ${IMAGE_NAME}"
+echo $CMD
+$CMD
