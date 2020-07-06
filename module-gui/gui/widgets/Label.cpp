@@ -291,7 +291,7 @@ namespace gui
         if (font == nullptr) {
             return 0;
         }
-        return font->info.line_height; // TODO + font->info.base ?
+        return font->info.line_height;
     }
 
 } /* namespace gui */

@@ -87,8 +87,8 @@ namespace gui
     /// class to disown Item temporary to ignore callback
     class ScopedParentDisown
     {
-        Item *parent;
-        Item *item;
+        Item *parent = nullptr;
+        Item *item   = nullptr;
 
       public:
         ScopedParentDisown(Item *it) : item(it)
@@ -147,15 +147,12 @@ namespace gui
             if (el->getFont() == nullptr) {
                 continue;
             }
-            // printf("          %d %d %d\n", curent_pos, el->getTextLength(), pos);
             if (curent_pos + el->getTextLength() > pos) {
                 width += el->getFont()->getPixelWidth(el->getText(), 0, pos - curent_pos);
-                // printf("          getWidhTo: %d %\n", pos, width);
                 return width;
             }
             else {
                 width += el->getWidth();
-                // printf("          width: %d \n", width);
             }
             curent_pos += el->getTextLength();
         }

@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    /// single tekst block. It might end with formatting, or with newline.
+    /// single text block. It might end with formatting, or with newline.
     /// it is responsible for:
     /// * storing part of text
     /// * storing properties of stored text
