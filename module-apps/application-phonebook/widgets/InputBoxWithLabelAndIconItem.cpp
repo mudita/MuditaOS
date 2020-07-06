@@ -18,6 +18,7 @@ namespace gui
                        phonebookStyle::inputBoxWithLabelAndIconItem::h);
         setMaximumSize(phonebookStyle::inputBoxWithLabelAndIconItem::w,
                        phonebookStyle::inputBoxWithLabelAndIconItem::h);
+        setMargins(gui::Margins(0, style::margins::big, 0, 0));
 
         hBox = new gui::HBox(this, 0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::w, 0);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -110,9 +111,11 @@ namespace gui
             };
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-              contact->speeddial = inputBoxLabel->getText();
+                contact->speeddial = inputBoxLabel->getText();
             };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputBoxLabel->setText(contact->speeddial); };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                inputBoxLabel->setText(contact->speeddial);
+            };
 
             break;
 
@@ -124,10 +127,10 @@ namespace gui
             this->focusChangedCallback = [&](gui::Item &item) {
                 if (this->focus) {
                     setFocusItem(inputBoxLabel);
-                    if(tickImage->visible){
+                    if (tickImage->visible) {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
                     }
-                    else{
+                    else {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                     }
                 }
@@ -145,10 +148,10 @@ namespace gui
 
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
                     tickImage->setVisible(!tickImage->visible);
-                    if(tickImage->visible){
+                    if (tickImage->visible) {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
                     }
-                    else{
+                    else {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                     }
                 }
@@ -157,9 +160,11 @@ namespace gui
             };
 
             onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-              contact->isOnFavourites = tickImage->visible;
+                contact->isOnFavourites = tickImage->visible;
             };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { tickImage->visible = contact->isOnFavourites; };
+            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+                tickImage->visible = contact->isOnFavourites;
+            };
 
             break;
 
@@ -171,10 +176,10 @@ namespace gui
             this->focusChangedCallback = [&](gui::Item &item) {
                 if (this->focus) {
                     setFocusItem(inputBoxLabel);
-                    if(tickImage->visible){
+                    if (tickImage->visible) {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
                     }
-                    else{
+                    else {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                     }
                 }
@@ -192,10 +197,10 @@ namespace gui
 
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
                     tickImage->setVisible(!tickImage->visible);
-                    if(tickImage->visible){
+                    if (tickImage->visible) {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
                     }
-                    else{
+                    else {
                         bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                     }
                 }
