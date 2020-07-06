@@ -1,9 +1,10 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "module-apps/application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/ContactListItem.hpp"
 #include "Application.hpp"
-#include "ListItemProvider.hpp"
+
+#include <ListItemProvider.hpp>
 
 class NewContactModel : public gui::ListItemProvider
 {

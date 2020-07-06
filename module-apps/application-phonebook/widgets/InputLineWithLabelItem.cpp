@@ -2,7 +2,7 @@
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
-#include <module-db/Interface/ContactRecord.hpp>
+#include <ContactRecord.hpp>
 #include <module-utils/i18/i18.hpp>
 
 namespace gui
