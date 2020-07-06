@@ -2,6 +2,9 @@
 
 ## Current Release
 
+### Fixed
+* `[sms]` Return to converstations view after deleting the last message in the thread 
+
 ### Added
 * `[antenna]` Added antenna service.
 * `[phonebook]` Add icon flags for showing contact special groups
@@ -10,7 +13,7 @@
 * `[gui]` Selector for newline in special character selection
 
 ### Other
- * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
+* `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
  
 ## [0.27.1] - 2020-07-03
 

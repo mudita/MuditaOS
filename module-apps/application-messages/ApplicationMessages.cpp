@@ -44,16 +44,11 @@ namespace app
             LOG_DEBUG("Received multicast");
             if (msg != nullptr) {
                 // window-specific actions
-                for (auto it = windows.begin(); it != windows.end(); it++) {
-                    it->second->onDatabaseMessage(msg);
+                for (auto &[name, window] : windows) {
+                    window->onDatabaseMessage(msg);
                 }
-                // generic actions
-                if (msg->interface == db::Interface::Name::SMSThread) {
-                    if (msg->type == db::Query::Type::Delete) {
-                        // if thread has just dissapeared, then just go to conversation view (main window)
-                        this->switchWindow(gui::name::window::main_window);
-                    }
-                }
+                // app-wide actions
+                // <none>
                 return std::make_shared<sys::ResponseMessage>();
             }
         }
@@ -140,7 +135,7 @@ namespace app
                     LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->ID);
                     return false;
                 }
-                //                this->switchWindow(gui::name::window::main_window);
+                this->switchWindow(gui::name::window::main_window);
                 return true;
             };
             meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
@@ -166,8 +161,16 @@ namespace app
                 LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
                 return false;
             }
-            this->switchWindow(gui::name::window::thread_view);
-            return true;
+            // if this was the last message in the thread, there won't be no thread. goto main window
+            std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this, record.threadID);
+            if (threadDetails == nullptr || !threadDetails->isValid()) {
+                this->switchWindow(gui::name::window::main_window);
+                return true;
+            }
+            else {
+                this->switchWindow(gui::name::window::thread_view);
+                return true;
+            }
         };
         meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
         meta.title = record.body;
