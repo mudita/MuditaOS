@@ -2,8 +2,9 @@
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
+#include <BottomBar.hpp>
 #include <module-utils/i18/i18.hpp>
-#include <module-gui/gui/widgets/BottomBar.hpp>
+
 #include <utility>
 
 namespace gui

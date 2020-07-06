@@ -2,9 +2,10 @@
 
 #include "application-phonebook/data/PhonebookInternals.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "module-apps/application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/ContactListItem.hpp"
+
 #include <ListItem.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <Text.hpp>
 
 namespace gui
 {

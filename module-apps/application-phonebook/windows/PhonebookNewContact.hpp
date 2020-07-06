@@ -1,11 +1,10 @@
 #pragma once
 
-#include "application-phonebook/models/NewContactModel.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/models/NewContactModel.hpp"
 
 #include <Text.hpp>
-
-#include <gui/widgets/ListView.hpp>
+#include <ListView.hpp>
 
 namespace gui
 {
@@ -15,7 +14,6 @@ namespace gui
         PhonebookNewContact(app::Application *app);
         ~PhonebookNewContact() override;
 
-        // virtual methods
         auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto handleSwitchData(SwitchData *data) -> bool override;

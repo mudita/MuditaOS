@@ -1,9 +1,10 @@
-#include <module-apps/application-phonebook/widgets/InputLineWithLabelItem.hpp>
-#include <module-apps/application-phonebook/widgets/InputBoxWithLabelAndIconItem.hpp>
-#include <module-apps/application-phonebook/widgets/ContactListItem.hpp>
 #include "NewContactModel.hpp"
-#include "../data/PhonebookStyle.hpp"
-#include "ListView.hpp"
+
+#include "application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/InputBoxWithLabelAndIconItem.hpp"
+#include "application-phonebook/widgets/InputLineWithLabelItem.hpp"
+
+#include <ListView.hpp>
 #include <time/ScopedTime.hpp>
 
 NewContactModel::NewContactModel(app::Application *app) : application(app)

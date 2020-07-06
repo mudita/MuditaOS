@@ -1,8 +1,9 @@
 #include "PhonebookNewContact.hpp"
+
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "PhonebookContact.hpp"
-#include "Dialog.hpp"
 
+#include <Dialog.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
 namespace gui
@@ -37,7 +38,6 @@ namespace gui
                                  phonebookStyle::mainWindow::newContactsList::w,
                                  phonebookStyle::mainWindow::newContactsList::h);
         list->setProvider(newContactModel);
-
         setFocusItem(list);
     }
 
@@ -54,6 +54,10 @@ namespace gui
 
     void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (mode != ShowMode::GUI_SHOW_RETURN) {
+            newContactModel->clearData();
+        }
+
         if (mode == ShowMode::GUI_SHOW_INIT) {
             list->setElementsCount(newContactModel->getItemCount());
         }
@@ -68,12 +72,12 @@ namespace gui
             setTitle(utils::localize.get("app_phonebook_options_edit"));
             break;
         }
+
+        newContactModel->loadData(contact);
     }
 
     auto PhonebookNewContact::handleSwitchData(SwitchData *data) -> bool
     {
-        newContactModel->clearData();
-
         if (data == nullptr) {
             return false;
         }
@@ -96,8 +100,6 @@ namespace gui
         else {
             contactAction = ContactAction::Edit;
         }
-
-        newContactModel->loadData(contact);
 
         return true;
     }
@@ -179,18 +181,18 @@ namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber)
     {
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(application->getWindow(gui::window::name::dialog_yes_no));
         assert(dialog != nullptr);
         auto meta             = dialog->meta;
-        auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(this->application, duplicatedNumber);
+        auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
         contact->ID           = oldContactRecord.ID;
         meta.action           = [=]() -> bool {
-            if (!DBServiceAPI::ContactUpdate(this->application, *contact)) {
+            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
                 return false;
             }
-            this->application->switchWindow(gui::name::window::main_window);
+            application->switchWindow(gui::name::window::main_window);
             return true;
         };
         std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
@@ -199,23 +201,23 @@ namespace gui
         meta.title = duplicatedNumber.getFormatted();
         meta.icon  = "info_big_circle_W_G";
         dialog->update(meta);
-        this->application->switchWindow(dialog->getName());
+        application->switchWindow(dialog->getName());
     }
 
     void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber()
     {
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(application->getWindow(gui::window::name::dialog_yes_no));
         assert(dialog != nullptr);
         auto meta              = dialog->meta;
-        auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(this->application, contact->speeddial);
+        auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(application, contact->speeddial);
         auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
         contact->ID            = oldContactRecord.ID;
         meta.action            = [=]() -> bool {
-            if (!DBServiceAPI::ContactUpdate(this->application, *contact)) {
+            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
                 return false;
             }
-            this->application->switchWindow(gui::name::window::main_window);
+            application->switchWindow(gui::name::window::main_window);
             return true;
         };
         std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
@@ -226,7 +228,7 @@ namespace gui
         meta.title = duplicatedSpeedDialTitle;
         meta.icon  = "info_big_circle_W_G";
         dialog->update(meta);
-        this->application->switchWindow(dialog->getName());
+        application->switchWindow(dialog->getName());
     }
 
 } // namespace gui

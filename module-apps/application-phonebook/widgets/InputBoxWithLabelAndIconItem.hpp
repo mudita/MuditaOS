@@ -2,7 +2,8 @@
 
 #include "application-phonebook/data/PhonebookInternals.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "module-apps/application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/ContactListItem.hpp"
+
 #include <BoxLayout.hpp>
 #include <Image.hpp>
 #include <Label.hpp>
