@@ -9,14 +9,14 @@
 #include "utf8/UTF8.hpp"
 
 #include "BoxLayout.hpp"
+#include "InputMode.hpp"
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "Style.hpp"
-#include "InputMode.hpp"
-#include "Translator.hpp"
 #include "TextCursor.hpp"
 #include "TextDocument.hpp"
 #include "TextLine.hpp"
+#include "Translator.hpp"
 
 namespace gui
 {
@@ -106,7 +106,7 @@ namespace gui
         {
             return editMode == edit;
         }
-        KeyCode key_signs_remove = KeyCode::KEY_RF;
+        KeyCode key_signs_remove = KeyCode::KEY_PND;
 
       public:
         ExpandMode expandMode = ExpandMode::EXPAND_NONE;
@@ -114,7 +114,7 @@ namespace gui
       private:
         TextType textType = TextType::MULTI_LINE;
         /// points to default text font to use
-        Font *font;
+        Font *font = nullptr;
         Color textColor;
         // margins for text
         Margins margins;
@@ -158,7 +158,7 @@ namespace gui
         /// saves text from widget to file at specified path
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
-        void setFont(Font *fontName);
+        void setFont(Font *font);
         virtual void setMargins(const Margins &margins);
 
         // virtual methods from Item

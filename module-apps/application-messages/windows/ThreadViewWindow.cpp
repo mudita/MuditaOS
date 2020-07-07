@@ -8,7 +8,7 @@
 #include "Span.hpp"
 
 #include <Text.hpp>
-#include <TextBuble.hpp>
+#include <TextBubble.hpp>
 #include <ListItem.hpp>
 #include <ListItemProvider.hpp>
 #include <ListView.hpp>
@@ -76,10 +76,9 @@ namespace gui
         if (text != nullptr) {
             return;
         }
-        text = new gui::Text(nullptr, 0, 0, 40, 0, "", ExpandMode::EXPAND_UP);
+        text = new gui::Text(nullptr, 0, 0, 0, 0, "", ExpandMode::EXPAND_UP);
         text->setMinimumSize(body->getWidth(), text->getHeight());
         text->setMaximumSize(body->getWidth(), body->getHeight());
-        // text->setMinimumSize(getWidth(), getHeight());
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
@@ -315,7 +314,7 @@ namespace gui
         auto max_available_h = body->area().h;
         auto max_available_w = style::window::messages::sms_max_width;
         /// dummy sms thread - TODO load from db - on switchData
-        auto smsBubble = new TextBuble(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
+        auto smsBubble = new TextBubble(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
         smsBubble->setMaximumSize(max_available_w, max_available_h);
         smsBubble->setTextType(TextType::MULTI_LINE);
         smsBubble->setRadius(style::window::messages::sms_radius);

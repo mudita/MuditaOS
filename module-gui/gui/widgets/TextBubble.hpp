@@ -5,10 +5,10 @@
 namespace gui
 {
 
-    class TextBuble : public Text
+    class TextBubble : public Text
     {
       public:
-        TextBuble(Item *parent, Position x, Position y, Length w, Length h);
+        TextBubble(Item *parent, Position x, Position y, Length w, Length h);
         void setYaps(RectangleYapFlags yaps) override;
     };
 } // namespace gui

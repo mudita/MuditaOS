@@ -42,6 +42,4 @@ Icon::Icon(Item *parent,
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-    // TODO
-    // text->setTextColor(style::text::color);
 }

@@ -11,14 +11,13 @@
 #include "TextConstants.hpp"
 #include "TextCursor.hpp"
 #include "TextDocument.hpp"
+#include "TextLine.hpp"
 #include "TextParse.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
 #include <Style.hpp>
 #include <cassert>
-#include "TextParse.hpp"
-#include "TextLine.hpp"
 
 #if DEBUG_GUI_TEXT == 1
 #define debug_text(...) LOG_DEBUG(__VA_ARGS__)
