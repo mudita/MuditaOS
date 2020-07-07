@@ -4,7 +4,7 @@
 #include "Navigation.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
-#include "Common.hpp"
+#include <tools/Common.hpp>
 #include <Style.hpp>
 #include <cassert>
 #include <i18/i18.hpp>

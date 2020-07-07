@@ -1,6 +1,7 @@
 #include "PhonebookContact.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookInternals.hpp"
+#include "application-phonebook/widgets/ContactFlagsWidget.hpp"
 #include "UiCommonActions.hpp"
 
 namespace gui
@@ -56,47 +57,10 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_call"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-        favouritesIcon  = new Image(this, 97, 107, 32, 32, "small_heart");
-        favouritesLabel = addLabel(nullptr,
-                                   65,
-                                   144,
-                                   89,
-                                   20,
-                                   utils::localize.get("app_phonebook_contact_favourites_upper"),
-                                   style::window::font::smallbold,
-                                   RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                   Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+        title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
-        speedDial = addLabel(nullptr,
-                             225,
-                             107,
-                             32,
-                             32,
-                             "",
-                             style::footer::font::bold,
-                             RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                             Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
-
-        speedDialLabel = addLabel(nullptr,
-                                  196,
-                                  144,
-                                  89,
-                                  20,
-                                  utils::localize.get("app_phonebook_contact_speed_dial_upper"),
-                                  style::window::font::smallbold,
-                                  RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
-
-        blockedIcon  = new Image(this, 351, 107, 32, 32, "small_circle");
-        blockedLabel = addLabel(nullptr,
-                                329,
-                                144,
-                                75,
-                                20,
-                                utils::localize.get("app_phonebook_contact_speed_blocked_uppper"),
-                                style::window::font::smallbold,
-                                RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+        contactFlagsWidget = new ContactFlagsWidget(this);
+        contactFlagsWidget->setVisible(true);
 
         // page1 contents
         informationLabel = addLabel(&page1,
@@ -318,53 +282,6 @@ namespace gui
 
         setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
 
-        auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
-            if (speedDialStr.length() == 0)
-                return false;
-
-            char *endPtr      = nullptr;
-            long speedDialInt = std::strtol(speedDialStr.c_str(), &endPtr, 10);
-            if (endPtr == speedDialStr.c_str()) {
-                LOG_ERROR("%s: not a decimal number", speedDialStr.c_str());
-                return false;
-            }
-            else if ('\0' != *endPtr) {
-                LOG_ERROR("%s: extra characters at end of input: %s\n", speedDialStr.c_str(), endPtr);
-                return false;
-            }
-            else if ((LONG_MIN == speedDialInt || LONG_MAX == speedDialInt) && ERANGE == errno) {
-                LOG_ERROR("%s out of range of type long\n", speedDialStr.c_str());
-                return false;
-            }
-            else if (speedDialInt > phonebookInternals::speedDialMaxValue) {
-                LOG_ERROR("%ld greater than speedDialMaxValue\n", speedDialInt);
-                return false;
-            }
-            return true;
-        };
-
-        speedDial->setText(isSpeedDialInRange(contact->speeddial) ? contact->speeddial : UTF8(""));
-
-        if (!contact->isOnFavourites) {
-            LOG_INFO("setContactData contact %s is not on fav list", contact->primaryName.c_str());
-            favouritesIcon->setVisible(false);
-            favouritesLabel->setVisible(false);
-        }
-        else {
-            LOG_INFO("setContactData contact %s is on fav list", contact->primaryName.c_str());
-            favouritesIcon->setVisible(true);
-            favouritesLabel->setVisible(true);
-        }
-
-        if (!contact->isOnBlacklist) {
-            blockedLabel->setVisible(false);
-            blockedIcon->setVisible(false);
-        }
-        else {
-            blockedLabel->setVisible(true);
-            blockedIcon->setVisible(true);
-        }
-
         if (contact->numbers.size() == 0) {
             numberPrimary->setVisible(false);
             numberPrimaryLabel->setVisible(false);
@@ -456,6 +373,36 @@ namespace gui
         if (inputEvent.keyCode == KeyCode::KEY_RF) {
             contact = nullptr;
             rebuild();
+        }
+        // used for testing will be removed with finished model
+        if (inputEvent.isShortPress()) {
+            if (inputEvent.is(KeyCode::KEY_1)) {
+                contactFlagsWidget->setFavourites(!contactFlagsWidget->getFavourites());
+                getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                return true;
+            }
+
+            if (inputEvent.is(KeyCode::KEY_2)) {
+                contactFlagsWidget->setICE(!contactFlagsWidget->getICE());
+                getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                return true;
+            }
+
+            if (inputEvent.is(KeyCode::KEY_3)) {
+                static unsigned char speeDialPosition = 0;
+                if (contactFlagsWidget->getSpeedDial()) {
+                    ++speeDialPosition %= 10;
+                }
+                contactFlagsWidget->setSpeedDial(!contactFlagsWidget->getSpeedDial(), speeDialPosition);
+                getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                return true;
+            }
+
+            if (inputEvent.is(KeyCode::KEY_4)) {
+                contactFlagsWidget->setBlocked(!contactFlagsWidget->getBlocked());
+                getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                return true;
+            }
         }
 
         return (AppWindow::onInput(inputEvent));
