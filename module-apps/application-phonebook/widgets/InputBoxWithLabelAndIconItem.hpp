@@ -33,6 +33,11 @@ namespace gui
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
 
         void applyItemNameSpecificSettings();
+
+        void speedDialKeyHandler();
+        void addToFavouritesHandler();
+        void addToICEHandler();
+
     };
 
 } /* namespace gui */
