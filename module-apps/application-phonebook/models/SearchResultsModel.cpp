@@ -23,7 +23,7 @@ void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t li
     list->onProviderDataUpdate();
 }
 
-unsigned int SearchResultsModel::getMinimalItemHeight()
+unsigned int SearchResultsModel::getMinimalItemHeight() const
 {
     return phonebookStyle::contactItem::h;
 }

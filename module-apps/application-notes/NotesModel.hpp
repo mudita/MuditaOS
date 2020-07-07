@@ -24,7 +24,6 @@ class NotesModel : public app::DatabaseModel<NotesRecord>, public gui::ListItemP
 {
   public:
     NotesModel(app::Application *app);
-    virtual ~NotesModel();
 
     // virtual methods
     void requestRecordsCount() override;
@@ -35,7 +34,7 @@ class NotesModel : public app::DatabaseModel<NotesRecord>, public gui::ListItemP
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    unsigned int getMinimalItemHeight() override;
+    unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
     int getItemCount() const override
     {

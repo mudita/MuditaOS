@@ -19,7 +19,6 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
 
   public:
     PhonebookModel(app::Application *app);
-    virtual ~PhonebookModel() = default;
 
     // virtual methods from DatabaseModel
     void requestRecordsCount() override;
@@ -30,7 +29,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    unsigned int getMinimalItemHeight() override;
+    unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
 
     int getItemCount() const override
