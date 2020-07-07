@@ -26,7 +26,9 @@
 #include "service-gui/ServiceGUI.hpp"
 
 #include "application-call/ApplicationCall.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
+#include "application-calllog//ApplicationCallLog.hpp"
 #include "application-special-input/AppSpecialInput.hpp"
 
 /// Auto phone lock disabled for now till the times when it's debugged

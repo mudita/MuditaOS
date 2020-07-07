@@ -203,7 +203,9 @@ namespace gui
         [[nodiscard]] Margins getMargins();
 
         virtual void setAlignment(const Alignment &value);
-        Alignment getAlignment(Axis axis);
+        [[nodiscard]] Alignment &getAlignment();
+        [[nodiscard]] Alignment getAlignment(Axis axis);
+        [[nodiscard]] virtual uint16_t getAxisAlignmentValue(Axis axis);
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///

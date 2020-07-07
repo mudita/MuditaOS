@@ -64,6 +64,7 @@ namespace gui
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
+        body->setAlignment(Alignment::Vertical::Top);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
@@ -127,6 +128,13 @@ namespace gui
     std::shared_ptr<ListItemProvider> ListView::getProvider()
     {
         return provider;
+    }
+
+        void ListView::setAlignment(const Alignment &value)
+    {
+        if (body->getAlignment() != value) {
+            body->setAlignment(value);
+        }
     }
 
     void ListView::clear()

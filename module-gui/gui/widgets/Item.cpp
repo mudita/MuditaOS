@@ -308,6 +308,46 @@ namespace gui
         }
     }
 
+    Alignment &Item::getAlignment()
+    {
+        return alignment;
+    }
+
+    uint16_t Item::getAxisAlignmentValue(Axis axis)
+    {
+        auto tempAlignment = getAlignment(axis);
+
+        if (parent->getAlignment(axis).vertical != Alignment::Vertical::None)
+            tempAlignment = parent->getAlignment(axis).vertical;
+
+        if (parent->getAlignment(axis).horizontal != Alignment::Horizontal::None)
+            tempAlignment = parent->getAlignment(axis).horizontal;
+
+        switch (tempAlignment.vertical) {
+        case gui::Alignment::Vertical::Top:
+            return 0;
+        case gui::Alignment::Vertical::Center:
+            return (parent->area().size(axis) - this->area().size(axis)) / 2;
+        case gui::Alignment::Vertical::Bottom:
+            return parent->area().size(axis) - this->area().size(axis);
+        default:
+            break;
+        }
+
+        switch (tempAlignment.horizontal) {
+        case gui::Alignment::Horizontal::Left:
+            return 0;
+        case gui::Alignment::Horizontal::Center:
+            return (parent->area().size(axis) - this->area().size(axis)) / 2;
+        case gui::Alignment::Horizontal::Right:
+            return parent->area().size(axis) - this->area().size(axis);
+        default:
+            break;
+        }
+
+        return getPosition(axis);
+    }
+
     void Item::setBoundingBox(const BoundingBox &new_box)
     {
         BoundingBox oldArea = widgetArea;

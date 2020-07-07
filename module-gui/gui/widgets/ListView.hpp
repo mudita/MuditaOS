@@ -57,6 +57,7 @@ namespace gui
         std::shared_ptr<ListItemProvider> getProvider();
         void setListViewType(style::listview::Type type);
         void setScrollTopMargin(int value);
+        void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();
         void clear();
 
