@@ -1,49 +1,42 @@
-/*
- * @file Text.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 sie 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include <iterator>
 
 #include "../core/Font.hpp"
+#include "Common.hpp"
 #include "Ellipsis.hpp"
+#include "InputEvent.hpp"
+#include "InputMode.hpp"
+#include "Item.hpp"
 #include "Text.hpp"
+#include "TextBlock.hpp"
+#include "TextConstants.hpp"
+#include "TextCursor.hpp"
+#include "TextDocument.hpp"
+#include "TextLine.hpp"
+#include "TextParse.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
 #include <Style.hpp>
 #include <cassert>
 
+#if DEBUG_GUI_TEXT == 1
+#define debug_text(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_text(...)
+#endif
+#if DEBUG_GUI_TEXT_LINES == 1
+#define debug_text_lines(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_text_lines(...)
+#endif
+#if DEBUG_GUI_TEXT_CURSOR == 1
+#define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_text_cursor(...)
+#endif
+
 namespace gui
 {
-
-    Text::TextLine::TextLine(
-        const UTF8 &text, uint32_t startIndex, uint32_t endIndex, Text::LineEndType endType, uint32_t pixelLength)
-        : text{text}, startIndex{startIndex}, endIndex{endIndex}, endType{endType}, pixelLength{pixelLength}
-    {}
-
-    Text::Text()
-    {
-        setPenWidth(1);
-        setPenFocusWidth(3);
-        font = FontManager::getInstance().getFont(style::window::font::small);
-
-        cursor = new Rect(this, 0, 0, 1, 1);
-        cursor->setFilled(true);
-        cursor->setVisible(false);
-
-        // insert first empty text line
-        textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-        firstLine = textLines.begin();
-        lastLine  = textLines.begin();
-        setBorderColor(gui::ColorFullBlack);
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        updateCursor();
-    }
-
     Text::Text(Item *parent,
                const uint32_t &x,
                const uint32_t &y,
@@ -52,597 +45,159 @@ namespace gui
                const UTF8 &text,
                ExpandMode expandMode,
                TextType textType)
-        : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType}
+        : Rect(parent, x, y, w, h), lines(this), expandMode{expandMode}, textType{textType}
     {
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
         font = FontManager::getInstance().getFont(style::window::font::small);
+        buildDocument(text);
 
-        cursor = new Rect(this, 0, 0, 1, 1);
-        cursor->setFilled(true);
-        cursor->setVisible(false);
-
-        if (text.length()) {
-            splitTextToLines(text);
-        }
-        else {
-            textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-            firstLine = textLines.begin();
-            lastLine  = textLines.begin();
-        }
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        // TODO this is bad - cursorColumn is badly handled on newline etc.
-        cursorColumn += text.length();
-        updateCursor();
     }
+
+    Text::Text() : Text(nullptr, 0, 0, 0, 0)
+    {}
 
     Text::~Text()
     {
-        // if there are text lines erase them.
-        if (!textLines.empty()) {
-            while (!textLines.empty()) {
-                delete textLines.front();
-                textLines.pop_front();
-            }
-        }
-        textLines.clear();
-        if (mode) {
+        if (mode != nullptr) {
             delete mode;
         }
     }
 
-    void Text::setYaps(RectangleYapFlags yaps)
+    void Text::setEditMode(EditMode new_mode)
     {
-        Rect::setYaps(yaps);
-        recalculateDrawParams();
-    }
-
-    void Text::setEditMode(EditMode mode)
-    {
-        editMode = mode;
-        if (mode == EditMode::BROWSE)
-            cursor->setVisible(false);
-        else {
-            if (focus)
-                cursor->setVisible(true);
+        if (new_mode != editMode) {
+            editMode = new_mode;
         }
     }
 
     void Text::setTextType(TextType type)
     {
-        textType = type;
     }
 
     void Text::setUnderline(bool underline)
     {
-        // do nothing, value of the flag doesn;t change
-        if (this->underline == underline)
-            return;
-
-        this->underline = underline;
-        // LOG_INFO("lines count: %d", labelLines.size());
-        for (auto it = labelLines.begin(); it != labelLines.end(); it++) {
-
-            gui::Label *label = *it;
-            if (this->underline)
-                label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-            else
-                label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        }
-    }
-
-    void Text::setNavigationBarrier(const NavigationBarrier &barrier, bool value)
-    {
-        if (value)
-            barriers |= static_cast<uint32_t>(barrier);
-        else
-            barriers &= ~(static_cast<uint32_t>(barrier));
-    }
-
-    void Text::setCursorWidth(uint32_t w)
-    {
-        cursorWidth = w;
     }
 
     void Text::setText(const UTF8 &text)
     {
-        clear();
-        cursorRow    = 0;
-        cursorColumn = 0;
-        if (text.length() > 0) {
-            // erase default empty line
-            delete textLines.front();
-            textLines.pop_front();
-            textLines.clear();
-            // split and add new lines
-            splitTextToLines(text);
-        }
-        recalculateDrawParams();
-        updateCursor();
+        debug_text("setText: %s", text.c_str());
+        setText(std::make_unique<TextDocument>(textToTextBlocks(text, font, TextBlock::End::None)));
     }
 
-    void Text::setTextColor(Color color)
+    void Text::setText(std::unique_ptr<TextDocument> &&document)
     {
-        textColor = color;
-        for (auto line : labelLines) {
-            line->setTextColor(color);
+        buildDocument(std::move(document));
+    }
+
+    void Text::addText(const UTF8 &text)
+    {
+        if (text.length() == 0) {
+            return;
         }
+        if (document->isEmpty()) {
+            addText(TextBlock(text, font, TextBlock::End::None));
+        }
+        else {
+            *cursor << text;
+            drawLines();
+        }
+    }
+
+    void Text::addText(TextBlock text)
+    {
+        debug_text("adding text...");
+        document->append(std::move(text));
+        buildCursor();
+        drawLines();
     }
 
     void Text::clear()
     {
-        // if there are text lines erase them.
-        if (!textLines.empty()) {
-            while (!textLines.empty()) {
-                delete textLines.front();
-                textLines.pop_front();
-            }
-        }
-        textLines.clear();
-        // insert first empty text line
-        textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-        firstLine = textLines.begin();
-        lastLine  = textLines.begin();
+        buildDocument("");
     }
 
     UTF8 Text::getText()
     {
-
-        UTF8 output;
-
-        // iterate over all lines and add content from each line to output string.
-        auto it = textLines.begin();
-        while (it != textLines.end()) {
-
-            auto textLine = (*it);
-            assert(textLine);
-            output += textLine->text;
-            if (textLine->endType == LineEndType::BREAK) {
-                output.insert("\n");
-            }
-
-            if (textLine->endType == LineEndType::CONTINUE_SPACE) {
-                output.insert(" ");
-            }
-
-            ++it;
-        }
-        return output;
+        return document->getText();
     }
 
     bool Text::saveText(UTF8 path)
     {
-
-        auto file = vfs.fopen(path.c_str(), "wb");
-
-        if (file == nullptr)
-            return false;
-
-        auto it = textLines.begin();
-
-        // iterate over all lines in text edit
-        while (it != textLines.end()) {
-
-            vfs.fwrite((*it)->text.c_str(), (*it)->text.used() - 1, 1, file);
-            if ((*it)->endType == LineEndType::BREAK) {
-                vfs.fwrite("\n", 1, 1, file);
-            }
-
-            if ((*it)->endType == LineEndType::CONTINUE_SPACE) {
-                vfs.fwrite(" ", 1, 1, file);
-            }
-
-            ++it;
-        }
-        // close file
-        vfs.fclose(file);
-
-        return true;
-    }
-
-    void Text::setFont(const UTF8 &fontName)
-    {
-
-        Font *newFont = FontManager::getInstance().getFont(fontName.c_str());
-        if (newFont != nullptr) {
-            font = newFont;
-            //		calculateDisplayText();
-        }
-        else {
-            LOG_ERROR("Font not found");
-        }
-        recalculateDrawParams();
-    }
-
-    void Text::splitTextToLines(const UTF8 &text)
-    {
-
-        if (text.length() == 0) {
-            if (textLines.size() == 0) {
-                firstLine = textLines.end();
-                lastLine  = textLines.end();
-            }
-            return;
-        }
-
-        // copy provided text to internal buffer
-        uint32_t index       = 0;
-        uint32_t totalLength = text.length();
-
-        uint32_t availableSpace = getAvailableHPixelSpace();
-
-        while (index < totalLength) {
-
-            UTF8 textCopy = text.substr(index, totalLength - index);
-            uint32_t charCount     = font->getCharCountInSpace(textCopy, availableSpace);
-            UTF8 tmpText           = textCopy.substr(0, charCount);
-            uint32_t spaceConsumed = font->getPixelWidth(tmpText);
-
-            // some default values
-            uint32_t startIndex     = 0;
-            uint32_t endIndex       = totalLength;
-            LineEndType lineEndType = LineEndType::EOT;
-
-            // check if this is not the end of the text
-            if (index + charCount == totalLength) {
-                // try to find first enter.
-                auto enterIndex = tmpText.find("\n", 0);
-                if (enterIndex != UTF8::npos) {
-                    endIndex = index + enterIndex;
-                    index += enterIndex + 1;
-                    lineEndType = LineEndType::BREAK;
-                    textLines.push_back(new TextLine(tmpText.substr(0, enterIndex),
-                                                     startIndex,
-                                                     endIndex,
-                                                     lineEndType,
-                                                     font->getPixelWidth(tmpText.substr(0, enterIndex))));
-                    //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
-                } // no enter found last line can be copied as a whole.
-                else {
-                    startIndex = index;
-                    endIndex   = totalLength;
-                    textLines.push_back(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
-                    //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
-                    index += charCount;
-                }
-            }
-            // if it wasn't the last line search for enter or space and break the line on it.
-            else {
-
-                startIndex = index;
-
-                // try to find first enter.
-                auto enterIndex = tmpText.find("\n", 0);
-                if (enterIndex != UTF8::npos) {
-                    endIndex = index + enterIndex;
-                    index += enterIndex + 1;
-                    lineEndType = LineEndType::BREAK;
-                    textLines.push_back(
-                        new TextLine(tmpText.substr(0, enterIndex), startIndex, endIndex, lineEndType, spaceConsumed));
-                    //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
-                }
-                else {
-                    // if there was no enter look for last space in the tmpText and break line on it
-                    auto spaceIndex = tmpText.findLast(" ", tmpText.length() - 1);
-
-                    // if there was no space take as many characters as possible and add CONTINUE ending
-                    if (spaceIndex == UTF8::npos) {
-                        endIndex = index + charCount;
-                        index += charCount;
-                        lineEndType = LineEndType::CONTINUE;
-                        textLines.push_back(new TextLine(tmpText, startIndex, endIndex, lineEndType, spaceConsumed));
-                        //					LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
-                    }
-                    else {
-                        lineEndType = LineEndType::CONTINUE_SPACE;
-
-                        uint32_t spaceWidth = font->getPixelWidth(" ", 0, 1);
-                        // if space is last character in string erase it and add appropriate CONTINUE_SPACE ending
-                        if (spaceIndex == tmpText.length() - 1) {
-                            endIndex = index + charCount - 1;
-                            index += charCount;
-                            textLines.push_back(new TextLine(tmpText.substr(0, tmpText.length() - 1),
-                                                             startIndex,
-                                                             endIndex,
-                                                             lineEndType,
-                                                             spaceConsumed - spaceWidth));
-                            //						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
-                        }
-                        else {
-                            endIndex = index + spaceIndex;
-                            index += spaceIndex + 1;
-                            textLines.push_back(new TextLine(tmpText.substr(0, spaceIndex),
-                                                             startIndex,
-                                                             endIndex,
-                                                             lineEndType,
-                                                             font->getPixelWidth(tmpText.substr(0, spaceIndex))));
-                            //						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
-                        }
-                    }
-                }
-            }
-
-            if (textType == TextType::SINGLE_LINE) {
-                // LOG_INFO("NUMBER OF LINES: %d", textLines.size());
-                auto textLine     = textLines.front();
-                textLine->endType = LineEndType::EOT;
-                break;
-            }
-        }
-
-        firstLine = textLines.begin();
-        lastLine  = textLines.begin();
-    }
-
-    bool Text::splitText(UTF8 &source, UTF8 &remaining, LineEndType &endType, uint32_t availableSpace)
-    {
-
-        uint32_t charCount = font->getCharCountInSpace(source, availableSpace);
-        UTF8 searchStr = source.substr(0, charCount);
-
-        // try to find first enter.
-        uint32_t enterIndex = searchStr.find("\n", 0);
-        if (enterIndex != UTF8::npos) {
-            endType   = LineEndType::BREAK;
-            remaining = source.substr(enterIndex, source.length() - 1 - enterIndex);
-            source.split(enterIndex);
-            //		LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+        if (auto file = vfs.fopen(path.c_str(), "wb")) {
+            auto text = getText();
+            vfs.fwrite(text.c_str(), text.length(), text.length(), file);
+            vfs.fclose(file);
             return true;
-        }
-        else {
-            // if there was no enter look for last space in the source and break line on it
-            uint32_t spaceIndex = searchStr.findLast(" ", searchStr.length() - 1);
-
-            // if there was no space take as many characters as possible and add CONTINUE ending
-            if (spaceIndex == UTF8::npos) {
-                remaining = source.split(charCount);
-                endType   = LineEndType::CONTINUE;
-                //			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
-                return true;
-            }
-            else {
-                endType = LineEndType::CONTINUE_SPACE;
-
-                remaining = source.substr(spaceIndex + 1, source.length() - 1 - spaceIndex);
-                source.split(spaceIndex);
-                //			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
-                return true;
-            }
         }
         return false;
     }
 
-    void Text::reworkLines(std::list<TextLine *>::iterator it)
+    void Text::setFont(const UTF8 &fontName)
     {
+        Font *newFont = FontManager::getInstance().getFont(fontName);
+        font          = newFont;
+    }
 
-        // iterate until end of text lines or till line that fits available space has break line ending (enter).
-        while (it != textLines.end()) {
+    void Text::setFont(Font *fontName)
+    {
+        font = fontName;
+    }
 
-            // if current line has BREAK of EOT line ending check if current text fits available space
-            // finish procedure
-            uint32_t availableSpace = getAvailableHPixelSpace();
-            uint32_t consumedSpace;
-
-            if (((*it)->endType == LineEndType::BREAK) || ((*it)->endType == LineEndType::EOT)) {
-                consumedSpace = font->getPixelWidth((*it)->getText());
-                if (consumedSpace < availableSpace)
-                    break;
-            }
-
-            // check if there is next line
-            auto itNext = it;
-            itNext++;
-
-            UTF8 mergedLinesText = (*it)->getTextWithEnding();
-
-            // if processed text line is not finished with break end type
-            if (((*it)->endType != LineEndType::BREAK) && (itNext != textLines.end())) {
-
-                // merge text from two lines
-                mergedLinesText += (*itNext)->getTextWithEnding();
-                // assign end type from next line to the current line
-                (*it)->endType = (*itNext)->endType;
-
-                // remove next line as the text was taken to the current line
-                delete (*itNext);
-                textLines.erase(itNext);
-            }
-
-            LineEndType endType;
-            UTF8 remainingText;
-            bool splitFlag = splitText(mergedLinesText, remainingText, endType, availableSpace);
-
-            // if there was a split update current and next item in the list
-            if (splitFlag) {
-
-                (*it)->text        = std::move(mergedLinesText);
-                (*it)->pixelLength = font->getPixelWidth((*it)->getText());
-
-                itNext = it;
-                itNext++;
-                textLines.insert(
-                    itNext,
-                    new TextLine(
-                        remainingText, 0, remainingText.length(), (*it)->endType, font->getPixelWidth(remainingText)));
-
-                (*it)->endType = endType;
-            }
-
-            // proceed to next line
-            it++;
+    bool Text::onInput(const InputEvent &evt)
+    {
+        if (Rect::onInput(evt)) {
+            debug_text("Rect::onInput");
+            return true;
         }
-
-        // TODO starting from first modified line up to last modified line update start and end index
-    }
-
-    std::list<DrawCommand *> Text::buildDrawList()
-    {
-        return Rect::buildDrawList();
-    }
-    void Text::setPosition(const short &x, const short &y)
-    {
-        Rect::setPosition(x, y);
-        recalculateDrawParams();
-        updateCursor();
-    }
-
-    void Text::setSize(const unsigned short w, const unsigned short h)
-    {
-        Rect::setSize(w, h);
-        recalculateDrawParams();
-        updateCursor();
-    }
-
-    bool Text::onInput(const InputEvent &inputEvent)
-    {
-        bool res = false;
-
-        if (inputCallback && inputCallback(*this, inputEvent)) {
+        if (handleRotateInputMode(evt)) {
+            debug_text("handleRotateInputMode");
+            return true;
+        }
+        if (handleRestoreInputModeUI(evt)) {
+            debug_text("handleRestoreInputModeUI");
+            return true;
+        }
+        if (handleSelectSpecialChar(evt)) {
+            debug_text("handleSelectSpecialChar");
+            return true;
+        }
+        if (handleActivation(evt)) {
+            debug_text("handleActivation");
+            return true;
+        }
+        if (handleNavigation(evt)) {
+            debug_text("handleNavigation");
+            return true;
+        }
+        if (handleBackspace(evt)) {
+            debug_text("handleBackspace");
+            return true;
+        }
+        if (handleAddChar(evt)) {
+            debug_text("handleAddChar");
+            return true;
+        }
+        if (handleDigitLongPress(evt)) {
+            debug_text("handleDigitLongPress");
             return true;
         }
 
-        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
-            if (mode) {
-                mode->next();
-                return true;
-            }
-        }
+        debug_text("not handled: %s", evt.str().c_str());
 
-        if (mode && (inputEvent.state == InputEvent::State::keyReleasedShort ||
-                     inputEvent.state == InputEvent::State::keyReleasedLong)) {
-            mode->show_restore();
-        }
-
-        if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
-            if (mode) {
-                mode->select_special_char();
-                return true;
-            }
-        }
-
-        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_ENTER) {
-            if (activatedCallback && activatedCallback(*this)) {
-                return true;
-            }
-        }
-
-        // handle navigation
-        if (inputEvent.state == InputEvent::State::keyReleasedShort &&
-            ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) ||
-             (inputEvent.keyCode == KeyCode::KEY_UP) || (inputEvent.keyCode == KeyCode::KEY_DOWN))) {
-            switch (editMode) {
-            case EditMode::BROWSE:
-                res = handleBrowsing(inputEvent);
-                break;
-            case EditMode::EDIT:
-                res = handleNavigation(inputEvent);
-                break;
-            case EditMode::SCROLL:
-                LOG_DEBUG("TODO");
-                res = false;
-                break;
-            }
-
-            if (res && editMode != EditMode::SCROLL)
-                updateCursor();
-            return res;
-        }
-
-        // translate and store keypress
-        uint32_t code = translator.handle(inputEvent.key, mode ? mode->get() : "");
-
-        /// handling of key removal
-        if (inputEvent.keyCode == gui::KeyCode::KEY_PND) {
-            // longpress -> remove all characters
-            if (inputEvent.state == InputEvent::State::keyReleasedLong) {
-                // TODO handle longpress remove key
-            }
-            // shortpress remove characters n time for multipress, one time for normal press
-            else if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-                auto char_rm = [=](bool &res) {
-                    res = handleBackspace();
-                    if (res) {
-                        updateCursor();
-                        contentCallback(*this);
-                    }
-                };
-                if (translator.getTimes()) {
-                    for (unsigned int i = 0; i < translator.getTimes(); ++i) {
-                        char_rm(res);
-                    }
-                }
-                else {
-                    char_rm(res);
-                }
-                return res;
-            }
-        }
-
-        // process only short release events
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-
-        // it there is no key char it means that translator didn't handled the key and this key
-        if (code == 0) {
-            LOG_DEBUG("Key not handled! %d", static_cast<int>(inputEvent.keyCode));
-            return false;
-        }
-
-        // get how many short presses were handled in this widget
-        if (translator.getTimes()) {
-            handleBackspace();
-            res = handleChar(code);
-            if (res) {
-                updateCursor();
-                contentCallback(*this);
-            }
-            return res;
-        }
-
-        // if char is a new line char then create new line and move caret and return
-        if (code == 0x0A) {
-            if (textType == TextType::MULTI_LINE) {
-                res = handleEnter();
-                contentCallback(*this);
-            }
-        }
-        else { // normal char -> add and check pixel width
-            res = handleChar(code);
-            contentCallback(*this);
-        }
-        if (res)
-            updateCursor();
-        return res;
-    }
-
-    bool Text::onActivated(void *data)
-    {
-        Rect::onActivated(data);
         return false;
     }
 
     bool Text::onFocus(bool state)
     {
-        // inform on start what type of input there is
-        if (mode) {
-            mode->on_focus(state);
+        if (state != focus && state == true) {
+            drawLines();
         }
-        bool ret = Rect::onFocus(state);
-        if (focus && editMode == EditMode::EDIT) {
-            cursor->setVisible(true);
-            for (auto it = labelLines.begin(); it != labelLines.end(); it++)
-                (*it)->setPenWidth(3);
-        }
-        else {
-            cursor->setVisible(false);
-            for (auto it = labelLines.begin(); it != labelLines.end(); it++)
-                (*it)->setPenWidth(1);
-        }
-
-        return ret;
+        showCursor(state);
+        return true;
     }
 
     void Text::setRadius(int value)
@@ -653,476 +208,305 @@ namespace gui
             margins.left = value;
         if (margins.right < value)
             margins.right = value;
-        updateCursor();
     }
 
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
-        updateCursor();
-        return false;
-    }
-
-    bool Text::moveCursor(const NavigationDirection &direction)
-    {
-
-        auto it = getCursorTextLine();
-
-        if (direction == NavigationDirection::LEFT) {
-            // if we are standing on the beginning for the line move to previous line
-            if (cursorColumn == 0) {
-
-                // if there is no previous line return false so window can switch focus to the item on the left.
-                if (it == textLines.begin()) {
-                    return false;
-                }
-
-                // there is a previous line, check if cursor's row is greater than 0;
-                cursorColumn = (*std::prev(it, 1))->text.length();
-                if (cursorRow > 0) {
-                    --cursorRow;
-                }
-                else {
-                    --firstLine;
-                    recalculateDrawParams();
-                }
-                return true;
-            }
-            // cursor's column is greater than 0
-            else {
-                --cursorColumn;
-                return true;
-            }
-        }
-        else if (direction == NavigationDirection::RIGHT) {
-            // if cursor is not at the end of current line simply move curosr
-            if (cursorColumn < (*it)->text.length()) {
-                ++cursorColumn;
-                return true;
-            }
-            else {
-                auto itNext = std::next(it, 1);
-                // if this is not the last line increment row and set column to 0
-                if (itNext != textLines.end()) {
-                    ++cursorRow;
-                    cursorColumn = 0;
-
-                    // if increased row is out of visible are increment first line
-                    if (cursorRow >= visibleRows) {
-                        firstLine++;
-                        recalculateDrawParams();
-                        cursorRow = visibleRows - 1;
-                    }
-                    return true;
-                }
-            }
-        }
-        else if (direction == NavigationDirection::DOWN) {
-
-            // if this is a single line text widget there is no navigation down allowed
-            if (textType == TextType::SINGLE_LINE)
-                return false;
-
-            auto itNext = std::next(it, 1);
-
-            // this is the last line, check for barrier
-            if (itNext == textLines.end()) {
-                if (barriers & static_cast<uint32_t>(NavigationBarrier::BARRIER_DOWN))
-                    return true;
-                return false;
-            }
-
-            // increment line
-            ++cursorRow;
-
-            // check if column position is still valid
-            if (cursorColumn > (*itNext)->text.length())
-                cursorColumn = (*itNext)->text.length();
-
-            if (cursorRow >= visibleRows) {
-                firstLine++;
-                recalculateDrawParams();
-                cursorRow = visibleRows - 1;
-            }
-            return true;
-        }
-        else if (direction == NavigationDirection::UP) {
-
-            // if this is a single line text widget there is no navigation up allowed
-            if (textType == TextType::SINGLE_LINE)
-                return false;
-
-            // if cursor is standing on the first line return false to allow focus change to previous widget
-            if (it == textLines.begin()) {
-                return false;
-            }
-
-            auto itPrev = std::prev(it, 1);
-            if (cursorRow == 0) {
-                --firstLine;
-
-                recalculateDrawParams();
-                return true;
-            }
-            else {
-                --cursorRow;
-            }
-
-            // check if previous line is shorter than last one if so move cursor to the end of previous line
-            if (cursorColumn > (*itPrev)->text.length()) {
-                cursorColumn = (*itPrev)->text.length();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    bool Text::handleBrowsing(const InputEvent &inputEvent)
-    {
-        // if this is a single line text widget there is no browsing allowed
-        if (textType == TextType::SINGLE_LINE)
-            return false;
-
-        switch (inputEvent.keyCode) {
-        case (KeyCode::KEY_UP): {
-            // move cursor to first visible element
-            cursorRow = 0;
-            return moveCursor(NavigationDirection::UP);
-        } break;
-        case KeyCode::KEY_DOWN: {
-            // move cursor to the last visible element
-            auto it   = firstLine;
-            cursorRow = 0;
-            while ((it != textLines.end()) && (cursorRow < visibleRows - 1)) {
-                it++;
-                cursorRow++;
-            }
-
-            return moveCursor(NavigationDirection::DOWN);
-        } break;
-        default: {
-            LOG_ERROR("Received unknown navigation key");
-        }
-        };
-        return false;
+        return true;
     }
 
     bool Text::handleNavigation(const InputEvent &inputEvent)
     {
-
-        switch (inputEvent.keyCode) {
-        case (KeyCode::KEY_UP): {
-            return moveCursor(NavigationDirection::UP);
-        } break;
-        case KeyCode::KEY_DOWN: {
-            return moveCursor(NavigationDirection::DOWN);
-        } break;
-        case KeyCode::KEY_LEFT: {
-            return moveCursor(NavigationDirection::LEFT);
-        } break;
-        case KeyCode::KEY_RIGHT: {
-            return moveCursor(NavigationDirection::RIGHT);
-        } break;
-        default: {
-            LOG_ERROR("Received unknown navigation key");
+        if (!inputEvent.isShortPress()) {
+            return false;
         }
-        };
+        if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT))) {
+            debug_text("Text in scroll mode ignores left/right navigation");
+        }
+        auto ret = cursor->move(inputToNavigation(inputEvent));
+        debug_text("move: %s", c_str(ret));
+        if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
+            debug_text("scrolling needs implementing");
+            return false;
+        }
+        if (ret != TextCursor::Move::Error) {
+            return true;
+        }
         return false;
     }
 
     bool Text::handleEnter()
     {
+        return false;
+    }
 
-        if (editMode == EditMode::BROWSE)
+    bool Text::addChar(uint32_t utf_value)
+    {
+        assert(cursor);
+        cursor->addChar(utf_value);
+        auto block = document->getBlock(cursor);
+        if (block == nullptr) {
+            LOG_ERROR("No block after add char!");
             return false;
-
-        // get textline where cursor is located
-        auto it = firstLine;
-        std::advance(it, cursorRow);
-
-        // split current text in line using cursors position
-        UTF8 remainingText = (*it)->text.split(cursorColumn);
-
-        // store old type of line ending set new type of ending to the current line
-        LineEndType endType = (*it)->endType;
-        (*it)->endType      = LineEndType::BREAK;
-
-        // create and add new line using remaining parts of text
-        auto itNext = it;
-        ++itNext;
-        textLines.insert(
-            itNext,
-            new TextLine(remainingText, 0, remainingText.length(), endType, font->getPixelWidth(remainingText)));
-        cursorRow++;
-
-        if (cursorRow >= visibleRows) {
-            cursorRow = visibleRows - 1;
-            firstLine++;
         }
-
-        cursorColumn = 0;
-
-        reworkLines(it);
-
-        recalculateDrawParams();
-
+        debug_text("len: %d font: %s",
+                   block->length(),
+                   block->getFont() == nullptr ? "no font" : block->getFont()->getName().c_str());
         return true;
     }
 
-    bool Text::handleBackspace()
+    void Text::drawCursor()
     {
+        cursor->updateView();
+    }
 
-        if (editMode == EditMode::BROWSE)
-            return false;
+    void Text::drawLines()
+    {
+        lines.erase();
 
-        // if cursor is in column 0 and there is no previous line return
-        if ((cursorRow == 0) && (cursorColumn == 0) && (firstLine == textLines.begin()))
-            return true;
-
-        // if cursor is in position other than 0 remove previous character and run lines rework
-        auto it = getCursorTextLine();
-        if (cursorColumn > 0) {
-            TextLine *currentTextLine = (*it);
-            currentTextLine->text.removeChar(cursorColumn - 1);
-            cursorColumn--;
-        }
-        // this is when cursor is located at the beginning of the line and there are previous lines
-        else {
-
-            if (it == textLines.begin()) {
-                return true;
-            }
-
-            auto itPrev = std::prev(it, 1);
-
-            // if ending is equal to LineEndType::CONTINUE delete last char from current string
-            if ((*itPrev)->endType == LineEndType::CONTINUE) {
-                (*itPrev)->text.removeChar((*itPrev)->text.length() - 1);
-            }
-            if ((*itPrev)->endType == LineEndType::CONTINUE_SPACE) {
-                (*itPrev)->endType = LineEndType::CONTINUE;
-            }
-            else if ((*itPrev)->endType == LineEndType::BREAK) {
-                (*itPrev)->endType = LineEndType::CONTINUE;
-            }
-
-            cursorColumn = (*itPrev)->text.length();
-
-            if (cursorRow == 0) {
-                firstLine = itPrev;
+        auto sizeMinusMargin = [&](Axis axis) {
+            auto size   = area(Area::Max).size(axis);
+            auto margin = margins.getSumInAxis(axis) + padding.getSumInAxis(axis);
+            if (size <= margin) {
+                size = 0;
             }
             else {
-                --cursorRow;
+                size -= margin;
             }
+            return size;
+        };
 
-            (*itPrev)->text += (*it)->text;
-            (*itPrev)->endType = (*it)->endType;
+        uint32_t w           = sizeMinusMargin(Axis::X);
+        uint32_t h           = sizeMinusMargin(Axis::Y);
+        auto line_y_position = margins.top;
+        auto cursor          = 0;
 
-            // delete current line
-            textLines.erase(it);
-            it = itPrev;
-        }
+        debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
-        reworkLines(it);
-        recalculateDrawParams();
+        auto line_x_position = margins.left;
+        do {
+            auto text_line = gui::TextLine(document.get(), cursor, w);
+            cursor += text_line.length();
 
-        return true;
-    }
-
-    bool Text::handleChar(uint32_t chars)
-    {
-
-        if (editMode == EditMode::BROWSE)
-            return false;
-
-        // get text line where cursor is standing
-        auto it                   = getCursorTextLine();
-        TextLine *currentTextLine = (*it);
-
-        // TODO
-        // calculate width of the character that is going to be inserted
-        uint32_t charWidth = font->getCharPixelWidth(chars);
-        if (charWidth == 0) {
-            return false;
-        }
-
-        // insert character into string in currently selected line
-        if (currentTextLine->text.insertCode(chars, cursorColumn) == false)
-            return false;
-
-        // if sum of the old string and width of the new character are greater than available space run lines rework
-        // procedure
-        uint32_t availableSpace = getAvailableHPixelSpace();
-        uint32_t currentWidth   = currentTextLine->pixelLength;
-        if (currentWidth + charWidth > availableSpace) {
-
-            // this is the case when new character inserted into single line text
-            // is creating the line that doesn't fit available space.
-            if (textType == TextType::SINGLE_LINE) {
-
-                currentTextLine->text.removeChar(cursorColumn, 1);
-                return true;
-            }
-
-            ++cursorColumn;
-            reworkLines(it);
-
-            // if cursor position is greater than number of characters in current line move cursor to next line.
-            if (cursorColumn > (*it)->text.length()) {
-                cursorColumn = 0;
-                ++cursorRow;
-            }
-
-            if (cursorRow >= visibleRows) {
-                firstRow++;
-            }
-        }
-        // no line splitting, update pixel width and proceed
-        else {
-            currentTextLine->pixelLength = font->getPixelWidth(currentTextLine->text);
-            ++cursorColumn;
-        }
-
-        recalculateDrawParams();
-        // calculate new position of the cursor
-
-        return true;
-    }
-
-    std::list<Text::TextLine *>::iterator Text::getCursorTextLine()
-    {
-        auto it = firstLine;
-        // TODO add check for distance to advance
-        std::advance(it, cursorRow);
-        return it;
-    }
-
-    void Text::updateCursor()
-    {
-        cursor->setSize(2, font->info.line_height);
-        auto it = std::next(firstLine, cursorRow);
-
-        uint32_t posX = (margins.left + padding.left) + font->getPixelWidth((*it)->text, 0, cursorColumn);
-        uint32_t posY = (margins.top + padding.top) + cursorRow * font->info.line_height;
-        cursor->setPosition(posX, posY);
-    }
-
-    int32_t Text::expand(uint32_t rowCount, int32_t h)
-    {
-        if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE) {
-            h = font->info.line_height * textLines.size() +
-                (margins.getSumInAxis(Axis::Y) + padding.getSumInAxis(Axis::Y));
-            if (parent && widgetArea.h > parent->widgetArea.h) {
-                h = widgetArea.h;
-            }
-            setSize(getWidth(), h);
-            LOG_DEBUG("Resized Text to: %" PRIu32 " %" PRIu32, getWidth(), getHeight());
-        }
-        return h;
-    }
-
-    void Text::recalculateDrawParams()
-    {
-
-        // calculate number of lines for displaying text
-        int32_t h = widgetArea.h - (margins.getSumInAxis(Axis::Y) + padding.getSumInAxis(Axis::Y));
-        if (h < 0)
-            h = 0;
-
-        // remove all old labels
-        for (uint32_t i = 0; i < labelLines.size(); ++i) {
-            removeWidget(labelLines[i]);
-            delete labelLines[i];
-        }
-
-        labelLines.clear();
-
-        // calculate how many rows can fit in available height.
-        uint32_t rowCount = h / font->info.line_height;
-        h                 = expand(rowCount, h);
-
-        if (textType == TextType::SINGLE_LINE) {
-            rowCount = 1;
-        }
-
-        // if there is not enough space for single line start from 0 and ignore vertical margins
-        uint16_t startY = (h < font->info.line_height) ? 0 : (margins.top + padding.top);
-
-        // create labels to display text. There will be always at least one.
-        for (uint32_t i = 0; i < rowCount; i++) {
-            gui::Label *label =
-                new gui::Label(this,
-                               (margins.left + padding.left),
-                               startY,
-                               widgetArea.w - (margins.getSumInAxis(Axis::X) + padding.getSumInAxis(Axis::X)),
-                               font->info.line_height);
-            label->setFilled(false);
-            label->setPenWidth(1);
-            label->setPenFocusWidth(3);
-            label->setAlignment(alignment);
-            label->setFont(font->getName());
-            label->setTextColor(textColor);
-            label->setEllipsis(gui::Ellipsis::None);
-
-            if (underline)
-                label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-            else
-                label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-            if (focus)
-                label->setPenWidth(3);
-            labelLines.push_back(label);
-            startY += font->info.line_height;
-        }
-        visibleRows = rowCount;
-
-        // assign text to all lines
-        auto textIterator = firstLine;
-        /// if there is less lines than possible to show, copy only needed lines
-        auto num_lines_visible = labelLines.size() > textLines.size() ? textLines.size() : labelLines.size();
-        for (uint32_t i = 0; i < num_lines_visible; i++) {
-            if (textIterator == textLines.end())
+            if (text_line.length() == 0) {
+                debug_text("cant show more text from this document");
                 break;
-            labelLines[i]->setText((*textIterator)->text);
-            lastLine = textIterator;
-            textIterator++;
+            }
+            if (line_y_position + text_line.height() > h) { // no more space for next line
+                debug_text("no more space for next text_line: %d + %" PRIu32 " > %" PRIu32,
+                           line_y_position,
+                           text_line.height(),
+                           h);
+                line_y_position += text_line.height();
+                break;
+            }
+
+            // for each different text which fits in line, addWidget last - to not trigger callbacks to parent
+            // on resizes while not needed, after detach there can be no `break` othervise there will be leak - hence
+            // detach
+            lines.emplace(std::move(text_line));
+            auto &line = lines.last();
+            line.setPosition(line_x_position, line_y_position);
+            line.setParent(this);
+            line.align(alignment, w);
+
+            line_y_position += line.height();
+
+            debug_text_lines("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
+                             "%d \n x: %d, y: %d \n%s",
+                             cursor - lines.last().length(),
+                             lines.last().length(),
+                             cursor,
+                             document->getText().length(),
+                             line_x_position,
+                             line_y_position,
+                             [&]() -> std::string {
+                                 std::string text = document->getText();
+                                 return std::string(text.begin() + cursor - lines.last().length(),
+                                                    text.begin() + cursor);
+                             }()
+                                          .c_str());
+        } while (true);
+
+        // silly case resize - there request space and all is nice
+        // need to at least erase last line if it wont fit
+        // should be done on each loop
+        {
+            uint16_t h_used = line_y_position + margins.bottom;
+            uint16_t w_used = lines.maxWidth();
+            if (lines.size() == 0) {
+                debug_text("No lines to show, try to at least fit in cursor");
+                if (font != nullptr) {
+                    h_used += font->info.line_height;
+                    w_used += TextCursor::default_width;
+                    debug_text("epty line height: %d", h_used);
+                }
+            }
+            if (h_used != area(Area::Normal).size(Axis::Y) || w_used != area(Area::Normal).size(Axis::X)) {
+                debug_text("size request: %d %d", w_used, h_used);
+                auto [w, h] = requestSize(w_used, h_used);
+                LOG_INFO("size granted: {%" PRIu32 ", %" PRIu32 "}", w, h);
+                // if last wont fit lines.eraseLast();
+                // break;
+            }
         }
+
+        debug_text("<- END\n");
     }
 
     void Text::setMargins(const Margins &margins)
     {
         this->margins = margins;
-        recalculateDrawParams();
-        updateCursor();
-    }
-
-    Item *Text::getNavigationItem(NavigationDirection direction)
-    {
-        // if provided direction is forbidden than return nullptr
-        if (barriers & static_cast<uint32_t>(direction))
-            return nullptr;
-
-        // otherwise run default navigation method (Item)
-        return Rect::getNavigationItem(direction);
-    }
-
-    bool Text::onContent()
-    {
-        if ((expandMode == Text::ExpandMode::EXPAND_DOWN) || (expandMode == Text::ExpandMode::EXPAND_UP)) {
-            if ((parent->type == ItemType::VBOX) || (parent->type == ItemType::HBOX)) {
-                parent->onContent();
-            }
-        }
-
-        return true;
     }
 
     void Text::setAlignment(const Alignment _alignment)
     {
         alignment = _alignment;
-        recalculateDrawParams();
-        updateCursor();
+    }
+
+    std::list<DrawCommand *> Text::buildDrawList()
+    {
+        // we can't build elements to show just before showing.
+        // why? because we need to know if these elements fit in
+        // if not -> these need to call resize, resize needs to be called prior to buildDrawList
+        drawCursor();
+        debug_text_lines("parent area: %s, elements area: %s",
+                         area().str().c_str(),
+                         [&]() -> std::string {
+                             std::string str;
+                             for (auto el : children) {
+                                 if (auto label = dynamic_cast<gui::Label *>(el)) {
+                                     str += "area: " + label->area().str() + std::string(label->getText()) + " ";
+                                 }
+                             }
+                             return str.c_str();
+                         }()
+                                      .c_str());
+        debug_text_cursor("cursor visibility: %d position: %s", cursor->visible, cursor->area().str().c_str());
+        return Rect::buildDrawList();
+    }
+
+    void Text::buildDocument(const UTF8 &text)
+    {
+        buildDocument(std::make_unique<TextDocument>(textToTextBlocks(text, font, TextBlock::End::None)));
+    }
+
+    void Text::buildDocument(std::unique_ptr<TextDocument> &&document_moved)
+    {
+        document = std::move(document_moved);
+        debug_text("document text: %s", document->getText().c_str());
+        buildCursor();
+        drawLines();
+    }
+
+    void Text::buildCursor()
+    {
+        erase(cursor);
+        cursor = new TextCursor(this, document.get());
+    }
+
+    void Text::showCursor(bool focus)
+    {
+        if (focus) {
+            cursor->setVisible(isMode(EditMode::EDIT));
+        }
+    }
+
+    bool Text::handleRotateInputMode(const InputEvent &inputEvent)
+    {
+        if (mode != nullptr && inputEvent.isShortPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+            mode->next();
+            return true;
+        }
+        return false;
+    }
+
+    bool Text::handleRestoreInputModeUI(const InputEvent &inputEvent)
+    {
+        if (mode != nullptr && inputEvent.isKeyRelease()) {
+            mode->show_restore();
+        }
+        return false;
+    }
+
+    bool Text::handleSelectSpecialChar(const InputEvent &inputEvent)
+    {
+
+        if (mode != nullptr && inputEvent.isLongPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+            mode->select_special_char();
+            return true;
+        }
+        return false;
+    }
+
+    bool Text::handleActivation(const InputEvent &inputEvent)
+    {
+        return inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
+    }
+
+    bool Text::handleBackspace(const InputEvent &inputEvent)
+    {
+        if (document->isEmpty() || !isMode(EditMode::EDIT)) {
+            return false;
+        }
+        if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+            if (removeChar()) {
+                drawLines();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    bool Text::handleAddChar(const InputEvent &inputEvent)
+    {
+        if (inputEvent.isShortPress() == false || !isMode(EditMode::EDIT)) {
+            return false;
+        }
+
+        auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+
+        debug_text("%s times: %" PRIu32, inputEvent.str().c_str(), translator.getTimes());
+
+        if (code != KeyProfile::none_key) {
+            /// if we have multi press in non digit mode - we need to replace char and put next char from translator
+            if (!mode->is(InputMode::digit) && translator.getTimes() > 0) {
+                removeChar();
+            }
+            addChar(code);
+            drawLines();
+            return true;
+        }
+        return false;
+    }
+
+    /// changes integer value to ascii int value (with no additional checks)
+    char intToAscii(int val)
+    {
+        return val + '0';
+    }
+
+    bool Text::handleDigitLongPress(const InputEvent &inputEvent)
+    {
+        if (!inputEvent.isLongPress()) {
+            return false;
+        }
+        auto val = toNumeric(inputEvent.keyCode);
+        if (val != InvalidNumericKeyCode) {
+            addChar(intToAscii(val));
+            drawLines();
+        }
+        return false;
+    }
+
+    bool Text::removeChar()
+    {
+        if (!document->isEmpty()) {
+            cursor->removeChar();
+            return true;
+        }
+        return false;
     }
 
 } /* namespace gui */

@@ -1,11 +1,3 @@
-/*
- * @file Application.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include <sstream>
 #include <iomanip>
 // module-utils
@@ -425,9 +417,7 @@ namespace app
                 if (ret != nullptr && switchData != nullptr) {
                     auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                     if (text != nullptr) {
-                        if (text->handleChar(ret->getDescription()[0])) {
-                            text->updateCursor();
-                        }
+                        text->addText(ret->getDescription());
                     }
                 }
             }
