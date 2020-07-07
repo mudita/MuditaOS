@@ -87,9 +87,7 @@ void UiCharSelector::decorateActionActivated(Item *it, const std::string &str)
         LOG_INFO("handled special char for %s", name.c_str());
         sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
-            std::make_unique<gui::SwitchSpecialChar>(
-                gui::SwitchSpecialChar::Type::Response, app->requester, str));
+            std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response, app->requester, str));
         return true;
     };
 }
-
