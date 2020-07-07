@@ -205,6 +205,8 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include <queue>
 #include <string>
 
+#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -428,8 +430,8 @@ class TS0710
     TS0710(PortSpeed_e portSpeed, sys::Service *parent);
     TS0710() = delete;
     ~TS0710();
-    void SelectAntenna(uint8_t antenna);
-    uint8_t GetAntenna();
+    void SelectAntenna(bsp::cellular::antenna antenna);
+    bsp::cellular::antenna GetAntenna();
     // Add error handling - only for Advanced mode. Leave for now
     // Add callback for received frame (after error handling)
     // Add frame routing to different channels

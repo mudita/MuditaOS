@@ -26,6 +26,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_Any.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

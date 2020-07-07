@@ -29,12 +29,13 @@ namespace antenna
         constexpr uint32_t buttonPosXCenter = 175;
         constexpr uint32_t buttonPostXRight = 315;
 
-        constexpr uint32_t buttonPosYRow1 = 479;
-        constexpr uint32_t buttonPosYRow2 = 517;
+        constexpr uint32_t buttonPosYRow1 = 441;
+        constexpr uint32_t buttonPosYRow2 = 479;
+        constexpr uint32_t buttonPosYRow3 = 517;
 
-        constexpr uint32_t scanListPosY = 260;
+        constexpr uint32_t scanListPosY = 255;
         constexpr uint32_t scanListW    = 400;
-        constexpr uint32_t scanListH    = 214;
+        constexpr uint32_t scanListH    = 185;
     } // namespace main_window
 
     namespace scan_mode_window
