@@ -178,7 +178,6 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
-        body->axisAlignment();
         pageLoaded = true;
     }
 

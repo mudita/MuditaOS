@@ -272,7 +272,7 @@ namespace gui
         const auto size_needed_for_2digits = 30;
         // 1. create hbox for all elements
         auto el = new gui::HBox(nullptr, 0, 0, style::window::default_body_width, style::window::label::default_h);
-        el->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        el->setAlignment(Alignment(gui::Alignment::Vertical::Center));
         auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
         text->setMaximumSize(el->area().w, Axis::X);
         text->setText(name);
@@ -321,8 +321,6 @@ namespace gui
             layout->addWidget(new gui::Span(Axis::Y, style::design_option_span));
         }
 
-        //        el->align();
-
         return el->visible;
     }
 
@@ -336,7 +334,7 @@ namespace gui
                                       style::design_notifications_offset,
                                       style::window_width,
                                       bottomBar->widgetArea.pos(Axis::Y) - style::design_notifications_offset);
-        notifications->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
+        notifications->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
         notifications->setPenWidth(style::window::default_border_no_focus_w);
         notifications->setPenFocusWidth(style::window::default_border_no_focus_w);
         this->addWidget(notifications);
