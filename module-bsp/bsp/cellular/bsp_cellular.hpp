@@ -22,7 +22,13 @@
 #include <common_data/EventStore.hpp>
 
 namespace bsp {
-
+namespace cellular
+    {
+    	enum class antenna{
+    		lowBand,
+			highBand
+    	};
+    }
     class Cellular {
     public:
 
@@ -57,15 +63,14 @@ namespace bsp {
         virtual void SetSendingAllowed(bool state) = 0;
         virtual bool GetSendingAllowed()           = 0;
 
-        virtual void SelectAntenna(uint8_t antenna) = 0;
-        virtual uint8_t GetAntenna() = 0;
+        virtual void SelectAntenna(bsp::cellular::antenna antenna) = 0;
+        virtual bsp::cellular::antenna GetAntenna() = 0;
 
       protected:
         bool isInitialized = false;
     };
-
     namespace cellular
-    {
+        {
         enum IRQsource{
             statusPin,
             trayPin,
