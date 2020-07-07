@@ -37,7 +37,6 @@ namespace gui
         void speedDialKeyHandler();
         void addToFavouritesHandler();
         void addToICEHandler();
-
     };
 
 } /* namespace gui */
