@@ -1,4 +1,5 @@
 file (COPY "${CMAKE_CURRENT_LIST_DIR}/pureos-unittest.tar" DESTINATION "${CMAKE_BINARY_DIR}/sys/updates")
+file (COPY "${CMAKE_CURRENT_LIST_DIR}/factory" DESTINATION "${CMAKE_BINARY_DIR}/sys")
 
 add_catch2_executable(
 	NAME
@@ -7,6 +8,7 @@ add_catch2_executable(
 		"${CMAKE_CURRENT_LIST_DIR}/unittest.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/tests-main.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/../update/UpdatePureOS.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/../factory-reset/FactoryReset.cpp"
 	LIBS
 		module-services
 )
