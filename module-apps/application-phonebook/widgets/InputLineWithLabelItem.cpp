@@ -110,7 +110,7 @@ namespace gui
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
         inputText->setFont(style::window::font::bigbold);
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
@@ -118,7 +118,7 @@ namespace gui
     void InputLineWithLabelItem::secondNameHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
             contact->alternativeName = inputText->getText();
@@ -128,7 +128,7 @@ namespace gui
     void InputLineWithLabelItem::numberHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
@@ -146,7 +146,7 @@ namespace gui
     void InputLineWithLabelItem::otherNumberHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
@@ -165,7 +165,7 @@ namespace gui
     void InputLineWithLabelItem::emailHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
@@ -173,7 +173,7 @@ namespace gui
     void InputLineWithLabelItem::addressHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
@@ -181,7 +181,7 @@ namespace gui
     void InputLineWithLabelItem::noteHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SINGLE_LINE);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
