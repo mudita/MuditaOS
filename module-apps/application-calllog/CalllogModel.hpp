@@ -24,7 +24,6 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListI
   public:
     CalllogModel() = delete;
     CalllogModel(app::Application *app);
-    virtual ~CalllogModel() = default;
 
     // virtual methods
     void requestRecordsCount() override;
@@ -35,7 +34,7 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListI
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    unsigned int getMinimalItemHeight() override;
+    unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
     int getItemCount() const override
     {

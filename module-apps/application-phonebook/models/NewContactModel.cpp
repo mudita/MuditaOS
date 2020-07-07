@@ -12,54 +12,25 @@ NewContactModel::NewContactModel(app::Application *app) : application(app)
     createData();
 }
 
-NewContactModel::~NewContactModel()
-{
-    for (auto item : internalData) {
-        delete item;
-    }
-    internalData.clear();
-}
-
 auto NewContactModel::getItemCount() const -> int
 {
     return internalData.size();
 }
 
-auto NewContactModel::getMinimalItemHeight() -> unsigned int
+auto NewContactModel::getMinimalItemHeight() const -> unsigned int
 {
     return phonebookStyle::inputLineWithLabelItem::h;
 }
 
 void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    modelIndex     = 0;
-    internalOffset = offset;
-    internalLimit  = limit;
+    setupModel(offset, limit);
     list->onProviderDataUpdate();
 }
 
 auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
 {
-    unsigned int index = 0;
-    if (order == gui::Order::Previous) {
-        index = internalLimit - modelIndex - 1;
-    }
-    if (order == gui::Order::Next) {
-        index = internalOffset + modelIndex;
-    }
-
-    if (index < internalData.size()) {
-
-        if (order == gui::Order::Previous && index < internalOffset) {
-            return nullptr;
-        }
-
-        modelIndex++;
-        internalData[index]->setVisible(true);
-        return internalData[index];
-    }
-
-    return nullptr;
+    return getRecord(order);
 }
 
 void NewContactModel::createData()
@@ -129,10 +100,7 @@ void NewContactModel::clearData()
 {
     list->clear();
 
-    for (auto item : internalData) {
-        delete item;
-    }
-    internalData.clear();
+    eraseInternalData();
 
     createData();
 
