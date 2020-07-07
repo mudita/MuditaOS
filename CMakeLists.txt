@@ -36,9 +36,9 @@ endif ()
 add_custom_target(assets)
 
 # setting build flags
-set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DDEBUG" CACHE STRING "")
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 
 set(TOOLCHAIN_PATH "" CACHE STRING "Path to coolchain directory")
 
