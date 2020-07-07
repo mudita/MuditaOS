@@ -23,7 +23,7 @@
 #include "application-call/data/CallSwitchData.hpp"
 #include <UiCommonActions.hpp>
 
-#include "Common.hpp"
+#include <gui/tools/Common.hpp>
 #include "i18/i18.hpp"
 #include "log/log.hpp"
 #include <Span.hpp>

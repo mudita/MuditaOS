@@ -27,6 +27,13 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
+        Item *buildNewline();
+        /// add Activation action to item in character selection
+        /// on click on item relevant utf value should be send to requesting app & window
+        /// i.e. requesting `ę` should send string with it's code
+        void decorateActionActivated(Item *it, const std::string &str);
     };
 
 }; // namespace gui

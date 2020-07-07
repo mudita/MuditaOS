@@ -19,6 +19,8 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/InputLineWithLabelItem.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactFlagsWidget.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactFlagIconWidget.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"

@@ -66,8 +66,8 @@ namespace gui
         informationLabel = new Text(this, 45, 315, 390, 90);
         informationLabel->setText(utils::localize.get("app_phonebook_search_no_results"));
         informationLabel->setFillColor(ColorTray);
-        informationLabel->setTextType(Text::TextType::MULTI_LINE);
-        informationLabel->setEditMode(Text::EditMode::BROWSE);
+        informationLabel->setTextType(TextType::MULTI_LINE);
+        informationLabel->setEditMode(EditMode::BROWSE);
         informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         informationLabel->setFont(style::window::font::small);
 
@@ -147,8 +147,8 @@ namespace gui
         informationLabel = new Text(this, 45, 315, 390, 90);
         informationLabel->setText(utils::localize.get("app_phonebook_search_no_results"));
         informationLabel->setFillColor(ColorTray);
-        informationLabel->setTextType(Text::TextType::MULTI_LINE);
-        informationLabel->setEditMode(Text::EditMode::BROWSE);
+        informationLabel->setTextType(TextType::MULTI_LINE);
+        informationLabel->setEditMode(EditMode::BROWSE);
         informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         informationLabel->setFont(style::window::font::small);
 

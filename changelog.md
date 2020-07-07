@@ -4,6 +4,10 @@
 
 ### Added
 * `[antenna]` Added antenna service.
+* `[phonebook]` Add icon flags for showing contact special groups
+* `[gui]` Fully refactored base text element with support for formatting.
+* `[gui]` Digit input on long-press in Text
+* `[gui]` Selector for newline in special character selection
 
 ### Other
  * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
@@ -12,6 +16,7 @@
 
 ### Fixed
 * `[sms]` Do not show "no message" prompt where there is an SMS.
+* `[gui]` Fixed with new text: movement, addition and line breaking
 
 ### Other
 * `[build]` CI improvements.
