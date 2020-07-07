@@ -17,7 +17,7 @@
 namespace gui
 {
     SMSTemplatesWindow::SMSTemplatesWindow(app::Application *app)
-        : AppWindow(app, name::window::sms_templates), smsTemplateModel{std::make_unique<SMSTemplateModel>(app)}
+        : AppWindow(app, name::window::sms_templates), smsTemplateModel{std::make_shared<SMSTemplateModel>(app)}
     {
         buildInterface();
     }
@@ -46,8 +46,7 @@ namespace gui
 
         namespace style = style::messages::templates::list;
 
-        list = new gui::ListView(this, style::x, style::y, style::w, style::h);
-        list->setProvider(smsTemplateModel.get());
+        list = new gui::ListView(this, style::x, style::y, style::w, style::h, smsTemplateModel);
 
         setFocusItem(list);
     }

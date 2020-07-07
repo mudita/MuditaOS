@@ -56,17 +56,17 @@ namespace gui
 
         AppWindow::buildInterface();
 
-        threadModel = new ThreadModel(application);
+        threadModel = std::make_shared<ThreadModel>(this->application);
 
         list = new gui::ListView(this,
                                  msgThreadStyle::listPositionX,
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
-                                 msgThreadStyle::listHeight);
+                                 msgThreadStyle::listHeight,
+                                 threadModel);
         list->setScrollTopMargin(style::margins::small);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
-        list->setProvider(threadModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -109,11 +109,6 @@ namespace gui
             searchImage->setVisible(false);
             return true;
         };
-    }
-
-    MessagesMainWindow::~MessagesMainWindow()
-    {
-        delete threadModel;
     }
 
     void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

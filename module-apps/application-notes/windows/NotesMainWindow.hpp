@@ -27,13 +27,12 @@ namespace gui
 
     class NotesMainWindow : public AppWindow
     {
-        NotesModel *notesModel = nullptr;
+        std::shared_ptr<NotesModel> notesModel = nullptr;
         gui::ListView *list    = nullptr;
         Label *title           = nullptr;
 
       public:
         NotesMainWindow(app::Application *app);
-        virtual ~NotesMainWindow();
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;

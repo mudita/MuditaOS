@@ -16,7 +16,7 @@ namespace gui
     {
         gui::Item *body     = nullptr;
         gui::ListView *list = nullptr;
-        std::unique_ptr<model::SearchResultsModel> model;
+        std::shared_ptr<model::SearchResultsModel> model;
         auto listViewRequest(const std::string &text) -> bool;
 
       public:
