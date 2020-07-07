@@ -2,6 +2,9 @@
 
 ## Current Release
 
+### Added
+* `[antenna]` Added antenna service.
+
 ### Other
  * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
  

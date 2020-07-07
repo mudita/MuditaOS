@@ -62,9 +62,9 @@ namespace bsp
             return pv_SendingAllowed;
         }
 
-        void SelectAntenna(uint8_t antenna) override final;
+        void SelectAntenna(bsp::cellular::antenna antenna) override final;
 
-        uint8_t GetAntenna() override final;
+        bsp::cellular::antenna GetAntenna() override final;
 
       private:
         static constexpr speed_t baud_bits[] = {0,

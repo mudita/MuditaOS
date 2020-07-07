@@ -204,12 +204,12 @@ namespace bsp
         ioctl(fd, TIOCMBIS, &status);
     }
 
-    void LinuxCellular::SelectAntenna(uint8_t antenna)
+    void LinuxCellular::SelectAntenna(bsp::cellular::antenna antenna)
     {}
 
-    uint8_t LinuxCellular::GetAntenna()
+    bsp::cellular::antenna LinuxCellular::GetAntenna()
     {
-        return 0;
+        return bsp::cellular::antenna::lowBand;
     }
 
     namespace cellular

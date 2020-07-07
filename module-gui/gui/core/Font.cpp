@@ -5,12 +5,15 @@
  *      Author: robert
  */
 
+#include <algorithm>
+#include <iterator>
 #include <unistd.h>
 #include <string.h>
 
 #include <string>
 #include "Font.hpp"
 
+#include "TextConstants.hpp"
 #include "utf8/UTF8.hpp"
 #include "log/log.hpp"
 // for loading files
@@ -253,18 +256,18 @@ namespace gui
 
     uint32_t Font::getCharCountInSpace(const UTF8 &str, const uint32_t space) const
     {
-        int32_t availableSpace = space;
+        uint32_t availableSpace = space;
         uint32_t count         = 0;
         uint32_t current       = 0;
         uint32_t previous      = none_char_id;
 
         for (uint32_t i = 0; i < str.length(); ++i, ++count) {
             current = str[i];
-
-            availableSpace -= getCharPixelWidth(current, previous);
-            if (availableSpace < 0) {
+            auto char_pixel_width = getCharPixelWidth(current, previous);
+            if (availableSpace < char_pixel_width) {
                 return count;
             }
+            availableSpace -= char_pixel_width;
             previous = current;
         }
         return count;
@@ -315,6 +318,9 @@ namespace gui
 
     uint32_t Font::getCharPixelWidth(uint32_t charCode, uint32_t previousChar) const
     {
+        if (charCode == text::newline) { // newline doesn't have width
+            return 0;
+        }
         auto glyph = getGlyph(charCode);
         if (glyph != nullptr) {
             return glyph->xadvance + getKerning(charCode, previousChar);
@@ -445,7 +451,6 @@ namespace gui
     void FontManager::clear()
     {
         for (Font *font : fonts) {
-            LOG_INFO("deleting font: %s", font->getName().c_str());
             delete font;
         }
         fonts.clear();
@@ -457,7 +462,6 @@ namespace gui
         std::vector<std::string> fontFiles = getFontsList();
 
         for (std::string fontName : fontFiles) {
-            LOG_INFO("Loading font: %s", fontName.c_str());
             loadFont(fontName);
         }
     }
@@ -524,13 +528,10 @@ namespace gui
         for (vfs::DirectoryEntry ent : dirList) {
             if ((ent.attributes != vfs::FileAttributes::Directory) && hasEnding(ent.fileName, ".mpf")) {
                 fontFiles.push_back(fontFolder + "/" + ent.fileName);
-                // TODO remove commented code
-                LOG_INFO("font: %s", (fontFolder + "/" + ent.fileName).c_str());
             }
         }
 
-        LOG_INFO("Total number of images: %u", static_cast<unsigned int>(fontFiles.size()));
-
+        LOG_INFO("Total number of fonts: %u", static_cast<unsigned int>(fontFiles.size()));
         return fontFiles;
     }
 
@@ -551,30 +552,36 @@ namespace gui
         return instance;
     }
 
-    Font *FontManager::getFont(uint32_t id)
+    [[nodiscard]] auto FontManager::getFont(const std::string &name) const -> Font *
     {
-        if (id >= fonts.size()) {
-            LOG_ERROR("Font not found! id: %" PRIu32, id);
+        auto font = find(name);
+        // default return first font
+        if (font == nullptr && fonts.size() > 0) {
+            LOG_ERROR("=> font not found: %s using default", name.c_str());
+            return fonts[0];
+        }
+        return font;
+    }
+
+    [[nodiscard]] auto FontManager::getFont(uint32_t num) const -> Font *
+    {
+        if (fonts.size() == 0) {
             return nullptr;
         }
-        return fonts[id];
+        if (num > fonts.size()) {
+            return fonts[0];
+        }
+        return fonts[num];
     }
-    uint32_t FontManager::getFontID(const std::string &name)
+
+    auto FontManager::find(const std::string &name) const -> Font *
     {
-        bool found = false;
-        uint32_t i;
-        for (i = 0; i < fonts.size(); i++) {
-            if (name.compare(fonts[i]->info.face) == 0) {
-                found = true;
-                break;
+        for (auto &font : fonts) {
+            if (name.compare(font->info.face) == 0) {
+                return font;
             }
         }
-        if (!found) {
-            LOG_ERROR("=> font not found: %s", name.c_str());
-            LOG_ERROR("Using default!");
-            return 0;
-        }
-        return i;
+        return nullptr;
     }
 
 } /* namespace gui */

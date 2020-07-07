@@ -65,3 +65,13 @@ TEST_CASE("Split tests")
     ret = utils::split("", "-");
     REQUIRE(ret.size() == 0);
 }
+
+TEST_CASE("toNumeric tests")
+{
+    std::string inputStr1 = "2";
+    uint32_t value;
+
+    auto ret = utils::toNumeric(inputStr1, value);
+    REQUIRE(ret == true);
+    REQUIRE(value == 2);
+}

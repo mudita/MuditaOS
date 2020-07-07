@@ -5,6 +5,7 @@
 #include "gui/widgets/Text.hpp"
 #include "windows/AppWindow.hpp"
 
+#include "service-antenna/ServiceAntenna.hpp"
 namespace gui
 {
 
@@ -33,7 +34,8 @@ namespace gui
             AntennaA = 0,
             AntennaB,
             StartScan,
-            ScanMode
+            ScanMode,
+            LockAntennaManager
         };
 
       public:
@@ -47,6 +49,8 @@ namespace gui
         void destroyInterface() override;
         void updateDebugInfo(std::vector<std::string> &data);
         void updateOperatorsScan(std::vector<std::string> &data);
+        void updateAntennaButtons(bsp::cellular::antenna antenna);
+        void updateLockedButton(antenna::lockState antennaState);
     };
 
 } /* namespace gui */

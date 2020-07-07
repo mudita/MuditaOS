@@ -30,7 +30,7 @@ function(add_catch2_executable)
         _TEST_ARGS
         ""
         "NAME"
-        "SRCS;INCLUDE;LIBS;DEFS"
+        "SRCS;INCLUDE;LIBS;DEFS;DEPS"
         ${ARGN}
     )
 
@@ -62,6 +62,10 @@ function(add_catch2_executable)
     foreach(def ${_TEST_ARGS_DEFS})
         target_compile_definitions(${_TESTNAME} PRIVATE ${def})
     endforeach(def)
+
+    foreach(dep ${_TEST_ARGS_DEPS})
+        add_dependencies(${_TESTNAME}  ${dep})
+    endforeach(dep)
 
     add_dependencies(unittests ${_TESTNAME})
     add_dependencies(check ${_TESTNAME})

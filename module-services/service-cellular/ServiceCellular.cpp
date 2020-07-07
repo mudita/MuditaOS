@@ -42,10 +42,13 @@
 #include "service-db/messages/DBNotificationMessage.hpp"
 
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp"
+#include "service-antenna/api/AntennaServiceAPI.hpp"
+#include "service-antenna/messages/AntennaMessage.hpp"
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
+#include <at/response.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <country.hpp>
@@ -198,6 +201,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
+    cmux->SelectAntenna(bsp::cellular::antenna::highBand);
     switch (board) {
     case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
@@ -616,6 +620,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         LOG_INFO("CellularHangupCall");
         if (channel) {
             if (channel->cmd(at::AT::ATH)) {
+                AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
                 stopTimer(callStateTimerId);
                 if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                     LOG_ERROR("Failed to end ongoing call");
@@ -676,7 +681,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             responseMsg = std::make_shared<CellularResponseMessage>(false);
             break;
         }
-        LOG_DEBUG("Received multicast");
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
             sendSMS();
@@ -722,20 +726,17 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         sys::Bus::SendUnicast(msg, msgl->sender, this);
     } break;
     case MessageType::CellularSelectAntenna: {
-        uint8_t value = 0;
-        auto msg      = dynamic_cast<CellularRequestMessage *>(msgl);
+        auto msg = dynamic_cast<CellularAntennaRequestMessage *>(msgl);
         if (msg != nullptr) {
-            try {
-                value = std::stoi(msg->data);
-            }
-            catch (std::exception &e) {
-                LOG_INFO("Service cellular CellularSelectAntenna exception occured: %s", e.what());
-            }
-            cmux->SelectAntenna(value);
+
+            cmux->SelectAntenna(msg->antenna);
             vTaskDelay(50); // sleep for 50 ms...
-            uint8_t actualAntenna = cmux->GetAntenna();
-            bool changedAntenna   = (actualAntenna == value);
+            auto actualAntenna    = cmux->GetAntenna();
+            bool changedAntenna   = (actualAntenna == msg->antenna);
             responseMsg           = std::make_shared<CellularResponseMessage>(changedAntenna);
+
+            auto notification = std::make_shared<AntennaChangedMessage>();
+            sys::Bus::SendMulticast(notification, sys::BusChannels::AntennaNotifications, this);
         }
         else {
             responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -796,6 +797,46 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         break;
     }
+    case MessageType::CellularGetCSQ: {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        if (channel) {
+            auto modemResponse = channel->cmd(at::AT::CSQ);
+            if (modemResponse.code == at::Result::Code::OK) {
+                responseMsg = std::make_shared<CellularResponseMessage>(true, modemResponse.response[0]);
+            }
+            else {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+    } break;
+    case MessageType::CellularGetCREG: {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        if (channel) {
+            auto resp = channel->cmd(at::AT::CREG);
+            if (resp.code == at::Result::Code::OK) {
+                responseMsg = std::make_shared<CellularResponseMessage>(true, resp.response[0]);
+            }
+            else {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+    } break;
+    case MessageType::CellularGetNWINFO: {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        if (channel) {
+            auto resp = channel->cmd(at::AT::QNWINFO);
+            if (resp.code == at::Result::Code::OK) {
+                responseMsg = std::make_shared<CellularResponseMessage>(true, resp.response[0]);
+            }
+            else {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+    } break;
+    case MessageType::CellularGetAntenna: {
+        auto antenna = cmux->GetAntenna();
+        responseMsg  = std::make_shared<CellularAntennaResponseMessage>(true, antenna, MessageType::CellularGetAntenna);
+    } break;
     default:
         break;
 
@@ -804,6 +845,11 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
     }
+    if (responseMsg == nullptr) {
+        return std::make_shared<sys::ResponseMessage>();
+    }
+
+    responseMsg->responseTo = msgl->messageType;
     return responseMsg;
 }
 namespace
@@ -895,6 +941,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     // Received signal strength change
     auto qind = at::urc::QIND(str);
     if (qind.is() && qind.is_csq()) {
+        AntennaServiceAPI::CSQChange(this);
         if (!qind.validate(at::urc::QIND::RSSI)) {
             LOG_INFO("Invalid csq - ignore");
         }
@@ -903,7 +950,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 return std::make_shared<CellularNotificationMessage>(
-                    CellularNotificationMessage::Type::SignalStrengthUpdate);
+                    CellularNotificationMessage::Type::SignalStrengthUpdate, str);
             }
         }
     }
@@ -1165,12 +1212,8 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
     if (channel) {
         auto resp = channel->cmd(at::AT::CSQ);
         if (resp.code == at::Result::Code::OK) {
-            // push back to response message
-            std::string ret     = resp.response[0];
-            std::string toErase = "+CSQ: ";
-            auto pos            = ret.find(toErase);
-            if (pos != std::string::npos) {
-                ret.erase(pos, toErase.length());
+            std::string ret;
+            if (at::response::parseCSQ(resp.response[0], ret)) {
                 data.push_back(ret);
             }
             else {
@@ -1183,29 +1226,9 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 
         resp = channel->cmd(at::AT::CREG);
         if (resp.code == at::Result::Code::OK) {
-            std::map<uint32_t, std::string> cregCodes;
-            cregCodes.insert(std::pair<uint32_t, std::string>(0, "Not registred"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(1, "Registered, home network"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(2, "Not registered, searching"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(3, "Registration denied"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(4, "Unknown"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(5, "Registerd, roaming"));
-
-            std::string rawResponse = resp.response[0];
-            auto pos                = rawResponse.find(',');
-
-            uint32_t cregValue;
-            try {
-                cregValue = std::stoi(rawResponse.substr(pos + 1, 1));
-            }
-            catch (const std::exception &e) {
-                LOG_ERROR("ServiceCellular::GetNetworkInfo exception %s", e.what());
-                cregValue = UINT32_MAX;
-            }
-            // push back to response message
-            auto commandCode = cregCodes.find(cregValue);
-            if (commandCode != cregCodes.end()) {
-                data.push_back(commandCode->second);
+            std::string ret;
+            if (at::response::parseCREG(resp.response[0], ret)) {
+                data.push_back(ret);
             }
             else {
                 data.push_back("");
@@ -1217,14 +1240,13 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 
         resp = channel->cmd(at::AT::QNWINFO);
         if (resp.code == at::Result::Code::OK) {
-            auto rawResponse = resp.response[0];
-            std::string toErase("+QNWINFO: ");
-            auto pos = rawResponse.find(toErase);
-            if (pos != std::string::npos) {
-                rawResponse.erase(pos, toErase.length());
+            std::string ret;
+            if (at::response::parseQNWINFO(resp.response[0], ret)) {
+                data.push_back(ret);
             }
-            rawResponse.erase(std::remove(rawResponse.begin(), rawResponse.end(), '\"'), rawResponse.end());
-            data.push_back(rawResponse);
+            else {
+                data.push_back("");
+            }
         }
         else {
             data.push_back("");

@@ -7,8 +7,11 @@
 
 #include "ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include "module-cellular/at/response.hpp"
+
 #include "windows/AntennaMainWindow.hpp"
 #include "windows/ScanModesWindow.hpp"
+
 #include <ticks.hpp>
 namespace app
 {
@@ -18,10 +21,13 @@ namespace app
         auto win = getCurrentWindow();
 
         if (win->getName() == gui::name::window::main_window) {
-            if (!cellularRequestInProgress) {
-                LOG_INFO("Get Network info");
-                cellularRequestInProgress = true;
-                CellularServiceAPI::GetNetworkInfo(this);
+            auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
+            if (window != nullptr) {
+                if (!cellularRequestInProgress) {
+                    LOG_INFO("Get Network info");
+                    cellularRequestInProgress = true;
+                    CellularServiceAPI::GetNetworkInfo(this);
+                }
             }
         }
     }
@@ -31,6 +37,8 @@ namespace app
           appTimer(CreateAppTimer(2000, true, [=]() { timerHandler(); }))
 
     {
+        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+
         appTimer.restart();
     }
 
@@ -93,6 +101,20 @@ namespace app
                     }
                 }
                 cellularRequestInProgress = false;
+            }
+            handled = true;
+        }
+        if (msgl->messageType == MessageType::AntennaChanged) {
+            bsp::cellular::antenna antenna;
+            CellularServiceAPI::GetAntenna(this, antenna);
+            auto win = getCurrentWindow();
+
+            if (win->getName() == gui::name::window::main_window) {
+                auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
+                if (window != nullptr) {
+
+                    window->updateAntennaButtons(antenna);
+                }
             }
             handled = true;
         }

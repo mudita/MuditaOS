@@ -503,15 +503,12 @@ ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout)
     return ret;
 }
 
-void TS0710::SelectAntenna(uint8_t antenna)
+void TS0710::SelectAntenna(bsp::cellular::antenna antenna)
 {
-    if (antenna == 0 || antenna == 1) {
-        // select antenna A
         pv_cellular->SelectAntenna(antenna);
-    }
 }
 
-uint8_t TS0710::GetAntenna()
+bsp::cellular::antenna TS0710::GetAntenna()
 {
     return pv_cellular->GetAntenna();
 }

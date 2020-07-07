@@ -8,8 +8,11 @@ add_catch2_executable(
                 test-gui-callbacks.cpp
                 test-gui-resizes.cpp
                 ../mock/TestWindow.cpp
+                ../mock/InitializedFontManager.cpp
         INCLUDE
                 ..
         LIBS
                 module-gui
+        DEPS
+                assets
 )
