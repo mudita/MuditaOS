@@ -35,6 +35,7 @@ namespace gui
 
         template <Axis axis> void resizeItems();
         template <Axis axis> void axisAlignment();
+        template <Axis axis>[[nodiscard]] uint16_t getAxisAlignmentValue(uint16_t calcPos);
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);

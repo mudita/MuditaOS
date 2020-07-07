@@ -213,6 +213,10 @@ namespace gui
                 addToOutOfDrawAreaList(el);
             }
 
+            // Recalculate lead Axis position if lead axis alignment provided.
+            axisItemPosition = getAxisAlignmentValue<axis>(axisItemPosition);
+
+            // Calculate orthogonal Axis position based on Box Alignment or if not specified child Alignment.
             orthogonalItemPosition = el->getAxisAlignmentValue(orthogonal(axis));
 
             if (el->visible)
@@ -237,6 +241,57 @@ namespace gui
             }
             return false;
         });
+    }
+
+    template <Axis axis> uint16_t BoxLayout::getAxisAlignmentValue(uint16_t calcPos)
+    {
+        switch (getAlignment(axis).vertical) {
+        case gui::Alignment::Vertical::Top:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this);
+            }
+            break;
+        case gui::Alignment::Vertical::Center:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this) / 2;
+            }
+            else {
+                return calcPos + sizeLeft<axis>(this) / 2;
+            }
+            break;
+        case gui::Alignment::Vertical::Bottom:
+            if (!reverseOrder) {
+                return calcPos + sizeLeft<axis>(this);
+            }
+            break;
+        default:
+            break;
+        }
+
+        switch (getAlignment(axis).horizontal) {
+        case gui::Alignment::Horizontal::Left:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this);
+            }
+            break;
+        case gui::Alignment::Horizontal::Center:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this) / 2;
+            }
+            else {
+                return calcPos + sizeLeft<axis>(this) / 2;
+            }
+            break;
+        case gui::Alignment::Horizontal::Right:
+            if (!reverseOrder) {
+                return calcPos + sizeLeft<axis>(this);
+            }
+            break;
+        default:
+            break;
+        }
+
+        return calcPos;
     }
 
     template <Axis axis> void BoxLayout::axisAlignment()
