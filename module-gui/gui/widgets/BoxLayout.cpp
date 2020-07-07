@@ -166,7 +166,7 @@ namespace gui
                 continue;
 
             auto axisItemPosition       = 0;
-            auto orthogonalItemPosition = el->getPosition(orthogonal(axis));
+            auto orthogonalItemPosition = 0;
             auto axisItemSize           = 0;
             auto orthogonalItemSize     = 0;
             auto grantedSize            = sizeStore->get(el);
@@ -213,33 +213,7 @@ namespace gui
                 addToOutOfDrawAreaList(el);
             }
 
-            switch (getAlignment(orthogonal(axis)).vertical) {
-            case gui::Alignment::Vertical::Top:
-                orthogonalItemPosition = this->getPosition(axis);
-                break;
-            case gui::Alignment::Vertical::Center:
-                orthogonalItemPosition = (this->area().size(orthogonal(axis)) - orthogonalItemSize) / 2;
-                break;
-            case gui::Alignment::Vertical::Bottom:
-                orthogonalItemPosition = this->area().size(orthogonal(axis)) - orthogonalItemSize;
-                break;
-            default:
-                break;
-            }
-
-            switch (getAlignment(orthogonal(axis)).horizontal) {
-            case gui::Alignment::Horizontal::Right:
-                orthogonalItemPosition = this->getPosition(axis);
-                break;
-            case gui::Alignment::Horizontal::Center:
-                orthogonalItemPosition = (this->area().size(orthogonal(axis)) - orthogonalItemSize) / 2;
-                break;
-            case gui::Alignment::Horizontal::Left:
-                orthogonalItemPosition = this->area().size(orthogonal(axis)) - orthogonalItemSize;
-                break;
-            default:
-                break;
-            }
+            orthogonalItemPosition = el->getAxisAlignmentValue(orthogonal(axis));
 
             if (el->visible)
                 el->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
@@ -265,10 +239,55 @@ namespace gui
         });
     }
 
-    template <Axis axis> void BoxLayout::reverseAlignment()
+    template <Axis axis> void BoxLayout::axisAlignment()
     {
         for (auto &it : children) {
-            it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
+
+            switch (getAlignment(axis).vertical) {
+            case gui::Alignment::Vertical::Top:
+                if (reverseOrder) {
+                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
+                }
+                break;
+            case gui::Alignment::Vertical::Center:
+                if (reverseOrder) {
+                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this) / 2, axis);
+                }
+                else {
+                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this) / 2, axis);
+                }
+                break;
+            case gui::Alignment::Vertical::Bottom:
+                if (!reverseOrder) {
+                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this), axis);
+                }
+                break;
+            default:
+                break;
+            }
+
+            switch (getAlignment(axis).horizontal) {
+            case gui::Alignment::Horizontal::Left:
+                if (reverseOrder) {
+                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
+                }
+                break;
+            case gui::Alignment::Horizontal::Center:
+                if (reverseOrder) {
+                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this) / 2, axis);
+                }
+                else {
+                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this) / 2, axis);
+                }
+                break;
+            case gui::Alignment::Horizontal::Right:
+                if (!reverseOrder) {
+                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this), axis);
+                }
+                break;
+            default:
+                break;
+            }
         }
     }
 
@@ -367,9 +386,7 @@ namespace gui
 
     void HBox::axisAlignment()
     {
-        if (reverseOrder) {
-            reverseAlignment<Axis::X>();
-        }
+        BoxLayout::axisAlignment<Axis::X>();
     }
 
     auto HBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
@@ -399,9 +416,7 @@ namespace gui
 
     void VBox::axisAlignment()
     {
-        if (reverseOrder) {
-            reverseAlignment<Axis::Y>();
-        }
+        BoxLayout::axisAlignment<Axis::Y>();
     }
 
     auto VBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
