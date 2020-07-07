@@ -27,6 +27,16 @@ namespace gui
 
       private:
         void applyItemNameSpecificSettings();
+
+        void firstNameHandler();
+        void secondNameHandler();
+        void numberHandler();
+        void otherNumberHandler();
+        void emailHandler();
+        void addressHandler();
+        void noteHandler();
+
+
     };
 
 } /* namespace gui */

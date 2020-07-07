@@ -13,7 +13,7 @@ class NewContactModel : public gui::ListItemProvider
     unsigned int internalOffset = 0;
     unsigned int internalLimit  = 0;
     vector<gui::ContactListItem *> internalData;
-    app::Application *application;
+    app::Application *application = nullptr;
 
   public:
     NewContactModel(app::Application *app);

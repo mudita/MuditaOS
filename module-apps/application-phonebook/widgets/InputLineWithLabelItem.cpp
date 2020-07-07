@@ -41,8 +41,8 @@ namespace gui
 
         applyItemNameSpecificSettings();
 
-        this->focusChangedCallback = [&](Item &item) {
-            if (this->focus) {
+        focusChangedCallback = [&](Item &item) {
+            if (focus) {
                 setFocusItem(inputText);
             }
             else {
@@ -51,8 +51,8 @@ namespace gui
             return true;
         };
 
-        this->inputCallback = [&](Item &item, const InputEvent &event) { return inputText->onInput(event); };
-        this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        inputCallback = [&](Item &item, const InputEvent &event) { return inputText->onInput(event); };
+        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     auto InputLineWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
@@ -74,93 +74,117 @@ namespace gui
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::FirstName:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
-            inputText->setFont(style::window::font::bigbold);
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                contact->primaryName = inputText->getText();
-            };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
+            firstNameHandler();
             break;
 
         case phonebookInternals::ListItemName::SecondName:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                contact->alternativeName = inputText->getText();
-            };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                inputText->setText(contact->alternativeName);
-            };
+            secondNameHandler();
             break;
 
         case phonebookInternals::ListItemName::Number:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
-            inputText->setTextType(TextType::SINGLE_LINE);
-            inputText->setInputMode(new InputMode({InputMode::phone}));
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                if (inputText->getText().length() > 0) {
-                    contact->numbers.emplace_back(
-                        ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
-                }
-            };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                if (contact->numbers.size() > 0) {
-                    inputText->setText(contact->numbers[0].number.getEntered());
-                }
-            };
+            numberHandler();
             break;
 
         case phonebookInternals::ListItemName::OtherNumber:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-            inputText->setInputMode(new InputMode({InputMode::phone}));
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                if (inputText->getText().length() > 0) {
-                    // Temporary disable saving secondary number since multiple numbers are not supported yet, and this
-                    // could lead to confusing errors
-                    // contact->numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
-                }
-            };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                if (contact->numbers.size() > 1) {
-                    inputText->setText(contact->numbers[1].number.getEntered());
-                }
-            };
+            otherNumberHandler();
             break;
 
         case phonebookInternals::ListItemName::Email:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
+            emailHandler();
             break;
 
         case phonebookInternals::ListItemName::Address:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
+            addressHandler();
             break;
 
         case phonebookInternals::ListItemName::Note:
-            titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-            inputText->setTextType(Text::TextType::SINGLE_LINE);
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
+            noteHandler();
             break;
 
         default:
             LOG_ERROR("Incorrect List Item Name!");
             break;
         }
+    }
+    void InputLineWithLabelItem::firstNameHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
+        inputText->setFont(style::window::font::bigbold);
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
+    }
+    void InputLineWithLabelItem::secondNameHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            contact->alternativeName = inputText->getText();
+        };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->alternativeName); };
+    }
+    void InputLineWithLabelItem::numberHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setInputMode(new InputMode({InputMode::phone}));
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            if (inputText->getText().length() > 0) {
+                contact->numbers.emplace_back(
+                    ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
+            }
+        };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            if (contact->numbers.size() > 0) {
+                inputText->setText(contact->numbers[0].number.getEntered());
+            }
+        };
+    }
+    void InputLineWithLabelItem::otherNumberHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+        inputText->setInputMode(new InputMode({InputMode::phone}));
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            if (inputText->getText().length() > 0) {
+                // Temporary disable saving secondary number since multiple numbers are not supported yet, and this
+                // could lead to confusing errors
+                // contact->numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
+            }
+        };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            if (contact->numbers.size() > 1) {
+                inputText->setText(contact->numbers[1].number.getEntered());
+            }
+        };
+    }
+    void InputLineWithLabelItem::emailHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
+    }
+    void InputLineWithLabelItem::addressHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
+    }
+    void InputLineWithLabelItem::noteHandler()
+    {
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
+        inputText->setTextType(Text::TextType::SINGLE_LINE);
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
     }
 
 } /* namespace gui */

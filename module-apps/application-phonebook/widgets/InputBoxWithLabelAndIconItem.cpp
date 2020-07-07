@@ -47,7 +47,7 @@ namespace gui
 
         applyItemNameSpecificSettings();
 
-        this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
@@ -83,138 +83,138 @@ namespace gui
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::SpeedDialKey:
-            descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
-            iconImage->set("small_circle");
-
-            this->focusChangedCallback = [&](gui::Item &item) {
-                if (this->focus) {
-                    setFocusItem(inputBoxLabel);
-                }
-                else {
-                    setFocusItem(nullptr);
-                }
-                return true;
-            };
-
-            this->inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-                if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                    return false;
-                }
-                if (toNumeric(event.keyCode) != -1) {
-                    inputBoxLabel->setText(std::to_string(toNumeric(event.keyCode)));
-                    return true;
-                }
-                if (event.keyCode == KeyCode::KEY_PND) {
-                    inputBoxLabel->clear();
-                    return true;
-                }
-                return false;
-            };
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                contact->speeddial = inputBoxLabel->getText();
-            };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                inputBoxLabel->setText(contact->speeddial);
-            };
-
+            speedDialKeyHandler();
             break;
 
         case phonebookInternals::ListItemName::AddToFavourites:
-            descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_fav"));
-            iconImage->set("small_heart");
-            tickImage->set("small_tick");
-
-            this->focusChangedCallback = [&](gui::Item &item) {
-                if (this->focus) {
-                    setFocusItem(inputBoxLabel);
-                    if (tickImage->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
-                    }
-                    else {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
-                    }
-                }
-                else {
-                    setFocusItem(nullptr);
-                    bottomBarRestoreFromTemporaryMode();
-                }
-                return true;
-            };
-
-            this->inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-                if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                    return false;
-                }
-
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    tickImage->setVisible(!tickImage->visible);
-                    if (tickImage->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
-                    }
-                    else {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
-                    }
-                }
-
-                return false;
-            };
-
-            onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                contact->isOnFavourites = tickImage->visible;
-            };
-            onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-                tickImage->visible = contact->isOnFavourites;
-            };
-
+            addToFavouritesHandler();
             break;
 
         case phonebookInternals::ListItemName::AddToICE:
-            descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_ice"));
-            iconImage->set("small_heart");
-            tickImage->set("small_tick");
-
-            this->focusChangedCallback = [&](gui::Item &item) {
-                if (this->focus) {
-                    setFocusItem(inputBoxLabel);
-                    if (tickImage->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
-                    }
-                    else {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
-                    }
-                }
-                else {
-                    setFocusItem(nullptr);
-                    bottomBarRestoreFromTemporaryMode();
-                }
-                return true;
-            };
-
-            this->inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-                if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                    return false;
-                }
-
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    tickImage->setVisible(!tickImage->visible);
-                    if (tickImage->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
-                    }
-                    else {
-                        bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
-                    }
-                }
-
-                return false;
-            };
-
+            addToICEHandler();
             break;
 
         default:
             LOG_ERROR("Incorrect List Item Name!");
             break;
         }
+    }
+
+    void InputBoxWithLabelAndIconItem::speedDialKeyHandler()
+    {
+        descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
+        iconImage->set("small_circle");
+
+        focusChangedCallback = [&](gui::Item &item) {
+            if (focus) {
+                setFocusItem(inputBoxLabel);
+            }
+            else {
+                setFocusItem(nullptr);
+            }
+            return true;
+        };
+
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (toNumeric(event.keyCode) != -1) {
+                inputBoxLabel->setText(std::to_string(toNumeric(event.keyCode)));
+                return true;
+            }
+            if (event.keyCode == KeyCode::KEY_PND) {
+                inputBoxLabel->clear();
+                return true;
+            }
+            return false;
+        };
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->speeddial = inputBoxLabel->getText(); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputBoxLabel->setText(contact->speeddial); };
+    }
+
+    void InputBoxWithLabelAndIconItem::addToFavouritesHandler()
+    {
+        descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_fav"));
+        iconImage->set("small_heart");
+        tickImage->set("small_tick");
+
+        focusChangedCallback = [&](gui::Item &item) {
+            if (focus) {
+                setFocusItem(inputBoxLabel);
+                if (tickImage->visible) {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                }
+                else {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                }
+            }
+            else {
+                setFocusItem(nullptr);
+                bottomBarRestoreFromTemporaryMode();
+            }
+            return true;
+        };
+
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (event.keyCode == gui::KeyCode::KEY_LF) {
+                tickImage->setVisible(!tickImage->visible);
+                if (tickImage->visible) {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                }
+                else {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                }
+            }
+            return false;
+        };
+
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->isOnFavourites = tickImage->visible; };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { tickImage->visible = contact->isOnFavourites; };
+    }
+    void InputBoxWithLabelAndIconItem::addToICEHandler()
+    {
+        descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_ice"));
+        iconImage->set("small_heart");
+        tickImage->set("small_tick");
+
+        focusChangedCallback = [&](gui::Item &item) {
+            if (focus) {
+                setFocusItem(inputBoxLabel);
+                if (tickImage->visible) {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                }
+                else {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                }
+            }
+            else {
+                setFocusItem(nullptr);
+                bottomBarRestoreFromTemporaryMode();
+            }
+            return true;
+        };
+
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+
+            if (event.keyCode == gui::KeyCode::KEY_LF) {
+                tickImage->setVisible(!tickImage->visible);
+                if (tickImage->visible) {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                }
+                else {
+                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                }
+            }
+            return false;
+        };
     }
 
 } /* namespace gui */
