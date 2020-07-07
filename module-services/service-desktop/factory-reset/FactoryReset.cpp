@@ -83,73 +83,66 @@ bool FactoryReset::DeleteDirContent(std::string dir)
 
 bool FactoryReset::CopyDirContent(std::string sourcedir, std::string targetdir)
 {
-    bool ret = true;
-
-    recurseDepth++;
-
-    if (recurseDepth < max_recurse_depth) {
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "", true);
-
-        for (auto &direntry : dirlist) {
-            if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
-                (direntry.fileName.compare("...") != 0)) {
-
-                std::string sourcepath = sourcedir;
-                sourcepath += "/";
-                sourcepath += direntry.fileName.c_str();
-
-                std::string targetpath = targetdir;
-                targetpath += "/";
-                targetpath += direntry.fileName.c_str();
-
-                if ((sourcepath.size() < max_filepath_length) && (targetpath.size() < max_filepath_length)) {
-                    if (direntry.attributes == vfs::FileAttributes::Directory) {
-                        if (targetpath.compare(purefs::dir::os_factory.c_str()) != 0) {
-                            LOG_INFO(
-                                "FactoryReset: restoring dir  %s into %s...", sourcepath.c_str(), targetpath.c_str());
-
-                            if (vfs.mkdir(targetpath.c_str()) != 0) {
-                                LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
-                                ret = false;
-                                break;
-                            }
-
-                            if (CopyDirContent(sourcepath, targetpath) != true) {
-                                ret = false;
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        LOG_INFO("FactoryReset: restoring file %s into %s...", sourcepath.c_str(), targetpath.c_str());
-
-                        if (CopyFile(sourcepath, targetpath) != true) {
-                            ret = false;
-                            break;
-                        }
-                    }
-                }
-                else {
-                    LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d",
-                              max_filepath_length);
-                    LOG_ERROR(
-                        "FactoryReset: skipping restore of dir %s into %s", sourcepath.c_str(), targetpath.c_str());
-                    ret = false;
-                    break;
-                }
-            }
-        }
-    }
-    else {
+    if (recurseDepth >= max_recurse_depth) {
         LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
                   recurseDepth,
                   sourcedir.c_str());
-        ret = false;
+        return false;
     }
 
-    recurseDepth--;
+    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "", true);
 
-    return ret;
+    for (auto &direntry : dirlist) {
+        if ((direntry.fileName.compare(".") == 0) || (direntry.fileName.compare("..") == 0) ||
+            (direntry.fileName.compare("...") == 0)) {
+            continue;
+        }
+
+        std::string sourcepath = sourcedir;
+        sourcepath += "/";
+        sourcepath += direntry.fileName.c_str();
+
+        std::string targetpath = targetdir;
+        targetpath += "/";
+        targetpath += direntry.fileName.c_str();
+
+        if ((sourcepath.size() >= max_filepath_length) || (targetpath.size() >= max_filepath_length)) {
+            LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d", max_filepath_length);
+            LOG_ERROR("FactoryReset: skipping restore of dir %s into %s", sourcepath.c_str(), targetpath.c_str());
+            return false;
+        }
+
+        if (direntry.attributes == vfs::FileAttributes::Directory) {
+            if (targetpath.compare(purefs::dir::os_factory.c_str()) == 0) {
+                continue;
+            }
+
+            LOG_INFO("FactoryReset: restoring dir  %s into %s...", sourcepath.c_str(), targetpath.c_str());
+
+            if (vfs.mkdir(targetpath.c_str()) != 0) {
+                LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
+                return false;
+            }
+
+            recurseDepth++;
+
+            if (CopyDirContent(sourcepath, targetpath) != true) {
+                recurseDepth--;
+                return false;
+            }
+
+            recurseDepth--;
+        }
+        else {
+            LOG_INFO("FactoryReset: restoring file %s into %s...", sourcepath.c_str(), targetpath.c_str());
+
+            if (CopyFile(sourcepath, targetpath) != true) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 bool FactoryReset::CopyFile(std::string sourcefile, std::string targetfile)
