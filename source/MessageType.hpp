@@ -104,6 +104,10 @@ enum class MessageType
     CellularGetFirmwareVersionResult, ///< Returns current firmware version
     CellularGetChannel,               ///< Asks for channel, requres chnnel name
     CellularGetChannelResponse,       ///< Returns channel (and it's name)
+    CellularGetCSQ,
+    CellularGetCREG,
+    CellularGetNWINFO,
+    CellularGetAntenna,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -201,6 +205,14 @@ enum class MessageType
     FotaStart,
     FotaProgress,
     FotaFinished,
+
+    StateChange,
+    // antenna messages
+    AntennaChanged,
+    AntennaCSQChange,
+    AntennaLockService,
+    AntennaGetLockState,
+    AntennaLockNotification
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

@@ -448,25 +448,26 @@ namespace bsp
         return pv_SendingAllowed;
     }
 
-    void RT1051Cellular::SelectAntenna(uint8_t antenna)
+    void RT1051Cellular::SelectAntenna(bsp::cellular::antenna antenna)
     {
-        if (antenna == 0) {
+        if (antenna == bsp::cellular::antenna::lowBand) {
             gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN),
                              CELLULAR_BSP_ANTSEL_PIN_A_STATE);
             LOG_INFO("Selecting Antenna A");
         }
-        else if (antenna == 1) {
+        else if (antenna == bsp::cellular::antenna::highBand) {
             gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN),
                              CELLULAR_BSP_ANTSEL_PIN_B_STATE);
             LOG_INFO("Selecting Antenna B");
         }
     }
 
-    uint8_t RT1051Cellular::GetAntenna()
+    bsp::cellular::antenna RT1051Cellular::GetAntenna()
     {
         // make sure ANTSEL pin has Software Input On Field set
         bool whichAntenna = gpio_2->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN));
-        return (whichAntenna == CELLULAR_BSP_ANTSEL_PIN_A_STATE ? 0 : 1);
+        return (whichAntenna == CELLULAR_BSP_ANTSEL_PIN_A_STATE ? bsp::cellular::antenna::lowBand
+                                                                : bsp::cellular::antenna::highBand);
     }
 
     namespace cellular

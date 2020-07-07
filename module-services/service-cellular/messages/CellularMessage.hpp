@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
+
 class CellularMessage : public sys::DataMessage
 {
   public:
@@ -94,6 +96,15 @@ class CellularRequestMessage : public CellularMessage
     std::string data;
 };
 
+class CellularAntennaRequestMessage : public CellularMessage
+{
+  public:
+    CellularAntennaRequestMessage(MessageType messageType) : CellularMessage(messageType)
+    {}
+
+    bsp::cellular::antenna antenna;
+};
+
 class CellularCallRequestMessage : public CellularMessage
 {
   public:
@@ -136,6 +147,18 @@ class CellularResponseMessage : public sys::ResponseMessage
     std::string data;
 };
 
+class CellularAntennaResponseMessage : public sys::ResponseMessage
+{
+  public:
+    CellularAntennaResponseMessage(bool retCode, bsp::cellular::antenna retAntenna, MessageType responseTo)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode)
+    {
+        antenna = retAntenna;
+    };
+
+    bool retCode;
+    bsp::cellular::antenna antenna;
+};
 namespace cellular
 {
 

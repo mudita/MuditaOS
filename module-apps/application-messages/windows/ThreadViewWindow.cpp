@@ -8,6 +8,7 @@
 #include "Span.hpp"
 
 #include <Text.hpp>
+#include <TextBubble.hpp>
 #include <ListItem.hpp>
 #include <ListItemProvider.hpp>
 #include <ListView.hpp>
@@ -75,8 +76,9 @@ namespace gui
         if (text != nullptr) {
             return;
         }
-        text = new gui::Text(
-            this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
+        text = new gui::Text(nullptr, 0, 0, 0, 0, "", ExpandMode::EXPAND_UP);
+        text->setMinimumSize(body->getWidth(), text->getHeight());
+        text->setMaximumSize(body->getWidth(), body->getHeight());
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
@@ -107,6 +109,7 @@ namespace gui
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("sms_reply"));
             return true;
         };
+        text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     void ThreadViewWindow::destroyTextItem()
@@ -189,12 +192,13 @@ namespace gui
         // if we are going from 0 then we want to show text prompt
         if (SMS.start == 0) {
             body->addWidget(text);
+            // to set proper text size required for element, not max possible size
+            text->setText(text->getText());
         }
 
         // rebuild bubbles
         SMS.end = SMS.start;
         for (auto &el : *SMS.sms) {
-            LOG_DEBUG("...");
             if (!smsBuild(el)) {
                 break;
             }
@@ -307,23 +311,23 @@ namespace gui
 
     bool ThreadViewWindow::smsBuild(const SMSRecord &smsRecord)
     {
+        auto max_available_h = body->area().h;
+        auto max_available_w = style::window::messages::sms_max_width;
         /// dummy sms thread - TODO load from db - on switchData
-        auto smsLabel = new Text(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
-        smsLabel->setTextType(Text::TextType::MULTI_LINE);
-        smsLabel->setEditMode(Text::EditMode::SCROLL);
-        smsLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        smsLabel->setRadius(style::window::messages::sms_radius);
-        smsLabel->setFont(style::window::font::medium);
-        smsLabel->setPenFocusWidth(style::window::default_border_focus_w);
-        smsLabel->setPenWidth(style::window::messages::sms_border_no_focus);
-        smsLabel->expandMode = Text::ExpandMode::EXPAND_DOWN;
-        smsLabel->setText(smsRecord.body.length() ? smsRecord.body : " "); // text doesn't really like being empty//
-        smsLabel->setMargins(gui::Margins(style::window::messages::sms_h_padding,
-                                          style::window::messages::sms_v_padding,
-                                          style::window::messages::sms_h_padding,
-                                          style::window::messages::sms_v_padding));
+        auto smsBubble = new TextBubble(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
+        smsBubble->setMaximumSize(max_available_w, max_available_h);
+        smsBubble->setTextType(TextType::MULTI_LINE);
+        smsBubble->setRadius(style::window::messages::sms_radius);
+        smsBubble->setFont(style::window::font::medium);
+        smsBubble->setPenFocusWidth(style::window::default_border_focus_w);
+        smsBubble->setPenWidth(style::window::messages::sms_border_no_focus);
+        smsBubble->setMargins(gui::Margins(style::window::messages::sms_h_padding,
+                                           style::window::messages::sms_v_padding,
+                                           style::window::messages::sms_h_padding,
+                                           style::window::messages::sms_v_padding));
+        smsBubble->setText(smsRecord.body);
 
-        smsLabel->inputCallback = [=, &smsRecord](Item &, const InputEvent &event) {
+        smsBubble->inputCallback = [=, &smsRecord](Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
@@ -337,13 +341,13 @@ namespace gui
             }
             return false;
         };
-        smsLabel->focusChangedCallback = [=](gui::Item &item) {
+        smsBubble->focusChangedCallback = [=](gui::Item &item) {
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             return true;
         };
 
         // wrap label in H box, to make fit datetime in it
-        HBox *labelSpan = smsSpanBuild(smsLabel, smsRecord);
+        HBox *labelSpan = smsSpanBuild(smsBubble, smsRecord);
 
         if (labelSpan == nullptr) {
             return false;

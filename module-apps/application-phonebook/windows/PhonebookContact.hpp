@@ -20,6 +20,7 @@ static inline void fillContactData(std::string &data, ContactRecord &contact)
 
 namespace gui
 {
+    class ContactFlagsWidget;
     class PhonebookContact : public AppWindow
     {
       protected:
@@ -31,17 +32,10 @@ namespace gui
         Label *email            = nullptr;
         Label *numberPrimary    = nullptr;
         Label *numberSecondary  = nullptr;
-        Label *favouritesLabel  = nullptr;
-        Label *speeddialLabel   = nullptr;
-        Label *blockedLabel     = nullptr;
-        Label *speedDialLabel   = nullptr;
-        Label *speedDial        = nullptr;
         Label *noteLabel        = nullptr;
         Text *noteText          = nullptr;
 
-        /** icons */
-        Image *favouritesIcon = nullptr;
-        Image *blockedIcon    = nullptr;
+        ContactFlagsWidget *contactFlagsWidget = nullptr;
 
         Label *numberPrimaryLabel = nullptr;
         Image *numberPrimaryIcon  = nullptr;

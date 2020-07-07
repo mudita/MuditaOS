@@ -39,7 +39,7 @@ namespace gui
     void textSetInput(Text *text, bool numeric = true)
     {
         /// tu ustawiasz że coś jest edytowalne
-        text->setEditMode(gui::Text::EditMode::EDIT);
+        text->setEditMode(EditMode::EDIT);
         text->setFont(style::window::font::bigbold);
         /// tu ustawiasz tak naprawdę przez tą listę InputMode::digit etc jakie kolejne tryby wprowadzania są wybierane
         if (numeric) {

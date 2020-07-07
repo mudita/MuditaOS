@@ -10,14 +10,6 @@ namespace gui
         const char newline      = '\n';
     }; // namespace text
 
-    enum class LineEndType
-    {
-        EOT,           // end of source text
-        BREAK,         // line had enter defined as a /r
-        CONTINUE,      // line was broken due to not enough space to hold all characters
-        CONTINUE_SPACE // line was broken on the space character because next word doesn't fit current line.
-    };
-
     enum class ExpandMode
     {
         EXPAND_UP,
