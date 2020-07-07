@@ -196,6 +196,9 @@ enum class MessageType
 
     // service-desktop  messages
     UpdateOS,
+    Backup,
+
+    // FOTA messages
     HttpRequest,
     HttpResponse,
     FotaConfigureAPN,
