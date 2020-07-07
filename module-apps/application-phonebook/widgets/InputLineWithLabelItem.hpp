@@ -35,8 +35,6 @@ namespace gui
         void emailHandler();
         void addressHandler();
         void noteHandler();
-
-
     };
 
 } /* namespace gui */
