@@ -21,7 +21,7 @@ class SearchResultsModel : public gui::ListItemProvider
     virtual ~SearchResultsModel();
 
     // virtual methods for ListViewProvider
-    unsigned int getMinimalItemHeight() override;
+    unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
 
     int getItemCount() const override;
