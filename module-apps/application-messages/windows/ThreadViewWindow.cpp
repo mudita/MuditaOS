@@ -192,6 +192,11 @@ namespace gui
                   static_cast<int>(SMS.start),
                   static_cast<int>(SMS.sms->size()),
                   static_cast<int>(maxsmsinwindow));
+        if (SMS.sms->size() == 0) {
+            LOG_WARN("Deleting bad thread. There are no messages belonging to it (id: %d)", SMS.thread);
+            DBServiceAPI::ThreadRemove(this->application, SMS.thread);
+            return;
+        }
         // 3. add them to box
         this->cleanView();
         // if we are going from 0 then we want to show text prompt
@@ -433,6 +438,13 @@ namespace gui
                     application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                 }
                 return true;
+            }
+            if (msg->interface == db::Interface::Name::SMSThread) {
+                if (msg->type == db::Query::Type::Delete) {
+                    if (this == application->getCurrentWindow()) {
+                        application->switchWindow(gui::name::window::main_window);
+                    }
+                }
             }
         }
         return false;
