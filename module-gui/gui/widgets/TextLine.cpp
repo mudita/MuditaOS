@@ -183,10 +183,10 @@ namespace gui
             return;
         }
         Length offset = 0;
-        if (line_align.horizontal_right) {
+        if (line_align.horizontal == Alignment::Horizontal::Right) {
             offset = parent_length - width;
         }
-        else if (line_align.horizontal_center) {
+        else if (line_align.horizontal == Alignment::Horizontal::Center) {
             offset = (parent_length - width) / 2;
         }
         for (auto &el : elements_to_show_in_line) {
