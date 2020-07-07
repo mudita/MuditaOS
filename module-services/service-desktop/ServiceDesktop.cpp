@@ -1,4 +1,6 @@
 #include "ServiceDesktop.hpp"
+#include "BackupRestore.hpp"
+#include "messages/DesktopMessages.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
@@ -32,6 +34,15 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
             if (updateOS->setUpdateFile(updateOsMsg->updateFile) == updateos::UpdateError::NoError)
                 updateOS->runUpdate();
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        auto *backupMessage = static_cast<sdesktop::BackupMessage *>(msg);
+        if (backupMessage != nullptr) {
+            LOG_DEBUG("ServiceDesktop::DataReceivedHandler BackupMessage received");
+            BackupRestore::BackupUserFiles(this);
         }
         return std::make_shared<sys::ResponseMessage>();
     });
