@@ -11,8 +11,8 @@ namespace gui
     class PhonebookMainWindow : public AppWindow
     {
       protected:
-        PhonebookModel *phonebookModel = nullptr;
-        ListView *contactsList         = nullptr;
+        std::shared_ptr<PhonebookModel> phonebookModel = nullptr;
+        ListView *contactsList                         = nullptr;
 
         Image *leftArrowImage  = nullptr;
         Image *rightArrowImage = nullptr;

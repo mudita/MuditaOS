@@ -22,13 +22,14 @@ namespace gui
         body->setBoundingBox(bodySize());
         addWidget(body);
 
-        model = std::make_unique<model::SearchResultsModel>(application);
+        model = std::make_shared<model::SearchResultsModel>(application);
 
         list = new gui::ListView(body,
                                  body->area().x + style::window::list_offset_default,
                                  8,
                                  body->area().w - 2 * style::window::list_offset_default,
-                                 body->area().h);
+                                 body->area().h,
+                                 model);
     }
 
     void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -48,7 +49,6 @@ namespace gui
             model->setSearchValue(text);
             model->requestRecords(0, model->getMaxItemsOnScreen());
             list->setElementsCount(model->getItemCount());
-            list->setProvider(model.get());
             setFocusItem(list);
             return true;
         }

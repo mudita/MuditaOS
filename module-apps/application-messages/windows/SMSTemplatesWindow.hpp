@@ -14,7 +14,7 @@ namespace gui
 {
     class SMSTemplatesWindow : public AppWindow
     {
-        std::unique_ptr<SMSTemplateModel> smsTemplateModel;
+        std::shared_ptr<SMSTemplateModel> smsTemplateModel;
         gui::ListView *list = nullptr;
 
         void smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData);
