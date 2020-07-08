@@ -22,8 +22,8 @@ namespace gui
         Image *newMessageImage = nullptr;
         Image *searchImage     = nullptr;
 
-        ThreadModel *threadModel = nullptr;
-        gui::ListView *list      = nullptr;
+        std::shared_ptr<ThreadModel> threadModel = nullptr;
+        gui::ListView *list                      = nullptr;
 
         Icon *emptyListIcon = nullptr;
 
@@ -31,17 +31,15 @@ namespace gui
 
       public:
         MessagesMainWindow(app::Application *app);
-        virtual ~MessagesMainWindow();
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        bool onDatabaseMessage(sys::Message *msgl);
+        bool onDatabaseMessage(sys::Message *msgl) override;
 
         void rebuild() override;
         void buildInterface() override;
     };
 
 } /* namespace gui */
-

@@ -8,7 +8,8 @@
 namespace gui
 {
     PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
-        : AppWindow(app, gui::window::name::search_results), searchResultsModel{new SearchResultsModel(app)}
+        : AppWindow(app, gui::window::name::search_results), searchResultsModel{
+                                                                 std::make_shared<SearchResultsModel>(app)}
     {
         buildInterface();
     }
@@ -28,10 +29,10 @@ namespace gui
                                                       phonebookStyle::searchResults::searchResultList::x,
                                                       phonebookStyle::searchResults::searchResultList::y,
                                                       phonebookStyle::searchResults::searchResultList::w,
-                                                      phonebookStyle::searchResults::searchResultList::h);
+                                                      phonebookStyle::searchResults::searchResultList::h,
+                                                      searchResultsModel);
         searchResultList->setPenFocusWidth(phonebookStyle::searchResults::searchResultList::penFocusWidth);
         searchResultList->setPenWidth(phonebookStyle::searchResults::searchResultList::penWidth);
-        searchResultList->setProvider(searchResultsModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -48,7 +49,6 @@ namespace gui
     void PhonebookSearchResults::destroyInterface()
     {
         erase();
-        delete searchResultsModel;
     }
 
     PhonebookSearchResults::~PhonebookSearchResults()

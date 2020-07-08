@@ -55,7 +55,9 @@ namespace gui
         type   = gui::ItemType::LIST;
     }
 
-    ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
+    ListView::ListView(
+        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov)
+        : Rect{parent, x, y, w, h}
     {
 
         this->setBorderColor(ColorNoColor);
@@ -86,6 +88,8 @@ namespace gui
                                     style::listview::scroll::w,
                                     style::listview::scroll::h);
 
+        setProvider(prov);
+
         type = gui::ItemType::LIST;
     }
 
@@ -109,7 +113,7 @@ namespace gui
         scrollTopMargin = value;
     }
 
-    void ListView::setProvider(ListItemProvider *prov)
+    void ListView::setProvider(std::shared_ptr<ListItemProvider> prov)
     {
         provider = prov;
         if (provider != nullptr) {
@@ -117,6 +121,11 @@ namespace gui
             setElementsCount(provider->getItemCount());
         }
         refresh();
+    }
+
+    std::shared_ptr<ListItemProvider> ListView::getProvider()
+    {
+        return provider;
     }
 
     void ListView::clear()

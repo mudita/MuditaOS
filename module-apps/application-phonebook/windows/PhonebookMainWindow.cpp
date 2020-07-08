@@ -9,7 +9,8 @@
 namespace gui
 {
     PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), phonebookModel{new PhonebookModel(app)}
+        : AppWindow(app, gui::name::window::main_window), phonebookModel{
+                                                              std::make_shared<PhonebookModel>(this->application)}
     {
         buildInterface();
     }
@@ -55,10 +56,10 @@ namespace gui
                                                   phonebookStyle::mainWindow::contactsList::x,
                                                   phonebookStyle::mainWindow::contactsList::y,
                                                   phonebookStyle::mainWindow::contactsList::w,
-                                                  phonebookStyle::mainWindow::contactsList::h);
+                                                  phonebookStyle::mainWindow::contactsList::h,
+                                                  phonebookModel);
         contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
         contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
-        contactsList->setProvider(phonebookModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -71,7 +72,6 @@ namespace gui
     void PhonebookMainWindow::destroyInterface()
     {
         erase();
-        delete phonebookModel;
     }
 
     PhonebookMainWindow::~PhonebookMainWindow()

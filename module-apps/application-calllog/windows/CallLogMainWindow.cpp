@@ -23,7 +23,7 @@ namespace gui
 {
 
     CallLogMainWindow::CallLogMainWindow(app::Application *app)
-        : AppWindow(app, calllog::settings::MainWindowStr), calllogModel{new CalllogModel(app)}
+        : AppWindow(app, calllog::settings::MainWindowStr), calllogModel{std::make_shared<CalllogModel>(app)}
     {
 
         buildInterface();
@@ -34,6 +34,7 @@ namespace gui
         destroyInterface();
         buildInterface();
     }
+
     void CallLogMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -46,20 +47,14 @@ namespace gui
 
         topBar->setActive(TopBar::Elements::TIME, true);
 
-        list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h);
-        list->setProvider(calllogModel);
+        list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h, calllogModel);
 
         setFocusItem(list);
     }
+
     void CallLogMainWindow::destroyInterface()
     {
         erase();
-        delete calllogModel;
-    }
-
-    CallLogMainWindow::~CallLogMainWindow()
-    {
-        destroyInterface();
     }
 
     void CallLogMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

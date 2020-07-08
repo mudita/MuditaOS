@@ -9,7 +9,7 @@ namespace gui
     class PhonebookSearchResults : public AppWindow
     {
       protected:
-        SearchResultsModel *searchResultsModel = nullptr;
+        std::shared_ptr<SearchResultsModel> searchResultsModel = nullptr;
         PhonebookListView *searchResultList    = nullptr;
 
       public:
