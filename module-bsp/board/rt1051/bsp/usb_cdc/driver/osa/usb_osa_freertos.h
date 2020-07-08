@@ -65,7 +65,7 @@ MISRAC_ENABLE
  * Definitions
  ******************************************************************************/
 
-#define USB_OSA_SR_ALLOC()       uint8_t usbOsaCurrentSr;
+#define USB_OSA_SR_ALLOC()       uint8_t usbOsaCurrentSr = 0;
 #define USB_OSA_ENTER_CRITICAL() USB_OsaEnterCritical(&usbOsaCurrentSr)
 #define USB_OSA_EXIT_CRITICAL()  USB_OsaExitCritical(usbOsaCurrentSr)
 
