@@ -314,17 +314,21 @@ class TS0710
         return channels.back();
     }
 
-    void CloseChannel(int index)
+    void CloseChannel(unsigned index)
     {
-        delete channels.at(index);
+        if (index >= channels.size()) {
+            LOG_ERROR("Wrong channel index");
+            return;
+        }
+        delete channels[index];
         channels.erase(channels.begin() + index);
     }
 
     void CloseChannel(const std::string &name)
     {
         for (size_t i = 0; i < channels.size(); i++) {
-            if (channels.at(i)->getName() == name) {
-                delete channels.at(i);
+            if (channels[i]->getName() == name) {
+                delete channels[i];
                 channels.erase(channels.begin() + 1);
             }
         }
