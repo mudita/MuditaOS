@@ -10,7 +10,7 @@ namespace gui
 {
 
     PhonebookNewContact::PhonebookNewContact(app::Application *app)
-        : AppWindow(app, gui::window::name::new_contact), newContactModel{new NewContactModel(app)}
+        : AppWindow(app, gui::window::name::new_contact), newContactModel{std::make_shared<NewContactModel>(app)}
     {
         buildInterface();
     }
@@ -36,20 +36,14 @@ namespace gui
                                  phonebookStyle::mainWindow::newContactsList::x,
                                  phonebookStyle::mainWindow::newContactsList::y,
                                  phonebookStyle::mainWindow::newContactsList::w,
-                                 phonebookStyle::mainWindow::newContactsList::h);
-        list->setProvider(newContactModel);
+                                 phonebookStyle::mainWindow::newContactsList::h,
+                                 newContactModel);
         setFocusItem(list);
     }
 
     void PhonebookNewContact::destroyInterface()
     {
         erase();
-        delete newContactModel;
-    }
-
-    PhonebookNewContact::~PhonebookNewContact()
-    {
-        destroyInterface();
     }
 
     void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)

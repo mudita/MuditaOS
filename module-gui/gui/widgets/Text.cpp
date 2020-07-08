@@ -75,12 +75,10 @@ namespace gui
     }
 
     void Text::setTextType(TextType type)
-    {
-    }
+    {}
 
     void Text::setUnderline(bool underline)
-    {
-    }
+    {}
 
     void Text::setText(const UTF8 &text)
     {
