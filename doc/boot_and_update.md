@@ -47,6 +47,17 @@ switch the phone to MSC mode (bootloader option 4)
 unmount disk from the OS so that it's not used
 find the disk name that is assigned to the phone (sda, sdb etc.)
 
+Find out if the disk is mounted (assuming /dev/sda)
+```
+[atom@urethra:~/devel/PurePhone_14/doc]$ cat /etc/mtab | grep /dev/sda | awk '{print $2}'
+/mnt
+```
+
+Umount /dev/sda from /mnt before you do anything else
+```
+# sudo umount /mnt 
+```
+
 cd into project root dir and run the partitioning script,
 
 ``replace /dev/sdX with the disk name you found for your phone``
@@ -108,7 +119,7 @@ mount the first partition of the phone to any location (ex. /mnt)
 
 `` replace /dev/sdX1 with the disk name``
 
-``$ sound mount /dev/sdX1 /mnt``
+``$ sudo mount /dev/sdX1 /mnt``
 
 now run the flash script (assuming you built your OS in the build-rt1051-Debug folder)
 ```
