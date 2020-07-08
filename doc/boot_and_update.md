@@ -40,7 +40,7 @@ as a variable to the boot.bin (PureOS) as an argument
    and reads all assets and files from it. 
    
 5. updating from old style partitioning (1 partition)
-   to new partition scheme (2 partitions)
+   to new partition scheme (2 partitions). In case of problems see pt 6.
    
 switch the phone to MSC mode (bootloader option 4)
 
@@ -263,3 +263,19 @@ PurePhone ejected
 Done. You can reset PurePhone now
 
 ```
+
+6. In case all above fails, try using gparted on the destination device
+   you should see two FAT partitions on a single disk, if that's not the case
+   use gparted to create a new partition table and re-run the partition script.
+   
+   This is how gparted should look like if the disk is OK
+   ![Gparted OK](./Images/gparted_ok.png "workflow")
+   
+   This is a case if the disk is not correct
+   ![Gparted OK](./Images/gparted_fail.png "workflow")
+   
+   If the phone fails to start in MSC mode, you can try using the D1_Flash_Loader
+   program to rescue it. Go to https://github.com/muditacom/D1_eMMC_FlashLoader/ and clone
+   the project. Open it in Ozone and load the .axf file attached in the initial release
+   of the project. This will present the phones eMMC storage to the OS and you can
+   partition it correctly then.
