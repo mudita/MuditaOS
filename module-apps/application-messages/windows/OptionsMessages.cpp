@@ -1,5 +1,6 @@
 #include "OptionsMessages.hpp"
 #include "application-messages/data/SMSdata.hpp"
+#include "tools/Common.hpp"
 
 #include <common_data/Clipboard.hpp>
 #include <Options.hpp>
@@ -8,6 +9,7 @@
 
 #include <Text.hpp>
 #include <BoxLayout.hpp>
+#include <memory>
 
 using namespace style::window;
 
@@ -71,6 +73,10 @@ gui::Item *placeholder(const UTF8 &text)
     ret->activeItem = false;
     return ret;
 }
+
+namespace gui
+{
+} // namespace gui
 
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {

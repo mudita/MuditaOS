@@ -8,8 +8,9 @@
 
 namespace gui
 {
+    class Rect;
     class Label;
-};
+}; // namespace gui
 
 /// one place to gather all common magical numbers from design
 namespace style
@@ -60,6 +61,7 @@ namespace style
         }; // namespace label
 
         /// minimal label decoration - edges, focus & alignment
+        void decorate(gui::Rect *el);
         void decorate(gui::Label *el);
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
