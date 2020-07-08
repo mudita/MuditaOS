@@ -11,4 +11,5 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 		"DeviceInfo.cpp"
 		"Update.cpp"
+		"BackupEndpoint.cpp"
 )
