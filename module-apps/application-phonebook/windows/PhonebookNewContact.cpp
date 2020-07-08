@@ -155,6 +155,9 @@ namespace gui
                 return false;
             }
             else {
+                auto contactRec = DBServiceAPI::ContactGetByID(application, DBServiceAPI::ContactGetCount(application));
+                assert(!contactRec->empty());
+                contact                               = std::make_shared<ContactRecord>(contactRec->front());
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 LOG_INFO("verifyAndSave contact ADDED");
