@@ -6,6 +6,7 @@
 class StateEndpointBattery;
 class StateEndpointUpdate;
 class StateEndpointDeviceInfo;
+class StateEndpointBackup;
 class StateEndpointNetwork;
 class StateEndpointStorage;
 
@@ -42,6 +43,9 @@ class StateDecodeJson : public EndpointFsm
             break;
         case parserutils::Endpoint::deviceInfo:
             transit<StateEndpointDeviceInfo>();
+            break;
+        case parserutils::Endpoint::backup:
+            transit<StateEndpointBackup>();
             break;
         }
     };
@@ -80,6 +84,23 @@ class StateEndpointUpdate : public EndpointFsm
         transit<StateDecodeJson>();
 
         LOG_DEBUG("*** entry StateEndpointUpdate ***");
+    };
+};
+
+class StateEndpointBackup : public EndpointFsm
+{
+    void entry() override
+    {
+        LOG_DEBUG("*** entry StateEndpointBackup *** uuid:%" PRIu32 "", uuid);
+
+        EndpointHandler endpointHandler = EndpointHandler();
+
+        std::string responseStr;
+        sys::ReturnCodes retCode = endpointHandler.backup(method, uuid, body, responseStr, ownerService);
+        LOG_DEBUG("endpointHandler.backup retCode %d uuid %" PRIu32 "", static_cast<int>(retCode), uuid);
+
+        putToSendQueue(responseStr);
+        transit<StateDecodeJson>();
     };
 };
 

@@ -10,7 +10,8 @@ namespace parserutils
     enum class Endpoint
     {
         deviceInfo = 1,
-        update
+        update,
+        backup
     };
 
     namespace message
@@ -71,5 +72,8 @@ namespace parserutils
         const inline std::string currentRTCTime = "currentRTCTime";
         const inline std::string updateReady    = "updateReady";
         const inline std::string updateFileList = "updateFileList";
+        const inline std::string backupRequest  = "backupRequest";
+        const inline std::string backupReady    = "backupReady";
+        const inline std::string backupUpload   = "backupUpload";
     } // namespace json
 };    // namespace parserutils
