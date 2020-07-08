@@ -38,7 +38,11 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC GOOGLE_PROTOBUF_NO_THREADS)
 # supress warning for protobuf
 set_source_files_properties(${PROTOBUF_SOURCES}
         PROPERTIES COMPILE_FLAGS
-	"-Wno-sign-compare -Wno-type-limits -Wno-redundant-move"
+	"-Wno-stringop-truncation \
+        -Wno-stringop-overflow \
+        -Wno-sign-compare \
+        -Wno-type-limits  \
+        -Wno-redundant-move"
 )
 
 # add include dir
