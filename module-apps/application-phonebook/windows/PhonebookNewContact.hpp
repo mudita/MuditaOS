@@ -12,7 +12,6 @@ namespace gui
     {
       public:
         PhonebookNewContact(app::Application *app);
-        ~PhonebookNewContact() override;
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -36,9 +35,9 @@ namespace gui
         void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber);
         void showDialogDuplicatedSpeedDialNumber();
 
-        gui::ListView *list              = nullptr;
-        NewContactModel *newContactModel = nullptr;
-        ContactAction contactAction      = ContactAction::None;
+        std::shared_ptr<NewContactModel> newContactModel = nullptr;
+        gui::ListView *list                              = nullptr;
+        ContactAction contactAction                      = ContactAction::None;
     };
 
 } /* namespace gui */
