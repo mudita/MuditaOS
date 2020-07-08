@@ -27,9 +27,9 @@ namespace gui
         titleLabel->setFont(style::window::font::small);
         titleLabel->activeItem = false;
 
-        new gui::Span(vBox, Axis::Y, 100); // spread title & inputText
+        new gui::Span(vBox, Axis::Y, phonebookStyle::inputLineWithLabelItem::span_size); // spread title & inputText
 
-        inputText = new Text(vBox, 0,0,0,phonebookStyle::inputLineWithLabelItem::input_text_h);
+        inputText = new Text(vBox, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::input_text_h);
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         inputText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
         inputText->setFont(style::window::font::medium);
@@ -45,7 +45,7 @@ namespace gui
         applyItemNameSpecificSettings();
 
         focusChangedCallback = [&](Item &item) {
-            setFocusItem( focus ? vBox : nullptr);
+            setFocusItem(focus ? vBox : nullptr);
             return true;
         };
 

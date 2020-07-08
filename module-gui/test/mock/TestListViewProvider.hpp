@@ -54,7 +54,7 @@ namespace gui
 
         int getItemCount() const override;
 
-        unsigned int getMinimalItemHeight() override;
+        unsigned int getMinimalItemHeight() const override;
 
         ListItem *getItem(Order order) override;
 
