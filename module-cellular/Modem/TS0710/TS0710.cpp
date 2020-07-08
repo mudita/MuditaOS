@@ -349,31 +349,34 @@ TS0710::ConfState TS0710::StartMultiplexer()
     delete pv_TS0710_Start;
 
     controlCallback = [this](std::vector<uint8_t> &data) {
-        TS0710_Frame *frame = new TS0710_Frame(data);
+        auto frame     = std::make_unique<TS0710_Frame>(data);
+        auto frameData = frame->getFrame().data;
 
-        switch (frame->getFrame().data.at(0)) {
+        if (frameData.size() < 4) {
+            LOG_ERROR("frame too short");
+            return;
+        }
+        switch (frameData[0]) {
         case 0xE3: { // MSC
-            LOG_PRINTF("[MSC ch #%i] ", frame->getFrame().data.at(2) >> 2);
-            if (frame->getFrame().data.at(3) & 0x80)
+            LOG_PRINTF("[MSC ch #%i] ", frameData[2] >> 2);
+            if (frameData[3] & 0x80)
                 LOG_PRINTF("DV ");
-            if (frame->getFrame().data.at(3) & 0x40)
+            if (frameData[3] & 0x40)
                 LOG_PRINTF("IC ");
-            if (frame->getFrame().data.at(3) & 0x08)
+            if (frameData[3] & 0x08)
                 LOG_PRINTF("RTR ");
-            if (frame->getFrame().data.at(3) & 0x04) {
+            if (frameData[3] & 0x04) {
                 LOG_PRINTF("RTC ");
                 this->getCellular()->SetSendingAllowed(true);
             }
             else
                 this->getCellular()->SetSendingAllowed(false);
-            if (frame->getFrame().data.at(3) & 0x02)
+            if (frameData[3] & 0x02)
                 LOG_PRINTF("FC ");
 
             LOG_PRINTF("\n");
         } break;
         }
-
-        delete frame;
     };
 
     // channels[0]->setCallback(controlCallback);
