@@ -1,5 +1,6 @@
 #include "InputLineWithLabelItem.hpp"
 
+#include <Span.hpp>
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
 #include <ContactRecord.hpp>
@@ -17,19 +18,21 @@ namespace gui
         setMaximumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
-        vBox = new VBox(this, 0, 0, 0, 0);
+        vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
-        titleLabel = new Label(vBox, 0, 0, 0, 0);
+        titleLabel = new Label(vBox);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_TOP));
         titleLabel->setFont(style::window::font::small);
         titleLabel->activeItem = false;
 
-        inputText = new Text(vBox, 0, 0, 0, 0);
+        new gui::Span(vBox, Axis::Y, 100); // spread title & inputText
+
+        inputText = new Text(vBox, 0,0,0,phonebookStyle::inputLineWithLabelItem::input_text_h);
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         inputText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
-        inputText->setFont(style::window::font::big);
+        inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
@@ -42,12 +45,7 @@ namespace gui
         applyItemNameSpecificSettings();
 
         focusChangedCallback = [&](Item &item) {
-            if (focus) {
-                setFocusItem(inputText);
-            }
-            else {
-                setFocusItem(nullptr);
-            }
+            setFocusItem( focus ? vBox : nullptr);
             return true;
         };
 
@@ -60,13 +58,9 @@ namespace gui
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
 
-        titleLabel->setArea(BoundingBox(0, 0, newDim.w, phonebookStyle::inputLineWithLabelItem::title_label_h));
-
-        inputText->setArea(BoundingBox(0,
-                                       phonebookStyle::inputLineWithLabelItem::title_label_input_text_span,
-                                       newDim.w,
-                                       phonebookStyle::inputLineWithLabelItem::input_text_h));
-
+        // this shouldn't be needed - without it there will be nothing shown in place of digit labels
+        titleLabel->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::title_label_h);
+        inputText->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::input_text_h);
         return true;
     }
 
