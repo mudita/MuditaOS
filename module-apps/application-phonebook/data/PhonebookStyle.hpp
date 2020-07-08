@@ -72,7 +72,7 @@ namespace phonebookStyle
         constexpr uint32_t w                           = style::window::default_body_width;
         constexpr uint32_t h                           = 75;
         constexpr uint32_t title_label_h               = 20;
-        constexpr uint32_t input_text_h                = 30;
+        constexpr uint32_t input_text_h                = 33;
         constexpr uint32_t title_label_input_text_span = input_text_h + 5;
     } // namespace inputLineWithLabelItem
 

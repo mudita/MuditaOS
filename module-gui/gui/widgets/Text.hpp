@@ -166,6 +166,9 @@ namespace gui
         /// move ownership of mode ptr to Text
         void setInputMode(InputMode *&&mode)
         {
+            if( this->mode != nullptr) {
+                delete this->mode;
+            }
             this->mode = mode;
         };
         bool onFocus(bool state) override;
