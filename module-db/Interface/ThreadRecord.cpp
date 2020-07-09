@@ -23,14 +23,12 @@ ThreadRecordInterface::~ThreadRecordInterface()
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.Add(ThreadsTableRow{.date      = rec.date,
-                                                  .msgCount  = rec.msgCount,
-                                                  .msgRead   = rec.msgRead,
-                                                  .contactID = rec.contactID,
-                                                  .snippet   = rec.snippet,
-                                                  .type      = rec.type
-
-    });
+    auto ret = smsDB->threads.Add(ThreadsTableRow{.date           = rec.date,
+                                                  .msgCount       = rec.msgCount,
+                                                  .unreadMsgCount = rec.unreadMsgCount,
+                                                  .contactID      = rec.contactID,
+                                                  .snippet        = rec.snippet,
+                                                  .type           = rec.type});
 
     return ret;
 }
@@ -49,21 +47,25 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.Update(ThreadsTableRow{.ID        = rec.ID,
-                                                 .date      = rec.date,
-                                                 .msgCount  = rec.msgCount,
-                                                 .msgRead   = rec.msgRead,
-                                                 .contactID = rec.contactID,
-                                                 .snippet   = rec.snippet,
-                                                 .type      = rec.type
+    return smsDB->threads.Update(ThreadsTableRow{.ID             = rec.ID,
+                                                 .date           = rec.date,
+                                                 .msgCount       = rec.msgCount,
+                                                 .unreadMsgCount = rec.unreadMsgCount,
+                                                 .contactID      = rec.contactID,
+                                                 .snippet        = rec.snippet,
+                                                 .type           = rec.type
 
     });
 }
 
 uint32_t ThreadRecordInterface::GetCount()
 {
-
     return smsDB->threads.GetCount();
+}
+
+uint32_t ThreadRecordInterface::GetCount(EntryState state)
+{
+    return smsDB->threads.GetCount(state);
 }
 
 std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)

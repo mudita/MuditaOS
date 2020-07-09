@@ -19,23 +19,28 @@
 
 struct ThreadRecord : Record
 {
-    uint32_t date      = 0;
-    uint32_t msgCount  = 0;
-    uint32_t msgRead   = 0;
-    UTF8 snippet       = "";
-    SMSType type       = SMSType::ALL;
-    uint32_t contactID = 0;
+    uint32_t date           = 0;
+    uint32_t msgCount       = 0;
+    uint32_t unreadMsgCount = 0;
+    UTF8 snippet            = "";
+    SMSType type            = SMSType::UNKNOWN;
+    uint32_t contactID      = DB_ID_NONE;
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
     {
-        ID        = rec.ID;
-        date      = rec.date;
-        msgCount  = rec.msgCount;
-        msgRead   = rec.msgRead;
-        snippet   = rec.snippet;
-        type      = rec.type;
-        contactID = rec.contactID;
+        ID             = rec.ID;
+        date           = rec.date;
+        msgCount       = rec.msgCount;
+        unreadMsgCount = rec.unreadMsgCount;
+        snippet        = rec.snippet;
+        type           = rec.type;
+        contactID      = rec.contactID;
+    }
+
+    bool isUnread() const
+    {
+        return unreadMsgCount > 0;
     }
 };
 
@@ -57,6 +62,7 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     ThreadRecord GetByContact(uint32_t contact_id);
 
     uint32_t GetCount() override final;
+    uint32_t GetCount(EntryState state);
 
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 

@@ -84,7 +84,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     thread.type    = rec.type;
     thread.msgCount++;
     if (rec.type == SMSType::INBOX) {
-        thread.msgRead++;
+        thread.unreadMsgCount++;
     }
 
     threadInterface.Update(thread);

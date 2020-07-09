@@ -25,7 +25,7 @@ struct SMSRecord : public Record
     uint32_t errorCode = 0;
     UTF8 body          = "";
     bool isRead        = false;
-    SMSType type       = SMSType::ALL;
+    SMSType type       = SMSType::UNKNOWN;
     uint32_t threadID  = 0;
     uint32_t contactID = 0;
     utils::PhoneNumber::View number;
