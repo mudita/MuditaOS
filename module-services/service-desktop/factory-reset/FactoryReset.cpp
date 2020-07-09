@@ -157,52 +157,49 @@ namespace FactoryReset
         bool ret = true;
 
         vfs::FILE *sf = vfs.fopen(sourcefile.c_str(), "r");
+        vfs::FILE *tf = vfs.fopen(targetfile.c_str(), "w");
 
-        if (sf != nullptr) {
-            vfs::FILE *tf = vfs.fopen(targetfile.c_str(), "w");
+        if ((sf != nullptr) && (tf != nullptr)) {
+            std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::copy_buf]);
 
-            if (tf != nullptr) {
-                std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::copy_buf]);
+            if (buffer.get() != nullptr) {
+                uint32_t loopcount = (vfs.filelength(sf) / purefs::buffer::copy_buf) + 1u;
+                uint32_t readsize  = purefs::buffer::copy_buf;
 
-                if (buffer.get() != nullptr) {
-                    uint32_t loopcount = (vfs.filelength(sf) / purefs::buffer::copy_buf) + 1u;
-                    uint32_t readsize  = purefs::buffer::copy_buf;
+                for (uint32_t i = 0u; i < loopcount; i++) {
+                    if (i + 1u == loopcount) {
+                        readsize = vfs.filelength(sf) % purefs::buffer::copy_buf;
+                    }
 
-                    for (uint32_t i = 0u; i < loopcount; i++) {
-                        if (i + 1u == loopcount) {
-                            readsize = vfs.filelength(sf) % purefs::buffer::copy_buf;
-                        }
+                    if (vfs.fread(buffer.get(), 1, readsize, sf) != readsize) {
+                        LOG_ERROR("FactoryReset: read from sourcefile %s failed", sourcefile.c_str());
+                        ret = false;
+                        break;
+                    }
 
-                        if (vfs.fread(buffer.get(), 1, readsize, sf) != readsize) {
-                            LOG_ERROR("FactoryReset: read from sourcefile %s failed", sourcefile.c_str());
-                            ret = false;
-                            break;
-                        }
-
-                        if (vfs.fwrite(buffer.get(), 1, readsize, tf) != readsize) {
-                            LOG_ERROR("FactoryReset: write to targetfile %s failed", targetfile.c_str());
-                            ret = false;
-                            break;
-                        }
+                    if (vfs.fwrite(buffer.get(), 1, readsize, tf) != readsize) {
+                        LOG_ERROR("FactoryReset: write to targetfile %s failed", targetfile.c_str());
+                        ret = false;
+                        break;
                     }
                 }
-                else {
-                    LOG_ERROR("FactoryReset: unable to open copy buffer");
-                    ret = false;
-                }
-
-                vfs.fclose(tf);
             }
             else {
-                LOG_ERROR("FactoryReset: unable to open target file %s", targetfile.c_str());
+                LOG_ERROR("FactoryReset: unable to open copy buffer");
                 ret = false;
             }
-
-            vfs.fclose(sf);
         }
         else {
-            LOG_ERROR("FactoryReset: unable to open source file %s", sourcefile.c_str());
+            LOG_ERROR("FactoryReset: unable to open source or target file");
             ret = false;
+        }
+
+        if (sf != nullptr) {
+            vfs.fclose(sf);
+        }
+
+        if (tf != nullptr) {
+            vfs.fclose(tf);
         }
 
         return ret;
