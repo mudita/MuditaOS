@@ -150,9 +150,9 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffsetByThreadI
     }
 }
 
-uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv, EntryState state)
+uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv)
 {
-    std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSGetCount>(state);
+    std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSGetCount>();
 
     auto ret  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto *sms = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
