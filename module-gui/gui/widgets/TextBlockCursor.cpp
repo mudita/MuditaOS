@@ -156,6 +156,11 @@ namespace gui
 
     bool BlockCursor::removeChar()
     {
+        if (checkNpos()) {
+            LOG_ERROR("cant remove from not initialized/empty cursor");
+            return false;
+        }
+
         auto block = curentBlock();
         if (block == blocksEnd()) {
             LOG_ERROR("removing char from document with no TextBlocks");
@@ -163,10 +168,6 @@ namespace gui
         }
 
         debug_cursor("From block: [%d], remove pos: [%d] block length [%d]", getBlockNr(), pos, block->length());
-        if (block_nr == text::npos) {
-            return false;
-        }
-
         block->removeChar(pos);
         if (block->isEmpty()) {
             debug_cursor("empty block removed");
