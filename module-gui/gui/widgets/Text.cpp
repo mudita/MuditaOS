@@ -492,6 +492,7 @@ namespace gui
         if (val != InvalidNumericKeyCode) {
             addChar(intToAscii(val));
             drawLines();
+            return true;
         }
         return false;
     }
