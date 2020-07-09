@@ -74,10 +74,6 @@ gui::Item *placeholder(const UTF8 &text)
     return ret;
 }
 
-namespace gui
-{
-} // namespace gui
-
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {
     ContactRecord contact = DBServiceAPI::ContactGetByID(app, record.contactID)->front();

@@ -7,6 +7,12 @@
 #include <functional>
 #include <memory>
 
+namespace style::option
+{
+    const gui::Position arrow_position_x = 408;
+    const gui::Position arrow_positon_y = 24;
+}
+
 namespace gui
 {
 
@@ -110,15 +116,19 @@ namespace gui
     {
         auto Simple::build() const -> Item *
         {
-            auto *label =
-                new gui::Label(nullptr, 20, 0, style::window_width - 2 * 20, style::window::label::big_h, text);
+            auto *label = new gui::Label(nullptr,
+                                         style::window::default_left_margin,
+                                         0,
+                                         style::window_width - 2 * style::window::default_left_margin,
+                                         style::window::label::big_h,
+                                         text);
             style::window::decorateOption(label);
             label->activatedCallback = activatedCallback;
             if (arrow == Arrow::Enabled) {
-                new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
+                new gui::Image(label, style::option::arrow_position_x, style::option::arrow_positon_y, 0, 0, "right_label_arrow");
             }
             return label;
         }
-    }
+    } // namespace option
 
 } /* namespace gui */

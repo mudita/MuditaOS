@@ -15,13 +15,17 @@ namespace gui
         Enabled
     };
 
-    namespace option {
+    namespace option
+    {
         class Base
         {
-            public:
-                virtual ~Base()= default;
-                [[nodiscard]] virtual auto build() const -> Item * = 0;
-                [[nodiscard]] virtual auto str() const -> std::string { return ""; };
+          public:
+            virtual ~Base()                                    = default;
+            [[nodiscard]] virtual auto build() const -> Item * = 0;
+            [[nodiscard]] virtual auto str() const -> std::string
+            {
+                return "";
+            };
         };
 
         class Simple : public Base
@@ -38,12 +42,12 @@ namespace gui
 
             [[nodiscard]] auto build() const -> Item * override;
         };
-    };
+    }; // namespace option
 
     struct Option
     {
       private:
-          std::unique_ptr<option::Base> option;
+        std::unique_ptr<option::Base> option;
 
       public:
         Option(std::unique_ptr<option::Base> option) : option(std::move(option))
@@ -53,7 +57,7 @@ namespace gui
             : Option(std::make_unique<option::Simple>(text, cb, arrow))
         {}
 
-        Option(const Option& o) = delete;
+        Option(const Option &o) = delete;
 
         Option(Option &&o)
         {

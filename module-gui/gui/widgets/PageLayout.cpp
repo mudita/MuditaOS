@@ -61,7 +61,7 @@ namespace gui
 
     void PageLayout::addWidget(Item *item)
     {
-        if( item == nullptr ) {
+        if (item == nullptr) {
             return;
         }
         if (this->children.size() == 0) {

@@ -19,18 +19,17 @@ void changeSim(app::Application *app, SettingsRecord::ActiveSim simsettings, Sto
 std::list<gui::Option> simSelectWindow(app::Application *app)
 {
     std::list<gui::Option> l;
-    l.emplace_back(
-        gui::Option{"SIM 1",
-         [=](gui::Item &item) {
-             changeSim(app, SettingsRecord::ActiveSim::SIM1, Store::GSM::SIM::SIM1);
-             return true;
-         },
-         gui::Arrow::Disabled});
-        l.emplace_back(gui::Option{"SIM 2",
-         [=](gui::Item &item) {
-             changeSim(app, SettingsRecord::ActiveSim::SIM2, Store::GSM::SIM::SIM2);
-             return true;
-         },
-         gui::Arrow::Disabled});
+    l.emplace_back(gui::Option{"SIM 1",
+                               [=](gui::Item &item) {
+                                   changeSim(app, SettingsRecord::ActiveSim::SIM1, Store::GSM::SIM::SIM1);
+                                   return true;
+                               },
+                               gui::Arrow::Disabled});
+    l.emplace_back(gui::Option{"SIM 2",
+                               [=](gui::Item &item) {
+                                   changeSim(app, SettingsRecord::ActiveSim::SIM2, Store::GSM::SIM::SIM2);
+                                   return true;
+                               },
+                               gui::Arrow::Disabled});
     return l;
 }
