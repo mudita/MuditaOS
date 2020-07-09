@@ -68,6 +68,8 @@ uint32_t ThreadRecordInterface::GetCount(EntryState state)
     return smsDB->threads.GetCount(state);
 }
 
+bool markAsRead();
+
 std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto records = std::make_unique<std::vector<ThreadRecord>>();

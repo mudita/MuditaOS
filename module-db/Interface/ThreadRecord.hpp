@@ -64,6 +64,8 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);
 
+    bool markAsRead();
+
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,
