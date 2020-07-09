@@ -8,7 +8,7 @@
 std::list<gui::Option> mainWindowOptions(app::Application *app)
 {
     std::list<gui::Option> l;
-    l.emplace_back(gui::Option{"Info",
+    l.emplace_back(gui::Option{utils::localize.get("Information"),
                                [=](gui::Item &item) {
                                    LOG_INFO("switching to TEST UI page");
                                    app->switchWindow(gui::window::hw_info, nullptr);

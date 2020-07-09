@@ -10,8 +10,8 @@
 namespace style::option
 {
     const gui::Position arrow_position_x = 408;
-    const gui::Position arrow_positon_y = 24;
-}
+    const gui::Position arrow_positon_y  = 24;
+} // namespace style::option
 
 namespace gui
 {
@@ -28,7 +28,6 @@ namespace gui
     {
         return option.build();
     }
-
 
     void OptionWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
@@ -125,7 +124,8 @@ namespace gui
             style::window::decorateOption(label);
             label->activatedCallback = activatedCallback;
             if (arrow == Arrow::Enabled) {
-                new gui::Image(label, style::option::arrow_position_x, style::option::arrow_positon_y, 0, 0, "right_label_arrow");
+                new gui::Image(
+                    label, style::option::arrow_position_x, style::option::arrow_positon_y, 0, 0, "right_label_arrow");
             }
             return label;
         }
