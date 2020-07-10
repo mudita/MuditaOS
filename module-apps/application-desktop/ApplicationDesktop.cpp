@@ -99,7 +99,8 @@ namespace app
             return requestNotSeenNotifications();
         }
 
-        if ((msg->interface == db::Interface::Name::Calllog || msg->interface == db::Interface::Name::SMSThread) &&
+        if ((msg->interface == db::Interface::Name::Calllog || msg->interface == db::Interface::Name::SMSThread ||
+             msg->interface == db::Interface::Name::SMS) &&
             msg->type != db::Query::Type::Read) {
             requestNotReadNotifications();
             windows[app::window::name::desktop_menu]->rebuild();
@@ -167,7 +168,7 @@ namespace app
     bool ApplicationDesktop::requestNotReadNotifications()
     {
         notifications.notRead.Calls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-        notifications.notRead.SMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+        notifications.notRead.SMS   = DBServiceAPI::ThreadGetCount(this, EntryState::UNREAD);
 
         return true;
     }

@@ -24,7 +24,6 @@ struct SMSTableRow
     uint32_t dateSent;
     uint32_t errorCode;
     UTF8 body;
-    bool isRead;
     SMSType type;
 };
 
@@ -54,7 +53,6 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
                                                    const char *str) override final;
 
     uint32_t GetCount() override final;
-    uint32_t GetCount(EntryState state);
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
 
   private:
@@ -66,7 +64,6 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
                                    "date_send INTEGER,"
                                    "error_code INTEGER,"
                                    "body TEXT NOT_NULL,"
-                                   "read INTEGER,"
                                    "type INTEGER,"
                                    "FOREIGN KEY(thread_id) REFERENCES threads(_id) ON DELETE CASCADE );";
 };

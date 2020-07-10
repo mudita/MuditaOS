@@ -24,14 +24,13 @@ bool SMSTable::Create()
 
 bool SMSTable::Add(SMSTableRow entry)
 {
-    return db->Execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, date_send, error_code, body, read, "
-                       "type ) VALUES (%lu,%lu,%lu,%lu,0,'%q',%d,%d);",
+    return db->Execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, date_send, error_code, body, "
+                       "type ) VALUES (%lu,%lu,%lu,%lu,0,'%q',%d);",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
                        entry.dateSent,
                        entry.body.c_str(),
-                       entry.isRead,
                        entry.type);
 }
 
@@ -66,13 +65,12 @@ bool SMSTable::RemoveByField(SMSTableFields field, const char *str)
 bool SMSTable::Update(SMSTableRow entry)
 {
     return db->Execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, date_send = %lu, error_code = 0, "
-                       "body = '%q', read = %d, type =%d WHERE _id=%lu;",
+                       "body = '%q', type =%d WHERE _id=%lu;",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
                        entry.dateSent,
                        entry.body.c_str(),
-                       entry.isRead,
                        entry.type,
                        entry.ID);
 }
@@ -93,8 +91,7 @@ SMSTableRow SMSTable::GetByID(uint32_t id)
         (*retQuery)[4].GetUInt32(),                       // dateSent
         (*retQuery)[5].GetUInt32(),                       // errorCode
         (*retQuery)[6].GetString(),                       // body
-        (*retQuery)[7].GetBool(),                         // isRead
-        static_cast<SMSType>((*retQuery)[8].GetUInt32()), // type
+        static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
     };
 }
 
@@ -117,8 +114,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limi
             (*retQuery)[4].GetUInt32(),                       // dateSent
             (*retQuery)[5].GetUInt32(),                       // errorCode
             (*retQuery)[6].GetString(),                       // body
-            (*retQuery)[7].GetBool(),                         // isRead
-            static_cast<SMSType>((*retQuery)[8].GetUInt32()), // type
+            static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
         });
     } while (retQuery->NextRow());
 
@@ -167,27 +163,15 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffsetByField(uint32_t offset,
             (*retQuery)[4].GetUInt32(),                       // dateSent
             (*retQuery)[5].GetUInt32(),                       // errorCode
             (*retQuery)[6].GetString(),                       // body
-            (*retQuery)[7].GetBool(),                         // isRead
-            static_cast<SMSType>((*retQuery)[8].GetUInt32()), // type
+            static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
         });
     } while (retQuery->NextRow());
 
     return ret;
 }
-uint32_t SMSTable::GetCount(EntryState state)
+uint32_t SMSTable::GetCount()
 {
-    std::string query = "SELECT COUNT(*) FROM sms ";
-    switch (state) {
-    case EntryState::ALL:
-        break;
-    case EntryState::READ:
-        query += "WHERE sms.read=1";
-        break;
-    case EntryState::UNREAD:
-        query += "WHERE sms.read=0";
-        break;
-    };
-    query += ";";
+    std::string query = "SELECT COUNT(*) FROM sms;";
 
     auto queryRet = db->Query(query.c_str());
     if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
@@ -195,11 +179,6 @@ uint32_t SMSTable::GetCount(EntryState state)
     }
 
     return uint32_t{(*queryRet)[0].GetUInt32()};
-}
-
-uint32_t SMSTable::GetCount()
-{
-    return GetCount(EntryState::ALL);
 }
 
 uint32_t SMSTable::GetCountByFieldID(const char *field, uint32_t id)

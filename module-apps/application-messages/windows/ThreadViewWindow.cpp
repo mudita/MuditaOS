@@ -147,6 +147,11 @@ namespace gui
         }
         SMS.dbsize = threadDetails->msgCount;
 
+        if (threadDetails != nullptr && threadDetails->isUnread()) {
+            threadDetails->unreadMsgCount = 0;
+            DBServiceAPI::ThreadUpdate(application, *threadDetails);
+        }
+
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Init || what == Action::NewestPage) {
             if (what == Action::NewestPage) {
@@ -397,12 +402,6 @@ namespace gui
             auto txt = pdata->text;
             LOG_INFO("received sms templates data \"%s\"", txt.c_str());
             text->setText(text->getText() + txt);
-        }
-
-        std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
-        if (threadDetails != nullptr && threadDetails->msgRead > 0) {
-            threadDetails->msgRead = 0;
-            DBServiceAPI::ThreadUpdate(application, *threadDetails);
         }
     }
 
