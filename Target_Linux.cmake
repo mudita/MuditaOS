@@ -8,7 +8,6 @@ set(TARGET_COMPILE_FEATURES CACHE INTERNAL "")
 
 set(TARGET_COMPILE_DEFINITIONS CACHE INTERNAL "")
 
-add_compile_options(-fsanitize=address)
 add_compile_options(-funsigned-char)
 
 set(TARGET_LIBRARIES
@@ -17,7 +16,11 @@ set(TARGET_LIBRARIES
     portaudio
     CACHE INTERNAL "" )
 
-add_link_options(-fsanitize=address)
+option (LINUX_ENABLE_SANITIZER "Enable address sanitizer for Linux" ON)
+if (LINUX_ENABLE_SANITIZER)
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
+endif (LINUX_ENABLE_SANITIZER)
 
 set(CMAKE_STRIP strip CACHE INTERNAL "")
 set(CMAKE_OBJCOPY objcopy CACHE INTERNAL "")
