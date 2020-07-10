@@ -28,35 +28,36 @@ namespace gui
 
     auto PhonebookContactOptions::contactOptionsList() -> std::list<gui::Option>
     {
-        return {
-            gui::Option{utils::localize.get("app_phonebook_options_edit"),
-                        [=](gui::Item &item) {
-                            LOG_INFO("Editing contact!");
-                            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-                            this->application->switchWindow(
-                                gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-                            return true;
-                        }},
-            gui::Option{utils::localize.get("app_phonebook_options_forward_namecard"),
-                        [=](gui::Item &item) {
-                            LOG_INFO("Forwarding namecard!");
-                            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-                            this->application->switchWindow(
-                                gui::window::name::namecard_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-                            return true;
-                        },
-                        gui::Arrow::Enabled},
-            gui::Option{utils::localize.get("app_phonebook_options_block"),
-                        [=](gui::Item &item) {
-                            LOG_INFO("Blocking contact!");
-                            return contactBlock();
-                        }},
-            gui::Option{utils::localize.get("app_phonebook_options_delete"),
-                        [=](gui::Item &item) {
-                            LOG_INFO("Deleting contact!");
-                            return contactRemove();
-                        }},
-        };
+        std::list<gui::Option> options;
+        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_edit"), [=](gui::Item &item) {
+                                             LOG_INFO("Editing contact!");
+                                             std::unique_ptr<gui::SwitchData> data =
+                                                 std::make_unique<PhonebookItemData>(contact);
+                                             this->application->switchWindow(gui::window::name::new_contact,
+                                                                             gui::ShowMode::GUI_SHOW_INIT,
+                                                                             std::move(data));
+                                             return true;
+                                         }});
+        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_forward_namecard"),
+                                         [=](gui::Item &item) {
+                                             LOG_INFO("Forwarding namecard!");
+                                             std::unique_ptr<gui::SwitchData> data =
+                                                 std::make_unique<PhonebookItemData>(contact);
+                                             this->application->switchWindow(gui::window::name::namecard_options,
+                                                                             gui::ShowMode::GUI_SHOW_INIT,
+                                                                             std::move(data));
+                                             return true;
+                                         },
+                                         gui::Arrow::Enabled});
+        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_block"), [=](gui::Item &item) {
+                                             LOG_INFO("Blocking contact!");
+                                             return contactBlock();
+                                         }});
+        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_delete"), [=](gui::Item &item) {
+                                             LOG_INFO("Deleting contact!");
+                                             return contactRemove();
+                                         }});
+        return options;
     }
 
     auto PhonebookContactOptions::contactBlock() -> bool

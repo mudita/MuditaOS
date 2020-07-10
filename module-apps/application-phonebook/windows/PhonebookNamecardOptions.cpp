@@ -49,19 +49,18 @@ namespace gui
 
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>
     {
-        return {
-            gui::Option{utils::localize.get("app_phonebook_options_send_bt"),
-                        [=](gui::Item &item) {
-                            LOG_INFO("Sending namecard via bluetooth!");
-                            sendViaBluetooth();
-                            return true;
-                        }},
-            gui::Option{utils::localize.get("app_phonebook_options_send_sms"),
-                        [=](gui::Item &item) {
-                            LOG_INFO("Sending namecard via SMS!");
-                            sendViaSms();
-                            return true;
-                        }},
-        };
+        std::list<gui::Option> l;
+
+        l.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_send_bt"), [=](gui::Item &item) {
+                                       LOG_INFO("Sending namecard via bluetooth!");
+                                       sendViaBluetooth();
+                                       return true;
+                                   }});
+        l.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_send_sms"), [=](gui::Item &item) {
+                                       LOG_INFO("Sending namecard via SMS!");
+                                       sendViaSms();
+                                       return true;
+                                   }});
+        return l;
     }
 } // namespace gui

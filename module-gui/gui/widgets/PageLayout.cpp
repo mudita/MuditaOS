@@ -61,6 +61,9 @@ namespace gui
 
     void PageLayout::addWidget(Item *item)
     {
+        if (item == nullptr) {
+            return;
+        }
         if (this->children.size() == 0) {
             // cant add this element to this paged view at all
             if (addPage() == nullptr) {
