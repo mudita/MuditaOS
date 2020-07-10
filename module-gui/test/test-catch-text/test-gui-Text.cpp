@@ -233,12 +233,11 @@ TEST_CASE("handle newline")
     REQUIRE(text->getText() == "\ntext\n");
 }
 
-
 TEST_CASE("handle text block - moved cursor to end")
 {
     std::string test_text = "text";
-    std::string newline = "\n";
-    auto text        = gui::TestText();
+    std::string newline   = "\n";
+    auto text             = gui::TestText();
     text.addText(gui::TextBlock(test_text, mockup::fontManager().getFont(0), gui::TextBlock::End::None));
     REQUIRE(text.getText() == test_text);
     test_text = test_text + newline;

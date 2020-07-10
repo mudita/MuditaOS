@@ -16,7 +16,7 @@ namespace gui
 {
     auto BlockCursor::curentBlock()
     {
-        if( block_nr == text::npos ) {
+        if (block_nr == text::npos) {
             return std::end(document->blocks);
         }
         return std::next(document->blocks.begin(), block_nr);
@@ -156,12 +156,12 @@ namespace gui
 
     void BlockCursor::addTextBlock(TextBlock &&textblock)
     {
-        if ( textblock.length() == 0 ) {
+        if (textblock.length() == 0) {
             return;
         }
-        if( document->isEmpty() ) {
-            block_nr =0;
-            pos = 0;
+        if (document->isEmpty()) {
+            block_nr = 0;
+            pos      = 0;
         }
         document->append(std::move(textblock));
     }
