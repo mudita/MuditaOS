@@ -13,6 +13,7 @@
 * `[gui]` Selector for newline in special character selection
 * `[phonebook]` New implementation of Add/Edit Contact window
 * `[messages]` Options have contact in bold
+* `[messages]``[home screen]` Splited unread from unseen new sms notifications.
 
 ### Changed
  * `[phonebook]` Improved contact searching.

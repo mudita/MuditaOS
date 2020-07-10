@@ -7,6 +7,10 @@ DBThreadMessageGet::DBThreadMessageGet(MessageType messageType, uint32_t contact
     : DBMessage(messageType), contactID(contactID)
 {}
 
+DBThreadGetCountMessage::DBThreadGetCountMessage(EntryState state)
+    : DBMessage(MessageType::DBThreadGetCount), state(state)
+{}
+
 DBThreadResponseMessage::DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,
                                                  uint32_t retCode,
                                                  uint32_t limit,

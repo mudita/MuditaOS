@@ -13,8 +13,7 @@ class DBSMSMessage : public DBMessage
 class DBSMSGetCount : public DBSMSMessage
 {
   public:
-    EntryState state;
-    DBSMSGetCount(EntryState state = EntryState::ALL);
+    DBSMSGetCount();
 };
 
 class DBSMSResponseMessage : public DBResponseMessage
