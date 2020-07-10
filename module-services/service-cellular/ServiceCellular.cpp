@@ -1021,12 +1021,6 @@ bool ServiceCellular::sendSMS(void)
             }
 
             auto channel = cmux->get(TS0710::Channel::Commands);
-            if (channel) {
-                auto resp = channel->cmd(at::AT::CREG);
-                std::string creg;
-                at::response::parseCREG(resp.response[0], creg);
-                LOG_INFO("GREG: %s", creg.c_str());
-            }
 
             for (uint32_t i = 0; i < messagePartsCount; i++) {
 
