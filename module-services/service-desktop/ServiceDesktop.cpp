@@ -47,6 +47,15 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    connect(sdesktop::RestoreMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        auto *restoreMessage = static_cast<sdesktop::RestoreMessage *>(msg);
+        if (restoreMessage != nullptr) {
+            LOG_DEBUG("ServiceDesktop: RestoreMessage received");
+            BackupRestore::RestoreUserFiles(this);
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     return (sys::ReturnCodes::Success);
 }
 

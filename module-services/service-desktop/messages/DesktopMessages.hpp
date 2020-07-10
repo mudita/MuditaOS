@@ -14,4 +14,13 @@ namespace sdesktop
         {}
     };
 
+    class RestoreMessage : public sys::DataMessage
+    {
+      public:
+        RestoreMessage() : sys::DataMessage(MessageType::Restore)
+        {}
+        ~RestoreMessage()
+        {}
+    };
+
 } // namespace sdesktop
