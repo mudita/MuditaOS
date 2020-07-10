@@ -406,7 +406,7 @@ namespace gui
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
             LOG_INFO("received sms templates data \"%s\"", txt.c_str());
-            text->setText(text->getText() + txt);
+            text->addText(txt);
         }
     }
 
