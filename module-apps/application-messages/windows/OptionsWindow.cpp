@@ -7,7 +7,7 @@
 
 std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const ThreadRecord *record)
 {
-
+    assert(record != nullptr);
     ContactRecord contact = record ? DBServiceAPI::ContactGetByID(app, record->contactID)->front() : ContactRecord();
     std::list<gui::Option> options;
 
@@ -15,12 +15,22 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
     auto contactOperation =
         contact.contactType == ContactType::TEMPORARY ? app::ContactOperation::Add : app::ContactOperation::Details;
     options.push_back(gui::options::contact(app, contactOperation, contact));
-    // TODO
-    // last sms, all sms? what author had in mind?
-    options.push_back(gui::Option{"<STUB>" + utils::localize.get("sms_mark_unread"), [=](gui::Item &item) {
-                                      LOG_ERROR("TODO: need implementation");
-                                      return true;
-                                  }});
+
+    if (record->isUnread()) {
+        options.push_back(gui::Option{utils::localize.get("sms_mark_read"), [=](gui::Item &item) {
+                                          app->markSmsThreadAsRead(record->ID);
+                                          app->returnToPreviousWindow();
+                                          return true;
+                                      }});
+    }
+    else {
+        options.push_back(gui::Option{utils::localize.get("sms_mark_unread"), [=](gui::Item &item) {
+                                          app->markSmsThreadAsUnread(record->ID);
+                                          app->returnToPreviousWindow();
+                                          return true;
+                                      }});
+    }
+
     options.push_back(gui::Option{utils::localize.get("sms_delete_conversation"), [=](gui::Item &item) {
                                       LOG_INFO("Removing sms thread!");
                                       return app->removeSMS_thread(record);
