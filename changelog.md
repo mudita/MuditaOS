@@ -3,7 +3,8 @@
 ## Current Release
 
 ### Fixed
-* `[sms]` Return to converstations view after deleting the last message in the thread 
+* `[sms]` Return to converstations view after deleting the last message in the thread
+* `[sms]` Delete old testing empty threads (conversations) on opening
 
 ### Added
 * `[antenna]` Added antenna service.
