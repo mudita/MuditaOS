@@ -13,4 +13,6 @@ class EndpointHandler
     static std::string buildResponseStr(std::size_t responseSize, std::string responsePayloadString);
     sys::ReturnCodes backup(
         uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService);
+    sys::ReturnCodes restore(
+        uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService);
 };

@@ -12,4 +12,5 @@ target_sources(${PROJECT_NAME}
 		"DeviceInfo.cpp"
 		"Update.cpp"
 		"BackupEndpoint.cpp"
+		"RestoreEndpoint.cpp"
 )
