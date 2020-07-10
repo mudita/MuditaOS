@@ -13,8 +13,6 @@ namespace gui
         /** labels */
         Text *inputField = nullptr;
 
-        PhonebookModel *phonebookModel = nullptr;
-
         /** currently displayed contact */
         std::shared_ptr<ContactRecord> contact = nullptr;
 
