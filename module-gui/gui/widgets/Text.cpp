@@ -75,12 +75,10 @@ namespace gui
     }
 
     void Text::setTextType(TextType type)
-    {
-    }
+    {}
 
     void Text::setUnderline(bool underline)
-    {
-    }
+    {}
 
     void Text::setText(const UTF8 &text)
     {
@@ -408,9 +406,7 @@ namespace gui
 
     void Text::showCursor(bool focus)
     {
-        if (focus) {
-            cursor->setVisible(isMode(EditMode::EDIT));
-        }
+        cursor->setVisible(focus && isMode(EditMode::EDIT));
     }
 
     bool Text::handleRotateInputMode(const InputEvent &inputEvent)
@@ -471,7 +467,7 @@ namespace gui
 
         if (code != KeyProfile::none_key) {
             /// if we have multi press in non digit mode - we need to replace char and put next char from translator
-            if (!mode->is(InputMode::digit) && translator.getTimes() > 0) {
+            if (!(mode->is(InputMode::digit) || (mode->is(InputMode::phone))) && translator.getTimes() > 0) {
                 removeChar();
             }
             addChar(code);
@@ -496,6 +492,7 @@ namespace gui
         if (val != InvalidNumericKeyCode) {
             addChar(intToAscii(val));
             drawLines();
+            return true;
         }
         return false;
     }

@@ -17,11 +17,13 @@ namespace gui
     {
 
       public:
+        virtual ~ListItemProvider() = default;
+
         ListView *list = nullptr;
 
         virtual int getItemCount() const = 0;
 
-        virtual unsigned int getMinimalItemHeight() = 0;
+        virtual unsigned int getMinimalItemHeight() const = 0;
 
         virtual ListItem *getItem(Order order) = 0;
 

@@ -26,12 +26,11 @@ namespace gui
 
     class CallLogMainWindow : public AppWindow
     {
-        CalllogModel *calllogModel = nullptr;
-        gui::ListView *list        = nullptr;
+        std::shared_ptr<CalllogModel> calllogModel = nullptr;
+        gui::ListView *list                        = nullptr;
 
       public:
         CallLogMainWindow(app::Application *app);
-        virtual ~CallLogMainWindow();
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

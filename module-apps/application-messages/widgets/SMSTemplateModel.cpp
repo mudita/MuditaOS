@@ -43,9 +43,8 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
     return false;
 }
 
-unsigned int SMSTemplateModel::getMinimalItemHeight()
+unsigned int SMSTemplateModel::getMinimalItemHeight() const
 {
-
     return style::smsTemplItem::h;
 }
 

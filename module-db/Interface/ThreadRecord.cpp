@@ -49,7 +49,7 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.Update(ThreadsTableRow{.ID        = rec.dbID,
+    return smsDB->threads.Update(ThreadsTableRow{.ID        = rec.ID,
                                                  .date      = rec.date,
                                                  .msgCount  = rec.msgCount,
                                                  .msgRead   = rec.msgRead,

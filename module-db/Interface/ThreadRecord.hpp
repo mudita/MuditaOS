@@ -17,9 +17,8 @@
 #include "../Common/Common.hpp"
 #include "../queries/sms/QuerySMSSearch.hpp"
 
-struct ThreadRecord
+struct ThreadRecord : Record
 {
-    uint32_t dbID      = 0;
     uint32_t date      = 0;
     uint32_t msgCount  = 0;
     uint32_t msgRead   = 0;
@@ -30,7 +29,7 @@ struct ThreadRecord
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
     {
-        dbID      = rec.ID;
+        ID        = rec.ID;
         date      = rec.date;
         msgCount  = rec.msgCount;
         msgRead   = rec.msgRead;

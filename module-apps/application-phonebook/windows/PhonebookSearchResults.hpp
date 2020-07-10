@@ -1,16 +1,16 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "application-phonebook/models/SearchResultsModel.hpp"
 #include "application-phonebook/widgets/PhonebookListView.hpp"
+#include "application-phonebook/models/PhonebookModel.hpp"
 
 namespace gui
 {
     class PhonebookSearchResults : public AppWindow
     {
       protected:
-        SearchResultsModel *searchResultsModel = nullptr;
-        PhonebookListView *searchResultList    = nullptr;
+        std::shared_ptr<PhonebookModel> searchResultsModel;
+        PhonebookListView *searchResultList = nullptr;
 
       public:
         PhonebookSearchResults(app::Application *app);
@@ -22,6 +22,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        bool onDatabaseMessage(sys::Message *msgl) override;
     };
 
 } /* namespace gui */

@@ -25,7 +25,9 @@ class TestListView : public gui::ListView
         return ListView::listPageEndReached();
     }
 
-    TestListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : ListView(parent, x, y, w, h){};
+    TestListView(
+        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<gui::ListItemProvider> prov)
+        : ListView(parent, x, y, w, h, prov){};
     ~TestListView() = default;
 };
 
@@ -34,18 +36,18 @@ class ListViewTesting : public ::testing::Test
   protected:
     void SetUp() override
     {
-        testProvider = new gui::TestListViewProvider();
-        testListView =
-            new TestListView(nullptr, testStyle::list_x, testStyle::list_y, testStyle::list_w, testStyle::list_h);
+        testProvider = std::make_shared<gui::TestListViewProvider>();
+        testListView = new TestListView(
+            nullptr, testStyle::list_x, testStyle::list_y, testStyle::list_w, testStyle::list_h, nullptr);
 
         ASSERT_EQ(0, testListView->currentPageSize) << "List should be empty";
+
         testListView->setProvider(testProvider);
     }
 
     void TearDown() override
     {
         delete testListView;
-        delete testProvider;
     }
 
     void moveNTimes(unsigned int n, style::listview::Direction direction)
@@ -62,8 +64,8 @@ class ListViewTesting : public ::testing::Test
         }
     }
 
-    gui::TestListViewProvider *testProvider = nullptr;
-    TestListView *testListView              = nullptr;
+    std::shared_ptr<gui::TestListViewProvider> testProvider = nullptr;
+    TestListView *testListView                              = nullptr;
 };
 
 TEST_F(ListViewTesting, Constructor_Destructor_Test)

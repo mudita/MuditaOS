@@ -1,6 +1,8 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookInternals.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/widgets/ContactListItem.hpp"
 
 #include <BoxLayout.hpp>
 #include <Image.hpp>
@@ -9,13 +11,15 @@
 
 namespace gui
 {
-    class InputBoxWithLabelAndIconItem : public ListItem
+    class InputBoxWithLabelAndIconItem : public ContactListItem
     {
 
         phonebookInternals::ListItemName listItemName;
 
       public:
-        InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName);
+        InputBoxWithLabelAndIconItem(phonebookInternals::ListItemName listItemName,
+                                     std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                                     std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         ~InputBoxWithLabelAndIconItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         gui::HBox *hBox              = nullptr;
@@ -25,7 +29,14 @@ namespace gui
         gui::Image *tickImage        = nullptr;
 
       private:
+        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
+        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+
         void applyItemNameSpecificSettings();
+
+        void speedDialKeyHandler();
+        void addToFavouritesHandler();
+        void addToICEHandler();
     };
 
 } /* namespace gui */

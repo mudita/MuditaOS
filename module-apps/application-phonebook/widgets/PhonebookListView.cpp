@@ -3,8 +3,9 @@
 namespace gui
 {
 
-    PhonebookListView::PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : ListView(parent, x, y, w, h)
+    PhonebookListView::PhonebookListView(
+        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov)
+        : ListView(parent, x, y, w, h, prov)
     {}
 
     void PhonebookListView::addLabelMarker(gui::PhonebookItem *item)

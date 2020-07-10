@@ -28,7 +28,7 @@ namespace gui
         End end = End::Newline;
 
       public:
-        TextBlock(const UTF8 text, Font *font, End eol);
+        TextBlock(const UTF8 text, Font *font, End eol = End::None);
 
         const UTF8 &getText() const;
         UTF8 getText(uint32_t start_position) const;

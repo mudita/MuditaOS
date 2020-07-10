@@ -1,5 +1,12 @@
 #!/bin/bash -e
-IMAGE_FILES="assets country-codes.db Luts.bin user"
+PURE_PARTITION_PRIMARY="PUREOS"
+PURE_PARTITION_RECOVERY="RECOVER"
+PURE_OS_CURRENT="current"
+PURE_OS_PREVIOUS="previous"
+PURE_OS_FACTORY="factory"
+
+IMAGE_FILES="assets country-codes.db Luts.bin user .boot.ini .boot.ini.crc32"
+IMAGE_MOVE_TO_ROOT="user .boot.ini .boot.ini.crc32"
 check_any_arch() {
     local path="${1}"
     local arch="${2}"

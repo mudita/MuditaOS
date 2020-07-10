@@ -98,4 +98,3 @@ if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
 endif()
 
 target_link_libraries(${PROJECT_NAME} module-bsp module-utils)
-

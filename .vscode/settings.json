@@ -6,4 +6,3 @@
     },
     "testMate.cpp.test.executables": "build-linux-Debug/{googletest,catch2}-*",
 }
-

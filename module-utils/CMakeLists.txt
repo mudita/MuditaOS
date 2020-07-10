@@ -28,7 +28,6 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_date_validation.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/microtar/src/microtar.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/crc32/crc32.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
@@ -44,6 +43,7 @@ include(segger/rtt/CMakeLists.txt)
 include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
+include(third-party/sbini.cmake)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 

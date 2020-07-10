@@ -2,15 +2,23 @@
 
 ## Current Release
 
+### Fixed
+* `[sms]` Return to converstations view after deleting the last message in the thread 
+
 ### Added
 * `[antenna]` Added antenna service.
 * `[phonebook]` Add icon flags for showing contact special groups
 * `[gui]` Fully refactored base text element with support for formatting.
 * `[gui]` Digit input on long-press in Text
 * `[gui]` Selector for newline in special character selection
+* `[phonebook]` New implementation of Add/Edit Contact window
+* `[messages]` Options have contact in bold
+
+### Changed
+ * `[phonebook]` Improved contact searching.
 
 ### Other
- * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
+* `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
  
 ## [0.27.1] - 2020-07-03
 

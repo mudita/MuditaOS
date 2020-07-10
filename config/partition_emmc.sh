@@ -1,6 +1,16 @@
 #!/bin/bash
-# set -e
+# set -eo pipefail
+if [ ! -e config/common.sh ]; then
+	echo "No config/common.sh, run this script from git root"
+	exit 1
+fi
 
+if [ ! $(which sfdisk) ]; then
+	echo "No sfdisk, please install"
+	exit 1
+fi
+
+source config/common.sh
 is_root=`id -u`
 if [ "$1" == "" ] || [ $is_root != 0 ]; then
 	echo "Refuse to work with no device. Runme as root [uid=$is_root]"
@@ -17,19 +27,27 @@ else
 fi
 
 pcount=$(sfdisk --dump $dev | grep "start=" | wc -l)
-is_mounted=$(grep $dev /etc/mtab)
-if [ $? != 0 ]; then
+is_mounted=$(grep $dev /etc/mtab | awk '{print $2}')
+if [ "$is_mounted" == "" ]; then
 	echo "$dev is not mounted"
+else
+	echo "$dev is mounted at $is_mounted, please unmount it first"
+	exit 1
 fi
 
 if [ $pcount == 2 ] && [ $use_the_force == 0 ]; then
-	echo "device $dev already has 2 partitions"
+	echo "device $dev already has 2 partitions (use -f to force)"
 	exit 1
 else
 	echo "$dev has $pcount partitions"
 fi
 
-sfdisk --wipe always $dev < emmc_partition_table.dump
+echo "!!! $dev will be wiped, no recovery at this point"
+echo "!!! press ENTER to continue or CTRL+C to cancel"
+echo -ne "?"
+read
+
+sfdisk --wipe always $dev < config/emmc_partition_table.dump
 
 if [ $? != 0 ]; then
 	echo "partitioning device $dev failed"
@@ -40,10 +58,10 @@ part1=$(sfdisk $dev --dump | grep bootable | awk '{print $1}')
 part2=$(sfdisk $dev --dump | tail -n 1 | awk '{print $1}')
 
 echo "create FATs"
-echo "FAT: PUREOS"
-mkfs.vfat -n PUREOS $part1
-echo "FAT: BACKUP"
-mkfs.vfat -n BACKUP $part2
+echo "FAT: $PURE_PARTITION_PRIMARY $part1"
+mkfs.vfat -n $PURE_PARTITION_PRIMARY $part1
+echo "FAT: $PURE_PARTITION_RECOVERY $part2"
+mkfs.vfat -n $PURE_PARTITION_RECOVERY $part2
 
 echo "probe new partitions to OS"
 partprobe

@@ -24,7 +24,7 @@ namespace utils
             const std::array<std::string, num_days> days = {"common_sunday",
                                                             "common_monday",
                                                             "common_tuesday",
-                                                            "common_wendesday",
+                                                            "common_wednesday",
                                                             "common_thursday",
                                                             "common_friday",
                                                             "common_saturday"};
