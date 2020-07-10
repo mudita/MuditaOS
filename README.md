@@ -244,6 +244,7 @@ Following CMake options can be used:
  * `COLOR_OUTPUT` - enable/disable colored output (enabled by default). Useful when you need to process CMake output or your IDE does not support escape codes.
  * `BUILD_DOC_WITH_ALL` - enable/disable building code documentation with the `all` target (disabled by default).
  * `ENABLE_TEST_LOGS` - enable/disable test log output (disabled by default).
+ * `LINUX_ENABLE_SANITIZER` - enable/disable building with address sanitizer for Linux (enabled by default). This option is handy when you need to run the app with valgrind.
 
 # Linux Bluetooth device
 
