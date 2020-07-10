@@ -14,9 +14,12 @@ fi
 check_target_rt1051 "$BUILD_PATH"
 
 PURE_DEV=/dev/disk/by-id/usb-NXP_SEMI_NXP_MASS_STORAGE_0123456789ABCDEF-0:0-part1
+PURE_DEV_RECOVER=/dev/disk/by-id/usb-NXP_SEMI_NXP_MASS_STORAGE_0123456789ABCDEF-0:0-part2
 PURE_DISK=`readlink -f $PURE_DEV`
+PURE_DISK_RECOVER=`readlink -f $PURE_DEV_RECOVER`
 # check if already mouted
 
+MOUNT_ENTRY_RECOVER=$(grep "$PURE_DISK_RECOVER" /etc/mtab)
 MOUNT_ENTRY=$(grep "$PURE_DISK" /etc/mtab)
 if [ $? -ne 0 ]; then
 	>&2 echo "PurePhone not mounted. Mount or retry with Ozone. https://github.com/muditacom/PurePhone/blob/master/doc/running_on_phone.md#eMMC_upload"
@@ -62,12 +65,19 @@ if [ -z $PURE_PARTITION ]; then
        PURE_PARTITION=$PURE_DISK # it is formatted like so apparently
 fi
 
-# unmount the partition (sdX1), but eject the whole disk (sdX). then the PurePhone will detect it's been removed (=ejected)
-if $(udisksctl unmount -b "$PURE_PARTITION" > /dev/null ) || $(umount "$PURE_PARTITION" > /dev/null ); then
-	echo "PurePhone unmouted"
-	timeout --signal=SIGINT 1 udisksctl power-off -b $PURE_DISK # timeout because there is known error, that this command hangs up.
-	echo "PurePhone ejected"
-	echo "Done. You can reset PurePhone now"
-else
-	>&2 echo "Eject manually"
+if [ "$MOUNT_ENTRY" != "" ]; then
+	echo "Unmounting disk: $PURE_DISK ($MOUNT_ENTRY)"
+	udisksctl unmount -b $PURE_DISK > /dev/null
 fi
+
+if [ "$MOUNT_ENTRY_RECOVER" != "" ]; then
+	echo "Unmounting disk: $PURE_DISK_RECOVER ($MOUNT_ENTRY_RECOVER)"
+	udisksctl unmount -b $PURE_DISK_RECOVER > /dev/null
+fi
+
+sleep 1
+echo "PurePhone unmouted"
+echo "Ejecting USB"
+timeout --signal=SIGINT 1 udisksctl power-off -b $PURE_DISK
+echo
+echo "Reset your phone now"

@@ -10,6 +10,11 @@ if [ ! $(which sfdisk) ]; then
 	exit 1
 fi
 
+if [ ! $(which parted) ]; then
+	echo "No parted, please install"
+	exit 1
+fi
+
 source config/common.sh
 is_root=`id -u`
 if [ "$1" == "" ] || [ $is_root != 0 ]; then
