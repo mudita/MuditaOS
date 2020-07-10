@@ -36,11 +36,6 @@ namespace gui
     void TextDocument::addNewline(BlockCursor &cursor, TextBlock::End eol)
     {
         assert(cursor.getBlockNr() < blocks.size());
-        auto block = std::next(blocks.begin(), cursor.getBlockNr());
-        if (block->getEnd() != TextBlock::End::Newline && block->length() == cursor.getPosition()) {
-            block->setEnd(TextBlock::End::Newline);
-            return;
-        }
         auto [l_block, r_block] = split(cursor);
         l_block.setEnd(eol);
     }

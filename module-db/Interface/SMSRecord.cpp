@@ -24,16 +24,12 @@ SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
     errorCode = w.errorCode;
     number    = num;
     body      = w.body;
-    isRead    = w.isRead;
     type      = w.type;
     threadID  = w.threadID;
     contactID = w.contactID;
 }
 
 SMSRecordInterface::SMSRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb) : smsDB(smsDb), contactsDB(contactsDb)
-{}
-
-SMSRecordInterface::~SMSRecordInterface()
 {}
 
 bool SMSRecordInterface::Add(const SMSRecord &rec)
@@ -70,7 +66,6 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
                                .dateSent  = rec.dateSent,
                                .errorCode = rec.errorCode,
                                .body      = rec.body,
-                               .isRead    = rec.isRead,
                                .type      = rec.type
 
     });
@@ -84,21 +79,16 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     thread.type    = rec.type;
     thread.msgCount++;
     if (rec.type == SMSType::INBOX) {
-        thread.msgRead++;
+        thread.unreadMsgCount++;
     }
 
     threadInterface.Update(thread);
 
     return true;
 }
-uint32_t SMSRecordInterface::GetCount(EntryState state)
-{
-    return smsDB->sms.GetCount(state);
-}
-
 uint32_t SMSRecordInterface::GetCount()
 {
-    return GetCount(EntryState::ALL);
+    return smsDB->sms.GetCount();
 }
 
 uint32_t SMSRecordInterface::GetLastID(void)
@@ -173,7 +163,6 @@ bool SMSRecordInterface::Update(const SMSRecord &rec)
                                   .dateSent  = rec.dateSent,
                                   .errorCode = rec.errorCode,
                                   .body      = rec.body,
-                                  .isRead    = rec.isRead,
                                   .type      = rec.type});
 
     return true;

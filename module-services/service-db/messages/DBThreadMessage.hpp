@@ -10,6 +10,13 @@ class DBThreadMessage : public DBMessage
     ThreadRecord record;
 };
 
+class DBThreadGetCountMessage : public DBMessage
+{
+  public:
+    EntryState state;
+    DBThreadGetCountMessage(EntryState state = EntryState::ALL);
+};
+
 class DBThreadMessageGet : public DBMessage
 {
   public:

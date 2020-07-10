@@ -11,19 +11,21 @@
 #pragma once
 
 #include "Table.hpp"
+#include "Record.hpp"
 #include "Database/Database.hpp"
-#include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
+
+#include <utf8/UTF8.hpp>
 
 struct ThreadsTableRow
 {
-    uint32_t ID = 0;
-    uint32_t date;
-    uint32_t msgCount;
-    uint32_t msgRead;
-    uint32_t contactID;
+    uint32_t ID             = DB_ID_NONE;
+    uint32_t date           = 0;
+    uint32_t msgCount       = 0;
+    uint32_t unreadMsgCount = 0;
+    uint32_t contactID      = DB_ID_NONE;
     UTF8 snippet;
-    SMSType type;
+    SMSType type = SMSType::UNKNOWN;
 };
 
 enum class ThreadsTableFields
@@ -53,6 +55,7 @@ class ThreadsTable : public Table<ThreadsTableRow, ThreadsTableFields>
                                                        const char *str) override final;
 
     uint32_t GetCount() override final;
+    uint32_t GetCount(EntryState state);
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
     ThreadsTableRow getByContact(uint32_t contact_id);
 

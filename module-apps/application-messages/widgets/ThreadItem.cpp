@@ -11,7 +11,7 @@ namespace gui
     ThreadItem *ThreadItem::makeThreadItem(ThreadModel *model, std::shared_ptr<ThreadRecord> thread)
     {
         ThreadItem *threadItem = nullptr;
-        threadItem             = thread->msgRead > 0 ? new ThreadItemNotRead(model) : new ThreadItem(model);
+        threadItem             = thread->isUnread() ? new ThreadItemNotRead(model) : new ThreadItem(model);
 
         threadItem->setThreadItem(thread);
 

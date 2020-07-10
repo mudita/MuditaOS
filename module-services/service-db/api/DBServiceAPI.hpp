@@ -44,7 +44,7 @@ class DBServiceAPI
                                                                                uint32_t offset,
                                                                                uint32_t limit,
                                                                                uint32_t id);
-    static uint32_t SMSGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
+    static uint32_t SMSGetCount(sys::Service *serv);
     /**
      * @brief Function is getting last modified SMS record.
      * @param serv Pointer to Service based object that is sending request.
@@ -56,7 +56,7 @@ class DBServiceAPI
     static std::unique_ptr<ThreadRecord> ThreadGetByContact(sys::Service *serv, uint32_t contactID);
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
     static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
-    static uint32_t ThreadGetCount(sys::Service *serv);
+    static uint32_t ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
     static bool ThreadUpdate(sys::Service *serv, const ThreadRecord &rec);
 
     static bool SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &rec);

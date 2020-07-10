@@ -16,6 +16,9 @@ namespace gui
 {
     auto BlockCursor::curentBlock()
     {
+        if (block_nr == text::npos) {
+            return std::end(document->blocks);
+        }
         return std::next(document->blocks.begin(), block_nr);
     }
 
@@ -146,16 +149,30 @@ namespace gui
         }
         if (utf_val == text::newline) {
             document->addNewline(*this, TextBlock::End::Newline);
-            // now we point to new block after newline was added
-            ++block_nr;
-            pos = 0;
             return;
         }
         block->addChar(utf_val, pos);
     }
 
+    void BlockCursor::addTextBlock(TextBlock &&textblock)
+    {
+        if (textblock.length() == 0) {
+            return;
+        }
+        if (document->isEmpty()) {
+            block_nr = 0;
+            pos      = 0;
+        }
+        document->append(std::move(textblock));
+    }
+
     bool BlockCursor::removeChar()
     {
+        if (checkNpos()) {
+            LOG_ERROR("cant remove from not initialized/empty cursor");
+            return false;
+        }
+
         auto block = curentBlock();
         if (block == blocksEnd()) {
             LOG_ERROR("removing char from document with no TextBlocks");
@@ -163,10 +180,6 @@ namespace gui
         }
 
         debug_cursor("From block: [%d], remove pos: [%d] block length [%d]", getBlockNr(), pos, block->length());
-        if (block_nr == text::npos) {
-            return false;
-        }
-
         block->removeChar(pos);
         if (block->isEmpty()) {
             debug_cursor("empty block removed");

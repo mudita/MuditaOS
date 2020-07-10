@@ -3,7 +3,7 @@
 DBSMSMessage::DBSMSMessage(MessageType messageType, const SMSRecord &rec) : DBMessage(messageType), record(rec)
 {}
 
-DBSMSGetCount::DBSMSGetCount(EntryState state) : DBSMSMessage(MessageType::DBSMSGetCount), state(state)
+DBSMSGetCount::DBSMSGetCount() : DBSMSMessage(MessageType::DBSMSGetCount)
 {}
 
 DBSMSResponseMessage::DBSMSResponseMessage(std::unique_ptr<std::vector<SMSRecord>> rec,

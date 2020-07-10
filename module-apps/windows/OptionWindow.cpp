@@ -7,6 +7,12 @@
 #include <functional>
 #include <memory>
 
+namespace style::option
+{
+    const gui::Position arrow_position_x = 408;
+    const gui::Position arrow_positon_y  = 24;
+} // namespace style::option
+
 namespace gui
 {
 
@@ -18,34 +24,21 @@ namespace gui
     void OptionWindow::rebuild()
     {}
 
-    Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
-    {
-        // TODO fix elements positioning with styles ready, right now moved from Settings main window as it is
-        gui::Label *label =
-            new gui::Label(nullptr, 20, 0, style::window_width - 2 * 20, style::window::label::big_h, text);
-        style::window::decorateOption(label);
-        label->activatedCallback = activatedCallback;
-        if (arrow == Arrow::Enabled) {
-            new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
-        }
-        return label;
-    }
-
     Item *newOptionLabel(const Option &option)
     {
-        return newOptionLabel(option.text, option.activatedCallback, option.arrow);
+        return option.build();
     }
 
     void OptionWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
-        body->addWidget(newOptionLabel(text, activatedCallback, arrow));
+        body->addWidget(Option(text, activatedCallback, arrow).build());
     }
 
     void OptionWindow::addOptions(std::list<Option> options)
     {
-        for (auto &el : options) {
-            LOG_INFO("adding option: %s", el.text.c_str());
-            addOptionLabel(el.text, el.activatedCallback, el.arrow);
+        for (auto &option : options) {
+            // LOG_INFO("adding option: %s", option.str().c_str());
+            body->addWidget(option.build());
         }
         body->switchPage(0);
     }
@@ -106,8 +99,36 @@ namespace gui
             name = utils::localize.get("app_phonebook_options_title");
         }
         auto window = new OptionWindow(app, name);
-        window->addOptions(options);
+        window->addOptions(std::move(options));
         return window;
     }
+
+    // TODO move it to separate file
+
+    [[nodiscard]] auto Option::build() const -> Item *
+    {
+        assert(option);
+        return option->build();
+    }
+
+    namespace option
+    {
+        auto Simple::build() const -> Item *
+        {
+            auto *label = new gui::Label(nullptr,
+                                         style::window::default_left_margin,
+                                         0,
+                                         style::window_width - 2 * style::window::default_left_margin,
+                                         style::window::label::big_h,
+                                         text);
+            style::window::decorateOption(label);
+            label->activatedCallback = activatedCallback;
+            if (arrow == Arrow::Enabled) {
+                new gui::Image(
+                    label, style::option::arrow_position_x, style::option::arrow_positon_y, 0, 0, "right_label_arrow");
+            }
+            return label;
+        }
+    } // namespace option
 
 } /* namespace gui */

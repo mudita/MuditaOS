@@ -40,7 +40,6 @@ TEST_CASE("SMS Record tests")
     auto numberTest2             = utils::PhoneNumber("222333444", utils::country::Id::UNKNOWN).getView();
     const char *bodyTest         = "Test SMS Body";
     const char *bodyTest2        = "Test SMS Body2";
-    const bool isReadTest        = true;
     const SMSType typeTest       = SMSType ::DRAFT;
 
     SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
@@ -51,7 +50,6 @@ TEST_CASE("SMS Record tests")
     recordIN.errorCode = errorCodeTest;
     recordIN.number    = numberTest;
     recordIN.body      = bodyTest;
-    recordIN.isRead    = isReadTest;
     recordIN.type      = typeTest;
 
     // Add 2 records
@@ -66,7 +64,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Get all available records by specified thread ID and check for invalid data
@@ -75,7 +72,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Get all available records by specified contact ID and check for invalid data
@@ -84,7 +80,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Remove records one by one
@@ -129,7 +124,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Get all available records by specified thread ID and check for invalid data
@@ -138,7 +132,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest2);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Get all available records by specified contact ID and check for invalid data
@@ -147,7 +140,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Get all available records by specified contact ID and check for invalid data
@@ -156,7 +148,6 @@ TEST_CASE("SMS Record tests")
     for (const auto &w : *records) {
         REQUIRE(w.body == bodyTest);
         REQUIRE(w.number == numberTest2);
-        REQUIRE(w.isRead == isReadTest);
     }
 
     // Remove sms records in order to check automatic management of threads and contact databases
