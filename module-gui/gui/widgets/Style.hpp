@@ -67,6 +67,15 @@ namespace style
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
 
+        namespace calendar
+        {
+            const inline uint32_t day_cell_width = 60;
+            const inline uint32_t day_cell_height = 55;
+            /// TODO: check req
+            const inline uint32_t month_year_height = 60;
+            
+        };
+
         namespace messages
         {
             inline const uint32_t sms_radius                    = 7;
