@@ -266,6 +266,8 @@ namespace gui
         virtual Item *getNavigationItem(NavigationDirection direction);
         /// set next navigation item in NavigationDirection
         virtual void setNavigationItem(NavigationDirection direction, Item *item);
+        /// clear next navigation item in NavigationDirection
+        virtual void clearNavigationItem(gui::NavigationDirection direction);
 
         Item();
         virtual ~Item();
