@@ -1,5 +1,10 @@
 # Mudita PurePhone changelog
 
+## Current version
+
+### Fixed
+* `[phonebook]` Fix wrong text label for back action.
+
 ## [0.28.1] - 2020-07-10
 
 ### Added
