@@ -5,25 +5,19 @@
 
 class CalendarModel : public gui::ListItemProvider
 {
+    const unsigned int itemHeight = 90;
+    const int tempItemCount       = 5; // temporary
   public:
     CalendarModel(app::Application *app);
-    virtual ~CalendarModel();
+    virtual ~CalendarModel() = default;
 
-    /// TODO: Connect with database
-    // virtual methods
-    // void requestRecordsCount() override;
-    // bool updateRecords(std::unique_ptr<std::vector< ?db_records? >> records,
-    //                const uint32_t offset,
-    //                const uint32_t limit,
-    //                uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    unsigned int getMinimalItemHeight() override;
+    unsigned int getMinimalItemHeight();
     gui::ListItem *getItem(gui::Order order) override;
     int getItemCount() const override
     {
-        /// TODO: Count items from database 
-        return 7;
+        return tempItemCount;
     };
 };

@@ -47,7 +47,7 @@ namespace app
             gui::name::window::main_window, new gui::CalendarMainWindow(this, gui::name::window::main_window)));
 
         gui::AppWindow *window = nullptr;
-        LOG_DEBUG("CREATE DAY WINDOW");
+        LOG_DEBUG("Create day window");
         window = new DayWindow(this,"Day");
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }

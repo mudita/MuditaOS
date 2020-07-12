@@ -14,23 +14,13 @@ namespace gui
     void Navigation::setDirectionItem(NavigationDirection direction, Item *item)
     {
         switch (direction) {
-<<<<<<< HEAD
         case NavigationDirection::LEFT:
-=======
-        case (NavigationDirection::LEFT):
-            LOG_DEBUG("LEFT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
->>>>>>> b1a43047... update mainWindow class, add dayWindow files
             left = item;
             break;
         case NavigationDirection::UP:
             up = item;
             break;
-<<<<<<< HEAD
         case NavigationDirection::RIGHT:
-=======
-        case (NavigationDirection::RIGHT):
-            LOG_DEBUG("RIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
->>>>>>> b1a43047... update mainWindow class, add dayWindow files
             right = item;
             break;
         case NavigationDirection::DOWN:

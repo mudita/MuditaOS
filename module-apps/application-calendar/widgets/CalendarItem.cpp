@@ -4,15 +4,14 @@
 
 #include "CalendarItem.hpp"
 #include <Style.hpp>
-#include <memory>
 
 namespace gui
 {
 
     CalendarItem::CalendarItem(CalendarModel *model) : model{model}
     {
-        setMinimumSize(style::window::default_body_width, 90);
-        setMaximumSize(style::window::default_body_width, 90);
+        setMinimumSize(style::window::default_body_width, model->getMinimalItemHeight());
+        setMaximumSize(style::window::default_body_width, model->getMinimalItemHeight());
 
         setRadius(0);
         setPenFocusWidth(2);
@@ -32,16 +31,11 @@ namespace gui
         description->setAlignment(
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
 
-        //clock = new gui::Image(this, 0, 0, 0, 0, "menu_alarm_W_G"); // get clock image
+        // clock = new gui::Image(this, 0, 0, 0, 0, "menu_alarm_W_G"); // get clock image
 
-        /// TODO: Change to load text from database
+        // temp
         description->setText("Meeting");
         title->setText("10:00 - 11:15 AM");
-    }
-
-    CalendarItem::~CalendarItem()
-    {
-
     }
 
     bool CalendarItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -55,20 +49,9 @@ namespace gui
         return true;
     }
 
-    /// TODO: Load text to labels from database
-    /*void CalendarItem::setNote(std::shared_ptr< > &note)
-    {
-        this->note = note;
-        // set values of the labels
-        //title->setText(std::to_string(note->ID));
-        //description->setText(note->path);
-        title->setText(note.title);
-        description->setText(note.note);
-    }*/
-
     bool CalendarItem::onActivated(void *data)
     {
-        LOG_INFO("OPEN ITEM");
+        LOG_DEBUG("Open calendar item");
         return true;
     }
 

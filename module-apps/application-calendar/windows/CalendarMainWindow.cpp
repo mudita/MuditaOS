@@ -9,6 +9,7 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "CalendarMainWindow.hpp"
+#include "../widgets/CalendarStyle.hpp"
 #include <time/time_conversion.hpp>
 #include <gui/widgets/Margins.hpp>
 #include <gui/widgets/Style.hpp>
@@ -18,6 +19,7 @@
 #include "../Common.hpp"
 #include "../ApplicationCalendar.hpp"
 #include <vector>
+#include "../widgets/CalendarStyle.hpp"
 
 namespace gui
 {
@@ -106,14 +108,14 @@ namespace gui
             }
         }
     }
-    void Month::get_month(const int &offset)
+    void Month::get_month(const uint32_t &offset)
     {
         /// @param offset defines number of empty fields in first row 
         /// This is a temporary solution
-        for (int i = 0; i<offset; i++) {
+        for (uint32_t i = 0; i<offset; i++) {
             days.push_back(0);
         }
-        for (int i = 1; i<=numberOfDays; i++) {
+        for (uint32_t i = 1; i<=numberOfDays; i++) {
             days.push_back(i);
         }
         ///   day record in DB will have a coordinate value...
@@ -236,29 +238,6 @@ namespace gui
             dayMap[firstRowKey]->setNavigationItem(NavigationDirection::UP, dayMap[lastRowKey]);
         }
 
-        
-        ///=======temporary solution:
-        //navi from first row, last element
-        auto key = std::make_pair(coords::last_column, coords::first_row);
-        dayMap[key]->setNavigationItem(NavigationDirection::RIGHT, dayMap[keyFirst]);
-        ///========================
-        ///-------------------------TODO:-----------------------------------------
-        // Change month while navigate from last column in the direction::RIGHT
-        //int y = coords::last_column;
-        for(int x = coords::first_row; x<=lastRow; x++) {
-            //auto key = std::make_pair(x, y);
-            //Set input right to change_to next_month event
-            LOG_DEBUG("TODO");
-        }
-        // Change month while navigate from first column in the direction::LEFT
-        //y = coords::last_column;
-        for(int x = coords::first_row; x<=lastRow; x++) {
-            //auto key = std::make_pair(x, y);
-            //Set input right to change_to next_month event
-            LOG_DEBUG("TODO");
-        }
-        //----------------------------------------------------------------------
-
     }
     
     CalendarMainWindow::CalendarMainWindow(app::Application *app, std::string name) : AppWindow(app, name)
@@ -277,7 +256,7 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(app);
 
-        year = new Year(this, " June 2019", style::window::default_left_margin, title->offset_h(), style::window::default_body_width,style::window::calendar::month_year_height);
+        year = new Year(this, " June 2019", style::window::default_left_margin, title->offset_h(), style::window::default_body_width,style::window::calendar::date_label_height);
         this->addWidget(year);
         setFocusItem(year);
 
@@ -285,20 +264,11 @@ namespace gui
         uint32_t monthHeight = style::window_height - title->offset_h() - style::footer::height; 
         uint32_t dayWidth = style::window::calendar::day_cell_width;
         uint32_t dayHeight = style::window::calendar::day_cell_height;
-        uint32_t offsetFromTop = title->offset_h()+style::window::calendar::month_year_height;
+        uint32_t offsetFromTop = title->offset_h()+style::window::calendar::date_label_height;
 
         month = new Month(app, this, "June", offsetFromTop,monthWidth, monthHeight,dayWidth, dayHeight);
         setFocusItem(month);
         month->rebuildNavigation();
-
-        // ///-------------to remove----------------------------------------------
-        // auto keyFirst = std::make_pair(getFirstDayCoord_X(),getFirstDayCoord_Y());
-        // auto keyLast = std::make_pair(getLastDayCoord_X(),getLastDayCoord_Y());
-        // auto temp = dayMap[keyFirst]->getNavigationItem(NavigationDirection::LEFT);
-        // auto temp2 = dayMap[keyLast];
-        // LOG_DEBUG("COMPARE OBJECTS AFTER FOCUS:  %" PRIxPTR "\n",reinterpret_cast<std::intptr_t>(temp));
-        // LOG_DEBUG("COMPARE OBJECTS AFTER FOCUS:  %" PRIxPTR "\n",reinterpret_cast<std::intptr_t>(temp2));
-        // ///-------------to remove----------------------------------------------
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);

@@ -10,8 +10,6 @@ namespace gui
     {
 
         CalendarModel *model = nullptr;
-        // pointer to the ... record
-        /// TODO: Connect to database
 
         gui::Label *title       = nullptr;
         gui::Label *description = nullptr;
@@ -19,7 +17,6 @@ namespace gui
 
       public:
         CalendarItem(CalendarModel *model);
-        virtual ~CalendarItem();
 
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
