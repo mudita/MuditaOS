@@ -1,9 +1,12 @@
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
 
+#include <queries/phonebook/QueryContactGet.hpp>
+
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
 
+#include <algorithm>
 #include <optional>
 #include <vector>
 
@@ -121,6 +124,61 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
     }
 
     return true;
+}
+
+std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(const db::Query *query)
+{
+    if (query->type != db::Query::Type::Read) {
+        LOG_WARN("Received unhandled query type: %lu", static_cast<unsigned long int>(query->type));
+        return nullptr;
+    }
+
+    auto textFilter = dynamic_cast<const db::query::TextFilter *>(query);
+    assert(query != nullptr);
+    bool searchByNumber = false;
+    if (textFilter->isFilterPresent() && utils::is_number(textFilter->getFilterData())) {
+        searchByNumber = true;
+        LOG_INFO("Filtering by number: %s", textFilter->getFilterData().c_str());
+    }
+
+    if (typeid(*query) == typeid(db::query::ContactGet)) {
+        auto readQuery = static_cast<const db::query::ContactGet *>(query);
+        LOG_DEBUG("Contact read query, filter: \"%s\", offset=%lu, limit=%lu",
+                  readQuery->getFilterData().c_str(),
+                  static_cast<unsigned long>(readQuery->getOffset()),
+                  static_cast<unsigned long>(readQuery->getLimit()));
+        auto [limit, offset] = readQuery->getLimitOffset();
+        auto ids = searchByNumber ? contactDB->contacts.GetIDsByTextNumber(readQuery->getFilterData(), limit, offset)
+                                  : contactDB->name.GetIDsByName(readQuery->getFilterData(), limit, offset);
+
+        std::vector<ContactRecord> result(ids.size());
+        std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
+
+        return std::make_unique<db::query::ContactGetResult>(result);
+    }
+    else if (typeid(*query) == typeid(db::query::ContactGetSize)) {
+        auto countQuery = static_cast<const db::query::ContactGetSize *>(query);
+        LOG_DEBUG("Contact count query, filter: \"%s\"", countQuery->getFilterData().c_str());
+
+        std::size_t count = 0;
+        if (!countQuery->isFilterPresent()) {
+            count = contactDB->contacts.GetCount();
+        }
+        else if (searchByNumber) {
+            count = contactDB->contacts.GetIDsByTextNumber(countQuery->getFilterData()).size();
+        }
+        else {
+            count = contactDB->name.GetCountByName(countQuery->getFilterData());
+        }
+
+        LOG_DEBUG("Contact count query result: %lu", static_cast<unsigned long>(count));
+
+        return std::make_unique<db::query::RecordsSizeQueryResult>(count);
+    }
+    else {
+        LOG_ERROR("Unexpected query type.");
+        return nullptr;
+    }
 }
 
 bool ContactRecordInterface::Update(const ContactRecord &rec)

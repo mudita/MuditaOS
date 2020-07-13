@@ -24,8 +24,7 @@ struct SMSRecord : public Record
     uint32_t dateSent  = 0;
     uint32_t errorCode = 0;
     UTF8 body          = "";
-    bool isRead        = false;
-    SMSType type       = SMSType::ALL;
+    SMSType type       = SMSType::UNKNOWN;
     uint32_t threadID  = 0;
     uint32_t contactID = 0;
     utils::PhoneNumber::View number;
@@ -45,7 +44,7 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
 {
   public:
     SMSRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb);
-    ~SMSRecordInterface();
+    ~SMSRecordInterface() = default;
 
     bool Add(const SMSRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
@@ -54,7 +53,6 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     SMSRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
-    uint32_t GetCount(EntryState state);
     uint32_t GetLastID(void);
     std::unique_ptr<std::vector<SMSRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 

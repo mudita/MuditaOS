@@ -72,6 +72,7 @@ namespace gui
         auto operator-=(unsigned int) -> BlockCursor &;
         auto operator--() -> BlockCursor &;
         void addChar(uint32_t utf_val);
+        void addTextBlock(TextBlock &&);
         // return if handled ( this is not i.e. at begin/end)
         bool removeChar();
     };

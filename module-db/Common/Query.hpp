@@ -18,7 +18,7 @@ namespace db
 
         Query(Type type) : type(type)
         {}
-        virtual ~Query()                                            = default;
+        virtual ~Query() = default;
 
         const Type type;
 

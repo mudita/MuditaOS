@@ -4,32 +4,51 @@
 #include "PhonebookModel.hpp"
 #include "i18/i18.hpp"
 
+#include <messages/QueryMessage.hpp>
+#include <queries/phonebook/QueryContactGet.hpp>
+#include <queries/RecordQuery.hpp>
+
 #include "service-db/api/DBServiceAPI.hpp"
 #include "UiCommonActions.hpp"
 
-PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel(app)
-{}
+#include <string>
+
+const static std::uint32_t phonebookModelTimeout = 1000;
+
+PhonebookModel::PhonebookModel(app::Application *app, std::string filter)
+    : DatabaseModel(app), queryFilter(std::move(filter))
+{
+    requestRecordsCount();
+}
 
 void PhonebookModel::requestRecordsCount()
 {
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(application,
+                                                       db::Interface::Name::Contact,
+                                                       std::make_unique<db::query::ContactGetSize>(queryFilter),
+                                                       phonebookModelTimeout);
 
-    favouriteCount = DBServiceAPI::ContactGetCount(application, true);
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        assert(queryResponse != nullptr);
 
-    recordsCount = DBServiceAPI::ContactGetCount(application);
+        auto countResult = dynamic_cast<db::query::RecordsSizeQueryResult *>(queryResponse->getResult());
+        assert(countResult != nullptr);
 
-    DBServiceAPI::ContactGetLimitOffset(application, 0, phonebookStyle::mainWindow::contactsList::pageSize);
+        recordsCount = countResult->getSize();
+    }
 }
 
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-
-    DBServiceAPI::ContactGetLimitOffset(application, offset, limit);
+    DBServiceAPI::GetQuery(
+        application, db::Interface::Name::Contact, std::make_unique<db::query::ContactGet>(offset, limit, queryFilter));
 }
 
-bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
+auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
                                    const uint32_t offset,
                                    const uint32_t limit,
-                                   uint32_t count)
+                                   uint32_t count) -> bool
 {
 
 #if DEBUG_DB_MODEL_DATA == 1
@@ -50,12 +69,12 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
     return true;
 }
 
-unsigned int PhonebookModel::getMinimalItemHeight()
+auto PhonebookModel::getMinimalItemHeight() const -> unsigned int
 {
     return phonebookStyle::contactItem::h;
 }
 
-gui::ListItem *PhonebookModel::getItem(gui::Order order)
+auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
 {
 
     std::shared_ptr<ContactRecord> contact = getRecord(order);
@@ -64,7 +83,7 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
         return nullptr;
     }
 
-    gui::PhonebookItem *item = new gui::PhonebookItem();
+    auto item = new gui::PhonebookItem();
 
     item->setContact(contact);
     item->activatedCallback = [this, item, contact](gui::Item &) {
@@ -72,7 +91,6 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
             return true;
         }
 
-        LOG_INFO("activatedCallback");
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
 
         application->switchWindow(gui::window::name::contact, std::move(data));
@@ -87,11 +105,15 @@ gui::ListItem *PhonebookModel::getItem(gui::Order order)
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
-            LOG_DEBUG("calling");
             return app::call(application, *item->contact);
         }
         return false;
     };
 
     return item;
+}
+
+auto PhonebookModel::getFilter() const -> const std::string &
+{
+    return queryFilter;
 }

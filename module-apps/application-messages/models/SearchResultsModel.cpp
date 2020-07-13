@@ -11,7 +11,7 @@ namespace gui::model
     SearchResultsModel::SearchResultsModel(app::Application *app) : BaseThreadRecordModel(app)
     {}
 
-    unsigned int SearchResultsModel::getMinimalItemHeight()
+    unsigned int SearchResultsModel::getMinimalItemHeight() const
     {
 
         return style::window::messages::sms_thread_item_h;

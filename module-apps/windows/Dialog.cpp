@@ -127,7 +127,7 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const M
     no->setNavigationItem(NavigationDirection::LEFT, yes);
     yes->setNavigationItem(NavigationDirection::RIGHT, no);
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
 
     setFocusItem(no);
 }

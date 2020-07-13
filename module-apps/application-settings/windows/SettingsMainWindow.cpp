@@ -7,71 +7,32 @@
 
 std::list<gui::Option> mainWindowOptions(app::Application *app)
 {
-    return {
-        gui::Option{"Info",
-                    [=](gui::Item &item) {
-                        LOG_INFO("switching to TEST UI page");
-                        app->switchWindow(gui::window::hw_info, nullptr);
-                        return true;
-                    },
-                    gui::Arrow::Enabled},
-        {"UI TEST",
-         [=](gui::Item &item) {
-             LOG_INFO("switching to TEST UI page");
-             app->switchWindow("TEST_UI", nullptr);
-             return true;
-         },
-         gui::Arrow::Enabled},
+    std::list<gui::Option> l;
 
-        {utils::localize.get("app_settings_bt"),
-         [=](gui::Item &item) {
-             LOG_INFO("switching to bluetooth page");
-             app->switchWindow("Bluetooth", nullptr);
-             return true;
-         },
-         gui::Arrow::Enabled},
+    auto i18     = [](std::string text) { return utils::localize.get(text); };
+    auto addMenu = [&](UTF8 name, std::string window = "") {
+        l.emplace_back(gui::Option{name,
+                                   [=](gui::Item &item) {
+                                       if (window == "") {
+                                           return false;
+                                       }
+                                       LOG_INFO("switching to %s page", window.c_str());
+                                       app->switchWindow(window, nullptr);
+                                       return true;
+                                   },
+                                   gui::Arrow::Enabled});
+    };
 
-        {utils::localize.get("app_settings_language"),
-         [=](gui::Item &) {
-             LOG_INFO("switching to language page");
-             app->switchWindow("Languages");
-             return true;
-         },
-         gui::Arrow::Enabled},
-
-        {"SIM SELECT",
-         [=](gui::Item &) {
-             app->switchWindow(app::sim_select, nullptr);
-             return true;
-         },
-         gui::Arrow::Enabled},
-        {utils::localize.get("app_settings_date_and_time"),
-         [=](gui::Item &) {
-             LOG_INFO("switching to date and time page");
-             app->switchWindow("DateTime");
-             return true;
-         },
-         gui::Arrow::Enabled},
-        {utils::localize.get("Fota update"),
-         [=](gui::Item &) {
-             LOG_INFO("switching to FOTA page");
-             app->switchWindow(gui::window::name::fota_window);
-             return true;
-         },
-         gui::Arrow::Enabled},
-        {"[None] " + utils::localize.get("app_settings_display"),
-         [=](gui::Item &) { return true; },
-         gui::Arrow::Enabled},
-        {"[None] " + utils::localize.get("app_settings_phone_modes"),
-         [=](gui::Item &) { return true; },
-         gui::Arrow::Enabled},
-        {"[None] " + utils::localize.get("app_settings_security"),
-         [=](gui::Item &) { return true; },
-         gui::Arrow::Enabled},
-        {"[None] " + utils::localize.get("app_settings_about"), [=](gui::Item &) { return true; }, gui::Arrow::Enabled},
-        {"[Dummy]", [=](gui::Item &) { return true; }, gui::Arrow::Enabled},
-        {"[Dummy]", [=](gui::Item &) { return true; }, gui::Arrow::Enabled},
-        {"[Dummy]", [=](gui::Item &) { return true; }, gui::Arrow::Enabled},
-        {"[Dummy]", [=](gui::Item &) { return true; }, gui::Arrow::Enabled},
-        {"[Dummy]", [=](gui::Item &) { return true; }, gui::Arrow::Enabled}};
+    addMenu(i18("Information"), gui::window::hw_info);
+    addMenu("UI TEST", "TEST_UI");
+    addMenu(i18("app_settings_bt"), "Bluetooth");
+    addMenu(i18("app_settings_language"), "Languages");
+    addMenu("SIM SELECT", app::sim_select);
+    addMenu(i18("app_settings_date_and_time"), "DateTime");
+    addMenu(i18("Fota update"), gui::window::name::fota_window);
+    addMenu(i18("app_settings_display"));
+    addMenu(i18("app_settings_phone_modes"));
+    addMenu(i18("app_settings_security"));
+    addMenu(i18("app_settings_about"));
+    return l;
 }

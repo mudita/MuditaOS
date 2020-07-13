@@ -10,6 +10,11 @@ if [ ! $(which sfdisk) ]; then
 	exit 1
 fi
 
+if [ ! $(which parted) ]; then
+	echo "No parted, please install"
+	exit 1
+fi
+
 source config/common.sh
 is_root=`id -u`
 if [ "$1" == "" ] || [ $is_root != 0 ]; then
@@ -47,6 +52,19 @@ echo "!!! press ENTER to continue or CTRL+C to cancel"
 echo -ne "?"
 read
 
+echo "wipe disk header"
+dd if=/dev/zero of=$dev bs=8192 count=8192
+echo "create msdos partition table"
+parted $dev mklabel msdos
+
+sleep 1
+
+echo "Sleep and re-probe disk"
+
+sleep 1
+partprobe
+
+echo "write partition table"
 sfdisk --wipe always $dev < config/emmc_partition_table.dump
 
 if [ $? != 0 ]; then

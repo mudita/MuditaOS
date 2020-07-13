@@ -36,7 +36,7 @@ namespace app
         if (resp != nullptr) {
             handled = true;
             switch (resp->responseTo) {
-            case MessageType::DBContactGetLimitOffset: {
+            case MessageType::DBQuery: {
                 if (getCurrentWindow()->onDatabaseMessage(resp))
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             } break;

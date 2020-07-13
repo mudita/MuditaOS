@@ -147,7 +147,6 @@ Name: sms
 | date_sent | (m) | INTEGER | Date when message was sent to recipients | 
 | error_code | (m) | INTEGER | ID of the error code for this message |
 | body | (m) | TEXT | Text of the message that was provided by the user. This is UTF8 encoded text. |
-| read | (m) | INTEGER | Boolean value that defines whether message was seen by the user |
 | type | (m) | INTEGER | Defines what is the type of the message | 
 
 Possible values of the type field
@@ -307,6 +306,23 @@ Name: calllog.
 | CT_REJECTED | 0x05 | Call log type for calls rejected by direct user action. |
 | CT_BLOCKED | 0x06 | Call log type for calls blocked automatically. |
 | CT_ANSW_EXT | 0x07 | Call log type for a call which was answered on another device. Used in situations where a call rings on multiple devices simultaneously and it ended up being answered on a device other than the current one. |
+
+#### 14. Table with information about notifications
+Name: notifications.
+
+| Field | Scope | Type | Description |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
+| key | (m) | INTEGER | unique notification key identifier |
+| value | (m) | INTEGER | number of notifcations |
+
+**key** field
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| NotValidKey | 0x00 | Not valid key |
+| Calls | 0x01 | Missed calls notifications |
+| Sms | 0x02 | Unread incoming sms notifications |
 
 ## Database Triggers <a name="triggers"></a>
 

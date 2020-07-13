@@ -31,7 +31,7 @@ namespace gui
         return testItemCount;
     }
 
-    unsigned int TestListViewProvider::getMinimalItemHeight()
+    unsigned int TestListViewProvider::getMinimalItemHeight() const
     {
 
         return testItemMinimalHeight;
