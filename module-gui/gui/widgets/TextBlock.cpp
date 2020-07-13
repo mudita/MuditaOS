@@ -2,15 +2,22 @@
 #include "TextConstants.hpp"
 #include "log/log.hpp"
 #include <cassert>
+#include <TextFormat.hpp>
 
 namespace gui
 {
 
-    TextBlock::TextBlock(const UTF8 text, Font *font, TextBlock::End eol) : font(font), text{text}
+    TextBlock::TextBlock(const UTF8 text, Font *font, TextBlock::End eol) : format(std::make_unique<TextFormat>(font)), text{text}
     {
         if (getEnd() != End::Newline && eol == End::Newline) {
             this->text.insertCode(text::newline);
         }
+    }
+
+    TextBlock::TextBlock(const TextBlock &p)
+    {
+        text = p.text;
+        format = std::make_unique<TextFormat>(*p.format);
     }
 
     const UTF8 &TextBlock::getText() const
@@ -23,9 +30,9 @@ namespace gui
         return text.substr(start_position, text.length() - start_position);
     }
 
-    Font *TextBlock::getFont() const
+    const TextFormat *TextBlock::getFormat() const
     {
-        return font;
+        return format.get();
     }
 
     void TextBlock::setText(const UTF8 text)
@@ -46,6 +53,7 @@ namespace gui
 
     uint32_t TextBlock::getWidth() const
     {
+        auto font = format->getFont();
         if (font != nullptr) {
             return font->getPixelWidth(text);
         }

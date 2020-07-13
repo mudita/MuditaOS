@@ -18,4 +18,13 @@ namespace gui
     extern Color ColorNoColor;
     extern Color ColorTray;
 
+    inline bool operator==(const Color &r, const Color &l)
+    {
+        return r.intensivity == l.intensivity && r.alpha == l.alpha;
+    }
+
+    inline bool operator!=(const Color &r, const Color &l)
+    {
+        return !(r == l);
+    }
 } // namespace gui
