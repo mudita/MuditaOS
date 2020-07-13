@@ -9,7 +9,7 @@
 
 #include <utf8/UTF8.hpp>
 
-#include <stdint.h>
+#include <cstdint>
 struct ThreadRecord : Record
 {
     uint32_t date           = 0;
