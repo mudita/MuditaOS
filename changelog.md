@@ -4,6 +4,9 @@
 
 ### Added
 
+* `[calendar]` main screen UI
+* `[calendar]` main screen navigation
+
 ### Changed
 * `[text]` set the cursor at the end of text by default
 

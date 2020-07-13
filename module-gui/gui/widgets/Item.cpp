@@ -421,11 +421,10 @@ namespace gui
 
     void Item::clearNavigationItem(gui::NavigationDirection direction)
     {
-        if (navigationDirections == nullptr)
-            navigationDirections = new Navigation();
-        navigationDirections->clearDirection(direction);
+        if (navigationDirections != nullptr) {
+            navigationDirections->clearDirection(direction);
+        }
     }
-
 
     bool Item::handleNavigation(const InputEvent inputEvent)
     {
