@@ -42,6 +42,13 @@ as a variable to the boot.bin (PureOS) as an argument
 5. updating from old style partitioning (1 partition)
    to new partition scheme (2 partitions). In case of problems see pt 6.
    
+_Make sure you have the latest ecoboot bootloader on the phone
+I 1.1 recommand https://github.com/muditacom/ecoboot/releases/tag/1.1
+that will work even if you manage to break the filesystems in the next steps
+(it's goot to be prepared)_
+
+###### now let's go:
+ 
 switch the phone to MSC mode (bootloader option 4)
 
 unmount disk from the OS so that it's not used
