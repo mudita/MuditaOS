@@ -20,6 +20,14 @@
     "common_options": "OPTIONS",
     "common_information": "Information",
 
+    "common_mo":"MO",
+    "common_tu":"TU",
+    "common_we":"WE",
+    "common_th":"TH",
+    "common_fr":"FR",
+    "common_sa":"SA",
+    "common_su":"SU",
+
     "common_monday": "Monday",
     "common_tuesday": "Tuesday",
     "common_wednesday": "Wednesday",
@@ -53,6 +61,8 @@
     "duration_0min_0sec" : "%0M:%0S",
     "duration_0hmin_0sec" : "%0N:%0S",
     "duration_hour_0min_0sec" : "%H:%0M:%0S",
+
+    "app_calendar_title_main" : "Calendar",
 
     "app_options_invalid_option": " <Invalid Option> ",
     "app_options_contact_details": "Contact details",
