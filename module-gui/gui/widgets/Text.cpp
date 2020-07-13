@@ -75,12 +75,10 @@ namespace gui
     }
 
     void Text::setTextType(TextType type)
-    {
-    }
+    {}
 
     void Text::setUnderline(bool underline)
-    {
-    }
+    {}
 
     void Text::setText(const UTF8 &text)
     {
@@ -98,20 +96,13 @@ namespace gui
         if (text.length() == 0) {
             return;
         }
-        if (document->isEmpty()) {
-            addText(TextBlock(text, font, TextBlock::End::None));
-        }
-        else {
-            *cursor << text;
-            drawLines();
-        }
+        *cursor << text;
+        drawLines();
     }
 
     void Text::addText(TextBlock text)
     {
-        debug_text("adding text...");
-        document->append(std::move(text));
-        buildCursor();
+        *cursor << text;
         drawLines();
     }
 
@@ -404,13 +395,12 @@ namespace gui
     {
         erase(cursor);
         cursor = new TextCursor(this, document.get());
+        showCursor(focus);
     }
 
     void Text::showCursor(bool focus)
     {
-        if (focus) {
-            cursor->setVisible(isMode(EditMode::EDIT));
-        }
+        cursor->setVisible(focus && isMode(EditMode::EDIT));
     }
 
     bool Text::handleRotateInputMode(const InputEvent &inputEvent)
@@ -447,11 +437,11 @@ namespace gui
 
     bool Text::handleBackspace(const InputEvent &inputEvent)
     {
-        if (document->isEmpty() || !isMode(EditMode::EDIT)) {
+        if (!isMode(EditMode::EDIT)) {
             return false;
         }
         if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
-            if (removeChar()) {
+            if (!document->isEmpty() && removeChar()) {
                 drawLines();
             }
             return true;
@@ -471,7 +461,7 @@ namespace gui
 
         if (code != KeyProfile::none_key) {
             /// if we have multi press in non digit mode - we need to replace char and put next char from translator
-            if (!mode->is(InputMode::digit) && translator.getTimes() > 0) {
+            if (!(mode->is(InputMode::digit) || (mode->is(InputMode::phone))) && translator.getTimes() > 0) {
                 removeChar();
             }
             addChar(code);
@@ -496,6 +486,7 @@ namespace gui
         if (val != InvalidNumericKeyCode) {
             addChar(intToAscii(val));
             drawLines();
+            return true;
         }
         return false;
     }

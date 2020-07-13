@@ -3,13 +3,17 @@
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
+#include <messages/QueryMessage.hpp>
+#include <queries/phonebook/QueryContactGet.hpp>
+
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBContactMessage.hpp>
 
 namespace gui
 {
     PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), phonebookModel{new PhonebookModel(app)}
+        : AppWindow(app, gui::name::window::main_window), phonebookModel{
+                                                              std::make_shared<PhonebookModel>(this->application)}
     {
         buildInterface();
     }
@@ -55,23 +59,22 @@ namespace gui
                                                   phonebookStyle::mainWindow::contactsList::x,
                                                   phonebookStyle::mainWindow::contactsList::y,
                                                   phonebookStyle::mainWindow::contactsList::w,
-                                                  phonebookStyle::mainWindow::contactsList::h);
+                                                  phonebookStyle::mainWindow::contactsList::h,
+                                                  phonebookModel);
         contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
         contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
-        contactsList->setProvider(phonebookModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_phonebook_call"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_open"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
     }
 
     void PhonebookMainWindow::destroyInterface()
     {
         erase();
-        delete phonebookModel;
     }
 
     PhonebookMainWindow::~PhonebookMainWindow()
@@ -84,11 +87,8 @@ namespace gui
         LOG_INFO("onBeforeShow");
         setFocusItem(contactsList);
 
-        phonebookModel->clear();
-        phonebookModel->requestRecordsCount();
-
         contactsList->clear();
-        contactsList->setElementsCount(phonebookModel->getItemCount());
+        contactsList->setProvider(phonebookModel);
 
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         if (contactRequest) {
@@ -106,7 +106,7 @@ namespace gui
 
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(""));
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         }
     }
 
@@ -140,11 +140,23 @@ namespace gui
 
     bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        DBContactResponseMessage *msg = reinterpret_cast<DBContactResponseMessage *>(msgl);
-        if (phonebookModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count))
-            return true;
+        auto respMsg = dynamic_cast<sys::ResponseMessage *>(msgl);
 
-        return false;
+        assert(respMsg != nullptr);
+        assert(respMsg->responseTo == MessageType::DBQuery);
+
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(respMsg);
+        if (queryResponse == nullptr) {
+            LOG_ERROR("Unexpected message.");
+            return false;
+        }
+
+        auto contactsResponse = dynamic_cast<db::query::ContactGetResult *>(queryResponse->getResult());
+        assert(contactsResponse != nullptr);
+
+        auto records = std::make_unique<std::vector<ContactRecord>>(contactsResponse->getRecords());
+
+        return phonebookModel->updateRecords(std::move(records));
     }
 
 } /* namespace gui */

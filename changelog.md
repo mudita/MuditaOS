@@ -1,16 +1,37 @@
 # Mudita PurePhone changelog
 
-## Current Release
+## Current version
 
 ### Added
-* `[antenna]` Added antenna service.
-* `[phonebook]` Add icon flags for showing contact special groups
-* `[gui]` Fully refactored base text element with support for formatting.
-* `[gui]` Digit input on long-press in Text
-* `[gui]` Selector for newline in special character selection
+* `[sms]` Added option to mark conversation as read/unread 
+
+### Changed
+
+### Fixed
+* `[phonebook]` Fix wrong text label for back action.
 
 ### Other
- * `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
+
+## [0.28.1] - 2020-07-10
+
+### Added
+* `[phonebook]` Add icon flags for showing contact special groups.
+* `[gui]` Add digit input on long-press in Text.
+* `[gui]` Add selector for newline in special character selection.
+
+### Changed
+ * `[antenna]` Improved reception and decreased SAR by adding antenna control service.
+ * `[sms]` Options have contact name in bold.
+ * `[phonebook]` Improved contact searching.
+ * `[phonebook]` New implementation of Add/Edit Contact window.
+ * `[sms][home screen]` Distinguish between unread and unseen message notifications.
+
+### Fixed
+ * `[sms]` Return to conversations view after deleting the last message in the thread.
+ * `[sms]` Delete old testing empty threads (conversations) on opening.
+
+### Other
+* `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
  
 ## [0.27.1] - 2020-07-03
 

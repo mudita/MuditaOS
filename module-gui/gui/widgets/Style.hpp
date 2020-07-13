@@ -8,8 +8,9 @@
 
 namespace gui
 {
+    class Rect;
     class Label;
-};
+}; // namespace gui
 
 /// one place to gather all common magical numbers from design
 namespace style
@@ -60,6 +61,7 @@ namespace style
         }; // namespace label
 
         /// minimal label decoration - edges, focus & alignment
+        void decorate(gui::Rect *el);
         void decorate(gui::Label *el);
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
@@ -186,14 +188,20 @@ namespace style
             style::window::default_body_width - style::listview::scroll::item_margin;
         const inline uint32_t body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
-        const inline uint32_t right_margin     = 15;
+        const inline uint32_t right_margin        = 15;
+        const inline uint32_t top_margin_small    = 5;
+        const inline uint32_t top_margin_big      = 8;
+        const inline uint32_t top_margin_very_big = 12;
+        const inline uint32_t item_span_small     = 8;
+        const inline uint32_t item_span_big       = 12;
 
     } // namespace listview
 
     namespace margins
     {
-        const inline uint32_t small = 6;
-        const inline uint32_t big   = 8;
+        const inline uint32_t small    = 6;
+        const inline uint32_t big      = 8;
+        const inline uint32_t very_big = 12;
     } // namespace margins
 
 }; // namespace style

@@ -147,6 +147,12 @@ namespace gui
         }
         SMS.dbsize = threadDetails->msgCount;
 
+        if (threadDetails != nullptr && threadDetails->isUnread()) {
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app != nullptr);
+            app->markSmsThreadAsRead(threadDetails->ID);
+        }
+
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Init || what == Action::NewestPage) {
             if (what == Action::NewestPage) {
@@ -187,6 +193,11 @@ namespace gui
                   static_cast<int>(SMS.start),
                   static_cast<int>(SMS.sms->size()),
                   static_cast<int>(maxsmsinwindow));
+        if (SMS.sms->size() == 0) {
+            LOG_WARN("Deleting bad thread. There are no messages belonging to it (id: %d)", SMS.thread);
+            DBServiceAPI::ThreadRemove(this->application, SMS.thread);
+            return;
+        }
         // 3. add them to box
         this->cleanView();
         // if we are going from 0 then we want to show text prompt
@@ -383,9 +394,9 @@ namespace gui
         {
             auto pdata = dynamic_cast<SMSThreadData *>(data);
             if (pdata) {
-                LOG_INFO("We have it! %" PRIu32, pdata->thread->dbID);
+                LOG_INFO("We have it! %" PRIu32, pdata->thread->ID);
                 cleanView();
-                SMS.thread = pdata->thread->dbID;
+                SMS.thread = pdata->thread->ID;
                 showMessages(Action::Init);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());
@@ -396,13 +407,7 @@ namespace gui
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
             LOG_INFO("received sms templates data \"%s\"", txt.c_str());
-            text->setText(text->getText() + txt);
-        }
-
-        std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
-        if (threadDetails != nullptr && threadDetails->msgRead > 0) {
-            threadDetails->msgRead = 0;
-            DBServiceAPI::ThreadUpdate(application, *threadDetails);
+            text->addText(txt);
         }
     }
 
@@ -415,22 +420,35 @@ namespace gui
     {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {
-            switch (msg->type) {
-            case db::Query::Type::Create:
-                // jump to the latest SMS
-                addSMS(ThreadViewWindow::Action::NewestPage);
-                break;
-            case db::Query::Type::Update:
-            case db::Query::Type::Delete:
-                // refresh view in place (current page)
-                addSMS(ThreadViewWindow::Action::Refresh);
-                break;
-            case db::Query::Type::Read:
-                // do not update view, as we don't have visual representation for read status
-                break;
+            if (msg->interface == db::Interface::Name::SMS) {
+                std::unique_ptr<ThreadRecord> threadDetails;
+                switch (msg->type) {
+                case db::Query::Type::Create:
+                    // jump to the latest SMS
+                    addSMS(ThreadViewWindow::Action::NewestPage);
+                    break;
+                case db::Query::Type::Update:
+                case db::Query::Type::Delete:
+                    addSMS(ThreadViewWindow::Action::Refresh);
+                    break;
+                case db::Query::Type::Read:
+                    // do not update view, as we don't have visual representation for read status
+                    break;
+                }
+                if (this == application->getCurrentWindow()) {
+                    application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
+                return true;
+            }
+            if (msg->interface == db::Interface::Name::SMSThread) {
+                if (msg->type == db::Query::Type::Delete) {
+                    if (this == application->getCurrentWindow()) {
+                        application->switchWindow(gui::name::window::main_window);
+                    }
+                }
             }
         }
-        return true;
+        return false;
     }
 
 } /* namespace gui */

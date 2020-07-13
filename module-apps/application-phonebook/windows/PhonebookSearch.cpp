@@ -7,8 +7,7 @@
 
 namespace gui
 {
-    PhonebookSearch::PhonebookSearch(app::Application *app)
-        : AppWindow(app, gui::window::name::search), phonebookModel{new PhonebookModel(app)}
+    PhonebookSearch::PhonebookSearch(app::Application *app) : AppWindow(app, gui::window::name::search)
     {
         buildInterface();
     }
@@ -26,7 +25,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::search));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         setFocusItem(inputField);
     }
@@ -70,44 +69,29 @@ namespace gui
         }
 
         if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-            LOG_INFO("Enter pressed");
-            std::string contents = utils::trim(inputField->getText());
-            std::shared_ptr<std::vector<ContactRecord>> searchResults;
-            std::string primaryName     = "";
-            std::string alternativeName = "";
-            std::string number          = "";
+            std::string searchFilter = utils::trim(inputField->getText());
 
-            if (contents.size() > 0) {
-                if (utils::is_number(contents) || contents.find('+') != std::string::npos) {
-                    number = contents;
-                }
-                else if (contents.find(' ') != std::string::npos) {
-                    std::vector<std::string> result = utils::split(contents, ' ');
-                    primaryName                     = result[0];
-                    alternativeName                 = result[1];
-                }
-                else {
-                    primaryName = contents;
-                }
+            if (searchFilter.size() > 0) {
+                auto searchModel = std::make_unique<PhonebookModel>(application, searchFilter);
 
-                LOG_INFO(
-                    "searching for pri:%s alt:%s num:%s", primaryName.c_str(), alternativeName.c_str(), number.c_str());
-                searchResults = DBServiceAPI::ContactSearch(application, primaryName, alternativeName, number);
-                if (searchResults.get()->size() > 0) {
-                    std::unique_ptr<PhonebookSearchResultsData> data =
-                        std::make_unique<PhonebookSearchResultsData>(inputField->getText());
-                    data->setResults(searchResults);
+                assert(searchModel->getItemCount() >= 0);
+                LOG_DEBUG("Search results count: %u", searchModel->getItemCount());
+                if (searchModel->getItemCount() > 0) {
+                    LOG_DEBUG("Switching to search results window.");
+                    auto data = std::make_unique<PhonebookSearchResultsData>(std::move(searchModel));
                     application->switchWindow("SearchResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 }
                 else {
+                    LOG_DEBUG("Switching to no results window.");
                     std::unique_ptr<gui::SwitchData> data =
                         std::make_unique<PhonebookSearchQuery>(inputField->getText());
                     application->switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 }
-                return (true);
+
+                return true;
             }
         }
 
         return (ret);
-    }
+    } // namespace gui
 } /* namespace gui */

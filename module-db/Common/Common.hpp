@@ -14,12 +14,12 @@
  */
 enum class SMSType
 {
-    DRAFT  = 0x01,
-    FAILED = 0x02,
-    INBOX  = 0x04,
-    OUTBOX = 0x08,
-    QUEUED = 0x10,
-    ALL    = 0xFF
+    DRAFT   = 0x01,
+    FAILED  = 0x02,
+    INBOX   = 0x04,
+    OUTBOX  = 0x08,
+    QUEUED  = 0x10,
+    UNKNOWN = 0xFF
 };
 
 enum class EntryState

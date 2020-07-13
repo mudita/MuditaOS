@@ -43,25 +43,13 @@ namespace app
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             LOG_DEBUG("Received multicast");
             if (msg != nullptr) {
-                if ((msg->interface == db::Interface::Name::SMS) ||
-                    (msg->interface == db::Interface::Name::SMSThread)) {
-
-                    this->windows[gui::name::window::main_window]->rebuild();
-                    // de facto parameterized rebuild
-                    this->windows[gui::name::window::thread_view]->onDatabaseMessage(msg);
-
-                    if (getCurrentWindow() == windows[gui::name::window::main_window] ||
-                        getCurrentWindow() == windows[gui::name::window::thread_view]) {
-                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                    }
-
-                    return std::make_shared<sys::ResponseMessage>();
+                // window-specific actions
+                for (auto &[name, window] : windows) {
+                    window->onDatabaseMessage(msg);
                 }
-                if (windows[gui::name::window::thread_view]->onDatabaseMessage(msg)) {
-                    if (getCurrentWindow() == windows[gui::name::window::thread_view]) {
-                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                    }
-                }
+                // app-wide actions
+                // <none>
+                return std::make_shared<sys::ResponseMessage>();
             }
         }
 
@@ -131,6 +119,24 @@ namespace app
     void ApplicationMessages::destroyUserInterface()
     {}
 
+    bool ApplicationMessages::markSmsThreadAsRead(const uint32_t id)
+    {
+        using namespace db::query::smsthread;
+        LOG_DEBUG("markSmsThreadAsRead");
+        DBServiceAPI::GetQuery(
+            this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::True));
+        return true;
+    }
+
+    bool ApplicationMessages::markSmsThreadAsUnread(const uint32_t id)
+    {
+        using namespace db::query::smsthread;
+        LOG_DEBUG("markSmsThreadAsRead");
+        DBServiceAPI::GetQuery(
+            this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::False));
+        return true;
+    }
+
     bool ApplicationMessages::removeSMS_thread(const ThreadRecord *record)
     {
         if (record == nullptr) {
@@ -138,13 +144,13 @@ namespace app
             return false;
         }
         else {
-            LOG_DEBUG("Removing thread: %" PRIu32, record->dbID);
+            LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
             auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialog_yes_no]);
             assert(dialog != nullptr);
             auto meta   = dialog->meta;
             meta.action = [=]() -> bool {
-                if (!DBServiceAPI::ThreadRemove(this, record->dbID)) {
-                    LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->dbID);
+                if (!DBServiceAPI::ThreadRemove(this, record->ID)) {
+                    LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->ID);
                     return false;
                 }
                 this->switchWindow(gui::name::window::main_window);
@@ -169,12 +175,20 @@ namespace app
 
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
-            if (!DBServiceAPI::SMSRemove(this, record.ID)) {
+            if (!DBServiceAPI::SMSRemove(this, record)) {
                 LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
                 return false;
             }
-            this->switchWindow(gui::name::window::thread_view);
-            return true;
+            // if this was the last message in the thread, there won't be no thread. goto main window
+            std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this, record.threadID);
+            if (threadDetails == nullptr || !threadDetails->isValid()) {
+                this->switchWindow(gui::name::window::main_window);
+                return true;
+            }
+            else {
+                this->switchWindow(gui::name::window::thread_view);
+                return true;
+            }
         };
         meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
         meta.title = record.body;

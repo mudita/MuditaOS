@@ -95,7 +95,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "portmacro.h"
-
+#include "macros.h"
 
 /* Each task maintains its own interrupt status in the critical nesting variable. */
 typedef struct ThreadState_t_
@@ -172,7 +172,6 @@ static void SuspendThread( pthread_t Thread )
     }
 }
 
-
 /**
  *  Signal handler for SIG_SUSPEND
  */
@@ -193,7 +192,7 @@ static void SuspendSignalHandler(int sig)
     /* Wait on the resume signal. */
     rc = sigwait(&xSignals, &sig);
     assert(rc == 0);
-
+    
     /* Will resume here when the SIG_RESUME signal is received. */
     /* Need to set the interrupts based on the task's critical nesting. */
     if ( uxCriticalNesting == 0 )
@@ -230,7 +229,7 @@ static void ResumeThread( pthread_t Thread )
 
     rc = pthread_mutex_lock(&xSuspendResumeThreadMutex);
     assert(rc == 0);
-
+    
     if ( !pthread_equal(pthread_self(), Thread))
     {
         pthread_kill( Thread, SIG_RESUME );
@@ -293,6 +292,7 @@ static portBASE_TYPE prvGetTaskCriticalNesting( pthread_t Thread )
     }
     
     assert(!"Failed finding pthread for task mapping!");
+    return 0;
 }
 
 
@@ -301,8 +301,8 @@ static portBASE_TYPE prvGetTaskCriticalNesting( pthread_t Thread )
  */
 static void TickSignalHandler( int sig )
 {
-    pthread_t ThreadToSuspend;
-    pthread_t ThreadToResume;
+    pthread_t ThreadToSuspend = 0;
+    pthread_t ThreadToResume = 0;
     int success;
 
     (void)sig;
@@ -554,6 +554,7 @@ static void prvSetupTimerInterrupt( void )
     /* Set-up the timer interrupt. */
     rc = setitimer( TIMER_TYPE, &itimer, &oitimer );
     assert(rc == 0);
+    
 }
 
 
@@ -566,7 +567,7 @@ portBASE_TYPE xPortStartScheduler( void )
     sigset_t xSignals;
     sigset_t xSignalToBlock;
     sigset_t xSignalsBlocked;
-    pthread_t FirstThread;
+    pthread_t FirstThread = 0;
     int success;
 
 #if LINUX_PORT_DEBUG
@@ -592,6 +593,7 @@ portBASE_TYPE xPortStartScheduler( void )
 
     success = LookupThread( xTaskGetCurrentTaskHandle(), &FirstThread);
     assert(success);
+    
 
     /* Start the first task. */
     ResumeThread(FirstThread);
@@ -753,12 +755,13 @@ void vPortExitCritical( void )
 void vPortYield( void )
 {
     int rc;
-    pthread_t ThreadToSuspend;
-    pthread_t ThreadToResume;
+    pthread_t ThreadToSuspend = 0;
+    pthread_t ThreadToResume = 0;
     int success;
 
     rc = pthread_mutex_lock(&xSingleThreadMutex);
     assert(rc == 0);
+   
 
     success = LookupThread(xTaskGetCurrentTaskHandle(), &ThreadToSuspend);
     assert(success);
@@ -767,6 +770,7 @@ void vPortYield( void )
 
     success = LookupThread(xTaskGetCurrentTaskHandle(), &ThreadToResume);
     assert(success);
+    
 
     if ( !pthread_equal(ThreadToSuspend, ThreadToResume) )
     {
@@ -817,8 +821,8 @@ void vPortClearInterruptMask( portBASE_TYPE xMask )
 void vPortForciblyEndThread( void *pxTaskToDelete )
 {
     xTaskHandle hTaskToDelete = ( xTaskHandle )pxTaskToDelete;
-    pthread_t ThreadToDelete;
-    pthread_t ThreadToResume;
+    pthread_t ThreadToDelete = 0;
+    pthread_t ThreadToResume = 0;
     int success;
 
     pthread_mutex_lock(&xSingleThreadMutex);
@@ -904,6 +908,3 @@ unsigned long ulPortGetTimerValue( void )
      */
     return ( unsigned long ) xTimes.tms_utime;
 }
-
-
-

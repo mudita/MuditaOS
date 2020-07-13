@@ -15,9 +15,6 @@
 NotesModel::NotesModel(app::Application *app) : DatabaseModel(app)
 {}
 
-NotesModel::~NotesModel()
-{}
-
 void NotesModel::requestRecordsCount()
 {
     recordsCount = DBServiceAPI::NotesGetCount(application);
@@ -52,9 +49,8 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
     return true;
 }
 
-unsigned int NotesModel::getMinimalItemHeight()
+unsigned int NotesModel::getMinimalItemHeight() const
 {
-
     return 146;
 }
 

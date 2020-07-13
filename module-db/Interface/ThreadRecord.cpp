@@ -1,13 +1,3 @@
-
-/*
- * @file ThreadRecord.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ThreadRecord.hpp"
 #include "SMSRecord.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
@@ -23,14 +13,12 @@ ThreadRecordInterface::~ThreadRecordInterface()
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.Add(ThreadsTableRow{.date      = rec.date,
-                                                  .msgCount  = rec.msgCount,
-                                                  .msgRead   = rec.msgRead,
-                                                  .contactID = rec.contactID,
-                                                  .snippet   = rec.snippet,
-                                                  .type      = rec.type
-
-    });
+    auto ret = smsDB->threads.Add(ThreadsTableRow{.date           = rec.date,
+                                                  .msgCount       = rec.msgCount,
+                                                  .unreadMsgCount = rec.unreadMsgCount,
+                                                  .contactID      = rec.contactID,
+                                                  .snippet        = rec.snippet,
+                                                  .type           = rec.type});
 
     return ret;
 }
@@ -49,22 +37,28 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.Update(ThreadsTableRow{.ID        = rec.dbID,
-                                                 .date      = rec.date,
-                                                 .msgCount  = rec.msgCount,
-                                                 .msgRead   = rec.msgRead,
-                                                 .contactID = rec.contactID,
-                                                 .snippet   = rec.snippet,
-                                                 .type      = rec.type
+    return smsDB->threads.Update(ThreadsTableRow{.ID             = rec.ID,
+                                                 .date           = rec.date,
+                                                 .msgCount       = rec.msgCount,
+                                                 .unreadMsgCount = rec.unreadMsgCount,
+                                                 .contactID      = rec.contactID,
+                                                 .snippet        = rec.snippet,
+                                                 .type           = rec.type
 
     });
 }
 
 uint32_t ThreadRecordInterface::GetCount()
 {
-
     return smsDB->threads.GetCount();
 }
+
+uint32_t ThreadRecordInterface::GetCount(EntryState state)
+{
+    return smsDB->threads.GetCount(state);
+}
+
+bool markAsRead();
 
 std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
@@ -134,6 +128,9 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(const db::Query
     if (const auto local_query = dynamic_cast<const db::query::SMSSearch *>(query)) {
         return runQueryImpl(local_query);
     }
+    if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query)) {
+        return runQueryImpl(local_query);
+    }
     return nullptr;
 }
 
@@ -141,4 +138,19 @@ std::unique_ptr<db::query::SMSSearchResult> ThreadRecordInterface::runQueryImpl(
 {
     auto db_result = smsDB->threads.getBySMSQuery(query->text, query->starting_postion, query->depth);
     return std::make_unique<db::query::SMSSearchResult>(db_result.first, db_result.second);
+}
+
+std::unique_ptr<db::query::smsthread::MarkAsReadResult> ThreadRecordInterface::runQueryImpl(
+    const db::query::smsthread::MarkAsRead *query)
+{
+    using namespace db::query::smsthread;
+    auto ret = false;
+
+    auto record = GetByID(query->id);
+    if (record.isValid()) {
+        LOG_FATAL("query-read %d", static_cast<int>(query->read));
+        record.unreadMsgCount = query->read == MarkAsRead::Read::True ? 0 : 1;
+        ret                   = Update(record);
+    }
+    return std::make_unique<MarkAsReadResult>(ret);
 }

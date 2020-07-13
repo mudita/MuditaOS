@@ -1,7 +1,53 @@
 #include "Options.hpp"
+#include "Text.hpp"
+#include "tools/Common.hpp"
 #include <UiCommonActions.hpp>
 #include <cassert>
 #include <i18/i18.hpp>
+#include <utility>
+
+namespace style::option
+{
+    const inline gui::Length text_left_padding = 10;
+}
+
+namespace gui::option
+{
+    /// builder for call option
+    /// creates text with caller in bold
+    class Call : public Base
+    {
+      private:
+        app::Application *app = nullptr;
+        ContactRecord contact;
+
+      public:
+        Call(app::Application *app, ContactRecord contact) : app(app), contact(std::move(contact))
+        {}
+
+        [[nodiscard]] auto build() const -> Item * override
+        {
+            auto *rect     = new gui::Rect(nullptr,
+                                       style::window::default_left_margin,
+                                       0,
+                                       style::window_width - 2 * style::window::default_right_margin,
+                                       style::window::label::big_h);
+            auto font      = FontManager::getInstance().getFont(style::window::font::medium);
+            auto font_bold = FontManager::getInstance().getFont(style::window::font::mediumbold);
+            auto text      = new Text(nullptr, style::option::text_left_padding, 0, 0, 0);
+            text->setMaximumSize(rect->getWidth(), rect->getHeight());
+            text->setEditMode(EditMode::BROWSE);
+            text->setText(std::make_unique<TextDocument>(std::list<TextBlock>(
+                {{utils::localize.get("sms_call_text"), font}, {contact.getFormattedName(), font_bold}})));
+            style::window::decorate(rect);
+            rect->activatedCallback = [this](gui::Item &item) { return app::call(app, contact); };
+            rect->addWidget(text);
+            center(rect, text, Axis::Y);
+            return rect;
+        }
+    };
+
+}; // namespace gui::option
 
 namespace gui::options
 {
@@ -10,8 +56,7 @@ namespace gui::options
     Option call(Application *app, CallOperation callOperation, const ContactRecord &contact)
     {
         assert(app != nullptr);
-        return Option{UTF8(utils::localize.get("sms_call_text")) + contact.getFormattedName(),
-                      [app, contact, callOperation](gui::Item &item) { return app::call(app, contact); }};
+        return Option{std::make_unique<gui::option::Call>(app, contact)};
     }
 
     Option contact(Application *app,

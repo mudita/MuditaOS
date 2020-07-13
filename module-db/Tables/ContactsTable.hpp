@@ -5,6 +5,9 @@
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
 
+#include <string>
+#include <vector>
+
 struct ContactsTableRow
 {
     uint32_t ID           = DB_ID_NONE;
@@ -60,6 +63,10 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     uint32_t GetCount() override final;
 
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+
+    std::vector<std::uint32_t> GetIDsByTextNumber(const std::string &filter,
+                                                  std::size_t limit  = 0,
+                                                  std::size_t offset = 0);
 
   private:
     const char *createTableQuery =

@@ -119,7 +119,7 @@ namespace gui
         // margins for text
         Margins margins;
         Alignment alignment = style::text::defaultTextAlignment;
-        bool underline = false;
+        bool underline      = false;
 
         bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
         bool handleNavigation(const InputEvent &inputEvent);
@@ -166,6 +166,9 @@ namespace gui
         /// move ownership of mode ptr to Text
         void setInputMode(InputMode *&&mode)
         {
+            if (this->mode != nullptr) {
+                delete this->mode;
+            }
             this->mode = mode;
         };
         bool onFocus(bool state) override;

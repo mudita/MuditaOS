@@ -39,7 +39,6 @@ TEST_CASE("SMS Table tests")
                             .dateSent  = 0,
                             .errorCode = 0,
                             .body      = "Test SMS message 1",
-                            .isRead    = true,
                             .type      = SMSType ::INBOX
 
     };

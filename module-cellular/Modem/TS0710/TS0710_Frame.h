@@ -69,8 +69,9 @@ class TS0710_Frame
                 //     len += 1;
             }
             /*len is the number of bytes in the message, p points to message*/
+
             while (len--) {
-                FCS = crctable[FCS ^ ret.at(i++)];
+                FCS = crctable[FCS ^ ret[i++]];
             }
             /*Ones complement*/
             FCS = 0xFF - FCS;
@@ -102,7 +103,7 @@ class TS0710_Frame
                 }
             }
 
-            if ((serData[0] != TS0710_FLAG) || (serData.at(myLen - 1) != TS0710_FLAG)) {
+            if ((serData[0] != TS0710_FLAG) || (serData[myLen - 1] != TS0710_FLAG)) {
                 Address = 0;
                 Control = 0;
                 LOG_ERROR("Received frame has incorrect leading/trailing flags. Dropping.");

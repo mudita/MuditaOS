@@ -214,3 +214,33 @@ TEST_CASE("handle text expand")
     text->setMaximumSize(w, h);
     REQUIRE(text->area() != BoundingBox{0, 0, 0, 0});
 }
+
+TEST_CASE("handle newline")
+{
+    mockup::fontManager();
+    using namespace gui;
+    Length w         = 10;
+    Length h         = 100;
+    BoxLayout layout = BoxLayout(nullptr, 0, 0, w, h);
+    auto text        = new gui::TestText();
+    layout.addWidget(text);
+    text->setMaximumSize(w, h);
+    text->addText("\n");
+    REQUIRE(text->getText() == "\n");
+    text->addText("text");
+    REQUIRE(text->getText() == "\ntext");
+    text->addText("\n");
+    REQUIRE(text->getText() == "\ntext\n");
+}
+
+TEST_CASE("handle text block - moved cursor to end")
+{
+    std::string test_text = "text";
+    std::string newline   = "\n";
+    auto text             = gui::TestText();
+    text.addText(gui::TextBlock(test_text, mockup::fontManager().getFont(0), gui::TextBlock::End::None));
+    REQUIRE(text.getText() == test_text);
+    test_text = test_text + newline;
+    text.addText(newline);
+    REQUIRE(text.getText() == test_text);
+}

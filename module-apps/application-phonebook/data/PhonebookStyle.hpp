@@ -49,6 +49,14 @@ namespace phonebookStyle
             constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
             constexpr uint32_t penWidth      = 0;
         } // namespace contactsList
+
+        namespace newContactsList
+        {
+            constexpr uint32_t x = style::window::default_left_margin;
+            constexpr uint32_t y = style::header::height;
+            constexpr uint32_t w = style::listview::body_width_with_scroll;
+            constexpr uint32_t h = style::window_height - y - style::footer::height;
+        } // namespace newContactsList
     }     // namespace mainWindow
 
     namespace contactItem
@@ -61,20 +69,20 @@ namespace phonebookStyle
 
     namespace inputLineWithLabelItem
     {
-        constexpr uint32_t w                           = style::window::default_body_width;
-        constexpr uint32_t h                           = 65;
-        constexpr uint32_t title_label_h               = 20;
-        constexpr uint32_t input_text_h                = 30;
-        constexpr uint32_t title_label_input_text_span = h - input_text_h;
+        constexpr uint32_t w             = style::window::default_body_width;
+        constexpr uint32_t h             = 75;
+        constexpr uint32_t title_label_h = 20;
+        constexpr uint32_t input_text_h  = 33;
+        constexpr uint32_t span_size     = 100;
     } // namespace inputLineWithLabelItem
 
     namespace inputBoxWithLabelAndIconItem
     {
         constexpr uint32_t w = style::window::default_body_width;
-        constexpr uint32_t h = 65;
+        constexpr uint32_t h = 50;
 
         constexpr uint32_t input_box_w = 55;
-        constexpr uint32_t input_box_h = 40;
+        constexpr uint32_t input_box_h = h;
 
         constexpr uint32_t description_label_x = input_box_w + 20;
         constexpr uint32_t description_label_w = 280;

@@ -4,7 +4,6 @@ project(module-db VERSION 1.0
         DESCRIPTION "Database module library")
 
 set(SOURCES
-
         Database/Field.cpp
         Database/QueryResult.cpp
         Database/Database.cpp
@@ -47,13 +46,16 @@ set(SOURCES
         Interface/SMSTemplateRecord.cpp
         Interface/NotificationsRecord.cpp
 
+        queries/RecordQuery.cpp
         queries/sms/QuerySMSSearch.cpp
+        queries/sms/QuerySmsThreadMarkAsRead.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
         queries/notifications/QueryNotificationsGetAll.cpp
-        )
+        queries/phonebook/QueryContactGet.cpp
+)
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
@@ -61,9 +63,7 @@ else()
     include(targets/Target_Linux.cmake)
 endif()
 
-
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
-
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

@@ -31,13 +31,13 @@ TEST_CASE("Threads Table tests")
     SmsDB smsdb;
     REQUIRE(smsdb.IsInitialized());
 
-    ThreadsTableRow testRow1 = {.ID        = 0,
-                                .date      = 0,
-                                .msgCount  = 0,
-                                .msgRead   = 0,
-                                .contactID = 0,
-                                .snippet   = "Test snippet",
-                                .type      = SMSType ::DRAFT
+    ThreadsTableRow testRow1 = {.ID             = 0,
+                                .date           = 0,
+                                .msgCount       = 0,
+                                .unreadMsgCount = 0,
+                                .contactID      = 0,
+                                .snippet        = "Test snippet",
+                                .type           = SMSType ::DRAFT
 
     };
 
@@ -45,10 +45,14 @@ TEST_CASE("Threads Table tests")
     REQUIRE(smsdb.threads.Add(testRow1));
     REQUIRE(smsdb.threads.Add(testRow1));
     REQUIRE(smsdb.threads.Add(testRow1));
+    testRow1.unreadMsgCount = 10;
     REQUIRE(smsdb.threads.Add(testRow1));
 
     // Table should have 4 elements
     REQUIRE(smsdb.threads.GetCount() == 4);
+    REQUIRE(smsdb.threads.GetCount(EntryState::ALL) == 4);
+    REQUIRE(smsdb.threads.GetCount(EntryState::READ) == 3);
+    REQUIRE(smsdb.threads.GetCount(EntryState::UNREAD) == 1);
 
     // Update existing element in table
     testRow1.ID      = 4;

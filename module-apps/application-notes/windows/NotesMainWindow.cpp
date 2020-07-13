@@ -25,7 +25,7 @@ namespace gui
 {
 
     NotesMainWindow::NotesMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), notesModel{new NotesModel(app)}
+        : AppWindow(app, gui::name::window::main_window), notesModel{std::make_shared<NotesModel>(app)}
     {
         buildInterface();
     }
@@ -35,14 +35,14 @@ namespace gui
         destroyInterface();
         buildInterface();
     }
+
     void NotesMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
-        list = new gui::ListView(this, 16, 105, 480 - 32, 440);
+        list = new gui::ListView(this, 16, 105, 480 - 32, 440, notesModel);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
-        list->setProvider(notesModel);
 
         setFocusItem(list);
 
@@ -55,15 +55,10 @@ namespace gui
 
         topBar->setActive(TopBar::Elements::TIME, true);
     }
+
     void NotesMainWindow::destroyInterface()
     {
         erase();
-        delete notesModel;
-    }
-
-    NotesMainWindow::~NotesMainWindow()
-    {
-        destroyInterface();
     }
 
     void NotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

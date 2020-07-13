@@ -24,6 +24,7 @@
 #include <functional>
 #include <memory>
 #include <cassert>
+#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
 {
@@ -55,17 +56,17 @@ namespace gui
 
         AppWindow::buildInterface();
 
-        threadModel = new ThreadModel(application);
+        threadModel = std::make_shared<ThreadModel>(this->application);
 
         list = new gui::ListView(this,
                                  msgThreadStyle::listPositionX,
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
-                                 msgThreadStyle::listHeight);
+                                 msgThreadStyle::listHeight,
+                                 threadModel);
         list->setScrollTopMargin(style::margins::small);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
-        list->setProvider(threadModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -108,11 +109,6 @@ namespace gui
             searchImage->setVisible(false);
             return true;
         };
-    }
-
-    MessagesMainWindow::~MessagesMainWindow()
-    {
-        delete threadModel;
     }
 
     void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -177,12 +173,23 @@ namespace gui
 
     bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        DBThreadResponseMessage *msg = dynamic_cast<DBThreadResponseMessage *>(msgl);
-        if (msg && threadModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count)) {
+        auto *msgResponse = dynamic_cast<DBThreadResponseMessage *>(msgl);
+        if (msgResponse &&
+            threadModel->updateRecords(
+                std::move(msgResponse->records), msgResponse->offset, msgResponse->limit, msgResponse->count)) {
             return true;
         }
 
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr) {
+            // whatever notification had happened, rebuild
+            this->rebuild();
+            if (this == application->getCurrentWindow()) {
+                application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            return true;
+        }
         return false;
-    }
+    } // namespace gui
 
 } /* namespace gui */

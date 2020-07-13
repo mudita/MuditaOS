@@ -1,13 +1,15 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookInternals.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/widgets/ContactListItem.hpp"
 
 #include <ListItem.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <Text.hpp>
 
 namespace gui
 {
-    class InputLineWithLabelItem : public ListItem
+    class InputLineWithLabelItem : public ContactListItem
     {
         phonebookInternals::ListItemName listItemName;
 
@@ -16,7 +18,6 @@ namespace gui
                                std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                                std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
                                std::function<void()> selectSpecialCharacter                 = nullptr);
-        InputLineWithLabelItem(const InputLineWithLabelItem &item);
 
         ~InputLineWithLabelItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
@@ -26,6 +27,14 @@ namespace gui
 
       private:
         void applyItemNameSpecificSettings();
+
+        void firstNameHandler();
+        void secondNameHandler();
+        void numberHandler();
+        void otherNumberHandler();
+        void emailHandler();
+        void addressHandler();
+        void noteHandler();
     };
 
 } /* namespace gui */
