@@ -14,13 +14,13 @@
 class MonthModel
 {  
     public:
-    std::string name = "";
-    std::vector< std::unique_ptr<DayModel> > days;
-    uint32_t numberOfDays = 0;
+      std::string name;
+      std::vector<std::unique_ptr<DayModel>> days;
+      uint32_t numberOfDays = 0;
     
     public:
-    MonthModel(const char *name,std::vector< std::unique_ptr<DayModel> > &days);
-    MonthModel() = default;
-    virtual ~MonthModel() = default;
+      MonthModel(std::string name, std::vector<std::unique_ptr<DayModel>> &days);
+      MonthModel()          = default;
+      virtual ~MonthModel() = default;
 
 };

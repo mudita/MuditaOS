@@ -1,33 +1,34 @@
-/*
- * @file CalendarMainWindow.cpp
- * @author Tomasz Rogala (tomasz.rogala@indoornavi.me)
- * @date 6 lip 2020
- */
 
-#include "gui/widgets/Window.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/BoxLayout.hpp"
 #include "CalendarMainWindow.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
+#include "application-calendar/models/DayModel.hpp"
+#include "application-calendar/models/DayModel.cpp"
+#include "application-calendar/models/MonthModel.hpp"
+#include "application-calendar/models/MonthModel.cpp"
+#include "application-calendar/widgets/CalendarStyle.hpp"
+#include <gui/widgets/Window.hpp>
+#include <gui/SwitchData.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/Item.hpp>
+#include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/GridLayout.hpp>
-#include <vector>
-#include <string>
-
 #include <time/time_conversion.hpp>
 #include <gui/widgets/Margins.hpp>
 #include <gui/widgets/Item.hpp>
+#include <time/time_conversion.hpp>
 #include <Text.hpp>
-#include "../Common.hpp"
-
-#include "../ApplicationCalendar.hpp"
-#include "../models/DayModel.hpp"
-#include "../models/DayModel.cpp"
-#include "../models/MonthModel.hpp"
-#include "../models/MonthModel.cpp"
+#include <vector>
+#include <string>
 
 namespace gui
 {
-    DayLabel::DayLabel(gui::Item *parent,const char *number,const uint32_t &x,const uint32_t &y, const uint32_t &width, const uint32_t &height) : Label(parent,0,0,0,0,""), DayModel(number,x,y)
+    DayLabel::DayLabel(gui::Item *parent,
+                       std::string number,
+                       const uint32_t &x,
+                       const uint32_t &y,
+                       const uint32_t &width,
+                       const uint32_t &height)
+        : Label(parent, 0, 0, 0, 0, ""), DayModel(number, x, y)
     {
         LOG_DEBUG("Call DayLabel constructor. With coords: x:%d, y:%d", x,y);
         parent->addWidget(this);
@@ -42,7 +43,7 @@ namespace gui
         this->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     }
 
-    void DayLabel::setLabel(gui::Item *parent,const char *number, std::function<bool(Item &)> activatedCallback)
+    void DayLabel::setLabel(gui::Item *parent, std::string number, std::function<bool(Item &)> activatedCallback)
     {
         LOG_DEBUG("Set callback of day label. coords: x:%d, y:%d", x,y);
         this->number = number;
@@ -56,37 +57,56 @@ namespace gui
         this->setFont(style::window::font::medium);
     }
 
-    MonthBox::MonthBox(app::Application *app, gui::Item *parent, const int &offsetTop, const uint32_t &width, const uint32_t &height, 
-                    const uint32_t &dayWidth, const uint32_t &dayHeight, const uint32_t &rows, const uint32_t &columns,const std::unique_ptr<MonthModel> &model)
-        : GridLayout(parent,style::window::default_left_margin,offsetTop,width,height,{dayWidth,dayHeight}), MonthModel(model->name.c_str(), model->days)
-        {   
-            LOG_DEBUG("Call MonthBox constructor");
-            //set the costant values of first and first column
-            this->firstRow = 0;
-            this->firstColumn = 0;
+    MonthBox::MonthBox(app::Application *app,
+                       gui::Item *parent,
+                       const int &offsetTop,
+                       const uint32_t &width,
+                       const uint32_t &height,
+                       const uint32_t &dayWidth,
+                       const uint32_t &dayHeight,
+                       const std::unique_ptr<MonthModel> &model)
+        : GridLayout(parent, style::window::default_left_margin, offsetTop, width, height, {dayWidth, dayHeight}),
+          MonthModel(model->name, model->days)
+    {
+        LOG_DEBUG("Call MonthBox constructor");
+        // set the costant values of first and first column
+        this->firstRow    = 0;
+        this->firstColumn = 0;
 
-            const char *week[] = {"MO","TU","WE","TH","FR","SA","SU"};
-            if (parent) {
-                parent->addWidget(this);
-            }
-            grid.x = dayWidth;
-            grid.y = dayHeight;
-            this->rows = rows;
-            this->columns = columns;
-            for (uint32_t y = 0; y < rows; y++){
-                for (uint32_t x = 0; x < columns; x++){
-                    auto key = std::make_pair(x,y);
-                    const char *name = "";
-                    if (y == 0){
-                        name = week[x];
-                    }
-                    dayMap[key] = new DayLabel(this,name,x,y, style::window::calendar::day_cell_width,style::window::calendar::day_cell_height);
-                    addWidget(dayMap[key]);
+        std::string week[] = {utils::localize.get("app_calendar_monday"),
+                              utils::localize.get("app_calendar_tuesday"),
+                              utils::localize.get("app_calendar_wensday"),
+                              utils::localize.get("app_calendar_thursday"),
+                              utils::localize.get("app_calendar_friday"),
+                              utils::localize.get("app_calendar_saturday"),
+                              utils::localize.get("app_calendar_sunday")};
+
+        assert(parent);
+        parent->addWidget(this);
+
+        grid.x        = dayWidth;
+        grid.y        = dayHeight;
+        this->rows    = style::window::calendar::week_days_number;
+        this->columns = style::window::calendar::max_weeks_number;
+        for (uint32_t y = 0; y < this->rows; y++) {
+            for (uint32_t x = 0; x < this->columns; x++) {
+                auto key         = std::make_pair(x, y);
+                std::string name = "";
+                if (y == 0) {
+                    name = week[x];
                 }
+                LOG_DEBUG("MonthBox x:%d y:%d", x, y);
+                dayMap[key] = new DayLabel(this,
+                                           name,
+                                           x,
+                                           y,
+                                           style::window::calendar::day_cell_width,
+                                           style::window::calendar::day_cell_height);
+                addWidget(dayMap[key]);
             }
-            LOG_DEBUG("MonthBox constructor Completed Successfully!");
-            
         }
+        LOG_DEBUG("MonthBox constructor Completed Successfully!");
+    }
 
     void MonthBox::buildMap(app::Application *app)
     {
@@ -96,15 +116,11 @@ namespace gui
                 LOG_DEBUG("Set element in monthbox map in position x:%d y:%d",day->x,day->y);
                 auto key = std::make_pair(day->x,day->y);
                 dayMap[key]->displayText();
-                dayMap[key]->setLabel(this, day->number.c_str(),
-                    [=](gui::Item &item) {
-                                {
-                                    LOG_DEBUG("Switch to DayWindow");
-                                    app->switchWindow("DayWindow",nullptr);
-                                    return true;
-                                }
-                            }
-                );
+                dayMap[key]->setLabel(this, day->number.c_str(), [=](gui::Item &item) {
+                    LOG_DEBUG("Switch to DayWindow");
+                    app->switchWindow("DayWindow", nullptr);
+                    return true;
+                });
             }
             else{
                 LOG_DEBUG("COLUMNS:%d ROWS:%d",this->columns,this->rows); 
@@ -130,68 +146,91 @@ namespace gui
     {
         uint32_t y = rows-2;
         uint32_t x = columns-1;
-        LOG_DEBUG("KEY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! x:%d y:%d", x,y);
         auto key = std::make_pair(x,y);
         if(!dayMap.empty()){
             while ( dayMap.count(key) == 0 || !dayMap[key]->activeItem){
-                LOG_DEBUG("KEY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! x:%d y:%d", x,y);
                 key = std::make_pair(--x, y);
             }
         }
-        LOG_DEBUG("KEY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! x:%d y:%d", x,y);
         return key;
     }
-
     
     void MonthBox::setNavigation()
-    {  
-        LOG_DEBUG("Start set navigation");
+    {
+        LOG_DEBUG("Start setting navigation");
+        // Go through each element of grid
         for (uint32_t y = this->firstRow; y< this->rows; y++){
             for (uint32_t x = this->firstColumn; x< this->columns; x++){    
                     auto keyCenter = std::make_pair(x,y);
-                    if (dayMap[keyCenter]->activeItem){ 
-
+                    // if current element is active set the navigation for all neighbours in 4 directions
+                    if (dayMap[keyCenter]->activeItem) {
+                        // direction UP
                         LOG_DEBUG("Set navigation UP from coords x:%d , y:%d", x,y);
                         auto keyUp = std::make_pair(x,y-1);
+                        // if neighbour on top is not active or outside the map it means the current element is at the
+                        // top border
                         if(dayMap.count(keyUp) == 0 || !dayMap[keyUp]->activeItem){
+                            /// get the grid element from the opposite row
+                            // change neighbour coords to the last row
                             uint32_t index = this->rows;
+                            // go up to the first active element
                             while(!dayMap[keyUp]->activeItem){
                                 keyUp = std::make_pair(x,--index);
                             }
                         }
+                        // set navigation from current element to the upper neighbour
                         dayMap[keyCenter]->setNavigationItem(NavigationDirection::UP, dayMap[keyUp]);
-                    
+
+                        // direction DOWN
                         LOG_DEBUG("Set navigation DOWN from coords x:%d , y:%d", x,y);
                         auto keyDown = std::make_pair(x,y+1);
+                        // if bottom neighbour is not active or outside the map it means the current element is at the
+                        // bottom border
                         if(dayMap.count(keyDown) == 0 || !dayMap[keyDown]->activeItem){
+                            /// get the grid element from the opposite row
+                            // change neighbour coords to the first row
                             uint32_t index = this->firstRow;
-                            //keyDown = std::make_pair(x,index);
+                            // go down to the first active element
                             while(dayMap.count(keyDown) == 0 || !dayMap[keyDown]->activeItem){
                                 keyDown = std::make_pair(x,++index);
                             }
                         }
+                        // set navigation from current element to the bottom neighbour
                         dayMap[keyCenter]->setNavigationItem(NavigationDirection::DOWN, dayMap[keyDown]);
 
+                        // direction LEFT
                         LOG_DEBUG("Set navigation LEFT from coords x:%d , y:%d", x,y);
                         auto keyLeft = std::make_pair(x-1,y);
+                        // if left neighbour is not active or outside the map it means the current element is at the
+                        // left border
                         if (dayMap.count(keyLeft) == 0 || !dayMap[keyLeft]->activeItem){
+                            /// get the grid element from the opposite column
+                            // change neighbour coords to the last column
                             uint32_t index = this->columns;
+                            // go left to the first active element
                             while (dayMap.count(keyLeft) == 0 || !dayMap[keyLeft]->activeItem){
                                 keyLeft = std::make_pair(--index,y);
                             }
                         }
+                        // set navigation from current element to the left neighbour
                         dayMap[keyCenter]->setNavigationItem(NavigationDirection::LEFT, dayMap[keyLeft]);
-                
+
+                        // direction RIGHT
                         LOG_DEBUG("Set navigation RIGHT from coords x:%d , y:%d", x,y); 
                         auto keyRight = std::make_pair(x+1,y);
+                        // if right neighbour is not active or outside the map it means the current element is at the
+                        // right border
                         if (dayMap.count(keyRight) == 0 || !dayMap[keyRight]->activeItem){
+                            /// get the grid element from the opposite column
+                            // change neighbour coords to the first column
                             uint32_t index = this->firstColumn-1;
                             while (dayMap.count(keyRight) == 0 || !dayMap[keyRight]->activeItem){
                                 keyRight = std::make_pair(++index,y);
                             }
                         }
+                        // set navigation from current element to the right neighbour
                         dayMap[keyCenter]->setNavigationItem(NavigationDirection::RIGHT, dayMap[keyRight]);
-                }
+                    }
             }
         }
         LOG_DEBUG("Setting navi completed successfully");
@@ -206,7 +245,7 @@ namespace gui
                 if (inputEvent.state == InputEvent::State::keyReleasedShort) {
                         if(inputEvent.keyCode == gui::KeyCode::KEY_LEFT){
                             LOG_DEBUG("Change to prev month");
-                            parent->rebuild(1);
+                            parent->rebuild(style::window::calendar::test::prev_month_id);
                             return true;
                         }
                         else{
@@ -225,7 +264,7 @@ namespace gui
                         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
                                 if(inputEvent.keyCode == gui::KeyCode::KEY_RIGHT){
                                     LOG_DEBUG("Change to next month");
-                                    parent->rebuild(3);
+                                    parent->rebuild(style::window::calendar::test::next_month_id);
                                     return true;
                                 }    
                                 else{
@@ -331,8 +370,7 @@ namespace gui
     
     CalendarMainWindow::CalendarMainWindow(app::Application *app, std::string name) : AppWindow(app, name)
     {
-        uint32_t actualDateTime = 2;
-        buildInterface(actualDateTime);
+        buildInterface(style::window::calendar::test::month_id);
     }
 
     void CalendarMainWindow::rebuild(const uint32_t &ID)
@@ -344,8 +382,6 @@ namespace gui
 
     void CalendarMainWindow::buildInterface(const uint32_t &actualDateTimeID)
     {
-        /// TODO:Complete Case for 7 rows
-        /// TODO:Complete change month!
         LOG_DEBUG("AppWindow build interface");
         LOG_DEBUG("Calendar Date Time ID:%d",actualDateTimeID); 
         AppWindow::buildInterface();
@@ -353,7 +389,7 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(app);
 
-        setTitle("Calendar");
+        setTitle(utils::localize.get("app_calendar_title_main"));
         offsetFromTop = title->offset_h()+style::window::calendar::month_year_height;
         monthWidth = style::window::default_body_width;
         monthHeight = style::window_height - title->offset_h() - style::footer::height; 
@@ -363,8 +399,8 @@ namespace gui
         bool resp = getData(actualDateTimeID);
         LOG_DEBUG("Calendar Date Time ID:%d",actualDateTimeID); 
         if(resp){
-            uint32_t numbOfColums = 7;
-            uint32_t numbOfRows = 8;
+            uint32_t numbOfColums = style::window::calendar::week_days_number;
+            uint32_t numbOfRows   = style::window::calendar::max_weeks_number;
             //create empty month box
             month = new MonthBox(app, this, offsetFromTop, monthWidth , monthHeight,dayWidth, dayHeight,numbOfRows,numbOfColums, monthModel);
             //setup month box
@@ -378,14 +414,13 @@ namespace gui
             //rebuild first day to make the change to next month available
             auto key = month->getFirstDay();
             month->changeMonthInput(this, key.first, key.second, NavigationDirection::LEFT);
-            // //rebuild last day to make the change to next month available
-            // key = month->getLastDay();
-            // month->changeMonthInput(this, key.first, key.second, NavigationDirection::RIGHT);
             
         }
 
-        std::string actualDateTime = "July 2020";
+        auto actualDateTime = "June 2019";
+        // CHange label into bar
         auto label = new Label(this,style::window::default_left_margin,title->offset_h(),style::window::default_body_width,style::window::calendar::month_year_height,actualDateTime);
+        // label->setActive(gui::TopBar::Elements::TIME, true);
         label->setPenWidth(style::window::default_border_no_focus_w);
         label->setFont(style::window::font::mediumbold);
         label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER));
@@ -405,4 +440,4 @@ namespace gui
         erase();
     }
 
- } /* namespace app */
+} // namespace gui

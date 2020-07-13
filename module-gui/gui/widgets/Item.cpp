@@ -421,8 +421,9 @@ namespace gui
 
     void Item::clearNavigationItem(gui::NavigationDirection direction)
     {
-        if (navigationDirections == nullptr)
+        if (navigationDirections == nullptr) {
             navigationDirections = new Navigation();
+        }
         navigationDirections->clearDirection(direction);
     }
 

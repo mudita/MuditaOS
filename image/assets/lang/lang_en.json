@@ -54,6 +54,15 @@
     "duration_0hmin_0sec" : "%0N:%0S",
     "duration_hour_0min_0sec" : "%H:%0M:%0S",
 
+    "app_calendar_title_main" : "Calendar",
+    "app_calendar_monday":"MO",
+    "app_calendar_tuesday":"TU",
+    "app_calendar_wensday":"WE",
+    "app_calendar_thursday":"TH",
+    "app_calendar_friday":"FR",
+    "app_calendar_saturday":"SA",
+    "app_calendar_sunday":"SU",
+
     "app_options_invalid_option": " <Invalid Option> ",
     "app_options_contact_details": "Contact details",
     "app_options_contact_add": "Add to contacts",
