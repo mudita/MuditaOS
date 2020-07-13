@@ -1,4 +1,6 @@
 #include "ServiceDesktop.hpp"
+#include "common_data/EventStore.hpp"
+#include "source/version.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
@@ -35,6 +37,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         }
         return std::make_shared<sys::ResponseMessage>();
     });
+
+    Store::OperatingSystem::modify().version.initFromMemory();
+    LOG_DEBUG("OS: %s", Store::OperatingSystem::get().version.toJson().dump().c_str());
 
     return (sys::ReturnCodes::Success);
 }

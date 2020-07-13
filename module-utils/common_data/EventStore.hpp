@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <string>
 #include <tuple>
+#include <json/json11.hpp>
 
 namespace cpp_freertos
 {
@@ -35,12 +36,7 @@ namespace Store
     {
         struct Version
         {
-            void setVersionFromString(const std::string &versionToSet)
-            {
-                sscanf(versionToSet.c_str(), "%d.%d.%d", &major, &minor, &patch);
-
-                versionString = versionToSet;
-            }
+            void initFromMemory();
 
             std::tuple<int, int, int> ToTuple() const
             {
@@ -52,15 +48,16 @@ namespace Store
                 return ToTuple() < other.ToTuple();
             }
 
+            const json11::Json toJson() const;
+            static OperatingSystem::Version fromJson(const json11::Json &json);
+
             unsigned int major;
             unsigned int minor;
             unsigned int patch;
-
-            std::string gitBranch;
             std::string gitTag;
+            std::string gitBranch;
             std::string gitRev;
             std::string codename;
-            std::string versionString;
             std::string kernelVersionString;
         } version;
 

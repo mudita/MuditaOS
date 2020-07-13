@@ -1,0 +1,22 @@
+{
+	"git":
+	{
+		"branch":   "$gitbranch",
+		"revision": "__GIT_REVISION__",
+		"tag":      "$gittag"
+	},
+	"misc":
+	{
+		"codename":  "__MISC_CODENAME__",
+		"kernel":    "__MISC_KERNEL__",
+		"buildon":   "__MISC_BUILD_HOST__",
+		"builddate": "__MISC_BUILD_DATE__",
+		"builduser": "__MISC_BUILD_USER__"
+	},
+	"version":
+	{
+		"major": "__VERSION_MAJOR__",
+		"minor": "__VERSION_MINOR__",
+		"patch": "__VERSION_PATCH__"
+	}
+}

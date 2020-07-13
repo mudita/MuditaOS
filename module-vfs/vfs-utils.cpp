@@ -76,12 +76,3 @@ bool vfs::verifyCRC(const fs::path filePath)
     LOG_ERROR("verifyCRC can't open %s", crcFilePath.c_str());
     return (false);
 }
-
-void vfs::initOperatingSystemStore()
-{
-    Store::OperatingSystem::modify().version.kernelVersionString = tskKERNEL_VERSION_NUMBER;
-    Store::OperatingSystem::modify().version.gitRev    = GIT_REV;
-    Store::OperatingSystem::modify().version.gitTag    = GIT_TAG;
-    Store::OperatingSystem::modify().version.gitBranch = GIT_BRANCH;
-    Store::OperatingSystem::modify().version.setVersionFromString(VERSION);
-}

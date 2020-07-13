@@ -10,7 +10,7 @@ namespace service::name
 
 namespace sdesktop
 {
-    const inline int service_stack         = 8192;
+    const inline int service_stack         = 12288;
     const inline int cdc_queue_len         = 10;
     const inline int cdc_queue_object_size = 10;
     class UpdateOsMessage : public sys::DataMessage

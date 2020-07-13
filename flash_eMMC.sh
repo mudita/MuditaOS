@@ -40,6 +40,7 @@ echo "Create directories"
 mkdir -p $PURE_PATH_ROOT/$PURE_OS_CURRENT
 mkdir -p $PURE_PATH_ROOT/$PURE_OS_PREVIOUS
 mkdir -p $PURE_PATH_ROOT/$PURE_OS_FACTORY
+mkdir -p $PURE_PATH_ROOT/$PURE_OS_UPDATES
 
 # sudo sync $PURE_DEV
 

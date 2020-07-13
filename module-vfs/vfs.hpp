@@ -78,7 +78,7 @@ namespace purefs
         const inline std::string main     = "main";
         const inline std::string os_type  = "ostype";
         const inline std::string os_image = "imagename";
-        const inline std::string timestamp= "timestamp";
+        const inline std::string timestamp = "timestamp";
 
         const inline std::string os_git_tag      = "git_tag";
         const inline std::string os_git_revision = "git_commit";
@@ -172,8 +172,6 @@ class vfs
     size_t fprintf(FILE *stream, const char *format, ...);
 
     FilesystemStats getFilesystemStats();
-
-    void initOperatingSystemStore();
 
     std::string relativeToRoot(const std::string path);
     std::string lastErrnoToStr();
