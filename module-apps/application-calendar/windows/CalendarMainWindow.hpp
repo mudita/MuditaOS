@@ -2,15 +2,15 @@
 
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
+#include "application-calendar/models/MonthModel.hpp"
+#include "application-calendar/models/DayModel.hpp"
 #include <gui/widgets/GridLayout.hpp>
 #include <gui/widgets/Item.hpp>
 #include <Text.hpp>
 #include <map>
 #include <vector>
 #include <string>
-#include "../ApplicationCalendar.hpp"
-#include "../models/MonthModel.hpp"
-#include "../models/DayModel.hpp"
 
 namespace gui
 {
@@ -18,81 +18,82 @@ namespace gui
 
     namespace coords
     {
-        const uint8_t first_row = 1;
+        const uint8_t first_row        = 1;
         const uint8_t default_last_row = 5;
 
         const uint8_t first_column = 0;
-        const uint8_t last_column = 6;
-    };
-
+        const uint8_t last_column  = 6;
+    }; // namespace coords
 
     class DayLabel : public Label, public DayModel
-    {  
-        public:
-        DayLabel(gui::Item *parent,const char *number,const uint32_t &x,const uint32_t &y, const uint32_t &width, const uint32_t &height);
-        
-        void setLabel(gui::Item *parent,const char *number,std::function<bool(Item &)> activatedCallback);
+    {
+      public:
+        DayLabel(gui::Item *parent,
+                 std::string number,
+                 const uint32_t &x,
+                 const uint32_t &y,
+                 const uint32_t &width,
+                 const uint32_t &height);
 
-        void displayText()
-        {
-          std::string s = this->text;
-          const char *c = s.c_str();
-          int disp = atoi(c);
-          LOG_DEBUG("%d",disp);
-        }
-
+        void setLabel(std::string number, std::function<bool(Item &)> activatedCallback);
         ~DayLabel() override = default;
-
     };
 
     class MonthBox : public GridLayout, public MonthModel
     {
-      /// @param columns: defines number of columns, @param rows: defines number of rows      
-      uint32_t firstRow = 0;
-      uint32_t firstColumn = 0;
-      uint32_t columns = 0;
-      uint32_t rows = 0;
-      std::map<std::pair<uint32_t,uint32_t>, DayLabel*> dayMap;
+        /// @param columns: defines number of columns, @param rows: defines number of rows
+        uint32_t firstRow    = 0;
+        uint32_t firstColumn = 0;
+        uint32_t columns     = 0;
+        uint32_t rows        = 0;
+        std::map<std::pair<uint32_t, uint32_t>, DayLabel *> dayMap;
 
       public:
-      MonthBox(app::Application *app, gui::Item *parent, const int &offsetTop, const uint32_t &width, const uint32_t &height, 
-              const uint32_t &dayWidth, const uint32_t &dayHeight, const uint32_t &rows, const uint32_t &columns, const std::unique_ptr<MonthModel> &model);
+        MonthBox(app::Application *app,
+                 gui::Item *parent,
+                 const int &offsetTop,
+                 const uint32_t &width,
+                 const uint32_t &height,
+                 const uint32_t &dayWidth,
+                 const uint32_t &dayHeight,
+                 const std::unique_ptr<MonthModel> &model);
 
-      ~MonthBox() override = default;
-      
-      void buildMap(app::Application *app);
-      std::pair<uint32_t, uint32_t> getFirstDay();
-      std::pair<uint32_t, uint32_t> getLastDay();
+        ~MonthBox() override = default;
 
-      void setNavigation() override;
-      void changeMonthInput(gui::CalendarMainWindow *parent, const uint32_t &x, const uint32_t &y, NavigationDirection direction);
-      void rebuildNavigation(gui::CalendarMainWindow *parent,  const uint32_t &x,  NavigationDirection direction);
-      
-      uint32_t getFirstRow()
-      {
-        return this->firstRow;
-      }
+        void buildMap(app::Application *app);
+        std::pair<uint32_t, uint32_t> getFirstDay();
+        std::pair<uint32_t, uint32_t> getLastDay();
 
-      uint32_t getFirstColumn()
-      {
-        return this->firstColumn;
-      }
+        void setNavigation() override;
+        void changeMonthInput(gui::CalendarMainWindow *parent,
+                              const uint32_t &x,
+                              const uint32_t &y,
+                              NavigationDirection direction);
+        void rebuildNavigation(gui::CalendarMainWindow *parent, const uint32_t &x, NavigationDirection direction);
 
-      uint32_t getColumns()
-      {
-        return this->columns;
-      }
-        
+        uint32_t getFirstRow()
+        {
+            return this->firstRow;
+        }
+
+        uint32_t getFirstColumn()
+        {
+            return this->firstColumn;
+        }
+
+        uint32_t getColumns()
+        {
+            return this->columns;
+        }
     };
 
     class CalendarMainWindow : public gui::AppWindow
     {
-      uint32_t offsetFromTop = 0;
-      uint32_t monthWidth = 0;
-      uint32_t monthHeight = 0; 
-      uint32_t dayWidth = 0;
-      uint32_t dayHeight = 0;
-      
+        uint32_t offsetFromTop = 0;
+        uint32_t monthWidth    = 0;
+        uint32_t monthHeight   = 0;
+        uint32_t dayWidth      = 0;
+        uint32_t dayHeight     = 0;
 
       protected:
         MonthBox *month = nullptr;
@@ -100,15 +101,14 @@ namespace gui
 
       public:
         CalendarMainWindow(app::Application *app, std::string name);
-        
-        /// @param date_time is a value key to DB get request 
+
+        /// used only for testing
         bool getData(const uint32_t &date_time);
-        
+
         ~CalendarMainWindow() override = default;
         void rebuild(const uint32_t &ID);
         void buildInterface(const uint32_t &actualDateTimeID);
         void destroyInterface() override;
-
     };
 
-} /* namespace app */
+} // namespace gui

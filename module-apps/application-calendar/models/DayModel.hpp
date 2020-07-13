@@ -10,13 +10,13 @@
 #include <string>
 
 class DayModel
-{  
-    public:
-    std::string number = "";
-    uint32_t x = 0;
-    uint32_t y = 0;
-    
-    public:
-    DayModel(const char *number,const uint32_t &x,const uint32_t &y);
+{
+  public:
+    std::string number;
+    const uint32_t x;
+    const uint32_t y;
+
+  public:
+    DayModel(std::string number, const uint32_t &x, const uint32_t &y);
     virtual ~DayModel() = default;
 };

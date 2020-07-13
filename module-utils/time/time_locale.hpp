@@ -21,6 +21,9 @@ namespace utils
             static const int num_formatters = 4;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
+            const std::array<std::string, num_days> daysShort = {
+                "common_mo", "common_tu", "common_we", "common_th", "common_fr", "common_sa", "common_su"};
+
             const std::array<std::string, num_days> days = {"common_sunday",
                                                             "common_monday",
                                                             "common_tuesday",
@@ -98,6 +101,17 @@ namespace utils
                 }
                 else {
                     return localize.get(tlocale.days[day]);
+                }
+            }
+
+            static const UTF8 get_short_day(const uint32_t &day)
+            {
+                if (day >= num_days) {
+                    LOG_ERROR("Bad value");
+                    return "";
+                }
+                else {
+                    return localize.get(tlocale.daysShort[day]);
                 }
             }
 
