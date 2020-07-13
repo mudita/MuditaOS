@@ -15,13 +15,6 @@ jobs:
     - name: "Style checking"
       run: |
         ./config/pre-commit.hook --last
-    - name: "Unit Tests"
-      run: |
-        ./configure.sh linux Debug && \
-        pushd build-linux-Debug && \
-        echo "JOBS=${JOBS:-8} | set to 8" &&\
-        make -j 8 check && \
-        popd 
     - name: "Build for RT1051"
       run: |
         ./configure.sh rt1051 Debug && \
@@ -30,3 +23,33 @@ jobs:
         make -j 8 && \
         popd && \
         uptime
+
+  unit-tests:
+    runs-on: self-hosted
+    steps:
+    - name: Check Out
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GitHub_PAT }}
+        submodules: recursive
+        fetch-depth: 0
+      - name: "Unit Tests"
+        run: |
+          ./configure.sh linux Debug && \
+          pushd build-linux-Debug && \
+          echo "JOBS=${JOBS:-8} | set to 8" &&\
+          make -j 8 check && \
+          popd 
+
+  tidy:
+    runs-on: self-hosted
+    steps:
+    - name: Check Out
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GitHub_PAT }}
+        submodules: recursive
+        fetch-depth: 0
+    - name: "Clang CI check"
+      run: |
+          ./config/tidy.sh
