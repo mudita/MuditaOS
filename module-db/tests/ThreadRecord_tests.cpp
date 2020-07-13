@@ -16,6 +16,7 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "queries/sms/QuerySmsThreadMarkAsRead.hpp"
 #include "vfs.hpp"
 
 #include <algorithm>
@@ -117,6 +118,34 @@ TEST_CASE("Thread Record tests")
         auto record = threadRecordInterface1.GetByID(1);
         REQUIRE(record.isValid());
         REQUIRE(record.snippet == snippetTest2);
+    }
+
+    SECTION("Mark as read / unread")
+    {
+        recordIN.unreadMsgCount = 10;
+        REQUIRE(threadRecordInterface1.Add(recordIN));
+        auto rec = threadRecordInterface1.GetByID(3);
+        REQUIRE(rec.isUnread());
+
+        {
+            db::query::smsthread::MarkAsRead query{3, db::query::smsthread::MarkAsRead::Read::True};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            REQUIRE(result->getResult());
+            rec = threadRecordInterface1.GetByID(3);
+            REQUIRE_FALSE(rec.isUnread());
+        }
+
+        {
+            db::query::smsthread::MarkAsRead query{3, db::query::smsthread::MarkAsRead::Read::False};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            REQUIRE(result->getResult());
+            rec = threadRecordInterface1.GetByID(3);
+            REQUIRE(rec.isUnread());
+        }
     }
 
     Database::Deinitialize();

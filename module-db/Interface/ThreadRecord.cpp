@@ -1,13 +1,3 @@
-
-/*
- * @file ThreadRecord.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ThreadRecord.hpp"
 #include "SMSRecord.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
@@ -138,6 +128,9 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(const db::Query
     if (const auto local_query = dynamic_cast<const db::query::SMSSearch *>(query)) {
         return runQueryImpl(local_query);
     }
+    if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query)) {
+        return runQueryImpl(local_query);
+    }
     return nullptr;
 }
 
@@ -145,4 +138,19 @@ std::unique_ptr<db::query::SMSSearchResult> ThreadRecordInterface::runQueryImpl(
 {
     auto db_result = smsDB->threads.getBySMSQuery(query->text, query->starting_postion, query->depth);
     return std::make_unique<db::query::SMSSearchResult>(db_result.first, db_result.second);
+}
+
+std::unique_ptr<db::query::smsthread::MarkAsReadResult> ThreadRecordInterface::runQueryImpl(
+    const db::query::smsthread::MarkAsRead *query)
+{
+    using namespace db::query::smsthread;
+    auto ret = false;
+
+    auto record = GetByID(query->id);
+    if (record.isValid()) {
+        LOG_FATAL("query-read %d", static_cast<int>(query->read));
+        record.unreadMsgCount = query->read == MarkAsRead::Read::True ? 0 : 1;
+        ret                   = Update(record);
+    }
+    return std::make_unique<MarkAsReadResult>(ret);
 }
