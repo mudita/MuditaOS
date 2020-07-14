@@ -1,7 +1,7 @@
 #include "PhonebookNewContact.hpp"
 
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "PhonebookContact.hpp"
+#include "application-phonebook/data/PhonebookUtils.hpp"
 
 #include <Dialog.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
@@ -28,7 +28,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::TIME, true);
 
         setTitle(utils::localize.get("app_phonebook_contact_title"));
 
@@ -193,7 +192,7 @@ namespace gui
             return true;
         };
         std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
-        fillContactData(duplicatedNumberPhrase, oldContactRecord);
+        phonebookUtils::fillContactData(duplicatedNumberPhrase, oldContactRecord);
         meta.text  = duplicatedNumberPhrase;
         meta.title = duplicatedNumber.getFormatted();
         meta.icon  = "info_big_circle_W_G";
@@ -218,9 +217,9 @@ namespace gui
             return true;
         };
         std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
-        fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
+        phonebookUtils::fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
         std::string duplicatedSpeedDialTitle = utils::localize.get("app_phonebook_duplicate_speed_dial_title");
-        fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
+        phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
         meta.text  = duplicatedSpeedDialPhrase;
         meta.title = duplicatedSpeedDialTitle;
         meta.icon  = "info_big_circle_W_G";

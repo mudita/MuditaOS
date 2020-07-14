@@ -1,9 +1,10 @@
 #pragma once
 
 #include <ContactRecord.hpp>
+#include <Utils.hpp>
 
-class PhonebookUtils
+namespace phonebookUtils
 {
-  public:
-    static auto formatVCard(const ContactRecord &) -> const std::string;
-};
+    void fillContactData(std::string &data, ContactRecord &contact);
+    auto formatVCard(const ContactRecord &) -> const std::string;
+} // namespace phonebookUtils
