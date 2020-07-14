@@ -130,7 +130,7 @@ namespace gui
         return provider;
     }
 
-        void ListView::setAlignment(const Alignment &value)
+    void ListView::setAlignment(const Alignment &value)
     {
         if (body->getAlignment() != value) {
             body->setAlignment(value);

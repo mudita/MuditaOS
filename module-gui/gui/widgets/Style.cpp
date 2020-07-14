@@ -21,7 +21,7 @@ namespace style::window
             return;
         }
         decorate(static_cast<gui::Rect *>(el));
-        el->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        el->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
     }
 
     void decorateOption(gui::Label *el)

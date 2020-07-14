@@ -14,6 +14,9 @@ namespace gui
 
     Alignment &Alignment::operator=(const Alignment &alignment)
     {
+        if (this == &alignment)
+            return *this;
+
         if (alignment.horizontal != Alignment::Horizontal::None)
             this->horizontal = alignment.horizontal;
 
@@ -23,12 +26,12 @@ namespace gui
         return *this;
     }
 
-    bool Alignment::operator==(const Alignment &alignment)
+    bool Alignment::operator==(const Alignment &alignment) const
     {
         return !(horizontal != alignment.horizontal || vertical != alignment.vertical);
     }
 
-    bool Alignment::operator!=(const Alignment &alignment)
+    bool Alignment::operator!=(const Alignment &alignment) const
     {
         return (horizontal != alignment.horizontal || vertical != alignment.vertical);
     }
