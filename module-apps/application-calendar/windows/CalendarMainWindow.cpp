@@ -433,3 +433,22 @@ namespace gui
     }
 
 } // namespace gui
+
+    bool CalendarMainWindow::onInput(const gui::InputEvent &inputEvent)
+    {
+        if (inputEvent.state == gui::InputEvent::State::keyReleasedShort ||
+            inputEvent.state == gui::InputEvent::State::keyReleasedLong) {
+            if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+                application->switchWindow("DayWindow");
+                LOG_DEBUG("Switch to Day Window");
+                return true;
+            }
+            if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+                LOG_DEBUG("Switch to List Window");
+                return true;
+            }
+        }
+
+        return AppWindow::onInput(inputEvent);
+    }
+} /* namespace app */
