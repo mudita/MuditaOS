@@ -150,9 +150,8 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (inputText->getText().length() > 0) {
-                // Temporary disable saving secondary number since multiple numbers are not supported yet, and this
-                // could lead to confusing errors
-                // contact->numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
+                contact->numbers.emplace_back(
+                    ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
             }
         };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
