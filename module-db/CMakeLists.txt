@@ -48,6 +48,7 @@ set(SOURCES
 
         queries/RecordQuery.cpp
         queries/sms/QuerySMSSearch.cpp
+        queries/sms/QuerySmsThreadMarkAsRead.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp

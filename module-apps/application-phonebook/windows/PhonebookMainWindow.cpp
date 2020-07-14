@@ -106,7 +106,7 @@ namespace gui
 
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(""));
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         }
     }
 

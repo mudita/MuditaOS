@@ -1,5 +1,17 @@
 # Mudita PurePhone changelog
 
+## Current version
+
+### Added
+* `[sms]` Added option to mark conversation as read/unread 
+
+### Changed
+
+### Fixed
+* `[phonebook]` Fix wrong text label for back action.
+* `[sms]` Concatenated sms sending fixed.
+### Other
+
 ## [0.28.1] - 2020-07-10
 
 ### Added

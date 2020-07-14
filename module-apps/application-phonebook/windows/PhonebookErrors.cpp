@@ -52,7 +52,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, false);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
         topSeparatorLabel = addLabel(this,
                                      0,
@@ -134,7 +134,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, false);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         topSeparatorLabel = addLabel(this,
                                      0,
                                      104,

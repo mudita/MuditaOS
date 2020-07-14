@@ -1,22 +1,15 @@
-
-/*
- * @file ThreadRecord.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
 #include "Record.hpp"
-#include <stdint.h>
-#include "utf8/UTF8.hpp"
-#include "../Databases/SmsDB.hpp"
-#include "../Databases/ContactsDB.hpp"
-#include "../Common/Common.hpp"
-#include "../queries/sms/QuerySMSSearch.hpp"
+#include "module-db/Databases/SmsDB.hpp"
+#include "module-db/Databases/ContactsDB.hpp"
+#include "module-db/Common/Common.hpp"
+#include "module-db/queries/sms/QuerySMSSearch.hpp"
+#include "module-db/queries/sms/QuerySmsThreadMarkAsRead.hpp"
 
+#include <utf8/UTF8.hpp>
+
+#include <cstdint>
 struct ThreadRecord : Record
 {
     uint32_t date           = 0;
@@ -64,8 +57,6 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);
 
-    bool markAsRead();
-
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,
@@ -83,4 +74,5 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     /// it would only make sense to pass Query from Inteface to multiple databases to get all data we are interested in
     /// or better split it to smaller entities... this could be done with any db high level interface -  left as it is
     std::unique_ptr<db::query::SMSSearchResult> runQueryImpl(const db::query::SMSSearch *query);
+    std::unique_ptr<db::query::smsthread::MarkAsReadResult> runQueryImpl(const db::query::smsthread::MarkAsRead *query);
 };

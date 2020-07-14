@@ -40,12 +40,30 @@ as a variable to the boot.bin (PureOS) as an argument
    and reads all assets and files from it. 
    
 5. updating from old style partitioning (1 partition)
-   to new partition scheme (2 partitions)
+   to new partition scheme (2 partitions). In case of problems see pt 6.
    
+_Make sure you have the latest ecoboot bootloader on the phone
+I 1.1 recommand https://github.com/muditacom/ecoboot/releases/tag/1.1
+that will work even if you manage to break the filesystems in the next steps
+(it's goot to be prepared)_
+
+###### now let's go:
+ 
 switch the phone to MSC mode (bootloader option 4)
 
 unmount disk from the OS so that it's not used
 find the disk name that is assigned to the phone (sda, sdb etc.)
+
+Find out if the disk is mounted (assuming /dev/sda)
+```
+[atom@urethra:~/devel/PurePhone_14/doc]$ cat /etc/mtab | grep /dev/sda | awk '{print $2}'
+/mnt
+```
+
+Umount /dev/sda from /mnt before you do anything else
+```
+# sudo umount /mnt 
+```
 
 cd into project root dir and run the partitioning script,
 
@@ -108,7 +126,7 @@ mount the first partition of the phone to any location (ex. /mnt)
 
 `` replace /dev/sdX1 with the disk name``
 
-``$ sound mount /dev/sdX1 /mnt``
+``$ sudo mount /dev/sdX1 /mnt``
 
 now run the flash script (assuming you built your OS in the build-rt1051-Debug folder)
 ```
@@ -252,3 +270,19 @@ PurePhone ejected
 Done. You can reset PurePhone now
 
 ```
+
+6. In case all above fails, try using gparted on the destination device
+   you should see two FAT partitions on a single disk, if that's not the case
+   use gparted to create a new partition table and re-run the partition script.
+   
+   This is how gparted should look like if the disk is OK
+   ![Gparted OK](./Images/gparted_ok.png "workflow")
+   
+   This is a case if the disk is not correct
+   ![Gparted OK](./Images/gparted_fail.png "workflow")
+   
+   If the phone fails to start in MSC mode, you can try using the D1_Flash_Loader
+   program to rescue it. Go to https://github.com/muditacom/D1_eMMC_FlashLoader/ and clone
+   the project. Open it in Ozone and load the .axf file attached in the initial release
+   of the project. This will present the phones eMMC storage to the OS and you can
+   partition it correctly then.
