@@ -9,6 +9,8 @@
 
 #include "ApplicationCalendar.hpp"
 #include "windows/CalendarMainWindow.hpp"
+#include "windows/DayWindow.hpp"
+#include "windows/NoEventsWindow.hpp"
 #include <map>
 
 namespace app
@@ -43,6 +45,10 @@ namespace app
 
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             gui::name::window::main_window, new gui::CalendarMainWindow(this, gui::name::window::main_window)));
+
+        windows.insert(std::pair<std::string, gui::AppWindow *>("DayWindow", new DayWindow(this, "DayWindow")));
+        windows.insert(
+            std::pair<std::string, gui::AppWindow *>("NoEventsWindow", new NoEventsWindow(this, "NoEventsWindow")));
     }
 
     void ApplicationCalendar::destroyUserInterface()

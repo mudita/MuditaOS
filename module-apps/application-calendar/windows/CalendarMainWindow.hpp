@@ -106,6 +106,7 @@ namespace gui
         bool getData(const uint32_t &date_time);
 
         ~CalendarMainWindow() override = default;
+        bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild(const uint32_t &ID);
         void buildInterface(const uint32_t &actualDateTimeID);
         void destroyInterface() override;
