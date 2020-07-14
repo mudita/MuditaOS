@@ -6,8 +6,9 @@
 ### Added
 
 * `[calendar]` Added all events list window.
-* `[torch]` Added initial torch functionality (driver)
-* `[music player]` Added simple music player implementation
+* `[torch]` Added initial torch functionality (driver).
+* `[phonebook]` Added alternative number handling.
+* `[music player]` Added simple music player implementation.
 
 ### Changed
 

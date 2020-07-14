@@ -44,16 +44,15 @@ namespace gui
                                                               phonebookStyle::informationWidget::h);
                 vBox->addWidget(primaryNumberHBox);
             }
-            if (contact->numbers.size() > 0) {
+            if (contact->numbers.size() > 1) {
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::h);
-                alternativeNumberHBox = new NumberWithIconsWidget(
-                    app,
-                    contact->numbers[0].number, // Using primary number since secondary number is not supported yet
-                    nullptr,
-                    0,
-                    0,
-                    phonebookStyle::informationWidget::w,
-                    phonebookStyle::informationWidget::h);
+                alternativeNumberHBox = new NumberWithIconsWidget(app,
+                                                                  contact->numbers[1].number,
+                                                                  nullptr,
+                                                                  0,
+                                                                  0,
+                                                                  phonebookStyle::informationWidget::w,
+                                                                  phonebookStyle::informationWidget::h);
 
                 vBox->addWidget(alternativeNumberHBox);
             }

@@ -40,7 +40,7 @@ struct ContactRecord : public Record
 
     UTF8 assetPath = "";
 
-    UTF8 speeddial      = "";
+    UTF8 speeddial                          = "";
     std::set<ContactsGroupsTableRow> groups = {};
 
     enum class NameFormatType
@@ -109,6 +109,7 @@ class ContactNumberHolder
     ContactNumberHolder(const ContactsNumberTableRow &numberRow);
     const utils::PhoneNumber &getNumber() const;
     std::uint32_t getContactID() const;
+    std::uint32_t getNumberID() const;
 };
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField>
@@ -175,4 +176,11 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
 
     std::vector<ContactsNumberTableRow> getAllNumbers();
+
+    utils::NumberHolderMatcher<std::vector, ContactNumberHolder> buildNumberMatcher(
+        std::vector<ContactNumberHolder> &contactNumberHolders);
+
+    std::vector<std::uint32_t> splitNumberIDs(const std::string &numberIDs);
+
+    std::string joinNumberIDs(const std::vector<std::uint32_t> &numberIDs);
 };
