@@ -1,6 +1,7 @@
 #include "ApplicationPhonebook.hpp"
 #include "Dialog.hpp"
 #include "windows/PhonebookContact.hpp"
+#include "windows/PhonebookContactDetails.hpp"
 #include "windows/PhonebookContactOptions.hpp"
 #include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
@@ -73,7 +74,8 @@ namespace app
     {
         windows.insert({gui::name::window::main_window, new gui::PhonebookMainWindow(this)});
         windows.insert({gui::window::name::new_contact, new gui::PhonebookNewContact(this)});
-        windows.insert({gui::window::name::contact, new gui::PhonebookContact(this)});
+        //windows.insert({gui::window::name::contact, new gui::PhonebookContact(this)});
+        windows.insert({gui::window::name::contact, new gui::PhonebookContactDetails(this)});
         windows.insert({gui::window::name::search, new gui::PhonebookSearch(this)});
         windows.insert({gui::window::name::no_results, new gui::NoResults(this)});
         windows.insert({gui::window::name::contact_blocked, new gui::ContactBlocked(this)});
