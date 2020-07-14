@@ -198,11 +198,11 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                                                                               uint32_t limit)
 {
     auto ret       = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
-    auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \"%%%q%%\"", text.c_str());
+    auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \'%%%q%%\'", text.c_str());
     ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].GetUInt32();
     if (ret.first != 0) {
         auto retQuery =
-            db->Query("SELECT * from sms WHERE sms.body like \"%%%q%%\" ORDER BY date DESC LIMIT %lu OFFSET %lu;",
+            db->Query("SELECT * from sms WHERE sms.body like \'%%%q%%\' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
                       text.c_str(),
                       limit,
                       offset);
@@ -211,10 +211,10 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                 .ID             = (*retQuery)[0].GetUInt32(),
                 .date           = (*retQuery)[3].GetUInt32(),
                 .msgCount       = 0,
-                .unreadMsgCount = (*retQuery)[7].GetUInt32(),
+                .unreadMsgCount = 0,
                 .contactID      = (*retQuery)[2].GetUInt32(),
                 .snippet        = (*retQuery)[6].GetString(),
-                .type           = static_cast<SMSType>((*retQuery)[8].GetUInt32()),
+                .type           = static_cast<SMSType>((*retQuery)[7].GetUInt32()),
             });
         } while (retQuery->NextRow());
     }
