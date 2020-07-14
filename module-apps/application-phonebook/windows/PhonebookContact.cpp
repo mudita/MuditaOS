@@ -303,6 +303,12 @@ namespace gui
         if (contact->numbers.size() == 1) {
             numberPrimary->setText(contact->numbers[0].number.getFormatted());
 
+            numberPrimary->setVisible(true);
+            numberPrimaryLabel->setVisible(true);
+            numberPrimaryIcon->setVisible(true);
+            numberPrimaryMessage->setVisible(true);
+            numberPrimaryMessageLabel->setVisible(true);
+
             numberSecondary->setVisible(false);
             numberSecondaryLabel->setVisible(false);
             numberSecondaryIcon->setVisible(false);
@@ -323,6 +329,19 @@ namespace gui
 
             numberPrimary->setText(contact->numbers[0].number.getFormatted());
             numberSecondary->setText(contact->numbers[1].number.getFormatted());
+
+            numberPrimary->setVisible(true);
+            numberPrimaryLabel->setVisible(true);
+            numberPrimaryIcon->setVisible(true);
+            numberPrimaryMessage->setVisible(true);
+            numberPrimaryMessageLabel->setVisible(true);
+
+            numberSecondary->setVisible(true);
+            numberSecondaryLabel->setVisible(true);
+            numberSecondaryIcon->setVisible(true);
+            numberSecondaryMessage->setVisible(true);
+            numberSecondaryMessageLabel->setVisible(true);
+
             email->setY(363);
             addressLabel->setY(429);
             address->setY(475);
@@ -352,6 +371,8 @@ namespace gui
         else {
             contactFlagsWidget->setSpeedDial(false, 0);
         }
+
+        getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
     bool PhonebookContact::handleSwitchData(SwitchData *data)

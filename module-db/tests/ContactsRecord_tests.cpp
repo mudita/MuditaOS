@@ -204,3 +204,105 @@ TEST_CASE("Contact Record tests")
 
     Database::deinitialize();
 }
+
+TEST_CASE("Contact record numbers update")
+{
+    Database::initialize();
+    vfs.remove(ContactsDB::GetDBName());
+
+    auto contactDB = std::make_unique<ContactsDB>();
+    REQUIRE(contactDB->isInitialized());
+
+    ContactRecord testRecord;
+
+    std::array<std::string, 4> numbers = {{{"600100100"}, {"600100200"}, {"600100300"}, {"600100400"}}};
+
+    testRecord.primaryName     = "number";
+    testRecord.alternativeName = "test";
+    testRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbers[0], std::string(""))});
+
+    auto records = ContactRecordInterface(contactDB.get());
+
+    REQUIRE(records.Add(testRecord));
+
+    SECTION("No number update")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(records.Update(newRecord));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(contactDB->number.count() == 1);
+        REQUIRE(validatationRecord.numbers.size() == 1);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[0]);
+    }
+
+    SECTION("Single number update")
+    {
+        auto newRecord    = records.GetByID(1);
+        newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(contactDB->number.count() == 1);
+        REQUIRE(validatationRecord.numbers.size() == 1);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[1]);
+    }
+
+    SECTION("Add alternative number")
+    {
+        auto newRecord    = records.GetByID(1);
+        newRecord.numbers = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(contactDB->number.count() == 2);
+        REQUIRE(validatationRecord.numbers.size() == 2);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[0]);
+        REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[1]);
+    }
+
+    SECTION("Change numbers positions")
+    {
+        auto newRecord    = records.GetByID(1);
+        newRecord.numbers = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numbers[1], std::string("")), ContactRecord::Number(numbers[0], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(contactDB->number.count() == 2);
+        REQUIRE(validatationRecord.numbers.size() == 2);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[1]);
+        REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[0]);
+    }
+
+    SECTION("Change one number")
+    {
+        auto newRecord    = records.GetByID(1);
+        newRecord.numbers = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numbers[1], std::string("")), ContactRecord::Number(numbers[2], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(contactDB->number.count() == 2);
+        REQUIRE(validatationRecord.numbers.size() == 2);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[1]);
+        REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[2]);
+    }
+
+    SECTION("Change both numbers")
+    {
+        auto newRecord    = records.GetByID(1);
+        newRecord.numbers = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[3], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(contactDB->number.count() == 2);
+        REQUIRE(validatationRecord.numbers.size() == 2);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[0]);
+        REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[3]);
+    }
+
+    Database::deinitialize();
+}
