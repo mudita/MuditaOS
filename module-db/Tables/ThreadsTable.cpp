@@ -1,13 +1,3 @@
-
-/*
- * @file ThreadsTable.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 27.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ThreadsTable.hpp"
 #include "log/log.hpp"
 
@@ -134,16 +124,16 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByField(uint32_t offset
         return std::vector<ThreadsTableRow>();
     }
 
-    std::string querry = "SELECT * from threads WHERE " + fieldName + " = '" + str + "' ORDER BY date";
+    std::string query = "SELECT * from threads WHERE " + fieldName + " = '" + str + "' ORDER BY date";
     if (limit != 0) {
-        querry += " LIMIT " + std::to_string(limit);
+        query += " LIMIT " + std::to_string(limit);
     }
     if (offset != 0) {
-        querry += " OFFSET " + std::to_string(offset);
+        query += " OFFSET " + std::to_string(offset);
     }
-    querry += ";";
+    query += ";";
 
-    auto retQuery = db->Query(querry.c_str());
+    auto retQuery = db->Query(query.c_str());
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
