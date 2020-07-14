@@ -12,7 +12,7 @@ namespace db
     {
       public:
         NotificationMessage(db::Interface::Name interface, Query::Type type);
-        db::Interface::Name interface;
+        const db::Interface::Name interface;
         const Query::Type type;
     };
 } // namespace db
