@@ -92,7 +92,7 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         contact.contactType == ContactType::TEMPORARY ? app::ContactOperation::Add : app::ContactOperation::Details;
     options.push_back(gui::options::contact(app, contactOperation, contact).build());
     options.push_back(gui::Option{
-        UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) {
+        UTF8(utils::localize.get("sms_forward_message")), [=](gui::Item &item) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
             app->switchWindow(gui::name::window::new_sms, std::move(data));
             return true;
