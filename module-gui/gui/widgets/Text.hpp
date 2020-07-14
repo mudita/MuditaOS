@@ -118,8 +118,7 @@ namespace gui
         Color textColor;
         // margins for text
         Margins margins;
-        Alignment alignment = style::text::defaultTextAlignment;
-        bool underline      = false;
+        bool underline = false;
 
         bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
         bool handleNavigation(const InputEvent &inputEvent);
@@ -174,11 +173,6 @@ namespace gui
         bool onFocus(bool state) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void setRadius(int value) override;
-        void setAlignment(const Alignment alignment);
-        auto getAlignment() -> auto const &
-        {
-            return alignment;
-        }
 
       private:
         gui::KeyInputMappedTranslation translator;

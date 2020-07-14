@@ -23,19 +23,17 @@ namespace gui
             None,
         };
 
-        Horizontal horizontal = Alignment::Horizontal::None;
-        Vertical vertical     = Alignment::Vertical::None;
+        Horizontal horizontal = Alignment::Horizontal::Left;
+        Vertical vertical     = Alignment::Vertical::Top;
 
-        Alignment() = default;
+        Alignment()                  = default;
         Alignment(const Alignment &) = default;
         Alignment(Horizontal valH, Vertical valV);
         Alignment(Horizontal valH);
         Alignment(Vertical valV);
 
-        Alignment &operator=(const Alignment &alignment);
         bool operator==(const Alignment &alignment) const;
         bool operator!=(const Alignment &alignment) const;
     };
 
 } /* namespace gui */
-
