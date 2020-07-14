@@ -301,10 +301,10 @@ namespace gui
     Alignment Item::getAlignment(Axis axis)
     {
         if (axis == Axis::X) {
-            return alignment.horizontal;
+            return Alignment(alignment.horizontal, Alignment::Vertical::None);
         }
         else {
-            return alignment.vertical;
+            return Alignment(Alignment::Horizontal::None, alignment.vertical);
         }
     }
 
@@ -318,10 +318,10 @@ namespace gui
         auto tempAlignment = getAlignment(axis);
 
         if (parent->getAlignment(axis).vertical != Alignment::Vertical::None)
-            tempAlignment = parent->getAlignment(axis).vertical;
+            tempAlignment.vertical = parent->getAlignment(axis).vertical;
 
         if (parent->getAlignment(axis).horizontal != Alignment::Horizontal::None)
-            tempAlignment = parent->getAlignment(axis).horizontal;
+            tempAlignment.horizontal = parent->getAlignment(axis).horizontal;
 
         switch (tempAlignment.vertical) {
         case gui::Alignment::Vertical::Top:

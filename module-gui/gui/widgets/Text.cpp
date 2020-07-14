@@ -48,6 +48,7 @@ namespace gui
                TextType textType)
         : Rect(parent, x, y, w, h), lines(this), expandMode{expandMode}, textType{textType}
     {
+        alignment = style::text::defaultTextAlignment;
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
@@ -350,11 +351,6 @@ namespace gui
     void Text::setMargins(const Margins &margins)
     {
         this->margins = margins;
-    }
-
-    void Text::setAlignment(const Alignment _alignment)
-    {
-        alignment = _alignment;
     }
 
     std::list<DrawCommand *> Text::buildDrawList()

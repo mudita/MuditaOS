@@ -8,6 +8,7 @@ namespace gui
     BoxLayout::BoxLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
         : Rect(parent, x, y, w, h)
     {
+        alignment = gui::Alignment(Alignment::Horizontal::None, Alignment::Vertical::None);
         sizeStore = std::make_unique<BoxLayoutSizeStore>();
     }
 
