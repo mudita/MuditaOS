@@ -1,13 +1,4 @@
 
-/*
- * @file ThreadRecord_tests.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 11.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
@@ -17,6 +8,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
 #include "queries/sms/QuerySmsThreadMarkAsRead.hpp"
+#include "queries/sms/QuerySMSSearch.hpp"
 #include "vfs.hpp"
 
 #include <algorithm>
@@ -145,6 +137,41 @@ TEST_CASE("Thread Record tests")
             REQUIRE(result->getResult());
             rec = threadRecordInterface1.GetByID(3);
             REQUIRE(rec.isUnread());
+        }
+    }
+
+    SECTION("SMS search")
+    {
+        SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+        SMSRecord recordIN;
+        recordIN.date      = 123456789;
+        recordIN.dateSent  = 987654321;
+        recordIN.errorCode = 0;
+        recordIN.number    = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
+        ;
+        recordIN.body = "Ala";
+        recordIN.type = SMSType ::DRAFT;
+
+        REQUIRE(smsRecInterface.Add(recordIN));
+        recordIN.body = "Ola";
+        REQUIRE(smsRecInterface.Add(recordIN));
+
+        {
+            db::query::SMSSearch query{"A", 0, 10};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            auto results = result->getResults();
+            REQUIRE(results.size() == 2);
+        }
+
+        {
+            db::query::SMSSearch query{"O", 0, 10};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            auto results = result->getResults();
+            REQUIRE(results.size() == 1);
         }
     }
 

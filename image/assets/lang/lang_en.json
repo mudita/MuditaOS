@@ -211,7 +211,7 @@
     "sms_call_text"  : "Call ",
     "sms_resend_failed" : "Send again",
     "sms_delete_conversation" : "Delete conversation",
-    "sms_forvard_message" : "Forward message",
+    "sms_forward_message" : "Forward message",
     "sms_copy" : "Copy",
     "sms_delete_message" : "Delete",
     "sms_from_this_sms" : "From this message",
