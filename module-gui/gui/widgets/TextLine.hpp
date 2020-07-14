@@ -71,6 +71,6 @@ namespace gui
         /// align TextLine due to alignment axis in parent_width
         ///
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
-        void align(Alignment align, Length parent_length);
+        void align(Alignment &align, Length parent_length);
     };
 } // namespace gui

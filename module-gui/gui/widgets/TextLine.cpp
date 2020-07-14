@@ -176,7 +176,7 @@ namespace gui
         elements_to_show_in_line.clear();
     }
 
-    void TextLine::align(Alignment line_align, Length parent_length)
+    void TextLine::align(Alignment &line_align, Length parent_length)
     {
         Length width = getWidth();
         if (parent_length <= width) {

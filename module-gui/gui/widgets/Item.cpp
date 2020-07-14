@@ -325,22 +325,24 @@ namespace gui
 
         switch (tempAlignment.vertical) {
         case gui::Alignment::Vertical::Top:
-            return 0;
+            return this->margins.getMarginInAxis(axis, MarginInAxis::First);
         case gui::Alignment::Vertical::Center:
-            return (parent->area().size(axis) - this->area().size(axis)) / 2;
+            return (parent->area().size(axis) - (this->area().size(axis) + this->margins.getSumInAxis(axis))) / 2;
         case gui::Alignment::Vertical::Bottom:
-            return parent->area().size(axis) - this->area().size(axis);
+            return parent->area().size(axis) - this->area().size(axis) -
+                   this->margins.getMarginInAxis(axis, MarginInAxis::Second);
         default:
             break;
         }
 
         switch (tempAlignment.horizontal) {
         case gui::Alignment::Horizontal::Left:
-            return 0;
+            return this->margins.getMarginInAxis(axis, MarginInAxis::First);
         case gui::Alignment::Horizontal::Center:
-            return (parent->area().size(axis) - this->area().size(axis)) / 2;
+            return (parent->area().size(axis) - (this->area().size(axis) + this->margins.getSumInAxis(axis))) / 2;
         case gui::Alignment::Horizontal::Right:
-            return parent->area().size(axis) - this->area().size(axis);
+            return parent->area().size(axis) - this->area().size(axis) -
+                   this->margins.getMarginInAxis(axis, MarginInAxis::Second);
         default:
             break;
         }

@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include <module-utils/log/log.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/test/mock/TestListViewProvider.hpp>
 
 namespace testStyle
 {
@@ -37,8 +38,10 @@ class TestBoxLayout : public gui::BoxLayout
     FRIEND_TEST(BoxLayoutTesting, Fill_Box_Test);
     FRIEND_TEST(BoxLayoutTesting, Navigate_Test);
     FRIEND_TEST(BoxLayoutTesting, Border_Callback_Test);
-    FRIEND_TEST(BoxLayoutTesting, Axis_Alignment_Test);
-    FRIEND_TEST(BoxLayoutTesting, Item_Margins_Test);
+    FRIEND_TEST(BoxLayoutTesting, Box_Alignment_Test);
+    FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Test);
+    FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Magrin_Test);
+    FRIEND_TEST(BoxLayoutTesting, Box_Margins_Test);
 
     TestBoxLayout(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : BoxLayout(parent, x, y, w, h){};
     ~TestBoxLayout() = default;
@@ -109,6 +112,7 @@ class BoxLayoutTesting : public ::testing::Test
     const unsigned int fillVBoxPage     = testStyle::VBox_h / testStyle::VBox_item_h;
     const unsigned int notFillVBoxPage  = fillVBoxPage - 2;
     const unsigned int fillHBoxPage     = testStyle::HBox_w / testStyle::HBox_item_w;
+    const unsigned int notFillHVBoxPage = fillHBoxPage - 1;
     const unsigned int overflowHBoxPage = fillHBoxPage + 2;
 };
 
@@ -209,11 +213,11 @@ TEST_F(BoxLayoutTesting, Border_Callback_Test)
     ASSERT_FALSE(borderCallback) << "move right by 2 - border callback should not be called";
 }
 
-TEST_F(BoxLayoutTesting, Axis_Alignment_Test)
+TEST_F(BoxLayoutTesting, Box_Alignment_Test)
 {
-    // set no Reverse Order
+    // set no Reverse Order and no Alignment
     testVBoxLayout->setReverseOrder(false);
-
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::None));
     // Add 4 elements to VBox - there should be space for 6
     addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
     ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
@@ -222,8 +226,9 @@ TEST_F(BoxLayoutTesting, Axis_Alignment_Test)
     ASSERT_EQ(300, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 300";
     testVBoxLayout->erase();
 
-    // set Reverse Order
+    // set Reverse Order and no Alignment
     testVBoxLayout->setReverseOrder(true);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::None));
     // Add 4 elements to VBox - there should be space for 6
     addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
     ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
@@ -233,19 +238,263 @@ TEST_F(BoxLayoutTesting, Axis_Alignment_Test)
     ASSERT_EQ(200, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 200";
     testVBoxLayout->erase();
 
-    // set Reverse Order and call axis Alignment
-    testVBoxLayout->setReverseOrder(true);
+    // set no Reverse Order and set Alignment to Top
+    testVBoxLayout->setReverseOrder(false);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::Top));
     // Add 4 elements to VBox - there should be space for 6
     addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
     ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
-    testVBoxLayout->axisAlignment();
+
+    ASSERT_EQ(0, testVBoxLayout->children.front()->getPosition(gui::Axis::Y)) << "first element should have Y pos 0";
+    ASSERT_EQ(300, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 300";
+    testVBoxLayout->erase();
+
+    // set no Reverse Order and set Alignment to Center
+    testVBoxLayout->setReverseOrder(false);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::Center));
+    // Add 4 elements to VBox - there should be space for 6
+    addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
+    ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
+
+    ASSERT_EQ(100, testVBoxLayout->children.front()->getPosition(gui::Axis::Y))
+        << "first element should have Y pos 100";
+    ASSERT_EQ(400, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 400";
+    testVBoxLayout->erase();
+
+    // set no Reverse Order and set Alignment to Bottom
+    testVBoxLayout->setReverseOrder(false);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::Bottom));
+    // Add 4 elements to VBox - there should be space for 6
+    addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
+    ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
+
+    ASSERT_EQ(200, testVBoxLayout->children.front()->getPosition(gui::Axis::Y))
+        << "first element should have Y pos 200";
+    ASSERT_EQ(500, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 500";
+    testVBoxLayout->erase();
+
+    // set Reverse Order and set Alignment to Top
+    testVBoxLayout->setReverseOrder(true);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::Top));
+    // Add 4 elements to VBox - there should be space for 6
+    addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
+    ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
 
     ASSERT_EQ(300, testVBoxLayout->children.front()->getPosition(gui::Axis::Y))
         << "first element should have Y pos 300";
     ASSERT_EQ(0, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 0";
+    testVBoxLayout->erase();
+
+    // set Reverse Order and set Alignment to Center
+    testVBoxLayout->setReverseOrder(true);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::Center));
+    // Add 4 elements to VBox - there should be space for 6
+    addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
+    ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
+
+    ASSERT_EQ(400, testVBoxLayout->children.front()->getPosition(gui::Axis::Y))
+        << "first element should have Y pos 400";
+    ASSERT_EQ(100, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 100";
+    testVBoxLayout->erase();
+
+    // set Reverse Order and set Alignment to Bottom
+    testVBoxLayout->setReverseOrder(true);
+    testVBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Vertical::Bottom));
+    // Add 4 elements to VBox - there should be space for 6
+    addNItems(testVBoxLayout, notFillVBoxPage, testStyle::VBox_item_w, testStyle::VBox_item_h);
+    ASSERT_EQ(notFillVBoxPage, testVBoxLayout->children.size()) << "Box should contain 4 elements";
+
+    ASSERT_EQ(500, testVBoxLayout->children.front()->getPosition(gui::Axis::Y))
+        << "first element should have Y pos 500 - first from bottom";
+    ASSERT_EQ(200, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 200";
+    testVBoxLayout->erase();
 }
 
-TEST_F(BoxLayoutTesting, Item_Margins_Test)
+TEST_F(BoxLayoutTesting, Box_Widgets_Alignment_Test)
+{
+    // set Box to None
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::None, gui::Alignment::Vertical::None));
+
+    // Add 3 elements to HBox with half parent Horizontal Size
+    addNItems(testHBoxLayout, notFillHVBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h / 2);
+    ASSERT_EQ(notFillHVBoxPage, testHBoxLayout->children.size()) << "Box should contain 3 elements";
+
+    // Set first item Alignment to Vertical Top
+    getNItem(testHBoxLayout, 0)->setAlignment(gui::Alignment(gui::Alignment::Vertical::Top));
+    // Set second item Alignment to Vertical Center
+    getNItem(testHBoxLayout, 1)->setAlignment(gui::Alignment(gui::Alignment::Vertical::Center));
+    // Set first item Alignment to Vertical Bottom
+    getNItem(testHBoxLayout, 2)->setAlignment(gui::Alignment(gui::Alignment::Vertical::Bottom));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 0 - first from left";
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y)) << "first element should have Y pos 0 - top";
+
+    ASSERT_EQ(testStyle::HBox_item_w, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos testStyle::HBox_item_w - second from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 4, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y))
+        << "second element should have Y pos testStyle::HBox_item_h/4 - Center";
+
+    ASSERT_EQ(2 * testStyle::HBox_item_w, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 2 * testStyle::HBox_item_w - third from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 2, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y))
+        << "third element should have Y pos testStyle::HBox_item_h/2 - Bottom";
+
+    // Change Box Horizontal (in Axis) Alignment to Center
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::None));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ((testStyle::HBox_w - notFillHVBoxPage * testStyle::HBox_item_w) / 2,
+              getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 25";
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y)) << "first element should have Y pos 0 - top";
+
+    ASSERT_EQ((testStyle::HBox_w - notFillHVBoxPage * testStyle::HBox_item_w) / 2 + testStyle::HBox_item_w,
+              getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos 75";
+    ASSERT_EQ(testStyle::HBox_item_h / 4, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y))
+        << "second element should have Y pos testStyle::HBox_item_h/4 - Center";
+
+    ASSERT_EQ((testStyle::HBox_w - notFillHVBoxPage * testStyle::HBox_item_w) / 2 + testStyle::HBox_item_w * 2,
+              getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 125";
+    ASSERT_EQ(testStyle::HBox_item_h / 2, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y))
+        << "third element should have Y pos testStyle::HBox_item_h/2 - Bottom";
+
+    // Change Box Horizontal (in Axis) Alignment to Right
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::None));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ((testStyle::HBox_w - notFillHVBoxPage * testStyle::HBox_item_w),
+              getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 50";
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y)) << "first element should have Y pos 0 - top";
+
+    ASSERT_EQ((testStyle::HBox_w - notFillHVBoxPage * testStyle::HBox_item_w) + testStyle::HBox_item_w,
+              getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos 100";
+    ASSERT_EQ(testStyle::HBox_item_h / 4, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y))
+        << "second element should have Y pos testStyle::HBox_item_h/4 - Center";
+
+    ASSERT_EQ((testStyle::HBox_w - notFillHVBoxPage * testStyle::HBox_item_w) + testStyle::HBox_item_w * 2,
+              getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 150";
+    ASSERT_EQ(testStyle::HBox_item_h / 2, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y))
+        << "third element should have Y pos testStyle::HBox_item_h/2 - Bottom";
+
+    // Change Box Vertical (in Axis) Alignment to Top -> so it should override children Alignment.
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 0 - first from left";
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y)) << "first element should have Y pos 0 - top";
+
+    ASSERT_EQ(testStyle::HBox_item_w, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos testStyle::HBox_item_w - second from left";
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y)) << "second element should have Y pos 0 - top";
+
+    ASSERT_EQ(2 * testStyle::HBox_item_w, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 2 * testStyle::HBox_item_w - third from left";
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y)) << "third element should have Y pos 0 - top";
+
+    // Change Box Vertical (in Axis) Alignment to Center -> so it should override children Alignment.
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 0 - first from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 4, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y))
+        << "first element should have Y pos testStyle::HBox_item_h/4 - Center";
+
+    ASSERT_EQ(testStyle::HBox_item_w, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos testStyle::HBox_item_w - second from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 4, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y))
+        << "second element should have Y pos testStyle::HBox_item_h/4 - Center";
+
+    ASSERT_EQ(2 * testStyle::HBox_item_w, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 2 * testStyle::HBox_item_w - third from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 4, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y))
+        << "third element should have Y pos testStyle::HBox_item_h/4 - Center";
+
+    // Change Box Vertical (in Axis) Alignment to Bottom -> so it should override children Alignment.
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 0 - first from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y))
+        << "first element should have Y pos testStyle::HBox_item_h/2 - Bottom";
+
+    ASSERT_EQ(testStyle::HBox_item_w, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos testStyle::HBox_item_w - second from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 2, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y))
+        << "second element should have Y pos testStyle::HBox_item_h/2 - Bottom";
+
+    ASSERT_EQ(2 * testStyle::HBox_item_w, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 2 * testStyle::HBox_item_w - third from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 2, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y))
+        << "third element should have Y pos testStyle::HBox_item_h/2 - Bottom";
+}
+
+TEST_F(BoxLayoutTesting, Box_Widgets_Alignment_Magrin_Test)
+{
+    // set Box to None
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::None, gui::Alignment::Vertical::None));
+
+    // Add 3 elements to HBox with half parent Horizontal Size
+    addNItems(testHBoxLayout, notFillHVBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h / 2);
+    ASSERT_EQ(notFillHVBoxPage, testHBoxLayout->children.size()) << "Box should contain 3 elements";
+
+    // Set first item Alignment to Vertical Top
+    getNItem(testHBoxLayout, 0)->setAlignment(gui::Alignment(gui::Alignment::Vertical::Top));
+    // Set second item Alignment to Vertical Center
+    getNItem(testHBoxLayout, 1)->setAlignment(gui::Alignment(gui::Alignment::Vertical::Center));
+    // Set first item Alignment to Vertical Bottom
+    getNItem(testHBoxLayout, 2)->setAlignment(gui::Alignment(gui::Alignment::Vertical::Bottom));
+
+    auto testSmallMargin = 5;
+    auto testBigMargin   = 15;
+
+    // Set items orthogonal margins
+    getNItem(testHBoxLayout, 0)->setMargins(gui::Margins(0, testBigMargin, 0, 0));
+    getNItem(testHBoxLayout, 1)->setMargins(gui::Margins(0, testSmallMargin, 0, testBigMargin));
+    getNItem(testHBoxLayout, 2)->setMargins(gui::Margins(0, testSmallMargin, 0, testBigMargin));
+
+    // Force position recalculation
+    testHBoxLayout->resizeItems();
+
+    ASSERT_EQ(0, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X))
+        << "first element should have X pos 0 - first from left";
+    ASSERT_EQ(testBigMargin, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y))
+        << "first element should have Y pos 0 + top margin";
+
+    ASSERT_EQ(testStyle::HBox_item_w, getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::X))
+        << "second element should have X pos testStyle::HBox_item_w - second from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 4 - ((testSmallMargin + testBigMargin) / 2),
+              getNItem(testHBoxLayout, 1)->getPosition(gui::Axis::Y))
+        << "second element should have Y pos testStyle::HBox_item_h/4 - margins/2";
+
+    ASSERT_EQ(2 * testStyle::HBox_item_w, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::X))
+        << "third element should have X pos 2 * testStyle::HBox_item_w - third from left";
+    ASSERT_EQ(testStyle::HBox_item_h / 2 - testBigMargin, getNItem(testHBoxLayout, 2)->getPosition(gui::Axis::Y))
+        << "third element should have Y pos testStyle::HBox_item_h/2 - bottom margin";
+}
+
+TEST_F(BoxLayoutTesting, Box_Margins_Test)
 {
     auto testTopMargin    = 30;
     auto testBottomMargin = 50;
