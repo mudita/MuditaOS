@@ -1,6 +1,5 @@
 #include <iterator>
 
-#include "../core/Font.hpp"
 #include "Common.hpp"
 #include "Ellipsis.hpp"
 #include "InputEvent.hpp"
@@ -18,6 +17,8 @@
 #include "vfs.hpp"
 #include <Style.hpp>
 #include <cassert>
+#include <FontManager.hpp>
+#include <RawFont.hpp>
 
 #if DEBUG_GUI_TEXT == 1
 #define debug_text(...) LOG_DEBUG(__VA_ARGS__)

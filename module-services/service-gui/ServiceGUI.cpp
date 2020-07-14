@@ -1,10 +1,3 @@
-/*
- * ServiceGUI.cpp
- *
- *  Created on: 22 maj 2019
- *      Author: robert
- */
-
 #include <memory>
 
 // module-os
@@ -12,7 +5,6 @@
 #include "semphr.h"
 
 // module-gui
-#include "gui/core/Font.hpp"
 #include "gui/core/Context.hpp"
 #include "gui/input/Translator.hpp"
 
@@ -29,11 +21,11 @@
 #include "../gui/core/ImageManager.hpp"
 #include "log/log.hpp"
 
-extern "C"
 #include "memory/usermem.h"
 
 #include "SystemManager/SystemManager.hpp"
 #include "WorkerGUI.hpp"
+#include <FontManager.hpp>
 
     namespace sgui
 {

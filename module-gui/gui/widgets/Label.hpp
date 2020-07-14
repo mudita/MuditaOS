@@ -1,18 +1,9 @@
-/*
- * Label.h
- *
- *  Created on: 7 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_
+#pragma once 
 
 #include <string>
 #include <list>
 
 #include "../core/BoundingBox.hpp"
-#include "../core/Font.hpp"
 #include "../core/Color.hpp"
 #include "../core/DrawCommand.hpp"
 #include "../Common.hpp"
@@ -22,9 +13,12 @@
 
 #include "Style.hpp"
 #include "utf8/UTF8.hpp"
+#include <Ellipsis.hpp>
 
 namespace gui
 {
+
+    class RawFont; 
 
     namespace meta
     {
@@ -145,5 +139,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_ */

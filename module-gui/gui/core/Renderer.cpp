@@ -9,7 +9,6 @@ extern "C"
 #include "Color.hpp"
 #include "Renderer.hpp"
 #include "Context.hpp"
-#include "Font.hpp"
 #include "ImageManager.hpp"
 #include "../Common.hpp"
 // utils
@@ -20,6 +19,9 @@ extern "C"
 // module-utils
 #include "utf8/UTF8.hpp"
 #include <cassert>
+#include <FontManager.hpp>
+#include <FontGlyph.hpp>
+#include <RawFont.hpp>
 
 #if DEBUG_FONT == 1
 #define log_warn_glyph(...) LOG_WARN(__VA_ARGS__)

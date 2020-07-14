@@ -2,12 +2,13 @@
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
-#include "../core/Font.hpp"
 
 #include "Label.hpp"
 #include <Style.hpp>
 #include <cassert>
 #include "TextConstants.hpp"
+#include <FontManager.hpp>
+#include <RawFont.hpp>
 
 namespace gui
 {

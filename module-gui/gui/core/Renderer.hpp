@@ -3,10 +3,11 @@
 #include <vector>
 #include "DrawCommand.hpp"
 #include "Context.hpp"
-#include "Font.hpp"
 
 namespace gui
 {
+    class RawFont;
+    class FontGlyph;
 
     enum class LineExpansionDirection
     {
