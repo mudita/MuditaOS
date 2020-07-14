@@ -187,4 +187,9 @@ namespace gui
         }
         return true;
     }
+
+    const TextBlock &BlockCursor::operator*()
+    {
+        return *curentBlock();
+    }
 } // namespace gui

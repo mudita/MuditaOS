@@ -29,6 +29,7 @@ namespace gui
 
       public:
         TextBlock(const UTF8 text, Font *font, End eol = End::None);
+        TextBlock(const UTF8 text, std::unique_ptr<TextFormat> format);
         TextBlock(const TextBlock &);
 
         const UTF8 &getText() const;
