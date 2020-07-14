@@ -16,19 +16,15 @@ struct ThreadRecord : Record
     uint32_t msgCount       = 0;
     uint32_t unreadMsgCount = 0;
     UTF8 snippet;
-    SMSType type            = SMSType::UNKNOWN;
-    uint32_t contactID      = DB_ID_NONE;
+    SMSType type       = SMSType::UNKNOWN;
+    uint32_t contactID = DB_ID_NONE;
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
+        : date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount), snippet(rec.snippet),
+          type(rec.type), contactID(rec.contactID)
     {
-        ID             = rec.ID;
-        date           = rec.date;
-        msgCount       = rec.msgCount;
-        unreadMsgCount = rec.unreadMsgCount;
-        snippet        = rec.snippet;
-        type           = rec.type;
-        contactID      = rec.contactID;
+        ID = rec.ID;
     }
 
     bool isUnread() const

@@ -7,16 +7,10 @@
 #include <optional>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
+    : date(w.date), dateSent(w.dateSent), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
+      contactID(w.contactID), number(num)
 {
-    ID        = w.ID;
-    date      = w.date;
-    dateSent  = w.dateSent;
-    errorCode = w.errorCode;
-    number    = num;
-    body      = w.body;
-    type      = w.type;
-    threadID  = w.threadID;
-    contactID = w.contactID;
+    this->ID = w.ID;
 }
 
 SMSRecordInterface::SMSRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb) : smsDB(smsDb), contactsDB(contactsDb)
@@ -158,21 +152,22 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
     return records;
 }
 
-bool SMSRecordInterface::Update(const SMSRecord &rec)
+bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
 {
-    auto sms = smsDB->sms.getById(rec.ID);
-    if (!sms.isValid()) {
+
+    auto recCurrent = GetByID(recUpdated.ID);
+    if (!recCurrent.isValid()) { // if updating non-existent entry
         return false;
     }
 
-    return smsDB->sms.update(SMSTableRow{{.ID = rec.ID},
-                                         .threadID  = sms.threadID,
-                                         .contactID = sms.contactID,
-                                         .date      = rec.date,
-                                         .dateSent  = rec.dateSent,
-                                         .errorCode = rec.errorCode,
-                                         .body      = rec.body,
-                                         .type      = rec.type});
+    return smsDB->sms.update(SMSTableRow{{.ID = recUpdated.ID},
+                                         .threadID  = recCurrent.threadID,
+                                         .contactID = recCurrent.contactID,
+                                         .date      = recUpdated.date,
+                                         .dateSent  = recUpdated.dateSent,
+                                         .errorCode = recUpdated.errorCode,
+                                         .body      = recUpdated.body,
+                                         .type      = recUpdated.type});
 }
 
 bool SMSRecordInterface::RemoveByID(uint32_t id)
