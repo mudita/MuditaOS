@@ -294,58 +294,6 @@ namespace gui
         return calcPos;
     }
 
-    template <Axis axis> void BoxLayout::axisAlignment()
-    {
-        for (auto &it : children) {
-
-            switch (getAlignment(axis).vertical) {
-            case gui::Alignment::Vertical::Top:
-                if (reverseOrder) {
-                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
-                }
-                break;
-            case gui::Alignment::Vertical::Center:
-                if (reverseOrder) {
-                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this) / 2, axis);
-                }
-                else {
-                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this) / 2, axis);
-                }
-                break;
-            case gui::Alignment::Vertical::Bottom:
-                if (!reverseOrder) {
-                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this), axis);
-                }
-                break;
-            default:
-                break;
-            }
-
-            switch (getAlignment(axis).horizontal) {
-            case gui::Alignment::Horizontal::Left:
-                if (reverseOrder) {
-                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
-                }
-                break;
-            case gui::Alignment::Horizontal::Center:
-                if (reverseOrder) {
-                    it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this) / 2, axis);
-                }
-                else {
-                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this) / 2, axis);
-                }
-                break;
-            case gui::Alignment::Horizontal::Right:
-                if (!reverseOrder) {
-                    it->setPosition(it->getPosition(axis) + sizeLeft<axis>(this), axis);
-                }
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
     void BoxLayout::setNavigation()
     {
         auto previous = nextNavigationItem(children.begin()), next = children.end();
@@ -439,11 +387,6 @@ namespace gui
         BoxLayout::addWidget<Axis::X>(item);
     }
 
-    void HBox::axisAlignment()
-    {
-        BoxLayout::axisAlignment<Axis::X>();
-    }
-
     auto HBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
     {
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
@@ -467,11 +410,6 @@ namespace gui
     void VBox::addWidget(Item *item)
     {
         BoxLayout::addWidget<Axis::Y>(item);
-    }
-
-    void VBox::axisAlignment()
-    {
-        BoxLayout::axisAlignment<Axis::Y>();
     }
 
     auto VBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
