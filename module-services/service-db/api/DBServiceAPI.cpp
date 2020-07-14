@@ -106,9 +106,7 @@ SMSRecord DBServiceAPI::SMSGetLastRecord(sys::Service *serv)
         return (*smsResponse->records)[0];
     }
     else {
-        SMSRecord rec;
-        rec.ID = 0;
-        return rec;
+        return SMSRecord();
     }
 }
 

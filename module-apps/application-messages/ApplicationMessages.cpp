@@ -257,7 +257,7 @@ namespace app
         // update date sent - it will display an old, failed sms at the the bottom, but this is correct
         auto time         = utils::time::Timestamp();
         resendRecord.date = time.getTime();
-        return DBServiceAPI::SMSUpdate(this, resendRecord) != DB_ID_NONE;
+        return DBServiceAPI::SMSUpdate(this, resendRecord);
     }
 
     bool ApplicationMessages::handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body)
