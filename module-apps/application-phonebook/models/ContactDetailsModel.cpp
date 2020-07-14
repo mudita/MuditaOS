@@ -1,9 +1,11 @@
 #include "ContactDetailsModel.hpp"
 
 #include "application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/MultiLineTextWithLabelItem.hpp"
 
 #include <ListView.hpp>
 #include <time/ScopedTime.hpp>
+#include <module-apps/application-phonebook/data/PhonebookInternals.hpp>
 
 ContactDetailsModel::ContactDetailsModel(app::Application *app) : application(app)
 {
@@ -33,18 +35,16 @@ auto ContactDetailsModel::getItem(gui::Order order) -> gui::ListItem *
 
 void ContactDetailsModel::createData(bool showInformationWidget, bool showAddressWidget, bool showNoteWidget)
 {
-    //auto app = application;
-
-    if(showInformationWidget){
-        //internalData.push_back(InformationWidget)
+    if (showInformationWidget) {
+        // internalData.push_back(InformationWidget)
     }
 
-    if(showAddressWidget){
-        //internalData.push_back(AddressWidget)
+    if (showAddressWidget) {
+        internalData.push_back(new gui::MultiLineTextWithLabelItem(phonebookInternals::ListItemName::Address));
     }
 
-    if(showNoteWidget){
-        //internalData.push_back(NoteWidget)
+    if (showNoteWidget) {
+        internalData.push_back(new gui::MultiLineTextWithLabelItem(phonebookInternals::ListItemName::Note));
     }
 
     for (auto item : internalData) {

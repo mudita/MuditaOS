@@ -39,12 +39,12 @@ namespace gui
 
     void PhonebookNamecardOptions::sendViaSms()
     {
-        const std::string vcard = PhonebookUtils::formatVCard(*contact);
+        const std::string vcard = phonebookUtils::formatVCard(*contact);
     }
 
     void PhonebookNamecardOptions::sendViaBluetooth()
     {
-        const std::string vcard = PhonebookUtils::formatVCard(*contact);
+        const std::string vcard = phonebookUtils::formatVCard(*contact);
     }
 
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>
