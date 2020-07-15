@@ -149,7 +149,9 @@ namespace gui
         if (threadDetails != nullptr && threadDetails->isUnread()) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            app->markSmsThreadAsRead(threadDetails->ID);
+            if (application->getCurrentWindow() == this) {
+                app->markSmsThreadAsRead(threadDetails->ID);
+            }
         }
 
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
