@@ -3,6 +3,7 @@
 #include "log/log.hpp"
 #include <cassert>
 #include <TextFormat.hpp>
+#include <RawFont.hpp>
 
 namespace gui
 {

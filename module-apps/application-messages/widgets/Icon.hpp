@@ -8,7 +8,6 @@ namespace gui
     class Icon : public Rect
     {
         Text *text = nullptr;
-        Image *img = nullptr;
 
       public:
         Icon(Item *parent,

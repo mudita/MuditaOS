@@ -4,6 +4,7 @@
 #include "TextConstants.hpp"
 #include "utf8/UTF8.hpp"
 #include <TextFormat.hpp>
+#include <memory>
 
 namespace gui
 {

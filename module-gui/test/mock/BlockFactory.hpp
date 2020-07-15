@@ -3,6 +3,7 @@
 #include "mock/InitializedFontManager.hpp"
 #include <module-gui/gui/widgets/TextBlock.hpp>
 #include <list>
+#include <map>
 
 namespace mockup
 {
