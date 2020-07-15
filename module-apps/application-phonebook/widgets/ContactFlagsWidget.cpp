@@ -78,16 +78,14 @@ namespace gui
 
     void ContactFlagsWidget::buildWidget()
     {
-        mainBox = new HBox(this, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight);
+        mainBox = new HBox(this, 0, 0, style::window_width, style::widget::ContatFlas::itemHeight);
+        mainBox->setAlignment(Alignment(Alignment::Horizontal::Center));
         mainBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        mainBox->setArea(
-            {0, 0, style::widget::ContatFlas::itemWidth * iconsCount, style::widget::ContatFlas::itemHeight});
+        mainBox->setArea({0, 0, style::window_width, style::widget::ContatFlas::itemHeight});
         mainBox->addWidget(favouritesIcon);
         mainBox->addWidget(iceIcon);
         mainBox->addWidget(speedDialIcon);
         mainBox->addWidget(blockedIcon);
-        center(this, mainBox, gui::Axis::X);
-        center(this, mainBox, gui::Axis::Y);
     }
 
     void ContactFlagsWidget::repositionIcons()
@@ -97,7 +95,7 @@ namespace gui
         mainBox->removeWidget(favouritesIcon);
         mainBox->removeWidget(speedDialIcon);
         mainBox->removeWidget(iceIcon);
-        mainBox->setArea({0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight});
+        mainBox->setArea({0, 0, style::window_width, style::widget::ContatFlas::itemHeight});
 
         favouritesIcon->setVisible(false);
         speedDialIcon->setVisible(false);
@@ -128,8 +126,7 @@ namespace gui
             // something's fubar in layout box
             // boxlayout have to be resized before adding widgets but
             // first items have to be visible or it will hide some widget randomly
-            mainBox->setArea(
-                {0, 0, (style::widget::ContatFlas::itemWidth * count), style::widget::ContatFlas::itemHeight});
+            mainBox->setArea({0, 0, style::window_width, style::widget::ContatFlas::itemHeight});
             if (favourites) {
                 mainBox->addWidget(favouritesIcon);
             }
@@ -142,8 +139,6 @@ namespace gui
                 mainBox->addWidget(speedDialIcon);
             }
         }
-        center(this, mainBox, gui::Axis::X);
-        center(this, mainBox, gui::Axis::Y);
     }
 
 } // namespace gui
