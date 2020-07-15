@@ -36,7 +36,6 @@ namespace gui
         setAlignment(label.align);
         setRadius(label.radius);
         setEdges(label.edges);
-        setMargins(label.margins);
     }
 
     void Label::calculateDisplayText()
@@ -46,16 +45,16 @@ namespace gui
             LOG_ERROR("No font loaded!");
             return;
         }
-        charDrawableCount       = font->getCharCountInSpace(text, availableSpace);
-        textArea.w              = font->getPixelWidth(text.substr(0, charDrawableCount));
-        textDisplayed           = text;
+        charDrawableCount = font->getCharCountInSpace(text, availableSpace);
+        textArea.w        = font->getPixelWidth(text.substr(0, charDrawableCount));
+        textDisplayed     = text;
         /// do not try to draw text::newline in label
         if (text.length() > 0 && text[text.length() - 1] == text::newline) {
             textDisplayed.removeChar(textDisplayed.length() - 1);
         }
-        textDisplayed           = font->getTextWithElipsis(textDisplayed, availableSpace, ellipsis);
-        stringPixelWidth        = font->getPixelWidth(textDisplayed, 0, textDisplayed.length());
-        textArea.h              = font->info.line_height;
+        textDisplayed    = font->getTextWithElipsis(textDisplayed, availableSpace, ellipsis);
+        stringPixelWidth = font->getPixelWidth(textDisplayed, 0, textDisplayed.length());
+        textArea.h       = font->info.line_height;
 
         // calculate vertical position of text
 

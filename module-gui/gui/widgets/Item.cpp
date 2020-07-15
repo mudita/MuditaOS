@@ -268,6 +268,18 @@ namespace gui
         return margins;
     }
 
+    void Item::setPadding(const Padding &value)
+    {
+        if (padding != value) {
+            padding = value;
+        }
+    }
+
+    Padding Item::getPadding()
+    {
+        return padding;
+    }
+
     uint16_t Item::getSize(Axis axis) const
     {
         return widgetArea.size(axis);

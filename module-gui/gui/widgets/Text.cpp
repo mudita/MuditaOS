@@ -196,11 +196,11 @@ namespace gui
     void Text::setRadius(int value)
     {
         Rect::setRadius(value);
-        // if margins are smaller than radius update the margins
-        if (margins.left < value)
-            margins.left = value;
-        if (margins.right < value)
-            margins.right = value;
+        // if padding are smaller than radius update the padding
+        if (padding.left < value)
+            padding.left = value;
+        if (padding.right < value)
+            padding.right = value;
     }
 
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -258,26 +258,25 @@ namespace gui
     {
         lines.erase();
 
-        auto sizeMinusMargin = [&](Axis axis) {
+        auto sizeMinusPadding = [&](Axis axis) {
             auto size   = area(Area::Max).size(axis);
-            auto margin = margins.getSumInAxis(axis) + padding.getSumInAxis(axis);
-            if (size <= margin) {
+            if (size <= padding.getSumInAxis(axis)) {
                 size = 0;
             }
             else {
-                size -= margin;
+                size -= padding.getSumInAxis(axis);
             }
             return size;
         };
 
-        uint32_t w           = sizeMinusMargin(Axis::X);
-        uint32_t h           = sizeMinusMargin(Axis::Y);
-        auto line_y_position = margins.top;
+        uint32_t w           = sizeMinusPadding(Axis::X);
+        uint32_t h           = sizeMinusPadding(Axis::Y);
+        auto line_y_position = padding.top;
         auto cursor          = 0;
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
-        auto line_x_position = margins.left;
+        auto line_x_position = padding.left;
         do {
             auto text_line = gui::TextLine(document.get(), cursor, w);
             cursor += text_line.length();
@@ -326,7 +325,7 @@ namespace gui
         // need to at least erase last line if it wont fit
         // should be done on each loop
         {
-            uint16_t h_used = line_y_position + margins.bottom;
+            uint16_t h_used = line_y_position + padding.bottom;
             uint16_t w_used = lines.maxWidth();
             if (lines.size() == 0) {
                 debug_text("No lines to show, try to at least fit in cursor");
@@ -346,11 +345,6 @@ namespace gui
         }
 
         debug_text("<- END\n");
-    }
-
-    void Text::setMargins(const Margins &margins)
-    {
-        this->margins = margins;
     }
 
     std::list<DrawCommand *> Text::buildDrawList()
