@@ -15,7 +15,7 @@ struct ThreadRecord : Record
     uint32_t date           = 0;
     uint32_t msgCount       = 0;
     uint32_t unreadMsgCount = 0;
-    UTF8 snippet            = "";
+    UTF8 snippet;
     SMSType type            = SMSType::UNKNOWN;
     uint32_t contactID      = DB_ID_NONE;
 
@@ -46,7 +46,7 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
 {
   public:
     ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb);
-    ~ThreadRecordInterface();
+    ~ThreadRecordInterface() = default;
 
     bool Add(const ThreadRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
@@ -67,8 +67,8 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
 
   private:
-    SmsDB *smsDB;
-    ContactsDB *contactsDB;
+    SmsDB *smsDB           = nullptr;
+    ContactsDB *contactsDB = nullptr;
 
     /// for now implementation between Interface <-> Database
     /// it would only make sense to pass Query from Inteface to multiple databases to get all data we are interested in

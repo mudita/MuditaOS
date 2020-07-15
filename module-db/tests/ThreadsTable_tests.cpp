@@ -31,7 +31,7 @@ TEST_CASE("Threads Table tests")
     SmsDB smsdb;
     REQUIRE(smsdb.isInitialized());
 
-    ThreadsTableRow testRow1 = {.ID             = 0,
+    ThreadsTableRow testRow1 = {{.ID = 0},
                                 .date           = 0,
                                 .msgCount       = 0,
                                 .unreadMsgCount = 0,

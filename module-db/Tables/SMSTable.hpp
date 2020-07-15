@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Table.hpp"
+#include "Record.hpp"
 #include "Database/Database.hpp"
 #include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
 
-struct SMSTableRow
+struct SMSTableRow : public Record
 {
-    uint32_t ID = 0;
     uint32_t threadID;
     uint32_t contactID;
     uint32_t date;
@@ -28,7 +28,7 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
 {
   public:
     SMSTable(Database *db);
-    virtual ~SMSTable();
+    virtual ~SMSTable() = default;
 
     bool create() override final;
     bool add(SMSTableRow entry) override final;

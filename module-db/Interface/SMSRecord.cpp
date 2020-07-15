@@ -1,13 +1,3 @@
-
-/*
- * @file SMSRecord.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "SMSRecord.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
@@ -67,7 +57,8 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     threadID = (*threadRec)[0].ID;
 
     // Create SMS
-    if (!smsDB->sms.add(SMSTableRow{.threadID  = threadID,
+    if (!smsDB->sms.add(SMSTableRow{{.ID = rec.ID},
+                                    .threadID  = threadID,
                                     .contactID = contactID,
                                     .date      = rec.date,
                                     .dateSent  = rec.dateSent,
@@ -169,13 +160,12 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 
 bool SMSRecordInterface::Update(const SMSRecord &rec)
 {
-
     auto sms = smsDB->sms.getById(rec.ID);
-    if (sms.ID == 0) {
+    if (!sms.isValid()) {
         return false;
     }
 
-    return smsDB->sms.update(SMSTableRow{.ID        = rec.ID,
+    return smsDB->sms.update(SMSTableRow{{.ID = rec.ID},
                                          .threadID  = sms.threadID,
                                          .contactID = sms.contactID,
                                          .date      = rec.date,
@@ -187,9 +177,8 @@ bool SMSRecordInterface::Update(const SMSRecord &rec)
 
 bool SMSRecordInterface::RemoveByID(uint32_t id)
 {
-
     auto sms = smsDB->sms.getById(id);
-    if (sms.ID == 0) {
+    if (!sms.isValid()) {
         return false;
     }
 
@@ -225,7 +214,6 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
 
 bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str)
 {
-
     switch (field) {
     case SMSRecordField ::ContactID:
         return smsDB->sms.removeByField(SMSTableFields::ContactID, str);
