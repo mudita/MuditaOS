@@ -199,8 +199,11 @@ namespace gui
         [[nodiscard]] uint16_t getSize(Axis axis) const;
         [[nodiscard]] uint16_t getPosition(Axis axis) const;
 
-        void setMargins(const Margins &value);
+        virtual void setMargins(const Margins &value);
         [[nodiscard]] Margins getMargins();
+
+        void setPadding(const Padding &value);
+        [[nodiscard]] Padding getPadding();
 
         virtual void setAlignment(const Alignment &value);
         [[nodiscard]] Alignment &getAlignment();

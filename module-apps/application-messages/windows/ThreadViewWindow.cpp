@@ -5,7 +5,6 @@
 #include "../models/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
 #include "Service/Message.hpp"
-#include "Span.hpp"
 
 #include <Text.hpp>
 #include <TextBubble.hpp>
@@ -77,6 +76,7 @@ namespace gui
             return;
         }
         text = new gui::Text(nullptr, 0, 0, 0, 0, "", ExpandMode::EXPAND_UP);
+        text->setMargins(Margins(0, style::window::messages::sms_vertical_spacer, 0, 0));
         text->setMinimumSize(body->getWidth(), text->getHeight());
         text->setMaximumSize(body->getWidth(), body->getHeight());
         text->setInputMode(new InputMode(
@@ -138,7 +138,6 @@ namespace gui
     {
         LOG_DEBUG("--- %d ---", static_cast<int>(what));
         // if there was text - then remove it temp
-        gui::Alignment align;
         // 1. load elements to tmp vector
         std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this->application, SMS.thread);
         if (threadDetails == nullptr) {
@@ -273,28 +272,26 @@ namespace gui
     void ThreadViewWindow::addErrorLabel(HBox *layout, uint16_t widthAvailable) const
     {
         auto errorIcon = new gui::Image("messages_error_W_M");
-        // set icon vertical aligmnet to center
-        errorIcon->setY((layout->getHeight() - errorIcon->getHeight()) / 2);
+        errorIcon->setAlignment(Alignment(Alignment::Vertical::Center));
         errorIcon->activeItem = false; // make it non-focusable
-
-        layout->addWidget(new Span(Axis::X, style::window::messages::sms_error_icon_offset));
+        errorIcon->setMargins(Margins(style::window::messages::sms_error_icon_offset,
+                                      0,
+                                      (style::window::messages::sms_failed_offset -
+                                       (errorIcon->getWidth() + style::window::messages::sms_error_icon_offset)),
+                                      0));
         layout->addWidget(errorIcon);
-        layout->addWidget(new Span(Axis::X,
-                                   style::window::messages::sms_failed_offset -
-                                       (errorIcon->getWidth() + style::window::messages::sms_error_icon_offset)));
     }
 
     void ThreadViewWindow::addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const
     {
         // add time label activated on focus
-        timeLabel->setSize(timeLabel->getWidth(), layout->getHeight());
-        timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
-        timeLabel->setMinimumWidth(timeLabel->getWidth());
-        timeLabel->setMinimumHeight(timeLabel->getHeight());
+        timeLabel->setMinimumWidth(timeLabel->getTextNeedSpace());
+        timeLabel->setMinimumHeight(layout->getHeight());
+        timeLabel->setSize(timeLabel->getTextNeedSpace(), layout->getHeight());
 
         uint16_t timeLabelSpacerWidth = widthAvailable - timeLabel->getWidth();
 
-        layout->addWidget(new gui::Span(Axis::X, timeLabelSpacerWidth));
+        timeLabel->setMargins(Margins(timeLabelSpacerWidth, 0, timeLabelSpacerWidth, 0));
         layout->addWidget(timeLabel);
 
         layout->focusChangedCallback = [=](gui::Item &item) {
@@ -331,7 +328,7 @@ namespace gui
         smsBubble->setFont(style::window::font::medium);
         smsBubble->setPenFocusWidth(style::window::default_border_focus_w);
         smsBubble->setPenWidth(style::window::messages::sms_border_no_focus);
-        smsBubble->setMargins(gui::Margins(style::window::messages::sms_h_padding,
+        smsBubble->setPadding(gui::Padding(style::window::messages::sms_h_padding,
                                            style::window::messages::sms_v_padding,
                                            style::window::messages::sms_h_padding,
                                            style::window::messages::sms_v_padding));
@@ -358,12 +355,11 @@ namespace gui
 
         // wrap label in H box, to make fit datetime in it
         HBox *labelSpan = smsSpanBuild(smsBubble, smsRecord);
+        labelSpan->setMargins(Margins(0, style::window::messages::sms_vertical_spacer, 0, 0));
 
         if (labelSpan == nullptr) {
             return false;
         }
-
-        body->addWidget(new gui::Span(Axis::Y, style::window::messages::sms_vertical_spacer));
 
         LOG_INFO("Add sms: %s %s", smsRecord.body.c_str(), smsRecord.number.getFormatted().c_str());
         body->addWidget(labelSpan);

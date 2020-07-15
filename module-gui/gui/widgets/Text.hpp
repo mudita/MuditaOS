@@ -116,8 +116,6 @@ namespace gui
         /// points to default text font to use
         RawFont *font = nullptr;
         Color textColor;
-        // margins for text
-        Margins margins;
         bool underline = false;
 
         bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
@@ -158,7 +156,6 @@ namespace gui
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
-        virtual void setMargins(const Margins &margins);
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
