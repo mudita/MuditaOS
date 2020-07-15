@@ -41,7 +41,7 @@ Icon::Icon(Item *parent,
     text->setTextType(TextType::MULTI_LINE);
     text->setEditMode(EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
     auto format = TextFormat(Font(27).raw(), Color(7, 0));
     for (auto &el : textToTextBlocks(str, format)) {

@@ -54,6 +54,7 @@ namespace gui
         // virtual methods from Item
         void setPosition(const short &x, const short &y) override;
         void setSize(const unsigned short w, const unsigned short h) override;
+        void setAlignment(const Alignment &value) override;
         void addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
         bool erase(Item *item) override;

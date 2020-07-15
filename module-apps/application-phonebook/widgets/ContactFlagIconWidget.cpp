@@ -60,17 +60,15 @@ namespace gui
         label->setAlignment(Alignment(Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         mainBox = new VBox(this, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight);
+        mainBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         mainBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         if (numericIcon) {
             mainBox->addWidget(numericLabel);
-            center(mainBox, numericLabel, gui::Axis::X);
         }
         else {
             mainBox->addWidget(icon);
-            center(mainBox, icon, gui::Axis::X);
         }
         mainBox->addWidget(label);
-        center(mainBox, label, gui::Axis::X);
     }
 
 } // namespace gui
