@@ -6,6 +6,7 @@
 #include "Rect.hpp"
 #include <Alignment.hpp>
 #include "LayoutSizeStore.hpp"
+#include "log/log.hpp"
 
 namespace gui
 {
@@ -30,7 +31,7 @@ namespace gui
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Min)
         {
-            return it->getSize(axis) - sizeUsed<axis>(it);
+            return (sizeUsed<axis>(it) >= it->getSize(axis)) ? 0 : it->getSize(axis) - sizeUsed<axis>(it);
         };
 
         template <Axis axis> void resizeItems();
