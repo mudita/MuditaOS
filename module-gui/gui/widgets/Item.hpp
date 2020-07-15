@@ -202,7 +202,7 @@ namespace gui
         virtual void setMargins(const Margins &value);
         [[nodiscard]] Margins getMargins();
 
-        void setPadding(const Padding &value);
+        virtual void setPadding(const Padding &value);
         [[nodiscard]] Padding getPadding();
 
         virtual void setAlignment(const Alignment &value);

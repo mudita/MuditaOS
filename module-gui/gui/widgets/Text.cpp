@@ -132,7 +132,7 @@ namespace gui
     void Text::setFont(const UTF8 &fontName)
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
-        font          = newFont;
+        font             = newFont;
     }
 
     void Text::setFont(RawFont *fontName)
@@ -203,6 +203,14 @@ namespace gui
             padding.right = value;
     }
 
+    void Text::setPadding(const Padding &value)
+    {
+        if (padding != value) {
+            padding = value;
+            drawLines();
+        }
+    }
+
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
@@ -259,7 +267,7 @@ namespace gui
         lines.erase();
 
         auto sizeMinusPadding = [&](Axis axis) {
-            auto size   = area(Area::Max).size(axis);
+            auto size = area(Area::Max).size(axis);
             if (size <= padding.getSumInAxis(axis)) {
                 size = 0;
             }

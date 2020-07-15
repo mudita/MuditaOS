@@ -170,6 +170,7 @@ namespace gui
         bool onFocus(bool state) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void setRadius(int value) override;
+        void setPadding(const Padding &value) override;
 
       private:
         gui::KeyInputMappedTranslation translator;

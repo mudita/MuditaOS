@@ -76,7 +76,7 @@ namespace gui
             return;
         }
         text = new gui::Text(nullptr, 0, 0, 0, 0, "", ExpandMode::EXPAND_UP);
-        text->setMargins(Margins(0, style::window::messages::sms_vertical_spacer, 0, 0));
+        text->setMargins(Margins(0, style::window::messages::new_sms_vertical_spacer, 0, 0));
         text->setMinimumSize(body->getWidth(), text->getHeight());
         text->setMaximumSize(body->getWidth(), body->getHeight());
         text->setInputMode(new InputMode(
@@ -246,6 +246,10 @@ namespace gui
                 labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
             break;
         case SMSType::INBOX:
+            smsBubble->setPadding(gui::Padding(style::window::messages::sms_h_left_padding,
+                                               style::window::messages::sms_v_padding,
+                                               style::window::messages::sms_h_padding,
+                                               style::window::messages::sms_v_padding));
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
             labelSpan->setReverseOrder(false);
             labelSpan->addWidget(smsBubble);
