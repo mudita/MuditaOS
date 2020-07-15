@@ -24,7 +24,6 @@ namespace gui
 
     void TextDocument::append(std::list<TextBlock> &&blocks)
     {
-        // this->blocks.emplace(this->blocks.end(), blocks.begin(), blocks.end());
         for (auto &&el : blocks) {
             this->blocks.emplace_back(std::move(el));
         }
