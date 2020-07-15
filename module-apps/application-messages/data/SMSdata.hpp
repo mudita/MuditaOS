@@ -56,10 +56,17 @@ class SMSTemplateSent : public gui::SwitchData
 class SMSTextData : public gui::SwitchData
 {
   public:
-    SMSTextData(const UTF8 &text) : text(text)
+    enum class Concatenate : bool
+    {
+        True,
+        False
+    };
+
+    SMSTextData(const UTF8 &text, Concatenate concatenate = Concatenate::False) : text(text), concatenate(concatenate)
     {}
     virtual ~SMSTextData() = default;
     UTF8 text;
+    Concatenate concatenate = Concatenate::False;
 };
 
 class SMSTemplateRequest : public gui::SwitchData
