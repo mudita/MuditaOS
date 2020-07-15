@@ -9,11 +9,12 @@ namespace gui
 {
 
     /// helper function to get our text representation
-    Label *buildUITextPart(const UTF8 &text, Font *font)
+    Label *buildUITextPart(const UTF8 &text, const TextFormat *format)
     {
         auto item = new gui::Label(nullptr);
         item->setText(text);
-        item->setFont(font);
+        item->setFont(format->getFont());
+        item->setTextColor(format->getColor());
         item->setSize(item->getTextNeedSpace(), item->getTextHeight());
         item->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         return item;
@@ -40,10 +41,11 @@ namespace gui
 
             // take Part of TextBlock we want to show
             auto text_part = document->getTextPart(cursor);
-            if (text_part.font == nullptr) {
+            auto text_format = (*cursor).getFormat();
+            if (text_format->getFont() == nullptr) {
                 return;
             }
-            auto can_show = text_part.font->getCharCountInSpace(text_part.text, max_width - width_used);
+            auto can_show = text_format->getFont()->getCharCountInSpace(text_part.text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
             if (can_show == 0) {
@@ -51,7 +53,7 @@ namespace gui
             }
 
             // create item for show and update Line data
-            auto item = buildUITextPart(text_part.text.substr(0, can_show), text_part.font);
+            auto item = buildUITextPart(text_part.text.substr(0, can_show), text_format);
             number_letters_shown += can_show;
             width_used += item->getTextNeedSpace();
             height_used = std::max(height_used, item->getTextHeight());
