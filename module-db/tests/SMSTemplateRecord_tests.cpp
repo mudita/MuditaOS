@@ -14,7 +14,7 @@
 
 TEST_CASE("SMS templates Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(SmsDB::GetDBName());
 
@@ -96,5 +96,5 @@ TEST_CASE("SMS templates Record tests")
         REQUIRE(SMSTemplateRecordInterface.GetCount() == 0);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

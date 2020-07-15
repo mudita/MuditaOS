@@ -18,7 +18,7 @@
 
 TEST_CASE("Notifications Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(NotificationsDB::GetDBName());
 
@@ -233,5 +233,5 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(records->size() == numberOfNotifcations);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

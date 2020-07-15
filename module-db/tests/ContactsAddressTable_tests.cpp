@@ -5,7 +5,7 @@
 
 TEST_CASE("Contacts Address Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(ContactsDB::GetDBName());
 
@@ -79,5 +79,5 @@ TEST_CASE("Contacts Address Table tests")
     // Table should be empty now
     REQUIRE(contactsdb.address.GetCount() == 0);
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

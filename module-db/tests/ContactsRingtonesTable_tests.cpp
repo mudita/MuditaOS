@@ -23,7 +23,7 @@
 
 TEST_CASE("Contacts Ringtones Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(ContactsDB::GetDBName());
 
@@ -93,5 +93,5 @@ TEST_CASE("Contacts Ringtones Table tests")
     // Table should be empty now
     REQUIRE(contactsdb.ringtones.GetCount() == 0);
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

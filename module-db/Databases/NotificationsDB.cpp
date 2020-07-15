@@ -8,5 +8,5 @@ NotificationsDB::NotificationsDB() : Database(dbName), notifications(this)
 {
     if (notifications.create() == false)
         return;
-    isInitialized = true;
+    isInitialized_ = true;
 }

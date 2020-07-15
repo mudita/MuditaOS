@@ -21,7 +21,7 @@ SmsDB::SmsDB() : Database(dbName), sms(this), threads(this), templates(this)
     if (templates.create() == false)
         return;
 
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 SmsDB::~SmsDB()

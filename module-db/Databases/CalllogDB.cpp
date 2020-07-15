@@ -16,7 +16,7 @@ CalllogDB::CalllogDB() : Database(dbName), calls(this)
 
     if (calls.create() == false)
         return;
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 CalllogDB::~CalllogDB()

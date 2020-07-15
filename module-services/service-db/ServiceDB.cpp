@@ -49,7 +49,7 @@ ServiceDB::~ServiceDB()
     countryCodesDB.reset();
     notificationsDB.reset();
 
-    Database::Deinitialize();
+    Database::deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
 }
 
@@ -579,7 +579,7 @@ void ServiceDB::TickHandler(uint32_t id)
 // Invoked during initialization
 sys::ReturnCodes ServiceDB::InitHandler()
 {
-    Database::Initialize();
+    Database::initialize();
 
     // Create databases
     settingsDB      = std::make_unique<SettingsDB>();
@@ -625,11 +625,11 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query:
 
 bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
 {
-    bool rc = settingsDB.get()->StoreIntoFile(backupPath + "settings.db");
-    rc |= contactsDB.get()->StoreIntoFile(backupPath + "contacts.db");
-    rc |= smsDB.get()->StoreIntoFile(backupPath + "sms.db");
-    rc |= alarmsDB.get()->StoreIntoFile(backupPath + "alarms.db");
-    rc |= notesDB.get()->StoreIntoFile(backupPath + "notes.db");
-    rc |= calllogDB.get()->StoreIntoFile(backupPath + "calllog.db");
+    bool rc = settingsDB.get()->storeIntoFile(backupPath + "settings.db");
+    rc |= contactsDB.get()->storeIntoFile(backupPath + "contacts.db");
+    rc |= smsDB.get()->storeIntoFile(backupPath + "sms.db");
+    rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
+    rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
+    rc |= calllogDB.get()->storeIntoFile(backupPath + "calllog.db");
     return rc;
 }

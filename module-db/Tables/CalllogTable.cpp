@@ -18,12 +18,12 @@ CalllogTable::~CalllogTable()
 
 bool CalllogTable::create()
 {
-    return db->Execute(createTableQuery);
+    return db->execute(createTableQuery);
 }
 
 bool CalllogTable::add(CalllogTableRow entry)
 {
-    return db->Execute(
+    return db->execute(
         "INSERT or ignore INTO calls (number, e164number, presentation, date, duration, type, name, contactId, "
         "isRead) VALUES ('%q', '%q', %lu, %q, %q, %lu, '%q', '%q', %d);",
         entry.number.c_str(),
@@ -39,7 +39,7 @@ bool CalllogTable::add(CalllogTableRow entry)
 
 bool CalllogTable::removeById(uint32_t id)
 {
-    return db->Execute("DELETE FROM calls where _id = %lu;", id);
+    return db->execute("DELETE FROM calls where _id = %lu;", id);
 }
 
 bool CalllogTable::removeByField(CalllogTableFields field, const char *str)
@@ -49,7 +49,7 @@ bool CalllogTable::removeByField(CalllogTableFields field, const char *str)
 
 bool CalllogTable::update(CalllogTableRow entry)
 {
-    return db->Execute("UPDATE calls SET number = '%q', e164number = '%q', presentation = %lu, date = %lu, duration = "
+    return db->execute("UPDATE calls SET number = '%q', e164number = '%q', presentation = %lu, date = %lu, duration = "
                        "%lu, type = %lu, "
                        "name = '%q', contactId = '%q', isRead = "
                        "%d WHERE _id = %lu;",
@@ -67,7 +67,7 @@ bool CalllogTable::update(CalllogTableRow entry)
 
 CalllogTableRow CalllogTable::getById(uint32_t id)
 {
-    auto retQuery = db->Query("SELECT * FROM calls WHERE _id= %u;", id);
+    auto retQuery = db->query("SELECT * FROM calls WHERE _id= %u;", id);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return CalllogTableRow();
@@ -89,7 +89,7 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
 
 std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->Query("SELECT * from calls ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from calls ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
@@ -133,7 +133,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
         return std::vector<CalllogTableRow>();
     }
 
-    auto retQuery = db->Query(
+    auto retQuery = db->query(
         "SELECT * from calls WHERE %q='%q' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
@@ -175,7 +175,7 @@ uint32_t CalllogTable::count(EntryState state)
     }
     query += ";";
     LOG_DEBUG("> %s", query.c_str());
-    auto queryRet = db->Query(query.c_str());
+    auto queryRet = db->query(query.c_str());
 
     if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
         return 0;
@@ -191,7 +191,7 @@ uint32_t CalllogTable::count()
 
 uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM calls WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM calls WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
@@ -202,5 +202,5 @@ uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
 
 bool CalllogTable::SetAllRead()
 {
-    return db->Execute("UPDATE calls SET isRead = 1;");
+    return db->execute("UPDATE calls SET isRead = 1;");
 }

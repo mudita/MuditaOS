@@ -18,12 +18,12 @@ ContactsNameTable::~ContactsNameTable()
 
 bool ContactsNameTable::create()
 {
-    return db->Execute(createTableQuery);
+    return db->execute(createTableQuery);
 }
 
 bool ContactsNameTable::add(ContactsNameTableRow entry)
 {
-    return db->Execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative, favourite) "
+    return db->execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative, favourite) "
                        "VALUES (%lu, '%q', '%q', '%lu');",
                        entry.contactID,
                        entry.namePrimary.c_str(),
@@ -33,12 +33,12 @@ bool ContactsNameTable::add(ContactsNameTableRow entry)
 
 bool ContactsNameTable::removeById(uint32_t id)
 {
-    return db->Execute("DELETE FROM contact_name where _id = %u;", id);
+    return db->execute("DELETE FROM contact_name where _id = %u;", id);
 }
 
 bool ContactsNameTable::update(ContactsNameTableRow entry)
 {
-    return db->Execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q', "
+    return db->execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q', "
                        "favourite = '%lu' WHERE _id = %lu;",
                        entry.contactID,
                        entry.namePrimary.c_str(),
@@ -49,7 +49,7 @@ bool ContactsNameTable::update(ContactsNameTableRow entry)
 
 ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
 {
-    auto retQuery = db->Query("SELECT * FROM contact_name WHERE _id= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contact_name WHERE _id= %lu;", id);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ContactsNameTableRow();
@@ -66,7 +66,7 @@ ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
 
 std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->Query(
+    auto retQuery = db->query(
         "SELECT * from contact_name ORDER BY favourite DESC, name_alternative LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
@@ -111,7 +111,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
     }
 
     auto retQuery =
-        db->Query("SELECT * from contact_name WHERE %q='%q' ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
+        db->query("SELECT * from contact_name WHERE %q='%q' ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
                   fieldName.c_str(),
                   str,
                   limit,
@@ -138,7 +138,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
 
 uint32_t ContactsNameTable::count()
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_name;");
+    auto queryRet = db->query("SELECT COUNT(*) FROM contact_name;");
 
     if (queryRet->GetRowCount() == 0) {
         return 0;
@@ -149,7 +149,7 @@ uint32_t ContactsNameTable::count()
 
 uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_name WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contact_name WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
@@ -161,7 +161,7 @@ uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
 std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *primaryName, const char *alternativeName)
 {
 
-    auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary='%q' AND name_alternative='%q' ORDER BY "
+    auto retQuery = db->query("SELECT * from contact_name WHERE name_primary='%q' AND name_alternative='%q' ORDER BY "
                               "name_alternative LIMIT 1;",
                               primaryName,
                               alternativeName);
@@ -205,7 +205,7 @@ std::vector<std::uint32_t> ContactsNameTable::GetIDsByName(const std::string &na
 
     query += " COLLATE NOCASE;";
 
-    auto queryRet = db->Query(query.c_str());
+    auto queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return ids;
     }
@@ -223,7 +223,7 @@ std::size_t ContactsNameTable::GetCountByName(const std::string &name)
         return count();
     }
     auto queryRet =
-        db->Query("SELECT COUNT(*) FROM contact_name WHERE name_primary like '%s%%' OR name_alternative like '%s%%';",
+        db->query("SELECT COUNT(*) FROM contact_name WHERE name_primary like '%s%%' OR name_alternative like '%s%%';",
                   name.c_str(),
                   name.c_str());
 

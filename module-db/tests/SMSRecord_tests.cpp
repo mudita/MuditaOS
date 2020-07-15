@@ -25,7 +25,7 @@ struct test
 
 TEST_CASE("SMS Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(ContactsDB::GetDBName());
     vfs.remove(SmsDB::GetDBName());
@@ -184,5 +184,5 @@ TEST_CASE("SMS Record tests")
     REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ContactID, "1"));
     REQUIRE(smsRecInterface.GetCount() == 0);
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

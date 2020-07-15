@@ -19,19 +19,19 @@ SettingsTable::~SettingsTable()
 bool SettingsTable::create()
 {
     bool ret = true;
-    ret      = db->Execute(createTableQuery);
+    ret      = db->execute(createTableQuery);
     if (!ret) {
         return false;
     }
 
-    ret = db->Execute(settingsInitialization);
+    ret = db->execute(settingsInitialization);
     return ret;
 }
 
 SettingsTableRow SettingsTable::getById(uint32_t id)
 {
 
-    auto retQuery = db->Query("SELECT * FROM settings WHERE _id= 1;");
+    auto retQuery = db->query("SELECT * FROM settings WHERE _id= 1;");
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return SettingsTableRow();
@@ -61,7 +61,7 @@ SettingsTableRow SettingsTable::getById(uint32_t id)
 
 bool SettingsTable::update(SettingsTableRow entry)
 {
-    return db->Execute("UPDATE settings SET time_format_12 = %lu, time_auto = %lu, time_date_format = %lu "
+    return db->execute("UPDATE settings SET time_format_12 = %lu, time_auto = %lu, time_date_format = %lu "
                        ",brightness_auto = %lu, brightness_level = %lu, "
                        "bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%q', "
                        "pin2_string = '%q', active_sim = %lu, "

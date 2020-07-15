@@ -14,7 +14,7 @@
 
 TEST_CASE("Calllog Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(CalllogDB::GetDBName());
     vfs.remove(ContactsDB::GetDBName());
@@ -183,5 +183,5 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(calllogRecordInterface.GetCount(EntryState::READ) == 4);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

@@ -25,7 +25,7 @@
 
 TEST_CASE("Settings Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(SettingsDB::GetDBName());
 
@@ -65,5 +65,5 @@ TEST_CASE("Settings Table tests")
         REQUIRE(settingsRow.language == SettingsLanguage ::POLISH);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }
