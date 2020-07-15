@@ -72,26 +72,17 @@ namespace gui
             std::string searchFilter = utils::trim(inputField->getText());
 
             if (searchFilter.size() > 0) {
-                auto searchModel = std::make_unique<PhonebookModel>(application, searchFilter);
-
-                assert(searchModel->getItemCount() >= 0);
-                LOG_DEBUG("Search results count: %u", searchModel->getItemCount());
-                if (searchModel->getItemCount() > 0) {
-                    LOG_DEBUG("Switching to search results window.");
-                    auto data = std::make_unique<PhonebookSearchResultsData>(std::move(searchModel));
-                    application->switchWindow("SearchResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-                }
-                else {
-                    LOG_DEBUG("Switching to no results window.");
-                    std::unique_ptr<gui::SwitchData> data =
-                        std::make_unique<PhonebookSearchQuery>(inputField->getText());
-                    application->switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
+                if (app == nullptr) {
+                    LOG_ERROR("Failed to get phonebook application.");
+                    return false;
                 }
 
+                app->onSearchRequest(searchFilter);
                 return true;
             }
         }
 
         return (ret);
-    } // namespace gui
-} /* namespace gui */
+    }
+} // namespace gui
