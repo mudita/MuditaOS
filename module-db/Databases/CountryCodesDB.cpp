@@ -4,7 +4,7 @@ const char *CountryCodesDB::dbName = "country-codes.db";
 
 CountryCodesDB::CountryCodesDB() : Database(dbName), countryCodes(this)
 {
-    if (countryCodes.Create() == false)
+    if (countryCodes.create() == false)
         return;
     isInitialized = true;
 }

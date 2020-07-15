@@ -35,20 +35,20 @@ class AlarmsTable : public Table<AlarmsTableRow, AlarmsTableFields>
     AlarmsTable(Database *db);
     virtual ~AlarmsTable();
 
-    bool Create() override final;
-    bool Add(AlarmsTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(AlarmsTableFields field, const char *str) override final;
-    bool Update(AlarmsTableRow entry) override final;
-    AlarmsTableRow GetByID(uint32_t id) override final;
-    std::vector<AlarmsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<AlarmsTableRow> GetLimitOffsetByField(uint32_t offset,
+    bool create() override final;
+    bool add(AlarmsTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    bool removeByField(AlarmsTableFields field, const char *str) override final;
+    bool update(AlarmsTableRow entry) override final;
+    AlarmsTableRow getById(uint32_t id) override final;
+    std::vector<AlarmsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<AlarmsTableRow> getLimitOffsetByField(uint32_t offset,
                                                       uint32_t limit,
                                                       AlarmsTableFields field,
                                                       const char *str) override final;
 
-    uint32_t GetCount() override final;
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t count() override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
     AlarmsTableRow GetNext(time_t time);
 

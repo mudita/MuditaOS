@@ -38,26 +38,26 @@ class ContactsNumberTable : public Table<ContactsNumberTableRow, ContactNumberTa
 
     virtual ~ContactsNumberTable();
 
-    bool Create() override final;
+    bool create() override final;
 
-    bool Add(ContactsNumberTableRow entry) override final;
+    bool add(ContactsNumberTableRow entry) override final;
 
-    bool RemoveByID(uint32_t id) override final;
+    bool removeById(uint32_t id) override final;
 
-    bool Update(ContactsNumberTableRow entry) override final;
+    bool update(ContactsNumberTableRow entry) override final;
 
-    ContactsNumberTableRow GetByID(uint32_t id) override final;
+    ContactsNumberTableRow getById(uint32_t id) override final;
 
-    std::vector<ContactsNumberTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<ContactsNumberTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsNumberTableRow> GetLimitOffsetByField(uint32_t offset,
+    std::vector<ContactsNumberTableRow> getLimitOffsetByField(uint32_t offset,
                                                               uint32_t limit,
                                                               ContactNumberTableFields field,
                                                               const char *str) override final;
 
-    uint32_t GetCount() override final;
+    uint32_t count() override final;
 
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_number("

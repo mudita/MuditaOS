@@ -47,19 +47,19 @@ class SettingsTable : public Table<SettingsTableRow, SettingsTableFields>
     SettingsTable(Database *db);
     virtual ~SettingsTable();
 
-    bool Create() override final;
-    bool Update(SettingsTableRow entry) override final;
-    SettingsTableRow GetByID(uint32_t id) override final;
+    bool create() override final;
+    bool update(SettingsTableRow entry) override final;
+    SettingsTableRow getById(uint32_t id) override final;
 
-    bool Add(SettingsTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    std::vector<SettingsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<SettingsTableRow> GetLimitOffsetByField(uint32_t offset,
+    bool add(SettingsTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    std::vector<SettingsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<SettingsTableRow> getLimitOffsetByField(uint32_t offset,
                                                         uint32_t limit,
                                                         SettingsTableFields field,
                                                         const char *str) override final;
-    uint32_t GetCount() override final;
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t count() override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS settings("

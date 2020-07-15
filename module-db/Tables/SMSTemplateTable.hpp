@@ -23,21 +23,21 @@ class SMSTemplateTable : public Table<SMSTemplateTableRow, SMSTemplateTableField
     SMSTemplateTable(Database *db);
     virtual ~SMSTemplateTable();
 
-    bool Create() override final;
-    bool Add(SMSTemplateTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(SMSTemplateTableFields field, const char *str) override final;
-    bool Update(SMSTemplateTableRow entry) override final;
-    SMSTemplateTableRow GetByID(uint32_t id) override final;
-    std::vector<SMSTemplateTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<SMSTemplateTableRow> GetLimitOffsetByField(uint32_t offset,
+    bool create() override final;
+    bool add(SMSTemplateTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    bool removeByField(SMSTemplateTableFields field, const char *str) override final;
+    bool update(SMSTemplateTableRow entry) override final;
+    SMSTemplateTableRow getById(uint32_t id) override final;
+    std::vector<SMSTemplateTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<SMSTemplateTableRow> getLimitOffsetByField(uint32_t offset,
                                                            uint32_t limit,
                                                            SMSTemplateTableFields field,
                                                            const char *str) override final;
 
-    uint32_t GetCount() override final;
-    uint32_t GetCount(EntryState state);
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t count() override final;
+    uint32_t count(EntryState state);
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS templates("

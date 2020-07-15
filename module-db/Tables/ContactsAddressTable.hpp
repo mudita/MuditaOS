@@ -25,26 +25,26 @@ class ContactsAddressTable : public Table<ContactsAddressTableRow, ContactAddres
 
     virtual ~ContactsAddressTable();
 
-    bool Create() override final;
+    bool create() override final;
 
-    bool Add(ContactsAddressTableRow entry) override final;
+    bool add(ContactsAddressTableRow entry) override final;
 
-    bool RemoveByID(uint32_t id) override final;
+    bool removeById(uint32_t id) override final;
 
-    bool Update(ContactsAddressTableRow entry) override final;
+    bool update(ContactsAddressTableRow entry) override final;
 
-    ContactsAddressTableRow GetByID(uint32_t id) override final;
+    ContactsAddressTableRow getById(uint32_t id) override final;
 
-    std::vector<ContactsAddressTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<ContactsAddressTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsAddressTableRow> GetLimitOffsetByField(uint32_t offset,
+    std::vector<ContactsAddressTableRow> getLimitOffsetByField(uint32_t offset,
                                                                uint32_t limit,
                                                                ContactAddressTableFields field,
                                                                const char *str) override final;
 
-    uint32_t GetCount() override final;
+    uint32_t count() override final;
 
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_address("

@@ -16,12 +16,12 @@ ContactsNameTable::ContactsNameTable(Database *db) : Table(db)
 ContactsNameTable::~ContactsNameTable()
 {}
 
-bool ContactsNameTable::Create()
+bool ContactsNameTable::create()
 {
     return db->Execute(createTableQuery);
 }
 
-bool ContactsNameTable::Add(ContactsNameTableRow entry)
+bool ContactsNameTable::add(ContactsNameTableRow entry)
 {
     return db->Execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative, favourite) "
                        "VALUES (%lu, '%q', '%q', '%lu');",
@@ -31,12 +31,12 @@ bool ContactsNameTable::Add(ContactsNameTableRow entry)
                        entry.favourite);
 }
 
-bool ContactsNameTable::RemoveByID(uint32_t id)
+bool ContactsNameTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM contact_name where _id = %u;", id);
 }
 
-bool ContactsNameTable::Update(ContactsNameTableRow entry)
+bool ContactsNameTable::update(ContactsNameTableRow entry)
 {
     return db->Execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q', "
                        "favourite = '%lu' WHERE _id = %lu;",
@@ -47,7 +47,7 @@ bool ContactsNameTable::Update(ContactsNameTableRow entry)
                        entry.ID);
 }
 
-ContactsNameTableRow ContactsNameTable::GetByID(uint32_t id)
+ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM contact_name WHERE _id= %lu;", id);
 
@@ -64,7 +64,7 @@ ContactsNameTableRow ContactsNameTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query(
         "SELECT * from contact_name ORDER BY favourite DESC, name_alternative LIMIT %lu OFFSET %lu;", limit, offset);
@@ -88,7 +88,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t off
     return ret;
 }
 
-std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint32_t offset,
                                                                            uint32_t limit,
                                                                            ContactNameTableFields field,
                                                                            const char *str)
@@ -136,7 +136,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint3
     return ret;
 }
 
-uint32_t ContactsNameTable::GetCount()
+uint32_t ContactsNameTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contact_name;");
 
@@ -147,7 +147,7 @@ uint32_t ContactsNameTable::GetCount()
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t ContactsNameTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contact_name WHERE %q=%lu;", field, id);
 
@@ -220,7 +220,7 @@ std::vector<std::uint32_t> ContactsNameTable::GetIDsByName(const std::string &na
 std::size_t ContactsNameTable::GetCountByName(const std::string &name)
 {
     if (name.empty()) {
-        return GetCount();
+        return count();
     }
     auto queryRet =
         db->Query("SELECT COUNT(*) FROM contact_name WHERE name_primary like '%s%%' OR name_alternative like '%s%%';",

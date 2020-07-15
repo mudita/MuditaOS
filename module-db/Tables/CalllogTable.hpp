@@ -62,21 +62,21 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
     CalllogTable(Database *db);
     virtual ~CalllogTable();
 
-    bool Create() override final;
-    bool Add(CalllogTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(CalllogTableFields field, const char *str) override final;
-    bool Update(CalllogTableRow entry) override final;
-    CalllogTableRow GetByID(uint32_t id) override final;
-    std::vector<CalllogTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<CalllogTableRow> GetLimitOffsetByField(uint32_t offset,
+    bool create() override final;
+    bool add(CalllogTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    bool removeByField(CalllogTableFields field, const char *str) override final;
+    bool update(CalllogTableRow entry) override final;
+    CalllogTableRow getById(uint32_t id) override final;
+    std::vector<CalllogTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<CalllogTableRow> getLimitOffsetByField(uint32_t offset,
                                                        uint32_t limit,
                                                        CalllogTableFields field,
                                                        const char *str) override final;
 
-    uint32_t GetCount() override final;
-    uint32_t GetCount(EntryState state);
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t count() override final;
+    uint32_t count(EntryState state);
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
     bool SetAllRead();
 
   private:

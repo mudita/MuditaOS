@@ -14,7 +14,7 @@ const char *CalllogDB::dbName = USER_PATH("calllog.db");
 CalllogDB::CalllogDB() : Database(dbName), calls(this)
 {
 
-    if (calls.Create() == false)
+    if (calls.create() == false)
         return;
     isInitialized = true;
 }

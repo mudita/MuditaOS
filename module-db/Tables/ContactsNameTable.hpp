@@ -40,26 +40,26 @@ class ContactsNameTable : public Table<ContactsNameTableRow, ContactNameTableFie
 
     virtual ~ContactsNameTable();
 
-    bool Create() override final;
+    bool create() override final;
 
-    bool Add(ContactsNameTableRow entry) override final;
+    bool add(ContactsNameTableRow entry) override final;
 
-    bool RemoveByID(uint32_t id) override final;
+    bool removeById(uint32_t id) override final;
 
-    bool Update(ContactsNameTableRow entry) override final;
+    bool update(ContactsNameTableRow entry) override final;
 
-    ContactsNameTableRow GetByID(uint32_t id) override final;
+    ContactsNameTableRow getById(uint32_t id) override final;
 
-    std::vector<ContactsNameTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<ContactsNameTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsNameTableRow> GetLimitOffsetByField(uint32_t offset,
+    std::vector<ContactsNameTableRow> getLimitOffsetByField(uint32_t offset,
                                                             uint32_t limit,
                                                             ContactNameTableFields field,
                                                             const char *str) override final;
 
-    uint32_t GetCount() override final;
+    uint32_t count() override final;
 
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
     std::vector<ContactsNameTableRow> GetByName(const char *primaryName, const char *alternativeName);
 
