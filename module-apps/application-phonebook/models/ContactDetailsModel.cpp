@@ -52,19 +52,22 @@ void ContactDetailsModel::createData(bool showInformationWidget, bool showAddres
     }
 }
 
-void ContactDetailsModel::clearData()
-{
-    list->clear();
-
-    eraseInternalData();
-
-    createData();
-
-    requestRecords(0, internalData.size());
-}
-
 void ContactDetailsModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
 {
+    list->clear();
+    eraseInternalData();
+
+    auto isInformationDataExist = [&]() -> bool {
+        return contactRecord->primaryName.length() > 0 || contactRecord->alternativeName.length() > 0 ||
+               contactRecord->numbers.size() > 0 || contactRecord->mail.length() > 0;
+    };
+    auto isAddressDataExist = [&]() -> bool { return contactRecord->address.length() > 0; };
+    auto isNoteDataExist    = [&]() -> bool { return contactRecord->note.length() > 0; };
+
+    createData(isInformationDataExist(), isAddressDataExist(), isNoteDataExist());
+
+    requestRecords(0, internalData.size());
+
     for (auto item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback(contactRecord);
