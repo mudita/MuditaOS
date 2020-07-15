@@ -544,7 +544,12 @@ namespace app
     bool Application::popToWindow(const std::string &window)
     {
         if (window == gui::name::window::no_window) {
-            return false;
+            bool ret = false;
+            if (windowStack.size() <= 1) {
+                windowStack.clear();
+                ret = true;
+            }
+            return ret;
         }
 
         auto ret = std::find(windowStack.begin(), windowStack.end(), window);
