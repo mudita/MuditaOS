@@ -64,7 +64,8 @@ namespace gui
         auto requestingWindow  = switchData->requestingWindow;
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
             LOG_DEBUG("SMS template id = %" PRIu32 "chosen", templ->ID);
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(templ->text);
+            std::unique_ptr<gui::SwitchData> data =
+                std::make_unique<SMSTextData>(templ->text, SMSTextData::Concatenate::True);
             application->switchWindow(requestingWindow, std::move(data));
             return true;
         };
