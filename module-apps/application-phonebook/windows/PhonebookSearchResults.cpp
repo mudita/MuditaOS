@@ -29,13 +29,13 @@ namespace gui
         AppWindow::buildInterface();
 
         searchResultList = new gui::PhonebookListView(this,
-                                                      phonebookStyle::searchResults::searchResultList::x,
-                                                      phonebookStyle::searchResults::searchResultList::y,
-                                                      phonebookStyle::searchResults::searchResultList::w,
-                                                      phonebookStyle::searchResults::searchResultList::h,
+                                                      phonebookStyle::searchResultsWindow::searchResultList::x,
+                                                      phonebookStyle::searchResultsWindow::searchResultList::y,
+                                                      phonebookStyle::searchResultsWindow::searchResultList::w,
+                                                      phonebookStyle::searchResultsWindow::searchResultList::h,
                                                       searchResultsModel);
-        searchResultList->setPenFocusWidth(phonebookStyle::searchResults::searchResultList::penFocusWidth);
-        searchResultList->setPenWidth(phonebookStyle::searchResults::searchResultList::penWidth);
+        searchResultList->setPenFocusWidth(phonebookStyle::searchResultsWindow::searchResultList::penFocusWidth);
+        searchResultList->setPenWidth(phonebookStyle::searchResultsWindow::searchResultList::penWidth);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);

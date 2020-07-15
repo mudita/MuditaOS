@@ -22,11 +22,9 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
 
-      protected:
-        std::shared_ptr<ContactRecord> contact = nullptr;
-        ContactFlagsWidget *contactFlagsWidget = nullptr;
-
       private:
+        std::shared_ptr<ContactRecord> contact                   = nullptr;
+        ContactFlagsWidget *contactFlagsWidget                   = nullptr;
         std::shared_ptr<ContactDetailsModel> contactDetailsModel = nullptr;
         gui::ListView *bodyList                                  = nullptr;
     };

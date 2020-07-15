@@ -32,10 +32,10 @@ namespace gui
         setTitle(utils::localize.get("app_phonebook_contact_title"));
 
         list = new gui::ListView(this,
-                                 phonebookStyle::mainWindow::newContactsList::x,
-                                 phonebookStyle::mainWindow::newContactsList::y,
-                                 phonebookStyle::mainWindow::newContactsList::w,
-                                 phonebookStyle::mainWindow::newContactsList::h,
+                                 phonebookStyle::newContactWindow::newContactsList::x,
+                                 phonebookStyle::newContactWindow::newContactsList::y,
+                                 phonebookStyle::newContactWindow::newContactsList::w,
+                                 phonebookStyle::newContactWindow::newContactsList::h,
                                  newContactModel);
         setFocusItem(list);
     }

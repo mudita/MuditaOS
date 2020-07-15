@@ -1,6 +1,6 @@
 #pragma once
 #include <Style.hpp>
-#include "utf8/UTF8.hpp"
+#include <utf8/UTF8.hpp>
 
 namespace phonebookStyle
 {
@@ -49,7 +49,10 @@ namespace phonebookStyle
             constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
             constexpr uint32_t penWidth      = 0;
         } // namespace contactsList
+    }     // namespace mainWindow
 
+    namespace newContactWindow
+    {
         namespace newContactsList
         {
             constexpr uint32_t x = style::window::default_left_margin;
@@ -57,15 +60,33 @@ namespace phonebookStyle
             constexpr uint32_t w = style::listview::body_width_with_scroll;
             constexpr uint32_t h = style::window_height - y - style::footer::height;
         } // namespace newContactsList
-    }     // namespace mainWindow
+    }     // namespace newContactWindow
 
-    namespace contactDetailsList
+    namespace contactDetailsWindow
     {
-        constexpr uint32_t x = style::window::default_left_margin;
-        constexpr uint32_t y = style::header::height + 74;
-        constexpr uint32_t w = style::listview::body_width_with_scroll;
-        constexpr uint32_t h = style::window_height - y - style::footer::height;
-    } // namespace contactDetailsList
+        namespace contactDetailsList
+        {
+            constexpr uint32_t x = style::window::default_left_margin;
+            constexpr uint32_t y = style::header::height + 74;
+            constexpr uint32_t w = style::listview::body_width_with_scroll;
+            constexpr uint32_t h = style::window_height - y - style::footer::height;
+        } // namespace contactDetailsList
+    }     // namespace contactDetailsWindow
+
+    namespace searchResultsWindow
+    {
+        namespace searchResultList
+        {
+            constexpr uint32_t x = style::window::default_left_margin;
+            constexpr uint32_t y = style::header::height;
+            constexpr uint32_t w = style::listview::body_width_with_scroll;
+            constexpr uint32_t h = style::window_height - y - style::footer::height;
+
+            constexpr uint32_t pageSize      = 8;
+            constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
+            constexpr uint32_t penWidth      = 0;
+        } // namespace searchResultList
+    }     // namespace searchResultsWindow
 
     namespace contactItem
     {
@@ -74,15 +95,6 @@ namespace phonebookStyle
         constexpr uint32_t left_margin = 10;
         const UTF8 favourites_string   = "Favourites";
     } // namespace contactItem
-
-    namespace inputLineWithLabelItem
-    {
-        constexpr uint32_t w             = style::window::default_body_width;
-        constexpr uint32_t h             = 75;
-        constexpr uint32_t title_label_h = 20;
-        constexpr uint32_t input_text_h  = 33;
-        constexpr uint32_t span_size     = 100;
-    } // namespace inputLineWithLabelItem
 
     namespace inputBoxWithLabelAndIconItem
     {
@@ -106,18 +118,22 @@ namespace phonebookStyle
 
     } // namespace inputBoxWithLabelAndIconItem
 
-    namespace searchResults
+    namespace inputLineWithLabelItem
     {
-        namespace searchResultList
-        {
-            constexpr uint32_t x = style::window::default_left_margin;
-            constexpr uint32_t y = style::header::height;
-            constexpr uint32_t w = style::listview::body_width_with_scroll;
-            constexpr uint32_t h = style::window_height - y - style::footer::height;
+        constexpr uint32_t w             = style::window::default_body_width;
+        constexpr uint32_t h             = 75;
+        constexpr uint32_t title_label_h = 20;
+        constexpr uint32_t input_text_h  = 33;
+        constexpr uint32_t span_size     = 100;
+    } // namespace inputLineWithLabelItem
 
-            constexpr uint32_t pageSize      = 8;
-            constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
-            constexpr uint32_t penWidth      = 0;
-        } // namespace searchResultList
-    }     // namespace searchResults
+    namespace multiLineTextWithLabelItem
+    {
+        constexpr uint32_t w             = style::window::default_body_width;
+        constexpr uint32_t h             = 75;
+        constexpr uint32_t title_label_h = 20;
+        constexpr uint32_t input_text_h  = 33;
+        constexpr uint32_t span_size     = 100;
+    } // namespace multiLineTextWithLabelItem
+
 } // namespace phonebookStyle

@@ -11,8 +11,8 @@ namespace gui
     MultiLineTextWithLabelItem::MultiLineTextWithLabelItem(phonebookInternals::ListItemName listItemName)
         : listItemName(listItemName)
     {
-        setMinimumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
-        setMaximumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
+        setMinimumSize(phonebookStyle::multiLineTextWithLabelItem::w, phonebookStyle::multiLineTextWithLabelItem::h);
+        setMaximumSize(phonebookStyle::multiLineTextWithLabelItem::w, phonebookStyle::multiLineTextWithLabelItem::h);
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
@@ -25,9 +25,9 @@ namespace gui
         titleLabel->setLineMode(true);
         titleLabel->activeItem = false;
 
-        new gui::Span(vBox, Axis::Y, phonebookStyle::inputLineWithLabelItem::span_size); // spread title & multilineText
+        new gui::Span(vBox, Axis::Y, phonebookStyle::multiLineTextWithLabelItem::span_size); // spread title & multilineText
 
-        multilineText = new Text(vBox, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::input_text_h);
+        multilineText = new Text(vBox, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
         multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         multilineText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         multilineText->setFont(style::window::font::medium);
@@ -51,8 +51,8 @@ namespace gui
         vBox->setSize(newDim.w, newDim.h);
 
         // this shouldn't be needed - without it there will be nothing shown in place of digit labels
-        titleLabel->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::title_label_h);
-        multilineText->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::input_text_h);
+        titleLabel->setSize(newDim.w, phonebookStyle::multiLineTextWithLabelItem::title_label_h);
+        multilineText->setSize(newDim.w, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
         return true;
     }
 
