@@ -73,10 +73,10 @@ NotesTableRow NotesTable::getById(uint32_t id)
     }
 
     return NotesTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // date
-        (*retQuery)[2].GetString(), // snippet
-        (*retQuery)[3].GetString(), // path
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // date
+        (*retQuery)[2].getString(), // snippet
+        (*retQuery)[3].getString(), // path
     };
 }
 
@@ -92,10 +92,10 @@ std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t 
 
     do {
         ret.push_back(NotesTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // date
-            (*retQuery)[2].GetString(), // snippet
-            (*retQuery)[3].GetString(), // path
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // date
+            (*retQuery)[2].getString(), // snippet
+            (*retQuery)[3].getString(), // path
         });
     } while (retQuery->nextRow());
 
@@ -134,10 +134,10 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(uint32_t offset,
 
     do {
         ret.push_back(NotesTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // date
-            (*retQuery)[2].GetString(), // snippet
-            (*retQuery)[3].GetString(), // path
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // date
+            (*retQuery)[2].getString(), // snippet
+            (*retQuery)[3].getString(), // path
         });
     } while (retQuery->nextRow());
 
@@ -152,7 +152,7 @@ uint32_t NotesTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t NotesTable::countByFieldId(const char *field, uint32_t id)
@@ -163,5 +163,5 @@ uint32_t NotesTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }

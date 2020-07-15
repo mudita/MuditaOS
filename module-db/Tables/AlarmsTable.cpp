@@ -82,11 +82,11 @@ AlarmsTableRow AlarmsTable::getById(uint32_t id)
     }
 
     return AlarmsTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // time
-        (*retQuery)[2].GetUInt32(), // snooze
-        (*retQuery)[3].GetUInt32(), // status
-        (*retQuery)[4].GetString(), // path
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // time
+        (*retQuery)[2].getUInt32(), // snooze
+        (*retQuery)[3].getUInt32(), // status
+        (*retQuery)[4].getString(), // path
     };
 }
 
@@ -102,11 +102,11 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffset(uint32_t offset, uint32_
 
     do {
         ret.push_back(AlarmsTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // time
-            (*retQuery)[2].GetUInt32(), // snooze
-            (*retQuery)[3].GetUInt32(), // status
-            (*retQuery)[4].GetString(), // path
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // time
+            (*retQuery)[2].getUInt32(), // snooze
+            (*retQuery)[3].getUInt32(), // status
+            (*retQuery)[4].getString(), // path
         });
     } while (retQuery->nextRow());
 
@@ -148,11 +148,11 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
 
     do {
         ret.push_back(AlarmsTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // time
-            (*retQuery)[2].GetUInt32(), // snooze
-            (*retQuery)[3].GetUInt32(), // status
-            (*retQuery)[4].GetString(), // path
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // time
+            (*retQuery)[2].getUInt32(), // snooze
+            (*retQuery)[3].getUInt32(), // status
+            (*retQuery)[4].getString(), // path
         });
     } while (retQuery->nextRow());
 
@@ -167,7 +167,7 @@ uint32_t AlarmsTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
@@ -178,7 +178,7 @@ uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 AlarmsTableRow AlarmsTable::GetNext(time_t time)
@@ -190,10 +190,10 @@ AlarmsTableRow AlarmsTable::GetNext(time_t time)
     }
 
     return AlarmsTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // time
-        (*retQuery)[2].GetUInt32(), // snooze
-        (*retQuery)[3].GetUInt32(), // status
-        (*retQuery)[4].GetString(), // path
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // time
+        (*retQuery)[2].getUInt32(), // snooze
+        (*retQuery)[3].getUInt32(), // status
+        (*retQuery)[4].getString(), // path
     };
 }

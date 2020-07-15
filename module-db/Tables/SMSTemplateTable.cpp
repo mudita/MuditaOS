@@ -53,9 +53,9 @@ SMSTemplateTableRow SMSTemplateTable::getById(uint32_t id)
     }
 
     return SMSTemplateTableRow{
-        (*retQuery)[0].GetUInt32(),                      // ID
-        (*retQuery)[1].GetString(),                      // text
-        static_cast<time_t>((*retQuery)[2].GetUInt64()), // lastUsageTimestamp
+        (*retQuery)[0].getUInt32(),                      // ID
+        (*retQuery)[1].getString(),                      // text
+        static_cast<time_t>((*retQuery)[2].getUInt64()), // lastUsageTimestamp
     };
 }
 
@@ -74,9 +74,9 @@ std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffset(uint32_t offse
 
     do {
         ret.push_back(SMSTemplateTableRow{
-            (*retQuery)[0].GetUInt32(),                      // ID
-            (*retQuery)[1].GetString(),                      // text
-            static_cast<time_t>((*retQuery)[2].GetUInt64()), // lastUsageTimestamp
+            (*retQuery)[0].getUInt32(),                      // ID
+            (*retQuery)[1].getString(),                      // text
+            static_cast<time_t>((*retQuery)[2].getUInt64()), // lastUsageTimestamp
         });
     } while (retQuery->nextRow());
 
@@ -100,7 +100,7 @@ uint32_t SMSTemplateTable::count()
         return 0;
     }
 
-    return (*queryRet)[0].GetUInt32();
+    return (*queryRet)[0].getUInt32();
 }
 
 uint32_t SMSTemplateTable::countByFieldId(const char *field, uint32_t id)
@@ -111,5 +111,5 @@ uint32_t SMSTemplateTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return (*queryRet)[0].GetUInt32();
+    return (*queryRet)[0].getUInt32();
 }

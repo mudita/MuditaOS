@@ -84,14 +84,14 @@ SMSTableRow SMSTable::getById(uint32_t id)
     }
 
     return SMSTableRow{
-        (*retQuery)[0].GetUInt32(),                       // ID
-        (*retQuery)[1].GetUInt32(),                       // threadID
-        (*retQuery)[2].GetUInt32(),                       // contactID
-        (*retQuery)[3].GetUInt32(),                       // date
-        (*retQuery)[4].GetUInt32(),                       // dateSent
-        (*retQuery)[5].GetUInt32(),                       // errorCode
-        (*retQuery)[6].GetString(),                       // body
-        static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
+        (*retQuery)[0].getUInt32(),                       // ID
+        (*retQuery)[1].getUInt32(),                       // threadID
+        (*retQuery)[2].getUInt32(),                       // contactID
+        (*retQuery)[3].getUInt32(),                       // date
+        (*retQuery)[4].getUInt32(),                       // dateSent
+        (*retQuery)[5].getUInt32(),                       // errorCode
+        (*retQuery)[6].getString(),                       // body
+        static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
     };
 }
 
@@ -107,14 +107,14 @@ std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limi
 
     do {
         ret.push_back(SMSTableRow{
-            (*retQuery)[0].GetUInt32(),                       // ID
-            (*retQuery)[1].GetUInt32(),                       // threadID
-            (*retQuery)[2].GetUInt32(),                       // contactID
-            (*retQuery)[3].GetUInt32(),                       // date
-            (*retQuery)[4].GetUInt32(),                       // dateSent
-            (*retQuery)[5].GetUInt32(),                       // errorCode
-            (*retQuery)[6].GetString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // threadID
+            (*retQuery)[2].getUInt32(),                       // contactID
+            (*retQuery)[3].getUInt32(),                       // date
+            (*retQuery)[4].getUInt32(),                       // dateSent
+            (*retQuery)[5].getUInt32(),                       // errorCode
+            (*retQuery)[6].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -156,14 +156,14 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
 
     do {
         ret.push_back(SMSTableRow{
-            (*retQuery)[0].GetUInt32(),                       // ID
-            (*retQuery)[1].GetUInt32(),                       // threadID
-            (*retQuery)[2].GetUInt32(),                       // contactID
-            (*retQuery)[3].GetUInt32(),                       // date
-            (*retQuery)[4].GetUInt32(),                       // dateSent
-            (*retQuery)[5].GetUInt32(),                       // errorCode
-            (*retQuery)[6].GetString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // threadID
+            (*retQuery)[2].getUInt32(),                       // contactID
+            (*retQuery)[3].getUInt32(),                       // date
+            (*retQuery)[4].getUInt32(),                       // dateSent
+            (*retQuery)[5].getUInt32(),                       // errorCode
+            (*retQuery)[6].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -178,7 +178,7 @@ uint32_t SMSTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
@@ -189,5 +189,5 @@ uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }

@@ -20,13 +20,13 @@ CodesTableRow CountryCodesTable::GetByMCC(uint32_t mcc)
     }
 
     return CodesTableRow{
-        (*retQuery)[0].GetUInt32(), /* _id */
-        (*retQuery)[1].GetUInt32(), /* mcc */
-        (*retQuery)[2].GetUInt32(), /* mnc */
-        (*retQuery)[3].GetString(), /* iso */
-        (*retQuery)[4].GetString(), /* country name */
-        (*retQuery)[5].GetUInt32(), /* country code */
-        (*retQuery)[5].GetString()  /* network name */
+        (*retQuery)[0].getUInt32(), /* _id */
+        (*retQuery)[1].getUInt32(), /* mcc */
+        (*retQuery)[2].getUInt32(), /* mnc */
+        (*retQuery)[3].getString(), /* iso */
+        (*retQuery)[4].getString(), /* country name */
+        (*retQuery)[5].getUInt32(), /* country code */
+        (*retQuery)[5].getString()  /* network name */
     };
 }
 
@@ -38,5 +38,5 @@ uint32_t CountryCodesTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }

@@ -64,13 +64,13 @@ ThreadsTableRow ThreadsTable::getById(uint32_t id)
     }
 
     return ThreadsTableRow{
-        (*retQuery)[0].GetUInt32(),                       // ID
-        (*retQuery)[1].GetUInt32(),                       // date
-        (*retQuery)[2].GetUInt32(),                       // msgCount
-        (*retQuery)[3].GetUInt32(),                       // unreadMsgCount
-        (*retQuery)[4].GetUInt32(),                       // contactID
-        (*retQuery)[5].GetString(),                       // snippet
-        static_cast<SMSType>((*retQuery)[6].GetUInt32()), // type/last-dir
+        (*retQuery)[0].getUInt32(),                       // ID
+        (*retQuery)[1].getUInt32(),                       // date
+        (*retQuery)[2].getUInt32(),                       // msgCount
+        (*retQuery)[3].getUInt32(),                       // unreadMsgCount
+        (*retQuery)[4].getUInt32(),                       // contactID
+        (*retQuery)[5].getString(),                       // snippet
+        static_cast<SMSType>((*retQuery)[6].getUInt32()), // type/last-dir
     };
 }
 
@@ -78,13 +78,13 @@ void fillRetQuery(std::vector<ThreadsTableRow> &ret, const std::unique_ptr<Query
 {
     do {
         ret.push_back(ThreadsTableRow{
-            (*retQuery)[0].GetUInt32(),                       // ID
-            (*retQuery)[1].GetUInt32(),                       // date
-            (*retQuery)[2].GetUInt32(),                       // msgCount
-            (*retQuery)[3].GetUInt32(),                       // unreadMsgCount
-            (*retQuery)[4].GetUInt32(),                       // contactID
-            (*retQuery)[5].GetString(),                       // snippet
-            static_cast<SMSType>((*retQuery)[6].GetUInt32()), // type/last-dir
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // date
+            (*retQuery)[2].getUInt32(),                       // msgCount
+            (*retQuery)[3].getUInt32(),                       // unreadMsgCount
+            (*retQuery)[4].getUInt32(),                       // contactID
+            (*retQuery)[5].getString(),                       // snippet
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type/last-dir
         });
     } while (retQuery->nextRow());
 }
@@ -169,7 +169,7 @@ uint32_t ThreadsTable::count(EntryState state)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t ThreadsTable::countByFieldId(const char *field, uint32_t id)
@@ -180,7 +180,7 @@ uint32_t ThreadsTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(std::string text,
@@ -189,7 +189,7 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
 {
     auto ret       = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
     auto count_ret = db->query("SELECT COUNT (*) from sms WHERE sms.body like \'%%%q%%\'", text.c_str());
-    ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].GetUInt32();
+    ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].getUInt32();
     if (ret.first != 0) {
         auto retQuery =
             db->query("SELECT * from sms WHERE sms.body like \'%%%q%%\' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
@@ -198,13 +198,13 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                       offset);
         do {
             ret.second.push_back(ThreadsTableRow{
-                .ID             = (*retQuery)[0].GetUInt32(),
-                .date           = (*retQuery)[3].GetUInt32(),
+                .ID             = (*retQuery)[0].getUInt32(),
+                .date           = (*retQuery)[3].getUInt32(),
                 .msgCount       = 0,
                 .unreadMsgCount = 0,
-                .contactID      = (*retQuery)[2].GetUInt32(),
-                .snippet        = (*retQuery)[6].GetString(),
-                .type           = static_cast<SMSType>((*retQuery)[7].GetUInt32()),
+                .contactID      = (*retQuery)[2].getUInt32(),
+                .snippet        = (*retQuery)[6].getString(),
+                .type           = static_cast<SMSType>((*retQuery)[7].getUInt32()),
             });
         } while (retQuery->nextRow());
     }
