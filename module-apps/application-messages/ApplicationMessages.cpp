@@ -245,7 +245,13 @@ namespace app
         SMSRecord record;
         record.number = number;
         record.body   = body;
+#if defined(TARGET_Linux) && not defined(SERIAL_PORT)
+        // pick random message type for testing purposes
+        std::array types{SMSType::FAILED, SMSType::INBOX, SMSType::OUTBOX, SMSType::QUEUED};
+        record.type = types[(rand() % types.size())];
+#else
         record.type   = SMSType::QUEUED;
+#endif
         auto time     = utils::time::Timestamp();
         record.date   = time.getTime();
         return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
