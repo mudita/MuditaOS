@@ -68,7 +68,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     localRec.name      = contactRec->getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
-    return calllogDB->calls.Add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
+    return calllogDB->calls.add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
                                                 .number       = localRec.phoneNumber.getEntered(),
                                                 .e164number   = localRec.phoneNumber.getE164(),
                                                 .presentation = localRec.presentation,
@@ -110,7 +110,7 @@ ContactRecord CalllogRecordInterface::GetContactRecordByID(const UTF8 &contactId
 
 std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto calls = calllogDB->calls.GetLimitOffset(offset, limit);
+    auto calls = calllogDB->calls.getLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<CalllogRecord>>();
 
@@ -131,12 +131,12 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 bool CalllogRecordInterface::Update(const CalllogRecord &rec)
 {
 
-    auto call = calllogDB->calls.GetByID(rec.ID);
+    auto call = calllogDB->calls.getById(rec.ID);
     if (call.ID == DB_ID_NONE) {
         return false;
     }
 
-    return calllogDB->calls.Update(CalllogTableRow{{.ID = rec.ID},
+    return calllogDB->calls.update(CalllogTableRow{{.ID = rec.ID},
                                                    .number       = rec.phoneNumber.getEntered(),
                                                    .e164number   = rec.phoneNumber.getE164(),
                                                    .presentation = rec.presentation,
@@ -151,12 +151,12 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
 bool CalllogRecordInterface::RemoveByID(uint32_t id)
 {
 
-    auto call = calllogDB->calls.GetByID(id);
+    auto call = calllogDB->calls.getById(id);
     if (call.ID == 0) {
         return false;
     }
 
-    return calllogDB->calls.RemoveByID(id);
+    return calllogDB->calls.removeById(id);
 }
 
 bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char *str)
@@ -164,9 +164,9 @@ bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char 
 
     switch (field) {
     case CalllogRecordField::DATE:
-        return calllogDB->calls.RemoveByField(CalllogTableFields::DATE, str);
+        return calllogDB->calls.removeByField(CalllogTableFields::DATE, str);
     case CalllogRecordField::TYPE:
-        return calllogDB->calls.RemoveByField(CalllogTableFields::TYPE, str);
+        return calllogDB->calls.removeByField(CalllogTableFields::TYPE, str);
     default:
         return false;
     }
@@ -174,7 +174,7 @@ bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char 
 
 CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
 {
-    auto call = calllogDB->calls.GetByID(id);
+    auto call = calllogDB->calls.getById(id);
 
     auto contactRec = GetContactRecordByID(call.contactId);
     if (contactRec.ID == DB_ID_NONE) {
@@ -189,7 +189,7 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
 
 uint32_t CalllogRecordInterface::GetCount(EntryState state)
 {
-    return calllogDB->calls.GetCount(state);
+    return calllogDB->calls.count(state);
 }
 
 uint32_t CalllogRecordInterface::GetCount()

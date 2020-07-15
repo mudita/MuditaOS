@@ -14,11 +14,11 @@ const char *SmsDB::dbName = USER_PATH("sms.db");
 
 SmsDB::SmsDB() : Database(dbName), sms(this), threads(this), templates(this)
 {
-    if (sms.Create() == false)
+    if (sms.create() == false)
         return;
-    if (threads.Create() == false)
+    if (threads.create() == false)
         return;
-    if (templates.Create() == false)
+    if (templates.create() == false)
         return;
 
     isInitialized = true;

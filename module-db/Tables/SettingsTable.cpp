@@ -16,7 +16,7 @@ SettingsTable::SettingsTable(Database *db) : Table(db)
 SettingsTable::~SettingsTable()
 {}
 
-bool SettingsTable::Create()
+bool SettingsTable::create()
 {
     bool ret = true;
     ret      = db->Execute(createTableQuery);
@@ -28,7 +28,7 @@ bool SettingsTable::Create()
     return ret;
 }
 
-SettingsTableRow SettingsTable::GetByID(uint32_t id)
+SettingsTableRow SettingsTable::getById(uint32_t id)
 {
 
     auto retQuery = db->Query("SELECT * FROM settings WHERE _id= 1;");
@@ -59,7 +59,7 @@ SettingsTableRow SettingsTable::GetByID(uint32_t id)
     };
 }
 
-bool SettingsTable::Update(SettingsTableRow entry)
+bool SettingsTable::update(SettingsTableRow entry)
 {
     return db->Execute("UPDATE settings SET time_format_12 = %lu, time_auto = %lu, time_date_format = %lu "
                        ",brightness_auto = %lu, brightness_level = %lu, "
@@ -84,23 +84,23 @@ bool SettingsTable::Update(SettingsTableRow entry)
                        entry.language);
 }
 
-bool SettingsTable::Add(SettingsTableRow entry)
+bool SettingsTable::add(SettingsTableRow entry)
 {
     // dummy
     return true;
 }
 
-bool SettingsTable::RemoveByID(uint32_t id)
+bool SettingsTable::removeById(uint32_t id)
 {
     return true;
 }
 
-std::vector<SettingsTableRow> SettingsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<SettingsTableRow> SettingsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     return std::vector<SettingsTableRow>{};
 }
 
-std::vector<SettingsTableRow> SettingsTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<SettingsTableRow> SettingsTable::getLimitOffsetByField(uint32_t offset,
                                                                    uint32_t limit,
                                                                    SettingsTableFields field,
                                                                    const char *str)
@@ -108,12 +108,12 @@ std::vector<SettingsTableRow> SettingsTable::GetLimitOffsetByField(uint32_t offs
     return std::vector<SettingsTableRow>{};
 }
 
-uint32_t SettingsTable::GetCount()
+uint32_t SettingsTable::count()
 {
     return 0;
 }
 
-uint32_t SettingsTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t SettingsTable::countByFieldId(const char *field, uint32_t id)
 {
     return 0;
 }

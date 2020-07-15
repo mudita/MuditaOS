@@ -16,12 +16,12 @@ CalllogTable::CalllogTable(Database *db) : Table(db)
 CalllogTable::~CalllogTable()
 {}
 
-bool CalllogTable::Create()
+bool CalllogTable::create()
 {
     return db->Execute(createTableQuery);
 }
 
-bool CalllogTable::Add(CalllogTableRow entry)
+bool CalllogTable::add(CalllogTableRow entry)
 {
     return db->Execute(
         "INSERT or ignore INTO calls (number, e164number, presentation, date, duration, type, name, contactId, "
@@ -37,17 +37,17 @@ bool CalllogTable::Add(CalllogTableRow entry)
         entry.isRead);
 }
 
-bool CalllogTable::RemoveByID(uint32_t id)
+bool CalllogTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM calls where _id = %lu;", id);
 }
 
-bool CalllogTable::RemoveByField(CalllogTableFields field, const char *str)
+bool CalllogTable::removeByField(CalllogTableFields field, const char *str)
 {
     return false; // not implemented // TODO: alek: check this
 }
 
-bool CalllogTable::Update(CalllogTableRow entry)
+bool CalllogTable::update(CalllogTableRow entry)
 {
     return db->Execute("UPDATE calls SET number = '%q', e164number = '%q', presentation = %lu, date = %lu, duration = "
                        "%lu, type = %lu, "
@@ -65,7 +65,7 @@ bool CalllogTable::Update(CalllogTableRow entry)
                        entry.ID);
 }
 
-CalllogTableRow CalllogTable::GetByID(uint32_t id)
+CalllogTableRow CalllogTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM calls WHERE _id= %u;", id);
 
@@ -87,7 +87,7 @@ CalllogTableRow CalllogTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<CalllogTableRow> CalllogTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from calls ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
@@ -115,7 +115,7 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffset(uint32_t offset, uint3
     return ret;
 }
 
-std::vector<CalllogTableRow> CalllogTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset,
                                                                  uint32_t limit,
                                                                  CalllogTableFields field,
                                                                  const char *str)
@@ -160,7 +160,7 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffsetByField(uint32_t offset
     return ret;
 }
 
-uint32_t CalllogTable::GetCount(EntryState state)
+uint32_t CalllogTable::count(EntryState state)
 {
     std::string query = "SELECT COUNT(*) FROM calls ";
     switch (state) {
@@ -184,12 +184,12 @@ uint32_t CalllogTable::GetCount(EntryState state)
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t CalllogTable::GetCount()
+uint32_t CalllogTable::count()
 {
-    return GetCount(EntryState::ALL);
+    return count(EntryState::ALL);
 }
 
-uint32_t CalllogTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM calls WHERE %q=%lu;", field, id);
 

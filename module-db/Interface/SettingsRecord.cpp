@@ -32,7 +32,7 @@ SettingsRecordInterface::~SettingsRecordInterface()
 SettingsRecord SettingsRecordInterface::GetByID(uint32_t id)
 {
 
-    auto rec = settingsDB->settings.GetByID(1);
+    auto rec = settingsDB->settings.getById(1);
 
     return SettingsRecord{.dbID            = rec.ID,
                           .timeFormat12    = rec.timeFormat12,
@@ -56,7 +56,7 @@ SettingsRecord SettingsRecordInterface::GetByID(uint32_t id)
 bool SettingsRecordInterface::Update(const SettingsRecord &rec)
 {
 
-    return settingsDB->settings.Update(SettingsTableRow{.ID              = rec.dbID,
+    return settingsDB->settings.update(SettingsTableRow{.ID              = rec.dbID,
                                                         .timeFormat12    = rec.timeFormat12,
                                                         .timeAuto        = rec.timeAuto,
                                                         .timeDateFormat  = rec.timeDateFormat,

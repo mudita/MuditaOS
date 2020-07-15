@@ -13,7 +13,7 @@ const char *AlarmsDB::dbName = USER_PATH("alarms.db");
 AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
 {
 
-    if (alarms.Create() == false)
+    if (alarms.create() == false)
         return;
 
     isInitialized = true;

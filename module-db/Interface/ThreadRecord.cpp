@@ -13,7 +13,7 @@ ThreadRecordInterface::~ThreadRecordInterface()
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.Add(ThreadsTableRow{.date           = rec.date,
+    auto ret = smsDB->threads.add(ThreadsTableRow{.date           = rec.date,
                                                   .msgCount       = rec.msgCount,
                                                   .unreadMsgCount = rec.unreadMsgCount,
                                                   .contactID      = rec.contactID,
@@ -26,7 +26,7 @@ bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 bool ThreadRecordInterface::RemoveByID(uint32_t id)
 {
 
-    auto ret = smsDB->threads.RemoveByID(id);
+    auto ret = smsDB->threads.removeById(id);
     if (ret == false) {
         return false;
     }
@@ -37,7 +37,7 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.Update(ThreadsTableRow{.ID             = rec.ID,
+    return smsDB->threads.update(ThreadsTableRow{.ID             = rec.ID,
                                                  .date           = rec.date,
                                                  .msgCount       = rec.msgCount,
                                                  .unreadMsgCount = rec.unreadMsgCount,
@@ -50,12 +50,12 @@ bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 
 uint32_t ThreadRecordInterface::GetCount()
 {
-    return smsDB->threads.GetCount();
+    return smsDB->threads.count();
 }
 
 uint32_t ThreadRecordInterface::GetCount(EntryState state)
 {
-    return smsDB->threads.GetCount(state);
+    return smsDB->threads.count(state);
 }
 
 bool markAsRead();
@@ -64,7 +64,7 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 {
     auto records = std::make_unique<std::vector<ThreadRecord>>();
 
-    auto ret = smsDB->threads.GetLimitOffset(offset, limit);
+    auto ret = smsDB->threads.getLimitOffset(offset, limit);
 
     for (const auto &w : ret) {
         records->push_back(w);
@@ -82,7 +82,7 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 
     switch (field) {
     case ThreadRecordField::ContactID: {
-        auto ret = smsDB->threads.GetLimitOffsetByField(offset, limit, ThreadsTableFields::ContactID, str);
+        auto ret = smsDB->threads.getLimitOffsetByField(offset, limit, ThreadsTableFields::ContactID, str);
 
         for (const auto &w : ret) {
             records->push_back(w);
@@ -96,7 +96,7 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 ThreadRecord ThreadRecordInterface::GetByID(uint32_t id)
 {
 
-    auto rec = smsDB->threads.GetByID(id);
+    auto rec = smsDB->threads.getById(id);
     if (rec.ID == 0) {
         return ThreadRecord();
     }
@@ -107,7 +107,7 @@ ThreadRecord ThreadRecordInterface::GetByID(uint32_t id)
 ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
 {
     auto ret =
-        smsDB->threads.GetLimitOffsetByField(0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
+        smsDB->threads.getLimitOffsetByField(0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
     if (ret.size() == 0) {
         ThreadRecord re;
         re.contactID = contact_id;
@@ -116,7 +116,7 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
             assert(0);
         }
 
-        ret = smsDB->threads.GetLimitOffsetByField(
+        ret = smsDB->threads.getLimitOffsetByField(
             0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
     }
     ThreadRecord a = ret[0];

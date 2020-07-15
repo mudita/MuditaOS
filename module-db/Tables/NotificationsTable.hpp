@@ -23,17 +23,17 @@ class NotificationsTable : public Table<NotificationsTableRow, NotificationsTabl
     NotificationsTable(Database *db);
     virtual ~NotificationsTable() = default;
 
-    bool Create() override final;
-    bool Add(NotificationsTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(NotificationsTableFields field, const char *str) override final;
-    bool Update(NotificationsTableRow entry) override final;
-    NotificationsTableRow GetByID(uint32_t id) override final;
+    bool create() override final;
+    bool add(NotificationsTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    bool removeByField(NotificationsTableFields field, const char *str) override final;
+    bool update(NotificationsTableRow entry) override final;
+    NotificationsTableRow getById(uint32_t id) override final;
     NotificationsTableRow GetByKey(uint32_t key);
-    uint32_t GetCount() override final;
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
-    std::vector<NotificationsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<NotificationsTableRow> GetLimitOffsetByField(uint32_t offset,
+    uint32_t count() override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
+    std::vector<NotificationsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<NotificationsTableRow> getLimitOffsetByField(uint32_t offset,
                                                              uint32_t limit,
                                                              NotificationsTableFields field,
                                                              const char *str) override final;

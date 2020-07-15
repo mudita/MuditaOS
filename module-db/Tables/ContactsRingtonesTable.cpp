@@ -16,24 +16,24 @@ ContactsRingtonesTable::ContactsRingtonesTable(Database *db) : Table(db)
 ContactsRingtonesTable::~ContactsRingtonesTable()
 {}
 
-bool ContactsRingtonesTable::Create()
+bool ContactsRingtonesTable::create()
 {
     return db->Execute(createTableQuery);
 }
 
-bool ContactsRingtonesTable::Add(ContactsRingtonesTableRow entry)
+bool ContactsRingtonesTable::add(ContactsRingtonesTableRow entry)
 {
     return db->Execute("insert or ignore into contact_ringtones (contact_id, asset_path ) VALUES (%lu, '%q');",
                        entry.contactID,
                        entry.assetPath.c_str());
 }
 
-bool ContactsRingtonesTable::RemoveByID(uint32_t id)
+bool ContactsRingtonesTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM contact_ringtones where _id = %u;", id);
 }
 
-bool ContactsRingtonesTable::Update(ContactsRingtonesTableRow entry)
+bool ContactsRingtonesTable::update(ContactsRingtonesTableRow entry)
 {
     return db->Execute("UPDATE contact_ringtones SET contact_id = %lu, asset_path = '%q' WHERE _id=%lu;",
                        entry.contactID,
@@ -41,7 +41,7 @@ bool ContactsRingtonesTable::Update(ContactsRingtonesTableRow entry)
                        entry.ID);
 }
 
-ContactsRingtonesTableRow ContactsRingtonesTable::GetByID(uint32_t id)
+ContactsRingtonesTableRow ContactsRingtonesTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM contact_ringtones WHERE _id= %lu;", id);
 
@@ -56,7 +56,7 @@ ContactsRingtonesTableRow ContactsRingtonesTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery =
         db->Query("SELECT * from contact_ringtones ORDER BY contact_id LIMIT %lu OFFSET %lu;", limit, offset);
@@ -78,7 +78,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffset(ui
     return ret;
 }
 
-std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffsetByField(uint32_t offset,
                                                                                      uint32_t limit,
                                                                                      ContactRingtonesTableFields field,
                                                                                      const char *str)
@@ -115,7 +115,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffsetByF
     return ret;
 }
 
-uint32_t ContactsRingtonesTable::GetCount()
+uint32_t ContactsRingtonesTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contact_ringtones;");
 
@@ -126,7 +126,7 @@ uint32_t ContactsRingtonesTable::GetCount()
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t ContactsRingtonesTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t ContactsRingtonesTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contact_ringtones WHERE %q=%lu;", field, id);
 

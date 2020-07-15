@@ -15,7 +15,7 @@ const char *SettingsDB::dbName = USER_PATH("settings.db");
 SettingsDB::SettingsDB() : Database(dbName), settings(this)
 {
 
-    if (settings.Create() == false)
+    if (settings.create() == false)
         return;
 
     isInitialized = true;

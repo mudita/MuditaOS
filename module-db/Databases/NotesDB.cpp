@@ -14,7 +14,7 @@ const char *NotesDB::dbName = USER_PATH("notes.db");
 NotesDB::NotesDB() : Database(dbName), notes(this)
 {
 
-    if (notes.Create() == false)
+    if (notes.create() == false)
         return;
     isInitialized = true;
 }

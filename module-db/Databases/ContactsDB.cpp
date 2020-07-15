@@ -15,15 +15,15 @@ const char *ContactsDB::dbName = USER_PATH("contacts.db");
 ContactsDB::ContactsDB() : Database(dbName), contacts(this), name(this), number(this), ringtones(this), address(this)
 {
 
-    if (contacts.Create() == false)
+    if (contacts.create() == false)
         return;
-    if (name.Create() == false)
+    if (name.create() == false)
         return;
-    if (number.Create() == false)
+    if (number.create() == false)
         return;
-    if (ringtones.Create() == false)
+    if (ringtones.create() == false)
         return;
-    if (address.Create() == false)
+    if (address.create() == false)
         return;
 
     isInitialized = true;

@@ -7,12 +7,12 @@ ContactsTable::ContactsTable(Database *db) : Table(db)
 ContactsTable::~ContactsTable()
 {}
 
-bool ContactsTable::Create()
+bool ContactsTable::create()
 {
     return db->Execute(createTableQuery);
 }
 
-bool ContactsTable::Add(ContactsTableRow entry)
+bool ContactsTable::add(ContactsTableRow entry)
 {
     return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, whitelist, "
                        "blacklist, favourites, speeddial ) VALUES "
@@ -28,7 +28,7 @@ bool ContactsTable::Add(ContactsTableRow entry)
                        entry.speedDial.c_str());
 }
 
-bool ContactsTable::RemoveByID(uint32_t id)
+bool ContactsTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM contacts where _id = %u;", id);
 }
@@ -38,7 +38,7 @@ bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
     return db->Execute("UPDATE contacts SET blacklist=%lu WHERE _id=%lu", shouldBeBlocked ? 1 : 0, id);
 }
 
-bool ContactsTable::Update(ContactsTableRow entry)
+bool ContactsTable::update(ContactsTableRow entry)
 {
     return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, type "
                        "= %lu, whitelist = %lu, blacklist = %lu, "
@@ -55,7 +55,7 @@ bool ContactsTable::Update(ContactsTableRow entry)
                        entry.ID);
 }
 
-ContactsTableRow ContactsTable::GetByID(uint32_t id)
+ContactsTableRow ContactsTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM contacts WHERE _id= %lu;", id);
 
@@ -164,7 +164,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &
     return ids;
 }
 
-std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);
 
@@ -192,7 +192,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
     return ret;
 }
 
-std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offset,
                                                                    uint32_t limit,
                                                                    ContactTableFields field,
                                                                    const char *str)
@@ -240,7 +240,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offs
     return ret;
 }
 
-uint32_t ContactsTable::GetCount()
+uint32_t ContactsTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contacts;");
 
@@ -251,7 +251,7 @@ uint32_t ContactsTable::GetCount()
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t ContactsTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %q=%lu;", field, id);
 

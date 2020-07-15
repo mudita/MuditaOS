@@ -24,21 +24,21 @@ template <typename T, typename F> class Table
     virtual ~Table()
     {}
 
-    virtual bool Create()                = 0;
-    virtual bool Add(T entry)            = 0;
-    virtual bool RemoveByID(uint32_t id) = 0;
-    virtual bool RemoveByField(F field, const char *str)
+    virtual bool create()                = 0;
+    virtual bool add(T entry)            = 0;
+    virtual bool removeById(uint32_t id) = 0;
+    virtual bool removeByField(F field, const char *str)
     {
         return true;
     }
-    virtual bool Update(T entry)                                                                            = 0;
-    virtual T GetByID(uint32_t id)                                                                          = 0;
-    virtual std::vector<T> GetLimitOffset(uint32_t offset, uint32_t limit)                                  = 0;
-    virtual std::vector<T> GetLimitOffsetByField(uint32_t offset, uint32_t limit, F field, const char *str) = 0;
-    virtual uint32_t GetCount()                                                                             = 0;
-    virtual uint32_t GetCountByFieldID(const char *field, uint32_t id)                                      = 0;
+    virtual bool update(T entry)                                                                            = 0;
+    virtual T getById(uint32_t id)                                                                          = 0;
+    virtual std::vector<T> getLimitOffset(uint32_t offset, uint32_t limit)                                  = 0;
+    virtual std::vector<T> getLimitOffsetByField(uint32_t offset, uint32_t limit, F field, const char *str) = 0;
+    virtual uint32_t count()                                                                                = 0;
+    virtual uint32_t countByFieldId(const char *field, uint32_t id)                                         = 0;
 
-    uint32_t GetLastInsertRowID()
+    uint32_t getLastInsertRowId()
     {
         return db->GetLastInsertRowID();
     }
