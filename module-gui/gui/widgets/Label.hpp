@@ -47,7 +47,6 @@ namespace gui
         struct Label : public Rect
         {
             const UTF8 text;
-            Margins margins;
             Label(std::array<uint32_t, 4> xywh)
             {
                 operator()(xywh);
@@ -65,7 +64,6 @@ namespace gui
         uint32_t stringPixelWidth  = 0;
         Color textColor            = {0, 0};
         RawFont *font              = nullptr;
-        Margins margins            = {0, 0, 0, 0};
         bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
 
         // area specified in pixels occupied by text inside label space.
@@ -73,7 +71,7 @@ namespace gui
         BoundingBox textArea;
         // widgets to add line
         Rect *lineFront = nullptr;
-        Rect *lineBack = nullptr;
+        Rect *lineBack  = nullptr;
         void calculateDisplayText();
 
       private:
@@ -112,8 +110,8 @@ namespace gui
         virtual void clear();
         virtual const UTF8 &getText() const;
         virtual unsigned int getTextLength() const;
-        virtual void setAlignment(const Alignment &value) override;
-        virtual void setMargins(const Margins &margins);
+        void setAlignment(const Alignment &value) override;
+        void setMargins(const Margins &margins) override;
         void setEllipsis(gui::Ellipsis ellipsis);
         /**
          * @brief Defines if remaining area of the label has a horizontal line.

@@ -10,7 +10,10 @@
 ### Fixed
 * `[phonebook]` Fix wrong text label for back action.
 * `[sms]` Concatenated sms sending fixed.
+* `[sms]` Messages window margins fix.
+
 ### Other
+* `[Alignment]` Refactored Alignment and added support to BoxLayout. 
 
 ## [0.28.1] - 2020-07-10
 
