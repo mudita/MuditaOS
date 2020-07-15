@@ -9,12 +9,12 @@ ContactsTable::~ContactsTable()
 
 bool ContactsTable::create()
 {
-    return db->Execute(createTableQuery);
+    return db->execute(createTableQuery);
 }
 
 bool ContactsTable::add(ContactsTableRow entry)
 {
-    return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, whitelist, "
+    return db->execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, whitelist, "
                        "blacklist, favourites, speeddial ) VALUES "
                        "(%lu, '%q', %lu, %lu, %lu, %lu, %lu, %lu, '%q');",
                        entry.nameID,
@@ -30,17 +30,17 @@ bool ContactsTable::add(ContactsTableRow entry)
 
 bool ContactsTable::removeById(uint32_t id)
 {
-    return db->Execute("DELETE FROM contacts where _id = %u;", id);
+    return db->execute("DELETE FROM contacts where _id = %u;", id);
 }
 
 bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 {
-    return db->Execute("UPDATE contacts SET blacklist=%lu WHERE _id=%lu", shouldBeBlocked ? 1 : 0, id);
+    return db->execute("UPDATE contacts SET blacklist=%lu WHERE _id=%lu", shouldBeBlocked ? 1 : 0, id);
 }
 
 bool ContactsTable::update(ContactsTableRow entry)
 {
-    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, type "
+    return db->execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, type "
                        "= %lu, whitelist = %lu, blacklist = %lu, "
                        "favourites = %lu, speeddial = '%q' WHERE _id=%lu;",
                        entry.nameID,
@@ -57,7 +57,7 @@ bool ContactsTable::update(ContactsTableRow entry)
 
 ContactsTableRow ContactsTable::getById(uint32_t id)
 {
-    auto retQuery = db->Query("SELECT * FROM contacts WHERE _id= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contacts WHERE _id= %lu;", id);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ContactsTableRow();
@@ -107,7 +107,7 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
         q += "t3.number_e164 like '%%" + number + "%%'";
 
     LOG_DEBUG("query: \"%s\"", q.c_str());
-    auto retQuery = db->Query(q.c_str());
+    auto retQuery = db->query(q.c_str());
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
@@ -152,7 +152,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &
         query += " OFFSET " + std::to_string(offset);
     }
 
-    auto queryRet = db->Query(query.c_str());
+    auto queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return ids;
     }
@@ -166,7 +166,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &
 
 std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->Query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
@@ -210,7 +210,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
         return std::vector<ContactsTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contacts WHERE %q='%q' ORDER BY name_id LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->query("SELECT * from contacts WHERE %q='%q' ORDER BY name_id LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -242,7 +242,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
 
 uint32_t ContactsTable::count()
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contacts;");
+    auto queryRet = db->query("SELECT COUNT(*) FROM contacts;");
 
     if (queryRet->GetRowCount() == 0) {
         return 0;
@@ -253,7 +253,7 @@ uint32_t ContactsTable::count()
 
 uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contacts WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

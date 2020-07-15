@@ -27,7 +27,7 @@ class vfs vfs;
 TEST_CASE("Create and destroy simple database")
 {
 
-    Database::Initialize();
+    Database::initialize();
 
     SECTION("Create database")
     {
@@ -97,5 +97,5 @@ TEST_CASE("Create and destroy simple database")
         REQUIRE(vfs.fileExists(backupPathDB.c_str()) == true);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

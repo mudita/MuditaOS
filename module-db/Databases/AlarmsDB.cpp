@@ -16,7 +16,7 @@ AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
     if (alarms.create() == false)
         return;
 
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 AlarmsDB::~AlarmsDB()

@@ -11,7 +11,7 @@ NotificationsTable::NotificationsTable(Database *db) : Table(db)
 
 bool NotificationsTable::create()
 {
-    if (!db->Execute(createTableQuery)) {
+    if (!db->execute(createTableQuery)) {
         return false;
     }
 
@@ -27,12 +27,12 @@ bool NotificationsTable::create()
 
 bool NotificationsTable::add(NotificationsTableRow entry)
 {
-    return db->Execute("INSERT or IGNORE INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
+    return db->execute("INSERT or IGNORE INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
 }
 
 bool NotificationsTable::removeById(uint32_t id)
 {
-    return db->Execute("DELETE FROM notifications where _id = %lu;", id);
+    return db->execute("DELETE FROM notifications where _id = %lu;", id);
 }
 
 bool NotificationsTable::removeByField(NotificationsTableFields field, const char *str)
@@ -45,18 +45,18 @@ bool NotificationsTable::removeByField(NotificationsTableFields field, const cha
         break;
     }
 
-    return db->Execute("DELETE FROM notifications where %q = '%q';", fieldName.c_str(), str);
+    return db->execute("DELETE FROM notifications where %q = '%q';", fieldName.c_str(), str);
 }
 
 bool NotificationsTable::update(NotificationsTableRow entry)
 {
-    return db->Execute(
+    return db->execute(
         "UPDATE notifications SET key = %lu, value = %lu WHERE _id = %lu;", entry.key, entry.value, entry.ID);
 }
 
 NotificationsTableRow NotificationsTable::getById(uint32_t id)
 {
-    auto retQuery = db->Query("SELECT * FROM notifications WHERE _id= %u;", id);
+    auto retQuery = db->query("SELECT * FROM notifications WHERE _id= %u;", id);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return NotificationsTableRow();
@@ -74,7 +74,7 @@ NotificationsTableRow NotificationsTable::getById(uint32_t id)
 
 NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
 {
-    auto retQuery = db->Query("SELECT * FROM notifications WHERE key= %u;", key);
+    auto retQuery = db->query("SELECT * FROM notifications WHERE key= %u;", key);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return NotificationsTableRow();
@@ -91,7 +91,7 @@ NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
 
 std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->Query("SELECT * from notifications LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from notifications LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<NotificationsTableRow>();
@@ -122,7 +122,7 @@ std::vector<NotificationsTableRow> NotificationsTable::getLimitOffsetByField(uin
 
 uint32_t NotificationsTable::count()
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM notifications;");
+    auto queryRet = db->query("SELECT COUNT(*) FROM notifications;");
 
     if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
         return 0;

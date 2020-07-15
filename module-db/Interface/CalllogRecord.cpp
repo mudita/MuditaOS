@@ -83,7 +83,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 
 uint32_t CalllogRecordInterface::GetLastID()
 {
-    return calllogDB->GetLastInsertRowID();
+    return calllogDB->getLastInsertRowId();
 }
 
 std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffsetByField(uint32_t offset,

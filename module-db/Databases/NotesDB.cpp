@@ -16,7 +16,7 @@ NotesDB::NotesDB() : Database(dbName), notes(this)
 
     if (notes.create() == false)
         return;
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 NotesDB::~NotesDB()

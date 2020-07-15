@@ -30,7 +30,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         return ret;
     }
 
-    uint32_t contactID = contactDB->GetLastInsertRowID();
+    uint32_t contactID = contactDB->getLastInsertRowId();
     LOG_DEBUG("New contact with ID %" PRIu32 " created", contactID);
 
     ret = contactDB->name.add(ContactsNameTableRow{.contactID       = contactID,
@@ -42,7 +42,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         return ret;
     }
 
-    auto contactNameID = contactDB->GetLastInsertRowID();
+    auto contactNameID = contactDB->getLastInsertRowId();
 
     for (auto a : rec.numbers) {
         ret = contactDB->number.add(ContactsNumberTableRow{.contactID  = contactID,
@@ -55,7 +55,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         return ret;
     }
 
-    auto contactNumberID = contactDB->GetLastInsertRowID();
+    auto contactNumberID = contactDB->getLastInsertRowId();
 
     ret = contactDB->ringtones.add(
         ContactsRingtonesTableRow{.ID = DB_ID_NONE, .contactID = contactID, .assetPath = rec.assetPath});
@@ -64,7 +64,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         return ret;
     }
 
-    auto contactRingID = contactDB->GetLastInsertRowID();
+    auto contactRingID = contactDB->getLastInsertRowId();
 
     ret = contactDB->address.add(
         ContactsAddressTableRow{.contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
@@ -73,7 +73,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         return ret;
     }
 
-    auto contactAddressID = contactDB->GetLastInsertRowID();
+    auto contactAddressID = contactDB->getLastInsertRowId();
 
     ret = contactDB->contacts.update(ContactsTableRow{.ID        = contactID,
                                                       .nameID    = contactNameID,
@@ -707,7 +707,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(
             return ret;
         }
 
-        ret->push_back(GetByID(contactDB->GetLastInsertRowID()));
+        ret->push_back(GetByID(contactDB->getLastInsertRowId()));
     }
 
     return ret;
@@ -752,7 +752,7 @@ std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::
             return std::nullopt;
         }
 
-        return GetByID(contactDB->GetLastInsertRowID());
+        return GetByID(contactDB->getLastInsertRowId());
     }
 
     return GetByID(matchedNumber->getContactID());

@@ -93,7 +93,7 @@ uint32_t SMSRecordInterface::GetCount()
 
 uint32_t SMSRecordInterface::GetLastID(void)
 {
-    return smsDB->GetLastInsertRowID();
+    return smsDB->getLastInsertRowId();
 }
 std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByField(uint32_t offset,
                                                                                   uint32_t limit,

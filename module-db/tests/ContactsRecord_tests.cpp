@@ -6,7 +6,7 @@
 
 TEST_CASE("Contact Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(ContactsDB::GetDBName());
 
@@ -202,5 +202,5 @@ TEST_CASE("Contact Record tests")
                 utils::localize.get("app_phonebook_contact_no_name"));
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

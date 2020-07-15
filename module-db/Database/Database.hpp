@@ -22,23 +22,23 @@ class Database
 
     virtual ~Database();
 
-    std::unique_ptr<QueryResult> Query(const char *format, ...);
+    std::unique_ptr<QueryResult> query(const char *format, ...);
 
-    bool Execute(const char *format, ...);
+    bool execute(const char *format, ...);
 
     // Must be invoked prior creating any database object in order to initialize database OS layer
-    static void Initialize();
+    static void initialize();
     // Must be invoked before closing system in order to properly close OS layer
-    static void Deinitialize();
+    static void deinitialize();
 
-    bool IsInitialized() const
+    bool isInitialized() const
     {
-        return isInitialized;
+        return isInitialized_;
     }
 
-    bool StoreIntoFile(const std::string &backupPath);
+    bool storeIntoFile(const std::string &backupPath);
 
-    uint32_t GetLastInsertRowID();
+    uint32_t getLastInsertRowId();
 
   private:
     const uint32_t maxQueryLen = (8 * 1024);
@@ -56,5 +56,5 @@ class Database
   protected:
     sqlite3 *dbConnection;
     const char *dbName;
-    bool isInitialized;
+    bool isInitialized_;
 };

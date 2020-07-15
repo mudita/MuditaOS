@@ -19,7 +19,7 @@
 
 TEST_CASE("Thread Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(ContactsDB::GetDBName());
     vfs.remove(SmsDB::GetDBName());
@@ -175,5 +175,5 @@ TEST_CASE("Thread Record tests")
         }
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

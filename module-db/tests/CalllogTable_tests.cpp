@@ -13,7 +13,7 @@
 
 TEST_CASE("Calllog Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(CalllogDB::GetDBName());
 
@@ -155,5 +155,5 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(callsTbl.GetCount(EntryState::READ) == 4);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

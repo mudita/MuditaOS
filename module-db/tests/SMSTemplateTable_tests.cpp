@@ -14,7 +14,7 @@
 
 TEST_CASE("SMS Templates Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(SmsDB::GetDBName());
 
@@ -95,5 +95,5 @@ TEST_CASE("SMS Templates Table tests")
         REQUIRE(templatesTbl.GetCount() == 0);
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

@@ -13,7 +13,7 @@
 
 TEST_CASE("Notifications Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(NotificationsDB::GetDBName());
 
@@ -146,5 +146,5 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(entry.isValid());
     }
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

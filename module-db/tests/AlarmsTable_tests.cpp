@@ -20,7 +20,7 @@
 
 TEST_CASE("Alarms Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(AlarmsDB::GetDBName());
 
@@ -116,5 +116,5 @@ TEST_CASE("Alarms Table tests")
     // Table should be empty now
     REQUIRE(alarmsDb.alarms.GetCount() == 0);
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }
