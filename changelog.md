@@ -11,7 +11,10 @@
 * `[phonebook]` Fix wrong text label for back action.
 * `[sms]` Concatenated sms sending fixed.
 * `[sms]` Messages window margins fix.
-
+* `[sms]` Fix for sms forward
+* `[sms]` Fix for missing send label in new message window
+* `[sms]` Fix for handling temporary contacts
+* `[call]` Fix for adding new contact from call app 
 ### Other
 * `[Alignment]` Refactored Alignment and added support to BoxLayout. 
 
