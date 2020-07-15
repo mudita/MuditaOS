@@ -16,19 +16,20 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
-        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         titleLabel = new Label(vBox);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_TOP));
         titleLabel->setFont(style::window::font::small);
+        titleLabel->setLineMode(true);
         titleLabel->activeItem = false;
 
         new gui::Span(vBox, Axis::Y, phonebookStyle::inputLineWithLabelItem::span_size); // spread title & multilineText
 
         multilineText = new Text(vBox, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::input_text_h);
         multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        multilineText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+        multilineText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         multilineText->setFont(style::window::font::medium);
         multilineText->setPenFocusWidth(style::window::default_border_focus_w);
         multilineText->setPenWidth(style::window::default_border_no_focus_w);
@@ -41,7 +42,6 @@ namespace gui
             return true;
         };
 
-        //inputCallback = [&](Item &item, const InputEvent &event) { return inputText->onInput(event); };
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
@@ -76,14 +76,12 @@ namespace gui
     void MultiLineTextWithLabelItem::addressHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-        multilineText->setTextType(TextType::SINGLE_LINE);
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->address); };
     }
     void MultiLineTextWithLabelItem::noteHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-        multilineText->setTextType(TextType::SINGLE_LINE);
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->note); };
     }

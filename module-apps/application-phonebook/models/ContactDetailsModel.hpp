@@ -14,12 +14,13 @@ class ContactDetailsModel : public app::InternalModel<gui::ContactListItem *>, p
   public:
     ContactDetailsModel(app::Application *app);
 
-    void clearData();
     void loadData(std::shared_ptr<ContactRecord> contactRecord);
-    void createData(bool showInformationWidget = false, bool showAddressWidget = false, bool showNoteWidget = false);
 
     [[nodiscard]] auto getItemCount() const -> int override;
     [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
     auto getItem(gui::Order order) -> gui::ListItem * override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
+
+  private:
+    void createData(bool showInformationWidget = false, bool showAddressWidget = false, bool showNoteWidget = false);
 };
