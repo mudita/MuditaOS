@@ -9,6 +9,8 @@
 * `[calendar]` main screen UI
 * `[calendar]` main screen navigation
 * `[audio]` added incoming call ringtone
+* `[phonebook]` general support for groups in DB
+* `[phonebook]` proper displaying of favorites, ice, blocked flags
 
 ### Changed
 
@@ -20,6 +22,7 @@
 * `[sms]` fixed focus in new message window after message forward option
 * `[audio]` added audio workers synchronization mutexes
 * `[phonebook]` Fixed bottom bar in main phonebook window 
+* `[info]` fixed displaying of version
 
 ### Other
 

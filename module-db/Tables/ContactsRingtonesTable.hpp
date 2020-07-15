@@ -68,6 +68,6 @@ class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow, ContactRi
                                    "_id              INTEGER PRIMARY KEY,"
                                    "contact_id       INTEGER,"
                                    "asset_path       TEXT NOT NULL,"
-                                   "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
+                                   "FOREIGN KEY(contact_id) REFERENCES contacts(_id) ON DELETE CASCADE"
                                    ");";
 };

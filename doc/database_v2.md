@@ -52,6 +52,9 @@ This document describes details of different user information database tables:
 | contact_rings | This table holds name of the audio file that should be played when phone receives call from given number. |
 | contact_address | Table that holds records with information about addresses assigned to given contact. |
 | preferences | (TBD) |
+| contact_groups | Dictionary defining groups for contact. |
+| contact_match_group | Joining table for connecting users with groups. |
+
 
 ### Design <a name="tables"></a>
 #### Database tables
@@ -323,6 +326,30 @@ Name: notifications.
 | NotValidKey | 0x00 | Not valid key |
 | Calls | 0x01 | Missed calls notifications |
 | Sms | 0x02 | Unread incoming sms notifications |
+
+#### 15. Dictionary defining groups
+Name: contact_groups
+
+| Field | Scope | Type | Description |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
+| name | (um) | STGRING | Group name |
+
+##### 15.1 Default groups
+By default sepecial gorups are created:
+
+| ID | Name | Description |
+|----|------|-------------|
+| 1 | Favourites | Defines favourites group. |
+| 2 | ICE | Defines ICE group. |
+| 3 | Blocked | Defines Blocked group. |
+
+#### 16. Joining table for groups and contacts
+| Field | Scope | Type | Description |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
+| group_id | (r) | INTEGER | Id of group. |
+| contact_id | (r) | INTEGER | Id of contact. |
 
 ## Database Triggers <a name="triggers"></a>
 
