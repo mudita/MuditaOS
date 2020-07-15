@@ -70,6 +70,14 @@ namespace gui
         setNavigation();
     }
 
+    void BoxLayout::setAlignment(const Alignment &value)
+    {
+        if (alignment != value) {
+            alignment = value;
+            resizeItems();
+        }
+    }
+
     void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
