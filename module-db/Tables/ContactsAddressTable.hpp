@@ -4,13 +4,12 @@
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
 
-struct ContactsAddressTableRow
+struct ContactsAddressTableRow : public Record
 {
-    uint32_t ID        = DB_ID_NONE;
     uint32_t contactID = DB_ID_NONE;
-    UTF8 address       = "";
-    UTF8 note          = "";
-    UTF8 mail          = "";
+    UTF8 address;
+    UTF8 note;
+    UTF8 mail;
 };
 
 enum class ContactAddressTableFields
