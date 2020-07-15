@@ -72,28 +72,25 @@ namespace app
 
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)
     {
+        auto data = std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact)));
+        data->disableAppClose = true;
         assert(app != nullptr);
         switch (contactOperation) {
         case ContactOperation::Add: {
+            data->ignoreCurrentWindowOnStack = true;
             return sapm::ApplicationManager::messageSwitchApplication(
-                app,
-                name_phonebook,
-                gui::window::name::new_contact,
-                std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+                app, name_phonebook, gui::window::name::new_contact, std::move(data));
         } break;
         case ContactOperation::Details: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app,
-                name_phonebook,
-                gui::window::name::contact,
-                std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+                app, name_phonebook, gui::window::name::contact, std::move(data));
         } break;
         case ContactOperation::Edit: {
             return sapm::ApplicationManager::messageSwitchApplication(
                 app,
                 name_phonebook,
                 gui::window::name::new_contact, // TODO: need to be fixed when contact edition is working
-                std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+                std::move(data));
         } break;
         default: {
             LOG_ERROR("ContactOperation not supported %" PRIu32, static_cast<uint32_t>(contactOperation));
@@ -136,6 +133,7 @@ namespace app
             return false;
         }
 
+        contactRec.numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(number).getView()));
         return contact(app, contactOperation, contactRec);
     }
 
