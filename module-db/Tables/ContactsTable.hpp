@@ -37,15 +37,15 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
 
     virtual ~ContactsTable();
 
-    bool Create() override final;
+    bool create() override final;
 
-    bool Add(ContactsTableRow entry) override final;
+    bool add(ContactsTableRow entry) override final;
 
-    bool RemoveByID(uint32_t id) override final;
+    bool removeById(uint32_t id) override final;
 
-    bool Update(ContactsTableRow entry) override final;
+    bool update(ContactsTableRow entry) override final;
 
-    ContactsTableRow GetByID(uint32_t id) override final;
+    ContactsTableRow getById(uint32_t id) override final;
 
     bool BlockByID(uint32_t id, bool shouldBeBlocked);
 
@@ -53,16 +53,16 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
                                          const std::string alternativeName,
                                          const std::string number);
 
-    std::vector<ContactsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<ContactsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsTableRow> GetLimitOffsetByField(uint32_t offset,
+    std::vector<ContactsTableRow> getLimitOffsetByField(uint32_t offset,
                                                         uint32_t limit,
                                                         ContactTableFields field,
                                                         const char *str) override final;
 
-    uint32_t GetCount() override final;
+    uint32_t count() override final;
 
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
     std::vector<std::uint32_t> GetIDsByTextNumber(const std::string &filter,
                                                   std::size_t limit  = 0,

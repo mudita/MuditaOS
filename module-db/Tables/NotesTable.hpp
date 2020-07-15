@@ -38,20 +38,20 @@ class NotesTable : public Table<NotesTableRow, NotesTableFields>
     NotesTable(Database *db);
     virtual ~NotesTable();
 
-    bool Create() override final;
-    bool Add(NotesTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(NotesTableFields field, const char *str) override final;
-    bool Update(NotesTableRow entry) override final;
-    NotesTableRow GetByID(uint32_t id) override final;
-    std::vector<NotesTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<NotesTableRow> GetLimitOffsetByField(uint32_t offset,
+    bool create() override final;
+    bool add(NotesTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    bool removeByField(NotesTableFields field, const char *str) override final;
+    bool update(NotesTableRow entry) override final;
+    NotesTableRow getById(uint32_t id) override final;
+    std::vector<NotesTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<NotesTableRow> getLimitOffsetByField(uint32_t offset,
                                                      uint32_t limit,
                                                      NotesTableFields field,
                                                      const char *str) override final;
 
-    uint32_t GetCount() override final;
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t count() override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS notes("

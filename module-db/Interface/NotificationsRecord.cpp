@@ -71,7 +71,7 @@ std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::
         limit = GetCount();
     }
 
-    auto rows = notificationsDb->notifications.GetLimitOffset(offset, limit);
+    auto rows = notificationsDb->notifications.getLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<NotificationsRecord>>();
 
@@ -84,12 +84,12 @@ std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::
 
 bool NotificationsRecordInterface::Update(const NotificationsRecord &rec)
 {
-    auto entry = notificationsDb->notifications.GetByID(rec.ID);
+    auto entry = notificationsDb->notifications.getById(rec.ID);
     if (!entry.isValid() || entry.key != static_cast<uint32_t>(rec.key)) {
         return false;
     }
 
-    return notificationsDb->notifications.Update(
+    return notificationsDb->notifications.update(
         NotificationsTableRow{{.ID = rec.ID}, .key = static_cast<uint32_t>(rec.key), .value = rec.value});
 }
 
@@ -109,12 +109,12 @@ bool NotificationsRecordInterface::RemoveByField(NotificationsRecordField field,
 
 NotificationsRecord NotificationsRecordInterface::GetByID(uint32_t id)
 {
-    return notificationsDb->notifications.GetByID(id);
+    return notificationsDb->notifications.getById(id);
 }
 
 uint32_t NotificationsRecordInterface::GetCount()
 {
-    return notificationsDb->notifications.GetCount();
+    return notificationsDb->notifications.count();
 }
 
 NotificationsRecord NotificationsRecordInterface::GetByKey(NotificationsRecord::Key key)

@@ -14,12 +14,12 @@ NotesTable::NotesTable(Database *db) : Table(db)
 NotesTable::~NotesTable()
 {}
 
-bool NotesTable::Create()
+bool NotesTable::create()
 {
     return db->Execute(createTableQuery);
 }
 
-bool NotesTable::Add(NotesTableRow entry)
+bool NotesTable::add(NotesTableRow entry)
 {
     return db->Execute("INSERT or ignore INTO notes ( date, snippet, path ) VALUES (%lu,'%q','%q');",
                        entry.date,
@@ -27,12 +27,12 @@ bool NotesTable::Add(NotesTableRow entry)
                        entry.path.c_str());
 }
 
-bool NotesTable::RemoveByID(uint32_t id)
+bool NotesTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM notes where _id = %lu;", id);
 }
 
-bool NotesTable::RemoveByField(NotesTableFields field, const char *str)
+bool NotesTable::removeByField(NotesTableFields field, const char *str)
 {
     std::string fieldName;
 
@@ -55,7 +55,7 @@ bool NotesTable::RemoveByField(NotesTableFields field, const char *str)
     return db->Execute("DELETE FROM note where %q = '%q';", fieldName.c_str(), str);
 }
 
-bool NotesTable::Update(NotesTableRow entry)
+bool NotesTable::update(NotesTableRow entry)
 {
     return db->Execute("UPDATE notes SET date = %lu, snippet = '%q', , snippet = '%q' WHERE _id=%lu;",
                        entry.date,
@@ -64,7 +64,7 @@ bool NotesTable::Update(NotesTableRow entry)
                        entry.ID);
 }
 
-NotesTableRow NotesTable::GetByID(uint32_t id)
+NotesTableRow NotesTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM notes WHERE _id= %u;", id);
 
@@ -80,7 +80,7 @@ NotesTableRow NotesTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<NotesTableRow> NotesTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from notes ORDER BY date LIMIT %lu OFFSET %lu;", limit, offset);
 
@@ -102,7 +102,7 @@ std::vector<NotesTableRow> NotesTable::GetLimitOffset(uint32_t offset, uint32_t 
     return ret;
 }
 
-std::vector<NotesTableRow> NotesTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(uint32_t offset,
                                                              uint32_t limit,
                                                              NotesTableFields field,
                                                              const char *str)
@@ -144,7 +144,7 @@ std::vector<NotesTableRow> NotesTable::GetLimitOffsetByField(uint32_t offset,
     return ret;
 }
 
-uint32_t NotesTable::GetCount()
+uint32_t NotesTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM NOTES;");
 
@@ -155,7 +155,7 @@ uint32_t NotesTable::GetCount()
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t NotesTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t NotesTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM notes WHERE %q=%lu;", field, id);
 

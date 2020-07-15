@@ -9,33 +9,33 @@
 NotificationsTable::NotificationsTable(Database *db) : Table(db)
 {}
 
-bool NotificationsTable::Create()
+bool NotificationsTable::create()
 {
     if (!db->Execute(createTableQuery)) {
         return false;
     }
 
-    if (!Add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0})) {
+    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0})) {
         return false;
     }
-    if (!Add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0})) {
+    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0})) {
         return false;
     }
 
     return true;
 }
 
-bool NotificationsTable::Add(NotificationsTableRow entry)
+bool NotificationsTable::add(NotificationsTableRow entry)
 {
     return db->Execute("INSERT or IGNORE INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
 }
 
-bool NotificationsTable::RemoveByID(uint32_t id)
+bool NotificationsTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM notifications where _id = %lu;", id);
 }
 
-bool NotificationsTable::RemoveByField(NotificationsTableFields field, const char *str)
+bool NotificationsTable::removeByField(NotificationsTableFields field, const char *str)
 {
     std::string fieldName;
 
@@ -48,13 +48,13 @@ bool NotificationsTable::RemoveByField(NotificationsTableFields field, const cha
     return db->Execute("DELETE FROM notifications where %q = '%q';", fieldName.c_str(), str);
 }
 
-bool NotificationsTable::Update(NotificationsTableRow entry)
+bool NotificationsTable::update(NotificationsTableRow entry)
 {
     return db->Execute(
         "UPDATE notifications SET key = %lu, value = %lu WHERE _id = %lu;", entry.key, entry.value, entry.ID);
 }
 
-NotificationsTableRow NotificationsTable::GetByID(uint32_t id)
+NotificationsTableRow NotificationsTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM notifications WHERE _id= %u;", id);
 
@@ -89,7 +89,7 @@ NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
     };
 }
 
-std::vector<NotificationsTableRow> NotificationsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from notifications LIMIT %lu OFFSET %lu;", limit, offset);
 
@@ -110,7 +110,7 @@ std::vector<NotificationsTableRow> NotificationsTable::GetLimitOffset(uint32_t o
     return ret;
 }
 
-std::vector<NotificationsTableRow> NotificationsTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<NotificationsTableRow> NotificationsTable::getLimitOffsetByField(uint32_t offset,
                                                                              uint32_t limit,
                                                                              NotificationsTableFields field,
                                                                              const char *str)
@@ -120,7 +120,7 @@ std::vector<NotificationsTableRow> NotificationsTable::GetLimitOffsetByField(uin
     return std::vector<NotificationsTableRow>();
 }
 
-uint32_t NotificationsTable::GetCount()
+uint32_t NotificationsTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM notifications;");
 
@@ -131,7 +131,7 @@ uint32_t NotificationsTable::GetCount()
     return (*queryRet)[0].GetUInt32();
 }
 
-uint32_t NotificationsTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t NotificationsTable::countByFieldId(const char *field, uint32_t id)
 {
     assert(0 && "Not implemented");
 

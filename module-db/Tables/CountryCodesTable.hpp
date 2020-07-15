@@ -26,38 +26,38 @@ class CountryCodesTable : public Table<CodesTableRow, CodesTableFields>
   public:
     CountryCodesTable(Database *db);
     virtual ~CountryCodesTable();
-    bool Create() override final;
-    uint32_t GetCount() override final;
-    bool Add(CodesTableRow entry) override final
+    bool create() override final;
+    uint32_t count() override final;
+    bool add(CodesTableRow entry) override final
     {
         return (true);
     }
-    bool RemoveByID(uint32_t id) override final
+    bool removeById(uint32_t id) override final
     {
         return (true);
     }
-    bool Update(CodesTableRow entry) override final
+    bool update(CodesTableRow entry) override final
     {
         return (true);
     }
-    CodesTableRow GetByID(uint32_t id) override final
+    CodesTableRow getById(uint32_t id) override final
     {
         return CodesTableRow();
     }
-    std::vector<CodesTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final
+    std::vector<CodesTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final
     {
         return std::vector<CodesTableRow>();
     }
-    std::vector<CodesTableRow> GetLimitOffsetByField(uint32_t offset,
+    std::vector<CodesTableRow> getLimitOffsetByField(uint32_t offset,
                                                      uint32_t limit,
                                                      CodesTableFields field,
                                                      const char *str) override final
     {
         return std::vector<CodesTableRow>();
     }
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final
+    uint32_t countByFieldId(const char *field, uint32_t id) override final
     {
-        return GetCount();
+        return count();
     }
     CodesTableRow GetByMCC(uint32_t mcc);
 

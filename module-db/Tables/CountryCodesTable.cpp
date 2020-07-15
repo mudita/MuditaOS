@@ -6,7 +6,7 @@ CountryCodesTable::CountryCodesTable(Database *db) : Table(db)
 CountryCodesTable::~CountryCodesTable()
 {}
 
-bool CountryCodesTable::Create()
+bool CountryCodesTable::create()
 {
     return db->Execute(createTableQuery);
 }
@@ -30,7 +30,7 @@ CodesTableRow CountryCodesTable::GetByMCC(uint32_t mcc)
     };
 }
 
-uint32_t CountryCodesTable::GetCount()
+uint32_t CountryCodesTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM codes;");
 

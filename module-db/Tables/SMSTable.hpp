@@ -30,20 +30,20 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
     SMSTable(Database *db);
     virtual ~SMSTable();
 
-    bool Create() override final;
-    bool Add(SMSTableRow entry) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(SMSTableFields field, const char *str) override final;
-    bool Update(SMSTableRow entry) override final;
-    SMSTableRow GetByID(uint32_t id) override final;
-    std::vector<SMSTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<SMSTableRow> GetLimitOffsetByField(uint32_t offset,
+    bool create() override final;
+    bool add(SMSTableRow entry) override final;
+    bool removeById(uint32_t id) override final;
+    bool removeByField(SMSTableFields field, const char *str) override final;
+    bool update(SMSTableRow entry) override final;
+    SMSTableRow getById(uint32_t id) override final;
+    std::vector<SMSTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<SMSTableRow> getLimitOffsetByField(uint32_t offset,
                                                    uint32_t limit,
                                                    SMSTableFields field,
                                                    const char *str) override final;
 
-    uint32_t GetCount() override final;
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t count() override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS sms("

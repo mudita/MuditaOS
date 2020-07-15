@@ -13,7 +13,7 @@ AlarmsTable::AlarmsTable(Database *db) : Table(db)
 AlarmsTable::~AlarmsTable()
 {}
 
-bool AlarmsTable::Create()
+bool AlarmsTable::create()
 {
     bool ret = true;
     ret      = db->Execute(createTableQuery);
@@ -26,7 +26,7 @@ bool AlarmsTable::Create()
     return ret;
 }
 
-bool AlarmsTable::Add(AlarmsTableRow entry)
+bool AlarmsTable::add(AlarmsTableRow entry)
 {
     return db->Execute("INSERT or ignore INTO alarms ( time, snooze, status, path ) VALUES (%lu,%lu,%lu,'%q');",
                        entry.time,
@@ -35,12 +35,12 @@ bool AlarmsTable::Add(AlarmsTableRow entry)
                        entry.path.c_str());
 }
 
-bool AlarmsTable::RemoveByID(uint32_t id)
+bool AlarmsTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM alarms where _id = %u;", id);
 }
 
-bool AlarmsTable::RemoveByField(AlarmsTableFields field, const char *str)
+bool AlarmsTable::removeByField(AlarmsTableFields field, const char *str)
 {
     std::string fieldName;
 
@@ -63,7 +63,7 @@ bool AlarmsTable::RemoveByField(AlarmsTableFields field, const char *str)
     return db->Execute("DELETE FROM alarms where %q = '%q';", fieldName.c_str(), str);
 }
 
-bool AlarmsTable::Update(AlarmsTableRow entry)
+bool AlarmsTable::update(AlarmsTableRow entry)
 {
     return db->Execute("UPDATE alarms SET time = %lu, snooze = %lu ,status = %lu, path = '%q' WHERE _id=%lu;",
                        entry.time,
@@ -73,7 +73,7 @@ bool AlarmsTable::Update(AlarmsTableRow entry)
                        entry.ID);
 }
 
-AlarmsTableRow AlarmsTable::GetByID(uint32_t id)
+AlarmsTableRow AlarmsTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM alarms WHERE _id= %u;", id);
 
@@ -90,7 +90,7 @@ AlarmsTableRow AlarmsTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<AlarmsTableRow> AlarmsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from alarms ORDER BY time ASC LIMIT %lu OFFSET %lu;", limit, offset);
 
@@ -113,7 +113,7 @@ std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffset(uint32_t offset, uint32_
     return ret;
 }
 
-std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
                                                                uint32_t limit,
                                                                AlarmsTableFields field,
                                                                const char *str)
@@ -159,7 +159,7 @@ std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffsetByField(uint32_t offset,
     return ret;
 }
 
-uint32_t AlarmsTable::GetCount()
+uint32_t AlarmsTable::count()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM alarms;");
 
@@ -170,7 +170,7 @@ uint32_t AlarmsTable::GetCount()
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t AlarmsTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM alarms WHERE %q=%lu;", field, id);
 

@@ -60,7 +60,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     threadID = (*threadRec)[0].ID;
 
     // Create SMS
-    smsDB->sms.Add(SMSTableRow{.threadID  = threadID,
+    smsDB->sms.add(SMSTableRow{.threadID  = threadID,
                                .contactID = contactID,
                                .date      = rec.date,
                                .dateSent  = rec.dateSent,
@@ -88,7 +88,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
 }
 uint32_t SMSRecordInterface::GetCount()
 {
-    return smsDB->sms.GetCount();
+    return smsDB->sms.count();
 }
 
 uint32_t SMSRecordInterface::GetLastID(void)
@@ -106,11 +106,11 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
 
     switch (field) {
     case SMSRecordField ::ContactID:
-        smses = smsDB->sms.GetLimitOffsetByField(offset, limit, SMSTableFields::ContactID, str);
+        smses = smsDB->sms.getLimitOffsetByField(offset, limit, SMSTableFields::ContactID, str);
         break;
 
     case SMSRecordField ::ThreadID:
-        smses = smsDB->sms.GetLimitOffsetByField(offset, limit, SMSTableFields::ThreadID, str);
+        smses = smsDB->sms.getLimitOffsetByField(offset, limit, SMSTableFields::ThreadID, str);
         break;
 
     default:
@@ -133,7 +133,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
 
 std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto smses = smsDB->sms.GetLimitOffset(offset, limit);
+    auto smses = smsDB->sms.getLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<SMSRecord>>();
 
@@ -151,12 +151,12 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 bool SMSRecordInterface::Update(const SMSRecord &rec)
 {
 
-    auto sms = smsDB->sms.GetByID(rec.ID);
+    auto sms = smsDB->sms.getById(rec.ID);
     if (sms.ID == 0) {
         return false;
     }
 
-    smsDB->sms.Update(SMSTableRow{.ID        = rec.ID,
+    smsDB->sms.update(SMSTableRow{.ID        = rec.ID,
                                   .threadID  = sms.threadID,
                                   .contactID = sms.contactID,
                                   .date      = rec.date,
@@ -171,7 +171,7 @@ bool SMSRecordInterface::Update(const SMSRecord &rec)
 bool SMSRecordInterface::RemoveByID(uint32_t id)
 {
 
-    auto sms = smsDB->sms.GetByID(id);
+    auto sms = smsDB->sms.getById(id);
     if (sms.ID == 0) {
         return false;
     }
@@ -181,7 +181,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
 
     // If thread not found
     if (!threadRec.isValid()) {
-        if (smsDB->sms.RemoveByID(id) == false) {
+        if (smsDB->sms.removeById(id) == false) {
             return false;
         }
 
@@ -199,7 +199,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     }
 
     // Remove SMS
-    if (smsDB->sms.RemoveByID(id) == false) {
+    if (smsDB->sms.removeById(id) == false) {
         return false;
     }
 
@@ -211,10 +211,10 @@ bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str)
 
     switch (field) {
     case SMSRecordField ::ContactID:
-        return smsDB->sms.RemoveByField(SMSTableFields::ContactID, str);
+        return smsDB->sms.removeByField(SMSTableFields::ContactID, str);
 
     case SMSRecordField ::ThreadID:
-        return smsDB->sms.RemoveByField(SMSTableFields::ThreadID, str);
+        return smsDB->sms.removeByField(SMSTableFields::ThreadID, str);
 
     case SMSRecordField ::Number:
         return false;
@@ -226,7 +226,7 @@ bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str)
 
 SMSRecord SMSRecordInterface::GetByID(uint32_t id)
 {
-    auto sms = smsDB->sms.GetByID(id);
+    auto sms = smsDB->sms.getById(id);
 
     ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetByID(sms.contactID);

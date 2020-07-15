@@ -19,7 +19,7 @@ ContactRecordInterface::~ContactRecordInterface()
 bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
 
-    bool ret = contactDB->contacts.Add(ContactsTableRow{.type           = rec.contactType,
+    bool ret = contactDB->contacts.add(ContactsTableRow{.type           = rec.contactType,
                                                         .isOnWhitelist  = rec.isOnBlacklist,
                                                         .isOnBlacklist  = rec.isOnBlacklist,
                                                         .isOnFavourites = rec.isOnFavourites,
@@ -33,7 +33,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     uint32_t contactID = contactDB->GetLastInsertRowID();
     LOG_DEBUG("New contact with ID %" PRIu32 " created", contactID);
 
-    ret = contactDB->name.Add(ContactsNameTableRow{.contactID       = contactID,
+    ret = contactDB->name.add(ContactsNameTableRow{.contactID       = contactID,
                                                    .namePrimary     = rec.primaryName,
                                                    .nameAlternative = rec.alternativeName,
                                                    .favourite       = rec.isOnFavourites});
@@ -45,7 +45,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     auto contactNameID = contactDB->GetLastInsertRowID();
 
     for (auto a : rec.numbers) {
-        ret = contactDB->number.Add(ContactsNumberTableRow{.contactID  = contactID,
+        ret = contactDB->number.add(ContactsNumberTableRow{.contactID  = contactID,
                                                            .numberUser = a.number.getEntered().c_str(),
                                                            .numbere164 = a.number.getE164().c_str(),
                                                            .type       = a.numberType});
@@ -57,7 +57,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactNumberID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->ringtones.Add(
+    ret = contactDB->ringtones.add(
         ContactsRingtonesTableRow{.ID = DB_ID_NONE, .contactID = contactID, .assetPath = rec.assetPath});
 
     if (!ret) {
@@ -66,7 +66,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactRingID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->address.Add(
+    ret = contactDB->address.add(
         ContactsAddressTableRow{.contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret) {
@@ -75,7 +75,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactAddressID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->contacts.Update(ContactsTableRow{.ID        = contactID,
+    ret = contactDB->contacts.update(ContactsTableRow{.ID        = contactID,
                                                       .nameID    = contactNameID,
                                                       .numbersID = std::to_string(contactNumberID),
                                                       .ringID    = contactRingID,
@@ -98,28 +98,28 @@ bool ContactRecordInterface::BlockByID(uint32_t id, const bool shouldBeBlocked)
 bool ContactRecordInterface::RemoveByID(uint32_t id)
 {
 
-    auto contact = contactDB->contacts.GetByID(id);
+    auto contact = contactDB->contacts.getById(id);
     if (contact.ID == 0) {
         return false;
     }
 
-    if (contactDB->name.RemoveByID(contact.nameID) == false) {
+    if (contactDB->name.removeById(contact.nameID) == false) {
         return false;
     }
 
-    if (contactDB->address.RemoveByID(contact.addressID) == false) {
+    if (contactDB->address.removeById(contact.addressID) == false) {
         return false;
     }
 
-    if (contactDB->number.RemoveByID(std::stoul(contact.numbersID)) == false) {
+    if (contactDB->number.removeById(std::stoul(contact.numbersID)) == false) {
         return false;
     }
 
-    if (contactDB->ringtones.RemoveByID(contact.ringID) == false) {
+    if (contactDB->ringtones.removeById(contact.ringID) == false) {
         return false;
     }
 
-    if (contactDB->contacts.RemoveByID(id) == false) {
+    if (contactDB->contacts.removeById(id) == false) {
         return false;
     }
 
@@ -162,7 +162,7 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(const db::Quer
 
         std::size_t count = 0;
         if (!countQuery->isFilterPresent()) {
-            count = contactDB->contacts.GetCount();
+            count = contactDB->contacts.count();
         }
         else if (searchByNumber) {
             count = contactDB->contacts.GetIDsByTextNumber(countQuery->getFilterData()).size();
@@ -183,11 +183,11 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(const db::Quer
 
 bool ContactRecordInterface::Update(const ContactRecord &rec)
 {
-    ContactsTableRow contact = contactDB->contacts.GetByID(rec.ID);
+    ContactsTableRow contact = contactDB->contacts.getById(rec.ID);
     if (contact.ID == DB_ID_NONE)
         return false;
 
-    bool ret = contactDB->contacts.Update(ContactsTableRow{.ID              = contact.ID,
+    bool ret = contactDB->contacts.update(ContactsTableRow{.ID              = contact.ID,
                                                            .nameID          = contact.nameID,
                                                            .numbersID       = contact.numbersID,
                                                            .ringID          = contact.ringID,
@@ -203,7 +203,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->name.Update(ContactsNameTableRow{.ID              = contact.nameID,
+    ret = contactDB->name.update(ContactsNameTableRow{.ID              = contact.nameID,
                                                       .contactID       = contact.ID,
                                                       .namePrimary     = rec.primaryName,
                                                       .nameAlternative = rec.alternativeName,
@@ -213,7 +213,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
         return ret;
 
     for (auto number : rec.numbers) {
-        ret = contactDB->number.Update(ContactsNumberTableRow{.ID = static_cast<uint32_t>(std::stoi(contact.numbersID)),
+        ret = contactDB->number.update(ContactsNumberTableRow{.ID = static_cast<uint32_t>(std::stoi(contact.numbersID)),
                                                               .contactID  = contact.ID,
                                                               .numberUser = number.number.getEntered().c_str(),
                                                               .numbere164 = number.number.getE164().c_str(),
@@ -223,13 +223,13 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->address.Update(ContactsAddressTableRow{
+    ret = contactDB->address.update(ContactsAddressTableRow{
         .ID = contact.addressID, .contactID = contact.ID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret)
         return ret;
 
-    ret = contactDB->ringtones.Update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
+    ret = contactDB->ringtones.update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
 
     return ret;
 }
@@ -239,7 +239,7 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
 
     ContactRecord rec = ContactRecord();
 
-    auto contact = contactDB->contacts.GetByID(id);
+    auto contact = contactDB->contacts.getById(id);
     if (contact.ID == DB_ID_NONE) {
         return rec;
     }
@@ -248,17 +248,17 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     if (nrs.size() == 0) {
         return rec;
     }
-    auto ring = contactDB->ringtones.GetByID(contact.ringID);
+    auto ring = contactDB->ringtones.getById(contact.ringID);
     if (ring.ID == DB_ID_NONE) {
         return rec;
     }
 
-    auto address = contactDB->address.GetByID(contact.addressID);
+    auto address = contactDB->address.getById(contact.addressID);
     if (address.ID == DB_ID_NONE) {
         return rec;
     }
 
-    auto name = contactDB->name.GetByID(contact.nameID);
+    auto name = contactDB->name.getById(contact.nameID);
     if (name.ID == 0) {
         return rec;
     }
@@ -283,28 +283,28 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
 uint32_t ContactRecordInterface::GetCount()
 {
 
-    return contactDB->contacts.GetCount();
+    return contactDB->contacts.count();
 }
 
 uint32_t ContactRecordInterface::GetCountFavourites()
 {
-    return contactDB->contacts.GetCountByFieldID("favourites", 1);
+    return contactDB->contacts.countByFieldId("favourites", 1);
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto records = std::make_unique<std::vector<ContactRecord>>();
 
-    auto ret = contactDB->name.GetLimitOffset(offset, limit);
+    auto ret = contactDB->name.getLimitOffset(offset, limit);
 
     for (const auto &w : ret) {
 
-        auto contact = contactDB->contacts.GetByID(w.ID);
+        auto contact = contactDB->contacts.getById(w.ID);
         if (contact.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto name = contactDB->name.GetByID(contact.nameID);
+        auto name = contactDB->name.getById(contact.nameID);
         if (name.ID == DB_ID_NONE) {
             return records;
         }
@@ -314,12 +314,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             return records;
         }
 
-        auto ring = contactDB->ringtones.GetByID(contact.ringID);
+        auto ring = contactDB->ringtones.getById(contact.ringID);
         if (ring.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto address = contactDB->address.GetByID(contact.addressID);
+        auto address = contactDB->address.getById(contact.addressID);
         if (address.ID == DB_ID_NONE) {
             return records;
         }
@@ -351,11 +351,11 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
     switch (field) {
     case ContactRecordField ::PrimaryName: {
-        auto ret = contactDB->name.GetLimitOffsetByField(offset, limit, ContactNameTableFields::NamePrimary, str);
+        auto ret = contactDB->name.getLimitOffsetByField(offset, limit, ContactNameTableFields::NamePrimary, str);
 
         for (const auto &w : ret) {
 
-            auto contact = contactDB->contacts.GetByID(w.contactID);
+            auto contact = contactDB->contacts.getById(w.contactID);
             if (contact.ID == DB_ID_NONE) {
                 return records;
             }
@@ -365,12 +365,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            auto ring = contactDB->ringtones.GetByID(contact.ringID);
+            auto ring = contactDB->ringtones.getById(contact.ringID);
             if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(contact.addressID);
+            auto address = contactDB->address.getById(contact.addressID);
             if (address.ID == DB_ID_NONE) {
                 return records;
             }
@@ -392,11 +392,11 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     } break;
 
     case ContactRecordField::NumberUser: {
-        auto ret = contactDB->number.GetLimitOffsetByField(offset, limit, ContactNumberTableFields ::NumberUser, str);
+        auto ret = contactDB->number.getLimitOffsetByField(offset, limit, ContactNumberTableFields ::NumberUser, str);
 
         for (const auto &w : ret) {
 
-            auto contact = contactDB->contacts.GetByID(w.contactID);
+            auto contact = contactDB->contacts.getById(w.contactID);
             if (contact.ID == DB_ID_NONE) {
                 return records;
             }
@@ -406,17 +406,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            auto name = contactDB->name.GetByID(contact.nameID);
+            auto name = contactDB->name.getById(contact.nameID);
             if (name.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto ring = contactDB->ringtones.GetByID(contact.ringID);
+            auto ring = contactDB->ringtones.getById(contact.ringID);
             if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(contact.addressID);
+            auto address = contactDB->address.getById(contact.addressID);
             if (address.ID == DB_ID_NONE) {
                 return records;
             }
@@ -440,11 +440,11 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     } break;
 
     case ContactRecordField::NumberE164: {
-        auto ret = contactDB->number.GetLimitOffsetByField(offset, limit, ContactNumberTableFields::NumberE164, str);
+        auto ret = contactDB->number.getLimitOffsetByField(offset, limit, ContactNumberTableFields::NumberE164, str);
 
         for (const auto &w : ret) {
 
-            auto contact = contactDB->contacts.GetByID(w.contactID);
+            auto contact = contactDB->contacts.getById(w.contactID);
             if (contact.ID == DB_ID_NONE) {
                 return records;
             }
@@ -454,17 +454,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            auto name = contactDB->name.GetByID(contact.nameID);
+            auto name = contactDB->name.getById(contact.nameID);
             if (name.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto ring = contactDB->ringtones.GetByID(contact.ringID);
+            auto ring = contactDB->ringtones.getById(contact.ringID);
             if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(contact.addressID);
+            auto address = contactDB->address.getById(contact.addressID);
             if (address.ID == DB_ID_NONE) {
                 return records;
             }
@@ -487,16 +487,16 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         }
     } break;
     case ContactRecordField::SpeedDial: {
-        auto ret = contactDB->contacts.GetLimitOffsetByField(0, 1, ContactTableFields::SpeedDial, str);
+        auto ret = contactDB->contacts.getLimitOffsetByField(0, 1, ContactTableFields::SpeedDial, str);
 
         for (const auto &w : ret) {
 
-            auto contact = contactDB->contacts.GetByID(w.ID);
+            auto contact = contactDB->contacts.getById(w.ID);
             if (contact.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto name = contactDB->name.GetByID(contact.nameID);
+            auto name = contactDB->name.getById(contact.nameID);
             if (name.ID == DB_ID_NONE) {
                 return records;
             }
@@ -506,12 +506,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            auto ring = contactDB->ringtones.GetByID(contact.ringID);
+            auto ring = contactDB->ringtones.getById(contact.ringID);
             if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(contact.addressID);
+            auto address = contactDB->address.getById(contact.addressID);
             if (address.ID == DB_ID_NONE) {
                 return records;
             }
@@ -533,16 +533,16 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     } break;
 
     case ContactRecordField::Favourite: {
-        auto ret = contactDB->name.GetLimitOffsetByField(offset, limit, ContactNameTableFields::Favourite, str);
+        auto ret = contactDB->name.getLimitOffsetByField(offset, limit, ContactNameTableFields::Favourite, str);
 
         for (const auto &w : ret) {
 
-            auto contact = contactDB->contacts.GetByID(w.ID);
+            auto contact = contactDB->contacts.getById(w.ID);
             if (contact.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto name = contactDB->name.GetByID(contact.nameID);
+            auto name = contactDB->name.getById(contact.nameID);
             if (name.ID == DB_ID_NONE) {
                 return records;
             }
@@ -552,12 +552,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            auto ring = contactDB->ringtones.GetByID(contact.ringID);
+            auto ring = contactDB->ringtones.getById(contact.ringID);
             if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(contact.addressID);
+            auto address = contactDB->address.getById(contact.addressID);
             if (address.ID == DB_ID_NONE) {
                 return records;
             }
@@ -591,7 +591,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
 
     for (const auto &w : ret) {
 
-        auto contact = contactDB->contacts.GetByID(w.contactID);
+        auto contact = contactDB->contacts.getById(w.contactID);
         if (contact.ID == DB_ID_NONE) {
             return records;
         }
@@ -601,12 +601,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
             return records;
         }
 
-        auto ring = contactDB->ringtones.GetByID(contact.ringID);
+        auto ring = contactDB->ringtones.getById(contact.ringID);
         if (ring.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto address = contactDB->address.GetByID(contact.addressID);
+        auto address = contactDB->address.getById(contact.addressID);
         if (address.ID == DB_ID_NONE) {
             return records;
         }
@@ -638,7 +638,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
     auto ret = contactDB->contacts.Search(primaryName, alternativeName, number);
 
     for (const auto &w : ret) {
-        auto contact = contactDB->contacts.GetByID(w.ID);
+        auto contact = contactDB->contacts.getById(w.ID);
         if (contact.ID == DB_ID_NONE) {
             return records;
         }
@@ -648,12 +648,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
             return records;
         }
 
-        auto ring = contactDB->ringtones.GetByID(contact.ringID);
+        auto ring = contactDB->ringtones.getById(contact.ringID);
         if (ring.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto address = contactDB->address.GetByID(contact.addressID);
+        auto address = contactDB->address.getById(contact.addressID);
         if (address.ID == DB_ID_NONE) {
             return records;
         }
@@ -767,7 +767,7 @@ std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std:
 {
     std::vector<ContactRecord::Number> nrs;
     for (auto nr_str : utils::split(numbers_id, ' ')) {
-        auto nr = contactDB->number.GetByID(std::stol(nr_str));
+        auto nr = contactDB->number.getById(std::stol(nr_str));
         if (nr.ID == DB_ID_NONE) {
             return nrs;
         }
@@ -805,9 +805,9 @@ std::vector<ContactsNumberTableRow> ContactRecordInterface::getAllNumbers()
     std::vector<ContactsNumberTableRow> v;
 
     std::size_t offset       = 0;
-    std::size_t numbersCount = contactDB->number.GetCount();
+    std::size_t numbersCount = contactDB->number.count();
     while (offset < numbersCount) {
-        auto singleRead = contactDB->number.GetLimitOffset(offset, singleDumpSize);
+        auto singleRead = contactDB->number.getLimitOffset(offset, singleDumpSize);
         v.insert(std::end(v), std::begin(singleRead), std::end(singleRead));
         offset += singleDumpSize;
     }

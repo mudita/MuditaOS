@@ -42,26 +42,26 @@ class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow, ContactRi
 
     virtual ~ContactsRingtonesTable();
 
-    bool Create() override final;
+    bool create() override final;
 
-    bool Add(ContactsRingtonesTableRow entry) override final;
+    bool add(ContactsRingtonesTableRow entry) override final;
 
-    bool RemoveByID(uint32_t id) override final;
+    bool removeById(uint32_t id) override final;
 
-    bool Update(ContactsRingtonesTableRow entry) override final;
+    bool update(ContactsRingtonesTableRow entry) override final;
 
-    ContactsRingtonesTableRow GetByID(uint32_t id) override final;
+    ContactsRingtonesTableRow getById(uint32_t id) override final;
 
-    std::vector<ContactsRingtonesTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::vector<ContactsRingtonesTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsRingtonesTableRow> GetLimitOffsetByField(uint32_t offset,
+    std::vector<ContactsRingtonesTableRow> getLimitOffsetByField(uint32_t offset,
                                                                  uint32_t limit,
                                                                  ContactRingtonesTableFields field,
                                                                  const char *str) override final;
 
-    uint32_t GetCount() override final;
+    uint32_t count() override final;
 
-    uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
+    uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_ringtones("

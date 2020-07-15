@@ -17,7 +17,7 @@ AlarmsRecordInterface::~AlarmsRecordInterface()
 bool AlarmsRecordInterface::Add(const AlarmsRecord &rec)
 {
     // Create alarm
-    alarmsDB->alarms.Add(
+    alarmsDB->alarms.add(
         AlarmsTableRow{.time = rec.time, .snooze = rec.snooze, .status = rec.status, .path = rec.path});
 
     // TODO: error check
@@ -27,7 +27,7 @@ bool AlarmsRecordInterface::Add(const AlarmsRecord &rec)
 
 uint32_t AlarmsRecordInterface::GetCount()
 {
-    return alarmsDB->alarms.GetCount();
+    return alarmsDB->alarms.count();
 }
 
 std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffsetByField(uint32_t offset,
@@ -41,13 +41,13 @@ std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset
 
     switch (field) {
     case AlarmsRecordField::Time:
-        alarm = alarmsDB->alarms.GetLimitOffsetByField(offset, limit, AlarmsTableFields::Time, str);
+        alarm = alarmsDB->alarms.getLimitOffsetByField(offset, limit, AlarmsTableFields::Time, str);
         break;
     case AlarmsRecordField::Snooze:
-        alarm = alarmsDB->alarms.GetLimitOffsetByField(offset, limit, AlarmsTableFields::Snooze, str);
+        alarm = alarmsDB->alarms.getLimitOffsetByField(offset, limit, AlarmsTableFields::Snooze, str);
         break;
     case AlarmsRecordField::Status:
-        alarm = alarmsDB->alarms.GetLimitOffsetByField(offset, limit, AlarmsTableFields::Status, str);
+        alarm = alarmsDB->alarms.getLimitOffsetByField(offset, limit, AlarmsTableFields::Status, str);
         break;
     default:
         return records;
@@ -57,7 +57,7 @@ std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset
 
 std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto alarm = alarmsDB->alarms.GetLimitOffset(offset, limit);
+    auto alarm = alarmsDB->alarms.getLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<AlarmsRecord>>();
 
@@ -81,12 +81,12 @@ std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset
 bool AlarmsRecordInterface::Update(const AlarmsRecord &rec)
 {
 
-    auto alarm = alarmsDB->alarms.GetByID(rec.ID);
+    auto alarm = alarmsDB->alarms.getById(rec.ID);
     if (alarm.ID == 0) {
         return false;
     }
 
-    alarmsDB->alarms.Update(
+    alarmsDB->alarms.update(
         AlarmsTableRow{.ID = rec.ID, .time = rec.time, .snooze = rec.snooze, .status = rec.status, .path = rec.path});
 
     return true;
@@ -95,13 +95,13 @@ bool AlarmsRecordInterface::Update(const AlarmsRecord &rec)
 bool AlarmsRecordInterface::RemoveByID(uint32_t id)
 {
 
-    auto alarm = alarmsDB->alarms.GetByID(id);
+    auto alarm = alarmsDB->alarms.getById(id);
     if (alarm.ID == 0) {
         return false;
     }
 
     // Remove alarm
-    if (alarmsDB->alarms.RemoveByID(id) == false) {
+    if (alarmsDB->alarms.removeById(id) == false) {
         return false;
     }
 
@@ -113,7 +113,7 @@ bool AlarmsRecordInterface::RemoveByField(AlarmsRecordField field, const char *s
 
     switch (field) {
     case AlarmsRecordField ::Time:
-        return alarmsDB->alarms.RemoveByField(AlarmsTableFields::Time, str);
+        return alarmsDB->alarms.removeByField(AlarmsTableFields::Time, str);
 
     default:
         return false;
@@ -122,7 +122,7 @@ bool AlarmsRecordInterface::RemoveByField(AlarmsRecordField field, const char *s
 
 AlarmsRecord AlarmsRecordInterface::GetByID(uint32_t id)
 {
-    auto alarm = alarmsDB->alarms.GetByID(id);
+    auto alarm = alarmsDB->alarms.getById(id);
 
     return AlarmsRecord{
         .ID = alarm.ID, .time = alarm.time, .snooze = alarm.snooze, .status = alarm.status, .path = alarm.path};

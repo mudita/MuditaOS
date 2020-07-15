@@ -7,7 +7,7 @@ ThreadsTable::ThreadsTable(Database *db) : Table(db)
 ThreadsTable::~ThreadsTable()
 {}
 
-bool ThreadsTable::Create()
+bool ThreadsTable::create()
 {
     // Create necessary tables
     if (!db->Execute(createTableQuery))
@@ -24,7 +24,7 @@ bool ThreadsTable::Create()
     return true;
 }
 
-bool ThreadsTable::Add(ThreadsTableRow entry)
+bool ThreadsTable::add(ThreadsTableRow entry)
 {
 
     return db->Execute("INSERT or ignore INTO threads ( date, msg_count, read, contact_id, snippet, last_dir ) VALUES "
@@ -37,12 +37,12 @@ bool ThreadsTable::Add(ThreadsTableRow entry)
                        entry.type);
 }
 
-bool ThreadsTable::RemoveByID(uint32_t id)
+bool ThreadsTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM threads where _id = %u;", id);
 }
 
-bool ThreadsTable::Update(ThreadsTableRow entry)
+bool ThreadsTable::update(ThreadsTableRow entry)
 {
     return db->Execute("UPDATE threads SET date = %lu, msg_count = %lu ,read = %lu, contact_id = %lu, snippet = '%q', "
                        "last_dir = %lu WHERE _id=%lu;",
@@ -55,7 +55,7 @@ bool ThreadsTable::Update(ThreadsTableRow entry)
                        entry.ID);
 }
 
-ThreadsTableRow ThreadsTable::GetByID(uint32_t id)
+ThreadsTableRow ThreadsTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM threads WHERE _id= %u;", id);
 
@@ -89,7 +89,7 @@ void fillRetQuery(std::vector<ThreadsTableRow> &ret, const std::unique_ptr<Query
     } while (retQuery->NextRow());
 }
 
-std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<ThreadsTableRow> ThreadsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
 
     auto retQuery = db->Query("SELECT * from threads ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
@@ -103,7 +103,7 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint3
     return ret;
 }
 
-std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<ThreadsTableRow> ThreadsTable::getLimitOffsetByField(uint32_t offset,
                                                                  uint32_t limit,
                                                                  ThreadsTableFields field,
                                                                  const char *str)
@@ -144,12 +144,12 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByField(uint32_t offset
     return ret;
 }
 
-uint32_t ThreadsTable::GetCount()
+uint32_t ThreadsTable::count()
 {
-    return GetCount(EntryState::ALL);
+    return count(EntryState::ALL);
 }
 
-uint32_t ThreadsTable::GetCount(EntryState state)
+uint32_t ThreadsTable::count(EntryState state)
 {
     std::string query = "SELECT COUNT(*) FROM threads ";
     switch (state) {
@@ -172,7 +172,7 @@ uint32_t ThreadsTable::GetCount(EntryState state)
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t ThreadsTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t ThreadsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM threads WHERE %q=%u;", field, id);
 

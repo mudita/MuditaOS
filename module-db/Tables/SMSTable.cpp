@@ -17,12 +17,12 @@ SMSTable::SMSTable(Database *db) : Table(db)
 SMSTable::~SMSTable()
 {}
 
-bool SMSTable::Create()
+bool SMSTable::create()
 {
     return db->Execute(createTableQuery);
 }
 
-bool SMSTable::Add(SMSTableRow entry)
+bool SMSTable::add(SMSTableRow entry)
 {
     return db->Execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, date_send, error_code, body, "
                        "type ) VALUES (%lu,%lu,%lu,%lu,0,'%q',%d);",
@@ -34,12 +34,12 @@ bool SMSTable::Add(SMSTableRow entry)
                        entry.type);
 }
 
-bool SMSTable::RemoveByID(uint32_t id)
+bool SMSTable::removeById(uint32_t id)
 {
     return db->Execute("DELETE FROM sms where _id = %u;", id);
 }
 
-bool SMSTable::RemoveByField(SMSTableFields field, const char *str)
+bool SMSTable::removeByField(SMSTableFields field, const char *str)
 {
     std::string fieldName;
 
@@ -62,7 +62,7 @@ bool SMSTable::RemoveByField(SMSTableFields field, const char *str)
     return db->Execute("DELETE FROM sms where %q = '%q';", fieldName.c_str(), str);
 }
 
-bool SMSTable::Update(SMSTableRow entry)
+bool SMSTable::update(SMSTableRow entry)
 {
     return db->Execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, date_send = %lu, error_code = 0, "
                        "body = '%q', type =%d WHERE _id=%lu;",
@@ -75,7 +75,7 @@ bool SMSTable::Update(SMSTableRow entry)
                        entry.ID);
 }
 
-SMSTableRow SMSTable::GetByID(uint32_t id)
+SMSTableRow SMSTable::getById(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM sms WHERE _id= %u;", id);
 
@@ -95,7 +95,7 @@ SMSTableRow SMSTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->Query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
@@ -121,7 +121,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limi
     return ret;
 }
 
-std::vector<SMSTableRow> SMSTable::GetLimitOffsetByField(uint32_t offset,
+std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
                                                          uint32_t limit,
                                                          SMSTableFields field,
                                                          const char *str)
@@ -169,7 +169,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffsetByField(uint32_t offset,
 
     return ret;
 }
-uint32_t SMSTable::GetCount()
+uint32_t SMSTable::count()
 {
     std::string query = "SELECT COUNT(*) FROM sms;";
 
@@ -181,7 +181,7 @@ uint32_t SMSTable::GetCount()
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
-uint32_t SMSTable::GetCountByFieldID(const char *field, uint32_t id)
+uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM sms WHERE %q=%lu;", field, id);
 
