@@ -52,23 +52,33 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
 
         ThreadRecord re;
         re.contactID = contactID;
-        threadInterface.Add(re);
+        if (!threadInterface.Add(re)) {
+            LOG_ERROR("Cannot create new thread");
+            return false;
+        }
 
         threadRec = threadInterface.GetLimitOffsetByField(
             0, 1, ThreadRecordField::ContactID, std::to_string(contactID).c_str());
+        if (threadRec->size() == 0) {
+            LOG_ERROR("Thread not found");
+            return false;
+        }
     }
     threadID = (*threadRec)[0].ID;
 
     // Create SMS
-    smsDB->sms.add(SMSTableRow{.threadID  = threadID,
-                               .contactID = contactID,
-                               .date      = rec.date,
-                               .dateSent  = rec.dateSent,
-                               .errorCode = rec.errorCode,
-                               .body      = rec.body,
-                               .type      = rec.type
+    if (!smsDB->sms.add(SMSTableRow{.threadID  = threadID,
+                                    .contactID = contactID,
+                                    .date      = rec.date,
+                                    .dateSent  = rec.dateSent,
+                                    .errorCode = rec.errorCode,
+                                    .body      = rec.body,
+                                    .type      = rec.type
 
-    });
+        })) {
+        LOG_ERROR("Cannot add sms");
+        return false;
+    }
 
     // TODO: error check
 
@@ -80,9 +90,13 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     thread.msgCount++;
     if (rec.type == SMSType::INBOX) {
         thread.unreadMsgCount++;
+        LOG_DEBUG("unreadMsgCount = %" PRIu32 " for thread = %" PRIu32, thread.unreadMsgCount, thread.ID);
     }
 
-    threadInterface.Update(thread);
+    if (!threadInterface.Update(thread)) {
+        LOG_ERROR("Cannot update thread");
+        return false;
+    }
 
     return true;
 }
@@ -161,16 +175,14 @@ bool SMSRecordInterface::Update(const SMSRecord &rec)
         return false;
     }
 
-    smsDB->sms.update(SMSTableRow{.ID        = rec.ID,
-                                  .threadID  = sms.threadID,
-                                  .contactID = sms.contactID,
-                                  .date      = rec.date,
-                                  .dateSent  = rec.dateSent,
-                                  .errorCode = rec.errorCode,
-                                  .body      = rec.body,
-                                  .type      = rec.type});
-
-    return true;
+    return smsDB->sms.update(SMSTableRow{.ID        = rec.ID,
+                                         .threadID  = sms.threadID,
+                                         .contactID = sms.contactID,
+                                         .date      = rec.date,
+                                         .dateSent  = rec.dateSent,
+                                         .errorCode = rec.errorCode,
+                                         .body      = rec.body,
+                                         .type      = rec.type});
 }
 
 bool SMSRecordInterface::RemoveByID(uint32_t id)
