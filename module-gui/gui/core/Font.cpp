@@ -144,7 +144,7 @@ namespace gui
         return gui::Status::GUI_SUCCESS;
     }
 
-    Font::~Font()
+    RawFont::~RawFont()
     {
         for (std::map<uint32_t, FontGlyph *>::iterator it = glyphs.begin(); it != glyphs.end(); ++it)
             delete it->second;
@@ -162,7 +162,7 @@ namespace gui
         kerning.clear();
     }
 
-    gui::Status Font::load(uint8_t *data)
+    gui::Status RawFont::load(uint8_t *data)
     {
 
         uint32_t offset = 0;
@@ -231,7 +231,7 @@ namespace gui
         return gui::Status::GUI_SUCCESS;
     }
 
-    int32_t Font::getKerning(uint32_t id1, uint32_t id2) const
+    int32_t RawFont::getKerning(uint32_t id1, uint32_t id2) const
     {
         if (id2 == none_char_id) {
             return 0;
@@ -254,7 +254,7 @@ namespace gui
         return kern->amount;
     }
 
-    uint32_t Font::getCharCountInSpace(const UTF8 &str, const uint32_t space) const
+    uint32_t RawFont::getCharCountInSpace(const UTF8 &str, const uint32_t space) const
     {
         uint32_t availableSpace = space;
         uint32_t count         = 0;
@@ -273,7 +273,7 @@ namespace gui
         return count;
     }
 
-    std::unique_ptr<FontGlyph> Font::getGlyph(uint32_t id) const
+    std::unique_ptr<FontGlyph> RawFont::getGlyph(uint32_t id) const
     {
         auto glyph_found = glyphs.find(id);
         if (glyph_found != glyphs.end()) {
@@ -282,7 +282,7 @@ namespace gui
         return getGlyphUnsupported();
     }
 
-    uint32_t Font::getPixelWidth(const UTF8 &str, const uint32_t start, const uint32_t count) const
+    uint32_t RawFont::getPixelWidth(const UTF8 &str, const uint32_t start, const uint32_t count) const
     {
         if (count == 0) {
             return 0;
@@ -311,12 +311,12 @@ namespace gui
         return width;
     }
 
-    uint32_t Font::getPixelWidth(const UTF8 &str) const
+    uint32_t RawFont::getPixelWidth(const UTF8 &str) const
     {
         return getPixelWidth(str, 0, str.length());
     }
 
-    uint32_t Font::getCharPixelWidth(uint32_t charCode, uint32_t previousChar) const
+    uint32_t RawFont::getCharPixelWidth(uint32_t charCode, uint32_t previousChar) const
     {
         if (charCode == text::newline) { // newline doesn't have width
             return 0;
@@ -329,7 +329,7 @@ namespace gui
         return 0;
     }
 
-    uint32_t Font::getCharPixelHeight(uint32_t charCode)
+    uint32_t RawFont::getCharPixelHeight(uint32_t charCode)
     {
         FontGlyph *glyph = glyphs.find(charCode)->second;
 
@@ -339,7 +339,7 @@ namespace gui
         return 0;
     }
 
-    UTF8 Font::getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const
+    UTF8 RawFont::getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const
     {
         std::string result;
         auto w_dot        = getCharPixelWidth('.');
@@ -366,7 +366,7 @@ namespace gui
         return result;
     }
 
-    void Font::setEllipsis(std::string &text, Ellipsis ellipsis) const
+    void RawFont::setEllipsis(std::string &text, Ellipsis ellipsis) const
     {
         auto set_dot = [&](auto begin, auto end) {
             auto dots_in_elipsis = 3;
@@ -389,7 +389,7 @@ namespace gui
         }
     }
 
-    std::unique_ptr<FontGlyph> Font::getGlyphUnsupported() const
+    std::unique_ptr<FontGlyph> RawFont::getGlyphUnsupported() const
     {
         std::unique_ptr<FontGlyph> unsupported = std::make_unique<FontGlyph>();
 
@@ -450,7 +450,7 @@ namespace gui
 
     void FontManager::clear()
     {
-        for (Font *font : fonts) {
+        for (RawFont *font : fonts) {
             delete font;
         }
         fonts.clear();
@@ -466,7 +466,7 @@ namespace gui
         }
     }
 
-    Font *FontManager::loadFont(std::string filename)
+    RawFont *FontManager::loadFont(std::string filename)
     {
 
         auto file = vfs.fopen(filename.c_str(), "rb");
@@ -492,7 +492,7 @@ namespace gui
         }
 
         // allocate memory for new font
-        Font *font = new Font();
+        RawFont *font = new RawFont();
         if (font->load(reinterpret_cast<uint8_t *>(fontData)) != gui::Status::GUI_SUCCESS) {
             delete font;
             delete[] fontData;
@@ -552,7 +552,7 @@ namespace gui
         return instance;
     }
 
-    [[nodiscard]] auto FontManager::getFont(const std::string &name) const -> Font *
+    [[nodiscard]] auto FontManager::getFont(const std::string &name) const -> RawFont *
     {
         auto font = find(name);
         // default return first font
@@ -563,7 +563,7 @@ namespace gui
         return font;
     }
 
-    [[nodiscard]] auto FontManager::getFont(uint32_t num) const -> Font *
+    [[nodiscard]] auto FontManager::getFont(uint32_t num) const -> RawFont *
     {
         if (fonts.size() == 0) {
             return nullptr;
@@ -574,7 +574,7 @@ namespace gui
         return fonts[num];
     }
 
-    auto FontManager::find(const std::string &name) const -> Font *
+    auto FontManager::find(const std::string &name) const -> RawFont *
     {
         for (auto &font : fonts) {
             if (name.compare(font->info.face) == 0) {

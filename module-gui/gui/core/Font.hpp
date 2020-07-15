@@ -89,10 +89,10 @@ namespace gui
         uint16_t scale_h;
     };
 
-    class Font
+    class RawFont
     {
       public:
-        virtual ~Font();
+        virtual ~RawFont();
 
         gui::Status load(uint8_t *data);
 
@@ -183,10 +183,10 @@ namespace gui
 
       protected:
         std::string fontFolder;
-        std::vector<Font *> fonts;
+        std::vector<RawFont *> fonts;
         std::vector<std::string> getFontsList();
 
-        Font *loadFont(std::string filename);
+        RawFont *loadFont(std::string filename);
         void loadFonts(std::string baseDirectory);
 
         FontManager();
@@ -201,15 +201,15 @@ namespace gui
 
         virtual ~FontManager();
 
-        [[nodiscard]] auto getFont(const std::string &name) const -> Font *;
-        [[nodiscard]] auto getFont(uint32_t num) const -> Font *;
+        [[nodiscard]] auto getFont(const std::string &name) const -> RawFont *;
+        [[nodiscard]] auto getFont(uint32_t num) const -> RawFont *;
         [[nodiscard]] auto isInitialized() const
         {
             return initialized;
         }
 
       private:
-        [[nodiscard]] auto find(const std::string &name) const -> Font *;
+        [[nodiscard]] auto find(const std::string &name) const -> RawFont *;
     };
 
 } /* namespace gui */

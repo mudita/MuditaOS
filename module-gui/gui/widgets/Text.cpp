@@ -129,11 +129,11 @@ namespace gui
 
     void Text::setFont(const UTF8 &fontName)
     {
-        Font *newFont = FontManager::getInstance().getFont(fontName);
+        RawFont *newFont = FontManager::getInstance().getFont(fontName);
         font          = newFont;
     }
 
-    void Text::setFont(Font *fontName)
+    void Text::setFont(RawFont *fontName)
     {
         font = fontName;
     }

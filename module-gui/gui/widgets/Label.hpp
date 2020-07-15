@@ -70,7 +70,7 @@ namespace gui
         uint32_t charDrawableCount = 0;
         uint32_t stringPixelWidth  = 0;
         Color textColor            = {0, 0};
-        Font *font                 = nullptr;
+        RawFont *font                 = nullptr;
         Margins margins            = {0, 0, 0, 0};
         bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
         Alignment alignment;
@@ -133,8 +133,8 @@ namespace gui
         void setTextColor(Color color);
 
         void setFont(const UTF8 &fontName);
-        void setFont(Font *font);
-        Font *getFont() const;
+        void setFont(RawFont *font);
+        RawFont *getFont() const;
         // virtual methods
         std::list<DrawCommand *> buildDrawList() override;
         uint32_t getTextNeedSpace() const;

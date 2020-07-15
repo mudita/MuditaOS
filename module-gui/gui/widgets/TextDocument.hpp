@@ -12,12 +12,12 @@ namespace gui
     /// based on TextBlock - which is paragraph representation
     struct TextPart
     {
-        TextPart(BlockCursor cursor, UTF8 text, Font *font) : cursor(cursor), text(std::move(text)), font(font)
+        TextPart(BlockCursor cursor, UTF8 text, RawFont *font) : cursor(cursor), text(std::move(text)), font(font)
         {}
         TextPart() = default;
         BlockCursor cursor;
         UTF8 text;
-        Font *font = nullptr;
+        RawFont *font = nullptr;
     };
 
     class TextDocument

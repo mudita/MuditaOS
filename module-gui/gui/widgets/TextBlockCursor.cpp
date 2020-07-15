@@ -27,7 +27,7 @@ namespace gui
         return std::end(document->blocks);
     }
 
-    BlockCursor::BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, Font *default_font)
+    BlockCursor::BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, RawFont *default_font)
         : document(document), default_font(default_font)
     {
         this->pos      = text::npos;

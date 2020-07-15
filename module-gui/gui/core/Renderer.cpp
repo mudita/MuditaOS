@@ -826,7 +826,7 @@ namespace gui
     }
 
     void Renderer::drawChar(
-        Context *context, const int16_t x, const int16_t y, Font *font, FontGlyph *glyph, const Color color)
+        Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color)
     {
 
         uint8_t *drawPtr  = context->getData() + x + (y - glyph->yoffset) * context->getW();
@@ -867,7 +867,7 @@ namespace gui
 
         // retrieve font used to draw text
         FontManager &fontManager = FontManager::getInstance();
-        Font *font               = fontManager.getFont(cmd->fontID);
+        RawFont *font               = fontManager.getFont(cmd->fontID);
 
         int16_t posX = cmd->tx;
         int16_t posY = cmd->ty;

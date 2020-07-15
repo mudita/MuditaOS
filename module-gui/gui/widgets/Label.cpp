@@ -256,11 +256,11 @@ namespace gui
 
     void Label::setFont(const UTF8 &fontName)
     {
-        Font *newFont = FontManager::getInstance().getFont(fontName);
+        RawFont *newFont = FontManager::getInstance().getFont(fontName);
         setFont(newFont);
     }
 
-    void Label::setFont(Font *font)
+    void Label::setFont(RawFont *font)
     {
         this->font = font;
         if (font != nullptr) {
@@ -268,7 +268,7 @@ namespace gui
         }
     }
 
-    Font *Label::getFont() const
+    RawFont *Label::getFont() const
     {
         return font;
     }
