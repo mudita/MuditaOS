@@ -129,12 +129,14 @@ namespace gui
 
     void NewSMS_Window::updateBottomBar()
     {
-        if (recipient->getText().length() == 0) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-            return;
-        }
+        if (getFocusItem() == recipient) {
+            if (recipient->getText().length() == 0) {
+                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+                return;
+            }
 
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+        }
     };
 
     void NewSMS_Window::buildInterface()
@@ -186,6 +188,10 @@ namespace gui
         };
         recipient->contentCallback = [=](Item &) -> bool {
             updateBottomBar();
+            if (recipient->getText().length() == 0) {
+                contact = nullptr;
+            }
+
             return true;
         };
 
