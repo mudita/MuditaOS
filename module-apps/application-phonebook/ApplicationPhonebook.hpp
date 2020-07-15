@@ -41,6 +41,8 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+
+        void onSearchRequest(const std::string &searchFilter);
     };
 
 } // namespace app

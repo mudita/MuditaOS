@@ -5,9 +5,12 @@
 ### Added
 
 * `[calendar]` Added events options and event delete windows.
+
 ### Changed
 
 ### Fixed
+
+* `[sms]` Fix selecting contact for a new message after searching in phonebook.
 
 ### Other
 

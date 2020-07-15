@@ -90,7 +90,8 @@ namespace gui
         contactsList->setProvider(phonebookModel);
 
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
-        if (contactRequest) {
+        requestedSearch     = contactRequest != nullptr;
+        if (requestedSearch) {
             enableNewContact                       = false;
             phonebookModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
                 std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
@@ -154,4 +155,8 @@ namespace gui
         return phonebookModel->updateRecords(std::move(records));
     }
 
+    bool PhonebookMainWindow::isSearchRequested() const
+    {
+        return requestedSearch;
+    }
 } /* namespace gui */
