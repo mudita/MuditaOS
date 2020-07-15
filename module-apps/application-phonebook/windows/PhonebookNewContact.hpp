@@ -25,7 +25,8 @@ namespace gui
         {
             None,
             Add,
-            Edit
+            Edit,
+            EditTemporary
         };
 
         auto verifyAndSave() -> bool;

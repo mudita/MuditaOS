@@ -59,6 +59,7 @@ namespace gui
         case ContactAction::None:
             break;
         case ContactAction::Add:
+        case ContactAction::EditTemporary:
             setTitle(utils::localize.get("app_phonebook_contact_title"));
             break;
         case ContactAction::Edit:
@@ -87,8 +88,11 @@ namespace gui
             return true;
         }
 
-        if (contact->ID == DB_ID_NONE || contact->contactType == ContactType::TEMPORARY) {
+        if (contact->ID == DB_ID_NONE) {
             contactAction = ContactAction::Add;
+        }
+        else if (contact->contactType == ContactType::TEMPORARY) {
+            contactAction = ContactAction::EditTemporary;
         }
         else {
             contactAction = ContactAction::Edit;
@@ -157,7 +161,9 @@ namespace gui
                 return true;
             }
         }
-        else if (contactAction == ContactAction::Edit) {
+        else if (contactAction == ContactAction::Edit || contactAction == ContactAction::EditTemporary) {
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            data->ignoreCurrentWindowOnStack      = true;
             if (contact->contactType == ContactType::TEMPORARY) {
                 contact->contactType = ContactType::USER;
             }
@@ -166,7 +172,6 @@ namespace gui
                 return false;
             }
             else {
-                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 LOG_INFO("verifyAndSave contact UPDATED");
                 return true;
@@ -183,6 +188,7 @@ namespace gui
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
         contact->ID           = oldContactRecord.ID;
+
         meta.action           = [=]() -> bool {
             if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
