@@ -28,16 +28,16 @@ class QueryResult
         return rows[currentRow][index];
     }
 
-    bool NextRow();
+    bool nextRow();
 
-    void AddRow(const std::vector<Field> &row);
+    void addRow(const std::vector<Field> &row);
 
-    uint32_t GetFieldCount() const
+    uint32_t getFieldCount() const
     {
         return fieldCount;
     }
 
-    uint32_t GetRowCount() const
+    uint32_t getRowCount() const
     {
         return rowCount;
     }

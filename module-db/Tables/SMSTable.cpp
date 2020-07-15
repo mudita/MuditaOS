@@ -79,7 +79,7 @@ SMSTableRow SMSTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM sms WHERE _id= %u;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return SMSTableRow();
     }
 
@@ -99,7 +99,7 @@ std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limi
 {
     auto retQuery = db->query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
     }
 
@@ -116,7 +116,7 @@ std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limi
             (*retQuery)[6].GetString(),                       // body
             static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -148,7 +148,7 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
                               limit,
                               offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
     }
 
@@ -165,7 +165,7 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
             (*retQuery)[6].GetString(),                       // body
             static_cast<SMSType>((*retQuery)[7].GetUInt32()), // type
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -174,7 +174,7 @@ uint32_t SMSTable::count()
     std::string query = "SELECT COUNT(*) FROM sms;";
 
     auto queryRet = db->query(query.c_str());
-    if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -185,7 +185,7 @@ uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM sms WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 

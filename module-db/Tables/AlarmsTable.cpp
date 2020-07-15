@@ -77,7 +77,7 @@ AlarmsTableRow AlarmsTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM alarms WHERE _id= %u;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return AlarmsTableRow();
     }
 
@@ -94,7 +94,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffset(uint32_t offset, uint32_
 {
     auto retQuery = db->query("SELECT * from alarms ORDER BY time ASC LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<AlarmsTableRow>();
     }
 
@@ -108,7 +108,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffset(uint32_t offset, uint32_
             (*retQuery)[3].GetUInt32(), // status
             (*retQuery)[4].GetString(), // path
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -140,7 +140,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
                               limit,
                               offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<AlarmsTableRow>();
     }
 
@@ -154,7 +154,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
             (*retQuery)[3].GetUInt32(), // status
             (*retQuery)[4].GetString(), // path
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -163,7 +163,7 @@ uint32_t AlarmsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM alarms;");
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -174,7 +174,7 @@ uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM alarms WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 
@@ -185,7 +185,7 @@ AlarmsTableRow AlarmsTable::GetNext(time_t time)
 {
     auto retQuery = db->query("SELECT * from alarms WHERE status=1 AND time>=%u ORDER BY time ASC LIMIT 1;", time);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return AlarmsTableRow();
     }
 

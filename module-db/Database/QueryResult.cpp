@@ -13,14 +13,14 @@
 QueryResult::QueryResult() : currentRow(0), fieldCount(0), rowCount(0)
 {}
 
-void QueryResult::AddRow(const std::vector<Field> &row)
+void QueryResult::addRow(const std::vector<Field> &row)
 {
     rows.push_back(row);
     rowCount++;
     fieldCount = row.size();
 }
 
-bool QueryResult::NextRow()
+bool QueryResult::nextRow()
 {
     if (currentRow < (rowCount - 1)) {
         currentRow++;

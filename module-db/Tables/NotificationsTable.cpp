@@ -58,11 +58,11 @@ NotificationsTableRow NotificationsTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM notifications WHERE _id= %u;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return NotificationsTableRow();
     }
 
-    assert(retQuery->GetRowCount() == 1);
+    assert(retQuery->getRowCount() == 1);
 
     return NotificationsTableRow{
         (*retQuery)[0].GetUInt32(), // ID
@@ -76,11 +76,11 @@ NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
 {
     auto retQuery = db->query("SELECT * FROM notifications WHERE key= %u;", key);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return NotificationsTableRow();
     }
 
-    assert(retQuery->GetRowCount() == 1);
+    assert(retQuery->getRowCount() == 1);
 
     return NotificationsTableRow{
         (*retQuery)[0].GetUInt32(), // ID
@@ -93,7 +93,7 @@ std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t o
 {
     auto retQuery = db->query("SELECT * from notifications LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<NotificationsTableRow>();
     }
 
@@ -105,7 +105,7 @@ std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t o
             (*retQuery)[1].GetUInt32(), // key
             (*retQuery)[2].GetUInt32(), // value
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -124,7 +124,7 @@ uint32_t NotificationsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM notifications;");
 
-    if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
     }
 

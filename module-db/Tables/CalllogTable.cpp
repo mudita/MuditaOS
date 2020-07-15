@@ -69,7 +69,7 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM calls WHERE _id= %u;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return CalllogTableRow();
     }
 
@@ -91,7 +91,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint3
 {
     auto retQuery = db->query("SELECT * from calls ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
     }
 
@@ -110,7 +110,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint3
             (*retQuery)[8].GetString(),                                // contactID
             static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -136,7 +136,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
     auto retQuery = db->query(
         "SELECT * from calls WHERE %q='%q' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
     }
 
@@ -155,7 +155,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
             (*retQuery)[8].GetString(),                                // contactID
             static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -177,7 +177,7 @@ uint32_t CalllogTable::count(EntryState state)
     LOG_DEBUG("> %s", query.c_str());
     auto queryRet = db->query(query.c_str());
 
-    if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -193,7 +193,7 @@ uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM calls WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 

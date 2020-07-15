@@ -158,7 +158,7 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
         }
     }
 
-    db->AddRow(row);
+    db->addRow(row);
 
     return 0;
 }

@@ -68,7 +68,7 @@ NotesTableRow NotesTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM notes WHERE _id= %u;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return NotesTableRow();
     }
 
@@ -84,7 +84,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t 
 {
     auto retQuery = db->query("SELECT * from notes ORDER BY date LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<NotesTableRow>();
     }
 
@@ -97,7 +97,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t 
             (*retQuery)[2].GetString(), // snippet
             (*retQuery)[3].GetString(), // path
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -126,7 +126,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(uint32_t offset,
     auto retQuery = db->query(
         "SELECT * from notes WHERE %q='%q' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<NotesTableRow>();
     }
 
@@ -139,7 +139,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(uint32_t offset,
             (*retQuery)[2].GetString(), // snippet
             (*retQuery)[3].GetString(), // path
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -148,7 +148,7 @@ uint32_t NotesTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM NOTES;");
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -159,7 +159,7 @@ uint32_t NotesTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM notes WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 

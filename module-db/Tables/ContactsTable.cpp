@@ -59,7 +59,7 @@ ContactsTableRow ContactsTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM contacts WHERE _id= %lu;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsTableRow();
     }
 
@@ -109,7 +109,7 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
     LOG_DEBUG("query: \"%s\"", q.c_str());
     auto retQuery = db->query(q.c_str());
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 
@@ -128,7 +128,7 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
             (*retQuery)[10].GetString(),                          // primaryName
             (*retQuery)[11].GetString(),                          // alternativeName (WTF!)
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -153,13 +153,13 @@ std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &
     }
 
     auto queryRet = db->query(query.c_str());
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;
     }
 
     do {
         ids.push_back((*queryRet)[0].GetUInt32());
-    } while (queryRet->NextRow());
+    } while (queryRet->nextRow());
 
     return ids;
 }
@@ -168,7 +168,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
 {
     auto retQuery = db->query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 
@@ -187,7 +187,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
             (*retQuery)[8].GetBool(),                             // is on favourites
             (*retQuery)[9].GetString(),                           // speed dial key
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -216,7 +216,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
                               limit,
                               offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 
@@ -235,7 +235,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
             (*retQuery)[8].GetBool(),                             // is on favourites
             (*retQuery)[9].GetString(),                           // speed dial key
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -244,7 +244,7 @@ uint32_t ContactsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contacts;");
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -255,7 +255,7 @@ uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contacts WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 

@@ -59,7 +59,7 @@ ThreadsTableRow ThreadsTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM threads WHERE _id= %u;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ThreadsTableRow();
     }
 
@@ -86,7 +86,7 @@ void fillRetQuery(std::vector<ThreadsTableRow> &ret, const std::unique_ptr<Query
             (*retQuery)[5].GetString(),                       // snippet
             static_cast<SMSType>((*retQuery)[6].GetUInt32()), // type/last-dir
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 }
 
 std::vector<ThreadsTableRow> ThreadsTable::getLimitOffset(uint32_t offset, uint32_t limit)
@@ -94,7 +94,7 @@ std::vector<ThreadsTableRow> ThreadsTable::getLimitOffset(uint32_t offset, uint3
 
     auto retQuery = db->query("SELECT * from threads ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
     }
 
@@ -135,7 +135,7 @@ std::vector<ThreadsTableRow> ThreadsTable::getLimitOffsetByField(uint32_t offset
 
     auto retQuery = db->query(query.c_str());
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
     }
 
@@ -165,7 +165,7 @@ uint32_t ThreadsTable::count(EntryState state)
     query += ";";
 
     auto queryRet = db->query(query.c_str());
-    if (queryRet == nullptr || queryRet->GetRowCount() == 0) {
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -176,7 +176,7 @@ uint32_t ThreadsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM threads WHERE %q=%u;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 
@@ -206,7 +206,7 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                 .snippet        = (*retQuery)[6].GetString(),
                 .type           = static_cast<SMSType>((*retQuery)[7].GetUInt32()),
             });
-        } while (retQuery->NextRow());
+        } while (retQuery->nextRow());
     }
     else {
         ret.second = {};

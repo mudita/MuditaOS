@@ -41,7 +41,7 @@ ContactsAddressTableRow ContactsAddressTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM contact_address WHERE _id= %lu;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsAddressTableRow();
     }
 
@@ -58,7 +58,7 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffset(uint32
 {
     auto retQuery = db->query("SELECT * from contact_address ORDER BY contact_id LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsAddressTableRow>();
     }
 
@@ -72,7 +72,7 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffset(uint32
             (*retQuery)[3].GetString(), // note
             (*retQuery)[4].GetString(), // mail
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -98,7 +98,7 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffsetByField
                               limit,
                               offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsAddressTableRow>();
     }
 
@@ -112,7 +112,7 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffsetByField
             (*retQuery)[3].GetString(), // note
             (*retQuery)[4].GetString(), // mail
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -121,7 +121,7 @@ uint32_t ContactsAddressTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contact_address;");
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -132,7 +132,7 @@ uint32_t ContactsAddressTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contact_address WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 
