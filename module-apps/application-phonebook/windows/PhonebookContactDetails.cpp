@@ -37,10 +37,10 @@ namespace gui
         contactFlagsWidget->setVisible(true);
 
         bodyList = new gui::ListView(this,
-                                     phonebookStyle::contactDetailsList::x,
-                                     phonebookStyle::contactDetailsList::y,
-                                     phonebookStyle::contactDetailsList::w,
-                                     phonebookStyle::contactDetailsList::h,
+                                     phonebookStyle::contactDetailsWindow::contactDetailsList::x,
+                                     phonebookStyle::contactDetailsWindow::contactDetailsList::y,
+                                     phonebookStyle::contactDetailsWindow::contactDetailsList::w,
+                                     phonebookStyle::contactDetailsWindow::contactDetailsList::h,
                                      contactDetailsModel);
         setFocusItem(bodyList);
     }
