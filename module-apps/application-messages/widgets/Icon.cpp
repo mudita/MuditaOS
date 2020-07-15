@@ -42,8 +42,8 @@ Icon::Icon(Item *parent,
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-    auto format = TextFormat(FontManager::getInstance().getFont(style::window::font::medium), Color(7,0));
-    for ( auto &el : textToTextBlocks(str, format) ) {
+    auto format = TextFormat(FontManager::getInstance().getFont(style::window::font::medium), Color(7, 0));
+    for (auto &el : textToTextBlocks(str, format)) {
         text->addText(el);
     }
 }

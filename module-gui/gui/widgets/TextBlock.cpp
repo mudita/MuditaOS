@@ -10,7 +10,8 @@ namespace gui
     TextBlock::TextBlock(const UTF8 text, std::unique_ptr<TextFormat> format) : format(std::move(format)), text{text}
     {}
 
-    TextBlock::TextBlock(const UTF8 text, Font *font, TextBlock::End eol) : TextBlock(text, std::make_unique<TextFormat>(font))
+    TextBlock::TextBlock(const UTF8 text, Font *font, TextBlock::End eol)
+        : TextBlock(text, std::make_unique<TextFormat>(font))
     {
         if (getEnd() != End::Newline && eol == End::Newline) {
             this->text.insertCode(text::newline);
@@ -19,7 +20,7 @@ namespace gui
 
     TextBlock::TextBlock(const TextBlock &p)
     {
-        text = p.text;
+        text   = p.text;
         format = std::make_unique<TextFormat>(*p.format);
     }
 

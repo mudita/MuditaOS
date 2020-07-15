@@ -110,7 +110,8 @@ namespace gui
     auto TextDocument::split(BlockCursor &cursor) -> std::pair<TextBlock &, TextBlock &>
     {
         auto to_split = std::next(blocks.begin(), cursor.getBlockNr());
-        auto newblock = TextBlock(to_split->getText(cursor.getPosition()), to_split->getFormat()->getFont(), to_split->getEnd());
+        auto newblock =
+            TextBlock(to_split->getText(cursor.getPosition()), to_split->getFormat()->getFont(), to_split->getEnd());
         to_split->setText(to_split->getText().substr(0, cursor.getPosition()));
         blocks.insert(std::next(to_split), std::move(newblock));
         return {*to_split, *(std::next(to_split))};

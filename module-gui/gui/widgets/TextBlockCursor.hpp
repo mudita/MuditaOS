@@ -75,6 +75,6 @@ namespace gui
         void addTextBlock(TextBlock &&);
         // return if handled ( this is not i.e. at begin/end)
         bool removeChar();
-        const TextBlock & operator*();
+        const TextBlock &operator*();
     };
 } // namespace gui
