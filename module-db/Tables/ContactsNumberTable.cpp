@@ -56,11 +56,11 @@ ContactsNumberTableRow ContactsNumberTable::getById(uint32_t id)
     }
 
     return ContactsNumberTableRow{
-        (*retQuery)[0].GetUInt32(),                                 // ID
-        (*retQuery)[1].GetUInt32(),                                 // contactID
-        (*retQuery)[2].GetString(),                                 // numberUser
-        (*retQuery)[3].GetString(),                                 // numbere164
-        static_cast<ContactNumberType>((*retQuery)[4].GetUInt32()), // type
+        (*retQuery)[0].getUInt32(),                                 // ID
+        (*retQuery)[1].getUInt32(),                                 // contactID
+        (*retQuery)[2].getString(),                                 // numberUser
+        (*retQuery)[3].getString(),                                 // numbere164
+        static_cast<ContactNumberType>((*retQuery)[4].getUInt32()), // type
     };
 }
 
@@ -76,11 +76,11 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(uint32_t
 
     do {
         ret.push_back(ContactsNumberTableRow{
-            (*retQuery)[0].GetUInt32(),                                 // ID
-            (*retQuery)[1].GetUInt32(),                                 // contactID
-            (*retQuery)[2].GetString(),                                 // numberUser
-            (*retQuery)[3].GetString(),                                 // numbere164
-            static_cast<ContactNumberType>((*retQuery)[4].GetUInt32()), // type
+            (*retQuery)[0].getUInt32(),                                 // ID
+            (*retQuery)[1].getUInt32(),                                 // contactID
+            (*retQuery)[2].getString(),                                 // numberUser
+            (*retQuery)[3].getString(),                                 // numbere164
+            static_cast<ContactNumberType>((*retQuery)[4].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -118,11 +118,11 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffsetByField(u
 
     do {
         ret.push_back(ContactsNumberTableRow{
-            (*retQuery)[0].GetUInt32(),                                 // ID
-            (*retQuery)[1].GetUInt32(),                                 // contactID
-            (*retQuery)[2].GetString(),                                 // numberUser
-            (*retQuery)[3].GetString(),                                 // numbere164
-            static_cast<ContactNumberType>((*retQuery)[4].GetUInt32()), // type
+            (*retQuery)[0].getUInt32(),                                 // ID
+            (*retQuery)[1].getUInt32(),                                 // contactID
+            (*retQuery)[2].getString(),                                 // numberUser
+            (*retQuery)[3].getString(),                                 // numbere164
+            static_cast<ContactNumberType>((*retQuery)[4].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -137,7 +137,7 @@ uint32_t ContactsNumberTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t ContactsNumberTable::countByFieldId(const char *field, uint32_t id)
@@ -148,5 +148,5 @@ uint32_t ContactsNumberTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }

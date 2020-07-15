@@ -65,9 +65,9 @@ NotificationsTableRow NotificationsTable::getById(uint32_t id)
     assert(retQuery->getRowCount() == 1);
 
     return NotificationsTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // key
-        (*retQuery)[2].GetUInt32()  // value
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // key
+        (*retQuery)[2].getUInt32()  // value
 
     };
 }
@@ -83,9 +83,9 @@ NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
     assert(retQuery->getRowCount() == 1);
 
     return NotificationsTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // key
-        (*retQuery)[2].GetUInt32()  // value
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // key
+        (*retQuery)[2].getUInt32()  // value
     };
 }
 
@@ -101,9 +101,9 @@ std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t o
 
     do {
         ret.push_back(NotificationsTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // key
-            (*retQuery)[2].GetUInt32(), // value
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // key
+            (*retQuery)[2].getUInt32(), // value
         });
     } while (retQuery->nextRow());
 
@@ -128,7 +128,7 @@ uint32_t NotificationsTable::count()
         return 0;
     }
 
-    return (*queryRet)[0].GetUInt32();
+    return (*queryRet)[0].getUInt32();
 }
 
 uint32_t NotificationsTable::countByFieldId(const char *field, uint32_t id)

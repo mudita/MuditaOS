@@ -46,11 +46,11 @@ ContactsAddressTableRow ContactsAddressTable::getById(uint32_t id)
     }
 
     return ContactsAddressTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // contactID
-        (*retQuery)[2].GetString(), // address
-        (*retQuery)[3].GetString(), // note
-        (*retQuery)[4].GetString(), // mail
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // contactID
+        (*retQuery)[2].getString(), // address
+        (*retQuery)[3].getString(), // note
+        (*retQuery)[4].getString(), // mail
     };
 }
 
@@ -66,11 +66,11 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffset(uint32
 
     do {
         ret.push_back(ContactsAddressTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // address
-            (*retQuery)[3].GetString(), // note
-            (*retQuery)[4].GetString(), // mail
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString(), // address
+            (*retQuery)[3].getString(), // note
+            (*retQuery)[4].getString(), // mail
         });
     } while (retQuery->nextRow());
 
@@ -106,11 +106,11 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffsetByField
 
     do {
         ret.push_back(ContactsAddressTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // address
-            (*retQuery)[3].GetString(), // note
-            (*retQuery)[4].GetString(), // mail
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString(), // address
+            (*retQuery)[3].getString(), // note
+            (*retQuery)[4].getString(), // mail
         });
     } while (retQuery->nextRow());
 
@@ -125,7 +125,7 @@ uint32_t ContactsAddressTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t ContactsAddressTable::countByFieldId(const char *field, uint32_t id)
@@ -136,5 +136,5 @@ uint32_t ContactsAddressTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }

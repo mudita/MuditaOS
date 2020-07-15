@@ -50,9 +50,9 @@ ContactsRingtonesTableRow ContactsRingtonesTable::getById(uint32_t id)
     }
 
     return ContactsRingtonesTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // contactID
-        (*retQuery)[2].GetString()  // assetPath
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // contactID
+        (*retQuery)[2].getString()  // assetPath
     };
 }
 
@@ -69,9 +69,9 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffset(ui
 
     do {
         ret.push_back(ContactsRingtonesTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString()  // assetPath
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString()  // assetPath
         });
     } while (retQuery->nextRow());
 
@@ -106,9 +106,9 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffsetByF
 
     do {
         ret.push_back(ContactsRingtonesTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString()  // assetPath
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString()  // assetPath
         });
     } while (retQuery->nextRow());
 
@@ -123,7 +123,7 @@ uint32_t ContactsRingtonesTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t ContactsRingtonesTable::countByFieldId(const char *field, uint32_t id)
@@ -134,5 +134,5 @@ uint32_t ContactsRingtonesTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
