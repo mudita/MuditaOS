@@ -1,12 +1,4 @@
 
-/*
- * @file SMSRecord.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
 #include "Record.hpp"
@@ -23,7 +15,7 @@ struct SMSRecord : public Record
     uint32_t date      = 0;
     uint32_t dateSent  = 0;
     uint32_t errorCode = 0;
-    UTF8 body          = "";
+    UTF8 body;
     SMSType type       = SMSType::UNKNOWN;
     uint32_t threadID  = 0;
     uint32_t contactID = 0;
@@ -63,6 +55,6 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
 
   private:
     const uint32_t snippetLength = 45;
-    SmsDB *smsDB;
-    ContactsDB *contactsDB;
+    SmsDB *smsDB                 = nullptr;
+    ContactsDB *contactsDB       = nullptr;
 };

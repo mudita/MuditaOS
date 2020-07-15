@@ -32,7 +32,7 @@ TEST_CASE("SMS Table tests")
     SmsDB smsdb;
     REQUIRE(smsdb.isInitialized());
 
-    SMSTableRow testRow1 = {.ID        = 0,
+    SMSTableRow testRow1 = {{.ID = 0},
                             .threadID  = 0,
                             .contactID = 0,
                             .date      = 0,

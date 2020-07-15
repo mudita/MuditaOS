@@ -8,12 +8,10 @@ ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsD
     : smsDB(smsDb), contactsDB(contactsDb)
 {}
 
-ThreadRecordInterface::~ThreadRecordInterface()
-{}
-
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.add(ThreadsTableRow{.date           = rec.date,
+    auto ret = smsDB->threads.add(ThreadsTableRow{{.ID = rec.ID},
+                                                  .date           = rec.date,
                                                   .msgCount       = rec.msgCount,
                                                   .unreadMsgCount = rec.unreadMsgCount,
                                                   .contactID      = rec.contactID,
@@ -25,8 +23,7 @@ bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 
 bool ThreadRecordInterface::RemoveByID(uint32_t id)
 {
-
-    auto ret = smsDB->threads.removeById(id);
+    auto ret = smsDB->threads.removeByID(id);
     if (ret == false) {
         return false;
     }
@@ -37,7 +34,7 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.update(ThreadsTableRow{.ID             = rec.ID,
+    return smsDB->threads.update(ThreadsTableRow{{.ID = rec.ID},
                                                  .date           = rec.date,
                                                  .msgCount       = rec.msgCount,
                                                  .unreadMsgCount = rec.unreadMsgCount,
@@ -93,9 +90,8 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 
 ThreadRecord ThreadRecordInterface::GetByID(uint32_t id)
 {
-
     auto rec = smsDB->threads.getById(id);
-    if (rec.ID == 0) {
+    if (!rec.isValid()) {
         return ThreadRecord();
     }
 
@@ -111,14 +107,17 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
         re.contactID = contact_id;
         if (!Add(re)) {
             LOG_ERROR("There is no thread but we cant add it");
-            assert(0);
+            return ThreadRecord();
         }
 
         ret = smsDB->threads.getLimitOffsetByField(
             0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
+        if (ret.size() == 0) {
+            return ThreadRecord();
+        }
     }
-    ThreadRecord a = ret[0];
-    return a;
+
+    return ThreadRecord(ret[0]);
 }
 
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(const db::Query *query)
