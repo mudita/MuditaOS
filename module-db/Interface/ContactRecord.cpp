@@ -66,8 +66,8 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactRingID = contactDB->getLastInsertRowId();
 
-    ret = contactDB->address.add(
-        ContactsAddressTableRow{.contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
+    ret = contactDB->address.add(ContactsAddressTableRow{
+        {.ID = DB_ID_NONE}, .contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret) {
         return ret;
@@ -223,8 +223,11 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->address.update(ContactsAddressTableRow{
-        .ID = contact.addressID, .contactID = contact.ID, .address = rec.address, .note = rec.note, .mail = rec.mail});
+    ret = contactDB->address.update(ContactsAddressTableRow{{.ID = contact.addressID},
+                                                            .contactID = contact.ID,
+                                                            .address   = rec.address,
+                                                            .note      = rec.note,
+                                                            .mail      = rec.mail});
 
     if (!ret)
         return ret;

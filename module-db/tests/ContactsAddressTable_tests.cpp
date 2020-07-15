@@ -12,7 +12,7 @@ TEST_CASE("Contacts address Table tests")
     ContactsDB contactsdb;
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsAddressTableRow testRow1 = {.ID        = 0,
+    ContactsAddressTableRow testRow1 = {{.ID = DB_ID_NONE},
                                         .contactID = 0,
                                         .address   = "6 Czeczota St.\n02600 Warsaw",
                                         .note      = "Test note",
