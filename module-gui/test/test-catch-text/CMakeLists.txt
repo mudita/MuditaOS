@@ -12,6 +12,7 @@ add_catch2_executable(
                 test-gui-TextDocument.cpp
                 test-gui-TextLine.cpp
                 test-gui-TextParse.cpp
+                test-gui-Font.cpp
                 ../mock/InitializedFontManager.cpp
         INCLUDE
                 ..

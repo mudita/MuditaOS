@@ -1,18 +1,9 @@
-/*
- * Label.h
- *
- *  Created on: 7 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_
+#pragma once
 
 #include <string>
 #include <list>
 
 #include "../core/BoundingBox.hpp"
-#include "../core/Font.hpp"
 #include "../core/Color.hpp"
 #include "../core/DrawCommand.hpp"
 #include "../Common.hpp"
@@ -22,9 +13,12 @@
 
 #include "Style.hpp"
 #include "utf8/UTF8.hpp"
+#include <Ellipsis.hpp>
 
 namespace gui
 {
+
+    class RawFont;
 
     namespace meta
     {
@@ -70,7 +64,7 @@ namespace gui
         uint32_t charDrawableCount = 0;
         uint32_t stringPixelWidth  = 0;
         Color textColor            = {0, 0};
-        Font *font                 = nullptr;
+        RawFont *font              = nullptr;
         Margins margins            = {0, 0, 0, 0};
         bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
         Alignment alignment;
@@ -133,8 +127,8 @@ namespace gui
         void setTextColor(Color color);
 
         void setFont(const UTF8 &fontName);
-        void setFont(Font *font);
-        Font *getFont() const;
+        void setFont(RawFont *font);
+        RawFont *getFont() const;
         // virtual methods
         std::list<DrawCommand *> buildDrawList() override;
         uint32_t getTextNeedSpace() const;
@@ -145,5 +139,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_ */

@@ -3,6 +3,7 @@
 #include "log/log.hpp"
 #include <cassert>
 #include <TextFormat.hpp>
+#include <RawFont.hpp>
 
 namespace gui
 {
@@ -10,7 +11,7 @@ namespace gui
     TextBlock::TextBlock(const UTF8 text, std::unique_ptr<TextFormat> format) : format(std::move(format)), text{text}
     {}
 
-    TextBlock::TextBlock(const UTF8 text, Font *font, TextBlock::End eol)
+    TextBlock::TextBlock(const UTF8 text, RawFont *font, TextBlock::End eol)
         : TextBlock(text, std::make_unique<TextFormat>(font))
     {
         if (getEnd() != End::Newline && eol == End::Newline) {
