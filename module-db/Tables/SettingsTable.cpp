@@ -38,23 +38,23 @@ SettingsTableRow SettingsTable::getById(uint32_t id)
     }
 
     return SettingsTableRow{
-        (*retQuery)[0].GetUInt32(),                                 // ID
-        (*retQuery)[1].GetBool(),                                   // timeFormat12
-        (*retQuery)[2].GetBool(),                                   // timeAuto
-        (*retQuery)[3].GetBool(),                                   // timeDateFormat
-        (*retQuery)[4].GetBool(),                                   // brightnessAuto
-        (*retQuery)[5].GetUInt32(),                                 // brightnessLevel
-        (*retQuery)[6].GetUInt32(),                                 // fontSize
-        static_cast<SettingsPinMode>((*retQuery)[7].GetUInt32()),   // pinMode
-        (*retQuery)[8].GetUInt32(),                                 // pinDays
-        (*retQuery)[9].GetUInt32(),                                 // pinDaysLeft
-        (*retQuery)[10].GetString(),                                // pin1
-        (*retQuery)[11].GetString(),                                // pin2
-        (*retQuery)[12].GetUInt32(),                                // activeSIM
-        (*retQuery)[13].GetString(),                                // networkOperator
-        (*retQuery)[14].GetUInt32(),                                // lockPassHash
-        (*retQuery)[15].GetUInt32(),                                // lockTime
-        static_cast<SettingsLanguage>((*retQuery)[16].GetUInt32()), // language
+        (*retQuery)[0].getUInt32(),                                 // ID
+        (*retQuery)[1].getBool(),                                   // timeFormat12
+        (*retQuery)[2].getBool(),                                   // timeAuto
+        (*retQuery)[3].getBool(),                                   // timeDateFormat
+        (*retQuery)[4].getBool(),                                   // brightnessAuto
+        (*retQuery)[5].getUInt32(),                                 // brightnessLevel
+        (*retQuery)[6].getUInt32(),                                 // fontSize
+        static_cast<SettingsPinMode>((*retQuery)[7].getUInt32()),   // pinMode
+        (*retQuery)[8].getUInt32(),                                 // pinDays
+        (*retQuery)[9].getUInt32(),                                 // pinDaysLeft
+        (*retQuery)[10].getString(),                                // pin1
+        (*retQuery)[11].getString(),                                // pin2
+        (*retQuery)[12].getUInt32(),                                // activeSIM
+        (*retQuery)[13].getString(),                                // networkOperator
+        (*retQuery)[14].getUInt32(),                                // lockPassHash
+        (*retQuery)[15].getUInt32(),                                // lockTime
+        static_cast<SettingsLanguage>((*retQuery)[16].getUInt32()), // language
 
     };
 }

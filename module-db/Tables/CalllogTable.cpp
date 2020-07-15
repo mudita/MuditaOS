@@ -74,16 +74,16 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
     }
 
     return CalllogTableRow{
-        (*retQuery)[0].GetUInt32(),                                // ID
-        (*retQuery)[1].GetString(),                                // number
-        (*retQuery)[2].GetString(),                                // e164number
-        static_cast<PresentationType>((*retQuery)[3].GetUInt32()), // presentation
-        static_cast<time_t>((*retQuery)[4].GetUInt64()),           // date
-        static_cast<time_t>((*retQuery)[5].GetUInt64()),           // duration
-        static_cast<CallType>((*retQuery)[6].GetUInt32()),         // type
-        (*retQuery)[7].GetString(),                                // name
-        (*retQuery)[8].GetString(),                                // contactID
-        static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
+        (*retQuery)[0].getUInt32(),                                // ID
+        (*retQuery)[1].getString(),                                // number
+        (*retQuery)[2].getString(),                                // e164number
+        static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
+        static_cast<time_t>((*retQuery)[4].getUInt64()),           // date
+        static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
+        static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
+        (*retQuery)[7].getString(),                                // name
+        (*retQuery)[8].getString(),                                // contactID
+        static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
     };
 }
 
@@ -99,16 +99,16 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint3
 
     do {
         ret.push_back(CalllogTableRow{
-            (*retQuery)[0].GetUInt32(),                                // ID
-            (*retQuery)[1].GetString(),                                // number
-            (*retQuery)[2].GetString(),                                // e164number
-            static_cast<PresentationType>((*retQuery)[3].GetUInt32()), // presentation
-            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // date
-            static_cast<time_t>((*retQuery)[5].GetUInt64()),           // duration
-            static_cast<CallType>((*retQuery)[6].GetUInt32()),         // type
-            (*retQuery)[7].GetString(),                                // name
-            (*retQuery)[8].GetString(),                                // contactID
-            static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
+            (*retQuery)[0].getUInt32(),                                // ID
+            (*retQuery)[1].getString(),                                // number
+            (*retQuery)[2].getString(),                                // e164number
+            static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[4].getUInt64()),           // date
+            static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
+            (*retQuery)[7].getString(),                                // name
+            (*retQuery)[8].getString(),                                // contactID
+            static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
         });
     } while (retQuery->nextRow());
 
@@ -144,16 +144,16 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
 
     do {
         ret.push_back(CalllogTableRow{
-            (*retQuery)[0].GetUInt32(),                                // ID
-            (*retQuery)[1].GetString(),                                // number
-            (*retQuery)[2].GetString(),                                // e164number
-            static_cast<PresentationType>((*retQuery)[3].GetUInt32()), // presentation
-            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // date
-            static_cast<time_t>((*retQuery)[5].GetUInt64()),           // duration
-            static_cast<CallType>((*retQuery)[6].GetUInt32()),         // type
-            (*retQuery)[7].GetString(),                                // name
-            (*retQuery)[8].GetString(),                                // contactID
-            static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
+            (*retQuery)[0].getUInt32(),                                // ID
+            (*retQuery)[1].getString(),                                // number
+            (*retQuery)[2].getString(),                                // e164number
+            static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[4].getUInt64()),           // date
+            static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
+            (*retQuery)[7].getString(),                                // name
+            (*retQuery)[8].getString(),                                // contactID
+            static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
         });
     } while (retQuery->nextRow());
 
@@ -181,7 +181,7 @@ uint32_t CalllogTable::count(EntryState state)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t CalllogTable::count()
@@ -197,7 +197,7 @@ uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 bool CalllogTable::SetAllRead()

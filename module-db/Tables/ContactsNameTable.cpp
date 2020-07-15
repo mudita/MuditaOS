@@ -56,11 +56,11 @@ ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
     }
 
     return ContactsNameTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetUInt32(), // contactID
-        (*retQuery)[2].GetString(), // namePrimary
-        (*retQuery)[3].GetString(), // nameAlternative
-        (*retQuery)[4].GetUInt32(), // favourite
+        (*retQuery)[0].getUInt32(), // ID
+        (*retQuery)[1].getUInt32(), // contactID
+        (*retQuery)[2].getString(), // namePrimary
+        (*retQuery)[3].getString(), // nameAlternative
+        (*retQuery)[4].getUInt32(), // favourite
     };
 }
 
@@ -77,11 +77,11 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffset(uint32_t off
 
     do {
         ret.push_back(ContactsNameTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // namePrimary
-            (*retQuery)[3].GetString(), // nameAlternative
-            (*retQuery)[4].GetUInt32(), // favourite
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString(), // namePrimary
+            (*retQuery)[3].getString(), // nameAlternative
+            (*retQuery)[4].getUInt32(), // favourite
         });
     } while (retQuery->nextRow());
 
@@ -125,11 +125,11 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
 
     do {
         ret.push_back(ContactsNameTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // namePrimary
-            (*retQuery)[3].GetString(), // nameAlternative
-            (*retQuery)[4].GetUInt32(), // favourite
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString(), // namePrimary
+            (*retQuery)[3].getString(), // nameAlternative
+            (*retQuery)[4].getUInt32(), // favourite
         });
     } while (retQuery->nextRow());
 
@@ -144,7 +144,7 @@ uint32_t ContactsNameTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
@@ -155,7 +155,7 @@ uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *primaryName, const char *alternativeName)
@@ -174,11 +174,11 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *prima
 
     do {
         ret.push_back(ContactsNameTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // namePrimary
-            (*retQuery)[3].GetString(), // nameAlternative
-            (*retQuery)[4].GetUInt32(), // favourite
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // contactID
+            (*retQuery)[2].getString(), // namePrimary
+            (*retQuery)[3].getString(), // nameAlternative
+            (*retQuery)[4].getUInt32(), // favourite
         });
     } while (retQuery->nextRow());
 
@@ -211,7 +211,7 @@ std::vector<std::uint32_t> ContactsNameTable::GetIDsByName(const std::string &na
     }
 
     do {
-        ids.push_back((*queryRet)[0].GetUInt32());
+        ids.push_back((*queryRet)[0].getUInt32());
     } while (queryRet->nextRow());
 
     return ids;
@@ -231,5 +231,5 @@ std::size_t ContactsNameTable::GetCountByName(const std::string &name)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }

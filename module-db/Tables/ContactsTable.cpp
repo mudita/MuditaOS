@@ -64,16 +64,16 @@ ContactsTableRow ContactsTable::getById(uint32_t id)
     }
 
     return ContactsTableRow{
-        (*retQuery)[0].GetUInt32(),                           // ID
-        (*retQuery)[1].GetUInt32(),                           // nameID
-        (*retQuery)[2].GetString(),                           // numbersID
-        (*retQuery)[3].GetUInt32(),                           // ringID
-        (*retQuery)[4].GetUInt32(),                           // addressID
-        static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
-        (*retQuery)[6].GetBool(),                             // is on whitelist
-        (*retQuery)[7].GetBool(),                             // is on blacklist
-        (*retQuery)[8].GetBool(),                             // is on favourites
-        (*retQuery)[9].GetString(),                           // speed dial key
+        (*retQuery)[0].getUInt32(),                           // ID
+        (*retQuery)[1].getUInt32(),                           // nameID
+        (*retQuery)[2].getString(),                           // numbersID
+        (*retQuery)[3].getUInt32(),                           // ringID
+        (*retQuery)[4].getUInt32(),                           // addressID
+        static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
+        (*retQuery)[6].getBool(),                             // is on whitelist
+        (*retQuery)[7].getBool(),                             // is on blacklist
+        (*retQuery)[8].getBool(),                             // is on favourites
+        (*retQuery)[9].getString(),                           // speed dial key
     };
 }
 
@@ -115,18 +115,18 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[0].GetUInt32(),                           // ID
-            (*retQuery)[1].GetUInt32(),                           // nameID
-            (*retQuery)[2].GetString(),                           // numbersID
-            (*retQuery)[3].GetUInt32(),                           // ringID
-            (*retQuery)[4].GetUInt32(),                           // addressID
-            static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
-            (*retQuery)[6].GetBool(),                             // is on whitelist
-            (*retQuery)[7].GetBool(),                             // is on blacklist
-            (*retQuery)[8].GetBool(),                             // is on favourites
-            (*retQuery)[9].GetString(),                           // speed dial key
-            (*retQuery)[10].GetString(),                          // primaryName
-            (*retQuery)[11].GetString(),                          // alternativeName (WTF!)
+            (*retQuery)[0].getUInt32(),                           // ID
+            (*retQuery)[1].getUInt32(),                           // nameID
+            (*retQuery)[2].getString(),                           // numbersID
+            (*retQuery)[3].getUInt32(),                           // ringID
+            (*retQuery)[4].getUInt32(),                           // addressID
+            static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
+            (*retQuery)[6].getBool(),                             // is on whitelist
+            (*retQuery)[7].getBool(),                             // is on blacklist
+            (*retQuery)[8].getBool(),                             // is on favourites
+            (*retQuery)[9].getString(),                           // speed dial key
+            (*retQuery)[10].getString(),                          // primaryName
+            (*retQuery)[11].getString(),                          // alternativeName (WTF!)
         });
     } while (retQuery->nextRow());
 
@@ -158,7 +158,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &
     }
 
     do {
-        ids.push_back((*queryRet)[0].GetUInt32());
+        ids.push_back((*queryRet)[0].getUInt32());
     } while (queryRet->nextRow());
 
     return ids;
@@ -176,16 +176,16 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[0].GetUInt32(),                           // ID
-            (*retQuery)[1].GetUInt32(),                           // nameID
-            (*retQuery)[2].GetString(),                           // numbersID
-            (*retQuery)[3].GetUInt32(),                           // ringID
-            (*retQuery)[4].GetUInt32(),                           // addressID
-            static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
-            (*retQuery)[6].GetBool(),                             // is on whitelist
-            (*retQuery)[7].GetBool(),                             // is on blacklist
-            (*retQuery)[8].GetBool(),                             // is on favourites
-            (*retQuery)[9].GetString(),                           // speed dial key
+            (*retQuery)[0].getUInt32(),                           // ID
+            (*retQuery)[1].getUInt32(),                           // nameID
+            (*retQuery)[2].getString(),                           // numbersID
+            (*retQuery)[3].getUInt32(),                           // ringID
+            (*retQuery)[4].getUInt32(),                           // addressID
+            static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
+            (*retQuery)[6].getBool(),                             // is on whitelist
+            (*retQuery)[7].getBool(),                             // is on blacklist
+            (*retQuery)[8].getBool(),                             // is on favourites
+            (*retQuery)[9].getString(),                           // speed dial key
         });
     } while (retQuery->nextRow());
 
@@ -224,16 +224,16 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[0].GetUInt32(),                           // ID
-            (*retQuery)[1].GetUInt32(),                           // nameID
-            (*retQuery)[2].GetString(),                           // numbersID
-            (*retQuery)[3].GetUInt32(),                           // ringID
-            (*retQuery)[4].GetUInt32(),                           // addressID
-            static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
-            (*retQuery)[6].GetBool(),                             // is on whitelist
-            (*retQuery)[7].GetBool(),                             // is on blacklist
-            (*retQuery)[8].GetBool(),                             // is on favourites
-            (*retQuery)[9].GetString(),                           // speed dial key
+            (*retQuery)[0].getUInt32(),                           // ID
+            (*retQuery)[1].getUInt32(),                           // nameID
+            (*retQuery)[2].getString(),                           // numbersID
+            (*retQuery)[3].getUInt32(),                           // ringID
+            (*retQuery)[4].getUInt32(),                           // addressID
+            static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
+            (*retQuery)[6].getBool(),                             // is on whitelist
+            (*retQuery)[7].getBool(),                             // is on blacklist
+            (*retQuery)[8].getBool(),                             // is on favourites
+            (*retQuery)[9].getString(),                           // speed dial key
         });
     } while (retQuery->nextRow());
 
@@ -248,7 +248,7 @@ uint32_t ContactsTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
 uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
@@ -259,5 +259,5 @@ uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return uint32_t{(*queryRet)[0].getUInt32()};
 }
