@@ -1,8 +1,9 @@
 #include "FontInfo.hpp"
-#include "Common.hpp"  // for Status, Status::GUI_SUCCESS
-#include <cstring>     // for memcpy
+#include "Common.hpp" // for Status, Status::GUI_SUCCESS
+#include <cstring>    // for memcpy
 
-namespace gui {
+namespace gui
+{
     gui::Status FontInfo::load(uint8_t *data, uint32_t &offset)
     {
 
@@ -45,4 +46,4 @@ namespace gui {
 
         return gui::Status::GUI_SUCCESS;
     }
-}
+} // namespace gui

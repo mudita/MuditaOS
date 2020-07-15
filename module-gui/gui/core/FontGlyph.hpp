@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Common.hpp"  // for Status
-#include <stdint.h>    // for uint16_t, uint32_t, uint8_t, int16_t
+#include "Common.hpp" // for Status
+#include <stdint.h>   // for uint16_t, uint32_t, uint8_t, int16_t
 
-namespace gui {
+namespace gui
+{
     class FontGlyph
     {
       public:
@@ -29,4 +30,4 @@ namespace gui {
         // image data of the glyph
         uint8_t *data = nullptr;
     };
-}
+} // namespace gui

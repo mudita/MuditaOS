@@ -1,12 +1,16 @@
 #pragma once
 
-#include <cstdint>  // for uint32_t
-#include <string>    // for string
-#include <vector>    // for vector
+#include <cstdint> // for uint32_t
+#include <string>  // for string
+#include <vector>  // for vector
 
-namespace gui { class RawFont; }  // lines 8-8
+namespace gui
+{
+    class RawFont;
+} // namespace gui
 
-namespace gui {
+namespace gui
+{
 
     /// system font provider
     /// loads fonts from discs and build RawFonts to use
@@ -45,4 +49,4 @@ namespace gui {
       private:
         [[nodiscard]] auto find(const std::string &name) const -> RawFont *;
     };
-};
+}; // namespace gui

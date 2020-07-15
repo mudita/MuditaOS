@@ -10,7 +10,7 @@ namespace gui
     class TextFormat
     {
       private:
-        RawFont *font  = nullptr;
+        RawFont *font = nullptr;
         Color color = ColorFullBlack;
 
         static constexpr auto setter = [](auto &local, auto &next) {

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <string>
 #include <list>
@@ -18,7 +18,7 @@
 namespace gui
 {
 
-    class RawFont; 
+    class RawFont;
 
     namespace meta
     {
@@ -64,7 +64,7 @@ namespace gui
         uint32_t charDrawableCount = 0;
         uint32_t stringPixelWidth  = 0;
         Color textColor            = {0, 0};
-        RawFont *font                 = nullptr;
+        RawFont *font              = nullptr;
         Margins margins            = {0, 0, 0, 0};
         bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
         Alignment alignment;

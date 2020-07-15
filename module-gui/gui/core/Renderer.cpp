@@ -869,7 +869,7 @@ namespace gui
 
         // retrieve font used to draw text
         FontManager &fontManager = FontManager::getInstance();
-        RawFont *font               = fontManager.getFont(cmd->fontID);
+        RawFont *font            = fontManager.getFont(cmd->fontID);
 
         int16_t posX = cmd->tx;
         int16_t posY = cmd->ty;

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <stdint.h>    // for uint16_t, int16_t, uint32_t, uint8_t
-#include <Common.hpp>  // for Status
+#include <stdint.h>   // for uint16_t, int16_t, uint32_t, uint8_t
+#include <Common.hpp> // for Status
 
-namespace gui {
+namespace gui
+{
     class FontKerning
     {
       public:
@@ -15,4 +16,4 @@ namespace gui {
         // distance in pixels between beginning of first character and beginning of second character
         int16_t amount;
     };
-}
+} // namespace gui

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <stdint.h>    // for uint16_t, uint32_t, uint8_t
-#include <Common.hpp>  // for Status
-#include <string>      // for string
+#include <stdint.h>   // for uint16_t, uint32_t, uint8_t
+#include <Common.hpp> // for Status
+#include <string>     // for string
 
-namespace gui {
+namespace gui
+{
     class FontInfo
     {
       public:
@@ -32,4 +33,4 @@ namespace gui {
         // height of the texture, normally used to scale the y pos of the character image
         uint16_t scale_h;
     };
-}
+} // namespace gui

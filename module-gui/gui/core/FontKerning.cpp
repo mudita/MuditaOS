@@ -1,8 +1,9 @@
 #include "FontKerning.hpp"
-#include "Common.hpp"  // for Status, Status::GUI_SUCCESS
-#include <cstring>     // for memcpy
+#include "Common.hpp" // for Status, Status::GUI_SUCCESS
+#include <cstring>    // for memcpy
 
-namespace gui {
+namespace gui
+{
     gui::Status FontKerning::load(uint8_t *data, uint32_t &offset)
     {
         // utf16 id of the first character
@@ -17,4 +18,4 @@ namespace gui {
 
         return gui::Status::GUI_SUCCESS;
     }
-}
+} // namespace gui

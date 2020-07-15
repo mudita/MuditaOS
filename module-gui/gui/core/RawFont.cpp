@@ -1,16 +1,16 @@
 #include "RawFont.hpp"
-#include "Common.hpp"         // for Status, Status::GUI_SUCCESS, Status::GU...
-#include "Context.hpp"        // for Context
-#include "DrawCommand.hpp"    // for CommandRectangle, DrawCommand (ptr only)
-#include "FontGlyph.hpp"      // for FontGlyph
-#include "FontKerning.hpp"    // for FontKerning
-#include "Renderer.hpp"       // for Renderer
-#include "TextConstants.hpp"  // for newline
-#include "log/log.hpp"        // for LOG_ERROR
-#include "utf8/UTF8.hpp"      // for UTF8
-#include <cstring>            // for memcpy
-#include <utility>            // for pair
-#include <vector>             // for vector
+#include "Common.hpp"        // for Status, Status::GUI_SUCCESS, Status::GU...
+#include "Context.hpp"       // for Context
+#include "DrawCommand.hpp"   // for CommandRectangle, DrawCommand (ptr only)
+#include "FontGlyph.hpp"     // for FontGlyph
+#include "FontKerning.hpp"   // for FontKerning
+#include "Renderer.hpp"      // for Renderer
+#include "TextConstants.hpp" // for newline
+#include "log/log.hpp"       // for LOG_ERROR
+#include "utf8/UTF8.hpp"     // for UTF8
+#include <cstring>           // for memcpy
+#include <utility>           // for pair
+#include <vector>            // for vector
 
 namespace gui
 {
@@ -128,12 +128,12 @@ namespace gui
     uint32_t RawFont::getCharCountInSpace(const UTF8 &str, const uint32_t space) const
     {
         uint32_t availableSpace = space;
-        uint32_t count         = 0;
-        uint32_t current       = 0;
-        uint32_t previous      = none_char_id;
+        uint32_t count          = 0;
+        uint32_t current        = 0;
+        uint32_t previous       = none_char_id;
 
         for (uint32_t i = 0; i < str.length(); ++i, ++count) {
-            current = str[i];
+            current               = str[i];
             auto char_pixel_width = getCharPixelWidth(current, previous);
             if (availableSpace < char_pixel_width) {
                 return count;
@@ -289,16 +289,16 @@ namespace gui
         unsupported->xadvance =
             unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
         // populate with a bitmap (glyph)
-        auto commandRect              = std::make_unique<CommandRectangle>();
-        commandRect->x                = 0;
-        commandRect->y                = 0;
-        commandRect->w                = unsupported->width;
-        commandRect->h                = unsupported->height;
-        commandRect->areaX            = 0;
-        commandRect->areaY            = 0;
-        commandRect->areaW            = unsupported->width;
-        commandRect->areaH            = unsupported->height;
-        commandRect->penWidth         = unsupported->xoffset;
+        auto commandRect      = std::make_unique<CommandRectangle>();
+        commandRect->x        = 0;
+        commandRect->y        = 0;
+        commandRect->w        = unsupported->width;
+        commandRect->h        = unsupported->height;
+        commandRect->areaX    = 0;
+        commandRect->areaY    = 0;
+        commandRect->areaW    = unsupported->width;
+        commandRect->areaH    = unsupported->height;
+        commandRect->penWidth = unsupported->xoffset;
 
         auto renderCtx                           = std::make_unique<Context>(unsupported->width, unsupported->height);
         std::vector<gui::DrawCommand *> commands = {commandRect.get()};

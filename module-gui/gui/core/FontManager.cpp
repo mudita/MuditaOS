@@ -1,11 +1,12 @@
 #include "FontManager.hpp"
-#include "Common.hpp"    // for Status, Status::GUI_SUCCESS
-#include "FontInfo.hpp"  // for FontInfo
-#include "RawFont.hpp"   // for RawFont
-#include "log/log.hpp"   // for LOG_ERROR, LOG_INFO, LOG_WARN
-#include "vfs.hpp"       // for vfs, vfs::DirectoryEntry, vfs::FileAttributes
+#include "Common.hpp"   // for Status, Status::GUI_SUCCESS
+#include "FontInfo.hpp" // for FontInfo
+#include "RawFont.hpp"  // for RawFont
+#include "log/log.hpp"  // for LOG_ERROR, LOG_INFO, LOG_WARN
+#include "vfs.hpp"      // for vfs, vfs::DirectoryEntry, vfs::FileAttributes
 
-namespace gui{
+namespace gui
+{
 
     FontManager::~FontManager()
     {
@@ -147,4 +148,4 @@ namespace gui{
         }
         return nullptr;
     }
-};
+}; // namespace gui

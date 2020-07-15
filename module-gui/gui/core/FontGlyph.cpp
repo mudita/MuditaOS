@@ -1,7 +1,7 @@
 #include "FontGlyph.hpp"
 #include <cstring>
 
-namespace gui 
+namespace gui
 {
     FontGlyph::~FontGlyph()
     {
@@ -61,4 +61,4 @@ namespace gui
 
         return gui::Status::GUI_SUCCESS;
     }
-}
+} // namespace gui

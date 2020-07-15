@@ -27,7 +27,7 @@
 #include "WorkerGUI.hpp"
 #include <FontManager.hpp>
 
-    namespace sgui
+namespace sgui
 {
 
     static uint32_t getTimeFunction()
