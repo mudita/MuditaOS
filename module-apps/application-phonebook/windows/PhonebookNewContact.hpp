@@ -20,9 +20,6 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
 
-      protected:
-        std::shared_ptr<ContactRecord> contact = nullptr;
-
       private:
         enum class ContactAction
         {
@@ -35,6 +32,7 @@ namespace gui
         void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber);
         void showDialogDuplicatedSpeedDialNumber();
 
+        std::shared_ptr<ContactRecord> contact           = nullptr;
         std::shared_ptr<NewContactModel> newContactModel = nullptr;
         gui::ListView *list                              = nullptr;
         ContactAction contactAction                      = ContactAction::None;
