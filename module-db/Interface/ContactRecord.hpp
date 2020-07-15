@@ -2,6 +2,7 @@
 
 #include <Databases/ContactsDB.hpp>
 #include <Common/Query.hpp>
+#include <Tables/ContactsGroups.hpp>
 
 #include "i18/i18.hpp"
 #include "Record.hpp"
@@ -12,6 +13,7 @@
 
 #include <memory>
 #include <optional>
+#include <set>
 
 struct ContactRecord : public Record
 {
@@ -38,10 +40,8 @@ struct ContactRecord : public Record
 
     UTF8 assetPath = "";
 
-    bool isOnWhitelist  = false;
-    bool isOnBlacklist  = false;
-    bool isOnFavourites = false;
     UTF8 speeddial      = "";
+    std::set<ContactsGroupsTableRow> groups = {};
 
     enum class NameFormatType
     {
@@ -77,6 +77,11 @@ struct ContactRecord : public Record
         }
         return "";
     }
+
+    bool isOnFavourites();
+    bool isOnIce();
+    bool isOnBlocked();
+    bool isOnGroup(uint32_t groupId);
 };
 
 enum class ContactRecordField
@@ -86,6 +91,7 @@ enum class ContactRecordField
     NumberUser,
     SpeedDial,
     Favourite,
+    Groups,
 };
 
 class ContactNumberHolder

@@ -342,6 +342,10 @@ namespace gui
         if (contact->note.length() > 0) {
             noteText->setText(contact->note);
         }
+
+        contactFlagsWidget->setFavourites(contact->isOnFavourites());
+        contactFlagsWidget->setICE(contact->isOnIce());
+        contactFlagsWidget->setBlocked(contact->isOnBlocked());
     }
 
     bool PhonebookContact::handleSwitchData(SwitchData *data)

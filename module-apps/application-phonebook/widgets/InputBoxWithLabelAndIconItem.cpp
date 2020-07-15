@@ -50,7 +50,8 @@ namespace gui
         setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
-    auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
+        -> bool
     {
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);
@@ -105,7 +106,7 @@ namespace gui
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
         iconImage->set("small_circle");
 
-        focusChangedCallback = [&](gui::Item &item) {
+        focusChangedCallback = [&](gui::Item & /*item*/) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
             }
@@ -115,7 +116,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+        inputCallback = [&](gui::Item & /*item*/, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
@@ -140,7 +141,7 @@ namespace gui
         iconImage->set("small_heart");
         tickImage->set("small_tick");
 
-        focusChangedCallback = [&](gui::Item &item) {
+        focusChangedCallback = [&](gui::Item & /*item*/) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
                 if (tickImage->visible) {
@@ -157,7 +158,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+        inputCallback = [&](gui::Item & /*item*/, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
@@ -173,8 +174,9 @@ namespace gui
             return false;
         };
 
-        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->isOnFavourites = tickImage->visible; };
-        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { tickImage->visible = contact->isOnFavourites; };
+        //        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->isOnFavourites =
+        //        tickImage->visible; }; onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+        //        tickImage->visible = contact->isOnFavourites; };
     }
     void InputBoxWithLabelAndIconItem::addToICEHandler()
     {
@@ -182,7 +184,7 @@ namespace gui
         iconImage->set("small_heart");
         tickImage->set("small_tick");
 
-        focusChangedCallback = [&](gui::Item &item) {
+        focusChangedCallback = [&](gui::Item & /*item*/) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
                 if (tickImage->visible) {
@@ -199,7 +201,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+        inputCallback = [&](gui::Item & /*item*/, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
