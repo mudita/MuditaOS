@@ -4,9 +4,6 @@
 ThreadsTable::ThreadsTable(Database *db) : Table(db)
 {}
 
-ThreadsTable::~ThreadsTable()
-{}
-
 bool ThreadsTable::create()
 {
     // Create necessary tables
@@ -198,7 +195,7 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                       offset);
         do {
             ret.second.push_back(ThreadsTableRow{
-                .ID             = (*retQuery)[0].getUInt32(),
+                {.ID = (*retQuery)[0].getUInt32()},
                 .date           = (*retQuery)[3].getUInt32(),
                 .msgCount       = 0,
                 .unreadMsgCount = 0,
