@@ -18,6 +18,7 @@
 * `[phonebook]` Add icon flags for showing contact special groups.
 * `[gui]` Add digit input on long-press in Text.
 * `[gui]` Add selector for newline in special character selection.
+* `[gui]` Added Color to text
 
 ### Changed
  * `[antenna]` Improved reception and decreased SAR by adding antenna control service.
