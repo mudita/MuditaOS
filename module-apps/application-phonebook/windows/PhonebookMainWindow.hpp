@@ -19,6 +19,7 @@ namespace gui
         Image *newContactImage = nullptr;
         Image *searchImage     = nullptr;
         bool enableNewContact  = true;
+        bool requestedSearch   = false;
 
       public:
         PhonebookMainWindow(app::Application *app);
@@ -32,6 +33,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+        bool isSearchRequested() const;
     };
 
 } /* namespace gui */
