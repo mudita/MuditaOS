@@ -20,7 +20,7 @@ namespace gui
 
     inline bool operator==(const Color &r, const Color &l)
     {
-        return r.intensivity == l.intensivity && r.alpha == l.alpha;
+        return r.intensity == l.intensity && r.alpha == l.alpha;
     }
 
     inline bool operator!=(const Color &r, const Color &l)
