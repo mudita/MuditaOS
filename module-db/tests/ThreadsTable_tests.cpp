@@ -24,7 +24,7 @@
 
 TEST_CASE("Threads Table tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(SmsDB::GetDBName());
 
@@ -104,5 +104,5 @@ TEST_CASE("Threads Table tests")
     // Table should be empty now
     REQUIRE(smsdb.threads.GetCount() == 0);
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

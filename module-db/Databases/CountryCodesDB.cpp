@@ -6,7 +6,7 @@ CountryCodesDB::CountryCodesDB() : Database(dbName), countryCodes(this)
 {
     if (countryCodes.create() == false)
         return;
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 CountryCodesDB::~CountryCodesDB()

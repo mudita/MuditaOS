@@ -23,7 +23,7 @@
 
 TEST_CASE("Alarms Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(AlarmsDB::GetDBName());
 
@@ -49,5 +49,5 @@ TEST_CASE("Alarms Record tests")
     REQUIRE(alarmsRecord.time == 1234);
     REQUIRE(alarmsRecord.path == "awesome.mp3");
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

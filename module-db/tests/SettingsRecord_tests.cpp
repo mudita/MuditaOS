@@ -25,7 +25,7 @@
 
 TEST_CASE("Settings Record tests")
 {
-    Database::Initialize();
+    Database::initialize();
 
     vfs.remove(SettingsDB::GetDBName());
 
@@ -59,5 +59,5 @@ TEST_CASE("Settings Record tests")
     REQUIRE(settingsRecord.networkOperator == "MuditaConnectingPeople");
     REQUIRE(settingsRecord.fontSize == 10);
 
-    Database::Deinitialize();
+    Database::deinitialize();
 }

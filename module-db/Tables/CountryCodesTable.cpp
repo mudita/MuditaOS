@@ -8,12 +8,12 @@ CountryCodesTable::~CountryCodesTable()
 
 bool CountryCodesTable::create()
 {
-    return db->Execute(createTableQuery);
+    return db->execute(createTableQuery);
 }
 
 CodesTableRow CountryCodesTable::GetByMCC(uint32_t mcc)
 {
-    auto retQuery = db->Query("SELECT * FROM codes WHERE mcc= %lu LIMIT 1;", mcc);
+    auto retQuery = db->query("SELECT * FROM codes WHERE mcc= %lu LIMIT 1;", mcc);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return CodesTableRow();
@@ -32,7 +32,7 @@ CodesTableRow CountryCodesTable::GetByMCC(uint32_t mcc)
 
 uint32_t CountryCodesTable::count()
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM codes;");
+    auto queryRet = db->query("SELECT COUNT(*) FROM codes;");
 
     if (queryRet->GetRowCount() == 0) {
         return 0;

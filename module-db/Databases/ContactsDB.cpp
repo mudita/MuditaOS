@@ -26,7 +26,7 @@ ContactsDB::ContactsDB() : Database(dbName), contacts(this), name(this), number(
     if (address.create() == false)
         return;
 
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 ContactsDB::~ContactsDB()

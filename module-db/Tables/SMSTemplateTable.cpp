@@ -14,12 +14,12 @@ SMSTemplateTable::~SMSTemplateTable()
 
 bool SMSTemplateTable::create()
 {
-    return db->Execute(createTableQuery);
+    return db->execute(createTableQuery);
 }
 
 bool SMSTemplateTable::add(SMSTemplateTableRow entry)
 {
-    return db->Execute("INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%q', '%q');",
+    return db->execute("INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%q', '%q');",
 
                        entry.text.c_str(),
                        utils::to_string(entry.lastUsageTimestamp).c_str());
@@ -27,7 +27,7 @@ bool SMSTemplateTable::add(SMSTemplateTableRow entry)
 
 bool SMSTemplateTable::removeById(uint32_t id)
 {
-    return db->Execute("DELETE FROM templates where _id = %" PRIu32 ";", id);
+    return db->execute("DELETE FROM templates where _id = %" PRIu32 ";", id);
 }
 
 bool SMSTemplateTable::removeByField(SMSTemplateTableFields field, const char *str)
@@ -38,7 +38,7 @@ bool SMSTemplateTable::removeByField(SMSTemplateTableFields field, const char *s
 
 bool SMSTemplateTable::update(SMSTemplateTableRow entry)
 {
-    return db->Execute("UPDATE templates SET text = '%q', lastUsageTimestamp = %q WHERE _id=%" PRIu32 ";",
+    return db->execute("UPDATE templates SET text = '%q', lastUsageTimestamp = %q WHERE _id=%" PRIu32 ";",
                        entry.text.c_str(),
                        utils::to_string(entry.lastUsageTimestamp).c_str(),
                        entry.ID);
@@ -46,7 +46,7 @@ bool SMSTemplateTable::update(SMSTemplateTableRow entry)
 
 SMSTemplateTableRow SMSTemplateTable::getById(uint32_t id)
 {
-    auto retQuery = db->Query("SELECT * FROM templates WHERE _id = %" PRIu32 ";", id);
+    auto retQuery = db->query("SELECT * FROM templates WHERE _id = %" PRIu32 ";", id);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return SMSTemplateTableRow();
@@ -62,7 +62,7 @@ SMSTemplateTableRow SMSTemplateTable::getById(uint32_t id)
 std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery =
-        db->Query("SELECT * from templates ORDER BY lastUsageTimestamp DESC LIMIT %" PRIu32 " OFFSET %" PRIu32 ";",
+        db->query("SELECT * from templates ORDER BY lastUsageTimestamp DESC LIMIT %" PRIu32 " OFFSET %" PRIu32 ";",
                   limit,
                   offset);
 
@@ -94,7 +94,7 @@ std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffsetByField(uint32_
 
 uint32_t SMSTemplateTable::count()
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM templates;");
+    auto queryRet = db->query("SELECT COUNT(*) FROM templates;");
 
     if (queryRet->GetRowCount() == 0) {
         return 0;
@@ -105,7 +105,7 @@ uint32_t SMSTemplateTable::count()
 
 uint32_t SMSTemplateTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM templates WHERE '%q'=%" PRIu32 ";", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM templates WHERE '%q'=%" PRIu32 ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

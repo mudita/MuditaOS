@@ -40,7 +40,7 @@ template <typename T, typename F> class Table
 
     uint32_t getLastInsertRowId()
     {
-        return db->GetLastInsertRowID();
+        return db->getLastInsertRowId();
     }
 
     Database *db;

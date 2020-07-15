@@ -28,7 +28,7 @@ namespace db
 
 TEST_CASE("Query interface")
 {
-    Database::Initialize();
+    Database::initialize();
     auto contactsDB      = std::make_unique<ContactsDB>();
     auto smsDB           = std::make_unique<SmsDB>();
     auto smsInterface    = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());

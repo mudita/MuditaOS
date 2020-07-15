@@ -68,7 +68,7 @@ extern "C"
     }
 }
 
-Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isInitialized(false)
+Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isInitialized_(false)
 {
     LOG_INFO("creating database: %s", dbName);
     auto rc = sqlite3_open(name, &dbConnection);
@@ -83,7 +83,7 @@ Database::~Database()
     sqlite3_close(dbConnection);
 }
 
-void Database::Initialize()
+void Database::initialize()
 {
     sqlite3_config(
         SQLITE_CONFIG_LOG,
@@ -91,12 +91,12 @@ void Database::Initialize()
         (void *)1); //(void*)1 is taken from official SQLITE examples and it appears that it ends variable args list
     sqlite3_initialize();
 }
-void Database::Deinitialize()
+void Database::deinitialize()
 {
     sqlite3_shutdown();
 }
 
-bool Database::Execute(const char *format, ...)
+bool Database::execute(const char *format, ...)
 {
     if (!format) {
         return false;
@@ -117,7 +117,7 @@ bool Database::Execute(const char *format, ...)
     return result != SQLITE_OK ? false : true;
 }
 
-std::unique_ptr<QueryResult> Database::Query(const char *format, ...)
+std::unique_ptr<QueryResult> Database::query(const char *format, ...)
 {
 
     if (!format) {
@@ -163,16 +163,16 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
     return 0;
 }
 
-uint32_t Database::GetLastInsertRowID()
+uint32_t Database::getLastInsertRowId()
 {
     return sqlite3_last_insert_rowid(dbConnection);
 }
 
-bool Database::StoreIntoFile(const std::string &backupPath)
+bool Database::storeIntoFile(const std::string &backupPath)
 {
     LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName, backupPath.c_str());
 
-    auto rc = Execute("VACUUM INTO '%q';", backupPath.c_str());
+    auto rc = execute("VACUUM INTO '%q';", backupPath.c_str());
 
     if (rc == true) {
         LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName, backupPath.c_str());

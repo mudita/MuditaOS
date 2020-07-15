@@ -18,7 +18,7 @@ SettingsDB::SettingsDB() : Database(dbName), settings(this)
     if (settings.create() == false)
         return;
 
-    isInitialized = true;
+    isInitialized_ = true;
 }
 
 SettingsDB::~SettingsDB()
