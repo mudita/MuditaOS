@@ -5,12 +5,12 @@
 
 namespace gui
 {
-    class Font;
+    class RawFont;
 
     class TextFormat
     {
       private:
-        Font *font  = nullptr;
+        RawFont *font = nullptr;
         Color color = ColorFullBlack;
 
         static constexpr auto setter = [](auto &local, auto &next) {
@@ -20,7 +20,7 @@ namespace gui
         };
 
       public:
-        TextFormat(Font *font, Color color = {}) : font(font), color(color){};
+        TextFormat(RawFont *font, Color color = {}) : font(font), color(color){};
         TextFormat(const TextFormat &) = default;
 
         [[nodiscard]] auto getFont() const
@@ -34,7 +34,7 @@ namespace gui
 
         // sets font
         // @note triggers onFormat change
-        void setFont(Font *font)
+        void setFont(RawFont *font)
         {
             setter(this->font, font);
         }

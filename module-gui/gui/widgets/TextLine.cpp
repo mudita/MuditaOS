@@ -4,6 +4,7 @@
 #include "TextBlock.hpp"
 #include "TextDocument.hpp"
 #include <cstdio>
+#include <RawFont.hpp>
 
 namespace gui
 {

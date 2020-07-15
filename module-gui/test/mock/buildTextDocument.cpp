@@ -7,7 +7,7 @@
 namespace mockup
 {
 
-    std::tuple<gui::TextDocument, gui::Font *> buildEmptyTestDocument()
+    std::tuple<gui::TextDocument, gui::RawFont *> buildEmptyTestDocument()
     {
         using namespace gui;
         auto &fontmanager = mockup::fontManager();
@@ -16,7 +16,7 @@ namespace mockup
         return std::tuple{document, testfont};
     }
 
-    std::tuple<gui::TextDocument, gui::Font *> buildTestDocument()
+    std::tuple<gui::TextDocument, gui::RawFont *> buildTestDocument()
     {
         using namespace gui;
 
@@ -30,7 +30,7 @@ namespace mockup
         return std::tuple{document, testfont};
     }
 
-    auto buildOnelineTestDocument(std::string text) -> std::tuple<gui::TextDocument, gui::Font *>
+    auto buildOnelineTestDocument(std::string text) -> std::tuple<gui::TextDocument, gui::RawFont *>
     {
         using namespace gui;
 
@@ -41,7 +41,7 @@ namespace mockup
         return std::tuple{document, testfont};
     }
 
-    auto buildMultilineTestDocument(std::list<std::string> source) -> std::tuple<gui::TextDocument, gui::Font *>
+    auto buildMultilineTestDocument(std::list<std::string> source) -> std::tuple<gui::TextDocument, gui::RawFont *>
     {
         using namespace gui;
         auto &fontmanager = mockup::fontManager();

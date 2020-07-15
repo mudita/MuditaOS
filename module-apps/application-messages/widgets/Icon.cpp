@@ -2,6 +2,7 @@
 #include "TextParse.hpp"
 #include <i18/i18.hpp>
 #include <Style.hpp>
+#include <Font.hpp>
 
 using namespace gui;
 
@@ -35,14 +36,14 @@ Icon::Icon(Item *parent,
     setPenFocusWidth(style::window::default_border_no_focus_w);
     setPenWidth(style::window::default_border_no_focus_w);
 
-    img = new Image(this, style::img::x, style::img::y, imageName);
+    new Image(this, style::img::x, style::img::y, imageName);
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
     text->setTextType(TextType::MULTI_LINE);
     text->setEditMode(EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-    auto format = TextFormat(FontManager::getInstance().getFont(style::window::font::medium), Color(7, 0));
+    auto format = TextFormat(Font(27).raw(), Color(7, 0));
     for (auto &el : textToTextBlocks(str, format)) {
         text->addText(el);
     }

@@ -2,12 +2,13 @@
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
-#include "../core/Font.hpp"
 
 #include "Label.hpp"
 #include <Style.hpp>
 #include <cassert>
 #include "TextConstants.hpp"
+#include <FontManager.hpp>
+#include <RawFont.hpp>
 
 namespace gui
 {
@@ -256,11 +257,11 @@ namespace gui
 
     void Label::setFont(const UTF8 &fontName)
     {
-        Font *newFont = FontManager::getInstance().getFont(fontName);
+        RawFont *newFont = FontManager::getInstance().getFont(fontName);
         setFont(newFont);
     }
 
-    void Label::setFont(Font *font)
+    void Label::setFont(RawFont *font)
     {
         this->font = font;
         if (font != nullptr) {
@@ -268,7 +269,7 @@ namespace gui
         }
     }
 
-    Font *Label::getFont() const
+    RawFont *Label::getFont() const
     {
         return font;
     }

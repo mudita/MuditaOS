@@ -5,6 +5,7 @@
 #include <cassert>
 #include <i18/i18.hpp>
 #include <utility>
+#include <FontManager.hpp>
 
 namespace style::option
 {

@@ -9,7 +9,6 @@ extern "C"
 #include "Color.hpp"
 #include "Renderer.hpp"
 #include "Context.hpp"
-#include "Font.hpp"
 #include "ImageManager.hpp"
 #include "../Common.hpp"
 // utils
@@ -20,6 +19,9 @@ extern "C"
 // module-utils
 #include "utf8/UTF8.hpp"
 #include <cassert>
+#include <FontManager.hpp>
+#include <FontGlyph.hpp>
+#include <RawFont.hpp>
 
 #if DEBUG_FONT == 1
 #define log_warn_glyph(...) LOG_WARN(__VA_ARGS__)
@@ -826,7 +828,7 @@ namespace gui
     }
 
     void Renderer::drawChar(
-        Context *context, const int16_t x, const int16_t y, Font *font, FontGlyph *glyph, const Color color)
+        Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color)
     {
 
         uint8_t *drawPtr  = context->getData() + x + (y - glyph->yoffset) * context->getW();
@@ -867,7 +869,7 @@ namespace gui
 
         // retrieve font used to draw text
         FontManager &fontManager = FontManager::getInstance();
-        Font *font               = fontManager.getFont(cmd->fontID);
+        RawFont *font            = fontManager.getFont(cmd->fontID);
 
         int16_t posX = cmd->tx;
         int16_t posY = cmd->ty;

@@ -114,7 +114,7 @@ namespace gui
       private:
         TextType textType = TextType::MULTI_LINE;
         /// points to default text font to use
-        Font *font = nullptr;
+        RawFont *font = nullptr;
         Color textColor;
         // margins for text
         Margins margins;
@@ -158,7 +158,7 @@ namespace gui
         /// saves text from widget to file at specified path
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
-        void setFont(Font *font);
+        void setFont(RawFont *font);
         virtual void setMargins(const Margins &margins);
 
         // virtual methods from Item

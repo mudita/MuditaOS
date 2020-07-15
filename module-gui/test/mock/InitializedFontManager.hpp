@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Font.hpp>
+#include <FontManager.hpp>
 
 namespace mockup
 {
