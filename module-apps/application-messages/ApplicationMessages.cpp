@@ -119,6 +119,24 @@ namespace app
     void ApplicationMessages::destroyUserInterface()
     {}
 
+    bool ApplicationMessages::markSmsThreadAsRead(const uint32_t id)
+    {
+        using namespace db::query::smsthread;
+        LOG_DEBUG("markSmsThreadAsRead");
+        DBServiceAPI::GetQuery(
+            this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::True));
+        return true;
+    }
+
+    bool ApplicationMessages::markSmsThreadAsUnread(const uint32_t id)
+    {
+        using namespace db::query::smsthread;
+        LOG_DEBUG("markSmsThreadAsRead");
+        DBServiceAPI::GetQuery(
+            this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::False));
+        return true;
+    }
+
     bool ApplicationMessages::removeSMS_thread(const ThreadRecord *record)
     {
         if (record == nullptr) {

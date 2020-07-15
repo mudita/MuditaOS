@@ -1,11 +1,24 @@
 # Mudita PurePhone changelog
 
+## Current version
+
+### Added
+* `[sms]` Added option to mark conversation as read/unread 
+
+### Changed
+
+### Fixed
+* `[phonebook]` Fix wrong text label for back action.
+* `[sms]` Concatenated sms sending fixed.
+### Other
+
 ## [0.28.1] - 2020-07-10
 
 ### Added
 * `[phonebook]` Add icon flags for showing contact special groups.
 * `[gui]` Add digit input on long-press in Text.
 * `[gui]` Add selector for newline in special character selection.
+* `[gui]` Added Color to text
 
 ### Changed
  * `[antenna]` Improved reception and decreased SAR by adding antenna control service.

@@ -1,13 +1,3 @@
-
-/*
- * @file ThreadsTable.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 27.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ThreadsTable.hpp"
 #include "log/log.hpp"
 
@@ -134,16 +124,16 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByField(uint32_t offset
         return std::vector<ThreadsTableRow>();
     }
 
-    std::string querry = "SELECT * from threads WHERE " + fieldName + " = '" + str + "' ORDER BY date";
+    std::string query = "SELECT * from threads WHERE " + fieldName + " = '" + str + "' ORDER BY date";
     if (limit != 0) {
-        querry += " LIMIT " + std::to_string(limit);
+        query += " LIMIT " + std::to_string(limit);
     }
     if (offset != 0) {
-        querry += " OFFSET " + std::to_string(offset);
+        query += " OFFSET " + std::to_string(offset);
     }
-    querry += ";";
+    query += ";";
 
-    auto retQuery = db->Query(querry.c_str());
+    auto retQuery = db->Query(query.c_str());
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
@@ -198,11 +188,11 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                                                                               uint32_t limit)
 {
     auto ret       = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
-    auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \"%%%q%%\"", text.c_str());
+    auto count_ret = db->Query("SELECT COUNT (*) from sms WHERE sms.body like \'%%%q%%\'", text.c_str());
     ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].GetUInt32();
     if (ret.first != 0) {
         auto retQuery =
-            db->Query("SELECT * from sms WHERE sms.body like \"%%%q%%\" ORDER BY date DESC LIMIT %lu OFFSET %lu;",
+            db->Query("SELECT * from sms WHERE sms.body like \'%%%q%%\' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
                       text.c_str(),
                       limit,
                       offset);
@@ -211,10 +201,10 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                 .ID             = (*retQuery)[0].GetUInt32(),
                 .date           = (*retQuery)[3].GetUInt32(),
                 .msgCount       = 0,
-                .unreadMsgCount = (*retQuery)[7].GetUInt32(),
+                .unreadMsgCount = 0,
                 .contactID      = (*retQuery)[2].GetUInt32(),
                 .snippet        = (*retQuery)[6].GetString(),
-                .type           = static_cast<SMSType>((*retQuery)[8].GetUInt32()),
+                .type           = static_cast<SMSType>((*retQuery)[7].GetUInt32()),
             });
         } while (retQuery->NextRow());
     }

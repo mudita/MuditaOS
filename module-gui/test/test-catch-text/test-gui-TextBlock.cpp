@@ -175,7 +175,7 @@ TEST_CASE("Text block - get width")
 
     SECTION("get width > 0 if text not empty (with newline)")
     {
-        REQUIRE(block_newline.getFont() != nullptr);
+        REQUIRE(block_newline.getFormat()->getFont() != nullptr);
         block_newline.setText("lol");
         REQUIRE(block_newline.getWidth() > 0);
     }

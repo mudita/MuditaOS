@@ -1,13 +1,4 @@
 
-/*
- * @file ThreadRecord_tests.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 11.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
@@ -16,6 +7,8 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "queries/sms/QuerySmsThreadMarkAsRead.hpp"
+#include "queries/sms/QuerySMSSearch.hpp"
 #include "vfs.hpp"
 
 #include <algorithm>
@@ -117,6 +110,69 @@ TEST_CASE("Thread Record tests")
         auto record = threadRecordInterface1.GetByID(1);
         REQUIRE(record.isValid());
         REQUIRE(record.snippet == snippetTest2);
+    }
+
+    SECTION("Mark as read / unread")
+    {
+        recordIN.unreadMsgCount = 10;
+        REQUIRE(threadRecordInterface1.Add(recordIN));
+        auto rec = threadRecordInterface1.GetByID(3);
+        REQUIRE(rec.isUnread());
+
+        {
+            db::query::smsthread::MarkAsRead query{3, db::query::smsthread::MarkAsRead::Read::True};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            REQUIRE(result->getResult());
+            rec = threadRecordInterface1.GetByID(3);
+            REQUIRE_FALSE(rec.isUnread());
+        }
+
+        {
+            db::query::smsthread::MarkAsRead query{3, db::query::smsthread::MarkAsRead::Read::False};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            REQUIRE(result->getResult());
+            rec = threadRecordInterface1.GetByID(3);
+            REQUIRE(rec.isUnread());
+        }
+    }
+
+    SECTION("SMS search")
+    {
+        SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+        SMSRecord recordIN;
+        recordIN.date      = 123456789;
+        recordIN.dateSent  = 987654321;
+        recordIN.errorCode = 0;
+        recordIN.number    = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
+        ;
+        recordIN.body = "Ala";
+        recordIN.type = SMSType ::DRAFT;
+
+        REQUIRE(smsRecInterface.Add(recordIN));
+        recordIN.body = "Ola";
+        REQUIRE(smsRecInterface.Add(recordIN));
+
+        {
+            db::query::SMSSearch query{"A", 0, 10};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            auto results = result->getResults();
+            REQUIRE(results.size() == 2);
+        }
+
+        {
+            db::query::SMSSearch query{"O", 0, 10};
+            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            auto results = result->getResults();
+            REQUIRE(results.size() == 1);
+        }
     }
 
     Database::Deinitialize();

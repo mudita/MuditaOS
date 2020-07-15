@@ -68,18 +68,18 @@ TEST_CASE("Draw window with labels")
 
     // add label with time
     auto label = new gui::Label(win, 20, 80, 440, 120, "TOP LEFT");
-    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_TOP));
+    label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
     label->setRadius(5);
     label->setFont("gt_pressura_bold_65");
 
     label = new gui::Label(win, 20, 280, 440, 120, "2xCENTER#####");
-    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     label->setRadius(10);
     label->setPenWidth(5);
     label->setFont("gt_pressura_bold_65");
 
     label = new gui::Label(win, 20, 480, 440, 120, "BOTTOM RIGHT");
-    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
     label->setRadius(15);
     label->setEllipsis(gui::Ellipsis::Right);
     label->setFont("gt_pressura_bold_65");
@@ -143,7 +143,7 @@ TEST_CASE("Draw window with box layouts")
     gui::Label *maxH4 = new gui::Label();
     maxH4->setText("Hello Mudita");
     maxH4->setRadius(20);
-    maxH4->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    maxH4->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     maxH4->setMaximumSize(75, 60);
 
     vBox->addWidget(maxH1);

@@ -12,6 +12,7 @@
 #include "Layout.hpp"
 #include "Navigation.hpp"
 #include "Margins.hpp"
+#include "Alignment.hpp"
 
 namespace gui
 {
@@ -85,6 +86,8 @@ namespace gui
 
         Padding padding;
         Margins margins;
+
+        Alignment alignment;
 
         /// radius of corner, default 0
         short radius = 0;
@@ -198,6 +201,11 @@ namespace gui
 
         void setMargins(const Margins &value);
         [[nodiscard]] Margins getMargins();
+
+        virtual void setAlignment(const Alignment &value);
+        [[nodiscard]] Alignment &getAlignment();
+        [[nodiscard]] Alignment getAlignment(Axis axis);
+        [[nodiscard]] virtual uint16_t getAxisAlignmentValue(Axis axis);
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///

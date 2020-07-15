@@ -114,12 +114,11 @@ namespace gui
       private:
         TextType textType = TextType::MULTI_LINE;
         /// points to default text font to use
-        Font *font = nullptr;
+        RawFont *font = nullptr;
         Color textColor;
         // margins for text
         Margins margins;
-        Alignment alignment = style::text::defaultTextAlignment;
-        bool underline      = false;
+        bool underline = false;
 
         bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
         bool handleNavigation(const InputEvent &inputEvent);
@@ -158,7 +157,7 @@ namespace gui
         /// saves text from widget to file at specified path
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
-        void setFont(Font *font);
+        void setFont(RawFont *font);
         virtual void setMargins(const Margins &margins);
 
         // virtual methods from Item
@@ -174,11 +173,6 @@ namespace gui
         bool onFocus(bool state) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void setRadius(int value) override;
-        void setAlignment(const Alignment alignment);
-        auto getAlignment() -> auto const &
-        {
-            return alignment;
-        }
 
       private:
         gui::KeyInputMappedTranslation translator;

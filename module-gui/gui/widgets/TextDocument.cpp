@@ -2,6 +2,7 @@
 #include "log/log.hpp"
 #include <cassert>
 #include <utility>
+#include <TextFormat.hpp>
 
 namespace gui
 {
@@ -23,14 +24,14 @@ namespace gui
 
     void TextDocument::append(std::list<TextBlock> &&blocks)
     {
-        for (auto el : blocks) {
-            this->blocks.emplace_back(el);
+        for (auto &&el : blocks) {
+            this->blocks.emplace_back(std::move(el));
         }
     }
 
     void TextDocument::append(TextBlock &&text)
     {
-        blocks.emplace_back(text);
+        blocks.emplace_back(std::move(text));
     }
 
     void TextDocument::addNewline(BlockCursor &cursor, TextBlock::End eol)
@@ -43,7 +44,7 @@ namespace gui
     UTF8 TextDocument::getText() const
     {
         UTF8 output;
-        for (auto el : blocks) {
+        for (auto &el : blocks) {
             output += el.getText();
         }
 
@@ -54,9 +55,9 @@ namespace gui
     {
         unsigned int block_no      = 0;
         unsigned int loop_position = 0;
-        for (auto el : blocks) {
+        for (auto &el : blocks) {
             if (loop_position + el.length() > position) { // data found
-                return BlockCursor(this, position - loop_position, block_no, el.getFont());
+                return BlockCursor(this, position - loop_position, block_no, el.getFormat()->getFont());
             }
             // data not found in block_number, early exit
             loop_position += el.length();
@@ -69,7 +70,7 @@ namespace gui
     {
         if (cursor) {
             auto block = std::next(blocks.begin(), cursor.getBlockNr());
-            return TextPart(cursor, block->getText(cursor.getPosition()), block->getFont());
+            return TextPart(cursor, block->getText(cursor.getPosition()), block->getFormat()->getFont());
         }
         return TextPart();
     }
@@ -109,7 +110,8 @@ namespace gui
     auto TextDocument::split(BlockCursor &cursor) -> std::pair<TextBlock &, TextBlock &>
     {
         auto to_split = std::next(blocks.begin(), cursor.getBlockNr());
-        auto newblock = TextBlock(to_split->getText(cursor.getPosition()), to_split->getFont(), to_split->getEnd());
+        auto newblock =
+            TextBlock(to_split->getText(cursor.getPosition()), to_split->getFormat()->getFont(), to_split->getEnd());
         to_split->setText(to_split->getText().substr(0, cursor.getPosition()));
         blocks.insert(std::next(to_split), std::move(newblock));
         return {*to_split, *(std::next(to_split))};

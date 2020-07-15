@@ -12,6 +12,7 @@
 #include <mock/multi-line-string.hpp>
 #include <algorithm>
 #include <mock/BlockFactory.hpp>
+#include <RawFont.hpp>
 
 TEST_CASE("Text ctor")
 {

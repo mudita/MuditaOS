@@ -1,21 +1,22 @@
 #pragma once
 
 #include "Color.hpp"
-#include "Font.hpp"
 #include "TextConstants.hpp"
 #include "utf8/UTF8.hpp"
+#include <TextFormat.hpp>
+#include <memory>
 
 namespace gui
 {
+    class RawFont;
     /// single text block. It might end with formatting, or with newline.
     /// it is responsible for:
     /// * storing part of text
     /// * storing properties of stored text
     class TextBlock
     {
-        Font *font = nullptr;
+        std::unique_ptr<TextFormat> format = nullptr;
         UTF8 text;
-        Color color = ColorFullBlack;
 
       public:
         enum class End
@@ -28,11 +29,13 @@ namespace gui
         End end = End::Newline;
 
       public:
-        TextBlock(const UTF8 text, Font *font, End eol = End::None);
+        TextBlock(const UTF8 text, RawFont *font, End eol = End::None);
+        TextBlock(const UTF8 text, std::unique_ptr<TextFormat> format);
+        TextBlock(const TextBlock &);
 
         const UTF8 &getText() const;
         UTF8 getText(uint32_t start_position) const;
-        Font *getFont() const;
+        auto getFormat() const -> const TextFormat *;
         void setText(const UTF8 text);
         void insertChar(const uint32_t value, const uint32_t pos);
         void removeChar(const uint32_t pos);

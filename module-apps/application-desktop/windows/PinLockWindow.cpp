@@ -65,8 +65,7 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+        titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
 
         // labels with stars for displaying entered digits
         uint32_t pinLabelX = 82;
@@ -78,8 +77,7 @@ namespace gui
             label->setFont(style::window::font::largelight);
             label->setText("*");
             label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-            label->setAlignment(
-                gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
             pinLabels.push_back(label);
             pinLabelX += 84;
         }
@@ -91,8 +89,7 @@ namespace gui
             label->setFilled(false);
             label->setBorderColor(gui::ColorNoColor);
             label->setFont(style::window::font::medium);
-            label->setAlignment(
-                gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
             infoLabels.push_back(label);
             infoLabelY += 40;
         }

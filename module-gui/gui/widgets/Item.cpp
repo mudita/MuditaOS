@@ -291,6 +291,65 @@ namespace gui
         setArea({x, y, getWidth(), getHeight()});
     }
 
+    void Item::setAlignment(const Alignment &value)
+    {
+        if (alignment != value) {
+            alignment = value;
+        }
+    }
+
+    Alignment Item::getAlignment(Axis axis)
+    {
+        if (axis == Axis::X) {
+            return Alignment(alignment.horizontal, Alignment::Vertical::None);
+        }
+        else {
+            return Alignment(Alignment::Horizontal::None, alignment.vertical);
+        }
+    }
+
+    Alignment &Item::getAlignment()
+    {
+        return alignment;
+    }
+
+    uint16_t Item::getAxisAlignmentValue(Axis axis)
+    {
+        auto tempAlignment = getAlignment(axis);
+
+        if (parent->getAlignment(axis).vertical != Alignment::Vertical::None)
+            tempAlignment.vertical = parent->getAlignment(axis).vertical;
+
+        if (parent->getAlignment(axis).horizontal != Alignment::Horizontal::None)
+            tempAlignment.horizontal = parent->getAlignment(axis).horizontal;
+
+        switch (tempAlignment.vertical) {
+        case gui::Alignment::Vertical::Top:
+            return this->margins.getMarginInAxis(axis, MarginInAxis::First);
+        case gui::Alignment::Vertical::Center:
+            return (parent->area().size(axis) - (this->area().size(axis) + this->margins.getSumInAxis(axis))) / 2;
+        case gui::Alignment::Vertical::Bottom:
+            return parent->area().size(axis) - this->area().size(axis) -
+                   this->margins.getMarginInAxis(axis, MarginInAxis::Second);
+        default:
+            break;
+        }
+
+        switch (tempAlignment.horizontal) {
+        case gui::Alignment::Horizontal::Left:
+            return this->margins.getMarginInAxis(axis, MarginInAxis::First);
+        case gui::Alignment::Horizontal::Center:
+            return (parent->area().size(axis) - (this->area().size(axis) + this->margins.getSumInAxis(axis))) / 2;
+        case gui::Alignment::Horizontal::Right:
+            return parent->area().size(axis) - this->area().size(axis) -
+                   this->margins.getMarginInAxis(axis, MarginInAxis::Second);
+        default:
+            break;
+        }
+
+        return getPosition(axis);
+    }
+
     void Item::setBoundingBox(const BoundingBox &new_box)
     {
         BoundingBox oldArea = widgetArea;
@@ -431,5 +490,6 @@ namespace gui
     bool Item::onContent()
     {
         return false;
-    };
+    }
+
 } /* namespace gui */

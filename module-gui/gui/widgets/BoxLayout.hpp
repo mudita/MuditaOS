@@ -6,9 +6,11 @@
 #include "Rect.hpp"
 #include <Alignment.hpp>
 #include "LayoutSizeStore.hpp"
+#include "log/log.hpp"
 
 namespace gui
 {
+
     class BoxLayout : public Rect, Layout
     {
       protected:
@@ -29,16 +31,17 @@ namespace gui
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Min)
         {
-            return it->getSize(axis) - sizeUsed<axis>(it);
+            return (sizeUsed<axis>(it) >= it->getSize(axis)) ? 0 : it->getSize(axis) - sizeUsed<axis>(it);
         };
 
         template <Axis axis> void resizeItems();
-        template <Axis axis> void reverseAlignment();
+        template <Axis axis>[[nodiscard]] uint16_t getAxisAlignmentValue(uint16_t calcPos);
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
         virtual void resizeItems();
         bool reverseOrder = false;
+
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items
         std::list<Item *>::iterator nextNavigationItem(std::list<Item *>::iterator from);
 
@@ -52,6 +55,7 @@ namespace gui
         // virtual methods from Item
         void setPosition(const short &x, const short &y) override;
         void setSize(const unsigned short w, const unsigned short h) override;
+        void setAlignment(const Alignment &value) override;
         void addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
         bool erase(Item *item) override;
@@ -84,7 +88,6 @@ namespace gui
         HBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
-        virtual void axisAlignment();
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 
@@ -96,7 +99,6 @@ namespace gui
         VBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
-        virtual void axisAlignment();
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 

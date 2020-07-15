@@ -2,12 +2,13 @@
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
-#include "../core/Font.hpp"
 
 #include "Label.hpp"
 #include <Style.hpp>
 #include <cassert>
 #include "TextConstants.hpp"
+#include <FontManager.hpp>
+#include <RawFont.hpp>
 
 namespace gui
 {
@@ -57,25 +58,33 @@ namespace gui
         textArea.h              = font->info.line_height;
 
         // calculate vertical position of text
-        if (alignment.vertical_center) {
+
+        switch (alignment.vertical) {
+        case (Alignment::Vertical::Center):
             textArea.y = (widgetArea.h - font->info.line_height) / 2 + font->info.base;
-        }
-        else if (alignment.vertical_top) {
+            break;
+        case Alignment::Vertical::Top:
             textArea.y = font->info.base + margins.top;
-        }
-        else if (alignment.vertical_bottom) {
+            break;
+        case Alignment::Vertical::Bottom:
             textArea.y = widgetArea.h - font->info.line_height + font->info.base - margins.bottom;
+            break;
+        default:
+            break;
         }
-        // calculate horizontal position o text
-        textArea.x = 0;
-        if (alignment.horizontal_center) {
+
+        switch (alignment.horizontal) {
+        case (Alignment::Horizontal::Center):
             textArea.x = (widgetArea.w - textArea.w) / 2;
-        }
-        else if (alignment.horizontal_left) {
+            break;
+        case Alignment::Horizontal::Left:
             textArea.x = margins.left;
-        }
-        else if (alignment.horizontal_right) {
+            break;
+        case Alignment::Horizontal::Right:
             textArea.x = widgetArea.w - textArea.w - margins.right;
+            break;
+        default:
+            break;
         }
 
         // if dots mode is disabled and line mode is enabled calculate positiona and width of the line
@@ -89,21 +98,26 @@ namespace gui
             lineFront->setVisible(true);
             lineBack->setVisible(true);
             // both lines are visible
-            if (alignment.horizontal_center) {
+
+            switch (alignment.horizontal) {
+            case (Alignment::Horizontal::Center):
                 lineFront->setPosition(0, lineY);
                 lineFront->setSize(lineW / 2 - spaceWidth, 2);
                 lineBack->setPosition(lineW / 2 + stringPixelWidth + spaceWidth, lineY);
                 lineBack->setSize(lineW / 2 - spaceWidth, 2);
-            }
-            else if (alignment.horizontal_right) {
+                break;
+            case Alignment::Horizontal::Right:
                 lineFront->setPosition(0, lineY);
                 lineFront->setSize(lineW - spaceWidth, 2);
                 lineBack->setVisible(false);
-            }
-            else if (alignment.horizontal_left) {
+                break;
+            case Alignment::Horizontal::Left:
                 lineBack->setPosition(stringPixelWidth + spaceWidth, lineY);
                 lineBack->setSize(lineW - spaceWidth, 2);
                 lineFront->setVisible(false);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -159,9 +173,9 @@ namespace gui
         return text.length();
     }
 
-    void Label::setAlignment(const Alignment &alignment)
+    void Label::setAlignment(const Alignment &value)
     {
-        this->alignment = alignment;
+        this->alignment = value;
         calculateDisplayText();
     }
 
@@ -256,11 +270,11 @@ namespace gui
 
     void Label::setFont(const UTF8 &fontName)
     {
-        Font *newFont = FontManager::getInstance().getFont(fontName);
+        RawFont *newFont = FontManager::getInstance().getFont(fontName);
         setFont(newFont);
     }
 
-    void Label::setFont(Font *font)
+    void Label::setFont(RawFont *font)
     {
         this->font = font;
         if (font != nullptr) {
@@ -268,7 +282,7 @@ namespace gui
         }
     }
 
-    Font *Label::getFont() const
+    RawFont *Label::getFont() const
     {
         return font;
     }

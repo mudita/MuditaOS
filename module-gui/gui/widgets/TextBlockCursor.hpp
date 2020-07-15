@@ -9,7 +9,7 @@ namespace gui
 
     class TextDocument;
     class TextBlock;
-    class Font;
+    class RawFont;
 
     /// element to:
     /// 1. get position in TextDocument and
@@ -24,7 +24,7 @@ namespace gui
         TextDocument *document = nullptr;
         auto curentBlock();
         auto blocksEnd();
-        Font *default_font = nullptr;
+        RawFont *default_font = nullptr;
 
       private:
         unsigned int pos      = text::npos;
@@ -39,7 +39,7 @@ namespace gui
         /// gets cursor pointing in position in block
         /// @note it does not select next block - to do so add another ctor based on operator+
         /// and check if this one is needed
-        BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, Font *default_font);
+        BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, RawFont *default_font);
         BlockCursor() = default; /// bad cursor
 
         [[nodiscard]] auto getPosition() const -> unsigned int
@@ -75,5 +75,6 @@ namespace gui
         void addTextBlock(TextBlock &&);
         // return if handled ( this is not i.e. at begin/end)
         bool removeChar();
+        const TextBlock &operator*();
     };
 } // namespace gui

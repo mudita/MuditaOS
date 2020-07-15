@@ -1,6 +1,5 @@
 #include <iterator>
 
-#include "../core/Font.hpp"
 #include "Common.hpp"
 #include "Ellipsis.hpp"
 #include "InputEvent.hpp"
@@ -18,6 +17,8 @@
 #include "vfs.hpp"
 #include <Style.hpp>
 #include <cassert>
+#include <FontManager.hpp>
+#include <RawFont.hpp>
 
 #if DEBUG_GUI_TEXT == 1
 #define debug_text(...) LOG_DEBUG(__VA_ARGS__)
@@ -47,6 +48,7 @@ namespace gui
                TextType textType)
         : Rect(parent, x, y, w, h), lines(this), expandMode{expandMode}, textType{textType}
     {
+        alignment = style::text::defaultTextAlignment;
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
@@ -129,11 +131,11 @@ namespace gui
 
     void Text::setFont(const UTF8 &fontName)
     {
-        Font *newFont = FontManager::getInstance().getFont(fontName);
+        RawFont *newFont = FontManager::getInstance().getFont(fontName);
         font          = newFont;
     }
 
-    void Text::setFont(Font *fontName)
+    void Text::setFont(RawFont *fontName)
     {
         font = fontName;
     }
@@ -349,11 +351,6 @@ namespace gui
     void Text::setMargins(const Margins &margins)
     {
         this->margins = margins;
-    }
-
-    void Text::setAlignment(const Alignment _alignment)
-    {
-        alignment = _alignment;
     }
 
     std::list<DrawCommand *> Text::buildDrawList()

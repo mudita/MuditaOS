@@ -64,6 +64,7 @@ namespace gui
 
         body = new VBox{this, 0, 0, w, h};
         body->setBorderColor(ColorNoColor);
+        body->setAlignment(Alignment::Vertical::Top);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
@@ -129,6 +130,13 @@ namespace gui
         return provider;
     }
 
+    void ListView::setAlignment(const Alignment &value)
+    {
+        if (body->getAlignment() != value) {
+            body->setAlignment(value);
+        }
+    }
+
     void ListView::clear()
     {
         clearItems();
@@ -170,7 +178,6 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
-        body->axisAlignment();
         pageLoaded = true;
     }
 

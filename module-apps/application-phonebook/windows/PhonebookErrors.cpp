@@ -20,8 +20,8 @@ namespace gui
                            const std::string text         = "",
                            const std::string fontName     = style::window::font::small,
                            const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                           const Alignment alignment      = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT,
-                                                                 Alignment::ALIGN_VERTICAL_BOTTOM),
+                           const Alignment alignment      = Alignment(gui::Alignment::Horizontal::Left,
+                                                                 gui::Alignment::Vertical::Bottom),
                            const bool lineMode            = false)
     {
         Label *l = new Label(parentPage, x, y, w, h);
@@ -52,7 +52,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, false);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
         topSeparatorLabel = addLabel(this,
                                      0,
@@ -134,7 +134,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, false);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         topSeparatorLabel = addLabel(this,
                                      0,
                                      104,

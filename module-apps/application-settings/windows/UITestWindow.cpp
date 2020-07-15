@@ -9,6 +9,7 @@
 #include <Style.hpp>
 #include <functional>
 #include <memory>
+#include <Font.hpp>
 
 namespace gui
 {
@@ -30,24 +31,14 @@ namespace gui
                              300);
         text->setEditMode(EditMode::EDIT);
         text->setFont(style::window::font::medium);
-        text->addText(TextBlock(
-            "Add text,", FontManager::getInstance().getFont(style::window::font::medium), TextBlock::End::None));
-        text->addText(TextBlock("long press * ",
-                                FontManager::getInstance().getFont(style::window::font::mediumbold),
-                                TextBlock::End::None));
-        text->addText(TextBlock("adds special char, long press # changes input",
-                                FontManager::getInstance().getFont(style::window::font::medium),
-                                TextBlock::End::Newline));
-        text->addText(TextBlock("(and shows it in bottom bar) arrows walk",
-                                FontManager::getInstance().getFont(style::window::font::medium),
-                                TextBlock::End::Newline));
-        text->addText(TextBlock(
-            "1 in text mode ", FontManager::getInstance().getFont(style::window::font::medium), TextBlock::End::None));
-        text->addText(TextBlock(
-            "adds ", FontManager::getInstance().getFont(style::window::font::largelight), TextBlock::End::None));
-        text->addText(TextBlock("special chars too",
-                                FontManager::getInstance().getFont(style::window::font::medium),
-                                TextBlock::End::None));
+        text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
+        text->addText(TextBlock("long press * ", Font(27, Font::Weight::Bold).raw(), TextBlock::End::None));
+        text->addText(
+            TextBlock("adds special char, long press # changes input", Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock("(and shows it in bottom bar) arrows walk", Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock("1 in text mode ", Font(27).raw(), TextBlock::End::None));
+        text->addText(TextBlock("adds ", Font(46, Font::Weight::Light).raw(), TextBlock::End::None));
+        text->addText(TextBlock("special chars too", Font(27).raw(), TextBlock::End::None));
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },

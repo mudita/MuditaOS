@@ -9,7 +9,6 @@ extern "C"
 #include "Color.hpp"
 #include "Renderer.hpp"
 #include "Context.hpp"
-#include "Font.hpp"
 #include "ImageManager.hpp"
 #include "../Common.hpp"
 // utils
@@ -20,6 +19,9 @@ extern "C"
 // module-utils
 #include "utf8/UTF8.hpp"
 #include <cassert>
+#include <FontManager.hpp>
+#include <FontGlyph.hpp>
+#include <RawFont.hpp>
 
 #if DEBUG_FONT == 1
 #define log_warn_glyph(...) LOG_WARN(__VA_ARGS__)
@@ -57,7 +59,7 @@ namespace gui
             return;
 
         for (uint32_t i = 0; i < penWidth; i++) {
-            memset(ctx->getData() + drawOffset, color.intensivity, width);
+            memset(ctx->getData() + drawOffset, color.intensity, width);
             drawOffset += rowStride;
         }
     }
@@ -85,7 +87,7 @@ namespace gui
         int32_t rowStride = ctx->getW();
 
         for (uint32_t row = 0; row < height; row++) {
-            memset(ctx->getData() + drawOffset, color.intensivity, penWidth);
+            memset(ctx->getData() + drawOffset, color.intensity, penWidth);
             drawOffset += rowStride;
         }
     }
@@ -142,17 +144,17 @@ namespace gui
             drawOffset -= rowStride * penWidthAcross;
             for (uint32_t skew = 0; skew < penWidthAcross; skew++) {
                 if (toRight) {
-                    memset(ctx->getData() + drawOffset, color.intensivity, skew);
+                    memset(ctx->getData() + drawOffset, color.intensity, skew);
                 }
                 else {
-                    memset(ctx->getData() + drawOffset + (penWidthAcross - skew), color.intensivity, (skew));
+                    memset(ctx->getData() + drawOffset + (penWidthAcross - skew), color.intensity, (skew));
                 }
                 drawOffset += rowStride;
             }
         }
         // produces \\\ with flat top and bottom
         for (uint32_t skew = 0; skew < side; skew++) {
-            memset(ctx->getData() + drawOffset, color.intensivity, penWidthAcross);
+            memset(ctx->getData() + drawOffset, color.intensity, penWidthAcross);
             drawOffset += rowStride;
             drawOffset += (toRight ? 1 : -1); // add skew
         }
@@ -160,10 +162,10 @@ namespace gui
         if (lineEnds & Line45degEnd::BOTTOM_TIP) {
             for (uint32_t skew = 0; skew < penWidthAcross; skew++) {
                 if (toRight) {
-                    memset(ctx->getData() + (drawOffset + skew), color.intensivity, (penWidthAcross - skew) - 1);
+                    memset(ctx->getData() + (drawOffset + skew), color.intensity, (penWidthAcross - skew) - 1);
                 }
                 else {
-                    memset(ctx->getData() + drawOffset + 1, color.intensivity, (penWidthAcross - skew) - 1);
+                    memset(ctx->getData() + drawOffset + 1, color.intensity, (penWidthAcross - skew) - 1);
                 }
                 drawOffset += rowStride;
             }
@@ -223,7 +225,7 @@ namespace gui
             if (cmd->filled) {
                 uint32_t offset = wgtY * drawCtx->getW() + wgtX;
                 for (int32_t y = 0; y < cmd->areaH; y++) {
-                    memset(drawCtx->getData() + offset, cmd->fillColor.intensivity, wgtW);
+                    memset(drawCtx->getData() + offset, cmd->fillColor.intensity, wgtW);
                     offset += drawCtx->getW();
                 }
             }
@@ -826,7 +828,7 @@ namespace gui
     }
 
     void Renderer::drawChar(
-        Context *context, const int16_t x, const int16_t y, Font *font, FontGlyph *glyph, const Color color)
+        Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color)
     {
 
         uint8_t *drawPtr  = context->getData() + x + (y - glyph->yoffset) * context->getW();
@@ -835,7 +837,7 @@ namespace gui
         for (uint16_t yy = 0; yy < glyph->height; ++yy) {
             for (uint16_t xx = 0; xx < glyph->width; ++xx) {
                 if (*(glyphPtr + xx) == 0)
-                    *(drawPtr + xx) = 0x0F & color.intensivity;
+                    *(drawPtr + xx) = 0x0F & color.intensity;
             }
             drawPtr += context->getW();
             glyphPtr += glyph->width;
@@ -867,7 +869,7 @@ namespace gui
 
         // retrieve font used to draw text
         FontManager &fontManager = FontManager::getInstance();
-        Font *font               = fontManager.getFont(cmd->fontID);
+        RawFont *font            = fontManager.getFont(cmd->fontID);
 
         int16_t posX = cmd->tx;
         int16_t posY = cmd->ty;

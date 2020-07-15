@@ -26,20 +26,19 @@ namespace gui
         hour->setPenFocusWidth(0);
         hour->setPenWidth(0);
         hour->setFont(style::window::font::medium);
-        hour->setAlignment(gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP});
+        hour->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
 
         title = new gui::Label(this, 0, 0, 0, 0);
         title->setPenFocusWidth(0);
         title->setPenWidth(0);
         title->setFont(style::window::font::bigbold);
-        title->setAlignment(gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_TOP});
+        title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
 
         snippet = new gui::Label(this, 0, 0, 0, 0);
         snippet->setPenFocusWidth(0);
         snippet->setPenWidth(0);
         snippet->setFont(style::window::font::small);
-        snippet->setAlignment(
-            gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
+        snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
 
     NotesItem::~NotesItem()

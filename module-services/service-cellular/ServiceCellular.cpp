@@ -201,7 +201,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
-    cmux->SelectAntenna(bsp::cellular::antenna::highBand);
+    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
     switch (board) {
     case bsp::Board::T4:
         state.set(this, State::ST::StatusCheck);
@@ -984,61 +984,68 @@ bool ServiceCellular::sendSMS(void)
 
     uint32_t textLen = record.body.length();
 
-    const uint32_t singleMessageLen = 30;
+    constexpr uint32_t commandTimeout   = 5000;
+    constexpr uint32_t singleMessageLen = 30;
     bool result                     = false;
-
-    // if text fit in single message send
-    if (textLen < singleMessageLen) {
-
-        if (cmux->CheckATCommandPrompt(
-                cmux->get(TS0710::Channel::Commands)
-                    ->SendCommandPrompt((std::string(at::factory(at::AT::CMGS)) +
-                                         UCS2(UTF8(record.number.getEntered())).modemStr() + "\"\r")
-                                            .c_str(),
-                                        1,
-                                        2000))) {
-
-            if (cmux->get(TS0710::Channel::Commands)->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
-                result = true;
-            }
-            else {
-                result = false;
-            }
-        }
-    }
-    // split text, and send concatenated messages
-    else {
-        const uint32_t maxConcatenatedCount = 7;
-        uint32_t messagePartsCount          = textLen / singleMessageLen;
-        if ((textLen % singleMessageLen) != 0) {
-            messagePartsCount++;
-        }
-
-        if (messagePartsCount > maxConcatenatedCount) {
-            LOG_ERROR("Message to long");
-            return false;
-        }
-
-        for (uint32_t i = 0; i < messagePartsCount; i++) {
-
-            uint32_t partLength = singleMessageLen;
-            if (i * singleMessageLen + singleMessageLen > record.body.length()) {
-                partLength = record.body.length() - i * singleMessageLen;
-            }
-            UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
-
-            std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).modemStr() +
-                                "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount) + "\r");
+    auto channel                        = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        // if text fit in single message send
+        if (textLen < singleMessageLen) {
 
             if (cmux->CheckATCommandPrompt(
-                    cmux->get(TS0710::Channel::Commands)->SendCommandPrompt(command.c_str(), 1, 5000))) {
-                // prompt sign received, send data ended by "Ctrl+Z"
-                if (cmux->get(TS0710::Channel::Commands)
-                        ->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2000, 2)) {
+                    channel->SendCommandPrompt((std::string(at::factory(at::AT::CMGS)) +
+                                                UCS2(UTF8(record.number.getEntered())).modemStr() + "\"\r")
+                                                   .c_str(),
+                                               1,
+                                               commandTimeout))) {
+
+                if (channel->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                     result = true;
                 }
                 else {
                     result = false;
+                }
+            }
+        }
+        // split text, and send concatenated messages
+        else {
+            const uint32_t maxConcatenatedCount = 7;
+            uint32_t messagePartsCount          = textLen / singleMessageLen;
+            if ((textLen % singleMessageLen) != 0) {
+                messagePartsCount++;
+            }
+
+            if (messagePartsCount > maxConcatenatedCount) {
+                LOG_ERROR("Message to long");
+                return false;
+            }
+
+            auto channel = cmux->get(TS0710::Channel::Commands);
+
+            for (uint32_t i = 0; i < messagePartsCount; i++) {
+
+                uint32_t partLength = singleMessageLen;
+                if (i * singleMessageLen + singleMessageLen > record.body.length()) {
+                    partLength = record.body.length() - i * singleMessageLen;
+                }
+                UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
+
+                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).modemStr() +
+                                    "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount) + "\r");
+
+                if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
+                    // prompt sign received, send data ended by "Ctrl+Z"
+                    if (channel->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), commandTimeout, 2)) {
+                        result = true;
+                    }
+                    else {
+                        result = false;
+                        break;
+                    }
+                }
+                else {
+                    result = false;
+                    break;
                 }
             }
         }

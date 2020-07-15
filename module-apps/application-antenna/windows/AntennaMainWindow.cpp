@@ -107,7 +107,7 @@ namespace gui
             buttons[i]->setFont(style::window::font::medium);
             buttons[i]->setPosition(posX, 500);
             buttons[i]->setAlignment(
-                gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+                gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             posX += 240;
         }
 
@@ -228,8 +228,7 @@ namespace gui
             label->setPenWidth(0);
         }
         label->setFont(style::window::font::verysmall);
-        label->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         label->setRadius(11);
         label->activatedCallback = activatedCallback;
 

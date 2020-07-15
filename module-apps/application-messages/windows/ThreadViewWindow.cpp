@@ -148,8 +148,9 @@ namespace gui
         SMS.dbsize = threadDetails->msgCount;
 
         if (threadDetails != nullptr && threadDetails->isUnread()) {
-            threadDetails->unreadMsgCount = 0;
-            DBServiceAPI::ThreadUpdate(application, *threadDetails);
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app != nullptr);
+            app->markSmsThreadAsRead(threadDetails->ID);
         }
 
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
@@ -314,8 +315,7 @@ namespace gui
         timeLabel->setText(utils::time::Time(timestamp));
         timeLabel->setPenWidth(style::window::default_border_no_focus_w);
         timeLabel->setVisible(false);
-        timeLabel->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         return timeLabel;
     }
 

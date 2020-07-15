@@ -6,6 +6,7 @@
 #include "log/log.hpp"
 #include "TextLine.hpp"
 #include <cassert>
+#include <RawFont.hpp>
 
 #define debug_text_cursor(...)
 // #define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)

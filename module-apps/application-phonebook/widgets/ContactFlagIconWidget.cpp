@@ -43,7 +43,7 @@ namespace gui
             new Label(this, 0, 0, style::widget::ContatFlas::iconsSize, style::widget::ContatFlas::iconsSize);
         numericLabel->setFont(style::window::font::bigbold);
         numericLabel->setText(std::to_string(number));
-        numericLabel->setAlignment({gui::Alignment::ALIGN_HORIZONTAL_CENTER | gui::Alignment::ALIGN_VERTICAL_CENTER});
+        numericLabel->setAlignment(Alignment(Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         numericLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
@@ -57,20 +57,18 @@ namespace gui
         label->setText(itemText);
         label->setEllipsis(gui::Ellipsis::None);
         label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        label->setAlignment({gui::Alignment::ALIGN_VERTICAL_CENTER | gui::Alignment::ALIGN_HORIZONTAL_CENTER});
+        label->setAlignment(Alignment(Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         mainBox = new VBox(this, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight);
+        mainBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         mainBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         if (numericIcon) {
             mainBox->addWidget(numericLabel);
-            center(mainBox, numericLabel, gui::Axis::X);
         }
         else {
             mainBox->addWidget(icon);
-            center(mainBox, icon, gui::Axis::X);
         }
         mainBox->addWidget(label);
-        center(mainBox, label, gui::Axis::X);
     }
 
 } // namespace gui

@@ -159,9 +159,10 @@ namespace gui
         recipientLabel->activeItem = false;
         recipientLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipientLabel->setFont(style::window::font::small);
-        recipientLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        recipientLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
+        reciepientHbox->setAlignment(gui::Alignment::Vertical::Center);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         reciepientHbox->setPenFocusWidth(style::window::default_border_focus_w);
         reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
@@ -176,7 +177,7 @@ namespace gui
         recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
-        recipient->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        recipient->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         recipient->activatedCallback    = [=](Item &) -> bool { return selectContact(); };
         recipient->focusChangedCallback = [=](Item &) -> bool {
             updateBottomBar();
@@ -196,7 +197,7 @@ namespace gui
         labelMessage->activeItem = false;
         labelMessage->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         labelMessage->setFont(style::window::font::small);
-        labelMessage->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::EXPAND_UP);
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -208,7 +209,7 @@ namespace gui
         message->setPenFocusWidth(style::window::default_border_focus_w);
         message->setPenWidth(style::window::messages::sms_border_no_focus);
         message->setFont(style::window::font::medium);
-        message->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        message->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         message->activatedCallback = [=](Item &) -> bool {
             if (!sendSms()) {
                 LOG_ERROR("sendSms failed");

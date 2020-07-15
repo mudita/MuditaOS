@@ -6,6 +6,7 @@
 namespace gui
 {
     /// @note with nullptr font - nullptr will be assigned as font
-    auto textToTextBlocks(const UTF8 &text, Font *font, TextBlock::End end = TextBlock::End::Newline)
+    auto textToTextBlocks(const UTF8 &text, RawFont *font, TextBlock::End end = TextBlock::End::Newline)
         -> std::list<TextBlock>;
+    auto textToTextBlocks(const UTF8 &text, TextFormat format) -> std::list<TextBlock>;
 } // namespace gui

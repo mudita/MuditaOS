@@ -8,6 +8,7 @@ namespace gui
     BoxLayout::BoxLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
         : Rect(parent, x, y, w, h)
     {
+        alignment = gui::Alignment(Alignment::Horizontal::None, Alignment::Vertical::None);
         sizeStore = std::make_unique<BoxLayoutSizeStore>();
     }
 
@@ -67,6 +68,14 @@ namespace gui
 
         resizeItems();
         setNavigation();
+    }
+
+    void BoxLayout::setAlignment(const Alignment &value)
+    {
+        if (alignment != value) {
+            alignment = value;
+            resizeItems();
+        }
     }
 
     void BoxLayout::addWidget(Item *item)
@@ -166,7 +175,7 @@ namespace gui
                 continue;
 
             auto axisItemPosition       = 0;
-            auto orthogonalItemPosition = el->getPosition(orthogonal(axis));
+            auto orthogonalItemPosition = 0;
             auto axisItemSize           = 0;
             auto orthogonalItemSize     = 0;
             auto grantedSize            = sizeStore->get(el);
@@ -213,6 +222,12 @@ namespace gui
                 addToOutOfDrawAreaList(el);
             }
 
+            // Recalculate lead Axis position if lead axis alignment provided.
+            axisItemPosition = getAxisAlignmentValue<axis>(axisItemPosition);
+
+            // Calculate orthogonal Axis position based on Box Alignment or if not specified child Alignment.
+            orthogonalItemPosition = el->getAxisAlignmentValue(orthogonal(axis));
+
             if (el->visible)
                 el->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
         }
@@ -237,11 +252,55 @@ namespace gui
         });
     }
 
-    template <Axis axis> void BoxLayout::reverseAlignment()
+    template <Axis axis> uint16_t BoxLayout::getAxisAlignmentValue(uint16_t calcPos)
     {
-        for (auto &it : children) {
-            it->setPosition(it->getPosition(axis) - sizeLeft<axis>(this), axis);
+        switch (getAlignment(axis).vertical) {
+        case gui::Alignment::Vertical::Top:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this);
+            }
+            break;
+        case gui::Alignment::Vertical::Center:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this) / 2;
+            }
+            else {
+                return calcPos + sizeLeft<axis>(this) / 2;
+            }
+            break;
+        case gui::Alignment::Vertical::Bottom:
+            if (!reverseOrder) {
+                return calcPos + sizeLeft<axis>(this);
+            }
+            break;
+        default:
+            break;
         }
+
+        switch (getAlignment(axis).horizontal) {
+        case gui::Alignment::Horizontal::Left:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this);
+            }
+            break;
+        case gui::Alignment::Horizontal::Center:
+            if (reverseOrder) {
+                return calcPos - sizeLeft<axis>(this) / 2;
+            }
+            else {
+                return calcPos + sizeLeft<axis>(this) / 2;
+            }
+            break;
+        case gui::Alignment::Horizontal::Right:
+            if (!reverseOrder) {
+                return calcPos + sizeLeft<axis>(this);
+            }
+            break;
+        default:
+            break;
+        }
+
+        return calcPos;
     }
 
     void BoxLayout::setNavigation()
@@ -337,13 +396,6 @@ namespace gui
         BoxLayout::addWidget<Axis::X>(item);
     }
 
-    void HBox::axisAlignment()
-    {
-        if (reverseOrder) {
-            reverseAlignment<Axis::X>();
-        }
-    }
-
     auto HBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
     {
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
@@ -367,13 +419,6 @@ namespace gui
     void VBox::addWidget(Item *item)
     {
         BoxLayout::addWidget<Axis::Y>(item);
-    }
-
-    void VBox::axisAlignment()
-    {
-        if (reverseOrder) {
-            reverseAlignment<Axis::Y>();
-        }
     }
 
     auto VBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size

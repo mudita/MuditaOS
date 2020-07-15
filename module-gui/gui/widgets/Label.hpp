@@ -1,18 +1,9 @@
-/*
- * Label.h
- *
- *  Created on: 7 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_
+#pragma once
 
 #include <string>
 #include <list>
 
 #include "../core/BoundingBox.hpp"
-#include "../core/Font.hpp"
 #include "../core/Color.hpp"
 #include "../core/DrawCommand.hpp"
 #include "../Common.hpp"
@@ -22,9 +13,12 @@
 
 #include "Style.hpp"
 #include "utf8/UTF8.hpp"
+#include <Ellipsis.hpp>
 
 namespace gui
 {
+
+    class RawFont;
 
     namespace meta
     {
@@ -45,7 +39,7 @@ namespace gui
             }
             uint32_t x = 0, y = 0, w = 0, h = 0;
             std::string font = style::window::font::medium;
-            uint32_t align   = gui::Alignment::ALIGN_HORIZONTAL_LEFT | gui::Alignment::ALIGN_VERTICAL_CENTER;
+            Alignment align  = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center);
             RectangleEdgeFlags edges =
                 gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM;
         };
@@ -70,10 +64,9 @@ namespace gui
         uint32_t charDrawableCount = 0;
         uint32_t stringPixelWidth  = 0;
         Color textColor            = {0, 0};
-        Font *font                 = nullptr;
+        RawFont *font              = nullptr;
         Margins margins            = {0, 0, 0, 0};
         bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
-        Alignment alignment;
 
         // area specified in pixels occupied by text inside label space.
         // This defines also position of the text considering alignment and margins.
@@ -119,11 +112,7 @@ namespace gui
         virtual void clear();
         virtual const UTF8 &getText() const;
         virtual unsigned int getTextLength() const;
-        virtual void setAlignment(const Alignment &alignment);
-        auto getAlignment() -> auto const &
-        {
-            return alignment;
-        }
+        virtual void setAlignment(const Alignment &value) override;
         virtual void setMargins(const Margins &margins);
         void setEllipsis(gui::Ellipsis ellipsis);
         /**
@@ -133,8 +122,8 @@ namespace gui
         void setTextColor(Color color);
 
         void setFont(const UTF8 &fontName);
-        void setFont(Font *font);
-        Font *getFont() const;
+        void setFont(RawFont *font);
+        RawFont *getFont() const;
         // virtual methods
         std::list<DrawCommand *> buildDrawList() override;
         uint32_t getTextNeedSpace() const;
@@ -145,5 +134,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_LABEL_HPP_ */

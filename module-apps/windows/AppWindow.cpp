@@ -45,8 +45,7 @@ namespace gui
         title->setFilled(false);
         title->setFont(font::title);
         title->clear();
-        title->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
+        title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         title->setEllipsis(Ellipsis::Right);
         title->visible = false;

@@ -1,27 +1,24 @@
-/*
- * Alignment.cpp
- *
- *  Created on: 7 mar 2019
- *      Author: robert
- */
-
 #include "Alignment.hpp"
 
 namespace gui
 {
 
-    Alignment::Alignment() : alignment{Alignment::ALIGN_HORIZONTAL_LEFT | ALIGN_VERTICAL_TOP}
+    Alignment::Alignment(Alignment::Horizontal valH, Alignment::Vertical valV) : horizontal(valH), vertical(valV)
     {}
 
-    Alignment::Alignment(const uint32_t align) : alignment{align}
+    Alignment::Alignment(Alignment::Horizontal valH) : horizontal(valH)
     {}
 
-    Alignment::Alignment(const uint32_t valH, const uint32_t valV) : Alignment(valH | valV)
+    Alignment::Alignment(Alignment::Vertical valV) : vertical(valV)
     {}
 
-    Alignment::~Alignment()
+    bool Alignment::operator==(const Alignment &alignment) const
     {
-        // TODO Auto-generated destructor stub
+        return !(horizontal != alignment.horizontal || vertical != alignment.vertical);
     }
 
+    bool Alignment::operator!=(const Alignment &alignment) const
+    {
+        return (horizontal != alignment.horizontal || vertical != alignment.vertical);
+    }
 } /* namespace gui */

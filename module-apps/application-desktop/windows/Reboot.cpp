@@ -35,8 +35,7 @@ namespace gui
         text->setBorderColor(gui::ColorFullBlack);
         text->setFont(style::header::font::title);
         text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        text->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+        text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
     }
 
     void RebootWindow::destroyInterface()
