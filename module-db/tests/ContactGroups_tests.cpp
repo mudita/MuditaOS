@@ -1,0 +1,150 @@
+#include <catch2/catch.hpp>
+
+#include <Databases/ContactsDB.hpp>
+#include <Tables/ContactsTable.hpp>
+#include <Tables/ContactsGroups.hpp>
+
+#include <vfs.hpp>
+
+#include <iomanip>
+#include <sstream>
+
+namespace consts
+{
+    uint32_t favouritesId = 1;
+    uint32_t iceId        = 2;
+    uint32_t blocked      = 3;
+} // namespace consts
+
+void addSomeContacts(ContactsDB &contactsDb);
+
+TEST_CASE("Contact Groups tests", "[Groups]")
+{
+    INFO("sqlite Init");
+    Database::initialize();
+    vfs.remove(ContactsDB::GetDBName());
+    ContactsDB contactDb;
+    INFO("contactDB init");
+    REQUIRE(contactDb.isInitialized());
+    ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);
+    INFO("Create groups table");
+    REQUIRE(contactGroupsTable.create());
+
+    SECTION("Adding checking standard groups")
+    {
+        REQUIRE(contactGroupsTable.count() == 3);
+        REQUIRE(contactGroupsTable.favouritesId() == consts::favouritesId);
+        REQUIRE(contactGroupsTable.iceId() == consts::iceId);
+        REQUIRE(contactGroupsTable.blockedId() == consts::blocked);
+    }
+
+    const std::string sendbajtName("#sendbajt");
+    const std::string sendbajt2Name("send'bajt");
+    const std::string sendbajtWrongName("sentbyte");
+    const std::string sendbajtProperName("sendbajt");
+
+    // test # in name
+    ContactsGroupsTableRow sendbajtGroup(sendbajtName);
+    REQUIRE(contactGroupsTable.add(sendbajtGroup));
+    REQUIRE(contactGroupsTable.getId(sendbajtName) != 0);
+
+    // test ' in name
+    ContactsGroupsTableRow sendbajt2Group(sendbajt2Name);
+    REQUIRE(contactGroupsTable.add(sendbajt2Group));
+    REQUIRE(contactGroupsTable.getId(sendbajt2Name) != 0);
+
+    // add wrong naame
+    ContactsGroupsTableRow wrongNameGroup(sendbajtWrongName);
+    REQUIRE(contactGroupsTable.add(wrongNameGroup));
+    ContactsGroupsTableRow newNameGroup(sendbajtProperName);
+    newNameGroup.ID = contactGroupsTable.getId(sendbajtWrongName);
+
+    // update group name
+    REQUIRE(contactGroupsTable.update(newNameGroup));
+    REQUIRE(contactGroupsTable.getId(sendbajtProperName) == newNameGroup.ID);
+    REQUIRE(contactGroupsTable.getById(newNameGroup.ID).name == sendbajtProperName);
+
+    // test remove statement
+    uint32_t currentItemsCount = contactGroupsTable.count();
+    REQUIRE(contactGroupsTable.removeById(newNameGroup.ID));
+
+    // test if removing works
+    REQUIRE(contactGroupsTable.count() == --currentItemsCount);
+    REQUIRE(contactGroupsTable.getId(newNameGroup.name) == 0);
+    REQUIRE(contactGroupsTable.getById(newNameGroup.ID).name.empty());
+
+    // adding more items to check offset and limit works;
+
+    for (unsigned int i = 0; i < 100; ++i) {
+        std::stringstream name;
+        name << "group_" << std::setw(3) << std::setfill('0') << i;
+        ContactsGroupsTableRow row(name.str());
+        contactGroupsTable.add(row);
+        currentItemsCount++;
+    }
+
+    REQUIRE(contactGroupsTable.count() == currentItemsCount);
+    REQUIRE(contactGroupsTable.getLimitOffset(0, 10).size() == 10);
+    REQUIRE(contactGroupsTable.getLimitOffset(0, 150).size() == currentItemsCount);
+    REQUIRE(contactGroupsTable.getAllRows().size() == currentItemsCount);
+
+    uint32_t group_000_id = contactGroupsTable.getId("group_000");
+    REQUIRE(group_000_id == 6);
+
+    auto someGroups = contactGroupsTable.getLimitOffset(6, 10);
+    REQUIRE(someGroups.size() == 10);
+    REQUIRE(someGroups[0].name == "group_001");
+    REQUIRE(someGroups[9].name == "group_010");
+    REQUIRE(someGroups[9].ID == 16);
+
+    INFO("Adding some contacts");
+    addSomeContacts(contactDb);
+
+    // adding to Favorites
+    REQUIRE(contactGroupsTable.addContactToGroup(1, contactGroupsTable.favouritesId()));
+    REQUIRE(contactGroupsTable.addContactToGroup(2, contactGroupsTable.favouritesId()));
+
+    // adding to ICE
+    REQUIRE(contactGroupsTable.addContactToGroup(1, contactGroupsTable.iceId()));
+    REQUIRE(contactGroupsTable.addContactToGroup(2, contactGroupsTable.iceId()));
+    REQUIRE(contactGroupsTable.addContactToGroup(3, contactGroupsTable.iceId()));
+
+    // add to blocked
+    REQUIRE(contactGroupsTable.addContactToGroup(4, contactGroupsTable.blockedId()));
+
+    // check Favorites
+    std::set<ContactsGroupsTableRow> groupsFor1 = contactGroupsTable.getGroupsForContact(1);
+    REQUIRE(groupsFor1.size() == 2);
+
+    std::set<ContactsGroupsTableRow> groupsFor2 = contactGroupsTable.getGroupsForContact(2);
+    REQUIRE(groupsFor2.size() == 2);
+
+    // getting all cantacts for group ICE
+    std::set<uint32_t> iceContacts = contactGroupsTable.getContactsForGroup(contactGroupsTable.iceId());
+    REQUIRE(iceContacts.size() == 3);
+
+    // remove Contact From ICE
+    REQUIRE(contactGroupsTable.removeContactFromGroup(2, contactGroupsTable.iceId()));
+
+    // check if removing sucessful
+    iceContacts = contactGroupsTable.getContactsForGroup(contactGroupsTable.iceId());
+    REQUIRE(iceContacts.size() == 2);
+    groupsFor2 = contactGroupsTable.getGroupsForContact(2);
+    REQUIRE(groupsFor2.size() == 1);
+
+    Database::deinitialize();
+}
+
+void addSomeContacts(ContactsDB &contactsDb)
+{
+    ContactsTableRow testRow1 = {
+        {.ID = 0}, .nameID = 0, .numbersID = "0 1 2 3 4", .ringID = 0, .addressID = 0, .speedDial = "666"
+
+    };
+
+    // add 4 elements into table
+    contactsDb.contacts.add(testRow1);
+    contactsDb.contacts.add(testRow1);
+    contactsDb.contacts.add(testRow1);
+    contactsDb.contacts.add(testRow1);
+}

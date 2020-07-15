@@ -1,6 +1,17 @@
 #include "ContactsTable.hpp"
 #include <log/log.hpp>
 
+namespace ColumnName
+{
+    const uint8_t id         = 0;
+    const uint8_t name_id    = 1;
+    const uint8_t numbers_id = 2;
+    const uint8_t ring_id    = 3;
+    const uint8_t address_id = 4;
+    const uint8_t type       = 5;
+    const uint8_t speeddial  = 6;
+}; // namespace ColumnName
+
 ContactsTable::ContactsTable(Database *db) : Table(db)
 {}
 
@@ -14,17 +25,13 @@ bool ContactsTable::create()
 
 bool ContactsTable::add(ContactsTableRow entry)
 {
-    return db->execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, whitelist, "
-                       "blacklist, favourites, speeddial ) VALUES "
-                       "(%lu, '%q', %lu, %lu, %lu, %lu, %lu, %lu, '%q');",
+    return db->execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, speeddial) "
+                       " VALUES (%lu, '%q', %lu, %lu, %lu, '%q');",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
                        entry.addressID,
                        entry.type,
-                       entry.isOnWhitelist,
-                       entry.isOnBlacklist,
-                       entry.isOnFavourites,
                        entry.speedDial.c_str());
 }
 
@@ -41,16 +48,12 @@ bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 bool ContactsTable::update(ContactsTableRow entry)
 {
     return db->execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, type "
-                       "= %lu, whitelist = %lu, blacklist = %lu, "
-                       "favourites = %lu, speeddial = '%q' WHERE _id=%lu;",
+                       " = %lu, speeddial = '%q' WHERE _id=%lu;",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
                        entry.addressID,
                        entry.type,
-                       entry.isOnWhitelist,
-                       entry.isOnBlacklist,
-                       entry.isOnFavourites,
                        entry.speedDial.c_str(),
                        entry.ID);
 }
@@ -64,22 +67,19 @@ ContactsTableRow ContactsTable::getById(uint32_t id)
     }
 
     return ContactsTableRow{
-        (*retQuery)[0].getUInt32(),                           // ID
-        (*retQuery)[1].getUInt32(),                           // nameID
-        (*retQuery)[2].getString(),                           // numbersID
-        (*retQuery)[3].getUInt32(),                           // ringID
-        (*retQuery)[4].getUInt32(),                           // addressID
-        static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
-        (*retQuery)[6].getBool(),                             // is on whitelist
-        (*retQuery)[7].getBool(),                             // is on blacklist
-        (*retQuery)[8].getBool(),                             // is on favourites
-        (*retQuery)[9].getString(),                           // speed dial key
+        (*retQuery)[ColumnName::id].getUInt32(),
+        (*retQuery)[ColumnName::name_id].getUInt32(),
+        (*retQuery)[ColumnName::numbers_id].getString(),
+        (*retQuery)[ColumnName::ring_id].getUInt32(),
+        (*retQuery)[ColumnName::address_id].getUInt32(),
+        static_cast<ContactType>((*retQuery)[ColumnName::type].getUInt32()),
+        (*retQuery)[ColumnName::speeddial].getString(),
     };
 }
 
-std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryName,
-                                                    const std::string alternativeName,
-                                                    const std::string number)
+std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryName,
+                                                    const std::string &alternativeName,
+                                                    const std::string &number)
 {
     std::vector<ContactsTableRow> ret;
 
@@ -115,18 +115,15 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[0].getUInt32(),                           // ID
-            (*retQuery)[1].getUInt32(),                           // nameID
-            (*retQuery)[2].getString(),                           // numbersID
-            (*retQuery)[3].getUInt32(),                           // ringID
-            (*retQuery)[4].getUInt32(),                           // addressID
-            static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
-            (*retQuery)[6].getBool(),                             // is on whitelist
-            (*retQuery)[7].getBool(),                             // is on blacklist
-            (*retQuery)[8].getBool(),                             // is on favourites
-            (*retQuery)[9].getString(),                           // speed dial key
-            (*retQuery)[10].getString(),                          // primaryName
-            (*retQuery)[11].getString(),                          // alternativeName (WTF!)
+            (*retQuery)[ColumnName::id].getUInt32(),
+            (*retQuery)[ColumnName::name_id].getUInt32(),
+            (*retQuery)[ColumnName::numbers_id].getString(),
+            (*retQuery)[ColumnName::ring_id].getUInt32(),
+            (*retQuery)[ColumnName::address_id].getUInt32(),
+            static_cast<ContactType>((*retQuery)[ColumnName::type].getUInt32()),
+            (*retQuery)[ColumnName::speeddial].getString(),
+            (*retQuery)[ColumnName::speeddial + 1].getString(), // primaryName
+            (*retQuery)[ColumnName::speeddial + 2].getString(), // alternativeName (WTF!)
         });
     } while (retQuery->nextRow());
 
@@ -176,16 +173,13 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[0].getUInt32(),                           // ID
-            (*retQuery)[1].getUInt32(),                           // nameID
-            (*retQuery)[2].getString(),                           // numbersID
-            (*retQuery)[3].getUInt32(),                           // ringID
-            (*retQuery)[4].getUInt32(),                           // addressID
-            static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
-            (*retQuery)[6].getBool(),                             // is on whitelist
-            (*retQuery)[7].getBool(),                             // is on blacklist
-            (*retQuery)[8].getBool(),                             // is on favourites
-            (*retQuery)[9].getString(),                           // speed dial key
+            (*retQuery)[ColumnName::id].getUInt32(),                             // ID
+            (*retQuery)[ColumnName::name_id].getUInt32(),                        // nameID
+            (*retQuery)[ColumnName::numbers_id].getString(),                     // numbersID
+            (*retQuery)[ColumnName::ring_id].getUInt32(),                        // ringID
+            (*retQuery)[ColumnName::address_id].getUInt32(),                     // addressID
+            static_cast<ContactType>((*retQuery)[ColumnName::type].getUInt32()), // type
+            (*retQuery)[ColumnName::speeddial].getString(),                      // speed dial key
         });
     } while (retQuery->nextRow());
 
@@ -202,9 +196,6 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
     switch (field) {
     case ContactTableFields ::SpeedDial:
         fieldName = "speeddial";
-        break;
-    case ContactTableFields::Favourite:
-        fieldName = "favourites";
         break;
     default:
         return std::vector<ContactsTableRow>();
@@ -224,16 +215,13 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[0].getUInt32(),                           // ID
-            (*retQuery)[1].getUInt32(),                           // nameID
-            (*retQuery)[2].getString(),                           // numbersID
-            (*retQuery)[3].getUInt32(),                           // ringID
-            (*retQuery)[4].getUInt32(),                           // addressID
-            static_cast<ContactType>((*retQuery)[5].getUInt32()), // type
-            (*retQuery)[6].getBool(),                             // is on whitelist
-            (*retQuery)[7].getBool(),                             // is on blacklist
-            (*retQuery)[8].getBool(),                             // is on favourites
-            (*retQuery)[9].getString(),                           // speed dial key
+            (*retQuery)[ColumnName::id].getUInt32(),
+            (*retQuery)[ColumnName::name_id].getUInt32(),
+            (*retQuery)[ColumnName::numbers_id].getString(),
+            (*retQuery)[ColumnName::ring_id].getUInt32(),
+            (*retQuery)[ColumnName::address_id].getUInt32(),
+            static_cast<ContactType>((*retQuery)[5].getUInt32()),
+            (*retQuery)[ColumnName::speeddial].getString(),
         });
     } while (retQuery->nextRow());
 

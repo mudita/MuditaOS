@@ -57,7 +57,7 @@ auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
                   records.get()->operator[](i).ID,
                   records.get()->operator[](i).primaryName.c_str(),
                   records.get()->operator[](i).alternativeName.c_str(),
-                  records.get()->operator[](i).isOnFavourites);
+                  records.get()->operator[](i).isOnFavourites());
     }
 #endif
 

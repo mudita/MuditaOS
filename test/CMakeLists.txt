@@ -45,6 +45,9 @@ function(add_catch2_executable)
 
     add_executable(${_TESTNAME} EXCLUDE_FROM_ALL ${_TEST_ARGS_SRCS})
 
+    target_compile_options(${_TESTNAME} PUBLIC "-fsanitize=address")
+    target_link_options(${_TESTNAME} PUBLIC "-fsanitize=address")
+
     # disable logs in unit tests
     if (NOT ${ENABLE_TEST_LOGS})
     	target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
