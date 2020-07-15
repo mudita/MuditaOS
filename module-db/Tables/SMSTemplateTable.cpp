@@ -48,7 +48,7 @@ SMSTemplateTableRow SMSTemplateTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM templates WHERE _id = %" PRIu32 ";", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return SMSTemplateTableRow();
     }
 
@@ -66,7 +66,7 @@ std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffset(uint32_t offse
                   limit,
                   offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTemplateTableRow>();
     }
 
@@ -78,7 +78,7 @@ std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffset(uint32_t offse
             (*retQuery)[1].GetString(),                      // text
             static_cast<time_t>((*retQuery)[2].GetUInt64()), // lastUsageTimestamp
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -96,7 +96,7 @@ uint32_t SMSTemplateTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM templates;");
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -107,7 +107,7 @@ uint32_t SMSTemplateTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM templates WHERE '%q'=%" PRIu32 ";", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 

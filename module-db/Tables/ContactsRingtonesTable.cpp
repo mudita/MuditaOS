@@ -45,7 +45,7 @@ ContactsRingtonesTableRow ContactsRingtonesTable::getById(uint32_t id)
 {
     auto retQuery = db->query("SELECT * FROM contact_ringtones WHERE _id= %lu;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsRingtonesTableRow();
     }
 
@@ -61,7 +61,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffset(ui
     auto retQuery =
         db->query("SELECT * from contact_ringtones ORDER BY contact_id LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsRingtonesTableRow>();
     }
 
@@ -73,7 +73,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffset(ui
             (*retQuery)[1].GetUInt32(), // contactID
             (*retQuery)[2].GetString()  // assetPath
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -98,7 +98,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffsetByF
                               limit,
                               offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsRingtonesTableRow>();
     }
 
@@ -110,7 +110,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffsetByF
             (*retQuery)[1].GetUInt32(), // contactID
             (*retQuery)[2].GetString()  // assetPath
         });
-    } while (retQuery->NextRow());
+    } while (retQuery->nextRow());
 
     return ret;
 }
@@ -119,7 +119,7 @@ uint32_t ContactsRingtonesTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contact_ringtones;");
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -130,7 +130,7 @@ uint32_t ContactsRingtonesTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contact_ringtones WHERE %q=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 

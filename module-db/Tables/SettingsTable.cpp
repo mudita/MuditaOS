@@ -33,7 +33,7 @@ SettingsTableRow SettingsTable::getById(uint32_t id)
 
     auto retQuery = db->query("SELECT * FROM settings WHERE _id= 1;");
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return SettingsTableRow();
     }
 
