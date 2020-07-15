@@ -28,7 +28,7 @@ fi
 CVER=$( [[ $(which clang-format) ]] && echo $(clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1) || echo "0")
 # check for either clang-format or clang-format-9
 if [[ $CVER -lt 10 && ! $(which clang-format-10) ]]; then
-    cat << EOF > 1
+    cat << EOF >&1
 Either install:
     clang-format in at least version 10 and set as default"
     or
