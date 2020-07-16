@@ -165,8 +165,7 @@ UTF8::UTF8(const uint8_t *data, const uint32_t allocated, const uint32_t used, c
 
 UTF8::~UTF8()
 {
-    if (data)
-        delete[] data;
+    delete[] data;
 }
 
 bool UTF8::expand(uint32_t size)
@@ -229,8 +228,7 @@ UTF8 &UTF8::operator=(const UTF8 &utf)
     sizeUsed      = utf.sizeUsed;
     strLength     = utf.strLength;
 
-    if (data)
-        delete[] data;
+    delete[] data;
 
     data = new uint8_t[sizeAllocated];
     memcpy(data, utf.data, sizeAllocated);
@@ -245,7 +243,6 @@ UTF8 &UTF8::operator=(UTF8 &&utf) noexcept
 {
     // prevent moving if object is moved to itself
     if (this != &utf) {
-        if (data)
             delete[] data;
         data          = utf.data;
         utf.data      = nullptr;
@@ -333,10 +330,7 @@ const char *UTF8::c_str() const
 
 void UTF8::clear()
 {
-
-    if (data)
-        delete data;
-
+    delete[] data;
     data          = new uint8_t[stringExpansion];
     sizeAllocated = stringExpansion;
     sizeUsed      = 1;
@@ -348,7 +342,7 @@ void UTF8::clear()
 UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
 {
 
-    if ((begin + length > this->length()) || (length == 0))
+    if ((static_cast<uint64_t>(begin) + length > this->length()) || (length == 0))
         return UTF8();
 
     uint8_t *beginPtr = this->data;
