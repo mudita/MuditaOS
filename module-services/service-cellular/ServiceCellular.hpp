@@ -11,6 +11,7 @@
 #define PUREPHONE_SERVICECELLULAR_HPP
 
 #include "CellularCall.hpp"
+#include "SMSRecord.hpp"
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
 #include <Service/Service.hpp>
@@ -47,8 +48,7 @@ class ServiceCellular : public sys::Service
 
     static const char *serviceName;
 
-    bool sendSMS(UTF8 &number, UTF8 &text);
-    bool sendSMS(void);
+    bool sendSMS(SMSRecord record);
     bool receiveSMS(std::string messageNumber);
     /**
      * @brief Its getting selected SIM card own number.
@@ -138,6 +138,9 @@ class ServiceCellular : public sys::Service
     void startStateTimer(uint32_t timeout);
     void stopStateTimer(void);
     void handleStateTimer(void);
+
+    // db response handlers
+    auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP

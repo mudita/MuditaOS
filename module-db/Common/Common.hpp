@@ -9,10 +9,11 @@
  */
 #pragma once
 
+#include <cstdint> // for uint32_t
 /**
  * Types of sms message
  */
-enum class SMSType
+enum class SMSType : uint32_t
 {
     DRAFT   = 0x01,
     FAILED  = 0x02,

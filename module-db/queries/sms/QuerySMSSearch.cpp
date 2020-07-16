@@ -1,3 +1,4 @@
+#include "SMSTable.hpp"
 #include "QuerySMSSearch.hpp"
 
 namespace db::query
