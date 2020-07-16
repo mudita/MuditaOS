@@ -6,6 +6,7 @@
 #include "application-calendar/models/MonthModel.hpp"
 #include "application-calendar/models/MonthModel.cpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "NoEvents.hpp"
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Item.hpp>
@@ -447,6 +448,30 @@ namespace gui
                 LOG_DEBUG("Switch to List Window");
                 return true;
             }
+        if (AppWindow::onInput(inputEvent)) {
+            return true;
+        }
+
+        if (!inputEvent.isShortPress()) {
+            return false;
+        }
+
+        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+            std::shared_ptr<CalendarEventsModel> calendarEventsModel =
+                std::make_shared<CalendarEventsModel>(this->application);
+            if (calendarEventsModel->getItemCount() == 0) {
+                switchToNoEventsWindow();
+            }
+            else {
+                LOG_DEBUG("Switch to Day Window");
+                application->switchWindow(style::window::calendar::name::day_window);
+            }
+            return true;
+        }
+
+        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+            LOG_DEBUG("TODO: Switch to List Window");
+            return true;
         }
 
         return AppWindow::onInput(inputEvent);
