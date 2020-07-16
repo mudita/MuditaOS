@@ -1,13 +1,15 @@
 
 #pragma once
 
-#include "Record.hpp"
 #include <stdint.h>
-#include "../Databases/SmsDB.hpp"
-#include "../Databases/ContactsDB.hpp"
-#include "utf8/UTF8.hpp"
-#include "../Common/Common.hpp"
 
+#include "Record.hpp"
+#include "module-db/Databases/SmsDB.hpp"
+#include "module-db/Databases/ContactsDB.hpp"
+#include "module-db/queries/sms/QuerySMSSearchByType.hpp"
+#include "module-db/Common/Common.hpp"
+
+#include "utf8/UTF8.hpp"
 #include <PhoneNumber.hpp>
 
 struct SMSRecord : public Record
@@ -53,8 +55,12 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
                                                                   SMSRecordField field,
                                                                   const char *str) override final;
 
+    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+
   private:
     const uint32_t snippetLength = 45;
     SmsDB *smsDB                 = nullptr;
     ContactsDB *contactsDB       = nullptr;
+
+    std::unique_ptr<db::query::SMSSearchByTypeResult> runQueryImpl(const db::query::SMSSearchByType *query);
 };

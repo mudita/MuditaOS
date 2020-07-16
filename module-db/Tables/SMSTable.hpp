@@ -45,6 +45,8 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
+    std::pair<uint32_t, std::vector<SMSTableRow>> getManyByType(SMSType type, uint32_t offset, uint32_t limit);
+
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS sms("
                                    "_id INTEGER PRIMARY KEY,"

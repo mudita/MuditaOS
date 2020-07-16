@@ -1,9 +1,10 @@
 #include "SMSRecord.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
+#include "queries/sms/QuerySMSSearchByType.hpp"
 #include <log/log.hpp>
-#include <PhoneNumber.hpp>
 
+#include <PhoneNumber.hpp>
 #include <optional>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
@@ -234,4 +235,31 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id)
     auto number = contactRec.numbers.size() != 0 ? contactRec.numbers[0].number : utils::PhoneNumber::View();
 
     return SMSRecord{sms, number};
+}
+
+std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(const db::Query *query)
+{
+    if (const auto local_query = dynamic_cast<const db::query::SMSSearchByType *>(query)) {
+        return runQueryImpl(local_query);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<db::query::SMSSearchByTypeResult> SMSRecordInterface::runQueryImpl(
+    const db::query::SMSSearchByType *query)
+{
+    auto db_result = smsDB->sms.getManyByType(query->type, query->starting_postion, query->depth);
+
+    auto records = std::make_unique<std::vector<SMSRecord>>();
+
+    ContactRecordInterface contactInterface(contactsDB);
+    for (const auto &w : db_result.second) {
+
+        auto contactRec = contactInterface.GetByID(w.contactID);
+        if (contactRec.numbers.size() != 0) {
+            // TODO: or numberUser? or other number
+            records->push_back({w, contactRec.numbers[0].number});
+        }
+    }
+    return std::make_unique<db::query::SMSSearchByTypeResult>(db_result.first, *records);
 }
