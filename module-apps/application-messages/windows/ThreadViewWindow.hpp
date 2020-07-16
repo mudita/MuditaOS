@@ -66,7 +66,7 @@ namespace gui
         void destroyTextItem();
         void refreshTextItem();
         void addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const;
-        void addErrorLabel(HBox *layout, uint16_t widthAvailable) const;
+        void addErrorIcon(HBox *layout) const;
     };
 
 } /* namespace gui */

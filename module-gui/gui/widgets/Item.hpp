@@ -36,8 +36,6 @@ namespace gui
 
     NavigationDirection inputToNavigation(const InputEvent &evt);
 
-    using Padding = Margins;
-
     class Item
     {
       public:
