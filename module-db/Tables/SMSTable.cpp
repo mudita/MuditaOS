@@ -143,7 +143,7 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
 
     do {
         ret.push_back(SMSTableRow{
-            (*retQuery)[0].getUInt32(),                       // ID
+            {(*retQuery)[0].getUInt32()},                     // ID
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
@@ -177,4 +177,38 @@ uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
     }
 
     return uint32_t{(*queryRet)[0].getUInt32()};
+}
+
+std::pair<uint32_t, std::vector<SMSTableRow>> SMSTable::getManyByType(SMSType type, uint32_t offset, uint32_t limit)
+{
+    auto ret   = std::pair<uint32_t, std::vector<SMSTableRow>>{0, {}};
+    auto count = db->query("SELECT COUNT (*) from sms WHERE type='%lu';", type);
+    ret.first  = count == nullptr ? 0 : (*count)[0].getUInt32();
+    if (ret.first != 0) {
+        limit         = limit == 0 ? ret.first : limit; // no limit intended
+        auto retQuery = db->query(
+            "SELECT * from sms WHERE type='%lu' ORDER BY date ASC LIMIT %lu OFFSET %lu;", type, limit, offset);
+
+        if (retQuery == nullptr || retQuery->getRowCount() == 0) {
+            ret.second = {};
+        }
+        else {
+            do {
+                ret.second.push_back(SMSTableRow{
+                    {(*retQuery)[0].getUInt32()},                     // ID
+                    (*retQuery)[1].getUInt32(),                       // threadID
+                    (*retQuery)[2].getUInt32(),                       // contactID
+                    (*retQuery)[3].getUInt32(),                       // date
+                    (*retQuery)[4].getUInt32(),                       // dateSent
+                    (*retQuery)[5].getUInt32(),                       // errorCode
+                    (*retQuery)[6].getString(),                       // body
+                    static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+                });
+            } while (retQuery->nextRow());
+        }
+    }
+    else {
+        ret.second = {};
+    }
+    return ret;
 }

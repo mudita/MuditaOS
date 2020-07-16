@@ -28,18 +28,16 @@
 #include "MessageType.hpp"
 
 #include "messages/CellularMessage.hpp"
-#include <ticks.hpp>
 
-#include "log/log.hpp"
-
+#include "SignalStrength.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-appmgr/messages/APMMessage.hpp"
-#include "service-cellular/SignalStrength.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "ucs2/UCS2.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
+#include "service-db/messages/QueryMessage.hpp"
 
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp"
 #include "service-antenna/api/AntennaServiceAPI.hpp"
@@ -55,10 +53,13 @@
 #include <PhoneNumber.hpp>
 #include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
 
+#include <log/log.hpp>
+
 #include <vector>
 #include <utility>
 #include <optional>
 #include <string>
+#include <ticks.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -472,7 +473,23 @@ bool ServiceCellular::handle_audio_conf_procedure()
     return true;
 }
 
-sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
+auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
+{
+    if (response->getResults().size() > 0) {
+        LOG_DEBUG("sending %ud last queued message(s)", static_cast<unsigned int>(response->getResults().size()));
+        for (auto &rec : response->getResults()) {
+            if (rec.type == SMSType::QUEUED) {
+                sendSMS(rec);
+            }
+        }
+        if (response->getMaxDepth() > response->getResults().size()) {
+            LOG_WARN("There still is/are messages QUEUED for sending");
+        }
+    }
+    return true;
+}
+
+sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
@@ -683,7 +700,14 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
-            sendSMS();
+            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
+
+            // are there new messges queued for sending ?
+            auto limitTo = 15; // how many to send in this Query
+            DBServiceAPI::GetQuery(this,
+                                   db::Interface::Name::SMS,
+                                   std::make_unique<db::query::SMSSearchByType>(SMSType::QUEUED, 0, limitTo));
+
             return std::make_shared<sys::ResponseMessage>();
         }
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
@@ -731,9 +755,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
             cmux->SelectAntenna(msg->antenna);
             vTaskDelay(50); // sleep for 50 ms...
-            auto actualAntenna    = cmux->GetAntenna();
-            bool changedAntenna   = (actualAntenna == msg->antenna);
-            responseMsg           = std::make_shared<CellularResponseMessage>(changedAntenna);
+            auto actualAntenna  = cmux->GetAntenna();
+            bool changedAntenna = (actualAntenna == msg->antenna);
+            responseMsg         = std::make_shared<CellularResponseMessage>(changedAntenna);
 
             auto notification = std::make_shared<AntennaChangedMessage>();
             sys::Bus::SendMulticast(notification, sys::BusChannels::AntennaNotifications, this);
@@ -845,12 +869,29 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
     }
-    if (responseMsg == nullptr) {
-        return std::make_shared<sys::ResponseMessage>();
+    if (responseMsg != nullptr) {
+        responseMsg->responseTo = msgl->messageType;
+        return responseMsg;
     }
 
-    responseMsg->responseTo = msgl->messageType;
-    return responseMsg;
+    // handle database response
+    bool responseHandled = false;
+    if (resp != nullptr) {
+        if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+            if (auto response = dynamic_cast<db::query::SMSSearchByTypeResult *>(msg->getResult())) {
+                responseHandled = handle(response);
+            }
+        }
+        if (responseHandled) {
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
+    }
+    else {
+        return std::make_shared<sys::ResponseMessage>();
+    }
 }
 namespace
 {
@@ -971,22 +1012,15 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     return std::nullopt;
 }
 
-bool ServiceCellular::sendSMS(void)
+bool ServiceCellular::sendSMS(SMSRecord record)
 {
-    auto record = DBServiceAPI::SMSGetLastRecord(this);
-
-    // skip if it's not sms to send
-    if (record.type != SMSType::QUEUED) {
-        return false;
-    }
-
     LOG_INFO("Trying to send SMS");
 
     uint32_t textLen = record.body.length();
 
     constexpr uint32_t commandTimeout   = 5000;
     constexpr uint32_t singleMessageLen = 30;
-    bool result                     = false;
+    bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
     if (channel) {
         // if text fit in single message send
