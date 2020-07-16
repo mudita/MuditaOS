@@ -1,12 +1,4 @@
-/*
- * Margins.h
- *
- *  Created on: 7 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_MARGINS_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_MARGINS_HPP_
+#pragma once
 
 #include "core/Axes.hpp"
 
@@ -33,6 +25,7 @@ namespace gui
         bool operator!=(const Margins &margins);
     };
 
+    using Padding = Margins;
+
 } /* namespace gui */
 
-#endif /* MIDDLEWARES_GUI_WIDGETS_MARGINS_HPP_ */
