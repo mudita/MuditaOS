@@ -25,9 +25,9 @@ TEST_CASE("Thread Record tests")
     vfs.remove(SmsDB::GetDBName());
 
     auto smsDB = std::make_unique<SmsDB>();
-    REQUIRE(smsDB->IsInitialized());
+    REQUIRE(smsDB->isInitialized());
     auto contactsDB = std::make_unique<ContactsDB>();
-    REQUIRE(contactsDB->IsInitialized());
+    REQUIRE(contactsDB->isInitialized());
 
     const uint32_t dateTest      = 123456789;
     const char *snippetTest      = "Test snippet";

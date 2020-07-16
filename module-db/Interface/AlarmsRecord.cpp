@@ -130,7 +130,7 @@ AlarmsRecord AlarmsRecordInterface::GetByID(uint32_t id)
 
 AlarmsRecord AlarmsRecordInterface::GetNext(time_t time)
 {
-    auto alarm = alarmsDB->alarms.GetNext(time);
+    auto alarm = alarmsDB->alarms.next(time);
 
     return AlarmsRecord{
         .ID = alarm.ID, .time = alarm.time, .snooze = alarm.snooze, .status = alarm.status, .path = alarm.path};

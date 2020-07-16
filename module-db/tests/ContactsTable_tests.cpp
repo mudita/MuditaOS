@@ -12,7 +12,7 @@ TEST_CASE("Contacts Table tests")
     vfs.remove(ContactsDB::GetDBName());
 
     ContactsDB contactsdb;
-    REQUIRE(contactsdb.IsInitialized());
+    REQUIRE(contactsdb.isInitialized());
 
     ContactsTableRow testRow1 = {.ID             = 0,
                                  .nameID         = 0,
@@ -26,64 +26,64 @@ TEST_CASE("Contacts Table tests")
 
     };
 
-    // Add 4 elements into table
-    REQUIRE(contactsdb.contacts.Add(testRow1));
-    REQUIRE(contactsdb.contacts.Add(testRow1));
-    REQUIRE(contactsdb.contacts.Add(testRow1));
-    REQUIRE(contactsdb.contacts.Add(testRow1));
+    // add 4 elements into table
+    REQUIRE(contactsdb.contacts.add(testRow1));
+    REQUIRE(contactsdb.contacts.add(testRow1));
+    REQUIRE(contactsdb.contacts.add(testRow1));
+    REQUIRE(contactsdb.contacts.add(testRow1));
 
     // Table should have 4 elements
-    REQUIRE(contactsdb.contacts.GetCount() == 4);
+    REQUIRE(contactsdb.contacts.count() == 4);
 
-    // Update existing element in table
+    // update existing element in table
     testRow1.ID        = 4;
     testRow1.speedDial = "777";
-    REQUIRE(contactsdb.contacts.Update(testRow1));
+    REQUIRE(contactsdb.contacts.update(testRow1));
 
     // Get table row using valid ID & check if it was updated
-    auto sms = contactsdb.contacts.GetByID(4);
+    auto sms = contactsdb.contacts.getById(4);
     REQUIRE(sms.speedDial == testRow1.speedDial);
 
     // Get table row using invalid ID(should return empty contactsdb.contactsRow)
-    auto smsFailed = contactsdb.contacts.GetByID(100);
+    auto smsFailed = contactsdb.contacts.getById(100);
     REQUIRE(smsFailed.speedDial == "");
 
     // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = contactsdb.contacts.GetLimitOffset(0, 4);
+    auto retOffsetLimit = contactsdb.contacts.getLimitOffset(0, 4);
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.contacts.GetLimitOffsetByField(0, 4, ContactTableFields::SpeedDial, "666").size() == 3);
+    REQUIRE(contactsdb.contacts.getLimitOffsetByField(0, 4, ContactTableFields::SpeedDial, "666").size() == 3);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = contactsdb.contacts.GetLimitOffset(0, 100);
+    auto retOffsetLimitBigger = contactsdb.contacts.getLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = contactsdb.contacts.GetLimitOffset(5, 4);
+    auto retOffsetLimitFailed = contactsdb.contacts.getLimitOffset(5, 4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get count of elements by field's ID
-    REQUIRE(contactsdb.contacts.GetCountByFieldID("ring_id", 0) == 4);
+    REQUIRE(contactsdb.contacts.countByFieldId("ring_id", 0) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(contactsdb.contacts.GetCountByFieldID("invalid_field", 0) == 0);
+    REQUIRE(contactsdb.contacts.countByFieldId("invalid_field", 0) == 0);
 
-    REQUIRE(contactsdb.contacts.RemoveByID(2));
+    REQUIRE(contactsdb.contacts.removeById(2));
 
     // Table should have now 3 elements
-    REQUIRE(contactsdb.contacts.GetCount() == 3);
+    REQUIRE(contactsdb.contacts.count() == 3);
 
     // Remove non existing element
-    REQUIRE(contactsdb.contacts.RemoveByID(100));
+    REQUIRE(contactsdb.contacts.removeById(100));
 
     // Remove all elements from table
-    REQUIRE(contactsdb.contacts.RemoveByID(1));
-    REQUIRE(contactsdb.contacts.RemoveByID(3));
-    REQUIRE(contactsdb.contacts.RemoveByID(4));
+    REQUIRE(contactsdb.contacts.removeById(1));
+    REQUIRE(contactsdb.contacts.removeById(3));
+    REQUIRE(contactsdb.contacts.removeById(4));
 
     // Table should be empty now
-    REQUIRE(contactsdb.contacts.GetCount() == 0);
+    REQUIRE(contactsdb.contacts.count() == 0);
 
     Database::deinitialize();
 }

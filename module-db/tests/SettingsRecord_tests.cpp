@@ -30,7 +30,7 @@ TEST_CASE("Settings Record tests")
     vfs.remove(SettingsDB::GetDBName());
 
     auto settingsDB = std::make_unique<SettingsDB>();
-    REQUIRE(settingsDB->IsInitialized());
+    REQUIRE(settingsDB->isInitialized());
 
     SettingsRecordInterface settingsRecordInterface(settingsDB.get());
 
