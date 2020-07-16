@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Label.hpp"
-#include "ListItem.hpp"
 #include "application-calendar/models/CalendarModel.hpp"
+
+#include <Label.hpp>
+#include <ListItem.hpp>
 
 namespace gui
 

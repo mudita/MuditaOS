@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../widgets/Icon.hpp"
 #include "../models/ThreadModel.hpp"
 
 #include <AppWindow.hpp>
@@ -8,6 +7,7 @@
 #include <Label.hpp>
 #include <ListView.hpp>
 #include <Text.hpp>
+#include <gui/widgets/Icon.hpp>
 
 #include <functional>
 #include <string>

@@ -6,6 +6,13 @@ namespace style
     {
         namespace calendar
         {
+
+            namespace name
+            {
+                const inline std::string day_window       = "DayWindow";
+                const inline std::string no_events_window = "NoEventsWindow";
+            } // namespace name
+
             const inline int day_cell_width    = 60;
             const inline int day_cell_height   = 55;
             const inline int month_year_height = 60;
