@@ -18,7 +18,7 @@ TEST_CASE("Calllog Table tests")
     vfs.remove(CalllogDB::GetDBName());
 
     CalllogDB calllogDb;
-    REQUIRE(calllogDb.IsInitialized());
+    REQUIRE(calllogDb.isInitialized());
 
     auto &callsTbl = calllogDb.calls;
 
@@ -48,17 +48,17 @@ TEST_CASE("Calllog Table tests")
                                .contactId    = "1",
                                .isRead       = false};
 
-    // Add 4 elements into table
-    REQUIRE(callsTbl.Add(testRow));
-    REQUIRE(callsTbl.Add(testRow));
-    REQUIRE(callsTbl.Add(testRow));
-    REQUIRE(callsTbl.Add(testRow));
+    // add 4 elements into table
+    REQUIRE(callsTbl.add(testRow));
+    REQUIRE(callsTbl.add(testRow));
+    REQUIRE(callsTbl.add(testRow));
+    REQUIRE(callsTbl.add(testRow));
 
-    REQUIRE(callsTbl.GetCount() == 4);
+    REQUIRE(callsTbl.count() == 4);
 
     SECTION("Get entry by ID")
     {
-        auto callEntry = callsTbl.GetByID(4);
+        auto callEntry = callsTbl.getById(4);
         REQUIRE(callEntry.ID == 4);
         REQUIRE(callEntry.number == testRow.number);
         REQUIRE(callEntry.e164number == testRow.e164number);
@@ -75,8 +75,8 @@ TEST_CASE("Calllog Table tests")
     {
         testRow.ID     = 3;
         testRow.number = "500888999";
-        REQUIRE(callsTbl.Update(testRow));
-        auto callEntry = callsTbl.GetByID(3);
+        REQUIRE(callsTbl.update(testRow));
+        auto callEntry = callsTbl.getById(3);
         REQUIRE(callEntry.ID == 3);
         REQUIRE(callEntry.number == testRow.number);
         REQUIRE(callEntry.e164number == testRow.e164number);
@@ -91,7 +91,7 @@ TEST_CASE("Calllog Table tests")
 
     SECTION("Get entry - invalid ID")
     {
-        auto callEntry = callsTbl.GetByID(100);
+        auto callEntry = callsTbl.getById(100);
         REQUIRE(callEntry.ID == DB_ID_NONE);
         REQUIRE(callEntry.number == "");
         REQUIRE(callEntry.e164number == "");
@@ -107,52 +107,52 @@ TEST_CASE("Calllog Table tests")
     SECTION("Get table rows")
     {
         // Get table rows using valid offset/limit parameters
-        auto retOffsetLimit = callsTbl.GetLimitOffset(0, 4);
+        auto retOffsetLimit = callsTbl.getLimitOffset(0, 4);
         REQUIRE(retOffsetLimit.size() == 4);
 
         // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-        auto retOffsetLimitBigger = callsTbl.GetLimitOffset(0, 100);
+        auto retOffsetLimitBigger = callsTbl.getLimitOffset(0, 100);
         REQUIRE(retOffsetLimitBigger.size() == 4);
 
         // Get table rows using invalid offset/limit parameters(should return empty object)
-        auto retOffsetLimitFailed = callsTbl.GetLimitOffset(5, 4);
+        auto retOffsetLimitFailed = callsTbl.getLimitOffset(5, 4);
         REQUIRE(retOffsetLimitFailed.size() == 0);
     }
 
     SECTION("Remove entries")
     {
-        REQUIRE(callsTbl.RemoveByID(2));
+        REQUIRE(callsTbl.removeById(2));
 
         // Table should have now 3 elements
-        REQUIRE(callsTbl.GetCount() == 3);
+        REQUIRE(callsTbl.count() == 3);
 
         // Remove non existing element
-        REQUIRE(callsTbl.RemoveByID(100));
+        REQUIRE(callsTbl.removeById(100));
 
         // Remove all elements from table
-        REQUIRE(callsTbl.RemoveByID(1));
-        REQUIRE(callsTbl.RemoveByID(3));
-        REQUIRE(callsTbl.RemoveByID(4));
+        REQUIRE(callsTbl.removeById(1));
+        REQUIRE(callsTbl.removeById(3));
+        REQUIRE(callsTbl.removeById(4));
 
         // Table should be empty now
-        REQUIRE(callsTbl.GetCount() == 0);
+        REQUIRE(callsTbl.count() == 0);
     }
 
     SECTION("Get Count")
     {
-        REQUIRE(callsTbl.GetCount() == 4);
-        REQUIRE(callsTbl.GetCount(EntryState::ALL) == 4);
-        REQUIRE(callsTbl.GetCount(EntryState::READ) == 0);
-        REQUIRE(callsTbl.GetCount(EntryState::UNREAD) == 4);
+        REQUIRE(callsTbl.count() == 4);
+        REQUIRE(callsTbl.count(EntryState::ALL) == 4);
+        REQUIRE(callsTbl.count(EntryState::READ) == 0);
+        REQUIRE(callsTbl.count(EntryState::UNREAD) == 4);
     }
 
     SECTION("Set All Read")
     {
-        REQUIRE(callsTbl.GetCount(EntryState::UNREAD) == 4);
-        REQUIRE(callsTbl.GetCount(EntryState::READ) == 0);
+        REQUIRE(callsTbl.count(EntryState::UNREAD) == 4);
+        REQUIRE(callsTbl.count(EntryState::READ) == 0);
         REQUIRE(callsTbl.SetAllRead());
-        REQUIRE(callsTbl.GetCount(EntryState::UNREAD) == 0);
-        REQUIRE(callsTbl.GetCount(EntryState::READ) == 4);
+        REQUIRE(callsTbl.count(EntryState::UNREAD) == 0);
+        REQUIRE(callsTbl.count(EntryState::READ) == 4);
     }
 
     Database::deinitialize();

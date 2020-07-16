@@ -50,7 +50,7 @@ class AlarmsTable : public Table<AlarmsTableRow, AlarmsTableFields>
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
-    AlarmsTableRow GetNext(time_t time);
+    AlarmsTableRow next(time_t time);
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS alarms("

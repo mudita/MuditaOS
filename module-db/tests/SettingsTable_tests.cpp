@@ -32,9 +32,9 @@ TEST_CASE("Settings Table tests")
     {
 
         SettingsDB settingsDb;
-        REQUIRE(settingsDb.IsInitialized());
+        REQUIRE(settingsDb.isInitialized());
 
-        auto settingsRow = settingsDb.settings.GetByID(1);
+        auto settingsRow = settingsDb.settings.getById(1);
         REQUIRE(settingsRow.ID == 1);
 
         settingsRow.timeFormat12   = false;
@@ -42,9 +42,9 @@ TEST_CASE("Settings Table tests")
         settingsRow.pin1           = "4321";
         settingsRow.pin2           = "5432";
         settingsRow.language       = SettingsLanguage ::POLISH;
-        REQUIRE(settingsDb.settings.Update(settingsRow));
+        REQUIRE(settingsDb.settings.update(settingsRow));
 
-        settingsRow = settingsDb.settings.GetByID(1);
+        settingsRow = settingsDb.settings.getById(1);
 
         REQUIRE(settingsRow.timeFormat12 == false);
         REQUIRE(settingsRow.timeDateFormat == false);
@@ -56,7 +56,7 @@ TEST_CASE("Settings Table tests")
     {
         SettingsDB settingsDb;
 
-        auto settingsRow = settingsDb.settings.GetByID(1);
+        auto settingsRow = settingsDb.settings.getById(1);
 
         REQUIRE(settingsRow.timeFormat12 == false);
         REQUIRE(settingsRow.timeDateFormat == false);
