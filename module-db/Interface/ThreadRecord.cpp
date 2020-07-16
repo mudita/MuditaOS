@@ -23,7 +23,7 @@ bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 
 bool ThreadRecordInterface::RemoveByID(uint32_t id)
 {
-    auto ret = smsDB->threads.removeByID(id);
+    auto ret = smsDB->threads.removeById(id);
     if (ret == false) {
         return false;
     }

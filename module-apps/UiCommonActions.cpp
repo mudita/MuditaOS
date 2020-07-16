@@ -72,7 +72,7 @@ namespace app
 
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)
     {
-        auto data = std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact)));
+        auto data             = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contact));
         data->disableAppClose = true;
         assert(app != nullptr);
         switch (contactOperation) {
