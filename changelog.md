@@ -6,6 +6,8 @@
 
 * `[calendar]` main screen UI
 * `[calendar]` main screen navigation
+* `[calendar]` Added no-events window in general purpose windows.
+* `[calendar]` Added day window with list of events.
 
 ### Changed
 * `[text]` set the cursor at the end of text by default

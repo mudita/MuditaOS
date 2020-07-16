@@ -1,10 +1,10 @@
-#include "application-calendar/models/CalendarModel.hpp"
 #include "CalendarItem.hpp"
+#include "application-calendar/models/CalendarModel.hpp"
 
-#include "ListView.hpp"
-#include "gui/widgets/Label.hpp"
-
+#include <ListView.hpp>
+#include <gui/widgets/Label.hpp>
 #include <Style.hpp>
+
 #include <time/time_conversion.hpp>
 
 namespace gui
@@ -15,23 +15,20 @@ namespace gui
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::height);
         setMaximumSize(style::window::default_body_width, style::window::calendar::item::height);
 
-        setRadius(0);
-        setPenFocusWidth(2);
-        setPenWidth(0);
+        setPenFocusWidth(style::window::default_border_focus_w);
+        setPenWidth(style::window::default_border_no_focus_w);
 
         title = new gui::Label(this, 0, 0, 0, 0);
         title->setPenFocusWidth(0);
         title->setPenWidth(0);
         title->setFont(style::window::font::bigbold);
-        title->setAlignment(
-            gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
+        title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
         description = new gui::Label(this, 0, 0, 0, 0);
         description->setPenFocusWidth(0);
         description->setPenWidth(0);
         description->setFont(style::window::font::medium);
-        description->setAlignment(
-            gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
+        description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
         description->setText(utils::localize.get("common_information"));
         title->setText("10:00 - 11:15 AM");

@@ -18,6 +18,7 @@ set( SOURCES
     "windows/OptionWindow.cpp"
     "windows/Options.cpp" 
     "windows/Dialog.cpp" 
+    "windows/NoEvents.cpp"
     "widgets/SearchBox.cpp"
     )
 

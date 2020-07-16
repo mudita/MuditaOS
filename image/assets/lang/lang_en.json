@@ -35,7 +35,15 @@
     "common_friday": "Friday",
     "common_saturday": "Saturday",
     "common_sunday": "Sunday",
-    
+
+    "common_mo":"MO",
+    "common_tu":"TU",
+    "common_we":"WE",
+    "common_th":"TH",
+    "common_fr":"FR",
+    "common_sa":"SA",
+    "common_su":"SU",
+
     "common_january": "January",
     "common_february": "February",
     "common_march": "March",
@@ -63,6 +71,15 @@
     "duration_hour_0min_0sec" : "%H:%0M:%0S",
 
     "app_calendar_title_main" : "Calendar",
+    "app_calendar_options_title": "Options",
+    "app_calendar_options_edit": "Edit",
+    "app_calendar_options_delete": "Delete",
+    "app_calendar_event_delete_confirmation": "Delete this event?",
+    "app_calendar_bar_month": "MONTH",
+    "app_calendar_event_detail": "Event",
+    "app_calendar_event_detail_repeat": "Repeat",
+    "app_calendar_event_detail_reminder": "Reminder",
+    "app_calendar_no_events_information": "No events yet.\nPress left arrow to add new.",
 
     "app_options_invalid_option": " <Invalid Option> ",
     "app_options_contact_details": "Contact details",

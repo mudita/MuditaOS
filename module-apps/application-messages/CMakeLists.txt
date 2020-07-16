@@ -17,7 +17,6 @@ target_sources( ${PROJECT_NAME}
         "widgets/ThreadItem.cpp"
         "widgets/SMSTemplateModel.cpp"
         "widgets/SMSTemplateItem.cpp"
-        "widgets/Icon.cpp"
         "widgets/SearchResultsItem.cpp"
         "widgets/BaseThreadItem.cpp"
 
