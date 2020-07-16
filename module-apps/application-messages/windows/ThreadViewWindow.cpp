@@ -146,7 +146,7 @@ namespace gui
         }
         SMS.dbsize = threadDetails->msgCount;
 
-        if (threadDetails != nullptr && threadDetails->isUnread()) {
+        if (threadDetails->isUnread()) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
             if (application->getCurrentWindow() == this) {
