@@ -1706,7 +1706,7 @@ static status_t MMC_CheckBlockRange(mmc_card_t *card, uint32_t startBlock, uint3
     uint32_t partitionBlocks;
 
     switch (card->currentPartition) {
-    case kMMC_AccessPartitionUserAera: {
+    case kMMC_AccessPartitionUserArea: {
         partitionBlocks = card->userPartitionBlocks;
         break;
     }
@@ -1740,7 +1740,7 @@ static status_t MMC_CheckEraseGroupRange(mmc_card_t *card, uint32_t startGroup, 
     uint32_t eraseGroupBoundary;
 
     switch (card->currentPartition) {
-    case kMMC_AccessPartitionUserAera: {
+    case kMMC_AccessPartitionUserArea: {
         partitionBlocks = card->userPartitionBlocks;
         break;
     }
@@ -2047,7 +2047,7 @@ status_t MMC_CardInit(mmc_card_t *card)
     }
 
     /* Set card default to access non-boot partition */
-    card->currentPartition = kMMC_AccessPartitionUserAera;
+    card->currentPartition = kMMC_AccessPartitionUserArea;
 
     return kStatus_Success;
 }

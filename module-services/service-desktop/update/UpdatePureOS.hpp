@@ -39,6 +39,15 @@ namespace updateos
         CantUpdateINI,
         CantSaveINI
     };
+
+    enum class BootloaderUpdateError
+    {
+        NoError,
+        NoBootloaderFile,
+        CantOpenBootloaderFile,
+        CantLoadBootloaderFile
+    };
+
 }; // namespace updateos
 
 struct FileInfo
@@ -64,6 +73,8 @@ class UpdatePureOS
     updateos::UpdateError updateBootINI();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
+
+    updateos::BootloaderUpdateError writeBootloader(fs::path bootloaderFile);
 
     void getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long);
     unsigned long getExtractedFileCRC32(const std::string &filePath);
