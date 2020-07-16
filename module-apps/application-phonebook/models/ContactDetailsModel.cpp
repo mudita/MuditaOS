@@ -35,9 +35,7 @@ auto ContactDetailsModel::getItem(gui::Order order) -> gui::ListItem *
 
 void ContactDetailsModel::createData(bool showInformationWidget, bool showAddressWidget, bool showNoteWidget)
 {
-    if (showInformationWidget) {
-        // internalData.push_back(InformationWidget)
-    }
+    if (showInformationWidget) {}
 
     if (showAddressWidget) {
         internalData.push_back(new gui::MultiLineTextWithLabelItem(phonebookInternals::ListItemName::Address));
