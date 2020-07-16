@@ -30,7 +30,7 @@ namespace bsp
       public:
         enum class Partition
         {
-            UserAera        = 0U, /*!< No access to boot partition (default), normal partition */
+            UserArea        = 0U, /*!< No access to boot partition (default), normal partition */
             Boot1           = 1U, /*!< Read/Write boot partition 1 */
             Boot2           = 2U, /*!< Read/Write boot partition 2*/
             RPMB            = 3U, /*!< Replay protected mem block */

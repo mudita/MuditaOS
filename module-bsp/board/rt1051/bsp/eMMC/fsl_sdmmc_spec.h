@@ -669,7 +669,7 @@ typedef enum _mmc_boot_partition_enable
     kMMC_BootPartitionEnableNot        = 0U, /*!< Device not boot enabled (default) */
     kMMC_BootPartitionEnablePartition1 = 1U, /*!< Boot partition 1 enabled for boot */
     kMMC_BootPartitionEnablePartition2 = 2U, /*!< Boot partition 2 enabled for boot */
-    kMMC_BootPartitionEnableUserAera   = 7U, /*!< User area enabled for boot */
+    kMMC_BootPartitionEnableUserArea   = 7U, /*!< User area enabled for boot */
 } mmc_boot_partition_enable_t;
 
 /*! @brief boot mode configuration
@@ -721,7 +721,7 @@ enum _mmc_boot_partition_wp_status
 /*! @brief MMC card partition to be accessed(BOOT_PARTITION_ACCESS in Extended CSD) */
 typedef enum _mmc_access_partition
 {
-    kMMC_AccessPartitionUserAera        = 0U, /*!< No access to boot partition (default), normal partition */
+    kMMC_AccessPartitionUserArea        = 0U, /*!< No access to boot partition (default), normal partition */
     kMMC_AccessPartitionBoot1           = 1U, /*!< Read/Write boot partition 1 */
     kMMC_AccessPartitionBoot2           = 2U, /*!< Read/Write boot partition 2*/
     kMMC_AccessRPMB                     = 3U, /*!< Replay protected mem block */

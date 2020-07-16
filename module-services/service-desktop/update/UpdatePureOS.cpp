@@ -1,4 +1,7 @@
 #include "UpdatePureOS.hpp"
+#if defined(TARGET_RT1051)
+#include "board/cross/eMMC/eMMC.hpp"
+#endif
 #include <service-desktop/ServiceDesktop.hpp>
 #include <source/version.hpp>
 
@@ -409,4 +412,45 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
 
     LOG_INFO("prepareTempDirForUpdate tempDir selected %s", updateTempDirectory.c_str());
     return updateos::UpdateError::NoError;
+}
+
+updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloaderFile)
+{
+
+#if defined(TARGET_Linux)
+    return updateos::BootloaderUpdateError::NoError;
+#else
+
+    if (vfs.fileExists(bootloaderFile.c_str()) == false) {
+        LOG_ERROR("[Bootloader Update] File %s doesn't exist!\n", bootloaderFile.c_str());
+        return updateos::BootloaderUpdateError::NoBootloaderFile;
+    }
+
+    auto fileHandler = vfs.fopen(bootloaderFile.c_str(), "r");
+    if (fileHandler == nullptr) {
+        LOG_ERROR("[Bootloader Update] Failed to open file %s\n", bootloaderFile.c_str());
+        return updateos::BootloaderUpdateError::CantOpenBootloaderFile;
+    }
+
+    unsigned long fileLen = vfs.filelength(fileHandler);
+    auto fileBuf          = std::make_unique<uint8_t[]>(fileLen);
+
+    auto filesLoaded = vfs.fread(fileBuf.get(), fileLen, fileLen, fileHandler);
+    if (filesLoaded == 0) {
+        LOG_ERROR("[Bootloader Update] Failed to load file %s\n", bootloaderFile.c_str());
+        return updateos::BootloaderUpdateError::CantOpenBootloaderFile;
+    }
+
+    LOG_INFO("[Bootloader Update] File size: %lu B, Writing...", fileLen);
+
+    bsp::eMMC emmc;
+    emmc.Init();
+    emmc.SwitchPartition(bsp::eMMC::Partition::Boot1);
+    emmc.WriteBlocks(fileBuf.get(), 0, fileLen >> (9U)); //    #define USB_DEVICE_SDCARD_BLOCK_SIZE_POWER (9U)
+
+    LOG_INFO("[Bootloader Update] DONE!\n");
+    emmc.SwitchPartition(bsp::eMMC::Partition::UserArea);
+
+    return updateos::BootloaderUpdateError::NoError;
+#endif
 }
