@@ -14,6 +14,7 @@
 * `[sms]` Fix for sms forward
 * `[sms]` Fix for missing send label in new message window
 * `[sms]` Fix for handling temporary contacts
+* `[sms]` Fix for clipboard usage
 * `[call]` Fix for adding new contact from call app 
 ### Other
 * `[Alignment]` Refactored Alignment and added support to BoxLayout. 

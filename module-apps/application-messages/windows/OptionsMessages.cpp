@@ -129,7 +129,7 @@ std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
     if (Clipboard::getInstance().gotData()) {
         options.push_back(gui::Option{
             utils::localize.get("sms_paste"), [=](gui::Item &item) {
-                text->setText(text->getText() + Clipboard::getInstance().paste());
+                text->addText(Clipboard::getInstance().paste());
                 app->returnToPreviousWindow();
                 return true;
             }}.build());
