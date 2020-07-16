@@ -19,7 +19,7 @@ TEST_CASE("SMS templates Record tests")
     vfs.remove(SmsDB::GetDBName());
 
     auto smsDB = std::make_unique<SmsDB>();
-    REQUIRE(smsDB->IsInitialized());
+    REQUIRE(smsDB->isInitialized());
 
     SMSTemplateRecordInterface SMSTemplateRecordInterface(smsDB.get());
     SMSTemplateRecord testRec;

@@ -24,7 +24,7 @@ TEST_CASE("Notifications Record tests")
 
     NotificationsDB notificationsDb;
 
-    REQUIRE(notificationsDb.IsInitialized());
+    REQUIRE(notificationsDb.isInitialized());
 
     SECTION("Default Constructor")
     {

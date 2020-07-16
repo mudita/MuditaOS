@@ -20,10 +20,10 @@ TEST_CASE("Calllog Record tests")
     vfs.remove(ContactsDB::GetDBName());
 
     CalllogDB calllogDb;
-    ContactsDB contactsDB;
+    ContactsDB contactsDd;
 
-    REQUIRE(calllogDb.IsInitialized());
-    REQUIRE(contactsDB.IsInitialized());
+    REQUIRE(calllogDb.isInitialized());
+    REQUIRE(contactsDd.isInitialized());
 
     SECTION("Default Constructor")
     {
@@ -39,7 +39,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(testRec.isRead == true);
     }
 
-    CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDB);
+    CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDd);
     CalllogRecord testRec;
     testRec.presentation = PresentationType::PR_ALLOWED;
     testRec.date         = 100;

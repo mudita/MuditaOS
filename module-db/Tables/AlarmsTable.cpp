@@ -181,7 +181,7 @@ uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
     return uint32_t{(*queryRet)[0].getUInt32()};
 }
 
-AlarmsTableRow AlarmsTable::GetNext(time_t time)
+AlarmsTableRow AlarmsTable::next(time_t time)
 {
     auto retQuery = db->query("SELECT * from alarms WHERE status=1 AND time>=%u ORDER BY time ASC LIMIT 1;", time);
 
