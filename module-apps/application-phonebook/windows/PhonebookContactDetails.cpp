@@ -107,29 +107,25 @@ namespace gui
 
         if (inputEvent.is(KeyCode::KEY_1)) {
             contactFlagsWidget->setFavourites(!contactFlagsWidget->getFavourites());
-            getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
 
         if (inputEvent.is(KeyCode::KEY_2)) {
             contactFlagsWidget->setICE(!contactFlagsWidget->getICE());
-            getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
 
         if (inputEvent.is(KeyCode::KEY_3)) {
-            static unsigned char speeDialPosition = 0;
+            static unsigned char speedDialPosition = 0;
             if (contactFlagsWidget->getSpeedDial()) {
-                ++speeDialPosition %= 10;
+                ++speedDialPosition %= 10;
             }
-            contactFlagsWidget->setSpeedDial(!contactFlagsWidget->getSpeedDial(), speeDialPosition);
-            getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            contactFlagsWidget->setSpeedDial(!contactFlagsWidget->getSpeedDial(), speedDialPosition);
             return true;
         }
 
         if (inputEvent.is(KeyCode::KEY_4)) {
             contactFlagsWidget->setBlocked(!contactFlagsWidget->getBlocked());
-            getApplication()->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
 

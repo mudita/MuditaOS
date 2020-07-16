@@ -20,16 +20,17 @@ namespace gui
 
         titleLabel = new Label(vBox);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_TOP));
+        titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         titleLabel->setFont(style::window::font::small);
         titleLabel->setLineMode(true);
         titleLabel->activeItem = false;
 
-        new gui::Span(vBox, Axis::Y, phonebookStyle::multiLineTextWithLabelItem::span_size); // spread title & multilineText
+        new gui::Span(
+            vBox, Axis::Y, phonebookStyle::multiLineTextWithLabelItem::span_size); // spread title & multilineText
 
         multilineText = new Text(vBox, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
         multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        multilineText->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        multilineText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         multilineText->setFont(style::window::font::medium);
         multilineText->setPenFocusWidth(style::window::default_border_focus_w);
         multilineText->setPenWidth(style::window::default_border_no_focus_w);
