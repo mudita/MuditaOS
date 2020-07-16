@@ -246,10 +246,7 @@ namespace gui
                 labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
             break;
         case SMSType::INBOX:
-            smsBubble->setPadding(gui::Padding(style::window::messages::sms_h_left_padding,
-                                               style::window::messages::sms_v_padding,
-                                               style::window::messages::sms_h_padding,
-                                               style::window::messages::sms_v_padding));
+            smsBubble->setPadding(style::window::messages::sms_left_bubble_padding);
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
             labelSpan->setReverseOrder(false);
             labelSpan->addWidget(smsBubble);
@@ -260,7 +257,7 @@ namespace gui
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
             smsBubble->setX(body->getWidth() - smsBubble->getWidth());
             labelSpan->setReverseOrder(true);
-            addErrorLabel(labelSpan, elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
+            addErrorIcon(labelSpan);
             labelSpan->addWidget(smsBubble);
         default:
             break;
@@ -273,7 +270,7 @@ namespace gui
         return labelSpan;
     }
 
-    void ThreadViewWindow::addErrorLabel(HBox *layout, uint16_t widthAvailable) const
+    void ThreadViewWindow::addErrorIcon(HBox *layout) const
     {
         auto errorIcon = new gui::Image("messages_error_W_M");
         errorIcon->setAlignment(Alignment(Alignment::Vertical::Center));
@@ -332,10 +329,7 @@ namespace gui
         smsBubble->setFont(style::window::font::medium);
         smsBubble->setPenFocusWidth(style::window::default_border_focus_w);
         smsBubble->setPenWidth(style::window::messages::sms_border_no_focus);
-        smsBubble->setPadding(gui::Padding(style::window::messages::sms_h_padding,
-                                           style::window::messages::sms_v_padding,
-                                           style::window::messages::sms_h_padding,
-                                           style::window::messages::sms_v_padding));
+        smsBubble->setPadding(style::window::messages::sms_right_bubble_padding);
         smsBubble->setText(smsRecord.body);
 
         smsBubble->inputCallback = [=, &smsRecord](Item &, const InputEvent &event) {

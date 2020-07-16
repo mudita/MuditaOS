@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Alignment.hpp>
+#include <Margins.hpp>
 #include <gui/core/Color.hpp>
 #include <inttypes.h>
 #include <string>
@@ -80,6 +81,15 @@ namespace style
             const inline unsigned short new_sms_vertical_spacer = 25;
             const inline unsigned short sms_failed_offset       = 39;
             const inline unsigned short sms_error_icon_offset   = 2;
+            const inline gui::Padding sms_left_bubble_padding =
+                gui::Padding(style::window::messages::sms_h_left_padding,
+                             style::window::messages::sms_v_padding,
+                             style::window::messages::sms_h_padding,
+                             style::window::messages::sms_v_padding);
+            const inline gui::Padding sms_right_bubble_padding = gui::Padding(style::window::messages::sms_h_padding,
+                                                                              style::window::messages::sms_v_padding,
+                                                                              style::window::messages::sms_h_padding,
+                                                                              style::window::messages::sms_v_padding);
         } // namespace messages
 
     }; // namespace window
