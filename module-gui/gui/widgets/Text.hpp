@@ -89,6 +89,15 @@ namespace gui
                 }
                 return w;
             }
+
+            auto linesHeight()
+            {
+                unsigned int h = 0;
+                for (auto &el : lines) {
+                    h += el.height();
+                }
+                return h;
+            }
         } lines;
 
         TextCursor *cursor                     = nullptr;
@@ -170,6 +179,7 @@ namespace gui
         bool onFocus(bool state) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void setRadius(int value) override;
+        void setAlignment(const Alignment &value) override;
         void setPadding(const Padding &value) override;
 
       private:

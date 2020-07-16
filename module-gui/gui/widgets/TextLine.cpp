@@ -176,22 +176,52 @@ namespace gui
         elements_to_show_in_line.clear();
     }
 
-    void TextLine::align(Alignment &line_align, Length parent_length)
+    void TextLine::align(Alignment line_align, Length parent_length, Length lines_height) const
     {
-        Length width = getWidth();
-        if (parent_length <= width) {
-            return;
+
+        Length xOffset = 0;
+        Length yOffset = 0;
+
+        switch (line_align.horizontal) {
+        case Alignment::Horizontal::Left:
+            xOffset = 0;
+            break;
+        case (Alignment::Horizontal::Center):
+            xOffset = (parent_length - getWidth()) / 2;
+            break;
+        case Alignment::Horizontal::Right:
+            xOffset = parent_length - getWidth();
+            break;
+        default:
+            break;
         }
-        Length offset = 0;
-        if (line_align.horizontal == Alignment::Horizontal::Right) {
-            offset = parent_length - width;
+
+        switch (line_align.vertical) {
+        case Alignment::Vertical::Top:
+            yOffset = 0;
+            break;
+        case (Alignment::Vertical::Center):
+            yOffset = (parent_length - lines_height) / 2;
+            break;
+        case Alignment::Vertical::Bottom:
+            yOffset = parent_length - lines_height;
+            break;
+        default:
+            break;
         }
-        else if (line_align.horizontal == Alignment::Horizontal::Center) {
-            offset = (parent_length - width) / 2;
+
+        if (xOffset) {
+            for (auto &el : elements_to_show_in_line) {
+                auto scoped_disown = ScopedParentDisown(el);
+                el->setPosition(el->getPosition(Axis::X) + xOffset, Axis::X);
+            }
         }
-        for (auto &el : elements_to_show_in_line) {
-            auto scoped_disown = ScopedParentDisown(el);
-            el->setPosition(el->getPosition(Axis::X) + offset, Axis::X);
+
+        if (yOffset) {
+            for (auto &el : elements_to_show_in_line) {
+                auto scoped_disown = ScopedParentDisown(el);
+                el->setPosition(el->getPosition(Axis::Y) + yOffset, Axis::Y);
+            }
         }
     }
 } // namespace gui

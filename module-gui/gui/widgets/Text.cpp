@@ -133,11 +133,13 @@ namespace gui
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
         font             = newFont;
+        buildCursor();
     }
 
     void Text::setFont(RawFont *fontName)
     {
         font = fontName;
+        buildCursor();
     }
 
     bool Text::onInput(const InputEvent &evt)
@@ -211,6 +213,14 @@ namespace gui
         }
     }
 
+    void Text::setAlignment(const Alignment &value)
+    {
+        if (alignment != value) {
+            alignment = value;
+            drawLines();
+        }
+    }
+
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
@@ -266,8 +276,8 @@ namespace gui
     {
         lines.erase();
 
-        auto sizeMinusPadding = [&](Axis axis) {
-            auto size = area(Area::Max).size(axis);
+        auto sizeMinusPadding = [&](Axis axis, Area val) {
+            auto size = area(val).size(axis);
             if (size <= padding.getSumInAxis(axis)) {
                 size = 0;
             }
@@ -277,17 +287,17 @@ namespace gui
             return size;
         };
 
-        uint32_t w           = sizeMinusPadding(Axis::X);
-        uint32_t h           = sizeMinusPadding(Axis::Y);
+        uint32_t w           = sizeMinusPadding(Axis::X, Area::Max);
+        uint32_t h           = sizeMinusPadding(Axis::Y, Area::Max);
         auto line_y_position = padding.top;
-        auto cursor          = 0;
+        auto cursor_pos      = 0;
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(document.get(), cursor, w);
-            cursor += text_line.length();
+            auto text_line = gui::TextLine(document.get(), cursor_pos, w);
+            cursor_pos += text_line.length();
 
             if (text_line.length() == 0) {
                 debug_text("cant show more text from this document");
@@ -309,24 +319,24 @@ namespace gui
             auto &line = lines.last();
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
-            line.align(alignment, w);
+            line.align(getAlignment(Axis::X), w);
 
             line_y_position += line.height();
 
-            debug_text_lines("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
-                             "%d \n x: %d, y: %d \n%s",
-                             cursor - lines.last().length(),
-                             lines.last().length(),
-                             cursor,
-                             document->getText().length(),
-                             line_x_position,
-                             line_y_position,
-                             [&]() -> std::string {
-                                 std::string text = document->getText();
-                                 return std::string(text.begin() + cursor - lines.last().length(),
-                                                    text.begin() + cursor);
-                             }()
-                                          .c_str());
+            debug_text_lines(
+                "debug text drawing: \n start cursor_pos: %d line length: %d end cursor_pos %d : document length "
+                "%d \n x: %d, y: %d \n%s",
+                cursor_pos - lines.last().length(),
+                lines.last().length(),
+                cursor_pos,
+                document->getText().length(),
+                line_x_position,
+                line_y_position,
+                [&]() -> std::string {
+                    std::string text = document->getText();
+                    return std::string(text.begin() + cursor_pos - lines.last().length(), text.begin() + cursor_pos);
+                }()
+                             .c_str());
         } while (true);
 
         // silly case resize - there request space and all is nice
@@ -350,6 +360,10 @@ namespace gui
                 // if last wont fit lines.eraseLast();
                 // break;
             }
+        }
+
+        for (auto &line : lines.get()) {
+            line.align(getAlignment(Axis::Y), sizeMinusPadding(Axis::Y, Area::Normal), lines.linesHeight());
         }
 
         debug_text("<- END\n");
@@ -394,6 +408,8 @@ namespace gui
     {
         erase(cursor);
         cursor = new TextCursor(this, document.get());
+        cursor->setAlignment(this->getAlignment());
+        cursor->setMargins(this->getPadding());
         showCursor(focus);
     }
 

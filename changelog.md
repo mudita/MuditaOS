@@ -16,6 +16,8 @@
 * `[sms]` Fix for handling temporary contacts
 * `[sms]` Fix for clipboard usage
 * `[call]` Fix for adding new contact from call app 
+* `[text]` Text Vertical Alignment and Text Cursor starting position fix. 
+
 ### Other
 * `[Alignment]` Refactored Alignment and added support to BoxLayout. 
 

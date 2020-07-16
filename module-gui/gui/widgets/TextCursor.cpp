@@ -90,6 +90,8 @@ namespace gui
         }
         if (document->isEmpty() && text->font != nullptr) {
             h += text->font->info.line_height;
+            x = getAxisAlignmentValue(Axis::X);
+            y = getAxisAlignmentValue(Axis::Y);
         }
         else if (text != nullptr || text->lines.size() > 0) {
             auto [line, column, row] = getLine();
