@@ -42,7 +42,7 @@ namespace gui
             std::string s = this->text;
             const char *c = s.c_str();
             int disp      = atoi(c);
-            LOG_DEBUG("%d", disp);
+            LOG_DEBUG("%ld", disp);
         }
 
         ~DayLabel() override = default;
