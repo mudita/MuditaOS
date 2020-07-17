@@ -41,7 +41,9 @@ namespace gui::option
             text->setText(std::make_unique<TextDocument>(std::list<TextBlock>(
                 {{utils::localize.get("sms_call_text"), font}, {contact.getFormattedName(), font_bold}})));
             style::window::decorate(rect);
-            rect->activatedCallback = [this](gui::Item &item) { return app::call(app, contact); };
+            auto l_app = app;
+            auto l_contact = contact;
+            rect->activatedCallback = [l_app, l_contact](gui::Item &item) { return app::call(l_app, l_contact); };
             rect->addWidget(text);
             center(rect, text, Axis::Y);
             return rect;
