@@ -17,9 +17,8 @@
 #include "utf8/UTF8.hpp"
 #include <string>
 
-struct ContactsNameTableRow
+struct ContactsNameTableRow : public Record
 {
-    uint32_t ID          = 0;
     uint32_t contactID   = 0;
     UTF8 namePrimary     = "";
     UTF8 nameAlternative = "";

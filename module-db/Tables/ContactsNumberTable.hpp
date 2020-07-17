@@ -9,15 +9,15 @@
  */
 #pragma once
 
+#include "Record.hpp"
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
 
-struct ContactsNumberTableRow
+struct ContactsNumberTableRow : public Record
 {
-    uint32_t ID            = 0;
     uint32_t contactID     = 0;
     std::string numberUser = "";
     std::string numbere164 = "";

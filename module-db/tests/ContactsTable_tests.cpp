@@ -15,10 +15,10 @@ TEST_CASE("Contacts Table tests")
     REQUIRE(contactsdb.isInitialized());
 
     ContactsTableRow testRow1 = {{.ID = DB_ID_NONE},
-                                 .nameID         = 0,
+                                 .nameID         = DB_ID_NONE,
                                  .numbersID      = "0 1 2 3 4",
-                                 .ringID         = 0,
-                                 .addressID      = 0,
+                                 .ringID         = DB_ID_NONE,
+                                 .addressID      = DB_ID_NONE,
                                  .isOnWhitelist  = true,
                                  .isOnBlacklist  = true,
                                  .isOnFavourites = false,

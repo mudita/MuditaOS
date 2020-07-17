@@ -19,7 +19,8 @@ ContactRecordInterface::~ContactRecordInterface()
 bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
 
-    bool ret = contactDB->contacts.add(ContactsTableRow{.type           = rec.contactType,
+    bool ret = contactDB->contacts.add(ContactsTableRow{{.ID = DB_ID_NONE},
+                                                        .type           = rec.contactType,
                                                         .isOnWhitelist  = rec.isOnBlacklist,
                                                         .isOnBlacklist  = rec.isOnBlacklist,
                                                         .isOnFavourites = rec.isOnFavourites,
@@ -33,7 +34,8 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     uint32_t contactID = contactDB->getLastInsertRowId();
     LOG_DEBUG("New contact with ID %" PRIu32 " created", contactID);
 
-    ret = contactDB->name.add(ContactsNameTableRow{.contactID       = contactID,
+    ret = contactDB->name.add(ContactsNameTableRow{{.ID = DB_ID_NONE},
+                                                   .contactID       = contactID,
                                                    .namePrimary     = rec.primaryName,
                                                    .nameAlternative = rec.alternativeName,
                                                    .favourite       = rec.isOnFavourites});
@@ -45,7 +47,8 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     auto contactNameID = contactDB->getLastInsertRowId();
 
     for (auto a : rec.numbers) {
-        ret = contactDB->number.add(ContactsNumberTableRow{.contactID  = contactID,
+        ret = contactDB->number.add(ContactsNumberTableRow{{.ID = DB_ID_NONE},
+                                                           .contactID  = contactID,
                                                            .numberUser = a.number.getEntered().c_str(),
                                                            .numbere164 = a.number.getE164().c_str(),
                                                            .type       = a.numberType});
@@ -75,7 +78,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactAddressID = contactDB->getLastInsertRowId();
 
-    ret = contactDB->contacts.update(ContactsTableRow{.ID        = contactID,
+    ret = contactDB->contacts.update(ContactsTableRow{{.ID = contactID},
                                                       .nameID    = contactNameID,
                                                       .numbersID = std::to_string(contactNumberID),
                                                       .ringID    = contactRingID,
@@ -187,7 +190,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (contact.ID == DB_ID_NONE)
         return false;
 
-    bool ret = contactDB->contacts.update(ContactsTableRow{.ID              = contact.ID,
+    bool ret = contactDB->contacts.update(ContactsTableRow{{.ID = contact.ID},
                                                            .nameID          = contact.nameID,
                                                            .numbersID       = contact.numbersID,
                                                            .ringID          = contact.ringID,
@@ -203,7 +206,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->name.update(ContactsNameTableRow{.ID              = contact.nameID,
+    ret = contactDB->name.update(ContactsNameTableRow{{.ID = contact.nameID},
                                                       .contactID       = contact.ID,
                                                       .namePrimary     = rec.primaryName,
                                                       .nameAlternative = rec.alternativeName,
@@ -213,11 +216,12 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
         return ret;
 
     for (auto number : rec.numbers) {
-        ret = contactDB->number.update(ContactsNumberTableRow{.ID = static_cast<uint32_t>(std::stoi(contact.numbersID)),
-                                                              .contactID  = contact.ID,
-                                                              .numberUser = number.number.getEntered().c_str(),
-                                                              .numbere164 = number.number.getE164().c_str(),
-                                                              .type       = number.numberType});
+        ret =
+            contactDB->number.update(ContactsNumberTableRow{{.ID = static_cast<uint32_t>(std::stoi(contact.numbersID))},
+                                                            .contactID  = contact.ID,
+                                                            .numberUser = number.number.getEntered().c_str(),
+                                                            .numbere164 = number.number.getE164().c_str(),
+                                                            .type       = number.numberType});
     }
 
     if (!ret)
@@ -327,7 +331,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             return records;
         }
 
-        records->push_back(ContactRecord{.ID              = contact.ID,
+        records->push_back(ContactRecord{{.ID = contact.ID},
                                          .primaryName     = name.namePrimary,
                                          .alternativeName = name.nameAlternative,
                                          .contactType     = contact.type,
@@ -378,7 +382,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.ID              = w.ID,
+            records->push_back(ContactRecord{{.ID = w.ID},
                                              .primaryName     = w.namePrimary,
                                              .alternativeName = w.nameAlternative,
                                              .contactType     = contact.type,
@@ -424,7 +428,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.ID              = w.ID,
+            records->push_back(ContactRecord{{.ID = w.ID},
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -519,7 +523,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.ID              = contact.ID,
+            records->push_back(ContactRecord{{.ID = contact.ID},
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -565,7 +569,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.ID              = contact.ID,
+            records->push_back(ContactRecord{{.ID = contact.ID},
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -614,7 +618,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
             return records;
         }
 
-        records->push_back(ContactRecord{.ID              = w.ID,
+        records->push_back(ContactRecord{{.ID = w.ID},
                                          .primaryName     = w.namePrimary,
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
@@ -661,7 +665,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
             return records;
         }
 
-        records->push_back(ContactRecord{.ID              = w.ID,
+        records->push_back(ContactRecord{{.ID = w.ID},
                                          .primaryName     = w.namePrimary,
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
@@ -703,6 +707,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(
     if (createTempContact == CreateTempContact::True) {
         LOG_INFO("Cannot find contact for number %s, creating temporary one", number.c_str());
         if (!Add(ContactRecord{
+                {.ID = DB_ID_NONE},
                 .contactType = ContactType::TEMPORARY,
                 .numbers     = std::vector<ContactRecord::Number>{ContactRecord::Number(numberView)},
             })) {
@@ -748,6 +753,7 @@ std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::
 
         LOG_INFO("Cannot find contact for number %s, creating temporary one", numberView.getEntered().c_str());
         if (!Add(ContactRecord{
+                {.ID = DB_ID_NONE},
                 .contactType = ContactType::TEMPORARY,
                 .numbers     = std::vector<ContactRecord::Number>{ContactRecord::Number(numberView)},
             })) {
