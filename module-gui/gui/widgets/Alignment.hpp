@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "Common.hpp"
 
 namespace gui
 {
@@ -31,6 +32,9 @@ namespace gui
         Alignment(Horizontal valH, Vertical valV);
         Alignment(Horizontal valH);
         Alignment(Vertical valV);
+
+        [[nodiscard]] Position calculateHAlignment(Length parentSize, Length childSize) const;
+        [[nodiscard]] Position calculateVAlignment(Length parentSize, Length childSize) const;
 
         bool operator==(const Alignment &alignment) const;
         bool operator!=(const Alignment &alignment) const;
