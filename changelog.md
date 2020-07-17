@@ -3,6 +3,16 @@
 ## Current version
 
 ### Added
+
+### Changed
+
+### Fixed
+
+### Other
+
+## [0.29.1] - 2020-07-17
+
+### Added
 * `[sms]` Added option to mark conversation as read/unread 
 
 ### Changed
