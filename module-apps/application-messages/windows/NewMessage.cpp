@@ -206,6 +206,7 @@ namespace gui
         labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::EXPAND_UP);
+        message->setMaximumSize(body->getWidth(), body->getHeight());
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
@@ -236,6 +237,8 @@ namespace gui
             return false;
         };
         body->addWidget(message);
+        body->addWidget(new Span(Axis::Y, body->getHeight()));
+        message->setText(""); // to set actual size of Text
 
         body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         body->setVisible(true);
