@@ -40,8 +40,7 @@ namespace gui
         }
         this->activeItem = false;
         this->setPenWidth(style::window::default_border_no_focus_w);
-        this->setAlignment(
-            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        this->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     }
 
     void DayLabel::setLabel(gui::Item *parent, std::string number, std::function<bool(Item &)> activatedCallback)
@@ -429,7 +428,7 @@ namespace gui
         // label->setActive(gui::TopBar::Elements::TIME, true);
         label->setPenWidth(style::window::default_border_no_focus_w);
         label->setFont(style::window::font::mediumbold);
-        label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignment(gui::Alignment(gui::Alignment::Vertical::Center));
         addWidget(label);
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
