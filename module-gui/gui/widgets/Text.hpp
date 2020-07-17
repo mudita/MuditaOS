@@ -101,7 +101,6 @@ namespace gui
 
             auto linesVAlign(Length parentSize)
             {
-
                 for (auto &line : lines) {
                     line.alignV(parent->getAlignment(Axis::Y), parentSize, linesHeight());
                 }
