@@ -6,6 +6,7 @@
 
 #include <ListItem.hpp>
 #include <Text.hpp>
+#include <TextFixedSize.hpp>
 
 namespace gui
 {
@@ -23,7 +24,7 @@ namespace gui
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         VBox *vBox        = nullptr;
         Label *titleLabel = nullptr;
-        Text *inputText   = nullptr;
+        TextFixedSize *inputText = nullptr;
 
       private:
         void applyItemNameSpecificSettings();
