@@ -176,39 +176,10 @@ namespace gui
         elements_to_show_in_line.clear();
     }
 
-    void TextLine::align(Alignment line_align, Length parent_length, Length lines_height) const
+    void TextLine::alignH(Alignment line_align, Length parent_length) const
     {
-
-        Length xOffset = 0;
-        Length yOffset = 0;
-
-        switch (line_align.horizontal) {
-        case Alignment::Horizontal::Left:
-            xOffset = 0;
-            break;
-        case (Alignment::Horizontal::Center):
-            xOffset = (parent_length - getWidth()) / 2;
-            break;
-        case Alignment::Horizontal::Right:
-            xOffset = parent_length - getWidth();
-            break;
-        default:
-            break;
-        }
-
-        switch (line_align.vertical) {
-        case Alignment::Vertical::Top:
-            yOffset = 0;
-            break;
-        case (Alignment::Vertical::Center):
-            yOffset = (parent_length - lines_height) / 2;
-            break;
-        case Alignment::Vertical::Bottom:
-            yOffset = parent_length - lines_height;
-            break;
-        default:
-            break;
-        }
+        Length xOffset = line_align.calculateHAlignment(parent_length, getWidth());
+        ;
 
         if (xOffset) {
             for (auto &el : elements_to_show_in_line) {
@@ -216,6 +187,11 @@ namespace gui
                 el->setPosition(el->getPosition(Axis::X) + xOffset, Axis::X);
             }
         }
+    }
+
+    void TextLine::alignV(Alignment line_align, Length parent_length, Length lines_height) const
+    {
+        Length yOffset = line_align.calculateVAlignment(parent_length, lines_height);
 
         if (yOffset) {
             for (auto &el : elements_to_show_in_line) {
@@ -224,4 +200,5 @@ namespace gui
             }
         }
     }
+
 } // namespace gui
