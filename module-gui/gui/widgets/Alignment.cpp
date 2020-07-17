@@ -21,4 +21,33 @@ namespace gui
     {
         return (horizontal != alignment.horizontal || vertical != alignment.vertical);
     }
+
+    Position Alignment::calculateHAlignment(Length parentSize, Length childSize) const
+    {
+        switch (horizontal) {
+        case Alignment::Horizontal::Left:
+            return 0;
+        case (Alignment::Horizontal::Center):
+            return (parentSize - childSize) / 2;
+        case Alignment::Horizontal::Right:
+            return parentSize - childSize;
+        default:
+            return 0;
+        }
+    }
+
+    Position Alignment::calculateVAlignment(Length parentSize, Length childSize) const
+    {
+        switch (vertical) {
+        case Alignment::Vertical::Top:
+            return 0;
+        case (Alignment::Vertical::Center):
+            return (parentSize - childSize) / 2;
+        case Alignment::Vertical::Bottom:
+            return parentSize - childSize;
+        default:
+            return 0;
+        }
+    }
+
 } /* namespace gui */

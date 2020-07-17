@@ -71,6 +71,7 @@ namespace gui
         /// align TextLine due to alignment axis in parent_width
         ///
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
-        void align(Alignment align, Length parent_length, Length lines_height = 0) const;
+        void alignH(Alignment align, Length parent_length) const;
+        void alignV(Alignment align, Length parent_length, Length lines_height) const;
     };
 } // namespace gui
