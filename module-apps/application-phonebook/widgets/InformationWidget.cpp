@@ -1,0 +1,58 @@
+#include "InformationWidget.hpp"
+
+#include "application-phonebook/data/PhonebookStyle.hpp"
+#include "NumberWithIconsWidget.hpp"
+
+#include <ContactRecord.hpp>
+#include <module-utils/i18/i18.hpp>
+
+namespace gui
+{
+    InformationWidget::InformationWidget(app::Application *app)
+    {
+        setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
+
+        vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
+        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+
+        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::localize.get("app_phonebook_contact_information"));
+        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        titleLabel->setFont(style::window::font::small);
+        titleLabel->setLineMode(true);
+        titleLabel->activeItem = false;
+
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            if (contact->numbers.size() > 0) {
+                primaryNumberHBox = new NumberWithIconsWidget(app, vBox, contact->numbers[0].number);
+            }
+            if (contact->numbers.size() > 1) {
+                alternativeNumberHBox = new NumberWithIconsWidget(app, vBox, contact->numbers[1].number);
+            }
+            if (contact->mail.length() > 0) {
+                emailText = new Text(vBox, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
+                emailText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+                emailText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+                emailText->setFont(style::window::font::medium);
+                emailText->setPenFocusWidth(style::window::default_border_focus_w);
+                emailText->setPenWidth(style::window::default_border_no_focus_w);
+                emailText->setEditMode(EditMode::BROWSE);
+            }
+        };
+
+        focusChangedCallback = [&](Item &item) {
+            setFocusItem(focus ? vBox : nullptr);
+            return true;
+        };
+
+        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    }
+
+    auto InformationWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    {
+        vBox->setPosition(0, 0);
+        vBox->setSize(newDim.w, newDim.h);
+
+        return true;
+    }
+} /* namespace gui */
