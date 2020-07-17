@@ -179,7 +179,6 @@ namespace gui
     void TextLine::alignH(Alignment line_align, Length parent_length) const
     {
         Length xOffset = line_align.calculateHAlignment(parent_length, getWidth());
-        ;
 
         if (xOffset) {
             for (auto &el : elements_to_show_in_line) {
