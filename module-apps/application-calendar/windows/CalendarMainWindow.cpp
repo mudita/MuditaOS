@@ -30,7 +30,7 @@ namespace gui
                        const uint32_t &height)
         : Label(parent, 0, 0, 0, 0, ""), DayModel(number, x, y)
     {
-        LOG_DEBUG("Call DayLabel constructor. With coords: x:%ld, y:%ld", x, y);
+        LOG_DEBUG("Call DayLabel constructor. With coords: x:%d, y:%d", (int)x, (int)y);
         parent->addWidget(this);
         this->setSize(width, height);
 
@@ -45,7 +45,7 @@ namespace gui
 
     void DayLabel::setLabel(gui::Item *parent, std::string number, std::function<bool(Item &)> activatedCallback)
     {
-        LOG_DEBUG("Set callback of day label. coords: x:%ld, y:%ld", x, y);
+        LOG_DEBUG("Set callback of day label. coords: x:%d, y:%d", (int)x, (int)y);
         this->number     = number;
         this->activeItem = true;
         this->setText(number);
@@ -95,7 +95,7 @@ namespace gui
                 if (y == 0) {
                     name = week[x];
                 }
-                LOG_DEBUG("MonthBox x:%ld y:%ld", x, y);
+                LOG_DEBUG("MonthBox x:%d y:%d", (int)x, (int)y);
                 dayMap[key] = new DayLabel(this,
                                            name,
                                            x,
@@ -113,7 +113,7 @@ namespace gui
         LOG_DEBUG("Start build month box map");
         for (auto &day : days) {
             if (day->x < this->columns && day->y < this->rows) {
-                LOG_DEBUG("Set element in monthbox map in position x:%ld y:%ld", day->x, day->y);
+                LOG_DEBUG("Set element in monthbox map in position x:%d y:%d", (int)day->x, (int)day->y);
                 auto key = std::make_pair(day->x, day->y);
                 dayMap[key]->displayText();
                 dayMap[key]->setLabel(this, day->number.c_str(), [=](gui::Item &item) {
@@ -123,8 +123,8 @@ namespace gui
                 });
             }
             else {
-                LOG_DEBUG("COLUMNS:%d ROWS:%d", this->columns, this->rows);
-                LOG_ERROR("Element positioned outside the box. coords x:%ld , y:%ld", day->x, day->y);
+                LOG_DEBUG("COLUMNS:%d ROWS:%d", (int)this->columns, (int)this->rows);
+                LOG_ERROR("Element positioned outside the box. coords x:%d , y:%d", (int)day->x, (int)day->y);
             }
         }
         LOG_DEBUG("Build Map Completed Successfully!");
@@ -165,7 +165,7 @@ namespace gui
                 // if current element is active set the navigation for all neighbours in 4 directions
                 if (dayMap[keyCenter]->activeItem) {
                     // direction UP
-                    LOG_DEBUG("Set navigation UP from coords x:%ld , y:%ld", x, y);
+                    LOG_DEBUG("Set navigation UP from coords x:%d , y:%d", (int)x, (int)y);
                     auto keyUp = std::make_pair(x, y - 1);
                     // if neighbour on top is not active or outside the map it means the current element is at the
                     // top border
@@ -182,7 +182,7 @@ namespace gui
                     dayMap[keyCenter]->setNavigationItem(NavigationDirection::UP, dayMap[keyUp]);
 
                     // direction DOWN
-                    LOG_DEBUG("Set navigation DOWN from coords x:%ld , y:%ld", x, y);
+                    LOG_DEBUG("Set navigation DOWN from coords x:%d , y:%d", (int)x, (int)y);
                     auto keyDown = std::make_pair(x, y + 1);
                     // if bottom neighbour is not active or outside the map it means the current element is at the
                     // bottom border
@@ -199,7 +199,7 @@ namespace gui
                     dayMap[keyCenter]->setNavigationItem(NavigationDirection::DOWN, dayMap[keyDown]);
 
                     // direction LEFT
-                    LOG_DEBUG("Set navigation LEFT from coords x:%ld , y:%ld", x, y);
+                    LOG_DEBUG("Set navigation LEFT from coords x:%d , y:%d", (int)x, (int)y);
                     auto keyLeft = std::make_pair(x - 1, y);
                     // if left neighbour is not active or outside the map it means the current element is at the
                     // left border
@@ -216,7 +216,7 @@ namespace gui
                     dayMap[keyCenter]->setNavigationItem(NavigationDirection::LEFT, dayMap[keyLeft]);
 
                     // direction RIGHT
-                    LOG_DEBUG("Set navigation RIGHT from coords x:%ld , y:%ld", x, y);
+                    LOG_DEBUG("Set navigation RIGHT from coords x:%d , y:%d", (int)x, (int)y);
                     auto keyRight = std::make_pair(x + 1, y);
                     // if right neighbour is not active or outside the map it means the current element is at the
                     // right border
@@ -252,7 +252,7 @@ namespace gui
                         return true;
                     }
                     else {
-                        LOG_DEBUG("Change month not handled. Pressed key: %ld", static_cast<int>(inputEvent.keyCode));
+                        LOG_DEBUG("Change month not handled. Pressed key: %d", static_cast<int>(inputEvent.keyCode));
                         return false;
                     }
                 }
@@ -271,7 +271,7 @@ namespace gui
                         return true;
                     }
                     else {
-                        LOG_DEBUG("Change month not handled. Pressed key: %ld", static_cast<int>(inputEvent.keyCode));
+                        LOG_DEBUG("Change month not handled. Pressed key: %d", static_cast<int>(inputEvent.keyCode));
                         return false;
                     }
                 }
@@ -287,11 +287,11 @@ namespace gui
     {
         // start from first row
         uint32_t y = 0;
-        LOG_DEBUG("Start Rebuild navigation on coords x:%d , y:%ld", x, y);
+        LOG_DEBUG("Start Rebuild navigation on coords x:%d , y:%d", (int)x, (int)y);
         auto key = std::make_pair(x, y);
         while (dayMap.count(key) > 0) {
             if (dayMap[key]->activeItem) {
-                LOG_DEBUG("Rebuild navigation on coords x:%d , y:%ld", x, y);
+                LOG_DEBUG("Rebuild navigation on coords x:%d , y:%d", (int)x, (int)y);
                 changeMonthInput(parent, key.first, key.second, direction);
             }
             key = std::make_pair(x, ++y);
@@ -379,14 +379,14 @@ namespace gui
     void CalendarMainWindow::rebuild(const uint32_t &ID)
     {
         destroyInterface();
-        LOG_DEBUG("Calendar Date Time ID:%d", ID);
+        LOG_DEBUG("Calendar Date Time ID:%d", (int)ID);
         buildInterface(ID);
     }
 
     void CalendarMainWindow::buildInterface(const uint32_t &actualDateTimeID)
     {
         LOG_DEBUG("AppWindow build interface");
-        LOG_DEBUG("Calendar Date Time ID:%d", actualDateTimeID);
+        LOG_DEBUG("Calendar Date Time ID:%d", (int)actualDateTimeID);
         AppWindow::buildInterface();
         LOG_DEBUG("Start build interface for calendar main window");
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
@@ -400,7 +400,7 @@ namespace gui
         dayHeight     = style::window::calendar::day_cell_height;
 
         bool resp = getData(actualDateTimeID);
-        LOG_DEBUG("Calendar Date Time ID:%ld", actualDateTimeID);
+        LOG_DEBUG("Calendar Date Time ID:%d", (int)actualDateTimeID);
         if (resp) {
             // create empty month box
             month = new MonthBox(app, this, offsetFromTop, monthWidth, monthHeight, dayWidth, dayHeight, monthModel);
@@ -437,7 +437,7 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-        LOG_DEBUG("Calendar Date Time ID:%ld", actualDateTimeID);
+        LOG_DEBUG("Calendar Date Time ID:%d", (int)actualDateTimeID);
     }
 
     void CalendarMainWindow::destroyInterface()
