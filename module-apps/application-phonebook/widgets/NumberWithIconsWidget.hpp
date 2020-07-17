@@ -8,13 +8,12 @@
 
 namespace gui
 {
-    class NumberWithIconsWidget
+    class NumberWithIconsWidget : public HBox
     {
       public:
         NumberWithIconsWidget(app::Application *app, gui::Item *parent, const utils::PhoneNumber::View &number);
-        ~NumberWithIconsWidget() = default;
+        ~NumberWithIconsWidget() override = default;
 
-        HBox *hBox        = nullptr;
         Text *numberText  = nullptr;
         Image *phoneImage = nullptr;
         Image *smsImage   = nullptr;

@@ -11,20 +11,19 @@ namespace gui
                                                  gui::Item *parent,
                                                  const utils::PhoneNumber::View &number)
     {
-        hBox = new HBox(parent, 0, 0, style::window::default_body_width, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        hBox->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        hBox->setPenFocusWidth(style::window::default_border_focus_w);
-        hBox->setPenWidth(style::window::messages::sms_border_no_focus);
+        this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        this->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        this->setPenFocusWidth(style::window::default_border_focus_w);
+        this->setPenWidth(style::window::messages::sms_border_no_focus);
 
-        numberText = new Text(hBox, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
+        numberText = new Text(this, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
         numberText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         numberText->setFont(style::window::font::medium);
         numberText->setPenFocusWidth(style::window::default_border_focus_w);
         numberText->setPenWidth(style::window::default_border_no_focus_w);
 
-        phoneImage = new Image(hBox, 0, 0, 32, 32, "phonebook_phone_ringing");
+        phoneImage = new Image(this, 0, 0, 32, 32, "phonebook_phone_ringing");
         phoneImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
         phoneImage->inputCallback = [&](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
@@ -34,7 +33,7 @@ namespace gui
             return false;
         };
 
-        smsImage = new Image(hBox, 0, 0, 32, 32, "mail");
+        smsImage = new Image(this, 0, 0, 32, 32, "mail");
         smsImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
         smsImage->inputCallback = [&](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
