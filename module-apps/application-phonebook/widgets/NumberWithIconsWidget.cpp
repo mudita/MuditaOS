@@ -1,12 +1,15 @@
 #include "NumberWithIconsWidget.hpp"
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
+#include "UiCommonActions.hpp"
 
 #include <BottomBar.hpp>
 
 namespace gui
 {
-    NumberWithIconsWidget::NumberWithIconsWidget(gui::Item *parent, const std::string &number)
+    NumberWithIconsWidget::NumberWithIconsWidget(app::Application *app,
+                                                 gui::Item *parent,
+                                                 const utils::PhoneNumber::View &number)
     {
         hBox = new HBox(parent, 0, 0, style::window::default_body_width, 0);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -22,8 +25,24 @@ namespace gui
         numberText->setPenWidth(style::window::default_border_no_focus_w);
 
         phoneImage = new Image(hBox, 0, 0, 32, 32, "phonebook_phone_ringing");
+        phoneImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        phoneImage->inputCallback = [&](Item &item, const InputEvent &input) {
+            if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
+                return app::call(app, number);
+            }
+            LOG_ERROR("Call operation failed");
+            return false;
+        };
 
         smsImage = new Image(hBox, 0, 0, 32, 32, "mail");
+        smsImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        smsImage->inputCallback = [&](Item &item, const InputEvent &input) {
+            if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
+                return app::sms(app, app::SmsOperation::New, number);
+            }
+            LOG_ERROR("SMS operation failed");
+            return false;
+        };
     }
 
 } /* namespace gui */
