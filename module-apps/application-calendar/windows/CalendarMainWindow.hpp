@@ -18,36 +18,34 @@ namespace gui
 
     namespace coords
     {
-        const uint8_t first_row = 1;
+        const uint8_t first_row        = 1;
         const uint8_t default_last_row = 5;
 
         const uint8_t first_column = 0;
-        const uint8_t last_column = 6;
-    };
-
+        const uint8_t last_column  = 6;
+    }; // namespace coords
 
     class DayLabel : public Label, public DayModel
-    {  
-        public:
-          DayLabel(gui::Item *parent,
-                   std::string number,
-                   const uint32_t &x,
-                   const uint32_t &y,
-                   const uint32_t &width,
-                   const uint32_t &height);
+    {
+      public:
+        DayLabel(gui::Item *parent,
+                 std::string number,
+                 const uint32_t &x,
+                 const uint32_t &y,
+                 const uint32_t &width,
+                 const uint32_t &height);
 
-          void setLabel(gui::Item *parent, std::string number, std::function<bool(Item &)> activatedCallback);
+        void setLabel(gui::Item *parent, std::string number, std::function<bool(Item &)> activatedCallback);
 
-          void displayText()
-          {
-              std::string s = this->text;
-              const char *c = s.c_str();
-              int disp      = atoi(c);
-              LOG_DEBUG("%d", disp);
-          }
+        void displayText()
+        {
+            std::string s = this->text;
+            const char *c = s.c_str();
+            int disp      = atoi(c);
+            LOG_DEBUG("%d", disp);
+        }
 
         ~DayLabel() override = default;
-
     };
 
     class MonthBox : public GridLayout, public MonthModel
@@ -85,28 +83,26 @@ namespace gui
         uint32_t getFirstRow()
         {
             return this->firstRow;
-      }
+        }
 
-      uint32_t getFirstColumn()
-      {
-        return this->firstColumn;
-      }
+        uint32_t getFirstColumn()
+        {
+            return this->firstColumn;
+        }
 
-      uint32_t getColumns()
-      {
-        return this->columns;
-      }
-        
+        uint32_t getColumns()
+        {
+            return this->columns;
+        }
     };
 
     class CalendarMainWindow : public gui::AppWindow
     {
-      uint32_t offsetFromTop = 0;
-      uint32_t monthWidth = 0;
-      uint32_t monthHeight = 0; 
-      uint32_t dayWidth = 0;
-      uint32_t dayHeight = 0;
-      
+        uint32_t offsetFromTop = 0;
+        uint32_t monthWidth    = 0;
+        uint32_t monthHeight   = 0;
+        uint32_t dayWidth      = 0;
+        uint32_t dayHeight     = 0;
 
       protected:
         MonthBox *month = nullptr;
@@ -117,12 +113,11 @@ namespace gui
 
         /// used only for testing
         bool getData(const uint32_t &date_time);
-        
+
         ~CalendarMainWindow() override = default;
         void rebuild(const uint32_t &ID);
         void buildInterface(const uint32_t &actualDateTimeID);
         void destroyInterface() override;
-
     };
 
 } // namespace gui
