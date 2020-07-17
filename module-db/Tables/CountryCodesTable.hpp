@@ -6,9 +6,8 @@
 #include "utf8/UTF8.hpp"
 #include <string>
 
-struct CodesTableRow
+struct CodesTableRow : public Record
 {
-    uint32_t ID = DB_ID_NONE;
     uint32_t mcc;
     uint32_t mnc;
     std::string iso;

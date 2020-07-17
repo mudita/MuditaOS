@@ -8,9 +8,8 @@
 #include <string>
 #include <vector>
 
-struct ContactsTableRow
+struct ContactsTableRow : public Record
 {
-    uint32_t ID           = DB_ID_NONE;
     uint32_t nameID       = DB_ID_NONE;
     std::string numbersID = "";
     uint32_t ringID       = DB_ID_NONE;

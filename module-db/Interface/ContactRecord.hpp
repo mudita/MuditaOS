@@ -13,9 +13,8 @@
 #include <memory>
 #include <optional>
 
-struct ContactRecord
+struct ContactRecord : public Record
 {
-    uint32_t ID             = DB_ID_NONE;
     UTF8 primaryName        = "";
     UTF8 alternativeName    = "";
     ContactType contactType = ContactType::TEMPORARY;
