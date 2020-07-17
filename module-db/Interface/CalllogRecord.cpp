@@ -116,7 +116,7 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
     for (auto &c : calls) {
         auto contactRec = GetContactRecordByID(c.contactId);
-        if (contactRec.ID == DB_ID_NONE) {
+        if (!contactRec.isValid()) {
             LOG_ERROR("Cannot find contact for ID %s", c.contactId.c_str());
             continue;
         }
@@ -132,7 +132,7 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
 {
 
     auto call = calllogDB->calls.getById(rec.ID);
-    if (call.ID == DB_ID_NONE) {
+    if (!call.isValid()) {
         return false;
     }
 

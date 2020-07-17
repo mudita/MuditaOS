@@ -187,7 +187,7 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(const db::Quer
 bool ContactRecordInterface::Update(const ContactRecord &rec)
 {
     ContactsTableRow contact = contactDB->contacts.getById(rec.ID);
-    if (contact.ID == DB_ID_NONE)
+    if (!contact.isValid())
         return false;
 
     bool ret = contactDB->contacts.update(ContactsTableRow{{.ID = contact.ID},
@@ -247,7 +247,7 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     ContactRecord rec = ContactRecord();
 
     auto contact = contactDB->contacts.getById(id);
-    if (contact.ID == DB_ID_NONE) {
+    if (!contact.isValid()) {
         return rec;
     }
 
@@ -256,12 +256,12 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
         return rec;
     }
     auto ring = contactDB->ringtones.getById(contact.ringID);
-    if (ring.ID == DB_ID_NONE) {
+    if (!ring.isValid()) {
         return rec;
     }
 
     auto address = contactDB->address.getById(contact.addressID);
-    if (address.ID == DB_ID_NONE) {
+    if (!address.isValid()) {
         return rec;
     }
 
@@ -307,12 +307,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     for (const auto &w : ret) {
 
         auto contact = contactDB->contacts.getById(w.ID);
-        if (contact.ID == DB_ID_NONE) {
+        if (!contact.isValid()) {
             return records;
         }
 
         auto name = contactDB->name.getById(contact.nameID);
-        if (name.ID == DB_ID_NONE) {
+        if (!name.isValid()) {
             return records;
         }
 
@@ -322,12 +322,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         }
 
         auto ring = contactDB->ringtones.getById(contact.ringID);
-        if (ring.ID == DB_ID_NONE) {
+        if (!ring.isValid()) {
             return records;
         }
 
         auto address = contactDB->address.getById(contact.addressID);
-        if (address.ID == DB_ID_NONE) {
+        if (!address.isValid()) {
             return records;
         }
 
@@ -363,7 +363,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.getById(w.contactID);
-            if (contact.ID == DB_ID_NONE) {
+            if (!contact.isValid()) {
                 return records;
             }
 
@@ -373,12 +373,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (ring.ID == DB_ID_NONE) {
+            if (!ring.isValid()) {
                 return records;
             }
 
             auto address = contactDB->address.getById(contact.addressID);
-            if (address.ID == DB_ID_NONE) {
+            if (!address.isValid()) {
                 return records;
             }
 
@@ -404,7 +404,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.getById(w.contactID);
-            if (contact.ID == DB_ID_NONE) {
+            if (!contact.isValid()) {
                 return records;
             }
 
@@ -414,17 +414,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto name = contactDB->name.getById(contact.nameID);
-            if (name.ID == DB_ID_NONE) {
+            if (!name.isValid()) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (ring.ID == DB_ID_NONE) {
+            if (!ring.isValid()) {
                 return records;
             }
 
             auto address = contactDB->address.getById(contact.addressID);
-            if (address.ID == DB_ID_NONE) {
+            if (!address.isValid()) {
                 return records;
             }
 
@@ -452,7 +452,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.getById(w.contactID);
-            if (contact.ID == DB_ID_NONE) {
+            if (!contact.isValid()) {
                 return records;
             }
 
@@ -462,21 +462,21 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto name = contactDB->name.getById(contact.nameID);
-            if (name.ID == DB_ID_NONE) {
+            if (!name.isValid()) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (ring.ID == DB_ID_NONE) {
+            if (!ring.isValid()) {
                 return records;
             }
 
             auto address = contactDB->address.getById(contact.addressID);
-            if (address.ID == DB_ID_NONE) {
+            if (!address.isValid()) {
                 return records;
             }
 
-            records->push_back(ContactRecord{.ID              = w.ID,
+            records->push_back(ContactRecord{{.ID = w.ID},
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -499,12 +499,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.getById(w.ID);
-            if (contact.ID == DB_ID_NONE) {
+            if (!contact.isValid()) {
                 return records;
             }
 
             auto name = contactDB->name.getById(contact.nameID);
-            if (name.ID == DB_ID_NONE) {
+            if (!name.isValid()) {
                 return records;
             }
 
@@ -514,12 +514,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (ring.ID == DB_ID_NONE) {
+            if (!ring.isValid()) {
                 return records;
             }
 
             auto address = contactDB->address.getById(contact.addressID);
-            if (address.ID == DB_ID_NONE) {
+            if (!address.isValid()) {
                 return records;
             }
 
@@ -545,12 +545,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.getById(w.ID);
-            if (contact.ID == DB_ID_NONE) {
+            if (!contact.isValid()) {
                 return records;
             }
 
             auto name = contactDB->name.getById(contact.nameID);
-            if (name.ID == DB_ID_NONE) {
+            if (!name.isValid()) {
                 return records;
             }
 
@@ -560,12 +560,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (ring.ID == DB_ID_NONE) {
+            if (!ring.isValid()) {
                 return records;
             }
 
             auto address = contactDB->address.getById(contact.addressID);
-            if (address.ID == DB_ID_NONE) {
+            if (!address.isValid()) {
                 return records;
             }
 
@@ -599,7 +599,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
     for (const auto &w : ret) {
 
         auto contact = contactDB->contacts.getById(w.contactID);
-        if (contact.ID == DB_ID_NONE) {
+        if (!contact.isValid()) {
             return records;
         }
 
@@ -609,12 +609,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
         }
 
         auto ring = contactDB->ringtones.getById(contact.ringID);
-        if (ring.ID == DB_ID_NONE) {
+        if (!ring.isValid()) {
             return records;
         }
 
         auto address = contactDB->address.getById(contact.addressID);
-        if (address.ID == DB_ID_NONE) {
+        if (!address.isValid()) {
             return records;
         }
 
@@ -646,7 +646,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
 
     for (const auto &w : ret) {
         auto contact = contactDB->contacts.getById(w.ID);
-        if (contact.ID == DB_ID_NONE) {
+        if (!contact.isValid()) {
             return records;
         }
 
@@ -656,12 +656,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
         }
 
         auto ring = contactDB->ringtones.getById(contact.ringID);
-        if (ring.ID == DB_ID_NONE) {
+        if (!ring.isValid()) {
             return records;
         }
 
         auto address = contactDB->address.getById(contact.addressID);
-        if (address.ID == DB_ID_NONE) {
+        if (!address.isValid()) {
             return records;
         }
 
@@ -777,7 +777,7 @@ std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std:
     std::vector<ContactRecord::Number> nrs;
     for (auto nr_str : utils::split(numbers_id, ' ')) {
         auto nr = contactDB->number.getById(std::stol(nr_str));
-        if (nr.ID == DB_ID_NONE) {
+        if (!nr.isValid()) {
             return nrs;
         }
         try {

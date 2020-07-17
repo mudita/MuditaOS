@@ -78,7 +78,7 @@ namespace CellularCall
         callRec.name        = number.getFormatted(); // temporary set name to entered number
         callRec.phoneNumber = number;
         call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
-        if (call.ID == DB_ID_NONE) {
+        if (!call.isValid()) {
             LOG_ERROR("startCallAction failed");
             clear();
             return false;
