@@ -40,7 +40,7 @@ namespace app
 
     void ApplicationCalendar::createUserInterface()
     {
-        
+
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             gui::name::window::main_window, new gui::CalendarMainWindow(this, gui::name::window::main_window)));
     }

@@ -427,7 +427,6 @@ namespace gui
         navigationDirections->clearDirection(direction);
     }
 
-
     bool Item::handleNavigation(const InputEvent inputEvent)
     {
         gui::Item *newFocusItem = nullptr;
