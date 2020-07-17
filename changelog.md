@@ -8,6 +8,8 @@
 
 ### Fixed
 
+* `[sms]` new message properly adds templates and resizes
+
 ### Other
 
 ## [0.29.1] - 2020-07-17
