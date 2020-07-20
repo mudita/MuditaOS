@@ -16,11 +16,12 @@ namespace gui
     const unsigned int TextCursor::default_width = 2;
 
     TextCursor::TextCursor(gui::Text *parent, gui::TextDocument *document)
-        : Rect(parent, 0, 0, default_width, 1), BlockCursor(document, 0, 0, parent != nullptr ? parent->font : nullptr),
-          text(parent)
+        : Rect(parent, 0, 0, default_width, 1),
+          BlockCursor(document, text::npos, text::npos, parent != nullptr ? parent->font : nullptr), text(parent)
     {
         setFilled(true);
         setVisible(false);
+        pos_on_screen = document->getText().length();
     }
 
     TextCursor::Move TextCursor::move(NavigationDirection direction)
