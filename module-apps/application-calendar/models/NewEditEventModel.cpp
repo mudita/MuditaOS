@@ -105,7 +105,7 @@ void NewEditEventModel::loadDataWithoutTimeItem()
 
 void NewEditEventModel::reloadDataWithTimeItem()
 {
-    auto app = application;
+    [[maybe_unused]] auto app = application;
     assert(app != nullptr);
 
     internalData.clear();

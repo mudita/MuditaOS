@@ -1,13 +1,17 @@
+#include "Common/Common.hpp"
 #include "ContactRecord.hpp"
+#include "MessageType.hpp"
 #include "ParserUtils.hpp"
 #include "Service/Common.hpp"
 #include "UpdatePureOS.hpp"
 #include "FactoryReset.hpp"
 #include "ParserStateMachine.hpp"
 #include "EndpointHandler.hpp"
+#include "queries/sms/QuerySMSSearchByType.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
 
 #include "json/json11.hpp"
+#include <memory>
 #include <vfs.hpp>
 #include <catch2/catch.hpp>
 #include <iostream>
@@ -162,7 +166,7 @@ TEST_CASE("DB Helpers test - json decoding")
     }
 }
 
-TEST_CASE("DB Helpers test - json encoding")
+TEST_CASE("DB Helpers test - json encoding (contacts)")
 {
     auto helper = std::make_unique<ContactHelper>(nullptr);
 
@@ -188,18 +192,55 @@ TEST_CASE("DB Helpers test - json encoding")
     REQUIRE(contactJson[json::contacts::numbers][0].dump() == "\"724842187\"");
 }
 
+TEST_CASE("DB Helpers test - json encoding (messages)")
+{
+    auto helper  = std::make_unique<MessageHelper>(nullptr);
+    auto message = std::make_unique<SMSRecord>();
+
+    utils::PhoneNumber phoneNumber("111222333");
+    auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType ::PAGER);
+
+    message->body      = "test message";
+    message->contactID = 1;
+    message->date      = 12345;
+    message->dateSent  = 54321;
+    message->errorCode = 0;
+    message->number    = contactNum.number;
+    message->threadID  = 1;
+    message->ID        = 10;
+    message->type      = SMSType::DRAFT;
+
+    auto messageJson = helper->to_json(*message);
+
+    REQUIRE(messageJson[json::messages::messageBody] == "test message");
+    REQUIRE(messageJson[json::messages::contactID] == 1);
+    REQUIRE(messageJson[json::messages::date] == 12345);
+    REQUIRE(messageJson[json::messages::dateSent] == 54321);
+    REQUIRE(messageJson[json::messages::threadID] == 1);
+    REQUIRE(messageJson[json::messages::id] == 10);
+
+    auto messageTemplate = std::make_unique<SMSTemplateRecord>();
+
+    messageTemplate->text = "test template";
+    messageTemplate->ID   = 1;
+
+    auto messageTemplateJson = helper->to_json(*messageTemplate);
+
+    REQUIRE(messageTemplateJson[json::messages::templateText] == "test template");
+    REQUIRE(messageTemplateJson[json::messages::id] == 1);
+}
+
 TEST_CASE("Simple response builder test")
 {
     auto resp =
         EndpointHandler::createSimpleResponse(sys::ReturnCodes::Success, static_cast<int>(Endpoint::contacts), 1234);
     std::string err;
-    REQUIRE(resp.substr(0, 10) == "#000000058");
+    REQUIRE(resp.substr(0, 10) == "#000000060");
     resp.erase(0, 10);
 
     auto responseJson = json11::Json::parse(resp, err);
     REQUIRE(err.empty());
     REQUIRE(responseJson[json::endpoint] == static_cast<int>(Endpoint::contacts));
-    REQUIRE(responseJson[json::body] == "");
     REQUIRE(responseJson[json::status] == static_cast<int>(http::Code::OK));
     REQUIRE(responseJson[json::uuid].dump() == "\"1234\"");
 }
