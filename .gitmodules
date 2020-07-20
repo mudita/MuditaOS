@@ -1,6 +1,3 @@
-[submodule "module-utils/tinyfsm"]
-	path = module-utils/tinyfsm
-	url = https://github.com/digint/tinyfsm.git
 [submodule "module-utils/microtar"]
 	path = module-utils/microtar
 	url = ../microtar.git
