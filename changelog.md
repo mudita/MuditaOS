@@ -9,6 +9,7 @@
 ### Fixed
 
 * `[sms]` new message properly adds templates and resizes
+* `[sms]` fixed focus in new message window after message forward option 
 
 ### Other
 
