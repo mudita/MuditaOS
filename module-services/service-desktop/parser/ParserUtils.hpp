@@ -1,12 +1,13 @@
 #pragma once
-
 #include <stdint.h>
 #include <string>
+#include <vector>
+#include <log/log.hpp>
 
-namespace parserutils
+namespace ParserStateMachine
 {
-    /*! Enum class for endpoints.
-     */
+
+    // Endpoint type definition
     enum class Endpoint
     {
         deviceInfo = 1,
@@ -16,16 +17,47 @@ namespace parserutils
         factory
     };
 
+    // Message defs and utils
     namespace message
     {
         constexpr size_t size_length = 9;
-        /*! Enum class for the message types.
-         */
-        enum class Type
+        constexpr size_t size_header = size_length + 1;
+
+        constexpr char endpointChar = '#';
+        constexpr char rawDataChar  = '$';
+
+        inline void removeHeader(std::string &msg)
         {
-            endpoint = '#',
-            rawData  = '$'
-        };
+            msg.erase(msg.begin(), msg.begin() + size_header);
+        }
+
+        inline unsigned long calcPayloadLength(const std::string header)
+        {
+            try {
+                return std::stol(header.substr(1, std::string::npos));
+            }
+            catch (const std::exception &e) {
+                LOG_ERROR("[PARSER FSM] Cant calculate payload length: %s", e.what());
+                return 0;
+            }
+        }
+
+        inline std::string getHeader(const std::string &msg)
+        {
+            return msg.substr(0, size_header);
+        }
+
+        inline void eraseFront(std::string &msg, size_t pos)
+        {
+            msg.erase(msg.begin(), msg.begin() + pos);
+        }
+        inline std::string extractPayload(std::string &msg, size_t payloadLength)
+        {
+            if (msg.size() > payloadLength)
+                return msg.substr(0, payloadLength);
+            else
+                return msg;
+        }
     } // namespace message
 
     namespace http
@@ -80,4 +112,5 @@ namespace parserutils
         const inline std::string restoreRequest = "restoreRequest";
         const inline std::string factoryRequest = "factoryRequest";
     } // namespace json
-};    // namespace parserutils
+
+} // namespace ParserStateMachine

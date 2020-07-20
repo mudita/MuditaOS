@@ -9,6 +9,10 @@ add_catch2_executable(
 		"${CMAKE_CURRENT_LIST_DIR}/tests-main.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/../update/UpdatePureOS.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/../factory-reset/FactoryReset.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/../parser/MessageHandler.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/../parser/EndpointHandler.cpp"
+
+
 	LIBS
 		module-services
 		module-sys

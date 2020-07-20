@@ -7,6 +7,7 @@
 * `[calendar]` Added events options and event delete windows.
 
 ### Changed
+* `[desktop]` Reimplemented JSON message parser.
 
 ### Fixed
 
@@ -25,7 +26,7 @@
 * `[audio]` added incoming call ringtone
 * `[phonebook]` general support for groups in DB
 * `[phonebook]` proper displaying of favorites, ice, blocked flags
-* `[sms]` thread summaries cover all SMS states (incoming, failed etc.) 
+* `[sms]` thread summaries cover all SMS states (incoming, failed etc.)
 
 ### Changed
 
@@ -36,9 +37,9 @@
 * `[sms]` new message properly adds templates and resizes
 * `[sms]` fixed focus in new message window after message forward option
 * `[audio]` added audio workers synchronization mutexes
-* `[phonebook]` Fixed bottom bar in main phonebook window 
+* `[phonebook]` Fixed bottom bar in main phonebook window
 * `[info]` fixed displaying of version
-* `[boxlayout]` min-max resize on alignment fix. 
+* `[boxlayout]` min-max resize on alignment fix.
 * `[sms]` fixed logic around re-sending messages
 * `[sms]` conversation view summary refreshes instantly
 
