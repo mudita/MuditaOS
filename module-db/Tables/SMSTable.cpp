@@ -82,6 +82,59 @@ SMSTableRow SMSTable::getById(uint32_t id)
     };
 }
 
+std::vector<SMSTableRow> SMSTable::getByContactId(uint32_t contactId)
+{
+    auto retQuery = db->query("SELECT * FROM sms WHERE contact_id= %u;", contactId);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<SMSTableRow>();
+    }
+
+    std::vector<SMSTableRow> ret;
+
+    do {
+        ret.push_back(SMSTableRow{
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // threadID
+            (*retQuery)[2].getUInt32(),                       // contactID
+            (*retQuery)[3].getUInt32(),                       // date
+            (*retQuery)[4].getUInt32(),                       // dateSent
+            (*retQuery)[5].getUInt32(),                       // errorCode
+            (*retQuery)[6].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}
+
+std::vector<SMSTableRow> SMSTable::getByText(std::string text)
+{
+
+    auto retQuery = db->query("SELECT *, INSTR(body,'%s') pos FROM sms WHERE pos > 0;", text.c_str());
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<SMSTableRow>();
+    }
+
+    std::vector<SMSTableRow> ret;
+
+    do {
+        ret.push_back(SMSTableRow{
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // threadID
+            (*retQuery)[2].getUInt32(),                       // contactID
+            (*retQuery)[3].getUInt32(),                       // date
+            (*retQuery)[4].getUInt32(),                       // dateSent
+            (*retQuery)[5].getUInt32(),                       // errorCode
+            (*retQuery)[6].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}
+
 std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);

@@ -42,6 +42,8 @@ class SMSTemplateRecordInterface : public RecordInterface<SMSTemplateRecord, SMS
                                                                           SMSTemplateRecordField field,
                                                                           const char *str) override final;
 
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
+
   private:
     SmsDB *smsDB = nullptr;
 };

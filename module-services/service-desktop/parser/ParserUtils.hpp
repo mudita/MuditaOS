@@ -15,7 +15,8 @@ namespace ParserStateMachine
         backup,
         restore,
         factory,
-        contacts
+        contacts,
+        messages
     };
 
     // Message defs and utils
@@ -125,6 +126,31 @@ namespace ParserStateMachine
             const inline std::string isFavourite     = "favourite";
 
         } // namespace contacts
+
+        namespace messages
+        {
+            const inline std::string id           = "id";
+            const inline std::string count        = "count";
+            const inline std::string offset       = "offset";
+            const inline std::string phoneNumber  = "phoneNumber";
+            const inline std::string messageBody  = "messageBody";
+            const inline std::string isUnread     = "unread";
+            const inline std::string contactID    = "contactID";
+            const inline std::string date         = "date";
+            const inline std::string dateSent     = "dateSent";
+            const inline std::string type         = "type";
+            const inline std::string threadID     = "threadID";
+            const inline std::string msgTemplate  = "template";
+            const inline std::string templateText = "text";
+            namespace thread
+            {
+                const inline std::string msgCount       = "msgCount";
+                const inline std::string snippet        = "snippet";
+                const inline std::string unreadMsgCount = "unreadMsgCount";
+
+            } // namespace thread
+
+        } // namespace messages
 
     } // namespace json
 

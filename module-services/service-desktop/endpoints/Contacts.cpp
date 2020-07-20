@@ -85,6 +85,7 @@ auto ContactHelper::createDBEntry(json11::Json createJSON, uint32_t uuid) -> sys
         LOG_ERROR("Empty number, not added!");
         return sys::ReturnCodes::Failure;
     }
+
     DBServiceAPI::ContactAdd(ownerServicePtr, *newRecord);
 
     return sys::ReturnCodes::Success;
