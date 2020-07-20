@@ -40,7 +40,7 @@ enum class Type
 requestPayloadJson:
 {
      { "endpoint", endpointNumber },
-     { "method", methodNumber}, 
+     { "method", methodNumber},
      { "body", requestBodyJson },
      { "uuid", uuidString }
 }
@@ -49,7 +49,7 @@ requestPayloadJson:
 responsePayloadJson:
 {
      { "endpoint", endpointNumber },
-     { "status", statusCode}, 
+     { "status", statusCode},
      { "body", responseBodyJson },
      { "uuid", uuidString }
 }
@@ -100,3 +100,26 @@ enum class Code
 ##### Example response
 
 ```#000000095{"endpoint": 1, "status": 200, "body": {"charging": true, "level": 75, "maximumCapacity": 100}}```
+
+#### Sample requests
+*Contacts*
+get contact:
+```#000000056{"endpoint":6, "method":1, "uuid":1, "body":{"count":5}}```
+response:
+```#000000861{"body": [{"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Bolig<0xc5><0x82>owa", "blocked": false, "favourite": true, "id": 19, "numbers": ["500639802"], "priName": "Alek"}, {"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Bolig<0xc5><0x82>owa", "blocked": false, "favourite": true, "id": 22, "numbers": ["500453837"], "priName": "Gra<0xc5><0xbc>yna"}, {"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Bolig<0xc5><0x82>owa", "blocked": false, "favourite": true, "id": 20, "numbers": ["500545546"], "priName": "Zofia"}, {"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Bubel", "blocked": false, "favourite": true, "id": 44, "numbers": ["500087699"], "priName": "Brian"}, {"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Bubel", "blocked": false, "favourite": true, "id": 43, "numbers": ["500656981"], "priName": "Cezary"}], "endpoint": 6, "status": 200, "uuid": "3"}```
+
+update contact:
+```#000000203{"endpoint":6, "method":2, "uuid":123, "body":{"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Cic", "blocked": true, "favourite": true, "id": "43", "numbers": ["724842187"], "priName": "Baatek"}}```
+response:
+```#000000057{"body": "", "endpoint": 6, "status": 500, "uuid": "123"}/```
+```#000000057{"body": "", "endpoint": 6, "status": 200, "uuid": "123"}```
+
+add contact:
+```#000000191{"endpoint":6, "method":3, "uuid":123, "body":{"address": "6 Czeczota St.\n02600 Warsaw", "altName": "Cic", "blocked": true, "favourite": true, "numbers": ["724842187"], "priName": "Baatek"}}```
+response:
+```#000000057{"body": "", "endpoint": 6, "status": 200, "uuid": "123"}```
+
+remove contact:
+```#000000057{"endpoint":6, "method":4, "uuid":123, "body":{"id": 23}}```
+response:
+```#000000057{"body": "", "endpoint": 6, "status": 200, "uuid": "123"}```
