@@ -49,9 +49,10 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  uint32_t count)
 {
 #if DEBUG_DB_MODEL_DATA == 1
-    LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count: %" PRIu32 "", offset, limit, count);
     for (uint32_t i = 0; i < records.get()->size(); ++i) {
-        LOG_DEBUG("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
+        LOG_DEBUG(
+            "id: %" PRIu32 ", name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
     }
 #endif
 

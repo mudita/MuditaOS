@@ -1,6 +1,7 @@
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
+#include "EndpointHandler.hpp"
 #include "FactoryReset.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
@@ -81,5 +82,17 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
 
 sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
+    if (resp != nullptr) {
+        if (resp->responseTo == MessageType::DBQuery) {
+            EndpointHandler::handleQueryMessage(msg, resp);
+        }
+        else if (resp->responseTo >= MessageType::DBContactVerify && resp->responseTo <= MessageType::DBContactBlock) {
+            EndpointHandler::handleContactsMessage(msg, resp);
+        }
+        else {
+            LOG_DEBUG("resp->ResponseTo: %d", static_cast<short>(resp->responseTo));
+        }
+    }
+
     return std::make_shared<sys::ResponseMessage>();
 }

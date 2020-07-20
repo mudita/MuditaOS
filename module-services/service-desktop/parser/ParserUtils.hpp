@@ -14,7 +14,8 @@ namespace ParserStateMachine
         update,
         backup,
         restore,
-        factory
+        factory,
+        contacts
     };
 
     // Message defs and utils
@@ -111,6 +112,20 @@ namespace ParserStateMachine
         const inline std::string backupUpload   = "backupUpload";
         const inline std::string restoreRequest = "restoreRequest";
         const inline std::string factoryRequest = "factoryRequest";
+
+        namespace contacts
+        {
+            const inline std::string count           = "count";
+            const inline std::string primaryName     = "priName";
+            const inline std::string alternativeName = "altName";
+            const inline std::string address         = "address";
+            const inline std::string id              = "id";
+            const inline std::string numbers         = "numbers";
+            const inline std::string isBlocked       = "blocked";
+            const inline std::string isFavourite     = "favourite";
+
+        } // namespace contacts
+
     } // namespace json
 
 } // namespace ParserStateMachine

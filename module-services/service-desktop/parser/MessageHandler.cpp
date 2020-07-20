@@ -1,6 +1,6 @@
 #include "MessageHandler.hpp"
+#include "Contacts.hpp"
 #include "EndpointHandler.hpp"
-#include "Service/Service.hpp"
 #include "log/log.hpp"
 #include "ParserUtils.hpp"
 
@@ -22,36 +22,38 @@ void MessageHandler::processMessage()
     LOG_DEBUG(
         "[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %lu\nbody: %s\n", method, endpoint, uuid, body.dump().c_str());
 
-    auto endpointHandler = std::make_unique<EndpointHandler>();
     std::string responseStr;
 
     switch (static_cast<Endpoint>(endpoint)) {
     case Endpoint::deviceInfo:
-        endpointHandler->deviceInfo(method, uuid, body, responseStr, OwnerServicePtr);
+        EndpointHandler::deviceInfo(method, uuid, body, responseStr, OwnerServicePtr);
         LOG_DEBUG("[ENDPOINT] DeviceInfo: %s", responseStr.c_str());
         putToSendQueue(responseStr);
         break;
     case Endpoint::update:
-        endpointHandler->update(method, uuid, body, responseStr, OwnerServicePtr);
+        EndpointHandler::update(method, uuid, body, responseStr, OwnerServicePtr);
         LOG_DEBUG("[ENDPOINT] Update: %s", responseStr.c_str());
         putToSendQueue(responseStr);
         break;
     case Endpoint::backup:
-        endpointHandler->backup(method, uuid, body, responseStr, OwnerServicePtr);
+        EndpointHandler::backup(method, uuid, body, responseStr, OwnerServicePtr);
         LOG_DEBUG("[ENDPOINT] Backup: %s", responseStr.c_str());
         putToSendQueue(responseStr);
         break;
     case Endpoint::restore:
-        endpointHandler->restore(method, uuid, body, responseStr, OwnerServicePtr);
+        EndpointHandler::restore(method, uuid, body, responseStr, OwnerServicePtr);
         LOG_DEBUG("[ENDPOINT] Restore: %s", responseStr.c_str());
         putToSendQueue(responseStr);
+        break;
+    case Endpoint::contacts:
+        EndpointHandler::contacts(method, uuid, body, responseStr, OwnerServicePtr);
         break;
     default:
         break;
     }
 }
 
-void MessageHandler::putToSendQueue(std::string msg)
+void MessageHandler::putToSendQueue(const std::string msg)
 {
 #if defined(TARGET_RT1051)
     if (uxQueueSpacesAvailable(sendQueue) != 0) {
