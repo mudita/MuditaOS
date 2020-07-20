@@ -1,4 +1,4 @@
-#include "CalendarModel.hpp"
+#include "CalendarEventsModel.hpp"
 #include "application-calendar/widgets/CalendarItem.hpp"
 
 #include <ListView.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "application-calendar/models/CalendarModel.hpp"
+#include "application-calendar/models/CalendarEventsModel.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
