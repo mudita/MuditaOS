@@ -30,7 +30,8 @@ TEST_CASE("Contacts Name Table tests")
     ContactsDB contactsdb;
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsNameTableRow testRow1 = {.ID = 0, .contactID = 0, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
+    ContactsNameTableRow testRow1 = {
+        {.ID = DB_ID_NONE}, .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
 
     // add 4 elements into table
     REQUIRE(contactsdb.name.add(testRow1));

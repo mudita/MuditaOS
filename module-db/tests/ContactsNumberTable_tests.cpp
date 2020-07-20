@@ -30,7 +30,8 @@ TEST_CASE("Contacts Number Table tests")
     ContactsDB contactsdb;
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsNumberTableRow testRow1 = {.ID = 0, .contactID = 0, .numberUser = "111222333", .numbere164 = "333222111"};
+    ContactsNumberTableRow testRow1 = {
+        {.ID = DB_ID_NONE}, .contactID = DB_ID_NONE, .numberUser = "111222333", .numbere164 = "333222111"};
 
     // add 4 elements into table
     REQUIRE(contactsdb.number.add(testRow1));
@@ -71,10 +72,10 @@ TEST_CASE("Contacts Number Table tests")
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get count of elements by field's ID
-    REQUIRE(contactsdb.number.countByFieldId("contact_id", 0) == 4);
+    REQUIRE(contactsdb.number.countByFieldId("contact_id", DB_ID_NONE) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(contactsdb.number.countByFieldId("invalid_field", 0) == 0);
+    REQUIRE(contactsdb.number.countByFieldId("invalid_field", DB_ID_NONE) == 0);
 
     REQUIRE(contactsdb.number.removeById(2));
 
