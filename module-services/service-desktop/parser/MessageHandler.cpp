@@ -54,6 +54,11 @@ void MessageHandler::processMessage()
     case Endpoint::contacts:
         EndpointHandler::contacts(method, uuid, body, responseStr, OwnerServicePtr);
         break;
+    case Endpoint::messages:
+        EndpointHandler::messages(method, uuid, body, responseStr, OwnerServicePtr);
+
+        break;
+
     default:
         break;
     }

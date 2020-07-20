@@ -217,7 +217,7 @@ namespace gui
         AppWindow::buildInterface();
 
         LOG_DEBUG("Start build interface for calendar main window");
-        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+        [[maybe_unused]] auto app = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(app != nullptr);
 
         setTitle(utils::localize.get("app_calendar_title_main"));
