@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+* `[text]` set the cursor at the end of text by default
 
 ### Fixed
 
