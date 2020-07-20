@@ -1,4 +1,5 @@
 #include "WorkerDesktop.hpp"
+#include "EndpointHandler.hpp"
 #include "MessageHandler.hpp"
 
 bool WorkerDesktop::handleMessage(uint32_t queueID)
@@ -44,6 +45,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     }
 
     ParserStateMachine::MessageHandler::sendQueue = Worker::getQueueByName(WorkerDesktop::SEND_QUEUE_BUFFER_NAME);
+    EndpointHandler::initHelpers(ownerService);
 
     return true;
 }

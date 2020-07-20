@@ -9,7 +9,9 @@
 * `[torch]` Added initial torch functionality (driver).
 * `[phonebook]` Added alternative number handling.
 * `[music player]` Added simple music player implementation.
-* `[torch]` Torch works with a press of a button 
+* `[torch]` Torch works with a press of a button
+* `[desktop]` Added service-desktop <-> DB interface.
+* `[desktop]` Added contact handling from service-desktop.
 
 ### Changed
 

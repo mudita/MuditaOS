@@ -27,12 +27,11 @@ namespace ParserStateMachine
             return JsonErrorMsg;
         };
         void processMessage();
+        static void putToSendQueue(const std::string msg);
 
       private:
         json11::Json messageJson;
         std::string JsonErrorMsg;
         sys::Service *OwnerServicePtr = nullptr;
-
-        void putToSendQueue(std::string msg);
     };
 } // namespace ParserStateMachine
