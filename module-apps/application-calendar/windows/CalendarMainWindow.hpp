@@ -5,6 +5,7 @@
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-calendar/models/MonthModel.hpp"
 #include "application-calendar/models/DayModel.hpp"
+#include "application-calendar/models/CalendarEventsModel.hpp"
 #include <gui/widgets/GridLayout.hpp>
 #include <gui/widgets/Item.hpp>
 #include <Text.hpp>

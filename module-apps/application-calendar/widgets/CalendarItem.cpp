@@ -1,5 +1,5 @@
 #include "CalendarItem.hpp"
-#include "application-calendar/models/CalendarModel.hpp"
+#include "application-calendar/models/CalendarEventsModel.hpp"
 
 #include <ListView.hpp>
 #include <gui/widgets/Label.hpp>

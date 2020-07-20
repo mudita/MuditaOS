@@ -433,8 +433,6 @@ namespace gui
         erase();
     }
 
-} // namespace gui
-
     bool CalendarMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.state == gui::InputEvent::State::keyReleasedShort ||
@@ -448,32 +446,46 @@ namespace gui
                 LOG_DEBUG("Switch to List Window");
                 return true;
             }
-        if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            std::shared_ptr<CalendarEventsModel> calendarEventsModel =
-                std::make_shared<CalendarEventsModel>(this->application);
-            if (calendarEventsModel->getItemCount() == 0) {
-                switchToNoEventsWindow();
+            if (AppWindow::onInput(inputEvent)) {
+                return true;
             }
-            else {
-                LOG_DEBUG("Switch to Day Window");
-                application->switchWindow(style::window::calendar::name::day_window);
+
+            if (!inputEvent.isShortPress()) {
+                return false;
             }
-            return true;
-        }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
-            LOG_DEBUG("TODO: Switch to List Window");
-            return true;
+            if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+                std::shared_ptr<CalendarEventsModel> calendarEventsModel =
+                    std::make_shared<CalendarEventsModel>(this->application);
+                if (calendarEventsModel->getItemCount() == 0) {
+                    switchToNoEventsWindow();
+                }
+                else {
+                    LOG_DEBUG("Switch to Day Window");
+                    application->switchWindow(style::window::calendar::name::day_window);
+                }
+                return true;
+            }
         }
-
         return AppWindow::onInput(inputEvent);
     }
-} /* namespace app */
+
+    void CalendarMainWindow::switchToNoEventsWindow()
+    {
+        auto dialog = dynamic_cast<gui::NoEvents *>(
+            this->application->getWindow(style::window::calendar::name::no_events_window));
+        assert(dialog != nullptr);
+        auto meta   = dialog->meta;
+        meta.text   = "app_calendar_no_events_information";
+        meta.title  = utils::time::Time().str("%d %B");
+        meta.icon   = "phonebook_empty_grey_circle_W_G";
+        meta.action = [=]() -> bool {
+            LOG_DEBUG("Switch to edit window");
+            return true;
+        };
+        dialog->update(meta);
+        this->application->switchWindow(dialog->getName());
+        LOG_DEBUG("Switch to no events window");
+    }
+
+} // namespace gui
