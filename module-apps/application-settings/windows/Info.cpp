@@ -6,6 +6,7 @@
 #include <module-services/service-cellular/api/CellularServiceAPI.hpp>
 
 #include <source/version.hpp>
+#include <log/log.hpp>
 
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Label.hpp>
@@ -15,6 +16,18 @@
 #include <i18/i18.hpp>
 
 #include <memory>
+
+namespace style
+{
+    namespace window
+    {
+        namespace Info
+        {
+            const float labelWidthFactor = 0.35;
+            const float valueWidthFactor = 0.58;
+        } // namespace Info
+    }     // namespace window
+} // namespace style
 
 namespace gui
 {
@@ -56,12 +69,12 @@ namespace gui
         addAllignedLabelWithValue(box, "GIT tag:", std::string(GIT_TAG));
         addAllignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
         addAllignedLabelWithValue(box, "Version:", std::string(VERSION));
+
         add_box_label(box, "Modem Firmware:");
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
         add_box_label(box, firmwareVersion);
         LOG_DEBUG("Modem Firmware: %s", firmwareVersion.c_str());
-        /// TODO: make sure entire string is displayed.
         box->resizeItems();
     }
 
@@ -75,13 +88,22 @@ namespace gui
         auto lineBox = new gui::HBox(layout, 0, 0, style::window_width, style::window::label::default_h);
 
         lineBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        auto label = new gui::Label(nullptr, 0, 0, style::window_width * 0.35, style::window::label::default_h);
+        auto label = new gui::Label(nullptr,
+                                    0,
+                                    0,
+                                    style::window_width * style::window::Info::labelWidthFactor,
+                                    style::window::label::default_h);
         style::window::decorateOption(label);
         label->setText(labelText);
 
-        auto value = new gui::Label(nullptr, 0, 0, style::window_width * 0.64, style::window::label::default_h);
+        auto value = new gui::Label(nullptr,
+                                    0,
+                                    0,
+                                    style::window_width * style::window::Info::valueWidthFactor,
+                                    style::window::label::default_h);
         style::window::decorateOption(value);
         value->setText(valueText);
+        value->setFont(style::window::font::smallbold);
 
         lineBox->addWidget(label);
         lineBox->addWidget(value);
