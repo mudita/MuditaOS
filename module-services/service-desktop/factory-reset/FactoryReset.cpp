@@ -154,31 +154,30 @@ namespace FactoryReset
 
     static bool CopyFile(std::string sourcefile, std::string targetfile)
     {
-        bool ret  = true;
-        auto lamb = [](vfs::FILE *stream) { vfs.fclose(stream); };
+        bool ret = true;
 
-        std::unique_ptr<vfs::FILE, decltype(lamb)> sf(vfs.fopen(sourcefile.c_str(), "r"), lamb);
-        std::unique_ptr<vfs::FILE, decltype(lamb)> tf(vfs.fopen(targetfile.c_str(), "w"), lamb);
+        vfs::FILE *sf = vfs.fopen(sourcefile.c_str(), "r");
+        vfs::FILE *tf = vfs.fopen(targetfile.c_str(), "w");
 
-        if ((sf.get() != nullptr) && (tf.get() != nullptr)) {
+        if ((sf != nullptr) && (tf != nullptr)) {
             std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::copy_buf]);
 
             if (buffer.get() != nullptr) {
-                uint32_t loopcount = (vfs.filelength(sf.get()) / purefs::buffer::copy_buf) + 1u;
+                uint32_t loopcount = (vfs.filelength(sf) / purefs::buffer::copy_buf) + 1u;
                 uint32_t readsize  = purefs::buffer::copy_buf;
 
                 for (uint32_t i = 0u; i < loopcount; i++) {
                     if (i + 1u == loopcount) {
-                        readsize = vfs.filelength(sf.get()) % purefs::buffer::copy_buf;
+                        readsize = vfs.filelength(sf) % purefs::buffer::copy_buf;
                     }
 
-                    if (vfs.fread(buffer.get(), 1, readsize, sf.get()) != readsize) {
+                    if (vfs.fread(buffer.get(), 1, readsize, sf) != readsize) {
                         LOG_ERROR("FactoryReset: read from sourcefile %s failed", sourcefile.c_str());
                         ret = false;
                         break;
                     }
 
-                    if (vfs.fwrite(buffer.get(), 1, readsize, tf.get()) != readsize) {
+                    if (vfs.fwrite(buffer.get(), 1, readsize, tf) != readsize) {
                         LOG_ERROR("FactoryReset: write to targetfile %s failed", targetfile.c_str());
                         ret = false;
                         break;
@@ -193,6 +192,14 @@ namespace FactoryReset
         else {
             LOG_ERROR("FactoryReset: unable to open source or target file");
             ret = false;
+        }
+
+        if (sf != nullptr) {
+            vfs.fclose(sf);
+        }
+
+        if (tf != nullptr) {
+            vfs.fclose(tf);
         }
 
         return ret;
