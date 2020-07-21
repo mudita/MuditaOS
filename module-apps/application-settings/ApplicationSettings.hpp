@@ -11,6 +11,8 @@
 
 #include "Application.hpp"
 
+#include "bsp/common.hpp"
+
 namespace app
 {
 
@@ -33,6 +35,7 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+        bsp::Board board = bsp::Board::none;
     };
 
 } /* namespace app */
