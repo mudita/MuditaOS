@@ -179,8 +179,9 @@ namespace gui
             if (bootPin == BootPinState::FIRMWARE_UPGRADE) {
                 ret = State::PASS_DFU;
             }
-            else
+            else {
                 ret = State::PASS_NORMAL;
+            }
         }
         else if (pass == PassthroughState::DISABLED) {
             ret = State::NO_PASS;
