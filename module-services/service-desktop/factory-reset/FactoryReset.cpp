@@ -4,11 +4,15 @@
 #include "SystemManager/SystemManager.hpp"
 
 static int runcount                   = 0;
-static int recurseDepth               = 0;
-static const int empty_dirlist_size   = 2;   /* vfs.listdir lists "." and ".." by default also for empty dir */
-static const int max_recurse_depth    = 120; /* 120 is just an arbitrary value of max number of recursive calls.
-                                              * If more then error is assumed, not the real depth of directories."
-                                              */
+static int recurseLevel               = 0;
+static const int min_factory_dir_size = 4;
+/* 4 is just an arbitrary value of min number of entries required in the factory reset directory.
+ * Otherwise the factory reset dir might be corrupted.
+ */
+static const int max_recurse_depth = 120;
+/* 120 is just an arbitrary value of max number of recursive calls.
+ * If more then error is assumed, not the real depth of directories."
+ */
 
 bool FactoryReset::Run(sys::Service *ownerService)
 {
@@ -19,13 +23,13 @@ bool FactoryReset::Run(sys::Service *ownerService)
 
     LOG_INFO("FactoryReset: restoring factory state started...");
 
-    recurseDepth = 0;
+    recurseLevel = 0;
 
     std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_factory.c_str(), "", true);
 
-    if (dirlist.size() <= empty_dirlist_size) {
+    if (dirlist.size() < min_factory_dir_size) {
         LOG_ERROR("FactoryReset: restoring factory state aborted");
-        LOG_ERROR("FactoryReset: directory %s seems empty.", purefs::dir::os_factory.c_str());
+        LOG_ERROR("FactoryReset: directory %s seems corrupted.", purefs::dir::os_factory.c_str());
         return false;
     }
 
@@ -55,7 +59,6 @@ bool FactoryReset::DeleteDirContent(std::string dir)
     for (auto &direntry : dirlist) {
         if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
             (direntry.fileName.compare("...") != 0)) {
-
             std::string delpath = dir;
             delpath += "/";
             delpath += direntry.fileName.c_str();
@@ -86,9 +89,9 @@ bool FactoryReset::CopyDirContent(std::string sourcedir, std::string targetdir)
 {
     bool ret = true;
 
-    recurseDepth++;
+    recurseLevel++;
 
-    if (recurseDepth < max_recurse_depth) {
+    if (recurseLevel < max_recurse_depth) {
         std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "", true);
 
         for (auto &direntry : dirlist) {
@@ -143,12 +146,12 @@ bool FactoryReset::CopyDirContent(std::string sourcedir, std::string targetdir)
     }
     else {
         LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
-                  recurseDepth,
+                  recurseLevel,
                   sourcedir.c_str());
         ret = false;
     }
 
-    recurseDepth--;
+    recurseLevel--;
 
     return ret;
 }
