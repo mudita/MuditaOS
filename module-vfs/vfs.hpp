@@ -73,7 +73,6 @@ namespace purefs
         const inline int crc_char_size = 9; // 9 ascii characters to store crc32 checksum
         const inline int crc_radix     = 16;
         const inline int tar_buf       = 8192 * 4;
-        const inline int copy_buf      = 8192 * 4;
     } // namespace buffer
 
     namespace ini
