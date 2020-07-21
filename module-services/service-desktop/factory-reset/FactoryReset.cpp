@@ -3,11 +3,12 @@
 #include "service-db/includes/DBServiceName.hpp"
 #include "SystemManager/SystemManager.hpp"
 
-static int recurseDepth             = 0;
-static const int empty_dirlist_size = 2;   /* vfs.listdir lists "." and ".." by default also for empty dir */
-static const int max_recurse_depth  = 120; /* 120 is just an arbitrary value of max number of recursive calls.
-                                            * If more then error is assumed, not the real depth of directories."
-                                            */
+static int runcount                   = 0;
+static int recurseDepth               = 0;
+static const int empty_dirlist_size   = 2;   /* vfs.listdir lists "." and ".." by default also for empty dir */
+static const int max_recurse_depth    = 120; /* 120 is just an arbitrary value of max number of recursive calls.
+                                              * If more then error is assumed, not the real depth of directories."
+                                              */
 #ifdef TARGET_Linux
 static const int max_filepath_length = 4096;
 #else
@@ -16,6 +17,11 @@ static const int max_filepath_length = ffconfigMAX_FILENAME;
 
 bool FactoryReset::Run(sys::Service *ownerService)
 {
+    if (runcount != 0) {
+        return false;
+    }
+    runcount = 1;
+
     LOG_INFO("FactoryReset: restoring factory state started...");
 
     recurseDepth = 0;
