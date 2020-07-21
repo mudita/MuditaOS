@@ -168,8 +168,6 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         break;
     }
     case MessageType::DBSMSGetCount: {
-        auto msg = dynamic_cast<DBSMSGetCount *>(msgl);
-        assert(msg);
         auto time   = utils::time::Scoped("DBSMSGetCount");
         auto ret    = smsRecordInterface->GetCount();
         responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, true, ret);
