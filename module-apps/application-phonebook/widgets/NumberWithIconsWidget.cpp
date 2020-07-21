@@ -8,13 +8,12 @@
 namespace gui
 {
     NumberWithIconsWidget::NumberWithIconsWidget(app::Application *app,
-                                                 gui::Item *parent,
                                                  const utils::PhoneNumber::View &number)
     {
-        this->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        this->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        this->setPenFocusWidth(style::window::default_border_focus_w);
-        this->setPenWidth(style::window::messages::sms_border_no_focus);
+        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        setPenFocusWidth(style::window::default_border_focus_w);
+        setPenWidth(style::window::messages::sms_border_no_focus);
 
         numberText = new Text(this, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
         numberText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
