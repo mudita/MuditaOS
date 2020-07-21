@@ -4,7 +4,6 @@ add_subdirectory( parser )
 add_subdirectory( endpoints )
 add_subdirectory( update )
 add_subdirectory( backup-restore )
-add_subdirectory( factory-reset )
 
 target_sources( ${PROJECT_NAME}
     PRIVATE
