@@ -28,6 +28,8 @@
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
 
+#include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
+
 #include <i18/i18.hpp>
 
 namespace app
@@ -108,8 +110,10 @@ namespace app
         window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
-        window = new gui::CellularPassthroughWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        if (board == bsp::Board::T4) {
+            window = new gui::CellularPassthroughWindow(this);
+            windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        }
     }
 
     void ApplicationSettings::destroyUserInterface()

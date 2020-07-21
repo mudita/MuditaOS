@@ -511,7 +511,7 @@ namespace bsp
                 return (state == true ? PassthroughState::ENABLED : PassthroughState::DISABLED);
             }
 
-            /// modem needs a reboot to enter DFU (Firmware Upgrade) mode
+            // modem needs a reboot to enter DFU (Firmware Upgrade) mode
             void setBootPin(BootPinState bootPin)
             {
                 auto gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_2),

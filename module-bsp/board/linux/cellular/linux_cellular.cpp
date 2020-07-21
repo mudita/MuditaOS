@@ -225,6 +225,7 @@ namespace bsp
             {
                 return BootPinState::NORMAL_BOOT;
             }
+
             PassthroughState getPassthrough()
             {
                 return PassthroughState::DISABLED;
@@ -246,7 +247,7 @@ namespace bsp
             {
                 return pdFALSE;
             }
-        }
+        } // namespace status
         namespace sim
         {
 
