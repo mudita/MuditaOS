@@ -24,10 +24,10 @@ namespace gui
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (contact->numbers.size() > 0) {
-                primaryNumberHBox = new NumberWithIconsWidget(app, vBox, contact->numbers[0].number);
+                primaryNumberHBox = new NumberWithIconsWidget(app, contact->numbers[0].number);
             }
             if (contact->numbers.size() > 1) {
-                alternativeNumberHBox = new NumberWithIconsWidget(app, vBox, contact->numbers[1].number);
+                alternativeNumberHBox = new NumberWithIconsWidget(app, contact->numbers[1].number);
             }
             if (contact->mail.length() > 0) {
                 emailText = new Text(vBox, 0, 0, 0, phonebookStyle::multiLineTextWithLabelItem::input_text_h);
