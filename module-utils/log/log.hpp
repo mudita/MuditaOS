@@ -70,16 +70,6 @@ extern "C"
 /**
  * Log functions (one per level).
  */
-#ifdef UNIT_TESTS
-#define LOG_PRINTF(...)
-#define LOG_TRACE(...)
-#define LOG_DEBUG(...)
-#define LOG_INFO(...)
-#define LOG_WARN(...)
-#define LOG_ERROR(...)
-#define LOG_FATAL(...)
-#define LOG_CUSTOM(...)
-#else
 #define LOG_PRINTF(...)              log_Printf(__VA_ARGS__)
 #define LOG_TRACE(...)               log_Log(LOGTRACE, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_DEBUG(...)               log_Log(LOGDEBUG, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
@@ -88,7 +78,6 @@ extern "C"
 #define LOG_ERROR(...)               log_Log(LOGERROR, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_FATAL(...)               log_Log(LOGFATAL, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_CUSTOM(loggerLevel, ...) log_Log(loggerLevel, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 }
