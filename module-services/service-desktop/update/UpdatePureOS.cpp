@@ -4,6 +4,7 @@
 #endif
 #include <service-desktop/ServiceDesktop.hpp>
 #include <source/version.hpp>
+#include <math.h>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
@@ -434,8 +435,12 @@ updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloade
 
     unsigned long fileLen = vfs.filelength(fileHandler);
     auto fileBuf          = std::make_unique<uint8_t[]>(fileLen);
+    if (fileBuf == nullptr) {
+        LOG_ERROR("[Bootloader Update] Failed to allocate buffer\n");
+        return updateos::BootloaderUpdateError::CantAllocateBuffer;
+    }
 
-    auto filesLoaded = vfs.fread(fileBuf.get(), fileLen, fileLen, fileHandler);
+    auto filesLoaded = vfs.fread(fileBuf.get(), fileLen, 1, fileHandler);
     if (filesLoaded == 0) {
         LOG_ERROR("[Bootloader Update] Failed to load file %s\n", bootloaderFile.c_str());
         return updateos::BootloaderUpdateError::CantOpenBootloaderFile;
@@ -446,7 +451,7 @@ updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloade
     bsp::eMMC emmc;
     emmc.Init();
     emmc.SwitchPartition(bsp::eMMC::Partition::Boot1);
-    emmc.WriteBlocks(fileBuf.get(), 0, fileLen >> (9U)); //    #define USB_DEVICE_SDCARD_BLOCK_SIZE_POWER (9U)
+    emmc.WriteBlocks(fileBuf.get(), 0, std::ceil(fileLen / FSL_SDMMC_DEFAULT_BLOCK_SIZE));
 
     LOG_INFO("[Bootloader Update] DONE!\n");
     emmc.SwitchPartition(bsp::eMMC::Partition::UserArea);
