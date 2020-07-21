@@ -11,7 +11,7 @@ namespace gui
     class NumberWithIconsWidget : public HBox
     {
       public:
-        NumberWithIconsWidget(app::Application *app, gui::Item *parent, const utils::PhoneNumber::View &number);
+        NumberWithIconsWidget(app::Application *app, const utils::PhoneNumber::View &number);
         ~NumberWithIconsWidget() override = default;
 
         Text *numberText  = nullptr;
