@@ -5,6 +5,8 @@
 
 namespace FactoryReset
 {
+    static bool DeleteDirContent(std::string dir);
+    static bool CopyDirContent(std::string sourcedir, std::string targetdir);
     static bool CopyFile(std::string sourcefile, std::string targetfile);
 
     static int recurseDepth             = 0;
@@ -24,7 +26,7 @@ namespace FactoryReset
 
         recurseDepth = 0;
 
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_factory.c_str(), "");
+        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_factory.c_str(), "", true);
 
         if (dirlist.size() <= empty_dirlist_size) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
@@ -32,11 +34,9 @@ namespace FactoryReset
             return false;
         }
 
-        if (ownerService != nullptr) {
-            LOG_INFO("FactoryReset: closing ServiceDB...");
-            std::string dbServiceName = service::name::db;
-            (void)sys::SystemManager::DestroyService(dbServiceName, ownerService);
-        }
+        LOG_INFO("FactoryReset: closing ServiceDB...");
+        std::string dbServiceName = service::name::db;
+        (void)sys::SystemManager::DestroyService(dbServiceName, ownerService);
 
         if (DeleteDirContent(purefs::dir::eMMC_disk) != true) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
@@ -53,9 +53,9 @@ namespace FactoryReset
         return true;
     }
 
-    bool DeleteDirContent(std::string dir)
+    static bool DeleteDirContent(std::string dir)
     {
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(dir.c_str(), "");
+        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(dir.c_str(), "", true);
 
         for (auto &direntry : dirlist) {
             if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
@@ -87,7 +87,7 @@ namespace FactoryReset
         return true;
     }
 
-    bool CopyDirContent(std::string sourcedir, std::string targetdir)
+    static bool CopyDirContent(std::string sourcedir, std::string targetdir)
     {
         if (recurseDepth >= max_recurse_depth) {
             LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
@@ -96,7 +96,7 @@ namespace FactoryReset
             return false;
         }
 
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "");
+        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "", true);
 
         for (auto &direntry : dirlist) {
             if ((direntry.fileName.compare(".") == 0) || (direntry.fileName.compare("..") == 0) ||
