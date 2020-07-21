@@ -45,6 +45,7 @@ namespace updateos
         NoError,
         NoBootloaderFile,
         CantOpenBootloaderFile,
+        CantAllocateBuffer,
         CantLoadBootloaderFile
     };
 
