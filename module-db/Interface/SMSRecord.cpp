@@ -68,9 +68,8 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     // TODO: error check
 
     // Update thread
-    thread.snippet = rec.body.substr(0, rec.body.length() >= snippetLength ? snippetLength : rec.body.length());
-    thread.date    = rec.date;
-    thread.type    = rec.type;
+    UpdateThreadSummary(thread, rec);
+
     thread.msgCount++;
     if (rec.type == SMSType::INBOX) {
         thread.unreadMsgCount++;
@@ -160,31 +159,43 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
     }
 
     smsDB->sms.update(SMSTableRow{{.ID = recUpdated.ID},
-        .threadID  = recCurrent.threadID,
-        .contactID = recCurrent.contactID,
-        .date      = recUpdated.date,
-        .dateSent  = recUpdated.dateSent,
-        .errorCode = recUpdated.errorCode,
-        .body      = recUpdated.body,
-        .type      = recUpdated.type});
+                                  .threadID  = recCurrent.threadID,
+                                  .contactID = recCurrent.contactID,
+                                  .date      = recUpdated.date,
+                                  .dateSent  = recUpdated.dateSent,
+                                  .errorCode = recUpdated.errorCode,
+                                  .body      = recUpdated.body,
+                                  .type      = recUpdated.type});
 
     // Update messages read count if necessary
     ThreadRecordInterface threadInterface(smsDB, contactsDB);
     auto thread = threadInterface.GetByID(recCurrent.threadID);
 
     // update thread details with the latest sms from given thread
-    auto latest =
-        smsDB->sms.getLimitOffsetByField(0, 1, SMSTableFields::ThreadID, std::to_string(thread.dbID).c_str())[0];
-    // check if there is need to change thread summary
-    if (latest.ID == recCurrent.ID) { // there is no == operator overloaded
-        thread.snippet = recUpdated.body.substr(0, recUpdated.body.length() >= snippetLength ? snippetLength : rec.body.length());
-        thread.date    = recUpdated.date;
-        thread.type    = recUpdated.type;
+
+
+    auto latest_vec = GetLimitOffsetByField(0, 1, SMSRecordField ::ThreadID, std::to_string(thread.ID).c_str());
+
+    if ( latest_vec->size() == 0 ) {
+        return false;
+    }
+    auto recLatestInThread = (*latest_vec)[0];
+
+    // is updated sms is the latest we need to update the summary
+    if (recUpdated.ID == recLatestInThread.ID) {
+        // latest is visible, so update thread details
+        UpdateThreadSummary(thread, recLatestInThread);
+        threadInterface.Update(thread);
     }
 
-    threadInterface.Update(thread);
-
     return true;
+}
+
+void SMSRecordInterface::UpdateThreadSummary(ThreadRecord &threadToUpdate, const SMSRecord &rec)
+{
+    threadToUpdate.snippet = rec.body.substr(0, rec.body.length() >= snippetLength ? snippetLength : rec.body.length());
+    threadToUpdate.date    = rec.date;
+    threadToUpdate.type    = rec.type;
 }
 
 bool SMSRecordInterface::RemoveByID(uint32_t id)
@@ -207,25 +218,29 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     }
 
     // If thread contains only one message remove it
-    if (threadRec.msgCount == 1) {
+    if (threadRec.msgCount <= 1) {
         threadInterface.RemoveByID(sms.threadID);
     }
     else {
-        // update thread details with the latest sms from given thread
-        auto twoLatest =
-            smsDB->sms.GetLimitOffsetByField(0, 2, SMSTableFields::ThreadID, std::to_string(threadRec.dbID).c_str());
-        // check if there is need to change thread summary
-        if (twoLatest[0].ID == sms.ID) { // there is no == operator overloaded
-            // if deleting the newest sms, refresh thread details with next sms in the column
-            auto newLatest    = twoLatest[1];
-            threadRec.snippet = newLatest.body.substr(
-                0, newLatest.body.length() >= snippetLength ? snippetLength : newLatest.body.length());
-            threadRec.date = newLatest.date;
-            threadRec.type = newLatest.type;
+        // update thread details if deleted SMS is the latest sms from the thread
+        try {
+            auto twoLatest =
+                GetLimitOffsetByField(0, 2, SMSRecordField ::ThreadID, std::to_string(threadRec.ID).c_str());
+            // check if there is need to change thread summary
+            if (sms.ID == (*twoLatest).at(0).ID) {
+                // if deleting the newest sms, refresh thread details with next sms in the column
+                auto newLatest = (*twoLatest).at(1);
+                UpdateThreadSummary(threadRec, newLatest);
+            }
+            // Update msg count
+            threadRec.msgCount--;
+            threadInterface.Update(threadRec);
         }
-        // Update msg count
-        threadRec.msgCount--;
-        threadInterface.Update(threadRec);
+        catch (std::out_of_range &d) {
+            LOG_ERROR("Cannot fetch 2 newest SMSes even though thread's msgCount says so (id %lu)",
+                      static_cast<long unsigned int>(sms.threadID));
+            threadInterface.RemoveByID(sms.threadID);
+        }
     }
 
     // Remove SMS

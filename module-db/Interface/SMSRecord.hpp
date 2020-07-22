@@ -4,12 +4,13 @@
 #include <stdint.h>
 
 #include "Record.hpp"
+#include "ThreadRecord.hpp"
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/queries/sms/QuerySMSSearchByType.hpp"
 #include "module-db/Common/Common.hpp"
 
-#include "utf8/UTF8.hpp"
+#include <utf8/UTF8.hpp>
 #include <PhoneNumber.hpp>
 
 struct SMSRecord : public Record
@@ -58,9 +59,11 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
 
   private:
-    const uint32_t snippetLength = 45;
+    static const uint32_t snippetLength = 45;
     SmsDB *smsDB                 = nullptr;
     ContactsDB *contactsDB       = nullptr;
 
     std::unique_ptr<db::query::SMSSearchByTypeResult> runQueryImpl(const db::query::SMSSearchByType *query);
+
+    static void UpdateThreadSummary(ThreadRecord &threadToUpdate, const SMSRecord &rec);
 };
