@@ -1,23 +1,11 @@
-
 #include "CalendarMainWindow.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-calendar/models/DayModel.hpp"
-#include "application-calendar/models/DayModel.cpp"
 #include "application-calendar/models/MonthModel.hpp"
-#include "application-calendar/models/MonthModel.cpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "application-calendar/models/CalendarEventsModel.hpp"
 #include "NoEvents.hpp"
-#include <gui/widgets/Window.hpp>
-#include <gui/widgets/Label.hpp>
-#include <gui/widgets/Item.hpp>
-#include <gui/widgets/BoxLayout.hpp>
-#include <gui/widgets/GridLayout.hpp>
 #include <time/time_conversion.hpp>
-#include <gui/widgets/Margins.hpp>
-#include <gui/widgets/Item.hpp>
-#include <time/time_conversion.hpp>
-#include <vector>
-#include <string>
 
 namespace gui
 {
@@ -110,8 +98,8 @@ namespace gui
                 auto key = std::make_pair(day.x, day.y);
 
                 dayMap[key]->setLabel(day.number.c_str(), [=](gui::Item &item) {
-                    LOG_DEBUG("Switch to DayWindow");
-                    app->switchWindow("DayWindow", nullptr);
+                    LOG_DEBUG("Switch to DayEventsWindow");
+                    app->switchWindow("DayEventsWindow", nullptr);
                     return true;
                 });
             }
@@ -376,6 +364,7 @@ namespace gui
         LOG_DEBUG("AppWindow build interface");
         LOG_DEBUG("Calendar Date Time ID:%d", static_cast<int>(actualDateTimeID));
         AppWindow::buildInterface();
+
         LOG_DEBUG("Start build interface for calendar main window");
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(app);
@@ -435,39 +424,33 @@ namespace gui
 
     bool CalendarMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.state == gui::InputEvent::State::keyReleasedShort ||
-            inputEvent.state == gui::InputEvent::State::keyReleasedLong) {
-            if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-                application->switchWindow("DayWindow");
-                LOG_DEBUG("Switch to Day Window");
-                return true;
-            }
-            if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
-                LOG_DEBUG("Switch to List Window");
-                return true;
-            }
-            if (AppWindow::onInput(inputEvent)) {
-                return true;
-            }
-
-            if (!inputEvent.isShortPress()) {
-                return false;
-            }
-
-            if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-                std::shared_ptr<CalendarEventsModel> calendarEventsModel =
-                    std::make_shared<CalendarEventsModel>(this->application);
-                if (calendarEventsModel->getItemCount() == 0) {
-                    switchToNoEventsWindow();
-                }
-                else {
-                    LOG_DEBUG("Switch to Day Window");
-                    application->switchWindow(style::window::calendar::name::day_window);
-                }
-                return true;
-            }
+        if (AppWindow::onInput(inputEvent)) {
+            return true;
         }
-        return AppWindow::onInput(inputEvent);
+
+        if (!inputEvent.isShortPress()) {
+            return false;
+        }
+
+        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+            std::shared_ptr<CalendarEventsModel> calendarEventsModel =
+                std::make_shared<CalendarEventsModel>(this->application);
+            if (calendarEventsModel->getItemCount() == 0) {
+                switchToNoEventsWindow();
+            }
+            else {
+                LOG_DEBUG("Switch to Day Window");
+                application->switchWindow(style::window::calendar::name::day_events_window);
+            }
+            return true;
+        }
+
+        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+            LOG_DEBUG("TODO: Switch to List Window");
+            return true;
+        }
+
+        return false;
     }
 
     void CalendarMainWindow::switchToNoEventsWindow()

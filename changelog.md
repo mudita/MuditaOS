@@ -3,11 +3,10 @@
 ## Current version
 
 ### Added
-
-* `[calendar]` main screen UI
-* `[calendar]` main screen navigation
 * `[calendar]` Added no-events window in general purpose windows.
 * `[calendar]` Added day window with list of events.
+* `[calendar]` main screen UI
+* `[calendar]` main screen navigation
 
 ### Changed
 * `[text]` set the cursor at the end of text by default
@@ -18,6 +17,7 @@
 * `[sms]` fixed focus in new message window after message forward option 
 
 ### Other
+* `[gui]` Moved Icon item into general widgets folder.
 
 ## [0.29.1] - 2020-07-17
 
