@@ -173,10 +173,9 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
 
     // update thread details with the latest sms from given thread
 
-
     auto latest_vec = GetLimitOffsetByField(0, 1, SMSRecordField ::ThreadID, std::to_string(thread.ID).c_str());
 
-    if ( latest_vec->size() == 0 ) {
+    if (latest_vec->size() == 0) {
         return false;
     }
     auto recLatestInThread = (*latest_vec)[0];
@@ -223,23 +222,34 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     }
     else {
         // update thread details if deleted SMS is the latest sms from the thread
-        try {
-            auto twoLatest =
-                GetLimitOffsetByField(0, 2, SMSRecordField ::ThreadID, std::to_string(threadRec.ID).c_str());
-            // check if there is need to change thread summary
-            if (sms.ID == (*twoLatest).at(0).ID) {
-                // if deleting the newest sms, refresh thread details with next sms in the column
-                auto newLatest = (*twoLatest).at(1);
-                UpdateThreadSummary(threadRec, newLatest);
-            }
-            // Update msg count
-            threadRec.msgCount--;
-            threadInterface.Update(threadRec);
-        }
-        catch (std::out_of_range &d) {
-            LOG_ERROR("Cannot fetch 2 newest SMSes even though thread's msgCount says so (id %lu)",
+
+        auto twoLatest = GetLimitOffsetByField(0, 2, SMSRecordField ::ThreadID, std::to_string(threadRec.ID).c_str());
+
+        if (twoLatest->size() == 0) {
+            LOG_ERROR("Cannot fetch no SMSes even though thread's msgCount says so (id %lu)",
                       static_cast<long unsigned int>(sms.threadID));
             threadInterface.RemoveByID(sms.threadID);
+            return false; // not handled (do no change window)
+        }
+        else {
+            // check if there is need to change thread summary
+            if (sms.ID == (*twoLatest)[0].ID) {
+                // there is the need
+                if (twoLatest->size() < 2) {
+                    LOG_ERROR("Cannot fetch another sms from a thread even though thread's msgCount says so (id %lu)",
+                              static_cast<long unsigned int>(sms.threadID));
+                    smsDB->sms.removeById(id);                // remove sms which triggered this function
+                    threadInterface.RemoveByID(sms.threadID); // and dangling thread as well
+                    return true;                              // handled (current window will be changed)
+                }
+                else {
+                    auto newLatest = (*twoLatest)[1];
+                    UpdateThreadSummary(threadRec, newLatest);
+                }
+            }
+            threadRec.msgCount--;
+            threadInterface.Update(threadRec);
+            // if deleting the newest sms, refresh thread details with next sms in the column
         }
     }
 
