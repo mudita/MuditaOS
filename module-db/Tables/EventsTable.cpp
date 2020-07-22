@@ -20,14 +20,16 @@ bool EventsTable::create()
 
 bool EventsTable::add(EventsTableRow entry)
 {
-    return db->execute("INSERT or IGNORE INTO events (title, description, date_from, date_till, reminder, repeat) "
-                       "VALUES ('%q','%q', %lu, %lu, %lu, %lu);",
-                       entry.title.c_str(),
-                       entry.description.c_str(),
-                       entry.date_from,
-                       entry.date_till,
-                       entry.reminder,
-                       entry.repeat);
+    return db->execute(
+        "INSERT or IGNORE INTO events (title, description, date_from, date_till, reminder, repeat, time_zone) "
+        "VALUES ('%q','%q', %lu, %lu, %lu, %lu, %lu);",
+        entry.title.c_str(),
+        entry.description.c_str(),
+        entry.date_from,
+        entry.date_till,
+        entry.reminder,
+        entry.repeat,
+        entry.time_zone);
 }
 
 bool EventsTable::removeById(uint32_t id)
@@ -56,13 +58,14 @@ bool EventsTable::removeByField(EventsTableFields field, const char *str)
 bool EventsTable::update(EventsTableRow entry)
 {
     return db->execute("UPDATE events SET title= %'q', description = %'q', date_from = %lu, date_till = %lu, reminder "
-                       "= %lu, repeat = %lu WHERE _id = %lu;",
+                       "= %lu, repeat = %lu, time_zone = %lu WHERE _id = %lu;",
                        entry.title.c_str(),
                        entry.description.c_str(),
                        entry.date_from,
                        entry.date_till,
                        entry.reminder,
                        entry.repeat,
+                       entry.time_zone,
                        entry.ID);
 }
 
@@ -83,35 +86,40 @@ EventsTableRow EventsTable::getById(uint32_t id)
         (*retQuery)[3].getUInt32(), // date_from
         (*retQuery)[4].getUInt32(), // date_till
         (*retQuery)[5].getUInt32(), // reminder
-        (*retQuery)[6].getUInt32()  // repeat
+        (*retQuery)[6].getUInt32(), // repeat
+        (*retQuery)[6].getUInt32()  // time_zone
 
     };
 }
 
-EventsTableRow EventsTable::GetByDatePeriod(uint32_t date_from, uint32_t date_till)
+std::vector<EventsTableRow> EventsTable::selectByDatePeriod(uint32_t date_from, uint32_t date_till)
 {
     auto retQuery = db->query("SELECT * FROM events WHERE date_from >= %u AND date_till <= %u;", date_from, date_till);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-        return EventsTableRow();
+        return std::vector<EventsTableRow>();
     }
 
-    assert(retQuery->getRowCount() == 1);
+    std::vector<EventsTableRow> ret;
 
-    return EventsTableRow{
-        (*retQuery)[0].getUInt32(), // ID
-        (*retQuery)[1].getString(), // title
-        (*retQuery)[2].getString(), // description
-        (*retQuery)[3].getUInt32(), // date_from
-        (*retQuery)[4].getUInt32(), // date_till
-        (*retQuery)[5].getUInt32(), // reminder
-        (*retQuery)[6].getUInt32()  // repeat
-    };
+    do {
+        ret.push_back(EventsTableRow{
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getString(), // title
+            (*retQuery)[2].getString(), // description
+            (*retQuery)[3].getUInt32(), // date_from
+            (*retQuery)[4].getUInt32(), // date_till
+            (*retQuery)[5].getUInt32(), // reminder
+            (*retQuery)[6].getUInt32(), // repeat
+            (*retQuery)[6].getUInt32()  // time_zone
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
 }
 
 std::vector<EventsTableRow> EventsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    /// TODO:check if it works correct
     auto retQuery = db->query("SELECT * from events LIMIT %lu OFFSET %lu;", limit, offset);
     //"SELECT * FROM event WHERE id = "
 
@@ -129,7 +137,8 @@ std::vector<EventsTableRow> EventsTable::getLimitOffset(uint32_t offset, uint32_
             (*retQuery)[3].getUInt32(), // date_from
             (*retQuery)[4].getUInt32(), // date_till
             (*retQuery)[5].getUInt32(), // reminder
-            (*retQuery)[6].getUInt32()  // repeat
+            (*retQuery)[6].getUInt32(), // repeat
+            (*retQuery)[6].getUInt32()  // time_zone
         });
     } while (retQuery->nextRow());
 

@@ -7,6 +7,7 @@ project(PurePhone)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config")
 
+include(Target_Linux.cmake)
 include(Colours)
 include(CCacheConfig)
 include(ProjectConfig)

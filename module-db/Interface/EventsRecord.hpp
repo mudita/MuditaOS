@@ -14,16 +14,16 @@ namespace db::query::events
 {
     class Get;
     class GetResult;
+    class GetAll;
+    class GetAllResult;
+    class GetFiltered;
+    class GetFilteredResult;
     class Add;
     class AddResult;
     class Remove;
-    class GetResult;
-    class GetAll;
-    class GetAllResult;
-    //    class Increment;
-    //    class IncrementResult;
-    //    class Clear;
-    //    class ClearResult;
+    class RemoveResult;
+    class Edit;
+    class EditResult;
 
 } // namespace db::query::events
 
@@ -39,6 +39,7 @@ struct EventsRecord : public Record
     uint32_t reminder = 0;
     // repeat the event daily
     uint32_t repeat = 0;
+    uint32_t time_zone = 0;
 
     EventsRecord()  = default;
     ~EventsRecord() = default;
@@ -64,13 +65,13 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     bool Update(const EventsRecord &rec) override final;
     EventsRecord GetByID(uint32_t id) override final;
     uint32_t GetCount() override final;
+    std::unique_ptr<std::vector<EventsRecord>> Select(uint32_t from, uint32_t till);
     std::unique_ptr<std::vector<EventsRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
     std::unique_ptr<std::vector<EventsRecord>> GetLimitOffsetByField(uint32_t offset,
                                                                      uint32_t limit,
                                                                      EventsRecordField field,
                                                                      const char *str) override final;
 
-    //    EventsRecord GetByKey(EventsRecord::Key key);
 
     std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
 
@@ -78,11 +79,9 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     EventsDB *eventsDb = nullptr;
 
     std::unique_ptr<db::query::events::GetResult> runQueryImpl(const db::query::events::Get *query);
-    //    std::unique_ptr<db::query::events::IncrementResult> runQueryImpl(
-    //        const db::query::events::Increment *query);
-    //    std::unique_ptr<db::query::events::ClearResult> runQueryImpl(const db::query::events::Clear *query);
-    std::unique_ptr<db::query::events::AddResult> runQueryImpl(const db::query::events::Add *query);
-    //    std::unique_ptr<db::query::events::RemoveResult> runQueryImpl(const db::query::events::Remove *query);
-    //    std::unique_ptr<db::query::events::UpdateResult> runQueryImpl(const db::query::events::Update *query);
     std::unique_ptr<db::query::events::GetAllResult> runQueryImpl(const db::query::events::GetAll *query);
+    std::unique_ptr<db::query::events::GetFilteredResult> runQueryImpl(const db::query::events::GetFiltered *query);
+    std::unique_ptr<db::query::events::AddResult> runQueryImpl(const db::query::events::Add *query);
+    std::unique_ptr<db::query::events::RemoveResult> runQueryImpl(const db::query::events::Remove *query);
+    std::unique_ptr<db::query::events::EditResult> runQueryImpl(const db::query::events::Edit *query);
 };

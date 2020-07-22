@@ -8,6 +8,9 @@
 #include <gui/widgets/TopBar.hpp>
 
 #include <time/time_conversion.hpp>
+#include <module-services/service-db/messages/QueryMessage.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAll.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 
 namespace gui
 {
@@ -68,6 +71,19 @@ namespace gui
             return true;
         }
 
+        return false;
+    }
+
+    bool DayEventsWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
+        if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(msg->getResult())) {
+            auto records = response->getResult();
+            for (auto &rec : *records) {
+                LOG_DEBUG("RESP!!!!!!: %s", rec.title.c_str());
+            }
+            return true;
+        }
         return false;
     }
 } /* namespace gui */
