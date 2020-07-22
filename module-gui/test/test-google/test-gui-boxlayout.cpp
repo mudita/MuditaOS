@@ -39,6 +39,7 @@ class TestBoxLayout : public gui::BoxLayout
     FRIEND_TEST(BoxLayoutTesting, Navigate_Test);
     FRIEND_TEST(BoxLayoutTesting, Border_Callback_Test);
     FRIEND_TEST(BoxLayoutTesting, Box_Alignment_Test);
+    FRIEND_TEST(BoxLayoutTesting, Box_Widget_Min_Max_Resize_Test);
     FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Test);
     FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Magrin_Test);
     FRIEND_TEST(BoxLayoutTesting, Box_Margins_Test);
@@ -308,6 +309,60 @@ TEST_F(BoxLayoutTesting, Box_Alignment_Test)
         << "first element should have Y pos 500 - first from bottom";
     ASSERT_EQ(200, testVBoxLayout->children.back()->getPosition(gui::Axis::Y)) << "last element should have Y pos 200";
     testVBoxLayout->erase();
+}
+
+TEST_F(BoxLayoutTesting, Box_Widget_Min_Max_Resize_Test)
+{
+    // Add element to HBox with 0 size
+    addNItems(testHBoxLayout, 1, 0, 0);
+
+    // Set element minimal size
+    getNItem(testHBoxLayout, 0)->setMinimumSize(testStyle::HBox_item_w / 2, testStyle::HBox_item_h / 3);
+
+    // Resize Box and check if item has actual size equal to Min size
+    testHBoxLayout->resizeItems();
+    ASSERT_EQ(testStyle::HBox_item_w / 2, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::X));
+    ASSERT_EQ(testStyle::HBox_item_h / 3, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::Y));
+
+    // Set element maximal size to HBoxSize
+    getNItem(testHBoxLayout, 0)->setMaximumSize(testStyle::HBox_w, testStyle::HBox_h);
+
+    // Resize Box and check if item has actual size equal to Max size
+    testHBoxLayout->resizeItems();
+    ASSERT_EQ(testStyle::HBox_w, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::X));
+    ASSERT_EQ(testStyle::HBox_h, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::Y));
+
+    // Set element maximal size to double HBoxSize
+    getNItem(testHBoxLayout, 0)->setMaximumSize(testStyle::HBox_w * 2, testStyle::HBox_h * 2);
+
+    // Resize Box and check if item has actual size equal to Box Size
+    testHBoxLayout->resizeItems();
+    ASSERT_EQ(testStyle::HBox_w, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::X));
+    ASSERT_EQ(testStyle::HBox_h, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::Y));
+
+    testHBoxLayout->erase();
+
+    // Add element to HBox with 0 size
+    addNItems(testHBoxLayout, 1, 0, 0);
+
+    // set Box to Alignment to Right and Vertical Center
+    testHBoxLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+
+    // Set element maximal size to half HBoxSize
+    getNItem(testHBoxLayout, 0)->setMaximumSize(testStyle::HBox_w / 2, testStyle::HBox_h / 2);
+
+    // Resize Box and check size
+    testHBoxLayout->resizeItems();
+    ASSERT_EQ(testStyle::HBox_w / 2, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::X));
+    ASSERT_EQ(testStyle::HBox_h / 2, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::Y));
+
+    // Current implementation require second resize to update alignment position in that case
+    ASSERT_NE(testStyle::HBox_w - testStyle::HBox_w / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X));
+    ASSERT_NE((testStyle::HBox_h - testStyle::HBox_h / 2) / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y));
+
+    testHBoxLayout->resizeItems();
+    ASSERT_EQ(testStyle::HBox_w - testStyle::HBox_w / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X));
+    ASSERT_EQ((testStyle::HBox_h - testStyle::HBox_h / 2) / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y));
 }
 
 TEST_F(BoxLayoutTesting, Box_Widgets_Alignment_Test)
