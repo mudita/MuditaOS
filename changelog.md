@@ -11,6 +11,7 @@
 * `[audio]` added incoming call ringtone
 * `[phonebook]` general support for groups in DB
 * `[phonebook]` proper displaying of favorites, ice, blocked flags
+* `[sms]` thread summaries cover all SMS states (incoming, failed etc.) 
 
 ### Changed
 
@@ -24,6 +25,8 @@
 * `[phonebook]` Fixed bottom bar in main phonebook window 
 * `[info]` fixed displaying of version
 * `[boxlayout]` min-max resize on alignment fix. 
+* `[sms]` fixed logic around re-sending messages
+* `[sms]` conversation view summary refreshes instantly
 
 ### Other
 
