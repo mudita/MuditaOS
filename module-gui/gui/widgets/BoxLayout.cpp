@@ -197,7 +197,10 @@ namespace gui
             }
 
             orthogonalItemSize =
-                std::min(this->area(Area::Normal).size(orthogonal(axis)), el->area(Area::Max).size(orthogonal(axis)));
+                std::min(this->area(Area::Normal).size(orthogonal(axis)),
+                         el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
+                             ? el->area(Area::Max).size(orthogonal(axis))
+                             : el->area(Area::Min).size(orthogonal(axis)));
 
             // Check if there is still position left
             if (axisItemSize <= pos_left) {
@@ -257,20 +260,20 @@ namespace gui
         switch (getAlignment(axis).vertical) {
         case gui::Alignment::Vertical::Top:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this);
+                return calcPos - sizeLeft<axis>(this, Area::Normal);
             }
             break;
         case gui::Alignment::Vertical::Center:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this) / 2;
+                return calcPos - sizeLeft<axis>(this, Area::Normal) / 2;
             }
             else {
-                return calcPos + sizeLeft<axis>(this) / 2;
+                return calcPos + sizeLeft<axis>(this, Area::Normal) / 2;
             }
             break;
         case gui::Alignment::Vertical::Bottom:
             if (!reverseOrder) {
-                return calcPos + sizeLeft<axis>(this);
+                return calcPos + sizeLeft<axis>(this, Area::Normal);
             }
             break;
         default:
@@ -280,20 +283,20 @@ namespace gui
         switch (getAlignment(axis).horizontal) {
         case gui::Alignment::Horizontal::Left:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this);
+                return calcPos - sizeLeft<axis>(this, Area::Normal);
             }
             break;
         case gui::Alignment::Horizontal::Center:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this) / 2;
+                return calcPos - sizeLeft<axis>(this, Area::Normal) / 2;
             }
             else {
-                return calcPos + sizeLeft<axis>(this) / 2;
+                return calcPos + sizeLeft<axis>(this, Area::Normal) / 2;
             }
             break;
         case gui::Alignment::Horizontal::Right:
             if (!reverseOrder) {
-                return calcPos + sizeLeft<axis>(this);
+                return calcPos + sizeLeft<axis>(this, Area::Normal);
             }
             break;
         default:
