@@ -39,7 +39,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
-        auto *backupMessage = static_cast<sdesktop::BackupMessage *>(msg);
+        sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop::DataReceivedHandler BackupMessage received");
             BackupRestore::BackupUserFiles(this);
@@ -48,7 +48,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::RestoreMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
-        auto *restoreMessage = static_cast<sdesktop::RestoreMessage *>(msg);
+        sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: RestoreMessage received");
             BackupRestore::RestoreUserFiles(this);
