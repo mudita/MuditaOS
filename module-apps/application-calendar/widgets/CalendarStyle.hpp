@@ -10,8 +10,8 @@ namespace style
 
             namespace name
             {
-                const inline std::string day_window       = "DayWindow";
-                const inline std::string no_events_window = "NoEventsWindow";
+                const inline std::string day_events_window = "DayEventsWindow";
+                const inline std::string no_events_window  = "NoEventsWindow";
             } // namespace name
 
             const inline int day_cell_width    = 60;
@@ -62,6 +62,7 @@ namespace style
                 const inline int label_no_x  = 70;
                 const inline int label_yes_x = 260;
             } // namespace deletion
-        };    // namespace calendar
-    }         // namespace window
+
+        }; // namespace calendar
+    }      // namespace window
 } // namespace style
