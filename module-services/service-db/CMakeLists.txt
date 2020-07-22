@@ -15,6 +15,7 @@ target_sources( ${PROJECT_NAME}
         "messages/DBCountryCodeMessage.cpp"
         "messages/DBNotesMessage.cpp"
         "messages/DBNotificationMessage.cpp"
+        "messages/DBEventsMessage.cpp"
         "messages/DBSettingsMessage.cpp"
         "messages/DBServiceMessage.cpp"
         "messages/DBSMSMessage.cpp"

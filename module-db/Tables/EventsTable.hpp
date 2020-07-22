@@ -14,6 +14,7 @@ struct EventsTableRow : public Record
     uint32_t date_till = 0;
     uint32_t reminder  = 0;
     uint32_t repeat    = 0;
+    uint32_t time_zone = 0;
 };
 
 enum class EventsTableFields
@@ -34,7 +35,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     bool removeByField(EventsTableFields field, const char *str) override final;
     bool update(EventsTableRow entry) override final;
     EventsTableRow getById(uint32_t id) override final;
-    EventsTableRow GetByDatePeriod(uint32_t date_from, uint32_t date_till);
+    std::vector<EventsTableRow> selectByDatePeriod(uint32_t date_from, uint32_t date_till);
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     std::vector<EventsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
@@ -53,5 +54,6 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                    "date_from INTEGER,"
                                    "date_till INTEGER,"
                                    "reminder INTEGER,"
-                                   "repeat INTEGER);";
+                                   "repeat INTEGER,"
+                                   "time_zone INTEGER);";
 };

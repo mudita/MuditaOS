@@ -6,7 +6,11 @@
 #include "application-calendar/models/DayEventsModel.hpp"
 #include "application-calendar/models/AllEventsModel.hpp"
 #include "NoEvents.hpp"
+#include <module-services/service-db/messages/QueryMessage.hpp>
 #include <time/time_conversion.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAll.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
 
 namespace gui
 {
@@ -100,6 +104,11 @@ namespace gui
 
                 dayMap[key]->setLabel(day.number.c_str(), [=](gui::Item &item) {
                     LOG_DEBUG("Switch to DayEventsWindow");
+                    uint32_t date_from = 2018;
+                    uint32_t date_till = 2048;
+                    DBServiceAPI::GetQuery(app,
+                                           db::Interface::Name::Events,
+                                           std::make_unique<db::query::events::GetFiltered>(date_from, date_till));
                     app->switchWindow("DayEventsWindow", nullptr);
                     return true;
                 });
@@ -320,6 +329,19 @@ namespace gui
     void CalendarMainWindow::destroyInterface()
     {
         erase();
+    }
+
+    bool CalendarMainWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
+        if (auto response = dynamic_cast<db::query::events::GetAllResult *>(msg->getResult())) {
+            auto records = response->getResult();
+            for (auto &rec : *records) {
+                LOG_DEBUG("RESP!!!!!!: %s", rec.title.c_str());
+            }
+            return true;
+        }
+        return false;
     }
 
     bool CalendarMainWindow::onInput(const gui::InputEvent &inputEvent)
