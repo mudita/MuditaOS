@@ -6,21 +6,21 @@
 
 namespace db::query::events
 {
-    class Add : public Query
+    class Edit : public Query
     {
         EventsRecord record;
 
       public:
-        Add(EventsRecord record);
-        [[nodiscard]] auto getRecord() const -> EventsRecord;
+        Edit(EventsRecord record);
 
+        [[nodiscard]] auto getRecord() const -> EventsRecord;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class AddResult : public QueryResult
+    class EditResult : public QueryResult
     {
       public:
-        AddResult(bool ret);
+        EditResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

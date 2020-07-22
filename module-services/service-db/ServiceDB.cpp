@@ -640,5 +640,6 @@ bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
     rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
     rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
     rc |= calllogDB.get()->storeIntoFile(backupPath + "calllog.db");
+    rc |= eventsDB.get()->storeIntoFile(backupPath + "events.db");
     return rc;
 }

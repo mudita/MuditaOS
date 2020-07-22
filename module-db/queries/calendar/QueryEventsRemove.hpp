@@ -6,25 +6,25 @@
 
 namespace db::query::events
 {
-    /// TODO:
-    //    class Get : public Query
-    //    {
-    //      public:
-    //        const EventsRecord::Key key;
-    //        Get(EventsRecord::Key key);
-    //
-    //        [[nodiscard]] auto debugInfo() const -> std::string override;
-    //    };
-    //
-    //    class GetResult : public QueryResult
-    //    {
-    //        EventsRecord record;
-    //
-    //      public:
-    //        GetResult(EventsRecord record);
-    //        [[nodiscard]] auto getResult() const -> EventsRecord;
-    //
-    //        [[nodiscard]] auto debugInfo() const -> std::string override;
-    //    };
+
+    class Remove : public Query
+    {
+      public:
+        Remove(const uint32_t &id);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+
+        uint32_t id;
+    };
+
+    class RemoveResult : public QueryResult
+    {
+        const bool ret = true;
+
+      public:
+        RemoveResult(const bool &ret);
+        [[nodiscard]] auto getResult() const -> bool;
+
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
 
 } // namespace db::query::events

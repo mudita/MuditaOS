@@ -2,25 +2,24 @@
 
 namespace db::query::events
 {
-    /// TODO:
-    //    Get::Get(EventsRecord::Key key) : Query(Query::Type::Read), key(key)
-    //    {}
-    //
-    //    auto Get::debugInfo() const -> std::string
-    //    {
-    //        return "Get";
-    //    }
-    //
-    //    GetResult::GetResult(EventsRecord record) : record(record)
-    //    {}
-    //
-    //    auto GetResult::getResult() const -> EventsRecord
-    //    {
-    //        return record;
-    //    }
-    //
-    //    auto GetResult::debugInfo() const -> std::string
-    //    {
-    //        return "GetResult";
-    //    }
+    Remove::Remove(const uint32_t &id) : Query(Query::Type::Delete)
+    {}
+
+    auto Remove::debugInfo() const -> std::string
+    {
+        return "Remove";
+    }
+
+    RemoveResult::RemoveResult(const bool &ret) : ret(ret)
+    {}
+
+    auto RemoveResult::getResult() const -> bool
+    {
+        return ret;
+    }
+
+    auto RemoveResult::debugInfo() const -> std::string
+    {
+        return "RemoveResult";
+    }
 } // namespace db::query::events
