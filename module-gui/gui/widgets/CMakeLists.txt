@@ -3,8 +3,9 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/BottomBar.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/Icon.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Icon.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Image.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ImageBox.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Item.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Label.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/ListItem.cpp"
@@ -35,6 +36,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/BottomBar.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Image.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ImageBox.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Item.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Label.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/ListItem.hpp"
