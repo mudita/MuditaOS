@@ -29,6 +29,8 @@ enum class MessageType
     GUIRenderingFinished, // Message is sent from the worker when all rendering is finished.
 
     // DB messages
+    DBServiceEvents,
+
     DBServiceNotification, // Common service-db notification message.
     DBServiceBackup,
 
