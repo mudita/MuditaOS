@@ -16,7 +16,7 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
-        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
 
         titleLabel = new Label(vBox);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
