@@ -1,7 +1,7 @@
 #include "EndpointHandler.hpp"
 #include "ParserUtils.hpp"
-#include "../messages/DesktopMessages.hpp"
-#include "../ServiceDesktop.hpp"
+#include "DesktopMessages.hpp"
+#include "ServiceDesktop.hpp"
 
 static bool backupReady = false;
 

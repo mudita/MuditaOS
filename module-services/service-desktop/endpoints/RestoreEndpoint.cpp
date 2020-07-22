@@ -1,7 +1,7 @@
 #include "EndpointHandler.hpp"
 #include "ParserUtils.hpp"
-#include "../messages/DesktopMessages.hpp"
-#include "../ServiceDesktop.hpp"
+#include "DesktopMessages.hpp"
+#include "ServiceDesktop.hpp"
 
 sys::ReturnCodes EndpointHandler::restore(
     uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService)
@@ -26,7 +26,10 @@ sys::ReturnCodes EndpointHandler::restore(
                                   {parserutils::json::body, responseBodyJson}});
 
         responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
-    }
 
-    return sys::ReturnCodes::Success;
+        return sys::ReturnCodes::Success;
+    }
+    else {
+        return sys::ReturnCodes::Failure;
+    }
 }
