@@ -14,6 +14,7 @@ namespace style
                 const inline std::string no_events_window  = "NoEventsWindow";
                 const inline std::string events_options    = "Options";
                 const inline std::string dialog_yes_no     = "DialogYesNo";
+                const inline std::string all_events_window = "AllEventsWindow";
             } // namespace name
 
             const inline int day_cell_width    = 60;
@@ -46,6 +47,13 @@ namespace style
                 const inline int title_h      = 40;
                 const inline int descripton_y = 42;
                 const inline int height       = 90;
+
+                namespace all
+                {
+                    const int description_w = 310;
+                    const int description_x = 120;
+                    const int start_time_x  = 11;
+                } // namespace all
             } // namespace item
 
             namespace options

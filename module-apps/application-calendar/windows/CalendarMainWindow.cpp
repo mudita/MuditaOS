@@ -4,6 +4,7 @@
 #include "application-calendar/models/MonthModel.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "application-calendar/models/CalendarEventsModel.hpp"
+#include "application-calendar/models/CalendarAllEventsModel.hpp"
 #include "NoEvents.hpp"
 #include <time/time_conversion.hpp>
 
@@ -413,7 +414,7 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_calendar_bar_list"));
         LOG_DEBUG("Calendar Date Time ID:%d", static_cast<int>(actualDateTimeID));
     }
 
@@ -446,7 +447,15 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
-            LOG_DEBUG("TODO: Switch to List Window");
+            std::shared_ptr<CalendarAllEventsModel> calendarAllEventsModel =
+                std::make_shared<CalendarAllEventsModel>(this->application);
+            if (calendarAllEventsModel->getItemCount() == 0) {
+                switchToNoEventsWindow();
+            }
+            else {
+                LOG_DEBUG("Switch to List Window");
+                application->switchWindow(style::window::calendar::name::all_events_window);
+            }
             return true;
         }
 
