@@ -68,6 +68,7 @@
     "app_calendar_options_delete": "Delete",
     "app_calendar_event_delete_confirmation": "Delete this event?",
     "app_calendar_bar_month": "MONTH",
+    "app_calendar_bar_list": "LIST",
     "app_calendar_event_detail": "Event",
     "app_calendar_event_detail_repeat": "Repeat",
     "app_calendar_event_detail_reminder": "Reminder",
