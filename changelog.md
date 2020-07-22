@@ -23,6 +23,7 @@
 * `[audio]` added audio workers synchronization mutexes
 * `[phonebook]` Fixed bottom bar in main phonebook window 
 * `[info]` fixed displaying of version
+* `[boxlayout]` min-max resize on alignment fix. 
 
 ### Other
 
