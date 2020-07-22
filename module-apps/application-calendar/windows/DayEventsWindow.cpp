@@ -1,4 +1,4 @@
-#include "DayWindow.hpp"
+#include "DayEventsWindow.hpp"
 
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/Label.hpp>
@@ -12,19 +12,19 @@
 namespace app
 {
 
-    DayWindow::DayWindow(app::Application *app, std::string name)
-        : AppWindow(app, style::window::calendar::name::day_window),
+    DayEventsWindow::DayEventsWindow(app::Application *app, std::string name)
+        : AppWindow(app, style::window::calendar::name::day_events_window),
           calendarEventsModel{std::make_shared<CalendarEventsModel>(this->application)}
     {
         buildInterface();
     }
 
-    void DayWindow::rebuild()
+    void DayEventsWindow::rebuild()
     {
         buildInterface();
     }
 
-    void DayWindow::buildInterface()
+    void DayEventsWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
@@ -50,14 +50,10 @@ namespace app
         dayEventsList->setPenFocusWidth(style::window::default_border_no_focus_w);
         dayEventsList->setPenWidth(style::window::default_border_no_focus_w);
 
-        dayEventsList->focusChangedCallback = [=](gui::Item &) {
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-            return true;
-        };
         setFocusItem(dayEventsList);
     }
 
-    bool DayWindow::onInput(const gui::InputEvent &inputEvent)
+    bool DayEventsWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (AppWindow::onInput(inputEvent)) {
             return true;

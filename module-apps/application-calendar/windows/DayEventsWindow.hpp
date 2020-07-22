@@ -12,7 +12,7 @@
 
 namespace app
 {
-    class DayWindow : public gui::AppWindow
+    class DayEventsWindow : public gui::AppWindow
     {
         gui::Image *leftArrowImage                               = nullptr;
         gui::Image *newDayEventImage                             = nullptr;
@@ -20,7 +20,7 @@ namespace app
         std::shared_ptr<CalendarEventsModel> calendarEventsModel = nullptr;
 
       public:
-        DayWindow(Application *app, std::string name);
+        DayEventsWindow(Application *app, std::string name);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild() override;
