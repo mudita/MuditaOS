@@ -7,7 +7,6 @@
 #include <queries/phonebook/QueryContactGet.hpp>
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBContactMessage.hpp>
 
 namespace gui
 {
@@ -103,10 +102,6 @@ namespace gui
 
             leftArrowImage->setVisible(false);
             newContactImage->setVisible(false);
-
-            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(""));
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         }
     }
 
