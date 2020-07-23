@@ -28,6 +28,7 @@ extern "C"
 #include "bsp/rtc/rtc.hpp"
 #include "bsp/vibrator/vibrator.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
+#include "bsp/torch/torch.hpp"
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
@@ -163,6 +164,9 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometer)]);
+    bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
+
+    bsp::torch::isPresent();
 
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);
