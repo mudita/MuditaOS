@@ -30,7 +30,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    auto getMinimalItemHeight() const -> unsigned int override;
+    [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
     auto getItem(gui::Order order) -> gui::ListItem * override;
 
     [[nodiscard]] auto getItemCount() const -> int override

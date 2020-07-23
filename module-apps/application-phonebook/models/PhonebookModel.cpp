@@ -2,7 +2,6 @@
 #include <module-apps/application-phonebook/windows/PhonebookContact.hpp>
 #include "ListView.hpp"
 #include "PhonebookModel.hpp"
-#include "i18/i18.hpp"
 
 #include <messages/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
