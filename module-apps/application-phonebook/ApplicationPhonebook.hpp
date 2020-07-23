@@ -4,39 +4,37 @@
 
 #include <string>
 
-namespace gui
+namespace gui::window::name
 {
-    namespace window::name
-    {
-        inline const std::string contact          = "Contact";
-        inline const std::string contact_options  = "Options";
-        inline const std::string no_results       = "NoResults";
-        inline const std::string contact_blocked  = "ContactBlocked";
-        inline const std::string namecard_options = "Namecard Options";
-        inline const std::string new_contact      = "New";
-        inline const std::string search           = "Search";
-        inline const std::string search_results   = "SearchResults";
-        inline const std::string dialog_yes_no    = "DialogYesNo";
-        inline const std::string dialog_confirm   = "DialogConfirm";
+    inline const std::string contact          = "Contact";
+    inline const std::string contact_options  = "Options";
+    inline const std::string no_results       = "NoResults";
+    inline const std::string contact_blocked  = "ContactBlocked";
+    inline const std::string namecard_options = "Namecard Options";
+    inline const std::string new_contact      = "New";
+    inline const std::string search           = "Search";
+    inline const std::string search_results   = "SearchResults";
+    inline const std::string dialog_yes_no    = "DialogYesNo";
+    inline const std::string dialog_confirm   = "DialogConfirm";
 
-    } // namespace window::name
-} // namespace gui
+} // namespace gui::window::name
 
 namespace app
 {
-    const inline std::string name_phonebook = "ApplicationPhonebook";
+    const inline std::string name_phonebook      = "ApplicationPhonebook";
+    constexpr std::uint16_t phonebook_stack_size = 8192;
 
     class ApplicationPhonebook : public app::Application
     {
       public:
         ApplicationPhonebook(std::string name = name_phonebook, std::string parent = "", bool startBackgound = false);
-        virtual ~ApplicationPhonebook();
+        ~ApplicationPhonebook() override = default;
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-        sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto InitHandler() -> sys::ReturnCodes override;
+        auto DeinitHandler() -> sys::ReturnCodes override;
 
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes final
         {
             return sys::ReturnCodes::Success;
         }
