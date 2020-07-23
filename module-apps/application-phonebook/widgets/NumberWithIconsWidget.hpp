@@ -24,6 +24,8 @@ namespace gui
         Text *numberText  = nullptr;
         ImageBox *phoneImage = nullptr;
         ImageBox *smsImage   = nullptr;
+
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */
