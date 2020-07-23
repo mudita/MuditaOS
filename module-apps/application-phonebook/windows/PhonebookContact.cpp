@@ -346,6 +346,12 @@ namespace gui
         contactFlagsWidget->setFavourites(contact->isOnFavourites());
         contactFlagsWidget->setICE(contact->isOnIce());
         contactFlagsWidget->setBlocked(contact->isOnBlocked());
+        if (contact->speeddial.length()) {
+            contactFlagsWidget->setSpeedDial(true, static_cast<unsigned char>(std::stoi(contact->speeddial.c_str())));
+        }
+        else {
+            contactFlagsWidget->setSpeedDial(false, 0);
+        }
     }
 
     bool PhonebookContact::handleSwitchData(SwitchData *data)

@@ -78,10 +78,15 @@ struct ContactRecord : public Record
         return "";
     }
 
-    bool isOnFavourites();
-    bool isOnIce();
-    bool isOnBlocked();
-    bool isOnGroup(uint32_t groupId);
+    void addToFavourites(bool add);
+    void addToIce(bool add);
+    void addToBlocked(bool add);
+    void addToGroup(uint32_t groupId);
+    void removeFromGroup(uint32_t groupId);
+    [[nodiscard]] bool isOnFavourites();
+    [[nodiscard]] bool isOnIce();
+    [[nodiscard]] bool isOnBlocked();
+    [[nodiscard]] bool isOnGroup(uint32_t groupId);
 };
 
 enum class ContactRecordField

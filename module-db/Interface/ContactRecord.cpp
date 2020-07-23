@@ -18,7 +18,6 @@ ContactRecordInterface::~ContactRecordInterface()
 
 bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
-
     bool ret = contactDB->contacts.add(ContactsTableRow{{.ID = DB_ID_NONE},
                                                         .type           = rec.contactType,
                                                         .speedDial      = rec.speeddial,
@@ -82,7 +81,9 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
                                                       .type           = rec.contactType,
                                                       .speedDial      = rec.speeddial});
-
+    for (auto group : rec.groups) {
+        contactDB->groups.addContactToGroup(contactID, group.ID);
+    }
     return ret;
 }
 
@@ -226,6 +227,11 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
         return ret;
 
     ret = contactDB->ringtones.update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
+
+    if (!ret)
+        return ret;
+
+    contactDB->groups.updateGroups(rec.ID, rec.groups);
 
     return ret;
 }
@@ -810,6 +816,46 @@ const utils::PhoneNumber &ContactNumberHolder::getNumber() const
 std::uint32_t ContactNumberHolder::getContactID() const
 {
     return row.contactID;
+}
+
+void ContactRecord::addToFavourites(bool add)
+{
+    if (add) {
+        groups.insert(ContactsDB::favouritesGroupId());
+    }
+    else {
+        groups.erase(ContactsDB::favouritesGroupId());
+    }
+}
+
+void ContactRecord::addToIce(bool add)
+{
+    if (add) {
+        groups.insert(ContactsDB::iceGroupId());
+    }
+    else {
+        groups.erase(ContactsDB::iceGroupId());
+    }
+}
+
+void ContactRecord::addToBlocked(bool add)
+{
+    if (add) {
+        groups.insert(ContactsDB::blockedGroupId());
+    }
+    else {
+        groups.erase(ContactsDB::blockedGroupId());
+    }
+}
+
+void ContactRecord::addToGroup(uint32_t groupId)
+{
+    groups.insert(groupId);
+}
+
+void ContactRecord::removeFromGroup(uint32_t groupId)
+{
+    groups.erase(groupId);
 }
 
 bool ContactRecord::isOnFavourites()
