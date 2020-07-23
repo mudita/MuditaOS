@@ -10,8 +10,7 @@ namespace sdesktop
       public:
         BackupMessage() : sys::DataMessage(MessageType::Backup)
         {}
-        ~BackupMessage()
-        {}
+        ~BackupMessage() override = default;
     };
 
     class RestoreMessage : public sys::DataMessage
@@ -19,8 +18,7 @@ namespace sdesktop
       public:
         RestoreMessage() : sys::DataMessage(MessageType::Restore)
         {}
-        ~RestoreMessage()
-        {}
+        ~RestoreMessage() override = default;
     };
 
 } // namespace sdesktop
