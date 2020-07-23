@@ -1,6 +1,6 @@
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
-#include "messages/DesktopMessages.hpp"
+#include "DesktopMessages.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
