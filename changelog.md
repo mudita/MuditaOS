@@ -18,6 +18,7 @@
 
 ### Other
 * `[gui]` Moved Icon item into general widgets folder.
+* `[backup-restore]` Add basic handling of backup and restore through JSon parser.
 
 ## [0.29.1] - 2020-07-17
 
