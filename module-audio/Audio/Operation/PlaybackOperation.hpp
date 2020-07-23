@@ -1,25 +1,11 @@
-/*
- *  @file PlaybackOperation.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 23.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_PLAYBACKOPERATION_HPP
-#define PUREPHONE_PLAYBACKOPERATION_HPP
-
-#include <memory>
-#include <optional>
-#include <functional>
-#include "bsp/audio/bsp_audio.hpp"
+#pragma once
 
 #include "Operation.hpp"
 
+#include <bsp/audio/bsp_audio.hpp>
+
 namespace audio
 {
-
     class decoder;
 
     class PlaybackOperation : public Operation
@@ -46,10 +32,8 @@ namespace audio
         Position GetPosition() override final;
 
       private:
-        std::unique_ptr<decoder> dec;
-        std::unique_ptr<bsp::AudioDevice> audioDevice;
+        std::unique_ptr<decoder> dec                  = nullptr;
+        std::unique_ptr<bsp::AudioDevice> audioDevice = nullptr;
     };
 
 } // namespace audio
-
-#endif // PUREPHONE_PLAYBACKOPERATION_HPP

@@ -78,6 +78,7 @@ namespace bsp
 
     int32_t RT1051CellularAudio::Stop()
     {
+        cpp_freertos::LockGuard lock(mutex);
 
         InStop();
         OutStop();
@@ -287,41 +288,48 @@ namespace bsp
                             UINT32_MAX,           /* Clear all bits on exit. */
                             &ulNotificationValue, /* Receives the notification value. */
                             portMAX_DELAY);       /* Block indefinitely. */
+            {
+                cpp_freertos::LockGuard lock(inst->mutex);
 
-            if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer)) {
-                auto framesFetched = inst->GetAudioCallback()(
-                    inst->inBuffer, nullptr, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-                if (framesFetched == 0) {
-                    goto cleanup;
+                if (ulNotificationValue &
+                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer)) {
+                    auto framesFetched = inst->GetAudioCallback()(
+                        inst->inBuffer, nullptr, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                    if (framesFetched == 0) {
+                        goto cleanup;
+                    }
+                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                        memset(&inst->inBuffer[framesFetched],
+                               0,
+                               RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
+                    }
                 }
-                else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                    memset(&inst->inBuffer[framesFetched],
-                           0,
-                           RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
-                }
-            }
 
-            if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateFullTransfer)) {
-                auto framesFetched =
-                    inst->GetAudioCallback()(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE],
-                                             nullptr,
-                                             RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                if (ulNotificationValue &
+                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateFullTransfer)) {
+                    auto framesFetched =
+                        inst->GetAudioCallback()(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE],
+                                                 nullptr,
+                                                 RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
-                if (framesFetched == 0) {
-                    goto cleanup;
-                }
-                else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                    memset(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
-                           0,
-                           RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
+                    if (framesFetched == 0) {
+                        goto cleanup;
+                    }
+                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                        memset(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
+                               0,
+                               RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
+                    }
                 }
             }
         }
 
-    cleanup:
+    cleanup : {
+        cpp_freertos::LockGuard lock(inst->mutex);
         inst->InStop();
         inst->inWorkerThread = nullptr;
         vTaskDelete(NULL);
+    }
     }
 
     void outCellularWorkerTask(void *pvp)
@@ -335,41 +343,47 @@ namespace bsp
                             UINT32_MAX,           /* Clear all bits on exit. */
                             &ulNotificationValue, /* Receives the notification value. */
                             portMAX_DELAY);       /* Block indefinitely. */
-
-            if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer)) {
-                auto framesFetched = inst->GetAudioCallback()(
-                    nullptr, inst->outBuffer, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-                if (framesFetched == 0) {
-                    goto cleanup;
+            {
+                cpp_freertos::LockGuard lock(inst->mutex);
+                if (ulNotificationValue &
+                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer)) {
+                    auto framesFetched = inst->GetAudioCallback()(
+                        nullptr, inst->outBuffer, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                    if (framesFetched == 0) {
+                        goto cleanup;
+                    }
+                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                        memset(&inst->outBuffer[framesFetched],
+                               0,
+                               RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
+                    }
                 }
-                else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                    memset(&inst->outBuffer[framesFetched],
-                           0,
-                           RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
-                }
-            }
 
-            if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateFullTransfer)) {
-                auto framesFetched =
-                    inst->GetAudioCallback()(nullptr,
-                                             &inst->outBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE],
-                                             RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                if (ulNotificationValue &
+                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateFullTransfer)) {
+                    auto framesFetched =
+                        inst->GetAudioCallback()(nullptr,
+                                                 &inst->outBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE],
+                                                 RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
-                if (framesFetched == 0) {
-                    goto cleanup;
-                }
-                else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                    memset(&inst->outBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
-                           0,
-                           RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
+                    if (framesFetched == 0) {
+                        goto cleanup;
+                    }
+                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                        memset(&inst->outBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
+                               0,
+                               RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
+                    }
                 }
             }
         }
 
-    cleanup:
+    cleanup : {
+        cpp_freertos::LockGuard lock(inst->mutex);
         inst->OutStop();
         inst->outWorkerThread = nullptr;
         vTaskDelete(NULL);
+    }
     }
 
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)

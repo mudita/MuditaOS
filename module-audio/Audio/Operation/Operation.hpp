@@ -37,6 +37,21 @@ namespace audio
             Router
         };
 
+        [[nodiscard]] static inline auto c_str(Type type) -> const char *
+        {
+            switch (type) {
+            case Type::Idle:
+                return "Idle";
+            case Type::Playback:
+                return "Playback";
+            case Type::Recorder:
+                return "Recorder";
+            case Type::Router:
+                return "Router ";
+            }
+            return "";
+        }
+
         enum class Event
         {
             HeadphonesPlugin,
