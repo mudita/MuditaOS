@@ -19,6 +19,7 @@
 * `[sms]` new message properly adds templates and resizes
 * `[sms]` fixed focus in new message window after message forward option
 * `[audio]` added audio workers synchronization mutexes
+* `[phonebook]` Fixed bottom bar in main phonebook window 
 
 ### Other
 
