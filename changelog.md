@@ -60,7 +60,8 @@
  * `[sms]` Delete old testing empty threads (conversations) on opening.
 
 ### Other
-* `[backup-restore]` Add backup tar archive handling (packing, unpacking). 
+ * `[backup-restore]` Add backup tar archive handling (packing, unpacking).
+ * `[factory-reset]` Add factory reset operation for restoring entire phone back to the factory state. 
  
 ## [0.27.1] - 2020-07-03
 
