@@ -214,6 +214,9 @@ extern "C"
 #define PINMUX_VIBRATOR_EN_PIN IOMUXC_GPIO_AD_B0_00_GPIO1_IO00
     void PINMUX_InitVibrator(void);
 
+#define PINMUX_TORCH_EN_PIN IOMUXC_GPIO_AD_B1_05_GPIO1_IO21
+    void PINMUX_InitTorch(void);
+
 #if defined(__cplusplus)
 }
 #endif

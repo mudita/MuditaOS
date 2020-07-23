@@ -8,7 +8,7 @@
 
 using namespace drivers;
 
-std::shared_ptr<drivers::DriverI2C> i2cDev;
+static std::shared_ptr<drivers::DriverI2C> i2c;
 static drivers::I2CAddress addr = {.deviceAddress = 0x64, .subAddressSize = 1};
 
 static xQueueHandle qHandleIrq = NULL;
@@ -21,7 +21,7 @@ namespace bsp
 
         int32_t init(xQueueHandle qHandle)
         {
-            i2cDev = DriverI2C::Create(
+            i2c = DriverI2C::Create(
                 static_cast<I2CInstances>(BoardDefinitions::MAGNETOMETER_I2C),
                 DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_I2C_BAUDRATE)});
 
@@ -33,9 +33,9 @@ namespace bsp
         {
             uint8_t buf;
             addr.subAddress = 0x00;
-            auto readed     = i2cDev->Read(addr, &buf, 1);
+            auto read       = i2c->Read(addr, &buf, 1);
 
-            if (readed != 1) {
+            if (read != 1) {
                 return false;
             }
             return true;

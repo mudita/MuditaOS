@@ -102,6 +102,11 @@ enum class BoardDefinitions{
     MAGNETOMETER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     MAGNETOMETER_IRQ = 20, // GPIO_AD_B1_04
 
+    TORCH_DRIVER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE, // can do 400 kHz
+    TORCH_DRIVER_I2C = AUDIOCODEC_I2C,
+    TORCH_DRIVER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
+    TORCH_DRIVER_EN = 21, // GPIO_AD_B1_05 Active HIGH. Internal pulldown resistor of 300kΩ between HWEN and GND.
+
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP
