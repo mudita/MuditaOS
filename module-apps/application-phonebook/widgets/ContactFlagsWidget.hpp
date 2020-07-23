@@ -17,7 +17,7 @@ namespace gui
         ContactFlagsWidget(Item *parent = nullptr);
         virtual ~ContactFlagsWidget();
         void setFavourites(bool isEnabled);
-        void setSpeedDial(bool isEnabled, unsigned char position);
+        void setSpeedDial(bool isEnabled, unsigned char position = 0);
         void setICE(bool isEnabled);
         void setBlocked(bool isBlocked);
 

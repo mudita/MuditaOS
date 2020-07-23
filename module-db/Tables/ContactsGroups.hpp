@@ -65,6 +65,7 @@ class ContactsGroupsTable : public Table<ContactsGroupsTableRow, ContactsGroupsT
     bool add(ContactsGroupsTableRow entry) override final;
     bool removeById(uint32_t id) override final;
     bool update(ContactsGroupsTableRow entry) override final;
+    void updateGroups(uint32_t contactId, std::set<ContactsGroupsTableRow> newGroups);
     ContactsGroupsTableRow getById(uint32_t id) override final;
     std::vector<ContactsGroupsTableRow> getAllRows();
     std::vector<ContactsGroupsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override;
@@ -78,6 +79,8 @@ class ContactsGroupsTable : public Table<ContactsGroupsTableRow, ContactsGroupsT
     [[nodiscard]] uint32_t favouritesId() const;
     [[nodiscard]] uint32_t iceId() const;
     [[nodiscard]] uint32_t blockedId() const;
+    /** Returns id of the grup
+     */
     uint32_t getId(const std::string &name);
 
     std::set<ContactsGroupsTableRow> getGroupsForContact(uint32_t contactId);

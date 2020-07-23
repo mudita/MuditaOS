@@ -106,6 +106,26 @@ bool ContactsGroupsTable::update(ContactsGroupsTableRow entry)
     return false;
 }
 
+void ContactsGroupsTable::updateGroups(uint32_t contactId, std::set<ContactsGroupsTableRow> newGroups)
+{
+    auto currentGroups = getGroupsForContact(contactId);
+    std::set<ContactsGroupsTableRow> groupsToRemove;
+    for (auto group : currentGroups) {
+        auto groupNode = newGroups.extract(group);
+        if (groupNode.empty()) {
+            groupsToRemove.insert(group);
+        }
+    }
+    // 1. removing from groups
+    for (auto group : groupsToRemove) {
+        removeContactFromGroup(contactId, group.ID);
+    }
+    // 2. add to new groups
+    for (auto group : newGroups) {
+        addContactToGroup(contactId, group.ID);
+    }
+}
+
 ContactsGroupsTableRow ContactsGroupsTable::getById(uint32_t id)
 {
     if (id != DB_ID_NONE) {

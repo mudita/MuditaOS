@@ -42,13 +42,13 @@ namespace gui
 
     void ContactFlagsWidget::setSpeedDial(bool isEnabled, unsigned char position)
     {
-        if (speedDialPos != position) {
-            speedDialPos = position;
-            speedDialIcon->setIconNumber(speedDialPos);
-        }
         if (speedDial != isEnabled) {
             speedDial = isEnabled;
             repositionIcons();
+        }
+        if (speedDialPos != position) {
+            speedDialPos = position;
+            speedDialIcon->setIconNumber(speedDialPos);
         }
     }
 

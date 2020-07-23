@@ -174,14 +174,15 @@ namespace gui
             return false;
         };
 
-        //        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->isOnFavourites =
-        //        tickImage->visible; }; onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
-        //        tickImage->visible = contact->isOnFavourites; };
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->addToFavourites(tickImage->visible); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            tickImage->visible = contact->isOnFavourites();
+        };
     }
     void InputBoxWithLabelAndIconItem::addToICEHandler()
     {
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_ice"));
-        iconImage->set("small_heart");
+        iconImage->set("ice");
         tickImage->set("small_tick");
 
         focusChangedCallback = [&](gui::Item & /*item*/) {
@@ -217,6 +218,8 @@ namespace gui
             }
             return false;
         };
+        onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->addToIce(tickImage->visible); };
+        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { tickImage->visible = contact->isOnIce(); };
     }
 
 } /* namespace gui */
