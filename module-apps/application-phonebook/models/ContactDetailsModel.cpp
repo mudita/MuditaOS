@@ -35,11 +35,7 @@ auto ContactDetailsModel::getItem(gui::Order order) -> gui::ListItem *
 void ContactDetailsModel::createData(bool showInformationWidget, bool showAddressWidget, bool showNoteWidget)
 {
     if (showInformationWidget) {
-        auto temp = new gui::InformationWidget(application);
-
-        temp->setMinimumSize(phonebookStyle::multiLineTextWithLabelItem::w,
-                             phonebookStyle::multiLineTextWithLabelItem::h * 3);
-        internalData.push_back(temp);
+        internalData.push_back(new gui::InformationWidget(application));
     }
 
     if (showAddressWidget) {
@@ -68,11 +64,11 @@ void ContactDetailsModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
 
     createData(isInformationDataExist(), isAddressDataExist(), isNoteDataExist());
 
-    requestRecords(0, internalData.size());
-
     for (auto item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback(contactRecord);
         }
     }
+
+    requestRecords(0, internalData.size());
 }
