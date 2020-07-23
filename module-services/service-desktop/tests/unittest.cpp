@@ -1,4 +1,5 @@
 #include "UpdatePureOS.hpp"
+#include "FactoryReset.hpp"
 
 #include <vfs.hpp>
 #include <catch2/catch.hpp>
@@ -24,4 +25,15 @@ TEST_CASE("System Update Tests")
 
     err = updateOS.prepareRoot();
     REQUIRE(err == updateos::UpdateError::NoError);
+}
+
+TEST_CASE("Factory Reset Test")
+{
+    vfs.Init();
+
+    std::string sysdir = purefs::dir::eMMC_disk;
+    sysdir += "/factory-test/sys";
+    std::string factorydir = sysdir + "/factory";
+    REQUIRE(FactoryReset::DeleteDirContent(sysdir) == true);
+    REQUIRE(FactoryReset::CopyDirContent(factorydir, sysdir) == true);
 }

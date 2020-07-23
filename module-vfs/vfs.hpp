@@ -36,6 +36,7 @@ namespace fs = std::filesystem;
 #define PATH_UPDATES  "updates"
 #define PATH_TMP      "tmp"
 #define PATH_BACKUP   "backup"
+#define PATH_FACTORY  "factory"
 
 // this just concatenates two strings and creates a /user/ subdirectory filename
 #define USER_PATH(file) PATH_SYS "/" PATH_USER "/" file
@@ -51,6 +52,7 @@ namespace purefs
         const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
         const inline fs::path tmp         = eMMC_disk / PATH_TMP;
         const inline fs::path os_backup   = eMMC_disk / PATH_BACKUP;
+        const inline fs::path os_factory  = eMMC_disk / PATH_FACTORY;
     } // namespace dir
 
     namespace file
@@ -71,6 +73,7 @@ namespace purefs
         const inline int crc_char_size = 9; // 9 ascii characters to store crc32 checksum
         const inline int crc_radix     = 16;
         const inline int tar_buf       = 8192 * 4;
+        const inline int copy_buf      = 8192 * 4;
     } // namespace buffer
 
     namespace ini
