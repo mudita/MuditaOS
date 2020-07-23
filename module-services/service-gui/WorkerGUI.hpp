@@ -38,7 +38,6 @@ namespace sgui
 
       public:
         WorkerGUI(ServiceGUI *service);
-        virtual ~WorkerGUI();
 
         /**
          * virtual method responsible for finishing the worker and handling rendering commands
