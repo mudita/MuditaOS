@@ -50,8 +50,6 @@ namespace gui
         numberText->setPenWidth(style::window::default_border_no_focus_w);
         numberText->setEditMode(EditMode::BROWSE);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-
-        this->resizeItems();
         numberText->setText(number.getFormatted());
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
@@ -63,6 +61,12 @@ namespace gui
 
             return false;
         };
+    }
+
+    bool NumberWithIconsWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    {
+        resizeItems();
+        return true;
     }
 
 } /* namespace gui */
