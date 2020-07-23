@@ -20,7 +20,7 @@ namespace app
         inline const std::string name_dialogConfirm     = "DialogConfirm";
     } // namespace window
 
-    inline const std::string ringtone_path = "sys/assets/audio/ringtone.wav"; // Should bo moved to database
+    inline const std::string ringtone_path = "assets/audio/ringtone.wav"; // Should bo moved to database
 
     class ApplicationCall : public Application
     {

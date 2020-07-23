@@ -58,6 +58,8 @@ namespace audio
             return 0.0;
         }
 
+        cpp_freertos::MutexStandard mutex;
+
       private:
         enum class RecorderEvent
         {

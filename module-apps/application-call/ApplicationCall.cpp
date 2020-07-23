@@ -24,8 +24,8 @@
 namespace app
 {
 
-    ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, app::call_stack_size),
+    ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackground)
+        : Application(name, parent, startBackground, app::call_stack_size),
           timerCall(CreateAppTimer(1000, true, [=]() { timerCallCallback(); }))
     {}
 
@@ -98,11 +98,9 @@ namespace app
             LOG_INFO("ignoring call incoming");
         }
         else {
-
-            // AudioServiceAPI::PlaybackStart(this, ringtone_path); // TODO: disabled untill
-            // https://appnroll.atlassian.net/browse/EGD-3095 is finished
+            AudioServiceAPI::PlaybackStart(this, ringtone_path);
             runCallTimer();
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->number);
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncomingCallData>(msg->number);
             // send to itself message to switch (run) call application
             callWindow->setState(gui::CallWindow::State::INCOMING_CALL);
             if (getState() == State::ACTIVE_FORGROUND) {

@@ -1,23 +1,15 @@
-/*
- *  @file PlaybackOperation.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 23.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
 #include "PlaybackOperation.hpp"
-#include "bsp/audio/bsp_audio.hpp"
+
 #include "Audio/decoder/decoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
 #include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 #include "Audio/AudioCommon.hpp"
 
-#include "log/log.hpp"
-#include "FreeRTOS.h"
-#include "task.h"
+#include <bsp/audio/bsp_audio.hpp>
+#include <log/log.hpp>
+#include <FreeRTOS.h>
+#include <task.h>
 
 namespace audio
 {
@@ -46,8 +38,10 @@ namespace audio
         };
 
         // TODO:M.P should be fetched from DB
-        availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 1.0));
-        availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 0.2));
+        constexpr float defaultLaudSpeakerVolume = 1.0;
+        constexpr float defaultHeadphonesVolume  = 0.2;
+        availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, defaultLaudSpeakerVolume));
+        availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, defaultHeadphonesVolume));
         currentProfile = availableProfiles[0].get();
 
         dec = decoder::Create(file);

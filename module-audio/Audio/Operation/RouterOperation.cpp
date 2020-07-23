@@ -296,6 +296,7 @@ namespace audio
 
     int32_t RouterOperation::StopRecording()
     {
+        cpp_freertos::LockGuard lock(mutex);
         if (recorderWorkerHandle) {
             vTaskDelete(recorderWorkerHandle);
             enc.reset();
@@ -315,49 +316,52 @@ namespace audio
                             UINT32_MAX,           /* Clear all bits on exit. */
                             &ulNotificationValue, /* Receives the notification value. */
                             portMAX_DELAY);       /* Block indefinitely. */
+            {
+                cpp_freertos::LockGuard lock(inst->mutex);
 
-            if (ulNotificationValue & static_cast<uint32_t>(RouterOperation::RecorderEvent::Channel1Ready)) {
-                chan1_ready = true;
-            }
-
-            if (ulNotificationValue & static_cast<uint32_t>(RouterOperation::RecorderEvent::Channel2Ready)) {
-                chan2_ready = true;
-            }
-
-            int16_t *chan1_ptr   = &inst->channel1Buffer[0];
-            int16_t *chan2_ptr   = &inst->channel2Buffer[0];
-            int16_t *mixed_ptr   = &inst->mixBuffer[0];
-            int32_t mixed_sample = 0;
-
-            inst->mixBuffer.resize(inst->channel1Buffer.size());
-
-            // Mix samples & encode them
-            if (chan1_ready && chan2_ready) {
-
-                for (uint32_t i = 0; i < inst->mixBuffer.size(); i++) {
-                    mixed_sample = *chan1_ptr + *chan2_ptr;
-                    if (mixed_sample > INT16_MAX) {
-                        *mixed_ptr = INT16_MAX;
-                    }
-                    else if (mixed_sample < INT16_MIN) {
-                        *mixed_ptr = INT16_MIN;
-                    }
-                    else {
-                        *mixed_ptr = (int16_t)mixed_sample;
-                    }
-
-                    mixed_ptr++;
-                    chan1_ptr++;
-                    chan2_ptr++;
+                if (ulNotificationValue & static_cast<uint32_t>(RouterOperation::RecorderEvent::Channel1Ready)) {
+                    chan1_ready = true;
                 }
 
-                size_t bytesWritten = inst->enc->Encode(inst->mixBuffer.size(), &inst->mixBuffer[0]);
-                if (bytesWritten == 0) {
-                    LOG_ERROR("Encoder failed");
+                if (ulNotificationValue & static_cast<uint32_t>(RouterOperation::RecorderEvent::Channel2Ready)) {
+                    chan2_ready = true;
                 }
 
-                chan1_ready = false;
-                chan2_ready = false;
+                int16_t *chan1_ptr   = &inst->channel1Buffer[0];
+                int16_t *chan2_ptr   = &inst->channel2Buffer[0];
+                int16_t *mixed_ptr   = &inst->mixBuffer[0];
+                int32_t mixed_sample = 0;
+
+                inst->mixBuffer.resize(inst->channel1Buffer.size());
+
+                // Mix samples & encode them
+                if (chan1_ready && chan2_ready) {
+
+                    for (uint32_t i = 0; i < inst->mixBuffer.size(); i++) {
+                        mixed_sample = *chan1_ptr + *chan2_ptr;
+                        if (mixed_sample > INT16_MAX) {
+                            *mixed_ptr = INT16_MAX;
+                        }
+                        else if (mixed_sample < INT16_MIN) {
+                            *mixed_ptr = INT16_MIN;
+                        }
+                        else {
+                            *mixed_ptr = (int16_t)mixed_sample;
+                        }
+
+                        mixed_ptr++;
+                        chan1_ptr++;
+                        chan2_ptr++;
+                    }
+
+                    size_t bytesWritten = inst->enc->Encode(inst->mixBuffer.size(), &inst->mixBuffer[0]);
+                    if (bytesWritten == 0) {
+                        LOG_ERROR("Encoder failed");
+                    }
+
+                    chan1_ready = false;
+                    chan2_ready = false;
+                }
             }
         }
     }
