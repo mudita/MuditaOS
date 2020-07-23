@@ -1,7 +1,3 @@
-//
-// Created by mati on 08.03.19.
-//
-
 #include "Message.hpp"
 #include "Service.hpp"
 #include "Bus.hpp"
@@ -37,15 +33,15 @@ namespace sys
 
         switch (sysMsgType) {
 
-        case SystemMessageType ::Ping:
+        case SystemMessageType::Ping:
             service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
             break;
 
-        case SystemMessageType ::SwitchPowerMode:
+        case SystemMessageType::SwitchPowerMode:
             service->SwitchPowerModeHandler(powerMode);
             break;
 
-        case SystemMessageType ::Exit:
+        case SystemMessageType::Exit:
             ret = service->DeinitHandler();
             service->CloseHandler();
             break;

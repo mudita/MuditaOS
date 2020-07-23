@@ -1,18 +1,9 @@
-/*
- * @file Worker.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 30 maj 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_SYS_SERVICE_WORKER_HPP_
-#define MODULE_SYS_SERVICE_WORKER_HPP_
+#pragma once
+
+#include "Service.hpp"
 
 #include <memory>
 #include <string>
-
-#include "Service.hpp"
 
 namespace sys
 {
@@ -64,7 +55,7 @@ namespace sys
 
       public:
         Worker(sys::Service *service);
-        virtual ~Worker();
+        virtual ~Worker() = default;
 
         /**
          * This function is responsible for creating all queues provided in the constructor.
@@ -73,7 +64,7 @@ namespace sys
         virtual bool init(std::list<WorkerQueueInfo> queues = std::list<WorkerQueueInfo>());
         virtual bool deinit();
         /**
-         * This method starts RTOS thread that waits for incomming queue events.
+         * This method starts RTOS thread that waits for incoming queue events.
          */
         virtual bool run();
         /**
@@ -96,5 +87,3 @@ namespace sys
     };
 
 } /* namespace sys */
-
-#endif /* MODULE_SYS_SERVICE_WORKER_HPP_ */
