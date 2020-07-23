@@ -8,6 +8,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/AllEventsWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayEventsItem.cpp"

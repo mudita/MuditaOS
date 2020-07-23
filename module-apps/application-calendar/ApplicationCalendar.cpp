@@ -3,6 +3,7 @@
 #include "windows/DayEventsWindow.hpp"
 #include "windows/CalendarEventsOptionsWindow.hpp"
 #include "windows/AllEventsWindow.hpp"
+#include "windows/EventDetailWindow.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
@@ -54,6 +55,9 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::all_events_window,
             new gui::AllEventsWindow(this, style::window::calendar::name::all_events_window)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            style::window::calendar::name::details_window,
+            new EventDetailWindow(this, style::window::calendar::name::details_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()
