@@ -8,6 +8,7 @@
 * `[calendar]` Added day window with list of events.
 * `[calendar]` main screen UI
 * `[calendar]` main screen navigation
+* `[audio]` added incoming call ringtone
 
 ### Changed
 
@@ -17,6 +18,7 @@
 
 * `[sms]` new message properly adds templates and resizes
 * `[sms]` fixed focus in new message window after message forward option
+* `[audio]` added audio workers synchronization mutexes
 
 ### Other
 
