@@ -8,6 +8,7 @@ class StateEndpointUpdate;
 class StateEndpointDeviceInfo;
 class StateEndpointBackup;
 class StateEndpointRestore;
+class StateEndpointFactory;
 class StateEndpointNetwork;
 class StateEndpointStorage;
 
@@ -50,6 +51,9 @@ class StateDecodeJson : public EndpointFsm
             break;
         case parserutils::Endpoint::restore:
             transit<StateEndpointRestore>();
+            break;
+        case parserutils::Endpoint::factory:
+            transit<StateEndpointFactory>();
             break;
         }
     };
@@ -119,6 +123,23 @@ class StateEndpointRestore : public EndpointFsm
         std::string responseStr;
         sys::ReturnCodes retCode = endpointHandler.restore(method, uuid, body, responseStr, ownerService);
         LOG_DEBUG("endpointHandler.restore retCode %d uuid %" PRIu32 "", static_cast<int>(retCode), uuid);
+
+        putToSendQueue(responseStr);
+        transit<StateDecodeJson>();
+    };
+};
+
+class StateEndpointFactory : public EndpointFsm
+{
+    void entry() override
+    {
+        LOG_DEBUG("*** entry StateEndpointFactory *** uuid:%" PRIu32 "", uuid);
+
+        EndpointHandler endpointHandler = EndpointHandler();
+
+        std::string responseStr;
+        sys::ReturnCodes retCode = endpointHandler.factory(method, uuid, body, responseStr, ownerService);
+        LOG_DEBUG("endpointHandler.factory retCode %d uuid %" PRIu32 "", static_cast<int>(retCode), uuid);
 
         putToSendQueue(responseStr);
         transit<StateDecodeJson>();
