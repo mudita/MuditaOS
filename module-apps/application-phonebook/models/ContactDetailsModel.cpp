@@ -8,9 +8,7 @@
 #include <module-apps/application-phonebook/data/PhonebookInternals.hpp>
 
 ContactDetailsModel::ContactDetailsModel(app::Application *app) : application(app)
-{
-    createData();
-}
+{}
 
 auto ContactDetailsModel::getItemCount() const -> int
 {
