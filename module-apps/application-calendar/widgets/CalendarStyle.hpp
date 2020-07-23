@@ -15,6 +15,7 @@ namespace style
                 const inline std::string events_options    = "Options";
                 const inline std::string dialog_yes_no     = "DialogYesNo";
                 const inline std::string all_events_window = "AllEventsWindow";
+                const inline std::string details_window    = "DetailsWindow";
             } // namespace name
 
             const inline int day_cell_width    = 60;
@@ -67,14 +68,15 @@ namespace style
                 const inline int label_y     = 112;
             } // namespace options
 
-            namespace deletion
+            namespace details
             {
-                const inline int label_w     = 150;
-                const inline int label_h     = 80;
-                const inline int label_y     = 420;
-                const inline int label_no_x  = 70;
-                const inline int label_yes_x = 260;
-            } // namespace deletion
+                const inline int description_y    = 225;
+                const inline int time_y           = 175;
+                const inline int repeat_heading_y = 290;
+                const inline int repeat_y         = 345;
+                const inline int remind_heading_y = 290;
+                const inline int remind_y         = 345;
+            } // namespace details
 
         }; // namespace calendar
     }      // namespace window
