@@ -1,6 +1,7 @@
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
+#include "FactoryReset.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
@@ -52,6 +53,15 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         if (restoreMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: RestoreMessage received");
             BackupRestore::RestoreUserFiles(this);
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::FactoryMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
+        if (factoryMessage != nullptr) {
+            LOG_DEBUG("ServiceDesktop: FactoryMessage received");
+            FactoryReset::Run(this);
         }
         return std::make_shared<sys::ResponseMessage>();
     });

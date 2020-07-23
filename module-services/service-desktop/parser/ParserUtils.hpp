@@ -12,7 +12,8 @@ namespace parserutils
         deviceInfo = 1,
         update,
         backup,
-        restore
+        restore,
+        factory
     };
 
     namespace message
@@ -77,5 +78,6 @@ namespace parserutils
         const inline std::string backupReady    = "backupReady";
         const inline std::string backupUpload   = "backupUpload";
         const inline std::string restoreRequest = "restoreRequest";
+        const inline std::string factoryRequest = "factoryRequest";
     } // namespace json
 };    // namespace parserutils
