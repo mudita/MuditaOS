@@ -33,6 +33,7 @@ enum class WorkerEventQueues
     queueHarness,
     queueCellular,
     queueMagnetometer,
+    queueTorch,
 };
 
 class WorkerEvent : public sys::Worker
