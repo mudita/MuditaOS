@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[calendar]` Added events options and event delete windows.
 ### Changed
 
 ### Fixed

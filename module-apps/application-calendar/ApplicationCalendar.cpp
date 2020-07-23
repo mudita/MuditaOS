@@ -1,8 +1,10 @@
 #include "ApplicationCalendar.hpp"
 #include "windows/CalendarMainWindow.hpp"
 #include "windows/DayEventsWindow.hpp"
-#include "NoEvents.hpp"
+#include "windows/CalendarEventsOptionsWindow.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "NoEvents.hpp"
+#include "Dialog.hpp"
 #include <map>
 
 namespace app
@@ -43,6 +45,11 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::no_events_window,
             new gui::NoEvents(this, style::window::calendar::name::no_events_window, gui::NoEvents::Meta())));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(style::window::calendar::name::events_options,
+                                                                new gui::CalendarEventsOptions(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            style::window::calendar::name::dialog_yes_no,
+            new gui::DialogYesNo(this, style::window::calendar::name::dialog_yes_no)));
     }
 
     void ApplicationCalendar::destroyUserInterface()

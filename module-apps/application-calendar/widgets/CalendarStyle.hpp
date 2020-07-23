@@ -12,6 +12,8 @@ namespace style
             {
                 const inline std::string day_events_window = "DayEventsWindow";
                 const inline std::string no_events_window  = "NoEventsWindow";
+                const inline std::string events_options    = "Options";
+                const inline std::string dialog_yes_no     = "DialogYesNo";
             } // namespace name
 
             const inline int day_cell_width    = 60;
