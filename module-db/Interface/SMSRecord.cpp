@@ -158,7 +158,7 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
         return false;
     }
 
-    smsDB->sms.update(SMSTableRow{{.ID = recUpdated.ID},
+    smsDB->sms.update(SMSTableRow{{.ID = recCurrent.ID},
                                   .threadID  = recCurrent.threadID,
                                   .contactID = recCurrent.contactID,
                                   .date      = recUpdated.date,
@@ -209,11 +209,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
 
     // If thread not found
     if (!threadRec.isValid()) {
-        if (smsDB->sms.removeById(id) == false) {
-            return false;
-        }
-
-        return false;
+        return smsDB->sms.removeById(id);
     }
 
     // If thread contains only one message remove it
