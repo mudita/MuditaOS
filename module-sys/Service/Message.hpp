@@ -35,7 +35,7 @@ namespace sys
         {
             Unicast,
             Multicast,
-            Broadcaast
+            Broadcast
         };
 
         enum class Type

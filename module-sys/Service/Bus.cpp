@@ -204,7 +204,7 @@ namespace sys
         msg->id = uniqueMsgId++;
         CriticalSection::Exit();
 
-        msg->transType = Message::TransmissionType ::Broadcaast;
+        msg->transType = Message::TransmissionType ::Broadcast;
         msg->sender    = source->GetName();
 
         for (auto const &w : servicesRegistered) {

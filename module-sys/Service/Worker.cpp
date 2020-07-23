@@ -1,12 +1,4 @@
-/*
- * @file Worker.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 30 maj 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#include <string.h>
+#include "Worker.hpp"
 
 extern "C"
 {
@@ -14,8 +6,7 @@ extern "C"
 #include "task.h"
 }
 
-// module-sys
-#include "Worker.hpp"
+#include <string.h>
 
 namespace sys
 {
@@ -39,9 +30,6 @@ namespace sys
     }
 
     Worker::Worker(sys::Service *service) : service{service}, serviceQueue{NULL}, queueSet{NULL}, taskHandle{NULL}
-    {}
-
-    Worker::~Worker()
     {}
 
     bool Worker::init(std::list<WorkerQueueInfo> queuesList)
@@ -120,7 +108,7 @@ namespace sys
         return true;
     };
     /**
-     * This method starts RTOS thread that waits for incomming queue events.
+     * This method starts RTOS thread that waits for incoming queue events.
      */
     bool Worker::run()
     {
@@ -147,11 +135,11 @@ namespace sys
 
         // service queue
         if (queueID == 0) {
-            WorkerCommand wcmd;
-            if (xQueueReceive(queue, &wcmd, 0) != pdTRUE) {
+            WorkerCommand workerCommand;
+            if (xQueueReceive(queue, &workerCommand, 0) != pdTRUE) {
                 return false;
             }
-            wcmd.command = 1;
+            workerCommand.command = 1;
             // place some code here to handle messages from service
         }
         return true;
@@ -160,8 +148,8 @@ namespace sys
     bool Worker::send(uint32_t cmd, uint32_t *data)
     {
         if (serviceQueue != NULL) {
-            WorkerCommand wcmd{cmd, data};
-            if (xQueueSend(serviceQueue, &wcmd, portMAX_DELAY) == pdTRUE)
+            WorkerCommand workerCommand{cmd, data};
+            if (xQueueSend(serviceQueue, &workerCommand, portMAX_DELAY) == pdTRUE)
                 return true;
         }
         return false;
