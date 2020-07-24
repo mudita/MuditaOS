@@ -82,7 +82,7 @@ namespace gui
             for (auto &rec : *records) {
                 LOG_DEBUG("RESP!!!!!!: %s", rec.title.c_str());
             }
-            return true;
+            return calendarEventsModel->updateRecords(std::move(records));
         }
         return false;
     }

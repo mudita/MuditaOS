@@ -7,10 +7,10 @@
 #include "application-calendar/models/AllEventsModel.hpp"
 #include "NoEvents.hpp"
 #include <module-services/service-db/messages/QueryMessage.hpp>
-#include <time/time_conversion.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAll.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <time/time_conversion.hpp>
 
 namespace gui
 {
@@ -104,8 +104,8 @@ namespace gui
 
                 dayMap[key]->setLabel(day.number.c_str(), [=](gui::Item &item) {
                     LOG_DEBUG("Switch to DayEventsWindow");
-                    uint32_t date_from = 2018;
-                    uint32_t date_till = 2048;
+                    uint32_t date_from = 0;
+                    uint32_t date_till = 3099999999;
                     DBServiceAPI::GetQuery(app,
                                            db::Interface::Name::Events,
                                            std::make_unique<db::query::events::GetFiltered>(date_from, date_till));

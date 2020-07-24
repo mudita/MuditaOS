@@ -4,14 +4,12 @@
 #include "module-db/queries/calendar/QueryEventsAdd.hpp"
 #include "module-db/queries/calendar/QueryEventsRemove.hpp"
 #include "module-db/queries/calendar/QueryEventsEdit.hpp"
-
-#include <log/log.hpp>
-#include <Utils.hpp>
-
-#include <cassert>
-#include <vector>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+#include <log/log.hpp>
+#include <Utils.hpp>
+#include <cassert>
+#include <vector>
 
 EventsRecord::EventsRecord(const EventsTableRow &tableRow)
     : Record{tableRow.ID}, title{tableRow.title}, description{tableRow.description}, date_from{tableRow.date_from},

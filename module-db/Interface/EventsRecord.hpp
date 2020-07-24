@@ -3,9 +3,7 @@
 #include "Common/Common.hpp"
 #include "Databases/EventsDB.hpp"
 #include "Record.hpp"
-
 #include <utf8/UTF8.hpp>
-
 #include <cstdint>
 #include <vector>
 
@@ -38,7 +36,7 @@ struct EventsRecord : public Record
     // date and time of the event reminder
     uint32_t reminder = 0;
     // repeat the event daily
-    uint32_t repeat = 0;
+    uint32_t repeat    = 0;
     uint32_t time_zone = 0;
 
     EventsRecord()  = default;
@@ -71,7 +69,6 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
                                                                      uint32_t limit,
                                                                      EventsRecordField field,
                                                                      const char *str) override final;
-
 
     std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
 

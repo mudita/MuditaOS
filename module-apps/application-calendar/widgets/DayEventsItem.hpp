@@ -3,6 +3,7 @@
 #include "application-calendar/models/DayEventsModel.hpp"
 #include <Label.hpp>
 #include <ListItem.hpp>
+#include <module-db/Interface/EventsRecord.hpp>
 
 namespace gui
 
@@ -14,10 +15,12 @@ namespace gui
         gui::Image *clock       = nullptr;
 
       public:
+        std::shared_ptr<EventsRecord> record;
         DayEventsItem();
         virtual ~DayEventsItem() override = default;
 
         // virtual methods from Item
+        void setEvent(std::shared_ptr<EventsRecord> record);
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
