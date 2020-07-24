@@ -86,9 +86,6 @@ namespace gui
         LOG_INFO("onBeforeShow");
         setFocusItem(contactsList);
 
-        contactsList->clear();
-        contactsList->setProvider(phonebookModel);
-
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         requestedSearch     = contactRequest != nullptr;
         if (requestedSearch) {

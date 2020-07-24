@@ -10,6 +10,7 @@
 #include "windows/PhonebookNamecardOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
+#include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 
 #include <service-appmgr/ApplicationManager.hpp>
 
@@ -29,6 +30,20 @@ namespace app
         if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+
+        //        if (msgl->messageType == MessageType::DBServiceNotification) {
+        //            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+        //            LOG_DEBUG("Received multicast");
+        //            if (msg != nullptr) {
+        //                // window-specific actions
+        //                for (auto &[name, window] : windows) {
+        //                    window->onDatabaseMessage(msg);
+        //                }
+        //                // app-wide actions
+        //                // <none>
+        //                return std::make_shared<sys::ResponseMessage>();
+        //            }
+        //        }
 
         // this variable defines whether message was processed.
         bool handled = false;
