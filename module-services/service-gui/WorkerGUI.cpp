@@ -28,9 +28,6 @@ namespace sgui
     WorkerGUI::WorkerGUI(ServiceGUI *service) : Worker(service)
     {}
 
-    WorkerGUI::~WorkerGUI()
-    {}
-
     bool WorkerGUI::handleMessage(uint32_t queueID)
     {
         QueueHandle_t queue = queues[queueID];

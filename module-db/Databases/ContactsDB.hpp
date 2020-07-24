@@ -1,21 +1,12 @@
-
-/*
- * @file ContactsDB.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #pragma once
 
-#include "Database/Database.hpp"
-#include "../Tables/ContactsTable.hpp"
-#include "../Tables/ContactsNameTable.hpp"
-#include "../Tables/ContactsNumberTable.hpp"
-#include "../Tables/ContactsRingtonesTable.hpp"
-#include "../Tables/ContactsAddressTable.hpp"
+#include <Database/Database.hpp>
+#include <Tables/ContactsTable.hpp>
+#include <Tables/ContactsNameTable.hpp>
+#include <Tables/ContactsNumberTable.hpp>
+#include <Tables/ContactsRingtonesTable.hpp>
+#include <Tables/ContactsAddressTable.hpp>
+#include <Tables/ContactsGroups.hpp>
 
 class ContactsDB : public Database
 {
@@ -33,7 +24,24 @@ class ContactsDB : public Database
     ContactsNumberTable number;
     ContactsRingtonesTable ringtones;
     ContactsAddressTable address;
+    ContactsGroupsTable groups;
+
+    static uint32_t favouritesGroupId()
+    {
+        return favouritesId;
+    }
+    static uint32_t iceGroupId()
+    {
+        return iceId;
+    }
+    static uint32_t blockedGroupId()
+    {
+        return blockedId;
+    }
 
   private:
     static const char *dbName;
+    static uint32_t favouritesId;
+    static uint32_t iceId;
+    static uint32_t blockedId;
 };

@@ -323,10 +323,12 @@ namespace gui
 
             pageLoaded = false;
 
-            // If starting page size smaller than last page - fill first page with last page size.
+            // If starting page size smaller than last page - fill first page from top with last page size.
             if (startIndex < currentPageSize) {
-
-                provider->requestRecords(0, currentPageSize);
+                body->setReverseOrder(false);
+                direction  = style::listview::Direction::Bottom;
+                startIndex = 0;
+                provider->requestRecords(startIndex, currentPageSize);
             }
             else {
 

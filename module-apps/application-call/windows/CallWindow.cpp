@@ -252,7 +252,7 @@ namespace gui
             assert(callData != nullptr);
             phoneNumber = callData->getPhoneNumber();
             switch (callData->getType()) {
-            case app::CallSwitchData::Type::INCOMMING_CALL: {
+            case app::CallSwitchData::Type::INCOMING_CALL: {
                 state = State::INCOMING_CALL;
             } break;
 

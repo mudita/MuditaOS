@@ -21,4 +21,11 @@ namespace sdesktop
         ~RestoreMessage() override = default;
     };
 
+    class FactoryMessage : public sys::DataMessage
+    {
+      public:
+        FactoryMessage() : sys::DataMessage(MessageType::Factory)
+        {}
+        ~FactoryMessage() override = default;
+    };
 } // namespace sdesktop

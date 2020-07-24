@@ -15,6 +15,7 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsNumberTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRingtonesTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsAddressTable_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/ContactGroups_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SettingsTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateTable_tests.cpp"

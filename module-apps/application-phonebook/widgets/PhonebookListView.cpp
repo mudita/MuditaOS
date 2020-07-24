@@ -102,7 +102,7 @@ namespace gui
 
         // Add element on top for first page purpose
         if (startIndex == 0 && direction == style::listview::Direction::Top) {
-            gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
+            auto *phonebookLabel = new gui::PhonebookItem();
             phonebookLabel->setMarkerItem(labelMark);
             body->addWidget(phonebookLabel);
         }

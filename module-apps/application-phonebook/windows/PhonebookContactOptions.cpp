@@ -67,6 +67,13 @@ namespace gui
         assert(dialog != nullptr);
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
+            if (contact->groups.find(ContactsDB::blockedGroupId()) == contact->groups.end()) {
+                contact->groups.insert(ContactsDB::blockedGroupId());
+            }
+            else {
+                contact->groups.erase(ContactsDB::blockedGroupId());
+            }
+            DBServiceAPI::ContactUpdate(this->application, *contact);
             showNotification(NotificationType::Block);
             return true;
         };

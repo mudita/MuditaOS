@@ -21,7 +21,7 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
 
     [[nodiscard]] auto getItemCount() const -> int override;
 
-    auto getMinimalItemHeight() const -> unsigned int override;
+    [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
 
     auto getItem(gui::Order order) -> gui::ListItem * override;
 

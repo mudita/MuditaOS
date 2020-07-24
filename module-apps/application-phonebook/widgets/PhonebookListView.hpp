@@ -1,9 +1,9 @@
 #pragma once
 
+#include "application-phonebook/widgets/PhonebookItem.hpp"
 #include "Application.hpp"
-#include "ListView.hpp"
-#include "../widgets/PhonebookItem.hpp"
-#include <functional>
+
+#include <ListView.hpp>
 
 namespace gui
 {

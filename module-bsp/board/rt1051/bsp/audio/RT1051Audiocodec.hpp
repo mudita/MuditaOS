@@ -22,6 +22,8 @@
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
 
+#include <mutex.hpp>
+
 namespace bsp
 {
 
@@ -49,6 +51,8 @@ namespace bsp
         int32_t OutputPathCtrl(OutputPath outputPath) override final;
         int32_t InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Format &format) override final;
+
+        cpp_freertos::MutexStandard mutex;
 
       private:
         static const uint32_t CODEC_CHANNEL_PCM_BUFFER_SIZE = 1024;

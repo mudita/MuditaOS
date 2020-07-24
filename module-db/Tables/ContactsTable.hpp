@@ -15,9 +15,6 @@ struct ContactsTableRow : public Record
     uint32_t ringID       = DB_ID_NONE;
     uint32_t addressID    = DB_ID_NONE;
     ContactType type      = ContactType::TEMPORARY;
-    bool isOnWhitelist    = false;
-    bool isOnBlacklist    = false;
-    bool isOnFavourites   = false;
     std::string speedDial = "";
     UTF8 namePrimary      = "";
     UTF8 nameAlternative  = "";
@@ -26,7 +23,6 @@ struct ContactsTableRow : public Record
 enum class ContactTableFields
 {
     SpeedDial,
-    Favourite
 };
 
 class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
@@ -48,9 +44,9 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
 
     bool BlockByID(uint32_t id, bool shouldBeBlocked);
 
-    std::vector<ContactsTableRow> Search(const std::string primaryName,
-                                         const std::string alternativeName,
-                                         const std::string number);
+    std::vector<ContactsTableRow> Search(const std::string &primaryName,
+                                         const std::string &alternativeName,
+                                         const std::string &number);
 
     std::vector<ContactsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
@@ -76,9 +72,6 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
         "ring_id          INTEGER,"
         "address_id       INTEGER,"
         "type             INTEGER,"
-        "whitelist        INTEGER,"
-        "blacklist        INTEGER,"
-        "favourites       INTEGER,"
         "speeddial        TEXT NOT NULL,"
         "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
         ");";

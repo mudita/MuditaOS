@@ -14,14 +14,11 @@ namespace app
 {
 
     ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, 8192)
-    {}
-
-    ApplicationPhonebook::~ApplicationPhonebook()
+        : Application(name, parent, startBackgound, phonebook_stack_size)
     {}
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    auto ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);
@@ -38,34 +35,38 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBQuery: {
-                if (getCurrentWindow()->onDatabaseMessage(resp))
+                if (getCurrentWindow()->onDatabaseMessage(resp)) {
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
             } break;
             default:
                 break;
             }
         }
 
-        if (handled)
+        if (handled) {
             return std::make_shared<sys::ResponseMessage>();
-        else
+        }
+        else {
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
 
     // Invoked during initialization
-    sys::ReturnCodes ApplicationPhonebook::InitHandler()
+    auto ApplicationPhonebook::InitHandler() -> sys::ReturnCodes
     {
 
         auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
+        }
 
         createUserInterface();
 
         return ret;
     }
 
-    sys::ReturnCodes ApplicationPhonebook::DeinitHandler()
+    auto ApplicationPhonebook::DeinitHandler() -> sys::ReturnCodes
     {
         return sys::ReturnCodes::Success;
     }

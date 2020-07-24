@@ -18,12 +18,8 @@ ContactRecordInterface::~ContactRecordInterface()
 
 bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
-
     bool ret = contactDB->contacts.add(ContactsTableRow{{.ID = DB_ID_NONE},
                                                         .type           = rec.contactType,
-                                                        .isOnWhitelist  = rec.isOnBlacklist,
-                                                        .isOnBlacklist  = rec.isOnBlacklist,
-                                                        .isOnFavourites = rec.isOnFavourites,
                                                         .speedDial      = rec.speeddial,
                                                         .namePrimary    = rec.primaryName});
 
@@ -37,8 +33,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     ret = contactDB->name.add(ContactsNameTableRow{{.ID = DB_ID_NONE},
                                                    .contactID       = contactID,
                                                    .namePrimary     = rec.primaryName,
-                                                   .nameAlternative = rec.alternativeName,
-                                                   .favourite       = rec.isOnFavourites});
+                                                   .nameAlternative = rec.alternativeName});
 
     if (!ret) {
         return ret;
@@ -85,11 +80,10 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
                                                       .addressID = contactAddressID,
 
                                                       .type           = rec.contactType,
-                                                      .isOnWhitelist  = rec.isOnBlacklist,
-                                                      .isOnBlacklist  = rec.isOnBlacklist,
-                                                      .isOnFavourites = rec.isOnFavourites,
                                                       .speedDial      = rec.speeddial});
-
+    for (auto group : rec.groups) {
+        contactDB->groups.addContactToGroup(contactID, group.ID);
+    }
     return ret;
 }
 
@@ -196,9 +190,6 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
                                                            .ringID          = contact.ringID,
                                                            .addressID       = contact.addressID,
                                                            .type            = rec.contactType,
-                                                           .isOnWhitelist   = rec.isOnWhitelist,
-                                                           .isOnBlacklist   = rec.isOnBlacklist,
-                                                           .isOnFavourites  = rec.isOnFavourites,
                                                            .speedDial       = rec.speeddial,
                                                            .namePrimary     = rec.primaryName,
                                                            .nameAlternative = rec.alternativeName});
@@ -209,8 +200,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     ret = contactDB->name.update(ContactsNameTableRow{{.ID = contact.nameID},
                                                       .contactID       = contact.ID,
                                                       .namePrimary     = rec.primaryName,
-                                                      .nameAlternative = rec.alternativeName,
-                                                      .favourite       = rec.isOnFavourites});
+                                                      .nameAlternative = rec.alternativeName});
 
     if (!ret)
         return ret;
@@ -238,12 +228,16 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
 
     ret = contactDB->ringtones.update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
 
+    if (!ret)
+        return ret;
+
+    contactDB->groups.updateGroups(rec.ID, rec.groups);
+
     return ret;
 }
 
 ContactRecord ContactRecordInterface::GetByID(uint32_t id)
 {
-
     ContactRecord rec = ContactRecord();
 
     auto contact = contactDB->contacts.getById(id);
@@ -279,17 +273,14 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     rec.note            = address.note;
     rec.mail            = address.mail;
     rec.assetPath       = ring.assetPath;
-    rec.isOnWhitelist   = contact.isOnWhitelist;
-    rec.isOnBlacklist   = contact.isOnBlacklist;
-    rec.isOnFavourites  = contact.isOnFavourites;
     rec.speeddial       = contact.speedDial;
+    rec.groups          = contactDB->groups.getGroupsForContact(contact.ID);
 
     return rec;
 }
 
 uint32_t ContactRecordInterface::GetCount()
 {
-
     return contactDB->contacts.count();
 }
 
@@ -340,10 +331,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                          .note            = address.note,
                                          .mail            = address.mail,
                                          .assetPath       = ring.assetPath,
-                                         .isOnWhitelist   = contact.isOnWhitelist,
-                                         .isOnBlacklist   = contact.isOnBlacklist,
-                                         .isOnFavourites  = contact.isOnFavourites,
-                                         .speeddial       = contact.speedDial});
+                                         .speeddial       = contact.speedDial,
+                                         .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
     }
 
     return records;
@@ -360,9 +349,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     case ContactRecordField ::PrimaryName: {
         auto ret = contactDB->name.getLimitOffsetByField(offset, limit, ContactNameTableFields::NamePrimary, str);
 
-        for (const auto &w : ret) {
+        for (const auto &record : ret) {
 
-            auto contact = contactDB->contacts.getById(w.contactID);
+            auto contact = contactDB->contacts.getById(record.contactID);
             if (!contact.isValid()) {
                 return records;
             }
@@ -382,28 +371,26 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{{.ID = w.ID},
-                                             .primaryName     = w.namePrimary,
-                                             .alternativeName = w.nameAlternative,
+            records->push_back(ContactRecord{{.ID = record.ID},
+                                             .primaryName     = record.namePrimary,
+                                             .alternativeName = record.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
                                              .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
-                                             .isOnWhitelist   = contact.isOnWhitelist,
-                                             .isOnBlacklist   = contact.isOnBlacklist,
-                                             .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = contact.speedDial});
+                                             .speeddial       = contact.speedDial,
+                                             .groups          = contactDB->groups.getGroupsForContact(record.ID)});
         }
     } break;
 
     case ContactRecordField::NumberUser: {
         auto ret = contactDB->number.getLimitOffsetByField(offset, limit, ContactNumberTableFields ::NumberUser, str);
 
-        for (const auto &w : ret) {
+        for (const auto &record : ret) {
 
-            auto contact = contactDB->contacts.getById(w.contactID);
+            auto contact = contactDB->contacts.getById(record.contactID);
             if (!contact.isValid()) {
                 return records;
             }
@@ -428,7 +415,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{{.ID = w.ID},
+            records->push_back(ContactRecord{{.ID = record.ID},
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -437,10 +424,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
-                                             .isOnWhitelist   = contact.isOnWhitelist,
-                                             .isOnBlacklist   = contact.isOnBlacklist,
-                                             .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = contact.speedDial
+                                             .speeddial       = contact.speedDial,
+                                             .groups          = contactDB->groups.getGroupsForContact(record.ID)
 
             });
         }
@@ -449,9 +434,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     case ContactRecordField::NumberE164: {
         auto ret = contactDB->number.getLimitOffsetByField(offset, limit, ContactNumberTableFields::NumberE164, str);
 
-        for (const auto &w : ret) {
+        for (const auto &record : ret) {
 
-            auto contact = contactDB->contacts.getById(w.contactID);
+            auto contact = contactDB->contacts.getById(record.contactID);
             if (!contact.isValid()) {
                 return records;
             }
@@ -476,19 +461,18 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{{.ID = w.ID},
-                                             .primaryName     = name.namePrimary,
-                                             .alternativeName = name.nameAlternative,
-                                             .contactType     = contact.type,
-                                             .numbers         = nrs,
-                                             .address         = address.address,
-                                             .note            = address.note,
-                                             .mail            = address.mail,
-                                             .assetPath       = ring.assetPath,
-                                             .isOnWhitelist   = contact.isOnWhitelist,
-                                             .isOnBlacklist   = contact.isOnBlacklist,
-                                             .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = contact.speedDial
+            records->push_back(ContactRecord{
+                {.ID = record.ID},
+                .primaryName     = name.namePrimary,
+                .alternativeName = name.nameAlternative,
+                .contactType     = contact.type,
+                .numbers         = nrs,
+                .address         = address.address,
+                .note            = address.note,
+                .mail            = address.mail,
+                .assetPath       = ring.assetPath,
+                .speeddial       = contact.speedDial,
+                .groups          = contactDB->groups.getGroupsForContact(record.ID),
 
             });
         }
@@ -532,10 +516,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
-                                             .isOnWhitelist   = contact.isOnWhitelist,
-                                             .isOnBlacklist   = contact.isOnBlacklist,
-                                             .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = contact.speedDial});
+                                             .speeddial       = contact.speedDial,
+                                             .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
         }
     } break;
 
@@ -578,12 +560,13 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
-                                             .isOnWhitelist   = contact.isOnWhitelist,
-                                             .isOnBlacklist   = contact.isOnBlacklist,
-                                             .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = contact.speedDial});
+                                             .speeddial       = contact.speedDial,
+                                             .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
         }
     } break;
+    case ContactRecordField::Groups: {
+        break;
+    }
     }
 
     return records;
@@ -596,9 +579,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
 
     auto ret = contactDB->name.GetByName(primaryName.c_str(), alternativeName.c_str());
 
-    for (const auto &w : ret) {
+    for (const auto &record : ret) {
 
-        auto contact = contactDB->contacts.getById(w.contactID);
+        auto contact = contactDB->contacts.getById(record.contactID);
         if (!contact.isValid()) {
             return records;
         }
@@ -618,19 +601,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
             return records;
         }
 
-        records->push_back(ContactRecord{{.ID = w.ID},
-                                         .primaryName     = w.namePrimary,
-                                         .alternativeName = w.nameAlternative,
+        records->push_back(ContactRecord{{.ID = record.ID},
+                                         .primaryName     = record.namePrimary,
+                                         .alternativeName = record.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
                                          .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
                                          .assetPath       = ring.assetPath,
-                                         .isOnWhitelist   = contact.isOnWhitelist,
-                                         .isOnBlacklist   = contact.isOnBlacklist,
-                                         .isOnFavourites  = contact.isOnFavourites,
-                                         .speeddial       = contact.speedDial});
+                                         .speeddial       = contact.speedDial,
+                                         .groups          = contactDB->groups.getGroupsForContact(record.ID)});
     }
 
     return records;
@@ -644,8 +625,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
 
     auto ret = contactDB->contacts.Search(primaryName, alternativeName, number);
 
-    for (const auto &w : ret) {
-        auto contact = contactDB->contacts.getById(w.ID);
+    for (const auto &record : ret) {
+        auto contact = contactDB->contacts.getById(record.ID);
         if (!contact.isValid()) {
             return records;
         }
@@ -665,19 +646,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
             return records;
         }
 
-        records->push_back(ContactRecord{{.ID = w.ID},
-                                         .primaryName     = w.namePrimary,
-                                         .alternativeName = w.nameAlternative,
+        records->push_back(ContactRecord{{.ID = record.ID},
+                                         .primaryName     = record.namePrimary,
+                                         .alternativeName = record.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
                                          .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
                                          .assetPath       = ring.assetPath,
-                                         .isOnWhitelist   = contact.isOnWhitelist,
-                                         .isOnBlacklist   = contact.isOnBlacklist,
-                                         .isOnFavourites  = contact.isOnFavourites,
-                                         .speeddial       = contact.speedDial});
+                                         .speeddial       = contact.speedDial,
+                                         .groups          = contactDB->groups.getGroupsForContact(record.ID)});
     }
 
     return records;
@@ -837,4 +816,64 @@ const utils::PhoneNumber &ContactNumberHolder::getNumber() const
 std::uint32_t ContactNumberHolder::getContactID() const
 {
     return row.contactID;
+}
+
+void ContactRecord::addToFavourites(bool add)
+{
+    if (add) {
+        groups.insert(ContactsDB::favouritesGroupId());
+    }
+    else {
+        groups.erase(ContactsDB::favouritesGroupId());
+    }
+}
+
+void ContactRecord::addToIce(bool add)
+{
+    if (add) {
+        groups.insert(ContactsDB::iceGroupId());
+    }
+    else {
+        groups.erase(ContactsDB::iceGroupId());
+    }
+}
+
+void ContactRecord::addToBlocked(bool add)
+{
+    if (add) {
+        groups.insert(ContactsDB::blockedGroupId());
+    }
+    else {
+        groups.erase(ContactsDB::blockedGroupId());
+    }
+}
+
+void ContactRecord::addToGroup(uint32_t groupId)
+{
+    groups.insert(groupId);
+}
+
+void ContactRecord::removeFromGroup(uint32_t groupId)
+{
+    groups.erase(groupId);
+}
+
+bool ContactRecord::isOnFavourites()
+{
+    return isOnGroup(ContactsDB::favouritesGroupId());
+}
+
+bool ContactRecord::isOnIce()
+{
+    return isOnGroup(ContactsDB::iceGroupId());
+}
+
+bool ContactRecord::isOnBlocked()
+{
+    return isOnGroup(ContactsDB::blockedGroupId());
+}
+
+bool ContactRecord::isOnGroup(uint32_t groupId)
+{
+    return groups.find(groupId) != groups.end();
 }

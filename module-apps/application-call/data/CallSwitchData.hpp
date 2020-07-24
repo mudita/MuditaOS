@@ -15,7 +15,7 @@ namespace app
         enum class Type
         {
             UNDEFINED,
-            INCOMMING_CALL,
+            INCOMING_CALL,
             EXECUTE_CALL
         };
         static const inline std::string descriptionStr = "CallSwitchData";
@@ -54,11 +54,11 @@ namespace app
         }
     };
 
-    class IncommingCallData : public CallSwitchData
+    class IncomingCallData : public CallSwitchData
     {
       public:
-        IncommingCallData(const utils::PhoneNumber::View &phoneNumber)
-            : CallSwitchData(phoneNumber, CallSwitchData::Type::INCOMMING_CALL){};
+        IncomingCallData(const utils::PhoneNumber::View &phoneNumber)
+            : CallSwitchData(phoneNumber, CallSwitchData::Type::INCOMING_CALL){};
     };
 
     class ExecuteCallData : public CallSwitchData

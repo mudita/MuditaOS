@@ -27,9 +27,10 @@ set(SOURCES
         Tables/ContactsNumberTable.cpp
         Tables/ContactsRingtonesTable.cpp
         Tables/ContactsAddressTable.cpp
+        Tables/ContactsGroups.cpp
         Tables/SettingsTable.cpp
-		Tables/AlarmsTable.cpp
-		Tables/NotesTable.cpp
+        Tables/AlarmsTable.cpp
+        Tables/NotesTable.cpp
         Tables/CalllogTable.cpp
         Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp

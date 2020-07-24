@@ -38,7 +38,7 @@ namespace gui
         this->contact = contact;
         /* alternativeName is used as Surname or Second name */
         value->setText(contact->getFormattedName(ContactRecord::NameFormatType::List));
-        markFavourite(contact.get()->isOnFavourites);
+        markFavourite(contact->isOnFavourites());
     }
 
     void PhonebookItem::setMarkerItem(UTF8 text)

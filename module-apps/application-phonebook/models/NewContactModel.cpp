@@ -8,9 +8,7 @@
 #include <time/ScopedTime.hpp>
 
 NewContactModel::NewContactModel(app::Application *app) : application(app)
-{
-    createData();
-}
+{}
 
 auto NewContactModel::getItemCount() const -> int
 {

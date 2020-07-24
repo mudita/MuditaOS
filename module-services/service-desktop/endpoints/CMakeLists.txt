@@ -15,4 +15,5 @@ target_sources(${PROJECT_NAME}
 		"Update.cpp"
 		"BackupEndpoint.cpp"
 		"RestoreEndpoint.cpp"
+		"FactoryEndpoint.cpp"
 )

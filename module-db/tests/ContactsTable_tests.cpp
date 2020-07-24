@@ -19,9 +19,6 @@ TEST_CASE("Contacts Table tests")
                                  .numbersID      = "0 1 2 3 4",
                                  .ringID         = DB_ID_NONE,
                                  .addressID      = DB_ID_NONE,
-                                 .isOnWhitelist  = true,
-                                 .isOnBlacklist  = true,
-                                 .isOnFavourites = false,
                                  .speedDial      = "666"
 
     };

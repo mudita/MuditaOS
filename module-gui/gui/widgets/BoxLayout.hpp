@@ -21,17 +21,17 @@ namespace gui
             bool noUpdate;
         };
 
-        template <Axis axis> uint32_t sizeUsed(Item *it)
+        template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Min)
         {
             uint32_t sum = 0;
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area(Area::Min).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
+                sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
             });
             return sum;
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Min)
         {
-            return (sizeUsed<axis>(it) >= it->getSize(axis)) ? 0 : it->getSize(axis) - sizeUsed<axis>(it);
+            return (sizeUsed<axis>(it, area) >= it->getSize(axis)) ? 0 : it->getSize(axis) - sizeUsed<axis>(it, area);
         };
 
         template <Axis axis> void resizeItems();

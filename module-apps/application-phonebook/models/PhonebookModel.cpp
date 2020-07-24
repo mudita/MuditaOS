@@ -2,7 +2,6 @@
 #include <module-apps/application-phonebook/windows/PhonebookContact.hpp>
 #include "ListView.hpp"
 #include "PhonebookModel.hpp"
-#include "i18/i18.hpp"
 
 #include <messages/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
@@ -58,7 +57,7 @@ auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
                   records.get()->operator[](i).ID,
                   records.get()->operator[](i).primaryName.c_str(),
                   records.get()->operator[](i).alternativeName.c_str(),
-                  records.get()->operator[](i).isOnFavourites);
+                  records.get()->operator[](i).isOnFavourites());
     }
 #endif
 

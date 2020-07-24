@@ -198,6 +198,7 @@ enum class MessageType
     UpdateOS,
     Backup,
     Restore,
+    Factory,
 
     // FOTA messages
     HttpRequest,
