@@ -106,7 +106,7 @@ namespace gui
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
         iconImage->set("small_circle");
 
-        focusChangedCallback = [&](gui::Item & /*item*/) {
+        focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
             }
@@ -116,7 +116,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](gui::Item & /*item*/, const gui::InputEvent &event) {
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
@@ -185,7 +185,7 @@ namespace gui
         iconImage->set("ice");
         tickImage->set("small_tick");
 
-        focusChangedCallback = [&](gui::Item & /*item*/) {
+        focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
                 if (tickImage->visible) {
@@ -202,7 +202,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](gui::Item & /*item*/, const gui::InputEvent &event) {
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
