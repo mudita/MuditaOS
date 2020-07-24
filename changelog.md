@@ -79,6 +79,7 @@
 * `[calendar]` Added day window with list of events.
 * `[calendar]` main screen UI
 * `[calendar]` main screen navigation
+* `[calendar]` database structure
 * `[audio]` added incoming call ringtone
 * `[phonebook]` general support for groups in DB
 * `[phonebook]` proper displaying of favorites, ice, blocked flags

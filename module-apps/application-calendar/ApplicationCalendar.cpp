@@ -59,7 +59,7 @@ namespace app
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
         auto ret = Application::InitHandler();
-        EventsRecord event(EventsTableRow{{1}, "tytfsfsful", "opsfsfis", 1910201324, 2010211536, 1, 2});
+        EventsRecord event(EventsTableRow{{1}, "tytfsfsful", "opsfsfis", 1910201424, 1910201536, 1, 2, 1});
         DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event));
         DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::GetAll>());
         createUserInterface();
