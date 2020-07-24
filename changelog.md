@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Other
+
+## [0.30.1] - 2020-07-24
+
+### Added
+
 * `[calendar]` Added no-events window in general purpose windows.
 * `[calendar]` Added day window with list of events.
 * `[calendar]` main screen UI
