@@ -26,9 +26,19 @@ namespace gui
         description->setPenWidth(0);
         description->setFont(style::window::font::medium);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+    }
 
-        description->setText(utils::localize.get("common_information"));
-        title->setText("10:00 - 11:15 AM");
+    void CalendarItem::setEvent(std::shared_ptr<EventsRecord> rec)
+    {
+        this->record = rec;
+
+        if (rec != nullptr) {
+            description->setText(this->record->title.c_str());
+            uint32_t start_time = this->record->date_from % 10000;
+            uint32_t end_time   = this->record->date_till % 10000;
+            std::string text    = std::to_string(start_time) + " - " + std::to_string(end_time);
+            title->setText(text);
+        }
     }
 
     bool DayEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

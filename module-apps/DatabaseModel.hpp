@@ -58,6 +58,7 @@ namespace app
             auto index = modelIndex;
 
             if ((index < 0) || (index >= records.size())) {
+                LOG_ERROR("Null pointer received from DB!!!!!!!!!!!!!!!!");
                 return nullptr;
             }
 
