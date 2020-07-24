@@ -6,17 +6,15 @@
 #include <cassert>
 
 BaseThreadRecordModel::BaseThreadRecordModel(app::Application *app) : DatabaseModel(app)
-{}
+{
+    requestRecordsCount();
+}
 
 void BaseThreadRecordModel::requestRecordsCount(void)
 {
     recordsCount = DBServiceAPI::ThreadGetCount(application);
-
-    if (recordsCount > 0) {
-
-        DBServiceAPI::ThreadGetLimitOffset(application, 0, style::messages::threads::pageSize);
-    }
 }
+
 bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,
                                           const uint32_t offset,
                                           const uint32_t limit,
