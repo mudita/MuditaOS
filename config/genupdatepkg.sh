@@ -1,6 +1,14 @@
 #!/bin/bash
-
+# set -eo pipefail
 # this is useless for now
+
+if [ ! -e config/common.sh ]; then
+  echo "No config/common.sh refuse to continue"
+  exit 1
+else
+  source ./config/common.sh
+fi
+
 VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{print $3}'`
 VERSION_CODENAME="salvador"
 print_help() {
@@ -50,28 +58,16 @@ if [ ! -d "$BUILD_PATH" ]; then
 	print_help
 fi
 
-if [ ! -e config/common.sh ]; then
-  echo "No config/common.sh refuse to continue"
-  exit 1
-fi
-
-source config/common.sh
-
 check_target_rt1051 "$BUILD_PATH"
-
-if [ ! -x $(which rhash) ]; then
-  echo "Please install the rhash command"
-  exit 1
-fi
-
-gittag=`git describe --tags | awk -F'-' '{print $2}'`
-version=( ${gittag//./ } )
-gitrev=`git log --pretty=format:'%h' -n 1`
-gitbranch=`git rev-parse --abbrev-ref HEAD`
 
 if [ ! -f $BUILD_PATH/boot.bin ]; then
 	echo "No boot.bin in $BUILD_PATH, refuse to continue"
 	exit 1
+fi
+
+if [ ! -x $(which rhash) ]; then
+  echo "Please install the rhash command"
+  exit 1
 fi
 
 if [ -d update ]; then
@@ -89,13 +85,13 @@ fi
 vjson=update/tmp/version.json
 cp config/version.json.template $vjson
 
-sed -i 's/__GIT_BRANCH__/'$gitbranch'/g' $vjson
-sed -i 's/__GIT_TAG__/'$gittag'/g' $vjson
-sed -i 's/__GIT_REVISION__/'$gitrev'/g' $vjson
+sed -i 's/__GIT_BRANCH__/'$PURE_OS_GIT_BRANCH'/g' $vjson
+sed -i 's/__GIT_TAG__/'$PURE_OS_GIT_TAG'/g' $vjson
+sed -i 's/__GIT_REVISION__/'$PURE_OS_GIT_REV'/g' $vjson
 
-sed -i 's/__VERSION_MAJOR__/'${version[0]}'/g' $vjson
-sed -i 's/__VERSION_MINOR__/'${version[1]}'/g' $vjson
-sed -i 's/__VERSION_PATCH__/'${version[2]}'/g' $vjson
+sed -i 's/__VERSION_MAJOR__/'$PURE_OS_VERSION_MAJOR'/g' $vjson
+sed -i 's/__VERSION_MINOR__/'$PURE_OS_VERSION_MINOR'/g' $vjson
+sed -i 's/__VERSION_PATCH__/'$PURE_OS_VERSION_PATCH'/g' $vjson
 
 BUILD_HOST=`uname -r`
 BUILD_USER=`whoami`
@@ -133,9 +129,9 @@ else
 	sed -i 's/__BOOTLOADER_INCLUDED_FILENAME__//g' $vjson
 fi
 
-rm -f update/pureos-$lasthash.tar
+rm -f update/*.tar
 curpwd=`pwd`
-vstr=${version[0]}.${version[1]}.${version[2]}-$gitrev
+vstr=$PURE_OS_VERSION_MAJOR.$PURE_OS_VERSION_MINOR.$PURE_OS_VERSION_PATCH-$PURE_OS_GIT_REV
 echo -ne "-- "
 cd update/tmp && rhash -ru checksums.txt .
 cd $curpwd
