@@ -88,6 +88,7 @@ namespace gui
     {
         bool ret = Rect::removeWidget(item);
 
+        outOfDrawAreaItems.remove(item);
         resizeItems();
 
         return ret;
@@ -97,7 +98,7 @@ namespace gui
     {
         auto ret = Item::erase(item);
 
-        outOfDrawAreaItems.clear();
+        outOfDrawAreaItems.remove(item);
         resizeItems();
 
         return ret;
@@ -240,7 +241,6 @@ namespace gui
 
     template <Axis axis> void BoxLayout::addWidget(Item *item)
     {
-        outOfDrawAreaItems.clear();
         Rect::addWidget(item);
         resizeItems<axis>();
     }

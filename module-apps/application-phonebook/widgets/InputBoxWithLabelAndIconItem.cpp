@@ -50,8 +50,7 @@ namespace gui
         setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
-    auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
-        -> bool
+    auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);
@@ -141,7 +140,7 @@ namespace gui
         iconImage->set("small_heart");
         tickImage->set("small_tick");
 
-        focusChangedCallback = [&](gui::Item & /*item*/) {
+        focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
                 if (tickImage->visible) {
@@ -158,7 +157,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](gui::Item & /*item*/, const gui::InputEvent &event) {
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
