@@ -4,9 +4,21 @@
         "ostype": "current",
         "imagename": "boot.bin"
     },
+<<<<<<< HEAD
     "bootloader":
     {
         "version":"0.0.0"
     },
     "git": {}
 }
+=======
+    "config":
+    {
+        "allow_downgrade":0
+    },
+    "bootloader":
+    {
+        "version":"0.0.0"
+    }
+}
+>>>>>>> removed sbini
