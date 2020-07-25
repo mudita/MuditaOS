@@ -222,72 +222,46 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     }
     // make sure that boot.ini points to the current version
 
-    return updateBootINI();
+    return updateBootJSON();
 }
 
-bool UpdatePureOS::iniSet(sbini_t *ini, const std::string section, const std::string name, const std::string value)
+updateos::UpdateError UpdatePureOS::updateBootJSON()
 {
-    if (sbini_set_string(ini, section.c_str(), name.c_str(), value.c_str())) {
-        LOG_ERROR("iniSet can't update internal structure %s::%s::%s", section.c_str(), name.c_str(), value.c_str());
-        sbini_free(ini);
-        return false;
-    }
-    return true;
-}
+    unsigned long bootJSONAbsoulteCRC = 0;
+    fs::path bootJSONAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_json;
+    LOG_DEBUG("updateBootJSON %s", bootJSONAbsoulte.c_str());
+    json11::Json::object jO;
+    json11::Json mainObject = json11::Json::object{{purefs::json::os_type, std::string(PATH_CURRENT)},
+                                                   {purefs::json::os_image, purefs::file::boot_bin}};
 
-updateos::UpdateError UpdatePureOS::updateBootINI()
-{
-    unsigned long bootIniAbsoulteCRC = 0;
-    fs::path bootIniAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_ini;
-    LOG_DEBUG("updateBootINI");
-    sbini_t *ini = sbini_load(bootIniAbsoulte.c_str());
+    json11::Json json = json11::Json::object{{"main", mainObject}};
 
-    if (ini == NULL) {
-        LOG_INFO("updateBootINI can't load %s", purefs::file::boot_ini.c_str());
-        ini = sbini_new();
-    }
+    jO["main"] = mainObject;
 
-    /* ini will be freed in iniSet if it fails */
-    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_type, PATH_CURRENT)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_image, purefs::file::boot_bin.c_str())) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_tag, GIT_TAG)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_revision, GIT_REV)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_branch, GIT_BRANCH)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
+    /* {PATH_CURRENT,R os_git_tag, GIT_TAG},
+       {purefs::json::os_git_revision, GIT_REV},
+       {purefs::json::os_git_branch, GIT_BRANCH}},
+      {"bootloader", {"version", "0.0.0"}},
+      {"config", {"allow_downgrade", 0}}},
+ };
+*/
+    vfs::FILE *fp = vfs.fopen(bootJSONAbsoulte.c_str(), "r");
 
-    if (sbini_save(ini, bootIniAbsoulte.c_str())) {
-        LOG_ERROR("updateBootINI can't save ini file at: %s", bootIniAbsoulte.c_str());
-        sbini_free(ini);
-        return updateos::UpdateError::CantSaveINI;
-    }
-
-    sbini_free(ini);
-
-    vfs::FILE *fp = vfs.fopen(bootIniAbsoulte.c_str(), "r");
     if (fp != nullptr) {
-        vfs.computeCRC32(fp, &bootIniAbsoulteCRC);
-        bootIniAbsoulte += purefs::extension::crc32;
+        vfs.computeCRC32(fp, &bootJSONAbsoulteCRC);
+        bootJSONAbsoulte += purefs::extension::crc32;
 
-        vfs::FILE *fpCRC = vfs.fopen(bootIniAbsoulte.c_str(), "w");
+        vfs::FILE *fpCRC = vfs.fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
             std::array<char, purefs::buffer::crc_char_size> crcBuf;
-            sprintf(crcBuf.data(), "%lX", bootIniAbsoulteCRC);
+            sprintf(crcBuf.data(), "%lX", bootJSONAbsoulteCRC);
             vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
             vfs.fclose(fpCRC);
         }
         vfs.fclose(fp);
     }
 
-    LOG_DEBUG("updateBootINI no error");
+    LOG_DEBUG("updateBootJSON no error");
     return updateos::UpdateError::NoError;
 }
 

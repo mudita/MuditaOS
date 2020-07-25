@@ -36,8 +36,8 @@ namespace updateos
         CantDeletePreviousOS,
         CantRenameCurrentToPrevious,
         CantRenameTempToCurrent,
-        CantUpdateINI,
-        CantSaveINI
+        CantUpdateJSON,
+        CantSaveJSON
     };
 
     enum class BootloaderUpdateError
@@ -71,7 +71,7 @@ class UpdatePureOS
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();
     updateos::UpdateError prepareRoot();
-    updateos::UpdateError updateBootINI();
+    updateos::UpdateError updateBootJSON();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
 
@@ -83,7 +83,6 @@ class UpdatePureOS
     const fs::path getUpdateTmpChild(const fs::path &childPath);
 
   private:
-    bool iniSet(sbini_t *ini, const std::string section, const std::string name, const std::string value);
 
     fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
