@@ -11,8 +11,8 @@ PURE_OS_GIT_TAG=""
 PURE_US_GIT_REV=""
 PURE_OS_GIT_BRANCH=""
 
-IMAGE_FILES="assets country-codes.db Luts.bin user .boot.ini .boot.ini.crc32"
-IMAGE_MOVE_TO_ROOT="user .boot.ini .boot.ini.crc32"
+IMAGE_FILES="assets country-codes.db Luts.bin user .boot.json .boot.json.crc32"
+IMAGE_MOVE_TO_ROOT="user .boot.json .boot.json.crc32"
 check_any_arch() {
     local path="${1}"
     local arch="${2}"

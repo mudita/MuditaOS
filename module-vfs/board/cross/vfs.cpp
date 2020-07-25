@@ -8,6 +8,7 @@
  */
 
 #include "../../vfs.hpp"
+#include <source/version.hpp>
 #include "ff_eMMC_user_disk.hpp"
 
 #define eMMCHIDDEN_SECTOR_COUNT 8
@@ -42,7 +43,7 @@ void vfs::Init()
 
     osRootPath = purefs::dir::eMMC_disk;
 
-    if (getOSRootFromIni()) {
+    if (getOSRootFromJSON()) {
         LOG_INFO("vfs::Init osType %s root:%s", osType.c_str(), osRootPath.c_str());
         if (ff_chdir(osRootPath.c_str()) != 0) {
             LOG_ERROR("vfs::Init can't chdir to %s", osRootPath.c_str());
@@ -67,31 +68,53 @@ void vfs::Init()
     }
 }
 
-bool vfs::getOSRootFromIni()
+std::string vfs::loadFileAsString(const fs::path &fileToLoad)
 {
-    const fs::path currentBootIni = getCurrentBootIni();
-    sbini_t *ini                  = sbini_load(currentBootIni.c_str());
-    if (!ini) {
-        LOG_ERROR("getOSRootFromIni can't load ini file %s", currentBootIni.c_str());
-        return false;
+    std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
+    FILE *fp = fopen(fileToLoad.c_str(), "r");
+    std::string contents;
+    size_t readSize;
+
+    if (fp != NULL) {
+        while (!eof(fp)) {
+            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp);
+            contents.append(static_cast<const char *>(readBuf.get()), readSize);
+        }
+
+        fclose(fp);
+    }
+
+    return contents;
+}
+
+bool vfs::getOSRootFromJSON()
+{
+    const fs::path currentBootJSON = getCurrentBootJSON();
+    std::string parseErrors        = "";
+
+    LOG_INFO("vfs::getOSRootFromJSON parsing %s", currentBootJSON.c_str());
+    bootJson = json11::Json::parse(loadFileAsString(currentBootJSON), parseErrors);
+
+    if (parseErrors == "") {
+        osType     = bootJson[purefs::json::main][purefs::json::os_type].string_value();
+        osRootPath = purefs::dir::eMMC_disk / osType;
+
+        return true;
     }
     else {
-        osType     = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
-        osRootPath = purefs::dir::eMMC_disk / osType;
-        sbini_free(ini);
-        return true;
+        LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", currentBootJSON.c_str(), parseErrors.c_str());
+
+        return false;
     }
 }
 
-const fs::path vfs::getCurrentBootIni()
+const fs::path vfs::getCurrentBootJSON()
 {
-    if (verifyCRC(purefs::file::boot_ini)) {
-        return relativeToRoot(purefs::file::boot_ini);
-    }
-    else if (verifyCRC(purefs::file::boot_ini_bak)) {
-        return relativeToRoot(purefs::file::boot_ini_bak);
+    if (verifyCRC(purefs::file::boot_json)) {
+        return relativeToRoot(purefs::file::boot_json);
     }
 
+    LOG_INFO("vfs::getCurrentBootJSON crc check failed on %s", purefs::file::boot_json.c_str());
     return "";
 }
 
