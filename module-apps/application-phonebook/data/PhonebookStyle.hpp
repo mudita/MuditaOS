@@ -129,10 +129,10 @@ namespace phonebookStyle
     namespace inputLineWithLabelItem
     {
         constexpr uint32_t w             = style::window::default_body_width;
-        constexpr uint32_t h             = 200;
+        constexpr uint32_t h             = 75;
         constexpr uint32_t title_label_h = 20;
-        constexpr uint32_t input_text_h  = 100;
-        constexpr uint32_t span_size     = 15;
+        constexpr uint32_t input_text_h  = 33;
+        constexpr uint32_t span_size     = 100;
     } // namespace inputLineWithLabelItem
 
     namespace multiLineTextWithLabelItem

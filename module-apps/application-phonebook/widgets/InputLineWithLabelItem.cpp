@@ -14,8 +14,7 @@ namespace gui
                                                    std::function<void()> selectSpecialCharacter)
         : listItemName(listItemName)
     {
-        setMinimumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
-        setMaximumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h);
+        setMinimumSize(phonebookStyle::inputLineWithLabelItem::w, phonebookStyle::inputLineWithLabelItem::h * 4);
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
@@ -27,11 +26,12 @@ namespace gui
         titleLabel->setFont(style::window::font::small);
         titleLabel->activeItem = false;
 
-        new gui::Span(vBox, Axis::Y, phonebookStyle::inputLineWithLabelItem::span_size); // spread title & inputText
+        inputText = new TextFixedSize(vBox, 0, 0, 0, 0);
+        inputText->setMaximumSize(phonebookStyle::inputLineWithLabelItem::w, 600);
+        inputText->setMargins(Margins(0, phonebookStyle::inputLineWithLabelItem::span_size, 0, 0));
 
-        inputText = new Text(vBox, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::input_text_h);
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+        inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
@@ -58,9 +58,6 @@ namespace gui
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
 
-        // this shouldn't be needed - without it there will be nothing shown in place of digit labels
-        titleLabel->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::title_label_h);
-        inputText->setSize(newDim.w, phonebookStyle::inputLineWithLabelItem::input_text_h);
         return true;
     }
 

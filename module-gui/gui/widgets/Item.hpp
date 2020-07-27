@@ -287,7 +287,7 @@ namespace gui
         {
             return (widgetArea.y);
         }
-        [[nodiscard]] uint32_t getWidth() const
+        [[nodiscard]] virtual uint32_t getWidth() const
         {
             return (widgetArea.w);
         }
