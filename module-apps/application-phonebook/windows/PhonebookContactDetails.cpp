@@ -35,12 +35,6 @@ namespace gui
 
         contactFlagsWidget = new ContactFlagsWidget(this);
         contactFlagsWidget->setVisible(true);
-        if (contact->speeddial.length()) {
-            contactFlagsWidget->setSpeedDial(true, static_cast<unsigned char>(std::stoi(contact->speeddial.c_str())));
-        }
-        else {
-            contactFlagsWidget->setSpeedDial(false, 0);
-        }
 
         bodyList = new gui::ListView(this,
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::x,
@@ -68,6 +62,13 @@ namespace gui
         }
 
         setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
+
+        if (contact->speeddial.length() != 0u) {
+            contactFlagsWidget->setSpeedDial(true, static_cast<unsigned char>(std::stoi(contact->speeddial.c_str())));
+        }
+        else {
+            contactFlagsWidget->setSpeedDial(false, 0);
+        }
 
         contactDetailsModel->loadData(contact);
     }
