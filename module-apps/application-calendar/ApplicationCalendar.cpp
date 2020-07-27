@@ -4,6 +4,8 @@
 #include "windows/CalendarEventsOptionsWindow.hpp"
 #include "windows/AllEventsWindow.hpp"
 #include "windows/EventDetailWindow.hpp"
+#include "windows/NewEditEventWindow.hpp"
+#include "windows/CustomRepeatWindow.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
@@ -76,6 +78,12 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::details_window,
             new gui::EventDetailWindow(this, style::window::calendar::name::details_window)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            style::window::calendar::name::new_edit_event,
+            new NewEditEventWindow(this, style::window::calendar::name::new_edit_event)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            style::window::calendar::name::custom_repeat_window,
+            new CustomRepeatWindow(this, style::window::calendar::name::custom_repeat_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()
