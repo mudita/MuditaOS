@@ -29,9 +29,6 @@ TEST_CASE("System Update Tests")
 
     err = updateOS.verifyChecksums();
     REQUIRE(err == updateos::UpdateError::NoError);
-
-    err = updateOS.prepareRoot();
-    REQUIRE(err == updateos::UpdateError::NoError);
 }
 
 TEST_CASE("Factory Reset Test")
