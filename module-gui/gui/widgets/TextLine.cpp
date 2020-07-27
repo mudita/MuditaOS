@@ -5,6 +5,7 @@
 #include "TextDocument.hpp"
 #include <cstdio>
 #include <RawFont.hpp>
+#include "log/log.hpp"
 
 namespace gui
 {
@@ -23,17 +24,22 @@ namespace gui
 
     /// Note - line breaking could be done here with different TextLines to return
     /// or via different block types (i.e. numeric block tyle could be not "breakable"
-    TextLine::TextLine(TextDocument *document, unsigned int start_position, unsigned int max_width)
+    TextLine::TextLine(Item *parent, TextDocument *document, unsigned int start_position, unsigned int max_width)
     {
         if (document == nullptr) {
             return;
         }
+
+        this->parent = parent;
+
         auto cursor     = document->getBlockCursor(start_position);
         auto old_cursor = cursor;
         do {
+
             if (!cursor) { // cursor is faulty
                 return;
             }
+
             // it would be better if cursor would know what to do when it jumps over blocks
             if (old_cursor.getBlockNr() != cursor.getBlockNr() &&
                 (*document)(old_cursor).getEnd() == TextBlock::End::Newline) {
@@ -46,6 +52,7 @@ namespace gui
             if (text_format->getFont() == nullptr) {
                 return;
             }
+
             auto can_show = text_format->getFont()->getCharCountInSpace(text_part.text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
@@ -58,6 +65,7 @@ namespace gui
             number_letters_shown += can_show;
             width_used += item->getTextNeedSpace();
             height_used = std::max(height_used, item->getTextHeight());
+
             elements_to_show_in_line.emplace_back(item);
 
             // not whole text shown, try again for next line if you want
@@ -109,7 +117,7 @@ namespace gui
         }
     };
 
-    void TextLine::setPosition(int32_t x, int32_t y)
+    void TextLine::setPosition(const short &x, const short &y)
     {
         auto line_x_position = x;
         for (auto &el : elements_to_show_in_line) {
@@ -125,6 +133,15 @@ namespace gui
         if (parent == nullptr) {
             return;
         }
+
+        setArea({int16_t(0), int16_t(0), uint16_t(100), uint16_t(100)});
+        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setFillColor(ColorFullBlack);
+        setFilled(true);
+        updateDrawArea();
+
+        LOG_INFO("Rozmiar i pozycja tego gówna %d, %d, %d, %d", widgetArea.x, widgetArea.y, widgetArea.w, widgetArea.h);
+
         for (auto &el : elements_to_show_in_line) {
             parent->addWidget(el);
         }

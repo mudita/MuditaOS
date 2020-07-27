@@ -7,9 +7,6 @@ namespace gui
     {
         this->linesCount = linesCount;
         setEditMode(EditMode::EDIT);
-        //
-        //        inputText->setMinimumSize(phonebookStyle::inputLineWithLabelItem::w,phonebookStyle::inputLineWithLabelItem::input_text_h);
-        //        inputText->setMaximumSize(phonebookStyle::inputLineWithLabelItem::w,phonebookStyle::inputLineWithLabelItem::input_text_h);
     }
 
     void TextFixedSize::setLines(const unsigned int val)
@@ -32,24 +29,33 @@ namespace gui
             return size;
         };
 
-        uint32_t w = sizeMinusPadding(Axis::X, Area::Max);
-        //        uint32_t h           = sizeMinusPadding(Axis::Y, Area::Max);
+        uint32_t w           = sizeMinusPadding(Axis::X, Area::Normal);
+        uint32_t h           = sizeMinusPadding(Axis::Y, Area::Normal);
         auto line_y_position = padding.top;
         auto cursor          = 0;
 
         unsigned int currentLine = 0;
+        unsigned int lineHeight  = 0;
 
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(document.get(), cursor, w);
+            auto text_line = gui::TextLine(this, document.get(), cursor, w);
             cursor += text_line.length();
 
-            if (text_line.length() == 0) {
+            if (text_line.length() == 0 && currentLine == 0) {
                 break;
             }
-            //            if (line_y_position + text_line.height() > h) { // no more space for next line
-            //                break;
-            //            }
+
+            if (text_line.height() > 0 && lineHeight != text_line.height()) {
+                lineHeight = text_line.height();
+            }
+
+            LOG_INFO("Wtf? %d", line_y_position + lineHeight);
+            LOG_INFO("wtf 2 %d", h);
+
+            if (line_y_position + lineHeight > h) { // no more space for next line
+                break;
+            }
 
             // for each different text which fits in line, addWidget last - to not trigger callbacks to parent
             // on resizes while not needed, after detach there can be no `break` othervise there will be leak - hence
@@ -58,13 +64,38 @@ namespace gui
             auto &line = lines.last();
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
-            line.alignH(getAlignment(Axis::X), w);
+            //            line.alignH(getAlignment(Axis::X), w);
 
-            line_y_position += line.height();
+            line_y_position += lineHeight;
+
+            LOG_INFO("Jaka wyskosc lini %d", text_line.height());
+            LOG_INFO("Ile mamy lini %d", currentLine);
+
+            LOG_INFO("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
+                     "%d \n x: %d, y: %d \n%s",
+                     cursor - lines.last().length(),
+                     lines.last().length(),
+                     cursor,
+                     document->getText().length(),
+                     line_x_position,
+                     line_y_position,
+                     [&]() -> std::string {
+                         std::string text = document->getText();
+                         return std::string(text.begin() + cursor - lines.last().length(), text.begin() + cursor);
+                     }()
+                                  .c_str());
+
             currentLine++;
 
-        } while (currentLine != linesCount);
+        } while (true);
 
-        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+        //        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+    }
+
+    bool TextFixedSize::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    {
+        Text::onDimensionChanged(oldDim, newDim);
+        drawLines();
+        return true;
     }
 } // namespace gui

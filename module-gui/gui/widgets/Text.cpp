@@ -296,7 +296,7 @@ namespace gui
 
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(document.get(), cursor, w);
+            auto text_line = gui::TextLine(this, document.get(), cursor, w);
             cursor += text_line.length();
 
             if (text_line.length() == 0) {

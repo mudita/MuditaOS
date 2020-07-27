@@ -9,7 +9,7 @@ namespace gui
 {
 
     /// interface element for TextDocument->getLine() <-- Text
-    class TextLine
+    class TextLine : public Rect
     {
         unsigned int number_letters_shown = 0;
         Length width_used                 = 0;
@@ -19,7 +19,7 @@ namespace gui
       public:
         /// creates TextLine with data from text from start position in `TextDocument` filling max_width
         /// @note might be better to have TextBlockIterator which could hop through TextBlock inside TextDocument
-        TextLine(TextDocument *, unsigned int start_position, unsigned int max_width);
+        TextLine(Item *parent, TextDocument *, unsigned int start_position, unsigned int max_width);
         ~TextLine();
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&);
@@ -63,11 +63,11 @@ namespace gui
             return elements_to_show_in_line.front()->area().pos(Axis::X);
         }
 
-        void setPosition(int32_t x, int32_t y);
+        void setPosition(const short &x, const short &y) override;
         void setParent(Item *parent);
-        Length getWidth() const;
-        Length getWidthTo(unsigned int pos) const;
-        void erase();
+        [[nodiscard]] Length getWidth() const override;
+        [[nodiscard]] Length getWidthTo(unsigned int pos) const;
+        void erase() override;
         /// align TextLine due to alignment axis in parent_width
         ///
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
