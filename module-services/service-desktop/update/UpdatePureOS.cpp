@@ -220,7 +220,6 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
                   vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantRenameTempToCurrent;
     }
-    // make sure that boot.ini points to the current version
 
     return updateBootJSON();
 }
@@ -230,21 +229,7 @@ updateos::UpdateError UpdatePureOS::updateBootJSON()
     unsigned long bootJSONAbsoulteCRC = 0;
     fs::path bootJSONAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_json;
     LOG_DEBUG("updateBootJSON %s", bootJSONAbsoulte.c_str());
-    json11::Json::object jO;
-    json11::Json mainObject = json11::Json::object{{purefs::json::os_type, std::string(PATH_CURRENT)},
-                                                   {purefs::json::os_image, purefs::file::boot_bin}};
 
-    json11::Json json = json11::Json::object{{"main", mainObject}};
-
-    jO["main"] = mainObject;
-
-    /* {PATH_CURRENT,R os_git_tag, GIT_TAG},
-       {purefs::json::os_git_revision, GIT_REV},
-       {purefs::json::os_git_branch, GIT_BRANCH}},
-      {"bootloader", {"version", "0.0.0"}},
-      {"config", {"allow_downgrade", 0}}},
- };
-*/
     vfs::FILE *fp = vfs.fopen(bootJSONAbsoulte.c_str(), "r");
 
     if (fp != nullptr) {
@@ -258,7 +243,14 @@ updateos::UpdateError UpdatePureOS::updateBootJSON()
             vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
             vfs.fclose(fpCRC);
         }
+        else {
+            return updateos::UpdateError::CantUpdateCRC32JSON;
+        }
+
         vfs.fclose(fp);
+    }
+    else {
+        return updateos::UpdateError::CantUpdateCRC32JSON;
     }
 
     LOG_DEBUG("updateBootJSON no error");

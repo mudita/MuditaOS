@@ -37,7 +37,8 @@ namespace updateos
         CantRenameCurrentToPrevious,
         CantRenameTempToCurrent,
         CantUpdateJSON,
-        CantSaveJSON
+        CantSaveJSON,
+        CantUpdateCRC32JSON
     };
 
     enum class BootloaderUpdateError
