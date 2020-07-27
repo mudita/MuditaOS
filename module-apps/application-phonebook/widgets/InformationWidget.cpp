@@ -22,7 +22,7 @@ namespace gui
                                0,
                                0,
                                phonebookStyle::multiLineTextWithLabelItem::w,
-                               phonebookStyle::multiLineTextWithLabelItem::h,
+                               30,
                                utils::localize.get("app_phonebook_contact_information"));
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
@@ -33,7 +33,7 @@ namespace gui
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (contact->numbers.size() > 0) {
 
-                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::multiLineTextWithLabelItem::h);
+                setMinimumHeight(widgetMinimumArea.h + 30);
 
                 primaryNumberHBox = new NumberWithIconsWidget(app,
                                                               contact->numbers[0].number,
@@ -61,7 +61,7 @@ namespace gui
 
                 emailText = new Text(nullptr, 0, 0, 0, 0);
                 emailText->setMaximumSize(phonebookStyle::multiLineTextWithLabelItem::w,
-                                          phonebookStyle::multiLineTextWithLabelItem::h);
+                                          35);
                 emailText->setFont(style::window::font::medium);
                 emailText->setPenFocusWidth(style::window::default_border_focus_w);
                 emailText->setPenWidth(style::window::default_border_no_focus_w);

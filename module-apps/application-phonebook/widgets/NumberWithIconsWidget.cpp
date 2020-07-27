@@ -22,7 +22,7 @@ namespace gui
         setPenFocusWidth(style::window::default_border_focus_w);
         setPenWidth(style::window::messages::sms_border_no_focus);
 
-        phoneImage = new ImageBox(this, 0, 0, 50, 50, new Image("phonebook_phone_ringing"));
+        phoneImage = new ImageBox(this, 0, 0, 55, 55, new Image("phonebook_phone_ringing"));
         phoneImage->setMargins(Margins(30, 0, 0, 0));
         phoneImage->inputCallback = [&](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
@@ -33,7 +33,7 @@ namespace gui
             return false;
         };
 
-        smsImage                = new ImageBox(this, 0, 0, 50, 50, new Image("mail"));
+        smsImage                = new ImageBox(this, 0, 0, 55, 55, new Image("mail"));
         smsImage->inputCallback = [&](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
                 //                return app::sms(app, app::SmsOperation::New, number);
@@ -44,7 +44,7 @@ namespace gui
         };
 
         numberText = new Text(this, 0, 0, 0, 0);
-        numberText->setMaximumSize(w, h);
+        numberText->setMaximumSize(w, 55);
         numberText->setFont(style::window::font::medium);
         numberText->setPenFocusWidth(style::window::default_border_focus_w);
         numberText->setPenWidth(style::window::default_border_no_focus_w);
