@@ -90,6 +90,7 @@
     "app_calendar_reminder_1_day_before": "1 day before",
     "app_calendar_reminder_2_days_before": "2 days before",
     "app_calendar_reminder_1_week_before": "1 week before",
+    "app_calendar_custom_repeat_title": "Custom repeat",
 
     "app_options_invalid_option": " <Invalid Option> ",
     "app_options_contact_details": "Contact details",

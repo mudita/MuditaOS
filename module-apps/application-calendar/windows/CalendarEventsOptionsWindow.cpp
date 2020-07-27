@@ -20,6 +20,7 @@ namespace gui
         std::list<gui::Option> options;
         options.emplace_back(gui::Option{utils::localize.get("app_calendar_options_edit"), [=](gui::Item &item) {
                                              LOG_INFO("Switch to edit window");
+                                             application->switchWindow(style::window::calendar::name::new_edit_event);
                                              return true;
                                          }});
         options.emplace_back(gui::Option{utils::localize.get("app_calendar_options_delete"),
