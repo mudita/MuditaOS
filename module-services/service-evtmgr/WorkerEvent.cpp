@@ -166,8 +166,6 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometer)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
 
-    bsp::torch::isPresent();
-
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);
     bsp::rtc_SetMinuteAlarm(timestamp);
@@ -180,6 +178,7 @@ bool WorkerEvent::deinit(void)
     Worker::deinit();
     bsp::keyboard_Deinit();
     bsp::battery_Deinit();
+    bsp::torch::deinit();
 
     return true;
 }

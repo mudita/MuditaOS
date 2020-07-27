@@ -17,7 +17,12 @@ namespace bsp
     {
 
         int32_t init(xQueueHandle qHandle);
+        void deinit();
 
         bool isPresent(void);
+
+        bool turn(bool state);
+        bool isOn();
+        bool setCurrent(const unsigned short mA);
     } // namespace torch
 } // namespace bsp

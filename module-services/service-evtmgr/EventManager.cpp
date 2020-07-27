@@ -201,6 +201,8 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qSIM = {"qSIM", sizeof(uint8_t), 5};
     // magnetometer queue
     sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
+    // torch driver queue
+    sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -210,6 +212,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qHarness);
     list.push_back(qSIM);
     list.push_back(qMagnetometer);
+    list.push_back(qTorch);
 
     EventWorker->init(list);
     EventWorker->run();
