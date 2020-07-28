@@ -80,13 +80,13 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    int32_t PlaybackOperation::Stop()
+    audio::RetCode PlaybackOperation::Stop()
     {
         if (state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
         state = State::Idle;
-        return audioDevice->Stop();
+        return GetDeviceError(audioDevice->Stop());
     }
 
     int32_t PlaybackOperation::Pause()
@@ -97,7 +97,7 @@ namespace audio
         }
 
         state = State::Paused;
-        return audioDevice->Stop();
+        return static_cast<int32_t>(audioDevice->Stop());
     }
 
     int32_t PlaybackOperation::Resume()

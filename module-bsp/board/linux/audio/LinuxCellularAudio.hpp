@@ -25,7 +25,7 @@ namespace bsp
 
         AudioDevice::RetCode Start(const Format &format) override final;
 
-        int32_t Stop() override final;
+        AudioDevice::RetCode Stop() override final;
 
         int32_t OutputVolumeCtrl(float vol) override final;
 

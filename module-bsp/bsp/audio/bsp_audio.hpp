@@ -99,7 +99,7 @@ namespace bsp {
 
         virtual RetCode Start(const Format &format) = 0;
 
-        virtual int32_t Stop() = 0;
+        virtual AudioDevice::RetCode Stop() = 0;
 
         virtual int32_t OutputVolumeCtrl(float vol) = 0;
 

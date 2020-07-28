@@ -39,7 +39,7 @@ namespace audio
 
         audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
 
-        int32_t Stop() override final;
+        audio::RetCode Stop() override final;
 
         int32_t Pause() override final;
 
