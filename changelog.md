@@ -6,6 +6,7 @@
 ### Added
 
 * `[calendar]` Added all events list window.
+* `[torch]` Added initial torch functionality (driver)
 
 ### Changed
 
