@@ -97,26 +97,25 @@ namespace audio
         return currentOperation->Start(asyncCallback);
     }
 
-    int32_t Audio::Stop()
+    audio::RetCode Audio::Stop()
     {
         if (currentState == State::Idle) {
-            return static_cast<int32_t>(RetCode::Success);
+            return RetCode::Success;
         }
 
-        auto retStop =
-            currentOperation != nullptr ? currentOperation->Stop() : static_cast<int32_t>(RetCode::OperationNotSet);
-        if (retStop != 0) {
-            LOG_ERROR("Operation STOP failure: %" PRIu32 " see RetCode enum for audio for more information", retStop);
+        auto retStop = currentOperation != nullptr ? currentOperation->Stop() : RetCode::OperationNotSet;
+        if (retStop != RetCode::Success) {
+            LOG_ERROR("Operation STOP failure: %s", audio::c_str(RetCode::DeviceFailure));
         }
 
         auto ret = Operation::Create(Operation::Type::Idle, "");
         if (ret) {
             currentState     = State::Idle;
             currentOperation = std::move(ret.value());
-            return static_cast<int32_t>(RetCode::Success);
+            return RetCode::Success;
         }
         else {
-            return static_cast<int32_t>(RetCode::OperationCreateFailed);
+            return RetCode::OperationCreateFailed;
         }
     }
 

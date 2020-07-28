@@ -148,10 +148,10 @@ namespace audio
         }
     }
 
-    int32_t RouterOperation::Stop()
+    audio::RetCode RouterOperation::Stop()
     {
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Idle;
@@ -159,7 +159,7 @@ namespace audio
         audioDeviceCellular->Stop();
 
         StopRecording();
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
     int32_t RouterOperation::Pause()

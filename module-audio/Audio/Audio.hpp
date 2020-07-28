@@ -58,7 +58,7 @@ namespace audio
         // Operations
         audio::RetCode Start(Operation::Type op, const char *fileName = "");
 
-        int32_t Stop();
+        audio::RetCode Stop();
 
         int32_t Pause();
 

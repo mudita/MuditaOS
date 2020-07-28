@@ -31,9 +31,9 @@ namespace audio
             return audio::RetCode::Success;
         }
 
-        int32_t Stop() override final
+        audio::RetCode Stop() override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
         int32_t Pause() override final

@@ -76,7 +76,7 @@ namespace bsp
         return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051CellularAudio::Stop()
+    AudioDevice::RetCode RT1051CellularAudio::Stop()
     {
         cpp_freertos::LockGuard lock(mutex);
 
@@ -93,7 +93,7 @@ namespace bsp
         }
 
         currentFormat = {};
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     int32_t RT1051CellularAudio::OutputVolumeCtrl(float vol)

@@ -75,7 +75,7 @@ namespace audio
 
         virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
-        virtual int32_t Stop() = 0;
+        virtual audio::RetCode Stop() = 0;
 
         virtual int32_t Pause() = 0;
 
