@@ -37,7 +37,7 @@ namespace audio
 
         ~RouterOperation();
 
-        int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
+        audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
 
         int32_t Stop() override final;
 

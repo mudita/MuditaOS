@@ -42,7 +42,7 @@ namespace bsp
         RT1051CellularAudio(AudioDevice::audioCallback_t callback);
         virtual ~RT1051CellularAudio();
 
-        int32_t Start(const Format &format) override final;
+        AudioDevice::RetCode Start(const Format &format) override final;
         int32_t Stop() override final;
         int32_t OutputVolumeCtrl(float vol) override final;
         int32_t InputGainCtrl(float gain) override final;

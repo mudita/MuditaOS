@@ -26,9 +26,9 @@ namespace audio
 
         ~IdleOperation();
 
-        int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final
+        audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
         int32_t Stop() override final

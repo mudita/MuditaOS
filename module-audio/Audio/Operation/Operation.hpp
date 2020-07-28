@@ -73,7 +73,7 @@ namespace audio
 
         static std::optional<std::unique_ptr<Operation>> Create(Type t, const char *fileName);
 
-        virtual int32_t Start(std::function<int32_t(AudioEvents event)> callback) = 0;
+        virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
         virtual int32_t Stop() = 0;
 

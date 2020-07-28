@@ -78,21 +78,22 @@ namespace audio
         isInitialized = true;
     }
 
-    int32_t RecorderOperation::Start(std::function<int32_t(AudioEvents event)> callback)
+    audio::RetCode RecorderOperation::Start(std::function<int32_t(AudioEvents event)> callback)
     {
 
         if (state == State::Paused || state == State::Active) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         eventCallback = callback;
         state         = State::Active;
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            return audioDevice->Start(currentProfile->GetAudioFormat());
+            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+            return GetDeviceError(ret);
         }
         else {
-            return static_cast<int32_t>(RetCode::InvalidFormat);
+            return RetCode::InvalidFormat;
         }
     }
 
@@ -126,7 +127,8 @@ namespace audio
         }
 
         state = State::Active;
-        return audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        return static_cast<int32_t>(GetDeviceError(ret));
     }
 
     int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)
@@ -199,5 +201,4 @@ namespace audio
     {
         return enc->getCurrentPosition();
     }
-
 } // namespace audio

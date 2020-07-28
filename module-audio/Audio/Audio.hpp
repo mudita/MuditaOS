@@ -56,7 +56,7 @@ namespace audio
         // TODO:M.P Set/Get inputGain/outputVolume for each profile
 
         // Operations
-        int32_t Start(Operation::Type op, const char *fileName = "");
+        audio::RetCode Start(Operation::Type op, const char *fileName = "");
 
         int32_t Stop();
 
