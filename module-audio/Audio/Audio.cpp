@@ -128,13 +128,12 @@ namespace audio
         return currentOperation != nullptr ? currentOperation->Pause() : RetCode::OperationNotSet;
     }
 
-    int32_t Audio::Resume()
+    audio::RetCode Audio::Resume()
     {
         if (currentState == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
-        return currentOperation != nullptr ? currentOperation->Resume()
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->Resume() : RetCode::OperationNotSet;
     }
 
 } // namespace audio
