@@ -47,7 +47,8 @@ namespace bsp
     {
 
         if (!TryOpenStream(format)) {
-            return paInternalError;
+            LOG_ERROR("PortAudio error: paInternalError");
+            return AudioDevice::RetCode::Failure;
         }
 
         auto err = Pa_StartStream(stream);
