@@ -63,7 +63,7 @@ namespace bsp
         return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxCellularAudio::Stop()
+    AudioDevice::RetCode LinuxCellularAudio::Stop()
     {
 
         if (stream) {
@@ -76,7 +76,7 @@ namespace bsp
         stream        = nullptr;
         currentFormat = {};
 
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     int LinuxCellularAudio::portAudioCallback(const void *inputBuffer,
