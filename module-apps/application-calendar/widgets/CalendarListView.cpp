@@ -6,16 +6,19 @@ namespace gui
     CalendarListView::CalendarListView(
         Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov)
         : ListView(parent, x, y, w, h, prov)
-    {}
-
-    void CalendarListView::addLabelMarker(gui::CalendarAllEventsItem *item)
     {
+        assert(prov != nullptr);
+    }
+
+    void CalendarListView::addLabelMarker(gui::AllEventsItem *item)
+    {
+        assert(item != nullptr);
         if (direction == style::listview::Direction::Bottom) {
-            if (!(labelMark == (item)->getLabelMarker())) {
+            if (!(labelMark == item->getLabelMarker())) {
 
-                labelMark = (item)->getLabelMarker();
+                labelMark = item->getLabelMarker();
 
-                gui::CalendarAllEventsItem *calendarAllEventsItem = new gui::CalendarAllEventsItem();
+                auto *calendarAllEventsItem = new gui::AllEventsItem();
                 calendarAllEventsItem->setMarkerItem(labelMark);
 
                 body->addWidget(calendarAllEventsItem);
@@ -24,15 +27,15 @@ namespace gui
         if (direction == style::listview::Direction::Top) {
 
             if (currentPageSize == 0) {
-                labelMark = (item)->getLabelMarker();
+                labelMark = item->getLabelMarker();
                 return;
             }
-            else if (!(labelMark == (item)->getLabelMarker())) {
+            else if (!(labelMark == item->getLabelMarker())) {
 
                 previousLabelMark = labelMark;
-                labelMark         = (item)->getLabelMarker();
+                labelMark         = item->getLabelMarker();
 
-                gui::CalendarAllEventsItem *calendarAllEventsItem = new gui::CalendarAllEventsItem();
+                auto *calendarAllEventsItem = new gui::AllEventsItem();
                 calendarAllEventsItem->setMarkerItem(previousLabelMark);
 
                 body->removeWidget(item);
@@ -56,13 +59,16 @@ namespace gui
 
             // if direction bot add label mark before adding item
             if (direction == style::listview::Direction::Bottom) {
-                addLabelMarker(dynamic_cast<gui::CalendarAllEventsItem *>(item));
+                auto eventItem = dynamic_cast<gui::AllEventsItem *>(item);
+                if (eventItem != nullptr) {
+                    addLabelMarker(eventItem);
+                }
             }
 
             body->addWidget(item);
 
             // if added item is not visible -> page is full.
-            if (item->visible != true) {
+            if (!item->visible) {
 
                 // if page full and direction top remove last element and add floating label mark on top if there was no
                 // one previously
@@ -76,7 +82,7 @@ namespace gui
                         body->erase(item);
                         body->erase(previousListItem);
 
-                        gui::CalendarAllEventsItem *calendarAllEventsItem = new gui::CalendarAllEventsItem();
+                        auto *calendarAllEventsItem = new gui::AllEventsItem();
 
                         calendarAllEventsItem->setMarkerItem(labelMark);
 
@@ -90,7 +96,10 @@ namespace gui
             // if direction top add label mark after adding item
             if (direction == style::listview::Direction::Top) {
                 previousItemIsLabel = false;
-                addLabelMarker(dynamic_cast<gui::CalendarAllEventsItem *>(item));
+                auto eventItem      = dynamic_cast<gui::AllEventsItem *>(item);
+                if (eventItem != nullptr) {
+                    addLabelMarker(eventItem);
+                }
             }
 
             previousListItem = item;
@@ -102,7 +111,7 @@ namespace gui
 
         // Add element on top for first page purpose
         if (startIndex == 0 && direction == style::listview::Direction::Top) {
-            gui::CalendarAllEventsItem *calendarAllEventsItem = new gui::CalendarAllEventsItem();
+            auto *calendarAllEventsItem = new gui::AllEventsItem();
             calendarAllEventsItem->setMarkerItem(labelMark);
             body->addWidget(calendarAllEventsItem);
         }

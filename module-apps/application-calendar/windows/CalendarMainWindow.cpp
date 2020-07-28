@@ -3,8 +3,8 @@
 #include "application-calendar/models/DayModel.hpp"
 #include "application-calendar/models/MonthModel.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/models/CalendarEventsModel.hpp"
-#include "application-calendar/models/CalendarAllEventsModel.hpp"
+#include "application-calendar/models/DayEventsModel.hpp"
+#include "application-calendar/models/AllEventsModel.hpp"
 #include "NoEvents.hpp"
 #include <time/time_conversion.hpp>
 
@@ -434,9 +434,8 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            std::shared_ptr<CalendarEventsModel> calendarEventsModel =
-                std::make_shared<CalendarEventsModel>(this->application);
-            if (calendarEventsModel->getItemCount() == 0) {
+            std::shared_ptr<DayEventsModel> dayEventsModel = std::make_shared<DayEventsModel>(this->application);
+            if (dayEventsModel->getItemCount() == 0) {
                 switchToNoEventsWindow();
             }
             else {
@@ -447,9 +446,8 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
-            std::shared_ptr<CalendarAllEventsModel> calendarAllEventsModel =
-                std::make_shared<CalendarAllEventsModel>(this->application);
-            if (calendarAllEventsModel->getItemCount() == 0) {
+            std::shared_ptr<AllEventsModel> allEventsModel = std::make_shared<AllEventsModel>(this->application);
+            if (allEventsModel->getItemCount() == 0) {
                 switchToNoEventsWindow();
             }
             else {
