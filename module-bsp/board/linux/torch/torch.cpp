@@ -12,13 +12,13 @@ namespace bsp
 
     namespace torch
     {
-        bool state_simulated = false;
+        State state_simulated = State::off;
 
         int32_t init(xQueueHandle qHandle)
         {
 
             qHandleIrq      = qHandle;
-            state_simulated = false;
+            state_simulated = State::off;
             return 1;
         }
 
@@ -32,17 +32,22 @@ namespace bsp
             return true;
         }
 
-        bool turn(bool state)
+        bool turn(State state)
         {
             state_simulated = state;
-            LOG_INFO("Torch is %s", (state == true) ? "ON \U0001f4a1 \U0001f526" : "OFF");
+            LOG_INFO("Torch is %s", (state == State::on) ? "ON \U0001f4a1 \U0001f526" : "OFF");
             return true;
         }
 
-        bool isOn()
+        std::pair<bool, State> getState()
         {
-            return state_simulated;
+            return std::make_pair(true, state_simulated);
         }
+
+        bool toggle()
+        {
+            return turn(getState().second == State::off ? State::on : State::off);
+        };
 
         bool setCurrent(const unsigned short mA)
         {

@@ -43,7 +43,7 @@ namespace bsp
             vTaskDelay(pdMS_TO_TICKS(5));
 
             if (isPresent()) {
-                turn(false);
+                turn(State::off);
                 setCurrent(max_current_mA);
                 return kStatus_Success;
             }
@@ -53,7 +53,7 @@ namespace bsp
         void deinit()
         {
             qHandleIrq = NULL;
-            turn(false);
+            turn(State::off);
         }
 
         bool isPresent(void)
@@ -88,13 +88,13 @@ namespace bsp
             }
             return true;
         };
-        bool turn(bool state)
+        bool turn(State state)
         {
             addr.subAddress = AL3644TT_ENABLE_REG;
             al3644tt_enable_reg en_reg{
-                .led1_en       = static_cast<uint8_t>(state == true ? AL3644TT_LED_ENABLED : AL3644TT_LED_DISABLED),
-                .led2_en       = AL3644TT_LED_DISABLED,
-                .mode          = 0b10,
+                .led1_en = static_cast<uint8_t>(state == State::on ? AL3644TT_LED_ENABLED : AL3644TT_LED_DISABLED),
+                .led2_en = AL3644TT_LED_DISABLED,
+                .mode    = 0b10,
                 .torch_temp_en = 0,
                 .strobe_en     = 0,
                 .strobe_type   = 0,
@@ -106,16 +106,26 @@ namespace bsp
             }
             return true;
         }
-        bool isOn()
+        std::pair<bool, State> getState()
         {
             addr.subAddress = AL3644TT_ENABLE_REG;
             al3644tt_enable_reg en_reg;
             auto read = i2c->Read(addr, (uint8_t *)(&en_reg), 1);
             if (read != 1) {
-                return false;
+                return std::make_pair(false, State::off); // invalid
             }
-            return en_reg.led1_en == AL3644TT_LED_ENABLED;
+            return std::make_pair(true, en_reg.led1_en == AL3644TT_LED_ENABLED ? State::on : State::off);
         }
 
+        bool toggle()
+        {
+            auto [success, state] = getState();
+            if (success == false) {
+                return false;
+            }
+            else {
+                return turn(state == State::off ? State::on : State::off);
+            }
+        }
     } // namespace torch
 } // namespace bsp

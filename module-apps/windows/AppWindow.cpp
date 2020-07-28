@@ -143,6 +143,10 @@ namespace gui
             application->returnToPreviousWindow();
             return true;
         }
+        case KeyCode::KEY_TORCH: {
+            application->toggleTorch();
+            return true;
+        }
         default:
             break;
         }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <module-bsp/bsp/torch/torch.hpp>
 #include "Message.hpp"
 
 namespace sevm
