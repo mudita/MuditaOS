@@ -120,10 +120,10 @@ namespace audio
         return static_cast<int32_t>(RetCode::Success);
     }
 
-    int32_t RouterOperation::Start(std::function<int32_t(audio::AudioEvents)> callback)
+    audio::RetCode RouterOperation::Start(std::function<int32_t(audio::AudioEvents)> callback)
     {
         if (state == State::Paused || state == State::Active) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         eventCallback = callback;
@@ -131,19 +131,20 @@ namespace audio
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
             auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-            if (ret != 0) {
-                LOG_ERROR("Start error: %u", static_cast<unsigned int>(ret));
+            if (ret != bsp::AudioDevice::RetCode::Success) {
+                LOG_ERROR("Start error: %s", audio::c_str(audio::RetCode::DeviceFailure));
             }
         }
         else {
-            return static_cast<int32_t>(RetCode::InvalidFormat);
+            return RetCode::InvalidFormat;
         }
 
         if (audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            return audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+            auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+            return GetDeviceError(ret);
         }
         else {
-            return static_cast<int32_t>(RetCode::InvalidFormat);
+            return RetCode::InvalidFormat;
         }
     }
 

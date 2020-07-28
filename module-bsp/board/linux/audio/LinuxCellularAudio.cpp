@@ -45,7 +45,7 @@ namespace bsp
         }
     }
 
-    int32_t LinuxCellularAudio::Start(const bsp::AudioDevice::Format &format)
+    AudioDevice::RetCode LinuxCellularAudio::Start(const bsp::AudioDevice::Format &format)
     {
 
         if (!TryOpenStream(format)) {
@@ -55,12 +55,12 @@ namespace bsp
         auto err = Pa_StartStream(stream);
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
-            return err;
+            return AudioDevice::RetCode::Failure;
         }
 
         currentFormat = format;
 
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     int32_t LinuxCellularAudio::Stop()

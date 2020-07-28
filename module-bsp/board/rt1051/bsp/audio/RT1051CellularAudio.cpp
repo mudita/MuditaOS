@@ -37,7 +37,7 @@ namespace bsp
         Deinit();
     }
 
-    int32_t RT1051CellularAudio::Start(const bsp::AudioDevice::Format &format)
+    AudioDevice::RetCode RT1051CellularAudio::Start(const bsp::AudioDevice::Format &format)
     {
 
         Init();
@@ -73,7 +73,7 @@ namespace bsp
         // Store format passed
         currentFormat = format;
 
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     int32_t RT1051CellularAudio::Stop()
