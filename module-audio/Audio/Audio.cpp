@@ -119,13 +119,13 @@ namespace audio
         }
     }
 
-    int32_t Audio::Pause()
+    audio::RetCode Audio::Pause()
     {
         if (currentState == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
-        return currentOperation != nullptr ? currentOperation->Pause() : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->Pause() : RetCode::OperationNotSet;
     }
 
     int32_t Audio::Resume()

@@ -41,7 +41,7 @@ namespace audio
 
         audio::RetCode Stop() override final;
 
-        int32_t Pause() override final;
+        audio::RetCode Pause() override final;
 
         int32_t Resume() override final;
 

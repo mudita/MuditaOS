@@ -108,15 +108,15 @@ namespace audio
         return GetDeviceError(audioDevice->Stop());
     }
 
-    int32_t RecorderOperation::Pause()
+    audio::RetCode RecorderOperation::Pause()
     {
 
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Paused;
-        return static_cast<int32_t>(audioDevice->Stop());
+        return GetDeviceError(audioDevice->Stop());
     }
 
     int32_t RecorderOperation::Resume()
