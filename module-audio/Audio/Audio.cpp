@@ -38,7 +38,7 @@ namespace audio
                                            : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
-    int32_t Audio::SetOutputVolume(Volume vol)
+    audio::RetCode Audio::SetOutputVolume(Volume vol)
     {
         auto volToSet = vol;
         if (vol > 1) {
@@ -48,11 +48,10 @@ namespace audio
             volToSet = 0;
         }
 
-        return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet)
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet) : RetCode::OperationNotSet;
     }
 
-    int32_t Audio::SetInputGain(Gain gain)
+    audio::RetCode Audio::SetInputGain(Gain gain)
     {
         auto gainToSet = gain;
         if (gain > 10) {
@@ -61,8 +60,7 @@ namespace audio
         if (gain < 0) {
             gainToSet = 0;
         }
-        return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet)
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet) : RetCode::OperationNotSet;
     }
 
     audio::RetCode Audio::Start(Operation::Type op, const char *fileName)

@@ -96,28 +96,28 @@ namespace bsp
         return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051CellularAudio::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode RT1051CellularAudio::OutputVolumeCtrl(float vol)
     {
         currentFormat.outputVolume = vol;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051CellularAudio::InputGainCtrl(float gain)
+    AudioDevice::RetCode RT1051CellularAudio::InputGainCtrl(float gain)
     {
         currentFormat.inputGain = gain;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051CellularAudio::InputPathCtrl(InputPath inputPath)
+    AudioDevice::RetCode RT1051CellularAudio::InputPathCtrl(InputPath inputPath)
     {
         currentFormat.inputPath = inputPath;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051CellularAudio::OutputPathCtrl(OutputPath outputPath)
+    AudioDevice::RetCode RT1051CellularAudio::OutputPathCtrl(OutputPath outputPath)
     {
         currentFormat.outputPath = outputPath;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     bool RT1051CellularAudio::IsFormatSupported(const bsp::AudioDevice::Format &format)

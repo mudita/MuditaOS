@@ -106,18 +106,18 @@ namespace audio
         StopRecording();
     }
 
-    int32_t RouterOperation::SetOutputVolume(float vol)
+    audio::RetCode RouterOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        audioDevice->OutputVolumeCtrl(vol);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        return GetDeviceError(ret);
     }
 
-    int32_t RouterOperation::SetInputGain(float gain)
+    audio::RetCode RouterOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        audioDevice->InputGainCtrl(gain);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->InputGainCtrl(gain);
+        return GetDeviceError(ret);
     }
 
     audio::RetCode RouterOperation::Start(std::function<int32_t(audio::AudioEvents)> callback)

@@ -111,18 +111,18 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    int32_t PlaybackOperation::SetOutputVolume(float vol)
+    audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        audioDevice->OutputVolumeCtrl(vol);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        return GetDeviceError(ret);
     }
 
-    int32_t PlaybackOperation::SetInputGain(float gain)
+    audio::RetCode PlaybackOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        audioDevice->InputGainCtrl(gain);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->InputGainCtrl(gain);
+        return GetDeviceError(ret);
     }
 
     Position PlaybackOperation::GetPosition()

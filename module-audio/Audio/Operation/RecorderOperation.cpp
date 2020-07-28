@@ -183,18 +183,18 @@ namespace audio
         return 0;
     }
 
-    int32_t RecorderOperation::SetOutputVolume(float vol)
+    audio::RetCode RecorderOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        audioDevice->OutputVolumeCtrl(vol);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        return GetDeviceError(ret);
     }
 
-    int32_t RecorderOperation::SetInputGain(float gain)
+    audio::RetCode RecorderOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        audioDevice->InputGainCtrl(gain);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->InputGainCtrl(gain);
+        return GetDeviceError(ret);
     }
 
     Position RecorderOperation::GetPosition()
