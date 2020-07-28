@@ -119,16 +119,16 @@ namespace audio
         return GetDeviceError(audioDevice->Stop());
     }
 
-    int32_t RecorderOperation::Resume()
+    audio::RetCode RecorderOperation::Resume()
     {
 
         if (state == State::Active || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Active;
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-        return static_cast<int32_t>(GetDeviceError(ret));
+        return GetDeviceError(ret);
     }
 
     int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)

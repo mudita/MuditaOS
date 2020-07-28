@@ -174,16 +174,16 @@ namespace audio
         return RetCode::Success;
     }
 
-    int32_t RouterOperation::Resume()
+    audio::RetCode RouterOperation::Resume()
     {
         if (state == State::Active || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Active;
         audioDevice->Start(currentProfile->GetAudioFormat());
         audioDeviceCellular->Start(currentProfile->GetAudioFormat());
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
     int32_t RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
