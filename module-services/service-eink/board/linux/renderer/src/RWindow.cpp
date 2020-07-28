@@ -21,22 +21,14 @@ static gboolean viewUpdate(gpointer data)
 
 void RWindow::keyMapInit(void)
 {
-    keyMap.insert(std::pair<int8_t, uint32_t>('q', static_cast<uint32_t>(bsp::KeyCodes::FnLeft)));
     keyMap.insert(std::pair<int8_t, uint32_t>('w', static_cast<uint32_t>(bsp::KeyCodes::JoystickUp)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('e', static_cast<uint32_t>(bsp::KeyCodes::FnRight)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('r', static_cast<uint32_t>(bsp::KeyCodes::VolUp)));
-
+    keyMap.insert(std::pair<int8_t, uint32_t>('x', static_cast<uint32_t>(bsp::KeyCodes::JoystickDown)));
     keyMap.insert(std::pair<int8_t, uint32_t>('a', static_cast<uint32_t>(bsp::KeyCodes::JoystickLeft)));
     keyMap.insert(std::pair<int8_t, uint32_t>('s', static_cast<uint32_t>(bsp::KeyCodes::JoystickEnter)));
     keyMap.insert(std::pair<int8_t, uint32_t>('d', static_cast<uint32_t>(bsp::KeyCodes::JoystickRight)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('f', static_cast<uint32_t>(bsp::KeyCodes::VolDown)));
 
-    keyMap.insert(std::pair<int8_t, uint32_t>('z', static_cast<uint32_t>(bsp::KeyCodes::NumericKeyAst)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('x', static_cast<uint32_t>(bsp::KeyCodes::JoystickDown)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('c', static_cast<uint32_t>(bsp::KeyCodes::NumericKeyPnd)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('v', static_cast<uint32_t>(bsp::KeyCodes::SSwitchDown)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('b', static_cast<uint32_t>(bsp::KeyCodes::SSwitchMid)));
-    keyMap.insert(std::pair<int8_t, uint32_t>('n', static_cast<uint32_t>(bsp::KeyCodes::SSwitchUp)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('q', static_cast<uint32_t>(bsp::KeyCodes::FnLeft)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('e', static_cast<uint32_t>(bsp::KeyCodes::FnRight)));
 
     keyMap.insert(std::pair<int8_t, uint32_t>('0', static_cast<uint32_t>(bsp::KeyCodes::NumericKey0)));
     keyMap.insert(std::pair<int8_t, uint32_t>('1', static_cast<uint32_t>(bsp::KeyCodes::NumericKey1)));
@@ -48,6 +40,18 @@ void RWindow::keyMapInit(void)
     keyMap.insert(std::pair<int8_t, uint32_t>('7', static_cast<uint32_t>(bsp::KeyCodes::NumericKey7)));
     keyMap.insert(std::pair<int8_t, uint32_t>('8', static_cast<uint32_t>(bsp::KeyCodes::NumericKey8)));
     keyMap.insert(std::pair<int8_t, uint32_t>('9', static_cast<uint32_t>(bsp::KeyCodes::NumericKey9)));
+
+    keyMap.insert(std::pair<int8_t, uint32_t>('z', static_cast<uint32_t>(bsp::KeyCodes::NumericKeyAst)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('c', static_cast<uint32_t>(bsp::KeyCodes::NumericKeyPnd)));
+
+    keyMap.insert(std::pair<int8_t, uint32_t>('r', static_cast<uint32_t>(bsp::KeyCodes::VolUp)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('f', static_cast<uint32_t>(bsp::KeyCodes::VolDown)));
+
+    keyMap.insert(std::pair<int8_t, uint32_t>('t', static_cast<uint32_t>(bsp::KeyCodes::Torch)));
+
+    keyMap.insert(std::pair<int8_t, uint32_t>('v', static_cast<uint32_t>(bsp::KeyCodes::SSwitchDown)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('b', static_cast<uint32_t>(bsp::KeyCodes::SSwitchMid)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('n', static_cast<uint32_t>(bsp::KeyCodes::SSwitchUp)));
 
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>('[', 1));
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>(']', 2));

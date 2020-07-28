@@ -9,9 +9,8 @@
 
 
 ### Functional buttons <a name="Functional buttons"></a>
-|Volume up |  key [ R ] |
-
-- Voulme down 		- key [ F ]
+- Volume up         - key [ R ] 
+- Volume down 		- key [ F ]
 - Functional left 	- key [ Q ]
 - Functional right 	- key [ E ]
 - Joystick up 		- key [ W ]
@@ -22,6 +21,7 @@
 - Slider up			- key [ V ]
 - Slider mid		- key [ B ]
 - Slider down 		- key [ N ]
+- Torch button 		- key [ T ]
 ### Numeric buttons <a name="Numeric buttons"></a>
 - Numeric 0		- key [ 0 ]
 - Numeric 1		- key [ 1 ]
@@ -35,7 +35,7 @@
 - Numeric 9		- key [ 9 ]
 - Numeric Ast		- key [ Z ]
 - Numeric Pnd		- key [ C ]
-### Battery buttons <a name="Battery buttons"></a>
+### Battery "buttons" <a name="Battery buttons"></a>
  - Connect/disconnect wall adapter		- key [ P ]
  - Decrease battery level		- key [ [ ]
  - Increase battery level		- key [ ] ]

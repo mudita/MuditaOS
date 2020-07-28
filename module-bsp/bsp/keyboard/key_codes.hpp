@@ -28,6 +28,7 @@ namespace bsp {
 
         VolUp = 4,
         VolDown = 14,
+
         Torch = 24,
 
         SSwitchUp = 34,
