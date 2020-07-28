@@ -84,23 +84,22 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
         switch (msg->type) {
         case MessageType::AudioPlaybackStart: {
-            responseMsg = std::make_shared<AudioResponseMessage>(
-                static_cast<RetCode>(audio.Start(Operation::Type::Playback, msg->fileName.c_str())));
+            responseMsg =
+                std::make_shared<AudioResponseMessage>(audio.Start(Operation::Type::Playback, msg->fileName.c_str()));
         } break;
 
         case MessageType::AudioRecorderStart: {
-            responseMsg = std::make_shared<AudioResponseMessage>(
-                static_cast<RetCode>(audio.Start(Operation::Type::Recorder, msg->fileName.c_str())));
+            responseMsg =
+                std::make_shared<AudioResponseMessage>(audio.Start(Operation::Type::Recorder, msg->fileName.c_str()));
         } break;
 
         case MessageType::AudioRoutingStart: {
             LOG_DEBUG("AudioRoutingStart");
-            responseMsg =
-                std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Start(Operation::Type::Router)));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.Start(Operation::Type::Router));
         } break;
 
         case MessageType::AudioStop: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Stop()));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.Stop());
 
             // Send notification that audio file was stopped
             auto msg = std::make_shared<AudioNotificationMessage>(
@@ -109,11 +108,11 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         } break;
 
         case MessageType::AudioPause: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Pause()));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.Pause());
         } break;
 
         case MessageType::AudioResume: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Resume()));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.Resume());
         } break;
 
         case MessageType::AudioGetFileTags: {
@@ -127,26 +126,26 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         } break;
 
         case MessageType::AudioRoutingRecordCtrl: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SendEvent(
-                msg->enable ? Operation::Event::StartCallRecording : Operation::Event::StopCallRecording)));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.SendEvent(
+                msg->enable ? Operation::Event::StartCallRecording : Operation::Event::StopCallRecording));
         } break;
 
         case MessageType::AudioRoutingMute: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(
-                audio.SendEvent(msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute)));
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                audio.SendEvent(msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute));
         } break;
 
         case MessageType::AudioRoutingSpeakerhone: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SendEvent(
-                msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff)));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.SendEvent(
+                msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff));
         } break;
 
         case MessageType::AudioSetOutputVolume: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetOutputVolume(msg->val)));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.SetOutputVolume(msg->val));
         } break;
 
         case MessageType::AudioSetInputGain: {
-            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetInputGain(msg->val)));
+            responseMsg = std::make_shared<AudioResponseMessage>(audio.SetInputGain(msg->val));
         } break;
 
         case MessageType::AudioGetOutputVolume: {
