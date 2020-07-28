@@ -17,11 +17,8 @@ namespace gui
 
     void TextFixedSize::drawLines()
     {
-        LOG_INFO("Ile dzieciaczków przed %lu", children.size());
 
         lines.erase();
-
-        LOG_INFO("Ile dzieciaczków zostało %lu", children.size());
 
         auto sizeMinusPadding = [&](Axis axis, Area val) {
             auto size = area(val).size(axis);
@@ -39,17 +36,17 @@ namespace gui
         auto line_y_position = padding.top;
         auto cursor          = 0;
 
-        unsigned int currentLine = 0;
-        unsigned int lineHeight  = font->info.line_height;
+        unsigned int currentLine = 1;
+        unsigned int lineHeight  = font->info.line_height + 4;
 
         auto line_x_position = padding.left;
         do {
             auto text_line = gui::TextLine(document.get(), cursor, w, lineHeight);
             cursor += text_line.length();
 
-            if (text_line.height() > 0 && lineHeight != text_line.height()) {
-                lineHeight = text_line.height();
-            }
+            //            if (text_line.height() > 0 && lineHeight != text_line.height()) {
+            //                lineHeight = text_line.height();
+            //            }
 
             if (line_y_position + lineHeight > h) { // no more space for next line
                 break;
@@ -58,16 +55,20 @@ namespace gui
             // for each different text which fits in line, addWidget last - to not trigger callbacks to parent
             // on resizes while not needed, after detach there can be no `break` othervise there will be leak - hence
             // detach
+
+            LOG_INFO("Co z tą pozycja %d", line_y_position);
+
             lines.emplace(std::move(text_line));
             auto &line = lines.last();
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
             line.alignH(getAlignment(Axis::X), w);
 
-            line_y_position += lineHeight;
-
+            LOG_INFO("Ile mamy miejsca %d", h);
             LOG_INFO("Jaka wyskosc lini %d", text_line.height());
             LOG_INFO("Ile mamy lini %d", currentLine);
+
+            line_y_position += lineHeight;
 
             LOG_INFO("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
                      "%d \n x: %d, y: %d \n%s",
@@ -87,6 +88,7 @@ namespace gui
 
         } while (true);
 
+        // Vertical Align disabled for that TextWidget - discuss how to handle it
         lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
     }
 
