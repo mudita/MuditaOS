@@ -79,7 +79,7 @@ namespace audio
 
         virtual audio::RetCode Pause() = 0;
 
-        virtual int32_t Resume() = 0;
+        virtual audio::RetCode Resume() = 0;
 
         virtual int32_t SendEvent(const Event evt, const EventData *data = nullptr) = 0;
 

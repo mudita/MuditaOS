@@ -28,7 +28,7 @@ namespace audio
 
         audio::RetCode Pause() override final;
 
-        int32_t Resume() override final;
+        audio::RetCode Resume() override final;
 
         int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final;
 

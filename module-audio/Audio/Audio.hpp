@@ -62,7 +62,7 @@ namespace audio
 
         audio::RetCode Pause();
 
-        int32_t Resume();
+        audio::RetCode Resume();
 
       private:
         State currentState = State::Idle;

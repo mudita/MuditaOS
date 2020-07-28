@@ -41,9 +41,9 @@ namespace audio
             return audio::RetCode::Success;
         }
 
-        int32_t Resume() override final
+        audio::RetCode Resume() override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
         int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final
