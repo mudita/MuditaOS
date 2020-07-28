@@ -98,6 +98,8 @@ namespace gui
         auto fi = std::find(children.begin(), children.end(), item);
         if (fi != children.end()) {
             children.erase(fi);
+            // Discuss with Adam
+            item->parent = nullptr;
             return true;
         }
         return false;
