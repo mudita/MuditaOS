@@ -60,7 +60,7 @@ namespace audio
 
         audio::RetCode Stop();
 
-        int32_t Pause();
+        audio::RetCode Pause();
 
         int32_t Resume();
 
