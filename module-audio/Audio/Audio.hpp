@@ -38,10 +38,10 @@ namespace audio
         std::optional<Tags> GetFileTags(const char *filename);
 
         // Range 0-1
-        int32_t SetOutputVolume(Volume vol);
+        audio::RetCode SetOutputVolume(Volume vol);
 
         // Range 0-10
-        int32_t SetInputGain(Gain gain);
+        audio::RetCode SetInputGain(Gain gain);
 
         Volume GetOutputVolume()
         {

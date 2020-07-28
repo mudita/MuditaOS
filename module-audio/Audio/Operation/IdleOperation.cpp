@@ -20,13 +20,13 @@ namespace audio
     IdleOperation::~IdleOperation()
     {}
 
-    int32_t IdleOperation::SetOutputVolume(float vol)
+    audio::RetCode IdleOperation::SetOutputVolume(float vol)
     {
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t IdleOperation::SetInputGain(float gain)
+    audio::RetCode IdleOperation::SetInputGain(float gain)
     {
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 } // namespace audio
