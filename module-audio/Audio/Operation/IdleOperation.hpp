@@ -46,14 +46,14 @@ namespace audio
             return audio::RetCode::Success;
         }
 
-        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final
+        audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t SwitchProfile(const Profile::Type type) override final
+        audio::RetCode SwitchProfile(const Profile::Type type) override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
         audio::RetCode SetOutputVolume(float vol) override final;

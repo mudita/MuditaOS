@@ -131,7 +131,7 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)
     {
         switch (evt) {
         case Event::HeadphonesPlugin:
@@ -149,13 +149,13 @@ namespace audio
             SwitchProfile(Profile::Type::RecordingBuiltInMic);
             break;
         default:
-            return static_cast<int32_t>(RetCode::UnsupportedEvent);
+            return RetCode::UnsupportedEvent;
         }
 
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RecorderOperation::SwitchProfile(const Profile::Type type)
+    audio::RetCode RecorderOperation::SwitchProfile(const Profile::Type type)
     {
 
         auto ret = GetProfile(type);
@@ -163,7 +163,7 @@ namespace audio
             currentProfile = ret.value();
         }
         else {
-            return static_cast<int32_t>(RetCode::UnsupportedProfile);
+            return RetCode::UnsupportedProfile;
         }
 
         audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
@@ -179,8 +179,7 @@ namespace audio
             break;
         }
 
-        // TODO:M.P add error handling
-        return 0;
+        return audio::RetCode::Success;
     }
 
     audio::RetCode RecorderOperation::SetOutputVolume(float vol)

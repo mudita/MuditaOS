@@ -81,7 +81,7 @@ namespace audio
 
         virtual audio::RetCode Resume() = 0;
 
-        virtual int32_t SendEvent(const Event evt, const EventData *data = nullptr) = 0;
+        virtual audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) = 0;
 
         virtual audio::RetCode SetOutputVolume(float vol) = 0;
 
@@ -117,7 +117,7 @@ namespace audio
 
         bool isInitialized = false;
 
-        virtual int32_t SwitchProfile(const Profile::Type type) = 0;
+        virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
 
         std::optional<Profile *> GetProfile(const Profile::Type type);
 
