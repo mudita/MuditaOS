@@ -263,7 +263,7 @@ namespace audio
         return true;
     }
 
-    int32_t RouterOperation::StartRecording()
+    audio::RetCode RouterOperation::StartRecording()
     {
         channel1Buffer.reserve(1024);
         channel2Buffer.reserve(1024);
@@ -283,25 +283,25 @@ namespace audio
                               Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
 
         if (enc == nullptr) {
-            return static_cast<int32_t>(RetCode::FileDoesntExist);
+            return RetCode::FileDoesntExist;
         }
 
         if (xTaskCreate(recorderWorker, "recworker", 512, this, 0, &recorderWorkerHandle) != pdPASS) {
             LOG_ERROR("Creating recworker failed");
-            return static_cast<int32_t>(RetCode::FailedToAllocateMemory);
+            return RetCode::FailedToAllocateMemory;
         }
 
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::StopRecording()
+    audio::RetCode RouterOperation::StopRecording()
     {
         cpp_freertos::LockGuard lock(mutex);
         if (recorderWorkerHandle) {
             vTaskDelete(recorderWorkerHandle);
             enc.reset();
         }
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
     void recorderWorker(void *pvp)
