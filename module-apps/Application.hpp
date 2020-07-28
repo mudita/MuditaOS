@@ -22,6 +22,9 @@
 // module-db
 #include "Interface/SettingsRecord.hpp"
 
+#include <module-bsp/bsp/torch/torch.hpp>
+#include "service-evtmgr/messages/EVMessages.hpp"
+
 #include "SwitchData.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "windows/AppWindow.hpp"
@@ -232,6 +235,12 @@ namespace app
         bool decreaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {
             return adjustCurrentVolume(-step);
+        }
+
+        void toggleTorch()
+        {
+            auto message = std::make_shared<sevm::TorchStateMessage>(bsp::torch::Action::toggle);
+            sys::Bus::SendUnicast(message, "EventManager", this);
         }
 
         /// @defgroup Application Application static functions

@@ -11,6 +11,8 @@
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
+#include "bsp/torch/torch.hpp"
+
 namespace sevm
 {
     namespace message
@@ -99,6 +101,25 @@ namespace sevm
         }
         bsp::cellular::status::value state = bsp::cellular::status::value::INACTIVE;
     };
+
+    class TorchStateMessage : public Message
+    {
+      public:
+        TorchStateMessage(bsp::torch::Action direction)
+            : Message(MessageType::EVMTorchStateMessage), direction(direction)
+        {}
+        bsp::torch::Action direction;
+        bsp::torch::State state = bsp::torch::State::off;
+    };
+
+    class TorchStateResultMessage : public TorchStateMessage
+    {
+      public:
+        TorchStateResultMessage(bsp::torch::Action direction) : TorchStateMessage(direction)
+        {}
+        bool success = false;
+    };
+
 } /* namespace sevm*/
 
 #endif /* MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_ */
