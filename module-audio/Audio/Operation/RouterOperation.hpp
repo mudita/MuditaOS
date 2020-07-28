@@ -89,9 +89,9 @@ namespace audio
 
         bool Mute(bool enable);
 
-        int32_t StartRecording();
+        audio::RetCode StartRecording();
 
-        int32_t StopRecording();
+        audio::RetCode StopRecording();
     };
 
 } // namespace audio
