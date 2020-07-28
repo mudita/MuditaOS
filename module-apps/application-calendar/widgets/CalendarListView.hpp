@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CalendarAllEventsItem.hpp"
+#include "AllEventsItem.hpp"
 #include "Application.hpp"
 #include <ListView.hpp>
 #include <functional>
@@ -17,7 +17,7 @@ namespace gui
         bool previousItemIsLabel = false;
 
         void addItemsOnPage() override;
-        void addLabelMarker(CalendarAllEventsItem *item);
+        void addLabelMarker(AllEventsItem *item);
 
       public:
         CalendarListView(

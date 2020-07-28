@@ -4,12 +4,12 @@
 #include <gui/widgets/TopBar.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 
-namespace app
+namespace gui
 {
 
     AllEventsWindow::AllEventsWindow(app::Application *app, std::string name)
         : AppWindow(app, style::window::calendar::name::all_events_window),
-          calendarAllEventsModel{std::make_shared<CalendarAllEventsModel>(this->application)}
+          allEventsModel{std::make_shared<AllEventsModel>(this->application)}
     {
         buildInterface();
     }
@@ -40,7 +40,7 @@ namespace app
                                                   style::window::calendar::listView_y,
                                                   style::window::calendar::listView_w,
                                                   style::window::calendar::listView_h,
-                                                  calendarAllEventsModel);
+                                                  allEventsModel);
 
         allEventsList->setPenFocusWidth(style::window::default_border_no_focus_w);
         allEventsList->setPenWidth(style::window::default_border_no_focus_w);
@@ -51,7 +51,7 @@ namespace app
     void AllEventsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         allEventsList->clear();
-        allEventsList->setProvider(calendarAllEventsModel);
+        allEventsList->setProvider(allEventsModel);
     }
 
     bool AllEventsWindow::onInput(const gui::InputEvent &inputEvent)
@@ -60,7 +60,6 @@ namespace app
             inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
             LOG_DEBUG("Switch to desktop");
             sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-            return true;
         }
 
         if (AppWindow::onInput(inputEvent)) {
@@ -84,4 +83,4 @@ namespace app
 
         return false;
     }
-} /* namespace app */
+} /* namespace gui */

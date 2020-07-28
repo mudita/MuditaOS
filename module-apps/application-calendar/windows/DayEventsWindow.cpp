@@ -9,12 +9,12 @@
 
 #include <time/time_conversion.hpp>
 
-namespace app
+namespace gui
 {
 
     DayEventsWindow::DayEventsWindow(app::Application *app, std::string name)
         : AppWindow(app, style::window::calendar::name::day_events_window),
-          calendarEventsModel{std::make_shared<CalendarEventsModel>(this->application)}
+          dayEventsModel{std::make_shared<DayEventsModel>(this->application)}
     {
         buildInterface();
     }
@@ -45,7 +45,7 @@ namespace app
                                           style::window::calendar::listView_y,
                                           style::window::calendar::listView_w,
                                           style::window::calendar::listView_h,
-                                          calendarEventsModel);
+                                          dayEventsModel);
 
         dayEventsList->setPenFocusWidth(style::window::default_border_no_focus_w);
         dayEventsList->setPenWidth(style::window::default_border_no_focus_w);
@@ -70,4 +70,4 @@ namespace app
 
         return false;
     }
-} /* namespace app */
+} /* namespace gui */

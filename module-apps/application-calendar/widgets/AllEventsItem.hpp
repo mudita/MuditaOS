@@ -1,22 +1,20 @@
 #pragma once
-
-#include "application-calendar/models/CalendarEventsModel.hpp"
-
-#include <Label.hpp>
 #include <ListItem.hpp>
+#include <Label.hpp>
 
 namespace gui
-
 {
-    class CalendarItem : public ListItem
+    class AllEventsItem : public ListItem
     {
-        gui::Label *title       = nullptr;
+        gui::Label *startTime   = nullptr;
         gui::Label *description = nullptr;
-        gui::Image *clock       = nullptr;
 
       public:
-        CalendarItem();
-        virtual ~CalendarItem() = default;
+        AllEventsItem();
+        virtual ~AllEventsItem() override = default;
+
+        void setMarkerItem(UTF8 text);
+        [[nodiscard]] UTF8 getLabelMarker() const;
 
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
