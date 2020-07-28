@@ -136,6 +136,9 @@ namespace gui
         for (auto &el : elements_to_show_in_line) {
             auto scoped_disown          = ScopedParentDisown(el);
             int32_t align_bottom_offset = height() - el->getHeight();
+
+            LOG_INFO("Co to za offset %d", y + align_bottom_offset);
+
             el->setArea({line_x_position, y + align_bottom_offset, el->getWidth(), el->getHeight()});
             line_x_position += el->getWidth();
         }
@@ -231,9 +234,9 @@ namespace gui
         Length yOffset = line_align.calculateVAlignment(parent_length, lines_height);
 
         if (yOffset) {
-
-            LOG_INFO("CO tutaj jest w tych Y, %d, %d", underLine->getPosition(Axis::Y), yOffset);
-            underLine->setPosition(underLine->getPosition(Axis::Y) + 0, Axis::Y);
+            //
+            //            LOG_INFO("CO tutaj jest w tych Y, %d, %d", underLine->getPosition(Axis::Y), yOffset);
+            //            underLine->setPosition(underLine->getPosition(Axis::Y) + 0, Axis::Y);
 
             for (auto &el : elements_to_show_in_line) {
                 auto scoped_disown = ScopedParentDisown(el);

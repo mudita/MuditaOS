@@ -214,6 +214,7 @@ namespace style
         const inline uint32_t small    = 6;
         const inline uint32_t big      = 8;
         const inline uint32_t very_big = 12;
+        const inline uint32_t huge     = 24;
     } // namespace margins
 
 }; // namespace style
