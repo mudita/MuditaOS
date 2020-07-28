@@ -128,7 +128,7 @@ namespace gui
       public:
         ExpandMode expandMode = ExpandMode::EXPAND_NONE;
 
-      private:
+      protected:
         TextType textType = TextType::MULTI_LINE;
         /// points to default text font to use
         RawFont *font = nullptr;
@@ -139,7 +139,6 @@ namespace gui
         bool handleNavigation(const InputEvent &inputEvent);
         bool handleEnter();
 
-      protected:
         std::list<DrawCommand *> buildDrawList() override;
         /// redrawing lines
         /// it redraws visible lines on screen and if needed requests resize in parent

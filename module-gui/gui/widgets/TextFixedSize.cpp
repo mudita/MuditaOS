@@ -1,3 +1,4 @@
+#include <module-gui/gui/core/RawFont.hpp>
 #include "TextFixedSize.hpp"
 
 namespace gui
@@ -16,7 +17,11 @@ namespace gui
 
     void TextFixedSize::drawLines()
     {
+        LOG_INFO("Ile dzieciaczków przed %lu", children.size());
+
         lines.erase();
+
+        LOG_INFO("Ile dzieciaczków zostało %lu", children.size());
 
         auto sizeMinusPadding = [&](Axis axis, Area val) {
             auto size = area(val).size(axis);
@@ -35,23 +40,16 @@ namespace gui
         auto cursor          = 0;
 
         unsigned int currentLine = 0;
-        unsigned int lineHeight  = 0;
+        unsigned int lineHeight  = font->info.line_height;
 
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(this, document.get(), cursor, w);
+            auto text_line = gui::TextLine(document.get(), cursor, w, lineHeight);
             cursor += text_line.length();
-
-            if (text_line.length() == 0 && currentLine == 0) {
-                break;
-            }
 
             if (text_line.height() > 0 && lineHeight != text_line.height()) {
                 lineHeight = text_line.height();
             }
-
-            LOG_INFO("Wtf? %d", line_y_position + lineHeight);
-            LOG_INFO("wtf 2 %d", h);
 
             if (line_y_position + lineHeight > h) { // no more space for next line
                 break;
@@ -64,7 +62,7 @@ namespace gui
             auto &line = lines.last();
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
-            //            line.alignH(getAlignment(Axis::X), w);
+            line.alignH(getAlignment(Axis::X), w);
 
             line_y_position += lineHeight;
 
@@ -89,7 +87,7 @@ namespace gui
 
         } while (true);
 
-        //        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
     }
 
     bool TextFixedSize::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

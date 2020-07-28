@@ -24,15 +24,20 @@ namespace gui
 
     /// Note - line breaking could be done here with different TextLines to return
     /// or via different block types (i.e. numeric block tyle could be not "breakable"
-    TextLine::TextLine(Item *parent, TextDocument *document, unsigned int start_position, unsigned int max_width)
+    TextLine::TextLine(TextDocument *document,
+                       unsigned int start_position,
+                       unsigned int max_width,
+                       unsigned int max_height)
     {
         if (document == nullptr) {
             return;
         }
 
-        this->parent = parent;
+        auto cursor = document->getBlockCursor(start_position);
 
-        auto cursor     = document->getBlockCursor(start_position);
+        underLine = new Rect(nullptr, 0, 0, max_width, max_height);
+        underLine->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+
         auto old_cursor = cursor;
         do {
 
@@ -47,7 +52,7 @@ namespace gui
             }
 
             // take Part of TextBlock we want to show
-            auto text_part = document->getTextPart(cursor);
+            auto text_part   = document->getTextPart(cursor);
             auto text_format = (*cursor).getFormat();
             if (text_format->getFont() == nullptr) {
                 return;
@@ -65,7 +70,6 @@ namespace gui
             number_letters_shown += can_show;
             width_used += item->getTextNeedSpace();
             height_used = std::max(height_used, item->getTextHeight());
-
             elements_to_show_in_line.emplace_back(item);
 
             // not whole text shown, try again for next line if you want
@@ -84,6 +88,7 @@ namespace gui
         number_letters_shown     = from.number_letters_shown;
         width_used               = from.width_used;
         height_used              = from.height_used;
+        underLine                = from.underLine;
     }
 
     TextLine::~TextLine()
@@ -92,6 +97,10 @@ namespace gui
             if (el->parent == nullptr) {
                 delete el;
             }
+        }
+
+        if (underLine->parent == nullptr) {
+            delete underLine;
         }
     }
 
@@ -120,6 +129,10 @@ namespace gui
     void TextLine::setPosition(const short &x, const short &y)
     {
         auto line_x_position = x;
+
+        underLine->setY(y);
+        //        underLine->setArea(BoundingBox(underLine->widgetArea.x, y, underLine->widgetArea.w, height_used));
+
         for (auto &el : elements_to_show_in_line) {
             auto scoped_disown          = ScopedParentDisown(el);
             int32_t align_bottom_offset = height() - el->getHeight();
@@ -134,13 +147,15 @@ namespace gui
             return;
         }
 
-        setArea({int16_t(0), int16_t(0), uint16_t(100), uint16_t(100)});
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        setFillColor(ColorFullBlack);
-        setFilled(true);
-        updateDrawArea();
+        if (underLine != nullptr) {
+            LOG_INFO("Rozmiar i pozycja tego gówna %d, %d, %d, %d",
+                     underLine->widgetArea.x,
+                     underLine->widgetArea.y,
+                     underLine->widgetArea.w,
+                     underLine->widgetArea.h);
+        }
 
-        LOG_INFO("Rozmiar i pozycja tego gówna %d, %d, %d, %d", widgetArea.x, widgetArea.y, widgetArea.w, widgetArea.h);
+        parent->addWidget(underLine);
 
         for (auto &el : elements_to_show_in_line) {
             parent->addWidget(el);
@@ -190,6 +205,12 @@ namespace gui
                 delete el;
             }
         }
+
+        if (underLine->parent != nullptr) {
+            auto p = underLine->parent;
+            p->removeWidget(underLine);
+        }
+
         elements_to_show_in_line.clear();
     }
 
@@ -210,6 +231,10 @@ namespace gui
         Length yOffset = line_align.calculateVAlignment(parent_length, lines_height);
 
         if (yOffset) {
+
+            LOG_INFO("CO tutaj jest w tych Y, %d, %d", underLine->getPosition(Axis::Y), yOffset);
+            underLine->setPosition(underLine->getPosition(Axis::Y) + 0, Axis::Y);
+
             for (auto &el : elements_to_show_in_line) {
                 auto scoped_disown = ScopedParentDisown(el);
                 el->setPosition(el->getPosition(Axis::Y) + yOffset, Axis::Y);
