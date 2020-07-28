@@ -4,6 +4,7 @@
 #include "Common.hpp"
 #include "Label.hpp"
 #include "TextDocument.hpp"
+#include "BoxLayout.hpp"
 
 namespace gui
 {
@@ -15,11 +16,12 @@ namespace gui
         Length width_used                 = 0;
         Length height_used                = 0;
         std::list<Label *> elements_to_show_in_line;
+        Rect *underLine = nullptr;
 
       public:
         /// creates TextLine with data from text from start position in `TextDocument` filling max_width
         /// @note might be better to have TextBlockIterator which could hop through TextBlock inside TextDocument
-        TextLine(Item *parent, TextDocument *, unsigned int start_position, unsigned int max_width);
+        TextLine(TextDocument *, unsigned int start_position, unsigned int max_width, unsigned int max_height = 0);
         ~TextLine();
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&);
