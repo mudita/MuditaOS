@@ -130,7 +130,7 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
-    int32_t PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data)
     {
 
         switch (evt) {
@@ -150,12 +150,12 @@ namespace audio
         case Event::BTHeadsetOff:
             break;
         default:
-            return static_cast<int32_t>(RetCode::UnsupportedEvent);
+            return RetCode::UnsupportedEvent;
         }
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t PlaybackOperation::SwitchProfile(const Profile::Type type)
+    audio::RetCode PlaybackOperation::SwitchProfile(const Profile::Type type)
     {
 
         uint32_t currentSampleRate = currentProfile->GetSampleRate();
@@ -166,7 +166,7 @@ namespace audio
             currentProfile = ret.value();
         }
         else {
-            return static_cast<int32_t>(RetCode::UnsupportedProfile);
+            return RetCode::UnsupportedProfile;
         }
 
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
@@ -185,8 +185,7 @@ namespace audio
             break;
         }
 
-        // TODO:M.P add error handling
-        return 0;
+        return audio::RetCode::Success;
     }
 
 } // namespace audio

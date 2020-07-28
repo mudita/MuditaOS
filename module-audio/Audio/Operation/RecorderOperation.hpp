@@ -30,9 +30,9 @@ namespace audio
 
         audio::RetCode Resume() override final;
 
-        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final;
+        audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) override final;
 
-        int32_t SwitchProfile(const Profile::Type type) override final;
+        audio::RetCode SwitchProfile(const Profile::Type type) override final;
 
         audio::RetCode SetOutputVolume(float vol) override final;
 

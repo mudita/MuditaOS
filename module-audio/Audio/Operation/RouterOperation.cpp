@@ -186,7 +186,7 @@ namespace audio
         return RetCode::Success;
     }
 
-    int32_t RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
+    audio::RetCode RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
     {
         switch (evt) {
         case Event::HeadphonesPlugin:
@@ -222,20 +222,20 @@ namespace audio
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         default:
-            return static_cast<int32_t>(RetCode::UnsupportedEvent);
+            return RetCode::UnsupportedEvent;
         }
 
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::SwitchProfile(const audio::Profile::Type type)
+    audio::RetCode RouterOperation::SwitchProfile(const audio::Profile::Type type)
     {
         auto ret = GetProfile(type);
         if (ret) {
             currentProfile = ret.value();
         }
         else {
-            return static_cast<int32_t>(RetCode::UnsupportedProfile);
+            return RetCode::UnsupportedProfile;
         }
 
         audioDevice =
@@ -254,8 +254,7 @@ namespace audio
             break;
         }
 
-        // TODO:M.P add error handling
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
     bool RouterOperation::Mute(bool enable)
