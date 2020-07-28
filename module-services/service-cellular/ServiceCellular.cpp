@@ -1183,11 +1183,18 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                     record.type   = SMSType::INBOX;
                     record.date   = messageDate;
 
-                    DBServiceAPI::SMSAdd(this, record);
-                    DBServiceAPI::GetQuery(
-                        this,
-                        db::Interface::Name::Notifications,
-                        std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
+                    if (DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE) {
+                        DBServiceAPI::GetQuery(
+                            this,
+                            db::Interface::Name::Notifications,
+                            std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
+                        const std::string ringtone_path = "assets/audio/sms_transformer.wav";
+                        AudioServiceAPI::PlaybackStart(this, ringtone_path);
+                    }
+                    else {
+                        LOG_ERROR("Failed to add text message to db");
+                        return false;
+                    }
                 }
             }
         }

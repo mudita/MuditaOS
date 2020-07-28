@@ -5,8 +5,10 @@
 ### Added
 
 * `[calendar]` Added events options and event delete windows.
+* `[sms]``[audio]` added incoming text message ringtone
 
 ### Changed
+
 * `[desktop]` Reimplemented JSON message parser.
 
 ### Fixed
