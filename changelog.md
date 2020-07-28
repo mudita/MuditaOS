@@ -9,6 +9,7 @@
 * `[torch]` Added initial torch functionality (driver).
 * `[phonebook]` Added alternative number handling.
 * `[music player]` Added simple music player implementation.
+* `[torch]` Torch works with a press of a button 
 
 ### Changed
 

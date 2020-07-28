@@ -183,6 +183,9 @@ enum class MessageType
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
 
+    // Torch messages
+    EVMTorchStateMessage,
+
     // cellular messages
     EVMGetBoard,
     EVMModemStatus,
@@ -217,7 +220,7 @@ enum class MessageType
     AntennaCSQChange,
     AntennaLockService,
     AntennaGetLockState,
-    AntennaLockNotification
+    AntennaLockNotification,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
