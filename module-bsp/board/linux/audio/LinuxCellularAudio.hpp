@@ -23,7 +23,7 @@ namespace bsp
 
         virtual ~LinuxCellularAudio();
 
-        int32_t Start(const Format &format) override final;
+        AudioDevice::RetCode Start(const Format &format) override final;
 
         int32_t Stop() override final;
 

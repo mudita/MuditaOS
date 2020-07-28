@@ -65,7 +65,7 @@ namespace audio
                                            : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
-    int32_t Audio::Start(Operation::Type op, const char *fileName)
+    audio::RetCode Audio::Start(Operation::Type op, const char *fileName)
     {
 
         auto ret = Operation::Create(op, fileName);
@@ -91,7 +91,7 @@ namespace audio
             LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
             currentOperation = Operation::Create(Operation::Type::Idle, "").value_or(nullptr);
             currentState     = State ::Idle;
-            return static_cast<int32_t>(RetCode::OperationCreateFailed);
+            return RetCode::OperationCreateFailed;
         }
 
         return currentOperation->Start(asyncCallback);

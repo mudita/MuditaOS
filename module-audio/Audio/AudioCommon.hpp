@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bsp_audio.hpp"
+
 namespace audio
 {
     using Position = float;
@@ -25,6 +27,7 @@ namespace audio
         FailedToAllocateMemory,
         OperationNotSet,
         ProfileNotSet,
+        DeviceFailure,
         Failed
     };
 
@@ -33,4 +36,7 @@ namespace audio
         EndOfFile,
         FileSystemNoSpace
     };
+
+    RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
+    const char *c_str(RetCode retcode);
 } // namespace audio

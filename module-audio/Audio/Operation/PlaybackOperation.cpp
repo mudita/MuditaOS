@@ -58,11 +58,11 @@ namespace audio
         isInitialized = true;
     }
 
-    int32_t PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback)
+    audio::RetCode PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback)
     {
 
         if (state == State::Active || state == State::Paused) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         auto tags = dec->fetchTags();
@@ -76,7 +76,8 @@ namespace audio
 
         currentProfile->SetSampleRate(tags->sample_rate);
 
-        return audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        return GetDeviceError(ret);
     }
 
     int32_t PlaybackOperation::Stop()
@@ -106,7 +107,8 @@ namespace audio
             return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
         }
         state = State::Active;
-        return audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        return static_cast<int32_t>(GetDeviceError(ret));
     }
 
     int32_t PlaybackOperation::SetOutputVolume(float vol)
