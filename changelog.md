@@ -1,5 +1,19 @@
 # Mudita PurePhone changelog
 
+
+## Current version
+
+### Added
+
+* `[calendar]` Added all events list window.
+
+### Changed
+
+### Fixed
+
+### Other
+
+
 ## [0.31.1] - 2020-07-31
 
 ### Added

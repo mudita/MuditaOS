@@ -1,4 +1,4 @@
-#include "CalendarAllEventsItem.hpp"
+#include "AllEventsItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include <Style.hpp>
 #include <gui/widgets/Label.hpp>
@@ -6,7 +6,7 @@
 
 namespace gui
 {
-    CalendarAllEventsItem::CalendarAllEventsItem()
+    AllEventsItem::AllEventsItem()
     {
         setMinimumSize(style::window::default_body_width, style::window::label::big_h);
         setMaximumSize(style::window::default_body_width, style::window::label::big_h);
@@ -23,11 +23,11 @@ namespace gui
         description->setFont(style::window::font::bigbold);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
-        description->setText("Football with folks at School");
-        startTime->setText("10:00 AM");
+        description->setText(utils::localize.get("common_information"));
+        startTime->setText(utils::time::DateTime().str());
     }
 
-    bool CalendarAllEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool AllEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         startTime->setPosition(style::window::calendar::item::all::start_time_x, 0);
         startTime->setSize(style::window::default_body_width, style::window::label::big_h);
@@ -38,7 +38,7 @@ namespace gui
         return true;
     }
 
-    void CalendarAllEventsItem::setMarkerItem(UTF8 text)
+    void AllEventsItem::setMarkerItem(UTF8 text)
     {
         description->setText("");
         startTime->setText(text);
@@ -47,7 +47,7 @@ namespace gui
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
-    UTF8 CalendarAllEventsItem::getLabelMarker()
+    UTF8 AllEventsItem::getLabelMarker() const
     {
         return utils::time::Time().str("%d %B");
     }

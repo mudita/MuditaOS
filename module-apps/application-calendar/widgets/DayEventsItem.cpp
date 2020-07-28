@@ -1,16 +1,13 @@
-#include "CalendarItem.hpp"
-#include "application-calendar/models/CalendarEventsModel.hpp"
-
+#include "DayEventsItem.hpp"
 #include <ListView.hpp>
 #include <gui/widgets/Label.hpp>
 #include <Style.hpp>
-
 #include <time/time_conversion.hpp>
 
 namespace gui
 {
 
-    CalendarItem::CalendarItem()
+    DayEventsItem::DayEventsItem()
     {
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::height);
         setMaximumSize(style::window::default_body_width, style::window::calendar::item::height);
@@ -34,7 +31,7 @@ namespace gui
         title->setText("10:00 - 11:15 AM");
     }
 
-    bool CalendarItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool DayEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         title->setPosition(style::window::calendar::item::label_x, style::window::calendar::item::title_y);
         title->setSize(style::window::calendar::item::title_w, style::window::calendar::item::title_h);

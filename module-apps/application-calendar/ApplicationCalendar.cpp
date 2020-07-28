@@ -42,7 +42,7 @@ namespace app
             gui::name::window::main_window, new gui::CalendarMainWindow(this, gui::name::window::main_window)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::day_events_window,
-            new DayEventsWindow(this, style::window::calendar::name::day_events_window)));
+            new gui::DayEventsWindow(this, style::window::calendar::name::day_events_window)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::no_events_window,
             new gui::NoEvents(this, style::window::calendar::name::no_events_window, gui::NoEvents::Meta())));
@@ -53,7 +53,7 @@ namespace app
             new gui::DialogYesNo(this, style::window::calendar::name::dialog_yes_no)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::all_events_window,
-            new AllEventsWindow(this, style::window::calendar::name::all_events_window)));
+            new gui::AllEventsWindow(this, style::window::calendar::name::all_events_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()
