@@ -32,10 +32,9 @@ namespace audio
         };
     }
 
-    int32_t Audio::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode Audio::SendEvent(const Operation::Event evt, const EventData *data)
     {
-        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data)
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data) : RetCode::OperationNotSet;
     }
 
     audio::RetCode Audio::SetOutputVolume(Volume vol)

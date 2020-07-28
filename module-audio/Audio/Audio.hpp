@@ -25,7 +25,7 @@ namespace audio
         Audio(std::function<int32_t(AudioEvents event)> asyncCallback);
 
         // Events
-        int32_t SendEvent(const Operation::Event evt, const EventData *data = nullptr);
+        audio::RetCode SendEvent(const Operation::Event evt, const EventData *data = nullptr);
 
         // utilities
         Position GetPosition();
