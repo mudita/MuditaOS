@@ -56,9 +56,9 @@ namespace audio
             return 0;
         }
 
-        int32_t SetOutputVolume(float vol) override final;
+        audio::RetCode SetOutputVolume(float vol) override final;
 
-        int32_t SetInputGain(float gain) override final;
+        audio::RetCode SetInputGain(float gain) override final;
 
         Position GetPosition() override final
         {

@@ -101,13 +101,13 @@ namespace bsp {
 
         virtual AudioDevice::RetCode Stop() = 0;
 
-        virtual int32_t OutputVolumeCtrl(float vol) = 0;
+        virtual AudioDevice::RetCode OutputVolumeCtrl(float vol) = 0;
 
-        virtual int32_t InputGainCtrl(float gain) = 0;
+        virtual AudioDevice::RetCode InputGainCtrl(float gain) = 0;
 
-        virtual int32_t OutputPathCtrl(OutputPath outputPath) = 0;
+        virtual AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) = 0;
 
-        virtual int32_t InputPathCtrl(InputPath inputPath) = 0;
+        virtual AudioDevice::RetCode InputPathCtrl(InputPath inputPath) = 0;
 
         virtual bool IsFormatSupported(const Format& format) = 0;
 

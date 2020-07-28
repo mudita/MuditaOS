@@ -124,26 +124,26 @@ namespace bsp
         return paAbort;
     }
 
-    int32_t LinuxAudiocodec::InputGainCtrl(float gain)
+    AudioDevice::RetCode LinuxAudiocodec::InputGainCtrl(float gain)
     {
         currentFormat.inputGain = gain;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxAudiocodec::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode LinuxAudiocodec::OutputVolumeCtrl(float vol)
     {
         currentFormat.outputVolume = vol;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxAudiocodec::InputPathCtrl([[maybe_unused]] InputPath inputPath)
+    AudioDevice::RetCode LinuxAudiocodec::InputPathCtrl([[maybe_unused]] InputPath inputPath)
     {
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxAudiocodec::OutputPathCtrl([[maybe_unused]] OutputPath outputPath)
+    AudioDevice::RetCode LinuxAudiocodec::OutputPathCtrl([[maybe_unused]] OutputPath outputPath)
     {
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     bool LinuxAudiocodec::TryOpenStream(const bsp::AudioDevice::Format &format)

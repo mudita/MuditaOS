@@ -98,44 +98,44 @@ namespace bsp
         return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051Audiocodec::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode RT1051Audiocodec::OutputVolumeCtrl(float vol)
     {
         currentFormat.outputVolume = vol;
         CodecParamsMAX98090 params;
         params.outVolume = vol;
         params.opCmd     = CodecParamsMAX98090::Cmd::SetOutVolume;
         codec.Ioctrl(params);
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051Audiocodec::InputGainCtrl(float gain)
+    AudioDevice::RetCode RT1051Audiocodec::InputGainCtrl(float gain)
     {
         currentFormat.inputGain = gain;
         CodecParamsMAX98090 params;
         params.inGain = gain;
         params.opCmd  = CodecParamsMAX98090::Cmd::SetInGain;
         codec.Ioctrl(params);
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051Audiocodec::InputPathCtrl(InputPath inputPath)
+    AudioDevice::RetCode RT1051Audiocodec::InputPathCtrl(InputPath inputPath)
     {
         currentFormat.inputPath = inputPath;
         CodecParamsMAX98090 params;
         params.inputPath = static_cast<CodecParamsMAX98090::InputPath>(inputPath); // TODO: M.P fix me
         params.opCmd     = CodecParamsMAX98090::Cmd::SetInput;
         codec.Ioctrl(params);
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t RT1051Audiocodec::OutputPathCtrl(OutputPath outputPath)
+    AudioDevice::RetCode RT1051Audiocodec::OutputPathCtrl(OutputPath outputPath)
     {
         currentFormat.outputPath = outputPath;
         CodecParamsMAX98090 params;
         params.outputPath = static_cast<CodecParamsMAX98090::OutputPath>(outputPath); // TODO: M.P fix me
         params.opCmd      = CodecParamsMAX98090::Cmd::SetOutput;
         codec.Ioctrl(params);
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     bool RT1051Audiocodec::IsFormatSupported(const bsp::AudioDevice::Format &format)

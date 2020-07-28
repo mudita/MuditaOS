@@ -83,9 +83,9 @@ namespace audio
 
         virtual int32_t SendEvent(const Event evt, const EventData *data = nullptr) = 0;
 
-        virtual int32_t SetOutputVolume(float vol) = 0;
+        virtual audio::RetCode SetOutputVolume(float vol) = 0;
 
-        virtual int32_t SetInputGain(float gain) = 0;
+        virtual audio::RetCode SetInputGain(float gain) = 0;
 
         virtual Position GetPosition() = 0;
 
