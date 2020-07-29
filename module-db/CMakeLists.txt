@@ -72,8 +72,9 @@ set(SOURCES
         queries/calendar/QueryEventsGetAll.cpp
         queries/calendar/QueryEventsAdd.cpp
         queries/calendar/QueryEventsEdit.cpp
-
-        queries/calendar/QueryEventsGetFiltered.hpp queries/calendar/QueryEventsGetFiltered.cpp tests/EventsTable_tests.cpp)
+        queries/calendar/QueryEventsGetFiltered.hpp
+        queries/calendar/QueryEventsGetFiltered.cpp
+        )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)

@@ -73,10 +73,11 @@ std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::GetLimitOffset
     return records;
 }
 
-bool EventsRecordInterface::Update(const EventsRecord &rec)
+bool EventsRecordInterface::Update(const EventsRecord &rec, const uint32_t &checkValue)
 {
     auto entry = eventsDb->events.getById(rec.ID);
-    if (!entry.isValid() || entry.date_from != static_cast<uint32_t>(rec.date_from)) {
+    if (!entry.isValid() || entry.date_from != checkValue) {
+        LOG_DEBUG("IS NOT VALID");
         return false;
     }
 
@@ -113,26 +114,30 @@ uint32_t EventsRecordInterface::GetCount()
     return eventsDb->events.count();
 }
 
-std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(const db::Query *query)
+std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-
-    if (const auto local_query = dynamic_cast<const db::query::events::Get *>(query)) {
+    if (typeid(*query) == typeid(db::query::events::Get)) {
+        const auto local_query = dynamic_cast<const db::query::events::Get *>(query.get());
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::events::GetAll *>(query)) {
+    if (typeid(*query) == typeid(db::query::events::GetAll)) {
+        const auto local_query = dynamic_cast<const db::query::events::GetAll *>(query.get());
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::events::GetFiltered *>(query)) {
+    if (typeid(*query) == typeid(db::query::events::GetFiltered)) {
+        const auto local_query = dynamic_cast<const db::query::events::GetFiltered *>(query.get());
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::events::Add *>(query)) {
+    if (typeid(*query) == typeid(db::query::events::Add)) {
+        const auto local_query = dynamic_cast<const db::query::events::Add *>(query.get());
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::events::Remove *>(query)) {
+    if (typeid(*query) == typeid(db::query::events::Remove)) {
+        const auto local_query = dynamic_cast<const db::query::events::Remove *>(query.get());
         return runQueryImpl(local_query);
     }
-
-    if (const auto local_query = dynamic_cast<const db::query::events::Edit *>(query)) {
+    if (typeid(*query) == typeid(db::query::events::Edit)) {
+        const auto local_query = dynamic_cast<const db::query::events::Edit *>(query.get());
         return runQueryImpl(local_query);
     }
     return nullptr;
@@ -174,6 +179,6 @@ std::unique_ptr<db::query::events::RemoveResult> EventsRecordInterface::runQuery
 
 std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryImpl(const db::query::events::Edit *query)
 {
-    bool ret = Update(query->getRecord());
+    bool ret = Update(query->getRecord(), query->getDateFrom());
     return std::make_unique<db::query::events::EditResult>(ret);
 }

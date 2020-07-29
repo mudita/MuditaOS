@@ -58,7 +58,7 @@ namespace gui
 
         ~MonthBox() override = default;
 
-        void buildMap(app::Application *app);
+        void buildMap(app::ApplicationCalendar *app);
     };
 
     class CalendarMainWindow : public gui::AppWindow

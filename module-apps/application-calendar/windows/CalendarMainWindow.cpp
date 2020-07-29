@@ -92,7 +92,7 @@ namespace gui
         LOG_DEBUG("MonthBox constructor Completed Successfully!");
     }
 
-    void MonthBox::buildMap(app::Application *app)
+    void MonthBox::buildMap(app::ApplicationCalendar *app)
     {
         LOG_DEBUG("Start build month box map");
         for (auto &day : days) {
@@ -104,11 +104,6 @@ namespace gui
 
                 dayMap[key]->setLabel(day.number.c_str(), [=](gui::Item &item) {
                     LOG_DEBUG("Switch to DayEventsWindow");
-                    uint32_t date_from = 0;
-                    uint32_t date_till = 3099999999;
-                    DBServiceAPI::GetQuery(app,
-                                           db::Interface::Name::Events,
-                                           std::make_unique<db::query::events::GetFiltered>(date_from, date_till));
                     app->switchWindow("DayEventsWindow", nullptr);
                     return true;
                 });
@@ -329,19 +324,6 @@ namespace gui
     void CalendarMainWindow::destroyInterface()
     {
         erase();
-    }
-
-    bool CalendarMainWindow::onDatabaseMessage(sys::Message *msgl)
-    {
-        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
-        if (auto response = dynamic_cast<db::query::events::GetAllResult *>(msg->getResult())) {
-            auto records = response->getResult();
-            for (auto &rec : *records) {
-                LOG_DEBUG("RESP!!!!!!: %s", rec.title.c_str());
-            }
-            return true;
-        }
-        return false;
     }
 
     bool CalendarMainWindow::onInput(const gui::InputEvent &inputEvent)
