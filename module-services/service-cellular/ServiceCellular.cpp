@@ -24,6 +24,7 @@
 #include "Service/Timer.hpp"
 #include "ServiceCellular.hpp"
 
+
 #include "MessageType.hpp"
 
 #include "messages/CellularMessage.hpp"
@@ -187,6 +188,21 @@ void ServiceCellular::CallStateTimerHandler()
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
+}
+
+// Invoked when timer ticked
+void ServiceCellular::TickHandler(uint32_t id)
+{
+    if (id == callStateTimerId) {
+        CallStateTimerHandler();
+    }
+    else if (id == stateTimerId) {
+        LOG_INFO("State timer tick");
+        handleStateTimer();
+    }
+    else {
+        LOG_ERROR("Unrecognized timer ID = %" PRIu32, id);
+    }
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
@@ -1025,6 +1041,13 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
                                                              cusd.message());
     }
+ if (str.find("+CTZE: ") != std::string::npos) {
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
+                                                             str);
+    } if (str.find("+CTZE: ") != std::string::npos) {
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
+                                                             str);
+    }
 
     // Power Down
     if (powerdown::isNormalPowerDown(str)) {
@@ -1517,6 +1540,9 @@ bool ServiceCellular::handle_modem_on()
 
 bool ServiceCellular::handle_URCReady()
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
+    channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
     LOG_DEBUG("%s", state.c_str());
     return true;
 }

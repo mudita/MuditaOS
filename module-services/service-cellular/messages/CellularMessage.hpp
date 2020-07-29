@@ -71,6 +71,7 @@ class CellularNotificationMessage : public CellularMessage
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
         NewIncomingUSSD           // modem received new ussd code from network
+        NetworkTimeUpdated        // modem informed it has updated time
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
