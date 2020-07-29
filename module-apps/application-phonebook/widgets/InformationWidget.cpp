@@ -46,13 +46,14 @@ namespace gui
             }
             if (contact->numbers.size() > 0) {
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::h);
-                alternativeNumberHBox = new NumberWithIconsWidget(app,
-                                                                  contact->numbers[0].number,
-                                                                  nullptr,
-                                                                  0,
-                                                                  0,
-                                                                  phonebookStyle::informationWidget::w,
-                                                                  phonebookStyle::informationWidget::h);
+                alternativeNumberHBox = new NumberWithIconsWidget(
+                    app,
+                    contact->numbers[0].number, // Using primary number since secondary number is not supported yet
+                    nullptr,
+                    0,
+                    0,
+                    phonebookStyle::informationWidget::w,
+                    phonebookStyle::informationWidget::h);
 
                 vBox->addWidget(alternativeNumberHBox);
             }

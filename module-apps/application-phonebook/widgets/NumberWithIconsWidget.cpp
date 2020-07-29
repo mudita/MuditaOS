@@ -53,7 +53,7 @@ namespace gui
 
         numberText = new Text(this, 0, 0, 0, 0);
         numberText->setMaximumSize(w, phonebookStyle::numbersWithIconsWidget::number_text_h);
-        numberText->setFont(style::window::font::medium);
+        numberText->setFont(style::window::font::mediumbold);
         numberText->setPenFocusWidth(style::window::default_border_focus_w);
         numberText->setPenWidth(style::window::default_border_no_focus_w);
         numberText->setEditMode(EditMode::BROWSE);
