@@ -20,31 +20,39 @@ namespace gui
         setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         setPenFocusWidth(style::window::default_border_focus_w);
-        setPenWidth(style::window::messages::sms_border_no_focus);
+        setPenWidth(style::window::default_border_no_focus_w);
 
-        phoneImage = new ImageBox(this, 0, 0, 55, 55, new Image("phonebook_phone_ringing"));
-        phoneImage->setMargins(Margins(30, 0, 0, 0));
-        phoneImage->inputCallback = [&](Item &item, const InputEvent &input) {
+        smsImage                = new ImageBox(this,
+                                0,
+                                0,
+                                phonebookStyle::numbersWithIconsWidget::sms_image_w,
+                                phonebookStyle::numbersWithIconsWidget::sms_image_h,
+                                new Image("mail"));
+        smsImage->inputCallback = [&](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
-                //                return app::call(app, number);
-                LOG_INFO("Call operation started");
-                return true;
+                return app::sms(app, app::SmsOperation::New, number);
+                LOG_INFO("SMS operation started");
             }
             return false;
         };
 
-        smsImage                = new ImageBox(this, 0, 0, 55, 55, new Image("mail"));
-        smsImage->inputCallback = [&](Item &item, const InputEvent &input) {
+        phoneImage = new ImageBox(this,
+                                  0,
+                                  0,
+                                  phonebookStyle::numbersWithIconsWidget::phone_image_w,
+                                  phonebookStyle::numbersWithIconsWidget::phone_image_h,
+                                  new Image("phonebook_phone_ringing"));
+        phoneImage->setMargins(Margins(phonebookStyle::numbersWithIconsWidget::phone_image_margin_left, 0, 0, 0));
+        phoneImage->inputCallback = [&](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
-                //                return app::sms(app, app::SmsOperation::New, number);
-                LOG_INFO("SMS operation started");
-                return true;
+                return app::call(app, number);
+                LOG_INFO("Call operation started");
             }
             return false;
         };
 
         numberText = new Text(this, 0, 0, 0, 0);
-        numberText->setMaximumSize(w, 55);
+        numberText->setMaximumSize(w, phonebookStyle::numbersWithIconsWidget::number_text_h);
         numberText->setFont(style::window::font::medium);
         numberText->setPenFocusWidth(style::window::default_border_focus_w);
         numberText->setPenWidth(style::window::default_border_no_focus_w);
@@ -63,7 +71,7 @@ namespace gui
         };
     }
 
-    bool NumberWithIconsWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    auto NumberWithIconsWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
         resizeItems();
         return true;

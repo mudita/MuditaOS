@@ -12,8 +12,8 @@ namespace gui
     {
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
-        setMinimumSize(phonebookStyle::multiLineTextWithLabelItem::w, phonebookStyle::multiLineTextWithLabelItem::h);
-        setMaximumSize(phonebookStyle::multiLineTextWithLabelItem::w, phonebookStyle::multiLineTextWithLabelItem::h);
+        setMinimumSize(phonebookStyle::informationWidget::w, phonebookStyle::informationWidget::h);
+        setMaximumSize(phonebookStyle::informationWidget::w, phonebookStyle::informationWidget::h);
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
@@ -21,8 +21,8 @@ namespace gui
         titleLabel = new Label(vBox,
                                0,
                                0,
-                               phonebookStyle::multiLineTextWithLabelItem::w,
-                               30,
+                               phonebookStyle::informationWidget::w,
+                               phonebookStyle::informationWidget::title_label_h,
                                utils::localize.get("app_phonebook_contact_information"));
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
@@ -33,35 +33,35 @@ namespace gui
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (contact->numbers.size() > 0) {
 
-                setMinimumHeight(widgetMinimumArea.h + 30);
+                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::title_label_h);
 
                 primaryNumberHBox = new NumberWithIconsWidget(app,
                                                               contact->numbers[0].number,
                                                               nullptr,
                                                               0,
                                                               0,
-                                                              phonebookStyle::multiLineTextWithLabelItem::w,
-                                                              phonebookStyle::multiLineTextWithLabelItem::h);
+                                                              phonebookStyle::informationWidget::w,
+                                                              phonebookStyle::informationWidget::h);
                 vBox->addWidget(primaryNumberHBox);
             }
             if (contact->numbers.size() > 0) {
-                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::multiLineTextWithLabelItem::h);
+                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::h);
                 alternativeNumberHBox = new NumberWithIconsWidget(app,
                                                                   contact->numbers[0].number,
                                                                   nullptr,
                                                                   0,
                                                                   0,
-                                                                  phonebookStyle::multiLineTextWithLabelItem::w,
-                                                                  phonebookStyle::multiLineTextWithLabelItem::h);
+                                                                  phonebookStyle::informationWidget::w,
+                                                                  phonebookStyle::informationWidget::h);
 
                 vBox->addWidget(alternativeNumberHBox);
             }
             if (contact->mail.length() > 0) {
-                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::multiLineTextWithLabelItem::h);
+                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::h);
 
                 emailText = new Text(nullptr, 0, 0, 0, 0);
-                emailText->setMaximumSize(phonebookStyle::multiLineTextWithLabelItem::w,
-                                          35);
+                emailText->setMaximumSize(phonebookStyle::informationWidget::w,
+                                          phonebookStyle::informationWidget::email_text_h);
                 emailText->setFont(style::window::font::medium);
                 emailText->setPenFocusWidth(style::window::default_border_focus_w);
                 emailText->setPenWidth(style::window::default_border_no_focus_w);
