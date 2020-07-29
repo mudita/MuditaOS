@@ -77,7 +77,6 @@ TEST_CASE("Thread Record tests")
             REQUIRE(w.contactID == contactIDTest);
         }
     }
-
     SECTION("Get all available records with query")
     {
         auto query  = std::make_shared<db::query::SMSThreadsGet>(0, 100);

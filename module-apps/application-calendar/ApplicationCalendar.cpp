@@ -17,7 +17,6 @@
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <module-services/service-db/messages/QueryMessage.hpp>
 #include <messages/QueryMessage.hpp>
-#include <messages/DBEventsMessage.hpp>
 
 namespace app
 {
@@ -31,37 +30,18 @@ namespace app
 
     sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-
-        auto retMsg = Application::DataReceivedHandler(msgl);
-        // if message was handled by application's template there is no need to process further.
-        if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
-            return retMsg;
-        }
-
-        // this variable defines whether message was processed.
-        bool handled = false;
-
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (dynamic_cast<db::QueryResponse *>(resp)) {
-                if (getCurrentWindow()->onDatabaseMessage(resp))
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-
-        if (handled)
-            return std::make_shared<sys::ResponseMessage>();
-        else
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        return Application::DataReceivedHandler(msgl);
     }
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
         auto ret = Application::InitHandler();
-        EventsRecord event(EventsTableRow{{1}, "tytfsfsful", "opsfsfis", 1910201424, 1910201536, 1, 2, 1});
+        EventsRecord event(EventsTableRow{{1}, "TEST", "TEST", 191020142, 191020153, 1, 2, 1});
+        EventsRecord event2(EventsTableRow{{2}, "TEST2", "TEST2", 191020152, 191020163, 1, 2, 1});
         DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event));
-        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::GetAll>());
+        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event));
+        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event2));
+        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event2));
         createUserInterface();
         return ret;
     }

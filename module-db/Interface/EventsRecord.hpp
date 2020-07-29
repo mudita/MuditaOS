@@ -55,12 +55,12 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
 {
   public:
     EventsRecordInterface(EventsDB *eventsDb);
-    virtual ~EventsRecordInterface() = default;
+    ~EventsRecordInterface() override = default;
 
     bool Add(const EventsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
     bool RemoveByField(EventsRecordField field, const char *str) override final;
-    bool Update(const EventsRecord &rec) override final;
+    bool Update(const EventsRecord &rec, const uint32_t &dateFromCheckVal);
     EventsRecord GetByID(uint32_t id) override final;
     uint32_t GetCount() override final;
     std::unique_ptr<std::vector<EventsRecord>> Select(uint32_t from, uint32_t till);
@@ -70,7 +70,7 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
                                                                      EventsRecordField field,
                                                                      const char *str) override final;
 
-    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
     EventsDB *eventsDb = nullptr;

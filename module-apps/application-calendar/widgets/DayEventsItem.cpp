@@ -28,7 +28,7 @@ namespace gui
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
 
-    void CalendarItem::setEvent(std::shared_ptr<EventsRecord> rec)
+    void DayEventsItem::setEvent(std::shared_ptr<EventsRecord> rec)
     {
         this->record = rec;
 

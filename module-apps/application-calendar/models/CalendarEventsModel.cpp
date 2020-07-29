@@ -28,7 +28,8 @@ gui::ListItem *CalendarEventsModel::getItem(gui::Order order)
         item->setEvent(record);
     }
     else {
-        LOG_DEBUG("Empty record in EventsMODEL::GetItem!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        LOG_DEBUG("Empty record in EventsModel::GetItem");
+        return nullptr;
     }
     LOG_DEBUG("Created new item in calendar day listView");
     item->activatedCallback = [=](gui::Item &item) {
@@ -48,4 +49,9 @@ bool CalendarEventsModel::updateRecords(std::unique_ptr<std::vector<EventsRecord
     list->onProviderDataUpdate();
 
     return true;
+}
+
+void CalendarEventsModel::setRecordsCount(const uint32_t &count)
+{
+    recordsCount = count;
 }

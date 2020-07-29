@@ -1,113 +1,173 @@
-//
-// Created by tomasz on 23.07.2020.
-//
+#include <catch2/catch.hpp>
 
-//#include "vfs.hpp"
-//
-//#include <catch2/catch.hpp>
-//
-//#include "Database/Database.hpp"
-//#include "Databases/EventsDB.hpp"
-//
-//#include "Tables/SettingsTable.hpp"
-//
-//#include <algorithm>
-//
-//#include <cstdint>
-//#include <cstdio>
-//#include <cstring>
-//
-// TEST_CASE("Events Table tests")
-//{
-//    Database::initialize();
-//
-//    vfs.remove(EventsDB::GetDBName());
-//
-//    EventsDB eventsdb;
-//    REQUIRE(eventsdb.isInitialized());
-//
-//    EventsTableRow testRow1 = {
-//        {.ID = 0},
-//        .title "tytul",
-//        .description = "opis",
-//        .date_from   = 2007242323,
-//        .date_till   = 2007262323,
-//        .reminder    = 0,
-//        .repeat      = 0,
-//        .time_zone   = 0,
-//
-//    };
-//
-//    // add 5 elements into table
-//    REQUIRE(eventsdb.events.add(testRow1));
-//    REQUIRE(eventsdb.events.add(testRow1));
-//    REQUIRE(eventsdb.events.add(testRow1));
-//    REQUIRE(eventsdb.events.add(testRow1));
-//    REQUIRE(eventsdb.events.add(testRow1));
-//
-//    // Table should have 5 elements
-//    REQUIRE(eventsdb.events.count() == 5);
-//
-//    // update existing element in table
-//    testRow1.ID    = 5;
-//    testRow1.title = "updated Test Events message ";
-//    REQUIRE(eventsdb.events.update(testRow1));
-//
-//    // Get table row using valid ID & check if it was updated
-//    auto events = eventsdb.events.getById(5);
-//    REQUIRE(events.title == testRow1.title);
-//
-//    // Get table row using invalid ID(should return empty eventsdb.eventsRow)
-//    auto eventsFailed = eventsdb.events.getById(100);
-//    REQUIRE(eventsFailed.title == "");
-//
-//    // Get table row using invalid ID(should return empty eventsdb.eventsRow)
-//    auto eventsFailed = eventsdb.events.getById(-1);
-//    REQUIRE(eventsFailed.title == "");
-//
-//    // Get table rows using valid offset/limit parameters
-//    auto retOffsetLimit = eventsdb.events.getLimitOffset(0, 5);
-//    REQUIRE(retOffsetLimit.size() == 5);
-//
-//    // Get table rows using valid offset/limit parameters and specific field's ID
-//    REQUIRE(eventsdb.events.getLimitOffsetByField(0, 4, EventsTableFields::Date, "0").size() == 4);
-//
-//    // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-//    auto retOffsetLimitBigger = eventsdb.events.getLimitOffset(0, 100);
-//    REQUIRE(retOffsetLimitBigger.size() == 4);
-//
-//    // Get table rows using invalid offset/limit parameters(should return empty object)
-//    auto retOffsetLimitFailed = eventsdb.events.getLimitOffset(5, 4);
-//    REQUIRE(retOffsetLimitFailed.size() == 0);
-//
-//    REQUIRE(eventsdb.events.removeById(2));
-//
-//    // All records should fit in this date time period
-//    auto retFiltered = selectByDatePeriod(2007242323, 2401251353);
-//    REQUIRE(retOffsetLimitBigger.size() == 4);
-//
-//    // Should return empty vector
-//    auto retFiltered = selectByDatePeriod(2007242323, 2401251353);
-//    REQUIRE(retOffsetLimitBigger.size() == 0);
-//
-//    // Table should have now 4 elements
-//    REQUIRE(eventsdb.events.count() == 4);
-//
-//    // Get table row using invalid ID(should return empty eventsdb.eventsRow)
-//    auto eventsFailed = eventsdb.events.getById(5);
-//    REQUIRE(eventsFailed.title == "");
-//
-//    // Remove non existing element
-//    REQUIRE(eventsdb.events.removeById(100));
-//
-//    // Remove all elements from table
-//    REQUIRE(eventsdb.events.removeById(1));
-//    REQUIRE(eventsdb.events.removeById(3));
-//    REQUIRE(eventsdb.events.removeById(4));
-//    REQUIRE(eventsdb.events.removeById(5));
-//
-//    // Table should be empty now
-//    REQUIRE(eventsdb.events.count() == 0);
-//
-//    Database::deinitialize();
-//}
+#include "Database/Database.hpp"
+#include "Databases/EventsDB.hpp"
+
+#include "Tables/EventsTable.hpp"
+
+#include <vfs.hpp>
+#include <stdint.h>
+#include <string>
+#include <algorithm>
+#include <iostream>
+
+TEST_CASE("Events Table tests")
+{
+    Database::initialize();
+
+    vfs.remove(EventsDB::GetDBName());
+
+    EventsDB eventsDb;
+    REQUIRE(eventsDb.isInitialized());
+
+    auto &eventsTbl = eventsDb.events;
+    REQUIRE(eventsTbl.count() == 0);
+
+    SECTION("Default Constructor")
+    {
+        EventsTableRow testRow;
+        REQUIRE(testRow.ID == DB_ID_NONE);
+        REQUIRE(testRow.title == "");
+        REQUIRE(testRow.description == "");
+        REQUIRE(testRow.date_from == 0);
+        REQUIRE(testRow.date_till == 0);
+        REQUIRE(testRow.reminder == 0);
+        REQUIRE(testRow.repeat == 0);
+        REQUIRE(testRow.time_zone == 0);
+        REQUIRE_FALSE(testRow.isValid());
+    }
+
+    REQUIRE(eventsTbl.add({{.ID = 0},
+                           .title       = "Event3",
+                           .description = "Desc3",
+                           .date_from   = 1910201424,
+                           .date_till   = 1910201536,
+                           .reminder    = 1,
+                           .repeat      = 2,
+                           .time_zone   = 1}));
+    REQUIRE(eventsTbl.add({{.ID = 0},
+                           .title       = "Event4",
+                           .description = "Desc4",
+                           .date_from   = 2104191224,
+                           .date_till   = 2104201536,
+                           .reminder    = 0,
+                           .repeat      = 3,
+                           .time_zone   = 0}));
+
+    REQUIRE(eventsTbl.count() == 2);
+
+    SECTION("Get entry by ID")
+    {
+        auto entry = eventsTbl.getById(2);
+        REQUIRE(entry.ID == 2);
+        REQUIRE(entry.title == "Event4");
+        REQUIRE(entry.description == "Desc4");
+        REQUIRE(entry.date_from == 2104191224);
+        REQUIRE(entry.date_till == 2104201536);
+        REQUIRE(entry.reminder == 0);
+        REQUIRE(entry.repeat == 3);
+        REQUIRE(entry.time_zone == 0);
+        REQUIRE(entry.isValid());
+    }
+
+    SECTION("Remove entry by ID")
+    {
+        auto response = eventsTbl.removeById(2);
+        REQUIRE(response);
+        REQUIRE_FALSE(eventsTbl.count() == 2);
+        REQUIRE_NOTHROW(eventsTbl.getById(2));
+        auto entry = eventsTbl.getById(1);
+        REQUIRE(entry.ID == 1);
+        REQUIRE(entry.title == "Event3");
+        REQUIRE(entry.description == "Desc3");
+        REQUIRE(entry.date_from == 1910201424);
+        REQUIRE(entry.date_till == 1910201536);
+        REQUIRE(entry.reminder == 1);
+        REQUIRE(entry.repeat == 2);
+        REQUIRE(entry.time_zone == 1);
+        REQUIRE(entry.isValid());
+    }
+
+    SECTION("Update entry by ID")
+    {
+        auto entry =
+            EventsTableRow({{.ID = 2}, "TestUpdateEvent", "Tested update event", 1910201500, 1910201854, 0, 2, 1});
+        REQUIRE(eventsTbl.update(entry));
+        auto record = eventsTbl.getById(2);
+        REQUIRE(record.ID == 2);
+        REQUIRE(record.title == "TestUpdateEvent");
+        REQUIRE(record.description == "Tested update event");
+        REQUIRE(record.date_from == 1910201500);
+        REQUIRE(record.date_till == 1910201854);
+        REQUIRE(record.reminder == 0);
+        REQUIRE(record.repeat == 2);
+        REQUIRE(record.time_zone == 1);
+        REQUIRE(record.isValid());
+    }
+
+    SECTION("Select entry by date")
+    {
+        REQUIRE(eventsTbl.add({{.ID = 0},
+                               .title       = "Event5",
+                               .description = "Desc5",
+                               .date_from   = 1910201424,
+                               .date_till   = 1910201536,
+                               .reminder    = 1,
+                               .repeat      = 2,
+                               .time_zone   = 1}));
+        REQUIRE(eventsTbl.add({{.ID = 0},
+                               .title       = "Event6",
+                               .description = "Desc6",
+                               .date_from   = 2104191224,
+                               .date_till   = 2104201536,
+                               .reminder    = 0,
+                               .repeat      = 3,
+                               .time_zone   = 0}));
+        REQUIRE(eventsTbl.add({{.ID = 0},
+                               .title       = "Event7",
+                               .description = "Desc7",
+                               .date_from   = 1910201524,
+                               .date_till   = 1910201536,
+                               .reminder    = 1,
+                               .repeat      = 2,
+                               .time_zone   = 1}));
+        REQUIRE(eventsTbl.add({{.ID = 0},
+                               .title       = "Event8",
+                               .description = "Desc8",
+                               .date_from   = 1504191224,
+                               .date_till   = 1504201536,
+                               .reminder    = 0,
+                               .repeat      = 3,
+                               .time_zone   = 0}));
+        REQUIRE(eventsTbl.add({{.ID = 0},
+                               .title       = "Event9",
+                               .description = "Desc9",
+                               .date_from   = 2510201424,
+                               .date_till   = 2510201536,
+                               .reminder    = 1,
+                               .repeat      = 2,
+                               .time_zone   = 1}));
+        REQUIRE(eventsTbl.add({{.ID = 0},
+                               .title       = "Event10",
+                               .description = "Desc10",
+                               .date_from   = 2112191224,
+                               .date_till   = 2112201536,
+                               .reminder    = 0,
+                               .repeat      = 3,
+                               .time_zone   = 0}));
+
+        auto entries = eventsTbl.selectByDatePeriod(1910201500, 2104201500);
+        auto entry   = entries.back();
+        REQUIRE(entry.ID == 5);
+        REQUIRE(entry.title == "Event7");
+        REQUIRE(entry.description == "Desc7");
+        REQUIRE(entry.date_from == 1910201524);
+        REQUIRE(entry.date_till == 1910201536);
+        REQUIRE(entry.reminder == 1);
+        REQUIRE(entry.repeat == 2);
+        REQUIRE(entry.time_zone == 1);
+        REQUIRE(entry.isValid());
+    }
+
+    Database::deinitialize();
+}

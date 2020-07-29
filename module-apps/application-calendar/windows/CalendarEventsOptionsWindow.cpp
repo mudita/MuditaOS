@@ -2,6 +2,8 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "Dialog.hpp"
 #include <Utils.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <module-db/queries/calendar/QueryEventsRemove.hpp>
 
 namespace gui
 {
@@ -34,6 +36,9 @@ namespace gui
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
             LOG_INFO("Detele calendar event");
+            uint32_t mockID = 2;
+            DBServiceAPI::GetQuery(
+                application, db::Interface::Name::Events, std::make_unique<db::query::events::Remove>(mockID));
             return true;
         };
         meta.text  = utils::localize.get("app_calendar_event_delete_confirmation");

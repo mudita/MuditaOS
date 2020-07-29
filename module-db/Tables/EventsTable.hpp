@@ -2,9 +2,9 @@
 
 #include "Table.hpp"
 #include "Record.hpp"
-#include "Database/Database.hpp"
-#include "utf8/UTF8.hpp"
-#include "Common/Common.hpp"
+#include <Database/Database.hpp>
+#include <Common/Common.hpp>
+#include <utf8/UTF8.hpp>
 
 struct EventsTableRow : public Record
 {
@@ -27,7 +27,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
 {
   public:
     EventsTable(Database *db);
-    virtual ~EventsTable() = default;
+    ~EventsTable() override = default;
 
     bool create() override final;
     bool add(EventsTableRow entry) override final;
@@ -39,8 +39,6 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     std::vector<EventsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
-    ///@param offset: (start index of record)
-    ///@param limit: (end index of record)
     std::vector<EventsTableRow> getLimitOffsetByField(uint32_t offset,
                                                       uint32_t limit,
                                                       EventsTableFields field,

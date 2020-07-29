@@ -7,7 +7,7 @@ class EventsDB : public Database
 {
   public:
     EventsDB();
-    virtual ~EventsDB() = default;
+    ~EventsDB() override = default;
 
     EventsTable events;
 
