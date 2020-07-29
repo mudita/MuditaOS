@@ -16,7 +16,7 @@ namespace gui
         setMaximumSize(phonebookStyle::informationWidget::w, phonebookStyle::informationWidget::h);
 
         vBox = new VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         titleLabel = new Label(vBox,
                                0,
@@ -24,7 +24,7 @@ namespace gui
                                phonebookStyle::informationWidget::w,
                                phonebookStyle::informationWidget::title_label_h,
                                utils::localize.get("app_phonebook_contact_information"));
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         titleLabel->setFont(style::window::font::small);
         titleLabel->setLineMode(true);
@@ -66,7 +66,7 @@ namespace gui
                 emailText->setPenFocusWidth(style::window::default_border_focus_w);
                 emailText->setPenWidth(style::window::default_border_no_focus_w);
                 emailText->setEditMode(EditMode::BROWSE);
-                emailText->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+                emailText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
                 emailText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
                 emailText->setText(contact->mail);
                 vBox->addWidget(emailText);
@@ -86,7 +86,7 @@ namespace gui
             return vBox->onInput(event);
         };
 
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     auto InformationWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
