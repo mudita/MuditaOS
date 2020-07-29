@@ -65,6 +65,7 @@ namespace gui
     {
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
+        vBox->resizeItems();
 
         return true;
     }

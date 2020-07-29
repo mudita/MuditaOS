@@ -41,13 +41,17 @@ namespace app
         {
             unsigned int index = 0;
             if (order == gui::Order::Previous) {
-                index = internalLimit - modelIndex - 1;
+
+                LOG_INFO("Co z tymi indexami kurwa %d, %d, %d", internalLimit, internalOffset, modelIndex);
+                index = internalLimit + internalOffset - modelIndex - 1;
             }
             if (order == gui::Order::Next) {
                 index = internalOffset + modelIndex;
             }
 
             if (isValidIndex(index, order)) {
+
+                LOG_INFO("Co z tym indexem kurwa %d", index);
 
                 return getNextInternalDataElement(index);
             }
