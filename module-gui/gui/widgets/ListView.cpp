@@ -234,6 +234,11 @@ namespace gui
     void ListView::setFocus()
     {
         setFocusItem(body);
+
+        if (focusOnLastItem) {
+            body->setFocusOnLastElement();
+            focusOnLastItem = false;
+        }
     };
 
     std::list<DrawCommand *> ListView::buildDrawList()
@@ -326,8 +331,9 @@ namespace gui
             // If starting page size smaller than last page - fill first page from top with last page size.
             if (startIndex < currentPageSize) {
                 body->setReverseOrder(false);
-                direction  = style::listview::Direction::Bottom;
-                startIndex = 0;
+                direction       = style::listview::Direction::Bottom;
+                startIndex      = 0;
+                focusOnLastItem = true;
                 provider->requestRecords(startIndex, currentPageSize);
             }
             else {

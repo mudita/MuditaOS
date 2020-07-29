@@ -8,6 +8,11 @@
 
 namespace gui
 {
+    enum class UnderlineDrawMode
+    {
+        WholeLine,
+        Concurrent
+    };
 
     /// interface element for TextDocument->getLine() <-- Text
     class TextLine : public Rect
@@ -16,12 +21,25 @@ namespace gui
         Length width_used                 = 0;
         Length height_used                = 0;
         std::list<Label *> elements_to_show_in_line;
-        Rect *underLine = nullptr;
+        Rect *underline                     = nullptr;
+        bool drawUnderline                  = false;
+        UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
+        Position underlinePadding           = 0;
+
+        void createUnderline(unsigned int max_width, unsigned int max_height);
+        void updateUnderline(const short &x, const short &y);
 
       public:
         /// creates TextLine with data from text from start position in `TextDocument` filling max_width
         /// @note might be better to have TextBlockIterator which could hop through TextBlock inside TextDocument
-        TextLine(TextDocument *, unsigned int start_position, unsigned int max_width, unsigned int max_height = 0);
+        TextLine(TextDocument *, unsigned int start_position, unsigned int max_width);
+        TextLine(TextDocument *,
+                 unsigned int start_position,
+                 unsigned int max_width,
+                 unsigned int init_height,
+                 bool drawUnderline,
+                 UnderlineDrawMode drawUnderlineMode,
+                 Position underlinePadding = 0);
         ~TextLine();
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&);

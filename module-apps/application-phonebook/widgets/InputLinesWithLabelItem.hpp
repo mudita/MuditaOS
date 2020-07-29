@@ -10,20 +10,21 @@
 
 namespace gui
 {
-    class InputLineWithLabelItem : public ContactListItem
+    class InputLinesWithLabelItem : public ContactListItem
     {
         phonebookInternals::ListItemName listItemName;
 
       public:
-        InputLineWithLabelItem(phonebookInternals::ListItemName listItemName,
-                               std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                               std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
-                               std::function<void()> selectSpecialCharacter                 = nullptr);
+        InputLinesWithLabelItem(phonebookInternals::ListItemName listItemName,
+                                std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                                std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
+                                std::function<void()> selectSpecialCharacter                 = nullptr,
+                                unsigned int lines                                           = 1);
 
-        ~InputLineWithLabelItem() override = default;
+        ~InputLinesWithLabelItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
-        VBox *vBox        = nullptr;
-        Label *titleLabel = nullptr;
+        VBox *vBox               = nullptr;
+        Label *titleLabel        = nullptr;
         TextFixedSize *inputText = nullptr;
 
       private:
