@@ -6,6 +6,7 @@
 
 * `[calendar]` Added events options and event delete windows.
 * `[sms]``[audio]` added incoming text message ringtone
+* `[sms]` Added network time synchronisation.
 
 ### Changed
 
