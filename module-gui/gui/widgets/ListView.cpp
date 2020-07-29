@@ -71,10 +71,16 @@ namespace gui
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
+
+                LOG_INFO("Woła się ten border z listy ?");
+
                 direction = style::listview::Direction::Top;
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
+
+                LOG_INFO("Woła się ten border z listy ?");
+
                 direction = style::listview::Direction::Bottom;
                 return this->listPageEndReached();
             }
@@ -179,6 +185,8 @@ namespace gui
         scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
         pageLoaded = true;
+
+        LOG_INFO("Rozmiar listy to %d", currentPageSize);
     }
 
     void ListView::onProviderDataUpdate()
@@ -209,6 +217,7 @@ namespace gui
         else {
             body->setSize(style::window::default_body_width, body->getHeight());
         }
+        body->resizeItems();
     }
 
     void ListView::addItemsOnPage()
@@ -323,13 +332,14 @@ namespace gui
             }
             else {
 
+                LOG_INFO("Co w tych chujach %d, %d", startIndex, calculateLimit());
                 topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
             }
 
             pageLoaded = false;
 
             // If starting page size smaller than last page - fill first page from top with last page size.
-            if (startIndex < currentPageSize) {
+            if (startIndex < 2) {
                 body->setReverseOrder(false);
                 direction       = style::listview::Direction::Bottom;
                 startIndex      = 0;

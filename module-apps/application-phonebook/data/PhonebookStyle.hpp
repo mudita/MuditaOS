@@ -111,17 +111,13 @@ namespace phonebookStyle
 
         constexpr uint32_t input_box_w = 55;
         constexpr uint32_t input_box_h = h;
+        constexpr uint32_t input_box_right_margin = 20;
 
-        constexpr uint32_t description_label_x = input_box_w + 20;
         constexpr uint32_t description_label_w = 280;
-        constexpr uint32_t description_label_h = 40;
-
-        constexpr uint32_t icon_image_x = description_label_x + description_label_w + 35;
-        constexpr uint32_t icon_image_w = 30;
-        constexpr uint32_t icon_image_h = 30;
+        constexpr uint32_t description_label_h            = 33;
+        constexpr uint32_t description_label_right_margin = 40;
 
         constexpr uint32_t tick_image_x = 12;
-        constexpr uint32_t tick_image_w = 30;
         constexpr uint32_t tick_image_h = 30;
 
     } // namespace inputBoxWithLabelAndIconItem

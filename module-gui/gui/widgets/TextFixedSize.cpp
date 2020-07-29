@@ -71,7 +71,7 @@ namespace gui
             // on resizes while not needed, after detach there can be no `break` othervise there will be leak - hence
             // detach
 
-            LOG_INFO("Co z tą pozycja %d", line_y_position);
+            //            LOG_INFO("Co z tą pozycja %d", line_y_position);
 
             lines.emplace(std::move(text_line));
             auto &line = lines.last();
@@ -79,25 +79,27 @@ namespace gui
             line.setParent(this);
             line.alignH(getAlignment(Axis::X), w);
 
-            LOG_INFO("Ile mamy miejsca %d", h);
-            LOG_INFO("Jaka wyskosc lini %d", text_line.height());
-            LOG_INFO("Ile mamy lini %d", currentLine);
+            //            LOG_INFO("Ile mamy miejsca %d", h);
+            //            LOG_INFO("Jaka wyskosc lini %d", text_line.height());
+            //            LOG_INFO("Ile mamy lini %d", currentLine);
 
             line_y_position += lineHeight;
 
-            LOG_INFO("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
-                     "%d \n x: %d, y: %d \n%s",
-                     cursor - lines.last().length(),
-                     lines.last().length(),
-                     cursor,
-                     document->getText().length(),
-                     line_x_position,
-                     line_y_position,
-                     [&]() -> std::string {
-                         std::string text = document->getText();
-                         return std::string(text.begin() + cursor - lines.last().length(), text.begin() + cursor);
-                     }()
-                                  .c_str());
+            //            LOG_INFO("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document
+            //            length "
+            //                     "%d \n x: %d, y: %d \n%s",
+            //                     cursor - lines.last().length(),
+            //                     lines.last().length(),
+            //                     cursor,
+            //                     document->getText().length(),
+            //                     line_x_position,
+            //                     line_y_position,
+            //                     [&]() -> std::string {
+            //                         std::string text = document->getText();
+            //                         return std::string(text.begin() + cursor - lines.last().length(), text.begin() +
+            //                         cursor);
+            //                     }()
+            //                                  .c_str());
 
             currentLine++;
 
