@@ -83,8 +83,6 @@ namespace gui
                 return false;
             }
 
-            LOG_INFO("jestem w parencie");
-
             return vBox->onInput(event);
         };
 
@@ -93,20 +91,9 @@ namespace gui
 
     auto InformationWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
-
-        LOG_INFO("Jaki nowy rozmiar %d, %d, %d, %d", newDim.x, newDim.y, newDim.w, newDim.h);
-
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
         vBox->resizeItems();
-
-        LOG_INFO("Co do chuja z tym vBoxem %d, %d, %d, %d",
-                 vBox->widgetArea.x,
-                 vBox->widgetArea.y,
-                 vBox->widgetArea.w,
-                 vBox->widgetArea.h);
-
-        LOG_INFO("Co do chuja z tym vBoxem rozmiar %lu", vBox->children.size());
 
         return true;
     }
