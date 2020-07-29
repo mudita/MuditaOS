@@ -41,19 +41,19 @@ void vfs::Init()
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
 
-    osRootPath = purefs::dir::eMMC_disk;
+    boot_config.os_root_path = purefs::dir::eMMC_disk;
 
-    if (getOSRootFromJSON()) {
-        LOG_INFO("vfs::Init osType %s root:%s", osType.c_str(), osRootPath.c_str());
-        if (ff_chdir(osRootPath.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't chdir to %s", osRootPath.c_str());
+    if (loadBootConfig(getCurrentBootJSON())) {
+        LOG_INFO("vfs::Init osType %s root:%s", boot_config.os_type.c_str(), boot_config.os_root_path.c_str());
+        if (ff_chdir(boot_config.os_root_path.c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", boot_config.os_root_path.c_str());
         }
     }
     else {
-        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", osRootPath.c_str());
+        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", boot_config.os_root_path.c_str());
     }
 
-    LOG_INFO("vfs::Init running on ARM osRootPath: %s", osRootPath.c_str());
+    LOG_INFO("vfs::Init running on ARM osRootPath: %s", boot_config.os_root_path.c_str());
 
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
@@ -66,56 +66,6 @@ void vfs::Init()
     else {
         LOG_INFO("vfs::Init looks like %s exists", purefs::dir::user_disk.c_str());
     }
-}
-
-std::string vfs::loadFileAsString(const fs::path &fileToLoad)
-{
-    std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
-    FILE *fp = fopen(fileToLoad.c_str(), "r");
-    std::string contents;
-    size_t readSize;
-
-    if (fp != NULL) {
-        while (!eof(fp)) {
-            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp);
-            contents.append(static_cast<const char *>(readBuf.get()), readSize);
-        }
-
-        fclose(fp);
-    }
-
-    return contents;
-}
-
-bool vfs::getOSRootFromJSON()
-{
-    const fs::path currentBootJSON = getCurrentBootJSON();
-    std::string parseErrors        = "";
-
-    LOG_INFO("vfs::getOSRootFromJSON parsing %s", currentBootJSON.c_str());
-    bootJson = json11::Json::parse(loadFileAsString(currentBootJSON), parseErrors);
-
-    if (parseErrors == "") {
-        osType     = bootJson[purefs::json::main][purefs::json::os_type].string_value();
-        osRootPath = purefs::dir::eMMC_disk / osType;
-
-        return true;
-    }
-    else {
-        LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", currentBootJSON.c_str(), parseErrors.c_str());
-
-        return false;
-    }
-}
-
-const fs::path vfs::getCurrentBootJSON()
-{
-    if (verifyCRC(purefs::file::boot_json)) {
-        return relativeToRoot(purefs::file::boot_json);
-    }
-
-    LOG_INFO("vfs::getCurrentBootJSON crc check failed on %s", purefs::file::boot_json.c_str());
-    return "";
 }
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
@@ -325,16 +275,16 @@ std::string vfs::relativeToRoot(const std::string path)
     fs::path fsPath(path);
 
     if (fsPath.is_absolute()) {
-        if (osRootPath.root_directory() == fsPath.root_directory())
+        if (boot_config.os_root_path.root_directory() == fsPath.root_directory())
             return fsPath;
         else
             return (purefs::dir::eMMC_disk / fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
-        return osRootPath;
+        return boot_config.os_root_path;
     else
-        return osRootPath / fsPath;
+        return boot_config.os_root_path / fsPath;
 }
 
 bool vfs::isDir(const char *path)
