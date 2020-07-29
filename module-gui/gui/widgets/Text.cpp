@@ -224,7 +224,6 @@ namespace gui
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
-        drawLines();
         return true;
     }
 
@@ -343,25 +342,25 @@ namespace gui
         // silly case resize - there request space and all is nice
         // need to at least erase last line if it wont fit
         // should be done on each loop
-        //        {
-        //            uint16_t h_used = line_y_position + padding.bottom;
-        //            uint16_t w_used = lines.maxWidth();
-        //            if (lines.size() == 0) {
-        //                debug_text("No lines to show, try to at least fit in cursor");
-        //                if (font != nullptr) {
-        //                    h_used += font->info.line_height;
-        //                    w_used += TextCursor::default_width;
-        //                    debug_text("epty line height: %d", h_used);
-        //                }
-        //            }
-        //            if (h_used != area(Area::Normal).size(Axis::Y) || w_used != area(Area::Normal).size(Axis::X)) {
-        //                debug_text("size request: %d %d", w_used, h_used);
-        //                auto [w, h] = requestSize(w_used, h_used);
-        //                LOG_INFO("size granted: {%" PRIu32 ", %" PRIu32 "}", w, h);
-        //                // if last wont fit lines.eraseLast();
-        //                // break;
-        //            }
-        //        }
+        {
+            uint16_t h_used = line_y_position + padding.bottom;
+            uint16_t w_used = lines.maxWidth();
+            if (lines.size() == 0) {
+                debug_text("No lines to show, try to at least fit in cursor");
+                if (font != nullptr) {
+                    h_used += font->info.line_height;
+                    w_used += TextCursor::default_width;
+                    debug_text("epty line height: %d", h_used);
+                }
+            }
+            if (h_used != area(Area::Normal).size(Axis::Y) || w_used != area(Area::Normal).size(Axis::X)) {
+                debug_text("size request: %d %d", w_used, h_used);
+                auto [w, h] = requestSize(w_used, h_used);
+                LOG_INFO("size granted: {%" PRIu32 ", %" PRIu32 "}", w, h);
+                // if last wont fit lines.eraseLast();
+                // break;
+            }
+        }
 
         lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
 
