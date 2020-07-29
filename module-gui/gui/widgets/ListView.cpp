@@ -116,7 +116,7 @@ namespace gui
 
     void ListView::setProvider(std::shared_ptr<ListItemProvider> prov)
     {
-        provider       = prov;
+        provider = prov;
         if (provider != nullptr) {
 
             provider->list = this;
