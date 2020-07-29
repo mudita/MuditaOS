@@ -21,11 +21,11 @@ namespace gui
                               const uint32_t &h);
         ~NumberWithIconsWidget() override = default;
 
-        Text *numberText  = nullptr;
+        Text *numberText     = nullptr;
         ImageBox *phoneImage = nullptr;
         ImageBox *smsImage   = nullptr;
 
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
     };
 
 } /* namespace gui */
