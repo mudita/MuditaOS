@@ -1,5 +1,7 @@
-//#include "application-calendar/models/CustomRepeatModel.hpp"
 #include "CheckBoxItem.hpp"
+#include "application-calendar/widgets/CalendarStyle.hpp"
+#include "application-calendar/windows/NewEditEventWindow.hpp"
+#include "windows/AppWindow.hpp"
 #include <ListView.hpp>
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
@@ -7,27 +9,31 @@
 namespace gui
 {
 
-    CheckBoxItem::CheckBoxItem(const std::string &description,
-                               std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                               std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+    CheckBoxItem::CheckBoxItem(app::Application *application, const std::string &description)
     {
-        setMinimumSize(style::window::default_body_width, 62);
-        setMaximumSize(style::window::default_body_width, 62);
+        app = application;
+        assert(app != nullptr);
+        setMinimumSize(style::window::default_body_width, style::window::calendar::item::checkBox::height);
+        setMaximumSize(style::window::default_body_width, style::window::calendar::item::checkBox::height);
 
-        // setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
-        hBox = new gui::HBox(this, 0, 0, 400, 0);
+        hBox = new gui::HBox(this, 0, 0, style::window::default_body_width, 0);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
-        hBox->setPenWidth(1);
+        hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
-        inputBoxLabel = new gui::Label(hBox, 0, 0, 0, 0);
-        inputBoxLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        inputBoxLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
-        inputBoxLabel->setFont(style::window::font::medium);
-        inputBoxLabel->activeItem = false;
+        checkBox = new gui::CheckBox(
+            hBox,
+            0,
+            0,
+            50,
+            30,
+            [=](const UTF8 &text, gui::BottomBar::Side side, bool emptyOthers) {
+                app->getCurrentWindow()->bottomBarTemporaryMode(text, side, emptyOthers);
+            },
+            [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+        checkBox->activeItem = false;
 
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
         descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -35,29 +41,18 @@ namespace gui
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
 
-        tickImage = new gui::Image(hBox, 0, 0, 0, 0);
-        tickImage->setVisible(false);
-        tickImage->activeItem = false;
-
         descriptionLabel->setText(description);
-        tickImage->set("small_tick");
 
-        /*this->focusChangedCallback = [&](gui::Item &item) {
+        focusChangedCallback = [&](Item &item) {
             if (focus) {
-                setFocusItem(inputBoxLabel);
-                if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
-                }
-                else {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
-                }
+                setFocusItem(checkBox);
             }
             else {
+                // descriptionLabel->setFont(style::window::font::medium);
                 setFocusItem(nullptr);
-                bottomBarRestoreFromTemporaryMode();
             }
             return true;
-        };*/
+        };
     }
 
     bool CheckBoxItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -65,28 +60,12 @@ namespace gui
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);
         LOG_DEBUG("SIZE: %i,  %i", newDim.w, newDim.h);
-        inputBoxLabel->setArea(BoundingBox(0, newDim.h - 50, 55, 50));
 
-        descriptionLabel->setArea(BoundingBox(75, newDim.h - 40, 280, 40));
+        descriptionLabel->setArea(BoundingBox(style::window::calendar::item::checkBox::description_label_x,
+                                              newDim.h - style::window::calendar::item::checkBox::description_label_h,
+                                              style::window::calendar::item::checkBox::description_label_w,
+                                              style::window::calendar::item::checkBox::description_label_h));
 
-        tickImage->setArea(BoundingBox(12, newDim.h - 35, 30, 30));
-
-        return true;
-    }
-
-    void CheckBoxItem::changeFont()
-    {}
-
-    bool CheckBoxItem::onActivated(void *data)
-    {
-        /// TODO: Center check/uncheck, now it is on the left side.
-        tickImage->setVisible(!tickImage->visible);
-        if (tickImage->visible) {
-            bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
-        }
-        else {
-            bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
-        }
         return true;
     }
 
