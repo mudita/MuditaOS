@@ -3,16 +3,26 @@
 
 namespace gui
 {
-    TextFixedSize::TextFixedSize(Item *parent, Position x, Position y, Length w, Length h, unsigned int linesCount)
-        : Text(parent, x, y, w, h)
+    TextFixedSize::TextFixedSize(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
-        this->linesCount = linesCount;
         setEditMode(EditMode::EDIT);
+        underline = true;
     }
 
     void TextFixedSize::setLines(const unsigned int val)
     {
-        linesCount = val;
+        if (linesCount != val) {
+            linesCount = val;
+            drawLines();
+        }
+    }
+
+    void TextFixedSize::setUnderlinePadding(Position val)
+    {
+        if (underlinePadding != val) {
+            underlinePadding = val;
+            drawLines();
+        }
     }
 
     void TextFixedSize::drawLines()
@@ -36,19 +46,24 @@ namespace gui
         auto line_y_position = padding.top;
         auto cursor          = 0;
 
-        unsigned int currentLine = 1;
-        unsigned int lineHeight  = font->info.line_height + 4;
+        unsigned int currentLine = 0;
+        unsigned int lineHeight  = font->info.line_height + underlinePadding;
 
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(document.get(), cursor, w, lineHeight);
+            auto text_line = gui::TextLine(
+                document.get(), cursor, w, lineHeight, underline, UnderlineDrawMode::WholeLine, underlinePadding);
             cursor += text_line.length();
 
-            //            if (text_line.height() > 0 && lineHeight != text_line.height()) {
-            //                lineHeight = text_line.height();
-            //            }
+            if (text_line.height() > 0 && lineHeight != text_line.height()) {
+                lineHeight = text_line.height();
+            }
 
             if (line_y_position + lineHeight > h) { // no more space for next line
+                break;
+            }
+
+            if (currentLine >= linesCount) {
                 break;
             }
 
