@@ -17,7 +17,7 @@ namespace gui
         : HBox(parent, x, y, w, h)
     {
         setReverseOrder(true);
-        setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         setPenFocusWidth(style::window::default_border_focus_w);
         setPenWidth(style::window::default_border_no_focus_w);
