@@ -343,12 +343,7 @@ class Thread {
 
 
 #ifdef CPP_FREERTOS_CONDITION_VARIABLES
-/**
- *  Reference to the underlying task handle for this thread.
- *  Can be obtained from GetHandle().
- */
-TaskHandle_t handle;
-    public: // TODO: M.P
+public: // TODO: M.P
         /**
          *  Have this thread wait on a condition variable.
          *
@@ -377,6 +372,11 @@ TaskHandle_t handle;
     //
     /////////////////////////////////////////////////////////////////////////
     private:
+        /**
+         *  Reference to the underlying task handle for this thread.
+         *  Can be obtained from GetHandle().
+         */
+        TaskHandle_t handle;
 
         /**
          *  We need to track whether the scheduler is active or not.

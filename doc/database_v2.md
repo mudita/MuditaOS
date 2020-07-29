@@ -351,6 +351,20 @@ By default sepecial gorups are created:
 | group_id | (r) | INTEGER | Id of group. |
 | contact_id | (r) | INTEGER | Id of contact. |
 
+#### 17. Events table
+Name: events
+
+| ID | Title | Description |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the event |
+| title | (m) | TEXT | Event title provided by the user. |
+| description | (m) | TEXT | Event description provided by the user. |
+| date_from | (m) | INTEGER | Event start time provided by the user. |
+| date_till | (m) | INTEGER | Event end time provided by the user. |
+| reminder | (m) | INTEGER | Event reminder time provided by the user. |
+| repeat | (m) | INTEGER | Event repeat option provided by the user. |
+| time_zone | (m) | INTEGER | Event creation time zone imported from settings. Needed to calculate the offset of event while changing time zone |
+
 ## Database Triggers <a name="triggers"></a>
 
 This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count column with _id equal to 1 in the threads_count table is incremented by 1.
