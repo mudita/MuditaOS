@@ -70,10 +70,29 @@ namespace purefs
         const inline std::string os_type         = "ostype";
         const inline std::string os_image        = "imagename";
         const inline std::string os_version      = "version";
+        const inline std::string timestamp       = "timestamp";
+
+        const inline std::string git_info        = "git";
         const inline std::string os_git_tag      = "git_tag";
         const inline std::string os_git_revision = "git_commit";
         const inline std::string os_git_branch   = "git_branch";
+
+        const inline std::string bootloader      = "bootloader";
     } // namespace json
+
+    struct boot_config_t
+    {
+        std::string os_image;
+        std::string os_type;
+        std::string os_version;
+        std::string bootloader_verion;
+        std::string timestamp;
+
+        fs::path os_root_path;
+        fs::path boot_json;
+
+        json11::Json to_json() const;
+    };
 };    // namespace purefs
 
 class vfs
@@ -140,6 +159,8 @@ class vfs
     int mkdir(const char *dir);
     int rename(const char *oldname, const char *newname);
     std::string loadFileAsString(const fs::path &fileToLoad);
+    bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
+    void updateTimestamp();
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
@@ -152,11 +173,11 @@ class vfs
     static std::string generateRandomId(size_t length);
 
   private:
-    bool getOSRootFromJSON();
+
     const fs::path getCurrentBootJSON();
-    fs::path osRootPath;
-    std::string osType;
-    json11::Json bootJson;
+    bool loadBootConfig(const fs::path &bootJsonPath);
+    bool updateBootConfig(const fs::path &bootJsonPath);
+    struct purefs::boot_config_t boot_config;
 };
 
 extern vfs vfs;
