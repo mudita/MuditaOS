@@ -10,6 +10,7 @@
 ### Changed
 
 * `[desktop]` Reimplemented JSON message parser.
+* `[audio]` Error codes unification.
 
 ### Fixed
 
@@ -50,7 +51,6 @@
 * `[gui]` Moved Icon item into general widgets folder.
 * `[backup-restore]` Add basic handling of backup and restore through JSon parser.
 * `[factory-reset]` Add basic handling of factory reset through JSon parser.
-* `[audio]` Error codes unification.
 
 ## [0.29.1] - 2020-07-17
 
