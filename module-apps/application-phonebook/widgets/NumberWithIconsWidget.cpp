@@ -59,16 +59,6 @@ namespace gui
         numberText->setEditMode(EditMode::BROWSE);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         numberText->setText(number.getFormatted());
-
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-
-            LOG_INFO("jestem w dziecku?");
-
-            return false;
-        };
     }
 
     auto NumberWithIconsWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
