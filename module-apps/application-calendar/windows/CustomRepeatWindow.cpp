@@ -5,7 +5,7 @@
 #include <gui/widgets/TopBar.hpp>
 #include <Utils.hpp>
 
-namespace app
+namespace gui
 {
 
     CustomRepeatWindow::CustomRepeatWindow(app::Application *app, std::string name)
@@ -41,4 +41,4 @@ namespace app
         setFocusItem(list);
     }
 
-} /* namespace app */
+} /* namespace gui */

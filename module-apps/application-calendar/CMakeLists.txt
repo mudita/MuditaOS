@@ -22,6 +22,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/RepeatAndReminderItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventTimeItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/SeveralOptionsItem.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.hpp"

@@ -6,7 +6,7 @@
 #include <gui/widgets/Item.hpp>
 #include <ListView.hpp>
 
-namespace app
+namespace gui
 {
     class CustomRepeatWindow : public gui::AppWindow
     {
@@ -14,11 +14,10 @@ namespace app
         std::shared_ptr<CustomRepeatModel> customRepeatModel = nullptr;
 
       public:
-        CustomRepeatWindow(Application *app, std::string name);
+        CustomRepeatWindow(app::Application *app, std::string name);
 
-        // bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild() override;
         void buildInterface() override;
     };
 
-} /* namespace app */
+} /* namespace gui */
