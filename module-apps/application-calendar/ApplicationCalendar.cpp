@@ -80,10 +80,10 @@ namespace app
             new gui::EventDetailWindow(this, style::window::calendar::name::details_window)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::new_edit_event,
-            new NewEditEventWindow(this, style::window::calendar::name::new_edit_event)));
+            new gui::NewEditEventWindow(this, style::window::calendar::name::new_edit_event)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::custom_repeat_window,
-            new CustomRepeatWindow(this, style::window::calendar::name::custom_repeat_window)));
+            new gui::CustomRepeatWindow(this, style::window::calendar::name::custom_repeat_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()

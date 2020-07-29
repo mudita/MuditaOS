@@ -6,7 +6,6 @@
 class CustomRepeatModel : public gui::ListItemProvider
 {
     app::Application *application = nullptr;
-    const int daysInWeek          = 7;
     int count                     = 7;
 
   public:
@@ -14,10 +13,10 @@ class CustomRepeatModel : public gui::ListItemProvider
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
     // virtual methods for ListViewProvider
-    unsigned int getMinimalItemHeight() const override;
+    [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
-    int getItemCount() const override
+    [[nodiscard]] int getItemCount() const override
     {
-        return daysInWeek;
+        return style::window::calendar::week_days_number;
     };
 };

@@ -14,18 +14,15 @@ namespace gui
         gui::Text *hourInput         = nullptr;
         gui::Text *minuteInput       = nullptr;
         gui::Text *mode12hInput      = nullptr;
-
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        bool mode24H                 = false;
 
       public:
-        EventTimeItem(const std::string &description,
-                      std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                      std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
-        virtual ~EventTimeItem() = default;
+        EventTimeItem(const std::string &description, bool mode24H);
+        virtual ~EventTimeItem() override = default;
 
+        void prepareForTimeMode();
+        void setNavigation();
         // virtual methods from Item
-        bool onActivated(void *data) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 

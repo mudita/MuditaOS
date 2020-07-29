@@ -81,15 +81,53 @@ namespace style
                     const inline int event_time_h  = 30;
                     const inline int description_h = 40;
                 } // namespace eventDetail
-            } // namespace item
 
-            namespace options
-            {
-                const inline int item_height = 55;
-                const inline int margin      = 15;
-                const inline int text_margin = 10;
-                const inline int label_y     = 112;
-            } // namespace options
+                namespace eventTime
+                {
+                    const inline int height              = 120;
+                    const inline int margin              = 22;
+                    const inline int description_label_w = 150;
+                    const inline int description_label_h = 20;
+                    const inline int colon_label_12h_x   = 130;
+                    const inline int colon_label_24h_x   = 210;
+                    const inline int colon_label_y       = 85;
+                    const inline int colon_label_w       = 25;
+                    const inline int colon_label_h       = 20;
+                    const inline int hour_input_x        = 0;
+                    const inline int minute_input_12h_x  = 155;
+                    const inline int minute_input_24h_x  = 235;
+                    const inline int mode12h_input_x     = 310;
+                    const inline int time_input_y        = 20;
+                    const inline int time_input_12h_w    = 130;
+                    const inline int time_input_24h_w    = 207;
+                } // namespace eventTime
+
+                namespace checkBox
+                {
+                    const inline int height              = 62;
+                    const inline int input_box_label_w   = 55;
+                    const inline int input_box_label_h   = 50;
+                    const inline int description_label_x = 75;
+                    const inline int description_label_w = 280;
+                    const inline int description_label_h = 40;
+                    const inline int tick_image_x        = 12;
+                    const inline int tick_image_w        = 30;
+                    const inline int tick_image_h        = 30;
+                } // namespace checkBox
+
+                namespace severalOptions
+                {
+                    const inline int height              = 62;
+                    const inline int margin              = 15;
+                    const inline int description_label_w = 100;
+                    const inline int description_label_h = 30;
+                    const inline int option_label_y      = 30;
+                    const inline int option_label_h      = 30;
+                    const inline int arrow_y             = 36;
+                    const inline int arrow_w             = 20;
+                    const inline int arrow_h             = 20;
+                } // namespace severalOptions
+            } // namespace item
 
             namespace details
             {
@@ -100,7 +138,6 @@ namespace style
                 const inline int remind_heading_y = 290;
                 const inline int remind_y         = 345;
             } // namespace details
-
         }; // namespace calendar
     }      // namespace window
 } // namespace style
