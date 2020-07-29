@@ -104,6 +104,8 @@ namespace at
         STORE_SETTINGS_ATW, /// required to save in firmware ex SIMSTAT_ON
         CEER,               /// get error description from modem
         QIGETERROR,         /// get tcp/ip error code
+        ENABLE_TIME_ZONE_UPDATE,
+        SET_TIME_ZONE_REPORTING
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -156,6 +158,8 @@ namespace at
             {AT::STORE_SETTINGS_ATW, {"AT&W\r"}},
             {AT::CEER, {"AT+CEER\r"}},
             {AT::QIGETERROR, {"AT+QIGETERROR\r"}},
+            {AT::ENABLE_TIME_ZONE_UPDATE, {"AT+CTZU=3\r"}},
+            {AT::SET_TIME_ZONE_REPORTING, {"AT+CTZR=2\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);

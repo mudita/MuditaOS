@@ -26,11 +26,14 @@
 #include "harness/events/FocusApp.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <at/URC_CTZE.hpp>
+
 #include <cassert>
 
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/common.hpp"
+#include "bsp/rtc/rtc.hpp"
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -38,6 +41,7 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
     alarmTimestamp = 0;
     alarmID        = 0;
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
 EventManager::~EventManager()
@@ -174,6 +178,16 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::Bus::SendUnicast(message, "ServiceCellular", this);
         }
         handled = true;
+    }
+    else if (msgl->messageType == MessageType::CellularNotification) {
+        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            if (msg->type == CellularNotificationMessage::Type::NetworkTimeUpdated) {
+                auto ctze     = at::urc::CTZE(msg->data);
+                auto timeinfo = ctze.getTimeInfo();
+                bsp::rtc_SetDateTime(&timeinfo);
+            }
+        }
     }
     if (handled)
         return std::make_shared<sys::ResponseMessage>();

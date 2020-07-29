@@ -1000,6 +1000,10 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         cmux->setMode(TS0710::Mode::AT);
     }
 
+    if (str.find("+CTZE: ") != std::string::npos) {
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
+                                                             str);
+    }
     // Power Down
     if (powerdown::isNormalPowerDown(str)) {
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistering);
@@ -1491,6 +1495,9 @@ bool ServiceCellular::handle_modem_on()
 
 bool ServiceCellular::handle_URCReady()
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
+    channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
     LOG_DEBUG("%s", state.c_str());
     return true;
 }

@@ -70,6 +70,7 @@ class CellularNotificationMessage : public CellularMessage
         RawCommand,               // send raw command to modem -> returns raw, tokenised result
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
+        NetworkTimeUpdated        // modem informed it has updated time
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
