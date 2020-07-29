@@ -67,6 +67,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    vfs.updateTimestamp();
+
     return (sys::ReturnCodes::Success);
 }
 
