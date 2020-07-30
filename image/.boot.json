@@ -4,10 +4,6 @@
         "ostype": "current",
         "imagename": "boot.bin"
     },
-    "config":
-    {
-        "allow_downgrade":0
-    },
     "bootloader":
     {
         "version":"0.0.0"
