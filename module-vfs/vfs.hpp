@@ -66,18 +66,18 @@ namespace purefs
 
     namespace json
     {
-        const inline std::string main            = "main";
-        const inline std::string os_type         = "ostype";
-        const inline std::string os_image        = "imagename";
-        const inline std::string os_version      = "version";
-        const inline std::string timestamp       = "timestamp";
+        const inline std::string main       = "main";
+        const inline std::string os_type    = "ostype";
+        const inline std::string os_image   = "imagename";
+        const inline std::string os_version = "version";
+        const inline std::string timestamp  = "timestamp";
 
         const inline std::string git_info        = "git";
         const inline std::string os_git_tag      = "git_tag";
         const inline std::string os_git_revision = "git_commit";
         const inline std::string os_git_branch   = "git_branch";
 
-        const inline std::string bootloader      = "bootloader";
+        const inline std::string bootloader = "bootloader";
     } // namespace json
 
     struct boot_config_t
@@ -173,7 +173,7 @@ class vfs
     static std::string generateRandomId(size_t length);
 
   private:
-
+    bool updateFileCRC32(const fs::path &file);
     const fs::path getCurrentBootJSON();
     bool loadBootConfig(const fs::path &bootJsonPath);
     bool updateBootConfig(const fs::path &bootJsonPath);
