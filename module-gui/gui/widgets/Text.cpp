@@ -79,8 +79,13 @@ namespace gui
     void Text::setTextType(TextType type)
     {}
 
-    void Text::setUnderline(bool underline)
-    {}
+    void Text::setUnderline(const bool val)
+    {
+        if (underline != val) {
+            underline = val;
+            drawLines();
+        }
+    }
 
     void Text::setText(const UTF8 &text)
     {

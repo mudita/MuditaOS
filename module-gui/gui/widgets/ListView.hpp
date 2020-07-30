@@ -28,11 +28,11 @@ namespace gui
         std::shared_ptr<ListItemProvider> provider = nullptr;
         VBox *body                                 = nullptr;
         ListViewScroll *scroll                     = nullptr;
-        bool focusOnLastItem                       = false;
 
-        int currentPageSize = 0;
-        bool pageLoaded     = false;
-        int scrollTopMargin = style::margins::big;
+        int currentPageSize  = 0;
+        bool pageLoaded      = false;
+        bool focusOnLastItem = false;
+        int scrollTopMargin  = style::margins::big;
 
         style::listview::Type listType       = style::listview::Type::TopDown;
         style::listview::Direction direction = style::listview::Direction::Bottom;

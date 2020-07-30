@@ -71,12 +71,10 @@ namespace gui
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
-
                 direction = style::listview::Direction::Top;
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
-
                 direction = style::listview::Direction::Bottom;
                 return this->listPageEndReached();
             }
@@ -212,7 +210,8 @@ namespace gui
             if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
                 clearItems();
                 body->setReverseOrder(false);
-                direction = style::listview::Direction::Bottom;
+                direction       = style::listview::Direction::Bottom;
+                focusOnLastItem = true;
                 provider->requestRecords(startIndex, calculateLimit());
             }
         }
@@ -226,7 +225,6 @@ namespace gui
         else {
             body->setSize(style::window::default_body_width, body->getHeight());
         }
-        body->resizeItems();
     }
 
     void ListView::addItemsOnPage()

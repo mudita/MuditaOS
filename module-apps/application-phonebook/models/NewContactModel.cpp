@@ -39,22 +39,19 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::FirstName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        3));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::SecondName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        4));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::Number,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        5));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::OtherNumber,
@@ -85,14 +82,13 @@ void NewContactModel::createData()
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        4));
+        2));
 
     internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::Note,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        4));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     for (auto item : internalData) {
         item->deleteByList = false;

@@ -15,7 +15,7 @@ namespace gui
     };
 
     /// interface element for TextDocument->getLine() <-- Text
-    class TextLine : public Rect
+    class TextLine
     {
         unsigned int number_letters_shown = 0;
         Length width_used                 = 0;
@@ -83,11 +83,11 @@ namespace gui
             return elements_to_show_in_line.front()->area().pos(Axis::X);
         }
 
-        void setPosition(const short &x, const short &y) override;
+        void setPosition(const short &x, const short &y);
         void setParent(Item *parent);
-        [[nodiscard]] Length getWidth() const override;
+        [[nodiscard]] Length getWidth() const;
         [[nodiscard]] Length getWidthTo(unsigned int pos) const;
-        void erase() override;
+        void erase();
         /// align TextLine due to alignment axis in parent_width
         ///
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
