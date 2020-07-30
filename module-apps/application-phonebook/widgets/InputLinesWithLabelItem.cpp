@@ -15,28 +15,28 @@ namespace gui
                                                      unsigned int lines)
         : listItemName(listItemName)
     {
-        setMinimumSize(phonebookStyle::inputLineWithLabelItem::w,
-                       phonebookStyle::inputLineWithLabelItem::title_label_h +
-                           phonebookStyle::inputLineWithLabelItem::span_size +
-                           phonebookStyle::inputLineWithLabelItem::input_text_h * lines);
+        setMinimumSize(phonebookStyle::inputLinesWithLabelItem::w,
+                       phonebookStyle::inputLinesWithLabelItem::title_label_h +
+                           phonebookStyle::inputLinesWithLabelItem::span_size +
+                           phonebookStyle::inputLinesWithLabelItem::input_text_h * lines);
         setMargins(gui::Margins(0, style::margins::huge, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         titleLabel = new Label(vBox);
-        titleLabel->setMinimumSize(phonebookStyle::inputLineWithLabelItem::w,
-                                   phonebookStyle::inputLineWithLabelItem::title_label_h);
+        titleLabel->setMinimumSize(phonebookStyle::inputLinesWithLabelItem::w,
+                                   phonebookStyle::inputLinesWithLabelItem::title_label_h);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         titleLabel->setFont(style::window::font::verysmall);
         titleLabel->activeItem = false;
 
         inputText = new TextFixedSize(vBox, 0, 0, 0, 0);
-        inputText->setMinimumSize(phonebookStyle::inputLineWithLabelItem::w,
-                                  phonebookStyle::inputLineWithLabelItem::input_text_h * lines);
-        inputText->setMargins(Margins(0, phonebookStyle::inputLineWithLabelItem::span_size, 0, 0));
-        inputText->setUnderlinePadding(phonebookStyle::inputLineWithLabelItem::underline_padding);
+        inputText->setMinimumSize(phonebookStyle::inputLinesWithLabelItem::w,
+                                  phonebookStyle::inputLinesWithLabelItem::input_text_h * lines);
+        inputText->setMargins(Margins(0, phonebookStyle::inputLinesWithLabelItem::span_size, 0, 0));
+        inputText->setUnderlinePadding(phonebookStyle::inputLinesWithLabelItem::underline_padding);
 
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));

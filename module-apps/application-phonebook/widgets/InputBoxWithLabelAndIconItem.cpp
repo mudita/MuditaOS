@@ -37,6 +37,11 @@ namespace gui
 
         tickImage = new gui::Image(hBox, 0, 0, 0, 0);
         tickImage->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+        // Not ideal -> best solution would be to create separate widget with image inside box.
+        tickImage->setMargins(gui::Margins(phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_left_margin,
+                                           0,
+                                           phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_right_margin,
+                                           0));
         tickImage->setVisible(false);
         tickImage->activeItem = false;
 
@@ -63,10 +68,6 @@ namespace gui
     {
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);
-
-        tickImage->setPosition(phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_x,
-                               (newDim.h - phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_h) / 2);
-
         hBox->resizeItems();
 
         return true;
@@ -162,6 +163,8 @@ namespace gui
                 else {
                     bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                 }
+                hBox->resizeItems();
+                return true;
             }
             return false;
         };
@@ -207,6 +210,8 @@ namespace gui
                 else {
                     bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                 }
+                hBox->resizeItems();
+                return true;
             }
             return false;
         };
