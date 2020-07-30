@@ -62,13 +62,18 @@ namespace app
             return (index < internalData.size()) || (order == gui::Order::Previous && index < internalOffset);
         }
 
+        void clearItemProperties(T Item)
+        {
+            Item->setFocus(false);
+            Item->setVisible(true);
+            Item->clearNavigationItem(gui::NavigationDirection::UP);
+            Item->clearNavigationItem(gui::NavigationDirection::DOWN);
+        }
+
         gui::ListItem *getNextInternalDataElement(unsigned int index)
         {
             modelIndex++;
-            internalData[index]->setFocus(false);
-            internalData[index]->setVisible(true);
-            internalData[index]->clearNavigationItem(gui::NavigationDirection::UP);
-            internalData[index]->clearNavigationItem(gui::NavigationDirection::DOWN);
+            clearItemProperties(internalData[index]);
             return internalData[index];
         }
     };

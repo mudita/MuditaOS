@@ -8,7 +8,7 @@ namespace gui
     class TextFixedSize : public Text
     {
       protected:
-        unsigned int linesCount   = 10;
+        unsigned int linesCount   = style::text::maxTextLines;
         Position underlinePadding = 0;
 
         void drawLines() override;

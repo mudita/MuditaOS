@@ -5,7 +5,6 @@
 #include "TextDocument.hpp"
 #include <cstdio>
 #include <RawFont.hpp>
-#include "log/log.hpp"
 
 namespace gui
 {
@@ -29,16 +28,12 @@ namespace gui
         if (document == nullptr) {
             return;
         }
-
-        auto cursor = document->getBlockCursor(start_position);
-
+        auto cursor     = document->getBlockCursor(start_position);
         auto old_cursor = cursor;
         do {
-
             if (!cursor) { // cursor is faulty
                 return;
             }
-
             // it would be better if cursor would know what to do when it jumps over blocks
             if (old_cursor.getBlockNr() != cursor.getBlockNr() &&
                 (*document)(old_cursor).getEnd() == TextBlock::End::Newline) {
@@ -51,7 +46,6 @@ namespace gui
             if (text_format->getFont() == nullptr) {
                 return;
             }
-
             auto can_show = text_format->getFont()->getCharCountInSpace(text_part.text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
@@ -112,10 +106,8 @@ namespace gui
             }
         }
 
-        if (underline) {
-            if (underline->parent == nullptr) {
-                delete underline;
-            }
+        if (underline != nullptr && underline->parent == nullptr) {
+            delete underline;
         }
     }
 
@@ -212,11 +204,9 @@ namespace gui
             }
         }
 
-        if (underline) {
-            if (underline->parent != nullptr) {
-                auto p = underline->parent;
-                p->removeWidget(underline);
-            }
+        if (underline != nullptr && underline->parent != nullptr) {
+            auto p = underline->parent;
+            p->removeWidget(underline);
         }
 
         elements_to_show_in_line.clear();
@@ -228,7 +218,7 @@ namespace gui
 
         if (xOffset) {
 
-            if (underline && drawUnderlineMode == UnderlineDrawMode::Concurrent)
+            if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent)
                 underline->setPosition(underline->getPosition(Axis::X) + xOffset, Axis::X);
 
             for (auto &el : elements_to_show_in_line) {
@@ -244,7 +234,7 @@ namespace gui
 
         if (yOffset) {
 
-            if (underline)
+            if (underline != nullptr)
                 underline->setPosition(underline->getPosition(Axis::Y) + yOffset, Axis::Y);
 
             for (auto &el : elements_to_show_in_line) {
@@ -262,17 +252,17 @@ namespace gui
             underline->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
             if (drawUnderlineMode == UnderlineDrawMode::WholeLine) {
-                height_used = std::max(height_used, init_height);
+                height_used = std::max(height_used, (Length)init_height);
             }
         }
     }
 
     void TextLine::updateUnderline(const short &x, const short &y)
     {
-        if (underline && drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+        if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::WholeLine) {
             underline->setArea({x, y, underline->widgetArea.w, height()});
         }
-        else if (underline && drawUnderlineMode == UnderlineDrawMode::Concurrent) {
+        else if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent) {
             underline->setArea({x, y, getWidth(), height()});
         }
     }
