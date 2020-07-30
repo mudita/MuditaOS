@@ -162,7 +162,7 @@ bool vfs::updateFileCRC32(const fs::path &file)
         std::unique_ptr<char[]> crc32Buf(new char[purefs::buffer::crc_char_size]);
         computeCRC32(fp, &fileCRC32);
         if (fileCRC32 != 0) {
-            snprintf(&crc32Buf[0], purefs::buffer::crc_char_size, "%X", fileCRC32);
+            snprintf(&crc32Buf[0], purefs::buffer::crc_char_size, "%lX", fileCRC32);
             fs::path fileCRC32Path = file;
             fileCRC32Path += ".crc32";
             fclose(fp);
