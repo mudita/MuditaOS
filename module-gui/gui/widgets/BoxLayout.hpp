@@ -89,6 +89,7 @@ namespace gui
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
+        uint32_t getSizeLeft();
     };
 
     class VBox : public BoxLayout
@@ -100,6 +101,7 @@ namespace gui
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
+        uint32_t getSizeLeft();
     };
 
 } /* namespace gui */

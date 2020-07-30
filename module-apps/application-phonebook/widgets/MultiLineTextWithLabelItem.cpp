@@ -15,7 +15,7 @@ namespace gui
         setMaximumSize(phonebookStyle::multiLineTextWithLabelItem::w, phonebookStyle::multiLineTextWithLabelItem::h);
         setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
 
-        vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLineWithLabelItem::title_label_h);
+        vBox = new VBox(this, 0, 0, 0, phonebookStyle::inputLinesWithLabelItem::title_label_h);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         titleLabel = new Label(vBox);
