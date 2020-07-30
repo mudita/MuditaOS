@@ -17,7 +17,7 @@ auto NewContactModel::getItemCount() const -> int
 
 auto NewContactModel::getMinimalItemHeight() const -> unsigned int
 {
-    return phonebookStyle::inputLineWithLabelItem::h;
+    return phonebookStyle::inputLinesWithLabelItem::h;
 }
 
 void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit)

@@ -72,14 +72,10 @@ namespace gui
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
 
-                LOG_INFO("Woła się ten border z listy ?");
-
                 direction = style::listview::Direction::Top;
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
-
-                LOG_INFO("Woła się ten border z listy ?");
 
                 direction = style::listview::Direction::Bottom;
                 return this->listPageEndReached();
@@ -184,9 +180,8 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
+        checkFirstPage();
         pageLoaded = true;
-
-        LOG_INFO("Rozmiar listy to %d", currentPageSize);
     }
 
     void ListView::onProviderDataUpdate()
@@ -206,6 +201,20 @@ namespace gui
     {
         if (direction == style::listview::Direction::Top) {
             startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
+        }
+    }
+
+    void ListView::checkFirstPage()
+    {
+        // On direction top check if first page is filled with items. If not reload page with direction bottom so it
+        // will be filled.
+        if (direction == style::listview::Direction::Top && startIndex == 0) {
+            if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
+                clearItems();
+                body->setReverseOrder(false);
+                direction = style::listview::Direction::Bottom;
+                provider->requestRecords(startIndex, calculateLimit());
+            }
         }
     }
 
@@ -332,24 +341,11 @@ namespace gui
             }
             else {
 
-                LOG_INFO("Co w tych chujach %d, %d", startIndex, calculateLimit());
                 topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
             }
 
             pageLoaded = false;
-
-            // If starting page size smaller than last page - fill first page from top with last page size.
-            if (startIndex < 2) {
-                body->setReverseOrder(false);
-                direction       = style::listview::Direction::Bottom;
-                startIndex      = 0;
-                focusOnLastItem = true;
-                provider->requestRecords(startIndex, currentPageSize);
-            }
-            else {
-
-                provider->requestRecords(topFetchIndex, calculateLimit());
-            }
+            provider->requestRecords(topFetchIndex, calculateLimit());
         }
 
         return true;
