@@ -160,7 +160,7 @@ namespace gui
 
         void setEditMode(EditMode mode);
         void setTextType(TextType type);
-        void setUnderline(bool underline);
+        void setUnderline(const bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
 

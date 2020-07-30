@@ -7,6 +7,7 @@
 * `[calendar]` Added events options and event delete windows.
 * `[sms]``[audio]` added incoming text message ringtone
 * `[gui]` Added generic ImageBox widget.
+* `[text]` Fixed size text and text underline support. 
 
 ### Changed
 
@@ -19,6 +20,7 @@
 
 ### Other
 * `[build]` Optimize third party libraries in debug configuration to lower the size footprint for the RT1051 platform
+* `[listview]` ListView data handling fixes. 
 
 ## [0.30.1] - 2020-07-24
 

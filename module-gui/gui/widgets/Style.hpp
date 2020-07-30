@@ -121,7 +121,8 @@ namespace style
     {
         const inline gui::Alignment defaultTextAlignment =
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
-    };
+        const inline unsigned int maxTextLines = 10;
+    }; // namespace text
 
     namespace strings
     {

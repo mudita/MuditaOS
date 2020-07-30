@@ -30,7 +30,7 @@ namespace gui
                                       phonebookStyle::inputBoxWithLabelAndIconItem::input_box_h);
         inputBoxLabel->setMargins(
             gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::input_box_right_margin, 0));
-        inputBoxLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        inputBoxLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         inputBoxLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         inputBoxLabel->setFont(style::window::font::medium);
         inputBoxLabel->activeItem = false;
@@ -50,7 +50,7 @@ namespace gui
                                          phonebookStyle::inputBoxWithLabelAndIconItem::description_label_h);
         descriptionLabel->setMargins(
             gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::description_label_right_margin, 0));
-        descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
@@ -61,7 +61,7 @@ namespace gui
 
         applyItemNameSpecificSettings();
 
-        setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     auto InputBoxWithLabelAndIconItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool

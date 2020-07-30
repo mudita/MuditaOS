@@ -109,13 +109,13 @@ namespace phonebookStyle
         constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = 50;
 
-        constexpr uint32_t input_box_w = 55;
-        constexpr uint32_t input_box_h = h;
+        constexpr uint32_t input_box_w           = 55;
+        constexpr uint32_t input_box_h           = h;
         constexpr int32_t input_box_right_margin = 20;
 
-        constexpr uint32_t description_label_w = 280;
-        constexpr uint32_t description_label_h            = 33;
-        constexpr int32_t description_label_right_margin  = 40;
+        constexpr uint32_t description_label_w           = 280;
+        constexpr uint32_t description_label_h           = 33;
+        constexpr int32_t description_label_right_margin = 40;
 
         constexpr int32_t tick_image_left_margin  = -64;
         constexpr int32_t tick_image_right_margin = 32;
@@ -124,12 +124,12 @@ namespace phonebookStyle
 
     namespace inputLinesWithLabelItem
     {
-        constexpr uint32_t w                 = style::window::default_body_width;
-        constexpr uint32_t h                 = 63;
-        constexpr uint32_t title_label_h     = 20;
-        constexpr uint32_t input_text_h      = 37;
-        constexpr uint32_t span_size         = 6;
-        constexpr int32_t underline_padding  = 4;
+        constexpr uint32_t w                = style::window::default_body_width;
+        constexpr uint32_t h                = 63;
+        constexpr uint32_t title_label_h    = 20;
+        constexpr uint32_t input_text_h     = 37;
+        constexpr uint32_t span_size        = 6;
+        constexpr int32_t underline_padding = 4;
     } // namespace inputLinesWithLabelItem
 
     namespace multiLineTextWithLabelItem
