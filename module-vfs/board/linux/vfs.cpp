@@ -33,13 +33,13 @@ vfs::~vfs()
 void vfs::Init()
 {
     // whatever current path on Linux we treat that as the root for our app
-    osRootPath = "./";
-    LOG_DEBUG("vfs::Iinit running on Linux osRootPath: %s", osRootPath.c_str());
+    boot_config.os_root_path = "./";
+    LOG_DEBUG("vfs::Iinit running on Linux osRootPath: %s", boot_config.os_root_path.c_str());
 }
 
 std::string vfs::relativeToRoot(const std::string path)
 {
-    return (osRootPath / fs::path(path).relative_path()).relative_path();
+    return (boot_config.os_root_path / fs::path(path).relative_path()).relative_path();
 }
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
