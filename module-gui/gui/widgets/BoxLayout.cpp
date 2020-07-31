@@ -235,16 +235,6 @@ namespace gui
         resizeItems<axis>();
     }
 
-    std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
-    {
-        return std::find_if(from, this->children.end(), [](auto &el) -> bool {
-            if (el->visible && el->activeItem) {
-                return true;
-            }
-            return false;
-        });
-    }
-
     template <Axis axis> Position BoxLayout::getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el)
     {
         auto offset = sizeLeftWithoutElem<axis>(this, el, Area::Normal) <= calcSize
@@ -298,6 +288,16 @@ namespace gui
         }
 
         return calcPos;
+    }
+
+    std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
+    {
+        return std::find_if(from, this->children.end(), [](auto &el) -> bool {
+            if (el->visible && el->activeItem) {
+                return true;
+            }
+            return false;
+        });
     }
 
     void BoxLayout::setNavigation()

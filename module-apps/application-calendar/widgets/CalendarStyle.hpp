@@ -37,6 +37,9 @@ namespace style
                 const inline int prev_month_id = 1;
                 const inline int month_id      = 2;
                 const inline int next_month_id = 3;
+                const inline std::string date_text_1 = "January 2019";
+                const inline std::string date_text_2 = "February 2019";
+                const inline std::string date_text_3 = "March 2019";
             } // namespace test
 
             namespace item

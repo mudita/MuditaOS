@@ -40,7 +40,7 @@ void GridLayout::resizeItems()
     if (el_in_y > 2)
         strech_y = (area().h - grid.y * el_in_y) / (el_in_y - 1);
 
-    int row = 0;
+    int row          = 0;
     unsigned int col = 0;
     for (auto it : children) {
         // check if element will fit in
@@ -61,59 +61,46 @@ void GridLayout::resizeItems()
 // TODO commomize - move loop to lambda
 void GridLayout::setNavigation()
 {
-    uint32_t el_in_x      = widgetArea.w / grid.x;
-    uint32_t el_in_y      = widgetArea.h / grid.y;
-    uint32_t max_elements = el_in_x * el_in_y;
-    unsigned int i        = 0;
-    int row               = 0;
-    unsigned int col      = 0;
+    int el_in_x      = widgetArea.w / grid.x;
+    int el_in_y      = widgetArea.h / grid.y;
+    int max_elements = el_in_x * el_in_y;
+
+    LOG_INFO("max_elements %d", max_elements);
+
+    int i       = 0;
+    auto offset = el_in_x;
+
     if (children.size() == 0) {
         LOG_ERROR("No children to set navigation");
     }
-    for (auto it = children.begin(); it != children.end() && i < max_elements; ++it, ++i) {
-        // first column left rotation
-        if (navigationRotate && col == 0) {
-            auto val = el_in_x - 1;
-            if (val + i >= children.size()) {
-                val = children.size() % el_in_x - 1;
-            }
-            (*it)->setNavigationItem(NavigationDirection::LEFT, *std::next(it, val));
-        }
-        else if (i != 0) {
-            (*it)->setNavigationItem(NavigationDirection::LEFT, *std::prev(it));
-        }
-        // last column - right rotation
-        if (navigationRotate && col + 1 == el_in_x) {
-            auto val = el_in_x - 1;
-            (*it)->setNavigationItem(NavigationDirection::RIGHT, *std::prev(it, val));
-        }
-        else if (col + 1 % el_in_x != 0 && i + 1 < children.size()) {
-            (*it)->setNavigationItem(NavigationDirection::RIGHT, *std::next(it));
-        }
-        if (row != 0) {
-            (*it)->setNavigationItem(NavigationDirection::UP, *std::prev(it, el_in_x));
-        }
-        // first row - rotate UP
-        else if (navigationRotate && (children.size() >= el_in_x * 2)) {
-            auto maxrow = children.size() / el_in_x + children.size();
-            auto val    = maxrow * el_in_x + col;
-            if (val + el_in_x < children.size()) {
-                val += el_in_x;
-            }
-            (*it)->setNavigationItem(NavigationDirection::UP, *std::next(children.begin(), val));
-        }
-        if (row + 1 % el_in_y != 0 && i + el_in_x < children.size()) {
-            (*it)->setNavigationItem(NavigationDirection::DOWN, *std::next(it, el_in_x));
-        }
-        // last row - rotate, DOWN assign to first col
-        else if (navigationRotate && (i + el_in_x >= children.size())) {
-            (*it)->setNavigationItem(NavigationDirection::DOWN, *std::next(children.begin(), col));
+
+    for (auto it = children.begin(); it != children.end(); ++it, ++i) {
+
+        if (it != children.begin() && (i + 1) % el_in_x != 1) {
+            (*it)->setNavigationItem(NavigationDirection::LEFT, nextNavigationItem(*std::prev(it)));
         }
 
-        ++col;
-        if (col == el_in_x) {
-            col = 0;
-            ++row;
+        if (it != std::prev(children.end()) && (i + 1) % el_in_x != 0) {
+            (*it)->setNavigationItem(NavigationDirection::RIGHT, nextNavigationItem(*std::next(it)));
         }
+
+        if ((i - offset) >= 0) {
+            (*it)->setNavigationItem(NavigationDirection::UP, nextNavigationItem(*std::prev(it, offset)));
+        }
+        if ((i + offset) < static_cast<int>(children.size())) {
+            (*it)->setNavigationItem(NavigationDirection::DOWN, nextNavigationItem(*std::next(it, offset)));
+        }
+    }
+}
+
+Item *GridLayout::nextNavigationItem(Item *item)
+{
+    auto el = std::find(children.begin(), children.end(), item);
+
+    if ((*el)->visible && (*el)->activeItem) {
+        return *el;
+    }
+    else {
+        return nullptr;
     }
 }
