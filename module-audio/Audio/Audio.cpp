@@ -102,7 +102,7 @@ namespace audio
 
         auto retStop = currentOperation != nullptr ? currentOperation->Stop() : RetCode::OperationNotSet;
         if (retStop != RetCode::Success) {
-            LOG_ERROR("Operation STOP failure: %s", audio::c_str(RetCode::DeviceFailure));
+            LOG_ERROR("Operation STOP failure: %s", audio::c_str(retStop));
         }
 
         auto ret = Operation::Create(Operation::Type::Idle, "");

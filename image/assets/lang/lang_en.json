@@ -227,6 +227,9 @@
     "app_phonebook_check": "CHECK",
     "app_phonebook_uncheck": "UNCHECK",
 
+    "app_music_player_all_songs": "All songs",
+    "app_music_player_play": "PLAY",
+
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",
     "sms_call_text"  : "Call ",
