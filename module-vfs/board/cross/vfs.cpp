@@ -8,7 +8,6 @@
  */
 
 #include "../../vfs.hpp"
-#include <source/version.hpp>
 #include "ff_eMMC_user_disk.hpp"
 
 #define eMMCHIDDEN_SECTOR_COUNT 8
@@ -41,19 +40,19 @@ void vfs::Init()
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
 
-    boot_config.os_root_path = purefs::dir::eMMC_disk;
+    bootConfig.os_root_path = purefs::dir::eMMC_disk;
 
     if (loadBootConfig(getCurrentBootJSON())) {
-        LOG_INFO("vfs::Init osType %s root:%s", boot_config.os_type.c_str(), boot_config.os_root_path.c_str());
-        if (ff_chdir(boot_config.os_root_path.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't chdir to %s", boot_config.os_root_path.c_str());
+        LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
+        if (ff_chdir(bootConfig.os_root_path.c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path.c_str());
         }
     }
     else {
-        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", boot_config.os_root_path.c_str());
+        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", bootConfig.os_root_path.c_str());
     }
 
-    LOG_INFO("vfs::Init running on ARM osRootPath: %s", boot_config.os_root_path.c_str());
+    LOG_INFO("vfs::Init running on ARM osRootPath: %s", bootConfig.os_root_path.c_str());
 
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
@@ -275,16 +274,16 @@ std::string vfs::relativeToRoot(const std::string path)
     fs::path fsPath(path);
 
     if (fsPath.is_absolute()) {
-        if (boot_config.os_root_path.root_directory() == fsPath.root_directory())
+        if (bootConfig.os_root_path.root_directory() == fsPath.root_directory())
             return fsPath;
         else
             return (purefs::dir::eMMC_disk / fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
-        return boot_config.os_root_path;
+        return bootConfig.os_root_path;
     else
-        return boot_config.os_root_path / fsPath;
+        return bootConfig.os_root_path / fsPath;
 }
 
 bool vfs::isDir(const char *path)
