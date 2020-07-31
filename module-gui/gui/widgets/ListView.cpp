@@ -118,7 +118,6 @@ namespace gui
     {
         provider = prov;
         if (provider != nullptr) {
-
             provider->list = this;
             setElementsCount(provider->getItemCount());
             provider->requestRecords(0, calculateLimit());
