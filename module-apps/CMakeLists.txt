@@ -36,6 +36,8 @@ add_subdirectory( application-messages )
 add_subdirectory( application-calllog )
 add_subdirectory( application-special-input )
 add_subdirectory( application-antenna )
+add_subdirectory( application-music-player )
+
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )
@@ -91,4 +93,3 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 
         cxx_std_14
 )
-

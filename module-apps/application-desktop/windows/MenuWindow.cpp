@@ -157,7 +157,14 @@ namespace gui
                                   return true;
                               },
                               app->notifications.notRead.SMS},
-                new gui::Tile{"menu_music_player_W_G", "app_desktop_menu_music", [=](gui::Item &item) { return true; }},
+                new gui::Tile{"menu_music_player_W_G",
+                              "app_desktop_menu_music",
+                              [=](gui::Item &item) {
+                                  LOG_INFO("Music Player");
+                                  sapm::ApplicationManager::messageSwitchApplication(
+                                      application, "ApplicationMusicPlayer", gui::name::window::main_window, nullptr);
+                                  return true;
+                              }},
                 new gui::Tile{
                     "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
                 new gui::Tile{"menu_settings_W_G",
