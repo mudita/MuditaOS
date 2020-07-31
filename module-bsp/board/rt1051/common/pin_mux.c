@@ -1388,7 +1388,7 @@ void PINMUX_InitJACKDET(void)
                      0U);                /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinConfig(PINMUX_JACKDET_IRQ, /* GPIO_AD_B0_02 PAD functional properties : */
-                        PAD_CONFIG_PULL_UP_100kOhm | PAD_CONFIG_SELECT_PULL);
+                        PAD_CONFIG_PULL_UP_100kOhm | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_KEEPER_ENABLED);
 }
 
 void PINMUX_InitBatteryCharger(void)
