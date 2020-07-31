@@ -1,7 +1,25 @@
 #include "MonthModel.hpp"
 
-MonthModel::MonthModel(std::string name, std::vector<DayModel> days) : name(std::move(name)), days(days)
+MonthModel::MonthModel(year_month_day ymd)
 {
-    LOG_DEBUG("Call month model constructor");
-    this->numberOfDays = this->days.size();
+    this->m                  = ymd.month();
+    this->offset             = weekday{ymd}.c_encoding();
+    this->y                  = ymd.year();
+    year_month_day_last ymdl = this->y / this->m / last;
+    this->lastDay            = ymdl.day();
+}
+
+month MonthModel::getMonth()
+{
+    return this->m;
+}
+
+day MonthModel::getLastDay()
+{
+    return this->lastDay;
+}
+
+uint32_t MonthModel::getFirstWeekOffset()
+{
+    return this->offset;
 }

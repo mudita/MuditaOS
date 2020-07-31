@@ -11,7 +11,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/EventDetailModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/DayModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/AllEventsItem.cpp"
@@ -21,6 +20,7 @@ target_sources( ${PROJECT_NAME}
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/date.h"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListItem.hpp"
 
 )

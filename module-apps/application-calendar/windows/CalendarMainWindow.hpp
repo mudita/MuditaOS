@@ -23,25 +23,24 @@ namespace gui
         const uint8_t last_column  = 6;
     }; // namespace coords
 
-    class DayLabel : public Label, public DayModel
+    class DayLabel : public Label
     {
       public:
-        DayLabel(gui::Item *parent,
-                 std::string number,
-                 const uint32_t &x,
-                 const uint32_t &y,
+        DayLabel(app::Application *app,
+                 gui::Item *parent,
+                 const uint32_t &i,
+                 const uint32_t &firstWeekOffset,
                  const uint32_t &width,
                  const uint32_t &height);
 
-        void setLabel(std::string number, std::function<bool(Item &)> activatedCallback);
+        // void setLabel(std::string number, std::function<bool(Item &)> activatedCallback);
         ~DayLabel() override = default;
     };
 
-    class MonthBox : public GridLayout, public MonthModel
+    class MonthBox : public GridLayout
     {
+
         /// @param columns: defines number of columns, @param rows: defines number of rows
-        uint32_t firstRow    = 0;
-        uint32_t firstColumn = 0;
         uint32_t columns     = 0;
         uint32_t rows        = 0;
         std::map<std::pair<uint32_t, uint32_t>, DayLabel *> dayMap;
@@ -58,7 +57,7 @@ namespace gui
 
         ~MonthBox() override = default;
 
-        void buildMap(app::ApplicationCalendar *app);
+        // void buildMap(app::Application *app);
     };
 
     class CalendarMainWindow : public gui::AppWindow
@@ -70,6 +69,7 @@ namespace gui
         uint32_t dayHeight     = 0;
 
       protected:
+        year_month_day actualDate;
         MonthBox *month = nullptr;
         Label *dateLabel = nullptr;
         std::unique_ptr<MonthModel> monthModel;
@@ -77,14 +77,11 @@ namespace gui
       public:
         CalendarMainWindow(app::Application *app, std::string name);
 
-        /// used only for testing
-        bool getData(const uint32_t &date_time);
-
         ~CalendarMainWindow() override = default;
         void switchToNoEventsWindow();
         void rebuild() override;
-        void refresh(const uint32_t &ID, std::string date);
-        void buildMonth(const uint32_t &actualDateTimeID);
+        void refresh();
+        void buildMonth(std::unique_ptr<MonthModel> &model);
         void buildDateLabel(std::string actualDateTime);
         void buildInterface(const uint32_t &actualDateTimeID);
         void destroyInterface() override;
