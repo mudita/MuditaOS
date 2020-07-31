@@ -64,7 +64,14 @@ namespace gui
         setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
 
         if (contact->speeddial.length() != 0u) {
-            contactFlagsWidget->setSpeedDial(true, static_cast<unsigned char>(std::stoi(contact->speeddial.c_str())));
+            try {
+                auto position = static_cast<unsigned char>(std::stoi(contact->speeddial.c_str()));
+                contactFlagsWidget->setSpeedDial(true, position);
+            }
+            catch (std::exception &e) {
+                LOG_ERROR("PhonebookContactDetails::onBeforeShow: %s", e.what());
+                contactFlagsWidget->setSpeedDial(false, 0);
+            }
         }
         else {
             contactFlagsWidget->setSpeedDial(false, 0);
