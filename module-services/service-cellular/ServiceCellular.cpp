@@ -861,6 +861,11 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto antenna = cmux->GetAntenna();
         responseMsg  = std::make_shared<CellularAntennaResponseMessage>(true, antenna, MessageType::CellularGetAntenna);
     } break;
+    case MessageType::EVMTimeUpdated: {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        channel->cmd("AT+CTZU=0\r");
+        channel->cmd("AT+CTZR=0\r");
+    } break;
     default:
         break;
 
