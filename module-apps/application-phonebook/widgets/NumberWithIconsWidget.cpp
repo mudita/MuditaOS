@@ -28,7 +28,7 @@ namespace gui
                                 phonebookStyle::numbersWithIconsWidget::sms_image_w,
                                 phonebookStyle::numbersWithIconsWidget::sms_image_h,
                                 new Image("mail"));
-        smsImage->inputCallback = [&](Item &item, const InputEvent &input) {
+        smsImage->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
                 return app::sms(app, app::SmsOperation::New, number);
                 LOG_INFO("SMS operation started");
@@ -43,7 +43,7 @@ namespace gui
                                   phonebookStyle::numbersWithIconsWidget::phone_image_h,
                                   new Image("phonebook_phone_ringing"));
         phoneImage->setMargins(Margins(phonebookStyle::numbersWithIconsWidget::phone_image_margin_left, 0, 0, 0));
-        phoneImage->inputCallback = [&](Item &item, const InputEvent &input) {
+        phoneImage->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
                 return app::call(app, number);
                 LOG_INFO("Call operation started");
