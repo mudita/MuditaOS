@@ -1,3 +1,5 @@
+include(thirdparty)
+
 # add re2 library sources
 set(RE2_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/re2)
 set(RE2_SOURCES
@@ -38,5 +40,5 @@ set_source_files_properties(${RE2_SRCDIR}/re2/perl_groups.cc
         -Wno-missing-field-initializers
 )
 
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${RE2_SRCDIR})
+third_party_source_optimization(${RE2_SOURCES})

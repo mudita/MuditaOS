@@ -1,3 +1,5 @@
+include(thirdparty)
+
 # add sources
 set(SBINI ${CMAKE_CURRENT_SOURCE_DIR}/sbini)
 set(SBINI_SOURCES
@@ -16,3 +18,5 @@ set_source_files_properties(${SBINI_SOURCES}
 
 # add include dir
 target_include_directories(${PROJECT_NAME} PUBLIC ${SBINI})
+
+third_party_source_optimization(${SBINI_SOURCES})

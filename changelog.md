@@ -17,6 +17,7 @@
 * `[sms]` Fix selecting contact for a new message after searching in phonebook.
 
 ### Other
+* `[build]` Optimize third party libraries in debug configuration to lower the size footprint for the RT1051 platform
 
 ## [0.30.1] - 2020-07-24
 
