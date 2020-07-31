@@ -186,6 +186,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 auto ctze     = at::urc::CTZE(msg->data);
                 auto timeinfo = ctze.getTimeInfo();
                 bsp::rtc_SetDateTime(&timeinfo);
+
+                auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+                sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
             }
         }
     }

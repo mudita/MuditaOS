@@ -101,6 +101,8 @@ inline const char *c_str(sys::BusChannels channel)
         return "ServiceFotaNotifications";
     case sys::BusChannels::AntennaNotifications:
         return "AntennaNotifications";
+    case sys::BusChannels::ServiceEvtmgrNotifications:
+        return "ServiceEvtmgrNotifications";
     }
     return "";
 }
