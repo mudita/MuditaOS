@@ -3,12 +3,16 @@ cmake_minimum_required(VERSION 3.12)
 project(module-db VERSION 1.0
         DESCRIPTION "Database module library")
 
+include(thirdparty)
+
+set (SQLITE3_SOURCE Database/sqlite3.c)
+
 set(SOURCES
         Database/Field.cpp
         Database/QueryResult.cpp
         Database/Database.cpp
-        Database/sqlite3.c
         Database/sqlite3vfs.cpp
+        ${SQLITE3_SOURCE}
 
         Databases/ContactsDB.cpp
         Databases/SmsDB.cpp
@@ -93,9 +97,9 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface
-        
+
         PRIVATE
-        
+
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables
@@ -114,3 +118,5 @@ target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
 endif ()
+
+third_party_source_optimization(${SQLITE3_SOURCE})

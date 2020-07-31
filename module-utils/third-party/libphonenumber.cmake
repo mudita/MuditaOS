@@ -1,3 +1,5 @@
+include (thirdparty)
+
 # add sources
 set (LIBPHONENUMBER_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/libphonenumber/cpp/src)
 set (LIBPHONENUMBER ${LIBPHONENUMBER_SRCDIR}/phonenumbers)
@@ -41,3 +43,5 @@ set_source_files_properties(${LIBPHONENUMBER}/asyoutypeformatter.cc
 
 # add include directory
 target_include_directories(${PROJECT_NAME} PUBLIC ${LIBPHONENUMBER_SRCDIR})
+
+third_party_source_optimization(${LIBPHONENUMBER_SOURCES})
