@@ -134,6 +134,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceEvtmgrNotifications);
 
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
     stateTimerId     = CreateTimer(Ticks::MsToTicks(1000), true);

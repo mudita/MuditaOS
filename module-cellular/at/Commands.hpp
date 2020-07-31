@@ -159,7 +159,7 @@ namespace at
             {AT::CEER, {"AT+CEER\r"}},
             {AT::QIGETERROR, {"AT+QIGETERROR\r"}},
             {AT::ENABLE_TIME_ZONE_UPDATE, {"AT+CTZU=3\r"}},
-            {AT::SET_TIME_ZONE_REPORTING, {"AT+CTZR=2\\r"}},
+            {AT::SET_TIME_ZONE_REPORTING, {"AT+CTZR=2\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);
