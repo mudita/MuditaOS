@@ -87,11 +87,13 @@ namespace purefs
         std::string os_version;
         std::string bootloader_verion;
         std::string timestamp;
+        json11::Json boot_json_parsed;
 
         fs::path os_root_path;
         fs::path boot_json;
 
-        json11::Json to_json() const;
+        void setVersion(const std::string versionString);
+        [[nodiscard]] json11::Json to_json() const;
     };
 };    // namespace purefs
 
@@ -177,7 +179,7 @@ class vfs
     const fs::path getCurrentBootJSON();
     bool loadBootConfig(const fs::path &bootJsonPath);
     bool updateBootConfig(const fs::path &bootJsonPath);
-    struct purefs::boot_config_t boot_config;
+    struct purefs::boot_config_t bootConfig;
 };
 
 extern vfs vfs;

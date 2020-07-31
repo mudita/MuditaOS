@@ -44,10 +44,12 @@ void vfs::computeCRC32(vfs::FILE *file, unsigned long *outCrc32)
 bool vfs::verifyCRC(const std::string filePath, const unsigned long crc32)
 {
     unsigned long crc32Read;
-    vfs::FILE *fp = ::vfs.fopen(filePath.c_str(), "r");
-    if (fp != NULL) {
-        computeCRC32(fp, &crc32Read);
-        ::vfs.fclose(fp);
+    auto lamb = [](vfs::FILE *stream) { ::vfs.fclose(stream); };
+
+    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(::vfs.fopen(filePath.c_str(), "r"), lamb);
+
+    if (fp.get() != nullptr) {
+        computeCRC32(fp.get(), &crc32Read);
         return (crc32Read == crc32);
     }
     LOG_ERROR("verifyCRC can't open %s", filePath.c_str());
@@ -56,19 +58,20 @@ bool vfs::verifyCRC(const std::string filePath, const unsigned long crc32)
 
 bool vfs::verifyCRC(const fs::path filePath)
 {
+    auto lamb = [](vfs::FILE *stream) { ::vfs.fclose(stream); };
     std::unique_ptr<char[]> crcBuf(new char[purefs::buffer::crc_char_size]);
 
     fs::path crcFilePath(filePath);
     crcFilePath += purefs::extension::crc32;
 
-    vfs::FILE *fp = ::vfs.fopen(crcFilePath.c_str(), "r");
-    if (fp != NULL) {
-        if (::vfs.fgets(crcBuf.get(), purefs::buffer::crc_char_size, fp) == NULL) {
+    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(::vfs.fopen(crcFilePath.c_str(), "r"), lamb);
+
+    if (fp.get() != nullptr) {
+        if (::vfs.fgets(crcBuf.get(), purefs::buffer::crc_char_size, fp.get()) == NULL) {
             LOG_ERROR("verifyCRC ff_fgets on %s returned NULL", crcFilePath.c_str());
             return (false);
         }
 
-        ::vfs.fclose(fp);
         const unsigned long crc32Read = strtoull(crcBuf.get(), nullptr, purefs::buffer::crc_radix);
         return (verifyCRC(filePath, crc32Read));
     }
@@ -78,18 +81,17 @@ bool vfs::verifyCRC(const fs::path filePath)
 
 std::string vfs::loadFileAsString(const fs::path &fileToLoad)
 {
+    auto lamb = [](vfs::FILE *stream) { ::vfs.fclose(stream); };
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
-    FILE *fp = fopen(fileToLoad.c_str(), "r");
+    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(fopen(fileToLoad.c_str(), "r"), lamb);
     std::string contents;
     size_t readSize;
 
-    if (fp != NULL) {
-        while (!eof(fp)) {
-            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp);
+    if (fp.get() != nullptr) {
+        while (!eof(fp.get())) {
+            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp.get());
             contents.append(static_cast<const char *>(readBuf.get()), readSize);
         }
-
-        fclose(fp);
     }
 
     return contents;
@@ -97,10 +99,11 @@ std::string vfs::loadFileAsString(const fs::path &fileToLoad)
 
 bool vfs::replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite)
 {
-    FILE *fp = fopen(fileToModify.c_str(), "w");
-    if (fp != NULL) {
-        size_t dataWritten = fprintf(fp, stringToWrite.c_str());
-        fclose(fp);
+    auto lamb = [](vfs::FILE *stream) { ::vfs.fclose(stream); };
+    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(fopen(fileToModify.c_str(), "w"), lamb);
+
+    if (fp.get() != nullptr) {
+        size_t dataWritten = fprintf(fp.get(), stringToWrite.c_str());
         return dataWritten == stringToWrite.length();
     }
     else {
@@ -128,28 +131,32 @@ bool vfs::loadBootConfig(const fs::path &bootJsonPath)
     LOG_INFO("vfs::getOSRootFromJSON parsing %s", bootJsonPath.c_str());
     LOG_INFO("vfs::getOSRootFromJSON \"%s\"", jsonContents.c_str());
 
-    json11::Json bootJson = json11::Json::parse(jsonContents, parseErrors);
+    bootConfig.boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
 
     if (parseErrors == "") {
-        boot_config.os_type           = bootJson[purefs::json::main][purefs::json::os_type].string_value();
-        boot_config.os_image          = bootJson[purefs::json::main][purefs::json::os_image].string_value();
-        boot_config.os_root_path      = purefs::dir::eMMC_disk / boot_config.os_type;
-        boot_config.os_version        = std::string(VERSION);
-        boot_config.boot_json         = bootJsonPath;
-        boot_config.bootloader_verion = bootJson[purefs::json::bootloader][purefs::json::os_version].string_value();
-        boot_config.timestamp         = utils::time::Timestamp().str("%c");
-        LOG_INFO("boot_config: %s", boot_config.to_json().dump().c_str());
+        bootConfig.os_type  = bootConfig.boot_json_parsed[purefs::json::main][purefs::json::os_type].string_value();
+        bootConfig.os_image = bootConfig.boot_json_parsed[purefs::json::main][purefs::json::os_image].string_value();
+        bootConfig.os_root_path = purefs::dir::eMMC_disk / bootConfig.os_type;
+        bootConfig.boot_json    = bootJsonPath;
+        bootConfig.bootloader_verion =
+            bootConfig.boot_json_parsed[purefs::json::bootloader][purefs::json::os_version].string_value();
+        bootConfig.timestamp = utils::time::Timestamp().str("%c");
 
+        bootConfig.setVersion(std::string(VERSION));
+
+        LOG_INFO("boot_config: %s", bootConfig.to_json().dump().c_str());
         return true;
     }
     else {
-        boot_config.os_type      = PATH_CURRENT;
-        boot_config.os_root_path = purefs::dir::eMMC_disk / boot_config.os_type;
-        boot_config.os_version   = std::string(VERSION);
-        boot_config.boot_json    = bootJsonPath;
-        boot_config.timestamp    = utils::time::Timestamp().str("%c");
-        LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", bootJsonPath.c_str(), parseErrors.c_str());
+        bootConfig.os_type      = PATH_CURRENT;
+        bootConfig.os_image     = purefs::file::boot_bin;
+        bootConfig.os_root_path = purefs::dir::eMMC_disk / bootConfig.os_type;
+        bootConfig.boot_json    = bootJsonPath;
+        bootConfig.timestamp    = utils::time::Timestamp().str("%c");
 
+        bootConfig.setVersion(std::string(VERSION));
+
+        LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", bootJsonPath.c_str(), parseErrors.c_str());
         return false;
     }
 }
@@ -157,20 +164,22 @@ bool vfs::loadBootConfig(const fs::path &bootJsonPath)
 bool vfs::updateFileCRC32(const fs::path &file)
 {
     unsigned long fileCRC32 = 0;
-    FILE *fp                = fopen(file.c_str(), "r");
-    if (fp != NULL) {
+    auto lamb               = [](vfs::FILE *stream) { ::vfs.fclose(stream); };
+
+    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(fopen(file.c_str(), "r"), lamb);
+
+    if (fp.get() != nullptr) {
         std::unique_ptr<char[]> crc32Buf(new char[purefs::buffer::crc_char_size]);
-        computeCRC32(fp, &fileCRC32);
+        computeCRC32(fp.get(), &fileCRC32);
         if (fileCRC32 != 0) {
             snprintf(&crc32Buf[0], purefs::buffer::crc_char_size, "%lX", fileCRC32);
             fs::path fileCRC32Path = file;
-            fileCRC32Path += ".crc32";
-            fclose(fp);
+            fileCRC32Path += purefs::extension::crc32;
 
-            FILE *fpCRC32 = fopen(fileCRC32Path.c_str(), "w");
-            if (fpCRC32 != NULL) {
-                fprintf(fpCRC32, &crc32Buf[0]);
-                fclose(fpCRC32);
+            std::unique_ptr<vfs::FILE, decltype(lamb)> fpCRC32(fopen(fileCRC32Path.c_str(), "w"), lamb);
+
+            if (fpCRC32.get() != nullptr) {
+                fprintf(fpCRC32.get(), &crc32Buf[0]);
             }
         }
     }
@@ -180,11 +189,11 @@ bool vfs::updateFileCRC32(const fs::path &file)
 
 void vfs::updateTimestamp()
 {
-    boot_config.timestamp = utils::time::Timestamp().str("%c");
-    LOG_INFO("vfs::updateTimestamp \"%s\"", boot_config.to_json().dump().c_str());
+    bootConfig.timestamp = utils::time::Timestamp().str("%c");
+    LOG_INFO("vfs::updateTimestamp \"%s\"", bootConfig.to_json().dump().c_str());
 
-    if (replaceWithString(boot_config.boot_json, boot_config.to_json().dump())) {
-        updateFileCRC32(boot_config.boot_json);
+    if (replaceWithString(bootConfig.boot_json, bootConfig.to_json().dump())) {
+        updateFileCRC32(bootConfig.boot_json);
     }
 }
 
@@ -202,4 +211,9 @@ json11::Json purefs::boot_config_t::to_json() const
                               {purefs::json::os_git_revision, std::string(GIT_REV)},
                               {purefs::json::os_git_branch, std::string(GIT_BRANCH)}}},
         {purefs::json::bootloader, json11::Json::object{{purefs::json::os_version, bootloader_verion}}}};
+}
+
+void purefs::boot_config_t::setVersion(const std::string versionString)
+{
+    os_version = versionString;
 }
