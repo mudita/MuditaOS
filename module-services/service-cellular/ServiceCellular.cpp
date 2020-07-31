@@ -137,6 +137,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceEvtmgrNotifications);
 
     callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
     callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
