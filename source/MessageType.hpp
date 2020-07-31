@@ -139,7 +139,9 @@ enum class MessageType
     AudioRoutingSpeakerhone,
     AudioRoutingHeadset,
 
+    AudioSetOutputVolume,
     AudioSetInputGain,
+    AudioGetOutputVolume,
     AudioGetInputGain,
     AudioGetFileTags,
 
@@ -185,7 +187,7 @@ enum class MessageType
     EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
-
+    EVMTimeUpdated,   // This message is send on every time update.
     // Torch messages
     EVMTorchStateMessage,
 
