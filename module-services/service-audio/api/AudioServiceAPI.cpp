@@ -159,7 +159,7 @@ namespace AudioServiceAPI
             return resp->tags;
         }
         else {
-            return {};
+            return std::nullopt;
         }
     }
 } // namespace AudioServiceAPI

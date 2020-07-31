@@ -1,0 +1,25 @@
+
+include_directories( ${CMAKE_PROJECT_NAME}
+
+	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}"
+)
+
+include_directories( ${PROJECT_NAME}
+
+	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}"
+)
+
+target_sources( ${PROJECT_NAME}
+
+	PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}/ApplicationMusicPlayer.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/MusicPlayerMainWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/SongItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/SongsModel.cpp"
+	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/ApplicationMusicPlayer.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/SongItem.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/MusicPlayerMainWindow.hpp"
+)
