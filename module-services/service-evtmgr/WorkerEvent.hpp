@@ -28,6 +28,7 @@ enum class WorkerEventQueues
 {
     queueService = 0,
     queueKeyboardIRQ,
+    queueHeadsetIRQ,
     queueBattery,
     queueRTC,
     queueHarness,
