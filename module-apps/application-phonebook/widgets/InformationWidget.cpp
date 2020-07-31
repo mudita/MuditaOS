@@ -30,7 +30,7 @@ namespace gui
         titleLabel->setLineMode(true);
         titleLabel->activeItem = false;
 
-        onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
+        onLoadCallback = [=](std::shared_ptr<ContactRecord> contact) {
             if (contact->numbers.size() > 0) {
 
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::title_label_h);
