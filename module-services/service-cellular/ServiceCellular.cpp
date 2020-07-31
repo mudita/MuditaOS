@@ -165,6 +165,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
+
         std::string message;
         auto msg = identifyNotification(data);
 
@@ -875,6 +876,11 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         break;
     }
+    case MessageType::EVMTimeUpdated: {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        channel->cmd("AT+CTZU=0\r");
+        channel->cmd("AT+CTZR=0\r");
+    } break;
     default:
         break;
 
@@ -1587,7 +1593,6 @@ bool ServiceCellular::handle_fatal_failure()
 bool ServiceCellular::handle_ready()
 {
     LOG_DEBUG("%s", state.c_str());
-
     return true;
 }
 

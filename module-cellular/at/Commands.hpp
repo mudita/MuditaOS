@@ -171,7 +171,7 @@ namespace at
             {AT::CUSD_SEND, {"AT+CUSD=1,"}},
             {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"\r", 300}},
             {AT::ENABLE_TIME_ZONE_UPDATE, {"AT+CTZU=3\r"}},
-            {AT::SET_TIME_ZONE_REPORTING, {"r\r"}},
+            {AT::SET_TIME_ZONE_REPORTING, {"AT+CTZR=2\\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);
