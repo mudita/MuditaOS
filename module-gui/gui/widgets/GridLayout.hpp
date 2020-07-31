@@ -15,6 +15,8 @@ namespace gui
             uint32_t y = 0;
         } grid;
 
+        Item *nextNavigationItem(Item *item);
+
       public:
         GridLayout(
             Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, GridSize grid);
