@@ -59,30 +59,6 @@ namespace gui
         ~MonthBox() override = default;
 
         void buildMap(app::Application *app);
-        std::pair<uint32_t, uint32_t> getFirstDay();
-        std::pair<uint32_t, uint32_t> getLastDay();
-
-        void setNavigation() override;
-        void changeMonthInput(gui::CalendarMainWindow *parent,
-                              const uint32_t &x,
-                              const uint32_t &y,
-                              NavigationDirection direction);
-        void rebuildNavigation(gui::CalendarMainWindow *parent, const uint32_t &x, NavigationDirection direction);
-
-        uint32_t getFirstRow()
-        {
-            return this->firstRow;
-        }
-
-        uint32_t getFirstColumn()
-        {
-            return this->firstColumn;
-        }
-
-        uint32_t getColumns()
-        {
-            return this->columns;
-        }
     };
 
     class CalendarMainWindow : public gui::AppWindow
@@ -95,6 +71,7 @@ namespace gui
 
       protected:
         MonthBox *month = nullptr;
+        Label *dateLabel = nullptr;
         std::unique_ptr<MonthModel> monthModel;
 
       public:
@@ -105,8 +82,10 @@ namespace gui
 
         ~CalendarMainWindow() override = default;
         void switchToNoEventsWindow();
-        bool onInput(const gui::InputEvent &inputEvent) override;
-        void rebuild(const uint32_t &ID);
+        void rebuild() override;
+        void refresh(const uint32_t &ID, std::string date);
+        void buildMonth(const uint32_t &actualDateTimeID);
+        void buildDateLabel(std::string actualDateTime);
         void buildInterface(const uint32_t &actualDateTimeID);
         void destroyInterface() override;
     };
