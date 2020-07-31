@@ -79,6 +79,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keyboard/keyboard.cpp"
+        
+                "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/headset/headset.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/cellular/rt1051_cellular.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pit/pit.cpp"
@@ -121,6 +123,10 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 			${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/cmsis
+            ${CMAKE_CURRENT_SOURCE_DIR}/bsp
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio
+            ${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
             ${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
             ${CMAKE_SOURCE_DIR}/module-sys/
 			${USB_CDC_DIR_INCLUDES}
