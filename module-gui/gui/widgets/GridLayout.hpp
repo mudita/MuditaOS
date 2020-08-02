@@ -15,7 +15,7 @@ namespace gui
             uint32_t y = 0;
         } grid;
 
-        Item *nextNavigationItem(Item *item);
+        Item *nextNavigationItem(std::list<Item *>::iterator it);
 
       public:
         GridLayout(
