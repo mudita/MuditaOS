@@ -77,28 +77,26 @@ void GridLayout::setNavigation()
     for (auto it = children.begin(); it != children.end(); ++it, ++i) {
 
         if (it != children.begin() && (i + 1) % el_in_x != 1) {
-            (*it)->setNavigationItem(NavigationDirection::LEFT, nextNavigationItem(*std::prev(it)));
+            (*it)->setNavigationItem(NavigationDirection::LEFT, nextNavigationItem(std::prev(it)));
         }
 
         if (it != std::prev(children.end()) && (i + 1) % el_in_x != 0) {
-            (*it)->setNavigationItem(NavigationDirection::RIGHT, nextNavigationItem(*std::next(it)));
+            (*it)->setNavigationItem(NavigationDirection::RIGHT, nextNavigationItem(std::next(it)));
         }
 
         if ((i - offset) >= 0) {
-            (*it)->setNavigationItem(NavigationDirection::UP, nextNavigationItem(*std::prev(it, offset)));
+            (*it)->setNavigationItem(NavigationDirection::UP, nextNavigationItem(std::prev(it, offset)));
         }
         if ((i + offset) < static_cast<int>(children.size())) {
-            (*it)->setNavigationItem(NavigationDirection::DOWN, nextNavigationItem(*std::next(it, offset)));
+            (*it)->setNavigationItem(NavigationDirection::DOWN, nextNavigationItem(std::next(it, offset)));
         }
     }
 }
 
-Item *GridLayout::nextNavigationItem(Item *item)
+Item *GridLayout::nextNavigationItem(std::list<Item *>::iterator it)
 {
-    auto el = std::find(children.begin(), children.end(), item);
-
-    if ((*el)->visible && (*el)->activeItem) {
-        return *el;
+    if ((*it)->visible && (*it)->activeItem) {
+        return *it;
     }
     else {
         return nullptr;
