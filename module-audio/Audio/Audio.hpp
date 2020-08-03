@@ -65,6 +65,7 @@ namespace audio
         audio::RetCode Resume();
 
       private:
+        bool headphonesInserted = false;
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 
