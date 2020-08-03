@@ -206,7 +206,7 @@ namespace gui
         virtual void setAlignment(const Alignment &value);
         [[nodiscard]] Alignment &getAlignment();
         [[nodiscard]] Alignment getAlignment(Axis axis);
-        [[nodiscard]] virtual uint16_t getAxisAlignmentValue(Axis axis);
+        [[nodiscard]] virtual uint16_t getAxisAlignmentValue(Axis axis, uint16_t itemSize);
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///

@@ -326,7 +326,7 @@ namespace gui
         return alignment;
     }
 
-    uint16_t Item::getAxisAlignmentValue(Axis axis)
+    uint16_t Item::getAxisAlignmentValue(Axis axis, uint16_t itemSize)
     {
         auto tempAlignment = getAlignment(axis);
 
@@ -340,10 +340,9 @@ namespace gui
         case gui::Alignment::Vertical::Top:
             return this->margins.getMarginInAxis(axis, MarginInAxis::First);
         case gui::Alignment::Vertical::Center:
-            return (parent->area().size(axis) - (this->area().size(axis) + this->margins.getSumInAxis(axis))) / 2;
+            return (parent->area().size(axis) - (itemSize + this->margins.getSumInAxis(axis))) / 2;
         case gui::Alignment::Vertical::Bottom:
-            return parent->area().size(axis) - this->area().size(axis) -
-                   this->margins.getMarginInAxis(axis, MarginInAxis::Second);
+            return parent->area().size(axis) - itemSize - this->margins.getMarginInAxis(axis, MarginInAxis::Second);
         default:
             break;
         }
@@ -352,10 +351,9 @@ namespace gui
         case gui::Alignment::Horizontal::Left:
             return this->margins.getMarginInAxis(axis, MarginInAxis::First);
         case gui::Alignment::Horizontal::Center:
-            return (parent->area().size(axis) - (this->area().size(axis) + this->margins.getSumInAxis(axis))) / 2;
+            return (parent->area().size(axis) - (itemSize + this->margins.getSumInAxis(axis))) / 2;
         case gui::Alignment::Horizontal::Right:
-            return parent->area().size(axis) - this->area().size(axis) -
-                   this->margins.getMarginInAxis(axis, MarginInAxis::Second);
+            return parent->area().size(axis) - itemSize - this->margins.getMarginInAxis(axis, MarginInAxis::Second);
         default:
             break;
         }

@@ -14,6 +14,7 @@
 
 ### Other
 
+* `[boxlayout]` Optimization on BoxLayout elements resize.
 
 ## [0.31.1] - 2020-07-31
 

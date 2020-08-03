@@ -356,11 +356,6 @@ TEST_F(BoxLayoutTesting, Box_Widget_Min_Max_Resize_Test)
     ASSERT_EQ(testStyle::HBox_w / 2, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::X));
     ASSERT_EQ(testStyle::HBox_h / 2, getNItem(testHBoxLayout, 0)->getSize(gui::Axis::Y));
 
-    // Current implementation require second resize to update alignment position in that case
-    ASSERT_NE(testStyle::HBox_w - testStyle::HBox_w / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X));
-    ASSERT_NE((testStyle::HBox_h - testStyle::HBox_h / 2) / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y));
-
-    testHBoxLayout->resizeItems();
     ASSERT_EQ(testStyle::HBox_w - testStyle::HBox_w / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::X));
     ASSERT_EQ((testStyle::HBox_h - testStyle::HBox_h / 2) / 2, getNItem(testHBoxLayout, 0)->getPosition(gui::Axis::Y));
 }
