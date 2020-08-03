@@ -8,8 +8,8 @@ namespace bsp {
  namespace headset {
  int32_t Init(xQueueHandle qHandle);
  	bool Handler(uint8_t notification);
- 	 bool IsInserted(void);
- 	int32_t Deinit(void);
+ 	 bool IsInserted();
+ 	int32_t Deinit();
 
  }
 }

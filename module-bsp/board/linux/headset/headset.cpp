@@ -15,12 +15,12 @@ namespace bsp
             return false;
         }
 
-        bool IsInserted(void)
+        bool IsInserted()
         {
             return false;
         }
 
-        int32_t Deinit(void)
+        int32_t Deinit()
         {
             return 1;
         }
