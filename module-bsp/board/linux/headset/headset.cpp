@@ -10,12 +10,7 @@ namespace bsp
             return 1;
         }
 
-        BaseType_t IRQHandler(void)
-        {
-            return 1;
-        }
-
-        void Handler(void)
+        void Handler(uint8_t notification)
         {}
 
         bool IsInserted(void)

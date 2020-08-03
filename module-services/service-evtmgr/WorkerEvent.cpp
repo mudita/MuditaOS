@@ -66,7 +66,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
             return false;
         }
-        bsp::headset::Handler();
+        bsp::headset::Handler(notification);
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery)) {
