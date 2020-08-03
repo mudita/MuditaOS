@@ -34,7 +34,7 @@ namespace bsp
         static xQueueHandle qHandleIrq = nullptr;
         static bool HeadsetInserted    = false;
 
-        static bool ReadInsertionStatus(void)
+        static bool ReadInsertionStatus()
         {
             uint8_t reg;
             bool ret = false;
@@ -85,8 +85,8 @@ namespace bsp
 
             if (timerHandle == nullptr) {
                 timerHandle =
-                    xTimerCreate("HeadsetTimer", pdMS_TO_TICKS(HEADSET_POLL_INTERVAL_MS), true, NULL, TimerHandler);
-                if (timerHandle == NULL) {
+                    xTimerCreate("HeadsetTimer", pdMS_TO_TICKS(HEADSET_POLL_INTERVAL_MS), true, nullptr, TimerHandler);
+                if (timerHandle == nullptr) {
                     LOG_FATAL("Could not create the timer for Headset insertion/removal detection");
                     return kStatus_Fail;
                 }
@@ -106,14 +106,14 @@ namespace bsp
             return false;
         }
 
-        bool IsInserted(void)
+        bool IsInserted()
         {
             return HeadsetInserted;
         }
 
-        status_t Deinit(void)
+        status_t Deinit()
         {
-            qHandleIrq = NULL;
+            qHandleIrq = nullptr;
 
             i2c.reset();
 
