@@ -34,9 +34,10 @@ namespace bsp
         static xQueueHandle qHandleIrq = nullptr;
         static bool HeadsetInserted    = false;
 
-        static void ReadInsertionStatus(void)
+        static bool ReadInsertionStatus(void)
         {
             uint8_t reg;
+            bool ret = false;
 
             i2cAddr.subAddress = HEADSET_INT_REG_ADDR;
             auto err           = i2c->Read(i2cAddr, (uint8_t *)&reg, 1);
@@ -47,12 +48,16 @@ namespace bsp
             if (((reg & 0x08) == 0) && (HeadsetInserted == true)) {
                 HeadsetInserted = false;
                 LOG_INFO("Headset removed");
+                ret = true;
             }
 
             if (((reg & 0x08) != 0) && (HeadsetInserted == false)) {
                 HeadsetInserted = true;
                 LOG_INFO("Headset inserted");
+                ret = true;
             }
+
+            return ret;
         }
 
         static void TimerHandler(TimerHandle_t xTimer)
@@ -92,11 +97,13 @@ namespace bsp
             return kStatus_Success;
         }
 
-        void Handler(uint8_t notification)
+        bool Handler(uint8_t notification)
         {
             if (notification == 0x01) {
-                ReadInsertionStatus();
+                return ReadInsertionStatus();
             }
+
+            return false;
         }
 
         bool IsInserted(void)
