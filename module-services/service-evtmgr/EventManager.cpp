@@ -210,6 +210,8 @@ sys::ReturnCodes EventManager::InitHandler()
     // create queues for worker
     // keyboard irq queue
     sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10};
+    // keyboard irq queue
+    sys::WorkerQueueInfo qHeadset = {"qHeadset", sizeof(uint8_t), 10};
     // battery manager queue
     sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10};
     // RTC irq queue
@@ -226,6 +228,7 @@ sys::ReturnCodes EventManager::InitHandler()
     std::list<sys::WorkerQueueInfo> list;
 
     list.push_back(qIrq);
+    list.push_back(qHeadset);
     list.push_back(qBattery);
     list.push_back(qRTC);
     list.push_back(qHarness);
