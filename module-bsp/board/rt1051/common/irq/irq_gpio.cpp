@@ -18,7 +18,6 @@
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
-#include "headset.hpp"
 
 #if 0 // TODO:M.P implement the rest of BSP drivers
 
@@ -125,7 +124,6 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BOARD_JACKDET_IRQ_GPIO_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::headset::IRQHandler();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_RI_PIN)) {
