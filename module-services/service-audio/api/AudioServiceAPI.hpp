@@ -14,6 +14,7 @@ namespace AudioServiceAPI
     audio::RetCode RoutingRecordCtrl(sys::Service *serv, bool enable);
     audio::RetCode RoutingMute(sys::Service *serv, bool enable);
     audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable);
+    audio::RetCode RoutingHeadset(sys::Service *serv, bool enable);
     audio::RetCode Stop(sys::Service *serv);
     audio::RetCode Pause(sys::Service *serv);
     audio::RetCode Resume(sys::Service *serv);
