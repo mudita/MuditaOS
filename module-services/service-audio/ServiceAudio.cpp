@@ -140,6 +140,11 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff));
         } break;
 
+        case MessageType::AudioRoutingHeadset: {
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                audio.SendEvent(msg->enable ? Operation::Event::HeadphonesPlugin : Operation::Event::HeadphonesUnplug));
+        } break;
+
         case MessageType::AudioSetOutputVolume: {
             responseMsg = std::make_shared<AudioResponseMessage>(audio.SetOutputVolume(msg->val));
         } break;
