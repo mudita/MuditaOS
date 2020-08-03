@@ -10,8 +10,10 @@ namespace bsp
             return 1;
         }
 
-        void Handler(uint8_t notification)
-        {}
+        bool Handler(uint8_t notification)
+        {
+            return false;
+        }
 
         bool IsInserted(void)
         {
