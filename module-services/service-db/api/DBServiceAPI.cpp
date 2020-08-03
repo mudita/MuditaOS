@@ -63,7 +63,7 @@ uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
         return (*smsResponse->records)[0].ID;
     }
     else {
-        return 0;
+        return DB_ID_NONE;
     }
 }
 

@@ -1,12 +1,10 @@
 #include "EndpointHandler.hpp"
-#include "ParserUtils.hpp"
 #include <source/version.hpp>
-#include "vfs.hpp"
+#include <vfs.hpp>
 #include <common_data/EventStore.hpp>
-
-#include <string>
 #include <time/time_conversion.hpp>
-#include "../ServiceDesktop.hpp"
+#include <service-desktop/ServiceDesktop.hpp>
+#include <string>
 
 time_t FreeRTOS_time(time_t *pxTime)
 {
@@ -16,30 +14,30 @@ time_t FreeRTOS_time(time_t *pxTime)
 sys::ReturnCodes EndpointHandler::deviceInfo(
     uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService)
 {
-    if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::get)) {
+    if (httpMethod == static_cast<uint8_t>(ParserStateMachine::http::Method::get)) {
         vfs::FilesystemStats fsStats = vfs.getFilesystemStats();
 
         json11::Json responseBodyJson = json11::Json::object(
-            {{parserutils::json::batteryLevel, std::to_string(Store::Battery::get().level)},
-             {parserutils::json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
-             {parserutils::json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
-             {parserutils::json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
-             {parserutils::json::signalStrength,
+            {{ParserStateMachine::json::batteryLevel, std::to_string(Store::Battery::get().level)},
+             {ParserStateMachine::json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
+             {ParserStateMachine::json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
+             {ParserStateMachine::json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
+             {ParserStateMachine::json::signalStrength,
               std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
-             {parserutils::json::fsTotal, std::to_string(fsStats.totalMbytes)},
-             {parserutils::json::fsFree, std::to_string(fsStats.freeMbytes)},
-             {parserutils::json::fsFreePercent, std::to_string(fsStats.freePercent)},
-             {parserutils::json::gitRevision, (std::string)(GIT_REV)},
-             {parserutils::json::gitTag, (std::string)GIT_TAG},
-             {parserutils::json::gitBranch, (std::string)GIT_BRANCH},
-             {parserutils::json::currentRTCTime,
+             {ParserStateMachine::json::fsTotal, std::to_string(fsStats.totalMbytes)},
+             {ParserStateMachine::json::fsFree, std::to_string(fsStats.freeMbytes)},
+             {ParserStateMachine::json::fsFreePercent, std::to_string(fsStats.freePercent)},
+             {ParserStateMachine::json::gitRevision, (std::string)(GIT_REV)},
+             {ParserStateMachine::json::gitTag, (std::string)GIT_TAG},
+             {ParserStateMachine::json::gitBranch, (std::string)GIT_BRANCH},
+             {ParserStateMachine::json::currentRTCTime,
               std::to_string(static_cast<uint32_t>(utils::time::Time().getTime()))}});
 
-        json11::Json responsePayloadJson =
-            json11::Json::object({{parserutils::json::endpoint, static_cast<int>(parserutils::Endpoint::deviceInfo)},
-                                  {parserutils::json::status, static_cast<int>(parserutils::http::Code::OK)},
-                                  {parserutils::json::uuid, std::to_string(uuid)},
-                                  {parserutils::json::body, responseBodyJson}});
+        json11::Json responsePayloadJson = json11::Json::object(
+            {{ParserStateMachine::json::endpoint, static_cast<int>(ParserStateMachine::Endpoint::deviceInfo)},
+             {ParserStateMachine::json::status, static_cast<int>(ParserStateMachine::http::Code::OK)},
+             {ParserStateMachine::json::uuid, std::to_string(uuid)},
+             {ParserStateMachine::json::body, responseBodyJson}});
 
         responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
 

@@ -96,36 +96,41 @@ namespace phonebookStyle
         const UTF8 favourites_string   = "Favourites";
     } // namespace contactItem
 
+    namespace informationWidget
+    {
+        constexpr uint32_t w             = style::window::default_body_width;
+        constexpr uint32_t h             = 75;
+        constexpr uint32_t title_label_h = 30;
+        constexpr uint32_t email_text_h  = 35;
+    } // namespace informationWidget
+
     namespace inputBoxWithLabelAndIconItem
     {
         constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = 50;
 
-        constexpr uint32_t input_box_w = 55;
-        constexpr uint32_t input_box_h = h;
+        constexpr uint32_t input_box_w           = 55;
+        constexpr uint32_t input_box_h           = h;
+        constexpr int32_t input_box_right_margin = 20;
 
-        constexpr uint32_t description_label_x = input_box_w + 20;
-        constexpr uint32_t description_label_w = 280;
-        constexpr uint32_t description_label_h = 40;
+        constexpr uint32_t description_label_w           = 280;
+        constexpr uint32_t description_label_h           = 33;
+        constexpr int32_t description_label_right_margin = 40;
 
-        constexpr uint32_t icon_image_x = description_label_x + description_label_w + 35;
-        constexpr uint32_t icon_image_w = 30;
-        constexpr uint32_t icon_image_h = 30;
-
-        constexpr uint32_t tick_image_x = 12;
-        constexpr uint32_t tick_image_w = 30;
-        constexpr uint32_t tick_image_h = 30;
+        constexpr int32_t tick_image_left_margin  = -64;
+        constexpr int32_t tick_image_right_margin = 32;
 
     } // namespace inputBoxWithLabelAndIconItem
 
-    namespace inputLineWithLabelItem
+    namespace inputLinesWithLabelItem
     {
-        constexpr uint32_t w             = style::window::default_body_width;
-        constexpr uint32_t h             = 75;
-        constexpr uint32_t title_label_h = 20;
-        constexpr uint32_t input_text_h  = 33;
-        constexpr uint32_t span_size     = 100;
-    } // namespace inputLineWithLabelItem
+        constexpr uint32_t w                = style::window::default_body_width;
+        constexpr uint32_t h                = 63;
+        constexpr uint32_t title_label_h    = 20;
+        constexpr uint32_t input_text_h     = 37;
+        constexpr uint32_t span_size        = 6;
+        constexpr int32_t underline_padding = 4;
+    } // namespace inputLinesWithLabelItem
 
     namespace multiLineTextWithLabelItem
     {
@@ -135,5 +140,15 @@ namespace phonebookStyle
         constexpr uint32_t input_text_h  = 33;
         constexpr uint32_t span_size     = 100;
     } // namespace multiLineTextWithLabelItem
+
+    namespace numbersWithIconsWidget
+    {
+        constexpr uint32_t sms_image_w             = 55;
+        constexpr uint32_t sms_image_h             = 55;
+        constexpr uint32_t phone_image_w           = 55;
+        constexpr uint32_t phone_image_h           = 55;
+        constexpr uint32_t phone_image_margin_left = 30;
+        constexpr uint32_t number_text_h           = 55;
+    } // namespace numbersWithIconsWidget
 
 } // namespace phonebookStyle

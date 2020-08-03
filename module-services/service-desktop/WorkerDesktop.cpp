@@ -1,4 +1,5 @@
 #include "WorkerDesktop.hpp"
+#include "MessageHandler.hpp"
 
 bool WorkerDesktop::handleMessage(uint32_t queueID)
 {
@@ -19,10 +20,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &receiveMsg, 0) != pdTRUE)
             return false;
 
-        ParserFsm::msgChunk.assign(receiveMsg.begin(), receiveMsg.end());
-        while (!ParserFsm::msgChunk.empty()) {
-            send_event(MessageDataEvt(service));
-        }
+        parser.processMessage(receiveMsg);
     }
 
     // TODO: Consider moving sendBuffer receive to bsp driver
@@ -45,9 +43,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
         return false;
     }
 
-    EndpointFsm::sendQueue = Worker::getQueueByName(WorkerDesktop::SEND_QUEUE_BUFFER_NAME);
-
-    fsm_list::start();
+    ParserStateMachine::MessageHandler::sendQueue = Worker::getQueueByName(WorkerDesktop::SEND_QUEUE_BUFFER_NAME);
 
     return true;
 }

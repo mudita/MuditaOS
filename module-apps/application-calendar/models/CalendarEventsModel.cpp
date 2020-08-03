@@ -24,6 +24,7 @@ gui::ListItem *CalendarEventsModel::getItem(gui::Order order)
     LOG_DEBUG("Created new item in calendar day listView");
     item->activatedCallback = [=](gui::Item &item) {
         LOG_INFO("Switch to options/delete window");
+        application->switchWindow(style::window::calendar::name::events_options);
         return true;
     };
     return item;

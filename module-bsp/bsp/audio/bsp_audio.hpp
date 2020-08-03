@@ -23,7 +23,12 @@ namespace bsp {
     class AudioDevice {
     public:
 
-        enum class Type {
+        enum class RetCode {
+        	Success = 0,
+        	Failure
+        };
+
+    	enum class Type {
             Audiocodec,
             Cellular,
             Bluetooth
@@ -92,17 +97,17 @@ namespace bsp {
 
         static std::optional<std::unique_ptr<AudioDevice>> Create(Type type,audioCallback_t callback);
 
-        virtual int32_t Start(const Format &format) = 0;
+        virtual RetCode Start(const Format &format) = 0;
 
-        virtual int32_t Stop() = 0;
+        virtual AudioDevice::RetCode Stop() = 0;
 
-        virtual int32_t OutputVolumeCtrl(float vol) = 0;
+        virtual AudioDevice::RetCode OutputVolumeCtrl(float vol) = 0;
 
-        virtual int32_t InputGainCtrl(float gain) = 0;
+        virtual AudioDevice::RetCode InputGainCtrl(float gain) = 0;
 
-        virtual int32_t OutputPathCtrl(OutputPath outputPath) = 0;
+        virtual AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) = 0;
 
-        virtual int32_t InputPathCtrl(InputPath inputPath) = 0;
+        virtual AudioDevice::RetCode InputPathCtrl(InputPath inputPath) = 0;
 
         virtual bool IsFormatSupported(const Format& format) = 0;
 

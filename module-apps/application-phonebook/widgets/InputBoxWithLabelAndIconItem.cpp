@@ -17,8 +17,7 @@ namespace gui
     {
         setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconItem::w,
                        phonebookStyle::inputBoxWithLabelAndIconItem::h);
-        setMaximumSize(phonebookStyle::inputBoxWithLabelAndIconItem::w,
-                       phonebookStyle::inputBoxWithLabelAndIconItem::h);
+
         setMargins(gui::Margins(0, style::margins::big, 0, 0));
 
         hBox = new gui::HBox(this, 0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::w, 0);
@@ -27,23 +26,38 @@ namespace gui
         hBox->setPenWidth(style::window::messages::sms_border_no_focus);
 
         inputBoxLabel = new gui::Label(hBox, 0, 0, 0, 0);
+        inputBoxLabel->setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconItem::input_box_w,
+                                      phonebookStyle::inputBoxWithLabelAndIconItem::input_box_h);
+        inputBoxLabel->setMargins(
+            gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::input_box_right_margin, 0));
         inputBoxLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        inputBoxLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        inputBoxLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         inputBoxLabel->setFont(style::window::font::medium);
         inputBoxLabel->activeItem = false;
 
+        tickImage = new gui::Image(hBox, 0, 0, 0, 0);
+        tickImage->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+        // Not ideal -> best solution would be to create separate widget with image inside box.
+        tickImage->setMargins(gui::Margins(phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_left_margin,
+                                           0,
+                                           phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_right_margin,
+                                           0));
+        tickImage->setVisible(false);
+        tickImage->activeItem = false;
+
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
+        descriptionLabel->setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconItem::description_label_w,
+                                         phonebookStyle::inputBoxWithLabelAndIconItem::description_label_h);
+        descriptionLabel->setMargins(
+            gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconItem::description_label_right_margin, 0));
         descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
 
-        iconImage             = new gui::Image(hBox, 0, 0, 0, 0);
+        iconImage = new gui::Image(hBox, 0, 0, 0, 0);
+        iconImage->setAlignment(Alignment(gui::Alignment::Vertical::Center));
         iconImage->activeItem = false;
-
-        tickImage = new gui::Image(hBox, 0, 0, 0, 0);
-        tickImage->setVisible(false);
-        tickImage->activeItem = false;
 
         applyItemNameSpecificSettings();
 
@@ -54,27 +68,7 @@ namespace gui
     {
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);
-
-        inputBoxLabel->setArea(BoundingBox(0,
-                                           newDim.h - phonebookStyle::inputBoxWithLabelAndIconItem::input_box_h,
-                                           phonebookStyle::inputBoxWithLabelAndIconItem::input_box_w,
-                                           phonebookStyle::inputBoxWithLabelAndIconItem::input_box_h));
-
-        descriptionLabel->setArea(
-            BoundingBox(phonebookStyle::inputBoxWithLabelAndIconItem::description_label_x,
-                        (newDim.h - phonebookStyle::inputBoxWithLabelAndIconItem::description_label_h) / 2,
-                        phonebookStyle::inputBoxWithLabelAndIconItem::description_label_w,
-                        phonebookStyle::inputBoxWithLabelAndIconItem::description_label_h));
-
-        iconImage->setArea(BoundingBox(phonebookStyle::inputBoxWithLabelAndIconItem::icon_image_x,
-                                       (newDim.h - phonebookStyle::inputBoxWithLabelAndIconItem::icon_image_h) / 2,
-                                       phonebookStyle::inputBoxWithLabelAndIconItem::icon_image_w,
-                                       phonebookStyle::inputBoxWithLabelAndIconItem::icon_image_h));
-
-        tickImage->setArea(BoundingBox(phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_x,
-                                       (newDim.h - phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_h) / 2,
-                                       phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_w,
-                                       phonebookStyle::inputBoxWithLabelAndIconItem::tick_image_h));
+        hBox->resizeItems();
 
         return true;
     }
@@ -169,6 +163,8 @@ namespace gui
                 else {
                     bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                 }
+                hBox->resizeItems();
+                return true;
             }
             return false;
         };
@@ -214,6 +210,8 @@ namespace gui
                 else {
                     bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
                 }
+                hBox->resizeItems();
+                return true;
             }
             return false;
         };

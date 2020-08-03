@@ -26,6 +26,10 @@
 #include "service-cellular/ServiceCellular.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
+#include "windows/CellularPassthroughWindow.hpp"
+
+#include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
+
 #include <i18/i18.hpp>
 
 namespace app
@@ -60,6 +64,7 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationSettings::InitHandler()
     {
+        board = EventManagerServiceAPI::GetBoard(this);
 
         auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success)
@@ -104,6 +109,11 @@ namespace app
 
         window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        if (board == bsp::Board::T4) {
+            window = new gui::CellularPassthroughWindow(this);
+            windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        }
     }
 
     void ApplicationSettings::destroyUserInterface()

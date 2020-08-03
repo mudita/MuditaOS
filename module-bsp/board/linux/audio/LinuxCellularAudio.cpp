@@ -45,25 +45,26 @@ namespace bsp
         }
     }
 
-    int32_t LinuxCellularAudio::Start(const bsp::AudioDevice::Format &format)
+    AudioDevice::RetCode LinuxCellularAudio::Start(const bsp::AudioDevice::Format &format)
     {
 
         if (!TryOpenStream(format)) {
-            return paInternalError;
+            LOG_ERROR("PortAudio error: paInternalError");
+            return AudioDevice::RetCode::Failure;
         }
 
         auto err = Pa_StartStream(stream);
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
-            return err;
+            return AudioDevice::RetCode::Failure;
         }
 
         currentFormat = format;
 
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxCellularAudio::Stop()
+    AudioDevice::RetCode LinuxCellularAudio::Stop()
     {
 
         if (stream) {
@@ -76,7 +77,7 @@ namespace bsp
         stream        = nullptr;
         currentFormat = {};
 
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     int LinuxCellularAudio::portAudioCallback(const void *inputBuffer,
@@ -126,26 +127,26 @@ namespace bsp
         return paAbort;
     }
 
-    int32_t LinuxCellularAudio::InputGainCtrl(float gain)
+    AudioDevice::RetCode LinuxCellularAudio::InputGainCtrl(float gain)
     {
         currentFormat.inputGain = gain;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxCellularAudio::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode LinuxCellularAudio::OutputVolumeCtrl(float vol)
     {
         currentFormat.outputVolume = vol;
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxCellularAudio::InputPathCtrl([[maybe_unused]] InputPath inputPath)
+    AudioDevice::RetCode LinuxCellularAudio::InputPathCtrl([[maybe_unused]] InputPath inputPath)
     {
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
-    int32_t LinuxCellularAudio::OutputPathCtrl([[maybe_unused]] OutputPath outputPath)
+    AudioDevice::RetCode LinuxCellularAudio::OutputPathCtrl([[maybe_unused]] OutputPath outputPath)
     {
-        return 0;
+        return AudioDevice::RetCode::Success;
     }
 
     bool LinuxCellularAudio::TryOpenStream(const bsp::AudioDevice::Format &format)

@@ -1,6 +1,27 @@
 # Mudita PurePhone changelog
 
-## Current version
+## [0.31.1] - 2020-07-31
+
+### Added
+
+* `[calendar]` Added events options and event delete windows.
+* `[sms][audio]` Added incoming text message ringtone.
+* `[usb]` Added ability to expose the cellular modem onto USB-C connector (USB re-routing).
+
+### Fixed
+
+* `[sms]` Fix selecting contact for a new message after searching in phonebook.
+
+### Other
+
+* `[desktop]` Reimplemented JSON message parser.
+* `[audio]` Error codes unification.
+* `[build]` Optimize third party libraries in debug configuration to lower the size footprint for the RT1051 platform.
+* `[text]` Fixed text size and underline support.
+* `[listview]` List view data handling fixes.
+* `[gui]` Added generic ImageBox widget.
+
+## [0.30.1] - 2020-07-24
 
 ### Added
 
@@ -11,6 +32,7 @@
 * `[audio]` added incoming call ringtone
 * `[phonebook]` general support for groups in DB
 * `[phonebook]` proper displaying of favorites, ice, blocked flags
+* `[sms]` thread summaries cover all SMS states (incoming, failed etc.)
 
 ### Changed
 
@@ -21,9 +43,11 @@
 * `[sms]` new message properly adds templates and resizes
 * `[sms]` fixed focus in new message window after message forward option
 * `[audio]` added audio workers synchronization mutexes
-* `[phonebook]` Fixed bottom bar in main phonebook window 
+* `[phonebook]` Fixed bottom bar in main phonebook window
 * `[info]` fixed displaying of version
-* `[boxlayout]` min-max resize on alignment fix. 
+* `[boxlayout]` min-max resize on alignment fix.
+* `[sms]` fixed logic around re-sending messages
+* `[sms]` conversation view summary refreshes instantly
 
 ### Other
 

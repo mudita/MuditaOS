@@ -1,3 +1,5 @@
+include (thirdparty)
+
 # add sources
 set(PROTOBUF_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/protobuf/src)
 set(PROTOBUF ${PROTOBUF_SRCDIR}/google/protobuf)
@@ -42,8 +44,11 @@ set_source_files_properties(${PROTOBUF_SOURCES}
         -Wno-stringop-overflow \
         -Wno-sign-compare \
         -Wno-type-limits  \
-        -Wno-redundant-move"
+        -Wno-redundant-move \
+        -Wno-maybe-uninitialized"
 )
 
 # add include dir
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOBUF_SRCDIR})
+
+third_party_source_optimization(${PROTOBUF_SOURCES})

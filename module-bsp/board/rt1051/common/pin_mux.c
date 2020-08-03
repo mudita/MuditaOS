@@ -1136,6 +1136,7 @@ void PINMUX_InitUSBC(void)
                      0U);                       /* Software Input On Field: Input Path is determined by functionality */
     IOMUXC_SetPinMux(PINMUX_USBC_CONTROLLER_PORT, /* GPIO_AD_B0_02 is configured as LPSPI1_SDI */
                      0U); /* Software Input On Field: Input Path is determined by functionality */
+    IOMUXC_SetPinMux(PINMUX_USB_FUNCTION_MUX_SELECT, 1U);
 
     IOMUXC_SetPinConfig(PINMUX_USBC_CONTROLLER_NEN, /* GPIO_AD_B0_02 PAD functional properties : */
                         0x10B0u);                   /* Slew Rate Field: Slow Slew Rate
@@ -1164,6 +1165,11 @@ void PINMUX_InitUSBC(void)
                                                       Pull / Keep Select Field: Keeper
                                                       Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                       Hyst. Enable Field: Hysteresis Disabled */
+
+    IOMUXC_SetPinConfig(PINMUX_USB_FUNCTION_MUX_SELECT,
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_KEEPER |
+                            PAD_CONFIG_HYSTERESIS_DISABLED);
 }
 
 void PINMUX_InitLEDDRIVER(void)
@@ -1199,6 +1205,7 @@ void PINMUX_InitCellular(void)
     IOMUXC_SetPinMux(PINMUX_CELLULAR_SIM_PRESENCE, 0U);
     IOMUXC_SetPinMux(PINMUX_CELLULAR_ANTENNA_SELECT, 1U);
     IOMUXC_SetPinMux(PINMUX_CELLULAR_STATUS, 0U);
+    IOMUXC_SetPinMux(PINMUX_CELLULAR_USB_BOOT_PIN, 1U);
     IOMUXC_SetPinMux(PINMUX_CELLULAR_SAIx_MCLK, 1U);
     IOMUXC_SetPinMux(PINMUX_CELLULAR_SAIx_TX_DATA00, 1U);
     IOMUXC_SetPinMux(PINMUX_CELLULAR_SAIx_RX_DATA00, 1U);
@@ -1238,7 +1245,7 @@ void PINMUX_InitCellular(void)
     IOMUXC_SetPinConfig(PINMUX_CELLULAR_RESET,
 
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
-                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_DOWN_100kOhm |
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_DOWN_100kOhm |
                             PAD_CONFIG_HYSTERESIS_DISABLED);
 
     IOMUXC_SetPinConfig(PINMUX_CELLULAR_PWRKEY,
@@ -1291,9 +1298,13 @@ void PINMUX_InitCellular(void)
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_HYSTERESIS_DISABLED);
 
     IOMUXC_SetPinConfig(PINMUX_CELLULAR_STATUS,
-                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_SPEED_SLOW_50MHz |
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_47kOhm |
                             PAD_CONFIG_HYSTERESIS_ENABLED);
+
+    IOMUXC_SetPinConfig(PINMUX_CELLULAR_USB_BOOT_PIN,
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER);
 
     IOMUXC_SetPinConfig(PINMUX_CELLULAR_SAIx_MCLK,
 

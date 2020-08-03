@@ -22,6 +22,7 @@ target_sources( ${PROJECT_NAME}
         windows/Info.cpp
         windows/SimSelectWindow.cpp
         windows/DateTimeWindow.cpp
+        windows/CellularPassthroughWindow.cpp
         windows/FotaWindow.cpp
         windows/Fota.cpp
 

@@ -25,7 +25,7 @@ namespace audio
         Audio(std::function<int32_t(AudioEvents event)> asyncCallback);
 
         // Events
-        int32_t SendEvent(const Operation::Event evt, const EventData *data = nullptr);
+        audio::RetCode SendEvent(const Operation::Event evt, const EventData *data = nullptr);
 
         // utilities
         Position GetPosition();
@@ -38,10 +38,10 @@ namespace audio
         std::optional<Tags> GetFileTags(const char *filename);
 
         // Range 0-1
-        int32_t SetOutputVolume(Volume vol);
+        audio::RetCode SetOutputVolume(Volume vol);
 
         // Range 0-10
-        int32_t SetInputGain(Gain gain);
+        audio::RetCode SetInputGain(Gain gain);
 
         Volume GetOutputVolume()
         {
@@ -56,13 +56,13 @@ namespace audio
         // TODO:M.P Set/Get inputGain/outputVolume for each profile
 
         // Operations
-        int32_t Start(Operation::Type op, const char *fileName = "");
+        audio::RetCode Start(Operation::Type op, const char *fileName = "");
 
-        int32_t Stop();
+        audio::RetCode Stop();
 
-        int32_t Pause();
+        audio::RetCode Pause();
 
-        int32_t Resume();
+        audio::RetCode Resume();
 
       private:
         State currentState = State::Idle;

@@ -106,24 +106,24 @@ namespace audio
         StopRecording();
     }
 
-    int32_t RouterOperation::SetOutputVolume(float vol)
+    audio::RetCode RouterOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        audioDevice->OutputVolumeCtrl(vol);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        return GetDeviceError(ret);
     }
 
-    int32_t RouterOperation::SetInputGain(float gain)
+    audio::RetCode RouterOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        audioDevice->InputGainCtrl(gain);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->InputGainCtrl(gain);
+        return GetDeviceError(ret);
     }
 
-    int32_t RouterOperation::Start(std::function<int32_t(audio::AudioEvents)> callback)
+    audio::RetCode RouterOperation::Start(std::function<int32_t(audio::AudioEvents)> callback)
     {
         if (state == State::Paused || state == State::Active) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         eventCallback = callback;
@@ -131,26 +131,27 @@ namespace audio
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
             auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-            if (ret != 0) {
-                LOG_ERROR("Start error: %u", static_cast<unsigned int>(ret));
+            if (ret != bsp::AudioDevice::RetCode::Success) {
+                LOG_ERROR("Start error: %s", audio::c_str(audio::RetCode::DeviceFailure));
             }
         }
         else {
-            return static_cast<int32_t>(RetCode::InvalidFormat);
+            return RetCode::InvalidFormat;
         }
 
         if (audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            return audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+            auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+            return GetDeviceError(ret);
         }
         else {
-            return static_cast<int32_t>(RetCode::InvalidFormat);
+            return RetCode::InvalidFormat;
         }
     }
 
-    int32_t RouterOperation::Stop()
+    audio::RetCode RouterOperation::Stop()
     {
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Idle;
@@ -158,34 +159,34 @@ namespace audio
         audioDeviceCellular->Stop();
 
         StopRecording();
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::Pause()
+    audio::RetCode RouterOperation::Pause()
     {
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Paused;
         audioDevice->Stop();
         audioDeviceCellular->Stop();
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::Resume()
+    audio::RetCode RouterOperation::Resume()
     {
         if (state == State::Active || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Active;
         audioDevice->Start(currentProfile->GetAudioFormat());
         audioDeviceCellular->Start(currentProfile->GetAudioFormat());
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
+    audio::RetCode RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
     {
         switch (evt) {
         case Event::HeadphonesPlugin:
@@ -221,20 +222,20 @@ namespace audio
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         default:
-            return static_cast<int32_t>(RetCode::UnsupportedEvent);
+            return RetCode::UnsupportedEvent;
         }
 
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::SwitchProfile(const audio::Profile::Type type)
+    audio::RetCode RouterOperation::SwitchProfile(const audio::Profile::Type type)
     {
         auto ret = GetProfile(type);
         if (ret) {
             currentProfile = ret.value();
         }
         else {
-            return static_cast<int32_t>(RetCode::UnsupportedProfile);
+            return RetCode::UnsupportedProfile;
         }
 
         audioDevice =
@@ -253,8 +254,7 @@ namespace audio
             break;
         }
 
-        // TODO:M.P add error handling
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
     bool RouterOperation::Mute(bool enable)
@@ -263,7 +263,7 @@ namespace audio
         return true;
     }
 
-    int32_t RouterOperation::StartRecording()
+    audio::RetCode RouterOperation::StartRecording()
     {
         channel1Buffer.reserve(1024);
         channel2Buffer.reserve(1024);
@@ -283,25 +283,25 @@ namespace audio
                               Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
 
         if (enc == nullptr) {
-            return static_cast<int32_t>(RetCode::FileDoesntExist);
+            return RetCode::FileDoesntExist;
         }
 
         if (xTaskCreate(recorderWorker, "recworker", 512, this, 0, &recorderWorkerHandle) != pdPASS) {
             LOG_ERROR("Creating recworker failed");
-            return static_cast<int32_t>(RetCode::FailedToAllocateMemory);
+            return RetCode::FailedToAllocateMemory;
         }
 
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RouterOperation::StopRecording()
+    audio::RetCode RouterOperation::StopRecording()
     {
         cpp_freertos::LockGuard lock(mutex);
         if (recorderWorkerHandle) {
             vTaskDelete(recorderWorkerHandle);
             enc.reset();
         }
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
     void recorderWorker(void *pvp)

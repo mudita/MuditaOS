@@ -26,39 +26,39 @@ namespace audio
 
         ~IdleOperation();
 
-        int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final
+        audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t Stop() override final
+        audio::RetCode Stop() override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t Pause() override final
+        audio::RetCode Pause() override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t Resume() override final
+        audio::RetCode Resume() override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final
+        audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t SwitchProfile(const Profile::Type type) override final
+        audio::RetCode SwitchProfile(const Profile::Type type) override final
         {
-            return 0;
+            return audio::RetCode::Success;
         }
 
-        int32_t SetOutputVolume(float vol) override final;
+        audio::RetCode SetOutputVolume(float vol) override final;
 
-        int32_t SetInputGain(float gain) override final;
+        audio::RetCode SetInputGain(float gain) override final;
 
         Position GetPosition() override final
         {

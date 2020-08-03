@@ -219,6 +219,22 @@ namespace bsp
             return 0;
         }
 
+        namespace USB
+        {
+            BootPinState getBootPin()
+            {
+                return BootPinState::NORMAL_BOOT;
+            }
+
+            PassthroughState getPassthrough()
+            {
+                return PassthroughState::DISABLED;
+            }
+
+            void setBootPin(BootPinState dfu){};
+            void setPassthrough(PassthroughState pass){};
+        } // namespace USB
+
         namespace status
         {
 
@@ -231,7 +247,7 @@ namespace bsp
             {
                 return pdFALSE;
             }
-        }
+        } // namespace status
         namespace sim
         {
 

@@ -44,12 +44,12 @@ namespace bsp
         RT1051Audiocodec(AudioDevice::audioCallback_t callback);
         virtual ~RT1051Audiocodec();
 
-        int32_t Start(const Format &format) override final;
-        int32_t Stop() override final;
-        int32_t OutputVolumeCtrl(float vol) override final;
-        int32_t InputGainCtrl(float gain) override final;
-        int32_t OutputPathCtrl(OutputPath outputPath) override final;
-        int32_t InputPathCtrl(InputPath inputPath) override final;
+        AudioDevice::RetCode Start(const Format &format) override final;
+        AudioDevice::RetCode Stop() override final;
+        AudioDevice::RetCode OutputVolumeCtrl(float vol) override final;
+        AudioDevice::RetCode InputGainCtrl(float gain) override final;
+        AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) override final;
+        AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Format &format) override final;
 
         cpp_freertos::MutexStandard mutex;

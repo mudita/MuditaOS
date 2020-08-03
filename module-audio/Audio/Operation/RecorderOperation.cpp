@@ -78,58 +78,60 @@ namespace audio
         isInitialized = true;
     }
 
-    int32_t RecorderOperation::Start(std::function<int32_t(AudioEvents event)> callback)
+    audio::RetCode RecorderOperation::Start(std::function<int32_t(AudioEvents event)> callback)
     {
 
         if (state == State::Paused || state == State::Active) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         eventCallback = callback;
         state         = State::Active;
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            return audioDevice->Start(currentProfile->GetAudioFormat());
+            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+            return GetDeviceError(ret);
         }
         else {
-            return static_cast<int32_t>(RetCode::InvalidFormat);
+            return RetCode::InvalidFormat;
         }
     }
 
-    int32_t RecorderOperation::Stop()
+    audio::RetCode RecorderOperation::Stop()
     {
 
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Idle;
-        return audioDevice->Stop();
+        return GetDeviceError(audioDevice->Stop());
     }
 
-    int32_t RecorderOperation::Pause()
+    audio::RetCode RecorderOperation::Pause()
     {
 
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Paused;
-        return audioDevice->Stop();
+        return GetDeviceError(audioDevice->Stop());
     }
 
-    int32_t RecorderOperation::Resume()
+    audio::RetCode RecorderOperation::Resume()
     {
 
         if (state == State::Active || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Active;
-        return audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        return GetDeviceError(ret);
     }
 
-    int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)
     {
         switch (evt) {
         case Event::HeadphonesPlugin:
@@ -147,13 +149,13 @@ namespace audio
             SwitchProfile(Profile::Type::RecordingBuiltInMic);
             break;
         default:
-            return static_cast<int32_t>(RetCode::UnsupportedEvent);
+            return RetCode::UnsupportedEvent;
         }
 
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t RecorderOperation::SwitchProfile(const Profile::Type type)
+    audio::RetCode RecorderOperation::SwitchProfile(const Profile::Type type)
     {
 
         auto ret = GetProfile(type);
@@ -161,7 +163,7 @@ namespace audio
             currentProfile = ret.value();
         }
         else {
-            return static_cast<int32_t>(RetCode::UnsupportedProfile);
+            return RetCode::UnsupportedProfile;
         }
 
         audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
@@ -177,27 +179,25 @@ namespace audio
             break;
         }
 
-        // TODO:M.P add error handling
-        return 0;
+        return audio::RetCode::Success;
     }
 
-    int32_t RecorderOperation::SetOutputVolume(float vol)
+    audio::RetCode RecorderOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        audioDevice->OutputVolumeCtrl(vol);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        return GetDeviceError(ret);
     }
 
-    int32_t RecorderOperation::SetInputGain(float gain)
+    audio::RetCode RecorderOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        audioDevice->InputGainCtrl(gain);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->InputGainCtrl(gain);
+        return GetDeviceError(ret);
     }
 
     Position RecorderOperation::GetPosition()
     {
         return enc->getCurrentPosition();
     }
-
 } // namespace audio

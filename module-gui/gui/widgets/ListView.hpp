@@ -29,9 +29,10 @@ namespace gui
         VBox *body                                 = nullptr;
         ListViewScroll *scroll                     = nullptr;
 
-        int currentPageSize = 0;
-        bool pageLoaded     = false;
-        int scrollTopMargin = style::margins::big;
+        int currentPageSize  = 0;
+        bool pageLoaded      = false;
+        bool focusOnLastItem = false;
+        int scrollTopMargin  = style::margins::big;
 
         style::listview::Type listType       = style::listview::Type::TopDown;
         style::listview::Direction direction = style::listview::Direction::Bottom;
@@ -42,6 +43,7 @@ namespace gui
         void refresh();
         void resizeWithScroll();
         void recalculateStartIndex();
+        void checkFirstPage();
         int calculateMaxItemsOnPage();
         int calculateLimit();
         Order getOrderFromDirection();

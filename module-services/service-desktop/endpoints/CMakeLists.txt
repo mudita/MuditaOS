@@ -1,5 +1,5 @@
-target_include_directories(${PROJECT_NAME} 
-	PUBLIC 
+target_include_directories(${PROJECT_NAME}
+	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}"
 		"${CMAKE_CURRENT_LIST_DIR}/.."
 		"${CMAKE_CURRENT_LIST_DIR}/../messages"
@@ -13,7 +13,7 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 		"DeviceInfo.cpp"
 		"Update.cpp"
-		"BackupEndpoint.cpp"
-		"RestoreEndpoint.cpp"
-		"FactoryEndpoint.cpp"
+		"Backup.cpp"
+		"Restore.cpp"
+		"Factory.cpp"
 )

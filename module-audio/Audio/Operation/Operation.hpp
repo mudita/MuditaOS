@@ -73,19 +73,19 @@ namespace audio
 
         static std::optional<std::unique_ptr<Operation>> Create(Type t, const char *fileName);
 
-        virtual int32_t Start(std::function<int32_t(AudioEvents event)> callback) = 0;
+        virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
-        virtual int32_t Stop() = 0;
+        virtual audio::RetCode Stop() = 0;
 
-        virtual int32_t Pause() = 0;
+        virtual audio::RetCode Pause() = 0;
 
-        virtual int32_t Resume() = 0;
+        virtual audio::RetCode Resume() = 0;
 
-        virtual int32_t SendEvent(const Event evt, const EventData *data = nullptr) = 0;
+        virtual audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) = 0;
 
-        virtual int32_t SetOutputVolume(float vol) = 0;
+        virtual audio::RetCode SetOutputVolume(float vol) = 0;
 
-        virtual int32_t SetInputGain(float gain) = 0;
+        virtual audio::RetCode SetInputGain(float gain) = 0;
 
         virtual Position GetPosition() = 0;
 
@@ -117,7 +117,7 @@ namespace audio
 
         bool isInitialized = false;
 
-        virtual int32_t SwitchProfile(const Profile::Type type) = 0;
+        virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
 
         std::optional<Profile *> GetProfile(const Profile::Type type);
 

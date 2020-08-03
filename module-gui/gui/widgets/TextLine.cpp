@@ -41,7 +41,7 @@ namespace gui
             }
 
             // take Part of TextBlock we want to show
-            auto text_part = document->getTextPart(cursor);
+            auto text_part   = document->getTextPart(cursor);
             auto text_format = (*cursor).getFormat();
             if (text_format->getFont() == nullptr) {
                 return;
@@ -70,12 +70,32 @@ namespace gui
         } while (true);
     }
 
+    TextLine::TextLine(TextDocument *document,
+                       unsigned int start_position,
+                       unsigned int max_width,
+                       unsigned int init_height,
+                       bool drawUnderline,
+                       UnderlineDrawMode drawUnderlineMode,
+                       Position underlinePadding)
+        : TextLine(document, start_position, max_width)
+    {
+        this->drawUnderline     = drawUnderline;
+        this->drawUnderlineMode = drawUnderlineMode;
+        this->underlinePadding  = underlinePadding;
+
+        createUnderline(max_width, init_height);
+    }
+
     TextLine::TextLine(TextLine &&from)
     {
         elements_to_show_in_line = std::move(from.elements_to_show_in_line);
         number_letters_shown     = from.number_letters_shown;
         width_used               = from.width_used;
         height_used              = from.height_used;
+        underline                = from.underline;
+        drawUnderline            = from.drawUnderline;
+        drawUnderlineMode        = from.drawUnderlineMode;
+        underlinePadding         = from.underlinePadding;
     }
 
     TextLine::~TextLine()
@@ -84,6 +104,10 @@ namespace gui
             if (el->parent == nullptr) {
                 delete el;
             }
+        }
+
+        if (underline != nullptr && underline->parent == nullptr) {
+            delete underline;
         }
     }
 
@@ -109,13 +133,16 @@ namespace gui
         }
     };
 
-    void TextLine::setPosition(int32_t x, int32_t y)
+    void TextLine::setPosition(const short &x, const short &y)
     {
         auto line_x_position = x;
+
+        updateUnderline(x, y);
+
         for (auto &el : elements_to_show_in_line) {
             auto scoped_disown          = ScopedParentDisown(el);
             int32_t align_bottom_offset = height() - el->getHeight();
-            el->setArea({line_x_position, y + align_bottom_offset, el->getWidth(), el->getHeight()});
+            el->setArea({line_x_position, y + align_bottom_offset - underlinePadding, el->getWidth(), el->getHeight()});
             line_x_position += el->getWidth();
         }
     }
@@ -125,6 +152,9 @@ namespace gui
         if (parent == nullptr) {
             return;
         }
+
+        parent->addWidget(underline);
+
         for (auto &el : elements_to_show_in_line) {
             parent->addWidget(el);
         }
@@ -173,15 +203,24 @@ namespace gui
                 delete el;
             }
         }
+
+        if (underline != nullptr && underline->parent != nullptr) {
+            auto p = underline->parent;
+            p->removeWidget(underline);
+        }
+
         elements_to_show_in_line.clear();
     }
 
     void TextLine::alignH(Alignment line_align, Length parent_length) const
     {
         Length xOffset = line_align.calculateHAlignment(parent_length, getWidth());
-        ;
 
         if (xOffset) {
+
+            if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent)
+                underline->setPosition(underline->getPosition(Axis::X) + xOffset, Axis::X);
+
             for (auto &el : elements_to_show_in_line) {
                 auto scoped_disown = ScopedParentDisown(el);
                 el->setPosition(el->getPosition(Axis::X) + xOffset, Axis::X);
@@ -194,10 +233,37 @@ namespace gui
         Length yOffset = line_align.calculateVAlignment(parent_length, lines_height);
 
         if (yOffset) {
+
+            if (underline != nullptr)
+                underline->setPosition(underline->getPosition(Axis::Y) + yOffset, Axis::Y);
+
             for (auto &el : elements_to_show_in_line) {
                 auto scoped_disown = ScopedParentDisown(el);
                 el->setPosition(el->getPosition(Axis::Y) + yOffset, Axis::Y);
             }
+        }
+    }
+
+    void TextLine::createUnderline(unsigned int max_width, unsigned int init_height)
+    {
+        if (drawUnderline) {
+
+            underline = new Rect(nullptr, 0, 0, max_width, init_height);
+            underline->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+
+            if (drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+                height_used = std::max(height_used, (Length)init_height);
+            }
+        }
+    }
+
+    void TextLine::updateUnderline(const short &x, const short &y)
+    {
+        if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+            underline->setArea({x, y, underline->widgetArea.w, height()});
+        }
+        else if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent) {
+            underline->setArea({x, y, getWidth(), height()});
         }
     }
 

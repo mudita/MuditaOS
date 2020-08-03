@@ -404,6 +404,11 @@ namespace gui
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
     }
 
+    uint32_t HBox::getSizeLeft()
+    {
+        return sizeLeft<Axis::X>(this, Area::Normal);
+    }
+
     VBox::VBox() : BoxLayout()
     {
         type = ItemType::VBOX;
@@ -427,6 +432,11 @@ namespace gui
     auto VBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
     {
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
+    }
+
+    uint32_t VBox::getSizeLeft()
+    {
+        return sizeLeft<Axis::Y>(this, Area::Normal);
     }
 
 } /* namespace gui */

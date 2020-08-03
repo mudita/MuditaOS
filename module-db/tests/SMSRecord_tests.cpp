@@ -167,6 +167,52 @@ TEST_CASE("SMS Record tests")
     REQUIRE(smsRecInterface.RemoveByID(4));
     REQUIRE(threadRecordInterface.GetCount() == 0);
 
+    // Test removing a message which belongs to non-existent thread
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsDB->threads.removeById(1)); // stealthy thread remove
+    REQUIRE(smsRecInterface.RemoveByID(1));
+
+    // Test handling of missmatch in sms vs. thread tables
+    auto trueCount = 10;
+    // prepare
+    for (auto added = 0; added < trueCount; added++) {
+        recordIN.date = added;                     // for proper order
+        recordIN.body = std::to_string(added + 1); // == ID
+        REQUIRE(smsRecInterface.Add(recordIN));    // threadID = 1
+    }
+    ThreadRecord threadRec = threadRecordInterface.GetByID(1);
+    REQUIRE(threadRec.isValid());
+    ThreadsTableRow threadRaw{{.ID = threadRec.ID},
+                              .date           = threadRec.date,
+                              .msgCount       = threadRec.msgCount,
+                              .unreadMsgCount = threadRec.unreadMsgCount,
+                              .contactID      = threadRec.contactID,
+                              .snippet        = threadRec.snippet,
+                              .type           = threadRec.type};
+    threadRaw.msgCount = trueCount + 1; // break the DB
+    REQUIRE(smsDB->threads.update(threadRaw));
+
+    REQUIRE(static_cast<int>(smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1")->size()) ==
+            trueCount);
+    // end of preparation, now test
+    for (auto latest = trueCount; latest > 0; latest--) {
+        REQUIRE(smsRecInterface.RemoveByID(latest)); // remove the latest
+        switch (latest) {                            // was just removed
+        case 3:                                      // remaining 2 or more
+        default:
+            REQUIRE(threadRecordInterface.GetByID(1).snippet.c_str() == std::to_string(latest - 1)); // next to newest
+            break;
+        case 2:                                                                             // remaining 1
+            REQUIRE(threadRecordInterface.GetByID(1).snippet.c_str() == std::to_string(1)); // only one remaining
+            break;
+        case 1: // no sms remaining
+            // make sure there is no thread nor sms
+            REQUIRE(threadRecordInterface.GetCount() == 0);
+            REQUIRE(smsRecInterface.GetCount() == 0);
+            break;
+        }
+    }
+
     // Test removing by field
     recordIN.number = numberTest;
     REQUIRE(smsRecInterface.Add(recordIN));

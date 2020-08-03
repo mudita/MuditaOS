@@ -41,7 +41,7 @@ namespace app
         {
             unsigned int index = 0;
             if (order == gui::Order::Previous) {
-                index = internalLimit - modelIndex - 1;
+                index = internalOffset + internalLimit - 1 - modelIndex;
             }
             if (order == gui::Order::Next) {
                 index = internalOffset + modelIndex;
@@ -62,10 +62,18 @@ namespace app
             return (index < internalData.size()) || (order == gui::Order::Previous && index < internalOffset);
         }
 
+        void clearItemProperties(T Item)
+        {
+            Item->setFocus(false);
+            Item->setVisible(true);
+            Item->clearNavigationItem(gui::NavigationDirection::UP);
+            Item->clearNavigationItem(gui::NavigationDirection::DOWN);
+        }
+
         gui::ListItem *getNextInternalDataElement(unsigned int index)
         {
             modelIndex++;
-            internalData[index]->setVisible(true);
+            clearItemProperties(internalData[index]);
             return internalData[index];
         }
     };

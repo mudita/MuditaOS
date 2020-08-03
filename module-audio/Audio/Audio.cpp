@@ -32,13 +32,12 @@ namespace audio
         };
     }
 
-    int32_t Audio::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode Audio::SendEvent(const Operation::Event evt, const EventData *data)
     {
-        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data)
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data) : RetCode::OperationNotSet;
     }
 
-    int32_t Audio::SetOutputVolume(Volume vol)
+    audio::RetCode Audio::SetOutputVolume(Volume vol)
     {
         auto volToSet = vol;
         if (vol > 1) {
@@ -48,11 +47,10 @@ namespace audio
             volToSet = 0;
         }
 
-        return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet)
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet) : RetCode::OperationNotSet;
     }
 
-    int32_t Audio::SetInputGain(Gain gain)
+    audio::RetCode Audio::SetInputGain(Gain gain)
     {
         auto gainToSet = gain;
         if (gain > 10) {
@@ -61,11 +59,10 @@ namespace audio
         if (gain < 0) {
             gainToSet = 0;
         }
-        return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet)
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet) : RetCode::OperationNotSet;
     }
 
-    int32_t Audio::Start(Operation::Type op, const char *fileName)
+    audio::RetCode Audio::Start(Operation::Type op, const char *fileName)
     {
 
         auto ret = Operation::Create(op, fileName);
@@ -91,51 +88,49 @@ namespace audio
             LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
             currentOperation = Operation::Create(Operation::Type::Idle, "").value_or(nullptr);
             currentState     = State ::Idle;
-            return static_cast<int32_t>(RetCode::OperationCreateFailed);
+            return RetCode::OperationCreateFailed;
         }
 
         return currentOperation->Start(asyncCallback);
     }
 
-    int32_t Audio::Stop()
+    audio::RetCode Audio::Stop()
     {
         if (currentState == State::Idle) {
-            return static_cast<int32_t>(RetCode::Success);
+            return RetCode::Success;
         }
 
-        auto retStop =
-            currentOperation != nullptr ? currentOperation->Stop() : static_cast<int32_t>(RetCode::OperationNotSet);
-        if (retStop != 0) {
-            LOG_ERROR("Operation STOP failure: %" PRIu32 " see RetCode enum for audio for more information", retStop);
+        auto retStop = currentOperation != nullptr ? currentOperation->Stop() : RetCode::OperationNotSet;
+        if (retStop != RetCode::Success) {
+            LOG_ERROR("Operation STOP failure: %s", audio::c_str(RetCode::DeviceFailure));
         }
 
         auto ret = Operation::Create(Operation::Type::Idle, "");
         if (ret) {
             currentState     = State::Idle;
             currentOperation = std::move(ret.value());
-            return static_cast<int32_t>(RetCode::Success);
+            return RetCode::Success;
         }
         else {
-            return static_cast<int32_t>(RetCode::OperationCreateFailed);
+            return RetCode::OperationCreateFailed;
         }
     }
 
-    int32_t Audio::Pause()
+    audio::RetCode Audio::Pause()
     {
         if (currentState == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
-        return currentOperation != nullptr ? currentOperation->Pause() : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->Pause() : RetCode::OperationNotSet;
     }
 
-    int32_t Audio::Resume()
+    audio::RetCode Audio::Resume()
     {
         if (currentState == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
-        return currentOperation != nullptr ? currentOperation->Resume()
-                                           : static_cast<int32_t>(RetCode::OperationNotSet);
+        return currentOperation != nullptr ? currentOperation->Resume() : RetCode::OperationNotSet;
     }
 
 } // namespace audio

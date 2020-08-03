@@ -58,11 +58,11 @@ namespace audio
         isInitialized = true;
     }
 
-    int32_t PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback)
+    audio::RetCode PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback)
     {
 
         if (state == State::Active || state == State::Paused) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         auto tags = dec->fetchTags();
@@ -76,51 +76,53 @@ namespace audio
 
         currentProfile->SetSampleRate(tags->sample_rate);
 
-        return audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        return GetDeviceError(ret);
     }
 
-    int32_t PlaybackOperation::Stop()
+    audio::RetCode PlaybackOperation::Stop()
     {
         if (state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
         state = State::Idle;
-        return audioDevice->Stop();
+        return GetDeviceError(audioDevice->Stop());
     }
 
-    int32_t PlaybackOperation::Pause()
+    audio::RetCode PlaybackOperation::Pause()
     {
 
         if (state == State::Paused || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
 
         state = State::Paused;
-        return audioDevice->Stop();
+        return GetDeviceError(audioDevice->Stop());
     }
 
-    int32_t PlaybackOperation::Resume()
+    audio::RetCode PlaybackOperation::Resume()
     {
 
         if (state == State::Active || state == State::Idle) {
-            return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
+            return RetCode::InvokedInIncorrectState;
         }
         state = State::Active;
-        return audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        return GetDeviceError(ret);
     }
 
-    int32_t PlaybackOperation::SetOutputVolume(float vol)
+    audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        audioDevice->OutputVolumeCtrl(vol);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        return GetDeviceError(ret);
     }
 
-    int32_t PlaybackOperation::SetInputGain(float gain)
+    audio::RetCode PlaybackOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        audioDevice->InputGainCtrl(gain);
-        return static_cast<int32_t>(RetCode::Success);
+        auto ret = audioDevice->InputGainCtrl(gain);
+        return GetDeviceError(ret);
     }
 
     Position PlaybackOperation::GetPosition()
@@ -128,7 +130,7 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
-    int32_t PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data)
     {
 
         switch (evt) {
@@ -148,12 +150,12 @@ namespace audio
         case Event::BTHeadsetOff:
             break;
         default:
-            return static_cast<int32_t>(RetCode::UnsupportedEvent);
+            return RetCode::UnsupportedEvent;
         }
-        return static_cast<int32_t>(RetCode::Success);
+        return RetCode::Success;
     }
 
-    int32_t PlaybackOperation::SwitchProfile(const Profile::Type type)
+    audio::RetCode PlaybackOperation::SwitchProfile(const Profile::Type type)
     {
 
         uint32_t currentSampleRate = currentProfile->GetSampleRate();
@@ -164,7 +166,7 @@ namespace audio
             currentProfile = ret.value();
         }
         else {
-            return static_cast<int32_t>(RetCode::UnsupportedProfile);
+            return RetCode::UnsupportedProfile;
         }
 
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
@@ -183,8 +185,7 @@ namespace audio
             break;
         }
 
-        // TODO:M.P add error handling
-        return 0;
+        return audio::RetCode::Success;
     }
 
 } // namespace audio

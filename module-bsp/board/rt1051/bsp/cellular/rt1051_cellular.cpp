@@ -343,6 +343,11 @@ namespace bsp
                                             .defLogic = 0,
                                             .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_RTS_PIN)});
 
+        gpio_1->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                            .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                            .defLogic = 0,
+                                            .pin = static_cast<uint32_t>(BoardDefinitions::USB_FUNCTION_MUX_SELECT)});
+
         gpio_2->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
                                             .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
                                             .defLogic = 0,
@@ -382,10 +387,17 @@ namespace bsp
                                 .defLogic = 0,
                                 .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN)});
 
+        gpio_2->ConfPin(
+            DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                .defLogic = 0,
+                                .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_USB_BOOT_PIN)});
+
         gpio_3->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
                                             .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
                                             .defLogic = 0,
                                             .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN)});
+        ;
         // ENABLE INTERRUPTS
 
         gpio_1->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN));
@@ -479,6 +491,43 @@ namespace bsp
             qhandle = qHandle;
             return 0;
         }
+
+        namespace USB
+        {
+            BootPinState getBootPin()
+            {
+                auto gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_2),
+                                                 DriverGPIOParams{});
+                bool state  = gpio_2->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_USB_BOOT_PIN));
+
+                return (state == true ? BootPinState::FIRMWARE_UPGRADE : BootPinState::NORMAL_BOOT);
+            }
+            PassthroughState getPassthrough()
+            {
+                auto gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_1),
+                                                 DriverGPIOParams{});
+                bool state  = gpio_1->ReadPin(magic_enum::enum_integer(BoardDefinitions::USB_FUNCTION_MUX_SELECT));
+
+                return (state == true ? PassthroughState::ENABLED : PassthroughState::DISABLED);
+            }
+
+            // modem needs a reboot to enter DFU (Firmware Upgrade) mode
+            void setBootPin(BootPinState bootPin)
+            {
+                auto gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_2),
+                                                 DriverGPIOParams{});
+                gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_USB_BOOT_PIN),
+                                 bootPin == BootPinState::FIRMWARE_UPGRADE ? 1 : 0);
+            }
+
+            void setPassthrough(PassthroughState pass)
+            {
+                auto gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_1),
+                                                 DriverGPIOParams{});
+                gpio_1->WritePin(magic_enum::enum_integer(BoardDefinitions::USB_FUNCTION_MUX_SELECT),
+                                 pass == PassthroughState::ENABLED ? 1 : 0);
+            }
+        } // namespace USB
 
         namespace status
         {

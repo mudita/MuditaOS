@@ -1,6 +1,7 @@
 #include "ContactDetailsModel.hpp"
 
 #include "application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/InformationWidget.hpp"
 #include "application-phonebook/widgets/MultiLineTextWithLabelItem.hpp"
 
 #include <ListView.hpp>
@@ -17,7 +18,7 @@ auto ContactDetailsModel::getItemCount() const -> int
 
 auto ContactDetailsModel::getMinimalItemHeight() const -> unsigned int
 {
-    return phonebookStyle::inputLineWithLabelItem::h;
+    return phonebookStyle::inputLinesWithLabelItem::h;
 }
 
 void ContactDetailsModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -33,7 +34,9 @@ auto ContactDetailsModel::getItem(gui::Order order) -> gui::ListItem *
 
 void ContactDetailsModel::createData(bool showInformationWidget, bool showAddressWidget, bool showNoteWidget)
 {
-    if (showInformationWidget) {}
+    if (showInformationWidget) {
+        internalData.push_back(new gui::InformationWidget(application));
+    }
 
     if (showAddressWidget) {
         internalData.push_back(new gui::MultiLineTextWithLabelItem(phonebookInternals::ListItemName::Address));
@@ -54,19 +57,18 @@ void ContactDetailsModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
     eraseInternalData();
 
     auto isInformationDataExist = [&]() -> bool {
-        return contactRecord->primaryName.length() > 0 || contactRecord->alternativeName.length() > 0 ||
-               contactRecord->numbers.size() > 0 || contactRecord->mail.length() > 0;
+        return contactRecord->numbers.size() > 0 || contactRecord->mail.length() > 0;
     };
     auto isAddressDataExist = [&]() -> bool { return contactRecord->address.length() > 0; };
     auto isNoteDataExist    = [&]() -> bool { return contactRecord->note.length() > 0; };
 
     createData(isInformationDataExist(), isAddressDataExist(), isNoteDataExist());
 
-    requestRecords(0, internalData.size());
-
     for (auto item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback(contactRecord);
         }
     }
+
+    requestRecords(0, internalData.size());
 }

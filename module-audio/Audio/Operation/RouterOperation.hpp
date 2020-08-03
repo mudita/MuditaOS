@@ -37,21 +37,21 @@ namespace audio
 
         ~RouterOperation();
 
-        int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
+        audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
 
-        int32_t Stop() override final;
+        audio::RetCode Stop() override final;
 
-        int32_t Pause() override final;
+        audio::RetCode Pause() override final;
 
-        int32_t Resume() override final;
+        audio::RetCode Resume() override final;
 
-        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final;
+        audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) override final;
 
-        int32_t SwitchProfile(const Profile::Type type) override final;
+        audio::RetCode SwitchProfile(const Profile::Type type) override final;
 
-        int32_t SetOutputVolume(float vol) override final;
+        audio::RetCode SetOutputVolume(float vol) override final;
 
-        int32_t SetInputGain(float gain) override final;
+        audio::RetCode SetInputGain(float gain) override final;
 
         Position GetPosition() override final
         {
@@ -89,9 +89,9 @@ namespace audio
 
         bool Mute(bool enable);
 
-        int32_t StartRecording();
+        audio::RetCode StartRecording();
 
-        int32_t StopRecording();
+        audio::RetCode StopRecording();
     };
 
 } // namespace audio

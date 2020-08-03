@@ -178,6 +178,7 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
+        checkFirstPage();
         pageLoaded = true;
     }
 
@@ -198,6 +199,21 @@ namespace gui
     {
         if (direction == style::listview::Direction::Top) {
             startIndex = startIndex - currentPageSize > 0 ? startIndex - currentPageSize : 0;
+        }
+    }
+
+    void ListView::checkFirstPage()
+    {
+        // On direction top check if first page is filled with items. If not reload page with direction bottom so it
+        // will be filled.
+        if (direction == style::listview::Direction::Top && startIndex == 0) {
+            if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
+                clearItems();
+                body->setReverseOrder(false);
+                direction       = style::listview::Direction::Bottom;
+                focusOnLastItem = true;
+                provider->requestRecords(startIndex, calculateLimit());
+            }
         }
     }
 
@@ -234,6 +250,11 @@ namespace gui
     void ListView::setFocus()
     {
         setFocusItem(body);
+
+        if (focusOnLastItem) {
+            body->setFocusOnLastElement();
+            focusOnLastItem = false;
+        }
     };
 
     std::list<DrawCommand *> ListView::buildDrawList()
@@ -322,18 +343,7 @@ namespace gui
             }
 
             pageLoaded = false;
-
-            // If starting page size smaller than last page - fill first page from top with last page size.
-            if (startIndex < currentPageSize) {
-                body->setReverseOrder(false);
-                direction  = style::listview::Direction::Bottom;
-                startIndex = 0;
-                provider->requestRecords(startIndex, currentPageSize);
-            }
-            else {
-
-                provider->requestRecords(topFetchIndex, calculateLimit());
-            }
+            provider->requestRecords(topFetchIndex, calculateLimit());
         }
 
         return true;

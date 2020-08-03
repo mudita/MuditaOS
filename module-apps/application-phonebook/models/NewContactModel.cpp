@@ -2,7 +2,7 @@
 
 #include "application-phonebook/widgets/ContactListItem.hpp"
 #include "application-phonebook/widgets/InputBoxWithLabelAndIconItem.hpp"
-#include "application-phonebook/widgets/InputLineWithLabelItem.hpp"
+#include "application-phonebook/widgets/InputLinesWithLabelItem.hpp"
 
 #include <ListView.hpp>
 #include <time/ScopedTime.hpp>
@@ -17,7 +17,7 @@ auto NewContactModel::getItemCount() const -> int
 
 auto NewContactModel::getMinimalItemHeight() const -> unsigned int
 {
-    return phonebookStyle::inputLineWithLabelItem::h;
+    return phonebookStyle::inputLinesWithLabelItem::h;
 }
 
 void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -35,31 +35,31 @@ void NewContactModel::createData()
 {
     auto app = application;
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::FirstName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::SecondName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::Number,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::OtherNumber,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::Email,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
@@ -77,13 +77,14 @@ void NewContactModel::createData()
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::Address,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        2));
 
-    internalData.push_back(new gui::InputLineWithLabelItem(
+    internalData.push_back(new gui::InputLinesWithLabelItem(
         phonebookInternals::ListItemName::Note,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },

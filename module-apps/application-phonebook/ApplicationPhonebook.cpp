@@ -1,5 +1,6 @@
 #include "ApplicationPhonebook.hpp"
 #include "Dialog.hpp"
+#include "models/PhonebookModel.hpp"
 #include "windows/PhonebookContact.hpp"
 #include "windows/PhonebookContactDetails.hpp"
 #include "windows/PhonebookContactOptions.hpp"
@@ -9,6 +10,8 @@
 #include "windows/PhonebookNamecardOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
+
+#include <service-appmgr/ApplicationManager.hpp>
 
 namespace app
 {
@@ -91,5 +94,37 @@ namespace app
 
     void ApplicationPhonebook::destroyUserInterface()
     {}
+
+    void ApplicationPhonebook::onSearchRequest(const std::string &searchFilter)
+    {
+        auto searchModel = std::make_unique<PhonebookModel>(this, searchFilter);
+
+        LOG_DEBUG("Search results count: %d", searchModel->getItemCount());
+        if (searchModel->getItemCount() > 0) {
+            auto main_window = dynamic_cast<gui::PhonebookMainWindow *>(windows[gui::name::window::main_window]);
+            if (main_window == nullptr) {
+                LOG_ERROR("Failed to get main window.");
+                return;
+            }
+
+            if (main_window->isSearchRequested()) {
+                searchModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
+                    std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                    data->result                                 = item->contact;
+                    data->setDescription("PhonebookSearchRequest");
+                    return sapm::ApplicationManager::messageSwitchPreviousApplication(
+                        this, std::make_unique<sapm::APMSwitchPrevApp>(GetName(), std::move(data)));
+                };
+            }
+            LOG_DEBUG("Switching to search results window.");
+            auto data = std::make_unique<PhonebookSearchResultsData>(std::move(searchModel));
+            switchWindow("SearchResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+        }
+        else {
+            LOG_DEBUG("Switching to no results window.");
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchFilter);
+            switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+        }
+    }
 
 } /* namespace app */

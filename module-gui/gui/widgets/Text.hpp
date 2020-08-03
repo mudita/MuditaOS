@@ -101,7 +101,6 @@ namespace gui
 
             auto linesVAlign(Length parentSize)
             {
-
                 for (auto &line : lines) {
                     line.alignV(parent->getAlignment(Axis::Y), parentSize, linesHeight());
                 }
@@ -129,7 +128,7 @@ namespace gui
       public:
         ExpandMode expandMode = ExpandMode::EXPAND_NONE;
 
-      private:
+      protected:
         TextType textType = TextType::MULTI_LINE;
         /// points to default text font to use
         RawFont *font = nullptr;
@@ -140,7 +139,6 @@ namespace gui
         bool handleNavigation(const InputEvent &inputEvent);
         bool handleEnter();
 
-      protected:
         std::list<DrawCommand *> buildDrawList() override;
         /// redrawing lines
         /// it redraws visible lines on screen and if needed requests resize in parent
@@ -162,7 +160,7 @@ namespace gui
 
         void setEditMode(EditMode mode);
         void setTextType(TextType type);
-        void setUnderline(bool underline);
+        void setUnderline(const bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
 

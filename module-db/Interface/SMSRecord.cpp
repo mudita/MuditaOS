@@ -27,7 +27,6 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     }
     uint32_t contactID = contactRec->ID;
     // Search for a thread with specified contactID
-    uint32_t threadID = 0;
     ThreadRecordInterface threadInterface(smsDB, contactsDB);
     auto threadRec =
         threadInterface.GetLimitOffsetByField(0, 1, ThreadRecordField::ContactID, std::to_string(contactID).c_str());
@@ -49,11 +48,11 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
             return false;
         }
     }
-    threadID = (*threadRec)[0].ID;
+    auto thread = (*threadRec)[0];
 
     // Create SMS
-    if (!smsDB->sms.add(SMSTableRow{{.ID = rec.ID},
-                                    .threadID  = threadID,
+    if (!smsDB->sms.add(SMSTableRow{{.ID = DB_ID_NONE}, // the entry is not yet in the DB
+                                    .threadID  = thread.ID,
                                     .contactID = contactID,
                                     .date      = rec.date,
                                     .dateSent  = rec.dateSent,
@@ -69,10 +68,8 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     // TODO: error check
 
     // Update thread
-    auto thread    = (*threadRec)[0];
-    thread.snippet = rec.body.substr(0, rec.body.length() >= snippetLength ? snippetLength : rec.body.length());
-    thread.date    = rec.date;
-    thread.type    = rec.type;
+    UpdateThreadSummary(thread, rec);
+
     thread.msgCount++;
     if (rec.type == SMSType::INBOX) {
         thread.unreadMsgCount++;
@@ -161,14 +158,43 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
         return false;
     }
 
-    return smsDB->sms.update(SMSTableRow{{.ID = recUpdated.ID},
-                                         .threadID  = recCurrent.threadID,
-                                         .contactID = recCurrent.contactID,
-                                         .date      = recUpdated.date,
-                                         .dateSent  = recUpdated.dateSent,
-                                         .errorCode = recUpdated.errorCode,
-                                         .body      = recUpdated.body,
-                                         .type      = recUpdated.type});
+    smsDB->sms.update(SMSTableRow{{.ID = recCurrent.ID},
+                                  .threadID  = recCurrent.threadID,
+                                  .contactID = recCurrent.contactID,
+                                  .date      = recUpdated.date,
+                                  .dateSent  = recUpdated.dateSent,
+                                  .errorCode = recUpdated.errorCode,
+                                  .body      = recUpdated.body,
+                                  .type      = recUpdated.type});
+
+    // Update messages read count if necessary
+    ThreadRecordInterface threadInterface(smsDB, contactsDB);
+    auto thread = threadInterface.GetByID(recCurrent.threadID);
+
+    // update thread details with the latest sms from given thread
+
+    auto latest_vec = GetLimitOffsetByField(0, 1, SMSRecordField ::ThreadID, std::to_string(thread.ID).c_str());
+
+    if (latest_vec->size() == 0) {
+        return false;
+    }
+    auto recLatestInThread = (*latest_vec)[0];
+
+    // is updated sms is the latest we need to update the summary
+    if (recUpdated.ID == recLatestInThread.ID) {
+        // latest is visible, so update thread details
+        UpdateThreadSummary(thread, recLatestInThread);
+        threadInterface.Update(thread);
+    }
+
+    return true;
+}
+
+void SMSRecordInterface::UpdateThreadSummary(ThreadRecord &threadToUpdate, const SMSRecord &rec)
+{
+    threadToUpdate.snippet = rec.body.substr(0, rec.body.length() >= snippetLength ? snippetLength : rec.body.length());
+    threadToUpdate.date    = rec.date;
+    threadToUpdate.type    = rec.type;
 }
 
 bool SMSRecordInterface::RemoveByID(uint32_t id)
@@ -183,21 +209,44 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
 
     // If thread not found
     if (!threadRec.isValid()) {
-        if (smsDB->sms.removeById(id) == false) {
-            return false;
-        }
-
-        return false;
+        return smsDB->sms.removeById(id);
     }
 
     // If thread contains only one message remove it
-    if (threadRec.msgCount == 1) {
+    if (threadRec.msgCount <= 1) {
         threadInterface.RemoveByID(sms.threadID);
     }
     else {
-        // Update msg count
-        threadRec.msgCount--;
-        threadInterface.Update(threadRec);
+        // update thread details if deleted SMS is the latest sms from the thread
+
+        auto twoLatest = GetLimitOffsetByField(0, 2, SMSRecordField ::ThreadID, std::to_string(threadRec.ID).c_str());
+
+        if (twoLatest->size() == 0) {
+            LOG_ERROR("Cannot fetch no SMSes even though thread's msgCount says so (id %lu)",
+                      static_cast<long unsigned int>(sms.threadID));
+            threadInterface.RemoveByID(sms.threadID);
+            return false; // not handled (do no change window)
+        }
+        else {
+            // check if there is need to change thread summary
+            if (sms.ID == (*twoLatest)[0].ID) {
+                // there is the need
+                if (twoLatest->size() < 2) {
+                    LOG_ERROR("Cannot fetch another sms from a thread even though thread's msgCount says so (id %lu)",
+                              static_cast<long unsigned int>(sms.threadID));
+                    smsDB->sms.removeById(id);                // remove sms which triggered this function
+                    threadInterface.RemoveByID(sms.threadID); // and dangling thread as well
+                    return true;                              // handled (current window will be changed)
+                }
+                else {
+                    auto newLatest = (*twoLatest)[1];
+                    UpdateThreadSummary(threadRec, newLatest);
+                }
+            }
+            threadRec.msgCount--;
+            threadInterface.Update(threadRec);
+            // if deleting the newest sms, refresh thread details with next sms in the column
+        }
     }
 
     // Remove SMS

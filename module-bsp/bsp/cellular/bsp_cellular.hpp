@@ -66,7 +66,7 @@ namespace cellular
         virtual void SelectAntenna(bsp::cellular::antenna antenna) = 0;
         virtual bsp::cellular::antenna GetAntenna() = 0;
 
-      protected:
+    protected:
         bool isInitialized = false;
     };
     namespace cellular
@@ -78,6 +78,24 @@ namespace cellular
 
         /// initialize SIM queue directed to EventWorker
         int init(xQueueHandle qHandle);
+
+        namespace USB {
+            enum class PassthroughState {
+                ENABLED,
+                DISABLED,
+            };
+
+            enum class BootPinState {
+                FIRMWARE_UPGRADE,
+                NORMAL_BOOT,
+            };
+
+            BootPinState getBootPin() ;
+            PassthroughState getPassthrough() ;
+
+            void setBootPin(BootPinState bootPin);
+            void setPassthrough(PassthroughState pass);
+        }
 
         namespace status{
             enum class value {
