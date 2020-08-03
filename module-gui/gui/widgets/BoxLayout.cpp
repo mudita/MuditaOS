@@ -50,26 +50,6 @@ namespace gui
     void BoxLayout::resizeItems()
     {}
 
-    void BoxLayout::setPosition(const short &x, const short &y)
-    {
-        Rect::setPosition(x, y);
-    }
-
-    void BoxLayout::setSize(const unsigned short w, const unsigned short h)
-    {
-        Rect::setSize(w, h);
-
-        if (children.size() != 0u) {
-            for (auto it : outOfDrawAreaItems) {
-                it->setVisible(true);
-            }
-        }
-        outOfDrawAreaItems.clear();
-
-        resizeItems();
-        setNavigation();
-    }
-
     void BoxLayout::setAlignment(const Alignment &value)
     {
         if (alignment != value) {
@@ -227,10 +207,10 @@ namespace gui
             }
 
             // Recalculate lead Axis position if lead axis alignment provided.
-            axisItemPosition = getAxisAlignmentValue<axis>(axisItemPosition);
+            axisItemPosition = getAxisAlignmentValue<axis>(axisItemPosition, axisItemSize, el);
 
             // Calculate orthogonal Axis position based on Box Alignment or if not specified child Alignment.
-            orthogonalItemPosition = el->getAxisAlignmentValue(orthogonal(axis));
+            orthogonalItemPosition = el->getAxisAlignmentValue(orthogonal(axis), orthogonalItemSize);
 
             if (el->visible)
                 el->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
@@ -255,25 +235,30 @@ namespace gui
         });
     }
 
-    template <Axis axis> uint16_t BoxLayout::getAxisAlignmentValue(uint16_t calcPos)
+    template <Axis axis> uint16_t BoxLayout::getAxisAlignmentValue(uint16_t calcPos, uint16_t calcSize, Item *el)
     {
+
+        auto offset = sizeLeftWithoutElem<axis>(this, el, Area::Normal) <= calcSize
+                          ? 0
+                          : sizeLeftWithoutElem<axis>(this, el, Area::Normal) - calcSize;
+
         switch (getAlignment(axis).vertical) {
         case gui::Alignment::Vertical::Top:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this, Area::Normal);
+                return calcPos - offset;
             }
             break;
         case gui::Alignment::Vertical::Center:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this, Area::Normal) / 2;
+                return calcPos - offset / 2;
             }
             else {
-                return calcPos + sizeLeft<axis>(this, Area::Normal) / 2;
+                return calcPos + offset / 2;
             }
             break;
         case gui::Alignment::Vertical::Bottom:
             if (!reverseOrder) {
-                return calcPos + sizeLeft<axis>(this, Area::Normal);
+                return calcPos + offset;
             }
             break;
         default:
@@ -283,20 +268,20 @@ namespace gui
         switch (getAlignment(axis).horizontal) {
         case gui::Alignment::Horizontal::Left:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this, Area::Normal);
+                return calcPos - offset;
             }
             break;
         case gui::Alignment::Horizontal::Center:
             if (reverseOrder) {
-                return calcPos - sizeLeft<axis>(this, Area::Normal) / 2;
+                return calcPos - offset / 2;
             }
             else {
-                return calcPos + sizeLeft<axis>(this, Area::Normal) / 2;
+                return calcPos + offset / 2;
             }
             break;
         case gui::Alignment::Horizontal::Right:
             if (!reverseOrder) {
-                return calcPos + sizeLeft<axis>(this, Area::Normal);
+                return calcPos + offset;
             }
             break;
         default:
@@ -377,6 +362,21 @@ namespace gui
                 (*child)->setFocus(false);
             }
         }
+    }
+
+    auto BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    {
+        if (children.size() != 0u) {
+            for (auto it : outOfDrawAreaItems) {
+                it->setVisible(true);
+            }
+        }
+        outOfDrawAreaItems.clear();
+
+        resizeItems();
+        setNavigation();
+
+        return true;
     }
 
     HBox::HBox() : BoxLayout()

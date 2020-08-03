@@ -68,7 +68,6 @@ namespace gui
     {
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);
-        hBox->resizeItems();
 
         return true;
     }
