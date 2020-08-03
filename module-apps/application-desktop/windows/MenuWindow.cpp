@@ -177,6 +177,43 @@ namespace gui
                               }},
             });
 
+        mainMenu->borderCallback = [this](const InputEvent &inputEvent) -> bool {
+            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (inputEvent.keyCode == KeyCode::KEY_UP) {
+                LOG_DEBUG("borderCallback -> Up");
+                std::list<Item *>::iterator it =
+                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
+                mainMenu->setFocusItem((*std::next(it, (mainMenu->col_numb - 1) * mainMenu->row_numb)));
+                return true;
+            }
+            else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
+                LOG_DEBUG("borderCallback -> Down");
+                std::list<Item *>::iterator it =
+                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
+                mainMenu->setFocusItem((*std::prev(it, (mainMenu->col_numb - 1) * mainMenu->row_numb)));
+                return true;
+            }
+            else if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
+                LOG_DEBUG("borderCallback -> Left");
+                std::list<Item *>::iterator it =
+                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
+                mainMenu->setFocusItem((*std::next(it, mainMenu->col_numb - 1)));
+                return true;
+            }
+            else if (inputEvent.keyCode == KeyCode::KEY_RIGHT) {
+                LOG_DEBUG("borderCallback -> Right");
+                std::list<Item *>::iterator it =
+                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
+                mainMenu->setFocusItem((*std::prev(it, mainMenu->col_numb - 1)));
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+
         toolsMenu = new MenuPage(
             this,
             utils::localize.get("app_desktop_tools_title"),
