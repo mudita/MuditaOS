@@ -21,6 +21,7 @@ extern "C"
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
+#include "AudioServiceAPI.hpp"
 
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
@@ -66,7 +67,12 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
             return false;
         }
-        bsp::headset::Handler(notification);
+
+        if (bsp::headset::Handler(notification) == true) {
+            bool state = bsp::headset::IsInserted();
+
+            AudioServiceAPI::RoutingHeadset(this->service, state);
+        }
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery)) {
