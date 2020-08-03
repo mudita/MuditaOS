@@ -92,7 +92,7 @@ namespace purefs
         fs::path os_root_path;
         fs::path boot_json;
 
-        void setVersion(const std::string versionString);
+        static int version_compare(const std::string &v1, const std::string &v2);
         [[nodiscard]] json11::Json to_json() const;
     };
 };    // namespace purefs
@@ -163,6 +163,10 @@ class vfs
     std::string loadFileAsString(const fs::path &fileToLoad);
     bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
     void updateTimestamp();
+    struct purefs::boot_config_t &getBootConfig()
+    {
+        return bootConfig;
+    }
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
