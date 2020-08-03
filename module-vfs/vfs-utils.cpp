@@ -109,8 +109,6 @@ bool vfs::replaceWithString(const fs::path &fileToModify, const std::string &str
     else {
         return false;
     }
-
-    return true;
 }
 
 const fs::path vfs::getCurrentBootJSON()
@@ -140,9 +138,8 @@ bool vfs::loadBootConfig(const fs::path &bootJsonPath)
         bootConfig.boot_json    = bootJsonPath;
         bootConfig.bootloader_verion =
             bootConfig.boot_json_parsed[purefs::json::bootloader][purefs::json::os_version].string_value();
-        bootConfig.timestamp = utils::time::Timestamp().str("%c");
-
-        bootConfig.setVersion(std::string(VERSION));
+        bootConfig.timestamp  = utils::time::Timestamp().str("%c");
+        bootConfig.os_version = std::string(VERSION);
 
         LOG_INFO("boot_config: %s", bootConfig.to_json().dump().c_str());
         return true;
@@ -153,8 +150,7 @@ bool vfs::loadBootConfig(const fs::path &bootJsonPath)
         bootConfig.os_root_path = purefs::dir::eMMC_disk / bootConfig.os_type;
         bootConfig.boot_json    = bootJsonPath;
         bootConfig.timestamp    = utils::time::Timestamp().str("%c");
-
-        bootConfig.setVersion(std::string(VERSION));
+        bootConfig.os_version   = std::string(VERSION);
 
         LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", bootJsonPath.c_str(), parseErrors.c_str());
         return false;
@@ -181,10 +177,12 @@ bool vfs::updateFileCRC32(const fs::path &file)
             if (fpCRC32.get() != nullptr) {
                 fprintf(fpCRC32.get(), &crc32Buf[0]);
             }
+
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 void vfs::updateTimestamp()
@@ -213,7 +211,31 @@ json11::Json purefs::boot_config_t::to_json() const
         {purefs::json::bootloader, json11::Json::object{{purefs::json::os_version, bootloader_verion}}}};
 }
 
-void purefs::boot_config_t::setVersion(const std::string versionString)
+// Method to compare two version strings
+//   v1 <  v2  -> -1
+//   v1 == v2  ->  0
+int purefs::boot_config_t::version_compare(const std::string &v1, const std::string &v2)
 {
-    os_version = versionString;
+    size_t i = 0, j = 0;
+    while (i < v1.length() || j < v2.length()) {
+        int acc1 = 0, acc2 = 0;
+
+        while (i < v1.length() && v1[i] != '.') {
+            acc1 = acc1 * 10 + (v1[i] - '0');
+            i++;
+        }
+        while (j < v2.length() && v2[j] != '.') {
+            acc2 = acc2 * 10 + (v2[j] - '0');
+            j++;
+        }
+
+        if (acc1 < acc2)
+            return -1;
+        if (acc1 > acc2)
+            return +1;
+
+        ++i;
+        ++j;
+    }
+    return 0;
 }
