@@ -86,6 +86,15 @@ namespace AudioServiceAPI
         return SendAudioRequest(serv, msg)->retCode;
     }
 
+    audio::RetCode RoutingHeadset(sys::Service *serv, bool enable)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingHeadset);
+        msg->enable = enable;
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
     RetCode Stop(sys::Service *serv)
     {
         std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioStop);
