@@ -185,8 +185,10 @@ namespace bsp
     {
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_AUDIOCODEC_SAIx);
-        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
-        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
+        if (dmamux) {
+            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
+            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
+        }
     }
 
     void RT1051Audiocodec::InStart()
