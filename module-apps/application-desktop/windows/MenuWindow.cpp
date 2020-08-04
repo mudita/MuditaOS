@@ -181,36 +181,34 @@ namespace gui
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (inputEvent.keyCode == KeyCode::KEY_UP) {
+            switch (inputEvent.keyCode) {
+            case KeyCode::KEY_UP: {
                 LOG_DEBUG("borderCallback -> Up");
-                std::list<Item *>::iterator it =
-                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
-                mainMenu->setFocusItem((*std::next(it, (mainMenu->col_numb - 1) * mainMenu->row_numb)));
+                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
+                mainMenu->setFocusItem((*std::next(it, (mainMenu->rowSize - 1) * mainMenu->colSize)));
                 return true;
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
+            case KeyCode::KEY_DOWN: {
                 LOG_DEBUG("borderCallback -> Down");
-                std::list<Item *>::iterator it =
-                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
-                mainMenu->setFocusItem((*std::prev(it, (mainMenu->col_numb - 1) * mainMenu->row_numb)));
+                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
+                mainMenu->setFocusItem((*std::prev(it, (mainMenu->rowSize - 1) * mainMenu->colSize)));
                 return true;
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
+            case KeyCode::KEY_LEFT: {
                 LOG_DEBUG("borderCallback -> Left");
-                std::list<Item *>::iterator it =
-                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
-                mainMenu->setFocusItem((*std::next(it, mainMenu->col_numb - 1)));
+                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
+                mainMenu->setFocusItem((*std::next(it, mainMenu->rowSize - 1)));
                 return true;
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_RIGHT) {
+            case KeyCode::KEY_RIGHT: {
                 LOG_DEBUG("borderCallback -> Right");
-                std::list<Item *>::iterator it =
-                    std::find(mainMenu->children.begin(), mainMenu->children.end(), mainMenu->getFocusItem());
-                mainMenu->setFocusItem((*std::prev(it, mainMenu->col_numb - 1)));
+                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
+                mainMenu->setFocusItem((*std::prev(it, mainMenu->rowSize - 1)));
                 return true;
             }
-            else {
+            default: {
                 return false;
+            }
             }
         };
 
@@ -235,6 +233,29 @@ namespace gui
                                   return true;
                               }},
             });
+
+        toolsMenu->borderCallback = [this](const InputEvent &inputEvent) -> bool {
+            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            switch (inputEvent.keyCode) {
+            case KeyCode::KEY_LEFT: {
+                LOG_DEBUG("borderCallback -> Left");
+                std::list<Item *>::iterator it = toolsMenu->getNavigationFocusedItem();
+                toolsMenu->setFocusItem((*std::next(it, toolsMenu->rowSize - 1)));
+                return true;
+            }
+            case KeyCode::KEY_RIGHT: {
+                LOG_DEBUG("borderCallback -> Right");
+                std::list<Item *>::iterator it = toolsMenu->getNavigationFocusedItem();
+                toolsMenu->setFocusItem((*std::prev(it, toolsMenu->rowSize - 1)));
+                return true;
+            }
+            default: {
+                return false;
+            }
+            }
+        };
 
         using namespace style::window;
         mainMenu->setSize(this->area().w - default_left_margin - default_right_margin,

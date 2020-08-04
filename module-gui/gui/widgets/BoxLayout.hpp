@@ -95,6 +95,7 @@ namespace gui
         // set focus on specified box element
         void setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
+        std::list<Item *>::iterator getNavigationFocusedItem();
         template <Axis axis>
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;

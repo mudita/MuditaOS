@@ -15,8 +15,6 @@ namespace gui
             uint32_t y = 0;
         } grid;
 
-        Item *nextNavigationItem(std::list<Item *>::iterator it);
-
       public:
         GridLayout(
             Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, GridSize grid);
@@ -30,6 +28,10 @@ namespace gui
         bool navigationRotate = true;
         void resizeItems() override;
         void setNavigation() override;
+        Item *nextNavigationItem(std::list<Item *>::iterator it);
+
+        uint32_t rowSize = 0;
+        uint32_t colSize = 0;
     };
 
 }; // namespace gui
