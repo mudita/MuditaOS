@@ -88,6 +88,7 @@ namespace gui
         void buildDateLabel(std::string actualDateTime);
         void buildInterface(const uint32_t &actualDateTimeID);
         void destroyInterface() override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
     };
 
 } // namespace gui
