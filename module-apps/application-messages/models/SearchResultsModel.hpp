@@ -18,8 +18,6 @@ namespace gui::model
 
         unsigned int getMinimalItemHeight() const override;
         ListItem *getItem(Order order) override;
-        /// resquest data for model - not needed
-        void requestRecordsCount() override;
         /// empty, size get in requestRecords
         void requestRecords(uint32_t offset, uint32_t limit) override;
         /// set count in top model class - used for scroll bar

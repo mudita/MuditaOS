@@ -11,7 +11,7 @@
 ContactDetailsModel::ContactDetailsModel(app::Application *app) : application(app)
 {}
 
-auto ContactDetailsModel::getItemCount() const -> int
+auto ContactDetailsModel::requestRecordsCount() -> unsigned int
 {
     return internalData.size();
 }

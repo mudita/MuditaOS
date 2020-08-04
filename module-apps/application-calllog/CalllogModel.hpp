@@ -26,7 +26,6 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListI
     CalllogModel(app::Application *app);
 
     // virtual methods
-    void requestRecordsCount() override;
     bool updateRecords(std::unique_ptr<std::vector<CalllogRecord>> records,
                        const uint32_t offset,
                        const uint32_t limit,
@@ -36,8 +35,5 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListI
     // virtual methods for ListViewProvider
     unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
-    int getItemCount() const override
-    {
-        return recordsCount;
-    };
+    [[nodiscard]] unsigned int requestRecordsCount() override;
 };

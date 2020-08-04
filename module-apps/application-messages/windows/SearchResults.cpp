@@ -48,7 +48,7 @@ namespace gui
         if (text.length() != 0u) {
             model->setSearchValue(text);
             model->requestRecords(0, model->getMaxItemsOnScreen());
-            list->setElementsCount(model->getItemCount());
+            list->setElementsCount(model->requestRecordsCount());
             setFocusItem(list);
             return true;
         }

@@ -117,8 +117,8 @@ namespace app
     {
         auto searchModel = std::make_unique<PhonebookModel>(this, searchFilter);
 
-        LOG_DEBUG("Search results count: %d", searchModel->getItemCount());
-        if (searchModel->getItemCount() > 0) {
+        LOG_DEBUG("Search results count: %d", searchModel->requestRecordsCount());
+        if (searchModel->requestRecordsCount() > 0) {
             auto main_window = dynamic_cast<gui::PhonebookMainWindow *>(windows[gui::name::window::main_window]);
             if (main_window == nullptr) {
                 LOG_ERROR("Failed to get main window.");

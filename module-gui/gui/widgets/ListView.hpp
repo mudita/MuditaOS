@@ -56,6 +56,7 @@ namespace gui
 
         void setElementsCount(int count);
         void setProvider(std::shared_ptr<ListItemProvider> provider);
+        void rebuildList();
         std::shared_ptr<ListItemProvider> getProvider();
         void setListViewType(style::listview::Type type);
         void setScrollTopMargin(int value);

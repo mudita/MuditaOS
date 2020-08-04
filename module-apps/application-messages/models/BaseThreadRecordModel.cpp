@@ -10,9 +10,10 @@ BaseThreadRecordModel::BaseThreadRecordModel(app::Application *app) : DatabaseMo
     requestRecordsCount();
 }
 
-void BaseThreadRecordModel::requestRecordsCount(void)
+unsigned int BaseThreadRecordModel::requestRecordsCount()
 {
     recordsCount = DBServiceAPI::ThreadGetCount(application);
+    return recordsCount;
 }
 
 bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,
@@ -21,7 +22,6 @@ bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadReco
                                           uint32_t count)
 {
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-    modelIndex = 0;
     list->onProviderDataUpdate();
     return true;
 }

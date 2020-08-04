@@ -15,14 +15,10 @@
 NotesModel::NotesModel(app::Application *app) : DatabaseModel(app)
 {}
 
-void NotesModel::requestRecordsCount()
+unsigned int NotesModel::requestRecordsCount()
 {
     recordsCount = DBServiceAPI::NotesGetCount(application);
-
-    // request first and second page if possible
-    if (recordsCount > 0) {
-        DBServiceAPI::NotesGetLimitOffset(application, 0, 3);
-    }
+    return recordsCount;
 }
 
 void NotesModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -45,7 +41,6 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-    modelIndex = 0;
     list->onProviderDataUpdate();
 
     return true;

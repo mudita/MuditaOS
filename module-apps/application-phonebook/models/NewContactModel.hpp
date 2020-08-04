@@ -19,7 +19,7 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
     void loadData(std::shared_ptr<ContactRecord> contactRecord);
     void createData();
 
-    [[nodiscard]] auto getItemCount() const -> int override;
+    [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
     [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
 

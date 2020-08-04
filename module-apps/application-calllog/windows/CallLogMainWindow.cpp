@@ -60,10 +60,7 @@ namespace gui
     void CallLogMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            calllogModel->clear();
-            calllogModel->requestRecordsCount();
-            list->clear();
-            list->setElementsCount(calllogModel->getItemCount());
+            list->rebuildList();
         }
         auto app = dynamic_cast<app::ApplicationCallLog *>(application);
         assert(app != nullptr);

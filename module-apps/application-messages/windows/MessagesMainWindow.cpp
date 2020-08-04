@@ -34,14 +34,9 @@ namespace gui
         buildInterface();
     }
 
-    void MessagesMainWindow::loadData()
-    {
-        setFocusItem(list);
-    }
-
     void MessagesMainWindow::rebuild()
     {
-        loadData();
+        list->rebuildList();
     }
 
     void MessagesMainWindow::buildInterface()
@@ -96,6 +91,8 @@ namespace gui
             return true;
         };
 
+        setFocusItem(list);
+
         emptyListIcon->setVisible(false);
         emptyListIcon->focusChangedCallback = [=](gui::Item & /*item*/) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
@@ -122,11 +119,12 @@ namespace gui
                 }
             }
         }
+
         if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
-            loadData();
+            rebuild();
         }
 
-        if (threadModel->getItemCount() == 0) {
+        if (threadModel->requestRecordsCount() == 0) {
             emptyListIcon->setVisible(true);
             setFocusItem(emptyListIcon);
         }
@@ -182,19 +180,18 @@ namespace gui
                 msgNotification->interface == db::Interface::Name::SMS) {
 
                 if (msgNotification->type == db::Query::Type::Delete ||
-                    msgNotification->type == db::Query::Type::Update) {
+                    msgNotification->type == db::Query::Type::Update ||
+                    msgNotification->type == db::Query::Type::Create) {
 
                     LOG_INFO("I CO MAMY type? %d", (int)msgNotification->type);
                     LOG_INFO("I CO MAMY intefejs? %d", (int)msgNotification->interface);
-                    threadModel->requestRecordsCount();
-                    list->setProvider(threadModel);
-                }
 
-                rebuild();
-                if (this == application->getCurrentWindow()) {
-                    application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    rebuild();
+                    if (this == application->getCurrentWindow()) {
+                        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    }
+                    return true;
                 }
-                return true;
             }
         }
         return false;

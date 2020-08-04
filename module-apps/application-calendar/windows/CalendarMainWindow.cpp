@@ -334,7 +334,7 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
             std::shared_ptr<DayEventsModel> dayEventsModel = std::make_shared<DayEventsModel>(this->application);
-            if (dayEventsModel->getItemCount() == 0) {
+            if (dayEventsModel->requestRecordsCount() == 0) {
                 switchToNoEventsWindow();
             }
             else {
@@ -346,7 +346,7 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
             std::shared_ptr<AllEventsModel> allEventsModel = std::make_shared<AllEventsModel>(this->application);
-            if (allEventsModel->getItemCount() == 0) {
+            if (allEventsModel->requestRecordsCount() == 0) {
                 switchToNoEventsWindow();
             }
             else {
