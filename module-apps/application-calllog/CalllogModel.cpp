@@ -21,7 +21,7 @@ using namespace calllog;
 CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app)
 {}
 
-void CalllogModel::requestRecordsCount()
+unsigned int CalllogModel::requestRecordsCount()
 {
 #if (DEBUG_CALLLOG_DB_ACCESS)
     auto tstamp = xTaskGetTickCount();
@@ -31,11 +31,7 @@ void CalllogModel::requestRecordsCount()
     LOG_INFO("DBServiceAPI::CalllogGetCount %d records %d ms", recordsCount, xTaskGetTickCount() - tstamp);
 #endif
 
-    // request first and second page if possible
-    if (recordsCount > 0) {
-        LOG_INFO("DBServiceAPI::CalllogGetCount CalllogGetLimitOffset");
-        DBServiceAPI::CalllogGetLimitOffset(application, 0, calllog::settings::pageSize);
-    }
+    return recordsCount;
 }
 
 void CalllogModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -57,7 +53,6 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-    modelIndex = 0;
     list->onProviderDataUpdate();
 
     return true;

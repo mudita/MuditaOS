@@ -58,7 +58,7 @@ namespace gui
     void PhonebookContactDetails::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            bodyList->setElementsCount(contactDetailsModel->getItemCount());
+            bodyList->rebuildList();
         }
 
         setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));

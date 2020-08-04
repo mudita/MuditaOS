@@ -14,17 +14,12 @@ class BaseThreadRecordModel : public app::DatabaseModel<ThreadRecord>, public gu
     BaseThreadRecordModel() = delete;
     BaseThreadRecordModel(app::Application *app);
 
-    void requestRecordsCount() override;
+    unsigned int requestRecordsCount() override;
     bool updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,
                        const uint32_t offset,
                        const uint32_t limit,
                        uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
-
-    int getItemCount() const override
-    {
-        return recordsCount;
-    };
 
     app::Application *getApplication(void)
     {

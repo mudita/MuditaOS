@@ -120,11 +120,18 @@ namespace gui
             clear();
             provider       = prov;
             provider->list = this;
-            setElementsCount(provider->getItemCount());
+
+            setElementsCount(provider->requestRecordsCount());
             provider->requestRecords(0, calculateLimit());
-            refresh();
         }
     }
+
+    void ListView::rebuildList()
+    {
+        clear();
+        setElementsCount(provider->requestRecordsCount());
+        provider->requestRecords(0, calculateLimit());
+    };
 
     std::shared_ptr<ListItemProvider> ListView::getProvider()
     {
@@ -173,7 +180,6 @@ namespace gui
 
         clearItems();
 
-        elementsCount = provider->getItemCount();
         addItemsOnPage();
 
         setFocus();

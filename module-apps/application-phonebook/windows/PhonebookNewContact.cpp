@@ -51,7 +51,7 @@ namespace gui
         }
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            list->setElementsCount(newContactModel->getItemCount());
+            list->rebuildList();
         }
 
         switch (contactAction) {

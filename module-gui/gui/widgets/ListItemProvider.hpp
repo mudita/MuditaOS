@@ -21,7 +21,7 @@ namespace gui
 
         ListView *list = nullptr;
 
-        virtual int getItemCount() const = 0;
+        virtual unsigned int requestRecordsCount() = 0;
 
         virtual unsigned int getMinimalItemHeight() const = 0;
 

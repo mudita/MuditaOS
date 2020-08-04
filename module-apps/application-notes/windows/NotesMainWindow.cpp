@@ -63,10 +63,7 @@ namespace gui
 
     void NotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        notesModel->clear();
-        notesModel->requestRecordsCount();
-        list->clear();
-        list->setElementsCount(notesModel->getItemCount());
+        list->rebuildList();
     }
 
     bool NotesMainWindow::onInput(const InputEvent &inputEvent)

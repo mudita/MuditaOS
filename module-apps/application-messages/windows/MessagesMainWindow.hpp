@@ -27,8 +27,6 @@ namespace gui
 
         Icon *emptyListIcon = nullptr;
 
-        void loadData();
-
       public:
         MessagesMainWindow(app::Application *app);
 

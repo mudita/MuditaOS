@@ -60,8 +60,7 @@ namespace gui
                                                   phonebookStyle::mainWindow::contactsList::w,
                                                   phonebookStyle::mainWindow::contactsList::h,
                                                   phonebookModel);
-        contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
-        contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
+        setFocusItem(contactsList);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -84,7 +83,6 @@ namespace gui
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
-        setFocusItem(contactsList);
 
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         requestedSearch     = contactRequest != nullptr;
