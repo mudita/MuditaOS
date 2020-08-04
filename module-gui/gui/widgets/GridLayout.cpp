@@ -14,16 +14,17 @@ GridLayout::GridLayout(
 
 void GridLayout::resizeItems()
 {
-
     if (grid.x == 0 || grid.y == 0) {
         LOG_ERROR("Grid == 0 - abort");
         return;
     }
-    uint32_t el_in_x      = area().w / grid.x;
-    uint32_t el_in_y      = area().h / grid.y;
+
+    rowSize = area().w / grid.x;
+    colSize = area().h / grid.y;
+
     uint32_t strech_x     = 0;
     uint32_t strech_y     = 0;
-    uint32_t max_elements = el_in_x * el_in_y;
+    uint32_t max_elements = rowSize * colSize;
     /// cant show elements when size is not set
     if (area().w == 0 || area().h == 0) {
         return;
@@ -35,10 +36,10 @@ void GridLayout::resizeItems()
                   max_elements);
         return;
     }
-    if (el_in_x > 2)
-        strech_x = (area().w - grid.x * el_in_x) / (el_in_x - 1);
-    if (el_in_y > 2)
-        strech_y = (area().h - grid.y * el_in_y) / (el_in_y - 1);
+    if (rowSize > 2)
+        strech_x = (area().w - grid.x * rowSize) / (rowSize - 1);
+    if (colSize > 2)
+        strech_y = (area().h - grid.y * colSize) / (colSize - 1);
 
     int row          = 0;
     unsigned int col = 0;
@@ -51,7 +52,7 @@ void GridLayout::resizeItems()
                         row * (grid.y + strech_y) + (grid.y - it->area().h) / 2);
         // shift row/col
         ++col;
-        if (col == el_in_x) {
+        if (col == rowSize) {
             col = 0;
             ++row;
         }
@@ -61,14 +62,8 @@ void GridLayout::resizeItems()
 // TODO commomize - move loop to lambda
 void GridLayout::setNavigation()
 {
-    int el_in_x      = widgetArea.w / grid.x;
-    int el_in_y      = widgetArea.h / grid.y;
-    int max_elements = el_in_x * el_in_y;
-
-    LOG_INFO("max_elements %d", max_elements);
-
     int i       = 0;
-    auto offset = el_in_x;
+    int offset  = rowSize;
 
     if (children.size() == 0) {
         LOG_ERROR("No children to set navigation");
@@ -76,11 +71,11 @@ void GridLayout::setNavigation()
 
     for (auto it = children.begin(); it != children.end(); ++it, ++i) {
 
-        if (it != children.begin() && (i + 1) % el_in_x != 1) {
+        if (it != children.begin() && (i + 1) % rowSize != 1) {
             (*it)->setNavigationItem(NavigationDirection::LEFT, nextNavigationItem(std::prev(it)));
         }
 
-        if (it != std::prev(children.end()) && (i + 1) % el_in_x != 0) {
+        if (it != std::prev(children.end()) && (i + 1) % rowSize != 0) {
             (*it)->setNavigationItem(NavigationDirection::RIGHT, nextNavigationItem(std::next(it)));
         }
 
@@ -95,7 +90,7 @@ void GridLayout::setNavigation()
 
 Item *GridLayout::nextNavigationItem(std::list<Item *>::iterator it)
 {
-    if ((*it)->visible && (*it)->activeItem) {
+    if (it != this->children.end() && (*it)->visible && (*it)->activeItem) {
         return *it;
     }
     else {

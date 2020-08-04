@@ -248,34 +248,23 @@ namespace gui
                 }
                 case KeyCode::KEY_LEFT: {
                     LOG_DEBUG("Call borderCallback -> go to the previous element");
-                    std::list<Item *>::iterator it =
-                        std::find(month->children.begin(), month->children.end(), month->getFocusItem());
-                    if (std::prev(*it) != nullptr && (*std::prev(it))->activeItem) {
-                        month->setFocusItem((*std::prev(it)));
+                    std::list<Item *>::iterator it = month->getNavigationFocusedItem();
+                    if (month->nextNavigationItem(std::prev(it)) != nullptr) {
+                        month->setFocusItem(month->nextNavigationItem(std::prev(it)));
                     }
                     else {
-                        auto it = --month->children.end();
-                        while (*it == nullptr || !(*it)->activeItem) {
-                            --it;
-                        }
-                        month->setFocusItem((*it));
+                        month->setFocusOnLastElement();
                     }
                     return true;
                 }
                 case KeyCode::KEY_RIGHT: {
                     LOG_DEBUG("Call borderCallback -> go to the next element");
-                    std::list<Item *>::iterator it =
-                        std::find(month->children.begin(), month->children.end(), month->getFocusItem());
-                    if (std::next(*it) != nullptr && (*std::next(it))->activeItem) {
-                        month->setFocusItem((*std::next(it)));
+                    std::list<Item *>::iterator it = month->getNavigationFocusedItem();
+                    if (month->nextNavigationItem(std::next(it)) != nullptr) {
+                        month->setFocusItem(month->nextNavigationItem(std::next(it)));
                     }
                     else {
-                        auto it = month->children.begin();
-                        while (*it == nullptr || !(*it)->activeItem) {
-                            LOG_DEBUG("Call borderCallback -> go to the next element");
-                            ++it;
-                        }
-                        month->setFocusItem((*it));
+                        month->setFocusOnElement(0);
                     }
                     return true;
                 }
