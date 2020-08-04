@@ -8,7 +8,7 @@
 SongsModel::SongsModel(app::Application *app) : application(app)
 {}
 
-auto SongsModel::getItemCount() const -> int
+auto SongsModel::requestRecordsCount() -> unsigned int
 {
     return internalData.size();
 }

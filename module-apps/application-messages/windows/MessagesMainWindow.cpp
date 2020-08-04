@@ -55,8 +55,6 @@ namespace gui
                                  msgThreadStyle::listHeight,
                                  threadModel);
         list->setScrollTopMargin(style::margins::small);
-        list->setPenFocusWidth(0);
-        list->setPenWidth(0);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -118,10 +116,6 @@ namespace gui
                     LOG_FATAL("No thread and thread not created!");
                 }
             }
-        }
-
-        if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr) {
-            rebuild();
         }
 
         if (threadModel->requestRecordsCount() == 0) {
