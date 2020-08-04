@@ -81,8 +81,6 @@ namespace bsp
             i2cAddr.subAddress = HEADSET_INT_DIS_ADDR;
             i2c->Write(i2cAddr, (uint8_t *)&reg, 1);
 
-            ReadInsertionStatus();
-
             if (timerHandle == nullptr) {
                 timerHandle =
                     xTimerCreate("HeadsetTimer", pdMS_TO_TICKS(HEADSET_POLL_INTERVAL_MS), true, nullptr, TimerHandler);
