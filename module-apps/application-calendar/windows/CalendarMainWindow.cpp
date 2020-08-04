@@ -234,19 +234,20 @@ namespace gui
                 if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                     return false;
                 }
-                if (inputEvent.keyCode == KeyCode::KEY_UP) {
+                switch (inputEvent.keyCode) {
+                case KeyCode::KEY_UP: {
                     LOG_DEBUG("change month prev");
                     this->refresh(style::window::calendar::test::prev_month_id,
                                   style::window::calendar::test::date_text_1);
                     return true;
                 }
-                else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
+                case KeyCode::KEY_DOWN: {
                     LOG_DEBUG("change month next");
                     this->refresh(style::window::calendar::test::next_month_id,
                                   style::window::calendar::test::date_text_3);
                     return true;
                 }
-                else if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
+                case KeyCode::KEY_LEFT: {
                     LOG_DEBUG("Call borderCallback -> go to the previous element");
                     std::list<Item *>::iterator it =
                         std::find(month->children.begin(), month->children.end(), month->getFocusItem());
@@ -262,7 +263,7 @@ namespace gui
                     }
                     return true;
                 }
-                else if (inputEvent.keyCode == KeyCode::KEY_RIGHT) {
+                case KeyCode::KEY_RIGHT: {
                     LOG_DEBUG("Call borderCallback -> go to the next element");
                     std::list<Item *>::iterator it =
                         std::find(month->children.begin(), month->children.end(), month->getFocusItem());
@@ -279,9 +280,60 @@ namespace gui
                     }
                     return true;
                 }
-                else {
+                default: {
                     return false;
                 }
+                }
+                //                if (inputEvent.keyCode == KeyCode::KEY_UP) {
+                //                    LOG_DEBUG("change month prev");
+                //                    this->refresh(style::window::calendar::test::prev_month_id,
+                //                                  style::window::calendar::test::date_text_1);
+                //                    return true;
+                //                }
+                //                else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
+                //                    LOG_DEBUG("change month next");
+                //                    this->refresh(style::window::calendar::test::next_month_id,
+                //                                  style::window::calendar::test::date_text_3);
+                //                    return true;
+                //                }
+                //                else if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
+                //                    LOG_DEBUG("Call borderCallback -> go to the previous element");
+                //                    std::list<Item *>::iterator it =
+                //                        std::find(month->children.begin(), month->children.end(),
+                //                        month->getFocusItem());
+                //                    if (std::prev(*it) != nullptr && (*std::prev(it))->activeItem) {
+                //                        month->setFocusItem((*std::prev(it)));
+                //                    }
+                //                    else {
+                //                        auto it = --month->children.end();
+                //                        while (*it == nullptr || !(*it)->activeItem) {
+                //                            --it;
+                //                        }
+                //                        month->setFocusItem((*it));
+                //                    }
+                //                    return true;
+                //                }
+                //                else if (inputEvent.keyCode == KeyCode::KEY_RIGHT) {
+                //                    LOG_DEBUG("Call borderCallback -> go to the next element");
+                //                    std::list<Item *>::iterator it =
+                //                        std::find(month->children.begin(), month->children.end(),
+                //                        month->getFocusItem());
+                //                    if (std::next(*it) != nullptr && (*std::next(it))->activeItem) {
+                //                        month->setFocusItem((*std::next(it)));
+                //                    }
+                //                    else {
+                //                        auto it = month->children.begin();
+                //                        while (*it == nullptr || !(*it)->activeItem) {
+                //                            LOG_DEBUG("Call borderCallback -> go to the next element");
+                //                            ++it;
+                //                        }
+                //                        month->setFocusItem((*it));
+                //                    }
+                //                    return true;
+                //                }
+                //                else {
+                //                    return false;
+                //                }
             };
 
             setFocusItem(month);
