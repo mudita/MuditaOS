@@ -21,18 +21,19 @@ namespace gui
             bool noUpdate;
         };
 
-        template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeUsed(Item *it, Item::Area area = Item::Area::Min)
         {
-            uint32_t sum = 0;
+            Length sum = 0;
+
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
                 sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
             });
             return sum;
         };
 
-        template <Axis axis> uint32_t sizeUsedWithoutElem(Item *it, Item *elem, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeUsedWithoutElem(Item *it, Item *elem, Item::Area area = Item::Area::Min)
         {
-            uint32_t sum = 0;
+            Length sum = 0;
 
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
                 sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
@@ -41,12 +42,12 @@ namespace gui
             return sum <= elem->area(area).size(axis) ? 0 : sum - elem->area(area).size(axis);
         };
 
-        template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeLeft(Item *it, Item::Area area = Item::Area::Min)
         {
             return (sizeUsed<axis>(it, area) >= it->getSize(axis)) ? 0 : it->getSize(axis) - sizeUsed<axis>(it, area);
         };
 
-        template <Axis axis> uint32_t sizeLeftWithoutElem(Item *it, Item *elem, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeLeftWithoutElem(Item *it, Item *elem, Item::Area area = Item::Area::Min)
         {
             return (sizeUsedWithoutElem<axis>(it, elem, area) >= it->getSize(axis))
                        ? 0
@@ -54,10 +55,11 @@ namespace gui
         };
 
         template <Axis axis> void resizeItems();
-        template <Axis axis>[[nodiscard]] uint16_t getAxisAlignmentValue(uint16_t calcPos, uint16_t calcSize, Item *el);
+        template <Axis axis>[[nodiscard]] Position getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el);
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
+        void addFromOutOfDrawAreaList();
         virtual void resizeItems();
         bool reverseOrder = false;
 
@@ -91,7 +93,7 @@ namespace gui
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
         // set focus on specified box element
-        void setFocusOnElement(uint32_t elementNumber);
+        void setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
         template <Axis axis>
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
@@ -107,7 +109,7 @@ namespace gui
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
-        uint32_t getSizeLeft();
+        Length getSizeLeft();
     };
 
     class VBox : public BoxLayout
@@ -119,7 +121,7 @@ namespace gui
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
-        uint32_t getSizeLeft();
+        Length getSizeLeft();
     };
 
 } /* namespace gui */
