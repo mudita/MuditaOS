@@ -41,9 +41,6 @@ namespace gui::model
         return ret;
     }
 
-    void SearchResultsModel::requestRecordsCount()
-    {}
-
     void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {

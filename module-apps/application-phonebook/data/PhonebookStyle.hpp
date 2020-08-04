@@ -44,10 +44,6 @@ namespace phonebookStyle
             constexpr uint32_t y = style::header::height;
             constexpr uint32_t w = style::listview::body_width_with_scroll;
             constexpr uint32_t h = style::window_height - y - style::footer::height;
-
-            constexpr uint32_t pageSize      = 8;
-            constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
-            constexpr uint32_t penWidth      = 0;
         } // namespace contactsList
     }     // namespace mainWindow
 
@@ -81,10 +77,6 @@ namespace phonebookStyle
             constexpr uint32_t y = style::header::height;
             constexpr uint32_t w = style::listview::body_width_with_scroll;
             constexpr uint32_t h = style::window_height - y - style::footer::height;
-
-            constexpr uint32_t pageSize      = 8;
-            constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
-            constexpr uint32_t penWidth      = 0;
         } // namespace searchResultList
     }     // namespace searchResultsWindow
 

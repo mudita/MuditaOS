@@ -13,7 +13,7 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gu
     SMSTemplateModel(app::Application *app);
     virtual ~SMSTemplateModel() = default;
 
-    void requestRecordsCount() override;
+    unsigned int requestRecordsCount() override;
     bool updateRecords(std::unique_ptr<std::vector<SMSTemplateRecord>> records,
                        const uint32_t offset,
                        const uint32_t limit,
@@ -22,9 +22,4 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gu
 
     unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
-
-    int getItemCount() const override
-    {
-        return recordsCount;
-    };
 };

@@ -10,7 +10,7 @@
 NewContactModel::NewContactModel(app::Application *app) : application(app)
 {}
 
-auto NewContactModel::getItemCount() const -> int
+auto NewContactModel::requestRecordsCount() -> unsigned int
 {
     return internalData.size();
 }

@@ -90,10 +90,7 @@ namespace gui
     void SMSTemplatesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            smsTemplateModel->clear();
-            smsTemplateModel->requestRecordsCount();
-            list->clear();
-            list->setElementsCount(smsTemplateModel->getItemCount());
+            list->rebuildList();
         }
 
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {

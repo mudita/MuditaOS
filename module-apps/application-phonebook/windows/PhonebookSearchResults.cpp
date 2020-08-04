@@ -34,8 +34,6 @@ namespace gui
                                                       phonebookStyle::searchResultsWindow::searchResultList::w,
                                                       phonebookStyle::searchResultsWindow::searchResultList::h,
                                                       searchResultsModel);
-        searchResultList->setPenFocusWidth(phonebookStyle::searchResultsWindow::searchResultList::penFocusWidth);
-        searchResultList->setPenWidth(phonebookStyle::searchResultsWindow::searchResultList::penWidth);
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);

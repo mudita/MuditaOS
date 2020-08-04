@@ -6,8 +6,6 @@ namespace style
     {
         namespace threads
         {
-            constexpr uint32_t pageSize = 5;
-
             constexpr uint32_t listPositionX = style::window::default_left_margin;
             // Magic 1 -> discussed with Design for proper alignment.
             constexpr uint32_t ListPositionY = style::header::height - 1;
@@ -56,8 +54,6 @@ namespace style
         {
             namespace list
             {
-                constexpr uint32_t pageSize = 7;
-
                 constexpr uint32_t x = style::window::default_left_margin;
                 constexpr uint32_t y = style::header::height;
                 constexpr uint32_t h = style::window_height - y - style::footer::height;

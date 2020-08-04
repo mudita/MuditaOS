@@ -23,7 +23,6 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     ~PhonebookModel() override = default;
 
     // virtual methods from DatabaseModel
-    void requestRecordsCount() override;
     auto updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
                        const uint32_t offset = 0,
                        const uint32_t limit  = 0,
@@ -37,10 +36,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     // virtual method for db::QueryListener
     auto handleQueryResponse(db::QueryResult *) -> bool override;
 
-    [[nodiscard]] auto getItemCount() const -> int override
-    {
-        return recordsCount;
-    };
+    [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
     [[nodiscard]] auto getFilter() const -> const std::string &;
 

@@ -43,6 +43,5 @@ namespace calllog
         const inline std::string DetailsWindowStr    = "DetailsWindow";
         const inline std::string DialogYesNoStr      = "DialogYesNo";
 
-        constexpr auto pageSize = 8;
     } // namespace settings
 } // namespace calllog

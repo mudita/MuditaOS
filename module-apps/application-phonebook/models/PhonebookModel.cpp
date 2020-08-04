@@ -18,11 +18,9 @@ const static std::uint32_t phonebookModelTimeout = 1000;
 
 PhonebookModel::PhonebookModel(app::Application *app, std::string filter)
     : DatabaseModel(app), queryFilter(std::move(filter))
-{
-    requestRecordsCount();
-}
+{}
 
-void PhonebookModel::requestRecordsCount()
+auto PhonebookModel::requestRecordsCount() -> unsigned int
 {
     auto [code, msg] = DBServiceAPI::GetQueryWithReply(application,
                                                        db::Interface::Name::Contact,
@@ -39,6 +37,8 @@ void PhonebookModel::requestRecordsCount()
 
         recordsCount = countResult->getSize();
     }
+
+    return recordsCount;
 }
 
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -66,7 +66,6 @@ auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
 #endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-    modelIndex = 0;
     list->onProviderDataUpdate();
 
     return true;

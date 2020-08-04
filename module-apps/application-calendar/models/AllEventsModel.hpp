@@ -17,7 +17,7 @@ class AllEventsModel : public gui::ListItemProvider
     // virtual methods for ListViewProvider
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
-    [[nodiscard]] int getItemCount() const override
+    [[nodiscard]] unsigned int requestRecordsCount() override
     {
         return tempItemCount;
     };
