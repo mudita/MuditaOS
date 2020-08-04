@@ -12,6 +12,30 @@
 #include <cstdint>
 #include <iostream>
 
+/// single utf8 character representation struct
+struct U8char
+{
+    U8char() = default;
+    /// get UTF16 (or U+ ) value and store it as UTF8
+    /// @note this is done for little endian
+    U8char(uint32_t code);
+    /// get UTF8 and store it
+    /// @note unsafe
+    U8char(unsigned char *val, unsigned int size);
+    /// get UTF8 code from char* stream depending on size of data
+    /// @note unsafe
+    U8char(unsigned char *);
+
+    static const unsigned int utf8_max_size = 4;
+
+    unsigned char utf8[utf8_max_size];
+
+    unsigned int size = 0;
+
+    void set(unsigned char *val, unsigned int size);
+    void set(uint32_t code);
+};
+
 class UTF8
 {
   protected:
@@ -42,8 +66,6 @@ class UTF8
      */
     uint32_t getDataBufferSize(uint32_t dataBytes);
     bool expand(uint32_t size = stringExpansion);
-    uint32_t decode(const char *utf8_char, uint32_t &length) const;
-
   public:
     UTF8();
     UTF8(const char *str);
@@ -60,6 +82,8 @@ class UTF8
 
     UTF8 &operator=(const UTF8 &utf);
     UTF8 &operator=(UTF8 &&utf) noexcept;
+    /// returns UTF16 value of character (this is - utf8 value encoded to utf16)
+    /// for utf8 value please use getChar
     uint32_t operator[](const uint32_t &idx) const;
     UTF8 operator+(const UTF8 &utf) const;
     UTF8 &operator+=(const UTF8 &utf);
@@ -81,12 +105,19 @@ class UTF8
     uint32_t length() const
     {
         return strLength;
-    };
-    uint32_t used()
+    }
+    uint32_t used() const
     {
         return sizeUsed;
-    };
+    }
+    uint32_t allocated() const
+    {
+        return sizeAllocated;
+    }
     const char *c_str() const;
+
+    /// returns utf8 value on position, to get utf16 use operator[]
+    U8char getChar(unsigned int pos);
 
     /**
      * @brief Removes all content from the string and reduce assigned memory to default value.
@@ -185,6 +216,10 @@ class UTF8
      * U+10FFFF.
      */
     static bool encode(const uint16_t &code, uint32_t &dest, uint32_t &length);
+
+    /// get utf16_t value from utf8 character
+    static uint32_t decode(const char *utf8_char, uint32_t &length);
+
     /**
      * PUBLIC METHODS
      */

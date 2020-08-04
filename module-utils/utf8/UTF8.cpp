@@ -4,11 +4,14 @@
  *  Created on: 9 kwi 2019
  *      Author: robert
  */
+#include <cassert>
 #include <cstring>
 #include <cstdint>
 
 #include "UTF8.hpp"
 #include "log/log.hpp"
+
+#define debug_utf(...)
 
 static uint8_t UTF8_EXT           = 0x80; // 1000 0000
 static uint8_t UTF8_EXT_MASK      = 0xC0; // 1100 0000
@@ -75,6 +78,41 @@ static inline uint32_t charLength(const char *utf8Char)
 
 const char *UTF8::emptyString        = "";
 const uint32_t UTF8::stringExpansion = 32;
+
+U8char::U8char(uint32_t code)
+{
+    uint32_t val = 0;
+    UTF8::encode(code, val, size);
+
+    union
+    {
+        unsigned char ch[utf8_max_size];
+        uint32_t spread;
+    } tmp{.spread = val};
+
+    for (unsigned int i = 0; i < size; ++i) {
+        utf8[size - i - 1] = tmp.ch[i];
+    }
+}
+
+U8char::U8char(unsigned char *val, unsigned int size)
+{
+    set(val, size);
+}
+
+U8char::U8char(unsigned char *ptr)
+{
+    set(ptr, charLength(reinterpret_cast<char *>(ptr)));
+}
+
+void U8char::set(unsigned char *val, unsigned int size)
+{
+    assert(size < utf8_max_size);
+    this->size = size;
+    for (unsigned int i = 0; i < size; ++i) {
+        utf8[i] = val[i];
+    }
+}
 
 UTF8::UTF8()
     : data{new uint8_t[stringExpansion]}, sizeAllocated{stringExpansion}, sizeUsed{1}, strLength{0}, lastIndex{0},
@@ -256,11 +294,13 @@ UTF8 &UTF8::operator=(UTF8 &&utf) noexcept
 uint32_t UTF8::operator[](const uint32_t &idx) const
 {
 
-    if (idx >= strLength)
+    if (idx >= strLength) {
         return 0;
+    }
 
-    uint8_t *dataPtr;
+    uint8_t *dataPtr = nullptr;
     uint32_t charCnt = 0;
+
     if (lastIndex < idx) {
         dataPtr = lastIndexData;
         charCnt = lastIndex;
@@ -269,6 +309,7 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
         dataPtr = data;
         charCnt = 0;
     }
+    assert(dataPtr);
     while (charCnt != idx) {
         dataPtr += charLength(reinterpret_cast<const char *>(dataPtr));
         charCnt++;
@@ -277,9 +318,23 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
     lastIndex     = charCnt;
     lastIndexData = dataPtr;
 
-    uint32_t dummy;
-    uint32_t retValue = decode(reinterpret_cast<const char *>(dataPtr), dummy);
-    return retValue;
+    uint32_t length;
+    return decode(reinterpret_cast<const char *>(dataPtr), length);
+}
+
+U8char UTF8::getChar(unsigned int pos)
+{
+    auto ptr = data;
+    int to   = pos;
+
+    U8char u;
+    while (to >= 0) {
+        u = U8char(ptr);
+        ptr += u.size;
+        --to;
+    }
+
+    return u;
 }
 
 UTF8 UTF8::operator+(const UTF8 &utf) const
@@ -553,8 +608,9 @@ bool UTF8::encode(const uint16_t &code, uint32_t &dest, uint32_t &length)
 
     dest   = 0;
     length = 0;
-    if (((code >= 0xD800) && (code <= 0xDFFF)))
+    if (((code >= 0xD800) && (code <= 0xDFFF))) {
         return false;
+    }
 
     if (code < 0x00080) {
         length = 1;
@@ -583,7 +639,7 @@ bool UTF8::encode(const uint16_t &code, uint32_t &dest, uint32_t &length)
     return true;
 }
 
-bool UTF8::insert(const char *charPtr, const uint32_t &index)
+bool UTF8::insert(const char *ch, const uint32_t &index)
 {
 
     // if index is different than UTF8::npos check if its valid
@@ -593,28 +649,51 @@ bool UTF8::insert(const char *charPtr, const uint32_t &index)
             return false;
         }
     }
-    else
+    else {
         insertIndex = strLength;
+    }
 
     // get length of the char in bytes
-    uint32_t charLen = charLength(charPtr);
+    uint32_t ch_len = charLength(ch);
 
-    // if there is not enough space in string buffer try t expand it by default expansion size.
-    if (charLen + sizeUsed >= sizeAllocated) {
-        if (expand() == false)
+    debug_utf("insert used: %d allocated: %d char len: %d 0x%x 0x%x 0x%x 0x%x\n",
+              used(),
+              allocated(),
+              ch_len,
+              *ch,
+              *(ch + 1),
+              *(ch + 2),
+              *(ch + 3));
+
+    if (ch_len == 0) {
+        LOG_FATAL("not UTF8 character insert failed");
+        return false;
+    }
+
+    // if there is not enough space in string buffer try to expand it by default expansion size.
+    if (ch_len + sizeUsed >= sizeAllocated) {
+        if (expand() == false) {
+            LOG_FATAL("expand");
             return false;
+        }
     }
 
     // find pointer where new character should be copied
-    uint8_t *beginPtr = this->data;
+    uint8_t *pos = data;
     for (unsigned int i = 0; i < insertIndex; i++) {
-        beginPtr += charLength(reinterpret_cast<const char *>(beginPtr));
+        pos += charLength(reinterpret_cast<const char *>(pos));
     }
 
-    memmove(beginPtr + charLen, beginPtr, sizeUsed - (beginPtr - data));
-    memcpy(beginPtr, charPtr, charLen);
+    if ((pos - data) >= sizeUsed) {
+        debug_utf("decode/encode error %d - ( %d ) < 0 && allocated: %d\n", sizeUsed, pos - data, sizeAllocated);
+        return false;
+    }
+    if (insertIndex != length()) {
+        memmove(pos + ch_len, pos, sizeUsed - (pos - data)); // move data when insert is in text, not at the end
+    }
+    memcpy(pos, ch, ch_len); // copy UTF8 char value
 
-    sizeUsed += charLen;
+    sizeUsed += ch_len;
     ++strLength;
 
     return true;
@@ -623,11 +702,14 @@ bool UTF8::insert(const char *charPtr, const uint32_t &index)
 bool UTF8::insertCode(const uint32_t &charCode, const uint32_t &index)
 {
 
-    uint32_t encodedValue;
-    uint32_t encodedLength;
-    encode(charCode, encodedValue, encodedLength);
-
-    return insert(reinterpret_cast<char *>(&encodedValue), index);
+    // bool encode(const uint16_t &code, uint32_t &dest, uint32_t &length);
+    auto u = U8char(charCode);
+    if (u.size == 0) {
+        LOG_ERROR("Failed to encode value: %x", charCode);
+        return false;
+    }
+    debug_utf("from 0x%x to size: %d -- 0x%x 0x%x\n", charCode, u.size, u.utf8[0], u.utf8[1]);
+    return insert((char *)u.utf8, index);
 }
 
 bool UTF8::insertString(const UTF8 &str, const uint32_t &index)
@@ -709,7 +791,7 @@ UTF8 UTF8::deserialize(uint8_t *stream)
     return UTF8(data, *sizeAllocated, *sizeUsed, *strLength);
 }
 
-uint32_t UTF8::decode(const char *utf8_char, uint32_t &length) const
+uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
 {
     uint32_t ret = 0;
     uint32_t len = 0;
@@ -764,5 +846,6 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length) const
     length = len;
     return ret;
 wrong_utf8_character:
+    LOG_ERROR("wrong utf8 char");
     return ret;
 }
