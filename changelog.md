@@ -10,6 +10,8 @@
 
 ### Changed
 
+* `[phonebook]` Switch to contact list instead of contact details after saving contact.
+
 ### Fixed
 
 ### Other
