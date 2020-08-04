@@ -52,7 +52,7 @@ namespace gui
 
         virtual ~TestListViewProvider();
 
-        [[nodiscard]] unsigned int getItemCount() override;
+        [[nodiscard]] unsigned int requestRecordsCount() override;
 
         unsigned int getMinimalItemHeight() const override;
 

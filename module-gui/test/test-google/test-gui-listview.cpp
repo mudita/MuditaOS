@@ -140,6 +140,7 @@ TEST_F(ListViewTesting, Scroll_Test)
     ASSERT_TRUE(testListView->scroll->visible) << "10 provider elements, 100 h each, list 600 - scroll yes";
 
     testProvider->testItemCount = 5;
+    testListView->rebuildList();
     testListView->provider->requestRecords(0, 10);
     ASSERT_FALSE(testListView->scroll->shouldShowScroll(testListView->currentPageSize, testListView->elementsCount))
         << "set provider elements to 5, 100 h each, list 600 -  scroll no.";

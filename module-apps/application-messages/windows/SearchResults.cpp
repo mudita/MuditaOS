@@ -2,6 +2,7 @@
 #include "ThreadRecord.hpp"
 #include <application-messages/data/SMSTextToSearch.hpp>
 #include <application-messages/ApplicationMessages.hpp>
+#include "application-messages/MessagesStyle.hpp"
 #include "messages/DBThreadMessage.hpp"
 #include "messages/QueryMessage.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
@@ -12,6 +13,8 @@ namespace gui
 {
     SearchResults::SearchResults(app::Application *app) : AppWindow(app, name::window::search_results)
     {
+        namespace msgThreadStyle = style::messages::threads;
+
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_messages_title_main"));
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -24,12 +27,13 @@ namespace gui
 
         model = std::make_shared<model::SearchResultsModel>(application);
 
-        list = new gui::ListView(body,
-                                 body->area().x + style::window::list_offset_default,
-                                 8,
-                                 body->area().w - 2 * style::window::list_offset_default,
-                                 body->area().h,
+        list = new gui::ListView(this,
+                                 msgThreadStyle::listPositionX,
+                                 msgThreadStyle::ListPositionY,
+                                 msgThreadStyle::listWidth,
+                                 msgThreadStyle::listHeight,
                                  model);
+        list->setScrollTopMargin(style::margins::small);
     }
 
     void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -47,8 +51,7 @@ namespace gui
     {
         if (text.length() != 0u) {
             model->setSearchValue(text);
-            model->requestRecords(0, model->getMaxItemsOnScreen());
-            list->setElementsCount(model->requestRecordsCount());
+            list->rebuildList();
             setFocusItem(list);
             return true;
         }
@@ -60,23 +63,21 @@ namespace gui
         if (auto msg = dynamic_cast<db::QueryResponse *>(msgl)) {
             auto result = msg->getResult();
             if (auto response = dynamic_cast<db::query::SMSSearchResult *>(result.get())) {
-                return listViewUpdate(response);
-            }
+                int count         = response->getResults().size();
+                auto records_data = response->getResults();
+                auto records = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+
+                if (response->getMax() == 0) {
+                    return showEmptyResults();
+                }
+
+                list->setElementsCount(response->getMax());
+                model->updateRecords(std::move(records), 0, response->getMax(), count);
+
+                return true;
+            };
         }
         return false;
-    }
-
-    auto SearchResults::listViewUpdate(db::query::SMSSearchResult *response) -> bool
-    {
-        int count         = response->getResults().size();
-        auto records_data = response->getResults();
-        auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
-        model->updateRecords(std::move(records), 0, 3, count);
-        model->setRecordsCount(response->getMax());
-        if (response->getMax() == 0) {
-            return showEmptyResults();
-        }
-        return true;
     }
 
     bool SearchResults::showEmptyResults()
