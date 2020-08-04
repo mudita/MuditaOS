@@ -141,14 +141,24 @@ namespace gui
         }
     }
 
+    void BoxLayout::addFromOutOfDrawAreaList()
+    {
+        if (children.size() != 0u) {
+            for (auto it : outOfDrawAreaItems) {
+                it->setVisible(true);
+            }
+        }
+        outOfDrawAreaItems.clear();
+    }
+
     // space left distposition `first is better` tactics
     // there could be other i.e. socialism: each element take in equal part up to it's max size
     // not needed now == not implemented
     template <Axis axis> void BoxLayout::resizeItems()
     {
-        int32_t pos      = reverseOrder ? this->area().size(axis) : 0;
-        int32_t pos_left = this->getSize(axis);
-        int32_t to_split = sizeLeft<axis>(this);
+        Position pos      = reverseOrder ? this->area().size(axis) : 0;
+        Position pos_left = this->getSize(axis);
+        Position to_split = sizeLeft<axis>(this);
 
         for (auto &el : children) {
 
@@ -161,7 +171,7 @@ namespace gui
             auto orthogonalItemSize     = 0;
             auto grantedSize            = sizeStore->get(el);
             // Check if item can be resized
-            int32_t left_in_el = 0;
+            Position left_in_el = 0;
             if (!grantedSize.isZero()) {
                 left_in_el = grantedSize.get(axis) - el->area(Area::Min).size(axis);
             }
@@ -235,9 +245,8 @@ namespace gui
         });
     }
 
-    template <Axis axis> uint16_t BoxLayout::getAxisAlignmentValue(uint16_t calcPos, uint16_t calcSize, Item *el)
+    template <Axis axis> Position BoxLayout::getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el)
     {
-
         auto offset = sizeLeftWithoutElem<axis>(this, el, Area::Normal) <= calcSize
                           ? 0
                           : sizeLeftWithoutElem<axis>(this, el, Area::Normal) - calcSize;
@@ -317,9 +326,9 @@ namespace gui
         }
     }
 
-    void BoxLayout::setFocusOnElement(uint32_t elementNumber)
+    void BoxLayout::setFocusOnElement(unsigned int elementNumber)
     {
-        uint32_t i = 0;
+        unsigned int i = 0;
         for (auto child : children) {
             if (child->activeItem == true && child->visible == true) {
 
@@ -366,13 +375,7 @@ namespace gui
 
     auto BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
-        if (children.size() != 0u) {
-            for (auto it : outOfDrawAreaItems) {
-                it->setVisible(true);
-            }
-        }
-        outOfDrawAreaItems.clear();
-
+        addFromOutOfDrawAreaList();
         resizeItems();
         setNavigation();
 
@@ -404,7 +407,7 @@ namespace gui
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
     }
 
-    uint32_t HBox::getSizeLeft()
+    Length HBox::getSizeLeft()
     {
         return sizeLeft<Axis::X>(this, Area::Normal);
     }
@@ -434,7 +437,7 @@ namespace gui
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }
 
-    uint32_t VBox::getSizeLeft()
+    Length VBox::getSizeLeft()
     {
         return sizeLeft<Axis::Y>(this, Area::Normal);
     }
