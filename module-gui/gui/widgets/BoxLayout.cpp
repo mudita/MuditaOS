@@ -238,8 +238,8 @@ namespace gui
     template <Axis axis> Position BoxLayout::getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el)
     {
         auto offset = sizeLeftWithoutElem<axis>(this, el, Area::Normal) <= calcSize
-                      ? 0
-                      : sizeLeftWithoutElem<axis>(this, el, Area::Normal) - calcSize;
+                          ? 0
+                          : sizeLeftWithoutElem<axis>(this, el, Area::Normal) - calcSize;
 
         switch (getAlignment(axis).vertical) {
         case gui::Alignment::Vertical::Top:
@@ -380,6 +380,11 @@ namespace gui
         setNavigation();
 
         return true;
+    }
+
+    std::list<Item *>::iterator BoxLayout::getNavigationFocusedItem()
+    {
+        return std::find(this->children.begin(), this->children.end(), this->getFocusItem());
     }
 
     HBox::HBox() : BoxLayout()
