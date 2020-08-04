@@ -16,21 +16,12 @@
 
 using namespace calllog;
 
-#define DEBUG_CALLLOG_DB_ACCESS 0
-
 CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app)
 {}
 
 unsigned int CalllogModel::requestRecordsCount()
 {
-#if (DEBUG_CALLLOG_DB_ACCESS)
-    auto tstamp = xTaskGetTickCount();
-#endif
     recordsCount = DBServiceAPI::CalllogGetCount(application);
-#if (DEBUG_CALLLOG_DB_ACCESS)
-    LOG_INFO("DBServiceAPI::CalllogGetCount %d records %d ms", recordsCount, xTaskGetTickCount() - tstamp);
-#endif
-
     return recordsCount;
 }
 

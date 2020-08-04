@@ -16,7 +16,7 @@ class SongsModel : public app::InternalModel<gui::ListItem *>, public gui::ListI
     void clearData();
     void createData(std::vector<std::string> songsList);
 
-    [[nodiscard]] auto getItemCount() const -> int override;
+    [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
     [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
 

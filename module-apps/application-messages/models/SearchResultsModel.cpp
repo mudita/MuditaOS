@@ -13,7 +13,6 @@ namespace gui::model
 
     unsigned int SearchResultsModel::getMinimalItemHeight() const
     {
-
         return style::window::messages::sms_thread_item_h;
     }
 
@@ -44,16 +43,10 @@ namespace gui::model
     void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
-            DBServiceAPI::GetQuery(
-                getApplication(),
-                db::Interface::Name::SMSThread,
-                std::make_unique<db::query::SMSSearch>(search_value, offset, max_search_items_on_screen));
+            DBServiceAPI::GetQuery(getApplication(),
+                                   db::Interface::Name::SMSThread,
+                                   std::make_unique<db::query::SMSSearch>(search_value, offset, limit));
         }
-    }
-
-    void SearchResultsModel::setRecordsCount(uint32_t count)
-    {
-        recordsCount = count;
     }
 
     void SearchResultsModel::setSearchValue(const UTF8 &search_value)

@@ -26,7 +26,7 @@ namespace gui
         internalData.clear();
     }
 
-    int TestListViewProvider::getItemCount() const
+    unsigned int TestListViewProvider::requestRecordsCount()
     {
         return testItemCount;
     }
