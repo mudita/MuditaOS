@@ -8,6 +8,7 @@
 * `[calendar]` Added event details window.
 * `[calendar]` Added all events list window.
 * `[phonebook]` Added alternative number handling.
+* `[audio]` added headset handling (insertion / removal)
 * `[music player]` Added simple music player implementation.
 * `[torch]` Added initial torch functionality (driver).
 * `[torch]` Torch works with a press of a button
