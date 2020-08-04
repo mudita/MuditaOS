@@ -166,8 +166,10 @@ namespace bsp
     {
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_CELLULAR_AUDIO_SAIx);
-        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
-        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+        if (dmamux) {
+            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
+            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+        }
     }
 
     void RT1051CellularAudio::InStart()
