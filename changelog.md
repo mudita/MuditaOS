@@ -41,19 +41,6 @@
 * `[listview]` List view data handling fixes.
 * `[gui]` Added generic ImageBox widget.
 
-## Current version
-* `[calendar]` Added all events list window.
-* `[torch]` Added initial torch functionality (driver).
-* `[phonebook]` Added alternative number handling.
-* `[music player]` Added simple music player implementation.
-
-* `[desktop]` Reimplemented JSON message parser.
-* `[audio]` Error codes unification.
-* `[build]` Optimize third party libraries in debug configuration to lower the size footprint for the RT1051 platform.
-* `[text]` Fixed text size and underline support.
-* `[listview]` List view data handling fixes.
-* `[gui]` Added generic ImageBox widget.
-
 ## [0.30.1] - 2020-07-24
 
 ### Added

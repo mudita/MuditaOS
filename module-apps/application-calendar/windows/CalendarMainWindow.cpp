@@ -197,8 +197,7 @@ namespace gui
 
     void CalendarMainWindow::refresh(const uint32_t &ID, std::string date)
     {
-        dateLabel->erase();
-        dateLabel->~Label();
+        erase(dateLabel);
         month->erase();
         this->buildMonth(ID);
         this->buildDateLabel(date);
@@ -213,7 +212,7 @@ namespace gui
     void CalendarMainWindow::buildMonth(const uint32_t &actualDateTimeID)
     {
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-        assert(app);
+        assert(app != nullptr);
 
         offsetFromTop = title->offset_h() + style::window::calendar::month_year_height;
         monthWidth    = style::window::default_body_width;
@@ -284,56 +283,6 @@ namespace gui
                     return false;
                 }
                 }
-                //                if (inputEvent.keyCode == KeyCode::KEY_UP) {
-                //                    LOG_DEBUG("change month prev");
-                //                    this->refresh(style::window::calendar::test::prev_month_id,
-                //                                  style::window::calendar::test::date_text_1);
-                //                    return true;
-                //                }
-                //                else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
-                //                    LOG_DEBUG("change month next");
-                //                    this->refresh(style::window::calendar::test::next_month_id,
-                //                                  style::window::calendar::test::date_text_3);
-                //                    return true;
-                //                }
-                //                else if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
-                //                    LOG_DEBUG("Call borderCallback -> go to the previous element");
-                //                    std::list<Item *>::iterator it =
-                //                        std::find(month->children.begin(), month->children.end(),
-                //                        month->getFocusItem());
-                //                    if (std::prev(*it) != nullptr && (*std::prev(it))->activeItem) {
-                //                        month->setFocusItem((*std::prev(it)));
-                //                    }
-                //                    else {
-                //                        auto it = --month->children.end();
-                //                        while (*it == nullptr || !(*it)->activeItem) {
-                //                            --it;
-                //                        }
-                //                        month->setFocusItem((*it));
-                //                    }
-                //                    return true;
-                //                }
-                //                else if (inputEvent.keyCode == KeyCode::KEY_RIGHT) {
-                //                    LOG_DEBUG("Call borderCallback -> go to the next element");
-                //                    std::list<Item *>::iterator it =
-                //                        std::find(month->children.begin(), month->children.end(),
-                //                        month->getFocusItem());
-                //                    if (std::next(*it) != nullptr && (*std::next(it))->activeItem) {
-                //                        month->setFocusItem((*std::next(it)));
-                //                    }
-                //                    else {
-                //                        auto it = month->children.begin();
-                //                        while (*it == nullptr || !(*it)->activeItem) {
-                //                            LOG_DEBUG("Call borderCallback -> go to the next element");
-                //                            ++it;
-                //                        }
-                //                        month->setFocusItem((*it));
-                //                    }
-                //                    return true;
-                //                }
-                //                else {
-                //                    return false;
-                //                }
             };
 
             setFocusItem(month);
@@ -363,7 +312,7 @@ namespace gui
 
         LOG_DEBUG("Start build interface for calendar main window");
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-        assert(app);
+        assert(app != nullptr);
 
         setTitle(utils::localize.get("app_calendar_title_main"));
 
