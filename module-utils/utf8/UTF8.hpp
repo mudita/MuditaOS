@@ -1,16 +1,8 @@
-/*
- * UTF8.hpp
- *
- *  Created on: 9 kwi 2019
- *      Author: robert
- */
-
-#ifndef UTF8_HPP_
-#define UTF8_HPP_
+#pragma once
 
 #include <string>
 #include <cstdint>
-#include <iostream>
+#include <iosfwd> // for forward declaration for ostream
 
 /// single utf8 character representation struct
 struct U8char
@@ -92,11 +84,7 @@ class UTF8
     {
         return c_str();
     }
-    friend std::ostream &operator<<(std::ostream &os, const UTF8 &el)
-    {
-        os << el.c_str();
-        return os;
-    }
+    friend std::ostream &operator<<(std::ostream &os, const UTF8 &el);
 
     /**
      * UTILITY FUNCTIONS
@@ -232,5 +220,3 @@ class UTF8
      */
     static bool getStreamLength(const char *stream, uint32_t &size, uint32_t &count);
 };
-
-#endif /* UTF8_HPP_ */

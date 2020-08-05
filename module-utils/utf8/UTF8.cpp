@@ -1,15 +1,11 @@
-/*
- * UTF8.cpp
- *
- *  Created on: 9 kwi 2019
- *      Author: robert
- */
 #include <cassert>
 #include <cstring>
 #include <cstdint>
+#include <ostream>
 
 #include "UTF8.hpp"
 #include "log/log.hpp"
+
 
 #define debug_utf(...)
 
@@ -817,4 +813,10 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
 wrong_utf8_character:
     LOG_ERROR("wrong utf8 char");
     return ret;
+}
+
+std::ostream &operator<<(std::ostream &os, const UTF8 &el)
+{
+    os << el.c_str();
+    return os;
 }
