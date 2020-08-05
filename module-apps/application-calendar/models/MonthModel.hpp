@@ -17,7 +17,7 @@ class MonthModel
 {
   public:
     month m;
-    day lastDay;
+    unsigned int lastDay;
     // first week offset
     uint32_t offset;
     year y;
@@ -29,6 +29,7 @@ class MonthModel
 
     year getYear();
     month getMonth();
-    day getLastDay();
+    uint32_t getLastDay();
     uint32_t getFirstWeekOffset();
+    std::string getMonthYearText();
 };

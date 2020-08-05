@@ -34,12 +34,12 @@ namespace gui
             this->activeItem = false;
         }
         else if (i >= style::window::calendar::week_days_number &&
-                 i <= style::window::calendar::week_days_number + firstWeekOffset) {
+                 i < style::window::calendar::week_days_number + firstWeekOffset - 1) {
             this->setPenWidth(style::window::default_border_no_focus_w);
             this->activeItem = false;
         }
         else {
-            std::string number = std::to_string(i - firstWeekOffset - style::window::calendar::week_days_number);
+            std::string number = std::to_string(i - firstWeekOffset - style::window::calendar::week_days_number + 2);
             this->setText(number);
             this->activeItem   = true;
             this->setFont(style::window::font::medium);
@@ -74,19 +74,12 @@ namespace gui
         grid.y        = dayHeight;
 
         uint32_t firstDayOffset    = model->getFirstWeekOffset();
-        day lastDay                = model->getLastDay();
-        uint32_t notActiveElements = style::window::calendar::week_days_number + firstDayOffset;
+        uint32_t lastDay           = model->getLastDay();
+        uint32_t iterations        = style::window::calendar::week_days_number + firstDayOffset + lastDay - 1;
+        LOG_DEBUG("OFFSET DAY: %u", firstDayOffset);
+        LOG_DEBUG("LAST DAY: %u", lastDay);
         uint32_t i;
-        for (i = 0; i < notActiveElements; ++i) {
-            auto day = new DayLabel(app,
-                                    this,
-                                    i,
-                                    firstDayOffset,
-                                    style::window::calendar::day_cell_width,
-                                    style::window::calendar::day_cell_height);
-            addWidget(day);
-        }
-        for (day d = day(1); d <= lastDay; ++d, ++i) {
+        for (i = 0; i < iterations; ++i) {
             auto day = new DayLabel(app,
                                     this,
                                     i,
@@ -111,8 +104,7 @@ namespace gui
         month->erase();
 
         monthModel = std::make_unique<MonthModel>(actualDate);
-        /// TODO: convert actual date to string
-        std::string dateText = "March 2020";
+        std::string dateText = monthModel->getMonthYearText();
         this->buildMonth(monthModel);
         this->buildDateLabel(dateText);
     }
@@ -232,7 +224,7 @@ namespace gui
 
         monthModel = std::make_unique<MonthModel>(actualDate);
         this->buildMonth(monthModel);
-        this->buildDateLabel(style::window::calendar::test::date_text_2);
+        this->buildDateLabel(monthModel->getMonthYearText());
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
