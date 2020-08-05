@@ -825,8 +825,8 @@ namespace gui
         Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color)
     {
         auto line_y_offset = (y - glyph->yoffset) * context->getW();
-        auto *drawPtr  = context->getData() + x + line_y_offset;
-        auto *glyphPtr = glyph->data;
+        auto *drawPtr      = context->getData() + x + line_y_offset;
+        auto *glyphPtr     = glyph->data;
         assert(glyph->data);
 
         for (uint16_t yy = 0; yy < glyph->height; ++yy) {

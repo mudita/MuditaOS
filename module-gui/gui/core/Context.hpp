@@ -71,7 +71,7 @@ namespace gui
 
         inline bool addressInData(const uint8_t *ptr) const
         {
-            return (ptr >= data) && (ptr < data + w*h);
+            return (ptr >= data) && (ptr < data + w * h);
         }
 
         friend std::ostream &operator<<(std::ostream &out, const Context &c);

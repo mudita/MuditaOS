@@ -6,7 +6,6 @@
 #include "UTF8.hpp"
 #include "log/log.hpp"
 
-
 #define debug_utf(...)
 
 static char UTF8_EXT           = 0x80; // 1000 0000
@@ -206,7 +205,7 @@ bool UTF8::expand(uint32_t size)
 {
 
     uint32_t newSizeAllocated = getDataBufferSize(sizeAllocated + size);
-    auto *newData          = new char[newSizeAllocated];
+    auto *newData             = new char[newSizeAllocated];
 
     if (newData != nullptr) {
 
@@ -294,7 +293,7 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
         return 0;
     }
 
-    char *dataPtr = nullptr;
+    char *dataPtr    = nullptr;
     uint32_t charCnt = 0;
 
     if (lastIndex < idx) {
@@ -346,7 +345,7 @@ UTF8 &UTF8::operator+=(const UTF8 &utf)
     }
 
     uint32_t newSizeAllocated = getDataBufferSize(sizeUsed + utf.sizeUsed);
-    auto *newData          = new char[newSizeAllocated];
+    auto *newData             = new char[newSizeAllocated];
     if (newData != nullptr) {
 
         memcpy(newData, data, sizeUsed);
@@ -398,7 +397,7 @@ UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
     }
 
     char *beginPtr = this->data;
-    char *endPtr = nullptr;
+    char *endPtr   = nullptr;
 
     uint32_t bufferSize = 0;
     uint32_t strCounter = 0;
@@ -444,7 +443,7 @@ uint32_t UTF8::find(const char *s, uint32_t pos)
     }
 
     uint32_t position = 0;
-    auto *dataPtr  = this->data;
+    auto *dataPtr     = this->data;
 
     for (position = 0; position < pos; position++) {
         dataPtr += charLength(dataPtr);
@@ -481,7 +480,7 @@ uint32_t UTF8::findLast(const char *s, uint32_t pos)
     }
 
     uint32_t position          = 0;
-    auto *dataPtr           = this->data;
+    auto *dataPtr              = this->data;
     uint32_t lastFoundPosition = npos;
 
     // calculate position of last string to compare
@@ -516,7 +515,7 @@ UTF8 UTF8::split(const uint32_t &idx)
     // create temp copy of string
     uint32_t tempStringSize       = dataPtr - this->data;
     uint32_t tempStringBufferSize = getDataBufferSize(tempStringSize);
-    auto *tempString           = new char[tempStringBufferSize];
+    auto *tempString              = new char[tempStringBufferSize];
 
     memset(tempString, 0, tempStringBufferSize);
     memcpy(tempString, this->data, tempStringSize);
@@ -576,7 +575,7 @@ bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
     uint32_t newStringSize = this->sizeUsed - bytesToRemove;
 
     uint32_t tempStringBufferSize = getDataBufferSize(newStringSize);
-    auto *tempString           = new char[tempStringBufferSize];
+    auto *tempString              = new char[tempStringBufferSize];
     if (tempString == nullptr) {
         return false;
     }

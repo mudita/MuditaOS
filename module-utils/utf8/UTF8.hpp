@@ -208,7 +208,7 @@ class UTF8
     /// get utf16_t value from utf8 character
     static uint32_t decode(const char *utf8_char, uint32_t &length);
 
-     /**
+    /**
      * @brief Calculates numer of utf8 characters in provided stream
      */
     static uint32_t getCharactersCount(const char *stream);
