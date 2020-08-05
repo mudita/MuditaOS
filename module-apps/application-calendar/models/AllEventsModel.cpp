@@ -24,8 +24,8 @@ gui::ListItem *AllEventsModel::getItem(gui::Order order)
     auto *item = new gui::AllEventsItem();
 
     item->activatedCallback = [=](gui::Item &item) {
-        LOG_INFO("Switch to options/delete window");
-        application->switchWindow(style::window::calendar::name::events_options);
+        LOG_INFO("Switch to event details window");
+        application->switchWindow(style::window::calendar::name::details_window);
         return true;
     };
 

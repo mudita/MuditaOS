@@ -6,17 +6,22 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DayEventsWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CalendarEventsOptionsWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/AllEventsWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/EventDetailModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/AllEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListView.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventDetailDescriptionItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/RepeatAndReminderItem.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListItem.hpp"
 
 )
 

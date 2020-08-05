@@ -5,6 +5,7 @@
 
 ### Added
 
+* `[calendar]` Added event details window.
 * `[calendar]` Added all events list window.
 * `[torch]` Added initial torch functionality (driver).
 * `[phonebook]` Added alternative number handling.
