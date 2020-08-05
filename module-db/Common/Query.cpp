@@ -35,6 +35,7 @@ std::shared_ptr<Query> QueryResult::getRequestQuery() const noexcept
 bool QueryResult::handle()
 {
     if (requestQuery == nullptr || requestQuery->getQueryListener() == nullptr) {
+        return false;
         throw std::runtime_error("No listener to handle query");
     }
 

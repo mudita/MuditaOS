@@ -58,28 +58,29 @@ namespace gui
         return false;
     }
 
-    bool SearchResults::onDatabaseMessage(sys::Message *msgl)
-    {
-        if (auto msg = dynamic_cast<db::QueryResponse *>(msgl)) {
-            auto result = msg->getResult();
-            if (auto response = dynamic_cast<db::query::SMSSearchResult *>(result.get())) {
-                int count         = response->getResults().size();
-                auto records_data = response->getResults();
-                auto records = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
-
-                if (response->getMax() == 0) {
-                    return showEmptyResults();
-                }
-
-                list->setElementsCount(response->getMax());
-                model->updateRecords(std::move(records), 0, response->getMax(), count);
-
-                return true;
-            };
-        }
-        return false;
-    }
-
+    //    bool SearchResults::onDatabaseMessage(sys::Message *msgl)
+    //    {
+    //        if (auto msg = dynamic_cast<db::QueryResponse *>(msgl)) {
+    //            auto result = msg->getResult();
+    //            if (auto response = dynamic_cast<db::query::SMSSearchResult *>(result.get())) {
+    //                int count         = response->getResults().size();
+    //                auto records_data = response->getResults();
+    //                auto records = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(),
+    //                records_data.end());
+    //
+    //                if (response->getMax() == 0) {
+    //                    return showEmptyResults();
+    //                }
+    //
+    //                list->setElementsCount(response->getMax());
+    //                model->updateRecords(std::move(records), 0, response->getMax(), count);
+    //
+    //                return true;
+    //            };
+    //        }
+    //        return false;
+    //    }
+    //
     bool SearchResults::showEmptyResults()
     {
         auto app = dynamic_cast<app::ApplicationMessages *>(application);

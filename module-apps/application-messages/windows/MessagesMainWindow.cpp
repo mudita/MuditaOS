@@ -161,9 +161,12 @@ namespace gui
     bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto *msgResponse = dynamic_cast<DBThreadResponseMessage *>(msgl);
-        if (msgResponse &&
+        if (msgResponse) {
+
+            LOG_INFO("Dlaczego ty to konsumujesz?");
             threadModel->updateRecords(
-                std::move(msgResponse->records), msgResponse->offset, msgResponse->limit, msgResponse->count)) {
+                std::move(msgResponse->records), msgResponse->offset, msgResponse->limit, msgResponse->count);
+
             return true;
         }
 
@@ -181,9 +184,7 @@ namespace gui
                     LOG_INFO("I CO MAMY intefejs? %d", (int)msgNotification->interface);
 
                     rebuild();
-                    if (this == application->getCurrentWindow()) {
-                        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                    }
+
                     return true;
                 }
             }
