@@ -1,9 +1,11 @@
 #include "SearchResultsModel.hpp"
+#include "ListView.hpp"
 #include "time/time_conversion.hpp"
 #include "../widgets/SearchResultsItem.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
 #include <module-db/queries/sms/QuerySMSSearch.hpp>
+#include <module-apps/application-messages/ApplicationMessages.hpp>
 
 namespace gui::model
 {
@@ -43,15 +45,44 @@ namespace gui::model
     void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
-            DBServiceAPI::GetQuery(getApplication(),
-                                   db::Interface::Name::SMSThread,
-                                   std::make_unique<db::query::SMSSearch>(search_value, offset, limit));
+
+            LOG_INFO("Szukam nowych danych");
+
+            auto query = std::make_unique<db::query::SMSSearch>(search_value, offset, limit);
+            query->setQueryListener(this);
+            DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
         }
     }
 
     void SearchResultsModel::setSearchValue(const UTF8 &search_value)
     {
         this->search_value = search_value;
+    }
+
+    auto SearchResultsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+    {
+
+        LOG_DEBUG("Przyszły nowe dane");
+
+        auto msgResponse = dynamic_cast<db::query::SMSSearchResult *>(queryResult);
+        assert(msgResponse != nullptr);
+
+        int count         = msgResponse->getResults().size();
+        auto records_data = msgResponse->getResults();
+        auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+
+        if (msgResponse->getMax() == 0) {
+
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app);
+            return app->searchEmpty();
+        }
+
+        if (list != nullptr) {
+            list->setElementsCount(msgResponse->getMax());
+        }
+
+        return this->updateRecords(std::move(records), 0, msgResponse->getMax(), count);
     }
 
 }; // namespace gui::model

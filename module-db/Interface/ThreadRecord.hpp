@@ -5,6 +5,7 @@
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
 #include "module-db/queries/sms/QuerySMSSearch.hpp"
+#include "module-db/queries/sms/QuerySMSThreadsGet.hpp"
 #include "module-db/queries/sms/QuerySmsThreadMarkAsRead.hpp"
 
 #include <utf8/UTF8.hpp>
@@ -69,6 +70,5 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     /// for now implementation between Interface <-> Database
     /// it would only make sense to pass Query from Inteface to multiple databases to get all data we are interested in
     /// or better split it to smaller entities... this could be done with any db high level interface -  left as it is
-    std::unique_ptr<db::query::SMSSearchResult> runQueryImpl(const db::query::SMSSearch *query);
     std::unique_ptr<db::query::smsthread::MarkAsReadResult> runQueryImpl(const db::query::smsthread::MarkAsRead *query);
 };

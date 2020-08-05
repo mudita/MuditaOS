@@ -19,7 +19,9 @@ namespace app
 
     ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound)
         : Application(name, parent, startBackgound, phonebook_stack_size)
-    {}
+    {
+        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    }
 
     // Invoked upon receiving data message
     auto ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t
@@ -31,19 +33,22 @@ namespace app
             return retMsg;
         }
 
-        //        if (msgl->messageType == MessageType::DBServiceNotification) {
-        //            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-        //            LOG_DEBUG("Received multicast");
-        //            if (msg != nullptr) {
-        //                // window-specific actions
-        //                for (auto &[name, window] : windows) {
-        //                    window->onDatabaseMessage(msg);
-        //                }
-        //                // app-wide actions
-        //                // <none>
-        //                return std::make_shared<sys::ResponseMessage>();
-        //            }
-        //        }
+        if (msgl->messageType == MessageType::DBServiceNotification) {
+            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+            LOG_DEBUG("Received multicast");
+            if (msg != nullptr) {
+                // window-specific actions
+                LOG_DEBUG("Notyfikacja odebrana");
+                LOG_DEBUG("W jakim oknie jestem? %s", getCurrentWindow()->getName().c_str());
+
+                for (auto &[name, window] : windows) {
+                    window->onDatabaseMessage(msg);
+                }
+                // app-wide actions
+                // <none>
+                return std::make_shared<sys::ResponseMessage>();
+            }
+        }
 
         // this variable defines whether message was processed.
         bool handled = false;

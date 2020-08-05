@@ -30,6 +30,7 @@ namespace gui
                 auto search_text = text->getText();
                 app->showSearchResults(utils::localize.get("common_search_results") + ": " + std::string(search_text),
                                        search_text);
+                return true;
             }
             return false;
         };

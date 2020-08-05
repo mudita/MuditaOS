@@ -1,3 +1,5 @@
+#include <module-services/service-db/messages/DBThreadMessage.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include "ThreadModel.hpp"
 #include "OptionWindow.hpp"
 #include "application-messages/windows/OptionsWindow.hpp"
@@ -47,4 +49,27 @@ gui::ListItem *ThreadModel::getItem(gui::Order order)
         return false;
     };
     return item;
+}
+
+void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
+{
+    LOG_INFO("Szukam nowych danych");
+
+    auto query = std::make_unique<db::query::SMSThreadsGet>(offset, limit);
+    query->setQueryListener(this);
+    DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
+}
+
+auto ThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+{
+
+    LOG_INFO("woła się z threada?");
+
+    auto msgResponse = dynamic_cast<db::query::SMSThreadsGetResults *>(queryResult);
+    assert(msgResponse != nullptr);
+
+    auto records_data = msgResponse->getResults();
+    auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+
+    return this->updateRecords(std::move(records), 0, 0, 0);
 }

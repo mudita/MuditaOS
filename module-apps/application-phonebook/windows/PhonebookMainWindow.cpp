@@ -7,6 +7,8 @@
 #include <queries/phonebook/QueryContactGet.hpp>
 
 #include <service-appmgr/ApplicationManager.hpp>
+#include <module-services/service-db/messages/DBContactMessage.hpp>
+#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
 {
@@ -19,8 +21,7 @@ namespace gui
 
     void PhonebookMainWindow::rebuild()
     {
-        destroyInterface();
-        buildInterface();
+        contactsList->rebuildList();
     }
 
     void PhonebookMainWindow::buildInterface()
@@ -127,6 +128,30 @@ namespace gui
 
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
+    }
+
+    bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr) {
+            // whatever notification had happened, rebuild
+            if (msgNotification->interface == db::Interface::Name::Contact) {
+
+                if (msgNotification->type == db::Query::Type::Delete ||
+                    msgNotification->type == db::Query::Type::Update ||
+                    msgNotification->type == db::Query::Type::Create) {
+
+                    LOG_INFO("I CO MAMY type? %d", (int)msgNotification->type);
+                    LOG_INFO("I CO MAMY intefejs? %d", (int)msgNotification->interface);
+
+                    rebuild();
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     bool PhonebookMainWindow::isSearchRequested() const

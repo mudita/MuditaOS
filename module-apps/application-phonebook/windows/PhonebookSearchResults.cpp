@@ -34,6 +34,7 @@ namespace gui
                                                       phonebookStyle::searchResultsWindow::searchResultList::w,
                                                       phonebookStyle::searchResultsWindow::searchResultList::h,
                                                       searchResultsModel);
+        setFocusItem(searchResultList);
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
@@ -56,7 +57,9 @@ namespace gui
 
     void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        setFocusItem(searchResultList);
+        //        if (mode == ShowMode::GUI_SHOW_INIT) {
+        //            searchResultList->rebuildList();
+        //        }
     }
 
     auto PhonebookSearchResults::onInput(const InputEvent &inputEvent) -> bool
