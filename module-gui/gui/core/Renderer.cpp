@@ -172,9 +172,6 @@ namespace gui
         }
     }
 
-    ;
-
-    // 43575
     void Renderer::drawRectangle(Context *ctx, CommandRectangle *cmd)
     {
 
@@ -817,12 +814,9 @@ namespace gui
         }
 
         // if drawing was performed in temporary context
+        // reinsert drawCtx into last context
         if (copyContext) {
-            // reinsert drawCtx into last context
-
-            //		ctx->insert( cmd->x, cmd->y, drawCtx );
             ctx->insertArea(cmd->x, cmd->y, cmd->areaX, cmd->areaY, cmd->w, cmd->h, drawCtx);
-            // remove draw context
             delete drawCtx;
         }
     }
@@ -893,7 +887,6 @@ namespace gui
                 glyph        = unique_glyph.get();
             }
 
-            //#ifdef BUILD_UNIT_TESTS
             // do not start drawing outside of draw context.
             if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0)) {
                 LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
@@ -903,7 +896,6 @@ namespace gui
                 LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
                 return;
             }
-            //#endif
 
             int32_t kernValue = 0;
             if (i > 0) {
@@ -916,10 +908,9 @@ namespace gui
         }
 
         // if drawing was performed in temporary context
+        // reinsert drawCtx into bast context
         if (copyContext) {
-            // reinsert drawCtx into bast context
             ctx->insert(cmd->x, cmd->y, drawCtx);
-            // remove draw context
             delete drawCtx;
         }
     }
