@@ -57,7 +57,7 @@ namespace app
             new gui::AllEventsWindow(this, style::window::calendar::name::all_events_window)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(
             style::window::calendar::name::details_window,
-            new EventDetailWindow(this, style::window::calendar::name::details_window)));
+            new gui::EventDetailWindow(this, style::window::calendar::name::details_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()
