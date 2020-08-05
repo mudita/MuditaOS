@@ -689,7 +689,7 @@ bool UTF8::insert(const char *ch, const uint32_t &index)
         pos += charLength(pos);
     }
 
-    if ((pos - data) >= sizeUsed) {
+    if ((pos - data) >= static_cast<int64_t>(sizeUsed)) {
         debug_utf("decode/encode error %d - ( %d ) < 0 && allocated: %d\n", sizeUsed, pos - data, sizeAllocated);
         return false;
     }
@@ -708,7 +708,7 @@ bool UTF8::insertCode(const uint32_t &charCode, const uint32_t &index)
 {
     auto u = U8char(charCode);
     if (u.size == 0) {
-        LOG_ERROR("Failed to encode value: %x", charCode);
+        LOG_ERROR("Failed to encode value: %x", static_cast<int>(charCode));
         return false;
     }
     debug_utf("from 0x%x to size: %d -- 0x%x 0x%x\n", charCode, u.size, u.utf8[0], u.utf8[1]);

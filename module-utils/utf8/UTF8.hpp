@@ -22,7 +22,7 @@ struct U8char
 
     unsigned char utf8[utf8_max_size];
 
-    unsigned int size = 0;
+    uint32_t size = 0;
 
     void set(char *val, unsigned int size);
     void set(uint32_t code);
