@@ -286,9 +286,9 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id)
     return SMSRecord{sms, number};
 }
 
-std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(const db::Query *query)
+std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto local_query = dynamic_cast<const db::query::SMSSearchByType *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::SMSSearchByType *>(query.get())) {
         return runQueryImpl(local_query);
     }
     return nullptr;

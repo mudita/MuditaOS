@@ -4,6 +4,8 @@
 #include <module-db/Common/Query.hpp>
 #include <module-db/Interface/BaseInterface.hpp>
 
+#include <memory>
+
 namespace db
 {
     class QueryMessage : public DBMessage
@@ -14,7 +16,7 @@ namespace db
       public:
         QueryMessage(db::Interface::Name interface, std::unique_ptr<db::Query> query);
         [[nodiscard]] auto getInterface() const -> db::Interface::Name;
-        [[nodiscard]] auto getQuery() const -> db::Query *;
+        [[nodiscard]] auto getQuery() -> std::unique_ptr<db::Query>;
     };
 
     ///@note please see that this message might carry more information than just result
@@ -25,6 +27,6 @@ namespace db
 
       public:
         QueryResponse(std::unique_ptr<db::QueryResult> result);
-        [[nodiscard]] auto getResult() const -> db::QueryResult *;
+        [[nodiscard]] auto getResult() -> std::unique_ptr<db::QueryResult>;
     };
 } // namespace db

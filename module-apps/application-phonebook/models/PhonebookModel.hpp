@@ -5,6 +5,7 @@
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include "application-phonebook/widgets/PhonebookItem.hpp"
 #include "Application.hpp"
+#include "Common/Query.hpp"
 #include "DatabaseModel.hpp"
 #include "Interface/ContactRecord.hpp"
 #include "ListItemProvider.hpp"
@@ -12,7 +13,7 @@
 
 #include <string>
 
-class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider
+class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider, public db::QueryListener
 {
   private:
     std::string queryFilter;
@@ -32,6 +33,9 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     // virtual methods for ListViewProvider
     [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
     auto getItem(gui::Order order) -> gui::ListItem * override;
+
+    // virtual method for db::QueryListener
+    auto handleQueryResponse(db::QueryResult *) -> bool override;
 
     [[nodiscard]] auto getItemCount() const -> int override
     {

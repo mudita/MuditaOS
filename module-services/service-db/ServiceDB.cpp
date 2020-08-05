@@ -546,9 +546,11 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         assert(msg);
         db::Interface *interface = getInterface(msg->getInterface());
         assert(interface != nullptr);
-        auto result = interface->runQuery(msg->getQuery());
-        responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
-        sendUpdateNotification(msg->getInterface(), msg->getQuery()->type);
+        auto query     = msg->getQuery();
+        auto queryType = query->type;
+        auto result    = interface->runQuery(std::move(query));
+        responseMsg    = std::make_shared<db::QueryResponse>(std::move(result));
+        sendUpdateNotification(msg->getInterface(), queryType);
     } break;
 
     case MessageType::DBServiceBackup: {

@@ -1,5 +1,6 @@
 #include "ApplicationPhonebook.hpp"
 #include "Dialog.hpp"
+#include "messages/QueryMessage.hpp"
 #include "models/PhonebookModel.hpp"
 #include "windows/PhonebookContact.hpp"
 #include "windows/PhonebookContactDetails.hpp"
@@ -38,7 +39,10 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBQuery: {
-                if (getCurrentWindow()->onDatabaseMessage(resp)) {
+                auto queryResponse = dynamic_cast<db::QueryResponse *>(resp);
+                assert(queryResponse);
+
+                if (queryResponse->getResult()->handle()) {
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                 }
             } break;

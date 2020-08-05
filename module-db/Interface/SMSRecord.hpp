@@ -56,12 +56,12 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
                                                                   SMSRecordField field,
                                                                   const char *str) override final;
 
-    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
     static const uint32_t snippetLength = 45;
-    SmsDB *smsDB                 = nullptr;
-    ContactsDB *contactsDB       = nullptr;
+    SmsDB *smsDB                        = nullptr;
+    ContactsDB *contactsDB              = nullptr;
 
     std::unique_ptr<db::query::SMSSearchByTypeResult> runQueryImpl(const db::query::SMSSearchByType *query);
 

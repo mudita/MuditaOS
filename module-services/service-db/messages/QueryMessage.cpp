@@ -1,5 +1,8 @@
 #include "QueryMessage.hpp"
 
+#include <memory>
+#include <stdexcept>
+
 namespace db
 {
     QueryMessage::QueryMessage(db::Interface::Name interface, std::unique_ptr<db::Query> query)
@@ -11,17 +14,21 @@ namespace db
         return interface;
     }
 
-    auto QueryMessage::getQuery() const -> db::Query *
+    auto QueryMessage::getQuery() -> std::unique_ptr<db::Query>
     {
-        return query.get();
+        if (query == nullptr) {
+            throw std::runtime_error("Invalid query (already moved from)");
+        }
+
+        return std::move(query);
     }
 
     QueryResponse::QueryResponse(std::unique_ptr<db::QueryResult> result)
         : DBResponseMessage(0, 0, MessageType::DBQuery), result(std::move(result))
     {}
 
-    auto QueryResponse::getResult() const -> db::QueryResult *
+    auto QueryResponse::getResult() -> std::unique_ptr<db::QueryResult>
     {
-        return result.get();
+        return std::move(result);
     }
 } // namespace db

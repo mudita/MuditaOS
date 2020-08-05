@@ -173,8 +173,8 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(calllogRecordInterface.GetCount(EntryState::UNREAD) == 4);
         REQUIRE(calllogRecordInterface.GetCount(EntryState::READ) == 0);
 
-        db::query::calllog::SetAllRead query;
-        auto ret    = calllogRecordInterface.runQuery(&query);
+        auto query  = std::make_shared<db::query::calllog::SetAllRead>();
+        auto ret    = calllogRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::calllog::SetAllReadResult *>(ret.get());
         REQUIRE(result != nullptr);
         REQUIRE(result->ret == true);

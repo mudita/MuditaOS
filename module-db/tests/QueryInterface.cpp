@@ -40,20 +40,20 @@ TEST_CASE("Query interface")
 
     SECTION("unknown query -> no results")
     {
-        REQUIRE(smsInterface->runQuery(std::make_unique<db::TestQuery>().get()) == nullptr);
+        REQUIRE(smsInterface->runQuery(std::make_shared<db::TestQuery>()) == nullptr);
     }
 
-    auto query = std::make_unique<db::query::SMSSearch>("a", 0, 10);
+    auto query = std::make_shared<db::query::SMSSearch>("a", 0, 10);
 
     SECTION("known query, wrong interface")
     {
-        auto result = smsInterface->runQuery(query.get());
+        auto result = smsInterface->runQuery(query);
         REQUIRE(result == nullptr);
     }
 
     SECTION("proper result returned")
     {
-        auto result = threadInterface->runQuery(query.get());
+        auto result = threadInterface->runQuery(query);
         REQUIRE(dynamic_cast<db::query::SMSSearchResult *>(result.get()));
     }
 }

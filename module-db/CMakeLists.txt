@@ -8,6 +8,8 @@ include(thirdparty)
 set (SQLITE3_SOURCE Database/sqlite3.c)
 
 set(SOURCES
+        Common/Query.cpp
+
         Database/Field.cpp
         Database/QueryResult.cpp
         Database/Database.cpp
