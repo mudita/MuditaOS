@@ -161,8 +161,8 @@ TEST_CASE("Notifications Record tests")
     }
 
     auto getByKey = [&](NotificationsRecord::Key key, uint32_t val) {
-        db::query::notifications::Get query{key};
-        auto ret    = notificationsRecordInterface.runQuery(&query);
+        auto query  = std::make_shared<db::query::notifications::Get>(key);
+        auto ret    = notificationsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::notifications::GetResult *>(ret.get());
         REQUIRE(result != nullptr);
         auto record = result->getResult();
@@ -172,16 +172,16 @@ TEST_CASE("Notifications Record tests")
     };
 
     auto incrementByKey = [&](NotificationsRecord::Key key) {
-        db::query::notifications::Increment query{key};
-        auto ret    = notificationsRecordInterface.runQuery(&query);
+        auto query  = std::make_shared<db::query::notifications::Increment>(key);
+        auto ret    = notificationsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::notifications::IncrementResult *>(ret.get());
         REQUIRE(result != nullptr);
         REQUIRE(result->getResult());
     };
 
     auto clearByKey = [&](NotificationsRecord::Key key) {
-        db::query::notifications::Clear query{key};
-        auto ret    = notificationsRecordInterface.runQuery(&query);
+        auto query  = std::make_shared<db::query::notifications::Clear>(key);
+        auto ret    = notificationsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::notifications::ClearResult *>(ret.get());
         REQUIRE(result != nullptr);
         REQUIRE(result->getResult());
@@ -225,8 +225,8 @@ TEST_CASE("Notifications Record tests")
 
     SECTION("Get All via query")
     {
-        db::query::notifications::GetAll query;
-        auto ret    = notificationsRecordInterface.runQuery(&query);
+        auto query  = std::make_shared<db::query::notifications::GetAll>();
+        auto ret    = notificationsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::notifications::GetAllResult *>(ret.get());
         REQUIRE(result != nullptr);
         auto records = result->getResult();

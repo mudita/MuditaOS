@@ -120,12 +120,12 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
     return ThreadRecord(ret[0]);
 }
 
-std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(const db::Query *query)
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto local_query = dynamic_cast<const db::query::SMSSearch *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::SMSSearch *>(query.get())) {
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query.get())) {
         return runQueryImpl(local_query);
     }
     return nullptr;

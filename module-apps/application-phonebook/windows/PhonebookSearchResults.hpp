@@ -22,7 +22,6 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        bool onDatabaseMessage(sys::Message *msgl) override;
     };
 
 } /* namespace gui */

@@ -63,7 +63,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 
     uint32_t GetLastID();
 
-    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
     CalllogDB *calllogDB   = nullptr;

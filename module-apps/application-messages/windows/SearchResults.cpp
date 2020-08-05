@@ -58,7 +58,8 @@ namespace gui
     bool SearchResults::onDatabaseMessage(sys::Message *msgl)
     {
         if (auto msg = dynamic_cast<db::QueryResponse *>(msgl)) {
-            if (auto response = dynamic_cast<db::query::SMSSearchResult *>(msg->getResult())) {
+            auto result = msg->getResult();
+            if (auto response = dynamic_cast<db::query::SMSSearchResult *>(result.get())) {
                 return listViewUpdate(response);
             }
         }

@@ -51,7 +51,8 @@ namespace app
         // handle database response
         if (resp != nullptr) {
             if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
-                if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(msg->getResult())) {
+                auto result = msg->getResult();
+                if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
                     handled = handle(response);
                 }
             }

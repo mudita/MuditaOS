@@ -116,24 +116,4 @@ namespace gui
         return true;
     }
 
-    bool PhonebookSearchResults::onDatabaseMessage(sys::Message *msgl)
-    {
-        auto respMsg = dynamic_cast<sys::ResponseMessage *>(msgl);
-
-        assert(respMsg != nullptr);
-        assert(respMsg->responseTo == MessageType::DBQuery);
-
-        auto queryResponse = dynamic_cast<db::QueryResponse *>(respMsg);
-        if (queryResponse == nullptr) {
-            LOG_ERROR("Unexpected message.");
-            return false;
-        }
-
-        auto contactsResponse = dynamic_cast<db::query::ContactGetResult *>(queryResponse->getResult());
-        assert(contactsResponse != nullptr);
-
-        auto records = std::make_unique<std::vector<ContactRecord>>(contactsResponse->getRecords());
-
-        return searchResultsModel->updateRecords(std::move(records));
-    }
 } /* namespace gui */
