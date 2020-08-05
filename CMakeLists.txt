@@ -3,12 +3,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config")
+include(CCacheConfig)
+
 project(PurePhone)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config")
-
 include(Colours)
-include(CCacheConfig)
 include(ProjectConfig)
 include(ModuleConfig)
 include(SerialPort)
