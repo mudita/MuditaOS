@@ -202,9 +202,9 @@ bool CalllogRecordInterface::SetAllRead()
     return calllogDB->calls.SetAllRead();
 }
 
-std::unique_ptr<db::QueryResult> CalllogRecordInterface::runQuery(const db::Query *query)
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto local_query = dynamic_cast<const db::query::calllog::SetAllRead *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::calllog::SetAllRead *>(query.get())) {
         return runQueryImpl(local_query);
     }
     return nullptr;

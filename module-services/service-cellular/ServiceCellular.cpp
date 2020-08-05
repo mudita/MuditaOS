@@ -878,7 +878,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     bool responseHandled = false;
     if (resp != nullptr) {
         if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
-            if (auto response = dynamic_cast<db::query::SMSSearchByTypeResult *>(msg->getResult())) {
+            auto result = msg->getResult();
+            if (auto response = dynamic_cast<db::query::SMSSearchByTypeResult *>(result.get())) {
                 responseHandled = handle(response);
             }
         }

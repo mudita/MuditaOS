@@ -3,6 +3,7 @@
 #include "ListView.hpp"
 #include "PhonebookModel.hpp"
 
+#include <Common/Query.hpp>
 #include <messages/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
 #include <queries/RecordQuery.hpp>
@@ -11,6 +12,7 @@
 #include "UiCommonActions.hpp"
 
 #include <string>
+#include <utility>
 
 const static std::uint32_t phonebookModelTimeout = 1000;
 
@@ -31,7 +33,8 @@ void PhonebookModel::requestRecordsCount()
         auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
         assert(queryResponse != nullptr);
 
-        auto countResult = dynamic_cast<db::query::RecordsSizeQueryResult *>(queryResponse->getResult());
+        auto countResultResponse = queryResponse->getResult();
+        auto countResult         = dynamic_cast<db::query::RecordsSizeQueryResult *>(countResultResponse.get());
         assert(countResult != nullptr);
 
         recordsCount = countResult->getSize();
@@ -40,8 +43,9 @@ void PhonebookModel::requestRecordsCount()
 
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    DBServiceAPI::GetQuery(
-        application, db::Interface::Name::Contact, std::make_unique<db::query::ContactGet>(offset, limit, queryFilter));
+    auto query = std::make_unique<db::query::ContactGet>(offset, limit, queryFilter);
+    query->setQueryListener(this);
+    DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
 }
 
 auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
@@ -115,4 +119,14 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
 auto PhonebookModel::getFilter() const -> const std::string &
 {
     return queryFilter;
+}
+
+auto PhonebookModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+{
+    auto contactsResponse = dynamic_cast<db::query::ContactGetResult *>(queryResult);
+    assert(contactsResponse != nullptr);
+
+    auto records = std::make_unique<std::vector<ContactRecord>>(contactsResponse->getRecords());
+
+    return this->updateRecords(std::move(records));
 }

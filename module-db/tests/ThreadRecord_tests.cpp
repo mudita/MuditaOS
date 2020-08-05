@@ -120,8 +120,9 @@ TEST_CASE("Thread Record tests")
         REQUIRE(rec.isUnread());
 
         {
-            db::query::smsthread::MarkAsRead query{3, db::query::smsthread::MarkAsRead::Read::True};
-            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto query =
+                std::make_shared<db::query::smsthread::MarkAsRead>(3, db::query::smsthread::MarkAsRead::Read::True);
+            auto ret    = threadRecordInterface1.runQuery(query);
             auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
             REQUIRE(result != nullptr);
             REQUIRE(result->getResult());
@@ -130,8 +131,9 @@ TEST_CASE("Thread Record tests")
         }
 
         {
-            db::query::smsthread::MarkAsRead query{3, db::query::smsthread::MarkAsRead::Read::False};
-            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto query =
+                std::make_shared<db::query::smsthread::MarkAsRead>(3, db::query::smsthread::MarkAsRead::Read::False);
+            auto ret    = threadRecordInterface1.runQuery(query);
             auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
             REQUIRE(result != nullptr);
             REQUIRE(result->getResult());
@@ -148,17 +150,16 @@ TEST_CASE("Thread Record tests")
         recordIN.dateSent  = 987654321;
         recordIN.errorCode = 0;
         recordIN.number    = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
-        ;
-        recordIN.body = "Ala";
-        recordIN.type = SMSType ::DRAFT;
+        recordIN.body      = "Ala";
+        recordIN.type      = SMSType ::DRAFT;
 
         REQUIRE(smsRecInterface.Add(recordIN));
         recordIN.body = "Ola";
         REQUIRE(smsRecInterface.Add(recordIN));
 
         {
-            db::query::SMSSearch query{"A", 0, 10};
-            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto query  = std::make_shared<db::query::SMSSearch>("A", 0, 10);
+            auto ret    = threadRecordInterface1.runQuery(query);
             auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
@@ -166,8 +167,8 @@ TEST_CASE("Thread Record tests")
         }
 
         {
-            db::query::SMSSearch query{"O", 0, 10};
-            auto ret    = threadRecordInterface1.runQuery(&query);
+            auto query  = std::make_shared<db::query::SMSSearch>("O", 0, 10);
+            auto ret    = threadRecordInterface1.runQuery(query);
             auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();

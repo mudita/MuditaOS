@@ -165,7 +165,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
                                                        const char *alternativeName,
                                                        const char *number);
 
-    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
     ContactsDB *contactDB;

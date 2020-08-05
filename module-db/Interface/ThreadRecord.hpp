@@ -60,7 +60,7 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
                                                                      ThreadRecordField field,
                                                                      const char *str) override final;
 
-    std::unique_ptr<db::QueryResult> runQuery(const db::Query *query) override;
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
     SmsDB *smsDB           = nullptr;

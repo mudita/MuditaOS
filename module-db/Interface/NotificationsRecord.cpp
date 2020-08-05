@@ -126,18 +126,18 @@ NotificationsRecord NotificationsRecordInterface::GetByKey(NotificationsRecord::
     return notificationsDb->notifications.GetByKey(static_cast<uint32_t>(key));
 }
 
-std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(const db::Query *query)
+std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto local_query = dynamic_cast<const db::query::notifications::Get *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::notifications::Get *>(query.get())) {
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::notifications::Increment *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::notifications::Increment *>(query.get())) {
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::notifications::Clear *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::notifications::Clear *>(query.get())) {
         return runQueryImpl(local_query);
     }
-    if (const auto local_query = dynamic_cast<const db::query::notifications::GetAll *>(query)) {
+    if (const auto local_query = dynamic_cast<const db::query::notifications::GetAll *>(query.get())) {
         return runQueryImpl(local_query);
     }
     return nullptr;
