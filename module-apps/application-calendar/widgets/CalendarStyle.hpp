@@ -1,4 +1,5 @@
 #pragma once
+#include <Style.hpp>
 #include <string>
 
 namespace style
@@ -54,10 +55,30 @@ namespace style
 
                 namespace all
                 {
-                    const int description_w = 310;
-                    const int description_x = 120;
-                    const int start_time_x  = 11;
+                    const inline int description_w = 310;
+                    const inline int description_x = 120;
+                    const inline int start_time_x  = 11;
                 } // namespace all
+
+                namespace repeatAndReminder
+                {
+                    const inline int height             = 150;
+                    const inline int title_label_h      = 45;
+                    const inline int title_label_margin = 15;
+                    const inline int description_w      = style::window::default_body_width / 2 - 30;
+                    const inline int description_h      = 30;
+                } // namespace repeatAndReminder
+
+                namespace eventDetail
+                {
+                    const inline int height_min    = 90;
+                    const inline int height_max    = 160;
+                    const inline int margin_top    = 25;
+                    const inline int margin_bottom = 10;
+                    const inline int title_h       = 20;
+                    const inline int event_time_h  = 30;
+                    const inline int description_h = 40;
+                } // namespace eventDetail
             } // namespace item
 
             namespace options

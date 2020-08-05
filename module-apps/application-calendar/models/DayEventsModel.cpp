@@ -23,7 +23,7 @@ gui::ListItem *DayEventsModel::getItem(gui::Order order)
     auto *item              = new gui::DayEventsItem();
     item->activatedCallback = [=](gui::Item &item) {
         LOG_INFO("Switch to options/delete window");
-        application->switchWindow(style::window::calendar::name::events_options);
+        application->switchWindow(style::window::calendar::name::details_window);
         return true;
     };
     return item;
