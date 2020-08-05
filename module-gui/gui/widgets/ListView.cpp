@@ -117,12 +117,10 @@ namespace gui
     void ListView::setProvider(std::shared_ptr<ListItemProvider> prov)
     {
         if (prov != nullptr) {
-            clear();
             provider       = prov;
             provider->list = this;
 
-            setElementsCount(provider->requestRecordsCount());
-            provider->requestRecords(0, calculateLimit());
+            rebuildList();
         }
     }
 

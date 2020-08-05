@@ -1,14 +1,16 @@
 #pragma once
 
-
 #include "DatabaseModel.hpp"
 #include "Application.hpp"
 #include "ListItemProvider.hpp"
+#include "Common/Query.hpp"
 #include "Interface/ThreadRecord.hpp"
 
 #include <vector>
 
-class BaseThreadRecordModel : public app::DatabaseModel<ThreadRecord>, public gui::ListItemProvider
+class BaseThreadRecordModel : public app::DatabaseModel<ThreadRecord>,
+                              public gui::ListItemProvider,
+                              public db::QueryListener
 {
   public:
     BaseThreadRecordModel() = delete;

@@ -278,6 +278,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->Add(msg->record);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Create);
     } break;
 
     case MessageType::DBContactGetByName: {
@@ -351,6 +352,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->RemoveByID(msg->id);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Delete);
     } break;
 
     case MessageType::DBContactBlock: {
@@ -365,6 +367,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Update);
     } break;
 
     case MessageType::DBContactGetCount: {

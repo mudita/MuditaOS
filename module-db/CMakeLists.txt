@@ -55,6 +55,7 @@ set(SOURCES
 
         queries/RecordQuery.cpp
         queries/sms/QuerySMSSearch.cpp
+        queries/sms/QuerySMSThreadsGet.cpp
         queries/sms/QuerySMSSearchByType.cpp
         queries/sms/QuerySmsThreadMarkAsRead.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
