@@ -13,7 +13,7 @@ struct Record
     {
         auto result = ID != DB_ID_NONE;
         if (!result) {
-            LOG_ERROR("Record validation failed - incorrect ID");
+            LOG_DEBUG("Record validation failed - incorrect ID");
         }
         return result;
     }
