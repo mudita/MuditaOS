@@ -83,7 +83,6 @@ namespace app
         windows.insert({gui::name::window::main_window, new gui::PhonebookMainWindow(this)});
         windows.insert({gui::window::name::new_contact, new gui::PhonebookNewContact(this)});
         windows.insert({gui::window::name::contact, new gui::PhonebookContact(this)});
-        // windows.insert({gui::window::name::contact, new gui::PhonebookContactDetails(this)});
         windows.insert({gui::window::name::search, new gui::PhonebookSearch(this)});
         windows.insert({gui::window::name::no_results, new gui::NoResults(this)});
         windows.insert({gui::window::name::contact_blocked, new gui::ContactBlocked(this)});
@@ -140,7 +139,7 @@ namespace app
         meta.icon = "search_big";
         // meta.text  = utils::localize.get("app_messages_thread_no_result");
         meta.text  = utils::localize.get("app_phonebook_search_no_results");
-        meta.title = utils::localize.get("common_results_prefix") + query;
+        meta.title = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
         dialog->update(meta);
         auto data                        = std::make_unique<gui::SwitchData>();
         data->ignoreCurrentWindowOnStack = true;
