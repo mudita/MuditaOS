@@ -1,5 +1,6 @@
 #pragma once
 
+#include <log/log.hpp>
 #include <cstdint>
 
 constexpr uint32_t DB_ID_NONE = 0;
@@ -10,6 +11,10 @@ struct Record
 
     bool isValid() const
     {
-        return ID != DB_ID_NONE;
+        auto result = ID != DB_ID_NONE;
+        if (!result) {
+            LOG_ERROR("Record validation failed - incorrect ID");
+        }
+        return result;
     }
 };
