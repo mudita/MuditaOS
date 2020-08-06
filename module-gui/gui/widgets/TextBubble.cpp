@@ -11,7 +11,10 @@ namespace gui
 
     void TextBubble::setYaps(RectangleYapFlags yaps)
     {
-        Rect::setYaps(yaps);
+        if (this->yaps != yaps) {
+            this->yaps = yaps;
+            drawLines();
+        }
     }
 
 } // namespace gui

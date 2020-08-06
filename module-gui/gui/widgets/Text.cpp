@@ -229,6 +229,7 @@ namespace gui
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
+        drawLines();
         return true;
     }
 
@@ -291,6 +292,14 @@ namespace gui
             }
             return size;
         };
+
+        // Check if Parent does not have max size restrictions.
+        if (this->parent != nullptr) {
+            area(Area::Max).w = parent->area(Area::Max).w != 0 ? std::min(parent->area(Area::Max).w, area(Area::Max).w)
+                                                               : area(Area::Max).w;
+            area(Area::Max).h = parent->area(Area::Max).h != 0 ? std::min(parent->area(Area::Max).h, area(Area::Max).h)
+                                                               : area(Area::Max).h;
+        }
 
         uint32_t w           = sizeMinusPadding(Axis::X, Area::Max);
         uint32_t h           = sizeMinusPadding(Axis::Y, Area::Max);

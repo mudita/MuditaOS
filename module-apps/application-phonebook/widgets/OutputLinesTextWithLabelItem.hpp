@@ -9,18 +9,20 @@
 
 namespace gui
 {
-    class MultiLineTextWithLabelItem : public ContactListItem
+    class OutputLinesTextWithLabelItem : public ContactListItem
     {
         phonebookInternals::ListItemName listItemName;
 
       public:
-        MultiLineTextWithLabelItem(phonebookInternals::ListItemName listItemName);
+        OutputLinesTextWithLabelItem(phonebookInternals::ListItemName listItemName);
 
-        ~MultiLineTextWithLabelItem() override = default;
+        ~OutputLinesTextWithLabelItem() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         VBox *vBox          = nullptr;
         Label *titleLabel   = nullptr;
         Text *multilineText = nullptr;
+
+        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
 
       private:
         void applyItemNameSpecificSettings();
