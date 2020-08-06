@@ -89,6 +89,9 @@ namespace app
         windows.insert({gui::window::name::contact_blocked, new gui::ContactBlocked(this)});
         windows.insert({gui::window::name::search_results, new gui::PhonebookSearchResults(this)});
         windows.insert(
+            {gui::window::name::dialog, new gui::Dialog(this, gui::window::name::dialog, gui::Dialog::Meta())});
+
+        windows.insert(
             {gui::window::name::dialog_yes_no, new gui::DialogYesNo(this, gui::window::name::dialog_yes_no)});
         windows.insert(
             {gui::window::name::dialog_confirm, new gui::DialogConfirm(this, gui::window::name::dialog_confirm)});
@@ -125,10 +128,32 @@ namespace app
             switchWindow("SearchResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         else {
+            /*
             LOG_DEBUG("Switching to no results window.");
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchFilter);
             switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            */
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchFilter);
+            searchEmpty(searchFilter);
         }
+    }
+
+    bool ApplicationPhonebook::searchEmpty(const std::string &query)
+    {
+        // auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::window::name::dialog]);
+        assert(dialog);
+        auto meta = dialog->meta;
+        meta.icon = "search_big";
+        // meta.text  = utils::localize.get("app_messages_thread_no_result");
+        meta.text  = utils::localize.get("app_phonebook_search_no_results");
+        meta.title = utils::localize.get("common_results_prefix") + query;
+        dialog->update(meta);
+        auto data                        = std::make_unique<gui::SwitchData>();
+        data->ignoreCurrentWindowOnStack = true;
+        LOG_DEBUG("Switching to app_phonebook_search_no_results window.");
+        switchWindow(dialog->getName(), std::move(data));
+        return true;
     }
 
 } /* namespace app */
