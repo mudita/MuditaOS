@@ -3,8 +3,6 @@
 
 #include "utf8/UTF8.hpp"
 
-static const std::uint32_t notFound = static_cast<std::uint32_t>(-1);
-
 TEST_CASE("UTF8: operator index returns value")
 {
     UTF8 ustr = UTF8("Rąbać");
@@ -19,6 +17,18 @@ TEST_CASE("UTF8: operator index exceeds string size")
     UTF8 ustr = UTF8("Rąbać");
 
     REQUIRE(0 == ustr[ustr.length() + 1]);
+}
+
+TEST_CASE("UTF8: operator== returns properly")
+{
+    const UTF8 test_test_test  = "test test test";
+    const UTF8 test_not = "test not";
+    const UTF8 test_test = "test test";
+
+    REQUIRE(test_test_test == test_test_test); // text exactly the same
+    REQUIRE(test_not != test_test_test);       // different text totally
+    REQUIRE(test_test != test_test_test);      // text 1 shorter than 2nd (with same text at the begining)
+    REQUIRE(test_test_test != test_test);      // text 2 shorter than 1st (with same text at the begining)
 }
 
 TEST_CASE("UTF8: substr returns empty string when zero length is passed")
@@ -65,14 +75,14 @@ TEST_CASE("UTF8: find returns npos if not found")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "E";
-    REQUIRE(notFound == sourceString.find(to_find));
+    REQUIRE(UTF8::npos == sourceString.find(to_find));
 }
 
 TEST_CASE("UTF8: find returns npos if pos exceeds string length")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "A";
-    REQUIRE(notFound == sourceString.find(to_find, sourceString.length() + 5));
+    REQUIRE(UTF8::npos == sourceString.find(to_find, sourceString.length() + 5));
 }
 
 TEST_CASE("UTF8: find returns position of passed string")
@@ -101,14 +111,14 @@ TEST_CASE("UTF8: findLast returns npos if not found")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "E";
-    REQUIRE(notFound == sourceString.findLast(to_find, sourceString.length() - 1));
+    REQUIRE(UTF8::npos == sourceString.findLast(to_find, sourceString.length() - 1));
 }
 
 TEST_CASE("UTF8: findLast returns npos if pos exceeds string length")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "A";
-    REQUIRE(notFound == sourceString.findLast(to_find, sourceString.length() + 5));
+    REQUIRE(UTF8::npos == sourceString.findLast(to_find, sourceString.length() + 5));
 }
 
 TEST_CASE("UTF8: findLast returns position of passed string")

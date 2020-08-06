@@ -80,6 +80,7 @@ class UTF8
     UTF8 operator+(const UTF8 &utf) const;
     UTF8 &operator+=(const UTF8 &utf);
     bool operator==(const UTF8 &utf) const;
+    bool operator!=(const UTF8 &utf) const { return !operator==(utf);}
     operator std::string() const
     {
         return c_str();
