@@ -133,7 +133,7 @@ namespace app
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchFilter);
             switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             */
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchFilter);
+
             searchEmpty(searchFilter);
         }
     }
