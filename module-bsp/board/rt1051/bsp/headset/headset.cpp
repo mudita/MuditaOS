@@ -14,6 +14,7 @@ namespace bsp
         static constexpr uint8_t HEADSET_I2C_ADDR     = 0x3B;
         static constexpr uint8_t HEADSET_INT_REG_ADDR = 0x01;
         static constexpr uint8_t HEADSET_INT_DIS_ADDR = 0x03;
+        static constexpr uint8_t HEADSET_DEV_SET_ADDR = 0x04;
         static constexpr uint8_t HEADSET_DET_RES_ADDR = 0x0B;
 
         static constexpr uint8_t HEADSET_INT_DIS_INT_DIS = 1 << 3;
@@ -24,6 +25,9 @@ namespace bsp
         static constexpr uint8_t HEADSET_INT_DIS_DC_ENA  = 0 << 1;
         static constexpr uint8_t HEADSET_INT_DIS_INS_DIS = 1 << 0;
         static constexpr uint8_t HEADSET_INT_DIS_INS_ENA = 0 << 0;
+
+        static constexpr uint8_t HEADSET_DEV_SET_DET_EN = 1 << 5;
+        static constexpr uint8_t HEADSET_DEV_SET_DEB_1S = 0x06;
 
         static constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 500;
 
@@ -79,6 +83,10 @@ namespace bsp
             uint8_t reg =
                 HEADSET_INT_DIS_INT_ENA | HEADSET_INT_DIS_ADC_ENA | HEADSET_INT_DIS_DC_ENA | HEADSET_INT_DIS_INS_ENA;
             i2cAddr.subAddress = HEADSET_INT_DIS_ADDR;
+            i2c->Write(i2cAddr, (uint8_t *)&reg, 1);
+
+            reg                = HEADSET_DEV_SET_DET_EN | HEADSET_DEV_SET_DEB_1S;
+            i2cAddr.subAddress = HEADSET_DEV_SET_ADDR;
             i2c->Write(i2cAddr, (uint8_t *)&reg, 1);
 
             if (timerHandle == nullptr) {
