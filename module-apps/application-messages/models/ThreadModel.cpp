@@ -71,5 +71,5 @@ auto ThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     auto records_data = msgResponse->getResults();
     auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
 
-    return this->updateRecords(std::move(records), 0, 0, 0);
+    return this->updateRecords(std::move(records));
 }
