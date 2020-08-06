@@ -61,29 +61,22 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBThreadGetLimitOffset:
-            case MessageType::DBQuery:
             case MessageType::DBSMSTemplateGetLimitOffset: {
-
-                LOG_DEBUG("Nowe Dane odebrane");
-                LOG_DEBUG("W jakim oknie jestem? %s", getCurrentWindow()->getName().c_str());
-
-                if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
-
-                    LOG_INFO("I co jest jakis handler1?");
-
-                    if (queryResponse->getResult()->handle()) {
-
-                        LOG_INFO("I co jest jakis handler2?");
-
-                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                        break;
-                    }
-                }
 
                 if (getCurrentWindow()->onDatabaseMessage(resp))
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
 
-            } break;
+                break;
+            }
+            case MessageType::DBQuery:
+
+                if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+                    if (queryResponse->getResult()->handle()) {
+                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    }
+                }
+
+                break;
             default:
                 break;
             }

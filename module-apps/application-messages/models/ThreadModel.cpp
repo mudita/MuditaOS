@@ -53,8 +53,6 @@ gui::ListItem *ThreadModel::getItem(gui::Order order)
 
 void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
 {
-    LOG_INFO("Szukam nowych danych");
-
     auto query = std::make_unique<db::query::SMSThreadsGet>(offset, limit);
     query->setQueryListener(this);
     DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
@@ -62,9 +60,6 @@ void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
 
 auto ThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
-
-    LOG_INFO("woła się z threada?");
-
     auto msgResponse = dynamic_cast<db::query::SMSThreadsGetResults *>(queryResult);
     assert(msgResponse != nullptr);
 

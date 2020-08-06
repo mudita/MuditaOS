@@ -160,15 +160,6 @@ namespace gui
 
     bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        auto *msgResponse = dynamic_cast<DBThreadResponseMessage *>(msgl);
-        if (msgResponse) {
-
-            LOG_INFO("Dlaczego ty to konsumujesz?");
-            threadModel->updateRecords(std::move(msgResponse->records));
-
-            return true;
-        }
-
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msgNotification != nullptr) {
             // whatever notification had happened, rebuild
@@ -178,9 +169,6 @@ namespace gui
                 if (msgNotification->type == db::Query::Type::Delete ||
                     msgNotification->type == db::Query::Type::Update ||
                     msgNotification->type == db::Query::Type::Create) {
-
-                    LOG_INFO("I CO MAMY type? %d", (int)msgNotification->type);
-                    LOG_INFO("I CO MAMY intefejs? %d", (int)msgNotification->interface);
 
                     rebuild();
 

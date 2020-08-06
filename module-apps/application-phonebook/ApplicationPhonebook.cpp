@@ -38,9 +38,6 @@ namespace app
             LOG_DEBUG("Received multicast");
             if (msg != nullptr) {
                 // window-specific actions
-                LOG_DEBUG("Notyfikacja odebrana");
-                LOG_DEBUG("W jakim oknie jestem? %s", getCurrentWindow()->getName().c_str());
-
                 for (auto &[name, window] : windows) {
                     window->onDatabaseMessage(msg);
                 }

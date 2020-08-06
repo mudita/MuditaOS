@@ -57,9 +57,9 @@ namespace gui
 
     void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        //        if (mode == ShowMode::GUI_SHOW_INIT) {
-        //            searchResultList->rebuildList();
-        //        }
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            searchResultList->rebuildList();
+        }
     }
 
     auto PhonebookSearchResults::onInput(const InputEvent &inputEvent) -> bool
