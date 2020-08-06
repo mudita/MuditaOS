@@ -78,6 +78,24 @@ TEST_CASE("Thread Record tests")
         }
     }
 
+    SECTION("Get all available records with query")
+    {
+        auto query  = std::make_shared<db::query::SMSThreadsGet>(0, 100);
+        auto ret    = threadRecordInterface1.runQuery(query);
+        auto result = dynamic_cast<db::query::SMSThreadsGetResults *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto results = result->getResults();
+        REQUIRE(results.size() == 2);
+
+        // Check if fetched records contain valid data
+        for (const auto &w : results) {
+            REQUIRE(w.date == dateTest);
+            REQUIRE(w.snippet == snippetTest);
+            REQUIRE(w.type == typeTest);
+            REQUIRE(w.contactID == contactIDTest);
+        }
+    }
+
     SECTION("Get all available records by specified thread ID and check for invalid data")
     {
         auto records = threadRecordInterface1.GetLimitOffsetByField(

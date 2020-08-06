@@ -23,8 +23,6 @@ namespace gui
         SearchResults(app::Application *app);
         /// needed to init populate db
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        /// needed to populate db responses
-        //        auto onDatabaseMessage(sys::Message *msgl) -> bool override;
         auto showEmptyResults() -> bool;
     };
 

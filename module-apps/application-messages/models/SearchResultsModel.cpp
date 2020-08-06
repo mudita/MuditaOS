@@ -45,9 +45,6 @@ namespace gui::model
     void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
-
-            LOG_INFO("Szukam nowych danych");
-
             auto query = std::make_unique<db::query::SMSSearch>(search_value, offset, limit);
             query->setQueryListener(this);
             DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
@@ -61,9 +58,6 @@ namespace gui::model
 
     auto SearchResultsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
-
-        LOG_DEBUG("Przyszły nowe dane");
-
         auto msgResponse = dynamic_cast<db::query::SMSSearchResult *>(queryResult);
         assert(msgResponse != nullptr);
 
