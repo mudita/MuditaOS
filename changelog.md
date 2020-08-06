@@ -20,6 +20,7 @@
 * `[sms]` do not delete if sms thread is malformed (not found what expected)
 
 ### Fixed
+* `[phonebook][db]` Fixed reading contact without a number from database.
 
 * `[utilities]` Fix for UTF8 by character copies
 * `[gui]` Fix crash in font glyph rendering on screen
