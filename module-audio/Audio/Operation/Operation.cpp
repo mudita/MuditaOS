@@ -13,7 +13,7 @@
 namespace audio
 {
 
-    std::optional<std::unique_ptr<Operation>> Operation::Create(Operation::Type t, const char *fileName)
+    std::optional<std::unique_ptr<Operation>> Operation::Create(const Operation::Type &t, const char *fileName)
     {
         std::unique_ptr<Operation> inst;
 
