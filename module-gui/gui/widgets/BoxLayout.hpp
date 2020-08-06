@@ -85,6 +85,7 @@ namespace gui
         template <Axis axis> void addWidget(Item *item);
         /// set navigation from last to fist element in box
         virtual void setNavigation();
+        std::list<Item *>::iterator getNavigationFocusedItem();
         void setVisible(bool value) override;
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
@@ -95,7 +96,6 @@ namespace gui
         // set focus on specified box element
         void setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
-        std::list<Item *>::iterator getNavigationFocusedItem();
         template <Axis axis>
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;

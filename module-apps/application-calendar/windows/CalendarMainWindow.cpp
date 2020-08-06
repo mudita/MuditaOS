@@ -248,7 +248,7 @@ namespace gui
                 }
                 case KeyCode::KEY_LEFT: {
                     LOG_DEBUG("Call borderCallback -> go to the previous element");
-                    std::list<Item *>::iterator it = month->getNavigationFocusedItem();
+                    auto it = month->getNavigationFocusedItem();
                     if (month->nextNavigationItem(std::prev(it)) != nullptr) {
                         month->setFocusItem(month->nextNavigationItem(std::prev(it)));
                     }
@@ -259,7 +259,7 @@ namespace gui
                 }
                 case KeyCode::KEY_RIGHT: {
                     LOG_DEBUG("Call borderCallback -> go to the next element");
-                    std::list<Item *>::iterator it = month->getNavigationFocusedItem();
+                    auto it = month->getNavigationFocusedItem();
                     if (month->nextNavigationItem(std::next(it)) != nullptr) {
                         month->setFocusItem(month->nextNavigationItem(std::next(it)));
                     }
