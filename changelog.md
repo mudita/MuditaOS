@@ -25,6 +25,7 @@
 * `[utilities]` Fix for UTF8 by character copies
 * `[gui]` Fix crash in font glyph rendering on screen
 * `[sms]` When opening a thread show it from the newest message  
+* `[sms]` Fixed superfluous refreshes (causing delay/screen flashing) on entering conversation view 
 
 ### Other
 
