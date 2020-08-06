@@ -7,9 +7,9 @@
 
 * `[calendar]` Added event details window.
 * `[calendar]` Added all events list window.
-* `[torch]` Added initial torch functionality (driver).
 * `[phonebook]` Added alternative number handling.
 * `[music player]` Added simple music player implementation.
+* `[torch]` Added initial torch functionality (driver).
 * `[torch]` Torch works with a press of a button
 * `[desktop]` Added service-desktop <-> DB interface.
 * `[desktop]` Added contact handling from service-desktop.
@@ -17,11 +17,13 @@
 ### Changed
 
 * `[phonebook]` Switch to contact list instead of contact details after saving contact.
+* `[sms]` do not delete if sms thread is malformed (not found what expected)
 
 ### Fixed
 
 * `[utilities]` Fix for UTF8 by character copies
 * `[gui]` Fix crash in font glyph rendering on screen
+* `[sms]` When opening a thread show it from the newest message  
 
 ### Other
 
