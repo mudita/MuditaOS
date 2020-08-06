@@ -5,7 +5,6 @@
 #include "windows/PhonebookContact.hpp"
 #include "windows/PhonebookContactDetails.hpp"
 #include "windows/PhonebookContactOptions.hpp"
-#include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
 #include "windows/PhonebookNamecardOptions.hpp"
@@ -83,9 +82,8 @@ namespace app
         windows.insert({gui::name::window::main_window, new gui::PhonebookMainWindow(this)});
         windows.insert({gui::window::name::new_contact, new gui::PhonebookNewContact(this)});
         windows.insert({gui::window::name::contact, new gui::PhonebookContact(this)});
+        // windows.insert({gui::window::name::contact, new gui::PhonebookContactDetails(this)});
         windows.insert({gui::window::name::search, new gui::PhonebookSearch(this)});
-        // windows.insert({gui::window::name::no_results, new gui::NoResults(this)});
-        windows.insert({gui::window::name::contact_blocked, new gui::ContactBlocked(this)});
         windows.insert({gui::window::name::search_results, new gui::PhonebookSearchResults(this)});
         windows.insert(
             {gui::window::name::dialog, new gui::Dialog(this, gui::window::name::dialog, gui::Dialog::Meta())});
@@ -132,12 +130,10 @@ namespace app
 
     bool ApplicationPhonebook::searchEmpty(const std::string &query)
     {
-        // auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::dialog]);
         auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::window::name::dialog]);
         assert(dialog);
-        auto meta = dialog->meta;
-        meta.icon = "search_big";
-        // meta.text  = utils::localize.get("app_messages_thread_no_result");
+        auto meta  = dialog->meta;
+        meta.icon  = "search_big";
         meta.text  = utils::localize.get("app_phonebook_search_no_results");
         meta.title = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
         dialog->update(meta);

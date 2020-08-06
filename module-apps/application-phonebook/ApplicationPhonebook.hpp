@@ -8,7 +8,6 @@ namespace gui::window::name
 {
     inline const std::string contact          = "Contact";
     inline const std::string contact_options  = "Options";
-    inline const std::string contact_blocked  = "ContactBlocked";
     inline const std::string namecard_options = "Namecard Options";
     inline const std::string new_contact      = "New";
     inline const std::string search           = "Search";

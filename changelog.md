@@ -16,6 +16,7 @@
 
 ### Changed
 
+* `[phonebook]` Phonebook search no window - new version of dialog box 
 * `[phonebook]` Switch to contact list instead of contact details after saving contact.
 * `[sms]` do not delete if sms thread is malformed (not found what expected)
 
