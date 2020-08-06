@@ -18,7 +18,7 @@ namespace audio
 
     Position Audio::GetPosition()
     {
-        return currentOperation != nullptr ? currentOperation->GetPosition() : -1; // TODO: need to be fixed
+        return currentOperation->GetPosition();
     }
 
     std::optional<Tags> Audio::GetFileTags(const char *filename)
@@ -45,7 +45,7 @@ namespace audio
             break;
         }
 
-        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data) : RetCode::OperationNotSet;
+        return currentOperation->SendEvent(evt, data);
     }
 
     audio::RetCode Audio::SetOutputVolume(Volume vol)
@@ -58,7 +58,7 @@ namespace audio
             volToSet = 0;
         }
 
-        return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet) : RetCode::OperationNotSet;
+        return currentOperation->SetOutputVolume(volToSet);
     }
 
     audio::RetCode Audio::SetInputGain(Gain gain)
@@ -70,7 +70,7 @@ namespace audio
         if (gain < 0) {
             gainToSet = 0;
         }
-        return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet) : RetCode::OperationNotSet;
+        return currentOperation->SetInputGain(gainToSet);
     }
 
     audio::RetCode Audio::Start(Operation::Type op, const char *fileName)
@@ -115,7 +115,7 @@ namespace audio
             return RetCode::Success;
         }
 
-        auto retStop = currentOperation != nullptr ? currentOperation->Stop() : RetCode::OperationNotSet;
+        auto retStop = currentOperation->Stop();
         if (retStop != RetCode::Success) {
             LOG_ERROR("Operation STOP failure: %s", audio::c_str(retStop));
         }
@@ -137,7 +137,7 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
 
-        return currentOperation != nullptr ? currentOperation->Pause() : RetCode::OperationNotSet;
+        return currentOperation->Pause();
     }
 
     audio::RetCode Audio::Resume()
@@ -145,7 +145,7 @@ namespace audio
         if (currentState == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
-        return currentOperation != nullptr ? currentOperation->Resume() : RetCode::OperationNotSet;
+        return currentOperation->Resume();
     }
 
 } // namespace audio
