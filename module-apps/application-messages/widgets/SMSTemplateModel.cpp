@@ -23,15 +23,9 @@ void SMSTemplateModel::requestRecords(const uint32_t offset, const uint32_t limi
     DBServiceAPI::SMSTemplateGetLimitOffset(application, offset, limit);
 }
 
-bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateRecord>> records,
-                                     const uint32_t offset,
-                                     const uint32_t limit,
-                                     uint32_t count)
+bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateRecord>> records)
 {
-
-    LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
-
-    if (DatabaseModel::updateRecords(std::move(records), offset, limit, count)) {
+    if (DatabaseModel::updateRecords(std::move(records))) {
         list->onProviderDataUpdate();
         return true;
     }

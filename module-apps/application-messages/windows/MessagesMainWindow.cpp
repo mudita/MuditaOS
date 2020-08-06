@@ -164,8 +164,7 @@ namespace gui
         if (msgResponse) {
 
             LOG_INFO("Dlaczego ty to konsumujesz?");
-            threadModel->updateRecords(
-                std::move(msgResponse->records), msgResponse->offset, msgResponse->limit, msgResponse->count);
+            threadModel->updateRecords(std::move(msgResponse->records));
 
             return true;
         }

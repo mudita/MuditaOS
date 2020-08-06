@@ -26,10 +26,7 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListI
     CalllogModel(app::Application *app);
 
     // virtual methods
-    bool updateRecords(std::unique_ptr<std::vector<CalllogRecord>> records,
-                       const uint32_t offset,
-                       const uint32_t limit,
-                       uint32_t count) override;
+    bool updateRecords(std::unique_ptr<std::vector<CalllogRecord>> records) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider

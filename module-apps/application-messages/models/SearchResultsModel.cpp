@@ -67,7 +67,6 @@ namespace gui::model
         auto msgResponse = dynamic_cast<db::query::SMSSearchResult *>(queryResult);
         assert(msgResponse != nullptr);
 
-        int count         = msgResponse->getResults().size();
         auto records_data = msgResponse->getResults();
         auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
 
@@ -82,7 +81,7 @@ namespace gui::model
             list->setElementsCount(msgResponse->getMax());
         }
 
-        return this->updateRecords(std::move(records), 0, msgResponse->getMax(), count);
+        return this->updateRecords(std::move(records));
     }
 
 }; // namespace gui::model
