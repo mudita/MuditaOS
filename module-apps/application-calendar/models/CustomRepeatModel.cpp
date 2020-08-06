@@ -6,46 +6,54 @@
 CustomRepeatModel::CustomRepeatModel(app::Application *app) : application(app)
 {}
 
-void CustomRepeatModel::requestRecords(const uint32_t offset, const uint32_t limit)
-{}
+int CustomRepeatModel::getItemCount() const
+{
+    return internalData.size();
+}
 
 unsigned int CustomRepeatModel::getMinimalItemHeight() const
 {
     return style::window::calendar::item::checkBox::height;
 }
 
+void CustomRepeatModel::requestRecords(const uint32_t offset, const uint32_t limit)
+{
+    setupModel(offset, limit);
+    list->onProviderDataUpdate();
+}
+
 gui::ListItem *CustomRepeatModel::getItem(gui::Order order)
 {
-    auto app = application;
-    assert(app != nullptr);
-    // maybe this should be different
-    gui::CheckBoxItem *item = nullptr;
-    switch (count) {
-    case 7:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Monday));
-        break;
-    case 6:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Tuesday));
-        break;
-    case 5:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Wednesday));
-        break;
-    case 4:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Thursday));
-        break;
-    case 3:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Friday));
-        break;
-    case 2:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Saturday));
-        break;
-    case 1:
-        item = new gui::CheckBoxItem(app, utils::localize.get(style::strings::common::Sunday));
-        break;
-    default:
-        return item;
-        break;
+    return getRecord(order);
+}
+
+void CustomRepeatModel::createData()
+{
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Monday)));
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Tuesday)));
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Wednesday)));
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Thursday)));
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Friday)));
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Saturday)));
+    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Sunday)));
+
+    for (auto item : internalData) {
+        item->deleteByList = false;
     }
-    count--;
-    return item;
+}
+
+void CustomRepeatModel::loadData()
+{
+    list->clear();
+    eraseInternalData();
+
+    createData();
+
+    for (auto item : internalData) {
+        if (item->onLoadCallback) {
+            item->onLoadCallback();
+        }
+    }
+
+    requestRecords(0, internalData.size());
 }

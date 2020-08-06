@@ -3,7 +3,6 @@
 #include "application-calendar/models/CustomRepeatModel.hpp"
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
-#include <gui/widgets/Item.hpp>
 #include <ListView.hpp>
 
 namespace gui
@@ -18,6 +17,7 @@ namespace gui
 
         void rebuild() override;
         void buildInterface() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
 } /* namespace gui */

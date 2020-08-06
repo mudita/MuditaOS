@@ -1,5 +1,5 @@
-#include "application-calendar/models/CustomRepeatModel.hpp"
 #include "EventTimeItem.hpp"
+#include "application-calendar/widgets/CalendarStyle.hpp"
 #include <ListView.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
@@ -19,7 +19,6 @@ namespace gui
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
-        hBox->activeItem = false;
 
         colonLabel = new gui::Label(hBox, 0, 0, 0, 0);
         colonLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -56,9 +55,11 @@ namespace gui
         descriptionLabel->setText(description);
 
         focusChangedCallback = [&](Item &item) {
-            setFocusItem(focus ? hourInput : nullptr);
+            setFocusItem(focus ? hBox : nullptr);
             return true;
         };
+
+        inputCallback = [&](Item &item, const InputEvent &event) { return hourInput->onInput(event); };
 
         prepareForTimeMode();
         setNavigation();

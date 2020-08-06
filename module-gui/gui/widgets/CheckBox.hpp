@@ -9,9 +9,9 @@ namespace gui
 {
     class CheckBox : public ImageBox
     {
-        Image *image                                                                                         = nullptr;
-        std::function<void(const UTF8 &text, BottomBar::Side side, bool emptyOthers)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode                                              = nullptr;
+        Image *image                                                 = nullptr;
+        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
+        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
 
       public:
         CheckBox(Item *parent,
@@ -19,9 +19,8 @@ namespace gui
                  const uint32_t &y,
                  const uint32_t &w,
                  const uint32_t &h,
-                 std::function<void(const UTF8 &text, BottomBar::Side side, bool emptyOthers)> bottomBarTemporaryMode =
-                     nullptr,
-                 std::function<void()> bottomBarRestoreFromTemporaryMode = nullptr);
+                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                 std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         virtual ~CheckBox() override = default;
     };
 
