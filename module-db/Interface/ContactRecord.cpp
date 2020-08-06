@@ -371,7 +371,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
         auto nrs = getNumbers(contact.numbersID);
         if (nrs.size() == 0) {
-            return records;
+            LOG_DEBUG("Contact record does not contain any numbers.");
         }
 
         auto ring = contactDB->ringtones.getById(contact.ringID);
@@ -420,7 +420,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
             auto nrs = getNumbers(contact.numbersID);
             if (nrs.size() == 0) {
-                return records;
+                LOG_DEBUG("Contact record does not contain any numbers.");
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
@@ -459,7 +459,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
             auto nrs = getNumbers(contact.numbersID);
             if (nrs.size() == 0) {
-                return records;
+                LOG_DEBUG("Contact record does not contain any numbers.");
             }
 
             auto name = contactDB->name.getById(contact.nameID);
@@ -505,7 +505,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
             auto nrs = getNumbers(contact.numbersID);
             if (nrs.size() == 0) {
-                return records;
+                LOG_DEBUG("Contact record does not contain any numbers.");
             }
 
             auto name = contactDB->name.getById(contact.nameID);
@@ -556,7 +556,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
             auto nrs = getNumbers(contact.numbersID);
             if (nrs.size() == 0) {
-                return records;
+                LOG_DEBUG("Contact record does not contain any numbers.");
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
@@ -600,7 +600,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
             auto nrs = getNumbers(contact.numbersID);
             if (nrs.size() == 0) {
-                return records;
+                LOG_DEBUG("Contact record does not contain any numbers.");
             }
 
             auto ring = contactDB->ringtones.getById(contact.ringID);
@@ -650,7 +650,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
 
         auto nrs = getNumbers(contact.numbersID);
         if (nrs.size() == 0) {
-            return records;
+            LOG_DEBUG("Contact record does not contain any numbers.");
         }
 
         auto ring = contactDB->ringtones.getById(contact.ringID);
@@ -695,7 +695,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
 
         auto nrs = getNumbers(contact.numbersID);
         if (nrs.size() == 0) {
-            return records;
+            LOG_DEBUG("Contact record does not contain any numbers.");
         }
 
         auto ring = contactDB->ringtones.getById(contact.ringID);
