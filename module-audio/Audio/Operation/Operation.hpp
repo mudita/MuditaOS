@@ -22,6 +22,9 @@ namespace audio
     class Operation
     {
       public:
+        Operation(const bool &isInitialized = false) : isInitialized{isInitialized}
+        {}
+
         enum class State
         {
             Idle,
@@ -68,10 +71,9 @@ namespace audio
             CallSpeakerphoneOff,
         };
 
-        virtual ~Operation()
-        {}
+        virtual ~Operation() = default;
 
-        static std::optional<std::unique_ptr<Operation>> Create(Type t, const char *fileName);
+        static std::optional<std::unique_ptr<Operation>> Create(const Type &t, const char *fileName);
 
         virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 

@@ -45,12 +45,12 @@ namespace audio
 
         Volume GetOutputVolume()
         {
-            return currentOperation != nullptr ? currentOperation->GetOutputVolume() : invalidVolume;
+            return currentOperation->GetOutputVolume();
         }
 
         Gain GetInputGain()
         {
-            return currentOperation != nullptr ? currentOperation->GetInputGain() : invalidGain;
+            return currentOperation->GetInputGain();
         }
 
         // TODO:M.P Set/Get inputGain/outputVolume for each profile
