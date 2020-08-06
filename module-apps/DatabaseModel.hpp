@@ -29,10 +29,7 @@ namespace app
             clear();
         }
 
-        virtual bool updateRecords(std::unique_ptr<std::vector<T>> dbRecords,
-                                   const uint32_t offset,
-                                   const uint32_t limit,
-                                   uint32_t count)
+        virtual bool updateRecords(std::unique_ptr<std::vector<T>> dbRecords)
         {
             modelIndex = 0;
             records.clear();

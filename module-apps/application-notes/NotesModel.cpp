@@ -26,10 +26,7 @@ void NotesModel::requestRecords(const uint32_t offset, const uint32_t limit)
     DBServiceAPI::NotesGetLimitOffset(application, offset, limit);
 }
 
-bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records,
-                               const uint32_t offset,
-                               const uint32_t limit,
-                               uint32_t count)
+bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records)
 {
 #if DEBUG_DB_MODEL_DATA == 1
     LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count: %" PRIu32 "", offset, limit, count);
@@ -40,7 +37,7 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
     }
 #endif
 
-    DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
 
     return true;

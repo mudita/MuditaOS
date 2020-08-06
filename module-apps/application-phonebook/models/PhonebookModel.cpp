@@ -48,10 +48,7 @@ void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
     DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
 }
 
-auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
-                                   const uint32_t offset,
-                                   const uint32_t limit,
-                                   uint32_t count) -> bool
+auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records) -> bool
 {
 
 #if DEBUG_DB_MODEL_DATA == 1
@@ -65,7 +62,7 @@ auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
     }
 #endif
 
-    DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
 
     return true;

@@ -16,12 +16,9 @@ unsigned int BaseThreadRecordModel::requestRecordsCount()
     return recordsCount;
 }
 
-bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,
-                                          const uint32_t offset,
-                                          const uint32_t limit,
-                                          uint32_t count)
+bool BaseThreadRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records)
 {
-    DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
     return true;
 }

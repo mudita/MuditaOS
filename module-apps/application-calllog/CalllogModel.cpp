@@ -30,10 +30,7 @@ void CalllogModel::requestRecords(const uint32_t offset, const uint32_t limit)
     DBServiceAPI::CalllogGetLimitOffset(application, offset, limit);
 }
 
-bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> records,
-                                 const uint32_t offset,
-                                 const uint32_t limit,
-                                 uint32_t count)
+bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> records)
 {
 #if DEBUG_DB_MODEL_DATA == 1
     LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count: %" PRIu32 "", offset, limit, count);
@@ -43,7 +40,7 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
     }
 #endif
 
-    DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
 
     return true;
