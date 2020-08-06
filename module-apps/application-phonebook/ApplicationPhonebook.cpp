@@ -90,7 +90,6 @@ namespace app
         windows.insert({gui::window::name::search_results, new gui::PhonebookSearchResults(this)});
         windows.insert(
             {gui::window::name::dialog, new gui::Dialog(this, gui::window::name::dialog, gui::Dialog::Meta())});
-
         windows.insert(
             {gui::window::name::dialog_yes_no, new gui::DialogYesNo(this, gui::window::name::dialog_yes_no)});
         windows.insert(
@@ -128,12 +127,6 @@ namespace app
             switchWindow("SearchResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         else {
-            /*
-            LOG_DEBUG("Switching to no results window.");
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchFilter);
-            switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            */
-
             searchEmpty(searchFilter);
         }
     }
