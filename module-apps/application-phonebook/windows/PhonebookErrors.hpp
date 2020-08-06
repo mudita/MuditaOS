@@ -13,28 +13,6 @@
 
 namespace gui
 {
-    class NoResults : public AppWindow
-    {
-      protected:
-        /** labels */
-        Label *topSeparatorLabel = nullptr;
-        Text *informationLabel   = nullptr;
-        Image *searchCenter;
-        std::string searchQuery;
-
-      public:
-        NoResults(app::Application *app);
-        virtual ~NoResults();
-        bool onInput(const InputEvent &inputEvent) override;
-        bool handleSwitchData(SwitchData *data) override;
-        void rebuild() override;
-        void buildInterface() override;
-        void destroyInterface() override;
-
-      private:
-        void setContactData();
-    };
-
     class ContactBlocked : public AppWindow
     {
       protected:
