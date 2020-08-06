@@ -9,7 +9,7 @@
 namespace gui
 {
 
-    CheckBoxItem::CheckBoxItem(app::Application *application, const std::string &description)
+    CheckBoxItem::CheckBoxItem(app::Application *application, const std::string &description) : app(application)
     {
         app = application;
         assert(app != nullptr);
@@ -29,8 +29,8 @@ namespace gui
             0,
             50,
             30,
-            [=](const UTF8 &text, gui::BottomBar::Side side, bool emptyOthers) {
-                app->getCurrentWindow()->bottomBarTemporaryMode(text, side, emptyOthers);
+            [=](const UTF8 &text) {
+                app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::LEFT, false);
             },
             [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
         checkBox->activeItem = false;
@@ -45,13 +45,27 @@ namespace gui
 
         focusChangedCallback = [&](Item &item) {
             if (focus) {
+                descriptionLabel->setFont(style::window::font::mediumbold);
                 setFocusItem(checkBox);
             }
             else {
-                // descriptionLabel->setFont(style::window::font::medium);
+                descriptionLabel->setFont(style::window::font::medium);
                 setFocusItem(nullptr);
             }
             return true;
+        };
+
+        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (event.keyCode == gui::KeyCode::KEY_LEFT) {
+                LOG_DEBUG("Temporary bottomBar check");
+                app->getCurrentWindow()->bottomBarTemporaryMode("MHM", BottomBar::Side::LEFT, false);
+                return true;
+            }
+
+            return checkBox->onInput(event);
         };
     }
 

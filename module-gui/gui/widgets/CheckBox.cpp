@@ -10,7 +10,7 @@ namespace gui
                        const uint32_t &y,
                        const uint32_t &w,
                        const uint32_t &h,
-                       std::function<void(const UTF8 &, BottomBar::Side, bool)> bottomBarTemporaryMode,
+                       std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                        std::function<void()> bottomBarRestoreFromTemporaryMode)
         : ImageBox(parent, x, y, w, h, image = new Image("small_tick")),
           bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
@@ -45,13 +45,13 @@ namespace gui
             }
             if (event.keyCode == gui::KeyCode::KEY_ENTER) {
                 LOG_DEBUG("KEY ENTER");
-                image->setVisible(!image->visible);
-                if (image->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"), BottomBar::Side::CENTER, false);
+                // image->setVisible(!image->visible);
+                /*if (image->visible) {
+                    bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_check"), BottomBar::Side::CENTER, false);
-                }
+                    bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                }*/
                 return true;
             }
             return false;

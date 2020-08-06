@@ -1,12 +1,12 @@
 #pragma once
+#include "CalendarListItem.hpp"
 #include <Label.hpp>
 #include <Text.hpp>
-#include <ListItem.hpp>
 #include <BoxLayout.hpp>
 
 namespace gui
 {
-    class EventTimeItem : public ListItem
+    class EventTimeItem : public CalendarListItem
     {
         gui::HBox *hBox              = nullptr;
         gui::Label *colonLabel       = nullptr;

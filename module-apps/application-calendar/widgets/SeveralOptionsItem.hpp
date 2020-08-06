@@ -1,14 +1,13 @@
 #pragma once
 #include "Application.hpp"
+#include "CalendarListItem.hpp"
 #include <Label.hpp>
 #include <Image.hpp>
-#include <ListItem.hpp>
 #include <BoxLayout.hpp>
-#include <BottomBar.hpp>
 
 namespace gui
 {
-    class SeveralOptionsItem : public ListItem
+    class SeveralOptionsItem : public CalendarListItem
     {
         app::Application *application = nullptr;
         gui::HBox *hBox               = nullptr;
@@ -19,15 +18,14 @@ namespace gui
         std::vector<std::string> optionsNames;
         unsigned int actualVectorIndex = 0;
 
-        std::function<void(const UTF8 &text, BottomBar::Side side, bool emptyOthers)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode                        = nullptr;
+        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
+        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
 
       public:
         SeveralOptionsItem(app::Application *app,
                            const std::string &description,
-                           std::function<void(const UTF8 &text, BottomBar::Side side, bool emptyOthers)>
-                               bottomBarTemporaryMode                              = nullptr,
-                           std::function<void()> bottomBarRestoreFromTemporaryMode = nullptr);
+                           std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                           std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         virtual ~SeveralOptionsItem() override = default;
 
         void prepareOptionsNames();

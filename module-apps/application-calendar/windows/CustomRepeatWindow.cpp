@@ -1,8 +1,5 @@
 #include "CustomRepeatWindow.hpp"
 #include <gui/widgets/Window.hpp>
-#include <gui/widgets/BoxLayout.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
 #include <Utils.hpp>
 
 namespace gui
@@ -17,7 +14,7 @@ namespace gui
 
     void CustomRepeatWindow::rebuild()
     {
-        AppWindow::destroyInterface();
+        erase();
         buildInterface();
     }
 
@@ -39,6 +36,15 @@ namespace gui
         list->setPenFocusWidth(style::window::default_border_no_focus_w);
         list->setPenWidth(style::window::default_border_no_focus_w);
         setFocusItem(list);
+    }
+
+    void CustomRepeatWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            list->setElementsCount(customRepeatModel->getItemCount());
+        }
+
+        customRepeatModel->loadData();
     }
 
 } /* namespace gui */

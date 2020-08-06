@@ -5,12 +5,12 @@
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
 
-class CustomRepeatModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
+class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
 {
     app::Application *application = nullptr;
 
   public:
-    CustomRepeatModel(app::Application *app);
+    NewEditEventModel(app::Application *app);
 
     void loadData();
 
