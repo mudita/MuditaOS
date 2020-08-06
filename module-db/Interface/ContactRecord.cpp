@@ -307,9 +307,9 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
         return rec;
     }
 
-    std::vector<ContactRecord::Number> nrs = getNumbers(contact.numbersID);
+    auto nrs = getNumbers(contact.numbersID);
     if (nrs.size() == 0) {
-        return rec;
+        LOG_DEBUG("Contact record does not contain any numbers.");
     }
     auto ring = contactDB->ringtones.getById(contact.ringID);
     if (!ring.isValid()) {
