@@ -1,12 +1,14 @@
 #pragma once
 
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "application-calendar/models/NewEditEventModel.hpp"
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
 #include <gui/widgets/Item.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Text.hpp>
 #include <gui/widgets/ListItem.hpp>
+#include <ListView.hpp>
 #include <Utils.hpp>
 
 namespace gui
@@ -61,12 +63,9 @@ namespace gui
             Add,
             Edit
         };
-        gui::VBox *body                = nullptr;
-        gui::Label *eventNameLabel = nullptr;
-        gui::Text *eventNameInput  = nullptr;
-        gui::ListItem *checkBox    = nullptr;
-        gui::ListItem *startTime   = nullptr;
-        gui::ListItem *reminderOptions = nullptr;
+
+        gui::ListView *list                                  = nullptr;
+        std::shared_ptr<NewEditEventModel> newEditEventModel = nullptr;
         EventAction eventAction        = EventAction::None;
 
       public:

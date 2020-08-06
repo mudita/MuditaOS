@@ -1,17 +1,15 @@
 #include "SeveralOptionsItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include <ListView.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
 
 namespace gui
 {
 
-    SeveralOptionsItem::SeveralOptionsItem(
-        app::Application *app,
-        const std::string &description,
-        std::function<void(const UTF8 &, BottomBar::Side, bool)> bottomBarTemporaryMode,
-        std::function<void()> bottomBarRestoreFromTemporaryMode)
+    SeveralOptionsItem::SeveralOptionsItem(app::Application *app,
+                                           const std::string &description,
+                                           std::function<void(const UTF8 &)> bottomBarTemporaryMode,
+                                           std::function<void()> bottomBarRestoreFromTemporaryMode)
         : bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
@@ -93,7 +91,9 @@ namespace gui
                 actualVectorIndex--;
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = optionsNames.size() - 1;
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"), BottomBar::Side::LEFT, false);
+                    if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
+                        bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
+                    }
                 }
                 else {
                     bottomBarRestoreFromTemporaryMode();
@@ -107,8 +107,9 @@ namespace gui
                     actualVectorIndex = 0;
                 }
                 optionLabel->setText(optionsNames[actualVectorIndex]);
-                if (actualVectorIndex == optionsNames.size() - 1) {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"), BottomBar::Side::LEFT, false);
+                if (actualVectorIndex == optionsNames.size() - 1 &&
+                    descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
+                    bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
                 }
                 else {
                     bottomBarRestoreFromTemporaryMode();

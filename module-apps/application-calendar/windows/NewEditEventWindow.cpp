@@ -1,20 +1,18 @@
 #include "NewEditEventWindow.hpp"
-#include "application-calendar/widgets/CheckBoxItem.hpp"
-#include "application-calendar/widgets/EventTimeItem.hpp"
-#include "application-calendar/widgets/SeveralOptionsItem.hpp"
-#include <gui/widgets/BoxLayout.hpp>
 
 namespace gui
 {
 
     NewEditEventWindow::NewEditEventWindow(app::Application *app, std::string name)
-        : AppWindow(app, style::window::calendar::name::new_edit_event)
+        : AppWindow(app, style::window::calendar::name::new_edit_event),
+          newEditEventModel{std::make_shared<NewEditEventModel>(this->application)}
     {
         buildInterface();
     }
 
     void NewEditEventWindow::rebuild()
     {
+        erase();
         buildInterface();
     }
 
@@ -28,45 +26,15 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
 
-        body = new gui::VBox(this, 15, 120, style::window::default_body_width, 430);
-        body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-
-        eventNameLabel = new gui::Label(body, 0, 0, style::window::default_body_width, 20);
-        eventNameLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        eventNameLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        eventNameLabel->setFont(style::window::font::small);
-        eventNameLabel->setText(utils::localize.get("app_calendar_new_edit_event_name"));
-        eventNameLabel->activeItem = false;
-
-        eventNameInput = new gui::Text(body, 0, 0, style::window::default_body_width, 50);
-        eventNameInput->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        eventNameInput->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
-        eventNameInput->setFont(style::window::font::medium);
-        eventNameInput->setInputMode(new InputMode({InputMode::ABC, InputMode::abc, InputMode::digit}));
-        eventNameInput->setPenFocusWidth(style::window::default_border_focus_w);
-        eventNameInput->setPenWidth(style::window::default_border_rect_no_focus);
-        eventNameInput->setEditMode(gui::EditMode::EDIT);
-
-        // All day event box
-        checkBox = new gui::CheckBoxItem(application, utils::localize.get("app_calendar_new_edit_event_allday"));
-        body->addWidget(checkBox);
-
-        // time
-        startTime = new gui::EventTimeItem(utils::localize.get("app_calendar_new_edit_event_start"), true);
-        body->addWidget(startTime);
-
-        // repeat
-        reminderOptions = new gui::SeveralOptionsItem(
-            application,
-            utils::localize.get("app_calendar_event_detail_repeat"),
-            [=](const UTF8 &text, gui::BottomBar::Side side, bool emptyOthers) {
-                application->getCurrentWindow()->bottomBarTemporaryMode(text, side, emptyOthers);
-            },
-            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
-        body->addWidget(reminderOptions);
-
-        setFocusItem(body);
+        list = new gui::ListView(this,
+                                 style::window::calendar::listView_x,
+                                 style::window::calendar::listView_y,
+                                 style::window::calendar::listView_w,
+                                 style::window::calendar::listView_h,
+                                 newEditEventModel);
+        list->setPenFocusWidth(style::window::default_border_no_focus_w);
+        list->setPenWidth(style::window::default_border_no_focus_w);
+        setFocusItem(list);
     }
 
     void NewEditEventWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
@@ -81,6 +49,12 @@ namespace gui
             setTitle(utils::localize.get("app_calendar_edit_event_title"));
             break;
         }
+
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            list->setElementsCount(newEditEventModel->getItemCount());
+        }
+
+        newEditEventModel->loadData();
     }
 
     bool NewEditEventWindow::onInput(const gui::InputEvent &inputEvent)
