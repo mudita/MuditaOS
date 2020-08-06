@@ -9,18 +9,14 @@ namespace gui
 {
     NumberWithIconsWidget::NumberWithIconsWidget(app::Application *app,
                                                  const utils::PhoneNumber::View &number,
-                                                 Item *parent,
-                                                 const uint32_t &x,
-                                                 const uint32_t &y,
-                                                 const uint32_t &w,
-                                                 const uint32_t &h)
-        : HBox(parent, x, y, w, h)
+                                                 const std::string &font,
+                                                 Item *parent)
+        : HBox(parent, 0, 0, 0, 0)
     {
         setReverseOrder(true);
+        setMinimumSize(phonebookStyle::informationWidget::w, phonebookStyle::numbersWithIconsWidget::sms_image_h);
         setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        setPenFocusWidth(style::window::default_border_focus_w);
-        setPenWidth(style::window::default_border_no_focus_w);
 
         smsImage                = new ImageBox(this,
                                 0,
@@ -51,20 +47,22 @@ namespace gui
             return false;
         };
 
-        numberText = new Text(this, 0, 0, 0, 0);
-        numberText->setMaximumSize(w, phonebookStyle::numbersWithIconsWidget::number_text_h);
-        numberText->setFont(style::window::font::mediumbold);
+        numberText = new TextFixedSize(this, 0, 0, 0, 0);
+        numberText->setUnderline(false);
+        numberText->setMaximumSize(phonebookStyle::informationWidget::w,
+                                   phonebookStyle::numbersWithIconsWidget::number_text_h);
+        numberText->setFont(font);
+        numberText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
         numberText->setPenFocusWidth(style::window::default_border_focus_w);
-        numberText->setPenWidth(style::window::default_border_no_focus_w);
+        numberText->setPenWidth(style::window::default_border_focus_w);
         numberText->setEditMode(EditMode::BROWSE);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         numberText->setText(number.getFormatted());
-    }
+        numberText->activeItem = false;
 
-    auto NumberWithIconsWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        resizeItems();
-        return true;
+        focusChangedCallback = [&](Item &item) {
+            setFocusItem(focus ? phoneImage : nullptr);
+            return true;
+        };
     }
-
 } /* namespace gui */
