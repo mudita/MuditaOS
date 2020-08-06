@@ -183,27 +183,23 @@ namespace gui
             }
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_UP: {
-                LOG_DEBUG("borderCallback -> Up");
-                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
+                auto it = mainMenu->getNavigationFocusedItem();
                 mainMenu->setFocusItem((*std::next(it, (mainMenu->rowSize - 1) * mainMenu->colSize)));
                 return true;
             }
             case KeyCode::KEY_DOWN: {
-                LOG_DEBUG("borderCallback -> Down");
-                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
+                auto it = mainMenu->getNavigationFocusedItem();
                 mainMenu->setFocusItem((*std::prev(it, (mainMenu->rowSize - 1) * mainMenu->colSize)));
                 return true;
             }
             case KeyCode::KEY_LEFT: {
-                LOG_DEBUG("borderCallback -> Left");
-                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
-                mainMenu->setFocusItem((*std::next(it, mainMenu->rowSize - 1)));
+                auto it = mainMenu->getNavigationFocusedItem();
+                mainMenu->setFocusItem((*std::next(it, mainMenu->colSize - 1)));
                 return true;
             }
             case KeyCode::KEY_RIGHT: {
-                LOG_DEBUG("borderCallback -> Right");
-                std::list<Item *>::iterator it = mainMenu->getNavigationFocusedItem();
-                mainMenu->setFocusItem((*std::prev(it, mainMenu->rowSize - 1)));
+                auto it = mainMenu->getNavigationFocusedItem();
+                mainMenu->setFocusItem((*std::prev(it, mainMenu->colSize - 1)));
                 return true;
             }
             default: {
@@ -239,16 +235,24 @@ namespace gui
                 return false;
             }
             switch (inputEvent.keyCode) {
+            case KeyCode::KEY_UP: {
+                auto it = toolsMenu->getNavigationFocusedItem();
+                toolsMenu->setFocusItem((*std::next(it, (toolsMenu->rowSize - 1) * toolsMenu->colSize)));
+                return true;
+            }
+            case KeyCode::KEY_DOWN: {
+                auto it = toolsMenu->getNavigationFocusedItem();
+                toolsMenu->setFocusItem((*std::prev(it, (toolsMenu->rowSize - 1) * toolsMenu->colSize)));
+                return true;
+            }
             case KeyCode::KEY_LEFT: {
-                LOG_DEBUG("borderCallback -> Left");
-                std::list<Item *>::iterator it = toolsMenu->getNavigationFocusedItem();
-                toolsMenu->setFocusItem((*std::next(it, toolsMenu->rowSize - 1)));
+                auto it = toolsMenu->getNavigationFocusedItem();
+                toolsMenu->setFocusItem((*std::next(it, toolsMenu->colSize - 1)));
                 return true;
             }
             case KeyCode::KEY_RIGHT: {
-                LOG_DEBUG("borderCallback -> Right");
-                std::list<Item *>::iterator it = toolsMenu->getNavigationFocusedItem();
-                toolsMenu->setFocusItem((*std::prev(it, toolsMenu->rowSize - 1)));
+                auto it = toolsMenu->getNavigationFocusedItem();
+                toolsMenu->setFocusItem((*std::prev(it, toolsMenu->colSize - 1)));
                 return true;
             }
             default: {

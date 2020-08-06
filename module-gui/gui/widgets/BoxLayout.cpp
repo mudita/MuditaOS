@@ -300,6 +300,11 @@ namespace gui
         });
     }
 
+    std::list<Item *>::iterator BoxLayout::getNavigationFocusedItem()
+    {
+        return std::find(this->children.begin(), this->children.end(), this->getFocusItem());
+    }
+
     void BoxLayout::setNavigation()
     {
         auto previous = nextNavigationItem(children.begin()), next = children.end();
@@ -380,11 +385,6 @@ namespace gui
         setNavigation();
 
         return true;
-    }
-
-    std::list<Item *>::iterator BoxLayout::getNavigationFocusedItem()
-    {
-        return std::find(this->children.begin(), this->children.end(), this->getFocusItem());
     }
 
     HBox::HBox() : BoxLayout()
