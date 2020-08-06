@@ -156,10 +156,8 @@ namespace gui
 
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Init || what == Action::NewestPage) {
-            if (what == Action::NewestPage) {
-                SMS.start = 0;
-                SMS.end   = maxsmsinwindow;
-            }
+            SMS.start = 0;
+            SMS.end   = maxsmsinwindow;
             if (what == Action::Init) {
                 destroyTextItem();
             }
@@ -195,8 +193,8 @@ namespace gui
                   static_cast<int>(SMS.sms->size()),
                   static_cast<int>(maxsmsinwindow));
         if (SMS.sms->size() == 0) {
-            LOG_WARN("Deleting bad thread. There are no messages belonging to it (id: %d)", SMS.thread);
-            DBServiceAPI::ThreadRemove(this->application, SMS.thread);
+            LOG_WARN("Malformed thread. Leave it (id: %d)", SMS.thread);
+            application->switchWindow(gui::name::window::main_window);
             return;
         }
         // 3. add them to box
