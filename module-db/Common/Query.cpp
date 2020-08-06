@@ -1,4 +1,5 @@
 #include "Query.hpp"
+#include <stdexcept>
 
 #include <memory>
 #include <utility>
