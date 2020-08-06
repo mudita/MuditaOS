@@ -19,6 +19,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
+#include "AudioServiceAPI.hpp"
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
@@ -153,6 +154,13 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         handled = true;
     }
+    else if (msgl->messageType == MessageType::AudioRoutingHeadset && msgl->sender == this->GetName()) {
+        auto *msg = dynamic_cast<AudioRequestMessage *>(msgl);
+        if (msg != nullptr) {
+            AudioServiceAPI::RoutingHeadset(this, msg->enable);
+            handled = true;
+        }
+    }
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
@@ -210,7 +218,7 @@ sys::ReturnCodes EventManager::InitHandler()
     // create queues for worker
     // keyboard irq queue
     sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10};
-    // keyboard irq queue
+    // headset irq queue
     sys::WorkerQueueInfo qHeadset = {"qHeadset", sizeof(uint8_t), 10};
     // battery manager queue
     sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10};
