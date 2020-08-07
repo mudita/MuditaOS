@@ -80,7 +80,7 @@ namespace purefs
         const inline std::string bootloader = "bootloader";
     } // namespace json
 
-    struct boot_config_t
+    struct BootConfig
     {
         std::string os_image;
         std::string os_type;
@@ -163,7 +163,7 @@ class vfs
     std::string loadFileAsString(const fs::path &fileToLoad);
     bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
     void updateTimestamp();
-    struct purefs::boot_config_t &getBootConfig()
+    struct purefs::BootConfig &getBootConfig()
     {
         return bootConfig;
     }
@@ -183,7 +183,7 @@ class vfs
     const fs::path getCurrentBootJSON();
     bool loadBootConfig(const fs::path &bootJsonPath);
     bool updateBootConfig(const fs::path &bootJsonPath);
-    struct purefs::boot_config_t bootConfig;
+    struct purefs::BootConfig bootConfig;
 };
 
 extern vfs vfs;
