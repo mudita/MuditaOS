@@ -12,6 +12,7 @@ namespace updateos
     {
         const inline std::string checksums = "checksums.txt";
         const inline std::string sql_mig   = "sqlmig.json";
+        const inline std::string version   = "version.json";
 
     } // namespace file
 
@@ -32,6 +33,8 @@ namespace updateos
         CantCreateExtractedFile,
         CantOpenChecksumsFile,
         VerifyChecksumsFailure,
+        VerifyVersionFailure,
+        CantWriteBootloader,
         CantOpenUpdateFile,
         CantDeletePreviousOS,
         CantRenameCurrentToPrevious,
@@ -71,6 +74,8 @@ class UpdatePureOS
     updateos::UpdateError prepareTempDirForUpdate();
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();
+    updateos::UpdateError verifyVersion();
+    updateos::UpdateError updateBootloader();
     updateos::UpdateError prepareRoot();
     updateos::UpdateError updateBootJSON();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
