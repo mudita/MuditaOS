@@ -44,7 +44,7 @@ namespace gui
     void EventDetailWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         if (mode == gui::ShowMode::GUI_SHOW_INIT) {
-            bodyList->setElementsCount(eventDetailModel->getItemCount());
+            bodyList->rebuildList();
         }
 
         eventDetailModel->loadData();

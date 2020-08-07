@@ -21,7 +21,7 @@ void GridLayout::resizeItems()
     uint32_t el_in_x = area().w / grid.x;
     uint32_t el_in_y = area().h / grid.y;
 
-    colSize = children.size() < area().h / grid.x ? children.size() : area().h / grid.x;
+    colSize = children.size() < area().w / grid.x ? children.size() : area().w / grid.x;
     rowSize = colSize != 0 ? children.size() / colSize : 1;
 
     uint32_t strech_x     = 0;

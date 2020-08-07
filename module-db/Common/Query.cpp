@@ -32,12 +32,14 @@ std::shared_ptr<Query> QueryResult::getRequestQuery() const noexcept
     return requestQuery;
 }
 
+bool QueryResult::hasListener() const noexcept
+{
+    return !(requestQuery == nullptr || requestQuery->getQueryListener() == nullptr);
+}
+
 bool QueryResult::handle()
 {
     if (requestQuery == nullptr || requestQuery->getQueryListener() == nullptr) {
-
-        // Temporary solution for not handled DBQueries in Messages application.
-        return false;
         throw std::runtime_error("No listener to handle query");
     }
 

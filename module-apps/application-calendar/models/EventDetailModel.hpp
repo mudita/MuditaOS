@@ -15,7 +15,7 @@ class EventDetailModel : public app::InternalModel<gui::CalendarListItem *>, pub
 
     void loadData();
 
-    [[nodiscard]] int getItemCount() const override;
+    [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;

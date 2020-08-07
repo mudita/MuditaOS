@@ -162,13 +162,10 @@ namespace gui
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msgNotification != nullptr) {
-            // whatever notification had happened, rebuild
             if (msgNotification->interface == db::Interface::Name::SMSThread ||
                 msgNotification->interface == db::Interface::Name::SMS) {
 
-                if (msgNotification->type == db::Query::Type::Delete ||
-                    msgNotification->type == db::Query::Type::Update ||
-                    msgNotification->type == db::Query::Type::Create) {
+                if (msgNotification->dataModified()) {
 
                     rebuild();
 

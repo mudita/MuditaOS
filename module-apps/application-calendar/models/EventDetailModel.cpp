@@ -6,7 +6,7 @@
 EventDetailModel::EventDetailModel(app::Application *app) : application(app)
 {}
 
-int EventDetailModel::getItemCount() const
+auto EventDetailModel::requestRecordsCount() -> unsigned int
 {
     return internalData.size();
 }

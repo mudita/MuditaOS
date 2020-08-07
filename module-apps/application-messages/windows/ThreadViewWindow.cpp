@@ -115,6 +115,9 @@ namespace gui
     void ThreadViewWindow::destroyTextItem()
     {
         body->erase(text);
+        if (text->parent == nullptr) {
+            delete (text);
+        }
         text = nullptr;
     }
 
