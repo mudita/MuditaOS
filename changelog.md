@@ -17,6 +17,9 @@
 
 ### Fixed
 
+* `[utilities]` Fix for UTF8 by character copies
+* `[gui]` Fix crash in font glyph rendering on screen
+
 ### Other
 
 * `[boxlayout]` Optimization on BoxLayout elements resize.
