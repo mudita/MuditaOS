@@ -7,7 +7,7 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
-#include <map>
+#include <time/time_conversion.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-db/queries/calendar/QueryEventsGet.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
@@ -17,6 +17,7 @@
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <module-services/service-db/messages/QueryMessage.hpp>
 #include <messages/QueryMessage.hpp>
+#include <map>
 
 namespace app
 {
@@ -35,7 +36,9 @@ namespace app
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        auto ret = Application::InitHandler();
+        auto timestamp       = new utils::time::Timestamp();
+        applicationStartTime = timestamp->getTime();
+        auto ret             = Application::InitHandler();
         EventsRecord event(EventsTableRow{{1}, "TEST", "TEST", 191020142, 191020153, 1, 2, 1});
         EventsRecord event2(EventsTableRow{{2}, "TEST2", "TEST2", 191020152, 191020163, 1, 2, 1});
         DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event));
