@@ -9,7 +9,7 @@ You can build project in docker container, to that
 
 2. Add yourself to a `docker` group
 ```bash
-NAME=$(wohami)
+NAME=$(whoami)
 sudo usermod -aG docker ${NAME}
 ```
 After that you have to logo out and login back, groups are set during the login process.
