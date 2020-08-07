@@ -130,24 +130,44 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryNa
     return ret;
 }
 
-std::vector<std::uint32_t> ContactsTable::GetIDsByTextNumber(const std::string &filter,
-                                                             std::size_t limit,
-                                                             std::size_t offset)
+std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
+    MatchType matchType, const std::string &name, std::uint32_t groupId, std::uint32_t limit, std::uint32_t offset)
 {
     std::vector<std::uint32_t> ids;
-    std::string query = "SELECT DISTINCT contacts._id"
-                        " FROM contacts"
-                        " INNER JOIN contact_name ON contacts._id == contact_name.contact_id"
-                        " INNER JOIN contact_number ON contacts._id == contact_number.contact_id"
-                        " WHERE contact_number.number_user LIKE '%%" +
-                        filter +
-                        "%%'"
-                        " ORDER BY contacts.favourites DESC, name_alternative || ' ' || name_primary";
+
+    std::string query = "SELECT DISTINCT contacts._id FROM contacts";
+
+    query += " INNER JOIN contact_name ON contact_name.contact_id == contacts._id";
+    query += " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
+             "contact_match_groups.group_id = " +
+             std::to_string(groupId);
+
+    if (!name.empty()) {
+        switch (matchType) {
+        case MatchType::Name: {
+            query += " WHERE contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
+            query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%'";
+        } break;
+
+        case MatchType::TextNumber: {
+            query += " INNER JOIN contact_number ON contact_number.contact_id == contacts._id AND "
+                     "contact_number.number_user LIKE '%%" +
+                     name + "%%'";
+        } break;
+
+        case MatchType::None:
+            break;
+        }
+    }
+
+    query += " ORDER BY group_id DESC, contact_name.name_alternative || ' ' || contact_name.name_primary";
 
     if (limit > 0) {
         query += " LIMIT " + std::to_string(limit);
         query += " OFFSET " + std::to_string(offset);
     }
+
+    query += " COLLATE NOCASE;";
 
     auto queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
