@@ -313,7 +313,10 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
     uint32_t sizeToRead   = purefs::buffer::tar_buf;
 
-    LOG_DEBUG("unpackFileToTemp %s blocksToRead %lu sizeToRead %lu", fullPath.c_str(), blocksToRead, sizeToRead);
+    LOG_DEBUG("unpackFileToTemp %s blocksToRead %ud sizeToRead %ud",
+              fullPath.c_str(),
+              (unsigned int)blocksToRead,
+              (unsigned int)sizeToRead);
 
     if (crc32 != nullptr) {
         *crc32 = 0;
