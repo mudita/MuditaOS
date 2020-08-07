@@ -29,3 +29,6 @@
 [submodule "test/Catch2"]
 	path = test/Catch2
 	url = https://github.com/catchorg/Catch2
+[submodule "module-utils/date"]
+	path = module-utils/date
+	url = git@github.com:muditacom/date.git

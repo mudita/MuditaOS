@@ -1,18 +1,19 @@
 #include "MonthModel.hpp"
+#include <time/time_locale.hpp>
 
-MonthModel::MonthModel(year_month_day ymd)
+MonthModel::MonthModel(date::year_month_day yearMonthDay)
 {
-    this->m                  = ymd.month();
-    this->y                  = ymd.year();
-    year_month_day_last ymdl = this->y / this->m / last;
-    this->lastDay            = unsigned{ymdl.day()};
-    year_month_day ymdf      = this->y / this->m / 1;
-    this->offset             = weekday{ymdf}.c_encoding();
+    this->month                                = yearMonthDay.month();
+    this->year                                 = yearMonthDay.year();
+    date::year_month_day_last yearMonthDayLast = this->year / this->month / date::last;
+    this->lastDay                              = static_cast<unsigned>(yearMonthDayLast.day());
+    date::year_month_day yearMonthDayFirst     = this->year / this->month / 1;
+    this->firstWeekDayNumb                     = date::weekday{yearMonthDayFirst}.c_encoding();
 }
 
-month MonthModel::getMonth()
+date::month MonthModel::getMonth()
 {
-    return this->m;
+    return this->month;
 }
 
 uint32_t MonthModel::getLastDay()
@@ -22,61 +23,21 @@ uint32_t MonthModel::getLastDay()
 
 uint32_t MonthModel::getFirstWeekOffset()
 {
-    if (this->offset == 0) {
-        return 7;
+    if (this->firstWeekDayNumb == 0) {
+        return 6;
     }
     else {
-        return this->offset;
+        return this->firstWeekDayNumb - 1;
     }
 }
 
 std::string MonthModel::getMonthYearText()
 {
-    int yearUInt        = static_cast<decltype(yearUInt)>(y);
+    int yearUInt        = static_cast<decltype(yearUInt)>(year);
     std::string yearStr = std::to_string(yearUInt);
     std::string monthStr;
-    unsigned int monthUInt = unsigned{m};
-
-    switch (monthUInt) {
-    case 1:
-        monthStr = "January";
-        break;
-    case 2:
-        monthStr = "February";
-        break;
-    case 3:
-        monthStr = "March";
-        break;
-    case 4:
-        monthStr = "April";
-        break;
-    case 5:
-        monthStr = "May";
-        break;
-    case 6:
-        monthStr = "June";
-        break;
-    case 7:
-        monthStr = "July";
-        break;
-    case 8:
-        monthStr = "August";
-        break;
-    case 9:
-        monthStr = "September";
-        break;
-    case 10:
-        monthStr = "October";
-        break;
-    case 11:
-        monthStr = "November";
-        break;
-    case 12:
-        monthStr = "December";
-        break;
-    default:
-        monthStr = "";
-    }
+    unsigned int monthUInt = static_cast<unsigned>(month);
+    monthStr               = utils::time::Locale::get_month(utils::time::Locale::Month(monthUInt - 1));
 
     return monthStr + " " + yearStr;
 }
