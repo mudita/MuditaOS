@@ -21,9 +21,9 @@ TEST_CASE("UTF8: operator index exceeds string size")
 
 TEST_CASE("UTF8: operator== returns properly")
 {
-    const UTF8 test_test_test  = "test test test";
-    const UTF8 test_not = "test not";
-    const UTF8 test_test = "test test";
+    const UTF8 test_test_test = "test test test";
+    const UTF8 test_not       = "test not";
+    const UTF8 test_test      = "test test";
 
     REQUIRE(test_test_test == test_test_test); // text exactly the same
     REQUIRE(test_not != test_test_test);       // different text totally
