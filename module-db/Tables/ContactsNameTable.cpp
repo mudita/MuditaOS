@@ -185,38 +185,6 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *prima
     return ret;
 }
 
-std::vector<std::uint32_t> ContactsNameTable::GetIDsByName(const std::string &name,
-                                                           std::uint32_t limit,
-                                                           std::uint32_t offset)
-{
-    std::vector<std::uint32_t> ids;
-
-    std::string query = "SELECT contact_id FROM contact_name";
-    if (!name.empty()) {
-        query += " WHERE name_primary || ' ' || name_alternative LIKE '" + name + "%%'";
-        query += " OR name_alternative || ' ' || name_primary LIKE '" + name + "%%'";
-    }
-    query += " ORDER BY favourite DESC, name_alternative || ' ' || name_primary";
-
-    if (limit > 0) {
-        query += " LIMIT " + std::to_string(limit);
-        query += " OFFSET " + std::to_string(offset);
-    }
-
-    query += " COLLATE NOCASE;";
-
-    auto queryRet = db->query(query.c_str());
-    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
-        return ids;
-    }
-
-    do {
-        ids.push_back((*queryRet)[0].getUInt32());
-    } while (queryRet->nextRow());
-
-    return ids;
-}
-
 std::size_t ContactsNameTable::GetCountByName(const std::string &name)
 {
     if (name.empty()) {

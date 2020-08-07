@@ -12,7 +12,8 @@
 #include <sstream>
 #include <vector>
 
-ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
+ContactRecordInterface::ContactRecordInterface(ContactsDB *db)
+    : contactDB(db), favouritesGroupId(db->groups.favouritesId())
 {}
 
 ContactRecordInterface::~ContactRecordInterface()
@@ -152,8 +153,9 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
                   static_cast<unsigned long>(readQuery->getOffset()),
                   static_cast<unsigned long>(readQuery->getLimit()));
         auto [limit, offset] = readQuery->getLimitOffset();
-        auto ids = searchByNumber ? contactDB->contacts.GetIDsByTextNumber(readQuery->getFilterData(), limit, offset)
-                                  : contactDB->name.GetIDsByName(readQuery->getFilterData(), limit, offset);
+        auto matchType       = searchByNumber ? ContactsTable::MatchType::TextNumber : ContactsTable::MatchType::Name;
+        auto ids             = contactDB->contacts.GetIDsSortedByField(
+            matchType, readQuery->getFilterData(), favouritesGroupId, limit, offset);
 
         std::vector<ContactRecord> result(ids.size());
         std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
@@ -171,7 +173,10 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
             count = contactDB->contacts.count();
         }
         else if (searchByNumber) {
-            count = contactDB->contacts.GetIDsByTextNumber(countQuery->getFilterData()).size();
+            count = contactDB->contacts
+                        .GetIDsSortedByField(
+                            ContactsTable::MatchType::TextNumber, countQuery->getFilterData(), favouritesGroupId)
+                        .size();
         }
         else {
             count = contactDB->name.GetCountByName(countQuery->getFilterData());

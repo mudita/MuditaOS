@@ -28,6 +28,14 @@ enum class ContactTableFields
 class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
 {
   public:
+    enum class MatchType
+    {
+        Name,
+        TextNumber,
+
+        None,
+    };
+
     ContactsTable(Database *db);
 
     virtual ~ContactsTable();
@@ -59,9 +67,11 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
 
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
-    std::vector<std::uint32_t> GetIDsByTextNumber(const std::string &filter,
-                                                  std::size_t limit  = 0,
-                                                  std::size_t offset = 0);
+    std::vector<std::uint32_t> GetIDsSortedByField(MatchType matchType,
+                                                   const std::string &text,
+                                                   std::uint32_t groupId,
+                                                   std::uint32_t limit  = 0,
+                                                   std::uint32_t offset = 0);
 
   private:
     const char *createTableQuery =
