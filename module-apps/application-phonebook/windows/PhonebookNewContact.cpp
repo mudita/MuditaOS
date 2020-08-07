@@ -28,7 +28,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-
         setTitle(utils::localize.get("app_phonebook_contact_title"));
 
         list = new gui::ListView(this,
@@ -125,9 +124,38 @@ namespace gui
         return false;
     }
 
+    auto PhonebookNewContact::isAtLeastOneFieldFulfilled() -> bool
+    {
+        if (contact->primaryName.length() > 0) {
+            return true;
+        }
+        if (contact->alternativeName.length() > 0) {
+            return true;
+        }
+        if (!contact->numbers.empty()) {
+            return true;
+        }
+        if (contact->mail.length() > 0) {
+            return true;
+        }
+        if (contact->address.length() > 0) {
+            return true;
+        }
+        if (contact->note.length() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
         ContactRecord errNumPrim, errNumAlt, errSpeedDial;
+
+        if (!isAtLeastOneFieldFulfilled()) {
+            LOG_ERROR("Can't save empty contact");
+            return false;
+        }
 
         if (contactAction == ContactAction::Add) {
             DBServiceAPI::ContactVerificationError err =
@@ -185,7 +213,7 @@ namespace gui
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
         contact->ID           = oldContactRecord.ID;
 
-        meta.action           = [=]() -> bool {
+        meta.action = [=]() -> bool {
             if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
                 return false;

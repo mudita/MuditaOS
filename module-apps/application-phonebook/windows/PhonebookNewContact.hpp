@@ -29,6 +29,7 @@ namespace gui
             EditTemporary
         };
 
+        auto isAtLeastOneFieldFulfilled() -> bool;
         auto verifyAndSave() -> bool;
         void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber);
         void showDialogDuplicatedSpeedDialNumber();
