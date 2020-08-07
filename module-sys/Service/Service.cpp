@@ -52,35 +52,41 @@ namespace sys
 
     void Service::Run()
     {
-
         while (enableRunLoop) {
+            try {
+                auto msg = mailbox.pop();
 
-            auto msg = mailbox.pop();
+                uint32_t timestamp = cpp_freertos::Ticks::GetTicks();
 
-            uint32_t timestamp = cpp_freertos::Ticks::GetTicks();
+                // Remove all staled messages
+                staleUniqueMsg.erase(std::remove_if(staleUniqueMsg.begin(),
+                                                    staleUniqueMsg.end(),
+                                                    [&](const auto &id) {
+                                                        return ((id.first == msg->uniID) ||
+                                                                ((timestamp - id.second) >= 15000));
+                                                    }),
+                                     staleUniqueMsg.end());
 
-            // Remove all staled messages
-            staleUniqueMsg.erase(std::remove_if(staleUniqueMsg.begin(),
-                                                staleUniqueMsg.end(),
-                                                [&](const auto &id) {
-                                                    return ((id.first == msg->uniID) ||
-                                                            ((timestamp - id.second) >= 15000));
-                                                }),
-                                 staleUniqueMsg.end());
+                /// this is the only place that uses Reponse messages (service manager doesnt...)
+                auto ret = msg->Execute(this);
+                if (ret == nullptr) {
+                    LOG_FATAL("NO MESSAGE from: %s msg type: %d", msg->sender.c_str(), static_cast<int>(msg->type));
+                    ret = std::make_shared<DataMessage>(MessageType::MessageTypeUninitialized);
+                }
 
-            /// this is the only place that uses Reponse messages (service manager doesnt...)
-            auto ret = msg->Execute(this);
-            if (ret == nullptr) {
-                LOG_FATAL("NO MESSAGE from: %s msg type: %d", msg->sender.c_str(), static_cast<int>(msg->type));
-                ret = std::make_shared<DataMessage>(MessageType::MessageTypeUninitialized);
+                // Unicast messages always need response with the same ID as received message
+                // Don't send responses to themselves,
+                // Don't send responses to responses
+                if ((msg->transType == Message::TransmissionType ::Unicast) && (msg->type != Message::Type::Response) &&
+                    (GetName() != msg->sender)) {
+                    Bus::SendResponse(ret, msg, this);
+                }
             }
-
-            // Unicast messages always need response with the same ID as received message
-            // Don't send responses to themselves,
-            // Don't send responses to responses
-            if ((msg->transType == Message::TransmissionType ::Unicast) && (msg->type != Message::Type::Response) &&
-                (GetName() != msg->sender)) {
-                Bus::SendResponse(ret, msg, this);
+            // this will at least keep us away from crush when things go south in application
+            // it will not protect us prior to moment when application is created and started
+            // not handled exception on application start may and will result in bad state os application manager - we will loose focus
+            catch (std::exception &ex) {
+                LOG_FATAL("Service: %s unhandled exception: %s", GetName().c_str(), ex.what());
             }
         }
 
