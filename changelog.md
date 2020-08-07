@@ -9,7 +9,7 @@
 * `[calendar]` Added all events list window.
 * `[phonebook]` Added alternative number handling.
 * `[music player]` Added simple music player implementation.
-* `[music player]` Added simple music player implementation.
+* `[audio]` Added headset handling (insertion / removal).
 * `[torch]` Added initial torch functionality (driver).
 * `[torch]` Torch works with a press of a button
 * `[desktop]` Added service-desktop <-> DB interface.
