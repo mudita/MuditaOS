@@ -3,8 +3,6 @@
 
 #include "utf8/UTF8.hpp"
 
-static const std::uint32_t notFound = static_cast<std::uint32_t>(-1);
-
 TEST_CASE("UTF8: operator index returns value")
 {
     UTF8 ustr = UTF8("Rąbać");
@@ -19,6 +17,18 @@ TEST_CASE("UTF8: operator index exceeds string size")
     UTF8 ustr = UTF8("Rąbać");
 
     REQUIRE(0 == ustr[ustr.length() + 1]);
+}
+
+TEST_CASE("UTF8: operator== returns properly")
+{
+    const UTF8 test_test_test = "test test test";
+    const UTF8 test_not       = "test not";
+    const UTF8 test_test      = "test test";
+
+    REQUIRE(test_test_test == test_test_test); // text exactly the same
+    REQUIRE(test_not != test_test_test);       // different text totally
+    REQUIRE(test_test != test_test_test);      // text 1 shorter than 2nd (with same text at the begining)
+    REQUIRE(test_test_test != test_test);      // text 2 shorter than 1st (with same text at the begining)
 }
 
 TEST_CASE("UTF8: substr returns empty string when zero length is passed")
@@ -65,14 +75,14 @@ TEST_CASE("UTF8: find returns npos if not found")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "E";
-    REQUIRE(notFound == sourceString.find(to_find));
+    REQUIRE(UTF8::npos == sourceString.find(to_find));
 }
 
 TEST_CASE("UTF8: find returns npos if pos exceeds string length")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "A";
-    REQUIRE(notFound == sourceString.find(to_find, sourceString.length() + 5));
+    REQUIRE(UTF8::npos == sourceString.find(to_find, sourceString.length() + 5));
 }
 
 TEST_CASE("UTF8: find returns position of passed string")
@@ -101,14 +111,14 @@ TEST_CASE("UTF8: findLast returns npos if not found")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "E";
-    REQUIRE(notFound == sourceString.findLast(to_find, sourceString.length() - 1));
+    REQUIRE(UTF8::npos == sourceString.findLast(to_find, sourceString.length() - 1));
 }
 
 TEST_CASE("UTF8: findLast returns npos if pos exceeds string length")
 {
     UTF8 sourceString   = UTF8("AaBbCcŃń");
     const char *to_find = "A";
-    REQUIRE(notFound == sourceString.findLast(to_find, sourceString.length() + 5));
+    REQUIRE(UTF8::npos == sourceString.findLast(to_find, sourceString.length() + 5));
 }
 
 TEST_CASE("UTF8: findLast returns position of passed string")
@@ -233,4 +243,98 @@ TEST_CASE("UTF8: removeChar returns propper string")
     REQUIRE(retVal);
     REQUIRE(toCompare.length() == sourceString.length());
     REQUIRE(toCompare.used() == sourceString.used());
+}
+
+TEST_CASE("UTF8: getChar")
+{
+    UTF8 fin = "Zadzwonię później, walczę z ostrym cieniem mgły ;)";
+    UTF8 end = "";
+
+    for (unsigned int i = 0; i < fin.length(); ++i) {
+        end.insert((const char *)fin.getChar(i).utf8);
+    }
+
+    REQUIRE(fin == end);
+}
+
+// getChar returns U8char, [] returns u16 encoded value
+TEST_CASE("UTF8: encode / decode / how it works")
+{
+    std::string test                = "ę";
+    uint32_t test_u8char_len        = 0;
+    const uint32_t code_encoded_u8t = 0xC499; // code encoded using utf8 notation
+    const uint32_t code_encoded_uni = 0x0119; // code encoded using U+ notation -> Ux0119 (utf16)
+
+    uint32_t test_code_decoded_u16 = UTF8::decode(test.c_str(), test_u8char_len);
+
+    REQUIRE(test_code_decoded_u16 == code_encoded_uni);
+
+    uint32_t test_code_encode_u8     = 0;
+    uint32_t test_code_encode_u8_len = 0;
+    bool result = UTF8::encode(test_code_decoded_u16, test_code_encode_u8, test_code_encode_u8_len);
+
+    REQUIRE(result == true);
+    REQUIRE(test_code_encode_u8 == code_encoded_u8t);
+
+    UTF8 u8t_test = "ę";
+
+    REQUIRE(code_encoded_uni == u8t_test[0]);
+}
+
+TEST_CASE("UTF8 bad case scenario - operator[] returns")
+{
+    UTF8 test                       = "ę";
+    UTF8 next                       = "";
+    const uint32_t code_encoded_uni = 0x0119; // code encoded using U+ notation -> Ux0119 (utf16)
+
+    // assert that there is utf8 in string - who says it has to be?
+    REQUIRE(*test.c_str() == 0xc4);
+    REQUIRE(*(test.c_str() + 1) == 0x99);
+
+    // get utf16 value for first character
+    auto code_utf16 = test[0];
+    REQUIRE(code_utf16 == code_encoded_uni);
+
+    // insert it with insert code
+    next.insertCode(code_utf16);
+
+    REQUIRE(test == next);
+}
+
+TEST_CASE("U8char && UTF8: encode")
+{
+    // this don't work...
+    // encode(0x119) as ę
+    UTF8 val;
+    uint32_t code       = 0x119;
+    uint32_t len        = 0;
+    uint32_t output     = 0;
+    const uint32_t pl_e = 0xc499;
+    bool res            = UTF8::encode(code, output, len);
+    // check that encode works
+    REQUIRE(len == 2);
+    REQUIRE(res);
+    REQUIRE(output == pl_e);
+    auto u = U8char(code);
+    REQUIRE(u.size == len);
+}
+
+TEST_CASE("UTF8: insert whole string which doesn't work")
+{
+    unsigned int len = 50;
+    UTF8 lol;
+    UTF8 fin = "Zadzwonię później, walczę z ostrym cieniem mgły ;)";
+    for (unsigned int i = 0; i < fin.length(); ++i) {
+        union
+        {
+            char ch[4] = {0};
+            uint32_t code;
+        } tmp;
+        tmp.code = fin[i];
+
+        printf("insert: 0x%x    which is: >%s<: ", tmp.code, std::string(tmp.ch).c_str());
+        lol.insertCode(tmp.code);
+    }
+    REQUIRE(lol == fin);
+    REQUIRE(lol.length() == len);
 }

@@ -17,14 +17,8 @@ namespace gui
     Context::Context() : x{0}, y{0}, w{0}, h{0}, data{nullptr}
     {}
 
-    Context::Context(uint16_t width, uint16_t height, uint8_t *buffer) : x{0}, y{0}, w{width}, h{height}
+    Context::Context(uint16_t width, uint16_t height) : x{0}, y{0}, w{width}, h{height}, data(new uint8_t[w * h])
     {
-        if (buffer == nullptr) {
-            data = new uint8_t[w * h];
-        }
-        else {
-            data = buffer;
-        }
         memset(data, 15, w * h);
     }
 

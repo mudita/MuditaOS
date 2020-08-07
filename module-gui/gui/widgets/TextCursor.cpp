@@ -117,8 +117,8 @@ namespace gui
 
     TextCursor &TextCursor::operator<<(const UTF8 &text)
     {
-        for (auto el : std::string(text)) {
-            addChar(el);
+        for (unsigned int i = 0; i < text.length(); ++i) {
+            addChar(text[i]);
         }
         return *this;
     }

@@ -172,9 +172,6 @@ namespace gui
         }
     }
 
-    ;
-
-    // 43575
     void Renderer::drawRectangle(Context *ctx, CommandRectangle *cmd)
     {
 
@@ -817,12 +814,9 @@ namespace gui
         }
 
         // if drawing was performed in temporary context
+        // reinsert drawCtx into last context
         if (copyContext) {
-            // reinsert drawCtx into last context
-
-            //		ctx->insert( cmd->x, cmd->y, drawCtx );
             ctx->insertArea(cmd->x, cmd->y, cmd->areaX, cmd->areaY, cmd->w, cmd->h, drawCtx);
-            // remove draw context
             delete drawCtx;
         }
     }
@@ -830,14 +824,20 @@ namespace gui
     void Renderer::drawChar(
         Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color)
     {
-
-        uint8_t *drawPtr  = context->getData() + x + (y - glyph->yoffset) * context->getW();
-        uint8_t *glyphPtr = (uint8_t *)glyph->data;
+        auto line_y_offset = (y - glyph->yoffset) * context->getW();
+        auto *drawPtr      = context->getData() + x + line_y_offset;
+        auto *glyphPtr     = glyph->data;
+        assert(glyph->data);
 
         for (uint16_t yy = 0; yy < glyph->height; ++yy) {
             for (uint16_t xx = 0; xx < glyph->width; ++xx) {
-                if (*(glyphPtr + xx) == 0)
+                if (!context->addressInData(drawPtr + xx)) {
+                    log_warn_glyph("drawing out of: %d vs %d", xx, context->getW() * context->getH());
+                    return;
+                }
+                if (*(glyphPtr + xx) == 0) {
                     *(drawPtr + xx) = 0x0F & color.intensity;
+                }
             }
             drawPtr += context->getW();
             glyphPtr += glyph->width;
@@ -893,7 +893,6 @@ namespace gui
                 glyph        = unique_glyph.get();
             }
 
-            //#ifdef BUILD_UNIT_TESTS
             // do not start drawing outside of draw context.
             if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0)) {
                 LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
@@ -903,7 +902,6 @@ namespace gui
                 LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
                 return;
             }
-            //#endif
 
             int32_t kernValue = 0;
             if (i > 0) {
@@ -916,10 +914,9 @@ namespace gui
         }
 
         // if drawing was performed in temporary context
+        // reinsert drawCtx into bast context
         if (copyContext) {
-            // reinsert drawCtx into bast context
             ctx->insert(cmd->x, cmd->y, drawCtx);
-            // remove draw context
             delete drawCtx;
         }
     }
