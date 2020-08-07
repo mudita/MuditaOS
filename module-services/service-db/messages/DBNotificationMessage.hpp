@@ -14,5 +14,7 @@ namespace db
         NotificationMessage(db::Interface::Name interface, Query::Type type);
         const db::Interface::Name interface;
         const Query::Type type;
+
+        bool dataModified();
     };
 } // namespace db

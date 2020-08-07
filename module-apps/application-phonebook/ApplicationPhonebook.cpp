@@ -1,6 +1,7 @@
 #include "ApplicationPhonebook.hpp"
 #include "Dialog.hpp"
 #include "messages/QueryMessage.hpp"
+#include "messages/DBNotificationMessage.hpp"
 #include "models/PhonebookModel.hpp"
 #include "windows/PhonebookContact.hpp"
 #include "windows/PhonebookContactDetails.hpp"
@@ -10,8 +11,6 @@
 #include "windows/PhonebookNamecardOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
-#include <../module-services/service-db/messages/DBNotificationMessage.hpp>
-
 #include <service-appmgr/ApplicationManager.hpp>
 
 namespace app
@@ -35,11 +34,13 @@ namespace app
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-            LOG_DEBUG("Received multicast");
+            LOG_DEBUG("Received notification");
             if (msg != nullptr) {
                 // window-specific actions
-                for (auto &[name, window] : windows) {
-                    window->onDatabaseMessage(msg);
+                if (msg->interface == db::Interface::Name::Contact) {
+                    for (auto &[name, window] : windows) {
+                        window->onDatabaseMessage(msg);
+                    }
                 }
                 // app-wide actions
                 // <none>
@@ -55,12 +56,17 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBQuery: {
-                auto queryResponse = dynamic_cast<db::QueryResponse *>(resp);
-                assert(queryResponse);
 
-                if (queryResponse->getResult()->handle()) {
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+                    auto result = queryResponse->getResult();
+
+                    if (result->hasListener()) {
+                        if (result->handle()) {
+                            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                        }
+                    }
                 }
+
             } break;
             default:
                 break;

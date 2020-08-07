@@ -134,15 +134,9 @@ namespace gui
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msgNotification != nullptr) {
-            // whatever notification had happened, rebuild
             if (msgNotification->interface == db::Interface::Name::Contact) {
 
-                if (msgNotification->type == db::Query::Type::Delete ||
-                    msgNotification->type == db::Query::Type::Update ||
-                    msgNotification->type == db::Query::Type::Create) {
-
-                    LOG_INFO("I CO MAMY type? %d", (int)msgNotification->type);
-                    LOG_INFO("I CO MAMY intefejs? %d", (int)msgNotification->interface);
+                if (msgNotification->dataModified()) {
 
                     rebuild();
 

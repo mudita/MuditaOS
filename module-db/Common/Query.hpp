@@ -52,6 +52,7 @@ namespace db
 
         virtual bool handle();
 
+        [[nodiscard]] bool hasListener() const noexcept;
         [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
 
       protected:

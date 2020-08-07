@@ -71,9 +71,8 @@ namespace gui::model
             return app->searchEmpty();
         }
 
-        if (list != nullptr) {
-            list->setElementsCount(msgResponse->getMax());
-        }
+        assert(list);
+        list->setElementsCount(msgResponse->getMax());
 
         return this->updateRecords(std::move(records));
     }

@@ -24,7 +24,7 @@
 
 ### Fixed
 * `[phonebook][db]` Fixed reading contact without a number from database.
-
+* `[listview]` Faster window refresh and wrong refresh data fix. 
 * `[utilities]` Fix for UTF8 by character copies
 * `[gui]` Fix crash in font glyph rendering on screen
 * `[sms]` When opening a thread show it from the newest message  
