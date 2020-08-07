@@ -8,9 +8,15 @@ using namespace ParserStateMachine;
 
 xQueueHandle MessageHandler::sendQueue;
 
-MessageHandler::MessageHandler(std::string &message, sys::Service *OwnerService)
-    : messageJson(json11::Json::parse(message, JsonErrorMsg)), OwnerServicePtr(OwnerService)
-{}
+MessageHandler::MessageHandler(std::string &message, sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
+{
+    try {
+        messageJson = json11::Json::parse(message, JsonErrorMsg);
+    }
+    catch (const std::exception &e) {
+        LOG_ERROR("Cannot create MessageHandler! err:%s", e.what());
+    }
+}
 
 void MessageHandler::processMessage()
 {
