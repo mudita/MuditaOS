@@ -13,6 +13,7 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     NewEditEventModel(app::Application *app);
 
     void loadData();
+    void saveData();
 
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     [[nodiscard]] int getItemCount() const override;

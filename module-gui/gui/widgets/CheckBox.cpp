@@ -10,10 +10,10 @@ namespace gui
                        const uint32_t &y,
                        const uint32_t &w,
                        const uint32_t &h,
+                       Image *image,
                        std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                        std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : ImageBox(parent, x, y, w, h, image = new Image("small_tick")),
-          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+        : ImageBox(parent, x, y, w, h, image), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -21,18 +21,18 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             if (focus) {
                 LOG_DEBUG("FOCUS");
-                setFocusItem(image);
-                if (image->visible) {
-                    // bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"), BottomBar::Side::LEFT,
-                    // false);
-                }
-                else {
-                    // bottomBarTemporaryMode(utils::localize.get("app_calendar_check"), BottomBar::Side::LEFT, false);
-                }
+                // setFocusItem(image);
+                // if (image->visible) {
+                // bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"), BottomBar::Side::LEFT,
+                // false);
+                //}
+                // else {
+                // bottomBarTemporaryMode(utils::localize.get("app_calendar_check"), BottomBar::Side::LEFT, false);
+                //}
             }
             else {
                 LOG_DEBUG("NOT FOCUS");
-                setFocusItem(nullptr);
+                // setFocusItem(nullptr);
                 // bottomBarRestoreFromTemporaryMode();
             }
             return true;

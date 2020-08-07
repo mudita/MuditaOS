@@ -17,36 +17,52 @@ namespace gui
         assert(app != nullptr);
 
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::severalOptions::height);
-        setMaximumSize(style::window::default_body_width, style::window::calendar::item::severalOptions::height);
 
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         setPenWidth(style::window::default_border_rect_no_focus);
         setMargins(gui::Margins(0, style::window::calendar::item::severalOptions::margin, 0, 0));
 
-        hBox = new gui::HBox(this, 0, 0, style::window::default_body_width, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        hBox->setPenFocusWidth(style::window::default_border_focus_w);
-        hBox->setPenWidth(style::window::default_border_rect_no_focus);
-        hBox->activeItem = false;
+        vBox = new gui::VBox(this, 0, 0, 0, 0);
+        vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->activeItem = false;
 
-        descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
+        descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
+        descriptionLabel->setMinimumSize(style::window::calendar::item::severalOptions::description_label_w,
+                                         style::window::calendar::item::severalOptions::description_label_h);
         descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::small);
         descriptionLabel->activeItem = false;
         descriptionLabel->setText(description);
 
+        hBox = new gui::HBox(vBox, 0, 0, 0, 0);
+        hBox->setMinimumSize(style::window::default_body_width,
+                             style::window::calendar::item::severalOptions::height -
+                                 style::window::calendar::item::severalOptions::description_label_h);
+        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->activeItem = false;
+
+        leftArrow = new gui::Image(hBox, 0, 0, 0, 0);
+        leftArrow->setMinimumSize(style::window::calendar::item::severalOptions::arrow_w,
+                                  style::window::calendar::item::severalOptions::arrow_h);
+        leftArrow->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        leftArrow->activeItem = false;
+        leftArrow->set("arrow_left");
+
         optionLabel = new gui::Label(hBox, 0, 0, 0, 0);
+        optionLabel->setMinimumSize(style::window::default_body_width -
+                                        2 * style::window::calendar::item::severalOptions::arrow_w,
+                                    style::window::calendar::item::severalOptions::height -
+                                        style::window::calendar::item::severalOptions::description_label_h);
         optionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         optionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         optionLabel->setFont(style::window::font::small);
         optionLabel->activeItem = false;
 
-        leftArrow             = new gui::Image(hBox, 0, 0, 0, 0);
-        leftArrow->activeItem = false;
-        leftArrow->set("arrow_left");
-
         rightArrow             = new gui::Image(hBox, 0, 0, 0, 0);
+        rightArrow->setMinimumSize(style::window::calendar::item::severalOptions::arrow_w,
+                                   style::window::calendar::item::severalOptions::arrow_h);
+        rightArrow->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         rightArrow->activeItem = false;
         rightArrow->set("arrow_right");
 
@@ -83,6 +99,19 @@ namespace gui
 
     void SeveralOptionsItem::setNavigation()
     {
+        focusChangedCallback = [&](Item &item) {
+            if (focus) {
+                if (actualVectorIndex == optionsNames.size() - 1 &&
+                    descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
+                    bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
+                }
+            }
+            else {
+                bottomBarRestoreFromTemporaryMode();
+            }
+            return true;
+        };
+
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
@@ -127,27 +156,8 @@ namespace gui
 
     bool SeveralOptionsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        LOG_DEBUG("SIZE SEVERALOPTIONS ITEM: %i,  %i", newDim.w, newDim.h);
-
-        descriptionLabel->setArea(BoundingBox(0,
-                                              0,
-                                              style::window::calendar::item::severalOptions::description_label_w,
-                                              style::window::calendar::item::severalOptions::description_label_h));
-        optionLabel->setArea(BoundingBox(style::window::calendar::item::severalOptions::arrow_w,
-                                         style::window::calendar::item::severalOptions::option_label_y,
-                                         newDim.w - 2 * style::window::calendar::item::severalOptions::arrow_w,
-                                         style::window::calendar::item::severalOptions::option_label_h));
-        leftArrow->setArea(BoundingBox(0,
-                                       style::window::calendar::item::severalOptions::arrow_y,
-                                       style::window::calendar::item::severalOptions::arrow_w,
-                                       style::window::calendar::item::severalOptions::arrow_h));
-        rightArrow->setArea(BoundingBox(newDim.w - style::window::calendar::item::severalOptions::arrow_w,
-                                        style::window::calendar::item::severalOptions::arrow_y,
-                                        style::window::calendar::item::severalOptions::arrow_w,
-                                        style::window::calendar::item::severalOptions::arrow_h));
-
+        vBox->setPosition(0, 0);
+        vBox->setSize(newDim.w, newDim.h);
         return true;
     }
 
