@@ -36,21 +36,25 @@ void NewEditEventModel::createData()
     auto app = application;
     assert(app != nullptr);
 
-    internalData.push_back(new gui::TextWithLabelItem(utils::localize.get("app_calendar_new_edit_event_name")));
+    internalData.push_back(new gui::TextWithLabelItem(
+        utils::localize.get("app_calendar_new_edit_event_name"),
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
     internalData.push_back(
         new gui::CheckBoxItem(application, utils::localize.get("app_calendar_new_edit_event_allday")));
-    internalData.push_back(new gui::EventTimeItem(utils::localize.get("app_calendar_new_edit_event_start"), true));
+    internalData.push_back(new gui::EventTimeItem(utils::localize.get("app_calendar_new_edit_event_start"), false));
     internalData.push_back(new gui::EventTimeItem(utils::localize.get("app_calendar_new_edit_event_end"), true));
     internalData.push_back(new gui::SeveralOptionsItem(
         application,
-        utils::localize.get("app_calendar_event_detail_repeat"),
+        utils::localize.get("app_calendar_event_detail_reminder"),
         [app](const UTF8 &text) {
             app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
         },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
     internalData.push_back(new gui::SeveralOptionsItem(
         application,
-        utils::localize.get("app_calendar_event_detail_reminder"),
+        utils::localize.get("app_calendar_event_detail_repeat"),
         [app](const UTF8 &text) {
             app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
         },
@@ -75,4 +79,13 @@ void NewEditEventModel::loadData()
     }
 
     requestRecords(0, internalData.size());
+}
+
+void NewEditEventModel::saveData()
+{
+    for (auto &item : internalData) {
+        if (item->onSaveCallback) {
+            item->onSaveCallback();
+        }
+    }
 }
