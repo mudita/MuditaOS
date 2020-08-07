@@ -1,4 +1,5 @@
 #include <Tables/ThreadsTable.hpp>
+#include <utility>
 #include "QuerySMSThreadsGet.hpp"
 
 namespace db::query
@@ -12,7 +13,8 @@ namespace db::query
         return "SMSThreadsGet";
     }
 
-    SMSThreadsGetResults::SMSThreadsGetResults(std::vector<ThreadsTableRow> result_rows) : results(result_rows)
+    SMSThreadsGetResults::SMSThreadsGetResults(std::vector<ThreadsTableRow> result_rows)
+        : results(std::move(result_rows))
     {}
 
     auto SMSThreadsGetResults::getResults() const -> std::vector<ThreadsTableRow>

@@ -1,6 +1,7 @@
 #include "ApplicationMessages.hpp"
 
 #include "application-messages/data/SMSTextToSearch.hpp"
+#include "messages/DBNotificationMessage.hpp"
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
@@ -13,7 +14,6 @@
 #include <MessageType.hpp>
 #include <Dialog.hpp>
 #include <i18/i18.hpp>
-#include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <cassert>
 #include <time/time_conversion.hpp>
@@ -41,11 +41,13 @@ namespace app
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-            LOG_DEBUG("Received multicast");
+            LOG_DEBUG("Received notification");
             if (msg != nullptr) {
                 // window-specific actions
-                for (auto &[name, window] : windows) {
-                    window->onDatabaseMessage(msg);
+                if (msg->interface == db::Interface::Name::SMSThread || msg->interface == db::Interface::Name::SMS) {
+                    for (auto &[name, window] : windows) {
+                        window->onDatabaseMessage(msg);
+                    }
                 }
                 // app-wide actions
                 // <none>
@@ -71,8 +73,12 @@ namespace app
             case MessageType::DBQuery:
 
                 if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
-                    if (queryResponse->getResult()->handle()) {
-                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                    auto result = queryResponse->getResult();
+
+                    if (result->hasListener()) {
+                        if (result->handle()) {
+                            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                        }
                     }
                 }
 
