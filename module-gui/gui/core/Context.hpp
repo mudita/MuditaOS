@@ -24,7 +24,7 @@ namespace gui
 
       public:
         Context();
-        Context(uint16_t width, uint16_t height, uint8_t *buffer = nullptr);
+        Context(uint16_t width, uint16_t height);
         virtual ~Context();
 
         /**
@@ -68,6 +68,11 @@ namespace gui
         {
             return h;
         };
+
+        inline bool addressInData(const uint8_t *ptr) const
+        {
+            return (ptr >= data) && (ptr < data + w * h);
+        }
 
         friend std::ostream &operator<<(std::ostream &out, const Context &c);
     };

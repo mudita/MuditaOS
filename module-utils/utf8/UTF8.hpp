@@ -1,38 +1,54 @@
-/*
- * UTF8.hpp
- *
- *  Created on: 9 kwi 2019
- *      Author: robert
- */
-
-#ifndef UTF8_HPP_
-#define UTF8_HPP_
+#pragma once
 
 #include <string>
 #include <cstdint>
-#include <iostream>
+#include <iosfwd> // for forward declaration for ostream
+
+/// single utf8 character representation struct
+struct U8char
+{
+    U8char() = default;
+    /// get UTF16 (or U+ ) value and store it as UTF8
+    /// @note this is done for little endian
+    U8char(uint32_t code);
+    /// get UTF8 and store it
+    /// @note unsafe
+    U8char(char *val, unsigned int size);
+    /// get UTF8 code from char* stream depending on size of data
+    /// @note unsafe
+    U8char(char *);
+
+    static const unsigned int utf8_max_size = 4;
+
+    unsigned char utf8[utf8_max_size];
+
+    uint32_t size = 0;
+
+    void set(char *val, unsigned int size);
+    void set(uint32_t code);
+};
 
 class UTF8
 {
   protected:
-    UTF8(const uint8_t *data, const uint32_t allocated, const uint32_t used, const uint32_t len);
+    UTF8(const char *data, const uint32_t allocated, const uint32_t used, const uint32_t len);
 
-    // pointer to buffer
-    uint8_t *data;
-    // total size of buffer in bytes
+    /// pointer to buffer
+    char *data;
+    /// total size of buffer in bytes
     uint32_t sizeAllocated;
-    // number of bytes used in buffer
+    /// number of bytes used in buffer
     uint32_t sizeUsed;
-    // umber of characters in the string
+    /// umber of characters in the string
     uint32_t strLength;
-    // last used index
+    /// last used index
     mutable uint32_t lastIndex;
-    // pointer to last indexed character
-    mutable uint8_t *lastIndexData;
+    /// pointer to last indexed character
+    mutable char *lastIndexData;
 
-    // variable used when c_str() is called for a string that has no data yet
+    /// variable used when c_str() is called for a string that has no data yet
     static const char *emptyString;
-    // holds number of bytes by which buffer will be expanded in case when current buffer can't hold new data.
+    /// holds number of bytes by which buffer will be expanded in case when current buffer can't hold new data.
     static const uint32_t stringExpansion;
     /**
      * @brief Calculates size of the buffer to store given number of data bytes.
@@ -42,8 +58,6 @@ class UTF8
      */
     uint32_t getDataBufferSize(uint32_t dataBytes);
     bool expand(uint32_t size = stringExpansion);
-    uint32_t decode(const char *utf8_char, uint32_t &length) const;
-
   public:
     UTF8();
     UTF8(const char *str);
@@ -60,19 +74,21 @@ class UTF8
 
     UTF8 &operator=(const UTF8 &utf);
     UTF8 &operator=(UTF8 &&utf) noexcept;
+    /// returns UTF16 value of character (this is - utf8 value encoded to utf16)
+    /// for utf8 value please use getChar
     uint32_t operator[](const uint32_t &idx) const;
     UTF8 operator+(const UTF8 &utf) const;
     UTF8 &operator+=(const UTF8 &utf);
     bool operator==(const UTF8 &utf) const;
+    bool operator!=(const UTF8 &utf) const
+    {
+        return !operator==(utf);
+    }
     operator std::string() const
     {
         return c_str();
     }
-    friend std::ostream &operator<<(std::ostream &os, const UTF8 &el)
-    {
-        os << el.c_str();
-        return os;
-    }
+    friend std::ostream &operator<<(std::ostream &os, const UTF8 &el);
 
     /**
      * UTILITY FUNCTIONS
@@ -81,12 +97,19 @@ class UTF8
     uint32_t length() const
     {
         return strLength;
-    };
-    uint32_t used()
+    }
+    uint32_t used() const
     {
         return sizeUsed;
-    };
+    }
+    uint32_t allocated() const
+    {
+        return sizeAllocated;
+    }
     const char *c_str() const;
+
+    /// returns utf8 value on position, to get utf16 use operator[]
+    U8char getChar(unsigned int pos);
 
     /**
      * @brief Removes all content from the string and reduce assigned memory to default value.
@@ -185,22 +208,9 @@ class UTF8
      * U+10FFFF.
      */
     static bool encode(const uint16_t &code, uint32_t &dest, uint32_t &length);
-    /**
-     * PUBLIC METHODS
-     */
 
-    /**
-     * @brief Serialize object to the stream of bytes.
-     * @param idx index of character from which the division will be made.
-     * @return newly created string, character under specified index will be first character in new string.
-     * Returns empty string in case of invalid index.
-     */
-
-    uint8_t *serialize(uint32_t &streamSize);
-
-    /**
-     * STATIC METHODS
-     */
+    /// get utf16_t value from utf8 character
+    static uint32_t decode(const char *utf8_char, uint32_t &length);
 
     /**
      * @brief Calculates numer of utf8 characters in provided stream
@@ -213,7 +223,4 @@ class UTF8
      * @return true if there was no error, false otherwise;
      */
     static bool getStreamLength(const char *stream, uint32_t &size, uint32_t &count);
-    static UTF8 deserialize(uint8_t *stream);
 };
-
-#endif /* UTF8_HPP_ */
