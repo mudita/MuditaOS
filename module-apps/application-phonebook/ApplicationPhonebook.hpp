@@ -8,14 +8,13 @@ namespace gui::window::name
 {
     inline const std::string contact          = "Contact";
     inline const std::string contact_options  = "Options";
-    inline const std::string no_results       = "NoResults";
-    inline const std::string contact_blocked  = "ContactBlocked";
     inline const std::string namecard_options = "Namecard Options";
     inline const std::string new_contact      = "New";
     inline const std::string search           = "Search";
     inline const std::string search_results   = "SearchResults";
     inline const std::string dialog_yes_no    = "DialogYesNo";
     inline const std::string dialog_confirm   = "DialogConfirm";
+    inline const std::string dialog           = "Dialog";
 
 } // namespace gui::window::name
 
@@ -43,6 +42,7 @@ namespace app
         void destroyUserInterface() override;
 
         void onSearchRequest(const std::string &searchFilter);
+        bool searchEmpty(const std::string &query);
     };
 
 } // namespace app
