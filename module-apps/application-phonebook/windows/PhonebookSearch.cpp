@@ -40,6 +40,7 @@ namespace gui
 
     void PhonebookSearch::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        inputField->setText("");
         setFocusItem(inputField);
     }
 

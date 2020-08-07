@@ -208,7 +208,7 @@
     "common_search_uc": "Search",
     "app_phonebook_search_win_info": "Type what do you need\nand click SEARCH",
     "common_search_results": "Search results",
-    "app_phonebook_search_no_results": "There are no results",
+    "app_phonebook_search_no_results": "No contacts found.",
     "app_phonebook_list_favourites": "Favourites",
     "app_phonebook_contact_title": "Add Contact",
     "app_phonebook_contact_no_name": "no name",
