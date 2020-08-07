@@ -1,4 +1,10 @@
 # Mudita PurePhone changelog
+
+## Current Release
+
+### Fixed
+* `[phonebook]` Fix favourites contacts display order.
+
 ## [0.33.1 - 2020-08-14]
 
 ### Other

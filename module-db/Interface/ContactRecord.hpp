@@ -183,4 +183,6 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::vector<std::uint32_t> splitNumberIDs(const std::string &numberIDs);
 
     std::string joinNumberIDs(const std::vector<std::uint32_t> &numberIDs);
+
+    const std::uint32_t favouritesGroupId;
 };
