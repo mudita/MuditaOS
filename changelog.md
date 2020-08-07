@@ -20,6 +20,7 @@
 * `[phonebook]` Phonebook search no window - new version of dialog box 
 * `[phonebook]` Switch to contact list instead of contact details after saving contact.
 * `[sms]` do not delete if sms thread is malformed (not found what expected)
+* `[phonebook]` Force fulfilling at least one field while adding/editing contact.
 
 ### Fixed
 * `[phonebook][db]` Fixed reading contact without a number from database.
