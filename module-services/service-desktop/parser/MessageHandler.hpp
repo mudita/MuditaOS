@@ -22,6 +22,10 @@ namespace ParserStateMachine
         {
             return messageJson.is_null();
         };
+        bool isValid()
+        {
+            return JsonErrorMsg.empty();
+        }
         std::string &getErrorString()
         {
             return JsonErrorMsg;

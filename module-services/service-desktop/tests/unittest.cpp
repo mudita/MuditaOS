@@ -104,6 +104,24 @@ TEST_CASE("Parser Test")
         parser.processMessage(testMessage);
         REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
+    SECTION("Parse message with incorrect header length")
+    {
+        testMessage = R"(#000000072{"endpoint":7, "method":2, "uuid":3, "body":{"threadID":1,"unread":false}})";
+        parser.processMessage(testMessage);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
+    }
+    SECTION("Parse message with damaged json ")
+    {
+        testMessage = R"(#000000074{"endpoint":7, "method":2, "uuid":3, "bo}}dy":{"threadID":1,"unread":false)";
+        parser.processMessage(testMessage);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
+    }
+    SECTION("Parse message with damaged json and incorrect header length")
+    {
+        testMessage = R"(#000000072{"endpoint":7, "method":2, "uuid":3, "bo}}dy":{"threadID":1,"unread":false)";
+        parser.processMessage(testMessage);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
+    }
 }
 
 TEST_CASE("DB Helpers test - json decoding")
