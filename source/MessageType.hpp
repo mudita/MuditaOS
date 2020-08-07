@@ -133,6 +133,7 @@ enum class MessageType
     AudioRoutingRecordCtrl,
     AudioRoutingMute,
     AudioRoutingSpeakerhone,
+    AudioRoutingHeadset,
 
     AudioSetOutputVolume,
     AudioSetInputGain,

@@ -21,10 +21,12 @@ extern "C"
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
+#include "AudioServiceAPI.hpp"
 
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
+#include "headset.hpp"
 #include "bsp/rtc/rtc.hpp"
 #include "bsp/vibrator/vibrator.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
@@ -58,6 +60,21 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         bsp::keyboard_get_data(notification, state, code);
 
         processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
+    }
+
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHeadsetIRQ)) {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
+            return false;
+        }
+
+        if (bsp::headset::Handler(notification) == true) {
+            bool state = bsp::headset::IsInserted();
+
+            auto message    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingHeadset);
+            message->enable = state;
+            sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
+        }
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery)) {
@@ -159,6 +176,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     std::vector<xQueueHandle> qhandles = this->queues;
     bsp::vibrator::init();
     bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
+    bsp::headset::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]);
     bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
@@ -177,6 +195,7 @@ bool WorkerEvent::deinit(void)
 {
     Worker::deinit();
     bsp::keyboard_Deinit();
+    bsp::headset::Deinit();
     bsp::battery_Deinit();
     bsp::torch::deinit();
 

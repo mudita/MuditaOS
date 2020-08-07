@@ -3,6 +3,8 @@ set(BOARD_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/board.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/eink/ED028TC1.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/keyboard/keyboard.cpp"
+        
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/headset/headset.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/battery-charger/battery_charger.cpp"
 
@@ -32,6 +34,7 @@ set(BOARD_DIR_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/eink
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/pwr
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio
+        ${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
 
         ${CMAKE_SOURCE_DIR}/module-sys/
 

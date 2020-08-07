@@ -21,7 +21,6 @@
 
 #if 0 // TODO:M.P implement the rest of BSP drivers
 
-#include "bsp_jackdet.h"
 #include "bsp_cellular.h"
 #include "bsp_battery_charger.h"
 
@@ -125,7 +124,6 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BOARD_JACKDET_IRQ_GPIO_PIN)) {
-                // TODO:M.P xHigherPriorityTaskWoken |= bsp_jackdet_IRQHandler();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_RI_PIN)) {
