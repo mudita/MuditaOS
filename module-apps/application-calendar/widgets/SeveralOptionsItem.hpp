@@ -10,6 +10,7 @@ namespace gui
     class SeveralOptionsItem : public CalendarListItem
     {
         app::Application *application = nullptr;
+        gui::VBox *vBox               = nullptr;
         gui::HBox *hBox               = nullptr;
         gui::Label *optionLabel       = nullptr;
         gui::Label *descriptionLabel  = nullptr;

@@ -8,6 +8,7 @@ namespace gui
 {
     class EventTimeItem : public CalendarListItem
     {
+        gui::VBox *vBox              = nullptr;
         gui::HBox *hBox              = nullptr;
         gui::Label *colonLabel       = nullptr;
         gui::Label *descriptionLabel = nullptr;

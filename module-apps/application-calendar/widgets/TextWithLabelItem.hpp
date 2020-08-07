@@ -13,7 +13,10 @@ namespace gui
         gui::Text *textInput         = nullptr;
 
       public:
-        TextWithLabelItem(const std::string &description);
+        TextWithLabelItem(const std::string &description,
+                          std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                          std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
+                          std::function<void()> selectSpecialCharacter                 = nullptr);
         virtual ~TextWithLabelItem() override = default;
 
         // virtual methods from Item
