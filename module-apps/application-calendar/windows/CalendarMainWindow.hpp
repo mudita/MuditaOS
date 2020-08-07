@@ -4,7 +4,6 @@
 #include "Application.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-calendar/models/MonthModel.hpp"
-#include "application-calendar/models/DayModel.hpp"
 #include <gui/widgets/GridLayout.hpp>
 #include <map>
 #include <vector>
@@ -14,37 +13,20 @@ namespace gui
 {
     class CalendarMainWindow;
 
-    namespace coords
-    {
-        const uint8_t first_row        = 1;
-        const uint8_t default_last_row = 5;
-
-        const uint8_t first_column = 0;
-        const uint8_t last_column  = 6;
-    }; // namespace coords
-
     class DayLabel : public Label
     {
       public:
         DayLabel(app::Application *app,
                  gui::Item *parent,
-                 const uint32_t &i,
+                 const uint32_t &cellIndex,
                  const uint32_t &firstWeekOffset,
                  const uint32_t &width,
                  const uint32_t &height);
-
-        // void setLabel(std::string number, std::function<bool(Item &)> activatedCallback);
         ~DayLabel() override = default;
     };
 
     class MonthBox : public GridLayout
     {
-
-        /// @param columns: defines number of columns, @param rows: defines number of rows
-        uint32_t columns     = 0;
-        uint32_t rows        = 0;
-        std::map<std::pair<uint32_t, uint32_t>, DayLabel *> dayMap;
-
       public:
         MonthBox(app::Application *app,
                  gui::Item *parent,
@@ -56,8 +38,6 @@ namespace gui
                  const std::unique_ptr<MonthModel> &model);
 
         ~MonthBox() override = default;
-
-        // void buildMap(app::Application *app);
     };
 
     class CalendarMainWindow : public gui::AppWindow
@@ -69,7 +49,7 @@ namespace gui
         uint32_t dayHeight     = 0;
 
       protected:
-        year_month_day actualDate;
+        date::year_month_day actualDate;
         MonthBox *month = nullptr;
         Label *dateLabel = nullptr;
         std::unique_ptr<MonthModel> monthModel;
@@ -83,7 +63,7 @@ namespace gui
         void refresh();
         void buildMonth(std::unique_ptr<MonthModel> &model);
         void buildDateLabel(std::string actualDateTime);
-        void buildInterface(const uint32_t &actualDateTimeID);
+        void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
     };

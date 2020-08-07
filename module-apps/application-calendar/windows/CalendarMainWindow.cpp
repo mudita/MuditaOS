@@ -1,6 +1,5 @@
 #include "CalendarMainWindow.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
-#include "application-calendar/models/DayModel.hpp"
 #include "application-calendar/models/MonthModel.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "application-calendar/models/DayEventsModel.hpp"
@@ -16,32 +15,31 @@ namespace gui
 {
     DayLabel::DayLabel(app::Application *app,
                        gui::Item *parent,
-                       const uint32_t &i,
+                       const uint32_t &cellIndex,
                        const uint32_t &firstWeekOffset,
                        const uint32_t &width,
                        const uint32_t &height)
         : Label(parent, 0, 0, 0, 0, "")
     {
-        LOG_DEBUG("Call DayLabel constructor");
-
         parent->addWidget(this);
         this->setSize(width, height);
 
-        if (i < style::window::calendar::week_days_number) {
-            this->setText(utils::time::Locale::get_short_day(i));
+        if (cellIndex < style::window::calendar::week_days_number) {
+            this->setText(utils::time::Locale::get_short_day(cellIndex));
             this->setFont(style::window::font::verysmall);
             this->setPenWidth(style::window::default_border_no_focus_w);
             this->activeItem = false;
         }
-        else if (i >= style::window::calendar::week_days_number &&
-                 i < style::window::calendar::week_days_number + firstWeekOffset - 1) {
+        else if (cellIndex >= style::window::calendar::week_days_number &&
+                 cellIndex < style::window::calendar::week_days_number + firstWeekOffset) {
             this->setPenWidth(style::window::default_border_no_focus_w);
             this->activeItem = false;
         }
         else {
-            std::string number = std::to_string(i - firstWeekOffset - style::window::calendar::week_days_number + 2);
+            std::string number =
+                std::to_string(cellIndex - firstWeekOffset - style::window::calendar::week_days_number + 1);
             this->setText(number);
-            this->activeItem   = true;
+            this->activeItem = true;
             this->setFont(style::window::font::medium);
             this->activatedCallback = [=](gui::Item &item) {
                 LOG_DEBUG("Switch to DayEventsWindow");
@@ -70,14 +68,13 @@ namespace gui
 
         assert(parent);
         parent->addWidget(this);
-        grid.x        = dayWidth;
-        grid.y        = dayHeight;
+        grid.x = dayWidth;
+        grid.y = dayHeight;
 
-        uint32_t firstDayOffset    = model->getFirstWeekOffset();
-        uint32_t lastDay           = model->getLastDay();
-        uint32_t iterations        = style::window::calendar::week_days_number + firstDayOffset + lastDay - 1;
-        LOG_DEBUG("OFFSET DAY: %u", firstDayOffset);
-        LOG_DEBUG("LAST DAY: %u", lastDay);
+        uint32_t firstDayOffset = model->getFirstWeekOffset();
+        uint32_t lastDay        = model->getLastDay();
+        uint32_t iterations     = style::window::calendar::week_days_number + firstDayOffset + lastDay;
+
         uint32_t i;
         for (i = 0; i < iterations; ++i) {
             auto day = new DayLabel(app,
@@ -94,8 +91,12 @@ namespace gui
 
     CalendarMainWindow::CalendarMainWindow(app::Application *app, std::string name) : AppWindow(app, name)
     {
-        this->actualDate = year_month_day{floor<days>(std::chrono::system_clock::now())};
-        buildInterface(style::window::calendar::test::month_id);
+        auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
+        assert(appCalendar != nullptr);
+        std::chrono::system_clock::time_point tp =
+            std::chrono::system_clock::from_time_t(appCalendar->getCurrentTimeStamp());
+        this->actualDate = date::year_month_day{date::floor<date::days>(tp)};
+        buildInterface();
     }
 
     void CalendarMainWindow::refresh()
@@ -103,7 +104,7 @@ namespace gui
         erase(dateLabel);
         month->erase();
 
-        monthModel = std::make_unique<MonthModel>(actualDate);
+        monthModel           = std::make_unique<MonthModel>(actualDate);
         std::string dateText = monthModel->getMonthYearText();
         this->buildMonth(monthModel);
         this->buildDateLabel(dateText);
@@ -112,7 +113,7 @@ namespace gui
     void CalendarMainWindow::rebuild()
     {
         destroyInterface();
-        buildInterface(style::window::calendar::test::month_id);
+        buildInterface();
     }
 
     void CalendarMainWindow::buildMonth(std::unique_ptr<MonthModel> &model)
@@ -131,66 +132,66 @@ namespace gui
         // setup month box
         addWidget(month);
 
-            month->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-                if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-                    return false;
+        month->borderCallback = [this](const InputEvent &inputEvent) -> bool {
+            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            switch (inputEvent.keyCode) {
+            case KeyCode::KEY_UP: {
+                LOG_DEBUG("change month prev");
+                if (actualDate.month() != date::January) {
+                    date::month prevMonth = --actualDate.month();
+                    actualDate            = actualDate.year() / prevMonth / date::last;
                 }
-                switch (inputEvent.keyCode) {
-                case KeyCode::KEY_UP: {
-                    LOG_DEBUG("change month prev");
-                    if (actualDate.month() != date::month(1)) {
-                        date::month prevMonth = --actualDate.month();
-                        actualDate            = actualDate.year() / prevMonth / last;
-                    }
-                    else {
-                        date::month prevMonth = date::month(12);
-                        date::year prevYear   = --actualDate.year();
-                        actualDate            = prevYear / prevMonth / last;
-                    }
-                    this->refresh();
-                    return true;
+                else {
+                    date::month prevMonth = date::December;
+                    date::year prevYear   = --actualDate.year();
+                    actualDate            = prevYear / prevMonth / date::last;
                 }
-                case KeyCode::KEY_DOWN: {
-                    LOG_DEBUG("change month next");
-                    if (actualDate.month() != date::month(12)) {
-                        date::month nextMonth = ++actualDate.month();
-                        actualDate            = actualDate.year() / nextMonth / 1;
-                    }
-                    else {
-                        date::month nextMonth = date::month(1);
-                        date::year nextYear   = ++actualDate.year();
-                        actualDate            = nextYear / nextMonth / 1;
-                    }
-                    this->refresh();
-                    return true;
+                this->refresh();
+                return true;
+            }
+            case KeyCode::KEY_DOWN: {
+                LOG_DEBUG("change month next");
+                if (actualDate.month() != date::December) {
+                    date::month nextMonth = ++actualDate.month();
+                    actualDate            = actualDate.year() / nextMonth / 1;
                 }
-                case KeyCode::KEY_LEFT: {
-                    LOG_DEBUG("Call borderCallback -> go to the previous element");
-                    auto it = month->getNavigationFocusedItem();
-                    if (month->nextNavigationItem(std::prev(it)) != nullptr) {
-                        month->setFocusItem(month->nextNavigationItem(std::prev(it)));
-                    }
-                    else {
-                        month->setFocusOnLastElement();
-                    }
-                    return true;
+                else {
+                    date::month nextMonth = date::January;
+                    date::year nextYear   = ++actualDate.year();
+                    actualDate            = nextYear / nextMonth / 1;
                 }
-                case KeyCode::KEY_RIGHT: {
-                    LOG_DEBUG("Call borderCallback -> go to the next element");
-                    auto it = month->getNavigationFocusedItem();
-                    if (month->nextNavigationItem(std::next(it)) != nullptr) {
-                        month->setFocusItem(month->nextNavigationItem(std::next(it)));
-                    }
-                    else {
-                        month->setFocusOnElement(0);
-                    }
-                    return true;
+                this->refresh();
+                return true;
+            }
+            case KeyCode::KEY_LEFT: {
+                LOG_DEBUG("Call borderCallback -> go to the previous element");
+                auto it = month->getNavigationFocusedItem();
+                if (month->nextNavigationItem(std::prev(it)) != nullptr) {
+                    month->setFocusItem(month->nextNavigationItem(std::prev(it)));
                 }
-                default: {
-                    return false;
+                else {
+                    month->setFocusOnLastElement();
                 }
+                return true;
+            }
+            case KeyCode::KEY_RIGHT: {
+                LOG_DEBUG("Call borderCallback -> go to the next element");
+                auto it = month->getNavigationFocusedItem();
+                if (month->nextNavigationItem(std::next(it)) != nullptr) {
+                    month->setFocusItem(month->nextNavigationItem(std::next(it)));
                 }
-            };
+                else {
+                    month->setFocusOnElement(0);
+                }
+                return true;
+            }
+            default: {
+                return false;
+            }
+            }
+        };
 
         setFocusItem(month);
     }
@@ -210,10 +211,9 @@ namespace gui
         addWidget(dateLabel);
     }
 
-    void CalendarMainWindow::buildInterface(const uint32_t &actualDateTimeID)
+    void CalendarMainWindow::buildInterface()
     {
         LOG_DEBUG("AppWindow build interface");
-        LOG_DEBUG("Calendar Date Time ID:%d", static_cast<int>(actualDateTimeID));
         AppWindow::buildInterface();
 
         LOG_DEBUG("Start build interface for calendar main window");
@@ -232,7 +232,6 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_calendar_bar_list"));
-        LOG_DEBUG("Calendar Date Time ID:%d", static_cast<int>(actualDateTimeID));
     }
 
     void CalendarMainWindow::destroyInterface()

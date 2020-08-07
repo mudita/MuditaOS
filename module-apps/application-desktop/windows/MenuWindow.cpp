@@ -177,37 +177,6 @@ namespace gui
                               }},
             });
 
-        mainMenu->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            switch (inputEvent.keyCode) {
-            case KeyCode::KEY_UP: {
-                auto it = mainMenu->getNavigationFocusedItem();
-                mainMenu->setFocusItem((*std::next(it, (mainMenu->rowSize - 1) * mainMenu->colSize)));
-                return true;
-            }
-            case KeyCode::KEY_DOWN: {
-                auto it = mainMenu->getNavigationFocusedItem();
-                mainMenu->setFocusItem((*std::prev(it, (mainMenu->rowSize - 1) * mainMenu->colSize)));
-                return true;
-            }
-            case KeyCode::KEY_LEFT: {
-                auto it = mainMenu->getNavigationFocusedItem();
-                mainMenu->setFocusItem((*std::next(it, mainMenu->colSize - 1)));
-                return true;
-            }
-            case KeyCode::KEY_RIGHT: {
-                auto it = mainMenu->getNavigationFocusedItem();
-                mainMenu->setFocusItem((*std::prev(it, mainMenu->colSize - 1)));
-                return true;
-            }
-            default: {
-                return false;
-            }
-            }
-        };
-
         toolsMenu = new MenuPage(
             this,
             utils::localize.get("app_desktop_tools_title"),
@@ -229,37 +198,6 @@ namespace gui
                                   return true;
                               }},
             });
-
-        toolsMenu->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            switch (inputEvent.keyCode) {
-            case KeyCode::KEY_UP: {
-                auto it = toolsMenu->getNavigationFocusedItem();
-                toolsMenu->setFocusItem((*std::next(it, (toolsMenu->rowSize - 1) * toolsMenu->colSize)));
-                return true;
-            }
-            case KeyCode::KEY_DOWN: {
-                auto it = toolsMenu->getNavigationFocusedItem();
-                toolsMenu->setFocusItem((*std::prev(it, (toolsMenu->rowSize - 1) * toolsMenu->colSize)));
-                return true;
-            }
-            case KeyCode::KEY_LEFT: {
-                auto it = toolsMenu->getNavigationFocusedItem();
-                toolsMenu->setFocusItem((*std::next(it, toolsMenu->colSize - 1)));
-                return true;
-            }
-            case KeyCode::KEY_RIGHT: {
-                auto it = toolsMenu->getNavigationFocusedItem();
-                toolsMenu->setFocusItem((*std::prev(it, toolsMenu->colSize - 1)));
-                return true;
-            }
-            default: {
-                return false;
-            }
-            }
-        };
 
         using namespace style::window;
         mainMenu->setSize(this->area().w - default_left_margin - default_right_margin,

@@ -1,34 +1,31 @@
 #pragma once
 
-#include "DayModel.hpp"
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
 #include <gui/widgets/GridLayout.hpp>
 #include <gui/widgets/Item.hpp>
 #include <Text.hpp>
-#include <application-calendar/date.h>
+#include <module-utils/date/include/date/date.h>
 #include <map>
 #include <string>
 #include <vector>
 
-using namespace date;
-
 class MonthModel
 {
   public:
-    month m;
+    date::month month;
     unsigned int lastDay;
     // first week offset
-    uint32_t offset;
-    year y;
+    uint32_t firstWeekDayNumb;
+    date::year year;
 
   public:
-    MonthModel(year_month_day ymd);
+    MonthModel(date::year_month_day ymd);
     MonthModel()          = default;
     virtual ~MonthModel() = default;
 
-    year getYear();
-    month getMonth();
+    date::year getYear();
+    date::month getMonth();
     uint32_t getLastDay();
     uint32_t getFirstWeekOffset();
     std::string getMonthYearText();
