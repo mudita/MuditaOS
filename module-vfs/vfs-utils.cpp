@@ -195,7 +195,7 @@ void vfs::updateTimestamp()
     }
 }
 
-json11::Json purefs::boot_config_t::to_json() const
+json11::Json purefs::BootConfig::to_json() const
 {
     return json11::Json::object{
         {purefs::json::main,
@@ -214,7 +214,7 @@ json11::Json purefs::boot_config_t::to_json() const
 // Method to compare two version strings
 //   v1 <  v2  -> -1
 //   v1 == v2  ->  0
-int purefs::boot_config_t::version_compare(const std::string &v1, const std::string &v2)
+int purefs::BootConfig::version_compare(const std::string &v1, const std::string &v2)
 {
     size_t i = 0, j = 0;
     while (i < v1.length() || j < v2.length()) {
