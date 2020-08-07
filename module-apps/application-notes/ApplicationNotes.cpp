@@ -29,7 +29,7 @@ namespace app
     sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
-    	auto retMsg = Application::DataReceivedHandler(msgl);
+        auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
             return retMsg;
