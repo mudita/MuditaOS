@@ -15,9 +15,12 @@ namespace gui
         gui::Label *descriptionLabel = nullptr;
         gui::CheckBox *checkBox      = nullptr;
         app::Application *app        = nullptr;
+        bool checkIsOnLeftBarSide    = false;
+
+        void applyCallbacks();
 
       public:
-        CheckBoxItem(app::Application *application, const std::string &description);
+        CheckBoxItem(app::Application *application, const std::string &description, bool checkIsOnLeftBarSide = false);
         virtual ~CheckBoxItem() override = default;
 
         // virtual methods from Item

@@ -10,52 +10,81 @@ namespace gui
                        const uint32_t &y,
                        const uint32_t &w,
                        const uint32_t &h,
-                       Image *image,
-                       std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                       std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : ImageBox(parent, x, y, w, h, image), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
+                       std::function<void()> bottomBarRestoreFromTemporaryMode,
+                       bool textOnLeft)
+        : HBox(parent, x, y, w, h), bottomBarTemporaryMode(bottomBarTemporaryMode),
+          bottomBarRestoreFromTemporaryMode(bottomBarRestoreFromTemporaryMode), textOnLeft(textOnLeft)
+
     {
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
+        image = new Image("small_tick");
+        addWidget(image);
+
+        applyCallbacks();
+    }
+
+    void CheckBox::applyCallbacks()
+    {
         focusChangedCallback = [&](Item &item) {
             if (focus) {
-                LOG_DEBUG("FOCUS");
-                // setFocusItem(image);
-                // if (image->visible) {
-                // bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"), BottomBar::Side::LEFT,
-                // false);
-                //}
-                // else {
-                // bottomBarTemporaryMode(utils::localize.get("app_calendar_check"), BottomBar::Side::LEFT, false);
-                //}
+                setFocusItem(image);
+                if (image->visible) {
+                    bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+                }
+                else {
+                    bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                }
             }
             else {
-                LOG_DEBUG("NOT FOCUS");
-                // setFocusItem(nullptr);
-                // bottomBarRestoreFromTemporaryMode();
+                setFocusItem(nullptr);
+                bottomBarRestoreFromTemporaryMode();
             }
             return true;
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            LOG_DEBUG("INPUT CALLBACK");
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (event.keyCode == gui::KeyCode::KEY_ENTER) {
-                LOG_DEBUG("KEY ENTER");
-                // image->setVisible(!image->visible);
-                /*if (image->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+            if (textOnLeft) {
+                if (event.keyCode == gui::KeyCode::KEY_LF) {
+                    image->setVisible(!image->visible);
+                    if (image->visible) {
+                        bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+                    }
+                    else {
+                        bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                    }
+                    return true;
                 }
-                else {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
-                }*/
-                return true;
+            }
+            else {
+                if (event.keyCode == gui::KeyCode::KEY_ENTER) {
+                    image->setVisible(!image->visible);
+                    if (image->visible) {
+                        bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+                    }
+                    else {
+                        bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                    }
+                    return true;
+                }
             }
             return false;
         };
+    }
+
+    void CheckBox::setImageVisible(bool state)
+    {
+        image->setVisible(state);
+    }
+
+    bool CheckBox::isChecked()
+    {
+        return image->visible;
     }
 
 } /* namespace gui */

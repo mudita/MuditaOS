@@ -92,15 +92,19 @@ namespace style
                     const inline int colon_label_h       = 20;
                     const inline int time_input_12h_w    = 125;
                     const inline int time_input_24h_w    = 202;
+                    const inline int mode12h_input_margin = 25;
                 } // namespace eventTime
 
                 namespace checkBox
                 {
-                    const inline int height              = 62;
+                    const inline int height              = 52;
+                    const inline int margin_top          = 6;
+                    const inline int margin_bottom       = 5;
                     const inline int input_box_label_w   = 55;
                     const inline int input_box_label_h   = 50;
                     const inline int description_label_w = 280;
                     const inline int description_label_h = 40;
+                    const inline int description_margin  = 11;
                     const inline int tick_image_w        = 30;
                     const inline int tick_image_h        = 30;
                 } // namespace checkBox
