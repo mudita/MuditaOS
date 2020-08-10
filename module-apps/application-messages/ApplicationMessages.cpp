@@ -50,7 +50,11 @@ namespace app
                     }
                 }
                 // app-wide actions
-                // <none>
+                if (msg->interface == db::Interface::Name::SMSThread && msg->type == db::Query::Type::Delete) {
+                    if (getCurrentWindow()->getName() != gui::name::window::main_window) {
+                        switchWindow(gui::name::window::main_window);
+                    }
+                }
                 return std::make_shared<sys::ResponseMessage>();
             }
         }
@@ -170,7 +174,6 @@ namespace app
                     LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->ID);
                     return false;
                 }
-                this->switchWindow(gui::name::window::main_window);
                 return true;
             };
             meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");

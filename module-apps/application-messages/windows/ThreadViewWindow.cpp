@@ -431,17 +431,13 @@ namespace gui
                     // do not update view, as we don't have visual representation for read status
                     break;
                 }
+
+                // manually until not ListView
                 if (this == application->getCurrentWindow()) {
                     application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                 }
+
                 return true;
-            }
-            if (msg->interface == db::Interface::Name::SMSThread) {
-                if (msg->type == db::Query::Type::Delete) {
-                    if (this == application->getCurrentWindow()) {
-                        application->switchWindow(gui::name::window::main_window);
-                    }
-                }
             }
         }
         return false;
