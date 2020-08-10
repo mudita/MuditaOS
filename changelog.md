@@ -247,6 +247,7 @@
 * `[sms]` Fix thread view refresh on a new message.
 * `[sms]` Fix message reordering on page change.
 * `[sms]` Remove empty screen view at the top of a thread view.
+* `[music player]` Added simple player volume indicator.
 
 ### Other
 

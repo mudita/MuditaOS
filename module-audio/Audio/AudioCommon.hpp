@@ -39,4 +39,5 @@ namespace audio
 
     RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
     const char *c_str(RetCode retcode);
+    [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> const std::string;
 } // namespace audio
