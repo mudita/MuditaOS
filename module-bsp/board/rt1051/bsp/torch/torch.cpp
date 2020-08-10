@@ -20,6 +20,7 @@ namespace bsp
     {
         std::shared_ptr<DriverGPIO> gpio;
         const unsigned short max_current_mA = 150;
+        ColourTemperature currentColourTemp = warmest;
 
         int32_t init(xQueueHandle qHandle)
         {
@@ -88,12 +89,20 @@ namespace bsp
             }
             return true;
         };
-        bool turn(State state)
+        bool turn(State state, ColourTemperature colourTemp)
         {
+            if (colourTemp != no_change) {
+                currentColourTemp = colourTemp;
+            }
+
             addr.subAddress = AL3644TT_ENABLE_REG;
             al3644tt_enable_reg en_reg{
-                .led1_en = static_cast<uint8_t>(state == State::on ? AL3644TT_LED_ENABLED : AL3644TT_LED_DISABLED),
-                .led2_en = AL3644TT_LED_DISABLED,
+                .led1_en = static_cast<uint8_t>(currentColourTemp == ColourTemperature::warmest && state == State::on
+                                                    ? AL3644TT_LED_ENABLED
+                                                    : AL3644TT_LED_DISABLED),
+                .led2_en = static_cast<uint8_t>(currentColourTemp == ColourTemperature::coldest && state == State::on
+                                                    ? AL3644TT_LED_ENABLED
+                                                    : AL3644TT_LED_DISABLED),
                 .mode    = 0b10,
                 .torch_temp_en = 0,
                 .strobe_en     = 0,
@@ -106,6 +115,7 @@ namespace bsp
             }
             return true;
         }
+
         std::pair<bool, State> getState()
         {
             addr.subAddress = AL3644TT_ENABLE_REG;
@@ -114,7 +124,15 @@ namespace bsp
             if (read != 1) {
                 return std::make_pair(false, State::off); // invalid
             }
-            return std::make_pair(true, en_reg.led1_en == AL3644TT_LED_ENABLED ? State::on : State::off);
+            return std::make_pair(true,
+                                  (en_reg.led1_en == AL3644TT_LED_ENABLED || en_reg.led2_en == AL3644TT_LED_ENABLED)
+                                      ? State::on
+                                      : State::off);
+        }
+
+        ColourTemperature getColorTemp()
+        {
+            return currentColourTemp;
         }
 
         bool toggle()

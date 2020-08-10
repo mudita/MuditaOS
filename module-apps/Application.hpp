@@ -23,6 +23,7 @@
 #include "Interface/SettingsRecord.hpp"
 
 #include <module-bsp/bsp/torch/torch.hpp>
+#include <module-services/service-evtmgr/Constants.hpp>
 #include "service-evtmgr/messages/EVMessages.hpp"
 
 #include "SwitchData.hpp"
@@ -237,10 +238,38 @@ namespace app
             return adjustCurrentVolume(-step);
         }
 
-        void toggleTorch()
+        void toggleTorchAndColourTemps()
         {
-            auto message = std::make_shared<sevm::TorchStateMessage>(bsp::torch::Action::toggle);
-            sys::Bus::SendUnicast(message, "EventManager", this);
+            using namespace bsp;
+
+            auto retGetState = sys::Bus::SendUnicast(std::make_shared<sevm::TorchStateMessage>(torch::Action::getState),
+                                                     service::name::evt_manager,
+                                                     this,
+                                                     pdMS_TO_TICKS(1500));
+            if (retGetState.first == sys::ReturnCodes::Success) {
+                auto msgGetState = dynamic_cast<sevm::TorchStateResultMessage *>(retGetState.second.get());
+                if (msgGetState == nullptr) {
+                    return;
+                }
+                auto msgSetState = std::make_shared<sevm::TorchStateMessage>(torch::Action::setState);
+
+                switch (msgGetState->state) {
+                case torch::State::off:
+                    msgSetState->state      = torch::State::on;
+                    msgSetState->colourTemp = torch::warmest;
+                    break;
+                case torch::State::on:
+                    if (msgGetState->colourTemp == torch::warmest) { // toggle colour temp
+                        msgSetState->state      = torch::State::on;
+                        msgSetState->colourTemp = torch::coldest;
+                    }
+                    else {
+                        msgSetState->state = torch::State::off;
+                    }
+                    break;
+                }
+                sys::Bus::SendUnicast(msgSetState, service::name::evt_manager, this);
+            }
         }
 
         /// @defgroup Application Application static functions
