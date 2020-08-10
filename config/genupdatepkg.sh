@@ -9,7 +9,7 @@ else
   source ./config/common.sh
 fi
 
-VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{print $3}'`
+VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{print $3}' | tr -d '\"'`
 VERSION_CODENAME="salvador"
 print_help() {
 	echo "Usage: $0 [OPTION] [BUILD-DIR]"
@@ -136,6 +136,6 @@ echo -ne "-- "
 cd update/tmp && rhash -ru checksums.txt .
 cd $curpwd
 echo "-- create tar update/pureos-$vstr.tar"
-cd update/tmp && tar -cf ../pureos-$vstr.tar *
+cd update/tmp && tar -cf ../pureos-$vstr.tar .
 cd $curpwd
 ls -alh update/pureos-$vstr.tar
