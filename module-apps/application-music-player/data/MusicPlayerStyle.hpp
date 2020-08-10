@@ -29,4 +29,21 @@ namespace musicPlayerStyle
 
     } // namespace songItem
 
+    namespace volumeLabel
+    {
+        constexpr uint32_t x = 0;
+        constexpr uint32_t y = 52;
+
+        constexpr uint32_t w = style::window_width;
+        constexpr uint32_t h = 52;
+
+        constexpr auto defaultVolumeLabelText = "Vol: 10";
+
+        constexpr int32_t topMargin    = 0;
+        constexpr int32_t bottomMargin = 0;
+
+        constexpr int32_t leftMargin  = 16;
+        constexpr int32_t rightMargin = 0;
+    } // namespace volumeLabel
+
 } // namespace musicPlayerStyle
