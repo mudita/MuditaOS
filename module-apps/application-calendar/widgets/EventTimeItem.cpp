@@ -7,7 +7,12 @@
 namespace gui
 {
 
-    EventTimeItem::EventTimeItem(const std::string &description, bool mode24H) : mode24H{mode24H}
+    EventTimeItem::EventTimeItem(const std::string &description,
+                                 bool mode24H,
+                                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
+                                 std::function<void()> bottomBarRestoreFromTemporaryMode)
+        : mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventTime::height);
 
@@ -63,11 +68,18 @@ namespace gui
         descriptionLabel->setText(description);
 
         focusChangedCallback = [&](Item &item) {
-            setFocusItem(focus ? hBox : nullptr);
+            LOG_DEBUG("Event time focus changed");
+            setFocusItem(focus ? hourInput : nullptr);
             return true;
         };
 
-        inputCallback = [&](Item &item, const InputEvent &event) { return hourInput->onInput(event); };
+        inputCallback = [&](Item &item, const InputEvent &event) {
+            auto focusedItem = getFocusItem();
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            return focusedItem->onInput(event);
+        };
 
         prepareForTimeMode();
         setNavigation();
@@ -89,11 +101,23 @@ namespace gui
                 LOG_INFO("12H mode clicked");
                 return true;
             };
+            mode12hInput->focusChangedCallback = [&](Item &item) {
+                if (focus) {
+                    LOG_DEBUG("Focus 12H");
+                    bottomBarTemporaryMode("SWITCH");
+                }
+                else {
+                    LOG_DEBUG("Lost focus 12H");
+                    bottomBarRestoreFromTemporaryMode();
+                }
+                return true;
+            };
 
             mode12hInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_12h_w,
                                          style::window::calendar::item::eventTime::height -
                                              style::window::calendar::item::eventTime::description_label_h);
-            mode12hInput->setMargins(gui::Margins(25, 0, 0, 0));
+            mode12hInput->setMargins(
+                gui::Margins(style::window::calendar::item::eventTime::mode12h_input_margin, 0, 0, 0));
             hourInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_12h_w,
                                       style::window::calendar::item::eventTime::height -
                                           style::window::calendar::item::eventTime::description_label_h);

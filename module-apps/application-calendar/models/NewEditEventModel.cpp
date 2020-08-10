@@ -41,10 +41,26 @@ void NewEditEventModel::createData()
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+
     internalData.push_back(
-        new gui::CheckBoxItem(application, utils::localize.get("app_calendar_new_edit_event_allday")));
-    internalData.push_back(new gui::EventTimeItem(utils::localize.get("app_calendar_new_edit_event_start"), false));
-    internalData.push_back(new gui::EventTimeItem(utils::localize.get("app_calendar_new_edit_event_end"), true));
+        new gui::CheckBoxItem(application, utils::localize.get("app_calendar_new_edit_event_allday"), true));
+
+    internalData.push_back(new gui::EventTimeItem(
+        utils::localize.get("app_calendar_new_edit_event_start"),
+        false,
+        [app](const UTF8 &text) {
+            app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
+        },
+        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+
+    internalData.push_back(new gui::EventTimeItem(
+        utils::localize.get("app_calendar_new_edit_event_end"),
+        true,
+        [app](const UTF8 &text) {
+            app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
+        },
+        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+
     internalData.push_back(new gui::SeveralOptionsItem(
         application,
         utils::localize.get("app_calendar_event_detail_reminder"),
@@ -52,6 +68,7 @@ void NewEditEventModel::createData()
             app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
         },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+
     internalData.push_back(new gui::SeveralOptionsItem(
         application,
         utils::localize.get("app_calendar_event_detail_repeat"),
