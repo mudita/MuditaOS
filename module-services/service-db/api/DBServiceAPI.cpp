@@ -389,35 +389,34 @@ std::unique_ptr<ContactRecord> DBServiceAPI::MatchContactByPhoneNumber(sys::Serv
     return std::move(contactResponse->contact);
 }
 
-DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service *serv,
-                                                                   const ContactRecord &rec,
-                                                                   ContactRecord &errNumPrim,
-                                                                   ContactRecord &errNumAlt,
-                                                                   ContactRecord &errSpeedDial)
+DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
 {
+
+    if (rec.primaryName.length() == 0 && rec.alternativeName.length() == 0 && rec.numbers.empty() &&
+        rec.mail.length() == 0 && rec.address.length() == 0 && rec.note.length() == 0) {
+        return emptyContactError;
+    }
+
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
     if (!retSpeedDial->empty()) {
-        errSpeedDial = retSpeedDial->operator[](0);
-        return (speedDialError);
+        return speedDialError;
     }
 
     if (rec.numbers.size() > 0 && rec.numbers[0].number.getEntered().size() > 0) {
         auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number);
         if (retPhone1) {
-            errNumPrim = *retPhone1;
-            return (primaryNumberError);
+            return primaryNumberError;
         }
     }
 
     if (rec.numbers.size() > 1 && rec.numbers[1].number.getEntered().size() > 0) {
         auto retPhone2 = MatchContactByPhoneNumber(serv, rec.numbers[1].number);
         if (retPhone2) {
-            errNumAlt = *retPhone2;
-            return (secondaryNumberError);
+            return secondaryNumberError;
         }
     }
 
-    return (noError);
+    return noError;
 }
 
 std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationError err)
@@ -425,6 +424,8 @@ std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationEr
     switch (err) {
     case noError:
         return "No error occurred";
+    case emptyContactError:
+        return "Contact record is empty";
     case speedDialError:
         return "Invalid or duplicate speed dial number";
     case primaryNumberError:

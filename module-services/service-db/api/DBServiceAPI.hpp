@@ -20,6 +20,7 @@ class DBServiceAPI
   public:
     enum ContactVerificationError
     {
+        emptyContactError,
         speedDialError,
         primaryNumberError,
         secondaryNumberError,
@@ -83,11 +84,7 @@ class DBServiceAPI
      *
      * @note This function is blocking. It's checking until first error.
      */
-    static ContactVerificationError verifyContact(sys::Service *serv,
-                                                  const ContactRecord &rec,
-                                                  ContactRecord &errNumPrim,
-                                                  ContactRecord &errNumAlt,
-                                                  ContactRecord &errSpeedDial);
+    static ContactVerificationError verifyContact(sys::Service *serv, const ContactRecord &rec);
     static std::string getVerificationErrorString(const ContactVerificationError err);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv,
                                                                         UTF8 primaryName,
