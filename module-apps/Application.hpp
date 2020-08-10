@@ -237,6 +237,10 @@ namespace app
         {
             return adjustCurrentVolume(-step);
         }
+        auto getCurrentVolume(audio::Volume &volume)
+        {
+            return AudioServiceAPI::GetOutputVolume(this, volume);
+        }
 
         void toggleTorchAndColourTemps()
         {
