@@ -110,3 +110,15 @@ TEST_CASE("CRC32 tests")
     REQUIRE(vfs.remove("testFile.txt") == 0);
     REQUIRE(vfs.remove("testFile.txt.crc32") == 0);
 }
+
+TEST_CASE("File loading and saving")
+{
+    vfs.Init();
+    std::string fileContents = vfs.loadFileAsString("module-vfs/test_dir/test1.txt");
+    REQUIRE(strcmp(fileContents.c_str(), "abcd") == 0);
+
+    vfs.replaceWithString("module-vfs/test_dir/testWrite.txt", "this is a test");
+    fileContents = vfs.loadFileAsString("module-vfs/test_dir/testWrite.txt");
+    REQUIRE(strcmp(fileContents.c_str(), "this is a test") == 0);
+    REQUIRE(vfs.remove("module-vfs/test_dir/testWrite.txt") == 0);
+}
