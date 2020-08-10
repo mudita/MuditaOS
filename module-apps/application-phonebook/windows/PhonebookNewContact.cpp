@@ -124,38 +124,9 @@ namespace gui
         return false;
     }
 
-    auto PhonebookNewContact::isAtLeastOneFieldFulfilled() -> bool
-    {
-        if (contact->primaryName.length() > 0) {
-            return true;
-        }
-        if (contact->alternativeName.length() > 0) {
-            return true;
-        }
-        if (!contact->numbers.empty()) {
-            return true;
-        }
-        if (contact->mail.length() > 0) {
-            return true;
-        }
-        if (contact->address.length() > 0) {
-            return true;
-        }
-        if (contact->note.length() > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
         ContactRecord errNumPrim, errNumAlt, errSpeedDial;
-
-        if (!isAtLeastOneFieldFulfilled()) {
-            LOG_ERROR("Can't save empty contact");
-            return false;
-        }
 
         if (contactAction == ContactAction::Add) {
             DBServiceAPI::ContactVerificationError err =
@@ -164,6 +135,8 @@ namespace gui
             switch (err) {
             case DBServiceAPI::noError:
                 break;
+            case DBServiceAPI::emptyContactError:
+                return false;
             case DBServiceAPI::primaryNumberError:
                 showDialogDuplicatedNumber(contact->numbers[0].number);
                 return false;
