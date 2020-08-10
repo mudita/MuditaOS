@@ -17,8 +17,14 @@ namespace gui
         gui::Text *mode12hInput      = nullptr;
         bool mode24H                 = false;
 
+        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
+        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+
       public:
-        EventTimeItem(const std::string &description, bool mode24H);
+        EventTimeItem(const std::string &description,
+                      bool mode24H,
+                      std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+                      std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         virtual ~EventTimeItem() override = default;
 
         void prepareForTimeMode();
