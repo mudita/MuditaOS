@@ -23,6 +23,6 @@
 	{
 		"included": "__BOOTLOADER_INCLUDED__",
 		"version": "__BOOTLOADER_INCLUDED_VERSION__",
-		"fiename"" "__BOOTLOADER_INCLUDED_FILENAME__"
+		"fiename": "__BOOTLOADER_INCLUDED_FILENAME__"
 	}
 }
