@@ -5,6 +5,9 @@
 ### Fixed
 * `[phonebook]` Fix favourites contacts display order.
 
+### Added
+* `[torch]` Toggle torch colours for certification purposes (redish, blueish, off)
+
 ## [0.33.1 - 2020-08-14]
 
 ### Changed

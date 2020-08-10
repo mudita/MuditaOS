@@ -144,7 +144,7 @@ namespace gui
             return true;
         }
         case KeyCode::KEY_TORCH: {
-            application->toggleTorch();
+            application->toggleTorchAndColourTemps();
             return true;
         }
         default:
