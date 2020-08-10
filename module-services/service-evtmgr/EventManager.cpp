@@ -186,14 +186,15 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgl->messageType == MessageType::EVMTorchStateMessage) {
         auto msg = dynamic_cast<sevm::TorchStateMessage *>(msgl);
         if (msg != nullptr) {
-            auto message = std::make_shared<sevm::TorchStateResultMessage>(msg->direction);
+            auto message = std::make_shared<sevm::TorchStateResultMessage>(msg->action);
 
-            switch (msg->direction) {
+            switch (msg->action) {
             case bsp::torch::Action::getState:
                 std::tie(message->success, message->state) = bsp::torch::getState();
+                message->colourTemp                        = bsp::torch::getColorTemp();
                 break;
             case bsp::torch::Action::setState:
-                message->success = bsp::torch::turn(msg->state);
+                message->success = bsp::torch::turn(msg->state, msg->colourTemp);
                 break;
             case bsp::torch::Action::toggle:
                 message->success = bsp::torch::toggle();

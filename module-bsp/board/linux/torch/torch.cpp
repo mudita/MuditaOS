@@ -12,7 +12,8 @@ namespace bsp
 
     namespace torch
     {
-        State state_simulated = State::off;
+        State state_simulated               = State::off;
+        ColourTemperature currentColourTemp = warmest;
 
         int32_t init(xQueueHandle qHandle)
         {
@@ -32,16 +33,31 @@ namespace bsp
             return true;
         }
 
-        bool turn(State state)
+        bool turn(State state, ColourTemperature colourTemp)
         {
             state_simulated = state;
-            LOG_INFO("Torch is %s", (state == State::on) ? "ON \U0001f4a1 \U0001f526" : "OFF");
+            if (colourTemp != no_change) {
+                currentColourTemp = colourTemp;
+            }
+
+            if (state == State::on) {
+                LOG_INFO("Torch is ON \U0001f526 (%s)",
+                         currentColourTemp == ColourTemperature::warmest ? "warm \U0001f987" : "cold \U0001f535");
+            }
+            else {
+                LOG_INFO("Torch is OFF");
+            }
             return true;
         }
 
         std::pair<bool, State> getState()
         {
             return std::make_pair(true, state_simulated);
+        }
+
+        ColourTemperature getColorTemp()
+        {
+            return currentColourTemp;
         }
 
         bool toggle()

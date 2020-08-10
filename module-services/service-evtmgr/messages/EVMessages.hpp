@@ -105,11 +105,11 @@ namespace sevm
     class TorchStateMessage : public Message
     {
       public:
-        TorchStateMessage(bsp::torch::Action direction)
-            : Message(MessageType::EVMTorchStateMessage), direction(direction)
+        TorchStateMessage(bsp::torch::Action direction) : Message(MessageType::EVMTorchStateMessage), action(direction)
         {}
-        bsp::torch::Action direction;
+        bsp::torch::Action action;
         bsp::torch::State state = bsp::torch::State::off;
+        bsp::torch::ColourTemperature colourTemp = bsp::torch::ColourTemperature::no_change;
     };
 
     class TorchStateResultMessage : public TorchStateMessage
