@@ -12,6 +12,7 @@ namespace updateos
     {
         const inline std::string checksums = "checksums.txt";
         const inline std::string sql_mig   = "sqlmig.json";
+        const inline std::string version   = "version.json";
 
     } // namespace file
 
@@ -32,12 +33,15 @@ namespace updateos
         CantCreateExtractedFile,
         CantOpenChecksumsFile,
         VerifyChecksumsFailure,
+        VerifyVersionFailure,
+        CantWriteBootloader,
         CantOpenUpdateFile,
         CantDeletePreviousOS,
         CantRenameCurrentToPrevious,
         CantRenameTempToCurrent,
-        CantUpdateINI,
-        CantSaveINI
+        CantUpdateJSON,
+        CantSaveJSON,
+        CantUpdateCRC32JSON
     };
 
     enum class BootloaderUpdateError
@@ -70,8 +74,10 @@ class UpdatePureOS
     updateos::UpdateError prepareTempDirForUpdate();
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();
+    updateos::UpdateError verifyVersion();
+    updateos::UpdateError updateBootloader();
     updateos::UpdateError prepareRoot();
-    updateos::UpdateError updateBootINI();
+    updateos::UpdateError updateBootJSON();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
 
@@ -83,7 +89,6 @@ class UpdatePureOS
     const fs::path getUpdateTmpChild(const fs::path &childPath);
 
   private:
-    bool iniSet(sbini_t *ini, const std::string section, const std::string name, const std::string value);
 
     fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;

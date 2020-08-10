@@ -40,19 +40,19 @@ void vfs::Init()
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
 
-    osRootPath = purefs::dir::eMMC_disk;
+    bootConfig.os_root_path = purefs::dir::eMMC_disk;
 
-    if (getOSRootFromIni()) {
-        LOG_INFO("vfs::Init osType %s root:%s", osType.c_str(), osRootPath.c_str());
-        if (ff_chdir(osRootPath.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't chdir to %s", osRootPath.c_str());
+    if (loadBootConfig(getCurrentBootJSON())) {
+        LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
+        if (ff_chdir(bootConfig.os_root_path.c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path.c_str());
         }
     }
     else {
-        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", osRootPath.c_str());
+        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", bootConfig.os_root_path.c_str());
     }
 
-    LOG_INFO("vfs::Init running on ARM osRootPath: %s", osRootPath.c_str());
+    LOG_INFO("vfs::Init running on ARM osRootPath: %s", bootConfig.os_root_path.c_str());
 
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
@@ -65,34 +65,6 @@ void vfs::Init()
     else {
         LOG_INFO("vfs::Init looks like %s exists", purefs::dir::user_disk.c_str());
     }
-}
-
-bool vfs::getOSRootFromIni()
-{
-    const fs::path currentBootIni = getCurrentBootIni();
-    sbini_t *ini                  = sbini_load(currentBootIni.c_str());
-    if (!ini) {
-        LOG_ERROR("getOSRootFromIni can't load ini file %s", currentBootIni.c_str());
-        return false;
-    }
-    else {
-        osType     = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
-        osRootPath = purefs::dir::eMMC_disk / osType;
-        sbini_free(ini);
-        return true;
-    }
-}
-
-const fs::path vfs::getCurrentBootIni()
-{
-    if (verifyCRC(purefs::file::boot_ini)) {
-        return relativeToRoot(purefs::file::boot_ini);
-    }
-    else if (verifyCRC(purefs::file::boot_ini_bak)) {
-        return relativeToRoot(purefs::file::boot_ini_bak);
-    }
-
-    return "";
 }
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
@@ -302,16 +274,16 @@ std::string vfs::relativeToRoot(const std::string path)
     fs::path fsPath(path);
 
     if (fsPath.is_absolute()) {
-        if (osRootPath.root_directory() == fsPath.root_directory())
+        if (bootConfig.os_root_path.root_directory() == fsPath.root_directory())
             return fsPath;
         else
             return (purefs::dir::eMMC_disk / fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
-        return osRootPath;
+        return bootConfig.os_root_path;
     else
-        return osRootPath / fsPath;
+        return bootConfig.os_root_path / fsPath;
 }
 
 bool vfs::isDir(const char *path)

@@ -1,5 +1,9 @@
 # Mudita PurePhone changelog
+## [0.33.1 - 2020-08-14]
 
+### Other
+* `[boot]` switched from ini to JSON format
+* `[core]` fixed TAR extract
 
 ## [0.32.1 - 2020-08-07]
 

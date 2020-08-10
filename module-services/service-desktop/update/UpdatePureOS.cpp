@@ -73,6 +73,22 @@ updateos::UpdateError UpdatePureOS::runUpdate()
         return err;
     }
 
+    if ((err = verifyVersion()) == updateos::UpdateError::NoError) {
+        LOG_INFO("runUpdate %s verifyVersion success", updateFile.c_str());
+    }
+    else {
+        LOG_ERROR("runUpdate %s version verification failed", updateFile.c_str());
+        return err;
+    }
+
+    if ((err = updateBootloader()) == updateos::UpdateError::NoError) {
+        LOG_INFO("runUpdate %s updateBootloader success", updateFile.c_str());
+    }
+    else {
+        LOG_ERROR("runUpdate %s version updateBootloader failed", updateFile.c_str());
+        return err;
+    }
+
     if ((err = prepareRoot()) == updateos::UpdateError::NoError) {
         LOG_INFO("runUpdate %s root ready for reset", updateFile.c_str());
     }
@@ -85,28 +101,33 @@ updateos::UpdateError UpdatePureOS::runUpdate()
 
 updateos::UpdateError UpdatePureOS::unpackUpdate()
 {
-    mtar_header_t h;
+    mtar_header_t tarHeader;
     filesInUpdatePackage.clear();
-    while ((mtar_read_header(&updateTar, &h)) != MTAR_ENULLRECORD) {
-        LOG_DEBUG("unpackUpdate %s (%d bytes) type:%s", h.name, h.size, (h.type == MTAR_TDIR) ? "dir" : "file");
+
+    while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
         unsigned long fileCRC32 = 0;
-        if (h.type == MTAR_TDIR) {
-            fs::path tmpPath = getUpdateTmpChild(h.name);
+        LOG_INFO("unpackUpdate: reading tar header name %s...", tarHeader.name);
+
+        if (tarHeader.type == MTAR_TDIR) {
+            fs::path tmpPath = getUpdateTmpChild(tarHeader.name);
             if (vfs.mkdir(tmpPath.c_str()) != 0) {
                 LOG_ERROR("unpackUpdate failed to create %s when extracting update tar", tmpPath.c_str());
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
         }
         else {
-            if (unpackFileToTemp(h, &fileCRC32) == false) {
-                LOG_ERROR("unpackUpdate failed to extract update file %s", h.name);
+            if (unpackFileToTemp(tarHeader, &fileCRC32) == false) {
+                LOG_ERROR("unpackUpdate failed to extract update file %s", tarHeader.name);
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
 
-            filesInUpdatePackage.emplace_back(FileInfo(h, fileCRC32));
+            filesInUpdatePackage.emplace_back(FileInfo(tarHeader, fileCRC32));
         }
+
         mtar_next(&updateTar);
     }
+
+    LOG_INFO("unpackUpdate last header: %s", tarHeader.name);
     return updateos::UpdateError::NoError;
 }
 
@@ -144,6 +165,32 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
     return updateos::UpdateError::NoError;
 }
 
+updateos::UpdateError UpdatePureOS::verifyVersion()
+{
+    LOG_DEBUG("verifyVersion noError");
+    if (!vfs.fileExists(getUpdateTmpChild(updateos::file::version).c_str())) {
+        LOG_ERROR("verifyVersion %s does not exist", getUpdateTmpChild(updateos::file::version).c_str());
+        return updateos::UpdateError::VerifyVersionFailure;
+    }
+
+    std::string versionJsonString = vfs.loadFileAsString(getUpdateTmpChild(updateos::file::version));
+    std::string parserError;
+    json11::Json updateVersionInformation = json11::Json::parse(versionJsonString, parserError);
+    if (parserError != "") {
+        LOG_INFO("verifyVersion parse json error: %s", parserError.c_str());
+        return updateos::UpdateError::VerifyVersionFailure;
+    }
+    else {
+    }
+    return updateos::UpdateError::NoError;
+}
+
+updateos::UpdateError UpdatePureOS::updateBootloader()
+{
+    LOG_DEBUG("updateBootloader noError");
+    return updateos::UpdateError::NoError;
+}
+
 unsigned long UpdatePureOS::getExtractedFileCRC32(const std::string &filePath)
 {
     for (auto file : filesInUpdatePackage) {
@@ -162,9 +209,10 @@ void UpdatePureOS::getChecksumInfo(const std::string &infoLine, std::string &fil
         const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, purefs::buffer::crc_char_size - 1);
         if (fileCRC32Long != nullptr) {
             *fileCRC32Long = strtoull(fileCRC32Str.c_str(), nullptr, purefs::buffer::crc_radix);
-            LOG_DEBUG("getChecksumInfo filePath: %s fileCRC32Str: %s fileCRC32Long: %lu",
+            LOG_DEBUG("getChecksumInfo filePath: %s fileCRC32Str: %s fileCRC32Long: %lu fileCRC32Hex: %lX",
                       filePath.c_str(),
                       fileCRC32Str.c_str(),
+                      *fileCRC32Long,
                       *fileCRC32Long);
         }
     }
@@ -220,74 +268,40 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
                   vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantRenameTempToCurrent;
     }
-    // make sure that boot.ini points to the current version
 
-    return updateBootINI();
+    return updateBootJSON();
 }
 
-bool UpdatePureOS::iniSet(sbini_t *ini, const std::string section, const std::string name, const std::string value)
+updateos::UpdateError UpdatePureOS::updateBootJSON()
 {
-    if (sbini_set_string(ini, section.c_str(), name.c_str(), value.c_str())) {
-        LOG_ERROR("iniSet can't update internal structure %s::%s::%s", section.c_str(), name.c_str(), value.c_str());
-        sbini_free(ini);
-        return false;
-    }
-    return true;
-}
+    unsigned long bootJSONAbsoulteCRC = 0;
+    fs::path bootJSONAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_json;
+    LOG_DEBUG("updateBootJSON %s", bootJSONAbsoulte.c_str());
 
-updateos::UpdateError UpdatePureOS::updateBootINI()
-{
-    unsigned long bootIniAbsoulteCRC = 0;
-    fs::path bootIniAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_ini;
-    LOG_DEBUG("updateBootINI");
-    sbini_t *ini = sbini_load(bootIniAbsoulte.c_str());
+    vfs::FILE *fp = vfs.fopen(bootJSONAbsoulte.c_str(), "r");
 
-    if (ini == NULL) {
-        LOG_INFO("updateBootINI can't load %s", purefs::file::boot_ini.c_str());
-        ini = sbini_new();
-    }
-
-    /* ini will be freed in iniSet if it fails */
-    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_type, PATH_CURRENT)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, purefs::ini::main, purefs::ini::os_image, purefs::file::boot_bin.c_str())) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_tag, GIT_TAG)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_revision, GIT_REV)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-    if (!iniSet(ini, PATH_CURRENT, purefs::ini::os_git_branch, GIT_BRANCH)) {
-        return updateos::UpdateError::CantUpdateINI;
-    }
-
-    if (sbini_save(ini, bootIniAbsoulte.c_str())) {
-        LOG_ERROR("updateBootINI can't save ini file at: %s", bootIniAbsoulte.c_str());
-        sbini_free(ini);
-        return updateos::UpdateError::CantSaveINI;
-    }
-
-    sbini_free(ini);
-
-    vfs::FILE *fp = vfs.fopen(bootIniAbsoulte.c_str(), "r");
     if (fp != nullptr) {
-        vfs.computeCRC32(fp, &bootIniAbsoulteCRC);
-        bootIniAbsoulte += purefs::extension::crc32;
+        vfs.computeCRC32(fp, &bootJSONAbsoulteCRC);
+        bootJSONAbsoulte += purefs::extension::crc32;
 
-        vfs::FILE *fpCRC = vfs.fopen(bootIniAbsoulte.c_str(), "w");
+        vfs::FILE *fpCRC = vfs.fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
             std::array<char, purefs::buffer::crc_char_size> crcBuf;
-            sprintf(crcBuf.data(), "%lX", bootIniAbsoulteCRC);
+            sprintf(crcBuf.data(), "%lX", bootJSONAbsoulteCRC);
             vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
             vfs.fclose(fpCRC);
         }
+        else {
+            return updateos::UpdateError::CantUpdateCRC32JSON;
+        }
+
         vfs.fclose(fp);
     }
+    else {
+        return updateos::UpdateError::CantUpdateCRC32JSON;
+    }
 
-    LOG_DEBUG("updateBootINI no error");
+    LOG_DEBUG("updateBootJSON no error");
     return updateos::UpdateError::NoError;
 }
 
@@ -296,10 +310,13 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     std::unique_ptr<unsigned char[]> readBuf(new unsigned char[purefs::buffer::tar_buf]);
     const fs::path fullPath = getUpdateTmpChild(h.name);
 
-    LOG_DEBUG("unpackFileToTemp %s", fullPath.c_str());
-
     uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
     uint32_t sizeToRead   = purefs::buffer::tar_buf;
+
+    LOG_DEBUG("unpackFileToTemp %s blocksToRead %ud sizeToRead %ud",
+              fullPath.c_str(),
+              (unsigned int)blocksToRead,
+              (unsigned int)sizeToRead);
 
     if (crc32 != nullptr) {
         *crc32 = 0;
@@ -317,13 +334,14 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 
     for (uint32_t i = 0; i < blocksToRead; i++) {
         if (i + 1 == blocksToRead) {
-            if (h.size < purefs::buffer::tar_buf) {
-                sizeToRead = h.size;
-            }
-            else {
-                sizeToRead = updateTar.remaining_data;
-            }
+            sizeToRead = h.size % purefs::buffer::tar_buf;
         }
+        else {
+            sizeToRead = purefs::buffer::tar_buf;
+        }
+
+        if (sizeToRead == 0)
+            break;
 
         if ((errCode = mtar_read_data(&updateTar, readBuf.get(), sizeToRead)) != MTAR_ESUCCESS) {
             LOG_ERROR("unpackFileToTemp mtar_read_data failed, errCode=%d", errCode);

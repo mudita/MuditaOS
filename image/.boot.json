@@ -1,0 +1,12 @@
+{
+    "main": 
+    {
+        "ostype": "current",
+        "imagename": "boot.bin"
+    },
+    "bootloader":
+    {
+        "version":"0.0.0"
+    },
+    "git": {}
+}

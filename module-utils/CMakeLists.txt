@@ -43,7 +43,6 @@ include(segger/rtt/CMakeLists.txt)
 include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
-include(third-party/sbini.cmake)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 
