@@ -31,7 +31,7 @@ namespace gui
         multilineText->setMaximumSize(phonebookStyle::outputLinesTextWithLabelItem::w,
                                       phonebookStyle::outputLinesTextWithLabelItem::input_text_h * 10);
         multilineText->setMargins(Margins(0, phonebookStyle::outputLinesTextWithLabelItem::span_size, 0, 0));
-        multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         multilineText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         multilineText->setFont(style::window::font::medium);
         multilineText->setEditMode(EditMode::BROWSE);

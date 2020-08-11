@@ -54,6 +54,17 @@ namespace gui
 
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? vBox : nullptr);
+
+            auto tempText = inputText->getText();
+
+            if (focus) {
+                inputText->setFont(style::window::font::mediumbold);
+                inputText->setText(tempText);
+            }
+            else {
+                inputText->setFont(style::window::font::medium);
+                inputText->setText(tempText);
+            }
             return true;
         };
 
@@ -108,7 +119,6 @@ namespace gui
     void InputLinesWithLabelItem::firstNameHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
-        inputText->setFont(style::window::font::bigbold);
         inputText->setTextType(TextType::SINGLE_LINE);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };

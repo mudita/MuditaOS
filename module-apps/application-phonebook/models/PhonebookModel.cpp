@@ -1,5 +1,5 @@
 #include <application-phonebook/ApplicationPhonebook.hpp>
-#include <module-apps/application-phonebook/windows/PhonebookContact.hpp>
+#include <application-phonebook/windows/PhonebookContactDetails.hpp>
 #include "ListView.hpp"
 #include "PhonebookModel.hpp"
 

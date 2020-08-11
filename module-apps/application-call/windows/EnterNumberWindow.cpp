@@ -12,7 +12,6 @@
 #include "../data/CallAppStyle.hpp"
 #include "../data/CallSwitchData.hpp"
 
-#include <application-phonebook/windows/PhonebookContact.hpp>
 #include <ContactRecord.hpp>
 #include <country.hpp>
 #include <i18/i18.hpp>

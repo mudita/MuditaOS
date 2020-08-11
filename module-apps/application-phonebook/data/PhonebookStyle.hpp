@@ -91,8 +91,7 @@ namespace phonebookStyle
     namespace informationWidget
     {
         constexpr uint32_t w             = style::window::default_body_width;
-        constexpr uint32_t h             = 75;
-        constexpr uint32_t title_label_h = 30;
+        constexpr uint32_t title_label_h = 20;
         constexpr uint32_t email_text_h  = 35;
     } // namespace informationWidget
 
@@ -135,12 +134,13 @@ namespace phonebookStyle
 
     namespace numbersWithIconsWidget
     {
+        constexpr uint32_t h                       = 55;
         constexpr uint32_t sms_image_w             = 55;
-        constexpr uint32_t sms_image_h             = 55;
+        constexpr uint32_t sms_image_h             = h;
         constexpr uint32_t phone_image_w           = 55;
-        constexpr uint32_t phone_image_h           = 55;
+        constexpr uint32_t phone_image_h           = h;
         constexpr uint32_t phone_image_margin_left = 30;
-        constexpr uint32_t number_text_h           = 55;
+        constexpr uint32_t number_text_h           = h;
     } // namespace numbersWithIconsWidget
 
 } // namespace phonebookStyle
