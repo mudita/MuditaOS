@@ -4,6 +4,7 @@
 
 ### Fixed
 * `[phonebook]` Fix favourites contacts display order.
+* `[phonebook]` Fix (un)blocking option name and improve contact blocking window handling.
 
 ### Added
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off)
