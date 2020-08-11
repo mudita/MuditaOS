@@ -7,6 +7,10 @@
 
 ## [0.33.1 - 2020-08-14]
 
+### Changed
+
+* `[phonebook]` Moved contact validation to DB service.
+
 ### Other
 * `[boot]` switched from ini to JSON format
 * `[core]` fixed TAR extract
