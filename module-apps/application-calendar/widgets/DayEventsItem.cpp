@@ -9,21 +9,32 @@ namespace gui
 
     DayEventsItem::DayEventsItem()
     {
-        setMinimumSize(style::window::default_body_width, style::window::calendar::item::height);
-        setMaximumSize(style::window::default_body_width, style::window::calendar::item::height);
+        setMinimumSize(style::window::default_body_width, style::window::calendar::item::dayEvents::height);
 
-        setPenFocusWidth(style::window::default_border_focus_w);
-        setPenWidth(style::window::default_border_no_focus_w);
+        vBox = new gui::VBox(this, 0, 0, 0, 0);
+        vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox = new gui::HBox(vBox, 0, 0, 0, 0);
+        hBox->setMinimumSize(style::window::default_body_width, style::window::calendar::item::dayEvents::h_box_h);
+        hBox->setMargins(gui::Margins(0, style::window::calendar::item::dayEvents::margins, 0, 0));
+        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
-        title = new gui::Label(this, 0, 0, 0, 0);
-        title->setPenFocusWidth(0);
-        title->setPenWidth(0);
+        title = new gui::Label(hBox, 0, 0, 0, 0);
+        title->setMinimumSize(style::window::calendar::item::dayEvents::title_w,
+                              style::window::calendar::item::dayEvents::h_box_h);
+        title->setMargins(gui::Margins(0, 0, style::window::calendar::item::dayEvents::margins, 0));
+        title->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         title->setFont(style::window::font::bigbold);
         title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
-        description = new gui::Label(this, 0, 0, 0, 0);
-        description->setPenFocusWidth(0);
-        description->setPenWidth(0);
+        clock = new gui::Image("small_tick");
+        clock->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        hBox->addWidget(clock);
+
+        description = new gui::Label(vBox, 0, 0, 0, 0);
+        description->setMinimumSize(style::window::default_body_width,
+                                    style::window::calendar::item::dayEvents::description_h);
+        description->setMargins(gui::Margins(0, 0, 0, style::window::calendar::item::dayEvents::margins));
+        description->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         description->setFont(style::window::font::medium);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
@@ -43,13 +54,8 @@ namespace gui
 
     bool DayEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        title->setPosition(style::window::calendar::item::label_x, style::window::calendar::item::title_y);
-        title->setSize(style::window::calendar::item::title_w, style::window::calendar::item::title_h);
-
-        description->setPosition(style::window::calendar::item::label_x, style::window::calendar::item::descripton_y);
-        description->setSize(newDim.w - 2 * style::window::calendar::item::label_x,
-                             newDim.h - style::window::calendar::item::title_h);
-
+        vBox->setPosition(0, 0);
+        vBox->setSize(newDim.w, newDim.h);
         return true;
     }
 

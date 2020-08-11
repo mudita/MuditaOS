@@ -8,11 +8,14 @@
 class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
 {
     app::Application *application = nullptr;
+    bool mode24H                  = false;
 
   public:
-    NewEditEventModel(app::Application *app);
+    NewEditEventModel(app::Application *app, bool mode24H = false);
 
-    void loadData();
+    void loadData(bool allDayEvent);
+    void loadDataWithoutTimeItem();
+    void reloadDataWithTimeItem();
     void saveData();
 
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
@@ -21,5 +24,5 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
   private:
-    void createData();
+    void createData(bool allDayEvent);
 };

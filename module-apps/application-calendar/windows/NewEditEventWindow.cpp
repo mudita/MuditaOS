@@ -52,9 +52,8 @@ namespace gui
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
             list->setElementsCount(newEditEventModel->getItemCount());
+            newEditEventModel->loadData(false);
         }
-
-        newEditEventModel->loadData();
     }
 
     bool NewEditEventWindow::onInput(const gui::InputEvent &inputEvent)

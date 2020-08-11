@@ -59,7 +59,7 @@ namespace gui
         optionLabel->setFont(style::window::font::small);
         optionLabel->activeItem = false;
 
-        rightArrow             = new gui::Image(hBox, 0, 0, 0, 0);
+        rightArrow = new gui::Image(hBox, 0, 0, 0, 0);
         rightArrow->setMinimumSize(style::window::calendar::item::severalOptions::arrow_w,
                                    style::window::calendar::item::severalOptions::arrow_h);
         rightArrow->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
@@ -67,7 +67,7 @@ namespace gui
         rightArrow->set("arrow_right");
 
         prepareOptionsNames();
-        setNavigation();
+        applyCallbacks();
     }
 
     void SeveralOptionsItem::prepareOptionsNames()
@@ -97,7 +97,7 @@ namespace gui
         optionLabel->setText(optionsNames[0]);
     }
 
-    void SeveralOptionsItem::setNavigation()
+    void SeveralOptionsItem::applyCallbacks()
     {
         focusChangedCallback = [&](Item &item) {
             if (focus) {
