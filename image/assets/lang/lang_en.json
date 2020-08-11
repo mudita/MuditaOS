@@ -19,6 +19,8 @@
     "common_switch": "SWITCH",
     "common_options": "OPTIONS",
     "common_information": "Information",
+    "common_check": "CHECK",
+    "common_uncheck": "UNCHECK",
 
     "common_mo":"MO",
     "common_tu":"TU",
@@ -94,8 +96,6 @@
     "app_calendar_new_event_title": "New event",
     "app_calendar_edit_event_title": "Edit event",
     "app_calendar_edit": "EDIT",
-    "app_calendar_check": "CHECK",
-    "app_calendar_uncheck": "UNCHECK",
     "app_calendar_new_edit_event_name": "Event name",
     "app_calendar_new_edit_event_allday": "All day event",
     "app_calendar_new_edit_event_start": "Start",

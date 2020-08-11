@@ -1,5 +1,5 @@
 #include "CustomRepeatModel.hpp"
-#include "application-calendar/widgets/CheckBoxItem.hpp"
+#include "application-calendar/widgets/CheckBoxWithLabelItem.hpp"
 #include <ListView.hpp>
 #include <Utils.hpp>
 
@@ -29,15 +29,22 @@ gui::ListItem *CustomRepeatModel::getItem(gui::Order order)
 
 void CustomRepeatModel::createData()
 {
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Monday)));
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Tuesday)));
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Wednesday)));
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Thursday)));
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Friday)));
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Saturday)));
-    internalData.push_back(new gui::CheckBoxItem(application, utils::localize.get(style::strings::common::Sunday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Monday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Tuesday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Wednesday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Thursday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Friday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Saturday)));
+    internalData.push_back(
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Sunday)));
 
-    for (auto item : internalData) {
+    for (auto &item : internalData) {
         item->deleteByList = false;
     }
 }
@@ -49,7 +56,7 @@ void CustomRepeatModel::loadData()
 
     createData();
 
-    for (auto item : internalData) {
+    for (auto &item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback();
         }

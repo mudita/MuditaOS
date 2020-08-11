@@ -77,6 +77,11 @@ namespace gui
             auto msgl = msg.second.get();
             assert(msgl != nullptr);
             onDatabaseMessage(msgl);
+
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<SwitchData>();
+            data->setDescription("New");
+            application->switchWindow(
+                style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
         return false;

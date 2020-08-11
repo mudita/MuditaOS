@@ -21,6 +21,7 @@ namespace gui
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         image = new Image("small_tick");
+        image->setVisible(false);
         addWidget(image);
 
         applyCallbacks();
@@ -32,10 +33,10 @@ namespace gui
             if (focus) {
                 setFocusItem(image);
                 if (image->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+                    bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                    bottomBarTemporaryMode(utils::localize.get("common_check"));
                 }
             }
             else {
@@ -53,10 +54,10 @@ namespace gui
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
                     }
                     else {
-                        bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                        bottomBarTemporaryMode(utils::localize.get("common_check"));
                     }
                     return true;
                 }
@@ -65,10 +66,10 @@ namespace gui
                 if (event.keyCode == gui::KeyCode::KEY_ENTER) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("app_calendar_uncheck"));
+                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
                     }
                     else {
-                        bottomBarTemporaryMode(utils::localize.get("app_calendar_check"));
+                        bottomBarTemporaryMode(utils::localize.get("common_check"));
                     }
                     return true;
                 }

@@ -15,7 +15,7 @@ void DayEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 
 unsigned int DayEventsModel::getMinimalItemHeight() const
 {
-    return style::window::calendar::item::height;
+    return style::window::calendar::item::dayEvents::height;
 }
 
 gui::ListItem *DayEventsModel::getItem(gui::Order order)
