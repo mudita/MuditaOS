@@ -1,8 +1,5 @@
 #include "PhonebookContactDetails.hpp"
-
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "PhonebookContact.hpp"
-
 #include "application-phonebook/widgets/ContactFlagsWidget.hpp"
 
 #include <Dialog.hpp>

@@ -9,36 +9,35 @@ namespace gui
 {
     InformationWidget::InformationWidget(app::Application *app)
     {
-        setMargins(gui::Margins(0, style::margins::very_big, 0, 0));
+        setMargins(gui::Margins(0, style::margins::huge, 0, 0));
 
-        setMinimumSize(phonebookStyle::informationWidget::w, phonebookStyle::informationWidget::h);
+        setMinimumSize(phonebookStyle::informationWidget::w,
+                       phonebookStyle::informationWidget::title_label_h + style::margins::huge);
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
-        titleLabel = new Label(vBox,
-                               0,
-                               0,
-                               phonebookStyle::informationWidget::w,
-                               phonebookStyle::informationWidget::title_label_h,
-                               utils::localize.get("app_phonebook_contact_information"));
+        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::localize.get("app_phonebook_contact_information"));
+        titleLabel->setMinimumSize(phonebookStyle::informationWidget::w,
+                                   phonebookStyle::informationWidget::title_label_h);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setMargins(Margins(0, 0, 0, style::margins::very_big));
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        titleLabel->setFont(style::window::font::small);
+        titleLabel->setFont(style::window::font::verysmall);
         titleLabel->setLineMode(true);
         titleLabel->activeItem = false;
 
         onLoadCallback = [=](std::shared_ptr<ContactRecord> contact) {
             if (contact->numbers.size() > 0) {
 
-                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::title_label_h);
+                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::numbersWithIconsWidget::h);
 
                 primaryNumberHBox = new NumberWithIconsWidget(
                     app, contact->numbers[0].number, style::window::font::mediumbold, nullptr);
                 vBox->addWidget(primaryNumberHBox);
             }
             if (contact->numbers.size() > 1) {
-                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::h);
+                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::numbersWithIconsWidget::h);
                 alternativeNumberHBox =
                     new NumberWithIconsWidget(app, contact->numbers[1].number, style::window::font::medium, nullptr);
 
@@ -56,30 +55,37 @@ namespace gui
                                                                      primaryNumberHBox->phoneImage);
             }
             if (contact->mail.length() > 0) {
-                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::h);
+                setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::email_text_h +
+                                 style::margins::very_big);
 
-                emailText = new Text(nullptr, 0, 0, 0, 0);
+                emailText = new Text(vBox, 0, 0, 0, 0);
                 emailText->setMaximumSize(phonebookStyle::informationWidget::w,
                                           phonebookStyle::informationWidget::email_text_h);
+                emailText->setMargins(Margins(0, style::margins::very_big, 0, 0));
                 emailText->setFont(style::window::font::medium);
-                emailText->setPenFocusWidth(style::window::default_border_focus_w);
-                emailText->setPenWidth(style::window::default_border_no_focus_w);
                 emailText->setEditMode(EditMode::BROWSE);
-                emailText->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+                emailText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
                 emailText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
                 emailText->setText(contact->mail);
-                vBox->addWidget(emailText);
+                emailText->activeItem = false;
             }
         };
 
         focusChangedCallback = [&](Item &item) {
-            setFocusItem(focus ? vBox : nullptr);
+            if (vBox->getFocusItem() == nullptr) {
+                setFocusItem(vBox);
+            }
             return true;
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
+            }
+
+            // Clear VBox down navigation if alternative number is present.
+            if (alternativeNumberHBox != nullptr) {
+                primaryNumberHBox->clearNavigationItem(NavigationDirection::DOWN);
             }
 
             return vBox->onInput(event);

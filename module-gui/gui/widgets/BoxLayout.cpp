@@ -143,12 +143,13 @@ namespace gui
 
     void BoxLayout::addFromOutOfDrawAreaList()
     {
-        if (children.size() != 0u) {
+        if (children.size() != 0) {
             for (auto it : outOfDrawAreaItems) {
                 it->setVisible(true);
             }
         }
         outOfDrawAreaItems.clear();
+        resizeItems();
     }
 
     // space left distposition `first is better` tactics
@@ -368,15 +369,6 @@ namespace gui
         sizeStore->store(*el, granted);
         BoxLayout::resizeItems<axis>(); // vs mark dirty
         return granted;
-
-        //        if (granted.width >= sizeLeft<Axis::X>(this) || granted.height >= sizeLeft<Axis::Y>(this)) {
-        //            sizeStore->store(*el, granted);
-        //            BoxLayout::resizeItems<axis>(); // vs mark dirty
-        //            return granted;
-        //        }
-        //        else {
-        //            return Size(0, 0);
-        //        }
     }
 
     void BoxLayout::setFocusOnLastElement()
