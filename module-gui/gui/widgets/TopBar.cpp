@@ -56,7 +56,12 @@ namespace gui
             val = battery.size();
         }
         for (unsigned int i = 0; i < battery.size(); ++i) {
-            battery[i]->setVisible(val >= i);
+            if (elements.battery) {
+                battery[i]->setVisible(val >= i);
+            }
+            else {
+                battery[i]->setVisible(false);
+            }
         }
     }
 

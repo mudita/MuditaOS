@@ -60,4 +60,21 @@ namespace gui
         void update(const Meta &meta);
     };
 
+    /// @brief Yes/No Icon Text  Dialog class
+    ///
+    /// Contain same items as DialogYesNo and additionally puts text on icon
+    class DialogYesNoIconTxt : public DialogYesNo
+    {
+      protected:
+        Text *iconText = nullptr;
+        UTF8 textStr   = "";
+
+      public:
+        DialogYesNoIconTxt(app::Application *app, const std::string &name, const Meta &meta = Dialog::Meta());
+        ~DialogYesNoIconTxt() override = default;
+
+        void SetIconText(const std::string &text);
+        void update(const Meta &meta);
+    };
+
 }; // namespace gui

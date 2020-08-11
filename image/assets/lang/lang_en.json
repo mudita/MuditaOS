@@ -218,7 +218,7 @@
     "app_phonebook_contact_favourites_upper": "FAVOURITES",
     "app_phonebook_contact_speed_dial_upper": "SPEED DIAL",
     "app_phonebook_contact_speed_blocked_uppper": "BLOCKED",
-    "app_phonebook_duplicate_numbers": "This number is already assigned to $CONTACT_NAME$. Would you like to replace it?",
+    "app_phonebook_duplicate_numbers": "Number $CONTACT_SPEED_DIAL$ is assigned to \n $CONTACT_NAME$. Replace it?",
     "app_phonebook_duplicate_speed_dial_title":"Speed dial key ($CONTACT_SPEED_DIAL$)",
     "app_phonebook_options_title": "Options",
     "app_phonebook_options_edit": "Edit Contact",
