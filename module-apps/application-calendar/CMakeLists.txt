@@ -21,10 +21,11 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventDetailDescriptionItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/RepeatAndReminderItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxWithLabelItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventTimeItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/SeveralOptionsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/TextWithLabelItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxWithLabelAndModel.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.hpp"

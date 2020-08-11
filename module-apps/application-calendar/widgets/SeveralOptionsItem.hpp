@@ -30,7 +30,7 @@ namespace gui
         virtual ~SeveralOptionsItem() override = default;
 
         void prepareOptionsNames();
-        void setNavigation();
+        void applyCallbacks();
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };

@@ -1,4 +1,4 @@
-#include "CheckBoxItem.hpp"
+#include "CheckBoxWithLabelItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "application-calendar/windows/NewEditEventWindow.hpp"
 #include "windows/AppWindow.hpp"
@@ -9,7 +9,9 @@
 namespace gui
 {
 
-    CheckBoxItem::CheckBoxItem(app::Application *application, const std::string &description, bool checkIsOnLeftBarSide)
+    CheckBoxWithLabelItem::CheckBoxWithLabelItem(app::Application *application,
+                                                 const std::string &description,
+                                                 bool checkIsOnLeftBarSide)
         : app(application), checkIsOnLeftBarSide(checkIsOnLeftBarSide)
     {
         app = application;
@@ -24,8 +26,6 @@ namespace gui
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        hBox->setPenFocusWidth(style::window::default_border_focus_w);
-        hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
         if (checkIsOnLeftBarSide) {
             checkBox = new gui::CheckBox(
@@ -53,8 +53,8 @@ namespace gui
                 [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
                 checkIsOnLeftBarSide);
         }
-        checkBox->setMinimumSize(50, style::window::calendar::item::checkBox::height);
-        checkBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        checkBox->setMinimumSize(style::window::calendar::item::checkBox::height,
+                                 style::window::calendar::item::checkBox::height);
         checkBox->activeItem = false;
 
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
@@ -71,7 +71,7 @@ namespace gui
         applyCallbacks();
     }
 
-    void CheckBoxItem::applyCallbacks()
+    void CheckBoxWithLabelItem::applyCallbacks()
     {
         focusChangedCallback = [&](Item &item) {
             if (focus) {
@@ -86,13 +86,17 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            return checkBox->onInput(event);
+            if (checkBox->onInput(event)) {
+                checkBox->resizeItems();
+                return true;
+            }
+            return false;
         };
 
         onLoadCallback = [&]() { checkBox->setImageVisible(false); };
     }
 
-    bool CheckBoxItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool CheckBoxWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         hBox->setPosition(0, 0);
         hBox->setSize(newDim.w, newDim.h);

@@ -21,6 +21,7 @@ namespace gui
 
         vBox = new gui::VBox(this, 0, 0, 0, 0);
         vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->activeItem = false;
 
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
         descriptionLabel->setMinimumSize(style::window::default_body_width,
@@ -35,6 +36,7 @@ namespace gui
                              style::window::calendar::item::eventTime::height -
                                  style::window::calendar::item::eventTime::description_label_h);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->activeItem = false;
 
         hourInput = new gui::Text(hBox, 0, 0, 0, 0);
         hourInput->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -64,50 +66,103 @@ namespace gui
         minuteInput->setPenWidth(style::window::default_border_rect_no_focus);
         minuteInput->setEditMode(gui::EditMode::EDIT);
 
-        setNavigationItem(NavigationDirection::LEFT, hourInput);
         descriptionLabel->setText(description);
 
         focusChangedCallback = [&](Item &item) {
-            LOG_DEBUG("Event time focus changed");
-            setFocusItem(focus ? hourInput : nullptr);
+            setFocusItem(focus ? hBox : nullptr);
             return true;
         };
 
+        applyInputCallbacks();
+        prepareForTimeMode();
+    }
+
+    void EventTimeItem::applyInputCallbacks()
+    {
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto focusedItem = getFocusItem();
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            return focusedItem->onInput(event);
+            if (event.keyCode == gui::KeyCode::KEY_ENTER || event.keyCode == gui::KeyCode::KEY_RF) {
+                return false;
+            }
+
+            if (focusedItem->onInput(event)) {
+                if (mode24H && atoi(hourInput->getText().c_str()) > timeConstants::max_hour_24H_mode) {
+                    hourInput->setText("00");
+                }
+                else if (!mode24H && atoi(hourInput->getText().c_str()) > timeConstants::max_hour_12H_mode) {
+                    hourInput->setText("12");
+                }
+                if (atoi(minuteInput->getText().c_str()) > timeConstants::max_minutes) {
+                    minuteInput->setText("00");
+                }
+                return true;
+            }
+            else if (hBox->onInput(event)) {
+                return true;
+            }
+
+            return false;
         };
 
-        prepareForTimeMode();
-        setNavigation();
+        hourInput->inputCallback = [&](Item &item, const InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (hourInput->getText().length() > 1 && event.keyCode != gui::KeyCode::KEY_LEFT &&
+                event.keyCode != gui::KeyCode::KEY_RIGHT && event.keyCode != gui::KeyCode::KEY_PND &&
+                event.keyCode != gui::KeyCode::KEY_UP && event.keyCode != gui::KeyCode::KEY_DOWN) {
+                return true;
+            }
+            return false;
+        };
+
+        minuteInput->inputCallback = [&](Item &item, const InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (minuteInput->getText().length() > 1 && event.keyCode != gui::KeyCode::KEY_LEFT &&
+                event.keyCode != gui::KeyCode::KEY_RIGHT && event.keyCode != gui::KeyCode::KEY_PND &&
+                event.keyCode != gui::KeyCode::KEY_UP && event.keyCode != gui::KeyCode::KEY_DOWN) {
+                return true;
+            }
+            return false;
+        };
     }
 
     void EventTimeItem::prepareForTimeMode()
     {
         if (!mode24H) {
-            mode12hInput = new gui::Text(hBox, 0, 0, 0, 0);
+            mode12hInput = new gui::Label(hBox, 0, 0, 0, 0);
             mode12hInput->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
             mode12hInput->setAlignment(
                 gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             mode12hInput->setFont(style::window::font::largelight);
-            mode12hInput->setInputMode(new InputMode({InputMode::ABC}));
             mode12hInput->setPenFocusWidth(style::window::default_border_focus_w);
             mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
-            mode12hInput->setEditMode(gui::EditMode::EDIT);
-            mode12hInput->activatedCallback = [=](gui::Item &item) {
-                LOG_INFO("12H mode clicked");
-                return true;
+            mode12hInput->setText(timeConstants::before_noon);
+            mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
+                if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                    return false;
+                }
+                if (event.keyCode == gui::KeyCode::KEY_LF) {
+                    if (mode12hInput->getText() == timeConstants::before_noon) {
+                        mode12hInput->setText(timeConstants::after_noon);
+                    }
+                    else {
+                        mode12hInput->setText(timeConstants::before_noon);
+                    }
+                    return true;
+                }
+                return false;
             };
             mode12hInput->focusChangedCallback = [&](Item &item) {
-                if (focus) {
-                    LOG_DEBUG("Focus 12H");
-                    bottomBarTemporaryMode("SWITCH");
+                if (item.focus) {
+                    bottomBarTemporaryMode(utils::localize.get("common_switch"));
                 }
                 else {
-                    LOG_DEBUG("Lost focus 12H");
                     bottomBarRestoreFromTemporaryMode();
                 }
                 return true;
@@ -124,6 +179,9 @@ namespace gui
             minuteInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_12h_w,
                                         style::window::calendar::item::eventTime::height -
                                             style::window::calendar::item::eventTime::description_label_h);
+
+            onLoadCallback = [&]() {};
+            onSaveCallback = [&]() {};
         }
         else {
             hourInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_24h_w,
@@ -132,24 +190,9 @@ namespace gui
             minuteInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_24h_w,
                                         style::window::calendar::item::eventTime::height -
                                             style::window::calendar::item::eventTime::description_label_h);
-        }
-    }
 
-    void EventTimeItem::setNavigation()
-    {
-        if (mode24H) {
-            hourInput->setNavigationItem(NavigationDirection::LEFT, minuteInput);
-            hourInput->setNavigationItem(NavigationDirection::RIGHT, minuteInput);
-            minuteInput->setNavigationItem(NavigationDirection::LEFT, hourInput);
-            minuteInput->setNavigationItem(NavigationDirection::RIGHT, hourInput);
-        }
-        else {
-            hourInput->setNavigationItem(NavigationDirection::LEFT, mode12hInput);
-            hourInput->setNavigationItem(NavigationDirection::RIGHT, minuteInput);
-            minuteInput->setNavigationItem(NavigationDirection::LEFT, hourInput);
-            minuteInput->setNavigationItem(NavigationDirection::RIGHT, mode12hInput);
-            mode12hInput->setNavigationItem(NavigationDirection::LEFT, minuteInput);
-            mode12hInput->setNavigationItem(NavigationDirection::RIGHT, hourInput);
+            onLoadCallback = [&]() {};
+            onSaveCallback = [&]() {};
         }
     }
 

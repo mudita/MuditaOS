@@ -48,19 +48,20 @@ namespace style
 
             namespace item
             {
-                const inline int label_x      = 11;
-                const inline int title_y      = 10;
-                const inline int title_w      = 250;
-                const inline int title_h      = 40;
-                const inline int descripton_y = 42;
-                const inline int height       = 90;
+                namespace dayEvents
+                {
+                    const inline int title_w       = 200;
+                    const inline int h_box_h       = 40;
+                    const inline int description_h = 30;
+                    const inline int margins       = 10;
+                    const inline int height        = 90;
+                } // namespace dayEvents
 
-                namespace all
+                namespace allEvents
                 {
                     const inline int description_w = 310;
-                    const inline int description_x = 120;
-                    const inline int start_time_x  = 11;
-                } // namespace all
+                    const inline int start_time_min_w = 60;
+                } // namespace allEvents
 
                 namespace repeatAndReminder
                 {
@@ -84,14 +85,14 @@ namespace style
 
                 namespace eventTime
                 {
-                    const inline int height              = 120;
-                    const inline int margin              = 22;
-                    const inline int description_label_w = 150;
-                    const inline int description_label_h = 30;
-                    const inline int colon_label_w       = 25;
-                    const inline int colon_label_h       = 20;
-                    const inline int time_input_12h_w    = 125;
-                    const inline int time_input_24h_w    = 202;
+                    const inline int height               = 120;
+                    const inline int margin               = 22;
+                    const inline int description_label_w  = 150;
+                    const inline int description_label_h  = 30;
+                    const inline int colon_label_w        = 25;
+                    const inline int colon_label_h        = 20;
+                    const inline int time_input_12h_w     = 125;
+                    const inline int time_input_24h_w     = 202;
                     const inline int mode12h_input_margin = 25;
                 } // namespace eventTime
 
@@ -115,9 +116,7 @@ namespace style
                     const inline int margin              = 15;
                     const inline int description_label_w = 100;
                     const inline int description_label_h = 30;
-                    const inline int option_label_y      = 30;
                     const inline int option_label_h      = 30;
-                    const inline int arrow_y             = 36;
                     const inline int arrow_w             = 20;
                     const inline int arrow_h             = 20;
                 } // namespace severalOptions
