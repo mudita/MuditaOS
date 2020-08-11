@@ -28,6 +28,7 @@
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include "service-bt/ServiceBT.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
@@ -186,6 +187,8 @@ int main()
 
         // Service Desktop disabled on master - pulling read on usb driver
         // ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
+
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBT>(), sysmgr.get());
 
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
