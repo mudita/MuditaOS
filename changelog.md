@@ -27,6 +27,7 @@
 * `[phonebook]` Phonebook search no window - new version of dialog box.
 * `[phonebook]` Switch to contact list instead of contact details after saving contact.
 * `[phonebook]` Require filling in at least one field while adding/editing contact.
+* `[phonebook]` Replace static icon with number inside circle in speed dial duplicate window.
 * `[sms]` Do not delete sms if thread is malformed (not found what expected).
 * `[listview]` Improved data refresh time.
 

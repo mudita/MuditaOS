@@ -32,6 +32,13 @@ namespace style
         constexpr uint32_t w = 150;
         constexpr uint32_t h = 75;
     } // namespace yes
+    namespace icontext
+    {
+        constexpr uint32_t x = image::x;
+        constexpr uint32_t y = image::y + 40;
+        constexpr uint32_t w = 130;
+        constexpr uint32_t h = 100;
+    } // namespace icontext
 
 } // namespace style
 
@@ -139,4 +146,31 @@ void DialogYesNo::update(const Meta &meta)
     yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
 
     setFocusItem(no);
+}
+
+DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string &name, const Meta &meta)
+    : DialogYesNo(app, name, meta)
+{
+    iconText = new Text(this, style::icontext::x, style::icontext::y, style::icontext::w, style::icontext::h);
+    iconText->setText(textStr);
+    iconText->setTextType(TextType::SINGLE_LINE);
+    iconText->setEditMode(EditMode::BROWSE);
+    iconText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    iconText->setFont(style::window::font::largelight);
+    iconText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::None));
+    setFocusItem(no);
+}
+
+void DialogYesNoIconTxt::update(const Meta &meta)
+{
+    Dialog::update(meta);
+    iconText->setText(textStr);
+    topBar->setActive(TopBar::Elements::BATTERY, false);
+    topBar->setActive(TopBar::Elements::SIM, false);
+    setFocusItem(no);
+}
+
+void DialogYesNoIconTxt::SetIconText(const std::string &text)
+{
+    textStr = text;
 }

@@ -232,7 +232,8 @@ namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber()
     {
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(application->getWindow(gui::window::name::dialog_yes_no));
+        auto dialog =
+            dynamic_cast<gui::DialogYesNoIconTxt *>(application->getWindow(gui::window::name::dialog_yes_no_icon_txt));
         assert(dialog != nullptr);
         auto meta              = dialog->meta;
         auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(application, contact->speeddial);
@@ -252,7 +253,9 @@ namespace gui
         phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
         meta.text  = duplicatedSpeedDialPhrase;
         meta.title = duplicatedSpeedDialTitle;
-        meta.icon  = "info_big_circle_W_G";
+        meta.icon  = "phonebook_empty_grey_circle_W_G";
+        dialog->SetIconText(contact->speeddial);
+
         dialog->update(meta);
         application->switchWindow(dialog->getName());
     }

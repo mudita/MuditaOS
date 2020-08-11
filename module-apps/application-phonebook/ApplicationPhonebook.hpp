@@ -15,6 +15,7 @@ namespace gui::window::name
     inline const std::string dialog_yes_no    = "DialogYesNo";
     inline const std::string dialog_confirm   = "DialogConfirm";
     inline const std::string dialog           = "Dialog";
+    inline const std::string dialog_yes_no_icon_txt = "DialogYesNoIconTxt";
 
 } // namespace gui::window::name
 

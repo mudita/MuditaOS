@@ -112,6 +112,8 @@ namespace app
             {gui::window::name::dialog, new gui::Dialog(this, gui::window::name::dialog, gui::Dialog::Meta())});
         windows.insert(
             {gui::window::name::dialog_yes_no, new gui::DialogYesNo(this, gui::window::name::dialog_yes_no)});
+        windows.insert({gui::window::name::dialog_yes_no_icon_txt,
+                        new gui::DialogYesNoIconTxt(this, gui::window::name::dialog_yes_no_icon_txt)});
         windows.insert(
             {gui::window::name::dialog_confirm, new gui::DialogConfirm(this, gui::window::name::dialog_confirm)});
         windows.insert({gui::window::name::contact_options, new gui::PhonebookContactOptions(this)});
