@@ -14,7 +14,7 @@ namespace gui
         : HBox(parent, 0, 0, 0, 0)
     {
         setReverseOrder(true);
-        setMinimumSize(phonebookStyle::informationWidget::w, phonebookStyle::numbersWithIconsWidget::sms_image_h);
+        setMinimumSize(phonebookStyle::informationWidget::w, phonebookStyle::numbersWithIconsWidget::h);
         setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
 
@@ -52,9 +52,7 @@ namespace gui
         numberText->setMaximumSize(phonebookStyle::informationWidget::w,
                                    phonebookStyle::numbersWithIconsWidget::number_text_h);
         numberText->setFont(font);
-        numberText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        numberText->setPenFocusWidth(style::window::default_border_focus_w);
-        numberText->setPenWidth(style::window::default_border_focus_w);
+        numberText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         numberText->setEditMode(EditMode::BROWSE);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         numberText->setText(number.getFormatted());
