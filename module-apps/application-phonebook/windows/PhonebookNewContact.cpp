@@ -126,11 +126,8 @@ namespace gui
 
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
-        ContactRecord errNumPrim, errNumAlt, errSpeedDial;
-
         if (contactAction == ContactAction::Add) {
-            DBServiceAPI::ContactVerificationError err =
-                DBServiceAPI::verifyContact(application, *contact, errNumPrim, errNumAlt, errSpeedDial);
+            DBServiceAPI::ContactVerificationError err = DBServiceAPI::verifyContact(application, *contact);
             LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
             switch (err) {
             case DBServiceAPI::noError:
