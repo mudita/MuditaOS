@@ -95,7 +95,7 @@ namespace phonebookStyle
         constexpr uint32_t email_text_h  = 35;
     } // namespace informationWidget
 
-    namespace inputBoxWithLabelAndIconItem
+    namespace inputBoxWithLabelAndIconIWidget
     {
         constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = 50;
@@ -111,9 +111,9 @@ namespace phonebookStyle
         constexpr int32_t tick_image_left_margin  = -64;
         constexpr int32_t tick_image_right_margin = 32;
 
-    } // namespace inputBoxWithLabelAndIconItem
+    } // namespace inputBoxWithLabelAndIconIWidget
 
-    namespace inputLinesWithLabelItem
+    namespace inputLinesWithLabelWidget
     {
         constexpr uint32_t w                = style::window::default_body_width;
         constexpr uint32_t h                = 63;
@@ -121,26 +121,27 @@ namespace phonebookStyle
         constexpr uint32_t input_text_h     = 37;
         constexpr uint32_t span_size        = 6;
         constexpr int32_t underline_padding = 4;
-    } // namespace inputLinesWithLabelItem
+    } // namespace inputLinesWithLabelWidget
 
-    namespace outputLinesTextWithLabelItem
+    namespace outputLinesTextWithLabelWidget
     {
         constexpr uint32_t w             = style::window::default_body_width;
         constexpr uint32_t h             = 75;
         constexpr uint32_t title_label_h = 20;
         constexpr uint32_t input_text_h  = 33;
         constexpr uint32_t span_size     = style::margins::huge;
-    } // namespace outputLinesTextWithLabelItem
+    } // namespace outputLinesTextWithLabelWidget
 
     namespace numbersWithIconsWidget
     {
-        constexpr uint32_t h                       = 55;
-        constexpr uint32_t sms_image_w             = 55;
-        constexpr uint32_t sms_image_h             = h;
-        constexpr uint32_t phone_image_w           = 55;
-        constexpr uint32_t phone_image_h           = h;
-        constexpr uint32_t phone_image_margin_left = 30;
-        constexpr uint32_t number_text_h           = h;
+        constexpr uint32_t h                        = 55;
+        constexpr uint32_t sms_image_w              = 55;
+        constexpr uint32_t sms_image_h              = h;
+        constexpr uint32_t phone_image_w            = 55;
+        constexpr uint32_t phone_image_h            = h;
+        constexpr uint32_t phone_image_margin_left  = 30;
+        constexpr uint32_t phone_image_margin_right = 15;
+        constexpr uint32_t number_text_h            = h;
     } // namespace numbersWithIconsWidget
 
 } // namespace phonebookStyle
