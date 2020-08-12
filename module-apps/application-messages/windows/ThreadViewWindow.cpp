@@ -196,7 +196,12 @@ namespace gui
                   static_cast<int>(SMS.sms->size()),
                   static_cast<int>(maxsmsinwindow));
         if (SMS.sms->size() == 0) {
-            LOG_WARN("Malformed thread. Leave it (id: %d)", SMS.thread);
+            // No SMSes to show. Last hope: if there previous page
+            if (SMS.start > 0) {
+                addSMS(Action::PreviousPage);
+                return;
+            }
+            LOG_WARN("Empty thread. Leaving it (id: %d)", SMS.thread);
             application->switchWindow(gui::name::window::main_window);
             return;
         }
