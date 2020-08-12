@@ -1,4 +1,5 @@
 #include "bsp/usb_cdc/usb_cdc.hpp"
+#include "log/log.hpp"
 
 extern "C"
 {
@@ -16,8 +17,9 @@ namespace bsp
         static std::string receive_msg;
 
         while (1) {
+            ulTaskNotifyTake(pdTRUE, 1000);
+            LOG_DEBUG(".");
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
-
                 ssize_t length = USB_CDCGetReceived(inputData);
 
                 if (length > 0) {
@@ -31,10 +33,6 @@ namespace bsp
                 else if (length == -1) {
                     LOG_ERROR("[ServiceDesktop:BSP_Driver] Error receiving usb data");
                 }
-            }
-            else {
-                LOG_DEBUG("[ServiceDesktop:BSP_Driver] USB receive Queue is full, yielding task");
-                vTaskDelay(1000);
             }
         }
     }
@@ -64,6 +62,8 @@ namespace bsp
 
         BaseType_t task_error = xTaskCreate(
             usbCDCReceive, "USBRT1051Receive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
+
+        setRecTask(taskHandleReceive);
 
         if (task_error != pdPASS) {
             LOG_ERROR("[ServiceDesktop:BSP_Driver] Failed to start freertos USB_RT1051_Receive");

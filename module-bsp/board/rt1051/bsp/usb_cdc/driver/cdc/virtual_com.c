@@ -119,6 +119,9 @@ static usb_device_class_config_list_struct_t s_cdcAcmConfigList = {
 volatile static uint8_t s_waitForDataReceive = 0;
 volatile static uint8_t s_comOpen            = 0;
 #endif
+
+TaskHandle_t recTask = NULL;
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -239,6 +242,14 @@ usb_status_t USB_DeviceCdcVcomCallback(class_handle_t handle, uint32_t event, vo
                 s_waitForDataReceive = 1;
                 USB0->INTEN &= ~USB_INTEN_SOFTOKEN_MASK;
 #endif
+            }
+
+            /// notify our receiver task that there is data
+            /// we could just await there for it...
+            /// or even await in worker...
+            if (recTask != NULL) {
+                BaseType_t hp = pdFALSE;
+                vTaskNotifyGiveFromISR(recTask, &hp);
             }
         }
     } break;
@@ -474,7 +485,7 @@ usb_status_t USB_DeviceCallback(usb_device_handle handle, uint32_t event, void *
  *
  * @return None.
  */
-int VCOMAPPInit(void)
+int VCOMAPPInit()
 {
     int ret = 0;
     USB_DeviceClockInit();
@@ -606,4 +617,10 @@ uint32_t USB_CDCGetReceived(uint8_t *buffer)
         }
     }
     return 0;
+}
+
+
+void setRecTask(TaskHandle_t data)
+{
+    recTask = data;
 }

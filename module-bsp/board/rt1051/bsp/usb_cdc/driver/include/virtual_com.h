@@ -81,9 +81,10 @@ typedef struct _usb_cdc_acm_info
     uint16_t uartState;       /* UART state of the CDC device.                      */
 } usb_cdc_acm_info_t;
 
-int VCOMAPPInit(void);
+int VCOMAPPInit();
 void VCOMAPPTask(void);
 usb_status_t USB_CDCSend(uint8_t *buffer, uint32_t length);
 uint32_t USB_CDCGetReceived(uint8_t *buffer);
+void setRecTask(TaskHandle_t taskHandleReceive);
 
 #endif /* _USB_CDC_VCOM_H_ */
