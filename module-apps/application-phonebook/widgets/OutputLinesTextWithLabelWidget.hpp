@@ -9,14 +9,14 @@
 
 namespace gui
 {
-    class OutputLinesTextWithLabelItem : public ContactListItem
+    class OutputLinesTextWithLabelWidget : public ContactListItem
     {
         phonebookInternals::ListItemName listItemName;
 
       public:
-        OutputLinesTextWithLabelItem(phonebookInternals::ListItemName listItemName);
+        OutputLinesTextWithLabelWidget(phonebookInternals::ListItemName listItemName);
 
-        ~OutputLinesTextWithLabelItem() override = default;
+        ~OutputLinesTextWithLabelWidget() override = default;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         VBox *vBox          = nullptr;
         Label *titleLabel   = nullptr;

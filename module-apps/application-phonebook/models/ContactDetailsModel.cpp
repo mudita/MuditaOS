@@ -2,7 +2,7 @@
 
 #include "application-phonebook/widgets/ContactListItem.hpp"
 #include "application-phonebook/widgets/InformationWidget.hpp"
-#include "application-phonebook/widgets/OutputLinesTextWithLabelItem.hpp"
+#include "application-phonebook/widgets/OutputLinesTextWithLabelWidget.hpp"
 
 #include <ListView.hpp>
 #include <time/ScopedTime.hpp>
@@ -18,7 +18,7 @@ auto ContactDetailsModel::requestRecordsCount() -> unsigned int
 
 auto ContactDetailsModel::getMinimalItemHeight() const -> unsigned int
 {
-    return phonebookStyle::outputLinesTextWithLabelItem::h;
+    return phonebookStyle::outputLinesTextWithLabelWidget::h;
 }
 
 void ContactDetailsModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -39,11 +39,11 @@ void ContactDetailsModel::createData(bool showInformationWidget, bool showAddres
     }
 
     if (showAddressWidget) {
-        internalData.push_back(new gui::OutputLinesTextWithLabelItem(phonebookInternals::ListItemName::Address));
+        internalData.push_back(new gui::OutputLinesTextWithLabelWidget(phonebookInternals::ListItemName::Address));
     }
 
     if (showNoteWidget) {
-        internalData.push_back(new gui::OutputLinesTextWithLabelItem(phonebookInternals::ListItemName::Note));
+        internalData.push_back(new gui::OutputLinesTextWithLabelWidget(phonebookInternals::ListItemName::Note));
     }
 
     for (auto item : internalData) {

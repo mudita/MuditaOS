@@ -14,11 +14,10 @@
 ### Added
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off)
 
-## [0.33.1 - 2020-08-14]
-
 ### Changed
 
 * `[phonebook]` Moved contact validation to DB service.
+* `[phonebook]` Refactored contact details window.
 
 ### Other
 * `[boot]` switched from ini to JSON format

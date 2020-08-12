@@ -38,7 +38,10 @@ namespace gui
                                   phonebookStyle::numbersWithIconsWidget::phone_image_w,
                                   phonebookStyle::numbersWithIconsWidget::phone_image_h,
                                   new Image("phonebook_phone_ringing"));
-        phoneImage->setMargins(Margins(phonebookStyle::numbersWithIconsWidget::phone_image_margin_left, 0, 0, 0));
+        phoneImage->setMargins(Margins(phonebookStyle::numbersWithIconsWidget::phone_image_margin_left,
+                                       0,
+                                       phonebookStyle::numbersWithIconsWidget::phone_image_margin_right,
+                                       0));
         phoneImage->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
                 return app::call(app, number);
