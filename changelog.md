@@ -12,6 +12,7 @@
 * `[audio]` Fixed audio buffers handling to eliminate sending uninitialized data and making loud noise on start of a call.
 * `[music player]` Fixed songs list building and song name font size.
 * `[gui]` Added bootloader version information 
+* `[phonebook]` Fix duplicated contact detection on contact update.
 
 ## [0.33.1 - 2020-08-13]
 
