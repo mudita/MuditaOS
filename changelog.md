@@ -2,9 +2,14 @@
 
 ## Current Release
 
+### Changed
+
+* `[phonebook]` Auto releasing speed dial number of blocked contact.
+
 ### Fixed
+
 * `[phonebook]` Fix favourites contacts display order.
-* `[phonebook]` Fix (un)blocking option name and improve contact blocking window handling.
+* `[phonebook]` Fix (un)blocking option name and improve handling of contact blocking window.
 
 ### Added
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off)
