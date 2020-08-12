@@ -308,6 +308,7 @@ void PINMUX_InitBootPins(void)
     PINMUX_InitJACKDET();
     PINMUX_InitVibrator();
     PINMUX_InitTorch();
+    PINMUX_InitMagnetometer();
 }
 
 /*
@@ -1485,6 +1486,16 @@ void PINMUX_InitTorch(void)
     IOMUXC_SetPinConfig(PINMUX_TORCH_EN_PIN,
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_HYSTERESIS_DISABLED);
+}
+
+void PINMUX_InitMagnetometer(void)
+{
+    IOMUXC_SetPinMux(PINMUX_MAGNETOMETER_IRQ_PIN, 0U);
+    IOMUXC_SetPinConfig(PINMUX_MAGNETOMETER_IRQ_PIN,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm
+                            );
 }
 
 /***********************************************************************************************************************
