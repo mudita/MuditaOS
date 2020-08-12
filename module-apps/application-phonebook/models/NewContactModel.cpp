@@ -70,32 +70,24 @@ void NewContactModel::createData()
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName::AddToFavourites,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName::AddToICE,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::Address,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
         2));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::Note,
-        [app](const UTF8 &text) {
-            app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::LEFT, false);
-        },
+        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 

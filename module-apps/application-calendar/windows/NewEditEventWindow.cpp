@@ -32,8 +32,6 @@ namespace gui
                                  style::window::calendar::listView_w,
                                  style::window::calendar::listView_h,
                                  newEditEventModel);
-        list->setPenFocusWidth(style::window::default_border_no_focus_w);
-        list->setPenWidth(style::window::default_border_no_focus_w);
         setFocusItem(list);
     }
 
@@ -51,8 +49,8 @@ namespace gui
         }
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            list->setElementsCount(newEditEventModel->getItemCount());
             newEditEventModel->loadData(false);
+            list->rebuildList();
         }
     }
 
@@ -67,7 +65,6 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            LOG_DEBUG("TODO: Save event");
             return true;
         }
 
