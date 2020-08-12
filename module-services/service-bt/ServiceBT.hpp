@@ -2,12 +2,13 @@
 
 #include "Service/Service.hpp"
 #include <functional>
-#include "Audio/Audio.hpp"
+#include <memory>
 #include "MessageType.hpp"
+#include "WorkerBT.hpp"
 
 class ServiceBT : public sys::Service
 {
-
+    std::unique_ptr<WorkerBT> worker;
   public:
     ServiceBT();
     ~ServiceBT() override = default;

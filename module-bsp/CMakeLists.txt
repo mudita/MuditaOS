@@ -6,7 +6,8 @@ project(module-bsp VERSION 1.0
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/harness/bsp_harness.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/bluetooth/Bluetooth.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"

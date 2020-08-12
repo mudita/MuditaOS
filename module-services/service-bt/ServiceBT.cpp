@@ -18,6 +18,10 @@ void ServiceBT::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceBT::InitHandler()
 {
+    LOG_DEBUG("Init!");
+    worker = std::make_unique<WorkerBT>(this);
+    worker->init( {{worker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 100}});
+    worker->run();
     return sys::ReturnCodes::Success;
 }
 
