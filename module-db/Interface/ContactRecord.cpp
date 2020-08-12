@@ -918,6 +918,7 @@ void ContactRecord::addToBlocked(bool add)
 {
     if (add) {
         groups.insert(ContactsDB::blockedGroupId());
+        speeddial.clear();
     }
     else {
         groups.erase(ContactsDB::blockedGroupId());
