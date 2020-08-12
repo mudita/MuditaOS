@@ -1,4 +1,4 @@
-#include "InputLinesWithLabelItem.hpp"
+#include "InputLinesWithLabelIWidget.hpp"
 
 #include <Span.hpp>
 #include "application-phonebook/data/PhonebookStyle.hpp"
@@ -8,35 +8,35 @@
 
 namespace gui
 {
-    InputLinesWithLabelItem::InputLinesWithLabelItem(phonebookInternals::ListItemName listItemName,
-                                                     std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                                                     std::function<void()> bottomBarRestoreFromTemporaryMode,
-                                                     std::function<void()> selectSpecialCharacter,
-                                                     unsigned int lines)
+    InputLinesWithLabelIWidget::InputLinesWithLabelIWidget(phonebookInternals::ListItemName listItemName,
+                                                           std::function<void(const UTF8 &)> bottomBarTemporaryMode,
+                                                           std::function<void()> bottomBarRestoreFromTemporaryMode,
+                                                           std::function<void()> selectSpecialCharacter,
+                                                           unsigned int lines)
         : listItemName(listItemName)
     {
-        setMinimumSize(phonebookStyle::inputLinesWithLabelItem::w,
-                       phonebookStyle::inputLinesWithLabelItem::title_label_h +
-                           phonebookStyle::inputLinesWithLabelItem::span_size +
-                           phonebookStyle::inputLinesWithLabelItem::input_text_h * lines);
+        setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
+                       phonebookStyle::inputLinesWithLabelWidget::title_label_h +
+                           phonebookStyle::inputLinesWithLabelWidget::span_size +
+                           phonebookStyle::inputLinesWithLabelWidget::input_text_h * lines);
         setMargins(gui::Margins(0, style::margins::huge, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         titleLabel = new Label(vBox);
-        titleLabel->setMinimumSize(phonebookStyle::inputLinesWithLabelItem::w,
-                                   phonebookStyle::inputLinesWithLabelItem::title_label_h);
+        titleLabel->setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
+                                   phonebookStyle::inputLinesWithLabelWidget::title_label_h);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         titleLabel->setFont(style::window::font::verysmall);
         titleLabel->activeItem = false;
 
         inputText = new TextFixedSize(vBox, 0, 0, 0, 0);
-        inputText->setMinimumSize(phonebookStyle::inputLinesWithLabelItem::w,
-                                  phonebookStyle::inputLinesWithLabelItem::input_text_h * lines);
-        inputText->setMargins(Margins(0, phonebookStyle::inputLinesWithLabelItem::span_size, 0, 0));
-        inputText->setUnderlinePadding(phonebookStyle::inputLinesWithLabelItem::underline_padding);
+        inputText->setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
+                                  phonebookStyle::inputLinesWithLabelWidget::input_text_h * lines);
+        inputText->setMargins(Margins(0, phonebookStyle::inputLinesWithLabelWidget::span_size, 0, 0));
+        inputText->setUnderlinePadding(phonebookStyle::inputLinesWithLabelWidget::underline_padding);
 
         inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
@@ -72,7 +72,7 @@ namespace gui
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
-    auto InputLinesWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    auto InputLinesWithLabelIWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
     {
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
@@ -80,7 +80,7 @@ namespace gui
         return true;
     }
 
-    void InputLinesWithLabelItem::applyItemNameSpecificSettings()
+    void InputLinesWithLabelIWidget::applyItemNameSpecificSettings()
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::FirstName:
@@ -116,7 +116,7 @@ namespace gui
             break;
         }
     }
-    void InputLinesWithLabelItem::firstNameHandler()
+    void InputLinesWithLabelIWidget::firstNameHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
         inputText->setTextType(TextType::SINGLE_LINE);
@@ -124,7 +124,7 @@ namespace gui
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
     }
-    void InputLinesWithLabelItem::secondNameHandler()
+    void InputLinesWithLabelIWidget::secondNameHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
         inputText->setTextType(TextType::SINGLE_LINE);
@@ -134,7 +134,7 @@ namespace gui
         };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->alternativeName); };
     }
-    void InputLinesWithLabelItem::numberHandler()
+    void InputLinesWithLabelIWidget::numberHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
         inputText->setTextType(TextType::SINGLE_LINE);
@@ -152,7 +152,7 @@ namespace gui
             }
         };
     }
-    void InputLinesWithLabelItem::otherNumberHandler()
+    void InputLinesWithLabelIWidget::otherNumberHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
         inputText->setTextType(TextType::SINGLE_LINE);
@@ -170,7 +170,7 @@ namespace gui
             }
         };
     }
-    void InputLinesWithLabelItem::emailHandler()
+    void InputLinesWithLabelIWidget::emailHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
         inputText->setTextType(TextType::SINGLE_LINE);
@@ -178,7 +178,7 @@ namespace gui
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
     }
-    void InputLinesWithLabelItem::addressHandler()
+    void InputLinesWithLabelIWidget::addressHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
         inputText->setTextType(TextType::SINGLE_LINE);
@@ -186,7 +186,7 @@ namespace gui
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
     }
-    void InputLinesWithLabelItem::noteHandler()
+    void InputLinesWithLabelIWidget::noteHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
         inputText->setTextType(TextType::SINGLE_LINE);

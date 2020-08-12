@@ -1,4 +1,4 @@
-#include "OutputLinesTextWithLabelItem.hpp"
+#include "OutputLinesTextWithLabelWidget.hpp"
 
 #include <Span.hpp>
 #include "application-phonebook/data/PhonebookStyle.hpp"
@@ -8,19 +8,19 @@
 
 namespace gui
 {
-    OutputLinesTextWithLabelItem::OutputLinesTextWithLabelItem(phonebookInternals::ListItemName listItemName)
+    OutputLinesTextWithLabelWidget::OutputLinesTextWithLabelWidget(phonebookInternals::ListItemName listItemName)
         : listItemName(listItemName)
     {
-        setMinimumSize(phonebookStyle::outputLinesTextWithLabelItem::w,
-                       phonebookStyle::outputLinesTextWithLabelItem::title_label_h);
+        setMinimumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
+                       phonebookStyle::outputLinesTextWithLabelWidget::title_label_h);
         setMargins(gui::Margins(0, style::margins::huge, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         titleLabel = new Label(vBox);
-        titleLabel->setMinimumSize(phonebookStyle::outputLinesTextWithLabelItem::w,
-                                   phonebookStyle::outputLinesTextWithLabelItem::title_label_h);
+        titleLabel->setMinimumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
+                                   phonebookStyle::outputLinesTextWithLabelWidget::title_label_h);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         titleLabel->setFont(style::window::font::verysmall);
@@ -28,9 +28,9 @@ namespace gui
         titleLabel->activeItem = false;
 
         multilineText = new Text(vBox, 0, 0, 0, 0);
-        multilineText->setMaximumSize(phonebookStyle::outputLinesTextWithLabelItem::w,
-                                      phonebookStyle::outputLinesTextWithLabelItem::input_text_h * 10);
-        multilineText->setMargins(Margins(0, phonebookStyle::outputLinesTextWithLabelItem::span_size, 0, 0));
+        multilineText->setMaximumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
+                                      phonebookStyle::outputLinesTextWithLabelWidget::input_text_h * 10);
+        multilineText->setMargins(Margins(0, phonebookStyle::outputLinesTextWithLabelWidget::span_size, 0, 0));
         multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         multilineText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         multilineText->setFont(style::window::font::medium);
@@ -47,7 +47,8 @@ namespace gui
         setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
     }
 
-    auto OutputLinesTextWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    auto OutputLinesTextWithLabelWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+        -> bool
     {
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
@@ -55,7 +56,7 @@ namespace gui
         return true;
     }
 
-    void OutputLinesTextWithLabelItem::applyItemNameSpecificSettings()
+    void OutputLinesTextWithLabelWidget::applyItemNameSpecificSettings()
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::Address:
@@ -72,27 +73,26 @@ namespace gui
         }
     }
 
-    void OutputLinesTextWithLabelItem::addressHandler()
+    void OutputLinesTextWithLabelWidget::addressHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->address); };
     }
 
-    void OutputLinesTextWithLabelItem::noteHandler()
+    void OutputLinesTextWithLabelWidget::noteHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->note); };
     }
 
-    auto OutputLinesTextWithLabelItem::handleRequestResize(const Item *child,
-                                                           unsigned short request_w,
-                                                           unsigned short request_h) -> Size
+    auto OutputLinesTextWithLabelWidget::handleRequestResize(const Item *child,
+                                                             unsigned short request_w,
+                                                             unsigned short request_h) -> Size
     {
-
-        setMinimumHeight(phonebookStyle::outputLinesTextWithLabelItem::title_label_h +
-                         phonebookStyle::outputLinesTextWithLabelItem::span_size + request_h);
+        setMinimumHeight(phonebookStyle::outputLinesTextWithLabelWidget::title_label_h +
+                         phonebookStyle::outputLinesTextWithLabelWidget::span_size + request_h);
 
         return Size(request_w, request_h);
     }

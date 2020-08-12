@@ -107,10 +107,11 @@ TEST_CASE("Text drawLines")
         auto font        = fontmanager.getFont(0);
         auto line_height = font->info.line_height;
         auto text        = TestText();
-        text.setMaximumSize(10, line_height * lines_to_show);
+        text.setMaximumSize(6, line_height * lines_to_show);
         text.setText(std::make_unique<TextDocument>(
             textToTextBlocks(testline, fontmanager.getFont(0), TextBlock::End::Newline)));
 
+        text.drawLines();
         REQUIRE(text.linesSize() == lines_to_show);
     }
 }
