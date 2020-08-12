@@ -50,6 +50,7 @@ bool vfs::verifyCRC(const std::string filePath, const unsigned long crc32)
 
     if (fp.get() != nullptr) {
         computeCRC32(fp.get(), &crc32Read);
+        LOG_INFO("verifyCRC computed crc32 for %s is %08X", filePath.c_str(), crc32Read);
         return (crc32Read == crc32);
     }
     LOG_ERROR("verifyCRC can't open %s", filePath.c_str());
@@ -67,16 +68,20 @@ bool vfs::verifyCRC(const fs::path filePath)
     std::unique_ptr<vfs::FILE, decltype(lamb)> fp(::vfs.fopen(crcFilePath.c_str(), "r"), lamb);
 
     if (fp.get() != nullptr) {
-        if (::vfs.fgets(crcBuf.get(), purefs::buffer::crc_char_size, fp.get()) == NULL) {
-            LOG_ERROR("verifyCRC ff_fgets on %s returned NULL", crcFilePath.c_str());
-            return (false);
+        if (::vfs.fread(crcBuf.get(), 1, purefs::buffer::crc_char_size, fp.get()) != purefs::buffer::crc_char_size) {
+            LOG_ERROR("verifyCRC fread on %s returned different size then %d",
+                      crcFilePath.c_str(),
+                      purefs::buffer::crc_char_size);
+            return false;
         }
 
         const unsigned long crc32Read = strtoull(crcBuf.get(), nullptr, purefs::buffer::crc_radix);
-        return (verifyCRC(filePath, crc32Read));
+
+        LOG_INFO("verifyCRC read %s string:\"%s\" hex:%08X", filePath.c_str(), crcBuf.get(), crc32Read);
+        return verifyCRC(filePath, crc32Read);
     }
     LOG_ERROR("verifyCRC can't open %s", crcFilePath.c_str());
-    return (false);
+    return false;
 }
 
 std::string vfs::loadFileAsString(const fs::path &fileToLoad)
@@ -166,20 +171,41 @@ bool vfs::updateFileCRC32(const fs::path &file)
 
     if (fp.get() != nullptr) {
         std::unique_ptr<char[]> crc32Buf(new char[purefs::buffer::crc_char_size]);
+        int written = 0;
         computeCRC32(fp.get(), &fileCRC32);
+        LOG_INFO("updateFileCRC32 writing new crc32 %08X for %s", fileCRC32, file.c_str());
         if (fileCRC32 != 0) {
-            snprintf(&crc32Buf[0], purefs::buffer::crc_char_size, "%lX", fileCRC32);
+            if ((written = sprintf(crc32Buf.get(), "%08X", fileCRC32)) != purefs::buffer::crc_char_size) {
+                LOG_INFO("updateFileCRC32 can't prepare string for crc32, sprintf returned %d instead of %d",
+                         written,
+                         purefs::buffer::crc_char_size);
+                return false;
+            }
             fs::path fileCRC32Path = file;
             fileCRC32Path += purefs::extension::crc32;
 
             std::unique_ptr<vfs::FILE, decltype(lamb)> fpCRC32(fopen(fileCRC32Path.c_str(), "w"), lamb);
 
             if (fpCRC32.get() != nullptr) {
-                fprintf(fpCRC32.get(), &crc32Buf[0]);
+                if (fwrite(crc32Buf.get(), 1, purefs::buffer::crc_char_size, fpCRC32.get()) ==
+                    purefs::buffer::crc_char_size) {
+                    LOG_INFO("updateFileCRC32 wrote \"%s\" in %s", crc32Buf.get(), fileCRC32Path.c_str());
+                    return true;
+                }
+                else {
+                    LOG_WARN("updateFileCRC32 can't write new crc32");
+                    return false;
+                }
             }
-
-            return true;
+            else {
+                LOG_WARN("updateFileCRC32 can't open crc32 file for write");
+                return false;
+            }
         }
+    }
+    else {
+        LOG_WARN("updateFileCRC32 can't open file %s for write", file.c_str());
+        return false;
     }
 
     return false;
