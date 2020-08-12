@@ -44,11 +44,11 @@ void EventDetailModel::loadData()
 
     createData();
 
-    requestRecords(0, internalData.size());
-
     for (auto &item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback();
         }
     }
+
+    list->rebuildList();
 }

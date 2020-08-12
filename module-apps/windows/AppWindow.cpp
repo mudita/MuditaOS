@@ -154,6 +154,11 @@ namespace gui
         return false;
     }
 
+    void AppWindow::bottomBarTemporaryMode(const UTF8 &text, bool emptyOthers)
+    {
+        bottomBarTemporaryMode(text, BottomBar::Side::LEFT, emptyOthers);
+    }
+
     void AppWindow::bottomBarTemporaryMode(const UTF8 &text, BottomBar::Side side, bool emptyOthers)
     {
         if (bottomBar == nullptr) {
@@ -162,36 +167,21 @@ namespace gui
 
         bottomBar->store();
 
+        if (emptyOthers) {
+            bottomBar->setText(BottomBar::Side::LEFT, "");
+            bottomBar->setText(BottomBar::Side::CENTER, "");
+            bottomBar->setText(BottomBar::Side::RIGHT, "");
+        }
+
         switch (side) {
         case BottomBar::Side::LEFT:
-            if (emptyOthers) {
-                bottomBar->setText(BottomBar::Side::LEFT, text);
-                bottomBar->setText(BottomBar::Side::CENTER, "");
-                bottomBar->setText(BottomBar::Side::RIGHT, "");
-            }
-            else {
-                bottomBar->setText(BottomBar::Side::LEFT, text);
-            }
+            bottomBar->setText(BottomBar::Side::LEFT, text);
             break;
         case BottomBar::Side::CENTER:
-            if (emptyOthers) {
-                bottomBar->setText(BottomBar::Side::LEFT, "");
-                bottomBar->setText(BottomBar::Side::CENTER, text);
-                bottomBar->setText(BottomBar::Side::RIGHT, "");
-            }
-            else {
-                bottomBar->setText(BottomBar::Side::CENTER, text);
-            }
+            bottomBar->setText(BottomBar::Side::CENTER, text);
             break;
         case BottomBar::Side::RIGHT:
-            if (emptyOthers) {
-                bottomBar->setText(BottomBar::Side::LEFT, "");
-                bottomBar->setText(BottomBar::Side::CENTER, "");
-                bottomBar->setText(BottomBar::Side::RIGHT, text);
-            }
-            else {
-                bottomBar->setText(BottomBar::Side::RIGHT, text);
-            }
+            bottomBar->setText(BottomBar::Side::RIGHT, text);
             break;
         }
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

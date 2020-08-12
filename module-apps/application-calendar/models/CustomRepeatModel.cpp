@@ -6,7 +6,7 @@
 CustomRepeatModel::CustomRepeatModel(app::Application *app) : application(app)
 {}
 
-int CustomRepeatModel::getItemCount() const
+unsigned int CustomRepeatModel::requestRecordsCount()
 {
     return internalData.size();
 }
@@ -62,5 +62,5 @@ void CustomRepeatModel::loadData()
         }
     }
 
-    requestRecords(0, internalData.size());
+    list->rebuildList();
 }
