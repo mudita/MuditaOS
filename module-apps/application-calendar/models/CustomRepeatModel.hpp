@@ -15,7 +15,7 @@ class CustomRepeatModel : public app::InternalModel<gui::CalendarListItem *>, pu
     void loadData();
 
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
-    [[nodiscard]] int getItemCount() const override;
+    [[nodiscard]] unsigned int requestRecordsCount() override;
     gui::ListItem *getItem(gui::Order order) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 

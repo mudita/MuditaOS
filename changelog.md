@@ -1,5 +1,13 @@
 # Mudita PurePhone changelog
 
+## Current Release
+
+### Added
+
+* `[calendar]` Added new/edit event window
+* `[gui]` Added CheckBox widget
+
+
 ## [0.33.1 - 2020-08-13]
 
 ### Added
