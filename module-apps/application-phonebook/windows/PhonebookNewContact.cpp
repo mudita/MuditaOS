@@ -126,34 +126,31 @@ namespace gui
 
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
-        if (contactAction == ContactAction::Add) {
-            DBServiceAPI::ContactVerificationError err = DBServiceAPI::verifyContact(application, *contact);
-            LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
-            switch (err) {
-            case DBServiceAPI::noError:
-                break;
-            case DBServiceAPI::emptyContactError:
-                return false;
-            case DBServiceAPI::primaryNumberError:
-                showDialogDuplicatedNumber(contact->numbers[0].number);
-                return false;
-            case DBServiceAPI::secondaryNumberError:
-                showDialogDuplicatedNumber(contact->numbers[1].number);
-                return false;
-            case DBServiceAPI::speedDialError:
-                showDialogDuplicatedSpeedDialNumber();
-                return false;
-            }
+        auto err = DBServiceAPI::verifyContact(application, *contact);
+        LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
+        switch (err) {
+        case DBServiceAPI::noError:
+            break;
+        case DBServiceAPI::emptyContactError:
+            return false;
+        case DBServiceAPI::primaryNumberError:
+            showDialogDuplicatedNumber(contact->numbers[0].number);
+            return false;
+        case DBServiceAPI::secondaryNumberError:
+            showDialogDuplicatedNumber(contact->numbers[1].number);
+            return false;
+        case DBServiceAPI::speedDialError:
+            showDialogDuplicatedSpeedDialNumber();
+            return false;
+        }
 
+        // perform actual add/update operation
+        if (contactAction == ContactAction::Add) {
             if (DBServiceAPI::ContactAdd(application, *contact) == false) {
                 LOG_ERROR("verifyAndSave failed to ADD contact");
                 return false;
             }
-            else {
-                application->switchWindow(gui::name::window::main_window);
-                LOG_INFO("verifyAndSave contact ADDED");
-                return true;
-            }
+            LOG_DEBUG("verifyAndSave contact ADDED");
         }
         else if (contactAction == ContactAction::Edit || contactAction == ContactAction::EditTemporary) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
@@ -165,14 +162,12 @@ namespace gui
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return false;
             }
-            else {
-                application->switchWindow(gui::name::window::main_window);
-                LOG_INFO("verifyAndSave contact UPDATED");
-                return true;
-            }
+            LOG_DEBUG("verifyAndSave contact UPDATED");
         }
-        return false;
-    }
+
+        application->switchWindow(gui::name::window::main_window);
+        return true;
+    } // namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber)
     {
@@ -181,7 +176,10 @@ namespace gui
         auto meta             = dialog->meta;
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
-        contact->ID           = oldContactRecord.ID;
+
+        if (contactAction == ContactAction::Add) {
+            contact->ID = oldContactRecord.ID;
+        }
 
         meta.action = [=]() -> bool {
             if (!DBServiceAPI::ContactUpdate(application, *contact)) {
@@ -208,8 +206,12 @@ namespace gui
         auto meta              = dialog->meta;
         auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(application, contact->speeddial);
         auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
-        contact->ID            = oldContactRecord.ID;
-        meta.action            = [=]() -> bool {
+
+        if (contactAction == ContactAction::Add) {
+            contact->ID = oldContactRecord.ID;
+        }
+
+        meta.action = [=]() -> bool {
             if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
                 return false;

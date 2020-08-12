@@ -400,20 +400,20 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
     }
 
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
-    if (!retSpeedDial->empty()) {
+    if (!retSpeedDial->empty() && (*retSpeedDial)[0].ID != rec.ID) {
         return speedDialError;
     }
 
     if (rec.numbers.size() > 0 && rec.numbers[0].number.getEntered().size() > 0) {
         auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number);
-        if (retPhone1) {
+        if (retPhone1 && retPhone1->ID != rec.ID) {
             return primaryNumberError;
         }
     }
 
     if (rec.numbers.size() > 1 && rec.numbers[1].number.getEntered().size() > 0) {
         auto retPhone2 = MatchContactByPhoneNumber(serv, rec.numbers[1].number);
-        if (retPhone2) {
+        if (retPhone2 && retPhone2->ID != rec.ID) {
             return secondaryNumberError;
         }
     }
