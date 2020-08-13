@@ -98,7 +98,7 @@ namespace gui
     void InputBoxWithLabelAndIconWidget::speedDialKeyHandler()
     {
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
-        iconImage->set("small_circle");
+        iconImage->set("speed_dial_empty");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
