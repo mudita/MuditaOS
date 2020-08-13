@@ -65,5 +65,29 @@ namespace gui
             setFocusItem(focus ? phoneImage : nullptr);
             return true;
         };
+
+        phoneImage->focusChangedCallback = [&, app](Item &item) {
+            if (phoneImage->focus) {
+                phoneImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+                app->getCurrentWindow()->bottomBarTemporaryMode(
+                    utils::localize.get(style::strings::common::call), BottomBar::Side::CENTER, false);
+            }
+            else {
+                phoneImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            }
+            return true;
+        };
+
+        smsImage->focusChangedCallback = [&, app](Item &item) {
+            if (smsImage->focus) {
+                smsImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+                app->getCurrentWindow()->bottomBarTemporaryMode(
+                    utils::localize.get(style::strings::common::send), BottomBar::Side::CENTER, false);
+            }
+            else {
+                smsImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            }
+            return true;
+        };
     }
 } /* namespace gui */

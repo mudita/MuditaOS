@@ -25,7 +25,6 @@ namespace gui
         topBar->setActive(TopBar::Elements::TIME, true);
 
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         contactFlagsWidget = new ContactFlagsWidget(this);

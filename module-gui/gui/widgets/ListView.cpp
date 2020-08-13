@@ -153,6 +153,8 @@ namespace gui
 
     void ListView::clearItems()
     {
+        body->setFocusItem(nullptr);
+
         while (auto el = body->children.back()) {
 
             if (el->type == ItemType::LIST_ITEM) {
