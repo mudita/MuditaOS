@@ -22,8 +22,9 @@ namespace gui
     {
       protected:
         TextDocument *document = nullptr;
-        auto curentBlock();
+        auto currentBlock();
         auto blocksEnd();
+        auto blocksBegin();
         RawFont *default_font = nullptr;
 
       private:

@@ -11,12 +11,12 @@ namespace style
 
             namespace name
             {
-                const inline std::string day_events_window = "DayEventsWindow";
-                const inline std::string no_events_window  = "NoEventsWindow";
-                const inline std::string events_options    = "Options";
-                const inline std::string dialog_yes_no     = "DialogYesNo";
-                const inline std::string all_events_window = "AllEventsWindow";
-                const inline std::string details_window    = "DetailsWindow";
+                const inline std::string day_events_window    = "DayEventsWindow";
+                const inline std::string no_events_window     = "NoEventsWindow";
+                const inline std::string events_options       = "Options";
+                const inline std::string dialog_yes_no        = "DialogYesNo";
+                const inline std::string all_events_window    = "AllEventsWindow";
+                const inline std::string details_window       = "DetailsWindow";
                 const inline std::string new_edit_event       = "NewEditEvent";
                 const inline std::string custom_repeat_window = "CustomRepeat";
             } // namespace name
@@ -38,9 +38,9 @@ namespace style
 
             namespace test
             {
-                const inline int prev_month_id = 1;
-                const inline int month_id      = 2;
-                const inline int next_month_id = 3;
+                const inline int prev_month_id       = 1;
+                const inline int month_id            = 2;
+                const inline int next_month_id       = 3;
                 const inline std::string date_text_1 = "January 2019";
                 const inline std::string date_text_2 = "February 2019";
                 const inline std::string date_text_3 = "March 2019";
@@ -59,7 +59,7 @@ namespace style
 
                 namespace allEvents
                 {
-                    const inline int description_w = 310;
+                    const inline int description_w    = 310;
                     const inline int start_time_min_w = 60;
                 } // namespace allEvents
 
@@ -129,6 +129,6 @@ namespace style
                     const inline int text_input_h  = 40;
                 } // namespace textWithLabel
             }     // namespace item
-        }; // namespace calendar
-    }      // namespace window
+        };        // namespace calendar
+    }             // namespace window
 } // namespace style

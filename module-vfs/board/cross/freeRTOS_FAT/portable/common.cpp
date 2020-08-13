@@ -23,4 +23,3 @@ time_t FreeRTOS_time(time_t *pxTime)
 {
     return utils::time::Time().getTime();
 }
-

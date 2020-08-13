@@ -28,29 +28,39 @@ namespace gui
         if (document == nullptr) {
             return;
         }
+
         auto cursor     = document->getBlockCursor(start_position);
         auto old_cursor = cursor;
+
         do {
             if (!cursor) { // cursor is faulty
-                return;
+                break;
             }
-            // it would be better if cursor would know what to do when it jumps over blocks
             if (old_cursor.getBlockNr() != cursor.getBlockNr() &&
                 (*document)(old_cursor).getEnd() == TextBlock::End::Newline) {
-                return;
+                end = TextBlock::End::Newline;
+                break;
             }
+
+            // it would be better if cursor would know what to do when it jumps over blocks
 
             // take Part of TextBlock we want to show
             auto text_part   = document->getTextPart(cursor);
             auto text_format = (*cursor).getFormat();
             if (text_format->getFont() == nullptr) {
-                return;
+                break;
             }
             auto can_show = text_format->getFont()->getCharCountInSpace(text_part.text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
             if (can_show == 0) {
-                return;
+                auto item = buildUITextPart("", text_format);
+                width_used += item->getTextNeedSpace();
+                height_used = std::max(height_used, item->getTextHeight());
+
+                elements_to_show_in_line.emplace_back(item);
+                block_nr = cursor.getBlockNr();
+                break;
             }
 
             // create item for show and update Line data
@@ -60,9 +70,11 @@ namespace gui
             height_used = std::max(height_used, item->getTextHeight());
             elements_to_show_in_line.emplace_back(item);
 
+            block_nr = cursor.getBlockNr();
+
             // not whole text shown, try again for next line if you want
             if (can_show < text_part.text.length()) {
-                return;
+                break;
             }
 
             old_cursor = cursor;
@@ -96,6 +108,8 @@ namespace gui
         drawUnderline            = from.drawUnderline;
         drawUnderlineMode        = from.drawUnderlineMode;
         underlinePadding         = from.underlinePadding;
+        end                      = from.end;
+        block_nr                 = from.block_nr;
     }
 
     TextLine::~TextLine()

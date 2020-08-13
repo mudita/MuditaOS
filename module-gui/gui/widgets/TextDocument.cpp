@@ -55,11 +55,18 @@ namespace gui
     {
         unsigned int block_no      = 0;
         unsigned int loop_position = 0;
+
         for (auto &el : blocks) {
+
+            if (el.length() == 0) {
+                return BlockCursor(this, 0, block_no, el.getFormat()->getFont());
+            }
+
             if (loop_position + el.length() > position) { // data found
                 return BlockCursor(this, position - loop_position, block_no, el.getFormat()->getFont());
             }
-            // data not found in block_number, early exit
+
+            // data not found in block_number, early exit,
             loop_position += el.length();
             ++block_no;
         }
@@ -110,10 +117,16 @@ namespace gui
     auto TextDocument::split(BlockCursor &cursor) -> std::pair<TextBlock &, TextBlock &>
     {
         auto to_split = std::next(blocks.begin(), cursor.getBlockNr());
-        auto newblock =
-            TextBlock(to_split->getText(cursor.getPosition()), to_split->getFormat()->getFont(), to_split->getEnd());
+
+        auto text = to_split->getText(cursor.getPosition());
+        auto font = to_split->getFormat()->getFont();
+        auto end  = to_split->getEnd();
+
+        auto newblock = TextBlock(text, font, end);
+
         to_split->setText(to_split->getText().substr(0, cursor.getPosition()));
         blocks.insert(std::next(to_split), std::move(newblock));
+
         return {*to_split, *(std::next(to_split))};
     }
 
