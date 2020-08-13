@@ -71,9 +71,18 @@ namespace gui
             }
         };
 
-        focusChangedCallback = [&](Item &item) {
-            if (vBox->getFocusItem() == nullptr) {
-                setFocusItem(vBox);
+        focusChangedCallback = [&, app](Item &item) {
+            if (focus) {
+                if (savedFocusItem == nullptr) {
+                    setFocusItem(vBox);
+                }
+                else {
+                    savedFocusItem->parent->focusChangedCallback(*savedFocusItem);
+                }
+            }
+            else {
+                savedFocusItem = getFocusItem();
+                app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode();
             }
             return true;
         };

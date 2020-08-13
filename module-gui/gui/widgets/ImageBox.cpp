@@ -8,7 +8,8 @@ ImageBox::ImageBox(
 {
     setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-
+    setPenFocusWidth(style::window::default_border_focus_w);
+    setPenWidth(style::window::default_border_no_focus_w);
     addWidget(image);
 
     focusChangedCallback = [&](Item &item) {
