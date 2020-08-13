@@ -21,6 +21,7 @@ namespace gui
         NumberWithIconsWidget *primaryNumberHBox     = nullptr;
         NumberWithIconsWidget *alternativeNumberHBox = nullptr;
         Text *emailText                              = nullptr;
+        Item *savedFocusItem                         = nullptr;
     };
 
 } /* namespace gui */
