@@ -479,10 +479,10 @@ void workerTaskFunction(void *ptr)
 
 ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout)
 {
-    ssize_t ret         = -1;
+    ssize_t ret = -1;
     std::unique_ptr<uint8_t[]> buf(new uint8_t[startParams.MaxFrameSize]);
-    bool complete       = false;
-    uint32_t _timeout   = timeout;
+    bool complete     = false;
+    uint32_t _timeout = timeout;
 
     while ((!complete) && (--_timeout)) {
         ret = pv_cellular->Read(reinterpret_cast<void *>(buf.get()), startParams.MaxFrameSize);
@@ -504,7 +504,7 @@ ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout)
 
 void TS0710::SelectAntenna(bsp::cellular::antenna antenna)
 {
-        pv_cellular->SelectAntenna(antenna);
+    pv_cellular->SelectAntenna(antenna);
 }
 
 bsp::cellular::antenna TS0710::GetAntenna()
