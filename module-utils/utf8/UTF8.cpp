@@ -276,7 +276,7 @@ UTF8 &UTF8::operator=(UTF8 &&utf) noexcept
 {
     // prevent moving if object is moved to itself
     if (this != &utf) {
-            delete[] data;
+        delete[] data;
         data          = utf.data;
         utf.data      = nullptr;
         sizeAllocated = utf.sizeAllocated;

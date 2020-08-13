@@ -247,8 +247,8 @@ namespace gui
         if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT))) {
             debug_text("Text in scroll mode ignores left/right navigation");
         }
-        auto ret = cursor->move(inputToNavigation(inputEvent));
-        debug_text("move: %s", c_str(ret));
+        auto ret = cursor->move_cursor(inputToNavigation(inputEvent));
+        debug_text("move_cursor: %s", c_str(ret));
         if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
             debug_text("scrolling needs implementing");
             return false;
@@ -266,16 +266,13 @@ namespace gui
 
     bool Text::addChar(uint32_t utf_value)
     {
-        assert(cursor);
         cursor->addChar(utf_value);
         auto block = document->getBlock(cursor);
+
         if (block == nullptr) {
-            LOG_ERROR("No block after add char!");
             return false;
         }
-        debug_text("len: %d font: %s",
-                   block->length(),
-                   block->getFont() == nullptr ? "no font" : block->getFont()->getName().c_str());
+        debug_text("value: %d, block len: %d", utf_value, block->length());
         return true;
     }
 
@@ -314,12 +311,13 @@ namespace gui
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
+        auto end             = TextBlock::End::None;
         auto line_x_position = padding.left;
         do {
             auto text_line = gui::TextLine(document.get(), cursor, w);
             cursor += text_line.length();
 
-            if (text_line.length() == 0) {
+            if (text_line.length() == 0 && end == TextBlock::End::None) {
                 debug_text("cant show more text from this document");
                 break;
             }
@@ -338,10 +336,12 @@ namespace gui
             // detach
             lines.emplace(std::move(text_line));
             auto &line = lines.last();
+
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
             line.alignH(getAlignment(Axis::X), w);
 
+            end = lines.last().getEnd();
             line_y_position += line.height();
 
             debug_text_lines("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
@@ -371,7 +371,7 @@ namespace gui
                 if (font != nullptr) {
                     h_used += font->info.line_height;
                     w_used += TextCursor::default_width;
-                    debug_text("epty line height: %d", h_used);
+                    debug_text("empty line height: %d", h_used);
                 }
             }
 
@@ -396,19 +396,18 @@ namespace gui
         // why? because we need to know if these elements fit in
         // if not -> these need to call resize, resize needs to be called prior to buildDrawList
         drawCursor();
-        debug_text_lines("parent area: %s, elements area: %s",
-                         area().str().c_str(),
-                         [&]() -> std::string {
-                             std::string str;
-                             for (auto el : children) {
-                                 if (auto label = dynamic_cast<gui::Label *>(el)) {
-                                     str += "area: " + label->area().str() + std::string(label->getText()) + " ";
-                                 }
-                             }
-                             return str.c_str();
-                         }()
-                                      .c_str());
-        debug_text_cursor("cursor visibility: %d position: %s", cursor->visible, cursor->area().str().c_str());
+        debug_text("parent area: %s, elements area: %s",
+                   area().str().c_str(),
+                   [&]() -> std::string {
+                       std::string str;
+                       for (auto el : children) {
+                           if (auto label = dynamic_cast<gui::Label *>(el)) {
+                               str += "area: " + label->area().str() + std::string(label->getText()) + " ";
+                           }
+                       }
+                       return str.c_str();
+                   }()
+                                .c_str());
         return Rect::buildDrawList();
     }
 
@@ -492,7 +491,7 @@ namespace gui
         }
 
         auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
-
+        debug_text("handleAddChar %d -> Begin", code);
         debug_text("%s times: %" PRIu32, inputEvent.str().c_str(), translator.getTimes());
 
         if (code != KeyProfile::none_key) {
@@ -502,8 +501,13 @@ namespace gui
             }
             addChar(code);
             drawLines();
+
+            debug_text("handleAddChar -> End(true)");
+
             return true;
         }
+
+        debug_text("handleAdChar -> End(false)");
         return false;
     }
 

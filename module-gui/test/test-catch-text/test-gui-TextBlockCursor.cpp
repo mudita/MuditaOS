@@ -253,7 +253,7 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
     {
         auto [doc, font]                     = mockup::buildTestDocument();
         auto cursor                          = BlockCursor(&doc, 0, 0, nullptr);
-        unsigned int first_block_size_offset = doc.getBlocks().front().length();
+        unsigned int first_block_size_offset = doc.getBlocks().front().length() - 1;
         unsigned int check_offset            = 2;
         unsigned int block_move_penalty      = 1; // +1 because with first_block_size_offset we are still in 1st block
         REQUIRE(first_block_size_offset > check_offset);
@@ -296,7 +296,7 @@ TEST_CASE("add Char to empty")
 TEST_CASE("add Char")
 {
     using namespace gui;
-    auto [doc, font] = mockup::buildTestDocument();
+    auto [doc, font] = mockup::buildOnelineTestDocument("one line");
     auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
 
     SECTION(" to second block -in the middle")
@@ -381,7 +381,7 @@ TEST_CASE("remove Char")
         auto block_count_start = doc.getBlocks().size();
         auto how_many          = std::next(doc.getBlocks().begin())->length();
         // move to end of second block +1 is for newline
-        cursor += doc.getBlocks().front().length() + 1 + how_many;
+        cursor += doc.getBlocks().front().length() + how_many;
         for (unsigned int i = 0; i <= how_many + 1; ++i) {
             REQUIRE(cursor.removeChar());
             --cursor;
@@ -412,4 +412,21 @@ TEST_CASE("add newline")
     cursor += text.find(" ");
     cursor.addChar('\n');
     REQUIRE(no_of_blocks < doc.getBlocks().size());
+}
+
+TEST_CASE("add newline at the end")
+{
+    using namespace gui;
+    std::string text = "some long text.";
+    auto [doc, font] = mockup::buildOnelineTestDocument(text);
+    auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
+
+    cursor += text.size();
+    cursor.addChar('\n');
+    ++cursor;
+    cursor.addChar('s');
+
+    REQUIRE(doc.getBlocks().size() == 2);
+    REQUIRE(doc.getBlocks().front().getText() == "some long text.\n");
+    REQUIRE(doc.getBlocks().back().getText() == "s");
 }

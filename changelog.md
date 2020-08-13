@@ -12,7 +12,7 @@
 
 * `[messages]` Fixed crashing in the new message window.
 * `[home screen]``[notifications]` Fixed notifications widget when phone is locked.
-
+* `[text]`	Handling new line when entering text
 ### Other
 
 * `[build]` Allow excluding applications from the build to decrease debug firmware size.
