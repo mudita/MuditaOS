@@ -1,27 +1,21 @@
 # Mudita PurePhone changelog
 
-## Current Release
+## [0.33.1 - 2020-08-13]
+
+### Added
+
+* `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
 
 ### Changed
 
+* `[boot]` Switched configuration file format from INI to JSON.
 * `[phonebook]` Auto releasing speed dial number of blocked contact.
+* `[phonebook]` Redesigned contact details window.
 
 ### Fixed
 
 * `[phonebook]` Fix favourites contacts display order.
 * `[phonebook]` Fix (un)blocking option name and improve handling of contact blocking window.
-
-### Added
-* `[torch]` Toggle torch colours for certification purposes (redish, blueish, off)
-
-### Changed
-
-* `[phonebook]` Moved contact validation to DB service.
-* `[phonebook]` Refactored contact details window.
-
-### Other
-* `[boot]` switched from ini to JSON format
-* `[core]` fixed TAR extract
 
 ## [0.32.1 - 2020-08-07]
 
