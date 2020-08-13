@@ -43,6 +43,7 @@
 * `[phonebook]` Switch to contact list instead of contact details after saving contact.
 * `[phonebook]` Require filling in at least one field while adding/editing contact.
 * `[phonebook]` Replace static icon with number inside circle in speed dial duplicate window.
+* `[phonebook]` Add final icons to Add/Edit Contact window.
 * `[sms]` Do not delete sms if thread is malformed (not found what expected).
 * `[listview]` Improved data refresh time.
 
