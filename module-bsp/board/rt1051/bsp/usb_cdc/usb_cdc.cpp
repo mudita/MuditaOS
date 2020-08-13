@@ -18,7 +18,6 @@ namespace bsp
 
         while (1) {
             ulTaskNotifyTake(pdTRUE, 1000);
-            LOG_DEBUG(".");
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
                 ssize_t length = USB_CDCGetReceived(inputData);
 
@@ -44,7 +43,7 @@ namespace bsp
         delete send_msg;
 
         if (t == 0x00) {
-            LOG_DEBUG("[ServiceDesktop:BSP_Driver] Send: %d signs", (*send_msg).length());
+            // LOG_DEBUG("[ServiceDesktop:BSP_Driver] Send: %d signs", (*send_msg).length());
             return 0;
         }
         else {

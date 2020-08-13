@@ -1,4 +1,5 @@
 #include "WorkerBT.hpp"
+#include "fsl_lpuart.h"
 
 bool WorkerBT::handleMessage(uint32_t queueID)
 {
@@ -6,7 +7,7 @@ bool WorkerBT::handleMessage(uint32_t queueID)
     QueueHandle_t queue = queues[queueID];
 
     std::string qname = queueNameMap[queue];
-    LOG_INFO("[ServiceDesktop:Worker] Received data from queue: %s", qname.c_str());
+    // LOG_INFO("[ServiceDesktop:Worker] Received data from queue: %s", qname.c_str());
 
     static std::string receiveMsg;
     // static std::string *sendMsg;
@@ -19,18 +20,39 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &receiveMsg, 0) != pdTRUE) {
             return false;
         }
-        LOG_DEBUG("%d> %s",receiveMsg.length(), receiveMsg.c_str());
-        auto send = new std::string(receiveMsg);
-        bsp::usbCDCSend(send);
+        printf("data:\n");
+        for (unsigned int i = 0; i < receiveMsg.length(); ++i)
+        {
+            printf("0x%X ", *(receiveMsg.c_str()+i));
+        }
+        printf("\n");
+
+//        bt = bsp::BlueKitchen::getInstance();
+//        bt->write_blocking(const_cast<char*>(receiveMsg.c_str()), receiveMsg.length());
+        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, (uint8_t*)(receiveMsg.c_str()), receiveMsg.length());
     }
 
-    // TODO: Consider moving sendBuffer receive to bsp driver
-    ///if (qname == SEND_QUEUE_BUFFER_NAME) {
-    ///    if (xQueueReceive(queue, &sendMsg, 0) != pdTRUE)
-    ///        return false;
-
-    ///    bsp::usbCDCSend(sendMsg);
-    ///}
+    if (qname == UART_RECEIVE_QUEUE) {
+        uint8_t evt;
+        if (xQueueReceive(queue, &evt, 0) != pdTRUE) {
+            return false;
+        }
+        if( evt == Bt::Message::EvtRecUnwanted ) {
+        // if( evt == 
+        char val;
+        int ret = bt->in.pop(&val);
+        if ( ret == 0 ) {
+            auto send = new std::string(&val,1);
+            printf("< 0x%X\n", val);
+            /// TODO check if all is send because I don't fully believe it...
+            bsp::usbCDCSend(send);
+        } else {
+            LOG_ERROR("ret: %d", ret);
+        }
+        } else {
+            LOG_ERROR("event... %d", evt);
+        }
+    }
 
     return true;
 }
@@ -43,6 +65,8 @@ bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
 
     LOG_DEBUG("get bt instajce");
     bt = bsp::BlueKitchen::getInstance();
+    bt->qHandle =  Worker::getQueueByName(WorkerBT::UART_RECEIVE_QUEUE);
+    bt->open();
     // TODO here initialization and crap...
 
     LOG_DEBUG("start usb");

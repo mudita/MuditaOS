@@ -21,7 +21,7 @@ class WorkerBT : public sys::Worker
       bsp::BlueKitchen *bt = nullptr;
   public:
     const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
-    // const std::string SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";
+    const std::string UART_RECEIVE_QUEUE    = "sendQueueBuffer";
 
     WorkerBT(sys::Service *ownerServicePtr)
         : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr) {
