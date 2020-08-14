@@ -144,6 +144,16 @@ namespace utils
                 }
                 return localize.get(tlocale.time_formats[what]);
             }
+
+            static const UTF8 getAM()
+            {
+                return localize.get("common_AM");
+            }
+
+            static const UTF8 getPM()
+            {
+                return localize.get("common_PM");
+            }
         };
 
     }; // namespace time

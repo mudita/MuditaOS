@@ -20,7 +20,7 @@ namespace gui
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        image = new Image("small_tick");
+        image = new Image("small_tick_W_M");
         image->setVisible(false);
         addWidget(image);
 
