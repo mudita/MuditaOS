@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
 
 class MonthModel
 {
@@ -29,4 +30,6 @@ class MonthModel
     uint32_t getLastDay();
     uint32_t getFirstWeekOffset();
     std::string getMonthYearText();
+    std::string getMonthText();
+    std::vector<std::string> split(const std::string &s, char delim);
 };

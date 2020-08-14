@@ -27,40 +27,34 @@ gui::ListItem *CustomRepeatModel::getItem(gui::Order order)
     return getRecord(order);
 }
 
-void CustomRepeatModel::createData()
+void CustomRepeatModel::createData(const std::shared_ptr<WeekDaysRepeatData> &data)
 {
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Monday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Monday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Tuesday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Tuesday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Wednesday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Wednesday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Thursday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Thursday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Friday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Friday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Saturday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Saturday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Sunday)));
+        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Sunday), data));
 
     for (auto &item : internalData) {
         item->deleteByList = false;
     }
 }
 
-void CustomRepeatModel::loadData()
+void CustomRepeatModel::loadData(const std::shared_ptr<WeekDaysRepeatData> &data)
 {
     list->clear();
     eraseInternalData();
 
-    createData();
-
-    for (auto &item : internalData) {
-        if (item->onLoadCallback) {
-            item->onLoadCallback();
-        }
-    }
+    createData(data);
 
     list->rebuildList();
 }

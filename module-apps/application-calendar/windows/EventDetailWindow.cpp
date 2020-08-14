@@ -1,5 +1,6 @@
 #include "EventDetailWindow.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
 
@@ -29,8 +30,6 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
 
-        setTitle(utils::time::Time().str("%d %B"));
-
         bodyList = new gui::ListView(this,
                                      style::window::calendar::listView_x,
                                      style::window::calendar::listView_y,
@@ -47,7 +46,28 @@ namespace gui
             bodyList->rebuildList();
         }
 
-        eventDetailModel->loadData();
+        eventDetailModel->loadData(eventRecord);
+    }
+
+    auto EventDetailWindow::handleSwitchData(SwitchData *data) -> bool
+    {
+        if (data == nullptr) {
+            return false;
+        }
+
+        auto *item = dynamic_cast<EventRecordData *>(data);
+        if (item == nullptr) {
+            return false;
+        }
+
+        eventRecord    = item->getData();
+        prevWindowName = item->getWindowName();
+        auto startDate = TimePointToYearMonthDay(eventRecord->date_from);
+        std::string monthStr =
+            utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+        setTitle(std::to_string(unsigned(startDate.day())) + " " + monthStr);
+
+        return true;
     }
 
     bool EventDetailWindow::onInput(const gui::InputEvent &inputEvent)
@@ -62,7 +82,10 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
             LOG_DEBUG("Switch to option window");
-            application->switchWindow(style::window::calendar::name::events_options);
+            auto rec  = std::make_unique<EventsRecord>(*eventRecord);
+            auto data = std::make_unique<EventRecordData>(std::move(rec));
+            data->setWindowName(prevWindowName);
+            application->switchWindow(style::window::calendar::name::events_options, std::move(data));
             return true;
         }
 
