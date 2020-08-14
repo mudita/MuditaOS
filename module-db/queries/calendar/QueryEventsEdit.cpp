@@ -2,18 +2,12 @@
 
 namespace db::query::events
 {
-    Edit::Edit(EventsRecord record, const uint32_t &dateFrom)
-        : Query(Query::Type::Update), record(record), dateFrom(dateFrom)
+    Edit::Edit(EventsRecord record) : Query(Query::Type::Update), record(record)
     {}
 
     auto Edit::getRecord() const -> EventsRecord
     {
         return record;
-    }
-
-    auto Edit::getDateFrom() const -> uint32_t
-    {
-        return dateFrom;
     }
 
     auto Edit::debugInfo() const -> std::string

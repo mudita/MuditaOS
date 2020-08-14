@@ -116,7 +116,6 @@ namespace gui
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-
         // update time
         time->setText(topBar->getTimeString());
 

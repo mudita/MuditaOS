@@ -19,10 +19,13 @@ namespace gui
       public:
         AllEventsWindow(app::Application *app, std::string name);
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
+        bool onDatabaseMessage(sys::Message *msgl) override;
 
         bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild() override;
         void buildInterface() override;
+
+        bool checkEmpty = false;
     };
 
 } // namespace gui
