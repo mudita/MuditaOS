@@ -1,4 +1,5 @@
 #include "SMSTemplateRecord.hpp"
+#include "queries/sms/QuerySMSTemplateGetByID.hpp"
 
 #include <log/log.hpp>
 
@@ -72,4 +73,16 @@ SMSTemplateRecord SMSTemplateRecordInterface::GetByID(uint32_t id)
     auto templ = smsDB->templates.getById(id);
 
     return SMSTemplateRecord{templ};
+}
+
+std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::runQuery(std::shared_ptr<db::Query> query)
+{
+    if (const auto local_query = dynamic_cast<const db::query::SMSTemplateGetByID *>(query.get())) {
+
+        auto smsTemplate = smsDB->templates.getById(local_query->id);
+        return std::make_unique<db::query::SMSTemplateGetByIDResult>(std::move(smsTemplate));
+    }
+    else {
+        return std::make_unique<db::query::SMSTemplateGetByIDResult>(SMSTemplateRecord());
+    }
 }

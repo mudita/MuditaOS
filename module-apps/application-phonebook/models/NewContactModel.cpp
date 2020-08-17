@@ -6,6 +6,7 @@
 
 #include <ListView.hpp>
 #include <time/ScopedTime.hpp>
+#include <BottomBar.hpp>
 
 NewContactModel::NewContactModel(app::Application *app) : application(app)
 {}

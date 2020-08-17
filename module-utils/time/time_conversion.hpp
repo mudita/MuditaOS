@@ -13,7 +13,6 @@ namespace utils
 {
     namespace time
     {
-
         constexpr auto secondsInMinute = 60;
         constexpr auto minutesInHour   = 60;
         constexpr auto hoursInday      = 24;

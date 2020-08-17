@@ -23,6 +23,7 @@ namespace gui
         DayEventsWindow(app::Application *app, std::string name);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
+        bool onDatabaseMessage(sys::Message *msgl) override;
         void rebuild() override;
         void buildInterface() override;
     };

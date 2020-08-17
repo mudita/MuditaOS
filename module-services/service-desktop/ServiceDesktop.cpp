@@ -3,6 +3,8 @@
 #include "DesktopMessages.hpp"
 #include "EndpointHandler.hpp"
 #include "FactoryReset.hpp"
+#include "messages/DBSMSMessage.hpp"
+#include "messages/DBSMSTemplateMessage.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
@@ -90,6 +92,14 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
         }
         else if (resp->responseTo >= MessageType::DBContactVerify && resp->responseTo <= MessageType::DBContactBlock) {
             EndpointHandler::handleContactsMessage(msg, resp);
+        }
+        else if (resp->responseTo >= MessageType::DBSMSAdd && resp->responseTo <= MessageType::DBSMSTemplateGetCount) {
+            if (dynamic_cast<DBSMSResponseMessage *>(resp) != nullptr) {
+                EndpointHandler::handleMessagesMessage(msg, resp);
+            }
+            else if (dynamic_cast<DBSMSTemplateResponseMessage *>(resp) != nullptr) {
+                EndpointHandler::handleMessageTemplatesMessage(msg, resp);
+            }
         }
         else {
             LOG_DEBUG("resp->ResponseTo: %d", static_cast<short>(resp->responseTo));

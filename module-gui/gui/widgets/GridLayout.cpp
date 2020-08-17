@@ -10,6 +10,37 @@ GridLayout::GridLayout(
 {
     setPenWidth(style::window::default_border_no_focus_w);
     setPenFocusWidth(style::window::default_border_no_focus_w);
+
+    this->borderCallback = [this](const InputEvent &inputEvent) -> bool {
+        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+            return false;
+        }
+        switch (inputEvent.keyCode) {
+        case KeyCode::KEY_UP: {
+            auto it = this->getNavigationFocusedItem();
+            this->setFocusItem((*std::next(it, (this->rowSize - 1) * this->colSize)));
+            return true;
+        }
+        case KeyCode::KEY_DOWN: {
+            auto it = this->getNavigationFocusedItem();
+            this->setFocusItem((*std::prev(it, (this->rowSize - 1) * this->colSize)));
+            return true;
+        }
+        case KeyCode::KEY_LEFT: {
+            auto it = this->getNavigationFocusedItem();
+            this->setFocusItem((*std::next(it, this->colSize - 1)));
+            return true;
+        }
+        case KeyCode::KEY_RIGHT: {
+            auto it = this->getNavigationFocusedItem();
+            this->setFocusItem((*std::prev(it, this->colSize - 1)));
+            return true;
+        }
+        default: {
+            return false;
+        }
+        }
+    };
 }
 
 void GridLayout::resizeItems()

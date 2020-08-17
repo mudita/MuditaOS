@@ -14,7 +14,6 @@
 #include "messages/DBThreadMessage.hpp"
 #include "messages/DBNotificationMessage.hpp"
 #include "messages/DBSettingsMessage.hpp"
-#include "messages/DBSMSMessage.hpp"
 #include "messages/DBSMSTemplateMessage.hpp"
 #include "messages/DBContactMessage.hpp"
 #include "messages/DBAlarmMessage.hpp"
@@ -48,6 +47,7 @@ ServiceDB::~ServiceDB()
     notesDB.reset();
     countryCodesDB.reset();
     notificationsDB.reset();
+    eventsDB.reset();
 
     Database::deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -76,6 +76,8 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return countryCodeRecordInterface.get();
     case db::Interface::Name::Notifications:
         return notificationsRecordInterface.get();
+    case db::Interface::Name::Events:
+        return eventsRecordInterface.get();
     }
     return nullptr;
 }
@@ -593,6 +595,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     calllogDB       = std::make_unique<CalllogDB>();
     countryCodesDB  = std::make_unique<CountryCodesDB>();
     notificationsDB = std::make_unique<NotificationsDB>();
+    eventsDB        = std::make_unique<EventsDB>();
 
     // Create record interfaces
     settingsRecordInterface      = std::make_unique<SettingsRecordInterface>(settingsDB.get());
@@ -605,6 +608,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     calllogRecordInterface       = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
     countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
+    eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
     return sys::ReturnCodes::Success;
 }
 
@@ -634,5 +638,6 @@ bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
     rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
     rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
     rc |= calllogDB.get()->storeIntoFile(backupPath + "calllog.db");
+    rc |= eventsDB.get()->storeIntoFile(backupPath + "events.db");
     return rc;
 }

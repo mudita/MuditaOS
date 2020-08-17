@@ -1,10 +1,19 @@
 # Mudita PurePhone changelog
 
+## Current Release
+
+### Added
+
+* `[calendar]` Added new/edit event window
+* `[gui]` Added CheckBox widget
+
+
 ## [0.33.1 - 2020-08-13]
 
 ### Added
 
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
+* `[calendar]` database structure
 
 ### Changed
 

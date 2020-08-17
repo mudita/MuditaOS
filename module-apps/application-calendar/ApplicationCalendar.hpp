@@ -12,6 +12,8 @@ namespace app
 
     class ApplicationCalendar : public Application
     {
+        time_t applicationStartTime = 0;
+
       public:
         ApplicationCalendar(std::string name,
                             std::string parent,
@@ -25,6 +27,10 @@ namespace app
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {
             return sys::ReturnCodes::Success;
+        }
+        time_t getCurrentTimeStamp()
+        {
+            return applicationStartTime;
         }
 
         void createUserInterface() override;

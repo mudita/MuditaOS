@@ -21,6 +21,7 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/CalllogTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsTable_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/EventsTable_tests.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/CalllogRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRecord_tests.cpp"
@@ -30,7 +31,9 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsRecord_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/EventsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/QueryInterface.cpp"
+
         
     LIBS
         module-db
