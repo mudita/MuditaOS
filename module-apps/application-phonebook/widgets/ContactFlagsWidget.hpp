@@ -42,6 +42,7 @@ namespace gui
         void initGUIIcons();
         void buildWidget();
         void repositionIcons();
+        void hideIfNoFlags();
         bool favourites                       = false;
         bool speedDial                        = false;
         unsigned char speedDialPos            = 0;

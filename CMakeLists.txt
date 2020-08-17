@@ -36,7 +36,7 @@ add_custom_target(assets)
 
 # setting build flags
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
+    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG -Og")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 
