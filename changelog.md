@@ -10,6 +10,7 @@
 ### Fixed
 
 * `[music player]` Fixed songs list building and song name font size.
+* `[gui]` Added bootloader version information 
 
 ## [0.33.1 - 2020-08-13]
 
