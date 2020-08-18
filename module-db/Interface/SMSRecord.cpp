@@ -308,8 +308,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
         record.threadID  = sms.threadID;
         record.type      = sms.type;
         record.ID        = sms.ID;
-
-        return std::make_unique<db::query::SMSGetByIDResult>(record);
+        auto response    = std::make_unique<db::query::SMSGetByIDResult>(record);
+        response->setRequestQuery(query);
+        return response;
     }
     else if (const auto localQuery = dynamic_cast<const db::query::SMSGetByContactID *>(query.get())) {
         auto smsVector = smsDB->sms.getByContactId(localQuery->contactId);
@@ -327,7 +328,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
             recordVector.emplace_back(record);
         }
 
-        return std::make_unique<db::query::SMSGetByContactIDResult>(recordVector);
+        auto response = std::make_unique<db::query::SMSGetByContactIDResult>(recordVector);
+        response->setRequestQuery(query);
+        return response;
     }
     else if (const auto localQuery = dynamic_cast<const db::query::SMSGetByText *>(query.get())) {
         auto smsVector = smsDB->sms.getByText(localQuery->text);
@@ -345,7 +348,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
             recordVector.emplace_back(record);
         }
 
-        return std::make_unique<db::query::SMSGetByContactIDResult>(recordVector);
+        auto response = std::make_unique<db::query::SMSGetByTextResult>(recordVector);
+        response->setRequestQuery(query);
+        return response;
     }
 
     return nullptr;

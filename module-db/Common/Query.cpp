@@ -1,6 +1,5 @@
 #include "Query.hpp"
 #include <stdexcept>
-
 #include <memory>
 #include <utility>
 
@@ -17,6 +16,12 @@ QueryListener *Query::getQueryListener() const noexcept
 void Query::setQueryListener(QueryListener *queryListener) noexcept
 {
     listener = queryListener;
+}
+
+void Query::setQueryListener(std::unique_ptr<EndpointListener> _listener) noexcept
+{
+    endpointListener = std::move(_listener);
+    listener         = dynamic_cast<QueryListener *>(endpointListener.get());
 }
 
 QueryResult::QueryResult(std::shared_ptr<Query> requestQuery) : requestQuery(std::move(requestQuery))
