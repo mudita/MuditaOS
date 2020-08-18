@@ -28,10 +28,7 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-
         contactFlagsWidget = new ContactFlagsWidget(this);
-        contactFlagsWidget->setVisible(true);
 
         bodyList = new gui::ListView(this,
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::x,
@@ -74,6 +71,22 @@ namespace gui
             contactFlagsWidget->setSpeedDial(false, 0);
         }
 
+        contactFlagsWidget->setICE(contact->isOnIce());
+        contactFlagsWidget->setBlocked(contact->isOnBlocked());
+        contactFlagsWidget->setFavourites(contact->isOnFavourites());
+        if (contactFlagsWidget->visible) {
+            title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsList::y);
+            bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsList::w,
+                              phonebookStyle::contactDetailsWindow::contactDetailsList::h);
+        }
+        else {
+            title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+            bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::y);
+            bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::w,
+                              phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::h);
+        }
+
         contactDetailsModel->loadData(contact);
     }
 
@@ -111,32 +124,6 @@ namespace gui
             application->switchWindow(
                 gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 
-            return true;
-        }
-
-        // used for testing will be removed with finished model
-
-        if (inputEvent.is(KeyCode::KEY_1)) {
-            contactFlagsWidget->setFavourites(!contactFlagsWidget->getFavourites());
-            return true;
-        }
-
-        if (inputEvent.is(KeyCode::KEY_2)) {
-            contactFlagsWidget->setICE(!contactFlagsWidget->getICE());
-            return true;
-        }
-
-        if (inputEvent.is(KeyCode::KEY_3)) {
-            static unsigned char speedDialPosition = 0;
-            if (contactFlagsWidget->getSpeedDial()) {
-                ++speedDialPosition %= 10;
-            }
-            contactFlagsWidget->setSpeedDial(!contactFlagsWidget->getSpeedDial(), speedDialPosition);
-            return true;
-        }
-
-        if (inputEvent.is(KeyCode::KEY_4)) {
-            contactFlagsWidget->setBlocked(!contactFlagsWidget->getBlocked());
             return true;
         }
 

@@ -103,7 +103,18 @@ namespace gui
             }
 
         }
+        hideIfNoFlags();
         mainBox->resizeItems();
+    }
+
+    void ContactFlagsWidget::hideIfNoFlags()
+    {
+        if (blocked || favourites || ice || speedDial) {
+            setVisible(true);
+        }
+        else {
+            setVisible(false);
+        }
     }
 
 } // namespace gui
