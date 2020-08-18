@@ -98,7 +98,7 @@ namespace gui
     void InputBoxWithLabelAndIconWidget::speedDialKeyHandler()
     {
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
-        iconImage->set("small_circle");
+        iconImage->set("speed_dial_empty_W_M");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
@@ -132,8 +132,8 @@ namespace gui
     void InputBoxWithLabelAndIconWidget::addToFavouritesHandler()
     {
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_fav"));
-        iconImage->set("small_heart");
-        tickImage->set("small_tick");
+        iconImage->set("small_heart_W_M");
+        tickImage->set("small_tick_W_M");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
@@ -179,7 +179,7 @@ namespace gui
     {
         descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_ice"));
         iconImage->set("ice");
-        tickImage->set("small_tick");
+        tickImage->set("small_tick_W_M");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {

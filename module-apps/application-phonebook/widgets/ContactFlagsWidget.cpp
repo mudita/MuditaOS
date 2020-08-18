@@ -62,7 +62,7 @@ namespace gui
 
     void ContactFlagsWidget::initGUIIcons()
     {
-        favouritesIcon = new ContactFlagIconWidget("small_heart", utils::localize.get("FAVOURITES"), this);
+        favouritesIcon = new ContactFlagIconWidget("small_heart_W_M", utils::localize.get("FAVOURITES"), this);
         speedDialIcon  = new ContactFlagIconWidget(speedDialPos, utils::localize.get("SPEED DIAL"), this);
         iceIcon        = new ContactFlagIconWidget("ice", utils::localize.get("ICE"), this);
         blockedIcon    = new ContactFlagIconWidget("block", utils::localize.get("BLOCKED"), this);
@@ -103,7 +103,18 @@ namespace gui
             }
 
         }
+        hideIfNoFlags();
         mainBox->resizeItems();
+    }
+
+    void ContactFlagsWidget::hideIfNoFlags()
+    {
+        if (blocked || favourites || ice || speedDial) {
+            setVisible(true);
+        }
+        else {
+            setVisible(false);
+        }
     }
 
 } // namespace gui

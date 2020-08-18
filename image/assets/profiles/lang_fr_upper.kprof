@@ -1,5 +1,5 @@
 #name of the profile
-lang_pl_upper
+lang_fr_upper
 #NumericKey1 = 31,
 31
 true
@@ -8,43 +8,43 @@ true
 #NumericKey2 = 32,
 32
 true
-'A','B','C','Ą','Ć'
-0,0,0,0,0
+'A','B','C','À','Â','Ç'
+0,0,0,0,0,0
 #NumericKey3 = 33,
 33
 true
-'D','E','F','Ę'
-0,0,0,0
+'D','E','F','É','È','Ê','Ë'
+0,0,0,0,0,0,0
 #NumericKey4 = 41,
 41
 true
-'G','H','I'
-0,0,0
+'G','H','I','Î','Ï'
+0,0,0,0,0
 #NumericKey5 = 42,
 42
 true
-'J','K','L','Ł'
-0,0,0,0
+'J','K','L'
+0,0,0
 #NumericKey6 = 43,
 43
 true
-'M','N','O','Ń','Ó'
-0,0,0,0,0
+'M','N','O','Ô'
+0,0,0,0
 #NumericKey7 = 51,
 51
 true
-'P','Q','R','S','Ś'
-0,0,0,0,0
+'P','Q','R','S'
+0,0,0,0
 #NumericKey8 = 52,
 52
 true
-'T','U','V'
-0,0,0
+'T','U','V','Û','Ù','Ü'
+0,0,0,0,0,0
 #NumericKey9 = 53,
 53
 true
-'W','X','Y','Z','Ź','Ż'
-0,0,0,0,0,0
+'W','X','Y','Z','Ÿ'
+0,0,0,0,0
 #NumericKey0 = 62,
 62
 false
@@ -53,12 +53,12 @@ false
 #NumericKeyAst = 61,
 61
 false
-0x08
+0x0A
 0
 #NumericKeyPnd = 63,
 63
 false
-0x0A
+0x08
 0
 #JoystickLeft = 11,
 11
