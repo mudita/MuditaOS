@@ -39,6 +39,7 @@
 
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
 * `[calendar]` database structure
+* `[phonebook]` Show block icon next to blocked contact name on contact list.
 
 ### Changed
 
