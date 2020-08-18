@@ -63,10 +63,10 @@ namespace gui
             textArea.y = (widgetArea.h - font->info.line_height) / 2 + font->info.base;
             break;
         case Alignment::Vertical::Top:
-            textArea.y = font->info.base + margins.top;
+            textArea.y = font->info.base + padding.top;
             break;
         case Alignment::Vertical::Bottom:
-            textArea.y = widgetArea.h - font->info.line_height + font->info.base - margins.bottom;
+            textArea.y = widgetArea.h - font->info.line_height + font->info.base - padding.bottom;
             break;
         default:
             break;
@@ -77,10 +77,10 @@ namespace gui
             textArea.x = (widgetArea.w - textArea.w) / 2;
             break;
         case Alignment::Horizontal::Left:
-            textArea.x = margins.left;
+            textArea.x = padding.left;
             break;
         case Alignment::Horizontal::Right:
-            textArea.x = widgetArea.w - textArea.w - margins.right;
+            textArea.x = widgetArea.w - textArea.w - padding.right;
             break;
         default:
             break;
@@ -107,12 +107,12 @@ namespace gui
                 break;
             case Alignment::Horizontal::Right:
                 lineFront->setPosition(0, lineY);
-                lineFront->setSize(lineW - spaceWidth, 2);
+                lineFront->setSize(lineW - spaceWidth - padding.right, 2);
                 lineBack->setVisible(false);
                 break;
             case Alignment::Horizontal::Left:
-                lineBack->setPosition(stringPixelWidth + spaceWidth, lineY);
-                lineBack->setSize(lineW - spaceWidth, 2);
+                lineBack->setPosition(stringPixelWidth + spaceWidth + padding.left, lineY);
+                lineBack->setSize(lineW - spaceWidth - padding.left, 2);
                 lineFront->setVisible(false);
                 break;
             default:
@@ -178,9 +178,9 @@ namespace gui
         calculateDisplayText();
     }
 
-    void Label::setMargins(const Margins &margins)
+    void Label::setPadding(const Padding &padding)
     {
-        this->margins = margins;
+        this->padding = padding;
         calculateDisplayText();
     }
 

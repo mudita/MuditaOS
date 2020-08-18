@@ -218,4 +218,9 @@ namespace style
         const inline uint32_t huge     = 24;
     } // namespace margins
 
+    namespace padding
+    {
+        const inline uint32_t default_left_text_padding = 10;
+    } // namespace padding
+
 }; // namespace style

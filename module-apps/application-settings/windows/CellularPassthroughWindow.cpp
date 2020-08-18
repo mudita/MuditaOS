@@ -66,7 +66,7 @@ namespace gui
         // enable buttons
         passNormal = new Label(nullptr, 0, 0, layout->getWidth(), style::window::label::big_h);
         style::window::decorateOption(passNormal);
-        passNormal->setMargins(Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
+        passNormal->setPadding(Padding(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
         passNormal->setText(window::cellular_passthrough::passNormalDescription);
         passNormal->activatedCallback = [=](gui::Item &) {
             if (set(PassthroughState::ENABLED, BootPinState::NORMAL_BOOT)) {
@@ -81,7 +81,7 @@ namespace gui
 
         passDFU = new Label(nullptr, 0, 0, layout->getWidth(), style::window::label::big_h);
         style::window::decorateOption(passDFU);
-        passDFU->setMargins(Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
+        passDFU->setPadding(Padding(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
         passDFU->setText(window::cellular_passthrough::passDFUDescription);
         passDFU->activatedCallback = [=](gui::Item &) {
             if (set(PassthroughState::ENABLED, BootPinState::FIRMWARE_UPGRADE)) {
@@ -97,7 +97,7 @@ namespace gui
         // disable buttons
         noPass = new Label(nullptr, 0, 0, layout->getWidth(), style::window::label::big_h);
         style::window::decorateOption(noPass);
-        noPass->setMargins(Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
+        noPass->setPadding(Padding(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
         noPass->setText(window::cellular_passthrough::noPassDescription);
         noPass->activatedCallback = [=](gui::Item &) {
             if (set(PassthroughState::DISABLED, BootPinState::NORMAL_BOOT)) {
