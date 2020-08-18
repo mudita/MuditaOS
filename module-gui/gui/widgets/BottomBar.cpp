@@ -17,14 +17,14 @@ namespace gui
     BottomBar::BottomBar()
     {
 
-        Margins margins{20, 0, 20, 0};
+        Padding margins{20, 0, 20, 0};
         left   = prepareLabel(Side::LEFT);
         center = prepareLabel(Side::CENTER);
         right  = prepareLabel(Side::RIGHT);
 
-        left->setMargins(margins);
-        center->setMargins(margins);
-        right->setMargins(margins);
+        left->setPadding(margins);
+        center->setPadding(margins);
+        right->setPadding(margins);
 
         addWidget(left);
         addWidget(center);
@@ -38,14 +38,14 @@ namespace gui
     BottomBar::BottomBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
     {
 
-        Margins margins{20, 0, 20, 0};
+        Padding margins{20, 0, 20, 0};
         left   = prepareLabel(Side::LEFT);
         center = prepareLabel(Side::CENTER);
         right  = prepareLabel(Side::RIGHT);
 
-        left->setMargins(margins);
-        center->setMargins(margins);
-        right->setMargins(margins);
+        left->setPadding(margins);
+        center->setPadding(margins);
+        right->setPadding(margins);
 
         addWidget(left);
         addWidget(center);
