@@ -218,7 +218,7 @@ namespace gui
                                            antenna::main_window::titleW,
                                            antenna::main_window::titleH,
                                            text);
-        label->setMargins(gui::Margins(16, 0, 0, 0));
+        label->setPadding(gui::Padding(16, 0, 0, 0));
         label->setFilled(false);
         label->setPenFocusWidth(3);
         if (visibleBorder) {

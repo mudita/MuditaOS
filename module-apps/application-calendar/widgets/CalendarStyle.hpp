@@ -105,7 +105,7 @@ namespace style
                     const inline int input_box_label_h   = 50;
                     const inline int description_label_w = 280;
                     const inline int description_label_h = 40;
-                    const inline int description_margin  = 11;
+                    const inline int description_margin  = 20;
                     const inline int tick_image_w        = 30;
                     const inline int tick_image_h        = 30;
                 } // namespace checkBox

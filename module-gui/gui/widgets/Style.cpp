@@ -30,12 +30,11 @@ namespace style::window
             return;
         }
         decorate(el);
-        el->setMargins(gui::Margins(10, 0, 20, 0));
+        el->setMargins(gui::Margins(style::window::default_left_margin, 0, 0, 0));
+        el->setPadding(gui::Padding(style::padding::default_left_text_padding, 0, 0, 0));
         el->setFont(style::window::font::big);
-        /// actual design values in px
-        el->widgetArea.w = style::window_width - 3 * 20;
-        el->widgetArea.x = 20;
-        el->widgetArea.h = style::window::label::big_h;
+        el->setMinimumHeight(style::window::label::big_h);
+        el->setMaximumWidth(style::window::default_body_width);
     }
 
 }; // namespace style::window
