@@ -7,8 +7,6 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <string>
 #include "DBHelper.hpp"
-#include "Contacts.hpp"
-#include "Messages.hpp"
 #include "queries/phonebook/QueryContactGet.hpp"
 
 using namespace ParserStateMachine;
@@ -24,16 +22,7 @@ class EndpointHandler
     static sys::ReturnCodes handleMessageTemplatesMessage(sys::DataMessage *msg, sys::ResponseMessage *resp);
 
     static sys::ReturnCodes decodeMessage(db::query::ContactGetResult *message);
-    static std::string createSimpleResponse(sys::ReturnCodes status,
-                                            int endpoint,
-                                            uint32_t uuid,
-                                            json11::Json body = json11::Json());
-    static std::string createSimpleResponse(bool status,
-                                            int endpoint,
-                                            uint32_t uuid,
-                                            json11::Json body = json11::Json());
 
-    static std::string buildResponseStr(std::size_t responseSize, std::string responsePayloadString);
     static sys::ReturnCodes update(
         uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService);
     static sys::ReturnCodes deviceInfo(
@@ -50,6 +39,4 @@ class EndpointHandler
         uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService);
 
   private:
-    static std::shared_ptr<ContactHelper> contactHelper;
-    static std::shared_ptr<MessageHelper> messageHelper;
 };

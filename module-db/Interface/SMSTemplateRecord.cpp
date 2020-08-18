@@ -80,9 +80,13 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::runQuery(std::share
     if (const auto local_query = dynamic_cast<const db::query::SMSTemplateGetByID *>(query.get())) {
 
         auto smsTemplate = smsDB->templates.getById(local_query->id);
-        return std::make_unique<db::query::SMSTemplateGetByIDResult>(std::move(smsTemplate));
+        auto response    = std::make_unique<db::query::SMSTemplateGetByIDResult>(std::move(smsTemplate));
+        response->setRequestQuery(query);
+        return response;
     }
     else {
-        return std::make_unique<db::query::SMSTemplateGetByIDResult>(SMSTemplateRecord());
+        auto response = std::make_unique<db::query::SMSTemplateGetByIDResult>(SMSTemplateRecord());
+        response->setRequestQuery(query);
+        return response;
     }
 }

@@ -1,8 +1,9 @@
 #include "MessageHandler.hpp"
-#include "Contacts.hpp"
-#include "EndpointHandler.hpp"
+#include "Context.hpp"
+#include "EndpointFactory.hpp"
 #include "log/log.hpp"
 #include "ParserUtils.hpp"
+#include <memory>
 
 using namespace ParserStateMachine;
 
@@ -20,47 +21,21 @@ MessageHandler::MessageHandler(std::string &message, sys::Service *OwnerService)
 
 void MessageHandler::processMessage()
 {
-    auto body          = messageJson[json::body];
-    int endpoint       = messageJson[json::endpoint].number_value();
-    unsigned long uuid = messageJson[json::uuid].number_value();
-    int method         = messageJson[json::method].number_value();
+    Context context(messageJson);
 
-    LOG_DEBUG(
-        "[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %lu\nbody: %s\n", method, endpoint, uuid, body.dump().c_str());
+    LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %" PRIu32 "\nbody: %s\n",
+              static_cast<int>(context.getMethod()),
+              static_cast<int>(context.getEndpoint()),
+              context.getUuid(),
+              context.getBody().dump().c_str());
 
-    std::string responseStr;
+    auto handler = EndpointFactory::create(context, OwnerServicePtr);
 
-    switch (static_cast<Endpoint>(endpoint)) {
-    case Endpoint::deviceInfo:
-        EndpointHandler::deviceInfo(method, uuid, body, responseStr, OwnerServicePtr);
-        LOG_DEBUG("[ENDPOINT] DeviceInfo: %s", responseStr.c_str());
-        putToSendQueue(responseStr);
-        break;
-    case Endpoint::update:
-        EndpointHandler::update(method, uuid, body, responseStr, OwnerServicePtr);
-        LOG_DEBUG("[ENDPOINT] Update: %s", responseStr.c_str());
-        putToSendQueue(responseStr);
-        break;
-    case Endpoint::backup:
-        EndpointHandler::backup(method, uuid, body, responseStr, OwnerServicePtr);
-        LOG_DEBUG("[ENDPOINT] Backup: %s", responseStr.c_str());
-        putToSendQueue(responseStr);
-        break;
-    case Endpoint::restore:
-        EndpointHandler::restore(method, uuid, body, responseStr, OwnerServicePtr);
-        LOG_DEBUG("[ENDPOINT] Restore: %s", responseStr.c_str());
-        putToSendQueue(responseStr);
-        break;
-    case Endpoint::contacts:
-        EndpointHandler::contacts(method, uuid, body, responseStr, OwnerServicePtr);
-        break;
-    case Endpoint::messages:
-        EndpointHandler::messages(method, uuid, body, responseStr, OwnerServicePtr);
-
-        break;
-
-    default:
-        break;
+    if (handler != nullptr) {
+        handler->handle(context);
+    }
+    else {
+        LOG_ERROR("No way to handle!");
     }
 }
 

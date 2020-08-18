@@ -3,6 +3,7 @@
 #include "DesktopMessages.hpp"
 #include "EndpointHandler.hpp"
 #include "FactoryReset.hpp"
+#include "log/log.hpp"
 #include "messages/DBSMSMessage.hpp"
 #include "messages/DBSMSTemplateMessage.hpp"
 
@@ -88,21 +89,15 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
 {
     if (resp != nullptr) {
         if (resp->responseTo == MessageType::DBQuery) {
-            EndpointHandler::handleQueryMessage(msg, resp);
-        }
-        else if (resp->responseTo >= MessageType::DBContactVerify && resp->responseTo <= MessageType::DBContactBlock) {
-            EndpointHandler::handleContactsMessage(msg, resp);
-        }
-        else if (resp->responseTo >= MessageType::DBSMSAdd && resp->responseTo <= MessageType::DBSMSTemplateGetCount) {
-            if (dynamic_cast<DBSMSResponseMessage *>(resp) != nullptr) {
-                EndpointHandler::handleMessagesMessage(msg, resp);
+            if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+                auto result = queryResponse->getResult();
+
+                LOG_DEBUG("Result: %s", result->debugInfo().c_str());
+                if (result->hasListener()) {
+                    LOG_DEBUG("Handling result...");
+                    result->handle();
+                }
             }
-            else if (dynamic_cast<DBSMSTemplateResponseMessage *>(resp) != nullptr) {
-                EndpointHandler::handleMessageTemplatesMessage(msg, resp);
-            }
-        }
-        else {
-            LOG_DEBUG("resp->ResponseTo: %d", static_cast<short>(resp->responseTo));
         }
     }
 

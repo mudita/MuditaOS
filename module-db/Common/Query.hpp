@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <string>
+#include <functional>
+#include <log/log.hpp>
 
 namespace db
 {
@@ -11,6 +13,31 @@ namespace db
     {
       public:
         virtual bool handleQueryResponse(QueryResult *) = 0;
+    };
+
+    using QueryCallback = std::function<bool(db::QueryResult *, uint32_t)>;
+
+    class EndpointListener : public db::QueryListener
+    {
+      private:
+        uint32_t uuid;
+
+      public:
+        EndpointListener(QueryCallback _callback, uint32_t uuid) : uuid(uuid), callback(std::move(_callback)){};
+        EndpointListener() : callback(nullptr){};
+        ~EndpointListener() = default;
+        QueryCallback callback;
+        auto handleQueryResponse(db::QueryResult *result) -> bool override
+        {
+            if (callback != nullptr) {
+                LOG_DEBUG("Executing callback...");
+                return callback(result, uuid);
+            }
+            else {
+                LOG_ERROR("callback is nullptr!");
+                return false;
+            }
+        }
     };
 
     /// virtual query input interface
@@ -31,6 +58,7 @@ namespace db
 
         QueryListener *getQueryListener() const noexcept;
         void setQueryListener(QueryListener *queryListener) noexcept;
+        void setQueryListener(std::unique_ptr<EndpointListener> listener) noexcept;
 
         const Type type;
 
@@ -38,6 +66,7 @@ namespace db
 
       private:
         QueryListener *listener = nullptr;
+        std::unique_ptr<EndpointListener> endpointListener = nullptr;
     };
 
     /// virtual query output (result) interface

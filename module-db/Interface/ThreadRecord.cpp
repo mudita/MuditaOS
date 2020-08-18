@@ -138,7 +138,9 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr
     }
 
     if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query.get())) {
-        return runQueryImpl(local_query);
+        auto response = runQueryImpl(local_query);
+        response->setRequestQuery(query);
+        return response;
     }
     return nullptr;
 }
