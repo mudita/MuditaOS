@@ -2,17 +2,22 @@
 
 #include "Interface/ContactRecord.hpp"
 #include "Label.hpp"
+#include "Image.hpp"
 #include "ListItem.hpp"
+#include <BoxLayout.hpp>
+#include <TextFixedSize.hpp>
 
 namespace gui
 {
 
     class PhonebookItem : public ListItem
     {
-        gui::Label *value = nullptr;
-        bool favourite    = false;
+        gui::Label *contactName = nullptr;
+        gui::HBox *hBox         = nullptr;
 
+        bool favourite = false;
         void markFavourite(bool val);
+        void markBlocked(bool val);
 
       public:
         std::shared_ptr<ContactRecord> contact = nullptr;

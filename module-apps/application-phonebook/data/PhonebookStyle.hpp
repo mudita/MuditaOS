@@ -75,7 +75,7 @@ namespace phonebookStyle
             constexpr uint32_t h = style::window_height - y - style::footer::height;
         } // namespace contactDetailsListNoFlags
 
-    }     // namespace contactDetailsWindow
+    } // namespace contactDetailsWindow
 
     namespace searchResultsWindow
     {
@@ -90,10 +90,10 @@ namespace phonebookStyle
 
     namespace contactItem
     {
-        constexpr uint32_t w           = style::window::default_body_width;
-        constexpr uint32_t h           = style::window::label::big_h;
-        constexpr uint32_t left_margin = 10;
-        const UTF8 favourites_string   = "Favourites";
+        constexpr uint32_t w                    = style::window::default_body_width;
+        constexpr uint32_t h                    = style::window::label::big_h;
+        constexpr uint32_t blocked_right_margin = 5;
+        const UTF8 favourites_string            = "Favourites";
     } // namespace contactItem
 
     namespace informationWidget
