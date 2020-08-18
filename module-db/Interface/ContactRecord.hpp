@@ -95,7 +95,6 @@ enum class ContactRecordField
     NumberE164,
     NumberUser,
     SpeedDial,
-    Favourite,
     Groups,
 };
 

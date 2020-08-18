@@ -22,14 +22,12 @@ struct ContactsNameTableRow : public Record
     uint32_t contactID   = 0;
     UTF8 namePrimary     = "";
     UTF8 nameAlternative = "";
-    uint32_t favourite   = 0;
 };
 
 enum class ContactNameTableFields
 {
     NamePrimary,
     NameAlternative,
-    Favourite
 };
 
 class ContactsNameTable : public Table<ContactsNameTableRow, ContactNameTableFields>
@@ -70,7 +68,6 @@ class ContactsNameTable : public Table<ContactsNameTableRow, ContactNameTableFie
                                    "contact_id       INTEGER,"
                                    "name_primary     TEXT NOT NULL,"
                                    "name_alternative TEXT NOT NULL,"
-                                   "favourite        INTEGER DEFAULT 0,"
                                    "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
                                    ");";
 };

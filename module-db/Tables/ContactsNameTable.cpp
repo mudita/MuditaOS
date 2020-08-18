@@ -23,27 +23,25 @@ bool ContactsNameTable::create()
 
 bool ContactsNameTable::add(ContactsNameTableRow entry)
 {
-    return db->execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative, favourite) "
-                       "VALUES (%lu, '%q', '%q', '%lu');",
+    return db->execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative) "
+                       "VALUES (%lu, '%q', '%q');",
                        entry.contactID,
                        entry.namePrimary.c_str(),
-                       entry.nameAlternative.c_str(),
-                       entry.favourite);
+                       entry.nameAlternative.c_str());
 }
 
 bool ContactsNameTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM contact_name where _id = %u;", id);
+    return db->execute("DELETE FROM contact_name where _id = %lu;", id);
 }
 
 bool ContactsNameTable::update(ContactsNameTableRow entry)
 {
-    return db->execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q', "
-                       "favourite = '%lu' WHERE _id = %lu;",
+    return db->execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q' "
+                       "WHERE _id = %lu;",
                        entry.contactID,
                        entry.namePrimary.c_str(),
                        entry.nameAlternative.c_str(),
-                       entry.favourite,
                        entry.ID);
 }
 
@@ -56,18 +54,17 @@ ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
     }
 
     return ContactsNameTableRow{
-        (*retQuery)[0].getUInt32(), // ID
-        (*retQuery)[1].getUInt32(), // contactID
-        (*retQuery)[2].getString(), // namePrimary
-        (*retQuery)[3].getString(), // nameAlternative
-        (*retQuery)[4].getUInt32(), // favourite
+        {(*retQuery)[0].getUInt32()}, // ID
+        (*retQuery)[1].getUInt32(),   // contactID
+        (*retQuery)[2].getString(),   // namePrimary
+        (*retQuery)[3].getString(),   // nameAlternative
     };
 }
 
 std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query(
-        "SELECT * from contact_name ORDER BY favourite DESC, name_alternative LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery =
+        db->query("SELECT * from contact_name ORDER BY name_alternative ASC LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNameTableRow>();
@@ -77,11 +74,10 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffset(uint32_t off
 
     do {
         ret.push_back(ContactsNameTableRow{
-            (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // contactID
-            (*retQuery)[2].getString(), // namePrimary
-            (*retQuery)[3].getString(), // nameAlternative
-            (*retQuery)[4].getUInt32(), // favourite
+            {(*retQuery)[0].getUInt32()}, // ID
+            (*retQuery)[1].getUInt32(),   // contactID
+            (*retQuery)[2].getString(),   // namePrimary
+            (*retQuery)[3].getString(),   // nameAlternative
         });
     } while (retQuery->nextRow());
 
@@ -103,9 +99,6 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
     case ContactNameTableFields ::NameAlternative:
         fieldName = "name_alternative";
         break;
-    case ContactNameTableFields ::Favourite:
-        fieldName = "favourite";
-        break;
     default:
         return std::vector<ContactsNameTableRow>();
     }
@@ -125,11 +118,10 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
 
     do {
         ret.push_back(ContactsNameTableRow{
-            (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // contactID
-            (*retQuery)[2].getString(), // namePrimary
-            (*retQuery)[3].getString(), // nameAlternative
-            (*retQuery)[4].getUInt32(), // favourite
+            {(*retQuery)[0].getUInt32()}, // ID
+            (*retQuery)[1].getUInt32(),   // contactID
+            (*retQuery)[2].getString(),   // namePrimary
+            (*retQuery)[3].getString(),   // nameAlternative
         });
     } while (retQuery->nextRow());
 
@@ -174,11 +166,10 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *prima
 
     do {
         ret.push_back(ContactsNameTableRow{
-            (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // contactID
-            (*retQuery)[2].getString(), // namePrimary
-            (*retQuery)[3].getString(), // nameAlternative
-            (*retQuery)[4].getUInt32(), // favourite
+            {(*retQuery)[0].getUInt32()}, // ID
+            (*retQuery)[1].getUInt32(),   // contactID
+            (*retQuery)[2].getString(),   // namePrimary
+            (*retQuery)[3].getString(),   // nameAlternative
         });
     } while (retQuery->nextRow());
 
