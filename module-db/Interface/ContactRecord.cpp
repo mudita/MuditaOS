@@ -1,4 +1,5 @@
 #include "ContactRecord.hpp"
+#include "queries/phonebook/QueryContactAdd.hpp"
 #include <Utils.hpp>
 
 #include <queries/phonebook/QueryContactGet.hpp>
@@ -141,12 +142,13 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
     auto textFilter = dynamic_cast<const db::query::TextFilter *>(query.get());
     assert(query != nullptr);
     bool searchByNumber = false;
-    if (textFilter->isFilterPresent() && utils::is_number(textFilter->getFilterData())) {
+    if (textFilter != nullptr && textFilter->isFilterPresent() && utils::is_number(textFilter->getFilterData())) {
         searchByNumber = true;
         LOG_INFO("Filtering by number: %s", textFilter->getFilterData().c_str());
     }
 
     if (typeid(*query) == typeid(db::query::ContactGet)) {
+
         auto readQuery = static_cast<const db::query::ContactGet *>(query.get());
         LOG_DEBUG("Contact read query, filter: \"%s\", offset=%lu, limit=%lu",
                   readQuery->getFilterData().c_str(),
@@ -202,6 +204,13 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
         LOG_DEBUG("Contact count query result: %lu", static_cast<unsigned long>(count));
 
         auto response = std::make_unique<db::query::RecordsSizeQueryResult>(count);
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::ContactAdd)) {
+        auto addQuery = static_cast<const db::query::ContactAdd *>(query.get());
+        auto ret      = ContactRecordInterface::Add(addQuery->rec);
+        auto response = std::make_unique<db::query::ContactAddResult>(ret);
         response->setRequestQuery(query);
         return response;
     }

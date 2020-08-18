@@ -8,8 +8,9 @@ namespace ParserStateMachine
 {
 
     // Endpoint type definition
-    enum class Endpoint
+    enum class EndpointType
     {
+        invalid    = 0,
         deviceInfo = 1,
         update,
         backup,
@@ -19,6 +20,7 @@ namespace ParserStateMachine
         messages
     };
 
+    constexpr int lastEndpoint = static_cast<int>(EndpointType::messages);
     // Message defs and utils
     namespace message
     {
@@ -88,12 +90,6 @@ namespace ParserStateMachine
 
     namespace json
     {
-        const inline std::string method   = "method";
-        const inline std::string endpoint = "endpoint";
-        const inline std::string uuid     = "uuid";
-        const inline std::string status   = "status";
-        const inline std::string body     = "body";
-
         const inline std::string batteryLevel   = "batteryLevel";
         const inline std::string batteryState   = "batteryState";
         const inline std::string selectedSim    = "selectedSim";
@@ -113,19 +109,6 @@ namespace ParserStateMachine
         const inline std::string backupUpload   = "backupUpload";
         const inline std::string restoreRequest = "restoreRequest";
         const inline std::string factoryRequest = "factoryRequest";
-
-        namespace contacts
-        {
-            const inline std::string count           = "count";
-            const inline std::string primaryName     = "priName";
-            const inline std::string alternativeName = "altName";
-            const inline std::string address         = "address";
-            const inline std::string id              = "id";
-            const inline std::string numbers         = "numbers";
-            const inline std::string isBlocked       = "blocked";
-            const inline std::string isFavourite     = "favourite";
-
-        } // namespace contacts
 
         namespace messages
         {
