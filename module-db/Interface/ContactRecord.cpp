@@ -587,50 +587,6 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
         }
     } break;
-
-    case ContactRecordField::Favourite: {
-        auto ret = contactDB->name.getLimitOffsetByField(offset, limit, ContactNameTableFields::Favourite, str);
-
-        for (const auto &w : ret) {
-
-            auto contact = contactDB->contacts.getById(w.ID);
-            if (!contact.isValid()) {
-                return records;
-            }
-
-            auto name = contactDB->name.getById(contact.nameID);
-            if (!name.isValid()) {
-                return records;
-            }
-
-            auto nrs = getNumbers(contact.numbersID);
-            if (nrs.size() == 0) {
-                LOG_DEBUG("Contact record does not contain any numbers.");
-            }
-
-            auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (!ring.isValid()) {
-                return records;
-            }
-
-            auto address = contactDB->address.getById(contact.addressID);
-            if (!address.isValid()) {
-                return records;
-            }
-
-            records->push_back(ContactRecord{{.ID = contact.ID},
-                                             .primaryName     = name.namePrimary,
-                                             .alternativeName = name.nameAlternative,
-                                             .contactType     = contact.type,
-                                             .numbers         = nrs,
-                                             .address         = address.address,
-                                             .note            = address.note,
-                                             .mail            = address.mail,
-                                             .assetPath       = ring.assetPath,
-                                             .speeddial       = contact.speedDial,
-                                             .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
-        }
-    } break;
     case ContactRecordField::Groups: {
         break;
     }
