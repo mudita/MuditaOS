@@ -58,6 +58,7 @@ namespace gui
         addAllignedLabelWithValue(box, "GIT tag:", std::string(GIT_TAG));
         addAllignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
         addAllignedLabelWithValue(box, "Version:", std::string(VERSION));
+        addAllignedLabelWithValue(box, "Bootloader:", vfs.getBootConfig().bootloader_verion);
 
         add_box_label(box, "Modem Firmware:");
         std::string firmwareVersion;
