@@ -7,6 +7,9 @@
 * `[calendar]` Added new/edit event window
 * `[gui]` Added CheckBox widget
 
+### Fixed
+
+* `[music player]` Fixed songs list building and song name font size.
 
 ## [0.33.1 - 2020-08-13]
 
