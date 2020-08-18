@@ -14,7 +14,7 @@ namespace gui
         vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         firstHBox = new HBox(vBox, 0, 0, 0, 0);
-        firstHBox->setMinimumSize(songItem::w, songItem::text_h);
+        firstHBox->setMinimumSize(songItem::w, songItem::bold_text_h);
         firstHBox->setMargins(Margins(0, songItem::topMargin, 0, 0));
         firstHBox->setReverseOrder(true);
         firstHBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -36,7 +36,7 @@ namespace gui
         durationText->setText(duration);
 
         songText = new TextFixedSize(firstHBox, 0, 0, 0, 0);
-        songText->setMinimumHeight(songItem::text_h);
+        songText->setMinimumHeight(songItem::bold_text_h);
         songText->setMaximumWidth(songItem::w);
         songText->setMargins(Margins(songItem::leftMargin, 0, 0, 0));
         songText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
