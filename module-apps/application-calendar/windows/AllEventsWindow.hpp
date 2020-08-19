@@ -15,6 +15,7 @@ namespace gui
 
         gui::ListView *allEventsList                   = nullptr;
         std::shared_ptr<AllEventsModel> allEventsModel = nullptr;
+        std::string getFilter();
 
       public:
         AllEventsWindow(app::Application *app, std::string name);

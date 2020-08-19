@@ -101,6 +101,13 @@ namespace gui
         if (data == nullptr) {
             return false;
         }
+        auto rec = dynamic_cast<EventRecordData *>(data);
+        if (rec != nullptr) {
+
+            eventRecord = rec->getData();
+            LOG_DEBUG(
+                "DATA!!!!!!!!!!!!!!! date_from: %u  date_till: %u", eventRecord->date_from, eventRecord->date_till);
+        }
 
         if (data->getDescription() == style::window::calendar::edit_event) {
             eventAction = EventAction::Edit;
