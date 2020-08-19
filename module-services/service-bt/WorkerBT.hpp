@@ -15,17 +15,20 @@ extern "C"
 #include "bsp/usb_cdc/usb_cdc.hpp"
 #include "bsp/bluetooth/Bluetooth.hpp"
 
+#include <memory>
+class BtLogger;
+
 class WorkerBT : public sys::Worker
 {
   private:
       bsp::BlueKitchen *bt = nullptr;
+      std::unique_ptr<BtLogger> logger;
   public:
     const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     const std::string UART_RECEIVE_QUEUE    = "sendQueueBuffer";
 
-    WorkerBT(sys::Service *ownerServicePtr)
-        : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr) {
-        }
+    WorkerBT(sys::Service *ownerServicePtr);
+    virtual ~WorkerBT();
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
     bool handleMessage(uint32_t queueID) override final;

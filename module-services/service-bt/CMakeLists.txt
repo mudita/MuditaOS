@@ -10,5 +10,6 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/ServiceBT.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/WorkerBT.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/BtLogger.cpp"
 )
 

@@ -48,7 +48,7 @@ namespace bsp
         }
         else {
             LOG_ERROR("[ServiceDesktop:BSP_Driver] USB_CDCSend failed with code: %d", t);
-            return -1;
+            return t;
         }
     }
 
