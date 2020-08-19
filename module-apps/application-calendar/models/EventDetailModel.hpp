@@ -6,6 +6,7 @@
 #include "Application.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 class EventDetailModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
 {
