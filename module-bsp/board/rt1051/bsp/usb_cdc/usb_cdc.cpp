@@ -38,8 +38,16 @@ namespace bsp
 
     int usbCDCSend(std::string *send_msg)
     {
-
-        usb_status_t t = USB_CDCSend((uint8_t *)(*send_msg).c_str(), (*send_msg).length());
+        auto retries = 10; // dumb but will see if it will work...
+        usb_status_t t = kStatus_USB_Busy;
+        while (retries--) {
+            if (t == kStatus_USB_Busy) {
+                t = USB_CDCSend((uint8_t *)(*send_msg).c_str(), (*send_msg).length());
+            }
+            else {
+                retries = 0;
+            }
+        }
         delete send_msg;
 
         if (t == 0x00) {
