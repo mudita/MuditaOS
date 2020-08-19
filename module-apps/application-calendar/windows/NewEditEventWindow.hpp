@@ -12,6 +12,7 @@
 #include <gui/widgets/ListItem.hpp>
 #include <ListView.hpp>
 #include <Utils.hpp>
+#include <module-apps/application-calendar/data/OptionParser.hpp>
 
 namespace gui
 {

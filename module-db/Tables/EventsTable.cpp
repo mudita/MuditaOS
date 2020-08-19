@@ -459,6 +459,33 @@ std::vector<EventsTableRow> EventsTable::getLimitOffsetByDate(uint32_t offset, u
     return ret;
 }
 
+std::vector<EventsTableRow> EventsTable::getLimitOffsetByDate(uint32_t offset, uint32_t limit)
+{
+
+    auto retQuery = db->query("SELECT * from events ORDER BY date_from LIMIT %u OFFSET %u;", limit, offset);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<EventsTableRow>();
+    }
+
+    std::vector<EventsTableRow> ret;
+
+    do {
+        ret.push_back(EventsTableRow{
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getString(), // title
+            (*retQuery)[2].getString(), // description
+            (*retQuery)[3].getUInt32(), // date_from
+            (*retQuery)[4].getUInt32(), // date_till
+            (*retQuery)[5].getUInt32(), // reminder
+            (*retQuery)[6].getUInt32(), // repeat
+            (*retQuery)[7].getUInt32()  // time_zone
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}
+
 std::vector<EventsTableRow> EventsTable::getLimitOffsetByField(uint32_t offset,
                                                                uint32_t limit,
                                                                EventsTableFields field,
