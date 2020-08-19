@@ -17,18 +17,6 @@
 
 #include <memory>
 
-namespace style
-{
-    namespace window
-    {
-        namespace Info
-        {
-            const float labelWidthFactor = 0.35;
-            const float valueWidthFactor = 0.58;
-        } // namespace Info
-    }     // namespace window
-} // namespace style
-
 namespace gui
 {
 
@@ -48,6 +36,7 @@ namespace gui
         auto el = new gui::Label(layout, 0, 0, style::window_width, style::window::label::default_h);
         style::window::decorateOption(el);
         el->setText(text);
+        el->setFont(style::window::font::smallbold);
     }
 
     void Info::buildInterface()
@@ -85,25 +74,18 @@ namespace gui
 
     void Info::addAllignedLabelWithValue(BoxLayout *layout, const string &labelText, const string &valueText)
     {
-        auto lineBox = new gui::HBox(layout, 0, 0, style::window_width, style::window::label::default_h);
+        auto lineBox = new gui::VBox(layout, 0, 0, style::window_width, style::window::label::default_h * 2);
 
-        lineBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        auto label = new gui::Label(nullptr,
-                                    0,
-                                    0,
-                                    style::window_width * style::window::Info::labelWidthFactor,
-                                    style::window::label::default_h);
+        lineBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        auto label = new gui::Label(nullptr, 0, 0, style::window_width, style::window::label::default_h);
         style::window::decorateOption(label);
         label->setText(labelText);
+        label->setFont(style::window::font::smallbold);
 
-        auto value = new gui::Label(nullptr,
-                                    0,
-                                    0,
-                                    style::window_width * style::window::Info::valueWidthFactor,
-                                    style::window::label::default_h);
+        auto value = new gui::Label(nullptr, 0, 0, style::window_width, style::window::label::default_h);
         style::window::decorateOption(value);
         value->setText(valueText);
-        value->setFont(style::window::font::smallbold);
+        value->setAlignment(gui::Alignment::Horizontal::Right);
 
         lineBox->addWidget(label);
         lineBox->addWidget(value);
