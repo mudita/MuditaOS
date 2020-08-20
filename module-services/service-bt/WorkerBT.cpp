@@ -1,6 +1,8 @@
 #include "WorkerBT.hpp"
 #include "fsl_lpuart.h"
 #include "BtLogger.hpp"
+#include "service-bt/BtInject.hpp"
+#include <memory>
 
 static bool we_can_send_usb = false;
 
@@ -77,8 +79,10 @@ bool WorkerBT::handleMessage(uint32_t queueID)
 }
 
 // TODO
-void initializer()
+bool WorkerBT::initializer()
 {
+    inject = std::make_unique<BtInject>();
+    return inject->parse_commands();
     //for (auto &cmd : bt_in) {
     //    LOG_DEBUG("CMD: ");
     //    for (unsigned char val : cmd) {

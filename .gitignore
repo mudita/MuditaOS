@@ -42,3 +42,4 @@ docker/Dockerfile.runner
 docker/assets/actions*
 docker/assets/cmake*
 docker/assets/gcc-arm*
+bluetooth/dump-bt.txt

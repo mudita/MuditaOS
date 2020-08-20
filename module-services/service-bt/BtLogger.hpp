@@ -1,13 +1,11 @@
 #pragma once
 
-#include <string>
-#include <vfs.hpp> // this sucks - but need to be done for FILE
+#include "BtFile.hpp"
 
 /// support to write to some bt log...
-class BtLogger
+class BtLogger : public BtFile
 {
     std::string logname;
-    vfs::FILE* file = nullptr;
     char* resp_buffer = nullptr;
     ssize_t resp_buffer_size = 512;
     ssize_t resp_buffer_take = 0;
@@ -20,8 +18,7 @@ class BtLogger
         USB_Error, /// usb error
     };
     BtLogger( std::string name);
-    ~BtLogger();
-    void write(const char *data, ssize_t size);
+    ~BtLogger() override;
     void log(enum BtLogger::Event evt, const char* data, uint32_t size);
     void log_out_byte(char byte);
     void flush();

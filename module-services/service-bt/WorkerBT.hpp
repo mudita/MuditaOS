@@ -17,12 +17,15 @@ extern "C"
 
 #include <memory>
 class BtLogger;
+class BtInject;
 
 class WorkerBT : public sys::Worker
 {
   private:
       bsp::BlueKitchen *bt = nullptr;
       std::unique_ptr<BtLogger> logger;
+      std::unique_ptr<BtInject> inject;
+      bool initializer();
   public:
     const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     const std::string UART_RECEIVE_QUEUE    = "sendQueueBuffer";

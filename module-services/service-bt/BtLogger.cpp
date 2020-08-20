@@ -4,26 +4,10 @@
 #include <cstring>
 #include <time/time_conversion.hpp>
 
-BtLogger::BtLogger(std::string name)
+BtLogger::BtLogger(std::string name) : BtFile(name)
 {
-    LOG_DEBUG("opening log file: %s", vfs.relativeToRoot(name).c_str());
-    file = vfs.fopen(name.c_str(), "w");
-    if ( file == nullptr ) 
-    {
-        LOG_FATAL("bluetooth log file cant be created!");
-    }
-
     resp_buffer = new char[resp_buffer_size];
     last_flush = utils::time::Time().getTime();
-}
-
-void BtLogger::write(const char *data, ssize_t size)
-{
-    if (file != nullptr) {
-        vfs.fwrite(data, size,1, file);
-    } else {
-        LOG_ERROR("no file!");
-    }
 }
 
 void BtLogger::log(enum BtLogger::Event evt, const char* data, uint32_t size) 
@@ -87,6 +71,5 @@ void BtLogger::timed_flush()
 BtLogger::~BtLogger()
 {
     flush();
-    vfs.fclose(file);
     delete[] resp_buffer;
 }
