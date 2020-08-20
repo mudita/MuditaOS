@@ -1,5 +1,6 @@
 import serial
 from FileReader import FileReader
+import time
 
 port = '/dev/ttyACM1'
 baud = 115200

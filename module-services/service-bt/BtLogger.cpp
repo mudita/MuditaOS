@@ -4,7 +4,7 @@
 #include <cstring>
 #include <time/time_conversion.hpp>
 
-BtLogger::BtLogger(std::string name) : BtFile(name)
+BtLogger::BtLogger(std::string name) : BtFile(name, "w")
 {
     resp_buffer = new char[resp_buffer_size];
     last_flush = utils::time::Time().getTime();
@@ -14,7 +14,6 @@ void BtLogger::log(enum BtLogger::Event evt, const char* data, uint32_t size)
 {
     if (file != nullptr ) 
     {
-        LOG_DEBUG("logging bt: %s len: %" PRIu32, c_str(evt), size);
         std::string header = c_str(evt);
         write(header.c_str(), header.length());
         write("[", 1);
@@ -22,7 +21,6 @@ void BtLogger::log(enum BtLogger::Event evt, const char* data, uint32_t size)
             char hex[8] = {0};
             sprintf(hex, "0x%X ", *(data+i));
             write(hex, std::strlen(hex));
-            LOG_DEBUG("%s", hex);
         }
         write("]\n",2);
     }
@@ -44,6 +42,7 @@ void BtLogger::log_out_byte(char byte)
 
 void BtLogger::flush() 
 {
+    last_flush = now;
     if ( file != nullptr && resp_buffer_take != 0 ) 
     {
         std::string header = c_str(BtLogger::Event::Out);
@@ -56,6 +55,7 @@ void BtLogger::flush()
             write(hex, std::strlen(hex));
         }
         write("]\n",2);
+        resp_buffer_take = 0;
     }
 }
 
@@ -64,7 +64,6 @@ void BtLogger::timed_flush()
     uint64_t now = utils::time::Time().getTime();
     if ( last_flush + 100 <  now ) {
         flush();
-        last_flush = now;
     }
 }
 

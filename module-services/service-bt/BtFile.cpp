@@ -1,10 +1,10 @@
 #include "BtFile.hpp"
 #include <log/log.hpp>
 
-BtFile::BtFile(const std::string &name)
+BtFile::BtFile(const std::string &name,  const std::string &rwx)
 {
     LOG_DEBUG("opening log file: %s", vfs.relativeToRoot(name).c_str());
-    file = vfs.fopen(name.c_str(), "w");
+    file = vfs.fopen(name.c_str(), rwx.c_str());
     if ( file == nullptr ) 
     {
         LOG_FATAL("bluetooth log file cant be created!");

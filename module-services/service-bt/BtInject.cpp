@@ -11,7 +11,35 @@ static std::string bt_file = "bt_commands.txt";
 
 BtInject::BtInject()
 {
-    file = std::make_unique<BtFile>(bt_file);
+    file = std::make_unique<BtFile>(bt_file, "r");
+}
+
+bool BtInject::parse_line(const std::string &type, std::string &line, Commands &list) const
+{
+    if (line.length() > type.length() && line.compare(0, type.length(), type) == 0) {
+        line.erase(0, type.length());
+        std::stringstream ss(line);
+        std::list<char> vals;
+        std::string tmp;
+        while (ss >> tmp) {
+            if (tmp.length() == 0) {
+                continue;
+            }
+            vals.push_back(std::stoul(tmp, nullptr, 16));
+        }
+        // LOG_DEBUG("Loaded command: %s",
+        //           [&]() -> std::string {
+        //               std::stringstream ss;
+        //               for (auto el : vals) {
+        //                   ss << " 0x" << std::hex << (int)el;
+        //               }
+        //               return ss.str();
+        //           }()
+        //                        .c_str());
+        list.push_back(vals);
+        return true;
+    }
+    return false;
 }
 
 /// Format: command - space delimited hexes
@@ -26,38 +54,16 @@ bool BtInject::parse_commands()
     {
         LOG_ERROR("empty file!");
     }
-    while ( line != "" ) 
-    {
+    while (line != "") {
         line = file->readline();
-        std::stringstream ss(line);
-        std::string tmp;
-        if (line.compare(bt_in) == 0 ) 
-        {
-            /// td::getline(ss, token, ' ' -> ignore empty
-            line = line.erase(0,bt_in.length());
-            std::list<char> vals;
-            while ( ss >> tmp ) 
-            {
-                vals.push_back(std::stoi(tmp,0,16));
-            }
-            LOG_DEBUG("Loaded out command: %s",
-                      [&]() -> std::string {
-                          std::string str;
-                          for (auto el : vals) {
-                              str += " ";
-                              str += std::to_string(el);
-                          }
-                          return str;
-                      }()
-                                   .c_str());
-        } else if ( line.compare(bt_out) == 0 ) 
-        {
-            line = line.erase(0,bt_out.length());
-            LOG_DEBUG("TODO");
-        } else 
-        {
-            LOG_ERROR("bad line: %s", line.c_str());
+        if (parse_line(bt_in, line, commands)) {
+            continue;
         }
+
+        if (parse_line(bt_out, line, responses)) {
+            continue;
+        }
+        LOG_ERROR("[in: %d out: %d] bad line: %s", line.compare(bt_in), line.compare(bt_out), line.c_str());
     }
     LOG_DEBUG("File parsing success!");
     return true;

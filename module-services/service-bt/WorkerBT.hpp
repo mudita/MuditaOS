@@ -29,6 +29,7 @@ class WorkerBT : public sys::Worker
   public:
     const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     const std::string UART_RECEIVE_QUEUE    = "sendQueueBuffer";
+    const std::string BT_COMMANDS = "btCommands";
 
     WorkerBT(sys::Service *ownerServicePtr);
     virtual ~WorkerBT();

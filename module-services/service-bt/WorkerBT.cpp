@@ -3,8 +3,12 @@
 #include "BtLogger.hpp"
 #include "service-bt/BtInject.hpp"
 #include <memory>
+#include <ios>
+#include "WorkerCmds.hpp"
 
 static bool we_can_send_usb = false;
+/// TODO blocking read like in service cellular :|
+/// we know how much to expect or else - just wait max 100ms
 
 WorkerBT::WorkerBT(sys::Service *ownerServicePtr) : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr)
 {
@@ -21,10 +25,8 @@ bool WorkerBT::handleMessage(uint32_t queueID)
     QueueHandle_t queue = queues[queueID];
 
     std::string qname = queueNameMap[queue];
-    // LOG_INFO("[ServiceDesktop:Worker] Received data from queue: %s", qname.c_str());
 
     static std::string receiveMsg;
-    // static std::string *sendMsg;
 
     if (qname == SERVICE_QUEUE_NAME) {
         LOG_ERROR("[ServiceDesktop:Worker] Service Queue invoked but not implemented!");
@@ -58,7 +60,7 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         int ret = bt->in.pop(&val);
         if ( ret == 0 ) {
             auto send = new std::string(&val,1);
-            printf("< 0x%X\n", val);
+            logger->log_out_byte(val);
             if ( we_can_send_usb ) {
                 auto ret = bsp::usbCDCSend(send);
                 if ( ret != 0 ) 
@@ -75,6 +77,26 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         }
     }
 
+    if ( qname == BT_COMMANDS ) 
+    {
+        BtCmd cmd;
+        if (xQueueReceive(queue, &cmd, 0) != pdTRUE) {
+            return false;
+        }
+
+        if( cmd.cmd == BtCmd::Cmd::Init) 
+        {
+            // TODO ths will stuck uart receive ----
+            initializer();
+        }
+
+        if( cmd.cmd == BtCmd::Cmd::TimerPoll) 
+        {
+            logger->timed_flush();
+        }
+
+    }
+
     return true;
 }
 
@@ -82,16 +104,32 @@ bool WorkerBT::handleMessage(uint32_t queueID)
 bool WorkerBT::initializer()
 {
     inject = std::make_unique<BtInject>();
-    return inject->parse_commands();
-    //for (auto &cmd : bt_in) {
-    //    LOG_DEBUG("CMD: ");
-    //    for (unsigned char val : cmd) {
-    //        printf("0x%X", val);
-    //        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, &val, 1);
-    //    }
-    //    printf("\n");
-    //    ulTaskNotifyTake(true, 100); // dummy to wait instead check
-    //}
+    if (inject->parse_commands() == false) {
+        return false;
+    }
+    for ( auto &cmd : inject->getCommands() ) 
+    // auto cmd = inject->getCommands().front();
+    {
+        for ( uint8_t ch : cmd ) {
+            LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, &ch, 1);
+        }
+
+        auto cmd_txt = [&]()->std::string{
+                        std::stringstream ss;
+                        for ( auto el : cmd ) 
+                        {
+                            ss << " 0x" << std::hex << (int)el;
+                        }
+                        return ss.str();
+                        }();
+
+        LOG_DEBUG("cmd: %s", cmd_txt.c_str());
+        logger->log(BtLogger::Event::In, (cmd_txt.c_str()), cmd_txt.length());
+
+        ulTaskNotifyTake(true, 100); // dummy to wait instead check
+    }
+    LOG_DEBUG("sent: %d", inject->getCommands().size());
+    return true;
 }
 
 bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
@@ -104,8 +142,6 @@ bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
     bt = bsp::BlueKitchen::getInstance();
     bt->qHandle =  Worker::getQueueByName(WorkerBT::UART_RECEIVE_QUEUE);
     bt->open();
-
-    initializer();
 
     LOG_DEBUG("start usb");
     auto queue = Worker::getQueueByName(WorkerBT::RECEIVE_QUEUE_BUFFER_NAME);
@@ -123,8 +159,6 @@ bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
     we_can_send_usb = true;
     LOG_DEBUG("WorkerBT initialized - usb Started");
 
-    /// TODO TIMER FOR
-    /// logger->timed_flush();
     return true;
 }
 

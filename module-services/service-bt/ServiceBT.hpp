@@ -9,6 +9,8 @@
 class ServiceBT : public sys::Service
 {
     std::unique_ptr<WorkerBT> worker;
+
+    uint32_t bt_timer = 0;
   public:
     ServiceBT();
     ~ServiceBT() override = default;
