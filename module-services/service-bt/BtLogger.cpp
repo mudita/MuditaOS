@@ -42,6 +42,7 @@ void BtLogger::log_out_byte(char byte)
 
 void BtLogger::flush() 
 {
+    uint64_t now = utils::time::Time().getTime();
     last_flush = now;
     if ( file != nullptr && resp_buffer_take != 0 ) 
     {

@@ -1,5 +1,6 @@
 #include "ServiceBT.hpp"
 #include "WorkerCmds.hpp"
+#include "BtInject.hpp"
 
 ServiceBT::ServiceBT() : sys::Service("ServiceBT", "", 4096 * 2, sys::ServicePriority::Idle)
 {
@@ -27,12 +28,16 @@ sys::ReturnCodes ServiceBT::InitHandler()
 {
     LOG_DEBUG("Init!");
     worker = std::make_unique<WorkerBT>(this);
-    worker->init( {{worker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 100}, {worker->UART_RECEIVE_QUEUE, sizeof(Bt::Message), 10}, {worker->BT_COMMANDS, sizeof(BtCmd), 3}});
+    worker->init({{worker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 100},
+                  {worker->UART_RECEIVE_QUEUE, sizeof(Bt::Message), 10},
+                  {worker->BT_COMMANDS, sizeof(BtCmd), 3}});
     worker->run();
 
     BtCmd cmd;
     cmd.cmd = BtCmd::Cmd::Init;
     xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &cmd, portMAX_DELAY);
+
+    initializer();
 
     bt_timer = CreateTimer(200, true);
     ReloadTimer(bt_timer);
@@ -49,4 +54,59 @@ sys::ReturnCodes ServiceBT::SwitchPowerModeHandler(const sys::ServicePowerMode m
 {
     LOG_FATAL("PowerModeHandler: %s", c_str(mode));
     return sys::ReturnCodes::Success;
+}
+
+bool ServiceBT::initializer()
+{
+    auto inject = std::make_unique<BtInject>();
+    if (inject->parse_commands() == false) {
+        return false;
+    }
+    auto pos = 0;
+    for (auto &cmd : inject->getCommands()) {
+        // auto expecting = *(std::next(inject->getResponses().begin(), pos));
+        bt_write(cmd);
+
+//        auto ret = bt_read(expecting.size(), 1000);
+//        if (ret.size() != expecting.size()) {
+//            LOG_DEBUG("command await timed out, read: %u %u", expecting.size(), ret.size());
+//            break;
+//        }
+//
+//        if (expecting != ret) {
+//            LOG_DEBUG("response missmatch on cmd no: %d", pos);
+//        }
+        ulTaskNotifyTake(1,1000);
+
+        pos += 1;
+    }
+    LOG_DEBUG("sent: %d", inject->getCommands().size());
+    return true;
+}
+
+bool ServiceBT::bt_write(const BtInject::Command &command)
+{
+    BtCmd to_send = {BtCmd::Cmd::Write, new BtWrite(command) };
+    // ay we work on temp memory here...
+    xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &to_send, portMAX_DELAY);
+    return true;
+}
+
+BtInject::Command ServiceBT::bt_read(uint32_t expected_count, uint32_t timeout)
+{
+    auto cmd = new BtRead();
+    BtCmd to_send = {BtCmd::Cmd::Read, cmd};
+    xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &to_send, portMAX_DELAY);
+
+    // await for data, it will be released with any event on bus or notify
+    ulTaskNotifyTake(pdTRUE, timeout);
+
+    // log if request timed out
+    if (cmd->timed_out == true) {
+        LOG_ERROR("BT waited for data timed out got %u of: %"PRIu32, cmd->data.size(), expected_count);
+    }
+
+    auto data = cmd->data;
+    to_send.cleanup();
+    return data;
 }

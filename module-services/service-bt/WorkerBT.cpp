@@ -7,6 +7,75 @@
 #include "WorkerCmds.hpp"
 
 static bool we_can_send_usb = false;
+
+struct BtInReceive {
+    static std::list<char> rec_data; // block it when we are not in read/write mode <-- in pass through
+    TaskHandle_t read_handle = nullptr;  // handle to notify when we end read
+    std::list<char> *rec_final_buffer = nullptr; // block of data we put data when we are requested for it
+    uint32_t to_read_count = 0; // num of bytes to read
+
+    void clear_rec_data() 
+    {
+        rec_data = {};
+    }
+
+    // add data and if we are done - notify
+    void add_rec_data(char val) 
+    {
+        rec_data.push_back(val);
+        if_read_done_notify();
+    }
+
+    void read_done_notify()
+    {
+        BaseType_t hp = pdFALSE;
+        if (read_handle != nullptr) {
+            vTaskNotifyGiveFromISR(read_handle, &hp);
+            read_handle = nullptr;
+        }
+        to_read_count = 0;
+        rec_final_buffer = nullptr;
+    }
+
+    void fill_read_data()
+    {
+        if ( rec_final_buffer != nullptr ) {
+            for ( auto val : rec_data ) 
+            {
+                rec_final_buffer->push_back(val);
+            }
+        }
+        rec_data.clear();
+    }
+
+    auto is_read_done() -> bool 
+    {
+        return rec_data.size() >= to_read_count;
+    }
+
+    void if_read_done_notify()
+    {
+        fill_read_data();
+        if ( is_read_done() )
+        {
+            read_done_notify();
+        }
+    }
+
+    void set_to_read_count(uint32_t to_read ) 
+    {
+        to_read_count = to_read;
+    }
+
+    void set_out_buffer(std::list<char> *buf)
+    {
+        rec_final_buffer = buf;
+    }
+
+} bt_receive;
+
+std::list<char> BtInReceive::rec_data;
+
 /// TODO blocking read like in service cellular :|
 /// we know how much to expect or else - just wait max 100ms
 
@@ -42,7 +111,7 @@ bool WorkerBT::handleMessage(uint32_t queueID)
             printf("0x%X ", *(receiveMsg.c_str()+i));
         }
         printf("\n");
-        logger->log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
+//        logger->log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
 
 //        bt = bsp::BlueKitchen::getInstance();
 //        bt->write_blocking(const_cast<char*>(receiveMsg.c_str()), receiveMsg.length());
@@ -54,11 +123,12 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &evt, 0) != pdTRUE) {
             return false;
         }
+        // if waiting - then pop as much as we can in read
         if( evt == Bt::Message::EvtRecUnwanted ) {
-        // if( evt == 
         char val;
         int ret = bt->in.pop(&val);
         if ( ret == 0 ) {
+            bt_receive.add_rec_data(val);
             auto send = new std::string(&val,1);
             logger->log_out_byte(val);
             if ( we_can_send_usb ) {
@@ -68,6 +138,9 @@ bool WorkerBT::handleMessage(uint32_t queueID)
                     auto result = std::to_string(ret);
                     logger->log(BtLogger::Event::USB_Error, result.c_str(), result.length());
                 }
+            }
+            if ( expecting_bytes > 0 ) {
+                expecting_bytes--;
             }
         } else {
             LOG_ERROR("ret: %d", ret);
@@ -84,51 +157,50 @@ bool WorkerBT::handleMessage(uint32_t queueID)
             return false;
         }
 
-        if( cmd.cmd == BtCmd::Cmd::Init) 
-        {
-            // TODO ths will stuck uart receive ----
-            initializer();
-        }
+        switch ( cmd.cmd ) {
 
-        if( cmd.cmd == BtCmd::Cmd::TimerPoll) 
-        {
+        case BtCmd::Cmd::Init: {
+        } break;
+
+        case BtCmd::Cmd::TimerPoll: {
             logger->timed_flush();
+        } break;
+
+        case BtCmd::Cmd::Write: {
+
+            bt_receive.clear_rec_data(); // empty local buffer
+
+            auto data = dynamic_cast<BtWrite*>(cmd.ptr);
+            assert(data);
+
+            auto cmd_txt = [&]()->std::string{
+                            std::stringstream ss;
+                            for ( auto el : data->command ) 
+                            {
+                                ss << " 0x" << std::hex << (int)el;
+                            }
+                            return ss.str();
+                            }();
+
+            LOG_DEBUG("cmd: %s", cmd_txt.c_str());
+            logger->log(BtLogger::Event::In, (cmd_txt.c_str()), cmd_txt.length());
+
+            for (uint8_t ch : data->command) {
+                LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, &ch, 1);
+            }
+            cmd.cleanup();
+        } break;
+
+        case BtCmd::Cmd::Read: {
+            auto data = dynamic_cast<BtRead*>(cmd.ptr);
+            bt_receive.set_to_read_count(data->to_read_count);  // set how many bytes to read
+            bt_receive.set_out_buffer(&(data->data));           // set buffer to set data when rec is done
+            bt_receive.if_read_done_notify();                   // if we somehow received enough data
+        }; break;
         }
 
     }
 
-    return true;
-}
-
-// TODO
-bool WorkerBT::initializer()
-{
-    inject = std::make_unique<BtInject>();
-    if (inject->parse_commands() == false) {
-        return false;
-    }
-    for ( auto &cmd : inject->getCommands() ) 
-    // auto cmd = inject->getCommands().front();
-    {
-        for ( uint8_t ch : cmd ) {
-            LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, &ch, 1);
-        }
-
-        auto cmd_txt = [&]()->std::string{
-                        std::stringstream ss;
-                        for ( auto el : cmd ) 
-                        {
-                            ss << " 0x" << std::hex << (int)el;
-                        }
-                        return ss.str();
-                        }();
-
-        LOG_DEBUG("cmd: %s", cmd_txt.c_str());
-        logger->log(BtLogger::Event::In, (cmd_txt.c_str()), cmd_txt.length());
-
-        ulTaskNotifyTake(true, 100); // dummy to wait instead check
-    }
-    LOG_DEBUG("sent: %d", inject->getCommands().size());
     return true;
 }
 

@@ -1,7 +1,6 @@
 #include "BtInject.hpp"
 #include <log/log.hpp>
 #include <sstream>
-#include "service-bt/BtFile.hpp"
 
 
 static std::string bt_in  = "in:  ";
@@ -83,11 +82,4 @@ static auto pop(std::list<std::list<char>> &list)  -> std::list<char>
 std::list<char> BtInject::popCommand() 
 {
     return pop(commands);
-}
-
-bool BtInject::checkResponse(char *data, uint32_t len)
-{
-    std::list<char> to_check = pop(responses);
-    std::list<char> result = std::list<char>(data, data+len);
-    return to_check == result;
 }
