@@ -1,18 +1,36 @@
 # Mudita PurePhone changelog
 
-## Current Release
+## [0.34.2 - 2020-08-21]
 
-### Added
+### Changed
 
-* `[calendar]` Added new/edit event window
-* `[gui]` Added CheckBox widget
+* `[settings]` Rearranged settings window.
 
 ### Fixed
 
 * `[audio]` Fixed audio buffers handling to eliminate sending uninitialized data and making loud noise on start of a call.
-* `[music player]` Fixed songs list building and song name font size.
-* `[gui]` Added bootloader version information 
 * `[phonebook]` Fix duplicated contact detection on contact update.
+
+## [0.34.1 - 2020-08-19]
+
+### Added
+
+* `[calendar]` Added new/edit event window.
+* `[gui]` Added bootloader version information.
+
+### Changed
+
+* `[phonebook]` Show/Hide flags widget in contact details depending if any flags are set.
+* `[phonebook]` Update icons in contact add/edit window.
+
+### Fixed
+
+* `[music player]` Fixed songs list building and song name font size.
+
+### Other
+
+* `[fonts]` Added special characters for german, spanish, french, polish languages in font files.
+* `[gui]` Added check box widget.
 
 ## [0.33.1 - 2020-08-13]
 
