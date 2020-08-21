@@ -1,5 +1,10 @@
 #include "SMSTemplateRecord.hpp"
 #include "queries/sms/QuerySMSTemplateGetByID.hpp"
+#include "queries/sms/QuerySMSTemplateGet.hpp"
+#include "queries/sms/QuerySMSTemplateAdd.hpp"
+#include "queries/sms/QuerySMSTemplateGetCount.hpp"
+#include "queries/sms/QuerySMSTemplateRemove.hpp"
+#include "queries/sms/QuerySMSThreadsGet.hpp"
 
 #include <log/log.hpp>
 
@@ -77,10 +82,45 @@ SMSTemplateRecord SMSTemplateRecordInterface::GetByID(uint32_t id)
 
 std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto local_query = dynamic_cast<const db::query::SMSTemplateGetByID *>(query.get())) {
+    if (typeid(*query) == typeid(db::query::SMSTemplateGetByID)) {
+        const auto local_query = dynamic_cast<const db::query::SMSTemplateGetByID *>(query.get());
+        auto smsTemplate       = smsDB->templates.getById(local_query->id);
 
-        auto smsTemplate = smsDB->templates.getById(local_query->id);
-        auto response    = std::make_unique<db::query::SMSTemplateGetByIDResult>(std::move(smsTemplate));
+        auto response = std::make_unique<db::query::SMSTemplateGetByIDResult>(std::move(smsTemplate));
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::SMSTemplateGet)) {
+        const auto localQuery = dynamic_cast<const db::query::SMSTemplateGet *>(query.get());
+        auto dbResult         = smsDB->templates.getLimitOffset(localQuery->offset, localQuery->limit);
+        std::vector<SMSTemplateRecord> recordVector;
+        for (auto SMStemplate : dbResult) {
+            SMSTemplateRecord record;
+            record.ID                 = SMStemplate.ID;
+            record.text               = SMStemplate.text;
+            record.lastUsageTimestamp = SMStemplate.lastUsageTimestamp;
+            recordVector.emplace_back(record);
+        }
+        auto response = std::make_unique<db::query::SMSTemplateGetResult>(std::move(recordVector));
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::SMSTemplateGetCount)) {
+        auto response = std::make_unique<db::query::SMSTemplateGetCountResult>(smsDB->templates.count());
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::SMSTemplateAdd)) {
+        const auto localQuery = dynamic_cast<const db::query::SMSTemplateAdd *>(query.get());
+        auto ret              = SMSTemplateRecordInterface::Add(localQuery->rec);
+        auto response         = std::make_unique<db::query::SMSTemplateAddResult>(ret);
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::SMSTemplateRemove)) {
+        const auto localQuery = dynamic_cast<const db::query::SMSTemplateRemove *>(query.get());
+        auto ret              = smsDB->templates.removeById(localQuery->id);
+        auto response         = std::make_unique<db::query::SMSTemplateRemoveResult>(ret);
         response->setRequestQuery(query);
         return response;
     }

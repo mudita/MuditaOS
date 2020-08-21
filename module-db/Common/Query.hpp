@@ -31,7 +31,9 @@ namespace db
         {
             if (callback != nullptr) {
                 LOG_DEBUG("Executing callback...");
-                return callback(result, uuid);
+                auto ret = callback(result, uuid);
+                LOG_DEBUG("Callback finished");
+                return ret;
             }
             else {
                 LOG_ERROR("callback is nullptr!");

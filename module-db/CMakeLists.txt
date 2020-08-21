@@ -63,17 +63,27 @@ set(SOURCES
         queries/sms/QuerySMSThreadsGet.cpp
         queries/sms/QuerySMSSearchByType.cpp
         queries/sms/QuerySmsThreadMarkAsRead.cpp
+        queries/sms/QuerySMSGet.cpp
+        queries/sms/QuerySMSGetCount.cpp
         queries/sms/QuerySMSGetByID.cpp
         queries/sms/QuerySMSGetByContactID.cpp
         queries/sms/QuerySMSGetByText.cpp
+        queries/sms/QuerySMSRemove.cpp
+        queries/sms/QuerySMSTemplateAdd.cpp
         queries/sms/QuerySMSTemplateGetByID.cpp
+        queries/sms/QuerySMSTemplateGet.cpp
+        queries/sms/QuerySMSTemplateGetCount.cpp
+        queries/sms/QuerySMSTemplateRemove.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
         queries/notifications/QueryNotificationsGetAll.cpp
         queries/phonebook/QueryContactGet.cpp
+        queries/phonebook/QueryContactGetByID.cpp
         queries/phonebook/QueryContactAdd.cpp
+        queries/phonebook/QueryContactUpdate.cpp
+        queries/phonebook/QueryContactRemove.cpp
         queries/calendar/QueryEventsRemove.cpp
         queries/calendar/QueryEventsGet.cpp
         queries/calendar/QueryEventsGetAll.cpp

@@ -55,6 +55,7 @@ namespace ParserStateMachine
 
             return Endpoint::buildResponseStr(responseJson.dump().size(), responseJson.dump());
         }
+
       protected:
         std::string debugName;
         sys::Service *ownerServicePtr;
