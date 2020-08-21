@@ -13,7 +13,7 @@ auto ContactsEndpoint::handle(Context &context) -> std::string
         helper->requestDataFromDB(context);
         break;
     case http::Method::post: // update entry
-        helper->requestContactByID(context);
+        helper->updateDBEntry(context);
         break;
     case http::Method::put:
         helper->createDBEntry(context);

@@ -21,9 +21,8 @@ namespace ParserStateMachine
         virtual auto deleteDBEntry(Context &context) -> sys::ReturnCodes     = 0;
 
         DBHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
-        // virtual ~DBHelper() = default;
+
       protected:
         sys::Service *ownerServicePtr = nullptr;
-        std::queue<uint32_t> uuidQueue;
     };
 } // namespace ParserStateMachine

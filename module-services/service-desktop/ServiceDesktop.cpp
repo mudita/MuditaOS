@@ -91,11 +91,15 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
         if (resp->responseTo == MessageType::DBQuery) {
             if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = queryResponse->getResult();
-
-                LOG_DEBUG("Result: %s", result->debugInfo().c_str());
-                if (result->hasListener()) {
-                    LOG_DEBUG("Handling result...");
-                    result->handle();
+                if (result != nullptr) {
+                    LOG_DEBUG("Result: %s", result->debugInfo().c_str());
+                    if (result->hasListener()) {
+                        LOG_DEBUG("Handling result...");
+                        result->handle();
+                    }
+                }
+                else {
+                    LOG_ERROR("Wrong result - nullptr!");
                 }
             }
         }

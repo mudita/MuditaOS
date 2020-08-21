@@ -1,12 +1,14 @@
 #include "Common/Common.hpp"
 #include "ContactRecord.hpp"
+#include "Endpoint.hpp"
 #include "MessageType.hpp"
 #include "ParserUtils.hpp"
 #include "Service/Common.hpp"
 #include "UpdatePureOS.hpp"
 #include "FactoryReset.hpp"
 #include "ParserStateMachine.hpp"
-#include "EndpointHandler.hpp"
+#include "contacts/ContactHelper.hpp"
+#include "messages/MessageHelper.hpp"
 #include "queries/sms/QuerySMSSearchByType.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
 
@@ -139,12 +141,12 @@ TEST_CASE("DB Helpers test - json decoding")
         auto helper = std::make_unique<ContactHelper>(nullptr);
 
         auto contact = helper->from_json(contactJson);
-        REQUIRE(contact->address == "6 Czeczota St.\n02600 Warsaw");
-        REQUIRE(contact->alternativeName == "Cic");
-        REQUIRE(contact->isOnBlocked() == true);
-        REQUIRE(contact->isOnFavourites() == true);
-        REQUIRE(contact->numbers.at(0).number.getFormatted() == "724 842 187");
-        REQUIRE(contact->primaryName == "Baatek");
+        REQUIRE(contact.address == "6 Czeczota St.\n02600 Warsaw");
+        REQUIRE(contact.alternativeName == "Cic");
+        REQUIRE(contact.isOnBlocked() == true);
+        REQUIRE(contact.isOnFavourites() == true);
+        REQUIRE(contact.numbers.at(0).number.getFormatted() == "724 842 187");
+        REQUIRE(contact.primaryName == "Baatek");
     }
     SECTION("incorrect json")
     {
@@ -154,15 +156,13 @@ TEST_CASE("DB Helpers test - json decoding")
         REQUIRE(err.empty());
 
         auto helper = std::make_unique<ContactHelper>(nullptr);
-
         auto contact = helper->from_json(contactJson);
-        REQUIRE(contact->address == "");
-        REQUIRE(contact->alternativeName == "Cic");
-        REQUIRE(contact->isOnBlocked() == true);
-        REQUIRE(contact->isOnFavourites() == true);
-        REQUIRE(contact->numbers.empty());
-        REQUIRE(contact->primaryName == "Baatek");
-        REQUIRE(helper->createDBEntry(recordPayload, 123) == sys::ReturnCodes::Failure);
+        REQUIRE(contact.address == "");
+        REQUIRE(contact.alternativeName == "Cic");
+        REQUIRE(contact.isOnBlocked() == true);
+        REQUIRE(contact.isOnFavourites() == true);
+        REQUIRE(contact.numbers.empty());
+        REQUIRE(contact.primaryName == "Baatek");
     }
 }
 
@@ -232,15 +232,15 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
 
 TEST_CASE("Simple response builder test")
 {
-    auto resp =
-        EndpointHandler::createSimpleResponse(sys::ReturnCodes::Success, static_cast<int>(Endpoint::contacts), 1234);
+    auto resp = Endpoint::createSimpleResponse(
+        sys::ReturnCodes::Success, static_cast<int>(EndpointType::contacts), 1234, json11::Json());
     std::string err;
     REQUIRE(resp.substr(0, 10) == "#000000060");
     resp.erase(0, 10);
 
     auto responseJson = json11::Json::parse(resp, err);
     REQUIRE(err.empty());
-    REQUIRE(responseJson[json::endpoint] == static_cast<int>(Endpoint::contacts));
+    REQUIRE(responseJson[json::endpoint] == static_cast<int>(EndpointType::contacts));
     REQUIRE(responseJson[json::status] == static_cast<int>(http::Code::OK));
     REQUIRE(responseJson[json::uuid].dump() == "\"1234\"");
 }
