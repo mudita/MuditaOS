@@ -1,5 +1,8 @@
 #include "ContactRecord.hpp"
 #include "queries/phonebook/QueryContactAdd.hpp"
+#include "queries/phonebook/QueryContactGetByID.hpp"
+#include "queries/phonebook/QueryContactUpdate.hpp"
+#include "queries/phonebook/QueryContactRemove.hpp"
 #include <Utils.hpp>
 
 #include <queries/phonebook/QueryContactGet.hpp>
@@ -176,6 +179,14 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
         response->setRequestQuery(query);
         return response;
     }
+    else if (typeid(*query) == typeid(db::query::ContactGetByID)) {
+        auto readQuery = static_cast<db::query::ContactGetByID *>(query.get());
+        auto record    = ContactRecordInterface::GetByID(readQuery->getID());
+        LOG_DEBUG("ID: %d", readQuery->getID());
+        auto response = std::make_unique<db::query::ContactGetByIDResult>(record);
+        response->setRequestQuery(query);
+        return response;
+    }
     else if (typeid(*query) == typeid(db::query::ContactGetSize)) {
         auto countQuery = static_cast<const db::query::ContactGetSize *>(query.get());
         LOG_DEBUG("Contact count query, filter: \"%s\"", countQuery->getFilterData().c_str());
@@ -211,6 +222,20 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
         auto addQuery = static_cast<const db::query::ContactAdd *>(query.get());
         auto ret      = ContactRecordInterface::Add(addQuery->rec);
         auto response = std::make_unique<db::query::ContactAddResult>(ret);
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::ContactUpdate)) {
+        auto updateQuery = static_cast<const db::query::ContactUpdate *>(query.get());
+        auto ret         = ContactRecordInterface::Update(updateQuery->rec);
+        auto response    = std::make_unique<db::query::ContactUpdateResult>(ret);
+        response->setRequestQuery(query);
+        return response;
+    }
+    else if (typeid(*query) == typeid(db::query::ContactRemove)) {
+        auto removeQuery = static_cast<db::query::ContactRemove *>(query.get());
+        auto ret         = ContactRecordInterface::RemoveByID(removeQuery->getID());
+        auto response    = std::make_unique<db::query::ContactRemoveResult>(ret);
         response->setRequestQuery(query);
         return response;
     }
