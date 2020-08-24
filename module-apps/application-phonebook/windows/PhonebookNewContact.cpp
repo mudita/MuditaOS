@@ -225,7 +225,7 @@ namespace gui
         phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
         meta.text  = duplicatedSpeedDialPhrase;
         meta.title = duplicatedSpeedDialTitle;
-        meta.icon  = "phonebook_empty_grey_circle_speed_dial_W_G";
+        meta.icon  = "phonebook_empty_grey_circle_speed_dial";
         dialog->SetIconText(contact->speeddial);
 
         dialog->update(meta);

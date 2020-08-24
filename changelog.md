@@ -10,6 +10,7 @@
 
 * `[audio]` Fixed audio buffers handling to eliminate sending uninitialized data and making loud noise on start of a call.
 * `[phonebook]` Fix duplicated contact detection on contact update.
+* `[phonebook]` Change name of duplicate speed dial icon. 
 
 ## [0.34.1 - 2020-08-19]
 
