@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <FreeRTOS.h>
+#include <FreeRTOS/include/task.h>
 
 class BtData
 {
@@ -34,6 +36,5 @@ class BtRead : public BtData
         std::list<char> data;
         bool timed_out = false;
         uint32_t to_read_count;
+        TaskHandle_t read_handle = nullptr;
 };
-
-

@@ -67,6 +67,11 @@ struct BtInReceive {
         to_read_count = to_read;
     }
 
+    void set_thread_notify(TaskHandle_t task)
+    {
+        read_handle = task;
+    }
+
     void set_out_buffer(std::list<char> *buf)
     {
         rec_final_buffer = buf;
@@ -111,10 +116,8 @@ bool WorkerBT::handleMessage(uint32_t queueID)
             printf("0x%X ", *(receiveMsg.c_str()+i));
         }
         printf("\n");
-//        logger->log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
+        logger->log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
 
-//        bt = bsp::BlueKitchen::getInstance();
-//        bt->write_blocking(const_cast<char*>(receiveMsg.c_str()), receiveMsg.length());
         LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, (uint8_t*)(receiveMsg.c_str()), receiveMsg.length());
     }
 
@@ -182,19 +185,20 @@ bool WorkerBT::handleMessage(uint32_t queueID)
                             return ss.str();
                             }();
 
-            LOG_DEBUG("cmd: %s", cmd_txt.c_str());
             logger->log(BtLogger::Event::In, (cmd_txt.c_str()), cmd_txt.length());
 
             for (uint8_t ch : data->command) {
                 LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, &ch, 1);
             }
             cmd.cleanup();
+            LOG_DEBUG("> In: %s", cmd_txt.c_str());
         } break;
 
         case BtCmd::Cmd::Read: {
             auto data = dynamic_cast<BtRead*>(cmd.ptr);
             bt_receive.set_to_read_count(data->to_read_count);  // set how many bytes to read
-            bt_receive.set_out_buffer(&(data->data));           // set buffer to set data when rec is done
+            bt_receive.set_thread_notify(data->read_handle);
+            bt_receive.set_out_buffer(&(data->data));           // set buffer to set data when rec is done ( TODO ) 
             bt_receive.if_read_done_notify();                   // if we somehow received enough data
         }; break;
         }

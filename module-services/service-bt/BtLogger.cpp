@@ -16,15 +16,13 @@ void BtLogger::log(enum BtLogger::Event evt, const char* data, uint32_t size)
     {
         std::string header = c_str(evt);
         write(header.c_str(), header.length());
-        write("[", 1);
-        for ( uint32_t i = 0; i < size; ++i ) {
-            char hex[8] = {0};
-            sprintf(hex, "0x%X ", *(data+i));
-            write(hex, std::strlen(hex));
-        }
+        write("[",  1);
+        write(data, size);
         write("]\n",2);
     }
-    flush();
+    if( evt == BtLogger::Event::In ) {
+        flush();
+    }
 }
 
 void BtLogger::log_out_byte(char byte)
@@ -46,16 +44,17 @@ void BtLogger::flush()
     last_flush = now;
     if ( file != nullptr && resp_buffer_take != 0 ) 
     {
-        std::string header = c_str(BtLogger::Event::Out);
-        write(header.c_str(), header.length());
-        write("[", 1);
-        for( int i =0; i < resp_buffer_take; ++i ) 
-        {
-            char hex[8] = {0};
-            sprintf(hex, "0x%X ", *(resp_buffer+i));
-            write(hex, std::strlen(hex));
-        }
-        write("]\n",2);
+        auto cmd_txt = [&]()->std::string{
+                            std::stringstream ss;
+                            for (int i = 0; i < resp_buffer_take; ++i) 
+                            {
+                                ss << " 0x" << std::hex << (int)*(resp_buffer+i);
+                            }
+                            return ss.str();
+                            }();
+
+        log(BtLogger::Event::Out, cmd_txt.c_str(), cmd_txt.length());
+
         resp_buffer_take = 0;
     }
 }

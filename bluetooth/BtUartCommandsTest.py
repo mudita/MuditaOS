@@ -37,4 +37,4 @@ if __name__ == "__main__":
                     val = val[0]
             if val != a :
                 print('bad response {} vs {}'.format(a, val))
-        print("done: {}".format([ ord(val) for val in send ] ))
+        print("done: {}".format([ hex(val) for val in send ] ))

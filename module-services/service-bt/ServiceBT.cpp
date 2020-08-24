@@ -1,6 +1,8 @@
 #include "ServiceBT.hpp"
+#include "FreeRTOS.h"
 #include "WorkerCmds.hpp"
 #include "BtInject.hpp"
+#include "bsp/rtc/rtc.hpp"
 
 ServiceBT::ServiceBT() : sys::Service("ServiceBT", "", 4096 * 2, sys::ServicePriority::Idle)
 {
@@ -63,20 +65,15 @@ bool ServiceBT::initializer()
         return false;
     }
     auto pos = 0;
+    LOG_DEBUG("send: %u commands", inject->getCommands().size());
     for (auto &cmd : inject->getCommands()) {
-        // auto expecting = *(std::next(inject->getResponses().begin(), pos));
+        auto expecting = *(std::next(inject->getResponses().begin(), pos));
         bt_write(cmd);
 
-//        auto ret = bt_read(expecting.size(), 1000);
-//        if (ret.size() != expecting.size()) {
-//            LOG_DEBUG("command await timed out, read: %u %u", expecting.size(), ret.size());
-//            break;
-//        }
-//
-//        if (expecting != ret) {
-//            LOG_DEBUG("response missmatch on cmd no: %d", pos);
-//        }
-        ulTaskNotifyTake(1,1000);
+        auto ret = bt_read(expecting.size(), 250);
+        if (expecting != ret) {
+            LOG_DEBUG("response missmatch on cmd no: %d", pos);
+        }
 
         pos += 1;
     }
@@ -95,11 +92,20 @@ bool ServiceBT::bt_write(const BtInject::Command &command)
 BtInject::Command ServiceBT::bt_read(uint32_t expected_count, uint32_t timeout)
 {
     auto cmd = new BtRead();
+    cmd->read_handle = GetHandle();
+    cmd->to_read_count = expected_count;
     BtCmd to_send = {BtCmd::Cmd::Read, cmd};
     xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &to_send, portMAX_DELAY);
 
-    // await for data, it will be released with any event on bus or notify
-    ulTaskNotifyTake(pdTRUE, timeout);
+    auto newtime = xTaskGetTickCount()+ timeout;
+    while (expected_count >= cmd->data.size()) {
+        ulTaskNotifyTake(1, 10); // poll each 10ms
+        if( xTaskGetTickCount() > newtime )
+        {
+            cmd->timed_out = true;
+            break;
+        }
+    }
 
     // log if request timed out
     if (cmd->timed_out == true) {
