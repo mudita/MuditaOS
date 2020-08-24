@@ -4,6 +4,7 @@
 
 #include <common_data/Clipboard.hpp>
 #include <Options.hpp>
+#include <OptionWindow.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
 
@@ -15,7 +16,7 @@ using namespace style::window;
 
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {
-    ContactRecord contact = DBServiceAPI::ContactGetByID(app, record.contactID)->front();
+    ContactRecord contact = DBServiceAPI::ContactGetByIDWithTemporary(app, record.contactID)->front();
     std::list<gui::Item *> options;
 
     if (record.type == SMSType::FAILED) {
@@ -27,8 +28,7 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
             }}.build());
     }
     options.push_back(gui::options::call(app, app::CallOperation::ExecuteCall, contact).build());
-    auto contactOperation =
-        contact.contactType == ContactType::TEMPORARY ? app::ContactOperation::Add : app::ContactOperation::Details;
+    auto contactOperation = contact.isTemporrary() ? app::ContactOperation::Add : app::ContactOperation::Details;
     options.push_back(gui::options::contact(app, contactOperation, contact).build());
     options.push_back(gui::Option{
         UTF8(utils::localize.get("sms_forward_message")), [=](gui::Item &item) {

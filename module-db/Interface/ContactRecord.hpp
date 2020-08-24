@@ -19,7 +19,6 @@ struct ContactRecord : public Record
 {
     UTF8 primaryName        = "";
     UTF8 alternativeName    = "";
-    ContactType contactType = ContactType::TEMPORARY;
 
     struct Number
     {
@@ -63,6 +62,10 @@ struct ContactRecord : public Record
 
     inline auto getFormattedName(const NameFormatType type = NameFormatType::Default) const -> UTF8
     {
+        if (isTemporrary()) {
+            LOG_DEBUG("temporary contact, numer as name: '%s'", getNumberAsName().c_str());
+            return getNumberAsName();
+        }
         if (primaryName.length() > 0) {
             return alternativeName.length() > 0 ? primaryName + " " + alternativeName : primaryName;
         }
@@ -83,10 +86,11 @@ struct ContactRecord : public Record
     void addToBlocked(bool add);
     void addToGroup(uint32_t groupId);
     void removeFromGroup(uint32_t groupId);
-    [[nodiscard]] bool isOnFavourites();
-    [[nodiscard]] bool isOnIce();
-    [[nodiscard]] bool isOnBlocked();
-    [[nodiscard]] bool isOnGroup(uint32_t groupId);
+    [[nodiscard]] bool isOnFavourites() const;
+    [[nodiscard]] bool isOnIce() const;
+    [[nodiscard]] bool isOnBlocked() const;
+    [[nodiscard]] bool isOnGroup(uint32_t groupId) const;
+    [[nodiscard]] bool isTemporrary() const;
 };
 
 enum class ContactRecordField
@@ -126,7 +130,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     ContactRecordInterface(ContactsDB *db);
     ~ContactRecordInterface();
 
-    bool Add(const ContactRecord &rec) override final;
+    bool Add(ContactRecord &rec) override final;
 
     bool RemoveByID(uint32_t id) override final;
 
@@ -135,7 +139,12 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     bool BlockByID(uint32_t id, const bool shouldBeBlocked = true);
 
     ContactRecord GetByID(uint32_t id) override final;
+    ContactRecord GetByIdWithTemporary(uint32_t id);
 
+  private:
+    ContactRecord GetByIdCommon(ContactsTableRow &contact);
+
+  public:
     uint32_t GetCount() override final;
 
     uint32_t GetCountFavourites();

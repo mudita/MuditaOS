@@ -5,7 +5,7 @@
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
-#include "windows/OptionsWindow.hpp"
+#include "windows/ThreadWindowOptions.hpp"
 #include "windows/ThreadViewWindow.hpp"
 #include "windows/SearchStart.hpp"
 #include "windows/SMSTemplatesWindow.hpp"
@@ -15,6 +15,8 @@
 #include <Dialog.hpp>
 #include <i18/i18.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
+#include <OptionWindow.hpp>
+
 #include <cassert>
 #include <time/time_conversion.hpp>
 

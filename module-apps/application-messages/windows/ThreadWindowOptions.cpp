@@ -1,19 +1,20 @@
-#include "OptionsWindow.hpp"
+#include "ThreadWindowOptions.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
 #include <Options.hpp>
+#include <OptionWindow.hpp>
 
 /// below just for apps names...
 
 std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const ThreadRecord *record)
 {
     assert(record != nullptr);
-    ContactRecord contact = record ? DBServiceAPI::ContactGetByID(app, record->contactID)->front() : ContactRecord();
+    ContactRecord contact =
+        record ? DBServiceAPI::ContactGetByIDWithTemporary(app, record->contactID)->front() : ContactRecord();
     std::list<gui::Option> options;
 
     options.emplace_back(gui::options::call(app, app::CallOperation::ExecuteCall, contact));
-    auto contactOperation =
-        contact.contactType == ContactType::TEMPORARY ? app::ContactOperation::Add : app::ContactOperation::Details;
+    auto contactOperation = contact.isTemporrary() ? app::ContactOperation::Add : app::ContactOperation::Details;
     options.emplace_back(gui::options::contact(app, contactOperation, contact));
 
     if (record->isUnread()) {

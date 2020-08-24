@@ -32,13 +32,7 @@ CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
 
 uint32_t CalllogRecord::getContactId() const
 {
-    try {
-        return static_cast<uint32_t>(std::stoi(contactId));
-    }
-    catch (const std::exception &e) {
-        LOG_ERROR("Invalid contactId %s", contactId.c_str());
-        return DB_ID_NONE;
-    }
+    return contactId;
 }
 
 std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
@@ -71,7 +65,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     auto &contactRec = contactMatch->contact;
 
     auto localRec      = rec;
-    localRec.contactId = std::to_string(contactRec.ID);
+    localRec.contactId = contactRec.ID;
     localRec.name      = contactRec.getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
@@ -102,17 +96,11 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
     return GetLimitOffset(offset, limit);
 }
 
-ContactRecord CalllogRecordInterface::GetContactRecordByID(const UTF8 &contactId)
+ContactRecord CalllogRecordInterface::GetContactRecordByID(uint32_t contactId)
 {
     assert(contactsDB != nullptr);
     ContactRecordInterface contactInterface(contactsDB);
-    try {
-        return contactInterface.GetByID(std::atoi(contactId.c_str()));
-    }
-    catch (const std::exception &e) {
-        LOG_ERROR("Exception %s occured", e.what());
-        return ContactRecord();
-    }
+    return contactInterface.GetByIdWithTemporary(contactId);
 }
 
 std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
@@ -120,15 +108,17 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
     auto calls = calllogDB->calls.getLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<CalllogRecord>>();
-
+    LOG_DEBUG("getting callog records");
     for (auto &c : calls) {
+        LOG_DEBUG(" - call id: %" PRIu32 "| contactId: %" PRIu32, c.ID, c.contactId);
         auto contactRec = GetContactRecordByID(c.contactId);
         if (!contactRec.isValid()) {
-            LOG_ERROR("Cannot find contact for ID %s", c.contactId.c_str());
-            continue;
+            LOG_ERROR("Cannot find contact for ID %" PRIu32 " (id:%" PRIu32 ")", c.contactId, c.ID);
+            c.name = c.number;
         }
-
-        c.name = contactRec.getFormattedName();
+        else {
+            c.name = contactRec.getFormattedName();
+        }
         records->push_back(c);
     }
 
@@ -185,8 +175,7 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
 
     auto contactRec = GetContactRecordByID(call.contactId);
     if (contactRec.ID == DB_ID_NONE) {
-        auto contactRec = GetContactRecordByID(call.contactId);
-        LOG_ERROR("Cannot find contact for ID %s", call.contactId.c_str());
+        LOG_ERROR("Cannot find contact for ID %" PRIu32, call.contactId);
         return CalllogRecord();
     }
 
@@ -201,7 +190,7 @@ std::vector<CalllogRecord> CalllogRecordInterface::GetByContactID(uint32_t id)
     for (auto &call : calls) {
         auto contactRec = GetContactRecordByID(call.contactId);
         if (contactRec.ID == DB_ID_NONE) {
-            LOG_ERROR("Cannot find contact for ID %s", call.contactId.c_str());
+            LOG_ERROR("Cannot find contact for ID %" PRIu32, call.contactId);
             records.emplace_back(CalllogRecord());
         }
 

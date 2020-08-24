@@ -28,7 +28,7 @@ target_sources( ${PROJECT_NAME}
         "windows/MessagesMainWindow.cpp"
         "windows/ThreadViewWindow.cpp"
         "windows/NewMessage.cpp"
-        "windows/OptionsWindow.cpp"
+        "windows/ThreadWindowOptions.cpp"
         "windows/OptionsMessages.cpp"
         "windows/SearchStart.cpp"
         "windows/SMSTemplatesWindow.cpp"

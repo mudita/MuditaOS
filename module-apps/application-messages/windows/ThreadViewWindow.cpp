@@ -16,6 +16,7 @@
 #include <time/time_conversion.hpp>
 #include <log/log.hpp>
 #include <Style.hpp>
+#include <OptionWindow.hpp>
 
 #include <memory>
 #include <cassert>
@@ -368,7 +369,7 @@ namespace gui
                 cleanView();
                 SMS.thread = pdata->thread->ID;
                 showMessages(Action::Init);
-                auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
+                auto ret = DBServiceAPI::ContactGetByIDWithTemporary(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
                 setTitle(ret->front().getFormattedName());

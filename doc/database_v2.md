@@ -343,6 +343,7 @@ By default sepecial gorups are created:
 | 1 | Favourites | Defines favourites group. |
 | 2 | ICE | Defines ICE group. |
 | 3 | Blocked | Defines Blocked group. |
+| 4 | Temporary | Defines temporary or deleted contacts. |
 
 #### 16. Joining table for groups and contacts
 | Field | Scope | Type | Description |

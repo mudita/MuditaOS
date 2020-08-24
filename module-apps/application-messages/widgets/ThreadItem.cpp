@@ -48,7 +48,7 @@ namespace gui
         this->thread = thread;
 
         if (model != nullptr) {
-            auto contactRec = DBServiceAPI::ContactGetByID(model->getApplication(), thread->contactID);
+            auto contactRec = DBServiceAPI::ContactGetByIDWithTemporary(model->getApplication(), thread->contactID);
             auto cont       = contactRec->front();
             contact->setText(cont.getFormattedName());
         }

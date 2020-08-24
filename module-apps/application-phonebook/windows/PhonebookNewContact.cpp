@@ -92,7 +92,7 @@ namespace gui
             contactAction = ContactAction::Add;
             setSaveButtonVisible(false);
         }
-        else if (contact->contactType == ContactType::TEMPORARY) {
+        else if (contact->isTemporrary()) {
             contactAction = ContactAction::EditTemporary;
         }
         else {
@@ -119,10 +119,16 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            auto tmpId  = contact->ID;
-            contact     = std::make_shared<ContactRecord>();
-            contact->ID = tmpId;
+            LOG_DEBUG("Enter pressed!");
+            if (!contact->isTemporrary()) {
+                auto tmpId  = contact->ID;
+                contact     = std::make_shared<ContactRecord>();
+                contact->ID = tmpId;
+            }
+            LOG_DEBUG("moving data to model");
+            LOG_DEBUG("nubers.size: %" PRIuPTR, contact->numbers.size());
             newContactModel->saveData(contact);
+            LOG_DEBUG("nubers.size: %" PRIuPTR, contact->numbers.size());
             verifyAndSave();
             return true;
         }
@@ -134,22 +140,28 @@ namespace gui
 
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
-        auto err = DBServiceAPI::verifyContact(application, *contact);
-        LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
-        switch (err) {
-        case DBServiceAPI::noError:
-            break;
-        case DBServiceAPI::emptyContactError:
-            return false;
-        case DBServiceAPI::primaryNumberError:
-            showDialogDuplicatedNumber(contact->numbers[0].number);
-            return false;
-        case DBServiceAPI::secondaryNumberError:
-            showDialogDuplicatedNumber(contact->numbers[1].number);
-            return false;
-        case DBServiceAPI::speedDialError:
-            showDialogDuplicatedSpeedDialNumber();
-            return false;
+        LOG_DEBUG("%s", __FUNCTION__);
+        if (!contact->isTemporrary()) {
+            auto err = DBServiceAPI::verifyContact(application, *contact);
+            LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
+            switch (err) {
+            case DBServiceAPI::noError:
+                break;
+            case DBServiceAPI::emptyContactError:
+                return false;
+            case DBServiceAPI::primaryNumberError:
+                showDialogDuplicatedNumber(contact->numbers[0].number);
+                return false;
+            case DBServiceAPI::secondaryNumberError:
+                showDialogDuplicatedNumber(contact->numbers[1].number);
+                return false;
+            case DBServiceAPI::speedDialError:
+                showDialogDuplicatedSpeedDialNumber();
+                return false;
+            }
+        }
+        else {
+            contact->removeFromGroup(ContactsDB::temporaryGroupId());
         }
 
         // perform actual add/update operation
@@ -158,19 +170,17 @@ namespace gui
                 LOG_ERROR("verifyAndSave failed to ADD contact");
                 return false;
             }
-            LOG_DEBUG("verifyAndSave contact ADDED");
         }
         else if (contactAction == ContactAction::Edit || contactAction == ContactAction::EditTemporary) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             data->ignoreCurrentWindowOnStack      = true;
-            if (contact->contactType == ContactType::TEMPORARY) {
-                contact->contactType = ContactType::USER;
-            }
+
+            contact->groups.erase(ContactsDB::temporaryGroupId());
+
             if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return false;
             }
-            LOG_DEBUG("verifyAndSave contact UPDATED");
         }
 
         application->switchWindow(gui::name::window::main_window);
