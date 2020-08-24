@@ -3,6 +3,8 @@
 #include "WorkerCmds.hpp"
 #include "BtInject.hpp"
 #include "bsp/rtc/rtc.hpp"
+#include "BtLogger.hpp"
+#include <string>
 
 ServiceBT::ServiceBT() : sys::Service("ServiceBT", "", 4096 * 2, sys::ServicePriority::Idle)
 {
@@ -39,7 +41,7 @@ sys::ReturnCodes ServiceBT::InitHandler()
     cmd.cmd = BtCmd::Cmd::Init;
     xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &cmd, portMAX_DELAY);
 
-    initializer();
+    // initializer();
 
     bt_timer = CreateTimer(200, true);
     ReloadTimer(bt_timer);
@@ -109,7 +111,9 @@ BtInject::Command ServiceBT::bt_read(uint32_t expected_count, uint32_t timeout)
 
     // log if request timed out
     if (cmd->timed_out == true) {
-        LOG_ERROR("BT waited for data timed out got %u of: %"PRIu32, cmd->data.size(), expected_count);
+        std::string log = "data timeout " + std::to_string(cmd->data.size()) + " of: " + std::to_string(expected_count);
+        LOG_ERROR("BT %s", log.c_str());
+        BtLogger::get().log(BtLogger::Event::BtInfo, log.c_str(), log.length());
     }
 
     auto data = cmd->data;

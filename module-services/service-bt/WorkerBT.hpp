@@ -16,13 +16,11 @@ extern "C"
 #include "bsp/bluetooth/Bluetooth.hpp"
 
 #include <memory>
-class BtLogger;
 
 class WorkerBT : public sys::Worker
 {
   private:
       bsp::BlueKitchen *bt = nullptr;
-      std::unique_ptr<BtLogger> logger;
       uint32_t expecting_bytes = 0;
   public:
     const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";

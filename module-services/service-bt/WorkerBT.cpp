@@ -86,7 +86,6 @@ std::list<char> BtInReceive::rec_data;
 
 WorkerBT::WorkerBT(sys::Service *ownerServicePtr) : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr)
 {
-    logger = std::make_unique<BtLogger>("bt_log.txt");
 }
 
 
@@ -116,7 +115,7 @@ bool WorkerBT::handleMessage(uint32_t queueID)
             printf("0x%X ", *(receiveMsg.c_str()+i));
         }
         printf("\n");
-        logger->log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
+        BtLogger::get().log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
 
         LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, (uint8_t*)(receiveMsg.c_str()), receiveMsg.length());
     }
@@ -133,13 +132,13 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         if ( ret == 0 ) {
             bt_receive.add_rec_data(val);
             auto send = new std::string(&val,1);
-            logger->log_out_byte(val);
+            BtLogger::get().log_out_byte(val);
             if ( we_can_send_usb ) {
                 auto ret = bsp::usbCDCSend(send);
                 if ( ret != 0 ) 
                 {
                     auto result = std::to_string(ret);
-                    logger->log(BtLogger::Event::USB_Error, result.c_str(), result.length());
+                    BtLogger::get().log(BtLogger::Event::USB_Error, result.c_str(), result.length());
                 }
             }
             if ( expecting_bytes > 0 ) {
@@ -166,7 +165,7 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         } break;
 
         case BtCmd::Cmd::TimerPoll: {
-            logger->timed_flush();
+            BtLogger::get().timed_flush();
         } break;
 
         case BtCmd::Cmd::Write: {
@@ -185,7 +184,7 @@ bool WorkerBT::handleMessage(uint32_t queueID)
                             return ss.str();
                             }();
 
-            logger->log(BtLogger::Event::In, (cmd_txt.c_str()), cmd_txt.length());
+            BtLogger::get().log(BtLogger::Event::In, (cmd_txt.c_str()), cmd_txt.length());
 
             for (uint8_t ch : data->command) {
                 LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, &ch, 1);
@@ -229,7 +228,7 @@ bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
     if ((bsp::usbCDCInit(queue) < 0)) {
         std::string log = "won't start desktop service without serial port";
         LOG_ERROR("%s",log.c_str());
-        logger->log(BtLogger::Event::USB_Error, log.c_str(), log.length());
+        BtLogger::get().log(BtLogger::Event::USB_Error, log.c_str(), log.length());
         return false;
     }
     we_can_send_usb = true;

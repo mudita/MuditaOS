@@ -16,8 +16,8 @@ class BtLogger : public BtFile
         In,  /// incoming data on usb
         Out, /// outgoing data on usb
         USB_Error, /// usb error
+        BtInfo, /// misc bt processing lgos
     };
-    BtLogger( std::string name);
     ~BtLogger() override;
     void log(enum BtLogger::Event evt, const char* data, uint32_t size);
     void log_out_byte(char byte);
@@ -26,6 +26,10 @@ class BtLogger : public BtFile
     /// if there was no data to flush
     /// otherwise we would just get data after next command
     void timed_flush();
+
+    static BtLogger& get();
+    private:
+        BtLogger( std::string name);
 };
 
 inline const char* c_str(BtLogger::Event evt) 
@@ -38,6 +42,8 @@ inline const char* c_str(BtLogger::Event evt)
             return "> ";
         case BtLogger::Event::USB_Error:
             return "usb_error: ";
+        case BtLogger::Event::BtInfo:
+            return "bt: ";
         default:
             return "?: ";
     }

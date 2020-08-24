@@ -4,6 +4,15 @@
 #include <cstring>
 #include <time/time_conversion.hpp>
 
+BtLogger &BtLogger::get()
+{
+    static BtLogger *ptr = nullptr;
+    if (ptr == nullptr) {
+        ptr = new BtLogger("bt_log.txt");
+    }
+    return *ptr;
+}
+
 BtLogger::BtLogger(std::string name) : BtFile(name, "w")
 {
     resp_buffer = new char[resp_buffer_size];
