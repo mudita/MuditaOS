@@ -16,6 +16,8 @@
 
 #include <Service/Message.hpp>
 
+class DBContactMessage;
+
 class DBServiceAPI
 {
   public:
@@ -94,6 +96,14 @@ class DBServiceAPI
                                                                         UTF8 primaryName,
                                                                         UTF8 alternativeName);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByIDWithTemporary(sys::Service *serv,
+                                                                                   uint32_t contactID);
+
+  private:
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByIDCommon(
+        sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg);
+
+  public:
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
 

@@ -23,7 +23,6 @@ TEST_CASE("Contact Record tests")
     const char *mailTest                          = "TestMail";
     const char *assetPath                         = "/Test/Path/To/Asset";
     const char *speeddialTest                     = "100";
-    const ContactType contactTypeTest             = ContactType ::USER;
     const ContactNumberType contactNumberTypeTest = ContactNumberType ::PAGER;
 
     ContactRecordInterface contRecInterface(contactDB.get());
@@ -35,7 +34,6 @@ TEST_CASE("Contact Record tests")
     recordIN.numbers         = std::vector<ContactRecord::Number>({
         ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
     });
-    recordIN.contactType     = contactTypeTest;
     recordIN.address         = addressTest;
     recordIN.note            = noteTest;
     recordIN.mail            = mailTest;
@@ -60,7 +58,6 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordOUT.numbers[0].number.getEntered() == numberUserTest);
         REQUIRE(recordOUT.numbers[0].number.getE164() == numberE164Test);
         REQUIRE(recordOUT.numbers[0].numberType == contactNumberTypeTest);
-        REQUIRE(recordOUT.contactType == contactTypeTest);
         REQUIRE(recordOUT.address == addressTest);
         REQUIRE(recordOUT.note == noteTest);
         REQUIRE(recordOUT.mail == mailTest);
@@ -85,7 +82,6 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
             REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
-            REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
             REQUIRE(w.mail == mailTest);
@@ -110,7 +106,6 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
             REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
-            REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
             REQUIRE(w.mail == mailTest);
@@ -134,7 +129,6 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
             REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
-            REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
             REQUIRE(w.mail == mailTest);

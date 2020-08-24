@@ -15,6 +15,11 @@ template <typename T, typename F> class RecordInterface : public db::Interface
         return true;
     };
 
+    virtual bool Add(T &)
+    {
+        return true;
+    };
+
     virtual bool RemoveByID(uint32_t id)
     {
         return true;

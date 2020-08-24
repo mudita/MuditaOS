@@ -1,7 +1,7 @@
 #include "MessagesMainWindow.hpp"
 
 #include "NewMessage.hpp"
-#include "OptionsWindow.hpp"
+#include "ThreadWindowOptions.hpp"
 #include "../ApplicationMessages.hpp"
 #include "../MessagesStyle.hpp"
 #include "../data/SMSdata.hpp"

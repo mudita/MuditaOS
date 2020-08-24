@@ -25,7 +25,7 @@ bool CalllogTable::add(CalllogTableRow entry)
 {
     return db->execute(
         "INSERT or ignore INTO calls (number, e164number, presentation, date, duration, type, name, contactId, "
-        "isRead) VALUES ('%q', '%q', %lu, %q, %q, %lu, '%q', '%q', %d);",
+        "isRead) VALUES ('%q', '%q', %lu, %q, %q, %lu, '%q', '%lu', %d);",
         entry.number.c_str(),
         entry.e164number.c_str(),
         static_cast<uint32_t>(entry.presentation),
@@ -33,7 +33,7 @@ bool CalllogTable::add(CalllogTableRow entry)
         utils::to_string(entry.duration).c_str(),
         static_cast<uint32_t>(entry.type),
         entry.name.c_str(),
-        entry.contactId.c_str(),
+        entry.contactId,
         entry.isRead);
 }
 
@@ -51,7 +51,7 @@ bool CalllogTable::update(CalllogTableRow entry)
 {
     return db->execute("UPDATE calls SET number = '%q', e164number = '%q', presentation = %lu, date = %lu, duration = "
                        "%lu, type = %lu, "
-                       "name = '%q', contactId = '%q', isRead = "
+                       "name = '%q', contactId = '%u', isRead = "
                        "%d WHERE _id = %lu;",
                        entry.number.c_str(),
                        entry.e164number.c_str(),
@@ -60,7 +60,7 @@ bool CalllogTable::update(CalllogTableRow entry)
                        static_cast<uint32_t>(entry.duration),
                        static_cast<uint32_t>(entry.type),
                        entry.name.c_str(),
-                       entry.contactId.c_str(),
+                       entry.contactId,
                        entry.isRead,
                        entry.ID);
 }
@@ -74,7 +74,7 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
     }
 
     return CalllogTableRow{
-        (*retQuery)[0].getUInt32(),                                // ID
+        {(*retQuery)[0].getUInt32()},                              // ID
         (*retQuery)[1].getString(),                                // number
         (*retQuery)[2].getString(),                                // e164number
         static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
@@ -82,14 +82,14 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
         static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
         static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
         (*retQuery)[7].getString(),                                // name
-        (*retQuery)[8].getString(),                                // contactID
+        (*retQuery)[8].getUInt32(),                                // contactID
         static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
     };
 }
 
 std::vector<CalllogTableRow> CalllogTable::getByContactId(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM calls WHERE contactId= %u;", id);
+    auto retQuery = db->query("SELECT * FROM calls WHERE contactId= %lu;", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
@@ -99,7 +99,7 @@ std::vector<CalllogTableRow> CalllogTable::getByContactId(uint32_t id)
 
     do {
         ret.push_back(CalllogTableRow{
-            (*retQuery)[0].getUInt32(),                                // ID
+            {(*retQuery)[0].getUInt32()},                              // ID
             (*retQuery)[1].getString(),                                // number
             (*retQuery)[2].getString(),                                // e164number
             static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
@@ -107,7 +107,7 @@ std::vector<CalllogTableRow> CalllogTable::getByContactId(uint32_t id)
             static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
             static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
             (*retQuery)[7].getString(),                                // name
-            (*retQuery)[8].getString(),                                // contactID
+            (*retQuery)[8].getUInt32(),                                // contactID
             static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
         });
     } while (retQuery->nextRow());
@@ -127,7 +127,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint3
 
     do {
         ret.push_back(CalllogTableRow{
-            (*retQuery)[0].getUInt32(),                                // ID
+            {(*retQuery)[0].getUInt32()},                              // ID
             (*retQuery)[1].getString(),                                // number
             (*retQuery)[2].getString(),                                // e164number
             static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
@@ -135,7 +135,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint3
             static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
             static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
             (*retQuery)[7].getString(),                                // name
-            (*retQuery)[8].getString(),                                // contactID
+            (*retQuery)[8].getUInt32(),                                // contactID
             static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
         });
     } while (retQuery->nextRow());
@@ -172,7 +172,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
 
     do {
         ret.push_back(CalllogTableRow{
-            (*retQuery)[0].getUInt32(),                                // ID
+            {(*retQuery)[0].getUInt32()},                              // ID
             (*retQuery)[1].getString(),                                // number
             (*retQuery)[2].getString(),                                // e164number
             static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
@@ -180,7 +180,7 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
             static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
             static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
             (*retQuery)[7].getString(),                                // name
-            (*retQuery)[8].getString(),                                // contactID
+            (*retQuery)[8].getUInt32(),                                // contactID
             static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
         });
     } while (retQuery->nextRow());

@@ -18,6 +18,7 @@ class DBContactMessage : public DBMessage
 
     ContactRecord record;
     bool favourite = false;
+    bool withTemporary = false;
 };
 
 /**

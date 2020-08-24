@@ -2,7 +2,7 @@
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include "ThreadModel.hpp"
 #include "OptionWindow.hpp"
-#include "application-messages/windows/OptionsWindow.hpp"
+#include "application-messages/windows/ThreadWindowOptions.hpp"
 #include "../widgets/ThreadItem.hpp"
 #include "application-messages/data/SMSdata.hpp"
 
