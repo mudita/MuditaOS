@@ -58,7 +58,7 @@ TEST_CASE("SMS Record tests")
 
     // Get all available records
     auto records = smsRecInterface.GetLimitOffset(0, 100);
-    REQUIRE((*records).size() == 2);
+    REQUIRE(records->size() == 2);
 
     // Check if fetched records contain valid data
     for (const auto &w : *records) {

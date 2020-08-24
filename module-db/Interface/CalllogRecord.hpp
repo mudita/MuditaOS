@@ -19,7 +19,7 @@ struct CalllogRecord : public Record
     time_t duration                      = 0;
     CallType type                        = CallType::CT_NONE;
     UTF8 name                            = "";
-    UTF8 contactId                       = "";
+    uint32_t contactId                   = 0;
     utils::PhoneNumber::View phoneNumber = utils::PhoneNumber::View();
     bool isRead                          = true;
 
@@ -68,7 +68,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
   private:
     CalllogDB *calllogDB   = nullptr;
     ContactsDB *contactsDB = nullptr;
-    ContactRecord GetContactRecordByID(const UTF8 &contactId);
+    ContactRecord GetContactRecordByID(uint32_t contactId);
     std::vector<CalllogRecord> GetByContactID(uint32_t id);
 
     std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);

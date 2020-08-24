@@ -30,15 +30,6 @@ enum class EntryState
     UNREAD /// only unread (by user) entries
 };
 
-/**
- * Types of contacts
- */
-enum class ContactType
-{
-    USER = 1,
-    TEMPORARY,
-};
-
 enum class ContactNumberType
 {
     CELL = 0, /*!< ID defines that number is a cellphone number. */
