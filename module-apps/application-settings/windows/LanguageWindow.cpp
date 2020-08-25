@@ -100,7 +100,7 @@ namespace gui
     gui::Item *LanguageWindow::addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback)
     {
         gui::Label *label = new gui::Label(this, 17, 0, 480 - 34, 60, text);
-        label->setMargins(gui::Margins(16, 0, 0, 0));
+        label->setPadding(gui::Padding(16, 0, 0, 0));
         label->setFilled(false);
         label->setPenFocusWidth(3);
         label->setPenWidth(0);

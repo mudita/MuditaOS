@@ -111,7 +111,7 @@ namespace gui
         virtual const UTF8 &getText() const;
         virtual unsigned int getTextLength() const;
         void setAlignment(const Alignment &value) override;
-        void setMargins(const Margins &margins) override;
+        void setPadding(const Padding &padding) override;
         void setEllipsis(gui::Ellipsis ellipsis);
         /**
          * @brief Defines if remaining area of the label has a horizontal line.
