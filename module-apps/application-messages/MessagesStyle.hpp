@@ -50,6 +50,16 @@ namespace style
             }
         } // namespace newMessage
 
+        namespace smsInput
+        {
+            constexpr uint32_t min_h               = 40;
+            constexpr uint32_t default_input_w     = 405;
+            constexpr uint32_t default_input_h     = 30;
+            constexpr uint32_t bottom_padding      = 5;
+            constexpr uint32_t max_input_h         = default_input_h * 4 + bottom_padding;
+            constexpr uint32_t reply_bottom_margin = 5;
+        } // namespace smsInput
+
         namespace templates
         {
             namespace list
