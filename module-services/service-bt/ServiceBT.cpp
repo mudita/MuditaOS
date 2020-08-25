@@ -4,7 +4,10 @@
 #include "BtInject.hpp"
 #include "bsp/rtc/rtc.hpp"
 #include "BtLogger.hpp"
+#include "service-bt/messages/BtInject.hpp"
 #include <string>
+
+BtInject::Command set_power = {0x01,0x84,0xfd,0x0c,0x00,0x03,0x00,0x0f,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
 ServiceBT::ServiceBT() : sys::Service("ServiceBT", "", 4096 * 2, sys::ServicePriority::Idle)
 {
@@ -41,10 +44,16 @@ sys::ReturnCodes ServiceBT::InitHandler()
     cmd.cmd = BtCmd::Cmd::Init;
     xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &cmd, portMAX_DELAY);
 
-    // initializer();
+    initializer();
 
     bt_timer = CreateTimer(200, true);
     ReloadTimer(bt_timer);
+
+    connect(BtOnOff(), [&](sys::DataMessage *, sys::ResponseMessage *) {
+        LOG_INFO("service bt received setting value!");
+        bt_write(set_power);
+        return sys::Message_t();
+    });
 
     return sys::ReturnCodes::Success;
 }
@@ -69,13 +78,24 @@ bool ServiceBT::initializer()
     auto pos = 0;
     LOG_DEBUG("send: %u commands", inject->getCommands().size());
     for (auto &cmd : inject->getCommands()) {
-        auto expecting = *(std::next(inject->getResponses().begin(), pos));
+        // auto expecting = *(std::next(inject->getResponses().begin(), pos));
         bt_write(cmd);
 
-        auto ret = bt_read(expecting.size(), 250);
-        if (expecting != ret) {
-            LOG_DEBUG("response missmatch on cmd no: %d", pos);
+        // sleep 250 ms
+        {
+            auto newtime = xTaskGetTickCount() + 250;
+            while (true) {
+                ulTaskNotifyTake(1, 10); // poll each 10ms
+                if (xTaskGetTickCount() > newtime) {
+                    break;
+                }
+            }
         }
+
+//        auto ret = bt_read(expecting.size(), 250);
+//        if (expecting != ret) {
+//            LOG_DEBUG("response missmatch on cmd no: %d", pos);
+//        }
 
         pos += 1;
     }

@@ -9,6 +9,8 @@
 #include "gui/widgets/Window.hpp"
 #include <memory>
 #include <BoxLayout.hpp>
+#include <service-bt/messages/BtInject.hpp>
+
 
 namespace gui
 {
@@ -16,10 +18,10 @@ namespace gui
     class BtWindow : public AppWindow
     {
       protected:
-        std::vector<gui::Item *> options;
-        VBox *box;
+        Label *send_button;
 
         gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
+        BtOnOff stamp_message;
 
       public:
         BtWindow(app::Application *app);
