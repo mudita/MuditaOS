@@ -1,5 +1,4 @@
 #include "WorkerDesktop.hpp"
-#include "EndpointHandler.hpp"
 #include "MessageHandler.hpp"
 
 bool WorkerDesktop::handleMessage(uint32_t queueID)
