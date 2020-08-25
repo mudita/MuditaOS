@@ -4,6 +4,10 @@
 #include "Service/Service.hpp"
 #include "contacts/ContactsEndpoint.hpp"
 #include "messages/MessagesEndpoint.hpp"
+#include "backup/BackupEndpoint.hpp"
+#include "deviceInfo/DeviceInfoEndpoint.hpp"
+#include "update/UpdateEndpoint.hpp"
+#include "restore/RestoreEndpoint.hpp"
 
 using namespace ParserStateMachine;
 
@@ -14,14 +18,14 @@ class EndpointFactory
     {
         LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
         switch (context.getEndpoint()) {
-        // case EndpointType::deviceInfo:
-        //     return std::make_unique(EndpointDeviceInfo());
-        // case EndpointType::update:
-        //     return std::make_unique(EndpointUpdate());
-        // case EndpointType::backup:
-        //     return std::make_unique(EndpointBackup());
-        // case EndpointType::restore:
-        //     return std::make_unique(EndpointRestore());
+        case EndpointType::update:
+            return std::make_unique<UpdateEndpoint>(ownerServicePtr);
+        case EndpointType::backup:
+            return std::make_unique<BackupEndpoint>(ownerServicePtr);
+        case EndpointType::deviceInfo:
+            return std::make_unique<DeviceInfoEndpoint>(ownerServicePtr);
+        case EndpointType::restore:
+            return std::make_unique<RestoreEndpoint>(ownerServicePtr);
         case EndpointType::contacts:
             return std::make_unique<ContactsEndpoint>(ownerServicePtr);
         case EndpointType::messages:

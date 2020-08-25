@@ -1,8 +1,9 @@
+#include <messages/QueryMessage.hpp>
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
-#include "EndpointHandler.hpp"
-#include "FactoryReset.hpp"
+#include "Endpoint.hpp"
+#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
 #include "log/log.hpp"
 #include "messages/DBSMSMessage.hpp"
 #include "messages/DBSMSTemplateMessage.hpp"
