@@ -7,10 +7,9 @@ add_catch2_executable(
 	SRCS
 		"${CMAKE_CURRENT_LIST_DIR}/unittest.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/tests-main.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/../update/UpdatePureOS.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/../factory-reset/FactoryReset.cpp"
+		"../endpoints/update/UpdatePureOS.cpp"
+		"../endpoints/factoryReset/FactoryReset.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/../parser/MessageHandler.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/../parser/EndpointHandler.cpp"
 
 
 	LIBS

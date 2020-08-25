@@ -89,7 +89,6 @@ class UpdatePureOS
     const fs::path getUpdateTmpChild(const fs::path &childPath);
 
   private:
-
     fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
     mtar_t updateTar      = {};
