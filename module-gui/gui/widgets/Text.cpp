@@ -118,6 +118,11 @@ namespace gui
         buildDocument("");
     }
 
+    bool Text::isEmpty()
+    {
+        return document->isEmpty();
+    }
+
     UTF8 Text::getText()
     {
         return document->getText();
@@ -214,6 +219,7 @@ namespace gui
     {
         if (padding != value) {
             padding = value;
+            buildCursor();
             drawLines();
         }
     }
