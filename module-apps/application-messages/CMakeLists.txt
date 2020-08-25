@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
         "widgets/ThreadItem.cpp"
         "widgets/SMSTemplateModel.cpp"
         "widgets/SMSTemplateItem.cpp"
+        "widgets/SMSInputWidget.cpp"
         "widgets/SearchResultsItem.cpp"
         "widgets/BaseThreadItem.cpp"
 
@@ -40,5 +41,6 @@ target_sources( ${PROJECT_NAME}
         "MessagesStyle.hpp"
         "models/ThreadModel.hpp"
         "widgets/ThreadItem.hpp"
+        "widgets/SMSInputWidget.hpp"
 )
 
