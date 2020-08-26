@@ -21,7 +21,7 @@ namespace bt::tx_test
     {
         f2402 = 0,  // first chanel
         f2442 = 20, // middle chanel
-        f2480 = 78, // last chanel
+        f2480 = 39, // last chanel
     };
 
     enum class Power : char
