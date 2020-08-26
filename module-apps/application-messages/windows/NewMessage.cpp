@@ -29,6 +29,7 @@ namespace gui
 
     void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        data->ignoreCurrentWindowOnStack = true;
         if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
             LOG_INFO("received search results");
             recipient->setText(pdata->result->getFormattedName());
@@ -47,10 +48,12 @@ namespace gui
             if (!retContact) {
                 LOG_WARN("not valid contact for number %s", number.getEntered().c_str());
                 recipient->setText(number.getFormatted());
+                message->setText(pdata->textData);
                 return;
             }
             contact = std::move(retContact);
             recipient->setText(contact->getFormattedName());
+            message->setText(pdata->textData);
         }
         updateBottomBar();
     }
