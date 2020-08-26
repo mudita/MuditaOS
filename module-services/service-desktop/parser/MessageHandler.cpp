@@ -5,7 +5,7 @@
 #include "ParserUtils.hpp"
 #include <memory>
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 xQueueHandle MessageHandler::sendQueue;
 

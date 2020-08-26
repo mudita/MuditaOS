@@ -1,15 +1,10 @@
 
 #include "MessagesEndpoint.hpp"
-#include "queries/sms/QuerySMSGetByID.hpp"
-#include "queries/sms/QuerySMSGetByContactID.hpp"
-#include "queries/sms/QuerySMSGetByText.hpp"
 #include "queries/sms/QuerySMSTemplateGetByID.hpp"
-#include <memory>
-#include <string>
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
-auto MessagesEndpoint::handle(Context &context) -> std::string
+auto MessagesEndpoint::handle(Context &context) -> void
 {
 
     switch (context.getMethod()) {
@@ -26,5 +21,4 @@ auto MessagesEndpoint::handle(Context &context) -> std::string
         helper->deleteDBEntry(context);
         break;
     }
-    return std::string();
 }

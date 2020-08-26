@@ -2,7 +2,7 @@
 #include "ParserUtils.hpp"
 #include "ServiceDesktop.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class BackupEndpoint : public Endpoint
 {
@@ -11,7 +11,7 @@ class BackupEndpoint : public Endpoint
     {
         debugName = "BackupEndpoint";
     }
-    auto handle(Context &context) -> std::string override;
+    auto handle(Context &context) -> void override;
     auto request(Context &context) -> sys::ReturnCodes;
     auto upload(Context &context) -> sys::ReturnCodes;
 };

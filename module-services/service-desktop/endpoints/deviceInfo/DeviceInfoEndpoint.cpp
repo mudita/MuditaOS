@@ -6,30 +6,23 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <string>
 
-time_t FreeRTOS_time(time_t *pxTime)
-{
-    return utils::time::Time().getTime();
-}
-
-auto DeviceInfoEndpoint::handle(Context &context) -> std::string
+auto DeviceInfoEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
     case http::Method::get:
         getDeviceInfo(context);
         break;
     default:
-        MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-            sys::ReturnCodes::Failure, static_cast<int>(EndpointType::deviceInfo), context.getUuid(), json11::Json()));
+        context.setResponseStatus(http::Code::BadRequest);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
         break;
     }
-
-    return std::string();
 }
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
     vfs::FilesystemStats fsStats = vfs.getFilesystemStats();
 
-    json11::Json responseBodyJson = json11::Json::object(
+    context.setResponseBody(json11::Json::object(
         {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
          {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
          {json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
@@ -41,9 +34,8 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitRevision, (std::string)(GIT_REV)},
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
-         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::Time().getTime()))}});
+         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::Time().getTime()))}}));
 
-    MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-        true, static_cast<int>(EndpointType::deviceInfo), context.getUuid(), responseBodyJson));
+    MessageHandler::putToSendQueue(context.createSimpleResponse());
     return true;
 }

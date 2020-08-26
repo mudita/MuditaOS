@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-
+#include <time/time_conversion.hpp>
 #if 0
 struct tm *gmtime_r( const time_t *pxTime, struct tm *tmStruct )
 {
@@ -19,16 +19,8 @@ struct tm *gmtime_r( const time_t *pxTime, struct tm *tmStruct )
 #endif
 /*-----------------------------------------------------------*/
 
-time_t FreeRTOS_time( time_t *pxTime )
+time_t FreeRTOS_time(time_t *pxTime)
 {
-time_t xReturn;
-
-	xReturn = 0;//time( &xReturn );
-
-	if( pxTime != NULL )
-	{
-		*pxTime = xReturn;
-	}
-
-	return xReturn;
+    return utils::time::Time().getTime();
 }
+

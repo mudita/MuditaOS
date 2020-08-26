@@ -9,7 +9,7 @@
 #include "update/UpdateEndpoint.hpp"
 #include "restore/RestoreEndpoint.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class EndpointFactory
 {

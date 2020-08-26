@@ -9,7 +9,7 @@
 #include <service-db/api/DBServiceAPI.hpp>
 #include "Endpoint.hpp"
 
-namespace ParserStateMachine
+namespace parserFSM
 {
 
     class MessageHelper final : public DBHelper
@@ -32,7 +32,7 @@ namespace ParserStateMachine
         auto updateSMS(Context &context) -> sys::ReturnCodes;
         auto deleteSMS(Context &context) -> sys::ReturnCodes;
 
-        auto requestMessagesCount(Context &context) -> sys::ReturnCodes;
+        // auto createSimpleResponse(Context &context) -> std::string override;
 
         static auto to_json(SMSRecord record) -> json11::Json;
         static auto to_json(ThreadRecord record) -> json11::Json;
@@ -49,7 +49,6 @@ namespace ParserStateMachine
         const inline std::string count        = "count";
         const inline std::string offset       = "offset";
         const inline std::string phoneNumber  = "phoneNumber";
-        const inline std::string messageBody  = "messageBody";
         const inline std::string isUnread     = "unread";
         const inline std::string contactID    = "contactID";
         const inline std::string date         = "date";
@@ -67,4 +66,4 @@ namespace ParserStateMachine
         } // namespace thread
 
     } // namespace messages
-} // namespace ParserStateMachine
+} // namespace parserFSM

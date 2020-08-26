@@ -3,7 +3,7 @@
 #include "json/json11.hpp"
 #include "MessageHandler.hpp"
 
-namespace ParserStateMachine
+namespace parserFSM
 {
     enum class State
     {
@@ -24,8 +24,8 @@ namespace ParserStateMachine
         };
 
       private:
-        std::string *receivedMsgPtr     = nullptr;
-        ParserStateMachine::State state = State::NoMsg;
+        std::string *receivedMsgPtr = nullptr;
+        parserFSM::State state      = State::NoMsg;
         std::string payload;
         std::string header;
         unsigned long payloadLength   = 0;
@@ -37,4 +37,4 @@ namespace ParserStateMachine
         void parsePartialMessage();
         void parsePayload();
     };
-} // namespace ParserStateMachine
+} // namespace parserFSM

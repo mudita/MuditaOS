@@ -1,8 +1,8 @@
 #pragma once
-#include "ParserUtils.hpp"
 #include "json/json11.hpp"
+#include "module-services/service-desktop/parser/ParserUtils.hpp"
 
-namespace ParserStateMachine
+namespace parserFSM
 {
 
     namespace json
@@ -14,6 +14,12 @@ namespace ParserStateMachine
         const inline std::string body     = "body";
     } // namespace json
 
+    struct endpointResponseContext
+    {
+        http::Code status = http::Code::OK;
+        json11::Json body = json11::Json();
+    };
+
     class Context
     {
       private:
@@ -21,6 +27,8 @@ namespace ParserStateMachine
         EndpointType endpoint;
         uint32_t uuid;
         http::Method method;
+        endpointResponseContext responseContext;
+
         auto validate() -> void
         {
             if (body.is_object() == false) {
@@ -29,6 +37,18 @@ namespace ParserStateMachine
             if (static_cast<int>(endpoint) > lastEndpoint) {
                 endpoint = EndpointType::invalid;
             }
+        }
+        auto buildResponseStr(std::size_t responseSize, std::string responsePayloadString) -> std::string
+        {
+            constexpr auto pos                 = 0;
+            constexpr auto count               = 1;
+            std::string responsePayloadSizeStr = std::to_string(responseSize);
+            while (responsePayloadSizeStr.length() < message::size_length) {
+                responsePayloadSizeStr.insert(pos, count, '0');
+            }
+
+            std::string responseStr = message::endpointChar + responsePayloadSizeStr + responsePayloadString;
+            return responseStr;
         }
 
       public:
@@ -39,6 +59,30 @@ namespace ParserStateMachine
             uuid     = js[json::uuid].int_value();
             method   = static_cast<http::Method>(js[json::method].int_value());
             validate();
+        }
+        Context()
+        {
+            body     = json11::Json();
+            endpoint = EndpointType::invalid;
+            uuid     = 0;
+            method   = http::Method::get;
+        }
+
+        auto createSimpleResponse() -> std::string
+        {
+            json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
+                                                             {json::status, static_cast<int>(responseContext.status)},
+                                                             {json::uuid, std::to_string(getUuid())},
+                                                             {json::body, responseContext.body}};
+            return buildResponseStr(responseJson.dump().size(), responseJson.dump());
+        }
+        auto setResponseStatus(http::Code status)
+        {
+            responseContext.status = status;
+        }
+        auto setResponseBody(json11::Json respBody)
+        {
+            responseContext.body = respBody;
         }
         auto getBody() -> json11::Json
         {
@@ -58,4 +102,4 @@ namespace ParserStateMachine
         }
     };
 
-} // namespace ParserStateMachine
+} // namespace parserFSM
