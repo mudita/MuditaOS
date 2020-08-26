@@ -3,7 +3,7 @@
 #include "Endpoint.hpp"
 #include "Service/Service.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class UpdateEndpoint : public Endpoint
 {
@@ -13,7 +13,7 @@ class UpdateEndpoint : public Endpoint
     {
         debugName = "UpdateEndpoint";
     }
-    auto handle(Context &context) -> std::string override;
+    auto handle(Context &context) -> void override;
     auto run(Context &context) -> sys::ReturnCodes;
     auto getUpdates(Context &context) -> sys::ReturnCodes;
 };

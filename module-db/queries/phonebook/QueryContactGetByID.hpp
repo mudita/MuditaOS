@@ -24,11 +24,6 @@ namespace db::query
         unsigned int id;
     };
 
-    /**
-     * @brief A response to the db::query::ContactGetByID query. Returns a vector of
-     * ContactRecord data
-     *
-     */
     class ContactGetByIDResult : public QueryResult
     {
       public:

@@ -1,11 +1,11 @@
-#include "ParserStateMachine.hpp"
+#include "ParserFSM.hpp"
 #include <service-desktop/ServiceDesktop.hpp>
 #include <log/log.hpp>
 #include <json/json11.hpp>
 #include <memory>
 #include <string>
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
 {}

@@ -1,6 +1,6 @@
 #include "ParserUtils.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 bool http::isMethodValid(uint8_t method)
 {

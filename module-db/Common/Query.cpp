@@ -5,23 +5,23 @@
 
 using namespace db;
 
-Query::Query(Type type, QueryListener *listener) : type(type), listener(listener)
+Query::Query(Type type, QueryListener *listener) : type(type), queryListener(listener)
 {}
 
 QueryListener *Query::getQueryListener() const noexcept
 {
-    return listener;
+    return queryListener;
 }
 
-void Query::setQueryListener(QueryListener *queryListener) noexcept
+void Query::setQueryListener(QueryListener *listener) noexcept
 {
-    listener = queryListener;
+    queryListener = listener;
 }
 
-void Query::setQueryListener(std::unique_ptr<EndpointListener> _listener) noexcept
+void Query::setQueryListener(std::unique_ptr<QueryListener> listener) noexcept
 {
-    endpointListener = std::move(_listener);
-    listener         = dynamic_cast<QueryListener *>(endpointListener.get());
+    queryListenerUniqueptr = std::move(listener);
+    queryListener          = dynamic_cast<QueryListener *>(queryListenerUniqueptr.get());
 }
 
 QueryResult::QueryResult(std::shared_ptr<Query> requestQuery) : requestQuery(std::move(requestQuery))

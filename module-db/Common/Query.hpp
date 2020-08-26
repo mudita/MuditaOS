@@ -4,6 +4,9 @@
 #include <string>
 #include <functional>
 #include <log/log.hpp>
+#include <module-services/service-desktop/endpoints/Context.hpp>
+
+using namespace parserFSM;
 
 namespace db
 {
@@ -13,25 +16,27 @@ namespace db
     {
       public:
         virtual bool handleQueryResponse(QueryResult *) = 0;
+        virtual ~QueryListener()                        = default;
     };
 
-    using QueryCallback = std::function<bool(db::QueryResult *, uint32_t)>;
+    using QueryCallback = std::function<bool(db::QueryResult *, Context &)>;
 
     class EndpointListener : public db::QueryListener
     {
       private:
-        uint32_t uuid;
+        Context context = Context();
 
       public:
-        EndpointListener(QueryCallback _callback, uint32_t uuid) : uuid(uuid), callback(std::move(_callback)){};
+        EndpointListener(QueryCallback callback, Context &context)
+            : context(std::move(context)), callback(std::move(callback)){};
         EndpointListener() : callback(nullptr){};
-        ~EndpointListener() = default;
-        QueryCallback callback;
+        ~EndpointListener()    = default;
+        QueryCallback callback = nullptr;
         auto handleQueryResponse(db::QueryResult *result) -> bool override
         {
             if (callback != nullptr) {
                 LOG_DEBUG("Executing callback...");
-                auto ret = callback(result, uuid);
+                auto ret = callback(result, context);
                 LOG_DEBUG("Callback finished");
                 return ret;
             }
@@ -60,15 +65,15 @@ namespace db
 
         QueryListener *getQueryListener() const noexcept;
         void setQueryListener(QueryListener *queryListener) noexcept;
-        void setQueryListener(std::unique_ptr<EndpointListener> listener) noexcept;
+        void setQueryListener(std::unique_ptr<QueryListener> listener) noexcept;
 
         const Type type;
 
         [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
 
       private:
-        QueryListener *listener = nullptr;
-        std::unique_ptr<EndpointListener> endpointListener = nullptr;
+        QueryListener *queryListener                          = nullptr;
+        std::unique_ptr<QueryListener> queryListenerUniqueptr = nullptr;
     };
 
     /// virtual query output (result) interface

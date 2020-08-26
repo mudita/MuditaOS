@@ -4,7 +4,7 @@
 #include "Service/Service.hpp"
 #include "MessageHelper.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class MessagesEndpoint : public Endpoint
 {
@@ -17,5 +17,5 @@ class MessagesEndpoint : public Endpoint
         debugName = "MessagesEndpoint";
         helper    = std::make_shared<MessageHelper>(ownerServicePtr);
     }
-    auto handle(Context &context) -> std::string override;
+    auto handle(Context &context) -> void override;
 };

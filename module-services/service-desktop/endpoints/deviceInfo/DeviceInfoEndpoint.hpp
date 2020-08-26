@@ -3,7 +3,7 @@
 #include "Endpoint.hpp"
 #include "Service/Service.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class DeviceInfoEndpoint : public Endpoint
 {
@@ -13,6 +13,6 @@ class DeviceInfoEndpoint : public Endpoint
     {
         debugName = "DeviceInfoEndpoint";
     }
-    auto handle(Context &context) -> std::string override;
+    auto handle(Context &context) -> void override;
     auto getDeviceInfo(Context &context) -> bool;
 };

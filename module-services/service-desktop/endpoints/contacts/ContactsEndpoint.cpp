@@ -3,11 +3,10 @@
 #include <memory>
 #include <string>
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
-auto ContactsEndpoint::handle(Context &context) -> std::string
+auto ContactsEndpoint::handle(Context &context) -> void
 {
-
     switch (context.getMethod()) {
     case http::Method::get:
         helper->requestDataFromDB(context);
@@ -22,6 +21,4 @@ auto ContactsEndpoint::handle(Context &context) -> std::string
         helper->deleteDBEntry(context);
         break;
     }
-
-    return std::string();
 }

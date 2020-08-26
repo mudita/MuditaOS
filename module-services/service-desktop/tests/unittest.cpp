@@ -6,7 +6,7 @@
 #include "Service/Common.hpp"
 #include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
 #include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
-#include "ParserStateMachine.hpp"
+#include "ParserFSM.hpp"
 #include "contacts/ContactHelper.hpp"
 #include "messages/MessageHelper.hpp"
 #include "queries/sms/QuerySMSSearchByType.hpp"
@@ -48,7 +48,7 @@ TEST_CASE("Factory Reset Test")
     REQUIRE(FactoryReset::CopyDirContent(factorydir, sysdir) == true);
 }
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 TEST_CASE("Parser Test")
 {
@@ -230,17 +230,3 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     REQUIRE(messageTemplateJson[json::messages::id] == 1);
 }
 
-TEST_CASE("Simple response builder test")
-{
-    auto resp = Endpoint::createSimpleResponse(
-        sys::ReturnCodes::Success, static_cast<int>(EndpointType::contacts), 1234, json11::Json());
-    std::string err;
-    REQUIRE(resp.substr(0, 10) == "#000000060");
-    resp.erase(0, 10);
-
-    auto responseJson = json11::Json::parse(resp, err);
-    REQUIRE(err.empty());
-    REQUIRE(responseJson[json::endpoint] == static_cast<int>(EndpointType::contacts));
-    REQUIRE(responseJson[json::status] == static_cast<int>(http::Code::OK));
-    REQUIRE(responseJson[json::uuid].dump() == "\"1234\"");
-}

@@ -186,4 +186,10 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     bool unbindNumber(std::uint32_t contactId, std::uint32_t numberId);
 
     const std::uint32_t favouritesGroupId;
+    std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> getByIDQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> getSizeQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> addQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> updateQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
 };

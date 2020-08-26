@@ -4,7 +4,7 @@
 #include "Service/Service.hpp"
 #include "ContactHelper.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class ContactsEndpoint : public Endpoint
 {
@@ -17,5 +17,5 @@ class ContactsEndpoint : public Endpoint
         debugName = "ContactsEndpoint";
         helper    = std::make_unique<ContactHelper>(ownerServicePtr);
     }
-    auto handle(Context &context) -> std::string override;
+    auto handle(Context &context) -> void override;
 };

@@ -25,7 +25,7 @@
 #include <memory>
 #include <string>
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 auto MessageHelper::to_json(SMSRecord record) -> json11::Json
 {
@@ -91,19 +91,19 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
         auto query = std::make_unique<db::query::SMSGetCount>();
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
-                    auto id   = SMSResult->getResults();
-                    auto body = json11::Json::object{{json::messages::count, static_cast<int>(id)}};
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, body));
+                    auto id = SMSResult->getResults();
+
+                    context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(id)}});
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
@@ -113,18 +113,18 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
         auto query = std::make_unique<db::query::SMSGetByID>(context.getBody()[json::messages::id].int_value());
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetByIDResult *>(result)) {
-                    auto body = MessageHelper::to_json(SMSResult->getResults());
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, body));
+
+                    context.setResponseBody(MessageHelper::to_json(SMSResult->getResults()));
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
@@ -135,7 +135,7 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
             std::make_unique<db::query::SMSGetByContactID>(context.getBody()[json::messages::contactID].int_value());
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetByContactIDResult *>(result)) {
 
                     json11::Json::array SMSarray;
@@ -143,15 +143,15 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
                         SMSarray.emplace_back(MessageHelper::to_json(record));
                     }
 
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, SMSarray));
+                    context.setResponseBody(SMSarray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
@@ -161,7 +161,7 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
             std::make_unique<db::query::SMSGetByText>(context.getBody()[json::messages::messageBody].string_value());
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetByTextResult *>(result)) {
 
                     json11::Json::array SMSarray;
@@ -169,15 +169,15 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
                         SMSarray.emplace_back(MessageHelper::to_json(record));
                     }
 
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, SMSarray));
+                    context.setResponseBody(SMSarray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
@@ -188,7 +188,7 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
                                                          context.getBody()[json::messages::offset].int_value());
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetResult *>(result)) {
 
                     json11::Json::array SMSarray;
@@ -196,15 +196,15 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
                         SMSarray.emplace_back(MessageHelper::to_json(record));
                     }
 
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, SMSarray));
+                    context.setResponseBody(SMSarray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
@@ -220,19 +220,19 @@ auto MessageHelper::requestTemplate(Context &context) -> sys::ReturnCodes
         auto query = std::make_unique<db::query::SMSTemplateGetCount>();
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSTemplateGetCountResult *>(result)) {
-                    auto id   = SMSResult->getResults();
-                    auto body = json11::Json::object{{json::messages::count, static_cast<int>(id)}};
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, body));
+                    auto id = SMSResult->getResults();
+
+                    context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(id)}});
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
@@ -241,18 +241,18 @@ auto MessageHelper::requestTemplate(Context &context) -> sys::ReturnCodes
         auto query = std::make_unique<db::query::SMSTemplateGetByID>(context.getBody()[json::messages::id].int_value());
 
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSTemplateResult = dynamic_cast<db::query::SMSTemplateGetByIDResult *>(result)) {
-                    auto body = MessageHelper::to_json(SMSTemplateResult->getResults());
-                    MessageHandler::putToSendQueue(
-                        Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::messages), uuid, body));
+
+                    context.setResponseBody(MessageHelper::to_json(SMSTemplateResult->getResults()));
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
@@ -262,22 +262,23 @@ auto MessageHelper::requestTemplate(Context &context) -> sys::ReturnCodes
         auto query = std::make_unique<db::query::SMSTemplateGet>(context.getBody()[json::messages::offset].int_value(),
                                                                  context.getBody()[json::messages::count].int_value());
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, uint32_t uuid) {
+            [=](db::QueryResult *result, Context context) {
                 if (auto SMSTemplateResult = dynamic_cast<db::query::SMSTemplateGetResult *>(result)) {
 
                     json11::Json::array SMSTemplateArray;
                     for (auto record : SMSTemplateResult->getResults()) {
                         SMSTemplateArray.emplace_back(to_json(record));
                     }
-                    MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                        true, static_cast<int>(EndpointType::messages), uuid, SMSTemplateArray));
+
+                    context.setResponseBody(SMSTemplateArray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
                     return false;
                 }
             },
-            context.getUuid());
+            context);
 
         query->setQueryListener(std::move(listener));
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
@@ -303,17 +304,19 @@ auto MessageHelper::createTemplate(Context &context) -> sys::ReturnCodes
 
     auto query    = std::make_unique<db::query::SMSTemplateAdd>(record);
     auto listener = std::make_unique<db::EndpointListener>(
-        [=](db::QueryResult *result, uint32_t uuid) {
+        [=](db::QueryResult *result, Context context) {
             if (auto SMSTemplateResult = dynamic_cast<db::query::SMSTemplateAddResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    SMSTemplateResult->getResult(), static_cast<int>(EndpointType::messages), uuid, json11::Json()));
+
+                context.setResponseStatus(SMSTemplateResult->getResult() ? http::Code::OK
+                                                                         : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
             else {
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
     DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
@@ -342,17 +345,19 @@ auto MessageHelper::deleteSMS(Context &context) -> sys::ReturnCodes
     auto id       = context.getBody()[json::messages::id].int_value();
     auto query    = std::make_unique<db::query::SMSRemove>(id);
     auto listener = std::make_unique<db::EndpointListener>(
-        [=](db::QueryResult *result, uint32_t uuid) {
+        [=](db::QueryResult *result, Context context) {
             if (auto SMSTemplateResult = dynamic_cast<db::query::SMSRemoveResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    SMSTemplateResult->getResults(), static_cast<int>(EndpointType::messages), uuid, json11::Json()));
+
+                context.setResponseStatus(SMSTemplateResult->getResults() ? http::Code::OK
+                                                                          : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
             else {
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
     DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
@@ -365,17 +370,19 @@ auto MessageHelper::deleteTemplate(Context &context) -> sys::ReturnCodes
     auto id       = context.getBody()[json::messages::id].int_value();
     auto query    = std::make_unique<db::query::SMSTemplateRemove>(id);
     auto listener = std::make_unique<db::EndpointListener>(
-        [=](db::QueryResult *result, uint32_t uuid) {
+        [=](db::QueryResult *result, Context context) {
             if (auto SMSTemplateResult = dynamic_cast<db::query::SMSTemplateRemoveResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    SMSTemplateResult->getResults(), static_cast<int>(EndpointType::messages), uuid, json11::Json()));
+
+                context.setResponseStatus(SMSTemplateResult->getResults() ? http::Code::OK
+                                                                          : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
             else {
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
     DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
@@ -402,10 +409,11 @@ auto MessageHelper::updateSMS(Context &context) -> sys::ReturnCodes
         (context.getBody()[json::messages::isUnread].bool_value() ? MarkAsRead::Read::False : MarkAsRead::Read::True));
 
     auto listener = std::make_unique<db::EndpointListener>(
-        [=](db::QueryResult *result, uint32_t uuid) {
+        [=](db::QueryResult *result, Context context) {
             if (auto SMSResult = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    SMSResult->getResult(), static_cast<int>(EndpointType::messages), uuid, json11::Json()));
+
+                context.setResponseStatus(SMSResult->getResult() ? http::Code::OK : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
 
                 return true;
             }
@@ -413,7 +421,7 @@ auto MessageHelper::updateSMS(Context &context) -> sys::ReturnCodes
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
 
