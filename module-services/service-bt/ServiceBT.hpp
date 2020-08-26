@@ -25,6 +25,8 @@ class ServiceBT : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
+    auto bt_open() -> bool;
+    auto bt_close() -> bool;
     auto bt_write(const BtInject::Command &command) -> bool;
     BtInject::Command bt_read(uint32_t expected_count, uint32_t timeout);
 };

@@ -117,6 +117,11 @@ bool WorkerBT::handleMessage(uint32_t queueID)
         printf("\n");
         BtLogger::get().log(BtLogger::Event::In, (receiveMsg.c_str()), receiveMsg.length());
 
+        if (bsp::BlueKitchen::getInstance()->is_open == false) {
+            LOG_ERROR("Bluetooth is closed, cant write!");
+            return true;
+        }
+
         LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, (uint8_t*)(receiveMsg.c_str()), receiveMsg.length());
     }
 
@@ -161,6 +166,16 @@ bool WorkerBT::handleMessage(uint32_t queueID)
 
         switch ( cmd.cmd ) {
 
+        case BtCmd::Cmd::BtOpen: {
+            LOG_DEBUG("bluetooth open");
+            bsp::BlueKitchen::getInstance()->open();
+        } break;
+
+        case BtCmd::Cmd::BtClose: {
+            LOG_DEBUG("bluetooth close");
+            bsp::BlueKitchen::getInstance()->close();
+        } break;
+
         case BtCmd::Cmd::Init: {
         } break;
 
@@ -170,6 +185,10 @@ bool WorkerBT::handleMessage(uint32_t queueID)
 
         case BtCmd::Cmd::Write: {
 
+            if (bsp::BlueKitchen::getInstance()->is_open == false) {
+                LOG_ERROR("Bluetooth is closed, cant write!");
+                return true;
+            }
             bt_receive.clear_rec_data(); // empty local buffer
 
             auto data = dynamic_cast<BtWrite*>(cmd.ptr);
@@ -216,6 +235,7 @@ bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
     LOG_DEBUG("get bt instajce");
     bt = bsp::BlueKitchen::getInstance();
     bt->qHandle =  Worker::getQueueByName(WorkerBT::UART_RECEIVE_QUEUE);
+    // TODO REM
     bt->open();
 
     LOG_DEBUG("start usb");

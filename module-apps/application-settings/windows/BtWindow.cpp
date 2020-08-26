@@ -30,6 +30,22 @@ namespace gui
         buildInterface();
     }
 
+    auto local_decorate(Label *el)
+    {
+        el->setSize( style::window_width, style::window::label::default_h);
+        el->penFocusWidth     = 2;
+        el->penWidth     = 0;
+    }
+
+    auto button_with_action(Item *parent, Label *child, std::string text, std::function<bool(Item &)> foo)
+    {
+        child = new gui::Label();
+        local_decorate(child);
+        child->setText(text.c_str());
+        child->activatedCallback = foo;
+        parent->addWidget(child);
+    }
+
     void BtWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -44,21 +60,41 @@ namespace gui
 
         LOG_INFO("Create box layout");
 
-//        const Position send_offset = 100;
-//        const Position margin = 5;
-//        uint32_t no_elements = 3;
+        auto *box = new VBox(this, style::margins::big, title->offset_h() + style::margins::big, style::window_width - 2*style::margins::big, style::window_height - 200);
 
-        send_button = new gui::Label(this, 0, title->offset_h(), style::window_width, style::window::label::default_h, "Start");
-        send_button->activatedCallback = [&](Item &) -> bool {
+        // TODO this should be Selector too...
+        button_with_action(box,on_button,"On", [&](Item &) -> bool {
             LOG_DEBUG("send clicked");
-            auto message = std::make_shared<BtOnOff>(stamp_message);
-            sys::Bus::SendUnicast(message, "ServiceBT", getApplication());
+            auto message = std::make_shared<message::bt::OnOff>();
+            sys::Bus::SendUnicast(message, "ServiceBT", this->getApplication(), 10000);
             return true;
-        };
-        send_button->penFocusWidth = 2;
+        });
 
-        LOG_INFO("ui built");
-        setFocusItem(send_button);
+        button_with_action(box, send_button, "Execute", [&](Item &) -> bool {
+            LOG_DEBUG("send clicked");
+            auto message = std::make_shared<message::bt::Test>(
+                power_button->getVal(), chanel_button->getVal(), pattern_button->getVal());
+            sys::Bus::SendUnicast(message, "ServiceBT", this->getApplication(), 10000);
+            return true;
+        });
+
+        { 
+            using namespace bt::tx_test;
+
+        power_button = new Selector<bt::tx_test::Power>("Power: " , {bt::tx_test::Power::Max, bt::tx_test::Power::Med, bt::tx_test::Power::Min} );
+        local_decorate(power_button);
+        box->addWidget(power_button);
+
+        chanel_button = new Selector<bt::tx_test::Chanel>("Chanel: " , {bt::tx_test::Chanel::f2402, bt::tx_test::Chanel::f2442,bt::tx_test::Chanel::f2480} );
+        local_decorate(chanel_button);
+        box->addWidget(chanel_button);
+
+        pattern_button = new Selector<bt::tx_test::Pattern>("Pattern: " , {Pattern::All1, Pattern::All0, Pattern::FF00, Pattern::FOFO, Pattern::PN15, Pattern::PN9, Pattern::Zebra } );
+        local_decorate(pattern_button);
+        box->addWidget(pattern_button);
+        };
+
+        setFocusItem(box);
         LOG_INFO("...");
     }
 

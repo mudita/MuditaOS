@@ -7,6 +7,9 @@ class BtFile
 {
     protected:
     vfs::FILE* file = nullptr;
+    std::string name,rwx;
+    void open();
+    void close();
     public:
     BtFile(const std::string &name, const std::string &rwx);
     virtual ~BtFile();

@@ -13,6 +13,8 @@ class BtData
 struct BtCmd
 {
     enum class Cmd {
+        BtOpen,
+        BtClose,
         Init,
         TimerPoll,
         Write,

@@ -3,6 +3,9 @@
 #include <log/log.hpp>
 #include <cstring>
 #include <time/time_conversion.hpp>
+#include <mutex.hpp>
+
+cpp_freertos::MutexStandard mutex;
 
 BtLogger &BtLogger::get()
 {
@@ -21,6 +24,7 @@ BtLogger::BtLogger(std::string name) : BtFile(name, "w")
 
 void BtLogger::log(enum BtLogger::Event evt, const char* data, uint32_t size) 
 {
+    cpp_freertos::LockGuard lock(mutex);
     if (file != nullptr ) 
     {
         std::string header = c_str(evt);
@@ -57,7 +61,7 @@ void BtLogger::flush()
                             std::stringstream ss;
                             for (int i = 0; i < resp_buffer_take; ++i) 
                             {
-                                ss << " 0x" << std::hex << (int)*(resp_buffer+i);
+                                ss << ",0x" << std::setw(2) << std::setfill('0') << std::hex << (int)*(resp_buffer+i);
                             }
                             return ss.str();
                             }();
@@ -70,6 +74,7 @@ void BtLogger::flush()
 
 void BtLogger::timed_flush() 
 {
+    cpp_freertos::LockGuard lock(mutex);
     uint64_t now = utils::time::Time().getTime();
     if ( last_flush + 100 <  now ) {
         flush();

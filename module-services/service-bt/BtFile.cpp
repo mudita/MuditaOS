@@ -1,7 +1,7 @@
 #include "BtFile.hpp"
 #include <log/log.hpp>
 
-BtFile::BtFile(const std::string &name,  const std::string &rwx)
+BtFile::BtFile(const std::string &name,  const std::string &rwx) : name (name), rwx(rwx)
 {
     LOG_DEBUG("opening log file: %s", vfs.relativeToRoot(name).c_str());
     file = vfs.fopen(name.c_str(), rwx.c_str());
@@ -11,13 +11,26 @@ BtFile::BtFile(const std::string &name,  const std::string &rwx)
     }
 }
 
+// for write only really...
+void BtFile::open()
+{
+    file = vfs.fopen(name.c_str(), "w+");
+}
+
+void BtFile::close()
+{
+    vfs.fclose(file);
+}
+
 void BtFile::write(const char *data, ssize_t size)
 {
+    open();
     if (file != nullptr) {
-        vfs.fwrite(data, size,1, file);
+        vfs.fwrite(data, 1,size, file);
     } else {
         LOG_ERROR("no file!");
     }
+    close();
 }
 
 
@@ -32,5 +45,5 @@ std::string BtFile::readline()
 
 BtFile::~BtFile()
 {
-    vfs.fclose(file);
+    close();
 }

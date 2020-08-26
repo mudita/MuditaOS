@@ -7,7 +7,35 @@
 #include "service-bt/messages/BtInject.hpp"
 #include <string>
 
-BtInject::Command set_power = {0x01,0x84,0xfd,0x0c,0x00,0x03,0x00,0x0f,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+namespace hci
+{
+    class TestCommand
+    {
+        BtInject::Command test_command = {
+            0x01, 0x84, 0xfd, 0x0c, 0x00, 0x03, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        enum Byte
+        {
+            Pattern   = 5,
+            Frequency = 6,
+            Power     = 7,
+        };
+
+        void setPower();
+
+      public:
+        TestCommand(const message::bt::Test *cmd)
+        {
+            *std::next(test_command.begin(), Byte::Pattern)   = static_cast<char>(cmd->pattern);
+            *std::next(test_command.begin(), Byte::Frequency) = static_cast<char>(cmd->chanel);
+            *std::next(test_command.begin(), Byte::Power)     = static_cast<char>(cmd->power);
+        }
+
+        BtInject::Command get()
+        {
+            return test_command;
+        }
+    };
+} // namespace hci
 
 ServiceBT::ServiceBT() : sys::Service("ServiceBT", "", 4096 * 2, sys::ServicePriority::Idle)
 {
@@ -44,14 +72,30 @@ sys::ReturnCodes ServiceBT::InitHandler()
     cmd.cmd = BtCmd::Cmd::Init;
     xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &cmd, portMAX_DELAY);
 
+    // TODO REM
     initializer();
 
     bt_timer = CreateTimer(200, true);
     ReloadTimer(bt_timer);
 
-    connect(BtOnOff(), [&](sys::DataMessage *, sys::ResponseMessage *) {
-        LOG_INFO("service bt received setting value!");
-        bt_write(set_power);
+    connect(message::bt::OnOff(), [&](sys::DataMessage *data_in, sys::ResponseMessage *) {
+        LOG_INFO("service bt - initialize TODO!");
+//        auto message = dynamic_cast<message::bt::OnOff*>(data_in);
+//        if ( message->state == message::bt::OnOff::State::On ) {
+//            // bt_open();
+//            // TODO sleep?
+//            // initializer();
+//        } else {
+//            // bt_close();
+//        }
+        return sys::Message_t();
+    });
+
+    connect(message::bt::Test(), [&](sys::DataMessage *data_in, sys::ResponseMessage *) {
+        auto message = dynamic_cast<message::bt::Test*>(data_in);
+        LOG_INFO("service bt - set vaweform!");
+        LOG_INFO("wave: %s %s %s", c_str(message->chanel), c_str(message->pattern), c_str(message->power));
+        bt_write(hci::TestCommand(message).get());
         return sys::Message_t();
     });
 
@@ -100,6 +144,21 @@ bool ServiceBT::initializer()
         pos += 1;
     }
     LOG_DEBUG("sent: %d", inject->getCommands().size());
+    return true;
+}
+
+
+auto ServiceBT::bt_open() -> bool
+{
+    BtCmd to_send = {BtCmd::Cmd::BtOpen, nullptr };
+    xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &to_send, portMAX_DELAY);
+    return true;
+}
+
+auto ServiceBT::bt_close() -> bool
+{
+    BtCmd to_send = {BtCmd::Cmd::BtClose, nullptr };
+    xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &to_send, portMAX_DELAY);
     return true;
 }
 

@@ -26,15 +26,15 @@ bool BtInject::parse_line(const std::string &type, std::string &line, Commands &
             }
             vals.push_back(std::stoul(tmp, nullptr, 16));
         }
-        // LOG_DEBUG("Loaded command: %s",
-        //           [&]() -> std::string {
-        //               std::stringstream ss;
-        //               for (auto el : vals) {
-        //                   ss << " 0x" << std::hex << (int)el;
-        //               }
-        //               return ss.str();
-        //           }()
-        //                        .c_str());
+        LOG_DEBUG("Loaded command: %s",
+                  [&]() -> std::string {
+                      std::stringstream ss;
+                      for (auto el : vals) {
+                          ss << " 0x" << std::hex << (int)el;
+                      }
+                      return ss.str();
+                  }()
+                               .c_str());
         list.push_back(vals);
         return true;
     }
