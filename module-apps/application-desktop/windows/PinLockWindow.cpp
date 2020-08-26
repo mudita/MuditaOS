@@ -157,6 +157,29 @@ namespace gui
         }
     }
 
+    bool PinLockWindow::isPinValid()
+    {
+        if (application->getSettings().lockPassHash ==
+            (1000 * charValue[0] + 100 * charValue[1] + 10 * charValue[2] + charValue[3])) {
+            remainingAttempts            = maxPasswordAttempts;
+            app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+            if (app) {
+                app->setScreenLocked(false);
+
+                // if there is no application to return to simply return to main window
+                if (lockTimeoutApplilcation.empty()) {
+                    application->switchWindow(gui::name::window::main_window);
+                }
+                else {
+                    lockTimeoutApplilcation = "";
+                    sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
 
@@ -193,24 +216,9 @@ namespace gui
                 else if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
                     if ((state == State::EnteringPin) && (charCount == 4)) {
 
-                        // TODO make pin checking here, currently it always fails
-                        if (application->getSettings().lockPassHash ==
-                            (1000 * charValue[0] + 100 * charValue[1] + 10 * charValue[2] + charValue[3])) {
-                            remainingAttempts            = maxPasswordAttempts;
-                            app::ApplicationDesktop *app = reinterpret_cast<app::ApplicationDesktop *>(application);
-                            app->setScreenLocked(false);
-
-                            // if there is no application to return to simply return to main window
-                            if (lockTimeoutApplilcation.empty()) {
-                                application->switchWindow(gui::name::window::main_window);
-                            }
-                            else {
-                                lockTimeoutApplilcation = "";
-                                sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-                            }
+                        if (isPinValid()) {
                             return true;
                         }
-
                         if (remainingAttempts == 1) {
                             state = State::PhoneBlocked;
                             bottomBar->setActive(BottomBar::Side::CENTER, false);
@@ -237,6 +245,9 @@ namespace gui
 
                         // if 4 char has been entered show bottom bar confirm
                         if (charCount == 4) {
+                            if (isPinValid()) {
+                                return true;
+                            }
                             bottomBar->setActive(BottomBar::Side::CENTER, true);
                         }
                         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);

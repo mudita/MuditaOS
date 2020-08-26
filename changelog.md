@@ -3,7 +3,7 @@
 ## [Current Release]
 
 ### Added
-
+* `[desktop]` Automatic confirmation of unlock pin if one is correct.
 * `[phonebook]` Forwarding VCard via SMS.
 * `[music player]` Added support for playing mp3 and flac files.
 
