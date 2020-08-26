@@ -34,6 +34,7 @@ namespace gui
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState(const State &state);
+        bool isPinValid();
 
       public:
         PinLockWindow(app::Application *app);
