@@ -73,21 +73,20 @@ sys::ReturnCodes ServiceBT::InitHandler()
     xQueueSend(worker->getQueueByName(worker->BT_COMMANDS), &cmd, portMAX_DELAY);
 
     // TODO REM
-    initializer();
+    // initializer();
 
     bt_timer = CreateTimer(200, true);
     ReloadTimer(bt_timer);
 
     connect(message::bt::OnOff(), [&](sys::DataMessage *data_in, sys::ResponseMessage *) {
         LOG_INFO("service bt - initialize TODO!");
-//        auto message = dynamic_cast<message::bt::OnOff*>(data_in);
-//        if ( message->state == message::bt::OnOff::State::On ) {
-//            // bt_open();
-//            // TODO sleep?
-//            // initializer();
-//        } else {
-//            // bt_close();
-//        }
+        auto message = dynamic_cast<message::bt::OnOff*>(data_in);
+        if ( message->state == message::bt::OnOff::State::On ) {
+            bt_open();
+            initializer();
+        } else {
+            bt_close();
+        }
         return sys::Message_t();
     });
 

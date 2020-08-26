@@ -235,8 +235,8 @@ bool WorkerBT::init(std::list<sys::WorkerQueueInfo> queues)
     LOG_DEBUG("get bt instajce");
     bt = bsp::BlueKitchen::getInstance();
     bt->qHandle =  Worker::getQueueByName(WorkerBT::UART_RECEIVE_QUEUE);
-    // TODO REM
-    bt->open();
+    // // TODO REM
+    // bt->open();
 
     LOG_DEBUG("start usb");
     auto queue = Worker::getQueueByName(WorkerBT::RECEIVE_QUEUE_BUFFER_NAME);
