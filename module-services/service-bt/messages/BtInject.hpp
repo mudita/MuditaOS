@@ -107,7 +107,8 @@ namespace message::bt
             On,
             Off
         } state;
-        OnOff(State state = State::On) : sys::DataMessage(MessageType::BtMessage), state(state)
+        OnOff() : sys::DataMessage(MessageType::BtMessage), state(State::Off) {}
+        OnOff(State state) : sys::DataMessage(MessageType::BtMessage), state(state)
         {}
     };
 

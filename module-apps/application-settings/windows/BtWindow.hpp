@@ -39,6 +39,7 @@ namespace gui
                 return;
             }
             setText((base_text + std::string(c_str(values.front()))).c_str());
+            // visible = false;
         }
 
         auto getVal()
@@ -57,6 +58,9 @@ namespace gui
         Selector<bt::tx_test::Pattern> *pattern_button;
 
         gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
+
+        bool bt_is_on = false;
+        VBox *box = nullptr;
 
       public:
         BtWindow(app::Application *app);
