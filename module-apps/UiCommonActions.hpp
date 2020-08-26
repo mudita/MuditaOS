@@ -22,7 +22,7 @@ namespace app
     /// @parem contact - contact record on which the operation is requested
     ///
     /// @return true if succeed
-    bool call(Application *app, const ContactRecord &contact);
+    auto call(Application *app, const ContactRecord &contact) -> bool;
 
     /// @brief requests selected call operation
     ///
@@ -32,7 +32,7 @@ namespace app
     /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
-    bool call(Application *app, const utils::PhoneNumber::View &number);
+    auto call(Application *app, const utils::PhoneNumber::View &number) -> bool;
 
     /// @brief prepares for a call (displays number to the user)
     ///
@@ -40,7 +40,7 @@ namespace app
     /// @param number - phone number on which the operation is requested
     ///
     /// @return true if succeed
-    bool prepare_call(Application *app, const std::string &number);
+    auto prepareCall(Application *app, const std::string &number) -> bool;
 
     enum class SmsOperation
     {
@@ -55,8 +55,13 @@ namespace app
     ///
     /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
+    /// @param textData - text message which should be sent as sms
+    ///
     /// @return true if succeed
-    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number);
+    auto sms(Application *app,
+             SmsOperation smsOperation,
+             const utils::PhoneNumber::View &number,
+             const UTF8 textData = "") -> bool;
 
     enum class ContactOperation
     {
@@ -73,7 +78,7 @@ namespace app
     /// @parem contact - contact record on which the operation is requested
     ///
     /// @return true if succeed
-    bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact);
+    auto contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact) -> bool;
 
     /// @brief requests selected contact operation
     ///
@@ -83,7 +88,7 @@ namespace app
     /// @parem number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
-    bool contact(Application *app, ContactOperation contactOperation, const std::string &number);
+    auto contact(Application *app, ContactOperation contactOperation, const std::string &number) -> bool;
 
     /// @brief requests selected contact operation
     ///
@@ -93,5 +98,5 @@ namespace app
     /// @parem contactId - id of contact on which the operation is requested
     ///
     /// @return true if succeed
-    bool contact(Application *app, ContactOperation contactOperation, uint32_t contactId);
+    auto contact(Application *app, ContactOperation contactOperation, uint32_t contactId) -> bool;
 } // namespace app

@@ -2,6 +2,7 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookUtils.hpp"
+#include "UiCommonActions.hpp"
 
 namespace gui
 {
@@ -37,14 +38,16 @@ namespace gui
         return (AppWindow::onInput(inputEvent));
     }
 
-    void PhonebookNamecardOptions::sendViaSms()
+    auto PhonebookNamecardOptions::sendViaSms() -> bool
     {
-        const std::string vcard = phonebookUtils::formatVCard(*contact);
+        const UTF8 vcard = phonebookUtils::formatVCard(*contact);
+        const utils::PhoneNumber::View emptyNumber;
+        return app::sms(application, app::SmsOperation::New, emptyNumber, vcard);
     }
 
     void PhonebookNamecardOptions::sendViaBluetooth()
     {
-        const std::string vcard = phonebookUtils::formatVCard(*contact);
+        const UTF8 vcard = phonebookUtils::formatVCard(*contact);
     }
 
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>

@@ -2,9 +2,14 @@
 
 ## [Current Release]
 
+### Added
+
+* `[phonebook]` Forwarding VCard via SMS.
+
 ### Changed
 
 ### Fixed
+
 * `[phonebook]` Contact details BottomBar call/send handling. 
 
 ## [0.34.2 - 2020-08-21]

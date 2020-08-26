@@ -17,7 +17,7 @@ namespace gui
       private:
         std::shared_ptr<ContactRecord> contact = nullptr;
         auto namecardOptionsList() -> std::list<gui::Option>;
-        void sendViaSms();
+        auto sendViaSms() -> bool;
         void sendViaBluetooth();
     };
 }; // namespace gui

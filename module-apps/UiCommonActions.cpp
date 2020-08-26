@@ -15,11 +15,10 @@
 #include <cassert>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace app
 {
-    bool call(Application *app, const ContactRecord &contact)
+    auto call(Application *app, const ContactRecord &contact) -> bool
     {
         assert(app != nullptr);
 
@@ -32,7 +31,7 @@ namespace app
         }
     }
 
-    bool call(Application *app, const utils::PhoneNumber::View &phoneNumber)
+    auto call(Application *app, const utils::PhoneNumber::View &phoneNumber) -> bool
     {
         assert(app != nullptr);
         auto data = std::make_unique<ExecuteCallData>(phoneNumber);
@@ -41,7 +40,7 @@ namespace app
             app, name_call, window::name_enterNumber, std::move(data));
     }
 
-    bool prepare_call(Application *app, const std::string &number)
+    auto prepareCall(Application *app, const std::string &number) -> bool
     {
         assert(app != nullptr);
         auto data = std::make_unique<EnterNumberData>(number);
@@ -50,14 +49,17 @@ namespace app
             app, name_call, window::name_enterNumber, std::move(data));
     }
 
-    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number)
+    auto sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number, const UTF8 textData)
+        -> bool
     {
         assert(app != nullptr);
 
         switch (smsOperation) {
         case SmsOperation::New: {
+            auto data                        = std::make_unique<SMSSendRequest>(number, textData);
+            data->ignoreCurrentWindowOnStack = true;
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_messages, gui::name::window::new_sms, std::make_unique<SMSSendRequest>(number));
+                app, name_messages, gui::name::window::new_sms, std::move(data));
         }
         case SmsOperation::Template: {
             return sapm::ApplicationManager::messageSwitchApplication(
@@ -70,7 +72,7 @@ namespace app
         }
     }
 
-    bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)
+    auto contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact) -> bool
     {
         auto data             = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contact));
         data->disableAppClose = true;
@@ -80,18 +82,18 @@ namespace app
             data->ignoreCurrentWindowOnStack = true;
             return sapm::ApplicationManager::messageSwitchApplication(
                 app, name_phonebook, gui::window::name::new_contact, std::move(data));
-        } break;
+        }
         case ContactOperation::Details: {
             return sapm::ApplicationManager::messageSwitchApplication(
                 app, name_phonebook, gui::window::name::contact, std::move(data));
-        } break;
+        }
         case ContactOperation::Edit: {
             return sapm::ApplicationManager::messageSwitchApplication(
                 app,
                 name_phonebook,
                 gui::window::name::new_contact, // TODO: need to be fixed when contact edition is working
                 std::move(data));
-        } break;
+        }
         default: {
             LOG_ERROR("ContactOperation not supported %" PRIu32, static_cast<uint32_t>(contactOperation));
             return false;
@@ -99,7 +101,7 @@ namespace app
         }
     }
 
-    bool contact(Application *app, ContactOperation contactOperation, const std::string &number)
+    auto contact(Application *app, ContactOperation contactOperation, const std::string &number) -> bool
     {
         assert(app != nullptr);
 
@@ -137,7 +139,7 @@ namespace app
         return contact(app, contactOperation, contactRec);
     }
 
-    bool contact(Application *app, ContactOperation contactOperation, uint32_t contactId)
+    auto contact(Application *app, ContactOperation contactOperation, uint32_t contactId) -> bool
     {
         assert(app != nullptr);
         assert(contactOperation != ContactOperation::Add);
