@@ -2,11 +2,8 @@
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
-#include "Endpoint.hpp"
 #include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
 #include "log/log.hpp"
-#include "messages/DBSMSMessage.hpp"
-#include "messages/DBSMSTemplateMessage.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {

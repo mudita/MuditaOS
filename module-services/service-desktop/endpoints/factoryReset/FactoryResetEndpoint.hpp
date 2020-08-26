@@ -3,7 +3,7 @@
 #include "Endpoint.hpp"
 #include "Service/Service.hpp"
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 class FactoryResetEndpoint : public Endpoint
 {
@@ -13,6 +13,6 @@ class FactoryResetEndpoint : public Endpoint
     {
         debugName = "FactoryResetEndpoint";
     }
-    auto handle(Context &context) -> std::string override;
+    auto handle(Context &context) -> void override;
     auto makeFactoryReset(Context &context) -> bool;
 };

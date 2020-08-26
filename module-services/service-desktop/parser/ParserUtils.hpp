@@ -4,14 +4,14 @@
 #include <vector>
 #include <log/log.hpp>
 
-namespace ParserStateMachine
+namespace parserFSM
 {
 
     // Endpoint type definition
     enum class EndpointType
     {
-        invalid    = 0,
-        deviceInfo = 1,
+        invalid = 0,
+        deviceInfo,
         update,
         backup,
         restore,
@@ -137,4 +137,4 @@ namespace ParserStateMachine
 
     } // namespace json
 
-} // namespace ParserStateMachine
+} // namespace parserFSM

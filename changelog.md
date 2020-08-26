@@ -38,6 +38,9 @@
 * `[gui]` Fixed label padding handling.
 * `[settings]` Fixed settings info.
 
+### Other
+* `[desktop]` Rewritten message handling.
+
 ## [0.34.2 - 2020-08-21]
 
 ### Changed

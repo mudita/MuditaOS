@@ -4,7 +4,6 @@
 #include "ParserUtils.hpp"
 #include "Service/Common.hpp"
 #include "api/DBServiceAPI.hpp"
-#include "application-phonebook/models/NewContactModel.hpp"
 #include "log/log.hpp"
 #include "queries/phonebook/QueryContactGetByID.hpp"
 #include "queries/phonebook/QueryContactUpdate.hpp"
@@ -13,7 +12,7 @@
 #include <queries/phonebook/QueryContactAdd.hpp>
 #include <queries/phonebook/QueryContactRemove.hpp>
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 auto ContactHelper::to_json(ContactRecord record) -> json11::Json
 {
@@ -41,7 +40,7 @@ auto ContactHelper::from_json(json11::Json contactJSON) -> ContactRecord
     newRecord.alternativeName = UTF8(contactJSON[json::contacts::alternativeName].string_value());
     newRecord.address         = UTF8(contactJSON[json::contacts::address].string_value());
 
-    newRecord.contactType = ContactType ::USER;
+    newRecord.contactType = ContactType::USER;
 
     for (auto num : contactJSON[json::contacts::numbers].array_items()) {
         utils::PhoneNumber phoneNumber(num.string_value());
@@ -59,12 +58,15 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     if (context.getBody()[json::contacts::id].int_value() != 0) {
         return requestContactByID(context);
     }
+    else if (context.getBody()[json::contacts::count].bool_value()) {
+        return requestCount(context);
+    }
 
     auto limit = context.getBody()[json::contacts::count].int_value();
     auto query = std::make_unique<db::query::ContactGet>(0, limit, "");
 
     auto listener = std::make_unique<db::EndpointListener>(
-        [](db::QueryResult *result, uint32_t uuid) {
+        [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactGetResult *>(result)) {
 
                 auto recordsPtr = std::make_unique<std::vector<ContactRecord>>(contactResult->getRecords());
@@ -74,15 +76,42 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
                     contactsArray.emplace_back(ContactHelper::to_json(record));
                 }
 
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    true, static_cast<int>(EndpointType::contacts), uuid, contactsArray));
+                context.setResponseBody(contactsArray);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
             else {
                 return false;
             }
         },
-        context.getUuid());
+        context);
+
+    query->setQueryListener(std::move(listener));
+
+    DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
+
+    return sys::ReturnCodes::Success;
+}
+
+sys::ReturnCodes ContactHelper::requestCount(Context &context)
+{
+    auto query = std::make_unique<db::query::ContactGetSize>();
+
+    auto listener = std::make_unique<db::EndpointListener>(
+        [](db::QueryResult *result, Context context) {
+            if (auto contactResult = dynamic_cast<db::query::RecordsSizeQueryResult *>(result)) {
+
+                auto count = contactResult->getSize();
+
+                context.setResponseBody(json11::Json::object({{json::contacts::count, static_cast<int>(count)}}));
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+                return true;
+            }
+            else {
+                return false;
+            }
+        },
+        context);
 
     query->setQueryListener(std::move(listener));
 
@@ -93,10 +122,6 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 
 auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    LOG_DEBUG("Creating %s %s ...",
-              context.getBody()[json::contacts::primaryName].string_value().c_str(),
-              context.getBody()[json::contacts::alternativeName].string_value().c_str());
-
     auto newRecord = from_json(context.getBody());
     if (newRecord.numbers.empty()) {
         LOG_ERROR("Empty number, not added!");
@@ -106,10 +131,12 @@ auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
     auto query = std::make_unique<db::query::ContactAdd>(newRecord);
 
     auto listener = std::make_unique<db::EndpointListener>(
-        [](db::QueryResult *result, uint32_t uuid) {
+        [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactAddResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    contactResult->getResult(), static_cast<int>(EndpointType::contacts), uuid, json11::Json()));
+
+                context.setResponseStatus(contactResult->getResult() ? http::Code::OK
+                                                                     : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
 
                 return true;
             }
@@ -117,7 +144,7 @@ auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
 
@@ -131,11 +158,12 @@ auto ContactHelper::requestContactByID(Context &context) -> sys::ReturnCodes
     auto query = std::make_unique<db::query::ContactGetByID>(id);
 
     auto listener = std::make_unique<db::EndpointListener>(
-        [](db::QueryResult *result, uint32_t uuid) {
+        [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactGetByIDResult *>(result)) {
                 auto record = ContactHelper::to_json(contactResult->getResult());
-                MessageHandler::putToSendQueue(
-                    Endpoint::createSimpleResponse(true, static_cast<int>(EndpointType::contacts), uuid, record));
+
+                context.setResponseBody(record);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
 
                 return true;
             }
@@ -143,7 +171,7 @@ auto ContactHelper::requestContactByID(Context &context) -> sys::ReturnCodes
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
 
@@ -157,10 +185,12 @@ auto ContactHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
     auto query   = std::make_unique<db::query::ContactUpdate>(contact);
 
     auto listener = std::make_unique<db::EndpointListener>(
-        [](db::QueryResult *result, uint32_t uuid) {
+        [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactUpdateResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    contactResult->getResult(), static_cast<int>(EndpointType::contacts), uuid, json11::Json()));
+
+                context.setResponseStatus(contactResult->getResult() ? http::Code::OK
+                                                                     : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
 
                 return true;
             }
@@ -168,11 +198,10 @@ auto ContactHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
     DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
-    LOG_DEBUG("Query done");
 
     return sys::ReturnCodes::Success;
 }
@@ -183,10 +212,12 @@ auto ContactHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
     auto query = std::make_unique<db::query::ContactRemove>(id);
 
     auto listener = std::make_unique<db::EndpointListener>(
-        [](db::QueryResult *result, uint32_t uuid) {
+        [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactRemoveResult *>(result)) {
-                MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-                    contactResult->getResult(), static_cast<int>(EndpointType::contacts), uuid, json11::Json()));
+
+                context.setResponseStatus(contactResult->getResult() ? http::Code::OK
+                                                                     : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
 
                 return true;
             }
@@ -194,7 +225,7 @@ auto ContactHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
                 return false;
             }
         },
-        context.getUuid());
+        context);
 
     query->setQueryListener(std::move(listener));
 

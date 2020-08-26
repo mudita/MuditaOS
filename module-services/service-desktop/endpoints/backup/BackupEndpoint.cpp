@@ -5,7 +5,7 @@
 
 static bool backupReady = false;
 
-auto BackupEndpoint::handle(Context &context) -> std::string
+auto BackupEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
     case http::Method::get:
@@ -17,12 +17,10 @@ auto BackupEndpoint::handle(Context &context) -> std::string
     case http::Method::put:
         [[fallthrough]];
     case http::Method::del:
-        MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-            sys::ReturnCodes::Failure, static_cast<int>(EndpointType::backup), context.getUuid(), json11::Json()));
+        context.setResponseStatus(http::Code::BadRequest);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
         break;
     }
-
-    return std::string();
 }
 auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
 {
@@ -33,14 +31,13 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
         sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
         backupReady = true;
 
-        responseBodyJson = json11::Json::object({{json::backupRequest, true}});
+        context.setResponseBody(json11::Json::object({{json::backupRequest, true}}));
     }
     else {
-        responseBodyJson = json11::Json::object({{json::backupRequest, false}});
+        context.setResponseBody(json11::Json::object({{json::backupRequest, false}}));
     }
 
-    MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-        true, static_cast<int>(EndpointType::backup), context.getUuid(), responseBodyJson));
+    MessageHandler::putToSendQueue(context.createSimpleResponse());
 
     return sys::ReturnCodes::Success;
 }
@@ -54,18 +51,17 @@ auto BackupEndpoint::upload(Context &context) -> sys::ReturnCodes
     }
     else if (context.getBody()[json::backupUpload] == true) {
         if (vfs.fileExists(purefs::dir::os_backup.c_str())) {
-            responseBodyJson = json11::Json::object({{json::backupUpload, true}});
+            context.setResponseBody(json11::Json::object({{json::backupUpload, true}}));
         }
         else {
-            responseBodyJson = json11::Json::object({{json::backupUpload, false}});
+            context.setResponseBody(json11::Json::object({{json::backupUpload, false}}));
         }
     }
     else {
-        responseBodyJson = json11::Json::object({{json::backupReady, false}});
+        context.setResponseBody(json11::Json::object({{json::backupReady, false}}));
     }
 
-    MessageHandler::putToSendQueue(Endpoint::createSimpleResponse(
-        true, static_cast<int>(EndpointType::backup), context.getUuid(), responseBodyJson));
+    MessageHandler::putToSendQueue(context.createSimpleResponse());
 
     return sys::ReturnCodes::Success;
 }
