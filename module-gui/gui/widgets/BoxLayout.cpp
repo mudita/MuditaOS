@@ -188,11 +188,17 @@ namespace gui
                 axisItemSize = el->area(Area::Min).size(axis);
             }
 
-            orthogonalItemSize =
-                std::min(this->area(Area::Normal).size(orthogonal(axis)),
-                         el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
-                             ? el->area(Area::Max).size(orthogonal(axis))
-                             : el->area(Area::Min).size(orthogonal(axis)));
+            Length maxOrthogonalItemInParentSize =
+                this->area(Area::Normal).size(orthogonal(axis)) <= el->getMargins().getSumInAxis(orthogonal(axis))
+                    ? 0
+                    : this->area(Area::Normal).size(orthogonal(axis)) - el->getMargins().getSumInAxis(orthogonal(axis));
+
+            Length maxOrthogonalItemSize =
+                el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
+                    ? el->area(Area::Max).size(orthogonal(axis))
+                    : el->area(Area::Min).size(orthogonal(axis));
+
+            orthogonalItemSize = std::min(maxOrthogonalItemInParentSize, maxOrthogonalItemSize);
 
             // Check if there is still position left
             if (axisItemSize <= pos_left) {

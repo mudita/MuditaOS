@@ -296,7 +296,7 @@ namespace gui
 
         uint16_t timeLabelSpacerWidth = widthAvailable - timeLabel->getWidth();
 
-        timeLabel->setPadding(Margins(timeLabelSpacerWidth, 0, timeLabelSpacerWidth, 0));
+        timeLabel->setMargins(Margins(timeLabelSpacerWidth, 0, timeLabelSpacerWidth, 0));
         layout->addWidget(timeLabel);
 
         layout->focusChangedCallback = [=](gui::Item &item) {
