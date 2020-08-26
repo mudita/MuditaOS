@@ -15,7 +15,7 @@ namespace phonebookUtils
         utils::findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", contact.speeddial);
     }
 
-    auto formatVCard(const ContactRecord &contact) -> const std::string
+    auto formatVCard(const ContactRecord &contact) -> const UTF8
     {
         const std::string priNumber = (contact.numbers.size() > 0) ? contact.numbers[0].number.getE164().c_str() : "";
         const std::string secNumber = (contact.numbers.size() > 1) ? contact.numbers[1].number.getE164().c_str() : "";
