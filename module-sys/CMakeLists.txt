@@ -22,7 +22,7 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} ${LINKING_MODE} ${SOURCES} ${BOARD_SOURCES})
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os)

@@ -12,7 +12,7 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} ${LINKING_MODE} STATIC ${BOARD_SOURCES})
 
 add_subdirectory( service-gui )
 add_subdirectory( service-eink )
@@ -26,6 +26,7 @@ add_subdirectory( service-fota )
 add_subdirectory( service-antenna )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db module-cellular module-audio  ${TARGET_LIBRARIES} )
+#target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-db module-cellular module-audio  ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

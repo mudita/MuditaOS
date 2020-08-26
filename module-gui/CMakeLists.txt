@@ -12,7 +12,7 @@ else()
 endif()
 
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} ${LINKING_MODE} ${SOURCES} ${BOARD_SOURCES})
 include(gui/CMakeLists.txt)
 include(gui/core/CMakeLists.txt)
 include(gui/widgets/CMakeLists.txt)

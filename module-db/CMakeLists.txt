@@ -86,7 +86,7 @@ else()
     include(targets/Target_Linux.cmake)
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} ${LINKING_MODE} ${SOURCES} ${BOARD_SOURCES})
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

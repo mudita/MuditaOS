@@ -36,7 +36,7 @@ else()
 endif()
 
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} ${LINKING_MODE} ${SOURCES} ${BOARD_SOURCES})
 
 
 # Board specific compilation definitions,options,include directories and features
