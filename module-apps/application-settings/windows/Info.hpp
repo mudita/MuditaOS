@@ -23,19 +23,15 @@ namespace gui
       protected:
         VBox *box;
 
-        gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
-
       public:
         Info(app::Application *app);
 
         // virtual methods
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        void set_navigation();
 
       private:
-        void addAllignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText);
+        void addAlignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText);
     };
 } // namespace gui
