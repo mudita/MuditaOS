@@ -59,7 +59,7 @@ namespace app
         const char *musicFolder = USER_PATH("music");
         std::vector<std::string> musicFiles;
         LOG_INFO("Scanning music folder: %s", musicFolder);
-        auto dirList = vfs.listdir(musicFolder, ".wav");
+        auto dirList = vfs.listdir(musicFolder, "");
 
         for (vfs::DirectoryEntry ent : dirList) {
             if (ent.attributes != vfs::FileAttributes::Directory) {

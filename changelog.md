@@ -5,12 +5,14 @@
 ### Added
 
 * `[phonebook]` Forwarding VCard via SMS.
+* `[music player]` Added support for playing mp3 and flac files.
 
 ### Changed
 
 ### Fixed
 
-* `[phonebook]` Contact details BottomBar call/send handling. 
+* `[phonebook]` Contact details BottomBar call/send handling.
+* `[audio]` Fixed playback of mp3 files
 
 ## [0.34.2 - 2020-08-21]
 
@@ -22,7 +24,7 @@
 
 * `[audio]` Fixed audio buffers handling to eliminate sending uninitialized data and making loud noise on start of a call.
 * `[phonebook]` Fix duplicated contact detection on contact update.
-* `[phonebook]` Change name of duplicate speed dial icon. 
+* `[phonebook]` Change name of duplicate speed dial icon.
 * `[label]` Fixed label padding usage.
 
 ## [0.34.1 - 2020-08-19]
