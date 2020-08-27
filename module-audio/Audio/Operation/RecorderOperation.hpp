@@ -20,7 +20,8 @@ namespace audio
     class RecorderOperation : public Operation
     {
       public:
-        RecorderOperation(const char *file);
+        RecorderOperation(const char *file,
+                          std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback);
 
         audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) override final;
 

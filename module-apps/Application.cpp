@@ -492,12 +492,13 @@ namespace app
         acceptInput = true;
     }
 
-    bool Application::adjustCurrentVolume(const audio::Volume step)
+    bool Application::adjustCurrentVolume(const int step)
     {
         audio::Volume vol;
         auto ret = AudioServiceAPI::GetOutputVolume(this, vol);
-        if (ret == audio::RetCode::Success && vol != audio::invalidVolume) {
-            ret = AudioServiceAPI::SetOutputVolume(this, vol + step);
+        if (ret == audio::RetCode::Success) {
+            ret = ((static_cast<int>(vol) + step) < 0) ? audio::RetCode::Success
+                                                       : AudioServiceAPI::SetOutputVolume(this, vol + step);
         }
         return ret == audio::RetCode::Success;
     }

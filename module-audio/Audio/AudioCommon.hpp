@@ -1,19 +1,36 @@
 #pragma once
 
+#include <map>
+
+#include "Profiles/Profile.hpp"
 #include "bsp_audio.hpp"
 
 namespace audio
 {
     using Position = float;
-    using Volume   = float;
-    using Gain     = float;
+    using Volume   = uint32_t;
+    using Gain     = uint32_t;
 
-    constexpr Volume defaultVolumeStep = 0.1;
-    constexpr Gain defaultGainStep     = 1.0;
-    constexpr Volume invalidVolume     = -1.0;
-    constexpr Gain invalidGain         = -1.0;
-    constexpr Volume defaultVolume     = 0.5;
-    constexpr Gain defaultGain         = 0.5;
+    constexpr Volume defaultVolumeStep = 1;
+    constexpr Gain defaultGainStep     = 10;
+    constexpr Volume defaultVolume     = 5;
+    constexpr Gain defaultGain         = 5;
+
+    constexpr Volume maxVolume = 10;
+    constexpr Volume minVolume = 0;
+
+    constexpr Gain maxGain = 100;
+    constexpr Gain minGain = 0;
+
+    constexpr uint32_t audioOperationTimeout = 1000;
+
+    enum class ProfileSetup
+    {
+        Volume,
+        Gain
+    };
+
+    [[nodiscard]] const std::string str(const Profile::Type &type, const ProfileSetup &setup);
 
     enum class RetCode
     {

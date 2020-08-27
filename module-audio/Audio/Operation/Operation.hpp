@@ -11,7 +11,6 @@
 
 namespace audio
 {
-
     class EventData
     {
       public:
@@ -73,7 +72,10 @@ namespace audio
 
         virtual ~Operation() = default;
 
-        static std::optional<std::unique_ptr<Operation>> Create(const Type &t, const char *fileName);
+        static std::optional<std::unique_ptr<Operation>> Create(
+            Type t,
+            const char *fileName                                                                      = "",
+            std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
         virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
@@ -91,22 +93,22 @@ namespace audio
 
         virtual Position GetPosition() = 0;
 
-        Volume GetOutputVolume()
+        Volume GetOutputVolume() const
         {
-            return currentProfile != nullptr ? currentProfile->GetOutputVolume() : invalidVolume;
+            return (currentProfile != nullptr) ? currentProfile->GetOutputVolume() : Volume{};
         }
 
-        Gain GetInputGain()
+        Gain GetInputGain() const
         {
-            return currentProfile != nullptr ? currentProfile->GetInputGain() : invalidGain;
+            return currentProfile->GetInputGain();
         }
 
-        State GetState()
+        State GetState() const
         {
             return state;
         }
 
-        const Profile *GetProfile()
+        const Profile *GetProfile() const
         {
             return currentProfile;
         }

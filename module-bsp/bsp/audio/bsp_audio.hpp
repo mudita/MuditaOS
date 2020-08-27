@@ -57,9 +57,9 @@ namespace bsp {
         };
 
         using Format = struct {
-            uint32_t sampleRate_Hz;   /*!< Sample rate of audio data */
-            uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
-            uint32_t flags;             /*!< In/Out configuration flags */
+            uint32_t sampleRate_Hz{};   /*!< Sample rate of audio data */
+            uint32_t bitWidth{};        /*!< Data length of audio data, usually 8/16/24/32 bits */
+            uint32_t flags{};             /*!< In/Out configuration flags */
             float outputVolume=0.0;
             float inputGain=0.0;
             InputPath inputPath=InputPath ::None;

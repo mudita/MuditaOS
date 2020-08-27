@@ -111,13 +111,13 @@ namespace audio
             return name;
         }
 
-        Type GetType()
+        Type GetType() const
         {
             return type;
         }
 
       protected:
-        bsp::AudioDevice::Format audioFormat;
+        bsp::AudioDevice::Format audioFormat{};
         bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
 
         std::string name;
@@ -126,4 +126,5 @@ namespace audio
         std::function<int32_t()> dbAccessCallback = nullptr;
     };
 
+    [[nodiscard]] const std::string str(const Profile::Type &profileType);
 } // namespace audio
