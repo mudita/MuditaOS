@@ -9,6 +9,7 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Bus.hpp"
+#include "Interface/SettingsRecord_v2.hpp"
 
 #include <Common/Query.hpp>
 #include <PhoneNumber.hpp>
