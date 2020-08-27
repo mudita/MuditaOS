@@ -32,3 +32,7 @@
 [submodule "module-utils/date"]
 	path = module-utils/date
 	url = git@github.com:muditacom/date.git
+[submodule "module-audio/Audio/decoder/minimp3"]
+	path = module-audio/Audio/decoder/minimp3
+	url = git@github.com:mudita/minimp3.git
+    branch = RT1051
