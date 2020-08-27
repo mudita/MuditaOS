@@ -100,6 +100,8 @@ set(SOURCES
         queries/calendar/QueryEventsGetFiltered.hpp
         queries/calendar/QueryEventsGetFiltered.cpp
         queries/settings/QuerySettingsGet_v2.cpp
+        queries/settings/QuerySettingsUpdate_v2.cpp
+        queries/settings/QuerySettingsAddOrIgnore_v2.cpp
 )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

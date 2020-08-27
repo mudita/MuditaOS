@@ -16,7 +16,9 @@ namespace audio
 
 #define PERF_STATS_ON 0
 
-    PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr)
+    PlaybackOperation::PlaybackOperation(
+        const char *file, std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
+        : dec(nullptr)
     {
 
         audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
@@ -37,11 +39,20 @@ namespace audio
             return ret;
         };
 
-        // TODO:M.P should be fetched from DB
-        constexpr float defaultLaudSpeakerVolume = 1.0;
-        constexpr float defaultHeadphonesVolume  = 0.2;
-        availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, defaultLaudSpeakerVolume));
-        availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, defaultHeadphonesVolume));
+        constexpr audio::Volume defaultLoudspeakerVolume = 10;
+        constexpr audio::Volume defaultHeadphonesVolume  = 2;
+
+        const auto dbLoudspeakerVolumePath =
+            audio::str(audio::Profile::Type::PlaybackLoudspeaker, audio::ProfileSetup::Volume);
+        const auto loudspeakerVolume = dbCallback(dbLoudspeakerVolumePath, defaultLoudspeakerVolume);
+
+        const auto dbHeadphonesVolumePath =
+            audio::str(audio::Profile::Type::PlaybackHeadphones, audio::ProfileSetup::Volume);
+        const auto headphonesVolume = dbCallback(dbHeadphonesVolumePath, defaultHeadphonesVolume);
+
+        availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, loudspeakerVolume));
+        availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, headphonesVolume));
+
         currentProfile = availableProfiles[0].get();
 
         dec = decoder::Create(file);

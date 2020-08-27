@@ -6,11 +6,12 @@
 namespace audio
 {
 
-    Audio::Audio(std::function<int32_t(AudioEvents event)> asyncCallback)
-        : currentOperation(), asyncCallback(asyncCallback)
+    Audio::Audio(std::function<int32_t(AudioEvents event)> asyncCallback,
+                 std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
+        : currentOperation(), asyncCallback(asyncCallback), dbCallback(dbCallback)
     {
 
-        auto ret = Operation::Create(Operation::Type::Idle, "");
+        auto ret = Operation::Create(Operation::Type::Idle, "", dbCallback);
         if (ret) {
             currentOperation = std::move(ret.value());
         }
@@ -51,11 +52,11 @@ namespace audio
     audio::RetCode Audio::SetOutputVolume(Volume vol)
     {
         auto volToSet = vol;
-        if (vol > 1) {
-            volToSet = 1;
+        if (vol > maxVolume) {
+            volToSet = maxVolume;
         }
-        if (vol < 0) {
-            volToSet = 0;
+        if (vol < minVolume) {
+            volToSet = minVolume;
         }
 
         return currentOperation->SetOutputVolume(volToSet);
@@ -64,11 +65,11 @@ namespace audio
     audio::RetCode Audio::SetInputGain(Gain gain)
     {
         auto gainToSet = gain;
-        if (gain > 10) {
-            gainToSet = 10.0;
+        if (gain > maxGain) {
+            gainToSet = maxGain;
         }
-        if (gain < 0) {
-            gainToSet = 0;
+        if (gain < minGain) {
+            gainToSet = minGain;
         }
         return currentOperation->SetInputGain(gainToSet);
     }
@@ -76,7 +77,7 @@ namespace audio
     audio::RetCode Audio::Start(Operation::Type op, const char *fileName)
     {
 
-        auto ret = Operation::Create(op, fileName);
+        auto ret = Operation::Create(op, fileName, dbCallback);
         if (ret) {
 
             switch (op) {
@@ -101,7 +102,7 @@ namespace audio
         else {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
             LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
-            currentOperation = Operation::Create(Operation::Type::Idle, "").value_or(nullptr);
+            currentOperation = Operation::Create(Operation::Type::Idle).value_or(nullptr);
             currentState     = State ::Idle;
             return RetCode::OperationCreateFailed;
         }
@@ -120,7 +121,7 @@ namespace audio
             LOG_ERROR("Operation STOP failure: %s", audio::c_str(retStop));
         }
 
-        auto ret = Operation::Create(Operation::Type::Idle, "");
+        auto ret = Operation::Create(Operation::Type::Idle);
         if (ret) {
             currentState     = State::Idle;
             currentOperation = std::move(ret.value());
