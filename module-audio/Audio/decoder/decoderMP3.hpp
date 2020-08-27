@@ -10,7 +10,7 @@
 #ifndef UNTITLED1_DECODERMP3_HPP
 #define UNTITLED1_DECODERMP3_HPP
 
-#include "minimp3.h"
+#include "minimp3/minimp3.h"
 
 #include <cstring>
 #include "decoder.hpp"
