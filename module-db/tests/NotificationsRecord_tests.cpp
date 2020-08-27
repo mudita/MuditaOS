@@ -29,7 +29,7 @@ TEST_CASE("Notifications Record tests")
     SECTION("Default Constructor")
     {
         NotificationsRecord testRec;
-        REQUIRE_FALSE(testRec.isValidRecord());
+        REQUIRE_FALSE(testRec.isValid());
         REQUIRE(testRec.ID == DB_ID_NONE);
         REQUIRE(testRec.key == NotificationsRecord::Key::NotValidKey);
         REQUIRE(testRec.value == 0);
@@ -41,7 +41,7 @@ TEST_CASE("Notifications Record tests")
             {.ID = 10}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 2};
 
         NotificationsRecord testRec(tableRow);
-        REQUIRE(testRec.isValidRecord());
+        REQUIRE(testRec.isValid());
         REQUIRE(testRec.ID == 10);
         REQUIRE(testRec.key == NotificationsRecord::Key::Calls);
         REQUIRE(testRec.value == 2);
@@ -56,13 +56,13 @@ TEST_CASE("Notifications Record tests")
     SECTION("Get entry by ID")
     {
         auto callsNotifications = notificationsRecordInterface.GetByID(1);
-        REQUIRE(callsNotifications.isValidRecord());
+        REQUIRE(callsNotifications.isValid());
         REQUIRE(callsNotifications.ID == 1);
         REQUIRE(callsNotifications.key == NotificationsRecord::Key::Calls);
         REQUIRE(callsNotifications.value == 0);
 
         auto smsNotifications = notificationsRecordInterface.GetByID(2);
-        REQUIRE(smsNotifications.isValidRecord());
+        REQUIRE(smsNotifications.isValid());
         REQUIRE(smsNotifications.ID == 2);
         REQUIRE(smsNotifications.key == NotificationsRecord::Key::Sms);
         REQUIRE(smsNotifications.value == 0);
@@ -71,13 +71,13 @@ TEST_CASE("Notifications Record tests")
     SECTION("Get entry by key")
     {
         auto callsNotifications = notificationsRecordInterface.GetByKey(NotificationsRecord::Key::Calls);
-        REQUIRE(callsNotifications.isValidRecord());
+        REQUIRE(callsNotifications.isValid());
         REQUIRE(callsNotifications.ID == 1);
         REQUIRE(callsNotifications.key == NotificationsRecord::Key::Calls);
         REQUIRE(callsNotifications.value == 0);
 
         auto smsNotifications = notificationsRecordInterface.GetByKey(NotificationsRecord::Key::Sms);
-        REQUIRE(smsNotifications.isValidRecord());
+        REQUIRE(smsNotifications.isValid());
         REQUIRE(smsNotifications.ID == 2);
         REQUIRE(smsNotifications.key == NotificationsRecord::Key::Sms);
         REQUIRE(smsNotifications.value == 0);
@@ -86,7 +86,7 @@ TEST_CASE("Notifications Record tests")
     SECTION("Get entry - invalid ID")
     {
         auto entry = notificationsRecordInterface.GetByID(100);
-        REQUIRE_FALSE(entry.isValidRecord());
+        REQUIRE_FALSE(entry.isValid());
         REQUIRE(entry.ID == DB_ID_NONE);
         REQUIRE(entry.key == NotificationsRecord::Key::NotValidKey);
         REQUIRE(entry.value == 0);
@@ -95,13 +95,13 @@ TEST_CASE("Notifications Record tests")
     SECTION("Get entry by invalid key")
     {
         auto callsNotifications = notificationsRecordInterface.GetByKey(NotificationsRecord::Key::NotValidKey);
-        REQUIRE_FALSE(callsNotifications.isValidRecord());
+        REQUIRE_FALSE(callsNotifications.isValid());
         REQUIRE(callsNotifications.ID == DB_ID_NONE);
         REQUIRE(callsNotifications.key == NotificationsRecord::Key::NotValidKey);
         REQUIRE(callsNotifications.value == 0);
 
         auto smsNotifications = notificationsRecordInterface.GetByKey(NotificationsRecord::Key::NumberOfKeys);
-        REQUIRE_FALSE(smsNotifications.isValidRecord());
+        REQUIRE_FALSE(smsNotifications.isValid());
         REQUIRE(smsNotifications.ID == DB_ID_NONE);
         REQUIRE(smsNotifications.key == NotificationsRecord::Key::NotValidKey);
         REQUIRE(smsNotifications.value == 0);

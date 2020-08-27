@@ -295,6 +295,7 @@
 * `[phonebook]` Add duplicated contact and speed dial numbers handling.
 * `[phonebook]` Add confirmation windows after deleting/blocking contact.
 * `[sms]` Add thread message status indicators: read/unread and last thread message (Not sent, You, Draft).
+* `[database]` Add new settings table in database.
 
 ### Fixed
 
