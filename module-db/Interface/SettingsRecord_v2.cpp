@@ -1,5 +1,7 @@
 #include "SettingsRecord_v2.hpp"
 #include "module-db/queries/settings/QuerySettingsGet_v2.hpp"
+#include "module-db/queries/settings/QuerySettingsUpdate_v2.hpp"
+#include "module-db/queries/settings/QuerySettingsAddOrIgnore_v2.hpp"
 #include <sstream>
 #include <cassert>
 
@@ -57,12 +59,37 @@ bool SettingsRecordInterface_v2::Update(const SettingsRecord_v2 &recUpdated)
         {.ID = recCurrent.ID}, .path = recUpdated.getPath(), .value = recUpdated.getValue<std::string>()});
 }
 
+bool SettingsRecordInterface_v2::Update(const std::string &path, const std::string &value) noexcept
+{
+    auto recCurrent = GetByPath(path);
+    if (!recCurrent.isValid()) {
+        return false;
+    }
+
+    return settingsDB->settings_v2.update(
+        SettingsTableRow_v2{{.ID = recCurrent.ID}, .path = recCurrent.getPath(), .value = value});
+}
+
 std::unique_ptr<db::QueryResult> SettingsRecordInterface_v2::runQuery(std::shared_ptr<db::Query> query)
 {
-    auto settingsQuery = dynamic_cast<db::query::settings::SettingsQuery *>(query.get());
-    assert(settingsQuery);
-    auto value = GetByPath(settingsQuery->getPath());
-    return std::make_unique<db::query::settings::SettingsResult>(value);
+    if (auto settingsQuery = dynamic_cast<db::query::settings::SettingsQuery *>(query.get())) {
+        auto value = GetByPath(settingsQuery->getPath());
+        return std::make_unique<db::query::settings::SettingsResult>(value);
+    }
+
+    if (auto updateQuery = dynamic_cast<db::query::settings::UpdateQuery *>(query.get())) {
+        auto updatedRec = updateQuery->getRecord();
+        auto value      = Update(updatedRec.getPath(), updatedRec.getValue<std::string>());
+        return std::make_unique<db::query::settings::UpdateResult>(value);
+    }
+
+    if (auto addOrIgnoreQuery = dynamic_cast<db::query::settings::AddOrIgnoreQuery *>(query.get())) {
+        auto record = addOrIgnoreQuery->getRecord();
+        auto value  = Add(record);
+        return std::make_unique<db::query::settings::AddOrIgnoreResult>(value);
+    }
+
+    return nullptr;
 }
 
 std::unique_ptr<db::query::settings::SettingsResult> SettingsRecordInterface_v2::runQueryImpl(

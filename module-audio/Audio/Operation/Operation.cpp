@@ -12,8 +12,10 @@
 
 namespace audio
 {
-
-    std::optional<std::unique_ptr<Operation>> Operation::Create(const Operation::Type &t, const char *fileName)
+    std::optional<std::unique_ptr<Operation>> Operation::Create(
+        Operation::Type t,
+        const char *fileName,
+        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
     {
         std::unique_ptr<Operation> inst;
 
@@ -22,13 +24,13 @@ namespace audio
             inst = std::make_unique<IdleOperation>(fileName);
             break;
         case Type::Playback:
-            inst = std::make_unique<PlaybackOperation>(fileName);
+            inst = std::make_unique<PlaybackOperation>(fileName, dbCallback);
             break;
         case Type::Router:
-            inst = std::make_unique<RouterOperation>(fileName);
+            inst = std::make_unique<RouterOperation>(fileName, dbCallback);
             break;
         case Type::Recorder:
-            inst = std::make_unique<RecorderOperation>(fileName);
+            inst = std::make_unique<RecorderOperation>(fileName, dbCallback);
             break;
         }
 

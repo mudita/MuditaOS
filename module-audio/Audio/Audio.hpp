@@ -22,7 +22,8 @@ namespace audio
             Routing,
         };
 
-        Audio(std::function<int32_t(AudioEvents event)> asyncCallback);
+        Audio(std::function<int32_t(AudioEvents event)> asyncCallback,
+              std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback);
 
         // Events
         audio::RetCode SendEvent(const Operation::Event evt, const EventData *data = nullptr);
@@ -53,6 +54,11 @@ namespace audio
             return currentOperation->GetInputGain();
         }
 
+        const Operation *GetCurrentOperation() const
+        {
+            return currentOperation.get();
+        }
+
         // TODO:M.P Set/Get inputGain/outputVolume for each profile
 
         // Operations
@@ -70,6 +76,7 @@ namespace audio
         std::unique_ptr<Operation> currentOperation;
 
         std::function<int32_t(AudioEvents event)> asyncCallback = nullptr;
+        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr;
     };
 
 } // namespace audio
