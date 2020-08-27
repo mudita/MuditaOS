@@ -43,6 +43,7 @@ set(SOURCES
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
         Tables/EventsTable.cpp
+        Tables/SettingsTable_v2.cpp
 
         Interface/Record.cpp
         Interface/SMSRecord.cpp
@@ -55,6 +56,7 @@ set(SOURCES
         Interface/SMSTemplateRecord.cpp
         Interface/NotificationsRecord.cpp
         Interface/EventsRecord.cpp
+        Interface/SettingsRecord_v2.cpp
 
         queries/RecordQuery.cpp
         queries/sms/QuerySMSSearch.cpp
@@ -78,7 +80,8 @@ set(SOURCES
         queries/calendar/QueryEventsEdit.cpp
         queries/calendar/QueryEventsGetFiltered.hpp
         queries/calendar/QueryEventsGetFiltered.cpp
-        )
+        queries/settings/QuerySettingsGet_v2.cpp
+)
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
