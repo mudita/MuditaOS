@@ -1,18 +1,23 @@
 # Mudita PurePhone changelog
 
-## [Current Release]
+## [0.35.1 2020-08-28]
 
 ### Added
-* `[desktop]` Automatic confirmation of unlock pin if one is correct.
+
 * `[phonebook]` Forwarding VCard via SMS.
+* `[phonebook]` Show block icon next to blocked contact name on contact list.
+* `[phonebook]` Contact details in bottom bar on call/send.
 * `[music player]` Added support for playing mp3 and flac files.
 
 ### Changed
 
+* `[desktop]` Automatic confirmation of unlock pin if correct.
+
 ### Fixed
 
-* `[phonebook]` Contact details BottomBar call/send handling.
-* `[audio]` Fixed playback of mp3 files
+* `[audio]` Fixed playback of mp3 files.
+* `[gui]` Fixed label padding handling.
+* `[settings]` Fixed settings info.
 
 ## [0.34.2 - 2020-08-21]
 
@@ -24,8 +29,6 @@
 
 * `[audio]` Fixed audio buffers handling to eliminate sending uninitialized data and making loud noise on start of a call.
 * `[phonebook]` Fix duplicated contact detection on contact update.
-* `[phonebook]` Change name of duplicate speed dial icon.
-* `[label]` Fixed label padding usage.
 
 ## [0.34.1 - 2020-08-19]
 
@@ -54,7 +57,6 @@
 
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
 * `[calendar]` database structure
-* `[phonebook]` Show block icon next to blocked contact name on contact list.
 
 ### Changed
 
