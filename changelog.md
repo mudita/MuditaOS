@@ -1,5 +1,19 @@
 # Mudita PurePhone changelog
 
+## [Current Version]
+
+### Added
+
+
+
+### Changed
+
+
+
+### Fixed
+
+* `[messages]` Fixed crashing new message window
+
 ## [0.35.1 2020-08-28]
 
 ### Added
