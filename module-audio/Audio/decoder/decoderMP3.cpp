@@ -27,20 +27,15 @@ namespace audio
             return;
         }
 
-        mp3d = static_cast<mp3dec_t *>(malloc(sizeof(mp3dec_t)));
+        mp3d = std::make_unique<mp3dec_t>();
 
-        mp3dec_init(mp3d);
+        mp3dec_init(mp3d.get());
 
         if (!find_first_valid_frame()) {
             return;
         }
 
         isInitialized = true;
-    }
-
-    decoderMP3::~decoderMP3()
-    {
-        free(mp3d);
     }
 
     void decoderMP3::setPosition(float pos)
@@ -153,7 +148,7 @@ namespace audio
 
         while (1) {
 
-            uint32_t smpl = mp3dec_decode_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
+            uint32_t smpl = mp3dec_decode_frame(mp3d.get(), &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
             bufferIndex += info.frame_bytes;
             bytesAvailable -= info.frame_bytes;
 
@@ -218,7 +213,7 @@ namespace audio
 
         while (1) {
 
-            uint32_t smpl = mp3dec_decode_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
+            uint32_t smpl = mp3dec_decode_frame(mp3d.get(), &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
             bufferIndex += info.frame_bytes;
             bytesAvailable -= info.frame_bytes;
 
@@ -290,7 +285,7 @@ namespace audio
         while (1) {
             uint32_t smpl = 0;
             if (samplesFetched < samplesToReadChann) {
-                smpl = mp3dec_decode_frame(mp3d,
+                smpl = mp3dec_decode_frame(mp3d.get(),
                                            &decoderBuffer[decoderBufferIdx],
                                            bytesAvailable,
                                            (short *)&pcmsamplesbuffer[samplesFetched],

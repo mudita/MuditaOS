@@ -10,6 +10,8 @@
 #include "../../vfs.hpp"
 #include "ff_eMMC_user_disk.hpp"
 
+#include <memory>
+
 #define eMMCHIDDEN_SECTOR_COUNT 8
 #define eMMCPRIMARY_PARTITIONS  2
 #define eMMCHUNDRED_64_BIT      100ULL
@@ -138,19 +140,18 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 {
     std::vector<DirectoryEntry> dir_list;
 
-    FF_FindData_t *pxFindStruct;
     FileAttributes attribute;
 
     /* FF_FindData_t can be large, so it is best to allocate the structure
     dynamically, rather than declare it as a stack variable. */
-    pxFindStruct = (FF_FindData_t *)malloc(sizeof(FF_FindData_t));
+    auto pxFindStruct = std::make_unique<FF_FindData_t>();
 
     /* FF_FindData_t must be cleared to 0. */
-    memset(pxFindStruct, 0x00, sizeof(FF_FindData_t));
+    memset(pxFindStruct.get(), 0x00, sizeof(FF_FindData_t));
 
     /* The first parameter to ff_findfist() is the directory being searched.  Do
     not add wildcards to the end of the directory name. */
-    if (ff_findfirst(bypassRootCheck ? path : relativeToRoot(path).c_str(), pxFindStruct) == 0 &&
+    if (ff_findfirst(bypassRootCheck ? path : relativeToRoot(path).c_str(), pxFindStruct.get()) == 0 &&
         pxFindStruct != nullptr) {
         do {
             if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_HIDDEN) ||
@@ -177,11 +178,8 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
                     dir_list.push_back(DirectoryEntry{pxFindStruct->pcFileName, attribute, pxFindStruct->ulFileSize});
             }
 
-        } while (ff_findnext(pxFindStruct) == 0);
+        } while (ff_findnext(pxFindStruct.get()) == 0);
     }
-
-    /* Free the allocated FF_FindData_t structure. */
-    free(pxFindStruct);
 
     return dir_list;
 }
@@ -198,14 +196,10 @@ std::string vfs::getline(FILE *stream, uint32_t length)
 
     // allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add string's
     // null terminator.
-    char *buffer = (char *)malloc(length + 1);
+    std::unique_ptr<char[]> buffer(new char[length + 1]);
+    memset(buffer.get(), 0, length + 1);
 
-    if (buffer == NULL)
-        return std::string("");
-
-    memset(buffer, 0, length + 1);
-
-    uint32_t bytesRead = ff_fread(buffer, 1, length, stream);
+    uint32_t bytesRead = ff_fread(buffer.get(), 1, length, stream);
 
     // search buffer for /n sign
     for (uint32_t i = 0; i < bytesRead; ++i) {
@@ -216,8 +210,7 @@ std::string vfs::getline(FILE *stream, uint32_t length)
         }
     }
 
-    std::string ret = std::string(buffer);
-    free(buffer);
+    std::string ret = std::string(buffer.get());
 
     return ret;
 }

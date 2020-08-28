@@ -1,7 +1,3 @@
-/**
- * Project Untitled
- */
-
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "projdefs.h"
@@ -9,9 +5,10 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include <at/URC_QIND.hpp>
+#include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <cassert>
 #include <sstream>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <memory>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
@@ -483,25 +480,24 @@ void workerTaskFunction(void *ptr)
 ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout)
 {
     ssize_t ret         = -1;
-    static uint8_t *buf = nullptr;
-    buf                 = reinterpret_cast<uint8_t *>(malloc(startParams.MaxFrameSize));
+    std::unique_ptr<uint8_t[]> buf(new uint8_t[startParams.MaxFrameSize]);
     bool complete       = false;
     uint32_t _timeout   = timeout;
 
     while ((!complete) && (--_timeout)) {
-        ret = pv_cellular->Read(reinterpret_cast<void *>(buf), startParams.MaxFrameSize);
+        ret = pv_cellular->Read(reinterpret_cast<void *>(buf.get()), startParams.MaxFrameSize);
         if (ret > 0) {
             // LOG_DEBUG("Received %i bytes", ret);
-            for (int i = 0; i < ret; i++)
+            for (int i = 0; i < ret; i++) {
                 data.push_back(buf[i]);
+            }
             complete = TS0710_Frame::isComplete(data);
         }
         vTaskDelay(pdMS_TO_TICKS(1));
     }
-    if ((!complete) && (_timeout))
+    if ((!complete) && (_timeout)) {
         LOG_ERROR("Incomplete frame received");
-
-    free(buf);
+    }
 
     return ret;
 }
