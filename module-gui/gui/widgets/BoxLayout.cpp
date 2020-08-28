@@ -372,8 +372,40 @@ namespace gui
 
         Size granted = {std::min((*el)->area(Area::Max).w, request_w), std::min((*el)->area(Area::Max).h, request_h)};
 
+        if (axis == Axis::Y) {
+
+            //            LOG_INFO("O co to tutaj prosi %d", granted.get(Axis::Y));
+            //            LOG_INFO("hmm a masz co dać %d", sizeLeftWithoutElem<Axis::Y>(this, *el, Area::Min));
+            //            LOG_INFO("Co ja mam mu tutaj zwrocić %d, %d", granted.width, granted.height);
+            //            LOG_INFO("Rozmiar parenta %d, %d",widgetArea.w, widgetArea.h );
+
+            if (granted.get(Axis::Y) >= sizeLeftWithoutElem<Axis::Y>(this, *el, Area::Min)) {
+
+                //                (*el)->setMinimumHeight(granted.height);
+                granted = Size(granted.width, 0);
+                //                granted = Size(0, 0);
+            }
+        }
+
+        if (axis == Axis::X) {
+
+            //            LOG_INFO("O co to tutaj prosi %d", granted.get(Axis::X));
+            //            LOG_INFO("hmm a masz co dać %d", sizeLeftWithoutElem<Axis::X>(this, *el, Area::Min));
+            //            LOG_INFO("Co ja mam mu tutaj zwrocić %d, %d", granted.width, granted.height);
+            //            LOG_INFO("Rozmiar parenta %d, %d",widgetArea.w, widgetArea.h );
+
+            if (granted.get(Axis::X) >= sizeLeftWithoutElem<Axis::X>(this, *el, Area::Min)) {
+
+                granted = Size(0, granted.height);
+            }
+        }
+
+        //        LOG_INFO("Zmienia się rozmiar tego gówna prawda? %d, %d", (*el)->widgetArea.w, (*el)->widgetArea.h);
         sizeStore->store(*el, granted);
-        BoxLayout::resizeItems<axis>(); // vs mark dirty
+        resizeItems<axis>(); // vs mark dirty
+
+        //        LOG_INFO("Zmienia się rozmiar tego gówna prawda? %d, %d", (*el)->widgetArea.w, (*el)->widgetArea.h);
+
         return granted;
     }
 

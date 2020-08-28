@@ -79,63 +79,17 @@ namespace gui
             return;
         }
 
-        inputMessage = new SMSInputWidget(nullptr, application, utils::PhoneNumber::View());
+        inputMessage = new SMSInputWidget(body, application, std::move(contact));
 
-        //        text = new gui::Text(nullptr, 0, 0, 0, 0, "", ExpandMode::EXPAND_UP);
-        //        text->setMargins(Margins(0, style::window::messages::new_sms_vertical_spacer, 0, 0));
-        //        text->setMinimumSize(body->getWidth(), text->getHeight());
-        //        text->setMaximumSize(body->getWidth(), body->getHeight());
-        //        text->setInputMode(new InputMode(
-        //            {InputMode::ABC, InputMode::abc, InputMode::digit},
-        //            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-        //            [=]() { bottomBarRestoreFromTemporaryMode(); },
-        //            [=]() { selectSpecialCharacter(); }));
-        //        text->setBorderColor(ColorNoColor);
-        //        text->setPenFocusWidth(style::window::default_border_focus_w);
-        //        text->setPenWidth(style::window::default_border_focus_w);
-        //        text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        //        text->activatedCallback = [&](gui::Item &item) {
-        //            auto app = dynamic_cast<app::ApplicationMessages *>(application);
-        //            assert(app != nullptr);
-        //            if (app->handleSendSmsFromThread(contact->numbers[0].number, text->getText())) {
-        //                LOG_ERROR("handleSendSmsFromThread failed");
-        //            }
-        //            text->clear();
-        //            return true;
-        //        };
-        //        text->inputCallback = [=](Item &, const InputEvent &event) {
-        //            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
-        //                auto app = dynamic_cast<app::ApplicationMessages *>(application);
-        //                assert(app != nullptr);
-        //                return app->newMessageOptions(getName(), text);
-        //            }
-        //            return false;
-        //        };
-        //        text->focusChangedCallback = [=](Item &) -> bool {
-        //            if (text->focus) {
-        //                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("sms_reply"));
-        //
-        //                LOG_INFO("CO do kurwy %s", text->getText().getLine().c_str());
-        ////                LOG_INFO("CO do kurwy %d", utils::localize.get("sms_reply").strLength);
-        //
-        //                if (text->getText().getLine() == utils::localize.get("sms_reply")) {
-        //                    text->clear();
-        //                }
-        //            }
-        //            else {
-        //
-        //                if (text->isEmpty()) {
-        //
-        //                    auto format = TextFormat(Font(24).raw(), Color(7, 0));
-        //                    for (auto &el : textToTextBlocks(utils::localize.get("sms_reply"), format)) {
-        //                        text->addText(el);
-        //                    }
-        //                }
-        //            }
-        //
-        //            return true;
-        //        };
-        //        text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        inputMessage->activatedCallback = [&](gui::Item &item) {
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app != nullptr);
+            if (app->handleSendSmsFromThread(contact->numbers[0].number, inputMessage->inputText->getText())) {
+                LOG_ERROR("handleSendSmsFromThread failed");
+            }
+            inputMessage->inputText->clear();
+            return true;
+        };
     }
 
     void ThreadViewWindow::destroyTextItem()
@@ -259,7 +213,7 @@ namespace gui
         labelSpan->setMinimumWidth(elements_width);
         labelSpan->setMinimumHeight(smsBubble->getHeight());
         labelSpan->setMaximumHeight(smsBubble->widgetMaximumArea.h);
-        labelSpan->setFillColor(gui::Color(10, 0));
+        labelSpan->setFillColor(gui::Color(11, 0));
 
         LOG_DEBUG("ADD SMS TYPE: %d", static_cast<int>(el.type));
         switch (el.type) {
