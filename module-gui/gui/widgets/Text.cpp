@@ -308,7 +308,7 @@ namespace gui
         }
 
         uint32_t w           = sizeMinusPadding(Axis::X, Area::Max);
-        uint32_t h           = sizeMinusPadding(Axis::Y, Area::Max);
+        //        uint32_t h           = sizeMinusPadding(Axis::Y, Area::Normal);
         auto line_y_position = padding.top;
         auto cursor          = 0;
 
@@ -323,7 +323,11 @@ namespace gui
                 debug_text("cant show more text from this document");
                 break;
             }
-            if (line_y_position + text_line.height() > h) { // no more space for next line
+
+            //            LOG_INFO("Czyli to ty chuju psułeś %d, %d", h, area(Area::Normal).size(Axis::Y));
+            // Świetny ten bug był po prostu
+            if (line_y_position + text_line.height() >
+                area(Area::Normal).size(Axis::Y)) { // no more space for next line
                 debug_text("no more space for next text_line: %d + %" PRIu32 " > %" PRIu32,
                            line_y_position,
                            text_line.height(),
@@ -373,18 +377,30 @@ namespace gui
                     debug_text("epty line height: %d", h_used);
                 }
             }
+
             if (h_used != area(Area::Normal).size(Axis::Y) || w_used != area(Area::Normal).size(Axis::X)) {
                 debug_text("size request: %d %d", w_used, h_used);
                 auto [w, h] = requestSize(w_used, h_used);
-                LOG_INFO("size granted: {%" PRIu32 ", %" PRIu32 "}", w, h);
-                // if last wont fit lines.eraseLast();
-                // break;
+                //                LOG_INFO("a o co prosze? %d, %d", w_used, h_used);
+                //                LOG_INFO("size granted: {%" PRIu32 ", %" PRIu32 "}", w, h);
+
+                if (h < h_used) {
+                    LOG_INFO("Nie ma dla ciebie miejsca!!!");
+                    if (lines.last().length() != 0) {
+
+                        LOG_INFO("Ile jest tych lini %lu", lines.size());
+                    }
+                    // if last wont fit lines.eraseLast();
+                    // break;
+                }
             }
+
+            //            LOG_INFO("I co ten size sie zmienia %d", sizeMinusPadding(Axis::Y, Area::Normal));
+
+            lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+
+            debug_text("<- END\n");
         }
-
-        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
-
-        debug_text("<- END\n");
     }
 
     std::list<DrawCommand *> Text::buildDrawList()

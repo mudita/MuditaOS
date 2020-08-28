@@ -5,13 +5,14 @@
 #include <Style.hpp>
 #include <i18/i18.hpp>
 #include <Font.hpp>
+#include <utility>
 
 #include "TextParse.hpp"
 
 namespace gui
 {
 
-    SMSInputWidget::SMSInputWidget(Item *parent, app::Application *application, const utils::PhoneNumber::View &number)
+    SMSInputWidget::SMSInputWidget(Item *parent, app::Application *application, std::shared_ptr<ContactRecord> contact)
         : HBox(parent, 0, 0, 0, 0)
     {
 
@@ -28,16 +29,19 @@ namespace gui
         inputText->setPadding(Padding(0, 0, 0, style::messages::smsInput::bottom_padding));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_focus_w);
-        inputText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        inputText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
 
         replyImage = new Image(this, 0, 0, "messages_reply");
         replyImage->setAlignment(Alignment(gui::Alignment::Vertical::Bottom));
         replyImage->setMargins(Margins(0, 0, 0, style::messages::smsInput::reply_bottom_margin));
+        replyImage->activeItem = false;
 
-        //        inputText->activatedCallback = [&](gui::Item &item) {
+        // Nie kumam dlaczego to crushuje
+        //        inputText->activatedCallback = [=](gui::Item &item) {
         //            auto app = dynamic_cast<app::ApplicationMessages *>(application);
         //            assert(app != nullptr);
-        //            if (app->handleSendSmsFromThread(number, inputText->getText())) {
+        //            assert(contact != nullptr);
+        //            if (app->handleSendSmsFromThread(contact->numbers[0].number, inputText->getText())) {
         //                LOG_ERROR("handleSendSmsFromThread failed");
         //            }
         //            inputText->clear();
