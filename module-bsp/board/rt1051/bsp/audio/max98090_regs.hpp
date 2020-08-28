@@ -84,14 +84,6 @@ typedef struct
     uint8_t dalen : 1;
 } max98090_reg_outputenable_t;
 
-// Output enable register
-#define MAX98090_REG_DAC_HP_PERF 0x43
-typedef struct
-{
-    uint8_t dachp : 1;
-    uint8_t perfmode : 1;
-    uint8_t unused : 6;
-} max98090_reg_dac_hp_perf_t;
 
 // Microphone 1 enable and level configuration register
 #define MAX98090_REG_MIC1_ENABLE_LEVEL_CONF 0x10

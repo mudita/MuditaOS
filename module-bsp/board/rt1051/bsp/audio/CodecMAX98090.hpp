@@ -34,6 +34,7 @@ class CodecParamsMAX98090 : public CodecParams
         Invalid
     };
 
+        LoudspeakerMono,
     enum class MonoStereo
     {
         Mono,
