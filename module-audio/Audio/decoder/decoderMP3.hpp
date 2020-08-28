@@ -29,7 +29,7 @@ namespace audio
       public:
         decoderMP3(const char *fileName);
 
-        ~decoderMP3();
+        ~decoderMP3() = default;
 
         std::unique_ptr<Tags> fetchTags() override;
 
@@ -46,7 +46,7 @@ namespace audio
 
         const uint32_t DECODER_BUFFER_SIZE = 1024 * 24;
 
-        mp3dec_t *mp3d = nullptr;
+        std::unique_ptr<mp3dec_t> mp3d;
 
         std::unique_ptr<uint8_t[]> decoderBuffer = nullptr;
         uint32_t decoderBufferIdx                = 0;
