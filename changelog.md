@@ -1,18 +1,15 @@
 # Mudita PurePhone changelog
 
-## [Current Version]
-
-### Added
-
-
-
-### Changed
-
-
+## Current release
 
 ### Fixed
 
-* `[messages]` Fixed crashing new message window
+* `[messages]` Fixed crashing in the new message window.
+
+### Other
+
+* `[build]` Allow excluding applications from the build to decrease debug firmware size.
+* `[build]` Allow choosing which applications are optimized to decrease debug firmware size.
 
 ## [0.35.1 2020-08-28]
 

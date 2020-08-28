@@ -24,20 +24,53 @@ set( SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-add_subdirectory( application-clock )
-add_subdirectory( application-calendar )
-add_subdirectory( application-viewer )
-add_subdirectory( application-desktop )
-add_subdirectory( application-settings )
-add_subdirectory( application-call )
-add_subdirectory( application-notes )
-add_subdirectory( application-phonebook )
-add_subdirectory( application-messages )
-add_subdirectory( application-calllog )
-add_subdirectory( application-special-input )
-add_subdirectory( application-antenna )
-add_subdirectory( application-music-player )
+set(APPLICATIONS
+    clock
+    calendar
+    viewer
+    desktop
+    settings
+    call
+    notes
+    phonebook
+    messages
+    calllog
+    special-input
+    antenna
+    music-player
+)
 
+list(SORT APPLICATIONS)
+foreach(app IN LISTS APPLICATIONS)
+    string(TOUPPER ${app} app_upper)
+    string(REPLACE "-" "_" app_macro_name ${app_upper})
+    option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
+    
+    if(ENABLE_APP_${app_macro_name})
+        message("Enabling application: ${app}")
+        add_subdirectory( application-${app} )
+        list(APPEND ENABLED_APPS_DEFINES "ENABLE_APP_${app_macro_name}")
+    endif()
+endforeach()
+set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE)
+
+if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    set(OPTIMIZE_APPS_DEBUG_DEFAULT OFF)
+else()
+    set(OPTIMIZE_APPS_DEBUG_DEFAULT ON)
+endif()
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    foreach(app IN LISTS APPLICATIONS)
+        string(TOUPPER ${app} app_upper)
+        string(REPLACE "-" "_" app_macro_name ${app_upper})
+        option(OPTIMIZE_APP_${app_macro_name} "Optimize application in debug" ${OPTIMIZE_APPS_DEBUG_DEFAULT})
+        if (${OPTIMIZE_APP_${app_macro_name}} AND ${ENABLE_APP_${app_macro_name}})
+            get_target_property(APP_SOURCES ${PROJECT_NAME} SOURCES)
+            list(FILTER APP_SOURCES INCLUDE REGEX "/application-${app}/")
+            set_source_files_properties(${APP_SOURCES} PROPERTIES COMPILE_FLAGS "-Os")
+        endif ()
+    endforeach()
+endif()
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )
