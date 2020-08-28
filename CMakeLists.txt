@@ -36,7 +36,7 @@ add_custom_target(assets)
 
 # setting build flags
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG -Og")
+    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 
@@ -44,11 +44,11 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 else()
-    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -Og -DDEBUG")
+    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -Og -DDEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 
@@ -187,6 +187,8 @@ target_link_libraries(${PROJECT_NAME}
         ${TARGET_LIBRARIES}
         )
 
+
+set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
