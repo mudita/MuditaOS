@@ -9,7 +9,7 @@ else
   source ./config/common.sh
 fi
 
-VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{print $3}' | tr -d '\"'`
+VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{print $3}' | tr -d '\r' | tr -d '\"'`
 VERSION_CODENAME="salvador"
 print_help() {
 	echo "Usage: $0 [OPTION] [BUILD-DIR]"
@@ -93,7 +93,7 @@ sed -i 's/__VERSION_MAJOR__/'$PURE_OS_VERSION_MAJOR'/g' $vjson
 sed -i 's/__VERSION_MINOR__/'$PURE_OS_VERSION_MINOR'/g' $vjson
 sed -i 's/__VERSION_PATCH__/'$PURE_OS_VERSION_PATCH'/g' $vjson
 
-BUILD_HOST=`uname -r`
+BUILD_HOST=`uname -n`
 BUILD_USER=`whoami`
 BUILD_DATE=`date +'%F-%T'`
 

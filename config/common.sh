@@ -28,7 +28,7 @@ check_target_linux() {
     check_any_arch "${@}" '(GNU/Linux)'
 }
 
-PURE_OS_GIT_TAG=`git describe --tags | awk -F'-' '{print $2}'`
+PURE_OS_GIT_TAG=`git describe --tags | awk -F'-' '{print $1}'`
 PURE_OS_GIT_REV=`git log --pretty=format:'%h' -n 1`
 PURE_OS_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
