@@ -895,11 +895,11 @@ namespace gui
 
             // do not start drawing outside of draw context.
             if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0)) {
-                LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
+                LOG_FATAL("Drawing outside context's X boundary for glyph: %" PRIu32, glyph->id);
                 return;
             }
             if ((wgtY + posY >= drawCtx->getH()) || (wgtY + posY < 0)) {
-                LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
+                LOG_FATAL("Drawing outside context's Y boundary for glyph: %" PRIu32, glyph->id);
                 return;
             }
 
