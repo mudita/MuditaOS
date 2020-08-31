@@ -245,7 +245,9 @@ Following CMake options can be used:
  * `BUILD_DOC_WITH_ALL` - enable/disable building code documentation with the `all` target (disabled by default).
  * `ENABLE_TEST_LOGS` - enable/disable test log output (disabled by default).
  * `LINUX_ENABLE_SANITIZER` - enable/disable building with address sanitizer for Linux (enabled by default). This option is handy when you need to run the app with valgrind.
-* `THIRD_PARTY_DEBUG_OPTIMIZE` - enable/disable third party size optimization for debug build type (enabled by default)
+ * `THIRD_PARTY_DEBUG_OPTIMIZE` - enable/disable third party size optimization for debug build type (enabled by default)
+ * `ENABLE_APP_<app>` - enable building application `<app>` (enabled by default). `<app>` name must be consistent with module path, i.e. `module-apps/application-<app>/`.
+ * `OPTIMIZE_APP_<app>` - allow optimization of app `<app>` in debug build type (disabled by default for Linux platform, enabled for others).
 
 # Linux Bluetooth device
 

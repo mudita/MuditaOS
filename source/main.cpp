@@ -189,18 +189,42 @@ int main()
 
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
+#ifdef ENABLE_APP_VIEWER
         applications.push_back(app::CreateLauncher<app::ApplicationViewer>(app::name_viewer));
+#endif
+#ifdef ENABLE_APP_DESKTOP
         applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
+#endif
+#ifdef ENABLE_APP_CALL
         applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
+#endif
+#ifdef ENABLE_APP_SETTINGS
         applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
+#endif
+#ifdef ENABLE_APP_NOTES
         applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
+#endif
+#ifdef ENABLE_APP_CALLLOG
         applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
+#endif
+#ifdef ENABLE_APP_PHONEBOOK
         applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
+#endif
+#ifdef ENABLE_APP_MESSAGES
         applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
+#endif
+#ifdef ENABLE_APP_SPECIAL_INPUT
         applications.push_back(app::CreateLauncher<app::AppSpecialInput>(app::special_input, false));
+#endif
+#ifdef ENABLE_APP_ANTENNA
         applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
+#endif
+#ifdef ENABLE_APP_CALENDAR
         applications.push_back(app::CreateLauncher<app::ApplicationCalendar>(app::name_calendar));
+#endif
+#ifdef ENABLE_APP_MUSIC_PLAYER
         applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
+#endif
 
         // start application manager
         ret |= sysmgr->CreateService(

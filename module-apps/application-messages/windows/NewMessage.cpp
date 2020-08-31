@@ -29,7 +29,9 @@ namespace gui
 
     void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        data->ignoreCurrentWindowOnStack = true;
+        if (data == nullptr) {
+            return;
+        }
         if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
             LOG_INFO("received search results");
             recipient->setText(pdata->result->getFormattedName());
