@@ -2,6 +2,10 @@
 
 ## Current release
 
+### Added
+
+* `[fonts]` Added phone compatibility with emoticons.
+
 ### Fixed
 
 * `[messages]` Fixed crashing in the new message window.

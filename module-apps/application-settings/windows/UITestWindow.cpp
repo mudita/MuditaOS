@@ -33,9 +33,11 @@ namespace gui
         text->setFont(style::window::font::medium);
         text->addText(
             TextBlock("!#$%&'()*+,-.0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-                      "ĄąĆćĘęŁłŃńÓóŚśŹźŻżÀàÂâÇçÉéÈèÊêËëÎîÏïÔôÙûÛùÜüŸÿÄäÖöẞßÁáÍíÚúÑñ¿¡",
+                      "ĄąĆćĘęŁłŃńÓóŚśŹźŻżÀàÂâÇçÉéÈèÊêËëÎîÏïÔôÙûÛùÜüŸÿÄäÖößÁáÍíÚúÑñ¿¡",
                       Font(27).raw(),
                       TextBlock::End::None));
+        text->addText(
+            TextBlock("😁emoji😂emoji😃", Font("dejavu_sans", 27, Font::Weight::Bold).raw(), TextBlock::End::None));
         text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
         text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
         text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
