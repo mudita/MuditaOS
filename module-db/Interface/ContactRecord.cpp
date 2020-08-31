@@ -154,8 +154,18 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
                   static_cast<unsigned long>(readQuery->getLimit()));
         auto [limit, offset] = readQuery->getLimitOffset();
         auto matchType       = searchByNumber ? ContactsTable::MatchType::TextNumber : ContactsTable::MatchType::Name;
-        auto ids             = contactDB->contacts.GetIDsSortedByField(
-            matchType, readQuery->getFilterData(), favouritesGroupId, limit, offset);
+        uint32_t groupID     = readQuery->getGroupFilterData();
+        if (groupID != DB_ID_NONE) {
+            matchType = ContactsTable::MatchType::Group;
+        }
+        else
+            groupID = favouritesGroupId;
+        LOG_DEBUG("Contact match Type: %lu", static_cast<unsigned long int>(matchType));
+
+        auto ids =
+            contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
+
+        LOG_DEBUG("Received records: %lu", static_cast<unsigned long int>(ids.size()));
 
         std::vector<ContactRecord> result(ids.size());
         std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
@@ -170,7 +180,14 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
 
         std::size_t count = 0;
         if (!countQuery->isFilterPresent()) {
-            count = contactDB->contacts.count();
+            uint32_t groupID = countQuery->getGroupFilterData();
+            if (groupID != DB_ID_NONE) {
+                count = contactDB->contacts
+                            .GetIDsSortedByField(ContactsTable::MatchType::Group, countQuery->getFilterData(), groupID)
+                            .size();
+            }
+            else
+                count = contactDB->contacts.count();
         }
         else if (searchByNumber) {
             count = contactDB->contacts

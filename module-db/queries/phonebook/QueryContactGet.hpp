@@ -12,7 +12,7 @@ namespace db::query
      * @brief ContactRecord read query, filtered by text.
      *
      */
-    class ContactGet : public RecordQuery, public TextFilter
+    class ContactGet : public RecordQuery, public TextFilter, public ContactGroupFilter
     {
       public:
         /**
@@ -20,7 +20,7 @@ namespace db::query
          *
          * @param filter text filter
          */
-        ContactGet(const std::string &filter = "");
+        ContactGet(const std::string &filter = "", const std::uint32_t &groupFilter = 0);
 
         /**
          * @brief Construct read query with limit, offset and filter values
@@ -29,7 +29,10 @@ namespace db::query
          * @param offset read start offset
          * @param filter text to filter records
          */
-        ContactGet(std::size_t limit, std::size_t offset, const std::string &filter = "");
+        ContactGet(std::size_t limit,
+                   std::size_t offset,
+                   const std::string &filter        = "",
+                   const std::uint32_t &groupFilter = 0);
 
         /**
          * @brief debug info
@@ -66,7 +69,7 @@ namespace db::query
      * @brief A query to get a number of contacts filtered with a text
      *
      */
-    class ContactGetSize : public RecordsSizeQuery, public TextFilter
+    class ContactGetSize : public RecordsSizeQuery, public TextFilter, public ContactGroupFilter
     {
       public:
         /**
@@ -74,7 +77,7 @@ namespace db::query
          *
          * @param filter text to filter contacts with
          */
-        ContactGetSize(const std::string &filter = "");
+        ContactGetSize(const std::string &filter = "", const std::uint32_t &groupFilter = 0);
 
         /**
          * @brief debug info

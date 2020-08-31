@@ -5,6 +5,7 @@
 ### Added
 
 * `[fonts]` Added phone compatibility with emoticons.
+* `[phonebook]` ICE contacts window.
 
 ### Fixed
 
@@ -15,6 +16,8 @@
 
 * `[build]` Allow excluding applications from the build to decrease debug firmware size.
 * `[build]` Allow choosing which applications are optimized to decrease debug firmware size.
+
+
 
 ## [0.35.1 2020-08-28]
 
