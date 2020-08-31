@@ -75,4 +75,30 @@ namespace db::query
         {}
     };
 
+    class ContactGroupFilter
+    {
+      protected:
+        std::uint32_t filterData;
+
+      public:
+        /**
+         * @brief Default constructor
+         *
+         */
+        ContactGroupFilter() = default;
+
+        /**
+         * @brief Construct a new Text Filter object. Marks filter as empty if string is empty ("")
+         *
+         * @param groupText group filter text
+         */
+        ContactGroupFilter(const std::uint32_t &groupId) : filterData(std::move(groupId))
+        {}
+
+        [[nodiscard]] const std::uint32_t &getGroupFilterData() const noexcept
+        {
+            return filterData;
+        }
+    };
+
 }; // namespace db::query

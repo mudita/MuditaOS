@@ -31,6 +31,7 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactOptions.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearchResults.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookIceContacts.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/ContactDetailsModel.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/NewContactModel.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.cpp"
@@ -50,5 +51,6 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactDetails.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.hpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookIceContacts.hpp"
 )
 
