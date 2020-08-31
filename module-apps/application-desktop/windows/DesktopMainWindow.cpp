@@ -86,15 +86,16 @@ namespace gui
 
     void DesktopMainWindow::setVisibleState()
     {
-
         auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (!app) {
-            return;
-        }
+        assert(app != nullptr);
 
         if (app->getScreenLocked()) {
+            bottomBar->restore();
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             topBar->setActive(TopBar::Elements::LOCK, true);
+            inputCallback = nullptr;
+            setFocusItem(nullptr);
+            erase(notifications);
         }
         else {
             auto app = dynamic_cast<app::ApplicationDesktop *>(application);
@@ -326,7 +327,7 @@ namespace gui
 
     auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
     {
-        bottomBar->restore(BottomBar::Side::RIGHT);
+        bottomBar->restore();
         erase(notifications);
         // 1. create notifications box
         notifications = new gui::VBox(nullptr,
@@ -365,10 +366,10 @@ namespace gui
                 },
                 [app]() -> bool { return app->clearMessagesNotification(); });
         }
+        bottomBar->store();
         if (app->notifications.notSeen.areEmpty() != true) {
             setFocusItem(notifications);
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_show"));
-            bottomBar->store(BottomBar::Side::RIGHT);
             bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"));
         }
         else {
