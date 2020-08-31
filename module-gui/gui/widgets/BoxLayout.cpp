@@ -171,10 +171,17 @@ namespace gui
             auto axisItemSize           = 0;
             auto orthogonalItemSize     = 0;
             auto grantedSize            = sizeStore->get(el);
+
             // Check if item can be resized
             Position left_in_el = 0;
             if (!grantedSize.isZero()) {
                 left_in_el = grantedSize.get(axis) - el->area(Area::Min).size(axis);
+
+                // Make place for element if there is none
+                if (to_split < left_in_el) {
+                    addToOutOfDrawAreaList(getLastVisibleElement());
+                    to_split = sizeLeft<axis>(this);
+                }
             }
             else {
                 left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
@@ -201,7 +208,7 @@ namespace gui
             orthogonalItemSize = std::min(maxOrthogonalItemInParentSize, maxOrthogonalItemSize);
 
             // Check if there is still position left
-            if (axisItemSize <= pos_left) {
+            if ((axisItemSize + el->getMargins().getSumInAxis(axis)) <= pos_left) {
 
                 if (reverseOrder) {
                     pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
@@ -251,20 +258,20 @@ namespace gui
         switch (getAlignment(axis).vertical) {
         case gui::Alignment::Vertical::Top:
             if (reverseOrder) {
-                return calcPos - offset;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset;
             }
             break;
         case gui::Alignment::Vertical::Center:
             if (reverseOrder) {
-                return calcPos - offset / 2;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset / 2;
             }
             else {
-                return calcPos + offset / 2;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset / 2;
             }
             break;
         case gui::Alignment::Vertical::Bottom:
             if (!reverseOrder) {
-                return calcPos + offset;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset;
             }
             break;
         default:
@@ -274,20 +281,20 @@ namespace gui
         switch (getAlignment(axis).horizontal) {
         case gui::Alignment::Horizontal::Left:
             if (reverseOrder) {
-                return calcPos - offset;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset;
             }
             break;
         case gui::Alignment::Horizontal::Center:
             if (reverseOrder) {
-                return calcPos - offset / 2;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset / 2;
             }
             else {
-                return calcPos + offset / 2;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset / 2;
             }
             break;
         case gui::Alignment::Horizontal::Right:
             if (!reverseOrder) {
-                return calcPos + offset;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset;
             }
             break;
         default:
@@ -324,6 +331,13 @@ namespace gui
                                            *previous);
                 previous = next;
             }
+
+            if (previous != children.end()) {
+                if ((*previous) != nullptr) {
+                    (*previous)->setNavigationItem(reverseOrder ? NavigationDirection::UP : NavigationDirection::DOWN,
+                                                   nullptr);
+                }
+            }
         }
 
         if (type == ItemType::HBOX) {
@@ -334,6 +348,13 @@ namespace gui
                 (*next)->setNavigationItem(reverseOrder ? NavigationDirection::RIGHT : NavigationDirection::LEFT,
                                            *previous);
                 previous = next;
+            }
+
+            if (previous != children.end()) {
+                if ((*previous) != nullptr) {
+                    (*previous)->setNavigationItem(
+                        reverseOrder ? NavigationDirection::LEFT : NavigationDirection::RIGHT, nullptr);
+                }
             }
         }
     }
@@ -372,39 +393,23 @@ namespace gui
 
         Size granted = {std::min((*el)->area(Area::Max).w, request_w), std::min((*el)->area(Area::Max).h, request_h)};
 
-        if (axis == Axis::Y) {
+        // Currently not used option for Layouts that don't push out objects.
+        if (!sizeStore->forceFreeSpace) {
+            if ((granted.get(axis) + (*el)->getMargins().getSumInAxis(axis)) >=
+                sizeLeftWithoutElem<axis>(this, *el, Area::Min)) {
 
-            //            LOG_INFO("O co to tutaj prosi %d", granted.get(Axis::Y));
-            //            LOG_INFO("hmm a masz co dać %d", sizeLeftWithoutElem<Axis::Y>(this, *el, Area::Min));
-            //            LOG_INFO("Co ja mam mu tutaj zwrocić %d, %d", granted.width, granted.height);
-            //            LOG_INFO("Rozmiar parenta %d, %d",widgetArea.w, widgetArea.h );
-
-            if (granted.get(Axis::Y) >= sizeLeftWithoutElem<Axis::Y>(this, *el, Area::Min)) {
-
-                //                (*el)->setMinimumHeight(granted.height);
-                granted = Size(granted.width, 0);
-                //                granted = Size(0, 0);
+                granted = Size((*el)->area(Area::Normal).w, (*el)->area(Area::Normal).h);
             }
         }
 
-        if (axis == Axis::X) {
-
-            //            LOG_INFO("O co to tutaj prosi %d", granted.get(Axis::X));
-            //            LOG_INFO("hmm a masz co dać %d", sizeLeftWithoutElem<Axis::X>(this, *el, Area::Min));
-            //            LOG_INFO("Co ja mam mu tutaj zwrocić %d, %d", granted.width, granted.height);
-            //            LOG_INFO("Rozmiar parenta %d, %d",widgetArea.w, widgetArea.h );
-
-            if (granted.get(Axis::X) >= sizeLeftWithoutElem<Axis::X>(this, *el, Area::Min)) {
-
-                granted = Size(0, granted.height);
-            }
+        // If granted size decreased check if pushed out elements can fit
+        if (granted.get(axis) < sizeStore->get(*el).get(axis)) {
+            addFromOutOfDrawAreaList();
         }
 
-        //        LOG_INFO("Zmienia się rozmiar tego gówna prawda? %d, %d", (*el)->widgetArea.w, (*el)->widgetArea.h);
         sizeStore->store(*el, granted);
-        resizeItems<axis>(); // vs mark dirty
-
-        //        LOG_INFO("Zmienia się rozmiar tego gówna prawda? %d, %d", (*el)->widgetArea.w, (*el)->widgetArea.h);
+        resizeItems(); // vs mark dirty
+        setNavigation();
 
         return granted;
     }
@@ -423,6 +428,16 @@ namespace gui
                 (*child)->setFocus(false);
             }
         }
+    }
+
+    Item *BoxLayout::getLastVisibleElement()
+    {
+        for (auto child = children.rbegin(); child != children.rend(); child++) {
+            if ((*child)->visible) {
+                return (*child);
+            }
+        }
+        return nullptr;
     }
 
     auto BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool

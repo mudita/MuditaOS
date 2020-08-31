@@ -231,13 +231,9 @@ namespace gui
     {
         Position yOffset = line_align.calculateVAlignment(parent_length, lines_height);
 
-        //        LOG_INFO("Wartosci szaleja szaleja? %d %d", parent_length, lines_height);
-
-        //        LOG_INFO("Offset sie zmienia ? %d", yOffset);
-
         if (yOffset >= 0 && yOffset != storedYOffset) {
 
-            // Nie mam pomysłu innego na ten moment ...
+            // Refactor - workaround for multiple offset addition.
             storedYOffset = yOffset;
 
             if (underline != nullptr)
@@ -245,10 +241,7 @@ namespace gui
 
             for (auto &el : elements_to_show_in_line) {
                 auto scoped_disown = ScopedParentDisown(el);
-
                 el->setPosition(el->getPosition(Axis::Y) + yOffset, Axis::Y);
-
-                //                LOG_INFO("TE POZYCJE COS SA ZJEBANE? %d", el->getPosition(Axis::Y));
             }
         }
     }
