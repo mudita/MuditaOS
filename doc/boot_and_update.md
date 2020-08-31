@@ -1,23 +1,26 @@
-1. ecoboot reads /.boot.ini and /.boot.ini.crc32
-   and verifies if crc32 in /.boot.ini.crc32 matches
-   the actual crc32 of /.boot.ini
+1. ecoboot reads /.boot.json and /.boot.json.crc32
+   and verifies if crc32 in /.boot.json.crc32 matches
+   the actual crc32 of /.boot.json
 
-2. if ecoboot can't read /.boot.ini and/or /.boot.ini.crc32
-   it tries to read /.boot.ini.bak and /.boot.ini.bak.crc32
-   and verifies the checksum of /.boot.ini.bak.
-   If the /.boot.ini.bak file passes the checksum test ecoboot
-   should fix /.boot.ini and /.boot.ini.crc32 files so that
-   PureOS can pick up what version is booted.
-
-3. if **(1)** and **(2)** fails ecoboot reads `/boot.bin` and loads it 
+3. if **(1)** and fails ecoboot reads `/current/boot.bin` and loads it 
    (failsafe)
 
-4. `boot.ini` contains the filename to load in a
-   simple INI format  
+4. `boot.json` contains the filename to load in a
+   simple JSON format  
 ```
-[global]  
-boot = current/boot.bin  
-type = current  
+{
+    "main": 
+    {
+        "ostype": "current",
+        "imagename": "boot.bin"
+    },
+    "bootloader":
+    {
+        "version":"0.0.0"
+    },
+    "git": {}
+}
+
 ```
 
 There should be 2 instances of the OS on the
@@ -28,22 +31,22 @@ phone (`/sys` is assumed at vfs class creation time)
 "previous" -> /sys/previous  
 ```
 
-The type variable in `boot.ini` is for the PureOS
+The **ostype** variable in `boot.json` is for the PureOS
 this will indicate a subdirectory name to append
 for all file operations (loading assets dbs etc.) 
 When the option becoms possible this should be passed
 as a variable to the boot.bin (PureOS) as an argument
 
-4. ecoboot boots the "**boot**" filename in `boot.ini`.
+4. ecoboot boots the "**boot**" filename in `boot.json`.
 
-   PureOS reads `/boot.ini` to find it's root directory
+   PureOS reads `/boot.json` to find it's root directory
    and reads all assets and files from it. 
    
 5. updating from old style partitioning (1 partition)
    to new partition scheme (2 partitions). In case of problems see pt 6.
    
 _Make sure you have the latest ecoboot bootloader on the phone
-I 1.1 recommand https://github.com/muditacom/ecoboot/releases/tag/1.1
+I 1.1 recommand https://github.com/muditacom/ecoboot/releases/tag/1.0.4
 that will work even if you manage to break the filesystems in the next steps
 (it's goot to be prepared)_
 
