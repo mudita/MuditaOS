@@ -6,6 +6,7 @@
 
 * `[fonts]` Added phone compatibility with emoticons.
 * `[phonebook]` ICE contacts window.
+* `[messages]` SmsInputWidget added.
 
 ### Fixed
 

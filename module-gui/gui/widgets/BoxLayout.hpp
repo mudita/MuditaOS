@@ -36,10 +36,11 @@ namespace gui
             Length sum = 0;
 
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
+                if (el != elem) {
+                    sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
+                }
             });
-
-            return sum <= elem->area(area).size(axis) ? 0 : sum - elem->area(area).size(axis);
+            return sum;
         };
 
         template <Axis axis> Length sizeLeft(Item *it, Item::Area area = Item::Area::Min)
@@ -96,6 +97,7 @@ namespace gui
         // set focus on specified box element
         void setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
+        Item *getLastVisibleElement();
         template <Axis axis>
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;

@@ -2,37 +2,23 @@
 
 #include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
-#include "../models/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
 #include "Service/Message.hpp"
 
 #include <Text.hpp>
 #include <TextBubble.hpp>
-#include <ListItem.hpp>
-#include <ListItemProvider.hpp>
-#include <ListView.hpp>
 #include <Label.hpp>
 #include <Margins.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBMessage.hpp>
 #include <service-db/messages/DBNotificationMessage.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-#include <application-phonebook/data/PhonebookItemData.hpp>
 #include <i18/i18.hpp>
 #include <time/time_conversion.hpp>
 #include <log/log.hpp>
 #include <Style.hpp>
 
-#include <functional>
 #include <memory>
 #include <cassert>
-
-#include <Font.hpp>
-#include "TextParse.hpp"
-
-namespace style
-{}; // namespace style
 
 namespace gui
 {
@@ -79,7 +65,7 @@ namespace gui
             return;
         }
 
-        inputMessage = new SMSInputWidget(body, application, std::move(contact));
+        inputMessage = new SMSInputWidget(body, application);
 
         inputMessage->activatedCallback = [&](gui::Item &item) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
@@ -140,7 +126,9 @@ namespace gui
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Init || what == Action::NewestPage) {
             SMS.start = 0;
-            SMS.end   = maxsmsinwindow;
+
+            // Refactor
+            SMS.end = maxsmsinwindow;
             if (what == Action::Init) {
                 destroyTextItem();
             }
@@ -151,7 +139,17 @@ namespace gui
         //         update begin / end in `SMS`
         if (what == Action::NextPage) {
             if (SMS.end != SMS.dbsize) {
-                SMS.start = SMS.end;
+
+                // Refactor
+                for (auto sms : body->children) {
+                    if (sms->visible)
+                        SMS.start++;
+                }
+
+                if (inputMessage->visible)
+                    SMS.start -= 1;
+
+                LOG_INFO("SMS start %d", SMS.start);
             }
             else {
                 LOG_INFO("All sms shown");
@@ -195,6 +193,7 @@ namespace gui
             }
             ++SMS.end;
         }
+
         body->setNavigation();
         setFocusItem(body);
         if (Action::PreviousPage == what) {
@@ -328,10 +327,6 @@ namespace gui
             }
             return false;
         };
-        smsBubble->focusChangedCallback = [=](gui::Item &item) {
-            //            bottomBar->setActive(BottomBar::Side::CENTER, false);
-            return true;
-        };
 
         // wrap label in H box, to make fit datetime in it
         HBox *labelSpan = smsSpanBuild(smsBubble, smsRecord);
@@ -384,6 +379,7 @@ namespace gui
             LOG_INFO("received sms templates data \"%s\"", txt.c_str());
             pdata->concatenate == SMSTextData::Concatenate::True ? inputMessage->inputText->addText(txt)
                                                                  : inputMessage->inputText->setText(txt);
+            body->resizeItems();
         }
     }
 
