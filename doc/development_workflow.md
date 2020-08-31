@@ -1,38 +1,58 @@
-# development workflow
+# Development workflow
 
-![alt text](./Images/workflow.png "workflow")
+When working on a project change one needs to take following steps in order to get
+changes merged into the master branch:
 
-Additional info, one feature at the time:
-* 1: create branch - branch name `EGD-<NUM>` i.e. `EGD-123`
-* 2: add more commits - each commit should have in short message `[EGD-<NUM>] short message`
-    * for WIP and FIX - this should be too added in commit message `[EGD-<NUM>]` i.e
-        * `[WIP] [EGD-123] Progress on progressbar`
-        * `[FIX] [EGD-123] Progress on progressbar`
-* 2.5: Add proper PR description to changelog
-* 3: rebase to master
-    * When updating own branch one should rather rebase (which moves own commits on top) then merge (which puts changes by dates as it is)
-    * This will provide better history and git conflict solving
+1. Create feature branch, which name must consist of JIRA number of a feature and 
+short, general description of its contents, e.g. `EGD-5555-some-feature-fixes`.
 
-After PR - feature branch is frozen in development (only fixes)
-If you need further development - fork and update this fork to PR till its closed (after closing to master)
+2. Commit your work. Each commit *must* start with JIRA number in square brackets. It can also point
+which component you are working on, e.g. `[EGD-5555] phonebook: fix contact details`
+but it is not required. A component list is not defined yet so please follow names
+that has been used already. Each commit should have description explaining:
+   * what are you changing,
+   * why are you making changes (motivation),
+   * what is a result of your changes.
+ If it is impossible to provide such information it means that your commit is likely
+ excessive or redundant and should be squashed in other commit. Do not add
+ commits that are out of scope of JIRA issue you are working on.
 
-**If you need any assistance on how to do it @Adam will be glad to show you and answer questions in scope of his ability.**
+3. Before submitting a PR it is required to do basic development checks:
+   * test your change on both Linux and RT1051 platforms. Please pay special attention to
+ things you might unintentionally broke, e.g.: when working on calling check call log
+ too,
+   * include changelog description if applicable,
+   * run unit tests,
+   * check code formatting.
+
+4. Submit a PR. PR name must include JIRA number in square brackets and a short
+ description, e.g. `[EGD-5555] Fix contact details`. You can add labels which will be
+ helpful for people who know part of code you are modifying to spot the change you are submitting and do a review. Try to explain in a PR description what and why are you
+ changing, what decisions you had to take and event what you had been considering
+ but eventually did not do. Include screenshots and gifs if applicable. The more
+ information you provide, the bigger chance that you'll receive a quick review.
+
+5. During PR review team members will be asking questions regarding your solution.
+Answer them explaining your reasoning. Even if comment suggests an obvious change
+answer with a simple OK to show that you have not missed it.
+
+6. Add changes to your PR that are requested by reviewers and push feature branch
+once again. Update comments requesting changes with a simple 'done'. Do not resolve
+discussion on you own, it is reviewer responsibility to do so.
+
+7. When PR is accepted by two or more reviewers it is time to add PR changes to master branch. Merging to
+master is prohibited, do a rebase instead. Do not add to master any commits that
+are not required, less is more. An ideal situation is when you have a single commit 
+for a PR and a single JIRA issue. If you have multiple commits, you can squash
+them and force push a branch before merging PR to master.
+
+8. Merging PR causes feature branch to be deleted. Switch to master branch on
+your local machine and do a pull or fetch to get your changes.
+
+**If you need any assistance do not hesitate to ask others**
 
 [What is rebase and how - by atlassian](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
 [Simple case flow example](https://makandracards.com/makandra/36003-recommended-git-workflow-for-feature-branches)
-
-# Cleaning mess on branch prior to PR and work on branch 
-
-* when you have mixed new fetures with PR features use `git rebase to HEAD~N` to move commits in proper order
-
-# PR review who, how and why
-
-* Author creates PR
-* We daily check if there are PR's requested with fresh changes
-* Author fixes all `blocking` comments on PR, as described above
-    * in case of disagreement - talk with commenter (comments)
-    * in case of stale disagreement - parties ask for lead decision
-* When everything is ok, and there are minimum 2 reviews approved author can select `rebase and merge` and do it
 
 # Git rebase commits and how it works
 

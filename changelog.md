@@ -1,19 +1,87 @@
 # Mudita PurePhone changelog
 
-## Current Release
+## [Current Version]
 
-### Fixed
-* `[phonebook]` Fix favourites contacts display order.
+### Added
 
-## [0.33.1 - 2020-08-14]
+
 
 ### Changed
 
-* `[phonebook]` Moved contact validation to DB service.
+
+
+### Fixed
+
+* `[messages]` Fixed crashing new message window
+
+## [0.35.1 2020-08-28]
+
+### Added
+
+* `[phonebook]` Forwarding VCard via SMS.
+* `[phonebook]` Show block icon next to blocked contact name on contact list.
+* `[phonebook]` Contact details in bottom bar on call/send.
+* `[music player]` Added support for playing mp3 and flac files.
+
+### Changed
+
+* `[desktop]` Automatic confirmation of unlock pin if correct.
+
+### Fixed
+
+* `[audio]` Fixed playback of mp3 files.
+* `[gui]` Fixed label padding handling.
+* `[settings]` Fixed settings info.
+
+## [0.34.2 - 2020-08-21]
+
+### Changed
+
+* `[settings]` Rearranged settings window.
+
+### Fixed
+
+* `[audio]` Fixed audio buffers handling to eliminate sending uninitialized data and making loud noise on start of a call.
+* `[phonebook]` Fix duplicated contact detection on contact update.
+
+## [0.34.1 - 2020-08-19]
+
+### Added
+
+* `[calendar]` Added new/edit event window.
+* `[gui]` Added bootloader version information.
+
+### Changed
+
+* `[phonebook]` Show/Hide flags widget in contact details depending if any flags are set.
+* `[phonebook]` Update icons in contact add/edit window.
+
+### Fixed
+
+* `[music player]` Fixed songs list building and song name font size.
 
 ### Other
-* `[boot]` switched from ini to JSON format
-* `[core]` fixed TAR extract
+
+* `[fonts]` Added special characters for german, spanish, french, polish languages in font files.
+* `[gui]` Added check box widget.
+
+## [0.33.1 - 2020-08-13]
+
+### Added
+
+* `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
+* `[calendar]` database structure
+
+### Changed
+
+* `[boot]` Switched configuration file format from INI to JSON.
+* `[phonebook]` Auto releasing speed dial number of blocked contact.
+* `[phonebook]` Redesigned contact details window.
+
+### Fixed
+
+* `[phonebook]` Fix favourites contacts display order.
+* `[phonebook]` Fix (un)blocking option name and improve handling of contact blocking window.
 
 ## [0.32.1 - 2020-08-07]
 
@@ -32,6 +100,7 @@
 * `[phonebook]` Switch to contact list instead of contact details after saving contact.
 * `[phonebook]` Require filling in at least one field while adding/editing contact.
 * `[phonebook]` Replace static icon with number inside circle in speed dial duplicate window.
+* `[phonebook]` Add final icons to Add/Edit Contact window.
 * `[sms]` Do not delete sms if thread is malformed (not found what expected).
 * `[listview]` Improved data refresh time.
 
@@ -231,6 +300,7 @@
 * `[sms]` Fix thread view refresh on a new message.
 * `[sms]` Fix message reordering on page change.
 * `[sms]` Remove empty screen view at the top of a thread view.
+* `[music player]` Added simple player volume indicator.
 
 ### Other
 

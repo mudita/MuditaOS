@@ -21,6 +21,24 @@ namespace gui
         buildInterface();
     }
 
+    auto MusicPlayerMainWindow::setCurrentVolume(const std::function<void(const audio::Volume &)> &successCallback,
+                                                 const std::function<void(const audio::Volume &)> &errCallback) -> bool
+    {
+        audio::Volume volume;
+        const auto ret = application->getCurrentVolume(volume);
+        if (ret == audio::RetCode::Success && volume != audio::invalidVolume) {
+            if (successCallback != nullptr) {
+                successCallback(volume);
+            }
+        }
+        else {
+            if (errCallback != nullptr) {
+                errCallback(volume);
+            }
+        }
+        return ret == audio::RetCode::Success;
+    }
+
     void MusicPlayerMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -38,6 +56,35 @@ namespace gui
                                       musicPlayerStyle::mainWindow::w,
                                       musicPlayerStyle::mainWindow::h,
                                       songsModel);
+
+        auto successCallback = [this](const audio::Volume &volume) {
+            auto volumeText = audio::GetVolumeText(volume);
+            soundLabel      = new gui::Label(this,
+                                        musicPlayerStyle::volumeLabel::x,
+                                        musicPlayerStyle::volumeLabel::y,
+                                        musicPlayerStyle::volumeLabel::w,
+                                        musicPlayerStyle::volumeLabel::h,
+                                        volumeText);
+        };
+        auto errCallback = [this](const audio::Volume &volume) {
+            soundLabel = new gui::Label(this,
+                                        musicPlayerStyle::volumeLabel::x,
+                                        musicPlayerStyle::volumeLabel::y,
+                                        musicPlayerStyle::volumeLabel::w,
+                                        musicPlayerStyle::volumeLabel::h,
+                                        musicPlayerStyle::volumeLabel::defaultVolumeLabelText);
+        };
+        setCurrentVolume(successCallback, errCallback);
+
+        soundLabel->setMargins(gui::Margins(musicPlayerStyle::volumeLabel::leftMargin,
+                                            musicPlayerStyle::volumeLabel::topMargin,
+                                            musicPlayerStyle::volumeLabel::rightMargin,
+                                            musicPlayerStyle::volumeLabel::bottomMargin));
+        soundLabel->setFilled(false);
+        soundLabel->setPenFocusWidth(style::window::default_border_focus_w);
+        soundLabel->setPenWidth(style::window::default_border_no_focus_w);
+        soundLabel->setFont(style::window::font::medium);
+        soundLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
 
         setFocusItem(songsList);
     }
@@ -58,6 +105,20 @@ namespace gui
     bool MusicPlayerMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         return false;
+    }
+
+    bool MusicPlayerMainWindow::onInput(const InputEvent &inputEvent)
+    {
+        auto ret           = AppWindow::onInput(inputEvent);
+        const auto keyCode = inputEvent.keyCode;
+        if (keyCode == KeyCode::KEY_VOLUP || keyCode == KeyCode::KEY_VOLDN || keyCode == KeyCode::KEY_ENTER) {
+            auto successCallback = [this](const audio::Volume &volume) {
+                auto volumeText = audio::GetVolumeText(volume);
+                soundLabel->setText(volumeText);
+            };
+            return setCurrentVolume(successCallback, nullptr);
+        }
+        return ret;
     }
 
 } /* namespace gui */

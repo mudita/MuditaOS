@@ -363,13 +363,15 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
 {
     ContactRecord rec;
-    rec.numbers.push_back(ContactRecord::Number(phoneNumber, phoneNumber));
+    utils::PhoneNumber contactNumber(phoneNumber);
+    auto number = ContactRecord::Number(contactNumber.get(), contactNumber.toE164(), ContactNumberType ::PAGER);
+    rec.numbers.push_back(number);
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber, rec);
 
     auto ret              = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     auto *contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
-    assert(contactResponse);
+
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
     }
@@ -398,20 +400,20 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
     }
 
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
-    if (!retSpeedDial->empty()) {
+    if (!retSpeedDial->empty() && (*retSpeedDial)[0].ID != rec.ID) {
         return speedDialError;
     }
 
     if (rec.numbers.size() > 0 && rec.numbers[0].number.getEntered().size() > 0) {
         auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number);
-        if (retPhone1) {
+        if (retPhone1 && retPhone1->ID != rec.ID) {
             return primaryNumberError;
         }
     }
 
     if (rec.numbers.size() > 1 && rec.numbers[1].number.getEntered().size() > 0) {
         auto retPhone2 = MatchContactByPhoneNumber(serv, rec.numbers[1].number);
-        if (retPhone2) {
+        if (retPhone2 && retPhone2->ID != rec.ID) {
             return secondaryNumberError;
         }
     }

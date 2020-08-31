@@ -12,7 +12,6 @@ namespace gui
         : OptionWindow(app, gui::window::name::contact_options)
     {
         buildInterface();
-        this->addOptions(contactOptionsList());
     }
 
     auto PhonebookContactOptions::handleSwitchData(SwitchData *data) -> bool
@@ -23,6 +22,9 @@ namespace gui
             return false;
         }
         contact = item->getContact();
+        clearOptions();
+        addOptions(contactOptionsList());
+
         return true;
     }
 
@@ -49,10 +51,19 @@ namespace gui
                                              return true;
                                          },
                                          gui::Arrow::Enabled});
-        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_block"), [=](gui::Item &item) {
-                                             LOG_INFO("Blocking contact!");
-                                             return contactBlock();
-                                         }});
+        if (contact->isOnBlocked()) {
+            options.emplace_back(
+                gui::Option{utils::localize.get("app_phonebook_options_unblock"), [=](gui::Item &item) {
+                                LOG_INFO("Unblocking contact!");
+                                return contactBlock(false);
+                            }});
+        }
+        else {
+            options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_block"), [=](gui::Item &item) {
+                                                 LOG_INFO("Blocking contact!");
+                                                 return contactBlock(true);
+                                             }});
+        }
         options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_delete"), [=](gui::Item &item) {
                                              LOG_INFO("Deleting contact!");
                                              return contactRemove();
@@ -60,24 +71,31 @@ namespace gui
         return options;
     }
 
-    auto PhonebookContactOptions::contactBlock() -> bool
+    auto PhonebookContactOptions::contactBlock(bool shouldBeBlocked) -> bool
     {
         LOG_DEBUG("Blocking contact: %" PRIu32, contact->ID);
         auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
         assert(dialog != nullptr);
         auto meta   = dialog->meta;
         meta.action = [=]() -> bool {
-            if (contact->groups.find(ContactsDB::blockedGroupId()) == contact->groups.end()) {
-                contact->groups.insert(ContactsDB::blockedGroupId());
+            contact->addToBlocked(shouldBeBlocked);
+            DBServiceAPI::ContactUpdate(this->application, *contact);
+            if (shouldBeBlocked) {
+                showNotification(NotificationType::Block);
             }
             else {
-                contact->groups.erase(ContactsDB::blockedGroupId());
+                showNotification(NotificationType::Unblock);
             }
-            DBServiceAPI::ContactUpdate(this->application, *contact);
-            showNotification(NotificationType::Block);
+
             return true;
         };
-        meta.text       = utils::localize.get("app_phonebook_options_block_confirm");
+        if (shouldBeBlocked) {
+            meta.text = utils::localize.get("app_phonebook_options_block_confirm");
+        }
+        else {
+            meta.text = utils::localize.get("app_phonebook_options_unblock_confirm");
+        }
+
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
         meta.title      = cont.getFormattedName();
@@ -124,6 +142,9 @@ namespace gui
             break;
         case NotificationType::Delete:
             meta.text = utils::localize.get("app_phonebook_options_delete_notification");
+            break;
+        case NotificationType::Unblock:
+            meta.text = utils::localize.get("app_phonebook_options_unblock_notification");
             break;
         }
         meta.action = [=]() -> bool {

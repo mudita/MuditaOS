@@ -54,12 +54,12 @@ void SongsModel::createData(std::vector<std::string> songsList)
         item->deleteByList = false;
     }
 
-    requestRecords(0, internalData.size());
+    list->rebuildList();
 }
 
 void SongsModel::clearData()
 {
     list->clear();
 
-    requestRecords(0, internalData.size());
+    list->rebuildList();
 }

@@ -234,6 +234,7 @@ namespace gui
         labelSpan->setSize(elements_width, smsBubble->getHeight());
         labelSpan->setMinimumWidth(elements_width);
         labelSpan->setMinimumHeight(smsBubble->getHeight());
+        labelSpan->setMaximumHeight(smsBubble->widgetMaximumArea.h);
         labelSpan->setFillColor(gui::Color(11, 0));
 
         LOG_DEBUG("ADD SMS TYPE: %d", static_cast<int>(el.type));

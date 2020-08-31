@@ -24,7 +24,7 @@ namespace audio
       public:
         IdleOperation(const char *file);
 
-        ~IdleOperation();
+        ~IdleOperation() = default;
 
         audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final
         {

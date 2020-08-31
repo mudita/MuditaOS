@@ -78,6 +78,7 @@ namespace gui
         /// @param text - bottomBar text
         /// @param overwriteOthers - set or not other bottomBar texts to "" (default true)
         void bottomBarTemporaryMode(const UTF8 &text, bool emptyOthers = true);
+        void bottomBarTemporaryMode(const UTF8 &text, BottomBar::Side side, bool emptyOthers = true);
         void bottomBarRestoreFromTemporaryMode();
         bool selectSpecialCharacter();
         /// get BoundingBox size of Window "body" area

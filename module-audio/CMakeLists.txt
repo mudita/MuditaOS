@@ -32,7 +32,6 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
@@ -48,7 +47,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../
 set_source_files_properties(
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
         PROPERTIES COMPILE_FLAGS
-	"-Wno-implicit-fallthrough"
+	    "-Wno-implicit-fallthrough -Wno-error=maybe-uninitialized"
 )
 
 target_compile_definitions(${PROJECT_NAME}

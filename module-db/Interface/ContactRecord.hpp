@@ -95,7 +95,6 @@ enum class ContactRecordField
     NumberE164,
     NumberUser,
     SpeedDial,
-    Favourite,
     Groups,
 };
 
@@ -183,6 +182,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::vector<std::uint32_t> splitNumberIDs(const std::string &numberIDs);
 
     std::string joinNumberIDs(const std::vector<std::uint32_t> &numberIDs);
+
+    bool unbindNumber(std::uint32_t contactId, std::uint32_t numberId);
 
     const std::uint32_t favouritesGroupId;
 };

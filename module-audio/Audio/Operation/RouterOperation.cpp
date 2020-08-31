@@ -23,18 +23,16 @@ namespace audio
 
         audioDeviceCallback =
             [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
-            if (framesPerBuffer > audioDeviceBuffer.capacity()) {
-                audioDeviceBuffer.reserve(framesPerBuffer);
-                std::fill(std::begin(audioDeviceBuffer), std::end(audioDeviceBuffer), 0);
-            }
+            if (inputBuffer != nullptr) {
+                if (framesPerBuffer > audioDeviceBuffer.size()) {
+                    audioDeviceBuffer.resize(framesPerBuffer, 0);
+                }
 
-            if (inputBuffer) {
                 if (muteEnable) {
                     memset(&audioDeviceBuffer[0], 0, framesPerBuffer * sizeof(int16_t));
                 }
                 else {
                     memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-                    audioDeviceBuffer.resize(framesPerBuffer);
                 }
 
                 if (recorderWorkerHandle) {
@@ -43,7 +41,11 @@ namespace audio
                 }
             }
 
-            if (outputBuffer) {
+            if (outputBuffer != nullptr) {
+                if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
+                    audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
+                }
+
                 memcpy(outputBuffer, &audioDeviceCellularBuffer[0], framesPerBuffer * sizeof(int16_t));
             }
             return framesPerBuffer;
@@ -51,14 +53,12 @@ namespace audio
 
         audioDeviceCellularCallback =
             [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
-            if (framesPerBuffer > audioDeviceCellularBuffer.capacity()) {
-                audioDeviceCellularBuffer.reserve(framesPerBuffer);
-                std::fill(std::begin(audioDeviceCellularBuffer), std::end(audioDeviceCellularBuffer), 0);
-            }
+            if (inputBuffer != nullptr) {
+                if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
+                    audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
+                }
 
-            if (inputBuffer) {
                 memcpy(&audioDeviceCellularBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-                audioDeviceCellularBuffer.resize(framesPerBuffer);
 
                 if (recorderWorkerHandle) {
                     channel2Buffer = audioDeviceCellularBuffer;
@@ -66,16 +66,18 @@ namespace audio
                 }
             }
 
-            if (outputBuffer) {
+            if (outputBuffer != nullptr) {
+                if (framesPerBuffer > audioDeviceBuffer.size()) {
+                    audioDeviceBuffer.resize(framesPerBuffer, 0);
+                }
+
                 memcpy(outputBuffer, &audioDeviceBuffer[0], framesPerBuffer * sizeof(int16_t));
             }
             return framesPerBuffer;
         };
 
-        audioDeviceBuffer.reserve(1024);
-        std::fill(std::begin(audioDeviceBuffer), std::end(audioDeviceBuffer), 0);
-        audioDeviceCellularBuffer.reserve(1024);
-        std::fill(std::begin(audioDeviceCellularBuffer), std::end(audioDeviceCellularBuffer), 0);
+        audioDeviceBuffer.resize(1024, 0);
+        audioDeviceCellularBuffer.resize(1024, 0);
 
         // TODO:M.P should be fetched from DB
         availableProfiles.push_back(std::make_unique<ProfileRoutingEarspeaker>(nullptr, 1, 2));

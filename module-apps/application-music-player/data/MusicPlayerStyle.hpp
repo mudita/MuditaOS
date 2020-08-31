@@ -19,13 +19,31 @@ namespace musicPlayerStyle
         constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = 100;
 
-        constexpr uint32_t text_h     = 22;
-        constexpr uint32_t duration_w = 50;
+        constexpr uint32_t bold_text_h = 24;
+        constexpr uint32_t text_h      = 22;
+        constexpr uint32_t duration_w  = 50;
 
         constexpr int32_t topMargin   = 18;
         constexpr int32_t leftMargin  = 10;
         constexpr int32_t rightMargin = 10;
 
     } // namespace songItem
+
+    namespace volumeLabel
+    {
+        constexpr uint32_t x = 0;
+        constexpr uint32_t y = 52;
+
+        constexpr uint32_t w = style::window_width;
+        constexpr uint32_t h = 52;
+
+        constexpr auto defaultVolumeLabelText = "Vol: 10";
+
+        constexpr int32_t topMargin    = 0;
+        constexpr int32_t bottomMargin = 0;
+
+        constexpr int32_t leftMargin  = 16;
+        constexpr int32_t rightMargin = 0;
+    } // namespace volumeLabel
 
 } // namespace musicPlayerStyle

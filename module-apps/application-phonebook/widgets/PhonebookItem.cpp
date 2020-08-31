@@ -1,6 +1,7 @@
 #include "PhonebookItem.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include <Style.hpp>
+#include "Image.hpp"
 
 namespace gui
 {
@@ -9,26 +10,28 @@ namespace gui
     {
         setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
-        setMaximumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
 
-        setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
 
-        setPenFocusWidth(2);
-        setPenWidth(0);
+        hBox = new gui::HBox(this, 0, 0, 0, 0);
+        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setPenFocusWidth(style::window::default_border_focus_w);
+        hBox->setPenWidth(style::window::messages::sms_border_no_focus);
 
-        value = new gui::Label(this, 0, 0, 0, 0);
-        value->setPenFocusWidth(0);
-        value->setPenWidth(0);
-        value->setFont(style::window::font::small);
-        value->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        contactName = new gui::Label(hBox, 0, 0, 0, 0);
+        contactName->setPenFocusWidth(0);
+        contactName->setPenWidth(0);
+        contactName->setFont(style::window::font::small);
+        contactName->setPadding(Padding(style::padding::default_left_text_padding, 0, 0, 0));
+        contactName->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        contactName->setMinimumHeight(phonebookStyle::contactItem::h);
+        contactName->setMaximumWidth(phonebookStyle::contactItem::w);
     }
 
     bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        value->setPosition(phonebookStyle::contactItem::left_margin, 0);
-        value->setSize(newDim.w, newDim.h);
-
+        hBox->setPosition(0, 0);
+        hBox->setSize(newDim.w, newDim.h);
         return true;
     }
 
@@ -37,14 +40,15 @@ namespace gui
     {
         this->contact = contact;
         /* alternativeName is used as Surname or Second name */
-        value->setText(contact->getFormattedName(ContactRecord::NameFormatType::List));
+        contactName->setText(contact->getFormattedName(ContactRecord::NameFormatType::List));
         markFavourite(contact->isOnFavourites());
+        markBlocked(contact->isOnBlocked());
     }
 
     void PhonebookItem::setMarkerItem(UTF8 text)
     {
-        value->setText(text);
-        value->setLineMode(true);
+        contactName->setText(text);
+        contactName->setLineMode(true);
         activeItem = false;
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
@@ -65,9 +69,18 @@ namespace gui
     {
         favourite = val;
         if (val)
-            value->setFont(style::window::font::bigbold);
+            contactName->setFont(style::window::font::bigbold);
         else
-            value->setFont(style::window::font::big);
+            contactName->setFont(style::window::font::big);
+    }
+
+    void PhonebookItem::markBlocked(bool val)
+    {
+        if (val) {
+            auto blockedIcon = new Image(hBox, 0, 0, "block");
+            blockedIcon->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+            blockedIcon->setMargins(Margins(0, 0, phonebookStyle::contactItem::blocked_right_margin, 0));
+        }
     }
 
 } /* namespace gui */

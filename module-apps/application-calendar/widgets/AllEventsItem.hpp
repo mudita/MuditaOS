@@ -1,11 +1,13 @@
 #pragma once
 #include <ListItem.hpp>
 #include <Label.hpp>
+#include <BoxLayout.hpp>
 
 namespace gui
 {
     class AllEventsItem : public ListItem
     {
+        gui::HBox *hBox         = nullptr;
         gui::Label *startTime   = nullptr;
         gui::Label *description = nullptr;
 

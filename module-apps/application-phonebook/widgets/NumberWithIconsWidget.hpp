@@ -5,7 +5,7 @@
 #include <BoxLayout.hpp>
 #include <Image.hpp>
 #include <ImageBox.hpp>
-#include <Text.hpp>
+#include <TextFixedSize.hpp>
 
 namespace gui
 {
@@ -14,18 +14,13 @@ namespace gui
       public:
         NumberWithIconsWidget(app::Application *app,
                               const utils::PhoneNumber::View &number,
-                              Item *parent,
-                              const uint32_t &x,
-                              const uint32_t &y,
-                              const uint32_t &w,
-                              const uint32_t &h);
+                              const std::string &font,
+                              Item *parent);
         ~NumberWithIconsWidget() override = default;
 
-        Text *numberText     = nullptr;
-        ImageBox *phoneImage = nullptr;
-        ImageBox *smsImage   = nullptr;
-
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        TextFixedSize *numberText = nullptr;
+        ImageBox *phoneImage      = nullptr;
+        ImageBox *smsImage        = nullptr;
     };
 
 } /* namespace gui */

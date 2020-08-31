@@ -9,17 +9,22 @@ namespace gui
     AllEventsItem::AllEventsItem()
     {
         setMinimumSize(style::window::default_body_width, style::window::label::big_h);
-        setMaximumSize(style::window::default_body_width, style::window::label::big_h);
 
-        startTime = new gui::Label(this, 0, 0, 0, 0);
-        startTime->setPenFocusWidth(0);
-        startTime->setPenWidth(0);
+        hBox = new gui::HBox(this, 0, 0, 0, 0);
+        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+
+        startTime = new gui::Label(hBox, 0, 0, 0, 0);
+        startTime->setMinimumSize(style::window::calendar::item::allEvents::start_time_min_w,
+                                  style::window::label::big_h);
+        startTime->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
+        startTime->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         startTime->setFont(style::window::font::small);
         startTime->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
-        description = new gui::Label(this, 0, 0, 0, 0);
-        description->setPenFocusWidth(0);
-        description->setPenWidth(0);
+        description = new gui::Label(hBox, 0, 0, 0, 0);
+        description->setMinimumSize(style::window::calendar::item::allEvents::description_w,
+                                    style::window::label::big_h);
+        description->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         description->setFont(style::window::font::bigbold);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
@@ -29,12 +34,8 @@ namespace gui
 
     bool AllEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        startTime->setPosition(style::window::calendar::item::all::start_time_x, 0);
-        startTime->setSize(style::window::default_body_width, style::window::label::big_h);
-
-        description->setPosition(style::window::calendar::item::all::description_x, 0);
-        description->setSize(style::window::calendar::item::all::description_w, style::window::label::big_h);
-
+        hBox->setPosition(0, 0);
+        hBox->setSize(newDim.w, newDim.h);
         return true;
     }
 
@@ -42,6 +43,7 @@ namespace gui
     {
         description->setText("");
         startTime->setText(text);
+        description->setMinimumSize(0, 0);
         startTime->setLineMode(true);
         activeItem = false;
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);

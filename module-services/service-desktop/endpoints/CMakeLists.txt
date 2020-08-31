@@ -17,4 +17,5 @@ target_sources(${PROJECT_NAME}
 		"Restore.cpp"
 		"Factory.cpp"
 		"Contacts.cpp"
+		"Messages.cpp"
 )

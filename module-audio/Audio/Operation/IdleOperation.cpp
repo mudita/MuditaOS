@@ -12,13 +12,9 @@
 namespace audio
 {
 
-    IdleOperation::IdleOperation([[maybe_unused]] const char *file)
+    IdleOperation::IdleOperation([[maybe_unused]] const char *file) : Operation{true}
     {
-        isInitialized = true;
     }
-
-    IdleOperation::~IdleOperation()
-    {}
 
     audio::RetCode IdleOperation::SetOutputVolume(float vol)
     {

@@ -24,6 +24,7 @@ set(SOURCES
         Databases/CalllogDB.cpp
         Databases/CountryCodesDB.cpp
         Databases/NotificationsDB.cpp
+        Databases/EventsDB.cpp
 
         Tables/Table.cpp
         Tables/SMSTable.cpp
@@ -41,6 +42,7 @@ set(SOURCES
         Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
+        Tables/EventsTable.cpp
 
         Interface/Record.cpp
         Interface/SMSRecord.cpp
@@ -52,19 +54,31 @@ set(SOURCES
         Interface/CalllogRecord.cpp
         Interface/SMSTemplateRecord.cpp
         Interface/NotificationsRecord.cpp
+        Interface/EventsRecord.cpp
 
         queries/RecordQuery.cpp
         queries/sms/QuerySMSSearch.cpp
         queries/sms/QuerySMSThreadsGet.cpp
         queries/sms/QuerySMSSearchByType.cpp
         queries/sms/QuerySmsThreadMarkAsRead.cpp
+        queries/sms/QuerySMSGetByID.cpp
+        queries/sms/QuerySMSGetByContactID.cpp
+        queries/sms/QuerySMSGetByText.cpp
+        queries/sms/QuerySMSTemplateGetByID.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
         queries/notifications/QueryNotificationsGetAll.cpp
         queries/phonebook/QueryContactGet.cpp
-)
+        queries/calendar/QueryEventsRemove.cpp
+        queries/calendar/QueryEventsGet.cpp
+        queries/calendar/QueryEventsGetAll.cpp
+        queries/calendar/QueryEventsAdd.cpp
+        queries/calendar/QueryEventsEdit.cpp
+        queries/calendar/QueryEventsGetFiltered.hpp
+        queries/calendar/QueryEventsGetFiltered.cpp
+        )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)

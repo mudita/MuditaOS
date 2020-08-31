@@ -7,14 +7,15 @@
 #include <Database/Database.hpp>
 #include <memory>
 #include <string>
+#include <utility>
 
 class SMSThreadData : public gui::SwitchData
 {
   public:
     std::shared_ptr<ThreadRecord> thread = nullptr;
-    SMSThreadData(std::shared_ptr<ThreadRecord> thread) : thread(thread)
+    SMSThreadData(std::shared_ptr<ThreadRecord> thread) : thread(std::move(thread))
     {}
-    virtual ~SMSThreadData() = default;
+    ~SMSThreadData() override = default;
 };
 
 class SMSRequest : public gui::SwitchData
@@ -26,9 +27,9 @@ class SMSRequest : public gui::SwitchData
     SMSRequest() = delete;
     SMSRequest(const utils::PhoneNumber::View &phoneNumber) : phoneNumber(phoneNumber)
     {}
-    virtual ~SMSRequest() = default;
+    ~SMSRequest() override = default;
 
-    const utils::PhoneNumber::View &getPhoneNumber() const
+    [[nodiscard]] auto getPhoneNumber() const -> const utils::PhoneNumber::View &
     {
         return phoneNumber;
     };
@@ -37,9 +38,11 @@ class SMSRequest : public gui::SwitchData
 class SMSSendRequest : public SMSRequest
 {
   public:
-    SMSSendRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
+    SMSSendRequest(const utils::PhoneNumber::View &phoneNumber, UTF8 textData)
+        : SMSRequest(phoneNumber), textData(std::move(textData))
     {}
-    virtual ~SMSSendRequest() = default;
+    ~SMSSendRequest() override = default;
+    UTF8 textData;
 };
 
 class SMSSendTemplateRequest : public SMSRequest
@@ -47,7 +50,7 @@ class SMSSendTemplateRequest : public SMSRequest
   public:
     SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
     {}
-    virtual ~SMSSendTemplateRequest() = default;
+    ~SMSSendTemplateRequest() override = default;
 };
 
 class SMSTemplateSent : public gui::SwitchData
@@ -62,9 +65,10 @@ class SMSTextData : public gui::SwitchData
         False
     };
 
-    SMSTextData(const UTF8 &text, Concatenate concatenate = Concatenate::False) : text(text), concatenate(concatenate)
+    SMSTextData(UTF8 text, Concatenate concatenate = Concatenate::False)
+        : text(std::move(text)), concatenate(concatenate)
     {}
-    virtual ~SMSTextData() = default;
+    ~SMSTextData() override = default;
     UTF8 text;
     Concatenate concatenate = Concatenate::False;
 };
@@ -72,9 +76,9 @@ class SMSTextData : public gui::SwitchData
 class SMSTemplateRequest : public gui::SwitchData
 {
   public:
-    SMSTemplateRequest(const std::string &requestingWindow) : requestingWindow(requestingWindow)
+    SMSTemplateRequest(std::string requestingWindow) : requestingWindow(std::move(requestingWindow))
     {}
-    virtual ~SMSTemplateRequest() = default;
+    ~SMSTemplateRequest() override = default;
 
     std::string requestingWindow;
 };

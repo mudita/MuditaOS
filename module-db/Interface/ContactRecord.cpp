@@ -210,6 +210,20 @@ std::string ContactRecordInterface::joinNumberIDs(const std::vector<std::uint32_
     return outStream.str();
 }
 
+bool ContactRecordInterface::unbindNumber(std::uint32_t contactId, std::uint32_t numberId)
+{
+    auto contactRecord = contactDB->contacts.getById(contactId);
+    if (!contactRecord.isValid()) {
+        return false;
+    }
+
+    auto numberIDs = splitNumberIDs(contactRecord.numbersID);
+    numberIDs.erase(std::remove(std::begin(numberIDs), std::end(numberIDs), numberId), std::end(numberIDs));
+    contactRecord.numbersID = joinNumberIDs(numberIDs);
+
+    return contactDB->contacts.update(contactRecord);
+}
+
 bool ContactRecordInterface::Update(const ContactRecord &rec)
 {
     bool ret;
@@ -239,6 +253,21 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
             outputNumberIDs.push_back(contactDB->getLastInsertRowId());
         }
         else {
+            if (auto oldId = numberMatch->getContactID(); oldId != rec.ID) {
+                if (!unbindNumber(oldId, numberMatch->getNumberID())) {
+                    LOG_ERROR(
+                        "Failed to unbind number %" PRIu32 " from contact %" PRIu32, numberMatch->getNumberID(), oldId);
+                }
+
+                auto numberRecord      = contactDB->number.getById(numberMatch->getNumberID());
+                numberRecord.contactID = rec.ID;
+
+                if (!contactDB->number.update(numberRecord)) {
+                    LOG_ERROR("Failed to reassing number %" PRIu32 " to contact %" PRIu32,
+                              numberMatch->getNumberID(),
+                              rec.ID);
+                }
+            }
             outputNumberIDs.push_back(numberMatch->getNumberID());
         }
     }
@@ -252,6 +281,19 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
                 LOG_ERROR("Failed to remove number");
                 return false;
             }
+        }
+    }
+
+    // check if speed dial is free to take, unbind if needed
+    auto speedDialContacts = GetBySpeedDial(rec.speeddial);
+    if (!speedDialContacts->empty()) {
+        if (speedDialContacts->size() != 1) {
+            LOG_ERROR("Multiple contacts for same speed dial value %s", rec.speeddial.c_str());
+        }
+        auto oldContact      = contactDB->contacts.getById(speedDialContacts->at(0).ID);
+        oldContact.speedDial = "";
+        if (!contactDB->contacts.update(oldContact)) {
+            LOG_ERROR("Failed to remove speed dial from old contact");
         }
     }
 
@@ -587,50 +629,6 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
         }
     } break;
-
-    case ContactRecordField::Favourite: {
-        auto ret = contactDB->name.getLimitOffsetByField(offset, limit, ContactNameTableFields::Favourite, str);
-
-        for (const auto &w : ret) {
-
-            auto contact = contactDB->contacts.getById(w.ID);
-            if (!contact.isValid()) {
-                return records;
-            }
-
-            auto name = contactDB->name.getById(contact.nameID);
-            if (!name.isValid()) {
-                return records;
-            }
-
-            auto nrs = getNumbers(contact.numbersID);
-            if (nrs.size() == 0) {
-                LOG_DEBUG("Contact record does not contain any numbers.");
-            }
-
-            auto ring = contactDB->ringtones.getById(contact.ringID);
-            if (!ring.isValid()) {
-                return records;
-            }
-
-            auto address = contactDB->address.getById(contact.addressID);
-            if (!address.isValid()) {
-                return records;
-            }
-
-            records->push_back(ContactRecord{{.ID = contact.ID},
-                                             .primaryName     = name.namePrimary,
-                                             .alternativeName = name.nameAlternative,
-                                             .contactType     = contact.type,
-                                             .numbers         = nrs,
-                                             .address         = address.address,
-                                             .note            = address.note,
-                                             .mail            = address.mail,
-                                             .assetPath       = ring.assetPath,
-                                             .speeddial       = contact.speedDial,
-                                             .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
-        }
-    } break;
     case ContactRecordField::Groups: {
         break;
     }
@@ -918,6 +916,7 @@ void ContactRecord::addToBlocked(bool add)
 {
     if (add) {
         groups.insert(ContactsDB::blockedGroupId());
+        speeddial.clear();
     }
     else {
         groups.erase(ContactsDB::blockedGroupId());

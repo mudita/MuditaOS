@@ -40,7 +40,6 @@ namespace audio
 
     decoderMP3::~decoderMP3()
     {
-        mp3dec_deinit(mp3d);
         free(mp3d);
     }
 
@@ -154,7 +153,7 @@ namespace audio
 
         while (1) {
 
-            uint32_t smpl = mp3dec_find_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, &info);
+            uint32_t smpl = mp3dec_decode_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
             bufferIndex += info.frame_bytes;
             bytesAvailable -= info.frame_bytes;
 
@@ -219,7 +218,7 @@ namespace audio
 
         while (1) {
 
-            uint32_t smpl = mp3dec_find_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, &info);
+            uint32_t smpl = mp3dec_decode_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
             bufferIndex += info.frame_bytes;
             bytesAvailable -= info.frame_bytes;
 
@@ -247,7 +246,7 @@ namespace audio
 
     uint32_t decoderMP3::decode(uint32_t samplesToRead, int16_t *pcmData)
     {
-        mp3dec_frame_info_t info = {0, 0, 0, 0, 0};
+        mp3dec_frame_info_t info = {0, 0, 0, 0, 0, 0};
 
         if (!decoderNotFirstRun) {
             decoderBuffer    = std::make_unique<uint8_t[]>(DECODER_BUFFER_SIZE);

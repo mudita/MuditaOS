@@ -143,12 +143,13 @@ namespace gui
 
     void BoxLayout::addFromOutOfDrawAreaList()
     {
-        if (children.size() != 0u) {
+        if (children.size() != 0) {
             for (auto it : outOfDrawAreaItems) {
                 it->setVisible(true);
             }
         }
         outOfDrawAreaItems.clear();
+        resizeItems();
     }
 
     // space left distposition `first is better` tactics
@@ -187,11 +188,17 @@ namespace gui
                 axisItemSize = el->area(Area::Min).size(axis);
             }
 
-            orthogonalItemSize =
-                std::min(this->area(Area::Normal).size(orthogonal(axis)),
-                         el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
-                             ? el->area(Area::Max).size(orthogonal(axis))
-                             : el->area(Area::Min).size(orthogonal(axis)));
+            Length maxOrthogonalItemInParentSize =
+                this->area(Area::Normal).size(orthogonal(axis)) <= el->getMargins().getSumInAxis(orthogonal(axis))
+                    ? 0
+                    : this->area(Area::Normal).size(orthogonal(axis)) - el->getMargins().getSumInAxis(orthogonal(axis));
+
+            Length maxOrthogonalItemSize =
+                el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
+                    ? el->area(Area::Max).size(orthogonal(axis))
+                    : el->area(Area::Min).size(orthogonal(axis));
+
+            orthogonalItemSize = std::min(maxOrthogonalItemInParentSize, maxOrthogonalItemSize);
 
             // Check if there is still position left
             if (axisItemSize <= pos_left) {
@@ -352,11 +359,19 @@ namespace gui
     template <Axis axis>
     auto BoxLayout::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
     {
+        if (parent != nullptr) {
+            auto [w, h] = requestSize(request_w, request_h);
+            request_w   = std::min(w, (Length)request_w);
+            request_h   = std::min(h, (Length)request_h);
+        }
+
         auto el = std::find(children.begin(), children.end(), child);
         if (el == std::end(children)) {
             return {0, 0};
         }
+
         Size granted = {std::min((*el)->area(Area::Max).w, request_w), std::min((*el)->area(Area::Max).h, request_h)};
+
         sizeStore->store(*el, granted);
         BoxLayout::resizeItems<axis>(); // vs mark dirty
         return granted;

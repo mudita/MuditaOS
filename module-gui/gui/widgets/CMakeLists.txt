@@ -3,6 +3,7 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/BottomBar.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/CheckBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Icon.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Image.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ImageBox.cpp"

@@ -199,7 +199,7 @@ namespace gui
                 }
                 // if numeric key was pressed record that key and send it to call application
                 else if (code != 0) {
-                    return app::prepare_call(application, std::string(1, static_cast<char>(code)));
+                    return app::prepareCall(application, std::string(1, static_cast<char>(code)));
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace gui
             }
             // long press of '0' key is translated to '+'
             else if (inputEvent.keyCode == KeyCode::KEY_0) {
-                return app::prepare_call(application, "+");
+                return app::prepareCall(application, "+");
             }
         }
 

@@ -8,6 +8,11 @@
 #include <gui/widgets/TopBar.hpp>
 
 #include <time/time_conversion.hpp>
+#include <module-services/service-db/messages/QueryMessage.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAll.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 namespace gui
 {
@@ -64,10 +69,42 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
-            LOG_DEBUG("TODO: Switch to new window - edit window");
+            LOG_DEBUG("Switch to new window - edit window");
+            auto msg = DBServiceAPI::GetQueryWithReply(
+                application, db::Interface::Name::Events, std::make_unique<db::query::events::GetAll>(), 1000);
+
+            LOG_DEBUG("Type id %s", typeid(*msg.second).name());
+            auto msgl = msg.second.get();
+            assert(msgl != nullptr);
+            onDatabaseMessage(msgl);
+
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<SwitchData>();
+            data->setDescription("New");
+            application->switchWindow(
+                style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
+        return false;
+    }
 
+    bool DayEventsWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
+        if (msg != nullptr) {
+            auto temp = msg->getResult();
+            if (auto response = dynamic_cast<db::query::events::GetAllResult *>(temp.get())) {
+                unique_ptr<vector<EventsRecord>> records = response->getResult();
+                for (auto &rec : *records) {
+                    LOG_DEBUG("record: %s", rec.title.c_str());
+                }
+                uint32_t numberOfItems = records->size();
+                dayEventsModel->setRecordsCount(numberOfItems);
+                return dayEventsModel->updateRecords(std::move(records));
+            }
+            LOG_DEBUG("Response False");
+            return false;
+        }
+        LOG_DEBUG("DayWindow DB Message != QueryResponse");
         return false;
     }
 } /* namespace gui */
