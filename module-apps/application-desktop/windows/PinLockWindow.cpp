@@ -20,6 +20,7 @@
 
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
+#include <application-phonebook/ApplicationPhonebook.hpp>
 #include <Style.hpp>
 
 namespace gui
@@ -198,6 +199,9 @@ namespace gui
             // accept only LF, enter, RF, #, and numeric values
             if (state == State::EnteringPin) {
                 if (inputEvent.keyCode == KeyCode::KEY_LF) {
+                    sapm::ApplicationManager::messageSwitchApplication(
+                        application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
+
                     return true;
                 }
                 else if (inputEvent.keyCode == KeyCode::KEY_RF) {

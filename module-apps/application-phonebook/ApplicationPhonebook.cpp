@@ -10,6 +10,7 @@
 #include "windows/PhonebookNamecardOptions.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
+#include "windows/PhonebookIceContacts.hpp"
 #include <service-appmgr/ApplicationManager.hpp>
 
 namespace app
@@ -116,6 +117,7 @@ namespace app
             {gui::window::name::dialog_confirm, new gui::DialogConfirm(this, gui::window::name::dialog_confirm)});
         windows.insert({gui::window::name::contact_options, new gui::PhonebookContactOptions(this)});
         windows.insert({gui::window::name::namecard_options, new gui::PhonebookNamecardOptions(this)});
+        windows.insert({gui::window::name::ice_contacts, new gui::PhonebookIceContacts(this)});
     }
 
     void ApplicationPhonebook::destroyUserInterface()
