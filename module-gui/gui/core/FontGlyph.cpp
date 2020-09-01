@@ -1,6 +1,8 @@
 #include "FontGlyph.hpp"
 #include <cstring>
 
+typedef uint32_t ucode32;
+
 namespace gui
 {
     FontGlyph::~FontGlyph()
@@ -23,8 +25,8 @@ namespace gui
     gui::Status FontGlyph::load(uint8_t *data, uint32_t &offset)
     {
         // character id
-        memcpy(&id, data + offset, sizeof(uint16_t));
-        offset += sizeof(uint16_t);
+        memcpy(&id, data + offset, sizeof(ucode32));
+        offset += sizeof(ucode32);
         // offset in glyph data field
         memcpy(&glyph_offset, data + offset, sizeof(uint32_t));
         offset += sizeof(uint32_t);

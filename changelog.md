@@ -2,9 +2,14 @@
 
 ## Current release
 
+### Added
+
+* `[fonts]` Added phone compatibility with emoticons.
+
 ### Fixed
 
 * `[messages]` Fixed crashing in the new message window.
+* `[home screen]``[notifications]` Fixed notifications widget when phone is locked.
 
 ### Other
 

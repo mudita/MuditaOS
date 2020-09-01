@@ -3,6 +3,8 @@
 #include "Common.hpp" // for Status
 #include <stdint.h>   // for uint16_t, uint32_t, uint8_t, int16_t
 
+typedef uint32_t ucode32;
+
 namespace gui
 {
     class FontGlyph
@@ -14,7 +16,7 @@ namespace gui
         gui::Status load(uint8_t *data, uint32_t &offset);
         gui::Status loadImage(uint8_t *data, uint32_t offset);
         // character id
-        uint16_t id = 0;
+        ucode32 id = 0;
         // offset in glyph data field
         uint32_t glyph_offset = 0;
         // width of the character image in the texture
