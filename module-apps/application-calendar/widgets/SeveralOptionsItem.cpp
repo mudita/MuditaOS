@@ -132,14 +132,6 @@ namespace gui
                     bottomBarRestoreFromTemporaryMode();
                 }
                 optionLabel->setText(optionsNames[actualVectorIndex]);
-                onSaveCallback = [&](std::shared_ptr<EventsRecord> record) {
-                    if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
-                        record->repeat = actualVectorIndex;
-                    }
-                    else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {
-                        record->reminder = reminderTimeOptions[actualVectorIndex];
-                    }
-                };
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_RIGHT) {
@@ -155,14 +147,6 @@ namespace gui
                 else {
                     bottomBarRestoreFromTemporaryMode();
                 }
-                onSaveCallback = [&](std::shared_ptr<EventsRecord> record) {
-                    if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
-                        record->repeat = actualVectorIndex;
-                    }
-                    else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {
-                        record->reminder = reminderTimeOptions[actualVectorIndex];
-                    }
-                };
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_LF && actualVectorIndex == optionsNames.size() - 1 &&

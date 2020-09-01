@@ -484,7 +484,12 @@ namespace sapm
         // this is applicable to all applications except desktop
         if ((focusApplicationName == msg->getName())) {
             LOG_WARN("Trying to return currently active application");
-            return false;
+            ////return false;
+
+            // mlucki
+            app::Application::messageSwitchApplication(
+                this, msg->getName(), msg->getWindow(), std::move(msg->getData()));
+            return true;
         }
 
         // store the name of the application to be executed and start closing previous application

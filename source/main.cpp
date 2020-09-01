@@ -24,6 +24,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
+#include <service-time/ServiceTime.hpp>
 #if ENABLE_GSM == 1
 #include <service-fota/ServiceFota.hpp>
 #include <service-cellular/ServiceCellular.hpp>
@@ -89,6 +90,9 @@ int main()
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
+
+        // mlucki
+        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceTime>(), sysmgr.get());
 
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;

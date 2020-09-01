@@ -107,6 +107,7 @@ set(SOURCES
         queries/calendar/QueryEventsEdit.cpp
         queries/calendar/QueryEventsGetFiltered.cpp
         queries/calendar/QueryEventsGetAllLimited.cpp
+        queries/calendar/QueryEventsSelectFirstUpcoming.cpp
         queries/settings/QuerySettingsGet_v2.cpp
         queries/settings/QuerySettingsUpdate_v2.cpp
         queries/settings/QuerySettingsAddOrIgnore_v2.cpp
