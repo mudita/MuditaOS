@@ -9,7 +9,7 @@ else
   source ./config/common.sh
 fi
 
-VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{print $3}' | tr -d '\r' | tr -d '\"'`
+VERSION_KERNEL=`grep tskKERNEL_VERSION_NUMBER module-os/FreeRTOS/include/task.h | awk '{printf %s, $3}' `
 VERSION_CODENAME="salvador"
 print_help() {
 	echo "Usage: $0 [OPTION] [BUILD-DIR]"
