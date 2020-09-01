@@ -6,6 +6,7 @@
 #include "windows/EventDetailWindow.hpp"
 #include "windows/NewEditEventWindow.hpp"
 #include "windows/CustomRepeatWindow.hpp"
+#include "windows/EventReminderWindow.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
 #include <time/time_conversion.hpp>
@@ -142,6 +143,10 @@ namespace app
         windowsFactory.attach(custom_repeat_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::CustomRepeatWindow>(app, custom_repeat_window);
         });
+        // mlucki
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            style::window::calendar::name::event_reminder_window,
+            new gui::EventReminderWindow(this, style::window::calendar::name::event_reminder_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()

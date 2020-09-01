@@ -38,7 +38,9 @@ enum class Repeat
     custom
 };
 
-constexpr TimePoint TIME_POINT_INVALID = TimePoint::min();
+// mlucki
+// constexpr TimePoint TIME_POINT_INVALID = TimePoint::min();
+constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
 
 inline std::tm CreateTmStruct(int year, int month, int day, int hour, int minutes, int seconds)
 {
@@ -137,6 +139,16 @@ inline TimePoint getFirstWeekDay(const TimePoint &tp)
     auto finalDateTime = finalDate + std::chrono::hours(hourV) + std::chrono::minutes(minuteV);
 
     return finalDateTime;
+}
+
+inline std::string TimePointToDateString(const TimePoint &tp)
+{
+    return date::format("%F", time_point_cast<seconds>(tp));
+}
+
+inline std::string TimePointToTimeString(const TimePoint &tp)
+{
+    return date::format("%T", time_point_cast<seconds>(tp));
 }
 
 inline std::string TimePointToString(const TimePoint &tp, date::months months)

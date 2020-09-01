@@ -96,4 +96,24 @@ namespace gui
         {}
         ~SpeakerIcon() override = default;
     };
+
+    enum class CalendarIconState
+    {
+        CALENDAR_SHOW
+    };
+    class CalendarIcon : public Icon<CalendarIconState>
+    {
+      protected:
+        static const inline std::string callendarImg    = "calendar";
+        static const inline std::string calendarShowStr = "app_call_calendar_show";
+        static const inline Icon::IconMap iconMap       = {
+            {CalendarIconState::CALENDAR_SHOW, {callendarImg, calendarShowStr}}};
+
+      public:
+        CalendarIcon() = delete;
+        CalendarIcon(Item *parent, const uint32_t &x, const uint32_t &y)
+            : Icon(parent, x, y, callAppStyle::icon::x_margin, CalendarIconState::CALENDAR_SHOW, iconMap)
+        {}
+        ~CalendarIcon() override = default;
+    };
 } // namespace gui

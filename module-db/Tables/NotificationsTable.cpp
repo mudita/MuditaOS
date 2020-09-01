@@ -15,10 +15,13 @@ bool NotificationsTable::create()
         return false;
     }
 
-    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0})) {
+    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 2})) {
         return false;
     }
-    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0})) {
+    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 3})) {
+        return false;
+    }
+    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::CalendarEvents), .value = 4})) {
         return false;
     }
 

@@ -29,10 +29,11 @@ namespace app
             {
                 unsigned int SMS   = 0;
                 unsigned int Calls = 0;
+                unsigned int CalendarEvents = 0;
 
                 auto areEmpty()
                 {
-                    return Calls == 0 && SMS == 0;
+                    return Calls == 0 && SMS == 0 && CalendarEvents == 0;
                 }
             };
 
@@ -68,8 +69,10 @@ namespace app
         //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
         //);
         bool showCalls();
+        bool showAllCalendarEvents();
         bool clearCallsNotification();
         bool clearMessagesNotification();
+        bool clearCalendarEventsNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
 
