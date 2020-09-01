@@ -814,6 +814,13 @@ bool DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, ui
     return true;
 }
 
+uint32_t DBServiceAPI::CalendarEventsGetCount(sys::Service *serv, EntryState state)
+{
+    // mlucki
+    // ToDo: calendarEvents
+    return 3;
+}
+
 uint32_t DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc)
 {
     std::shared_ptr<DBCountryCodeMessage> msg =

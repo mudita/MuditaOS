@@ -10,6 +10,10 @@
 #include <cassert>
 #include <i18/i18.hpp>
 
+// mlucki
+#include "module-apps/application-calendar/data/CalendarData.hpp"
+#include "service-time/ServiceTime.hpp"
+
 namespace style::design
 {
     // all these might not be final - as designs for these didn't look like that
@@ -245,6 +249,39 @@ namespace gui
 
     bool MenuWindow::onInput(const InputEvent &inputEvent)
     {
+        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_1)) {
+
+            // mlucki
+            EventsRecord eventRecord;
+            eventRecord.title     = "Ciapek do weterynarza";
+            eventRecord.reminder  = 40;
+            eventRecord.date_from = TimePointFromString("2020-09-12 11:55:00");
+
+            std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
+            eventData->setDescription(style::window::calendar::name::event_reminder_window);
+            auto event = std::make_shared<EventsRecord>(eventRecord);
+            eventData->setData(event);
+            eventData->setWindowName("");
+
+            sapm::ApplicationManager::messageSwitchApplication(
+                application, "ApplicationCalendar", "EventReminderWindow", std::move(eventData));
+            return true;
+        }
+
+        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_3)) {
+
+            // mlucki
+            ServiceTime::messageTimersProcessingStart(application);
+            return true;
+        }
+
+        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_4)) {
+
+            // mlucki
+            ServiceTime::messageTimersProcessingStop(application);
+            return true;
+        }
+
         if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_RF) &&
             (toolsMenu->visible)) {
             switchMenu(mainMenu);
