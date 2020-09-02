@@ -9,6 +9,8 @@
 #include "queries/sms/QuerySMSSearch.hpp"
 
 #include <memory>
+#include <module-db/queries/sms/QuerySMSGetCount.hpp>
+#include <module-utils/json/json11.hpp>
 
 namespace db
 {
@@ -55,5 +57,33 @@ TEST_CASE("Query interface")
     {
         auto result = threadInterface->runQuery(query);
         REQUIRE(dynamic_cast<db::query::SMSSearchResult *>(result.get()));
+    }
+
+    SECTION("Endpoint callback test")
+    {
+        std::shared_ptr<db::Query> query = std::make_shared<db::query::SMSGetCount>();
+        auto testMessage                 = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context &context) {
+                if (auto SMSResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
+                    auto id   = SMSResult->getResults();
+                    auto body = json11::Json::object{{"count", static_cast<int>(id)}};
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        auto result        = smsInterface->runQuery(query);
+        auto queryListener = result->getRequestQuery()->getQueryListener();
+        REQUIRE(queryListener->handleQueryResponse(result.get()) == true);
     }
 }
