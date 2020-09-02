@@ -18,6 +18,7 @@ namespace app
         // determines whether screen should be protected by pin verification
         bool screenLocked = true;
         bool pinLocked    = false;
+        void reloadSettings();
 
       public:
         bool need_sim_select = false;

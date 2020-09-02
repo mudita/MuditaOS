@@ -71,7 +71,6 @@ namespace gui
             auto &line = lines.last();
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
-            line.alignH(getAlignment(Axis::X), w);
 
             line_y_position += lineHeight;
 
@@ -79,6 +78,7 @@ namespace gui
 
         } while (true);
 
+        lines.linesHAlign(sizeMinusPadding(Axis::X, Area::Normal));
         lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
     }
 } // namespace gui

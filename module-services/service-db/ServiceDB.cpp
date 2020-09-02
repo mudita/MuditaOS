@@ -105,6 +105,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBSettingsMessage *msg = reinterpret_cast<DBSettingsMessage *>(msgl);
         auto ret               = settingsRecordInterface->Update(msg->record);
         responseMsg            = std::make_shared<DBSettingsResponseMessage>(SettingsRecord{}, ret);
+        sendUpdateNotification(db::Interface::Name::Settings, db::Query::Type::Update);
     } break;
         /*
          * SMS records
