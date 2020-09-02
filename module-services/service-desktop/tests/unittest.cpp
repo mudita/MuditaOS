@@ -11,7 +11,8 @@
 #include "messages/MessageHelper.hpp"
 #include "queries/sms/QuerySMSSearchByType.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
-
+#include "EndpointFactory.hpp"
+#include "contacts/ContactsEndpoint.hpp"
 #include "json/json11.hpp"
 #include <memory>
 #include <vfs.hpp>
@@ -230,3 +231,65 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     REQUIRE(messageTemplateJson[json::messages::id] == 1);
 }
 
+TEST_CASE("Context class test")
+{
+    SECTION("Correct message")
+    {
+        auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        REQUIRE(context.getBody()["test"] == "test");
+        REQUIRE(context.getMethod() == http::Method::get);
+        REQUIRE(context.getUuid() == 12345);
+        REQUIRE(context.getEndpoint() == EndpointType::contacts);
+        REQUIRE(context.createSimpleResponse() ==
+                R"(#000000061{"body": null, "endpoint": 6, "status": 200, "uuid": "12345"})");
+
+        context.setResponseBody(context.getBody());
+        REQUIRE(context.createSimpleResponse() ==
+                R"(#000000073{"body": {"test": "test"}, "endpoint": 6, "status": 200, "uuid": "12345"})");
+    }
+    SECTION("Invalid message")
+    {
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"0", "body":{"te":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        REQUIRE(context.getBody()["test"] == json11::Json());
+        REQUIRE(context.getMethod() == http::Method::get);
+        REQUIRE(context.getUuid() == invalidUuid);
+        REQUIRE(context.getEndpoint() == EndpointType::invalid);
+    }
+}
+
+TEST_CASE("Endpoint Factory test")
+{
+    SECTION("Proper endpoint")
+    {
+        auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto handler = EndpointFactory::create(context, nullptr);
+        REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
+    }
+
+    SECTION("Wrong endpoint")
+    {
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto handler = EndpointFactory::create(context, nullptr);
+        REQUIRE(handler == nullptr);
+    }
+}

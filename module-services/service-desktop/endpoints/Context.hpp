@@ -20,6 +20,8 @@ namespace parserFSM
         json11::Json body = json11::Json();
     };
 
+    constexpr int invalidUuid = 0;
+
     class Context
     {
       private:
@@ -36,6 +38,9 @@ namespace parserFSM
             }
             if (static_cast<int>(endpoint) > lastEndpoint) {
                 endpoint = EndpointType::invalid;
+            }
+            if (method > http::Method::del) {
+                method = http::Method::get;
             }
         }
         auto buildResponseStr(std::size_t responseSize, std::string responsePayloadString) -> std::string
@@ -57,6 +62,14 @@ namespace parserFSM
             body     = js[json::body];
             endpoint = static_cast<EndpointType>(js[json::endpoint].int_value());
             uuid     = js[json::uuid].int_value();
+            if (uuid == invalidUuid) {
+                try {
+                    uuid = stoi(js[json::uuid].string_value());
+                }
+                catch (...) {
+                    uuid = invalidUuid;
+                }
+            }
             method   = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
@@ -64,7 +77,7 @@ namespace parserFSM
         {
             body     = json11::Json();
             endpoint = EndpointType::invalid;
-            uuid     = 0;
+            uuid     = invalidUuid;
             method   = http::Method::get;
         }
 
