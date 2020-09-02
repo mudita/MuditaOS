@@ -7,6 +7,7 @@
 #include "module-db/queries/sms/QuerySMSSearch.hpp"
 #include "module-db/queries/sms/QuerySMSThreadsGet.hpp"
 #include "module-db/queries/sms/QuerySmsThreadMarkAsRead.hpp"
+#include <PhoneNumber.hpp>
 
 #include <utf8/UTF8.hpp>
 
@@ -19,11 +20,12 @@ struct ThreadRecord : Record
     UTF8 snippet;
     SMSType type       = SMSType::UNKNOWN;
     uint32_t contactID = DB_ID_NONE;
+    uint32_t numberID  = DB_ID_NONE;
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
         : date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount), snippet(rec.snippet),
-          type(rec.type), contactID(rec.contactID)
+          type(rec.type), contactID(rec.contactID), numberID(rec.numberID)
     {
         ID = rec.ID;
     }
@@ -37,6 +39,7 @@ struct ThreadRecord : Record
 enum class ThreadRecordField
 {
     ContactID,
+    NumberID,
 };
 
 class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordField>
@@ -50,6 +53,7 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     bool Update(const ThreadRecord &rec) override final;
     ThreadRecord GetByID(uint32_t id) override final;
     ThreadRecord GetByContact(uint32_t contact_id);
+    ThreadRecord GetByNumber(const utils::PhoneNumber::View &phoneNumber);
 
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);

@@ -6,6 +6,7 @@
 #include <Utils.hpp>
 
 #include <queries/phonebook/QueryContactGet.hpp>
+#include <queries/phonebook/QueryNumberGetByID.hpp>
 
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
@@ -164,6 +165,9 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
     else if (typeid(*query) == typeid(db::query::ContactRemove)) {
         return removeQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::NumberGetByID)) {
+        return numberGetByIdQuery(query);
+    }
     else {
         LOG_ERROR("Unexpected query type.");
         return nullptr;
@@ -274,11 +278,21 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::updateQuery(std::shared
     response->setRequestQuery(query);
     return response;
 }
+
 std::unique_ptr<db::QueryResult> ContactRecordInterface::removeQuery(std::shared_ptr<db::Query> query)
 {
     auto removeQuery = static_cast<db::query::ContactRemove *>(query.get());
     auto ret         = ContactRecordInterface::RemoveByID(removeQuery->getID());
     auto response    = std::make_unique<db::query::ContactRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ContactRecordInterface::numberGetByIdQuery(std::shared_ptr<db::Query> query)
+{
+    auto numberQuery = static_cast<db::query::NumberGetByID *>(query.get());
+    auto ret         = ContactRecordInterface::GetNumberById(numberQuery->getID());
+    auto response    = std::make_unique<db::query::NumberGetByIDResult>(ret);
     response->setRequestQuery(query);
     return response;
 }
@@ -874,9 +888,10 @@ utils::NumberHolderMatcher<std::vector, ContactNumberHolder> ContactRecordInterf
                                                                         std::cend(contactNumberHolders));
 }
 
-std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numberView,
-                                                                   CreateTempContact createTempContact,
-                                                                   utils::PhoneNumber::Match matchLevel)
+std::optional<ContactRecordInterface::ContactNumberMatch> ContactRecordInterface::MatchByNumber(
+    const utils::PhoneNumber::View &numberView,
+    CreateTempContact createTempContact,
+    utils::PhoneNumber::Match matchLevel)
 {
     std::vector<ContactNumberHolder> contactNumberHolders;
     auto numberMatcher = buildNumberMatcher(contactNumberHolders);
@@ -898,10 +913,17 @@ std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::
             return std::nullopt;
         }
 
-        return GetByID(contactDB->getLastInsertRowId());
+        auto contactID       = contactDB->getLastInsertRowId();
+        auto contactTableRow = contactDB->contacts.getById(contactID);
+        auto numberIDs       = splitNumberIDs(contactTableRow.numbersID);
+        assert(numberIDs.size() == 1);
+        auto numberID = numberIDs[0];
+        return ContactRecordInterface::ContactNumberMatch(GetByID(contactID), contactID, numberID);
     }
 
-    return GetByID(matchedNumber->getContactID());
+    auto contactID = matchedNumber->getContactID();
+    auto numberID  = matchedNumber->getNumberID();
+    return ContactRecordInterface::ContactNumberMatch(GetByID(contactID), contactID, numberID);
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial(UTF8 speedDial)
@@ -1040,4 +1062,16 @@ bool ContactRecord::isOnBlocked()
 bool ContactRecord::isOnGroup(uint32_t groupId)
 {
     return groups.find(groupId) != groups.end();
+}
+
+ContactRecordInterface::ContactNumberMatch::ContactNumberMatch(ContactRecord rec,
+                                                               std::uint32_t contactId,
+                                                               std::uint32_t numberId)
+    : contact(std::move(rec)), contactId(contactId), numberId(numberId)
+{}
+
+utils::PhoneNumber::View ContactRecordInterface::GetNumberById(std::uint32_t numberId)
+{
+    auto row = contactDB->number.getById(numberId);
+    return utils::PhoneNumber(row.numberUser, row.numbere164).getView();
 }
