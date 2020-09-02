@@ -65,7 +65,7 @@ namespace gui
         virtual void resizeItems();
         bool reverseOrder = false;
 
-        template <Axis axis>[[nodiscard]] Length calculateElemResize(Item *el);
+        template <Axis axis>[[nodiscard]] Length calculateElemResize(Item *el, Length &toSplit);
         template <Axis axis>
         [[nodiscard]] Length calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit);
         template <Axis axis>[[nodiscard]] Length calculateElemOrtAxisSize(Item *el);
