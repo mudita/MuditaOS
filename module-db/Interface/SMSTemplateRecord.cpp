@@ -4,6 +4,7 @@
 #include "queries/sms/QuerySMSTemplateAdd.hpp"
 #include "queries/sms/QuerySMSTemplateGetCount.hpp"
 #include "queries/sms/QuerySMSTemplateRemove.hpp"
+#include "queries/sms/QuerySMSTemplateUpdate.hpp"
 #include "queries/sms/QuerySMSThreadsGet.hpp"
 
 #include <log/log.hpp>
@@ -97,6 +98,9 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::runQuery(std::share
     else if (typeid(*query) == typeid(db::query::SMSTemplateRemove)) {
         return removeQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::SMSTemplateUpdate)) {
+        return updateQuery(query);
+    }
     else {
         return getByIDQuery(query);
     }
@@ -146,6 +150,14 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::removeQuery(std::sh
     const auto localQuery = static_cast<const db::query::SMSTemplateRemove *>(query.get());
     auto ret              = smsDB->templates.removeById(localQuery->id);
     auto response         = std::make_unique<db::query::SMSTemplateRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::updateQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSTemplateAdd *>(query.get());
+    auto ret              = SMSTemplateRecordInterface::Update(localQuery->rec);
+    auto response         = std::make_unique<db::query::SMSTemplateAddResult>(ret);
     response->setRequestQuery(query);
     return response;
 }
