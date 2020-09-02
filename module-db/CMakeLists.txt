@@ -76,6 +76,7 @@ set(SOURCES
         queries/sms/QuerySMSTemplateGetCount.cpp
         queries/sms/QuerySMSTemplateRemove.cpp
         queries/sms/QuerySMSTemplateUpdate.cpp
+        queries/sms/QueryThreadGetByNumber.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetCount.cpp
@@ -90,6 +91,7 @@ set(SOURCES
         queries/phonebook/QueryContactAdd.cpp
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryContactRemove.cpp
+        queries/phonebook/QueryNumberGetByID.cpp
         queries/calendar/QueryEventsRemove.cpp
         queries/calendar/QueryEventsGet.cpp
         queries/calendar/QueryEventsGetAll.cpp

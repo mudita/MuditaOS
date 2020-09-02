@@ -13,6 +13,7 @@ struct ThreadsTableRow : public Record
     uint32_t msgCount       = 0;
     uint32_t unreadMsgCount = 0;
     uint32_t contactID      = DB_ID_NONE;
+    uint32_t numberID       = DB_ID_NONE;
     UTF8 snippet;
     SMSType type = SMSType::UNKNOWN;
 };
@@ -23,6 +24,7 @@ enum class ThreadsTableFields
     MsgCount,
     MsgRead,
     ContactID,
+    NumberID,
     Type
 };
 
@@ -58,6 +60,7 @@ class ThreadsTable : public Table<ThreadsTableRow, ThreadsTableFields>
                                    "msg_count INTEGER,"
                                    "read INTEGER,"
                                    "contact_id INTEGER,"
+                                   "number_id INTEGER,"
                                    "snippet TEXT NOT NULL,"
                                    "last_dir INTEGER"
                                    ");";

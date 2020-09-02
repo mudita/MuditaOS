@@ -8,6 +8,8 @@
 
 ### Changed
 
+* `[messages]` Use different thread for each of contact's number.
+
 ### Fixed
 
 * `[desktopApp]` Fixed endpoint handling.
@@ -19,8 +21,6 @@
 
 ### Other
 * `[desktopApp]` Added functional tests.
-
-
 
 ## [0.36.1 2020-09-04]
 
