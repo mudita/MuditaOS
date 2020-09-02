@@ -23,4 +23,20 @@ namespace gui
         }
         return {0, 0};
     }
+
+    bool BoxLayoutSizeStore::isSizeSmaller(Item *item, Size size, Axis axis)
+    {
+        return size.get(axis) < get(item).get(axis);
+    }
+
+    void BoxLayoutSizeStore::setReleaseSpaceFlag(const bool &val)
+    {
+        releaseSpace = val;
+    }
+
+    bool BoxLayoutSizeStore::getReleaseSpaceFlag()
+    {
+        return releaseSpace;
+    }
+
 } // namespace gui
