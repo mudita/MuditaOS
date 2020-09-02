@@ -181,7 +181,7 @@ namespace gui
             auto orthogonalItemSize     = 0;
 
             // 1. Calculate element axis resize.
-            calculatedResize = calculateElemResize<axis>(el);
+            calculatedResize = calculateElemResize<axis>(el, toSplit);
 
             // 2. Check if new size in axis can be applied and set it or use element minimal size in axis.
             axisItemSize = calculateElemAxisSize<axis>(el, calculatedResize, toSplit);
@@ -189,7 +189,7 @@ namespace gui
             // 3. Calculate orthogonal axis size.
             orthogonalItemSize = calculateElemOrtAxisSize<axis>(el);
 
-            // 4. Calculate initial element position in axis.
+            // 4. Calculate element position in axis and apply in axis alignment.
             axisItemPosition = calculateElemAxisPosition<axis>(el, axisItemSize, startingPosition, leftPosition);
 
             // 5. Calculate element orthogonal axis position based on Layout alignment or on element alignment.
@@ -203,7 +203,7 @@ namespace gui
         Rect::updateDrawArea();
     }
 
-    template <Axis axis> Length BoxLayout::calculateElemResize(Item *el)
+    template <Axis axis> Length BoxLayout::calculateElemResize(Item *el, Length &toSplit)
     {
         auto grantedSize        = sizeStore->get(el);
         Length calculatedResize = 0;
@@ -218,6 +218,7 @@ namespace gui
             // outOfDrawAreaList.
             if (sizeLeft<axis>(this) < calculatedResize) {
                 addToOutOfDrawAreaList(getLastVisibleElement());
+                toSplit = sizeLeft<axis>(this);
             }
         }
         else {
