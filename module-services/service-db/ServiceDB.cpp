@@ -341,8 +341,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto ret  = contactRecordInterface->MatchByNumber(msg->numberView);
 
         if (ret.has_value()) {
-            responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Success,
-                                                                           std::make_unique<ContactRecord>(*ret));
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(
+                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(ret->contact));
         }
         else {
             responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Failure,

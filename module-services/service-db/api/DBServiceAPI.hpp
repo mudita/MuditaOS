@@ -56,6 +56,9 @@ class DBServiceAPI
 
     static std::unique_ptr<ThreadRecord> ThreadGet(sys::Service *serv, uint32_t id);
     static std::unique_ptr<ThreadRecord> ThreadGetByContact(sys::Service *serv, uint32_t contactID);
+    static std::unique_ptr<ThreadRecord> ThreadGetByNumber(sys::Service *serv,
+                                                           const utils::PhoneNumber::View &phoneNumber,
+                                                           std::uint32_t timeout);
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
     static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static uint32_t ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
@@ -113,6 +116,9 @@ class DBServiceAPI
                                                                      UTF8 primaryName,
                                                                      UTF8 alternativeName,
                                                                      UTF8 number);
+    static std::unique_ptr<utils::PhoneNumber::View> GetNumberById(sys::Service *serv,
+                                                                   std::uint32_t numberId,
+                                                                   std::uint32_t timeout);
     static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
     static bool AlarmRemove(sys::Service *serv, uint32_t id);
     static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);

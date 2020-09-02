@@ -62,14 +62,17 @@ CalllogRecordInterface::~CalllogRecordInterface()
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
-    if (!contactRec) {
+    auto contactMatch =
+        contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
+    if (!contactMatch) {
         LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
         return false;
     }
+    auto &contactRec = contactMatch->contact;
+
     auto localRec      = rec;
-    localRec.contactId = std::to_string(contactRec->ID);
-    localRec.name      = contactRec->getFormattedName();
+    localRec.contactId = std::to_string(contactRec.ID);
+    localRec.name      = contactRec.getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
     return calllogDB->calls.add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
