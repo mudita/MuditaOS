@@ -74,6 +74,7 @@ set(SOURCES
         queries/sms/QuerySMSTemplateGet.cpp
         queries/sms/QuerySMSTemplateGetCount.cpp
         queries/sms/QuerySMSTemplateRemove.cpp
+        queries/sms/QuerySMSTemplateUpdate.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp

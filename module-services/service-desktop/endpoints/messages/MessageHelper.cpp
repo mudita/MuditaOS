@@ -16,6 +16,7 @@
 #include "queries/sms/QuerySMSRemove.hpp"
 #include "queries/sms/QuerySMSTemplateGet.hpp"
 #include "queries/sms/QuerySMSTemplateRemove.hpp"
+#include "queries/sms/QuerySMSTemplateUpdate.hpp"
 #include "queries/sms/QuerySMSTemplateAdd.hpp"
 #include "queries/sms/QuerySMSTemplateGetByID.hpp"
 #include "queries/sms/QuerySMSTemplateGetCount.hpp"
@@ -435,6 +436,24 @@ auto MessageHelper::updateTemplate(Context &context) -> sys::ReturnCodes
     record.ID   = context.getBody()[json::messages::id].int_value();
     record.text = context.getBody()[json::messages::templateText].string_value();
 
-    DBServiceAPI::SMSTemplateUpdate(ownerServicePtr, record);
+    auto query    = std::make_unique<db::query::SMSTemplateUpdate>(record);
+    auto listener = std::make_unique<db::EndpointListener>(
+        [=](db::QueryResult *result, Context context) {
+            if (auto SMSTemplateResult = dynamic_cast<db::query::SMSTemplateUpdateResult *>(result)) {
+
+                context.setResponseStatus(SMSTemplateResult->getResult() ? http::Code::OK
+                                                                         : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+                return true;
+            }
+            else {
+                return false;
+            }
+        },
+        context);
+
+    query->setQueryListener(std::move(listener));
+    DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
+
     return sys::ReturnCodes::Success;
 }
