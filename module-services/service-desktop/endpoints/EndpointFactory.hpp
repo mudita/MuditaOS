@@ -8,6 +8,7 @@
 #include "deviceInfo/DeviceInfoEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
 #include "restore/RestoreEndpoint.hpp"
+#include "factoryReset/FactoryResetEndpoint.hpp"
 
 using namespace parserFSM;
 
@@ -30,6 +31,8 @@ class EndpointFactory
             return std::make_unique<ContactsEndpoint>(ownerServicePtr);
         case EndpointType::messages:
             return std::make_unique<MessagesEndpoint>(ownerServicePtr);
+        case EndpointType::factory:
+            return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }
