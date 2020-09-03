@@ -1,23 +1,18 @@
 #include "Common/Common.hpp"
 #include "ContactRecord.hpp"
-#include "Endpoint.hpp"
-#include "MessageType.hpp"
 #include "ParserUtils.hpp"
-#include "Service/Common.hpp"
 #include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
 #include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
 #include "ParserFSM.hpp"
 #include "contacts/ContactHelper.hpp"
 #include "messages/MessageHelper.hpp"
 #include "queries/sms/QuerySMSSearchByType.hpp"
-#include "service-desktop/ServiceDesktop.hpp"
 #include "EndpointFactory.hpp"
 #include "contacts/ContactsEndpoint.hpp"
 #include "json/json11.hpp"
 #include <memory>
 #include <vfs.hpp>
 #include <catch2/catch.hpp>
-#include <iostream>
 
 class vfs vfs;
 

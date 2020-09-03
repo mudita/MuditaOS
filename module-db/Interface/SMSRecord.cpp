@@ -14,6 +14,7 @@
 
 #include <PhoneNumber.hpp>
 #include <optional>
+#include <module-db/queries/sms/QuerySMSGetByThreadID.hpp>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
     : date(w.date), dateSent(w.dateSent), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
@@ -305,6 +306,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
     else if (typeid(*query) == typeid(db::query::SMSGetByContactID)) {
         return getByContactIDQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::SMSGetByThreadID)) {
+        return getByThreadIDQuery(query);
+    }
     else if (typeid(*query) == typeid(db::query::SMSGetByText)) {
         return getByTextQuery(query);
     }
@@ -437,6 +441,28 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::getQuery(std::shared_ptr<db
     }
 
     auto response = std::make_unique<db::query::SMSGetResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getByThreadIDQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetByThreadID *>(query.get());
+    auto smsVector        = smsDB->sms.getByThreadId(localQuery->threadId);
+    std::vector<SMSRecord> recordVector;
+    for (auto sms : smsVector) {
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        recordVector.emplace_back(record);
+    }
+
+    auto response = std::make_unique<db::query::SMSGetByThreadIDResult>(recordVector);
     response->setRequestQuery(query);
     return response;
 }

@@ -1,5 +1,20 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+### Changed
+
+### Fixed
+
+* `[desktopApp]` Fixed endpoint handling.
+
+### Other
+* `[desktopApp]` Added functional tests.
+
+
+
 ## [0.36.1 2020-09-04]
 
 ### Added

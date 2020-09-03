@@ -9,6 +9,7 @@
 #include "api/DBServiceAPI.hpp"
 #include "queries/sms/QuerySMSGet.hpp"
 #include "queries/sms/QuerySMSGetByContactID.hpp"
+#include "queries/sms/QuerySMSGetByThreadID.hpp"
 #include "queries/sms/QuerySMSGetByID.hpp"
 #include "queries/sms/QuerySMSGetByText.hpp"
 #include "queries/sms/QuerySMSGetCount.hpp"
@@ -138,6 +139,33 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
         auto listener = std::make_unique<db::EndpointListener>(
             [=](db::QueryResult *result, Context context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetByContactIDResult *>(result)) {
+
+                    json11::Json::array SMSarray;
+                    for (auto record : SMSResult->getResults()) {
+                        SMSarray.emplace_back(MessageHelper::to_json(record));
+                    }
+
+                    context.setResponseBody(SMSarray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+    }
+    else if (context.getBody()[json::messages::threadID].int_value() != 0) {
+
+        auto query =
+            std::make_unique<db::query::SMSGetByThreadID>(context.getBody()[json::messages::threadID].int_value());
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context context) {
+                if (auto SMSResult = dynamic_cast<db::query::SMSGetByThreadIDResult *>(result)) {
 
                     json11::Json::array SMSarray;
                     for (auto record : SMSResult->getResults()) {
