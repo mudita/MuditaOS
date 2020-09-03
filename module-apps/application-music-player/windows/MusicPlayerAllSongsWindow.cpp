@@ -1,4 +1,4 @@
-#include "MusicPlayerMainWindow.hpp"
+#include "MusicPlayerAllSongsWindow.hpp"
 #include "application-music-player/ApplicationMusicPlayer.hpp"
 
 #include <Style.hpp>
@@ -9,20 +9,22 @@
 namespace gui
 {
 
-    MusicPlayerMainWindow::MusicPlayerMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), songsModel{std::make_shared<SongsModel>(this->application)}
+    MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(app::Application *app)
+        : AppWindow(app, gui::name::window::all_songs_window), songsModel{
+                                                                   std::make_shared<SongsModel>(this->application)}
     {
         buildInterface();
     }
 
-    void MusicPlayerMainWindow::rebuild()
+    void MusicPlayerAllSongsWindow::rebuild()
     {
         destroyInterface();
         buildInterface();
     }
 
-    auto MusicPlayerMainWindow::setCurrentVolume(const std::function<void(const audio::Volume &)> &successCallback,
-                                                 const std::function<void(const audio::Volume &)> &errCallback) -> bool
+    auto MusicPlayerAllSongsWindow::setCurrentVolume(const std::function<void(const audio::Volume &)> &successCallback,
+                                                     const std::function<void(const audio::Volume &)> &errCallback)
+        -> bool
     {
         audio::Volume volume;
         const auto ret = application->getCurrentVolume(volume);
@@ -39,7 +41,7 @@ namespace gui
         return ret == audio::RetCode::Success;
     }
 
-    void MusicPlayerMainWindow::buildInterface()
+    void MusicPlayerAllSongsWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
@@ -51,10 +53,10 @@ namespace gui
         topBar->setActive(TopBar::Elements::TIME, true);
 
         songsList = new gui::ListView(this,
-                                      musicPlayerStyle::mainWindow::x,
-                                      musicPlayerStyle::mainWindow::y,
-                                      musicPlayerStyle::mainWindow::w,
-                                      musicPlayerStyle::mainWindow::h,
+                                      musicPlayerStyle::allSongsWindow::x,
+                                      musicPlayerStyle::allSongsWindow::y,
+                                      musicPlayerStyle::allSongsWindow::w,
+                                      musicPlayerStyle::allSongsWindow::h,
                                       songsModel);
 
         auto successCallback = [this](const audio::Volume &volume) {
@@ -89,25 +91,26 @@ namespace gui
         setFocusItem(songsList);
     }
 
-    void MusicPlayerMainWindow::destroyInterface()
+    void MusicPlayerAllSongsWindow::destroyInterface()
     {
         erase();
     }
 
-    void MusicPlayerMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void MusicPlayerAllSongsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
         assert(app);
 
-        songsModel->createData(app->getMusicFilesList());
+        songsModel->createData(app->getMusicFilesList(),
+                               [app](const std::string &fileName) { return app->play(fileName); });
     }
 
-    bool MusicPlayerMainWindow::onDatabaseMessage(sys::Message *msgl)
+    bool MusicPlayerAllSongsWindow::onDatabaseMessage(sys::Message *msgl)
     {
         return false;
     }
 
-    bool MusicPlayerMainWindow::onInput(const InputEvent &inputEvent)
+    bool MusicPlayerAllSongsWindow::onInput(const InputEvent &inputEvent)
     {
         auto ret           = AppWindow::onInput(inputEvent);
         const auto keyCode = inputEvent.keyCode;

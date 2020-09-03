@@ -29,22 +29,14 @@ auto SongsModel::getItem(gui::Order order) -> gui::ListItem *
     return getRecord(order);
 }
 
-void SongsModel::createData(std::vector<std::string> songsList)
+void SongsModel::createData(std::vector<audio::Tags> songsList, std::function<bool(const std::string &fileName)> func)
 {
     for (auto song : songsList) {
+        auto item = new gui::SongItem(song.title, song.artist, utils::time::Duration(song.total_duration_s).str());
 
-        auto fileTags = AudioServiceAPI::GetFileTags(application, song);
-        auto item     = fileTags ? new gui::SongItem(fileTags->title,
-                                                 fileTags->artist,
-                                                 utils::time::Duration(fileTags->total_duration_s).str())
-                             : new gui::SongItem(song, "", utils::time::Duration(0).str());
-
-        item->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("activatedCallback");
-
-            AudioServiceAPI::PlaybackStart(application, song);
-
-            return false;
+        item->activatedCallback = [=](gui::Item &) {
+            func(song.filePath);
+            return true;
         };
 
         internalData.push_back(item);

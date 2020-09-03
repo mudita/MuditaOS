@@ -1,8 +1,12 @@
 #include "ApplicationMusicPlayer.hpp"
-#include "windows/MusicPlayerMainWindow.hpp"
+#include "windows/MusicPlayerAllSongsWindow.hpp"
+#include "windows/MusicPlayerEmptyWindow.hpp"
 
+#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-audio/api/AudioServiceAPI.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
+#include <time/ScopedTime.hpp>
 
 namespace app
 {
@@ -44,32 +48,61 @@ namespace app
 
     void ApplicationMusicPlayer::createUserInterface()
     {
-
         gui::AppWindow *window = nullptr;
 
-        window = new gui::MusicPlayerMainWindow(this);
+        window = new gui::MusicPlayerAllSongsWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::MusicPlayerEmptyWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
     void ApplicationMusicPlayer::destroyUserInterface()
     {}
 
-    std::vector<std::string> ApplicationMusicPlayer::getMusicFilesList() const
+    std::vector<audio::Tags> ApplicationMusicPlayer::getMusicFilesList()
     {
         const char *musicFolder = USER_PATH("music");
-        std::vector<std::string> musicFiles;
+        std::vector<audio::Tags> musicFiles;
         LOG_INFO("Scanning music folder: %s", musicFolder);
-        auto dirList = vfs.listdir(musicFolder, "");
-
-        for (vfs::DirectoryEntry ent : dirList) {
-            if (ent.attributes != vfs::FileAttributes::Directory) {
-                musicFiles.push_back(std::string(musicFolder) + "/" + ent.fileName);
-                LOG_INFO(" - file %s found", ent.fileName.c_str());
+        std::vector<vfs::DirectoryEntry> dirList;
+        {
+            auto time = utils::time::Scoped("listdir time");
+            dirList   = vfs.listdir(musicFolder, "");
+        }
+        {
+            auto time = utils::time::Scoped("fetch tags time");
+            for (vfs::DirectoryEntry ent : dirList) {
+                if (ent.attributes != vfs::FileAttributes::Directory) {
+                    const auto filePath = std::string(musicFolder) + "/" + ent.fileName;
+                    auto fileTags       = getFileTags(filePath);
+                    if (fileTags) {
+                        musicFiles.push_back(*fileTags);
+                        LOG_DEBUG(" - file %s found", ent.fileName.c_str());
+                    }
+                    else {
+                        LOG_ERROR("Not an audio file %s", ent.fileName.c_str());
+                    }
+                }
             }
         }
-
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
         return musicFiles;
+    }
+
+    bool ApplicationMusicPlayer::play(const std::string &fileName)
+    {
+        auto ret = AudioServiceAPI::PlaybackStart(this, fileName);
+        if (ret != audio::RetCode::Success) {
+            LOG_ERROR("play failed with %s", audio::c_str(ret));
+            return false;
+        }
+        return true;
+    }
+
+    std::optional<audio::Tags> ApplicationMusicPlayer::getFileTags(const std::string &filePath)
+    {
+        return AudioServiceAPI::GetFileTags(this, filePath);
     }
 
 } /* namespace app */

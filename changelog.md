@@ -1,5 +1,23 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+* `[music player]` Added Empty window
+
+### Changed
+
+
+
+### Fixed
+
+
+
+### Other
+
+
+
 ## [0.38.1 2020-09-18]
 
 ### Added
@@ -369,4 +387,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-

@@ -264,6 +264,9 @@
 
     "app_music_player_all_songs": "All songs",
     "app_music_player_play": "PLAY",
+    "app_music_player_music_library": "MUSIC LIBRARY",
+    "app_music_player_quit": "QUIT",
+    "app_music_player_music_empty_window_notification": "Press Music Library to choose\n a song from the library",
 
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",
