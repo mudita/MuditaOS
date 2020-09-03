@@ -4,12 +4,17 @@
 
 namespace gui
 {
+    class MusicPlayerAllSongsWindow;
     namespace name
     {
         namespace window
-        {}; // namespace window
-    };      // namespace name
-};          // namespace gui
+        {
+            inline const std::string all_songs_window = "All Songs";
+            inline const std::string player_window    = "Player";
+            inline const std::string empty_window     = "Empty";
+        }; // namespace window
+    };     // namespace name
+};         // namespace gui
 
 namespace app
 {
@@ -17,7 +22,7 @@ namespace app
 
     class ApplicationMusicPlayer : public Application
     {
-      protected:
+
       public:
         ApplicationMusicPlayer(std::string name    = name_music_player,
                                std::string parent  = "",
@@ -36,7 +41,12 @@ namespace app
         void createUserInterface() final;
         void destroyUserInterface() final;
 
-        std::vector<std::string> getMusicFilesList() const;
+        std::vector<audio::Tags> getMusicFilesList();
+        bool play(const std::string &fileName);
+        bool pause();
+        bool resume();
+        bool stop();
+        std::optional<audio::Tags> getFileTags(const std::string &filePath);
     };
 
 } /* namespace app */
