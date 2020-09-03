@@ -107,6 +107,31 @@ std::vector<SMSTableRow> SMSTable::getByContactId(uint32_t contactId)
 
     return ret;
 }
+std::vector<SMSTableRow> SMSTable::getByThreadId(uint32_t threadId)
+{
+    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u;", threadId);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<SMSTableRow>();
+    }
+
+    std::vector<SMSTableRow> ret;
+
+    do {
+        ret.push_back(SMSTableRow{
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // threadID
+            (*retQuery)[2].getUInt32(),                       // contactID
+            (*retQuery)[3].getUInt32(),                       // date
+            (*retQuery)[4].getUInt32(),                       // dateSent
+            (*retQuery)[5].getUInt32(),                       // errorCode
+            (*retQuery)[6].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}
 
 std::vector<SMSTableRow> SMSTable::getByText(std::string text)
 {

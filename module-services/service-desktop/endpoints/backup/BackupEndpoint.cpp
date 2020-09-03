@@ -8,10 +8,10 @@ static bool backupReady = false;
 auto BackupEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
-    case http::Method::get:
+    case http::Method::post:
         upload(context);
         break;
-    case http::Method::post:
+    case http::Method::get:
         request(context);
         break;
     case http::Method::put:
@@ -25,8 +25,10 @@ auto BackupEndpoint::handle(Context &context) -> void
 auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
 {
     json11::Json responseBodyJson;
-
-    if (context.getBody()[json::backupRequest] == true) {
+    if (context.getBody()[json::backupReady] == true) {
+        context.setResponseBody(json11::Json::object({{json::backupReady, backupReady}}));
+    }
+    else if (context.getBody()[json::backupRequest] == true) {
         auto msg = std::make_shared<sdesktop::BackupMessage>();
         sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
         backupReady = true;
@@ -44,12 +46,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
 
 auto BackupEndpoint::upload(Context &context) -> sys::ReturnCodes
 {
-    json11::Json responseBodyJson;
-
-    if (context.getBody()[json::backupReady] == true) {
-        responseBodyJson = json11::Json::object({{json::backupReady, backupReady}});
-    }
-    else if (context.getBody()[json::backupUpload] == true) {
+    if (context.getBody()[json::backupUpload] == true) {
         if (vfs.fileExists(purefs::dir::os_backup.c_str())) {
             context.setResponseBody(json11::Json::object({{json::backupUpload, true}}));
         }
