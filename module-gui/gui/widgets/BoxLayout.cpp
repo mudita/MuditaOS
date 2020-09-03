@@ -454,15 +454,18 @@ namespace gui
         return granted;
     }
 
-    void BoxLayout::setFocusOnElement(unsigned int elementNumber)
+    bool BoxLayout::setFocusOnElement(unsigned int elementNumber)
     {
         unsigned int i = 0;
+        bool success   = false;
+
         for (auto child : children) {
-            if (child->activeItem == true && child->visible == true) {
+            if (child->activeItem && child->visible) {
 
                 if (elementNumber == i) {
                     child->setFocus(true);
                     focusItem = child;
+                    success   = true;
                 }
                 else {
                     child->setFocus(false);
@@ -470,6 +473,8 @@ namespace gui
                 ++i;
             }
         }
+
+        return success;
     }
 
     void BoxLayout::setFocusOnLastElement()
@@ -486,6 +491,22 @@ namespace gui
                 (*child)->setFocus(false);
             }
         }
+    }
+
+    unsigned int BoxLayout::getFocusItemIndex() const
+    {
+        auto index     = 0;
+        auto focusItem = getFocusItem();
+
+        for (auto child : children) {
+            if (child == focusItem) {
+                break;
+            }
+            if (child->activeItem && child->visible) {
+                index++;
+            }
+        }
+        return index;
     }
 
     Item *BoxLayout::getLastVisibleElement()

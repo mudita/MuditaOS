@@ -101,6 +101,7 @@ namespace gui
         /// set navigation from last to fist element in box
         virtual void setNavigation();
         std::list<Item *>::iterator getNavigationFocusedItem();
+        unsigned int getFocusItemIndex() const;
         void setVisible(bool value) override;
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
@@ -109,7 +110,7 @@ namespace gui
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
         // set focus on specified box element
-        void setFocusOnElement(unsigned int elementNumber);
+        bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
         template <Axis axis>
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
