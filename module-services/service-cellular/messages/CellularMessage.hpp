@@ -85,6 +85,22 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
+class CellularUSSDMessage : public CellularMessage
+{
+  public:
+    enum class RequestType
+    {
+        data,
+        abort
+    };
+    CellularUSSDMessage() = delete;
+    CellularUSSDMessage(RequestType requestType, const std::string &data = "")
+        : CellularMessage(MessageType::CellularUSSDRequest), type(requestType), data(data)
+    {}
+
+    RequestType type;
+    std::string data;
+};
 class CellularRequestMessage : public CellularMessage
 {
   public:

@@ -574,6 +574,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 for (auto const &el : respMsg->response) {
                     LOG_DEBUG("> %s", el.c_str());
                 }
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                break;
             }
             responseMsg = respMsg;
             break;
@@ -582,6 +584,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
                 state.set(this, cellular::State::ST::SimInit);
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
+                break;
             }
             break;
         default: {
@@ -860,6 +863,11 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto resp   = transmitDtmfTone(msg->getDigit());
         responseMsg = std::make_shared<CellularResponseMessage>(resp);
     } break;
+   case MessageType::CellularUSSDRequest: {
+        auto msg    = dynamic_cast<CellularUSSDMessage *>(msgl);
+        responseMsg = std::make_shared<CellularResponseMessage>(handleUSSDRequest(msg->type, msg->data));
+        break;
+    }
     default:
         break;
 
@@ -1631,4 +1639,9 @@ void ServiceCellular::handleStateTimer(void)
         LOG_FATAL("State %s timeout occured!", state.c_str(state.get()));
         state.set(this, cellular::State::ST::ModemFatalFailure);
     }
+}
+
+bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
+{
+    return false;
 }

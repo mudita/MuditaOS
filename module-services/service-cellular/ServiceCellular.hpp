@@ -142,6 +142,9 @@ class ServiceCellular : public sys::Service
 
     // db response handlers
     auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
+
+    // ussd handlers
+    bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP

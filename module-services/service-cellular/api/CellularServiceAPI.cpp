@@ -253,3 +253,16 @@ bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, uint32_t digit)
 
     return sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
 }
+
+bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data)
+{
+
+    auto msg = std::make_shared<CellularUSSDMessage>(type, data);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+
+    if (ret.first == sys::ReturnCodes::Success) {
+
+        return true;
+    }
+    return false;
+}

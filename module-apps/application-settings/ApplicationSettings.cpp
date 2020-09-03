@@ -18,6 +18,7 @@
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/USSDWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -137,6 +138,9 @@ namespace app
             window = new gui::CellularPassthroughWindow(this);
             windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
         }
+
+        window = new gui::USSDWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
     void ApplicationSettings::destroyUserInterface()
