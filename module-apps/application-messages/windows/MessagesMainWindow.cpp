@@ -36,7 +36,7 @@ namespace gui
 
     void MessagesMainWindow::rebuild()
     {
-        list->rebuildList();
+        list->rebuildList(style::listview::RebuildType::Partial);
     }
 
     void MessagesMainWindow::buildInterface()

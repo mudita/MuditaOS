@@ -23,16 +23,17 @@ namespace gui
     class ListView : public Rect
     {
       protected:
-        int startIndex                             = 0;
-        int elementsCount                          = 1;
+        unsigned int startIndex                    = 0;
+        unsigned int storedFocusIndex              = 0;
+        unsigned int elementsCount                 = 1;
         std::shared_ptr<ListItemProvider> provider = nullptr;
         VBox *body                                 = nullptr;
         ListViewScroll *scroll                     = nullptr;
 
-        int currentPageSize  = 0;
-        bool pageLoaded      = false;
-        bool focusOnLastItem = false;
-        int scrollTopMargin  = style::margins::big;
+        unsigned int currentPageSize = 0;
+        bool pageLoaded              = false;
+        bool focusOnLastItem         = false;
+        int scrollTopMargin          = style::margins::big;
 
         style::listview::Type listType       = style::listview::Type::TopDown;
         style::listview::Direction direction = style::listview::Direction::Bottom;
@@ -44,10 +45,12 @@ namespace gui
         void resizeWithScroll();
         void recalculateStartIndex();
         void checkFirstPage();
-        int calculateMaxItemsOnPage();
-        int calculateLimit();
+        unsigned int calculateMaxItemsOnPage();
+        unsigned int calculateLimit();
         Order getOrderFromDirection();
-        virtual bool listPageEndReached();
+        virtual bool requestNextPage();
+        virtual bool requestPreviousPage();
+        void setup(style::listview::RebuildType rebuildType);
 
       public:
         ListView();
@@ -56,13 +59,13 @@ namespace gui
 
         void setElementsCount(int count);
         void setProvider(std::shared_ptr<ListItemProvider> provider);
-        void rebuildList();
+        void rebuildList(style::listview::RebuildType rebuildType = style::listview::RebuildType::Full);
+        void clear();
         std::shared_ptr<ListItemProvider> getProvider();
         void setListViewType(style::listview::Type type);
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();
-        void clear();
 
         // virtual methods from Item
         std::list<DrawCommand *> buildDrawList() override;

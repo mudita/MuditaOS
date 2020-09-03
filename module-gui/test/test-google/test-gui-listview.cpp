@@ -19,10 +19,16 @@ class TestListView : public gui::ListView
 
     bool listBorderReached = false;
 
-    bool listPageEndReached() override
+    bool requestNextPage() override
     {
         listBorderReached = true;
-        return ListView::listPageEndReached();
+        return ListView::requestNextPage();
+    }
+
+    bool requestPreviousPage() override
+    {
+        listBorderReached = true;
+        return ListView::requestPreviousPage();
     }
 
     TestListView(
