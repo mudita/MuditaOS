@@ -104,7 +104,7 @@ void NewContactModel::clearData()
 
     createData();
 
-    requestRecords(0, internalData.size());
+    list->rebuildList();
 }
 
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)

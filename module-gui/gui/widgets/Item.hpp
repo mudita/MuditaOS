@@ -144,7 +144,7 @@ namespace gui
         void setFocusItem(Item *item);
         /// gettter for focus item
         /// @attention focusItem is just a pointer, might crash if item with focus was removed
-        Item *getFocusItem();
+        Item *getFocusItem() const;
         /// @}
 
         /// @defgroup callbackCallers   functions which should call functors from callbacks group

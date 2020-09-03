@@ -50,8 +50,7 @@ namespace gui
 
     void AllEventsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        allEventsList->clear();
-        allEventsList->setProvider(allEventsModel);
+        allEventsList->rebuildList();
     }
 
     bool AllEventsWindow::onInput(const gui::InputEvent &inputEvent)

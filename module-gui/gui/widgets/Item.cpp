@@ -467,7 +467,7 @@ namespace gui
         checknrun(true);
     }
 
-    Item *Item::getFocusItem()
+    Item *Item::getFocusItem() const
     {
         if (focusItem) {
             auto subFocusItem = focusItem->getFocusItem();
