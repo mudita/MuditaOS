@@ -41,12 +41,12 @@ once again. Update comments requesting changes with a simple 'done'. Do not reso
 discussion on you own, it is reviewer responsibility to do so.
 
 7. When PR is accepted by two or more reviewers it is time to add PR changes to master branch. Merging to
-master is prohibited, do a rebase instead. Do not add to master any commits that
-are not required, less is more. An ideal situation is when you have a single commit 
-for a PR and a single JIRA issue. If you have multiple commits, you can squash
-them and force push a branch before merging PR to master.
+master is prohibited, do a rebase instead. **Do not add to master any commits that
+are not required, less is more. An ideal situation is when you have a single commit
+for a PR and a single JIRA issue.** If you have multiple commits, you can squash
+them and force push a branch before merging PR to master - **make sure that commit message contains only valuable information.**
 
-8. Merging PR causes feature branch to be deleted. Switch to master branch on
+1. Merging PR causes feature branch to be deleted. Switch to master branch on
 your local machine and do a pull or fetch to get your changes.
 
 **If you need any assistance do not hesitate to ask others**
