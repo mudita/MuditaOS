@@ -1,10 +1,9 @@
+#include <messages/QueryMessage.hpp>
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
-#include "EndpointHandler.hpp"
-#include "FactoryReset.hpp"
-#include "messages/DBSMSMessage.hpp"
-#include "messages/DBSMSTemplateMessage.hpp"
+#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
+#include "log/log.hpp"
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
@@ -88,21 +87,19 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
 {
     if (resp != nullptr) {
         if (resp->responseTo == MessageType::DBQuery) {
-            EndpointHandler::handleQueryMessage(msg, resp);
-        }
-        else if (resp->responseTo >= MessageType::DBContactVerify && resp->responseTo <= MessageType::DBContactBlock) {
-            EndpointHandler::handleContactsMessage(msg, resp);
-        }
-        else if (resp->responseTo >= MessageType::DBSMSAdd && resp->responseTo <= MessageType::DBSMSTemplateGetCount) {
-            if (dynamic_cast<DBSMSResponseMessage *>(resp) != nullptr) {
-                EndpointHandler::handleMessagesMessage(msg, resp);
+            if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+                auto result = queryResponse->getResult();
+                if (result != nullptr) {
+                    LOG_DEBUG("Result: %s", result->debugInfo().c_str());
+                    if (result->hasListener()) {
+                        LOG_DEBUG("Handling result...");
+                        result->handle();
+                    }
+                }
+                else {
+                    LOG_ERROR("Wrong result - nullptr!");
+                }
             }
-            else if (dynamic_cast<DBSMSTemplateResponseMessage *>(resp) != nullptr) {
-                EndpointHandler::handleMessageTemplatesMessage(msg, resp);
-            }
-        }
-        else {
-            LOG_DEBUG("resp->ResponseTo: %d", static_cast<short>(resp->responseTo));
         }
     }
 

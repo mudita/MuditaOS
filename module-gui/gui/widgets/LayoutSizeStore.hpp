@@ -12,8 +12,12 @@ namespace gui
     class LayoutSizeStore
     {
       public:
-        virtual ~LayoutSizeStore()                    = default;
-        virtual auto store(Item *, Size size) -> bool = 0;
-        virtual auto get(Item *) -> Size              = 0;
+        virtual ~LayoutSizeStore()                                                     = default;
+        virtual auto store(Item *, Size size) -> bool                                  = 0;
+        [[nodiscard]] virtual auto get(Item *) -> Size                                 = 0;
+        [[nodiscard]] virtual auto isSizeSmaller(Item *, Size size, Axis axis) -> bool = 0;
+
+        virtual void setReleaseSpaceFlag(const bool &val) = 0;
+        [[nodiscard]] virtual bool getReleaseSpaceFlag()  = 0;
     };
 } // namespace gui

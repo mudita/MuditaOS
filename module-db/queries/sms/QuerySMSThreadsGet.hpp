@@ -6,7 +6,7 @@
 
 namespace db::query
 {
-    /// implements search for SMS by text
+
     class SMSThreadsGet : public Query
     {
       public:

@@ -11,6 +11,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include <Text.hpp>
 #include <gui/widgets/BoxLayout.hpp>
+#include "application-messages/widgets/SMSInputWidget.hpp"
 
 namespace gui
 {
@@ -47,7 +48,7 @@ namespace gui
             std::unique_ptr<std::vector<SMSRecord>> sms = nullptr; // loaded sms from db
         } SMS;
 
-        gui::Text *text = nullptr;
+        gui::SMSInputWidget *inputMessage = nullptr;
 
       public:
         ThreadViewWindow(app::Application *app);

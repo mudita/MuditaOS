@@ -57,7 +57,7 @@ namespace app
         {
             auto index = modelIndex;
 
-            if ((index < 0) || (index >= records.size())) {
+            if (index >= records.size()) {
                 return nullptr;
             }
 

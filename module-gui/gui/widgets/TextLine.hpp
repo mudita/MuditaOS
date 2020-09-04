@@ -25,6 +25,7 @@ namespace gui
         bool drawUnderline                  = false;
         UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
         Position underlinePadding           = 0;
+        Position storedYOffset              = 0;
 
         void createUnderline(unsigned int max_width, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
@@ -92,6 +93,6 @@ namespace gui
         ///
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
         void alignH(Alignment align, Length parent_length) const;
-        void alignV(Alignment align, Length parent_length, Length lines_height) const;
+        void alignV(Alignment align, Length parent_length, Length lines_height);
     };
 } // namespace gui

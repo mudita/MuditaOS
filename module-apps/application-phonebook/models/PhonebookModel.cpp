@@ -16,16 +16,17 @@
 
 const static std::uint32_t phonebookModelTimeout = 1000;
 
-PhonebookModel::PhonebookModel(app::Application *app, std::string filter)
-    : DatabaseModel(app), queryFilter(std::move(filter))
+PhonebookModel::PhonebookModel(app::Application *app, std::string filter, std::uint32_t groupFilter)
+    : DatabaseModel(app), queryFilter(std::move(filter)), queryGroupFilter(std::move(groupFilter))
 {}
 
 auto PhonebookModel::requestRecordsCount() -> unsigned int
 {
-    auto [code, msg] = DBServiceAPI::GetQueryWithReply(application,
-                                                       db::Interface::Name::Contact,
-                                                       std::make_unique<db::query::ContactGetSize>(queryFilter),
-                                                       phonebookModelTimeout);
+    auto [code, msg] =
+        DBServiceAPI::GetQueryWithReply(application,
+                                        db::Interface::Name::Contact,
+                                        std::make_unique<db::query::ContactGetSize>(queryFilter, queryGroupFilter),
+                                        phonebookModelTimeout);
 
     if (code == sys::ReturnCodes::Success && msg != nullptr) {
         auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
@@ -43,7 +44,7 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
 
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    auto query = std::make_unique<db::query::ContactGet>(offset, limit, queryFilter);
+    auto query = std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter);
     query->setQueryListener(this);
     DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
 }

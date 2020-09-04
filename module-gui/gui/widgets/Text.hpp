@@ -167,6 +167,7 @@ namespace gui
         void addText(const UTF8 &text);
         void addText(TextBlock text);
         virtual void clear();
+        bool isEmpty();
         virtual UTF8 getText();
         /// saves text from widget to file at specified path
         virtual bool saveText(UTF8 path);

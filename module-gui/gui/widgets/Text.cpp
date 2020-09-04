@@ -118,6 +118,11 @@ namespace gui
         buildDocument("");
     }
 
+    bool Text::isEmpty()
+    {
+        return document->isEmpty();
+    }
+
     UTF8 Text::getText()
     {
         return document->getText();
@@ -214,6 +219,7 @@ namespace gui
     {
         if (padding != value) {
             padding = value;
+            buildCursor();
             drawLines();
         }
     }
@@ -301,8 +307,8 @@ namespace gui
                                                                : area(Area::Max).h;
         }
 
-        uint32_t w           = sizeMinusPadding(Axis::X, Area::Max);
-        uint32_t h           = sizeMinusPadding(Axis::Y, Area::Max);
+        Length w             = sizeMinusPadding(Axis::X, Area::Max);
+        Length h             = area(Area::Normal).size(Axis::Y);
         auto line_y_position = padding.top;
         auto cursor          = 0;
 
@@ -317,6 +323,7 @@ namespace gui
                 debug_text("cant show more text from this document");
                 break;
             }
+
             if (line_y_position + text_line.height() > h) { // no more space for next line
                 debug_text("no more space for next text_line: %d + %" PRIu32 " > %" PRIu32,
                            line_y_position,
@@ -367,18 +374,20 @@ namespace gui
                     debug_text("epty line height: %d", h_used);
                 }
             }
+
             if (h_used != area(Area::Normal).size(Axis::Y) || w_used != area(Area::Normal).size(Axis::X)) {
                 debug_text("size request: %d %d", w_used, h_used);
                 auto [w, h] = requestSize(w_used, h_used);
-                LOG_INFO("size granted: {%" PRIu32 ", %" PRIu32 "}", w, h);
-                // if last wont fit lines.eraseLast();
-                // break;
+
+                if (h < h_used) {
+                    debug_text("No free height for text!");
+                }
             }
+
+            lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+
+            debug_text("<- END\n");
         }
-
-        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
-
-        debug_text("<- END\n");
     }
 
     std::list<DrawCommand *> Text::buildDrawList()

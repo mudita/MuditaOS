@@ -165,14 +165,10 @@ std::string vfs::getline(FILE *stream, uint32_t length)
 
     // allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add string's
     // null terminator.
-    char *buffer = (char *)malloc(length + 1);
+    std::unique_ptr<char[]> buffer(new char[length + 1]);
+    memset(buffer.get(), 0, length + 1);
 
-    if (buffer == NULL)
-        return std::string("");
-
-    memset(buffer, 0, length + 1);
-
-    uint32_t bytesRead = fread(buffer, 1, length, stream);
+    uint32_t bytesRead = fread(buffer.get(), 1, length, stream);
 
     // search buffer for /n sign
     for (uint32_t i = 0; i < bytesRead; ++i) {
@@ -183,8 +179,7 @@ std::string vfs::getline(FILE *stream, uint32_t length)
         }
     }
 
-    std::string ret = std::string(buffer);
-    free(buffer);
+    std::string ret = std::string(buffer.get());
 
     return ret;
 }

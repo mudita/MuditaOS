@@ -32,6 +32,7 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     {
         Name,
         TextNumber,
+        Group,
 
         None,
     };

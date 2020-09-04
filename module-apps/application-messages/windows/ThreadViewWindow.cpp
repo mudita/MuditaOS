@@ -2,34 +2,23 @@
 
 #include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
-#include "../models/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
 #include "Service/Message.hpp"
 
 #include <Text.hpp>
 #include <TextBubble.hpp>
-#include <ListItem.hpp>
-#include <ListItemProvider.hpp>
-#include <ListView.hpp>
 #include <Label.hpp>
 #include <Margins.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBMessage.hpp>
 #include <service-db/messages/DBNotificationMessage.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-#include <application-phonebook/data/PhonebookItemData.hpp>
 #include <i18/i18.hpp>
 #include <time/time_conversion.hpp>
 #include <log/log.hpp>
 #include <Style.hpp>
 
-#include <functional>
 #include <memory>
 #include <cassert>
-
-namespace style
-{}; // namespace style
 
 namespace gui
 {
@@ -72,58 +61,35 @@ namespace gui
 
     void ThreadViewWindow::refreshTextItem()
     {
-        if (text != nullptr) {
+        if (inputMessage != nullptr) {
             return;
         }
-        text = new gui::Text(nullptr, 0, 0, 0, 0, "", ExpandMode::EXPAND_UP);
-        text->setMargins(Margins(0, style::window::messages::new_sms_vertical_spacer, 0, 0));
-        text->setMinimumSize(body->getWidth(), text->getHeight());
-        text->setMaximumSize(body->getWidth(), body->getHeight());
-        text->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
-            [=]() { selectSpecialCharacter(); }));
-        text->setBorderColor(ColorNoColor);
-        text->setPenFocusWidth(style::window::default_border_focus_w);
-        text->setPenWidth(style::window::default_border_focus_w);
-        text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        text->activatedCallback = [&](gui::Item &item) {
+
+        inputMessage = new SMSInputWidget(body, application);
+
+        inputMessage->activatedCallback = [&](gui::Item &item) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            if (app->handleSendSmsFromThread(contact->numbers[0].number, text->getText())) {
+            if (app->handleSendSmsFromThread(contact->numbers[0].number, inputMessage->inputText->getText())) {
                 LOG_ERROR("handleSendSmsFromThread failed");
             }
-            text->clear();
+            inputMessage->inputText->clear();
             return true;
         };
-        text->inputCallback = [=](Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
-                auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                assert(app != nullptr);
-                return app->newMessageOptions(getName(), text);
-            }
-            return false;
-        };
-        text->focusChangedCallback = [=](Item &) -> bool {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("sms_reply"));
-            return true;
-        };
-        text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     void ThreadViewWindow::destroyTextItem()
     {
-        body->erase(text);
-        if (text->parent == nullptr) {
-            delete (text);
+        body->erase(inputMessage);
+        if (inputMessage->parent == nullptr) {
+            delete (inputMessage);
         }
-        text = nullptr;
+        inputMessage = nullptr;
     }
 
     void ThreadViewWindow::cleanView()
     {
-        body->removeWidget(text);
+        body->removeWidget(inputMessage);
         body->erase();
     }
 
@@ -160,7 +126,9 @@ namespace gui
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
         if (what == Action::Init || what == Action::NewestPage) {
             SMS.start = 0;
-            SMS.end   = maxsmsinwindow;
+
+            // Refactor
+            SMS.end = maxsmsinwindow;
             if (what == Action::Init) {
                 destroyTextItem();
             }
@@ -171,7 +139,17 @@ namespace gui
         //         update begin / end in `SMS`
         if (what == Action::NextPage) {
             if (SMS.end != SMS.dbsize) {
-                SMS.start = SMS.end;
+
+                // Refactor
+                for (auto sms : body->children) {
+                    if (sms->visible)
+                        SMS.start++;
+                }
+
+                if (inputMessage->visible)
+                    SMS.start -= 1;
+
+                LOG_INFO("SMS start %d", SMS.start);
             }
             else {
                 LOG_INFO("All sms shown");
@@ -204,9 +182,7 @@ namespace gui
         this->cleanView();
         // if we are going from 0 then we want to show text prompt
         if (SMS.start == 0) {
-            body->addWidget(text);
-            // to set proper text size required for element, not max possible size
-            text->setText(text->getText());
+            body->addWidget(inputMessage);
         }
 
         // rebuild bubbles
@@ -217,6 +193,7 @@ namespace gui
             }
             ++SMS.end;
         }
+
         body->setNavigation();
         setFocusItem(body);
         if (Action::PreviousPage == what) {
@@ -350,10 +327,6 @@ namespace gui
             }
             return false;
         };
-        smsBubble->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
-            return true;
-        };
 
         // wrap label in H box, to make fit datetime in it
         HBox *labelSpan = smsSpanBuild(smsBubble, smsRecord);
@@ -404,7 +377,9 @@ namespace gui
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
             LOG_INFO("received sms templates data \"%s\"", txt.c_str());
-            pdata->concatenate == SMSTextData::Concatenate::True ? text->addText(txt) : text->setText(txt);
+            pdata->concatenate == SMSTextData::Concatenate::True ? inputMessage->inputText->addText(txt)
+                                                                 : inputMessage->inputText->setText(txt);
+            body->resizeItems();
         }
     }
 

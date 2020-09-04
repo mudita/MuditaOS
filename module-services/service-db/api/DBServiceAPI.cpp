@@ -363,8 +363,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
 {
     ContactRecord rec;
-    utils::PhoneNumber contactNumber(phoneNumber);
-    auto number = ContactRecord::Number(contactNumber.get(), contactNumber.toE164(), ContactNumberType ::PAGER);
+    auto number = ContactRecord::Number(utils::PhoneNumber(phoneNumber).getView(), ContactNumberType ::PAGER);
     rec.numbers.push_back(number);
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber, rec);

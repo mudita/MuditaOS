@@ -91,8 +91,8 @@ namespace gui
         }
         if (document->isEmpty() && text->font != nullptr) {
             h += text->font->info.line_height;
-            x = getAxisAlignmentValue(Axis::X, widgetArea.w);
-            y = getAxisAlignmentValue(Axis::Y, widgetArea.h);
+            x = getAxisAlignmentValue(Axis::X, w);
+            y = getAxisAlignmentValue(Axis::Y, h);
         }
         else if (text != nullptr || text->lines.size() > 0) {
             auto [line, column, row] = getLine();

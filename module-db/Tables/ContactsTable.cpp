@@ -142,23 +142,29 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
              "contact_match_groups.group_id = " +
              std::to_string(groupId);
 
-    if (!name.empty()) {
-        switch (matchType) {
-        case MatchType::Name: {
+    switch (matchType) {
+    case MatchType::Name: {
+        if (!name.empty()) {
             query += " WHERE contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
             query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%'";
-        } break;
+        }
+    } break;
 
         case MatchType::TextNumber: {
-            query += " INNER JOIN contact_number ON contact_number.contact_id == contacts._id AND "
-                     "contact_number.number_user LIKE '%%" +
-                     name + "%%'";
+            if (!name.empty()) {
+                query += " INNER JOIN contact_number ON contact_number.contact_id == contacts._id AND "
+                         "contact_number.number_user LIKE '%%" +
+                         name + "%%'";
+            }
         } break;
+
+        case MatchType::Group:
+            query += " WHERE contact_match_groups.group_id == " + std::to_string(groupId);
+            break;
 
         case MatchType::None:
             break;
         }
-    }
 
     query += " ORDER BY group_id DESC, contact_name.name_alternative || ' ' || contact_name.name_primary";
 

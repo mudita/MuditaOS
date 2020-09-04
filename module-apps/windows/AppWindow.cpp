@@ -197,6 +197,16 @@ namespace gui
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
+    void AppWindow::setBottomBarText(const UTF8 &text, BottomBar::Side side)
+    {
+        bottomBar->setText(side, text);
+    }
+
+    void AppWindow::clearBottomBarText(BottomBar::Side side)
+    {
+        bottomBar->setText(side, "");
+    }
+
     bool AppWindow::selectSpecialCharacter()
     {
         return sapm::ApplicationManager::messageSwitchSpecialInput(

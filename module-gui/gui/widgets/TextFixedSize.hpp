@@ -12,7 +12,6 @@ namespace gui
         Position underlinePadding = 0;
 
         void drawLines() override;
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       public:
         TextFixedSize(Item *parent, Position x, Position y, Length w, Length h);

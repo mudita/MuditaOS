@@ -81,11 +81,4 @@ namespace gui
 
         lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
     }
-
-    bool TextFixedSize::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        Text::onDimensionChanged(oldDim, newDim);
-        drawLines();
-        return true;
-    }
 } // namespace gui

@@ -140,9 +140,8 @@ namespace gui
         updateUnderline(x, y);
 
         for (auto &el : elements_to_show_in_line) {
-            auto scoped_disown          = ScopedParentDisown(el);
-            int32_t align_bottom_offset = height() - el->getHeight();
-            el->setArea({line_x_position, y + align_bottom_offset - underlinePadding, el->getWidth(), el->getHeight()});
+            auto scoped_disown = ScopedParentDisown(el);
+            el->setArea({line_x_position, y - underlinePadding, el->getWidth(), el->getHeight()});
             line_x_position += el->getWidth();
         }
     }
@@ -214,9 +213,9 @@ namespace gui
 
     void TextLine::alignH(Alignment line_align, Length parent_length) const
     {
-        Length xOffset = line_align.calculateHAlignment(parent_length, getWidth());
+        Position xOffset = line_align.calculateHAlignment(parent_length, getWidth());
 
-        if (xOffset) {
+        if (xOffset >= 0) {
 
             if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent)
                 underline->setPosition(underline->getPosition(Axis::X) + xOffset, Axis::X);
@@ -228,11 +227,14 @@ namespace gui
         }
     }
 
-    void TextLine::alignV(Alignment line_align, Length parent_length, Length lines_height) const
+    void TextLine::alignV(Alignment line_align, Length parent_length, Length lines_height)
     {
-        Length yOffset = line_align.calculateVAlignment(parent_length, lines_height);
+        Position yOffset = line_align.calculateVAlignment(parent_length, lines_height);
 
-        if (yOffset) {
+        if (yOffset >= 0 && yOffset != storedYOffset) {
+
+            // Refactor - workaround for multiple offset addition.
+            storedYOffset = yOffset;
 
             if (underline != nullptr)
                 underline->setPosition(underline->getPosition(Axis::Y) + yOffset, Axis::Y);
