@@ -13,6 +13,10 @@
 #include <Tables/CalllogTable.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
+#include "queries/calllog/QueryCalllogGet.hpp"
+#include "queries/calllog/QueryCalllogGetCount.hpp"
+#include "queries/calllog/QueryCalllogRemove.hpp"
+#include "queries/calllog/QueryCalllogGetByContactID.hpp"
 
 #include <cassert>
 #include <exception>
@@ -187,6 +191,24 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
     return CalllogRecord(call);
 }
 
+std::vector<CalllogRecord> CalllogRecordInterface::GetByContactID(uint32_t id)
+{
+    auto calls = calllogDB->calls.getByContactId(id);
+    std::vector<CalllogRecord> records;
+    for (auto &call : calls) {
+        auto contactRec = GetContactRecordByID(call.contactId);
+        if (contactRec.ID == DB_ID_NONE) {
+            LOG_ERROR("Cannot find contact for ID %s", call.contactId.c_str());
+            records.emplace_back(CalllogRecord());
+        }
+
+        call.name = contactRec.getFormattedName();
+        records.emplace_back(CalllogRecord(call));
+    }
+
+    return records;
+}
+
 uint32_t CalllogRecordInterface::GetCount(EntryState state)
 {
     return calllogDB->calls.count(state);
@@ -204,15 +226,78 @@ bool CalllogRecordInterface::SetAllRead()
 
 std::unique_ptr<db::QueryResult> CalllogRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto local_query = dynamic_cast<const db::query::calllog::SetAllRead *>(query.get())) {
-        return runQueryImpl(local_query);
+    if (typeid(*query) == typeid(db::query::CalllogGet)) {
+        return getQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::CalllogGetByContactID)) {
+        return getByContactIDQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::calllog::SetAllRead)) {
+        return setAllReadQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::CalllogGetCount)) {
+        return getCountQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::CalllogRemove)) {
+        return removeQuery(query);
     }
     return nullptr;
 }
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::getQuery(std::shared_ptr<db::Query> query)
+{
+    auto getQuery = static_cast<db::query::CalllogGet *>(query.get());
+    auto records  = calllogDB->calls.getLimitOffset(getQuery->getOffset(), getQuery->getLimit());
+    std::vector<CalllogRecord> recordVector;
 
-std::unique_ptr<db::query::calllog::SetAllReadResult> CalllogRecordInterface::runQueryImpl(
-    const db::query::calllog::SetAllRead *query)
+    for (auto calllog : records) {
+        CalllogRecord record;
+        record.isRead       = calllog.isRead;
+        record.phoneNumber  = utils::PhoneNumber::parse(calllog.number);
+        record.contactId    = calllog.contactId;
+        record.name         = calllog.name;
+        record.type         = calllog.type;
+        record.duration     = calllog.duration;
+        record.date         = calllog.date;
+        record.presentation = calllog.presentation;
+        record.ID           = calllog.ID;
+        recordVector.emplace_back(record);
+    }
+    auto response = std::make_unique<db::query::CalllogGetResult>(std::move(recordVector));
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::getByContactIDQuery(std::shared_ptr<db::Query> query)
+{
+    auto getQuery = static_cast<db::query::CalllogGetByContactID *>(query.get());
+    auto records  = CalllogRecordInterface::GetByContactID(getQuery->contactId);
+
+    auto response = std::make_unique<db::query::CalllogGetByContactIDResult>(std::move(records));
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::setAllReadQuery(std::shared_ptr<db::Query> query)
 {
     auto db_result = SetAllRead();
-    return std::make_unique<db::query::calllog::SetAllReadResult>(db_result);
+    auto response  = std::make_unique<db::query::calllog::SetAllReadResult>(db_result);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::getCountQuery(std::shared_ptr<db::Query> query)
+{
+    auto count    = CalllogRecordInterface::GetCount();
+    auto response = std::make_unique<db::query::CalllogGetCountResult>(count);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::removeQuery(std::shared_ptr<db::Query> query)
+{
+    auto removeQuery = static_cast<db::query::CalllogRemove *>(query.get());
+    auto ret         = CalllogRecordInterface::RemoveByID(removeQuery->id);
+    auto response    = std::make_unique<db::query::CalllogRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
 }
