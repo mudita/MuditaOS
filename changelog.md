@@ -17,7 +17,7 @@
 
 * `[build]` Allow excluding applications from the build to decrease debug firmware size.
 * `[build]` Allow choosing which applications are optimized to decrease debug firmware size.
-
+* `[doc]` Procedure on flashing a phone without ecoboot. Using D1 flashloader.
 
 
 ## [0.35.1 2020-08-28]
