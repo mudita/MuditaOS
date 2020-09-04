@@ -66,13 +66,6 @@ namespace utils
                 return nullptr;
             }
 
-            /// replace day mon specifiers (first 2 characters)
-            /// cant use std::replace -> due to fact that it doesn't support multiple element replace (or i cant find
-            /// it) cant use string::replace -> expcetion out_of_range on size when replacing with bigger (our case)
-            /// please be vary when using begin_pos/found_pos (as format in next loops might be in totally different
-            /// place)
-            void replace_specifiers();
-
           public:
             Timestamp()
             {
@@ -90,7 +83,7 @@ namespace utils
             /// set Time time_t value held (set timestamp)
             void set_time(time_t newtime);
             /// set Time from string
-            void set_time(std::string time, const char *format);
+            void set_time(std::string time, const char *fmt);
             void set_format(std::string format)
             {
                 this->format = format;
@@ -182,7 +175,7 @@ namespace utils
             void before_n_sec(time_t val);
 
             /// Time have str(std::string ) this one uses presets
-            virtual UTF8 str(std::string format = "");
+            virtual UTF8 str(std::string fmt = "");
             bool isToday();
             bool isYesterday();
         };
