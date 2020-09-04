@@ -70,6 +70,8 @@ namespace gui
             loop_position += el.length();
             ++block_no;
         }
+        // TODO ok... here we might want to return BlockCursor(this) <- but returning text::npos / empty/none block if
+        // we wanted to return anything
         return BlockCursor();
     }
 

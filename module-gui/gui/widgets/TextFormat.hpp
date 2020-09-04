@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Alignment.hpp"
 #include <Color.hpp>
 #include <functional>
+#include <string>
 
 namespace gui
 {
@@ -10,8 +12,9 @@ namespace gui
     class TextFormat
     {
       private:
-        RawFont *font = nullptr;
+        mutable RawFont *font = nullptr;
         Color color = ColorFullBlack;
+        Alignment alignment   = Alignment(Alignment::Horizontal::Left);
 
         static constexpr auto setter = [](auto &local, auto &next) {
             if (local != next) {
@@ -20,7 +23,7 @@ namespace gui
         };
 
       public:
-        TextFormat(RawFont *font, Color color = {}) : font(font), color(color){};
+        TextFormat(const RawFont *font, Color color = {}) : font(const_cast<RawFont *>(font)), color(color){};
         TextFormat(const TextFormat &) = default;
 
         [[nodiscard]] auto getFont() const
@@ -44,5 +47,12 @@ namespace gui
         {
             setter(this->color, color);
         }
+
+        void setAlignment(Alignment alignment)
+        {
+            setter(this->alignment, alignment);
+        }
+
+        auto str() const -> std::string;
     };
 }; // namespace gui

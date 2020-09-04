@@ -55,7 +55,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     icon = new Image(this, style::image::x, style::image::y, meta.icon);
 
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
-    text->setText(meta.text);
+    text->setRichText(meta.text);
     text->setTextType(TextType::MULTI_LINE);
     text->setEditMode(EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -67,7 +67,7 @@ void Dialog::update(const Meta &meta)
 {
     this->meta = meta;
     setTitle(meta.title);
-    text->setText(meta.text);
+    text->setRichText(meta.text);
     icon->set(meta.icon);
     // meta.action not used
 }

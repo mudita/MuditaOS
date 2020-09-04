@@ -29,7 +29,7 @@ namespace gui
         End end = End::Newline;
 
       public:
-        TextBlock(const UTF8 text, RawFont *font, End eol = End::None);
+        TextBlock(const UTF8 text, const RawFont *font, End eol = End::None);
         TextBlock(const UTF8 text, std::unique_ptr<TextFormat> format);
         TextBlock(const TextBlock &);
 

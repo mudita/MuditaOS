@@ -1,8 +1,14 @@
 #include "Font.hpp"
 #include "FontManager.hpp" // for FontManager
+#include "RawFont.hpp"
+#include "log/log.hpp"
+#include <algorithm>
+#include <sstream>
 
 namespace gui
 {
+
+    auto toWeight(const std::string &val) -> Font::Weight;
 
     Font::Font(std::string name, unsigned int size, Weight weight)
     {
@@ -11,6 +17,27 @@ namespace gui
 
     Font::Font(unsigned int size, Weight weight) : Font(font_default_type, size, weight)
     {}
+
+    Font::Font(RawFont *rawfont)
+    {
+        if (rawfont == nullptr) {
+            font = FontManager::getInstance().getFont(""); // get default
+        }
+
+        auto name  = rawfont->getName();
+        auto pos   = name.npos;
+        auto parse = [&]() {
+            pos      = name.rfind('_');
+            auto val = name.substr(pos + 1, name.length());
+            name.erase(pos);
+            return val;
+        };
+
+        unsigned int size = std::stoi(parse());
+        Weight weight     = toWeight(parse());
+
+        setFont(name, size, weight);
+    }
 
     void Font::setFont(std::string new_name, unsigned int new_size, Weight new_weight)
     {
@@ -48,5 +75,19 @@ namespace gui
     auto Font::raw() -> RawFont *
     {
         return font;
+    }
+
+    auto toWeight(const std::string &val) -> Font::Weight
+    {
+        if (val == c_str(Font::Weight::Regular)) {
+            return Font::Weight::Regular;
+        }
+        else if (val == c_str(Font::Weight::Bold)) {
+            return Font::Weight::Bold;
+        }
+        else if (val == c_str(Font::Weight::Light)) {
+            return Font::Weight::Light;
+        }
+        return Font::Weight::Regular;
     }
 }; // namespace gui
