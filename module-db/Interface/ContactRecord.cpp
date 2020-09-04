@@ -120,8 +120,13 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
         return false;
     }
 
-    if (contactDB->number.removeById(std::stoul(contact.numbersID)) == false) {
-        return false;
+    try {
+        if (contactDB->number.removeById(std::stoul(contact.numbersID)) == false) {
+            return false;
+        }
+    }
+    catch (const std::exception &e) {
+        LOG_ERROR("%s", e.what());
     }
 
     if (contactDB->ringtones.removeById(contact.ringID) == false) {

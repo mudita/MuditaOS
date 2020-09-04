@@ -87,6 +87,34 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
     };
 }
 
+std::vector<CalllogTableRow> CalllogTable::getByContactId(uint32_t id)
+{
+    auto retQuery = db->query("SELECT * FROM calls WHERE contactId= %u;", id);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<CalllogTableRow>();
+    }
+
+    std::vector<CalllogTableRow> ret;
+
+    do {
+        ret.push_back(CalllogTableRow{
+            (*retQuery)[0].getUInt32(),                                // ID
+            (*retQuery)[1].getString(),                                // number
+            (*retQuery)[2].getString(),                                // e164number
+            static_cast<PresentationType>((*retQuery)[3].getUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[4].getUInt64()),           // date
+            static_cast<time_t>((*retQuery)[5].getUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[6].getUInt32()),         // type
+            (*retQuery)[7].getString(),                                // name
+            (*retQuery)[8].getString(),                                // contactID
+            static_cast<bool>((*retQuery)[9].getUInt64()),             // isRead
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}
+
 std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->query("SELECT * from calls ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);

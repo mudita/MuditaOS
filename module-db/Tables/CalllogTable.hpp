@@ -74,6 +74,8 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
                                                        CalllogTableFields field,
                                                        const char *str) override final;
 
+    std::vector<CalllogTableRow> getByContactId(uint32_t id);
+
     uint32_t count() override final;
     uint32_t count(EntryState state);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
