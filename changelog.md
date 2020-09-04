@@ -1,23 +1,29 @@
 # Mudita PurePhone changelog
 
-## Current release
+## [0.36.1 2020-09-04]
 
 ### Added
 
-* `[fonts]` Added phone compatibility with emoticons.
+* `[fonts]` Added phone emoji support.
 * `[phonebook]` ICE contacts window.
-* `[messages]` SmsInputWidget added.
+
+### Changed
+
+* `[messages]` Improved sms input.
 
 ### Fixed
 
 * `[messages]` Fixed crashing in the new message window.
 * `[home screen]``[notifications]` Fixed notifications widget when phone is locked.
-* `[text]`	Handling new line when entering text
+* `[text]`	Handling new line when entering text.
+
 ### Other
 
 * `[build]` Allow excluding applications from the build to decrease debug firmware size.
 * `[build]` Allow choosing which applications are optimized to decrease debug firmware size.
-* `[doc]` Procedure on flashing a phone without ecoboot. Using D1 flashloader.
+* `[doc]` Procedure on flashing a phone without ecoboot using D1 flash loader.
+* `[database]` Message handling refactor.
+* `[database]` Add new settings table in database.
 
 
 ## [0.35.1 2020-08-28]
@@ -38,9 +44,6 @@
 * `[audio]` Fixed playback of mp3 files.
 * `[gui]` Fixed label padding handling.
 * `[settings]` Fixed settings info.
-
-### Other
-* `[desktop]` Rewritten message handling.
 
 ## [0.34.2 - 2020-08-21]
 
@@ -80,6 +83,7 @@
 
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
 * `[calendar]` database structure
+* `[music player]` Added simple volume indicator.
 
 ### Changed
 
@@ -302,7 +306,6 @@
 * `[phonebook]` Add duplicated contact and speed dial numbers handling.
 * `[phonebook]` Add confirmation windows after deleting/blocking contact.
 * `[sms]` Add thread message status indicators: read/unread and last thread message (Not sent, You, Draft).
-* `[database]` Add new settings table in database.
 
 ### Fixed
 
@@ -310,7 +313,6 @@
 * `[sms]` Fix thread view refresh on a new message.
 * `[sms]` Fix message reordering on page change.
 * `[sms]` Remove empty screen view at the top of a thread view.
-* `[music player]` Added simple player volume indicator.
 
 ### Other
 
