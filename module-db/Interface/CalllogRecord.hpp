@@ -69,6 +69,11 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
     CalllogDB *calllogDB   = nullptr;
     ContactsDB *contactsDB = nullptr;
     ContactRecord GetContactRecordByID(const UTF8 &contactId);
+    std::vector<CalllogRecord> GetByContactID(uint32_t id);
 
-    std::unique_ptr<db::query::calllog::SetAllReadResult> runQueryImpl(const db::query::calllog::SetAllRead *query);
+    std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> setAllReadQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> getCountQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> getByContactIDQuery(std::shared_ptr<db::Query> query);
 };

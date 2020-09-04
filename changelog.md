@@ -4,6 +4,7 @@
 
 ### Added
 * `[phonebook]` NoName contacts at the end of contacts list.
+* `[calllog]` Added new queries to the DB
 
 ### Changed
 
