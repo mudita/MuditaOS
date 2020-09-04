@@ -5,7 +5,8 @@ endpoint = {
     "restore": 4,
     "factory": 5,
     "contacts": 6,
-    "messages": 7
+    "messages": 7,
+    "calllog": 8
 }
 
 method = {
