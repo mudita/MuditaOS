@@ -10,7 +10,10 @@ class BackupTest:
         test = Test(msg, result_msg)
         ret, result = test.execute()
         if ret == False:
-            return False
+            if result["backupReady"] == True:
+                print("backup already ready!")
+            else:
+                return False
 
         msg, result_msg = prepare_message(endpoint["backup"], method["get"], status["OK"],
                                           {}, {"backupRequest": False})

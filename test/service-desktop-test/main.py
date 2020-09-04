@@ -5,6 +5,7 @@ from tests.update import *
 from tests.deviceinfo import *
 from tests.factoryReset import *
 from tests.backup import *
+from tests.calllog import *
 from termcolor import colored
 
 
@@ -16,7 +17,7 @@ def main(port_name='/dev/ttyACM1'):
     final_result = True
     failed_tests = []
     for test_instance in (DeviceInfoTest(), UpdateTest(), BackupTest(), MessageTest(),
-                          MessageTemplateTest(), ContactTest(), FactoryResetTest()):
+                          MessageTemplateTest(), ContactTest(), CalllogTest(), FactoryResetTest()):
         test_name = type(test_instance).__name__
         result = test_instance.run()
         if result == False:
