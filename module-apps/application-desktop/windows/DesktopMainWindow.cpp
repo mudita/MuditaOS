@@ -42,6 +42,8 @@ namespace style
     const auto design_border_offset        = 20;
     const auto design_option_span          = 8;
     const auto design_notifications_offset = 284;
+    const auto digit_normal_size              = 13;
+    const auto notification_icon_unified_size = 35;
 }; // namespace style
 
 namespace gui
@@ -253,11 +255,20 @@ namespace gui
         return gui::AppWindow::buildDrawList();
     }
 
-    auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
+    auto add_image_inactive(UTF8 img)
     {
-        auto thumbnail        = new gui::Image(icon);
+        auto thumbnail        = new gui::Image(img);
         thumbnail->activeItem = false;
-        layout->addWidget(thumbnail);
+        return thumbnail;
+    }
+
+    auto add_box_icon(UTF8 icon)
+    {
+        auto thumbnail = add_image_inactive(icon);
+        thumbnail->setMinimumWidth(style::notification_icon_unified_size);
+        thumbnail->setMargins(
+            gui::Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
+        return thumbnail;
     }
 
     /// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of
@@ -269,12 +280,11 @@ namespace gui
                           std::function<bool()> showCallback,
                           std::function<bool()> clearCallback) -> bool
     {
-        const auto text_normal_size        = 200;
-        const auto size_needed_for_2digits = 30;
         // 1. create hbox for all elements
         auto el = new gui::HBox(nullptr, 0, 0, style::window::default_body_width, style::window::label::default_h);
         el->setAlignment(Alignment(gui::Alignment::Vertical::Center));
-        auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
+
+        auto text = new gui::Label();
         text->setMaximumSize(el->area().w, Axis::X);
         text->setText(name);
         text->setFont(style::window::font::medium);
@@ -282,23 +292,28 @@ namespace gui
         text->setPenWidth(style::window::default_border_no_focus_w);
         text->activeItem = false;
 
-        auto number = new gui::Label();
-        number->setText(indicator);
+        auto number = new gui::Text();
+        if (indicator.length() > 2) {
+            const UTF8 max_notification_value = "99+";
+            number->setText(max_notification_value);
+            number->setMinimumWidth(max_notification_value.length() * style::digit_normal_size);
+        }
+        else {
+            number->setText(indicator);
+            number->setMinimumWidth(indicator.length() * style::digit_normal_size);
+        }
         number->setFont(style::window::font::mediumbold);
         number->setPenWidth(style::window::default_border_no_focus_w);
-        number->setSize(size_needed_for_2digits, el->area().h);
-        number->setMinimumWidth(size_needed_for_2digits);
+        number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
         number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         number->activeItem = false;
+
         // 2. Add all elements to hbox layout
-        new gui::Span(el, Axis::X, style::design_border_offset);
-        add_box_icon(el, icon);
-        new gui::Span(el, Axis::X, style::design_border_offset);
+        el->addWidget(add_box_icon(icon));
         el->addWidget(text);
-        add_box_icon(el, "dot_12px_hard_alpha_W_G");
+        el->addWidget(add_image_inactive("dot_12px_hard_alpha_W_G"));
         el->addWidget(number);
-        // box right inner margin
-        new gui::Span(el, Axis::X, style::design_border_offset);
+
         // 3. Set hbox layout properties
         el->setPenWidth(style::window::default_border_no_focus_w);
         el->setPenFocusWidth(style::window::default_border_focus_w);
