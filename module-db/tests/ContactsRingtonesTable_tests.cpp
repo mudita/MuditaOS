@@ -30,8 +30,7 @@ TEST_CASE("Contacts Ringtones Table tests")
     ContactsDB contactsdb;
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsRingtonesTableRow testRow1 = {
-        .ID = DB_ID_NONE, .contactID = DB_ID_NONE, .assetPath = "/test/assets/path/ringtone.wr"};
+    ContactsRingtonesTableRow testRow1(DB_ID_NONE, DB_ID_NONE, "/test/assets/path/ringtone.wr");
 
     // add 4 elements into table
     REQUIRE(contactsdb.ringtones.add(testRow1));
