@@ -169,14 +169,14 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
     query += " ORDER BY group_id DESC ";
     query += " , (contact_name.name_alternative IS NULL OR contact_name.name_alternative ='') ";
     query += " AND (contact_name.name_primary IS NULL OR contact_name.name_primary ='') ASC ";
-    query += " , contact_name.name_alternative || ' ' || contact_name.name_primary ";
+    query += " , UPPER(contact_name.name_alternative || contact_name.name_primary) ";
 
     if (limit > 0) {
         query += " LIMIT " + std::to_string(limit);
         query += " OFFSET " + std::to_string(offset);
     }
 
-    query += " COLLATE NOCASE;";
+    query += " ;";
 
     auto queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
