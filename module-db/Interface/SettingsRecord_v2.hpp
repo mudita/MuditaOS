@@ -3,6 +3,10 @@
 #include "Databases/SettingsDB.hpp"
 #include "Record.hpp"
 
+#include <memory>
+#include <sstream>
+#include <string>
+
 // fw declarations
 namespace db::query::settings
 {
