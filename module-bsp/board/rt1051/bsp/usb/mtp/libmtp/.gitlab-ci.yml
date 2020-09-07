@@ -1,0 +1,14 @@
+build:
+  stage: build
+  image: gcc
+  script: 
+    - make lib
+  artifacts:
+    paths:
+      - libmtp.a
+
+test:
+  stage: test
+  image: registry.gitlab.com/arturmadrzak/gcc-cgreen-docker
+  script:
+    - make test
