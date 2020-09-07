@@ -1,32 +1,51 @@
-set(USB_CDC_SRC
+set(USB_SRC
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class/usb_device_class.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class/hid/usb_device_hid.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/usb_device_ch9.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/usb_device_dci.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/ehci/usb_device_ehci.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/phy/usb_phy.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/cdc/virtual_com.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/cdc/usb_device_descriptor.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/cdc/usb_device_cdc_acm.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/osa/usb_osa_freertos.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/component/lists/generic_list.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/component/osa/fsl_os_abstraction_free_rtos.c"
 
-		CACHE INTERNAL ""
-		)
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device/ehci/usb_device_ehci.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device/usb_device_ch9.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device/usb_device_class.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device/usb_device_dci.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device/usb_string_descriptor.c"
 
-set(USB_CDC_DIR_INCLUDES
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/cdc/usb_device_cdc_acm.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/cdc/virtual_com.c"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class/hid"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/include"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/ehci"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/include"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/phy"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/osa"
 
-		CACHE INTERNAL ""
-		)
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp/mtp_container.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp/mtp_dataset.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp/mtp_responder.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp/mtp_storage.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp/mtp_util.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp_db.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp_fs.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/usb_device_mtp.c"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/phy/usb_phy.c"
+
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/usb_device_descriptor.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/composite.c"
+        
+        CACHE INTERNAL ""
+        )
+
+set(USB_DIR_INCLUDES
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/cdc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/component/lists"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/component/osa"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/device/ehci"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/phy"
+
+        CACHE INTERNAL ""
+        )
 
 set(BOARD_SOURCES ${BOARD_SOURCES}
 
@@ -52,11 +71,11 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_gpc.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_src.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_adc.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_lpi2c.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_clock.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_dmamux.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_edma.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_wdog.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_lpi2c.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_clock.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_dmamux.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_edma.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_wdog.c"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
 
@@ -87,40 +106,40 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/harness/rt1051_harness.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/harness/rt1051_harness_gpio.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/vibrator/vibrator.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/watchdog/watchdog.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/vibrator/vibrator.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/watchdog/watchdog.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/RT1051LPM.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/RT1051LPM.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
-		
-		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pwr/lpm.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
+        #"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pwr/lpm.c"
 
-		"${USB_CDC_SRC}"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/usb_cdc.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
+
+        "${USB_SRC}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/usb.cpp"
 
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
-		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverSAI.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMAMux.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMA.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverGPIO.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
+        #"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverSAI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMAMux.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMA.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverGPIO.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/magnetometer/magnetometer.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/torch/torch.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/magnetometer/magnetometer.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/torch/torch.cpp"
         CACHE INTERNAL ""
         )
 
 set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 
-			${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common
+            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/cmsis
             ${CMAKE_CURRENT_SOURCE_DIR}/bsp
@@ -129,7 +148,7 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
             ${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
             ${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
             ${CMAKE_SOURCE_DIR}/module-sys/
-			${USB_CDC_DIR_INCLUDES}
+            ${USB_DIR_INCLUDES}
 
         CACHE INTERNAL "")
 

@@ -1,0 +1,8 @@
+cscope.*
+tags
+*.o
+*.d
+*.a
+*.so
+.clangd/
+compile_commands.json
