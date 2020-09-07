@@ -166,7 +166,10 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
         break;
     }
 
-    query += " ORDER BY group_id DESC, contact_name.name_alternative || ' ' || contact_name.name_primary";
+    query += " ORDER BY group_id DESC ";
+    query += " , (contact_name.name_alternative IS NULL OR contact_name.name_alternative ='') ";
+    query += " AND (contact_name.name_primary IS NULL OR contact_name.name_primary ='') ASC ";
+    query += " , contact_name.name_alternative || ' ' || contact_name.name_primary ";
 
     if (limit > 0) {
         query += " LIMIT " + std::to_string(limit);
