@@ -151,6 +151,9 @@ enum _status_groups
     kStatusGroup_DebugConsole = 99,           /*!< Group number for debug console status codes. */
     kStatusGroup_SEMC = 100,                   /*!< Group number for SEMC status codes. */    
     kStatusGroup_ApplicationRangeStart = 101, /*!< Starting number for application groups. */
+
+    kStatusGroup_LIST = 142,                  /*!< Group number for List status codes. */
+    kStatusGroup_OSA = 143,                   /*!< Group number for OSA status codes. */
 };
 
 /*! @brief Generic status return codes. */
