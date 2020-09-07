@@ -66,8 +66,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         numbersIDs.pop_back();
     }
 
-    ret = contactDB->ringtones.add(
-        ContactsRingtonesTableRow{.ID = DB_ID_NONE, .contactID = contactID, .assetPath = rec.assetPath});
+    ret = contactDB->ringtones.add(ContactsRingtonesTableRow(DB_ID_NONE, contactID, rec.assetPath));
 
     if (!ret) {
         return false;
@@ -181,32 +180,32 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::getQuery(std::shared_pt
         LOG_INFO("Filtering by number: %s", textFilter->getFilterData().c_str());
     }
 
-        auto readQuery = static_cast<const db::query::ContactGet *>(query.get());
-        LOG_DEBUG("Contact read query, filter: \"%s\", offset=%lu, limit=%lu",
-                  readQuery->getFilterData().c_str(),
-                  static_cast<unsigned long>(readQuery->getOffset()),
-                  static_cast<unsigned long>(readQuery->getLimit()));
-        auto [limit, offset] = readQuery->getLimitOffset();
-        auto matchType       = searchByNumber ? ContactsTable::MatchType::TextNumber : ContactsTable::MatchType::Name;
-        uint32_t groupID     = readQuery->getGroupFilterData();
-        if (groupID != DB_ID_NONE) {
-            matchType = ContactsTable::MatchType::Group;
-        }
-        else
-            groupID = favouritesGroupId;
-        LOG_DEBUG("Contact match Type: %lu", static_cast<unsigned long int>(matchType));
+    auto readQuery = static_cast<const db::query::ContactGet *>(query.get());
+    LOG_DEBUG("Contact read query, filter: \"%s\", offset=%lu, limit=%lu",
+              readQuery->getFilterData().c_str(),
+              static_cast<unsigned long>(readQuery->getOffset()),
+              static_cast<unsigned long>(readQuery->getLimit()));
+    auto [limit, offset] = readQuery->getLimitOffset();
+    auto matchType       = searchByNumber ? ContactsTable::MatchType::TextNumber : ContactsTable::MatchType::Name;
+    uint32_t groupID     = readQuery->getGroupFilterData();
+    if (groupID != DB_ID_NONE) {
+        matchType = ContactsTable::MatchType::Group;
+    }
+    else {
+        groupID = favouritesGroupId;
+    }
+    LOG_DEBUG("Contact match Type: %lu", static_cast<unsigned long int>(matchType));
 
-        auto ids =
-            contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
+    auto ids = contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
 
-        LOG_DEBUG("Received records: %lu", static_cast<unsigned long int>(ids.size()));
+    LOG_DEBUG("Received records: %lu", static_cast<unsigned long int>(ids.size()));
 
-        std::vector<ContactRecord> result(ids.size());
-        std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
+    std::vector<ContactRecord> result(ids.size());
+    std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
 
-        auto response = std::make_unique<db::query::ContactGetResult>(result);
-        response->setRequestQuery(query);
-        return response;
+    auto response = std::make_unique<db::query::ContactGetResult>(result);
+    response->setRequestQuery(query);
+    return response;
 }
 
 std::unique_ptr<db::QueryResult> ContactRecordInterface::getByIDQuery(std::shared_ptr<db::Query> query)
@@ -423,7 +422,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
         return false;
     }
 
-    ret = contactDB->ringtones.update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
+    ret = contactDB->ringtones.update(ContactsRingtonesTableRow(contact.ID, rec.assetPath));
 
     if (!ret) {
         LOG_ERROR("Failed to update contact ringtone");
