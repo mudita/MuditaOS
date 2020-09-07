@@ -3,6 +3,7 @@
 ## [Current release]
 
 ### Added
+* `[phonebook]` NoName contacts at the end of contacts list.
 
 ### Changed
 
