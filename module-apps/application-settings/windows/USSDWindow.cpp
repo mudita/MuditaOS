@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <Font.hpp>
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 namespace gui
 {
@@ -65,10 +66,16 @@ namespace gui
         pullToSend->setText("*101#");
         pullToSend->setPosition(style::settings::ussd::commonXPos, h);
         pullToSend->activatedCallback = [=](gui::Item &) {
-            LOG_INFO("Activated callback");
+            std::string data = "#101#";
+            CellularServiceAPI::USSDRequest(this->application, CellularUSSDMessage::RequestType::data, data);
             return true;
         };
-
+        pullToSend->setEditMode(EditMode::EDIT);
+        pullToSend->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
+            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=]() { selectSpecialCharacter(); }));
         setFocusItem(pullToSend);
     }
 

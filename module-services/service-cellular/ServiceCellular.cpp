@@ -1643,5 +1643,12 @@ void ServiceCellular::handleStateTimer(void)
 
 bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+
+    channel->cmd("AT+CSCS=\"GSM\"\r", 1000, 1);
+
+    std::string command = "AT+CUSD=1,\"*101#\",15\r";
+
+    channel->cmd(command, 120000, 2);
     return false;
 }

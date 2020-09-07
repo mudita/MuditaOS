@@ -196,6 +196,10 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> &data)
         std::vector<uint8_t> v;
         for (auto c : data)
             v.push_back(c);
+        std::string frames(v.begin(), v.end());
+        LOG_INFO(
+            "																			DLC_channel::ParseInputData %s",
+            frames.c_str());
         pv_callback(v);
     }
     // else{
