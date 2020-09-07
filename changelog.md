@@ -14,6 +14,7 @@
 * `[phonebook]` Sort list of contacts by first name if there is no second name.
 * `[listview]` List returning to previously focused element on CRUD notifications (Messages and Phonebook).
 * `[phonebook]` Change alternative/other number to second number.
+* `[database]` Fixed boot error caused by new settings table.
 
 ### Other
 * `[desktopApp]` Added functional tests.
