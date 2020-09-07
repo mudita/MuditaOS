@@ -40,7 +40,6 @@ class SettingsTable_v2 : public Table<SettingsTableRow_v2, SettingsTableFields_v
 
   private:
     template <typename T> SettingsTableRow_v2 getBy(const char *statement, T arg) const;
-    std::vector<SettingsTableRow_v2> defaultInitialization;
 
     enum
     {
