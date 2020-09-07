@@ -10,6 +10,7 @@
 ### Fixed
 
 * `[desktopApp]` Fixed endpoint handling.
+* `[phonebook]` Sort list of contacts by first name if there is no second name.
 
 ### Other
 * `[desktopApp]` Added functional tests.
