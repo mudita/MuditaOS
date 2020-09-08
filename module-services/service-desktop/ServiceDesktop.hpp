@@ -13,18 +13,6 @@ namespace sdesktop
     const inline int service_stack         = 8192;
     const inline int cdc_queue_len         = 10;
     const inline int cdc_queue_object_size = 10;
-    class UpdateOsMessage : public sys::DataMessage
-    {
-      public:
-        UpdateOsMessage(const std::string updateFilePath, const uint32_t requestUUID)
-            : sys::DataMessage(MessageType::UpdateOS), updateFile(updateFilePath), uuid(requestUUID){};
-        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
-        {}
-        ~UpdateOsMessage() override = default;
-
-        std::string updateFile;
-        uint32_t uuid;
-    };
 }; // namespace sdesktop
 
 class ServiceDesktop : public sys::Service

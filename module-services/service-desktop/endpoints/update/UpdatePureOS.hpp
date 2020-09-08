@@ -3,6 +3,7 @@
 #include <module-utils/microtar/src/microtar.hpp>
 #include <vfs.hpp>
 #include <json/json11.hpp>
+#include <service-desktop/messages/DesktopMessages.hpp>
 
 class ServiceDesktop;
 namespace fs = std::filesystem;
@@ -80,6 +81,11 @@ class UpdatePureOS
     updateos::UpdateError updateBootJSON();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
+    updateos::UpdateError updateUserData();
+
+    void informError(const char *format, ...);
+    void informDebug(const char *format, ...);
+    void informUpdate(const char *format, ...);
 
     updateos::BootloaderUpdateError writeBootloader(fs::path bootloaderFile);
 
@@ -88,6 +94,9 @@ class UpdatePureOS
     bool unpackFileToTemp(mtar_header_t &header, unsigned long *crc32);
     const fs::path getUpdateTmpChild(const fs::path &childPath);
 
+    static const json11::Json getVersionInfoFromFile(const fs::path &updateFile);
+    static bool isUpgradeToCurrent(const std::string &versionToCompare);
+    static const fs::path checkForUpdate();
   private:
     fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
