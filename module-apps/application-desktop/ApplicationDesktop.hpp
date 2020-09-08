@@ -7,6 +7,9 @@
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <service-db/messages/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <service-desktop/endpoints/update/UpdatePureOS.hpp>
+#include <module-services/service-desktop/ServiceDesktop.hpp>
+#include "DesktopMessages.hpp"
 
 namespace app
 {
@@ -60,6 +63,8 @@ namespace app
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
+        auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
+
         /**
          * This static method will be used to lock the phone
          */

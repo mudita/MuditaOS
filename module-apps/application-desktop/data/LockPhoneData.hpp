@@ -10,6 +10,7 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 
 #include "gui/SwitchData.hpp"
+#include <filesystem>
 
 namespace gui
 {
@@ -34,6 +35,18 @@ namespace gui
         {
             return previousApplication;
         };
+    };
+
+    class UpdateFileData : public gui::SwitchData
+    {
+        std::filesystem::path updateFilePath;
+
+      public:
+        void setFile(const std::filesystem::path &file)
+        {
+            updateFilePath = file;
+        }
+        std::filesystem::path getFile() { return updateFilePath; }
     };
 
 } // namespace gui

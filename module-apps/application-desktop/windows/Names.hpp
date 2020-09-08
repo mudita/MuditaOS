@@ -9,4 +9,5 @@ namespace app::window::name
     inline const std::string desktop_reboot      = "Reboot";
     inline const std::string desktop_poweroff    = "PowerOffWindow";
     inline const std::string desktop_pin_lock    = "PinLockWindow";
+    inline const std::string desktop_update      = "Update";
 }; // namespace app::window::name
