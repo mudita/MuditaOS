@@ -38,21 +38,18 @@ namespace gui
             }
             if (contact->numbers.size() > 1) {
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::numbersWithIconsWidget::h);
-                alternativeNumberHBox =
+                secondNumberHBox =
                     new NumberWithIconsWidget(app, contact->numbers[1].number, style::window::font::medium, nullptr);
 
-                vBox->addWidget(alternativeNumberHBox);
+                vBox->addWidget(secondNumberHBox);
 
-                // Set proper navigation if alternative number is present
-                primaryNumberHBox->smsImage->setNavigationItem(NavigationDirection::DOWN,
-                                                               alternativeNumberHBox->smsImage);
+                // Set proper navigation if second number is present
+                primaryNumberHBox->smsImage->setNavigationItem(NavigationDirection::DOWN, secondNumberHBox->smsImage);
                 primaryNumberHBox->phoneImage->setNavigationItem(NavigationDirection::DOWN,
-                                                                 alternativeNumberHBox->phoneImage);
+                                                                 secondNumberHBox->phoneImage);
 
-                alternativeNumberHBox->smsImage->setNavigationItem(NavigationDirection::UP,
-                                                                   primaryNumberHBox->smsImage);
-                alternativeNumberHBox->phoneImage->setNavigationItem(NavigationDirection::UP,
-                                                                     primaryNumberHBox->phoneImage);
+                secondNumberHBox->smsImage->setNavigationItem(NavigationDirection::UP, primaryNumberHBox->smsImage);
+                secondNumberHBox->phoneImage->setNavigationItem(NavigationDirection::UP, primaryNumberHBox->phoneImage);
             }
             if (contact->mail.length() > 0) {
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::email_text_h +
@@ -92,8 +89,8 @@ namespace gui
                 return false;
             }
 
-            // Clear VBox down navigation if alternative number is present.
-            if (alternativeNumberHBox != nullptr) {
+            // Clear VBox down navigation if second number is present.
+            if (secondNumberHBox != nullptr) {
                 primaryNumberHBox->clearNavigationItem(NavigationDirection::DOWN);
             }
 
