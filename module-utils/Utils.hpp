@@ -8,6 +8,8 @@
 namespace utils
 {
     static const std::string WHITESPACE = " \n\r\t\f\v";
+    constexpr unsigned int secondsInMinute =
+        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
 
     template <typename Out> void split(const std::string &s, char delim, Out result)
     {

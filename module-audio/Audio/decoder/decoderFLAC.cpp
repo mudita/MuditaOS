@@ -8,6 +8,7 @@
  */
 
 #include "decoderFLAC.hpp"
+#include "Utils.hpp"
 
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO
@@ -20,7 +21,7 @@
 namespace audio
 {
 
-    decoderFLAC::decoderFLAC(const char *fileName) : decoder(fileName), tags(std::make_unique<Tags>())
+    decoderFLAC::decoderFLAC(const char *fileName) : decoder(fileName)
     {
 
         if (fileSize == 0) {
@@ -38,21 +39,6 @@ namespace audio
     decoderFLAC::~decoderFLAC()
     {
         drflac_close(flac);
-    }
-
-    std::unique_ptr<Tags> decoderFLAC::fetchTags()
-    {
-        tags->filePath.append(filePath);
-        if (tags->title.size() == 0) {
-            auto pos = filePath.rfind("/");
-            if (pos == std::string::npos) {
-                tags->title.append(filePath);
-            }
-            else {
-                tags->title.append(&filePath[pos + 1]);
-            }
-        }
-        return std::make_unique<Tags>(*tags);
     }
 
     uint32_t decoderFLAC::decode(uint32_t samplesToRead, int16_t *pcmData)
@@ -105,68 +91,20 @@ namespace audio
     {
         decoderFLAC *userdata = (decoderFLAC *)pUserData;
 
-        /* We're only interested in VORBIS comments which contain album/track/artist info */
-        if (pMetadata->type == DRFLAC_METADATA_BLOCK_TYPE_VORBIS_COMMENT) {
-            uint8_t buff[128] = {0};
-
-            /*ommit vendor string*/
-            uint8_t *p = (uint8_t *)pMetadata->data.vorbis_comment.comments;
-
-            uint8_t i = 0;
-            for (i = 0; i < pMetadata->data.vorbis_comment.commentCount; i++) {
-                /* Little Endian */
-                uint32_t *taglen = (uint32_t *)p;
-                p += sizeof(*taglen);
-
-                uint8_t *pp           = (uint8_t *)strchr((char *)p, '=');
-                uint8_t j             = 0;
-                uint32_t tolower_size = pp - p;
-                /*convert to lower case*/
-                for (j = 0; j < tolower_size; ++j)
-                    p[j] = tolower(p[j]);
-
-                if (!memcmp(p, "artist=", 7)) {
-                    userdata->flac_parse_text(p, 7, *taglen, buff, sizeof buff);
-                    userdata->tags->artist.append(reinterpret_cast<char *>(&buff[0]));
-                }
-
-                if (!memcmp(p, "title=", 6)) {
-                    userdata->flac_parse_text(p, 6, *taglen, buff, sizeof buff);
-                    userdata->tags->title.append(reinterpret_cast<char *>(&buff[0]));
-                }
-
-                if (!memcmp(p, "album=", 6)) {
-                    userdata->flac_parse_text(p, 6, *taglen, buff, sizeof buff);
-                    userdata->tags->album.append(reinterpret_cast<char *>(&buff[0]));
-                }
-
-                if (!memcmp(p, "genre=", 6)) {
-                    userdata->flac_parse_text(p, 6, *taglen, buff, sizeof buff);
-                    userdata->tags->genre.append(reinterpret_cast<char *>(&buff[0]));
-                }
-
-                if (!memcmp(p, "date=", 5)) {
-                    userdata->flac_parse_text(p, 5, *taglen, buff, sizeof buff);
-                    userdata->tags->year.append(reinterpret_cast<char *>(&buff[0]));
-                }
-
-                p += *taglen;
-            }
-        }
-        else if (pMetadata->type == DRFLAC_METADATA_BLOCK_TYPE_STREAMINFO) {
-            userdata->tags->total_duration_s =
+        if (pMetadata->type == DRFLAC_METADATA_BLOCK_TYPE_STREAMINFO) {
+            userdata->tag->total_duration_s =
                 (pMetadata->data.streaminfo.totalSampleCount / (pMetadata->data.streaminfo.bitsPerSample / 8)) /
                 pMetadata->data.streaminfo.sampleRate;
 
             if (pMetadata->data.streaminfo.channels == 1) {
-                userdata->tags->total_duration_s *= 2;
+                userdata->tag->total_duration_s *= 2;
             }
 
-            userdata->tags->duration_min  = userdata->tags->total_duration_s / 60;
-            userdata->tags->duration_hour = userdata->tags->duration_min / 60;
-            userdata->tags->duration_sec  = userdata->tags->total_duration_s % 60;
-            userdata->tags->sample_rate   = pMetadata->data.streaminfo.sampleRate;
-            userdata->tags->num_channel   = pMetadata->data.streaminfo.channels;
+            userdata->tag->duration_min  = userdata->tag->total_duration_s / utils::secondsInMinute;
+            userdata->tag->duration_hour = userdata->tag->duration_min / utils::secondsInMinute;
+            userdata->tag->duration_sec  = userdata->tag->total_duration_s % utils::secondsInMinute;
+            userdata->tag->sample_rate   = pMetadata->data.streaminfo.sampleRate;
+            userdata->tag->num_channel   = pMetadata->data.streaminfo.channels;
 
             userdata->sampleRate = pMetadata->data.streaminfo.sampleRate;
             userdata->chanNumber = pMetadata->data.streaminfo.channels;

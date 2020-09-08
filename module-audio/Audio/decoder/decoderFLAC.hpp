@@ -25,15 +25,11 @@ namespace audio
 
         ~decoderFLAC();
 
-        std::unique_ptr<Tags> fetchTags() override;
-
         uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
 
         void setPosition(float pos) override;
 
       private:
-        std::unique_ptr<Tags> tags;
-
         drflac *flac = nullptr;
 
         uint32_t totalSamplesCount = 0;

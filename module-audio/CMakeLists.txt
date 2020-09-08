@@ -3,6 +3,14 @@ cmake_minimum_required(VERSION 3.12)
 project(module-audio VERSION 1.0
         DESCRIPTION "Audio module library")
 
+add_subdirectory(Audio/decoder/taglib)
+
+include_directories(
+        ${CMAKE_CURRENT_BINARY_DIR}/Audio/decoder/taglib
+        ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/taglib/taglib
+        ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/taglib/taglib/toolkit
+)
+
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoder.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
@@ -64,5 +72,9 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs  module-sys )
+target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs module-sys tag )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(Audio/test)
+endif ()
 
