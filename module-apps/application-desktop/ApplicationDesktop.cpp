@@ -1,5 +1,5 @@
 #include "ApplicationDesktop.hpp"
-
+#include "Dialog.hpp"
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
@@ -7,6 +7,9 @@
 #include "windows/PowerOffWindow.hpp"
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
+#include "windows/Update.hpp"
+#include "AppWindow.hpp"
+#include "data/LockPhoneData.hpp"
 
 #include <service-db/api/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
@@ -51,6 +54,8 @@ namespace app
         }
         else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
             handled = lockHandler.handle(msg);
+        else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
+            handled = handle(msg);
         }
 
         // handle database response
@@ -69,6 +74,22 @@ namespace app
         else {
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
+    }
+
+    auto ApplicationDesktop::handle(sdesktop::UpdateOsMessage *msg) -> bool
+    {
+        if (msg->messageType == sdesktop::UpdateFoundOnBoot) {
+            LOG_DEBUG("ApplicationDesktop::handle updateFoundOnBoot message");
+            auto *updateMessage = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+
+            if (updateMessage != nullptr) {
+                if (updateMessage->messageType == sdesktop::UpdateFoundOnBoot &&
+                    updateMessage->updateFile.has_filename()) {
+                    LOG_DEBUG("ApplicationDesktop::handle pending update found: %s", updateMessage->updateFile.c_str());
+                }
+            }
+        }
+        return true;
     }
 
     auto ApplicationDesktop::handle(db::query::notifications::GetAllResult *msg) -> bool
@@ -198,7 +219,24 @@ namespace app
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
 
-        return sys::ReturnCodes::Success;
+        connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+          LOG_INFO("InitHandler UpdateOsMessage handler");
+          auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+          if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateFoundOnBoot) {
+              LOG_INFO("InitHandler got updateMsg: %s", updateMsg->updateFile.c_str());
+              if (getWindow(app::window::name::desktop_update)) {
+                  std::unique_ptr<gui::UpdateFileData> data = make_unique<gui::UpdateFileData>();
+                  data->setFile(updateMsg->updateFile);
+                  switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+              }
+          }
+          return std::make_shared<sys::ResponseMessage>();
+        });
+
+        auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateCheckForUpdateOnce);
+        sys::Bus::SendBroadcast(msgToSend, this);
+
+        return ret;
     }
 
     sys::ReturnCodes ApplicationDesktop::DeinitHandler()
@@ -250,4 +288,11 @@ namespace app
         }
     }
 
+    void ApplicationDesktop::setScreenLocked(bool val)
+    {
+        screenLocked = val;
+    };
+
+    void ApplicationDesktop::destroyUserInterface()
+    {}
 } // namespace app

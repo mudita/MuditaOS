@@ -89,6 +89,7 @@ sed -i 's/__GIT_BRANCH__/'$PURE_OS_GIT_BRANCH'/g' $vjson
 sed -i 's/__GIT_TAG__/'$PURE_OS_GIT_TAG'/g' $vjson
 sed -i 's/__GIT_REVISION__/'$PURE_OS_GIT_REV'/g' $vjson
 
+sed -i 's/__VERSION_STRING__/'$PURE_OS_VERSION_STRING'/g' $vjson
 sed -i 's/__VERSION_MAJOR__/'$PURE_OS_VERSION_MAJOR'/g' $vjson
 sed -i 's/__VERSION_MINOR__/'$PURE_OS_VERSION_MINOR'/g' $vjson
 sed -i 's/__VERSION_PATCH__/'$PURE_OS_VERSION_PATCH'/g' $vjson
