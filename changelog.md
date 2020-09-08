@@ -7,11 +7,10 @@
 * `[desktop]` info on how to unlock
 * `[settings]` pin change option in settings main window
 
-## [0.37.1 2020-09-11]
-
 ### Fixed
 
 * `[gui]` Fixed notifications display on unlocked screen.
+* `[audio]` `[music player]` Fixed audio files meta tags parsing
 
 ## [0.37.1 2020-09-11]
 
