@@ -17,7 +17,8 @@
 	{
 		"major": "__VERSION_MAJOR__",
 		"minor": "__VERSION_MINOR__",
-		"patch": "__VERSION_PATCH__"
+		"patch": "__VERSION_PATCH__",
+		"string": "__VERSION_STRING__"
 	},
 	"bootloader":
 	{
