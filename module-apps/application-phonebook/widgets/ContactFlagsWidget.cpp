@@ -14,7 +14,7 @@ namespace gui
 
     const unsigned char ContactFlagsWidget::iconsCount = 4;
     ContactFlagsWidget::ContactFlagsWidget(Item *parent)
-        : Rect(parent, 0, style::header::height, style::window_width, style::widget::ContatFlas::height)
+        : Rect(parent, 0, style::header::height, style::window_width, style::widget::ContactFlag::height)
     {
         favourites = speedDial = ice = true;
         blocked                      = false;
@@ -70,7 +70,7 @@ namespace gui
 
     void ContactFlagsWidget::buildWidget()
     {
-        mainBox = new HBox(this, 0, 0, style::window_width, style::widget::ContatFlas::itemHeight);
+        mainBox = new HBox(this, 0, 0, style::window_width, style::widget::ContactFlag::itemHeight);
         mainBox->setAlignment(Alignment(Alignment::Horizontal::Center));
         mainBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         mainBox->addWidget(favouritesIcon);
