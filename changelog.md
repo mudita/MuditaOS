@@ -1,5 +1,23 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+
+
+### Changed
+
+
+
+### Fixed
+
+
+
+### Other
+
+* `[system_features]` Sprintf clean up.
+
 ## [0.38.2 2020-09-18]
 
 ### Added
