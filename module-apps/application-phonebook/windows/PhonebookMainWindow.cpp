@@ -7,7 +7,6 @@
 #include <queries/phonebook/QueryContactGet.hpp>
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <module-services/service-db/messages/DBContactMessage.hpp>
 #include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui

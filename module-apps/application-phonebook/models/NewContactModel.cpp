@@ -55,7 +55,7 @@ void NewContactModel::createData()
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
-        phonebookInternals::ListItemName::OtherNumber,
+        phonebookInternals::ListItemName::SecondNumber,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
