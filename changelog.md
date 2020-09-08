@@ -15,6 +15,7 @@
 * `[listview]` List returning to previously focused element on CRUD notifications (Messages and Phonebook).
 * `[phonebook]` Change alternative/other number to second number.
 * `[database]` Fixed boot error caused by new settings table.
+* `[phonebook]` Fix speed dial number conflict resolution.
 
 ### Other
 * `[desktopApp]` Added functional tests.
