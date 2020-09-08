@@ -33,7 +33,7 @@ namespace gui
         void firstNameHandler();
         void secondNameHandler();
         void numberHandler();
-        void otherNumberHandler();
+        void secondNumberHandler();
         void emailHandler();
         void addressHandler();
         void noteHandler();
