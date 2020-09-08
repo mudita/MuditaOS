@@ -82,6 +82,7 @@ namespace gui
         void bottomBarRestoreFromTemporaryMode();
         void setBottomBarText(const UTF8 &text, BottomBar::Side side);
         void clearBottomBarText(BottomBar::Side side);
+        void setBottomBarActive(BottomBar::Side side, bool value);
         bool selectSpecialCharacter();
         /// get BoundingBox size of Window "body" area
         /// @note it would be much better to just have "body item" instead

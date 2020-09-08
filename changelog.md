@@ -11,6 +11,9 @@
 ### Added
 
 * `[audio]` Add storing and updating audio settings in database.
+* `[phonebook]` NoName contacts at the end of contacts list.
+* `[calllog]` Added new queries to the DB
+* `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
 
 ### Changed
 

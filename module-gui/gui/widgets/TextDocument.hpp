@@ -4,6 +4,7 @@
 #include <utility>
 #include "TextBlock.hpp"
 #include "TextBlockCursor.hpp"
+#include "log/log.hpp"
 
 namespace gui
 {
