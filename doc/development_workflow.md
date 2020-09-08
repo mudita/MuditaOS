@@ -4,7 +4,7 @@ When submitting code or documentation changes please follow these steps to have 
 
 ## Create a new branch
 
-Create a branch, which name is connected to the feature, bug fix or documentation change you want to contribute e.g. `some-feature-fixes`. 
+Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `some-feature-fixes`. 
 
 **Note:** If you're part of the MuditaOS core development team, please precede the branch name with a relevant Jira ticket number e.g. `EGD-5555-some-feature-fixes`.
 
@@ -17,19 +17,19 @@ Commit your work. Each commit should have a description explaining:
 
 If it's impossible to provide the above information then your commit is likely excessive or redundant and should be squashed with other commit(s).
 
-**Note:** If you're part of the MuditaOS core development team, your commit *must* start with Jira ticket number in square brackets. It can also point to which component you are working on, e.g. `[EGD-5555] phonebook: fix contact details`. A list of components is not yet defined, so please follow the names that are already in use. Do not add commits that are out of scope of the Jira issue you are working on.
+**Note:** If you're part of the MuditaOS core development team, your commit *must* start with Jira ticket number in square brackets. It can also point to which component you are working on, e.g. `[EGD-5555] phonebook: fix contact details`. A list of components is not yet defined, so please follow the names that are already in use. Do not add commits that are out of the scope of the Jira issue you are working on.
 
 ## Basic checks before Pull Request
 
 Before submitting a Pull Request please go through some basic checks:
-	- test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling, check call log too)
+	- test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling funcionality, check call log too)
 	- [include changelog description](changelog_howto.md) (if applicable),
 	- run unit tests (`make check`),
 	- check if your code formatting complies with [`.clang-format`](.clang-format).
 
 ## Submit a Pull Request
 
-Submit a Pull Request. You can add labels which will help people who know the part of code you are modifying in spotting the changes you are submitting and do a code review. 
+Submit a Pull Request. You can add labels that will help people who know the part of the code you are modifying in spotting the changes you are submitting and do a code review. 
 
 Please use the PR description to:
 	- explain what and why you are changing, 
@@ -42,7 +42,7 @@ Include screenshots and gifs/screencasts if applicable. The more information you
 
 ## PR review - answer questions
 
-During a PR review, team members will ask you questions regarding your solution. Please answer them by explaining the reasoning behind the suggested changes. Even if the feedback you receive regarding your PR suggest an obvious change, please answer with a simple OK to show that you haven't missed it.
+During a PR review, team members will ask you questions regarding your solution. Please answer them by explaining the reasoning behind the suggested changes. Even if the feedback you receive regarding your PR suggests an obvious change, please answer with a simple OK to show that you haven't missed it.
 
 ## PR review - act on feedback
 
@@ -50,12 +50,12 @@ Add changes to your PR that are requested by reviewers and push the feature bran
 
 ## Merge to `master` branch
 
-When a PR is accepted by two or more reviewers it's time to add PR changes to master branch. **Merging to
-master is prohibited - [do a rebase instead](https://www.atlassian.com/git/tutorials/merging-vs-rebasing). Do not add to master any commits that are not required, less is more. An ideal situation is when you have a single commit for a PR and a single Jira issue (MuditaOS core development team).** 
+When a PR is accepted by two or more reviewers it's time to add PR changes to `master` branch. **Merging to
+`master` is prohibited - [do a rebase instead](https://www.atlassian.com/git/tutorials/merging-vs-rebasing). Do not add any commits to `master` that are not required - less is more. An ideal situation is when you have a single commit for a PR and a single Jira issue (MuditaOS core development team).** 
 
 If you have multiple commits, you can squash them and force push a branch before merging your PR to master. **Please make sure that your commit message contains only valuable information.**
 
-Merging a PR causes feature branch to be deleted. Switch to master branch on your local machine and do a pull or fetch to get your changes.
+Merging a PR causes the feature branch to be deleted. Switch to master branch on your local machine and do a pull or fetch to get your changes.
 
 **If you need any assistance do not hesitate to ask others 🙌🏼**
 
@@ -68,7 +68,7 @@ With `rebase`, you update your commits one by one.
 git rebase origin/master  # will update your commits one by one to master.
 ```
 
-To update it to the latest version of master:
+To update it to the latest version of `master`:
 ```
 git fetch                 # update remote branches on your local machine
 git rebase origin/master  # update branch you are at to origin/master
@@ -80,7 +80,7 @@ git rebase origin/master  # update branch you are at to origin/master
  - when you did a lot of changes in a lot of places - either `git push` your branch on server, or make its copy
  - when you're happy of `git rebase` results - you'll need to push your branch with force to server - since you've changed its history (updated it) 
 
-Minimal set of commands:
+A minimal set of commands:
 ```
 git fetch                                             # update all remote branches  
 git status                                            # check if there are no changes dangling, or waiting to commit, no merge in progress, etc.  
@@ -105,7 +105,7 @@ If your rebase succeeds:
 * `git push origin your_branch_name:your_branch_name`
 
 **Note:**
- - Rebase changes history - don't rebase branches that other people are working on (it's doable, but don't do this if you're not really familliar with how to do it properly)
+ - Rebase changes history - don't rebase branches that other people are working on (it's doable, but don't do this if you're not familiar with how to do it properly)
  - Always rebase your feature branches to `origin master`
 
 #### How to change some shameful commit somewhere in your PR branch history
