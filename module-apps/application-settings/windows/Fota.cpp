@@ -260,8 +260,14 @@ void Fota::handleHTTPResponse()
             for (auto &header : msg->responseHeaders) {
                 auto sizeBegin = header.find(contentLength);
                 if (sizeBegin != std::string::npos) {
-                    unsigned long len = std::stoul(header.substr(sizeBegin + contentLength.size()));
-                    data              = msg->body.substr(0, len);
+                    try {
+                        unsigned long len = std::stoul(header.substr(sizeBegin + contentLength.size()));
+                        data              = msg->body.substr(0, len);
+                    }
+                    catch (const std::exception &e) {
+                        LOG_ERROR("Fota::handleHTTPResponse exception %s", e.what());
+                        return std::make_shared<sys::ResponseMessage>();
+                    }
                     break;
                 }
             }

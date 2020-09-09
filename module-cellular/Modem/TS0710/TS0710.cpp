@@ -394,7 +394,16 @@ TS0710::ConfState TS0710::StartMultiplexer()
         if (res) {
             auto beg = res.response[0].find(" ");
             auto end = res.response[0].find(",", 1);
-            SignalStrength signalStrength(std::stoi(res.response[0].substr(beg + 1, end - beg - 1)));
+            auto input_val = res.response[0].substr(beg + 1, end - beg - 1);
+            auto strength  = 0;
+            try {
+                strength = std::stoi(input_val);
+            }
+            catch (const std::exception &e) {
+                LOG_ERROR("Conversion error of %s, taking default value %d", input_val.c_str(), strength);
+            }
+
+            SignalStrength signalStrength(strength);
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 auto msg = std::make_shared<CellularNotificationMessage>(

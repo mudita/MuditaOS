@@ -121,12 +121,14 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
     }
 
     try {
-        if (contactDB->number.removeById(std::stoul(contact.numbersID)) == false) {
+        uint32_t id = std::stoul(contact.numbersID);
+        if (contactDB->number.removeById(id) == false) {
             return false;
         }
     }
     catch (const std::exception &e) {
-        LOG_ERROR("%s", e.what());
+        LOG_ERROR("ontactRecordInterface::RemoveByID exception %s", e.what());
+        return false;
     }
 
     if (contactDB->ringtones.removeById(contact.ringID) == false) {
@@ -935,7 +937,15 @@ std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std:
 {
     std::vector<ContactRecord::Number> nrs;
     for (auto nr_str : utils::split(numbers_id, ' ')) {
-        auto nr = contactDB->number.getById(std::stol(nr_str));
+        auto nr_val = 0L;
+        try {
+            nr_val = std::stol(nr_str);
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR("Convertion error from %s, taking default value %ld", nr_str.c_str(), nr_val);
+        }
+
+        auto nr = contactDB->number.getById(nr_val);
         if (!nr.isValid()) {
             return nrs;
         }
