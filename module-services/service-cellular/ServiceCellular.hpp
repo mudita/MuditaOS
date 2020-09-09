@@ -79,7 +79,7 @@ class ServiceCellular : public sys::Service
     bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
-    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::vector<uint8_t> &data);
+    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
 
     std::vector<std::string> messageParts;
 

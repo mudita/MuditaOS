@@ -193,15 +193,22 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> &data)
         xTaskNotifyGive(blockedTaskHandle);
     }
     else if (pv_callback != nullptr) {
-        std::vector<uint8_t> v;
-        for (auto c : data)
-            v.push_back(c);
-        std::string frames(v.begin(), v.end());
-        LOG_INFO(
-            "																			DLC_channel::ParseInputData %s",
-            frames.c_str());
-        pv_callback(v);
+
+        TS0710_Frame frame(data);
+        auto deserialised = frame.getFrame().data;
+
+        std::string receivedData = part + std::string(deserialised.begin(), deserialised.end());
+
+        auto pos = receivedData.find('\r', 1);
+        if (pos != std::string::npos) {
+            part.clear();
+            pv_callback(receivedData);
+        }
+        else {
+            part += receivedData;
+        }
     }
+
     // else{
     //     LOG_DEBUG("Dropping unneeded frame");
     // }

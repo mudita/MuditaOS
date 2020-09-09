@@ -110,7 +110,7 @@ namespace gui
                                         style::settings::ussd::commonXPos,
                                         style::settings::ussd::commonYPos,
                                         style::settings::ussd::commonW,
-                                        style::settings::ussd::commonLabelH);
+                                        style::settings::ussd::commonTextH);
         text->setFilled(false);
         text->setPenFocusWidth(style::window::default_border_focus_w);
         text->setPenWidth(style::window::default_border_no_focus_w);
@@ -121,4 +121,8 @@ namespace gui
         return text;
     }
 
+    void USSDWindow::handleIncomingUSSD(const std::string &data)
+    {
+        pullReceived->setText(UTF8(data));
+    }
 } // namespace gui

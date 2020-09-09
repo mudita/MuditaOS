@@ -345,9 +345,9 @@ TS0710::ConfState TS0710::StartMultiplexer()
     }
     delete pv_TS0710_Start;
 
-    controlCallback = [this](std::vector<uint8_t> &data) {
-        auto frame     = std::make_unique<TS0710_Frame>(data);
-        auto frameData = frame->getFrame().data;
+    controlCallback = [this](std::string &data) {
+        //        auto frame     = std::make_unique<TS0710_Frame>(data);
+        auto frameData = data;
 
         if (frameData.size() < 4) {
             LOG_ERROR("frame too short");

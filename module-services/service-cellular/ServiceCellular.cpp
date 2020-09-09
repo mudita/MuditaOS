@@ -157,11 +157,11 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         return true;
     });
 
-    notificationCallback = [this](std::vector<uint8_t> &data) {
+    notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
-        TS0710_Frame frame(data);
+        //        TS0710_Frame frame(data);
         std::string message;
-        auto msg = identifyNotification(frame.getFrame().data);
+        auto msg = identifyNotification(data);
 
         if (msg == std::nullopt) {
             LOG_INFO("Skipped unknown notification");
@@ -347,7 +347,7 @@ bool ServiceCellular::handle_power_up_procedure()
         // check baud once to determine if it's already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
-            // it's on aka hot start.
+            // it's on aka hot start.EGD-2914
             LOG_DEBUG("Linux - hot start");
             state.set(this, State::ST::CellularConfProcedure);
             break;
@@ -927,7 +927,7 @@ namespace
     } // namespace powerdown
 } // namespace
 
-std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
+std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
     std::string str(data.begin(), data.end());
 
@@ -1014,6 +1014,12 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     if (str.find("\"FOTA\",\"HTTPEND\",0") != std::string::npos) {
         LOG_DEBUG("Fota UPDATE, switching to AT mode");
         cmux->setMode(TS0710::Mode::AT);
+    }
+
+    if (str.find("+CUSD: ") != std::string::npos) {
+        auto tokens = utils::split(str, '\"');
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
+                                                             tokens[1]);
     }
 
     // Power Down

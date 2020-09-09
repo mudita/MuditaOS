@@ -44,5 +44,6 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         void set_navigation();
+        void handleIncomingUSSD(const std::string &data);
     };
 } // namespace gui
