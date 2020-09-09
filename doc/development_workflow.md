@@ -4,9 +4,9 @@ When submitting code or documentation changes please follow these steps to have 
 
 ## Create a new branch
 
-Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `some-feature-fixes`. 
+Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or ``fix/some-fix`.
 
-**Note:** If you're part of the MuditaOS core development team, please precede the branch name with a relevant Jira ticket number e.g. `EGD-5555-some-feature-fixes`.
+**Note:** If you're part of the MuditaOS core development team, please precede the branch name with a relevant Jira ticket number e.g. `EGD-5555-some-feature`.
 
 ## Commit changes
 
@@ -42,7 +42,7 @@ Include screenshots and gifs/screencasts if applicable. The more information you
 
 ## PR review - answer questions
 
-During a PR review, team members will ask you questions regarding your solution. Please answer them by explaining the reasoning behind the suggested changes. Even if the feedback you receive regarding your PR suggests an obvious change, please answer with a simple OK to show that you haven't missed it.
+During a PR review, team members will ask you questions regarding your solution. Please answer them by explaining the reasoning behind the suggested changes. Even if the feedback you receive regarding your PR is an obvious change, please answer with a simple OK to show that you haven't missed it.
 
 ## PR review - act on feedback
 
