@@ -15,7 +15,7 @@ Please make sure that your bug report includes the following data:
 
 - General description (what happened)
 - Expected behavior (what you think should happen)
-- Current behavior (current 'buggy' bahvior)
+- Current behavior (current 'buggy' behavior)
 - Steps to reproduce the bug
 
 Feel free to add any screenshots or gifs/screencasts to illustrate the issue.
