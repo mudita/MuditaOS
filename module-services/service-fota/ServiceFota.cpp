@@ -394,7 +394,14 @@ namespace FotaService
                     apnConfig.contextId = 1;
                 }
                 apnConfig.activated = (data[1] == "1" ? true : false);
-                int contextTypeRaw  = std::stoi(data[2]);
+                int contextTypeRaw  = 0;
+                try {
+                    contextTypeRaw = std::stoi(data[2]);
+                }
+                catch (const std::exception &e) {
+                    LOG_ERROR("Conversion error of %s, taking default value %d", data[2].c_str(), contextTypeRaw);
+                }
+
                 apnConfig.type      = static_cast<APN::ContextType>(contextTypeRaw);
                 apnConfig.ip        = data[3].substr(1, data[3].size() - 1);
                 LOG_DEBUG("Warking APN: %s", apnConfig.toString().c_str());
@@ -588,7 +595,15 @@ namespace FotaService
                     sendFotaFinshed(receiverServiceName);
                 }
                 else if (qind.tokens[fotaStatusTagPosition].find("UPDATING") != std::string::npos) {
-                    unsigned char progress = static_cast<unsigned char>(std::stoi(qind.tokens[2]));
+                    auto token_val = 0;
+                    try {
+                        token_val = std::stoi(qind.tokens[2]);
+                    }
+                    catch (const std::exception &e) {
+                        LOG_ERROR("Conversion error of %s, taking default value %d", qind.tokens[2].c_str(), token_val);
+                    }
+
+                    unsigned char progress = static_cast<unsigned char>(token_val);
                     LOG_DEBUG("FOTA UPDATING: %d", progress);
                     sendProgress(progress, receiverServiceName);
                 }
