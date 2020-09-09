@@ -1,7 +1,7 @@
-#include "ThreadViewWindow.hpp"
+#include "SMSThreadViewWindow.hpp"
 
-#include "../ApplicationMessages.hpp"
-#include "../data/SMSdata.hpp"
+#include "application-messages/ApplicationMessages.hpp"
+#include "application-messages/data/SMSdata.hpp"
 #include "OptionsMessages.hpp"
 #include "Service/Message.hpp"
 
@@ -24,7 +24,7 @@
 namespace gui
 {
 
-    ThreadViewWindow::ThreadViewWindow(app::Application *app) : AppWindow(app, name::window::thread_view)
+    SMSThreadViewWindow::SMSThreadViewWindow(app::Application *app) : AppWindow(app, name::window::thread_view)
     {
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_messages_title_main"));
@@ -60,7 +60,7 @@ namespace gui
         setFocusItem(body);
     }
 
-    void ThreadViewWindow::refreshTextItem()
+    void SMSThreadViewWindow::refreshTextItem()
     {
         if (inputMessage != nullptr) {
             return;
@@ -79,7 +79,7 @@ namespace gui
         };
     }
 
-    void ThreadViewWindow::destroyTextItem()
+    void SMSThreadViewWindow::destroyTextItem()
     {
         body->erase(inputMessage);
         if (inputMessage->parent == nullptr) {
@@ -88,13 +88,13 @@ namespace gui
         inputMessage = nullptr;
     }
 
-    void ThreadViewWindow::cleanView()
+    void SMSThreadViewWindow::cleanView()
     {
         body->removeWidget(inputMessage);
         body->erase();
     }
 
-    bool ThreadViewWindow::showMessages(ThreadViewWindow::Action what)
+    bool SMSThreadViewWindow::showMessages(SMSThreadViewWindow::Action what)
     {
         if (SMS.thread <= 0) {
             LOG_ERROR("threadID not set!");
@@ -104,7 +104,7 @@ namespace gui
         return true;
     }
 
-    void ThreadViewWindow::addSMS(ThreadViewWindow::Action what)
+    void SMSThreadViewWindow::addSMS(SMSThreadViewWindow::Action what)
     {
         LOG_DEBUG("--- %d ---", static_cast<int>(what));
         // if there was text - then remove it temp
@@ -203,7 +203,7 @@ namespace gui
         LOG_DEBUG("sms built");
     }
 
-    HBox *ThreadViewWindow::smsSpanBuild(Text *smsBubble, const SMSRecord &el) const
+    HBox *SMSThreadViewWindow::smsSpanBuild(Text *smsBubble, const SMSRecord &el) const
     {
         HBox *labelSpan = new gui::HBox();
 
@@ -252,7 +252,7 @@ namespace gui
         return labelSpan;
     }
 
-    void ThreadViewWindow::addErrorIcon(HBox *layout) const
+    void SMSThreadViewWindow::addErrorIcon(HBox *layout) const
     {
         auto errorIcon = new gui::Image("messages_error_W_M");
         errorIcon->setAlignment(Alignment(Alignment::Vertical::Center));
@@ -265,7 +265,7 @@ namespace gui
         layout->addWidget(errorIcon);
     }
 
-    void ThreadViewWindow::addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const
+    void SMSThreadViewWindow::addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const
     {
         // add time label activated on focus
         timeLabel->setMinimumWidth(timeLabel->getTextNeedSpace());
@@ -287,7 +287,7 @@ namespace gui
         };
     }
 
-    Label *ThreadViewWindow::timeLabelBuild(time_t timestamp) const
+    Label *SMSThreadViewWindow::timeLabelBuild(time_t timestamp) const
     {
         auto timeLabel        = new gui::Label(nullptr, 0, 0, 0, 0);
         timeLabel->activeItem = false;
@@ -299,7 +299,7 @@ namespace gui
         return timeLabel;
     }
 
-    bool ThreadViewWindow::smsBuild(const SMSRecord &smsRecord)
+    bool SMSThreadViewWindow::smsBuild(const SMSRecord &smsRecord)
     {
         auto max_available_h = body->area().h;
         auto max_available_w = style::window::messages::sms_max_width;
@@ -342,25 +342,25 @@ namespace gui
         return labelSpan->visible;
     }
 
-    void ThreadViewWindow::rebuild()
+    void SMSThreadViewWindow::rebuild()
     {
-        addSMS(ThreadViewWindow::Action::Init);
+        addSMS(SMSThreadViewWindow::Action::Init);
     }
 
-    void ThreadViewWindow::buildInterface()
+    void SMSThreadViewWindow::buildInterface()
     {}
 
-    void ThreadViewWindow::destroyInterface()
+    void SMSThreadViewWindow::destroyInterface()
     {
         erase();
     }
 
-    ThreadViewWindow::~ThreadViewWindow()
+    SMSThreadViewWindow::~SMSThreadViewWindow()
     {
         destroyInterface();
     }
 
-    void ThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void SMSThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         {
             auto pdata = dynamic_cast<SMSThreadData *>(data);
@@ -388,12 +388,12 @@ namespace gui
         }
     }
 
-    bool ThreadViewWindow::onInput(const InputEvent &inputEvent)
+    bool SMSThreadViewWindow::onInput(const InputEvent &inputEvent)
     {
         return AppWindow::onInput(inputEvent);
     }
 
-    bool ThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
+    bool SMSThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {
@@ -402,11 +402,11 @@ namespace gui
                 switch (msg->type) {
                 case db::Query::Type::Create:
                     // jump to the latest SMS
-                    addSMS(ThreadViewWindow::Action::NewestPage);
+                    addSMS(SMSThreadViewWindow::Action::NewestPage);
                     break;
                 case db::Query::Type::Update:
                 case db::Query::Type::Delete:
-                    addSMS(ThreadViewWindow::Action::Refresh);
+                    addSMS(SMSThreadViewWindow::Action::Refresh);
                     break;
                 case db::Query::Type::Read:
                     // do not update view, as we don't have visual representation for read status

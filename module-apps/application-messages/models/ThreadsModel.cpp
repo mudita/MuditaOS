@@ -1,20 +1,20 @@
 #include <module-services/service-db/messages/DBThreadMessage.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
-#include "ThreadModel.hpp"
+#include "ThreadsModel.hpp"
 #include "OptionWindow.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
-#include "../widgets/ThreadItem.hpp"
+#include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/data/SMSdata.hpp"
 
-ThreadModel::ThreadModel(app::Application *app) : BaseThreadRecordModel(app)
+ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}
 
-unsigned int ThreadModel::getMinimalItemHeight() const
+unsigned int ThreadsModel::getMinimalItemHeight() const
 {
     return style::window::messages::sms_thread_item_h;
 }
 
-gui::ListItem *ThreadModel::getItem(gui::Order order)
+gui::ListItem *ThreadsModel::getItem(gui::Order order)
 {
     std::shared_ptr<ThreadRecord> thread = getRecord(order);
 
@@ -51,14 +51,14 @@ gui::ListItem *ThreadModel::getItem(gui::Order order)
     return item;
 }
 
-void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
+void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::SMSThreadsGet>(offset, limit);
     query->setQueryListener(this);
     DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
 }
 
-auto ThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
     auto msgResponse = dynamic_cast<db::query::SMSThreadsGetResults *>(queryResult);
     assert(msgResponse != nullptr);

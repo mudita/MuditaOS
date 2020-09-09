@@ -1,11 +1,11 @@
 #pragma once
 
-#include "BaseThreadRecordModel.hpp"
+#include "BaseThreadsRecordModel.hpp"
 
-class ThreadModel : public BaseThreadRecordModel
+class ThreadsModel : public BaseThreadsRecordModel
 {
   public:
-    ThreadModel(app::Application *app);
+    ThreadsModel(app::Application *app);
 
     // virtual method for db::QueryListener
     auto handleQueryResponse(db::QueryResult *) -> bool override;

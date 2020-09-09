@@ -21,12 +21,12 @@ target_sources( ${PROJECT_NAME}
         "widgets/SearchResultsItem.cpp"
         "widgets/BaseThreadItem.cpp"
 
-        "models/BaseThreadRecordModel.cpp"
-        "models/ThreadModel.cpp"
-        "models/SearchResultsModel.cpp"
+        "models/BaseThreadsRecordModel.cpp"
+        "models/ThreadsModel.cpp"
+        "models/ThreadsSearchResultsModel.cpp"
         
         "windows/MessagesMainWindow.cpp"
-        "windows/ThreadViewWindow.cpp"
+        "windows/SMSThreadViewWindow.cpp"
         "windows/NewMessage.cpp"
         "windows/ThreadWindowOptions.cpp"
         "windows/OptionsMessages.cpp"
@@ -38,8 +38,8 @@ target_sources( ${PROJECT_NAME}
 
     PUBLIC
         "ApplicationMessages.hpp"
-        "MessagesStyle.hpp"
-        "models/ThreadModel.hpp"
+        "data/MessagesStyle.hpp"
+        "models/ThreadsModel.hpp"
         "widgets/ThreadItem.hpp"
         "widgets/SMSInputWidget.hpp"
 )

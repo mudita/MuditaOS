@@ -1,17 +1,17 @@
 #pragma once
 
-#include "BaseThreadRecordModel.hpp"
+#include "BaseThreadsRecordModel.hpp"
 #include "Style.hpp"
 
 namespace gui::model
 {
 
-    class SearchResultsModel : public BaseThreadRecordModel
+    class ThreadsSearchResultsModel : public BaseThreadsRecordModel
     {
         UTF8 search_value;
 
       public:
-        SearchResultsModel(app::Application *app);
+        ThreadsSearchResultsModel(app::Application *app);
 
         unsigned int getMinimalItemHeight() const override;
         ListItem *getItem(Order order) override;
