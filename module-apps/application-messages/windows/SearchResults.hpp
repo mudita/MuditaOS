@@ -2,7 +2,7 @@
 
 #include "AppWindow.hpp"
 #include <ListView.hpp>
-#include "../models/SearchResultsModel.hpp"
+#include "application-messages/models/ThreadsSearchResultsModel.hpp"
 #include "messages/QueryMessage.hpp"
 
 namespace gui
@@ -16,7 +16,7 @@ namespace gui
     {
         gui::Item *body     = nullptr;
         gui::ListView *list = nullptr;
-        std::shared_ptr<model::SearchResultsModel> model;
+        std::shared_ptr<model::ThreadsSearchResultsModel> model;
         auto listViewRequest(const std::string &text) -> bool;
 
       public:

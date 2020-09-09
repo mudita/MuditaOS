@@ -1,7 +1,7 @@
-#include "SearchResultsModel.hpp"
+#include "ThreadsSearchResultsModel.hpp"
 #include "ListView.hpp"
 #include "time/time_conversion.hpp"
-#include "../widgets/SearchResultsItem.hpp"
+#include "application-messages/widgets/SearchResultsItem.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
 #include <module-db/queries/sms/QuerySMSSearch.hpp>
@@ -10,15 +10,15 @@
 namespace gui::model
 {
 
-    SearchResultsModel::SearchResultsModel(app::Application *app) : BaseThreadRecordModel(app)
+    ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app) : BaseThreadsRecordModel(app)
     {}
 
-    unsigned int SearchResultsModel::getMinimalItemHeight() const
+    unsigned int ThreadsSearchResultsModel::getMinimalItemHeight() const
     {
         return style::window::messages::sms_thread_item_h;
     }
 
-    gui::ListItem *SearchResultsModel::getItem(gui::Order order)
+    gui::ListItem *ThreadsSearchResultsModel::getItem(gui::Order order)
     {
 
         std::shared_ptr<ThreadRecord> thread = getRecord(order);
@@ -42,7 +42,7 @@ namespace gui::model
         return ret;
     }
 
-    void SearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
+    void ThreadsSearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
             auto query = std::make_unique<db::query::SMSSearch>(search_value, offset, limit);
@@ -51,12 +51,12 @@ namespace gui::model
         }
     }
 
-    void SearchResultsModel::setSearchValue(const UTF8 &search_value)
+    void ThreadsSearchResultsModel::setSearchValue(const UTF8 &search_value)
     {
         this->search_value = search_value;
     }
 
-    auto SearchResultsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+    auto ThreadsSearchResultsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
         auto msgResponse = dynamic_cast<db::query::SMSSearchResult *>(queryResult);
         assert(msgResponse != nullptr);

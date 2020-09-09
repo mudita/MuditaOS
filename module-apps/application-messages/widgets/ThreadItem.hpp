@@ -1,27 +1,27 @@
 #pragma once
 
 #include "BaseThreadItem.hpp"
-#include "../models/ThreadModel.hpp"
+#include "application-messages/models/ThreadsModel.hpp"
 
 namespace gui
 {
 
     class ThreadItem : public BaseThreadItem
     {
-        ThreadModel *model = nullptr;
+        ThreadsModel *model                  = nullptr;
         std::shared_ptr<ThreadRecord> thread = nullptr;
 
         void setPreview();
 
       public:
-        ThreadItem(ThreadModel *model);
+        ThreadItem(ThreadsModel *model);
         void setThreadItem(std::shared_ptr<ThreadRecord> thread);
         std::shared_ptr<ThreadRecord> getThreadItem()
         {
             return thread;
         }
 
-        static ThreadItem *makeThreadItem(ThreadModel *model, std::shared_ptr<ThreadRecord> thread);
+        static ThreadItem *makeThreadItem(ThreadsModel *model, std::shared_ptr<ThreadRecord> thread);
     };
 
     class ThreadItemWithIndicator : public ThreadItem
@@ -31,7 +31,7 @@ namespace gui
         void onDimensionChangedBottom(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       public:
-        ThreadItemWithIndicator(ThreadModel *model, const UTF8 &indicatorName);
+        ThreadItemWithIndicator(ThreadsModel *model, const UTF8 &indicatorName);
     };
 
     class ThreadItemNotRead : public ThreadItemWithIndicator
@@ -39,7 +39,7 @@ namespace gui
         static const inline UTF8 indicatorName = "dot_12px_hard_alpha_W_M";
 
       public:
-        ThreadItemNotRead(ThreadModel *model);
+        ThreadItemNotRead(ThreadsModel *model);
     };
 
 } /*namespace gui*/

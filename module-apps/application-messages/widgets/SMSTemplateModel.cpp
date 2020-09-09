@@ -3,7 +3,7 @@
 #include "SMSTemplateItem.hpp"
 #include "ListView.hpp"
 #include "application-messages/data/SMSdata.hpp"
-#include "application-messages/MessagesStyle.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include <service-db/api/DBServiceAPI.hpp>
 
