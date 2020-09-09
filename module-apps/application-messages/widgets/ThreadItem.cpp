@@ -4,11 +4,11 @@
 #include "service-db/api/DBServiceAPI.hpp"
 
 #include <Style.hpp>
-#include "../MessagesStyle.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
 
 namespace gui
 {
-    ThreadItem *ThreadItem::makeThreadItem(ThreadModel *model, std::shared_ptr<ThreadRecord> thread)
+    ThreadItem *ThreadItem::makeThreadItem(ThreadsModel *model, std::shared_ptr<ThreadRecord> thread)
     {
         ThreadItem *threadItem = nullptr;
         threadItem             = thread->isUnread() ? new ThreadItemNotRead(model) : new ThreadItem(model);
@@ -18,7 +18,7 @@ namespace gui
         return threadItem;
     }
 
-    ThreadItem::ThreadItem(ThreadModel *model)
+    ThreadItem::ThreadItem(ThreadsModel *model)
     {
         this->model = model;
     }
@@ -58,7 +58,7 @@ namespace gui
         setPreview();
     }
 
-    ThreadItemWithIndicator::ThreadItemWithIndicator(ThreadModel *model, const UTF8 &indicatorName) : ThreadItem(model)
+    ThreadItemWithIndicator::ThreadItemWithIndicator(ThreadsModel *model, const UTF8 &indicatorName) : ThreadItem(model)
     {
         indicator = new gui::Image(this, 0, 0, indicatorName);
     }
@@ -77,7 +77,7 @@ namespace gui
                                    indicator->getSize(gui::Axis::Y) / 2); // align with text
     }
 
-    ThreadItemNotRead::ThreadItemNotRead(ThreadModel *model)
+    ThreadItemNotRead::ThreadItemNotRead(ThreadsModel *model)
         : ThreadItemWithIndicator(model, ThreadItemNotRead::indicatorName)
     {}
 } /*namespace gui*/

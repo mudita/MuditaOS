@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../models/ThreadModel.hpp"
+#include "application-messages/models/ThreadsModel.hpp"
 
 #include <AppWindow.hpp>
 #include <Image.hpp>
@@ -22,7 +22,7 @@ namespace gui
         Image *newMessageImage = nullptr;
         Image *searchImage     = nullptr;
 
-        std::shared_ptr<ThreadModel> threadModel = nullptr;
+        std::shared_ptr<ThreadsModel> threadsModel = nullptr;
         gui::ListView *list                      = nullptr;
 
         Icon *emptyListIcon = nullptr;

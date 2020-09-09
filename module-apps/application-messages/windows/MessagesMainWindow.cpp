@@ -1,27 +1,19 @@
 #include "MessagesMainWindow.hpp"
 
-#include "NewMessage.hpp"
-#include "ThreadWindowOptions.hpp"
-#include "../ApplicationMessages.hpp"
-#include "../MessagesStyle.hpp"
-#include "../data/SMSdata.hpp"
-#include "../widgets/ThreadItem.hpp"
-#include "../windows/ThreadViewWindow.hpp"
+#include "application-messages/ApplicationMessages.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
+#include "application-messages/data/SMSdata.hpp"
+#include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/SearchStart.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <service-db/messages/DBThreadMessage.hpp>
 #include <i18/i18.hpp>
-#include <Margins.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
-#include <time/time_conversion.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 
-#include <functional>
 #include <memory>
 #include <cassert>
 #include <module-services/service-db/messages/DBNotificationMessage.hpp>
@@ -46,14 +38,14 @@ namespace gui
 
         AppWindow::buildInterface();
 
-        threadModel = std::make_shared<ThreadModel>(this->application);
+        threadsModel = std::make_shared<ThreadsModel>(this->application);
 
         list = new gui::ListView(this,
                                  msgThreadStyle::listPositionX,
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
-                                 threadModel);
+                                 threadsModel);
         list->setScrollTopMargin(style::margins::small);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
@@ -118,7 +110,7 @@ namespace gui
             }
         }
 
-        if (threadModel->requestRecordsCount() == 0) {
+        if (threadsModel->requestRecordsCount() == 0) {
             emptyListIcon->setVisible(true);
             setFocusItem(emptyListIcon);
         }
