@@ -138,6 +138,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
     stateTimerId     = CreateTimer(Ticks::MsToTicks(1000), true);
+    ussdTimerId      = CreateTimer(Ticks::MsToTicks(1000), true);
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
@@ -194,6 +195,9 @@ void ServiceCellular::TickHandler(uint32_t id)
     else if (id == stateTimerId) {
         LOG_INFO("State timer tick");
         handleStateTimer();
+    }
+    else if (id == ussdTimerId) {
+        handleUSSDTimer();
     }
     else {
         LOG_ERROR("Unrecognized timer ID = %" PRIu32, id);
@@ -1017,7 +1021,13 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     }
 
     if (str.find("+CUSD: ") != std::string::npos) {
+
+        if (ussdState == ussd::State::pullRequestSent) {
+            ussdState = ussd::State::pullResponseReceived;
+            setUSSDTimer();
+        }
         auto tokens = utils::split(str, '\"');
+        LOG_INFO("USSD code: %s, ", tokens[0].c_str());
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
                                                              tokens[1]);
     }
@@ -1045,6 +1055,8 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
     if (channel) {
+
+        channel->cmd(at::AT::SMS_UCSC2);
         // if text fit in single message send
         if (textLen < singleMessageLen) {
 
@@ -1121,9 +1133,15 @@ bool ServiceCellular::sendSMS(SMSRecord record)
 
 bool ServiceCellular::receiveSMS(std::string messageNumber)
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel == nullptr) {
+        return false;
+    }
+
+    channel->cmd(at::AT::SMS_UCSC2);
 
     auto cmd = at::factory(at::AT::QCMGR);
-    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(cmd + messageNumber + "\r", cmd.timeout);
+    auto ret = channel->cmd(cmd + messageNumber + "\r", cmd.timeout);
 
     bool messageParsed = false;
 
@@ -1650,11 +1668,64 @@ void ServiceCellular::handleStateTimer(void)
 bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel != nullptr) {
+        if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
+            channel->cmd(at::AT::SMS_GSM);
+            std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15\r";
+            auto result         = channel->cmd(command, 120000, 2);
+            if (result.code == at::Result::Code::OK) {
+                ussdState = ussd::State::pullRequestSent;
+                setUSSDTimer();
+            }
+        }
+        else if (requestType == CellularUSSDMessage::RequestType::abortSesion) {
 
-    channel->cmd("AT+CSCS=\"GSM\"\r", 1000, 1);
+            ussdState   = ussd::State::sesionAborted;
+            auto result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
+            if (result.code == at::Result::Code::OK) {
+                LOG_INFO("USSD sesion aborted, reopening push session.");
+                CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::pushSesionRequest);
+            }
+            else {
+                LOG_WARN("Session close failed, retry.");
+                CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
+            }
+        }
+        else if (requestType == CellularUSSDMessage::RequestType::pushSesionRequest) {
 
-    std::string command = "AT+CUSD=1,\"*101#\",15\r";
-
-    channel->cmd(command, 120000, 2);
+            ussdState   = ussd::State::pushSesion;
+            auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
+            if (result.code == at::Result::Code::OK) {
+                LOG_INFO("Push session opened.");
+            }
+        }
+        return true;
+    }
     return false;
+}
+
+void ServiceCellular::handleUSSDTimer(void)
+{
+    if (ussdTimeout > 0) {
+        ussdTimeout -= 1;
+    }
+    else {
+        LOG_WARN("USSD timeout occured, abotrig current session");
+        stopTimer(ussdTimerId);
+        CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
+    }
+}
+void ServiceCellular::setUSSDTimer(void)
+{
+    switch (ussdState) {
+    case ussd::State::pullRequestSent:
+        ussdTimeout = ussd::pullResponseTimeout;
+        break;
+    case ::ussd::State::pullResponseReceived:
+        ussdTimeout = ussd::pullSesionTimeout;
+        break;
+    default:
+        return;
+    }
+    ReloadTimer(ussdTimerId);
 }

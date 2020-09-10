@@ -66,8 +66,9 @@ namespace gui
         pullToSend->setText("*101#");
         pullToSend->setPosition(style::settings::ussd::commonXPos, h);
         pullToSend->activatedCallback = [=](gui::Item &) {
-            std::string data = "#101#";
-            CellularServiceAPI::USSDRequest(this->application, CellularUSSDMessage::RequestType::data, data);
+            std::string data = "*101#";
+            CellularServiceAPI::USSDRequest(
+                this->application, CellularUSSDMessage::RequestType::pullSesionRequest, data);
             return true;
         };
         pullToSend->setEditMode(EditMode::EDIT);

@@ -258,11 +258,6 @@ bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std:
 {
 
     auto msg = std::make_shared<CellularUSSDMessage>(type, data);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
-
-    if (ret.first == sys::ReturnCodes::Success) {
-
-        return true;
-    }
-    return false;
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    return true;
 }

@@ -91,8 +91,9 @@ class CellularUSSDMessage : public CellularMessage
   public:
     enum class RequestType
     {
-        data,
-        abort
+        pullSesionRequest,
+        pushSesionRequest,
+        abortSesion
     };
     CellularUSSDMessage() = delete;
     CellularUSSDMessage(RequestType requestType, const std::string &data = "")
