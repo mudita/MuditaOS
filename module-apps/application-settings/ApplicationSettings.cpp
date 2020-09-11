@@ -12,6 +12,7 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
+#include "windows/BtScanWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
 #include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
@@ -31,7 +32,7 @@
 #include "windows/SettingsChange.hpp"
 
 #include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
-
+#include <service-bluetooth/messages/BluetoothMessage.hpp>
 #include <i18/i18.hpp>
 
 namespace app
@@ -53,7 +54,17 @@ namespace app
         if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+        if (auto btmsg = dynamic_cast<BluetoothScanMessage *>(msgl); btmsg != nullptr) {
+            auto devices = btmsg->devices;
+            LOG_INFO("received BT Scan message!");
+            auto window = new gui::BtScanWindow(this, devices);
+            windows.erase(gui::name::window::name_btscan);
+            windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
+            setActiveWindow(gui::name::window::name_btscan);
+            // this->switchWindow("BT_SCAN",nullptr);
+            render(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
         // this variable defines whether message was processed.
         bool handled = true;
 
@@ -97,6 +108,10 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         window = new gui::BtWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::BtScanWindow(this, std::vector<Devicei>());
+        window->setVisible(false);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         window = new gui::UiTestWindow(this);

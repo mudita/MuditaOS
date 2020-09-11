@@ -100,7 +100,7 @@ namespace bsp {
             // uart specyfic
     };
 
-    // Common stuff for Bluetopia and bluekitchen +clean listing for overrrides
+    // Common stuff for Bluetopia and profiles +clean listing for overrrides
     class BluetoothCommon : public BTdev
     {
         public:
