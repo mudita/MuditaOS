@@ -1,3 +1,7 @@
+[submodule "module-lwip/lib/lwip"]
+	path = module-lwip/lib/lwip
+	url = ../lwip.git
+	shallow = true
 [submodule "module-utils/microtar"]
 	path = module-utils/microtar
 	url = ../microtar.git
@@ -40,3 +44,6 @@
 	path = module-audio/Audio/decoder/taglib
 	url = ../taglib.git
 	branch = rt1051
+[submodule "module-bluetooth/lib/btstack"]
+	path = module-bluetooth/lib/btstack
+	url = git@github.com:mudita/btstack.git
