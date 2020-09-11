@@ -32,4 +32,4 @@ done
 
 check_target_rt1051 "${BIN_DIR}"
 
-${GDB_ARM} "${BIN_DIR}"/PurePhone.elf -x .gdbinit-1051
+${GDB_ARM} -tui "${BIN_DIR}"/PurePhone.elf -x .gdbinit-1051

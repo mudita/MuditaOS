@@ -1,4 +1,4 @@
-target remote localhost:2331
+target remote 172.17.0.1:2331
 monitor reset 0
 monitor halt
 monitor memU32 0x401BC000 = 128;
@@ -9,4 +9,3 @@ b HardFault_Handler
 b MemManage_Handler
 b BusFault_Handler
 b UsageFault_Handler
-b ResetISR
