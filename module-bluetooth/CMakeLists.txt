@@ -11,7 +11,7 @@ set(SOURCES
 message("Build with BlueKitchen")
 include(lib/btstack.cmake)
 
-
+message(${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
 message("Sources: " ${SOURCES})
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_DIR_SOURCES})
 
