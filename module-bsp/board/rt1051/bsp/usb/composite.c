@@ -9,6 +9,8 @@
 #include "composite.h"
 #include "usb_phy.h"
 
+#include "virtual_com_demo.h"
+
 extern usb_device_class_struct_t g_UsbDeviceCdcVcomConfig;
 extern usb_device_class_struct_t g_MtpClass;
 
@@ -211,6 +213,8 @@ int composite_init(void)
         if (MtpInit(&composite.mtpApp, g_CompositeClassConfig[1].classHandle) != kStatus_USB_Success)
             LOG_ERROR("[===============] MTP initialization failed");
     }
+
+    VirtualComDemoInit(&composite.cdcVcom);
 
     USB_DeviceIsrEnable();
 
