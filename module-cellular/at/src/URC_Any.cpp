@@ -3,18 +3,18 @@
 namespace at::urc
 {
 
-    Any::Any(const std::string &str)
+    Any::Any(const std::string &str, char tokenDelimiter)
     {
-        split(str);
+        split(str, tokenDelimiter);
     }
 
-    void Any::split(const std::string &str)
+    void Any::split(const std::string &str, char tokenDelimiter)
     {
         const std::string delim = ": ";
         auto pos                = str.find(delim);
         head                    = std::string(str, 0, pos);
         if (pos != std::string::npos) {
-            tokens = utils::split(std::string(str.begin() + pos + delim.size(), str.end()), ',');
+            tokens = utils::split(std::string(str.begin() + pos + delim.size(), str.end()), tokenDelimiter);
         } // else - everyting went to head
     }
 

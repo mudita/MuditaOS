@@ -46,6 +46,7 @@
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
+#include <at/URC_CUSD.hpp>
 #include <at/response.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -1020,16 +1021,23 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         cmux->setMode(TS0710::Mode::AT);
     }
 
-    if (str.find("+CUSD: ") != std::string::npos) {
+    auto cusd = at::urc::CUSD(str);
+    if (cusd.is()) {
 
-        if (ussdState == ussd::State::pullRequestSent) {
-            ussdState = ussd::State::pullResponseReceived;
+        if (cusd.isActionNeeded()) {
+            if (ussdState == ussd::State::pullRequestSent) {
+                ussdState = ussd::State::pullResponseReceived;
+                setUSSDTimer();
+            }
+        }
+        else {
+            CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
+            ussdState = ussd::State::sesionAborted;
             setUSSDTimer();
         }
-        auto tokens = utils::split(str, '\"');
-        LOG_INFO("USSD code: %s, ", tokens[0].c_str());
+
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
-                                                             tokens[1]);
+                                                             cusd.message());
     }
 
     // Power Down
@@ -1128,6 +1136,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     }
     DBServiceAPI::SMSUpdate(this, record);
 
+    channel->cmd(at::AT::SMS_GSM);
     return result;
 }
 
@@ -1239,8 +1248,9 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
             }
         }
     }
+    channel->cmd(at::AT::SMS_GSM);
     // delete message from modem memory
-    cmux->get(TS0710::Channel::Commands)->cmd(at::factory(at::AT::CMGD) + messageNumber);
+    channel->cmd(at::factory(at::AT::CMGD) + messageNumber);
     return true;
 }
 
@@ -1725,6 +1735,11 @@ void ServiceCellular::setUSSDTimer(void)
         ussdTimeout = ussd::pullSesionTimeout;
         break;
     default:
+        ussdTimeout = ussd::noTimeout;
+        break;
+    }
+    if (ussdTimeout == ussd::noTimeout) {
+        stopTimer(ussdTimerId);
         return;
     }
     ReloadTimer(ussdTimerId);

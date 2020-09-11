@@ -63,17 +63,17 @@ namespace gui
         h += style::settings::ussd::commonLabelH;
 
         pullToSend = addText();
-        pullToSend->setText("*101#");
+        //        pullToSend->setText("*101#");
         pullToSend->setPosition(style::settings::ussd::commonXPos, h);
         pullToSend->activatedCallback = [=](gui::Item &) {
-            std::string data = "*101#";
+            std::string data = pullToSend->getText().c_str();
             CellularServiceAPI::USSDRequest(
                 this->application, CellularUSSDMessage::RequestType::pullSesionRequest, data);
             return true;
         };
         pullToSend->setEditMode(EditMode::EDIT);
         pullToSend->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
