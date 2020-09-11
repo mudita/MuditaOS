@@ -4,8 +4,19 @@
 
 ### Added
 
+* `[gui]` fallback font used before displaying unsupported glyph
+* `[calendar]` Communication between windows.
+* `[calendar]` Add/Edit/Remove events functionality.
+* `[calendar]` Display events in day window and allEvents window.
+* `[calendar]` Marking days witch contains events in Calendar Main Window.
+* `[calendar]` Add repeated events.
 * `[desktop]` info on how to unlock
 * `[settings]` pin change option in settings main window
+* `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
+
+### Changed
+
+* `[phonebook]` Replace vCard encoding with plain text for exporting contact data.
 
 ### Fixed
 
@@ -354,4 +365,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-

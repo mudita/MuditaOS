@@ -91,8 +91,7 @@ namespace gui
         /**
          * @brief Draws single glyph to specified context
          */
-        void drawChar(
-            Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color);
+        void drawChar(Context *context, const int16_t x, const int16_t y, FontGlyph *glyph, const Color color);
         /**
          * @brief Draws an image with specified ID on given coordinates.
          */
