@@ -11,6 +11,7 @@ include(Colours)
 include(CCacheConfig)
 include(ProjectConfig)
 include(ModuleConfig)
+include(module-lwip/lwip-includes.cmake)
 include(SerialPort)
 include(CopyGdbInit)
 
@@ -161,6 +162,12 @@ add_subdirectory(module-services)
 message("${PROJECT_NAME}: add_subdirectory module-apps")
 add_subdirectory(module-apps)
 
+message("${PROJECT_NAME}: add_subdirectory module-bluetooth")
+add_subdirectory(module-bluetooth)
+
+message("${PROJECT_NAME}: add_subdirectory module-lwip")
+add_subdirectory(module-lwip)
+
 add_subdirectory(image)
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
@@ -184,6 +191,9 @@ target_link_libraries(${PROJECT_NAME}
         module-gui
         module-services
         module-apps
+        module-bluetooth
+        ${LWIP_LIBRARIES}
+        module-lwip
         ${TARGET_LIBRARIES}
         )
 
