@@ -1,16 +1,16 @@
-#include <log/log.hpp>
 #include <cstdlib>
+#include <log/log.hpp>
 
 extern "C"
 {
 #include <btstack_event.h>
 
+#include <bluetooth_company_id.h>
 #include <btstack_memory.h>
 #include <btstack_run_loop.h>
-#include <bluetooth_company_id.h>
+#include <btstack_stdin.h>
 #include <hci.h>
 #include <hci_dump.h>
-#include <btstack_stdin.h>
 
 #include <btstack_chipset_cc256x.h>
 #include <btstack_link_key_db_memory.h>
@@ -27,9 +27,9 @@ extern "C"
 }
 #endif
 
+#include "BtKeysStorage.hpp"
 #include <Error.hpp>
 #include <functional>
-#include "BtKeysStorage.hpp"
 
 // #define TLV_DB_PATH_PREFIX "/tmp/btstack_"
 // #define TLV_DB_PATH_POSTFIX ".tlv"
