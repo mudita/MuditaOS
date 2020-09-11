@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Bluetooth/Device.hpp"
+#include "MessageType.hpp"
 #include "Service/Message.hpp"
 
 #include <utility>
@@ -22,6 +24,8 @@ class BluetoothMessage : public sys::DataMessage
         StopScan,
         PAN,
         Visible,
+        Play,
+        Stop
     };
     enum Request req = Request::None;
     BluetoothMessage(enum Request req = None) : sys::DataMessage(MessageType::BluetoothRequest), req(req){};
@@ -37,6 +41,23 @@ class BluetoothScanResultMessage : public sys::DataMessage
     ~BluetoothScanResultMessage() override = default;
 };
 
+class BluetoothPairResultMessage : public sys::DataMessage
+{
+  public:
+    bool status;
+    explicit BluetoothPairResultMessage(bool status)
+        : sys::DataMessage(MessageType::BluetoothPairResult), status(status){};
+};
+
+class BluetoothScanMessage : public sys::DataMessage
+{
+  public:
+    std::vector<Devicei> devices;
+    BluetoothScanMessage(std::vector<Devicei> devices)
+        : sys::DataMessage(MessageType::BluetoothScanResult), devices(std::move(devices)){};
+    ~BluetoothScanMessage() override = default;
+};
+
 class BluetoothAddrMessage : public sys::DataMessage
 {
   public:
@@ -48,12 +69,22 @@ class BluetoothAddrMessage : public sys::DataMessage
     ~BluetoothAddrMessage() override = default;
 };
 
-class BluetoothPairResultMessage : public sys::DataMessage
+class BluetoothAudioRegisterMessage : public sys::DataMessage
 {
   public:
-    bool status;
-    explicit BluetoothPairResultMessage(bool status)
-        : sys::DataMessage(MessageType::BluetoothPairResult), status(status){};
+    QueueHandle_t audioSourceQueue;
+    QueueHandle_t audioSinkQueue;
+    BluetoothAudioRegisterMessage(QueueHandle_t audioSourceQueue, QueueHandle_t audioSinkQueue)
+        : sys::DataMessage(MessageType::BluetoothAudioRegister), audioSourceQueue(audioSourceQueue),
+          audioSinkQueue(audioSinkQueue){};
+    ~BluetoothAudioRegisterMessage() override = default;
+};
 
-    ~BluetoothPairResultMessage() override = default;
+class BluetoothDeviceMetadataMessage : public sys::DataMessage
+{
+  public:
+    DeviceMetadata_t metadata;
+    BluetoothDeviceMetadataMessage(DeviceMetadata_t metadata)
+        : DataMessage(MessageType::BluetoothDeviceMetadata), metadata(std::move(metadata)){};
+    ~BluetoothDeviceMetadataMessage() override = default;
 };

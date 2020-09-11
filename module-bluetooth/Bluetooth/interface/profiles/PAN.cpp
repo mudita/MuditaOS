@@ -2,30 +2,30 @@
 
 extern "C"
 {
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 
-#include "btstack_config.h"
+#include "module-bluetooth/Bluetooth/btstack_config.h"
 
 #include <btstack_event.h>
 // #include <btstack_link_key_db_fs.h>
+#include <bluetooth_company_id.h>
 #include <btstack_memory.h>
 #include <btstack_run_loop.h>
 #include <btstack_run_loop_freertos.h>
-#include <bluetooth_company_id.h>
+#include <btstack_stdin.h>
 #include <hci.h>
 #include <hci_dump.h>
-#include <btstack_stdin.h>
     // #include <btstack_tlv_posix.h>
 
+#include <bluetooth_sdp.h>
+#include <bnep_lwip.h>
 #include <btstack_chipset_cc256x.h>
 #include <pan.h>
 #include <sdp_util.h>
-#include <bnep_lwip.h>
-#include <bluetooth_sdp.h>
 };
 
 #include <BtCommand.hpp>

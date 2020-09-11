@@ -184,6 +184,8 @@ enum class MessageType
     BluetoothScanResult,
     BluetoothAddrResult,
     BluetoothPairResult,
+    BluetoothAudioRegister,
+    BluetoothDeviceMetadata,
 
     LwIP_request,
     EVM_GPIO,
