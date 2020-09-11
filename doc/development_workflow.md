@@ -17,7 +17,7 @@ Commit your work. Each commit should have a description explaining:
 
 If it's impossible to provide the above information then your commit is likely excessive or redundant and should be squashed with other commit(s).
 
-Here's [a helpful article about writing good Git commit messages](https://chris.beams.io/posts/git-commit/)).
+Here's [a helpful article about writing good Git commit messages](https://chris.beams.io/posts/git-commit/).
 
 **Note:** If you're part of the MuditaOS core development team, your commit *must* start with Jira ticket number in square brackets. It can also point to which component you are working on, e.g. `[EGD-5555] phonebook: fix contact details`. A list of components is not yet defined, so please follow the names that are already in use. Do not add commits that are out of the scope of the Jira issue you are working on.
 
