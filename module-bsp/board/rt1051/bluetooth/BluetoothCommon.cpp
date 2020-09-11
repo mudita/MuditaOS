@@ -241,14 +241,16 @@ void BluetoothCommon::set_irq(bool enable)
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
     if (enable) {
-        LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+        LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
+                                kLPUART_RxDataRegFullInterruptEnable | kLPUART_IdleLineInterruptEnable);
     }
     else {
-        LPUART_DisableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+        LPUART_DisableInterrupts(BSP_BLUETOOTH_UART_BASE,
+                                 kLPUART_RxDataRegFullInterruptEnable | kLPUART_IdleLineInterruptEnable);
     }
-    // LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
-    // kLPUART_RxDataRegFullInterruptEnable|kLPUART_TxDataRegEmptyInterruptEnable|kLPUART_TransmissionCompleteInterruptEnable|kLPUART_RxOverrunInterruptEnable
-    // );
+    //     LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
+    //     kLPUART_RxDataRegFullInterruptEnable|kLPUART_TxDataRegEmptyInterruptEnable|kLPUART_TransmissionCompleteInterruptEnable|kLPUART_RxOverrunInterruptEnable
+    //     );
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
 }

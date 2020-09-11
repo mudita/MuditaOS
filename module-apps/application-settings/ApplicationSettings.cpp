@@ -9,10 +9,8 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
-#include "windows/SettingsMainWindow.hpp"
-#include "windows/LanguageWindow.hpp"
-#include "windows/BtWindow.hpp"
 #include "windows/BtScanWindow.hpp"
+#include "windows/BtWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
 #include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
@@ -32,9 +30,9 @@
 #include "windows/CellularPassthroughWindow.hpp"
 #include "windows/SettingsChange.hpp"
 
+#include <i18/i18.hpp>
 #include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/messages/BluetoothMessage.hpp>
-#include <i18/i18.hpp>
 
 namespace app
 {
