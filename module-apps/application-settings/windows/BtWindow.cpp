@@ -4,6 +4,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../ApplicationSettings.hpp"
+#include "../windows/BtScanWindow.hpp"
 
 #include "i18/i18.hpp"
 
@@ -41,11 +42,11 @@ namespace gui
     sys::ReturnCodes message_bt(app::Application *app, BluetoothMessage::Request req)
     {
         std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(req);
-        auto ret                              = sys::Bus::SendUnicast(msg, "ServiceBluetooth", app, 5000);
-        if (ret.first != sys::ReturnCodes::Success) {
-            LOG_ERROR("err: %d", static_cast<int>(ret.first));
+        auto ret                              = sys::Bus::SendUnicast(msg, "ServiceBluetooth", app);
+        if (!ret) {
+            LOG_ERROR("err: %d", static_cast<int>(ret));
         }
-        return ret.first;
+        return ret ? sys::ReturnCodes::Success : sys::ReturnCodes::Failure;
     }
 
     void BtWindow::buildInterface()
@@ -80,6 +81,7 @@ namespace gui
         add_box_label(box, "  -> All devices", [=](Item &) {
             LOG_DEBUG("Callback all devices");
             message_bt(application, BluetoothMessage::Request::Scan);
+            application->setActiveWindow(gui::name::window::name_btscan);
             return true;
         });
 

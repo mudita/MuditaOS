@@ -58,8 +58,9 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
                 else {
                     return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
                 }
+            case BluetoothMessage::StopScan:
+                worker->stop_scan();
                 break;
-
             case BluetoothMessage::PAN: {
                 /// TODO request lwip first...
                 /// because TODO blocking message - wrecks system
@@ -90,6 +91,10 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
     }
     catch (std::exception &ex) {
         LOG_ERROR("Exception on BtService!: %s", ex.what());
+    }
+    if (dynamic_cast<BluetoothAddrMessage *>(msg) != nullptr) {
+        auto addrMsg = static_cast<BluetoothAddrMessage *>(msg);
+        worker->set_addr(addrMsg->addr);
     }
     return std::make_shared<sys::ResponseMessage>();
 }

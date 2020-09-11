@@ -1,5 +1,5 @@
 set(BT_GLU "${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/glucode/")
-set(BT_INT "${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/bluekitchen/")
+set(BT_INT "${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/")
 set(BT_STACK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/lib/btstack")
 
 
