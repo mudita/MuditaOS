@@ -1,27 +1,28 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.37.1 2020-09-11]
 
 ### Added
-* `[phonebook]` NoName contacts at the end of contacts list.
-* `[calllog]` Added new queries to the DB
+
 * `[audio]` Add storing and updating audio settings in database.
 
 ### Changed
 
+* `[listview]` List returns to previously focused element on CRUD notifications (messages and phonebook).
 * `[messages]` Use different thread for each of contact's number.
+* `[phonebook]` Sort list of contacts by first name if there is no second name.
+* `[phonebook]` Unnamed contacts at the end of contacts list.
+* `[phonebook]` Change name of alternative/other number to second number.
 
 ### Fixed
 
-* `[desktopApp]` Fixed endpoint handling.
-* `[phonebook]` Sort list of contacts by first name if there is no second name.
-* `[listview]` List returning to previously focused element on CRUD notifications (Messages and Phonebook).
-* `[phonebook]` Change alternative/other number to second number.
+* `[desktop]` Fixed endpoint handling.
 * `[database]` Fixed boot error caused by new settings table.
 * `[phonebook]` Fix speed dial number conflict resolution.
 
 ### Other
-* `[desktopApp]` Added functional tests.
+
+* `[desktop]` Added functional tests.
 
 ## [0.36.1 2020-09-04]
 
