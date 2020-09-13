@@ -67,6 +67,10 @@ namespace gui
 
         if (direction == NavigationDirection::DOWN) {
 
+            if (document->isEmpty()) {
+                return Move::Error;
+            }
+
             operator++();
 
             auto block = document->getBlock(this);
