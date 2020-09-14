@@ -133,6 +133,7 @@
     "app_desktop_menu": "MENU",
     "app_desktop_emergency": "EMERG.",
     "app_desktop_pin_lock": "Enter passcode",
+    "app_desktop_no_pin_lock": "Press Unlock and then #",
     "app_desktop_pin_info1": "Wrong passcode",
     "app_desktop_pin_info2": "Allowed unlock attempts",
     "app_desktop_pin_blocked1": "Sorry, phone blocked",

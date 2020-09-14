@@ -339,7 +339,6 @@ namespace gui
 
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
-            line.alignH(getAlignment(Axis::X), w);
 
             end = lines.last().getEnd();
             line_y_position += line.height();
@@ -384,6 +383,7 @@ namespace gui
                 }
             }
 
+            lines.linesHAlign(sizeMinusPadding(Axis::X, Area::Normal));
             lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
 
             debug_text("<- END\n");
