@@ -8,6 +8,10 @@
 * `[settings]` pin change option in settings main window
 * `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
 
+### Changed
+
+* `[phonebook]` Replace vCard encoding with plain text for exporting contact data.
+
 ### Fixed
 
 * `[gui]` Fixed notifications display on unlocked screen.
