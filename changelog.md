@@ -14,7 +14,7 @@
 * `[renderer]` Add drawing circles and arcs functionality.
 
 ### Changed
-
+* `[special input]` Added emoji selector and changed special character selector.
 
 
 ### Fixed

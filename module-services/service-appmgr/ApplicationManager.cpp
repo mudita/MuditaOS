@@ -27,7 +27,7 @@
 
 #include "application-call/ApplicationCall.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-special-input/AppSpecialInput.hpp"
+#include "application-special-input/ApplicationSpecialInput.hpp"
 
 /// Auto phone lock disabled for now till the times when it's debugged
 /// #define AUTO_PHONE_LOCK_ENABLED

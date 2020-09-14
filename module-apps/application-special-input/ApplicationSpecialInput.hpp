@@ -6,36 +6,27 @@
 namespace app
 {
 
-    inline const std::string special_input = "AppSpecialInput";
+    inline const std::string special_input = "ApplicationSpecialInput";
     inline const std::string char_select   = gui::name::window::main_window;
 
     // app just to provide input selection on UI
-    class AppSpecialInput : public app::Application
+    class ApplicationSpecialInput : public app::Application
     {
       public:
         std::string requester = "";
 
-        AppSpecialInput(std::string name = special_input, std::string parent = "", bool startBackgound = true);
-        virtual ~AppSpecialInput() = default;
+        ApplicationSpecialInput(std::string name = special_input, std::string parent = "", bool startBackgound = true);
+        virtual ~ApplicationSpecialInput() = default;
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override
-        {
-            return sys::ReturnCodes::Success;
-        }
+        sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {
             return sys::ReturnCodes::Success;
         }
-        void createUserInterface() override
-        {
-            return;
-        }
-        void destroyUserInterface() override
-        {
-            return;
-        }
+        void createUserInterface() override;
+        void destroyUserInterface() override;
     };
 
 }; // namespace app

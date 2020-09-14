@@ -10,7 +10,7 @@
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
-#include <application-special-input/AppSpecialInput.hpp>
+#include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 
@@ -114,7 +114,7 @@ int main()
         applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
 #endif
 #ifdef ENABLE_APP_SPECIAL_INPUT
-        applications.push_back(app::CreateLauncher<app::AppSpecialInput>(app::special_input, false));
+        applications.push_back(app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, false));
 #endif
 #ifdef ENABLE_APP_ANTENNA
         applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
