@@ -24,7 +24,7 @@ namespace style::design
 
 namespace gui
 {
-
+    inline const auto APP_SETTINGS_NEW = "ApplicationSettingsNew";
     Tile::Tile(UTF8 icon, std::string title, std::function<bool(Item &)> activatedCallback, unsigned int notifications)
     {
         setSize(style::design::tile_w, style::design::tile_h);
@@ -168,11 +168,11 @@ namespace gui
                 new gui::Tile{
                     "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
                 new gui::Tile{"menu_settings_W_G",
-                              "app_desktop_menu_settings",
+                              "app_desktop_menu_settings_new",
                               [=](gui::Item &item) {
                                   LOG_INFO("page 1 settings");
                                   sapm::ApplicationManager::messageSwitchApplication(
-                                      application, "ApplicationSettings", gui::name::window::main_window, nullptr);
+                                      application, APP_SETTINGS_NEW, gui::name::window::main_window, nullptr);
                                   return true;
                               }},
             });

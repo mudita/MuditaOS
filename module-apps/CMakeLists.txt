@@ -29,6 +29,7 @@ set(APPLICATIONS
     calendar
     desktop
     settings
+    settings-new
     call
     notes
     phonebook
