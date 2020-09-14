@@ -10,6 +10,7 @@
 
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
+#include "module-gui/gui/widgets/TextConstants.hpp"
 
 #include <memory>
 #include <optional>
@@ -17,8 +18,8 @@
 
 struct ContactRecord : public Record
 {
-    UTF8 primaryName        = "";
-    UTF8 alternativeName    = "";
+    UTF8 primaryName     = "";
+    UTF8 alternativeName = "";
 
     struct Number
     {
@@ -46,6 +47,7 @@ struct ContactRecord : public Record
     {
         Default,
         List,
+        NotUseNumber,
         Title,
     };
 
@@ -72,6 +74,9 @@ struct ContactRecord : public Record
         if (alternativeName.length() > 0) {
             return alternativeName;
         }
+        if (type == NameFormatType::NotUseNumber) {
+            return "";
+        }
         if ((type == NameFormatType::Default || type == NameFormatType::List) && getNumberAsName().length() > 0) {
             return getNumberAsName();
         }
@@ -81,16 +86,42 @@ struct ContactRecord : public Record
         return "";
     }
 
+    auto getAsString() const -> std::string
+    {
+        std::stringstream contactData;
+
+        if (getFormattedName(NameFormatType::NotUseNumber).length() > 0) {
+            contactData << getFormattedName(NameFormatType::NotUseNumber) << gui::text::newline;
+        }
+        if (numbers.size() > 0 && numbers[0].number.getEntered().size() > 0) {
+            contactData << numbers[0].number.getFormatted() << gui::text::newline;
+        }
+        if (numbers.size() > 1 && numbers[1].number.getEntered().size() > 0) {
+            contactData << numbers[1].number.getFormatted() << gui::text::newline;
+        }
+        if (mail.length() > 0) {
+            contactData << mail << gui::text::newline;
+        }
+        if (address.length() > 0) {
+            contactData << address << gui::text::newline;
+        }
+        if (note.length() > 0) {
+            contactData << note.c_str();
+        }
+
+        return contactData.str();
+    }
+
     void addToFavourites(bool add);
     void addToIce(bool add);
     void addToBlocked(bool add);
     void addToGroup(uint32_t groupId);
     void removeFromGroup(uint32_t groupId);
-    [[nodiscard]] bool isOnFavourites() const;
-    [[nodiscard]] bool isOnIce() const;
-    [[nodiscard]] bool isOnBlocked() const;
-    [[nodiscard]] bool isOnGroup(uint32_t groupId) const;
-    [[nodiscard]] bool isTemporary() const;
+    [[nodiscard]] auto isOnFavourites() const -> bool;
+    [[nodiscard]] auto isOnIce() const -> bool;
+    [[nodiscard]] auto isOnBlocked() const -> bool;
+    [[nodiscard]] auto isOnGroup(uint32_t groupId) const -> bool;
+    [[nodiscard]] auto isTemporary() const -> bool;
 };
 
 enum class ContactRecordField
@@ -109,10 +140,11 @@ class ContactNumberHolder
     utils::PhoneNumber number;
 
   public:
-    ContactNumberHolder(const ContactsNumberTableRow &numberRow);
-    const utils::PhoneNumber &getNumber() const;
-    std::uint32_t getContactID() const;
-    std::uint32_t getNumberID() const;
+    ContactNumberHolder(ContactsNumberTableRow numberRow);
+
+    auto getNumber() const -> const utils::PhoneNumber &;
+    auto getContactID() const -> std::uint32_t;
+    auto getNumberID() const -> std::uint32_t;
 };
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField>
@@ -128,35 +160,29 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     };
 
     ContactRecordInterface(ContactsDB *db);
-    ~ContactRecordInterface();
+    ~ContactRecordInterface() override = default;
 
-    bool Add(ContactRecord &rec) override final;
+    auto Add(ContactRecord &rec) -> bool final;
 
-    bool RemoveByID(uint32_t id) override final;
+    auto RemoveByID(uint32_t id) -> bool final;
 
-    bool Update(const ContactRecord &rec) override final;
+    auto Update(const ContactRecord &rec) -> bool final;
 
-    bool BlockByID(uint32_t id, const bool shouldBeBlocked = true);
+    auto BlockByID(uint32_t id, const bool shouldBeBlocked = true) -> bool;
 
-    ContactRecord GetByID(uint32_t id) override final;
-    ContactRecord GetByIdWithTemporary(uint32_t id);
+    auto GetByID(uint32_t id) -> ContactRecord final;
+    auto GetByIdWithTemporary(uint32_t id) -> ContactRecord;
 
-  private:
-    ContactRecord GetByIdCommon(ContactsTableRow &contact);
+    auto GetCount() -> uint32_t final;
 
-  public:
-    uint32_t GetCount() override final;
+    auto GetCountFavourites() -> uint32_t;
 
-    uint32_t GetCountFavourites();
+    auto GetLimitOffset(uint32_t offset, uint32_t limit) -> std::unique_ptr<std::vector<ContactRecord>> final;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    auto GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str)
+        -> std::unique_ptr<std::vector<ContactRecord>> final;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset,
-                                                                      uint32_t limit,
-                                                                      ContactRecordField field,
-                                                                      const char *str) override final;
-
-    std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
+    auto GetByName(UTF8 primaryName, UTF8 alternativeName) -> std::unique_ptr<std::vector<ContactRecord>>;
 
     enum class CreateTempContact : bool
     {
@@ -164,52 +190,47 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
         True
     };
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
-        const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
+    auto GetByNumber(const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
-        const utils::PhoneNumber::View &numberView, CreateTempContact createTempContact = CreateTempContact::False);
+    auto GetByNumber(const utils::PhoneNumber::View &numberView,
+                     CreateTempContact createTempContact = CreateTempContact::False)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
-    std::optional<ContactNumberMatch> MatchByNumber(
-        const utils::PhoneNumber::View &numberView,
-        CreateTempContact createTempContact  = CreateTempContact::False,
-        utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE);
+    auto MatchByNumber(const utils::PhoneNumber::View &numberView,
+                       CreateTempContact createTempContact  = CreateTempContact::False,
+                       utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE)
+        -> std::optional<ContactNumberMatch>;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(UTF8 speedDial);
+    auto GetBySpeedDial(UTF8 speedDial) -> std::unique_ptr<std::vector<ContactRecord>>;
 
-    std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName,
-                                                       const char *alternativeName,
-                                                       const char *number);
+    auto Search(const char *primaryName, const char *alternativeName, const char *number)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
-    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
+    auto runQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult> override;
 
-    utils::PhoneNumber::View GetNumberById(std::uint32_t numberId);
+    auto GetNumberById(std::uint32_t numberId) -> utils::PhoneNumber::View;
 
   private:
     ContactsDB *contactDB;
 
     /// get multiple numbers by split numbers_id
-    std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
-
-    std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
-
-    std::vector<ContactsNumberTableRow> getAllNumbers();
-
-    utils::NumberHolderMatcher<std::vector, ContactNumberHolder> buildNumberMatcher(
-        std::vector<ContactNumberHolder> &contactNumberHolders);
-
-    std::vector<std::uint32_t> splitNumberIDs(const std::string &numberIDs);
-
-    std::string joinNumberIDs(const std::vector<std::uint32_t> &numberIDs);
-
-    bool unbindNumber(std::uint32_t contactId, std::uint32_t numberId);
+    auto getNumbers(const std::string &numbers_id) -> std::vector<ContactRecord::Number>;
+    auto getByIdCommon(ContactsTableRow &contact) -> ContactRecord;
+    auto getContactByNumber(const UTF8 &number) -> std::unique_ptr<std::vector<ContactRecord>>;
+    auto getAllNumbers() -> std::vector<ContactsNumberTableRow>;
+    auto buildNumberMatcher(std::vector<ContactNumberHolder> &contactNumberHolders)
+        -> utils::NumberHolderMatcher<std::vector, ContactNumberHolder>;
+    auto splitNumberIDs(const std::string &numberIDs) -> std::vector<std::uint32_t>;
+    auto joinNumberIDs(const std::vector<std::uint32_t> &numberIDs) -> std::string;
+    auto unbindNumber(std::uint32_t contactId, std::uint32_t numberId) -> bool;
 
     const std::uint32_t favouritesGroupId;
-    std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> getByIDQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> getSizeQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> addQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> updateQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> numberGetByIdQuery(std::shared_ptr<db::Query> query);
+    auto getQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto getByIDQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto getSizeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto addQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto updateQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto removeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto numberGetByIdQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 };
