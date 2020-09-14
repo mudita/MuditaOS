@@ -84,20 +84,28 @@ namespace gui
         if (contact == nullptr) {
             contactAction = ContactAction::Add;
             contact       = std::make_shared<ContactRecord>();
+            setSaveButtonVisible(false);
             return true;
         }
 
         if (contact->ID == DB_ID_NONE) {
             contactAction = ContactAction::Add;
+            setSaveButtonVisible(false);
         }
         else if (contact->contactType == ContactType::TEMPORARY) {
             contactAction = ContactAction::EditTemporary;
         }
         else {
             contactAction = ContactAction::Edit;
+            setSaveButtonVisible(true);
         }
 
         return true;
+    }
+
+    void PhonebookNewContact::setSaveButtonVisible(bool visible)
+    {
+        bottomBar->setActive(BottomBar::Side::CENTER, visible);
     }
 
     auto PhonebookNewContact::onInput(const InputEvent &inputEvent) -> bool

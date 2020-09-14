@@ -222,4 +222,9 @@ namespace gui
                 this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
     }
 
+    void AppWindow::setBottomBarActive(BottomBar::Side side, bool value)
+    {
+        bottomBar->setActive(side, value);
+    }
+
 } /* namespace gui */
