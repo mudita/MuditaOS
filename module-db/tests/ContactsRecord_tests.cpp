@@ -4,7 +4,7 @@
 #include "i18/i18.hpp"
 #include "vfs.hpp"
 
-TEST_CASE("Contact Record tests")
+TEST_CASE("Contact Record db tests")
 {
     Database::initialize();
 
@@ -17,7 +17,6 @@ TEST_CASE("Contact Record tests")
     const char *alternativeNameTest               = "AlternativeNameTest";
     const char *numberUserTest                    = "600123456";
     const char *numberE164Test                    = "+48600123456";
-    const char *numberFormattedTest               = "600 123 456";
     const char *addressTest                       = "6 Czeczota St.\n02600 Warsaw";
     const char *noteTest                          = "TestNote";
     const char *mailTest                          = "TestMail";
@@ -40,11 +39,11 @@ TEST_CASE("Contact Record tests")
     recordIN.assetPath       = assetPath;
     recordIN.speeddial       = speeddialTest;
 
-    REQUIRE(contRecInterface.Add(recordIN) == true);
-    REQUIRE(contRecInterface.Add(recordIN) == true);
-    REQUIRE(contRecInterface.Add(recordIN) == true);
-    REQUIRE(contRecInterface.Add(recordIN) == true);
-    REQUIRE(contRecInterface.Add(recordIN) == true);
+    REQUIRE(contRecInterface.Add(recordIN));
+    REQUIRE(contRecInterface.Add(recordIN));
+    REQUIRE(contRecInterface.Add(recordIN));
+    REQUIRE(contRecInterface.Add(recordIN));
+    REQUIRE(contRecInterface.Add(recordIN));
 
     SECTION("Get record by ID")
     {
@@ -65,7 +64,7 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordOUT.speeddial == speeddialTest);
     }
 
-    REQUIRE(contRecInterface.RemoveByID(5) == true);
+    REQUIRE(contRecInterface.RemoveByID(5));
 
     SECTION("Get records by limit offset")
     {
@@ -73,7 +72,7 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordList->size() == 4);
 
         uint32_t cnt = 1;
-        for (const auto w : *recordList) {
+        for (const auto &w : *recordList) {
 
             REQUIRE(w.ID == cnt++);
 
@@ -97,7 +96,7 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordList->size() == 4);
 
         uint32_t cnt = 1;
-        for (const auto w : *recordList) {
+        for (const auto &w : *recordList) {
 
             REQUIRE(w.ID == cnt++);
 
@@ -120,7 +119,7 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordList->size() == 2);
 
         uint32_t cnt = 1;
-        for (const auto w : *recordList) {
+        for (const auto &w : *recordList) {
 
             REQUIRE(w.ID == cnt++);
 
@@ -137,66 +136,121 @@ TEST_CASE("Contact Record tests")
         }
     }
 
-    SECTION("Test contact name formatting")
-    {
-        ContactRecord testRecord;
-
-        testRecord.primaryName     = primaryNameTest;
-        testRecord.alternativeName = alternativeNameTest;
-        testRecord.numbers         = std::vector<ContactRecord::Number>({
-            ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
-        });
-
-        std::stringstream primaryAlternativeNameFormat;
-        primaryAlternativeNameFormat << primaryNameTest << ' ' << alternativeNameTest;
-
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) ==
-                primaryAlternativeNameFormat.str());
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryAlternativeNameFormat.str());
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-                primaryAlternativeNameFormat.str());
-
-        testRecord.primaryName = "";
-
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == alternativeNameTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == alternativeNameTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == alternativeNameTest);
-
-        testRecord.primaryName     = primaryNameTest;
-        testRecord.alternativeName = "";
-
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == primaryNameTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryNameTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == primaryNameTest);
-
-        testRecord.primaryName = "";
-
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberFormattedTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-                utils::localize.get("app_phonebook_contact_no_name"));
-
-        testRecord.numbers.clear();
-        testRecord.numbers = std::vector<ContactRecord::Number>({
-            ContactRecord::Number(),
-            ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
-        });
-
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberFormattedTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-                utils::localize.get("app_phonebook_contact_no_name"));
-
-        testRecord.numbers.clear();
-
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == "");
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) ==
-                utils::localize.get("app_phonebook_contact_no_name"));
-        REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-                utils::localize.get("app_phonebook_contact_no_name"));
-    }
-
     Database::deinitialize();
+}
+
+TEST_CASE("Test contact name formatting")
+{
+    const std::string primaryNameTest             = "PrimaryNameTest";
+    const std::string alternativeNameTest         = "AlternativeNameTest";
+    const std::string numberUserTest              = "600123456";
+    const std::string numberE164Test              = "+48600123456";
+    const std::string numberFormattedTest         = "600 123 456";
+    const ContactNumberType contactNumberTypeTest = ContactNumberType::CELL;
+
+    ContactRecord testRecord;
+
+    testRecord.primaryName     = primaryNameTest;
+    testRecord.alternativeName = alternativeNameTest;
+    testRecord.numbers         = std::vector<ContactRecord::Number>({
+        ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
+    });
+
+    std::stringstream primaryAlternativeNameFormat;
+    primaryAlternativeNameFormat << primaryNameTest << ' ' << alternativeNameTest;
+
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == primaryAlternativeNameFormat.str());
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryAlternativeNameFormat.str());
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) ==
+            primaryAlternativeNameFormat.str());
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == primaryAlternativeNameFormat.str());
+
+    testRecord.primaryName = "";
+
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == alternativeNameTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == alternativeNameTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == alternativeNameTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == alternativeNameTest);
+
+    testRecord.primaryName     = primaryNameTest;
+    testRecord.alternativeName = "";
+
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == primaryNameTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == primaryNameTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == primaryNameTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) == primaryNameTest);
+
+    testRecord.primaryName = "";
+
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberFormattedTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == "");
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+            utils::localize.get("app_phonebook_contact_no_name"));
+
+    testRecord.numbers.clear();
+    testRecord.numbers = std::vector<ContactRecord::Number>({
+        ContactRecord::Number(),
+        ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
+    });
+
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == numberFormattedTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == "");
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+            utils::localize.get("app_phonebook_contact_no_name"));
+
+    testRecord.numbers.clear();
+
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == "");
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) ==
+            utils::localize.get("app_phonebook_contact_no_name"));
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == "");
+    REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
+            utils::localize.get("app_phonebook_contact_no_name"));
+}
+
+TEST_CASE("Test converting contact data to string")
+{
+    const std::string primaryNameTest             = "PrimaryNameTest";
+    const std::string alternativeNameTest         = "AlternativeNameTest";
+    const std::string numberUserTest              = "600123456";
+    const std::string numberE164Test              = "+48600123456";
+    const std::string numberFormattedTest         = "600 123 456";
+    const std::string mailTest                    = "TestMail";
+    const std::string addressTest                 = "6 Czeczota St.\n02600 Warsaw";
+    const std::string noteTest                    = "TestNote";
+    const ContactNumberType contactNumberTypeTest = ContactNumberType::CELL;
+
+    ContactRecord testRecord;
+
+    testRecord.primaryName     = primaryNameTest;
+    testRecord.alternativeName = alternativeNameTest;
+    testRecord.numbers         = std::vector<ContactRecord::Number>({
+        ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
+    });
+    testRecord.mail            = mailTest;
+    testRecord.address         = addressTest;
+    testRecord.note            = noteTest;
+
+    const std::string contactDataAll = primaryNameTest + " " + alternativeNameTest + "\n" + numberFormattedTest + "\n" +
+                                       mailTest + "\n" + addressTest + "\n" + noteTest;
+    const std::string contactDataTwoFieldsFromTheMiddle = numberFormattedTest + "\n" + mailTest + "\n";
+    const std::string contactDataSingleField            = numberFormattedTest + "\n";
+
+    auto contactDataStr = testRecord.getAsString();
+    REQUIRE(contactDataStr == contactDataAll);
+
+    testRecord.primaryName.clear();
+    testRecord.alternativeName.clear();
+    testRecord.address.clear();
+    testRecord.note.clear();
+    contactDataStr = testRecord.getAsString();
+    REQUIRE(contactDataStr == contactDataTwoFieldsFromTheMiddle);
+
+    testRecord.mail.clear();
+    contactDataStr = testRecord.getAsString();
+    REQUIRE(contactDataStr == contactDataSingleField);
 }
 
 TEST_CASE("Contact record numbers update")
