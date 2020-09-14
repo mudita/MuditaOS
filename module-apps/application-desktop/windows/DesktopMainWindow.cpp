@@ -28,6 +28,7 @@
 #include "log/log.hpp"
 #include <Span.hpp>
 #include <Style.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
 #include <service-appmgr/ApplicationManager.hpp>

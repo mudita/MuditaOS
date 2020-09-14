@@ -1,0 +1,48 @@
+#include "SettingsMainWindow.hpp"
+#include "../ApplicationSettings.hpp"
+#include "i18/i18.hpp"
+#include "log/log.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
+
+std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
+{
+    std::list<gui::Option> l;
+
+    auto i18     = [](const std::string &text) { return utils::localize.get(text); };
+    auto addMenu = [&l, &app](UTF8 name, const std::string &window = "") {
+        l.emplace_back(gui::Option{name,
+                                   [=](gui::Item &item) {
+                                       if (window.empty()) {
+                                           return false;
+                                       }
+                                       LOG_INFO("switching to %s page", window.c_str());
+                                       app->switchWindow(window, nullptr);
+                                       return true;
+                                   },
+                                   gui::Arrow::Enabled});
+    };
+    auto addApp = [&l, &app](UTF8 name, const std::string &window = "") {
+        l.emplace_back(gui::Option{name,
+                                   [=](gui::Item &item) {
+                                       if (window.empty()) {
+                                           return false;
+                                       }
+                                       LOG_INFO("switching to %s page", window.c_str());
+                                       sapm::ApplicationManager::messageSwitchApplication(
+                                           app, "ApplicationSettings", gui::name::window::main_window, nullptr);
+                                       app->switchWindow(window, nullptr);
+                                       return true;
+                                   },
+                                   gui::Arrow::Enabled});
+    };
+
+    addApp(i18("app_desktop_menu_settings"), "Settings");
+    addMenu(i18("app_settings_bt"), "Bluetooth");
+    addMenu(i18("app_settings_net"), "Network");
+    addMenu(i18("app_settings_disp_key"), "Display and keypad");
+    addMenu(i18("app_settings_phone_modes"), "Phone modes");
+    addMenu(i18("app_settings_apps_tools"), "Apps and tools");
+    addMenu(i18("app_settings_security"), "Security");
+    addMenu(i18("app_settings_system"), "System");
+    return l;
+}
