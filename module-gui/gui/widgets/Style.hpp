@@ -27,12 +27,24 @@ namespace style
             const inline std::string title = "gt_pressura_bold_32";
         }; // namespace font
     };     // namespace header
+
+    namespace footer
+    {
+        const inline uint32_t height = 54;
+        namespace font
+        {
+            const inline std::string bold   = "gt_pressura_bold_24";
+            const inline std::string medium = "gt_pressura_regular_24";
+        }; // namespace font
+    };     // namespace footer
     namespace window
     {
         const inline uint32_t default_left_margin  = 20;
         const inline uint32_t default_right_margin = 20;
         const inline uint32_t default_body_width =
             style::window_width - style::window::default_right_margin - style::window::default_left_margin;
+        const inline uint32_t default_body_height =
+            style::window_height - style::header::height - style::footer::height;
         const inline uint32_t default_border_focus_w       = 2;
         const inline uint32_t default_border_rect_no_focus = 1;
         const inline uint32_t default_border_no_focus_w    = 0;
@@ -93,15 +105,6 @@ namespace style
         } // namespace messages
 
     }; // namespace window
-    namespace footer
-    {
-        const inline uint32_t height = 54;
-        namespace font
-        {
-            const inline std::string bold   = "gt_pressura_bold_24";
-            const inline std::string medium = "gt_pressura_regular_24";
-        }; // namespace font
-    };     // namespace footer
     namespace settings
     {
         namespace date
@@ -159,6 +162,8 @@ namespace style
             const inline std::string information    = "common_information";
             const inline std::string search         = "common_search";
             const inline std::string search_results = "common_search_results";
+            const inline std::string emoji          = "common_emoji";
+            const inline std::string special_chars  = "common_special_characters";
             // days
             const inline std::string Monday    = "common_monday";
             const inline std::string Tuesday   = "common_tuesday";
