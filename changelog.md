@@ -6,6 +6,7 @@
 
 * `[desktop]` info on how to unlock
 * `[settings]` pin change option in settings main window
+* `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
 
 ### Fixed
 
