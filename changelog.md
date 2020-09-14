@@ -1,5 +1,12 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+* `[desktop]` info on how to unlock
+* `[settings]` pin change option in settings main window
+
 ## [0.37.1 2020-09-11]
 
 ### Fixed
