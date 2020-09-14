@@ -64,8 +64,7 @@ class ServiceAudio : public sys::Service
             assert(queryResponse != nullptr);
 
             auto settingsResultResponse = queryResponse->getResult();
-            auto settingsResult = dynamic_cast<db::query::settings::AddOrIgnoreResult *>(settingsResultResponse.get());
-            assert(settingsResult != nullptr);
+            assert(dynamic_cast<db::query::settings::AddOrIgnoreResult *>(settingsResultResponse.get()) != nullptr);
         }
     }
 
