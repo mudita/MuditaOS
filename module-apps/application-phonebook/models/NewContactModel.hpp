@@ -26,4 +26,5 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
     auto getItem(gui::Order order) -> gui::ListItem * override;
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
+    void ContactDataChanged();
 };
