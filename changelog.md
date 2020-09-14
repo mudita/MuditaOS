@@ -2,6 +2,12 @@
 
 ## [0.37.1 2020-09-11]
 
+### Fixed
+
+* `[gui]` Fixed notifications display on unlocked screen.
+
+## [0.37.1 2020-09-11]
+
 ### Added
 
 * `[audio]` Add storing and updating audio settings in database.
@@ -342,3 +348,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+
