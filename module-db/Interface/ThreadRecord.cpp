@@ -88,6 +88,9 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
     case ThreadRecordField::NumberID: {
         threadsField = ThreadsTableFields::NumberID;
     } break;
+    default:
+        LOG_ERROR("Invalid field type %u", static_cast<unsigned>(field));
+        return records;
     }
 
     auto ret = smsDB->threads.getLimitOffsetByField(offset, limit, threadsField, str);
