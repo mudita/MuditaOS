@@ -12,10 +12,14 @@ namespace gui
     class NewSMS_Window : public AppWindow
     {
       private:
+        inline static const std::uint32_t getThreadTimeout = 1000;
+
         gui::Text *recipient = nullptr;
         gui::Text *message   = nullptr;
         gui::VBox *body      = nullptr;
         std::shared_ptr<ContactRecord> contact;
+        utils::PhoneNumber::View phoneNumber;
+        std::uint32_t numberId = 0;
 
         bool selectContact();
         bool sendSms();

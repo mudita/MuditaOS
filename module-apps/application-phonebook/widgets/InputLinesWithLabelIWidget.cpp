@@ -95,8 +95,8 @@ namespace gui
             numberHandler();
             break;
 
-        case phonebookInternals::ListItemName::OtherNumber:
-            otherNumberHandler();
+        case phonebookInternals::ListItemName::SecondNumber:
+            secondNumberHandler();
             break;
 
         case phonebookInternals::ListItemName::Email:
@@ -136,7 +136,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::numberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number"));
         inputText->setTextType(TextType::SINGLE_LINE);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
@@ -152,9 +152,9 @@ namespace gui
             }
         };
     }
-    void InputLinesWithLabelIWidget::otherNumberHandler()
+    void InputLinesWithLabelIWidget::secondNumberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_number"));
         inputText->setTextType(TextType::SINGLE_LINE);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 

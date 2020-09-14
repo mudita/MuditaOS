@@ -6,6 +6,7 @@
 #include <Utils.hpp>
 
 #include <queries/phonebook/QueryContactGet.hpp>
+#include <queries/phonebook/QueryNumberGetByID.hpp>
 
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
@@ -66,8 +67,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
         numbersIDs.pop_back();
     }
 
-    ret = contactDB->ringtones.add(
-        ContactsRingtonesTableRow{.ID = DB_ID_NONE, .contactID = contactID, .assetPath = rec.assetPath});
+    ret = contactDB->ringtones.add(ContactsRingtonesTableRow(DB_ID_NONE, contactID, rec.assetPath));
 
     if (!ret) {
         return false;
@@ -120,7 +120,14 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
         return false;
     }
 
-    if (contactDB->number.removeById(std::stoul(contact.numbersID)) == false) {
+    try {
+        uint32_t id = std::stoul(contact.numbersID);
+        if (contactDB->number.removeById(id) == false) {
+            return false;
+        }
+    }
+    catch (const std::exception &e) {
+        LOG_ERROR("ontactRecordInterface::RemoveByID exception %s", e.what());
         return false;
     }
 
@@ -160,6 +167,9 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::runQuery(std::shared_pt
     else if (typeid(*query) == typeid(db::query::ContactRemove)) {
         return removeQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::NumberGetByID)) {
+        return numberGetByIdQuery(query);
+    }
     else {
         LOG_ERROR("Unexpected query type.");
         return nullptr;
@@ -176,32 +186,32 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::getQuery(std::shared_pt
         LOG_INFO("Filtering by number: %s", textFilter->getFilterData().c_str());
     }
 
-        auto readQuery = static_cast<const db::query::ContactGet *>(query.get());
-        LOG_DEBUG("Contact read query, filter: \"%s\", offset=%lu, limit=%lu",
-                  readQuery->getFilterData().c_str(),
-                  static_cast<unsigned long>(readQuery->getOffset()),
-                  static_cast<unsigned long>(readQuery->getLimit()));
-        auto [limit, offset] = readQuery->getLimitOffset();
-        auto matchType       = searchByNumber ? ContactsTable::MatchType::TextNumber : ContactsTable::MatchType::Name;
-        uint32_t groupID     = readQuery->getGroupFilterData();
-        if (groupID != DB_ID_NONE) {
-            matchType = ContactsTable::MatchType::Group;
-        }
-        else
-            groupID = favouritesGroupId;
-        LOG_DEBUG("Contact match Type: %lu", static_cast<unsigned long int>(matchType));
+    auto readQuery = static_cast<const db::query::ContactGet *>(query.get());
+    LOG_DEBUG("Contact read query, filter: \"%s\", offset=%lu, limit=%lu",
+              readQuery->getFilterData().c_str(),
+              static_cast<unsigned long>(readQuery->getOffset()),
+              static_cast<unsigned long>(readQuery->getLimit()));
+    auto [limit, offset] = readQuery->getLimitOffset();
+    auto matchType       = searchByNumber ? ContactsTable::MatchType::TextNumber : ContactsTable::MatchType::Name;
+    uint32_t groupID     = readQuery->getGroupFilterData();
+    if (groupID != DB_ID_NONE) {
+        matchType = ContactsTable::MatchType::Group;
+    }
+    else {
+        groupID = favouritesGroupId;
+    }
+    LOG_DEBUG("Contact match Type: %lu", static_cast<unsigned long int>(matchType));
 
-        auto ids =
-            contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
+    auto ids = contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
 
-        LOG_DEBUG("Received records: %lu", static_cast<unsigned long int>(ids.size()));
+    LOG_DEBUG("Received records: %lu", static_cast<unsigned long int>(ids.size()));
 
-        std::vector<ContactRecord> result(ids.size());
-        std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
+    std::vector<ContactRecord> result(ids.size());
+    std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
 
-        auto response = std::make_unique<db::query::ContactGetResult>(result);
-        response->setRequestQuery(query);
-        return response;
+    auto response = std::make_unique<db::query::ContactGetResult>(result);
+    response->setRequestQuery(query);
+    return response;
 }
 
 std::unique_ptr<db::QueryResult> ContactRecordInterface::getByIDQuery(std::shared_ptr<db::Query> query)
@@ -270,11 +280,21 @@ std::unique_ptr<db::QueryResult> ContactRecordInterface::updateQuery(std::shared
     response->setRequestQuery(query);
     return response;
 }
+
 std::unique_ptr<db::QueryResult> ContactRecordInterface::removeQuery(std::shared_ptr<db::Query> query)
 {
     auto removeQuery = static_cast<db::query::ContactRemove *>(query.get());
     auto ret         = ContactRecordInterface::RemoveByID(removeQuery->getID());
     auto response    = std::make_unique<db::query::ContactRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ContactRecordInterface::numberGetByIdQuery(std::shared_ptr<db::Query> query)
+{
+    auto numberQuery = static_cast<db::query::NumberGetByID *>(query.get());
+    auto ret         = ContactRecordInterface::GetNumberById(numberQuery->getID());
+    auto response    = std::make_unique<db::query::NumberGetByIDResult>(ret);
     response->setRequestQuery(query);
     return response;
 }
@@ -418,7 +438,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
         return false;
     }
 
-    ret = contactDB->ringtones.update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
+    ret = contactDB->ringtones.update(ContactsRingtonesTableRow(contact.ID, rec.assetPath));
 
     if (!ret) {
         LOG_ERROR("Failed to update contact ringtone");
@@ -870,9 +890,10 @@ utils::NumberHolderMatcher<std::vector, ContactNumberHolder> ContactRecordInterf
                                                                         std::cend(contactNumberHolders));
 }
 
-std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numberView,
-                                                                   CreateTempContact createTempContact,
-                                                                   utils::PhoneNumber::Match matchLevel)
+std::optional<ContactRecordInterface::ContactNumberMatch> ContactRecordInterface::MatchByNumber(
+    const utils::PhoneNumber::View &numberView,
+    CreateTempContact createTempContact,
+    utils::PhoneNumber::Match matchLevel)
 {
     std::vector<ContactNumberHolder> contactNumberHolders;
     auto numberMatcher = buildNumberMatcher(contactNumberHolders);
@@ -894,10 +915,17 @@ std::optional<ContactRecord> ContactRecordInterface::MatchByNumber(const utils::
             return std::nullopt;
         }
 
-        return GetByID(contactDB->getLastInsertRowId());
+        auto contactID       = contactDB->getLastInsertRowId();
+        auto contactTableRow = contactDB->contacts.getById(contactID);
+        auto numberIDs       = splitNumberIDs(contactTableRow.numbersID);
+        assert(numberIDs.size() == 1);
+        auto numberID = numberIDs[0];
+        return ContactRecordInterface::ContactNumberMatch(GetByID(contactID), contactID, numberID);
     }
 
-    return GetByID(matchedNumber->getContactID());
+    auto contactID = matchedNumber->getContactID();
+    auto numberID  = matchedNumber->getNumberID();
+    return ContactRecordInterface::ContactNumberMatch(GetByID(contactID), contactID, numberID);
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial(UTF8 speedDial)
@@ -909,7 +937,15 @@ std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std:
 {
     std::vector<ContactRecord::Number> nrs;
     for (auto nr_str : utils::split(numbers_id, ' ')) {
-        auto nr = contactDB->number.getById(std::stol(nr_str));
+        auto nr_val = 0L;
+        try {
+            nr_val = std::stol(nr_str);
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR("Convertion error from %s, taking default value %ld", nr_str.c_str(), nr_val);
+        }
+
+        auto nr = contactDB->number.getById(nr_val);
         if (!nr.isValid()) {
             return nrs;
         }
@@ -1036,4 +1072,16 @@ bool ContactRecord::isOnBlocked()
 bool ContactRecord::isOnGroup(uint32_t groupId)
 {
     return groups.find(groupId) != groups.end();
+}
+
+ContactRecordInterface::ContactNumberMatch::ContactNumberMatch(ContactRecord rec,
+                                                               std::uint32_t contactId,
+                                                               std::uint32_t numberId)
+    : contact(std::move(rec)), contactId(contactId), numberId(numberId)
+{}
+
+utils::PhoneNumber::View ContactRecordInterface::GetNumberById(std::uint32_t numberId)
+{
+    auto row = contactDB->number.getById(numberId);
+    return utils::PhoneNumber(row.numberUser, row.numbere164).getView();
 }

@@ -1,9 +1,8 @@
 #include "PhonebookSearch.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "../data/PhonebookStyle.hpp"
-#include "Utils.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
 #include "widgets/SearchBox.hpp"
+
+#include <Utils.hpp>
 
 namespace gui
 {
@@ -54,7 +53,7 @@ namespace gui
         PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
         inputField->setText(item->getQuery());
 
-        return (true);
+        return true;
     }
 
     bool PhonebookSearch::onInput(const InputEvent &inputEvent)
@@ -66,7 +65,7 @@ namespace gui
 
         if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
             ((inputEvent.state != InputEvent::State::keyReleasedLong))) {
-            return (false);
+            return false;
         }
 
         if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
@@ -84,6 +83,6 @@ namespace gui
             }
         }
 
-        return (ret);
+        return ret;
     }
 } // namespace gui

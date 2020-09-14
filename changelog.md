@@ -1,6 +1,6 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.37.1 2020-09-11]
 
 ### Fixed
 

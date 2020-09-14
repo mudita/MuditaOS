@@ -184,6 +184,12 @@ namespace style
             Bottom
         };
 
+        enum class RebuildType
+        {
+            Full,
+            Partial
+        };
+
         namespace scroll
         {
             const inline uint32_t x           = 0;

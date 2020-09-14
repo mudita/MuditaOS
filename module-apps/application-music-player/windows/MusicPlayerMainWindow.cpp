@@ -26,7 +26,7 @@ namespace gui
     {
         audio::Volume volume;
         const auto ret = application->getCurrentVolume(volume);
-        if (ret == audio::RetCode::Success && volume != audio::invalidVolume) {
+        if (ret == audio::RetCode::Success) {
             if (successCallback != nullptr) {
                 successCallback(volume);
             }

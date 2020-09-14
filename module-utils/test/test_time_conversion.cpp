@@ -166,7 +166,7 @@ bool test_time_from_before(std::ostream &outstream, time_t before, std::string f
 
     strftime(buf, 128, format_expected.c_str(), &todaytime);
 
-    if (!(mytime.str() == buf)) {
+    if (!(mytime.str(format_expected) == buf)) {
         std::cerr << "Error: "
                   << "\n\t" << mytime.str() << "\n\t"
                   << " :vs:"

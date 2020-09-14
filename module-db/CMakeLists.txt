@@ -76,7 +76,12 @@ set(SOURCES
         queries/sms/QuerySMSTemplateGetCount.cpp
         queries/sms/QuerySMSTemplateRemove.cpp
         queries/sms/QuerySMSTemplateUpdate.cpp
+        queries/sms/QueryThreadGetByNumber.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
+        queries/calllog/QueryCalllogGet.cpp
+        queries/calllog/QueryCalllogGetCount.cpp
+        queries/calllog/QueryCalllogRemove.cpp
+        queries/calllog/QueryCalllogGetByContactID.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
@@ -86,6 +91,7 @@ set(SOURCES
         queries/phonebook/QueryContactAdd.cpp
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryContactRemove.cpp
+        queries/phonebook/QueryNumberGetByID.cpp
         queries/calendar/QueryEventsRemove.cpp
         queries/calendar/QueryEventsGet.cpp
         queries/calendar/QueryEventsGetAll.cpp
@@ -94,6 +100,8 @@ set(SOURCES
         queries/calendar/QueryEventsGetFiltered.hpp
         queries/calendar/QueryEventsGetFiltered.cpp
         queries/settings/QuerySettingsGet_v2.cpp
+        queries/settings/QuerySettingsUpdate_v2.cpp
+        queries/settings/QuerySettingsAddOrIgnore_v2.cpp
 )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

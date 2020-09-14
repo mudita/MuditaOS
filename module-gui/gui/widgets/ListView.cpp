@@ -71,12 +71,10 @@ namespace gui
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
-                direction = style::listview::Direction::Top;
-                return this->listPageEndReached();
+                return this->requestPreviousPage();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
-                direction = style::listview::Direction::Bottom;
-                return this->listPageEndReached();
+                return this->requestNextPage();
             }
             else {
                 return false;
@@ -124,12 +122,39 @@ namespace gui
         }
     }
 
-    void ListView::rebuildList()
+    void ListView::rebuildList(style::listview::RebuildType rebuildType)
     {
-        clear();
+        setup(rebuildType);
+        clearItems();
+
         setElementsCount(provider->requestRecordsCount());
-        provider->requestRecords(0, calculateLimit());
+
+        // If deletion operation caused last page to be removed request previous one.
+        if (startIndex != 0 && startIndex == elementsCount) {
+            requestPreviousPage();
+        }
+        else {
+            provider->requestRecords(startIndex, calculateLimit());
+        }
     };
+
+    void ListView::setup(style::listview::RebuildType rebuildType)
+    {
+        if (rebuildType == style::listview::RebuildType::Full) {
+            startIndex       = 0;
+            storedFocusIndex = 0;
+        }
+        else {
+            storedFocusIndex = body->getFocusItemIndex();
+
+            if (direction == style::listview::Direction::Top) {
+                storedFocusIndex = abs((currentPageSize - 1) - storedFocusIndex);
+            }
+        }
+
+        body->setReverseOrder(false);
+        direction = style::listview::Direction::Bottom;
+    }
 
     std::shared_ptr<ListItemProvider> ListView::getProvider()
     {
@@ -258,6 +283,15 @@ namespace gui
     {
         setFocusItem(body);
 
+        if (storedFocusIndex != 0) {
+
+            if (!body->setFocusOnElement(storedFocusIndex)) {
+                body->setFocusOnLastElement();
+            }
+
+            storedFocusIndex = 0;
+        }
+
         if (focusOnLastItem) {
             body->setFocusOnLastElement();
             focusOnLastItem = false;
@@ -287,7 +321,7 @@ namespace gui
         return body->onInput(inputEvent);
     }
 
-    int ListView::calculateMaxItemsOnPage()
+    unsigned int ListView::calculateMaxItemsOnPage()
     {
         assert(provider->getMinimalItemHeight() != 0);
         auto count = widgetArea.h / provider->getMinimalItemHeight();
@@ -295,7 +329,7 @@ namespace gui
         return count;
     }
 
-    int ListView::calculateLimit()
+    unsigned int ListView::calculateLimit()
     {
         auto minLimit =
             (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
@@ -305,53 +339,53 @@ namespace gui
             return minLimit < startIndex ? minLimit : startIndex;
     }
 
-    bool ListView::listPageEndReached()
+    bool ListView::requestNextPage()
     {
-        if (direction == style::listview::Direction::Bottom) {
+        direction = style::listview::Direction::Bottom;
+        body->setReverseOrder(false);
 
-            body->setReverseOrder(false);
+        if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::Continuous) {
 
-            if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::Continuous) {
+            startIndex = 0;
+        }
+        else if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::TopDown) {
 
-                startIndex = 0;
-            }
-            else if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::TopDown) {
+            return true;
+        }
+        else {
 
-                return true;
-            }
-            else {
-
-                startIndex = startIndex <= elementsCount - currentPageSize
-                                 ? startIndex + currentPageSize
-                                 : elementsCount - (elementsCount - startIndex);
-            }
-
-            pageLoaded = false;
-            provider->requestRecords(startIndex, calculateLimit());
+            startIndex = startIndex <= elementsCount - currentPageSize ? startIndex + currentPageSize
+                                                                       : elementsCount - (elementsCount - startIndex);
         }
 
-        if (direction == style::listview::Direction::Top) {
+        pageLoaded = false;
+        provider->requestRecords(startIndex, calculateLimit());
 
-            body->setReverseOrder(true);
-            auto topFetchIndex = 0;
+        return true;
+    }
 
-            if (startIndex == 0 && listType == style::listview::Type::Continuous) {
+    bool ListView::requestPreviousPage()
+    {
+        direction = style::listview::Direction::Top;
+        body->setReverseOrder(true);
+        auto topFetchIndex = 0;
 
-                topFetchIndex = elementsCount - (elementsCount % currentPageSize);
-                startIndex    = elementsCount;
-            }
-            else if (startIndex == 0 && listType == style::listview::Type::TopDown) {
+        if (startIndex == 0 && listType == style::listview::Type::Continuous) {
 
-                return true;
-            }
-            else {
-
-                topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
-            }
-
-            pageLoaded = false;
-            provider->requestRecords(topFetchIndex, calculateLimit());
+            topFetchIndex = elementsCount - (elementsCount % currentPageSize);
+            startIndex    = elementsCount;
         }
+        else if (startIndex == 0 && listType == style::listview::Type::TopDown) {
+
+            return true;
+        }
+        else {
+
+            topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
+        }
+
+        pageLoaded = false;
+        provider->requestRecords(topFetchIndex, calculateLimit());
 
         return true;
     }

@@ -1,14 +1,7 @@
 #include "PhonebookIceContacts.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
-#include <module-db/Interface/ContactRecord.hpp>
 
-#include <messages/QueryMessage.hpp>
-#include <queries/phonebook/QueryContactGet.hpp>
-
-#include <service-appmgr/ApplicationManager.hpp>
-#include <module-services/service-db/messages/DBContactMessage.hpp>
 #include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
@@ -79,10 +72,5 @@ namespace gui
         }
 
         return false;
-    }
-
-    bool PhonebookIceContacts::isSearchRequested() const
-    {
-        return requestedSearch;
     }
 } /* namespace gui */

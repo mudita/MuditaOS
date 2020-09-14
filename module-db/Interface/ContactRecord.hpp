@@ -113,8 +113,16 @@ class ContactNumberHolder
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField>
 {
-
   public:
+    struct ContactNumberMatch
+    {
+        ContactRecord contact;
+        std::uint32_t contactId = DB_ID_NONE;
+        std::uint32_t numberId  = DB_ID_NONE;
+
+        ContactNumberMatch(ContactRecord rec, std::uint32_t contactId, std::uint32_t numberId);
+    };
+
     ContactRecordInterface(ContactsDB *db);
     ~ContactRecordInterface();
 
@@ -153,7 +161,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
         const utils::PhoneNumber::View &numberView, CreateTempContact createTempContact = CreateTempContact::False);
 
-    std::optional<ContactRecord> MatchByNumber(
+    std::optional<ContactNumberMatch> MatchByNumber(
         const utils::PhoneNumber::View &numberView,
         CreateTempContact createTempContact  = CreateTempContact::False,
         utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE);
@@ -165,6 +173,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
                                                        const char *number);
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
+
+    utils::PhoneNumber::View GetNumberById(std::uint32_t numberId);
 
   private:
     ContactsDB *contactDB;
@@ -192,4 +202,5 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<db::QueryResult> addQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> updateQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> numberGetByIdQuery(std::shared_ptr<db::Query> query);
 };

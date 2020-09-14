@@ -1,8 +1,8 @@
 #pragma once
 
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "application-phonebook/widgets/PhonebookListView.hpp"
 #include "application-phonebook/models/PhonebookModel.hpp"
+#include "application-phonebook/widgets/PhonebookListView.hpp"
 
 namespace gui
 {

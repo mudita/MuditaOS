@@ -1,32 +1,29 @@
 #pragma once
 
-#include "../data/PhonebookItemData.hpp"
-#include "../models/PhonebookModel.hpp"
-#include "../widgets/PhonebookListView.hpp"
-#include "Text.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/models/PhonebookModel.hpp"
+#include "application-phonebook/widgets/PhonebookListView.hpp"
+
+#include <Text.hpp>
 
 namespace gui
 {
     class PhonebookSearch : public AppWindow
     {
-      protected:
-        /** labels */
-        Text *inputField = nullptr;
-
-        /** currently displayed contact */
-        std::shared_ptr<ContactRecord> contact = nullptr;
-
       public:
         PhonebookSearch(app::Application *app);
         ~PhonebookSearch() override = default;
 
-        // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool handleSwitchData(SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
+        Text *inputField                       = nullptr;
+        std::shared_ptr<ContactRecord> contact = nullptr;
     };
 
 } /* namespace gui */

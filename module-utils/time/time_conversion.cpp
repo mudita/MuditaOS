@@ -45,41 +45,13 @@ namespace utils
             return retval;
         }
 
-        void Timestamp::replace_specifiers()
-        {
-            int replacements_n              = 0;
-            const int strtof_formatter_size = 2;
-            for (auto &el : specifiers_replacement) {
-                auto begin_pos = format.begin();
-                auto found_pos = format.begin();
-                while (found_pos != format.end()) {
-                    begin_pos = format.begin();
-                    found_pos = std::search(begin_pos, format.end(), el.begin(), el.end());
-                    if (found_pos != format.end()) {
-                        UTF8 begin = std::string(begin_pos, found_pos);
-                        UTF8 day   = get_replacement(Replacements(replacements_n), timeinfo);
-                        UTF8 next;
-                        // std::next doesnt care for distance... (doesn't return element.end()) need to check it
-                        if (std::distance(found_pos, format.end()) <= strtof_formatter_size) {
-                            next = "";
-                        }
-                        else {
-                            next = std::string(std::next(found_pos, strtof_formatter_size), format.end());
-                        }
-                        format = (begin + day + next).c_str();
-                    }
-                }
-                ++replacements_n;
-            }
-        }
-
         void Timestamp::set_time(time_t newtime)
         {
             time     = newtime;
             timeinfo = *localtime(&time);
         }
 
-        void Timestamp::set_time(std::string timestr, const char *format)
+        void Timestamp::set_time(std::string timestr, const char *fmt)
         {
 
             std::stringstream stream(timestr);
@@ -96,14 +68,14 @@ namespace utils
         }
 
         constexpr uint32_t datasize = 128;
-        UTF8 Timestamp::str(std::string format)
+        UTF8 Timestamp::str(std::string fmt)
         {
-            if (format.compare("") != 0) {
-                this->format = format;
+            if (fmt.compare("") != 0) {
+                this->format = fmt;
             }
             UTF8 datetimestr = "";
-            replace_specifiers();
-
+            auto replaceFunc = [&](int idx) { return get_replacement(Replacements(idx), timeinfo); };
+            utils::findAndReplaceAll(this->format, specifiers_replacement, replaceFunc);
             auto data = std::unique_ptr<char[]>(new char[datasize]);
             std::strftime(data.get(), datasize, this->format.c_str(), &timeinfo);
             datetimestr = UTF8(data.get());

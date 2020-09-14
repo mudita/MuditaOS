@@ -18,7 +18,9 @@
 namespace audio
 {
 
-    RouterOperation::RouterOperation([[maybe_unused]] const char *file)
+    RouterOperation::RouterOperation(
+        [[maybe_unused]] const char *file,
+        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
     {
 
         audioDeviceCallback =
@@ -79,10 +81,39 @@ namespace audio
         audioDeviceBuffer.resize(1024, 0);
         audioDeviceCellularBuffer.resize(1024, 0);
 
-        // TODO:M.P should be fetched from DB
-        availableProfiles.push_back(std::make_unique<ProfileRoutingEarspeaker>(nullptr, 1, 2));
-        availableProfiles.push_back(std::make_unique<ProfileRoutingSpeakerphone>(nullptr, 1, 2));
-        availableProfiles.push_back(std::make_unique<ProfileRoutingHeadset>(nullptr, 1, 5));
+        constexpr audio::Gain defaultRoutingEarspeakerGain       = 20;
+        constexpr audio::Volume defaultRoutingEarspeakerVolume   = 10;
+        constexpr audio::Gain defaultRoutingSpeakerphoneGain     = 20;
+        constexpr audio::Volume defaultRoutingSpeakerphoneVolume = 10;
+        constexpr audio::Gain defaultRoutingHeadsetGain          = 50;
+        constexpr audio::Volume defaultRoutingHeadsetVolume      = 10;
+
+        const auto dbRoutingEarspeakerGainPath =
+            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::ProfileSetup::Gain);
+        const auto routingEarspeakerGain = dbCallback(dbRoutingEarspeakerGainPath, defaultRoutingEarspeakerGain);
+        const auto dbRoutingEarspeakerVolumePath =
+            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::ProfileSetup::Volume);
+        const auto routingEarspeakerVolume = dbCallback(dbRoutingEarspeakerVolumePath, defaultRoutingEarspeakerVolume);
+        const auto dbRoutingSpeakerphoneGainPath =
+            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::ProfileSetup::Gain);
+        const auto routingSpeakerphoneGain = dbCallback(dbRoutingSpeakerphoneGainPath, defaultRoutingSpeakerphoneGain);
+        const auto dbRoutingSpeakerphoneVolumePath =
+            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::ProfileSetup::Volume);
+        const auto routingSpeakerphoneVolume =
+            dbCallback(dbRoutingSpeakerphoneVolumePath, defaultRoutingSpeakerphoneVolume);
+        const auto dbRoutingHeadsetGainPath =
+            audio::str(audio::Profile::Type::RoutingHeadset, audio::ProfileSetup::Gain);
+        const auto routingHeadsetGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadsetGain);
+        const auto dbRoutingHeadsetVolumePath =
+            audio::str(audio::Profile::Type::RoutingHeadset, audio::ProfileSetup::Volume);
+        const auto routingHeadsetVolume = dbCallback(dbRoutingHeadsetVolumePath, defaultRoutingHeadsetVolume);
+
+        availableProfiles.push_back(
+            std::make_unique<ProfileRoutingEarspeaker>(nullptr, routingEarspeakerVolume, routingEarspeakerGain));
+        availableProfiles.push_back(
+            std::make_unique<ProfileRoutingSpeakerphone>(nullptr, routingSpeakerphoneVolume, routingSpeakerphoneGain));
+        availableProfiles.push_back(
+            std::make_unique<ProfileRoutingHeadset>(nullptr, routingHeadsetVolume, routingHeadsetGain));
 
         currentProfile = availableProfiles[0].get();
 

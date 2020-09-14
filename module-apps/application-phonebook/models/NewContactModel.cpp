@@ -55,7 +55,7 @@ void NewContactModel::createData()
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
-        phonebookInternals::ListItemName::OtherNumber,
+        phonebookInternals::ListItemName::SecondNumber,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
@@ -104,7 +104,7 @@ void NewContactModel::clearData()
 
     createData();
 
-    requestRecords(0, internalData.size());
+    list->rebuildList();
 }
 
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)

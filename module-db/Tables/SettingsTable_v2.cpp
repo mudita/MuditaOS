@@ -32,12 +32,6 @@ bool SettingsTable_v2::create()
         return false;
     }
 
-    for (auto entry : defaultInitialization) {
-        if (!add(entry)) {
-            return false;
-        }
-    }
-
     return true;
 }
 

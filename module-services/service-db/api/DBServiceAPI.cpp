@@ -10,6 +10,11 @@
 #include <messages/DBCalllogMessage.hpp>
 #include <messages/DBCountryCodeMessage.hpp>
 #include <messages/DBServiceMessage.hpp>
+#include <messages/QueryMessage.hpp>
+
+#include <Common/Query.hpp>
+#include <queries/phonebook/QueryNumberGetByID.hpp>
+#include <queries/sms/QueryThreadGetByNumber.hpp>
 
 #include <ServiceDB.hpp>
 #include <includes/DBServiceName.hpp>
@@ -189,6 +194,27 @@ std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGetByContact(sys::Service *ser
     else {
         return nullptr;
     }
+}
+
+std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
+                                                              const utils::PhoneNumber::View &phoneNumber,
+                                                              std::uint32_t timeout)
+{
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
+        serv, db::Interface::Name::SMSThread, std::make_unique<db::query::ThreadGetByNumber>(phoneNumber), timeout);
+
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        assert(queryResponse != nullptr);
+
+        auto threadResponse = queryResponse->getResult();
+        auto threadResult   = dynamic_cast<db::query::ThreadGetByNumberResult *>(threadResponse.get());
+        assert(threadResult != nullptr);
+
+        return std::make_unique<ThreadRecord>(std::move(threadResult->getThread()));
+    }
+
+    return nullptr;
 }
 
 bool DBServiceAPI::ThreadRemove(sys::Service *serv, uint32_t id)
@@ -804,4 +830,25 @@ bool DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath)
         LOG_ERROR("DBBackup error, return code: %s", c_str(ret.first));
         return false;
     }
+}
+
+std::unique_ptr<utils::PhoneNumber::View> DBServiceAPI::GetNumberById(sys::Service *serv,
+                                                                      std::uint32_t numberId,
+                                                                      std::uint32_t timeout)
+{
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
+        serv, db::Interface::Name::Contact, std::make_unique<db::query::NumberGetByID>(numberId), timeout);
+
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        assert(queryResponse != nullptr);
+
+        auto numberResponse = queryResponse->getResult();
+        auto numberResult   = dynamic_cast<db::query::NumberGetByIDResult *>(numberResponse.get());
+        assert(numberResult != nullptr);
+
+        return std::make_unique<utils::PhoneNumber::View>(std::move(numberResult->getNumber()));
+    }
+
+    return nullptr;
 }
