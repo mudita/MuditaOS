@@ -228,6 +228,17 @@ namespace app
             shutdownInProgress = true;
         };
 
+        bool setVolume(const audio::Volume &value,
+                       const audio::Profile::Type &profileType,
+                       const audio::PlaybackType &playbackType);
+
+        auto getVolume(audio::Volume &volume,
+                       const audio::Profile::Type &profileType,
+                       const audio::PlaybackType &playbackType)
+        {
+            return AudioServiceAPI::GetVolume(this, volume, profileType, playbackType);
+        }
+
         bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {

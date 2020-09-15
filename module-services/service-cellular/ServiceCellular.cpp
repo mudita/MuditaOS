@@ -1200,7 +1200,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                             db::Interface::Name::Notifications,
                             std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
                         const std::string ringtone_path = "assets/audio/sms_transformer.wav";
-                        AudioServiceAPI::PlaybackStart(this, ringtone_path);
+                        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
                     }
                     else {
                         LOG_ERROR("Failed to add text message to db");

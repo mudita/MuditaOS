@@ -92,7 +92,7 @@ namespace app
 
     bool ApplicationMusicPlayer::play(const std::string &fileName)
     {
-        auto ret = AudioServiceAPI::PlaybackStart(this, fileName);
+        auto ret = AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::Multimedia, fileName);
         if (ret != audio::RetCode::Success) {
             LOG_ERROR("play failed with %s", audio::c_str(ret));
             return false;
