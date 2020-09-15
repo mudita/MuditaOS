@@ -29,7 +29,7 @@ ServiceAudio::ServiceAudio()
               }
               return 0;
           },
-          [this](const std::string &path, const float &defaultValue) -> uint32_t {
+          [this](const std::string &path, const uint32_t &defaultValue) -> uint32_t {
               this->addOrIgnoreEntry(path, defaultValue);
               return this->fetchAudioSettingFromDb(path, defaultValue);
           })
@@ -87,11 +87,21 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             break;
         }
     }
+    else if (auto *msg = dynamic_cast<AudioGetSetting *>(msgl)) {
+        const auto path = audio::str(msg->profileType, audio::Setting::Volume, msg->playbackType);
+        const auto vol  = fetchAudioSettingFromDb<audio::Volume>(path, 0);
+        responseMsg     = std::make_shared<AudioResponseMessage>(RetCode::Success, vol);
+    }
+    else if (auto *msg = dynamic_cast<AudioSetSetting *>(msgl)) {
+        responseMsg     = std::make_shared<AudioResponseMessage>(RetCode::Success);
+        const auto path = audio::str(msg->profileType, audio::Setting::Volume, msg->playbackType);
+        updateDbValue(path, audio::Setting::Volume, msg->val);
+    }
     else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
         switch (msg->type) {
         case MessageType::AudioPlaybackStart: {
-            responseMsg =
-                std::make_shared<AudioResponseMessage>(audio.Start(Operation::Type::Playback, msg->fileName.c_str()));
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                audio.Start(Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType));
         } break;
 
         case MessageType::AudioRecorderStart: {
@@ -153,12 +163,12 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         case MessageType::AudioSetOutputVolume: {
             responseMsg = std::make_shared<AudioResponseMessage>(audio.SetOutputVolume(msg->val));
-            updateDbValue(audio.GetCurrentOperation(), audio::ProfileSetup::Volume);
+            updateDbValue(audio.GetCurrentOperation(), audio::Setting::Volume, audio.GetOutputVolume());
         } break;
 
         case MessageType::AudioSetInputGain: {
             responseMsg = std::make_shared<AudioResponseMessage>(audio.SetInputGain(msg->val));
-            updateDbValue(audio.GetCurrentOperation(), audio::ProfileSetup::Gain);
+            updateDbValue(audio.GetCurrentOperation(), audio::Setting::Gain, audio.GetInputGain());
         } break;
 
         case MessageType::AudioGetOutputVolume: {
@@ -182,7 +192,21 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     return responseMsg;
 }
 
-void ServiceAudio::updateDbValue(const audio::Operation *currentOperation, const audio::ProfileSetup &profileSetup)
+void ServiceAudio::updateDbValue(const std::string &path, const audio::Setting &setting, const uint32_t &value)
+{
+    if (path.empty()) {
+        return;
+    }
+
+    auto query = std::make_unique<db::query::settings::UpdateQuery>(
+        SettingsRecord_v2({{.ID = DB_ID_NONE}, .path = path, .value = std::to_string(value)}));
+
+    DBServiceAPI::GetQuery(this, db::Interface::Name::Settings_v2, std::move(query));
+}
+
+void ServiceAudio::updateDbValue(const audio::Operation *currentOperation,
+                                 const audio::Setting &setting,
+                                 const uint32_t &value)
 {
     if (currentOperation == nullptr) {
         return;
@@ -192,13 +216,6 @@ void ServiceAudio::updateDbValue(const audio::Operation *currentOperation, const
         return;
     }
 
-    auto dbPath = audio::str(currentProfile->GetType(), profileSetup);
-    auto volume = std::to_string(audio.GetOutputVolume());
-    auto query  = std::make_unique<db::query::settings::UpdateQuery>(
-        SettingsRecord_v2({{.ID = DB_ID_NONE}, .path = dbPath, .value = volume}));
-
-    if (dbPath.empty()) {
-        return;
-    }
-    DBServiceAPI::GetQuery(this, db::Interface::Name::Settings_v2, std::move(query));
+    auto dbPath = audio::str(currentProfile->GetType(), setting, currentOperation->GetplaybackType());
+    updateDbValue(dbPath, setting, value);
 }

@@ -14,6 +14,7 @@
 
 * `[build]` Move user data to SDRAM during linking.
 * `[build]` RT1051's linker script cleanup.
+* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.1 2020-09-18]
 

@@ -11,7 +11,7 @@ namespace audio
         : currentOperation(), asyncCallback(asyncCallback), dbCallback(dbCallback)
     {
 
-        auto ret = Operation::Create(Operation::Type::Idle, "", dbCallback);
+        auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, dbCallback);
         if (ret) {
             currentOperation = std::move(ret.value());
         }
@@ -74,10 +74,10 @@ namespace audio
         return currentOperation->SetInputGain(gainToSet);
     }
 
-    audio::RetCode Audio::Start(Operation::Type op, const char *fileName)
+    audio::RetCode Audio::Start(Operation::Type op, const char *fileName, const audio::PlaybackType &playbackType)
     {
 
-        auto ret = Operation::Create(op, fileName, dbCallback);
+        auto ret = Operation::Create(op, fileName, playbackType, dbCallback);
         if (ret) {
 
             switch (op) {

@@ -44,11 +44,86 @@ namespace audio
         return "";
     }
 
-    const std::string str(const Profile::Type &type, const ProfileSetup &setup)
+    const std::string str(const PlaybackType &playbackType) noexcept
+    {
+        switch (playbackType) {
+        case PlaybackType::None: {
+            return "";
+        }
+        case PlaybackType::Multimedia: {
+            return "Multimedia";
+        }
+        case PlaybackType::Notifications: {
+            return "Notifications";
+        }
+        case PlaybackType::KeypadSound: {
+            return "KeypadSound";
+        }
+        case PlaybackType::CallRingtone: {
+            return "CallRingtone";
+        }
+        case PlaybackType::TextMessageRingtone: {
+            return "TextMessageRingtone";
+        }
+        }
+        return "";
+    }
+
+    const std::string str(const Setting &setting) noexcept
+    {
+        switch (setting) {
+        case Setting::Volume:
+            return "volume";
+            break;
+        case Setting::Gain:
+            return "gain";
+            break;
+        }
+        return "";
+    }
+
+    const std::string str(const Profile::Type &profileType, const Setting &setup, const PlaybackType &playbackType)
     {
         std::stringstream ss;
-        ss << "audio/" << str(type) << ((setup == ProfileSetup::Volume) ? "/volume" : "/gain");
+        const auto typeStr = str(profileType);
+        if (typeStr.empty()) {
+            return "";
+        }
+        const auto op = str(playbackType);
+        if (op.empty()) {
+            ss << "audio/" << str(profileType) << "/" << str(setup);
+        }
+        else {
+            ss << "audio/" << str(profileType) << "/" << str(playbackType) << "/" << str(setup);
+        }
         return ss.str();
+    }
+
+    const std::string str(const PlaybackType &playbackType, const Setting &setup, const bool headphonesInserted)
+    {
+        const auto playbackCall = (headphonesInserted) ? str(Profile::Type::PlaybackHeadphones, setup, playbackType)
+                                                       : str(Profile::Type::PlaybackLoudspeaker, setup, playbackType);
+        switch (playbackType) {
+        case PlaybackType::None: {
+            return "";
+        }
+        case PlaybackType::Multimedia: {
+            return playbackCall;
+        }
+        case PlaybackType::Notifications: {
+            return playbackCall;
+        }
+        case PlaybackType::KeypadSound: {
+            return playbackCall;
+        }
+        case PlaybackType::CallRingtone: {
+            return playbackCall;
+        }
+        case PlaybackType::TextMessageRingtone: {
+            return playbackCall;
+        }
+        }
+        return "";
     }
 
     auto GetVolumeText(const audio::Volume &volume) -> const std::string
