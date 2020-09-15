@@ -15,10 +15,8 @@ namespace gui
     class DesktopMainWindow : public AppWindow
     {
       protected:
-        gui::Label *description   = nullptr;
         gui::Label *time          = nullptr;
         gui::Label *dayText       = nullptr;
-        gui::Image *messagesImage = nullptr;
         gui::VBox *notifications  = nullptr;
 
         /// Timed enter value cache, could be templated to any value really
@@ -77,6 +75,8 @@ namespace gui
         std::list<DrawCommand *> buildDrawList() override;
 
       private:
+        void invalidate() noexcept;
+
         gui::KeyInputMappedTranslation translator;
     };
 
