@@ -98,7 +98,7 @@ namespace app
             LOG_INFO("ignoring call incoming");
         }
         else {
-            AudioServiceAPI::PlaybackStart(this, ringtone_path);
+            AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
             runCallTimer();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncomingCallData>(msg->number);
             // send to itself message to switch (run) call application

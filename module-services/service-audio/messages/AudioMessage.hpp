@@ -20,11 +20,15 @@
 class AudioMessage : public sys::DataMessage
 {
   public:
-    AudioMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
+    AudioMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType)
+    {}
 
-    virtual ~AudioMessage(){};
+    AudioMessage() : sys::DataMessage(MessageType::MessageTypeUninitialized)
+    {}
 
-    MessageType type;
+    virtual ~AudioMessage() = default;
+
+    MessageType type = MessageType::MessageTypeUninitialized;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -46,6 +50,44 @@ class AudioNotificationMessage : public AudioMessage
     Type type;
 };
 
+class AudioSettingsMessage : public AudioMessage
+{
+  public:
+    AudioSettingsMessage(const audio::Profile::Type &profileType,
+                         const audio::PlaybackType &playbackType,
+                         const uint32_t &val = 0)
+        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, val{val}
+    {}
+
+    ~AudioSettingsMessage() override = default;
+
+    audio::Profile::Type profileType = audio::Profile::Type::Idle;
+    audio::PlaybackType playbackType = audio::PlaybackType::None;
+    uint32_t val{};
+};
+
+class AudioGetSetting : public AudioSettingsMessage
+{
+  public:
+    AudioGetSetting(const audio::Profile::Type &profileType, const audio::PlaybackType &playbackType)
+        : AudioSettingsMessage{profileType, playbackType}
+    {}
+
+    ~AudioGetSetting() override = default;
+};
+
+class AudioSetSetting : public AudioSettingsMessage
+{
+  public:
+    AudioSetSetting(const audio::Profile::Type &profileType,
+                    const audio::PlaybackType &playbackType,
+                    const uint32_t &val)
+        : AudioSettingsMessage{profileType, playbackType, val}
+    {}
+
+    ~AudioSetSetting() override = default;
+};
+
 class AudioRequestMessage : public AudioMessage
 {
   public:
@@ -57,6 +99,7 @@ class AudioRequestMessage : public AudioMessage
     std::string fileName;
     float val;
     bool enable;
+    audio::PlaybackType playbackType = audio::PlaybackType::None;
 };
 
 class AudioResponseMessage : public sys::ResponseMessage

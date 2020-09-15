@@ -13,6 +13,7 @@ namespace audio
       public:
         PlaybackOperation(
             const char *file,
+            const audio::PlaybackType &playbackType,
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
         audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) override final;

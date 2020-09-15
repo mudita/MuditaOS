@@ -21,7 +21,9 @@ namespace audio
     class Operation
     {
       public:
-        Operation(const bool &isInitialized = false) : isInitialized{isInitialized}
+        Operation(const bool &isInitialized               = false,
+                  const audio::PlaybackType &playbackType = audio::PlaybackType::None)
+            : isInitialized{isInitialized}, playbackType{playbackType}
         {}
 
         enum class State
@@ -74,7 +76,8 @@ namespace audio
 
         static std::optional<std::unique_ptr<Operation>> Create(
             Type t,
-            const char *fileName                                                                      = "",
+            const char *fileName                  = "",
+            const audio::PlaybackType &operations = audio::PlaybackType::None,
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
         virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
@@ -113,6 +116,11 @@ namespace audio
             return currentProfile;
         }
 
+        audio::PlaybackType GetplaybackType() const noexcept
+        {
+            return playbackType;
+        }
+
       protected:
         Profile *currentProfile = nullptr;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
@@ -120,6 +128,7 @@ namespace audio
         std::function<int32_t(AudioEvents event)> eventCallback = nullptr;
 
         bool isInitialized = false;
+        audio::PlaybackType playbackType = audio::PlaybackType::None;
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
 
