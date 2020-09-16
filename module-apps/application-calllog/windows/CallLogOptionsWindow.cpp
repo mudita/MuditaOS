@@ -11,7 +11,7 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
 
     std::list<gui::Option> options;
 
-    if (searchResults->empty() || !searchResults->front().isValid() || searchResults->front().isTemporrary()) {
+    if (searchResults->empty() || !searchResults->front().isValid() || searchResults->front().isTemporary()) {
         // add option - add contact
         options.push_back(gui::options::contact(app, app::ContactOperation::Add, searchResults->front()));
     }

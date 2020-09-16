@@ -14,7 +14,7 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
     std::list<gui::Option> options;
 
     options.emplace_back(gui::options::call(app, app::CallOperation::ExecuteCall, contact));
-    auto contactOperation = contact.isTemporrary() ? app::ContactOperation::Add : app::ContactOperation::Details;
+    auto contactOperation = contact.isTemporary() ? app::ContactOperation::Add : app::ContactOperation::Details;
     options.emplace_back(gui::options::contact(app, contactOperation, contact));
 
     if (record->isUnread()) {
