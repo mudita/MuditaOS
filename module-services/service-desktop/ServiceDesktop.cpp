@@ -28,7 +28,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-            LOG_DEBUG("ServiceDesktop::DataReceivedHandler BackupMessage received");
+
             BackupRestore::BackupUserFiles(this);
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -37,7 +37,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::RestoreMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
-            LOG_DEBUG("ServiceDesktop: RestoreMessage received");
+
             BackupRestore::RestoreUserFiles(this);
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -54,11 +54,13 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
     connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
       sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+
       if (updateOsMsg != nullptr && updateOsMsg->messageType == sdesktop::UpdateCheckForUpdateOnce) {
           fs::path file = UpdatePureOS::checkForUpdate();
+
           if (file.has_filename()) {
               /* send info to applicationDesktop that there is an update waiting */
-              LOG_INFO("got message on bus to send update info: %s", file.c_str());
+
               auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateFoundOnBoot, file);
               sys::Bus::SendBroadcast(msgToSend, this);
           }
@@ -66,10 +68,10 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
       if (updateOsMsg != nullptr && updateOsMsg->messageType == sdesktop::UpdateNow) {
           LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
-                    updateOsMsg->updateFile.c_str(),
-                    updateOsMsg->uuid);
+                    updateOsMsg->updateStats.updateFile.c_str(),
+                    updateOsMsg->updateStats.uuid);
 
-          if (updateOS->setUpdateFile(updateOsMsg->updateFile) == updateos::UpdateError::NoError)
+          if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
               updateOS->runUpdate();
       }
       return std::make_shared<sys::ResponseMessage>();
