@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[desktop][gui]` SIM and PUK lock windows
 * `[desktop]` info on how to unlock
 * `[settings]` pin change option in settings main window
 

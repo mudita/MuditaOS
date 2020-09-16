@@ -20,7 +20,9 @@ namespace app
 {
 
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent)
+        : Application(name, parent), screenLock(this, gui::PinLock::LockType::Screen),
+          simLock(this, gui::PinLock::LockType::SIM1, gui::PinLock::State::EnterPin),
+          pukLock(this, gui::PinLock::LockType::PUK, gui::PinLock::State::VerifiedPin)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
@@ -117,7 +119,7 @@ namespace app
     {
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
-            if (need_sim_select && !screenLocked) {
+            if (need_sim_select && !screenLock.isLocked()) {
                 sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
             }
@@ -185,8 +187,6 @@ namespace app
             return ret;
         }
 
-        screenLocked = true;
-
         reloadSettings();
         requestNotReadNotifications();
         requestNotSeenNotifications();
@@ -208,26 +208,16 @@ namespace app
     {
         using namespace app::window::name;
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_main_window, new gui::DesktopMainWindow(this)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_pin_lock, new gui::PinLockWindow(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            desktop_pin_lock, new gui::PinLockWindow(this, desktop_pin_lock, &screenLock)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            desktop_sim_lock, new gui::PinLockWindow(this, desktop_sim_lock, &simLock)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            desktop_puk_lock, new gui::PinLockWindow(this, desktop_puk_lock, &pukLock)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_menu, new gui::MenuWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_poweroff, new gui::PowerOffWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_reboot, new gui::RebootWindow(this)));
     }
-
-    bool ApplicationDesktop::getScreenLocked()
-    {
-        return screenLocked;
-    }
-
-    bool ApplicationDesktop::getPinLocked()
-    {
-        return pinLocked;
-    }
-
-    void ApplicationDesktop::setScreenLocked(bool val)
-    {
-        screenLocked = val;
-    };
 
     void ApplicationDesktop::destroyUserInterface()
     {}
@@ -236,7 +226,8 @@ namespace app
     {
         settings = DBServiceAPI::SettingsGet(this);
 
-        pinLocked = settings.lockPassHash != 0;
+        screenLock.info.pinSize = settings.lockPassHash == 0 ? 0 : 4;
+        screenLock.reset(gui::PinLock::State::EnterPin);
 
         switch (settings.activeSIM) {
         case SettingsRecord::ActiveSim::NONE:

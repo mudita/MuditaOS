@@ -1,6 +1,7 @@
 #pragma once
 
 #include "windows/Names.hpp"
+#include "widgets/PinLock.hpp"
 
 #include <Application.hpp>
 #include <Service/Message.hpp>
@@ -15,9 +16,6 @@ namespace app
     class ApplicationDesktop : public Application
     {
       protected:
-        // determines whether screen should be protected by pin verification
-        bool screenLocked = true;
-        bool pinLocked    = false;
         void reloadSettings();
 
       public:
@@ -40,6 +38,10 @@ namespace app
 
         } notifications;
 
+        gui::PinLock screenLock;
+        gui::PinLock simLock;
+        gui::PinLock pukLock;
+
         ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
         virtual ~ApplicationDesktop();
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -53,9 +55,6 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-        bool getScreenLocked();
-        void setScreenLocked(bool val);
-        bool getPinLocked();
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
         // done
         bool handle(db::NotificationMessage *msg);

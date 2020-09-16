@@ -3,43 +3,25 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
-
+#include "../widgets/PinLock.hpp"
+#include "../widgets/PinLockBox.hpp"
+#include "PinLockBaseWindow.hpp"
 namespace gui
 {
 
-    class PinLockWindow : public AppWindow
+    class PinLockWindow : public PinLockBaseWindow
     {
-        const uint32_t maxPasswordAttempts = 4;
-        enum class State
-        {
-            EnteringPin,
-            WrongPinInfo,
-            PhoneBlocked,
-            SimpleUnlock, /// when there is no pin -> use this
-            ShowPrompt,   /// when wrong key instead/after enter -> show prompt
-        };
-
-        gui::Label *titleLabel = nullptr;
-        std::vector<gui::Label *> infoLabels;
-        std::vector<gui::Label *> pinLabels;
-        gui::Image *lockImage      = nullptr;
-        gui::Image *infoImage      = nullptr;
-        uint32_t remainingAttempts = maxPasswordAttempts;
-        // code of the entered character on specified position
-        uint32_t charValue[4] = {0};
-        // flag defines number of entered characters
-        uint32_t charCount = 0;
-        // state of the window
-        State state = State::EnteringPin;
-
-        std::string lockTimeoutApplilcation = "";
+        const std::string this_window_name;
+        std::string lockTimeoutApplication  = "";
+        std::unique_ptr<PinLockBox> LockBox = nullptr;
 
         // method hides or show widgets and sets bars according to provided state
-        void setVisibleState(const State &state);
-        bool isPinValid();
+        void setVisibleState(const PinLock::State state);
+        void makePinLockBox();
+        void invalidate() noexcept;
 
       public:
-        PinLockWindow(app::Application *app);
+        PinLockWindow(app::Application *app, const std::string &window_name, PinLock *Lock);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 

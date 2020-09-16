@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../ApplicationDesktop.hpp"
 #include "AppWindow.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
@@ -8,6 +7,11 @@
 #include "gui/widgets/Text.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
+
+namespace app
+{
+    class ApplicationDesktop;
+}
 
 namespace gui
 {
@@ -61,6 +65,12 @@ namespace gui
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
         auto fillNotifications(app::ApplicationDesktop *app) -> bool;
+        bool processLongPressEvent(const InputEvent &inputEvent);
+        bool processShortPressEventOnUnlocked(const InputEvent &inputEvent);
+        bool processShortPressEventOnLocked(const InputEvent &inputEvent, const std::string &nextWindow);
+        void updateLocksState();
+        std::string getNextWindowName() const;
+        app::ApplicationDesktop *getAppDesktop() const;
 
       public:
         DesktopMainWindow(app::Application *app);
