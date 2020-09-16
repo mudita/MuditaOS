@@ -19,7 +19,7 @@ namespace gui
         VBox *vBox                                   = nullptr;
         Label *titleLabel                            = nullptr;
         NumberWithIconsWidget *primaryNumberHBox     = nullptr;
-        NumberWithIconsWidget *alternativeNumberHBox = nullptr;
+        NumberWithIconsWidget *secondNumberHBox      = nullptr;
         Text *emailText                              = nullptr;
         Item *savedFocusItem                         = nullptr;
     };

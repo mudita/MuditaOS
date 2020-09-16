@@ -75,3 +75,76 @@ TEST_CASE("toNumeric tests")
     REQUIRE(ret == true);
     REQUIRE(value == 2);
 }
+
+TEST_CASE("findAndReplaceAll tests")
+{
+    // helper lambda
+    auto compare = [](std::string &data, std::string &expected, bool &retVal) {
+        if (data.compare(expected)) {
+            std::cout << "Expected:" << std::endl
+                      << "\t" << expected << std::endl
+                      << "But is:" << std::endl
+                      << "\t" << data << std::endl;
+            retVal = false;
+        }
+    };
+
+    // test findAndReplaceAll with different data combinations
+    enum
+    {
+        eTestString,
+        eToSearch,
+        eReplace,
+        eExpected
+    };
+    std::vector<std::vector<std::string>> testValues = {
+        // multiple replacements
+        {"%T TT %T TT %t %T", "%T", "test", "test TT test TT %t test"},
+        {"%T TT %T TT %t %T", "%t", "test", "%T TT %T TT test %T"},
+        // capital letter test
+        {"%T TT %T TT %T %T", "%t", "test", "%T TT %T TT %T %T"},
+        // empty test string
+        {"", "%t", "test", ""},
+        // no match
+        {"TEST", "%t", "test", "TEST"},
+        // empty match string
+        {"TEST", "", "test", "TEST"},
+        // empty test string and match string
+        {"", "", "test", ""},
+        // empty test, match and replace
+        {"", "", "", ""},
+        // empty replace string
+        {"%T TT %T TT %T %T", " ", "", "%TTT%TTT%T%T"},
+    };
+
+    std::string testString;
+    bool retVal = true;
+
+    for (auto &testCase : testValues) {
+        testString = testCase[eTestString];
+        utils::findAndReplaceAll(testString, testCase[eToSearch], testCase[eReplace]);
+        compare(testString, testCase[eExpected], retVal);
+    }
+
+    // test findAndReplaceAll with replacement function
+    std::string testFormat, expectedFormat;
+    std::vector<std::string> testValuesFunc = {"A", "B", "C", "D"};
+    // test helper lambdas
+    auto toLower     = [](unsigned char c) { return std::tolower(c); };
+    auto replaceFunc = [&](int idx) { return std::string(1, toLower(testValuesFunc[idx][0])); };
+
+    // create test format
+    for (const auto &ch : testValuesFunc) {
+        testFormat += ch;
+    }
+    // create expected result
+    expectedFormat = testFormat;
+    std::transform(expectedFormat.begin(), expectedFormat.end(), expectedFormat.begin(), [toLower](unsigned char c) {
+        return toLower(c);
+    });
+
+    utils::findAndReplaceAll(testFormat, testValuesFunc, replaceFunc);
+    compare(testFormat, expectedFormat, retVal);
+
+    REQUIRE(retVal == true);
+}

@@ -31,8 +31,12 @@
 	url = https://github.com/catchorg/Catch2
 [submodule "module-utils/date"]
 	path = module-utils/date
-	url = git@github.com:muditacom/date.git
+	url = ../date.git
 [submodule "module-audio/Audio/decoder/minimp3"]
 	path = module-audio/Audio/decoder/minimp3
-	url = git@github.com:mudita/minimp3.git
+	url = ../minimp3.git
     branch = RT1051
+[submodule "module-audio/Audio/decoder/taglib"]
+	path = module-audio/Audio/decoder/taglib
+	url = ../taglib.git
+	branch = rt1051

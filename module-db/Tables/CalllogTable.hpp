@@ -43,7 +43,7 @@ struct CalllogTableRow : public Record
     time_t duration               = 0;
     CallType type                 = CallType::CT_NONE;
     UTF8 name;
-    UTF8 contactId;
+    uint32_t contactId = 0;
     bool isRead = true;
 };
 
@@ -74,6 +74,8 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
                                                        CalllogTableFields field,
                                                        const char *str) override final;
 
+    std::vector<CalllogTableRow> getByContactId(uint32_t id);
+
     uint32_t count() override final;
     uint32_t count(EntryState state);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
@@ -89,6 +91,6 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
                                    "duration INTEGER DEFAULT 0,"
                                    "type INTEGER DEFAULT 0,"
                                    "name TEXT DEFAULT '',"
-                                   "contactId TEXT DEFAULT '',"
+                                   "contactId INTEGER DEFAULT 0,"
                                    "isRead INTEGER DEFAULT 1)";
 };

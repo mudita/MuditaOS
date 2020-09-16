@@ -11,7 +11,7 @@ namespace phonebookInternals
         FirstName,
         SecondName,
         Number,
-        OtherNumber,
+        SecondNumber,
         Email,
         SpeedDialKey,
         AddToFavourites,

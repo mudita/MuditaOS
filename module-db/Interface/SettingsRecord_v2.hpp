@@ -3,11 +3,19 @@
 #include "Databases/SettingsDB.hpp"
 #include "Record.hpp"
 
+#include <memory>
+#include <sstream>
+#include <string>
+
 // fw declarations
 namespace db::query::settings
 {
     class SettingsQuery;
     class SettingsResult;
+    class AddOrIgnoreQuery;
+    class AddOrIgnoreResult;
+    class UpdateQuery;
+    class UpdateResult;
 } // namespace db::query::settings
 
 class SettingsRecord_v2 : public Record
@@ -24,8 +32,11 @@ class SettingsRecord_v2 : public Record
         return path;
     }
 
-    template <typename T>[[nodiscard]] auto getValue() const -> T
+    template <typename T>[[nodiscard]] auto getValue(const T &defaultValue = {}) const -> T
     {
+        if (value.empty()) {
+            return defaultValue;
+        }
         T ret;
         std::istringstream(value) >> ret;
         return ret;
@@ -55,6 +66,7 @@ class SettingsRecordInterface_v2 : public RecordInterface<SettingsRecord_v2, Set
     uint32_t GetCount() override final;
     bool RemoveByID(uint32_t id) override final;
     bool Update(const SettingsRecord_v2 &recUpdated) override final;
+    bool Update(const std::string &path, const std::string &value) noexcept;
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:

@@ -12,7 +12,7 @@
 namespace audio
 {
 
-    decoderWAV::decoderWAV(const char *fileName) : decoder(fileName), tag(std::make_unique<Tags>())
+    decoderWAV::decoderWAV(const char *fileName) : decoder(fileName)
     {
 
         if (fileSize == 0) {
@@ -30,33 +30,11 @@ namespace audio
         // TODO:M.P; implement support for sample size different than 16bit
         // pcmsamplesbuffer.reserve(1024);
 
-        tag->total_duration_s = (fileSize - sizeof(WAVE_FormatTypeDef)) / waveHeader.ByteRate;
-        tag->duration_min     = tag->total_duration_s / 60;
-        tag->duration_hour    = tag->duration_min / 60;
-        tag->duration_sec     = tag->total_duration_s % 60;
-        tag->sample_rate      = waveHeader.SampleRate;
-        tag->num_channel      = waveHeader.NbrChannels;
-
         sampleRate    = waveHeader.SampleRate;
         bitsPerSample = waveHeader.BitPerSample;
         chanNumber    = waveHeader.NbrChannels;
 
         isInitialized = true;
-    }
-
-    std::unique_ptr<Tags> decoderWAV::fetchTags()
-    {
-
-        tag->filePath.append(filePath);
-        auto pos = filePath.rfind("/");
-        if (pos == std::string::npos) {
-            tag->title.append(filePath);
-        }
-        else {
-            tag->title.append(&filePath[pos + 1]);
-        }
-
-        return std::make_unique<Tags>(*tag);
     }
 
     uint32_t decoderWAV::decode(uint32_t samplesToRead, int16_t *pcmData)

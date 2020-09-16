@@ -5,6 +5,7 @@
 
 #include <ContactRecord.hpp>
 #include <module-utils/i18/i18.hpp>
+#include <utility>
 
 namespace gui
 {
@@ -12,8 +13,9 @@ namespace gui
                                                            std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                                            std::function<void()> bottomBarRestoreFromTemporaryMode,
                                                            std::function<void()> selectSpecialCharacter,
+                                                           std::function<void()> contentChanged,
                                                            unsigned int lines)
-        : listItemName(listItemName)
+        : listItemName(listItemName), checkTextContent(std::move(contentChanged))
     {
         setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
                        phonebookStyle::inputLinesWithLabelWidget::title_label_h +
@@ -68,7 +70,11 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](Item &item, const InputEvent &event) { return inputText->onInput(event); };
+        inputCallback = [&](Item &item, const InputEvent &event) {
+            auto result = inputText->onInput(event);
+            checkTextContent();
+            return result;
+        };
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
@@ -95,8 +101,8 @@ namespace gui
             numberHandler();
             break;
 
-        case phonebookInternals::ListItemName::OtherNumber:
-            otherNumberHandler();
+        case phonebookInternals::ListItemName::SecondNumber:
+            secondNumberHandler();
             break;
 
         case phonebookInternals::ListItemName::Email:
@@ -123,6 +129,7 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
+        onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
     void InputLinesWithLabelIWidget::secondNameHandler()
     {
@@ -133,10 +140,11 @@ namespace gui
             contact->alternativeName = inputText->getText();
         };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->alternativeName); };
+        onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
     void InputLinesWithLabelIWidget::numberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_1"));
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number"));
         inputText->setTextType(TextType::SINGLE_LINE);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
@@ -151,10 +159,11 @@ namespace gui
                 inputText->setText(contact->numbers[0].number.getEntered());
             }
         };
+        onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
-    void InputLinesWithLabelIWidget::otherNumberHandler()
+    void InputLinesWithLabelIWidget::secondNumberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number_2"));
+        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_number"));
         inputText->setTextType(TextType::SINGLE_LINE);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
@@ -169,6 +178,7 @@ namespace gui
                 inputText->setText(contact->numbers[1].number.getEntered());
             }
         };
+        onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
     void InputLinesWithLabelIWidget::emailHandler()
     {
@@ -177,6 +187,7 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
+        onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
     void InputLinesWithLabelIWidget::addressHandler()
     {

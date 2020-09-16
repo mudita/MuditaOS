@@ -33,7 +33,7 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(testRow.duration == 0);
         REQUIRE(testRow.type == CallType::CT_NONE);
         REQUIRE(testRow.name == "");
-        REQUIRE(testRow.contactId == "");
+        REQUIRE(testRow.contactId == 0);
         REQUIRE(testRow.isRead == true);
     }
 
@@ -45,7 +45,7 @@ TEST_CASE("Calllog Table tests")
                                .duration     = 100,
                                .type         = CallType::CT_INCOMING,
                                .name         = "Test name",
-                               .contactId    = "1",
+                               .contactId    = 1,
                                .isRead       = false};
 
     // add 4 elements into table
@@ -100,7 +100,7 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(callEntry.duration == 0);
         REQUIRE(callEntry.type == CallType::CT_NONE);
         REQUIRE(callEntry.name == "");
-        REQUIRE(callEntry.contactId == "");
+        REQUIRE(callEntry.contactId == 0);
         REQUIRE(callEntry.isRead == true);
     }
 

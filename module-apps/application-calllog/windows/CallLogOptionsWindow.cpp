@@ -7,11 +7,11 @@
 
 std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const CalllogRecord &record)
 {
-    auto searchResults = DBServiceAPI::ContactGetByID(app, record.getContactId());
+    auto searchResults = DBServiceAPI::ContactGetByIDWithTemporary(app, record.getContactId());
 
     std::list<gui::Option> options;
 
-    if (searchResults.get()->empty() || searchResults->front().contactType == ContactType::TEMPORARY) {
+    if (searchResults->empty() || !searchResults->front().isValid() || searchResults->front().isTemporary()) {
         // add option - add contact
         options.push_back(gui::options::contact(app, app::ContactOperation::Add, searchResults->front()));
     }

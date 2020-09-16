@@ -153,7 +153,9 @@ namespace AudioServiceAPI
             std::make_shared<AudioRequestMessage>(MessageType::AudioGetOutputVolume);
 
         auto resp = SendAudioRequest(serv, msg);
-        vol       = resp->retCode == audio::RetCode::Success ? resp->val : invalidVolume;
+        if (resp->retCode == RetCode::Success) {
+            vol = resp->val;
+        }
 
         return resp->retCode;
     }

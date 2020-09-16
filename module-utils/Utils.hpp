@@ -8,6 +8,8 @@
 namespace utils
 {
     static const std::string WHITESPACE = " \n\r\t\f\v";
+    constexpr unsigned int secondsInMinute =
+        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
 
     template <typename Out> void split(const std::string &s, char delim, Out result)
     {
@@ -89,14 +91,57 @@ namespace utils
         return ss.str();
     }
 
-    static inline void findAndReplaceAll(std::string &data, std::string toSearch, std::string replaceStr)
+    static inline void findAndReplaceAll(std::string &data,
+                                         const std::vector<std::pair<std::string, std::optional<std::string>>> &values,
+                                         std::function<std::string(int)> getReplaceString = nullptr)
     {
-        size_t pos = data.find(toSearch);
-        while (pos != std::string::npos) {
-            data.replace(pos, toSearch.size(), replaceStr);
-            pos = data.find(toSearch, pos + replaceStr.size());
+        int valIdx = 0;
+        for (auto &el : values) {
+            std::string preStr, replaceStr, postStr;
+            const std::string &toSearch = el.first;
+
+            if (toSearch.empty()) {
+                continue;
+            }
+
+            auto begin_pos = data.begin();
+            auto found_pos = data.begin();
+            while (found_pos != data.end()) {
+                begin_pos = data.begin();
+                found_pos = std::search(begin_pos, data.end(), toSearch.begin(), toSearch.end());
+                if (found_pos != data.end()) {
+                    preStr = std::string(begin_pos, found_pos);
+                    if (replaceStr.empty() && el.second) {
+                        replaceStr = *el.second;
+                    }
+                    else if (replaceStr.empty() && getReplaceString) {
+                        replaceStr = getReplaceString(valIdx);
+                    }
+                    postStr.assign(found_pos + toSearch.size(), data.end());
+                    data = preStr + replaceStr + postStr;
+                }
+            }
+            valIdx++;
         }
     }
+
+    static inline void findAndReplaceAll(std::string &data,
+                                         const std::vector<std::string> &values,
+                                         std::function<std::string(int)> getReplaceString)
+    {
+        std::vector<std::pair<std::string, std::optional<std::string>>> valuePairs;
+        valuePairs.reserve(values.size());
+        for (auto val : values) {
+            valuePairs.emplace_back(std::make_pair(val, std::nullopt));
+        }
+        findAndReplaceAll(data, valuePairs, getReplaceString);
+    }
+
+    static inline void findAndReplaceAll(std::string &data, const std::string &toSearch, const std::string &replaceStr)
+    {
+        findAndReplaceAll(data, {{toSearch, replaceStr}});
+    }
+
     static inline bool toNumeric(const std::string &text, uint32_t &value)
     {
         try {

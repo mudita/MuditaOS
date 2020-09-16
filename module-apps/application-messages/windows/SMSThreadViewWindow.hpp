@@ -1,21 +1,22 @@
 #pragma once
 
+#include <AppWindow.hpp>
+#include <application-messages/widgets/SMSInputWidget.hpp>
+#include <gui/widgets/BoxLayout.hpp>
+#include <gui/widgets/Image.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/Window.hpp>
+#include <ListView.hpp>
+#include <PhoneNumber.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <Text.hpp>
+
 #include <functional>
 #include <string>
 
-#include "AppWindow.hpp"
-#include "ListView.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <Text.hpp>
-#include <gui/widgets/BoxLayout.hpp>
-#include "application-messages/widgets/SMSInputWidget.hpp"
-
 namespace gui
 {
-    class ThreadViewWindow : public AppWindow
+    class SMSThreadViewWindow : public AppWindow
     {
       private:
         gui::VBox *body         = nullptr;
@@ -38,6 +39,7 @@ namespace gui
         const ssize_t maxsmsinwindow = 7;
 
         std::shared_ptr<ContactRecord> contact;
+        std::unique_ptr<utils::PhoneNumber::View> number;
 
         struct
         {
@@ -48,12 +50,13 @@ namespace gui
             std::unique_ptr<std::vector<SMSRecord>> sms = nullptr; // loaded sms from db
         } SMS;
 
-        gui::SMSInputWidget *inputMessage = nullptr;
+        gui::SMSInputWidget *inputMessage                 = nullptr;
+        inline static const std::uint32_t numberIdTimeout = 1000;
 
       public:
-        ThreadViewWindow(app::Application *app);
+        SMSThreadViewWindow(app::Application *app);
 
-        virtual ~ThreadViewWindow();
+        virtual ~SMSThreadViewWindow();
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
 

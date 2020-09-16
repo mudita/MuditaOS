@@ -5,6 +5,9 @@
 #include "Database/Database.hpp"
 #include "Databases/SettingsDB.hpp"
 #include "Interface/SettingsRecord_v2.hpp"
+#include "module-db/queries/settings/QuerySettingsAddOrIgnore_v2.hpp"
+#include "module-db/queries/settings/QuerySettingsGet_v2.hpp"
+#include "module-db/queries/settings/QuerySettingsUpdate_v2.hpp"
 
 #include <algorithm>
 
@@ -123,6 +126,63 @@ TEST_CASE("Settings Record version 2 tests")
             REQUIRE(settingsRecordInterface.RemoveByID(2));
 
             REQUIRE(settingsRecordInterface.GetCount() == 0);
+        }
+    }
+
+    const auto addSettingsItem = [&](const std::string &path, const std::string &value) {
+        auto query = std::make_shared<db::query::settings::AddOrIgnoreQuery>(
+            SettingsRecord_v2{SettingsTableRow_v2{{.ID = DB_ID_NONE}, .path = path, .value = value}});
+        auto ret    = settingsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::settings::AddOrIgnoreResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto resultVal = result->getValue();
+        REQUIRE(resultVal == true);
+    };
+
+    const auto getSettingsItem = [&](const std::string &path) {
+        auto query  = std::make_shared<db::query::settings::SettingsQuery>(path);
+        auto ret    = settingsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::settings::SettingsResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto entry = result->getResult();
+        REQUIRE(entry.isValid());
+        REQUIRE(entry.getPath() == path);
+        return entry;
+    };
+
+    const auto updateSettingsItem = [&](const std::string &dbPath, const std::string &volume) {
+        auto query = std::make_shared<db::query::settings::UpdateQuery>(
+            SettingsRecord_v2({{.ID = DB_ID_NONE}, .path = dbPath, .value = volume}));
+        auto ret    = settingsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::settings::UpdateResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto resultVal = result->getValue();
+        REQUIRE(resultVal == true);
+    };
+
+    SECTION("Add, get, update via query")
+    {
+        // Add items
+        REQUIRE(settingsRecordInterface.GetCount() == 0);
+        addSettingsItem("pure/Test", "1");
+        addSettingsItem("pure/Test/two", "123");
+        REQUIRE(settingsRecordInterface.GetCount() == 2);
+
+        SECTION("Get items via query")
+        {
+            auto entry = getSettingsItem("pure/Test");
+            REQUIRE(entry.getValue<std::string>("") == "1");
+            entry = getSettingsItem("pure/Test/two");
+            REQUIRE(entry.getValue<std::string>("") == "123");
+        }
+        SECTION("Update and get items via query")
+        {
+            updateSettingsItem("pure/Test", "2");
+            auto entry = getSettingsItem("pure/Test");
+            REQUIRE(entry.getValue<std::string>("") == "2");
+            updateSettingsItem("pure/Test/two", "test");
+            entry = getSettingsItem("pure/Test/two");
+            REQUIRE(entry.getValue<std::string>("") == "test");
         }
     }
 

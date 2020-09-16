@@ -228,7 +228,7 @@ namespace app
             shutdownInProgress = true;
         };
 
-        bool adjustCurrentVolume(const audio::Volume step);
+        bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {
             return adjustCurrentVolume(step);

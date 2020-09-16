@@ -8,13 +8,13 @@
 
 #include <vector>
 
-class BaseThreadRecordModel : public app::DatabaseModel<ThreadRecord>,
-                              public gui::ListItemProvider,
-                              public db::QueryListener
+class BaseThreadsRecordModel : public app::DatabaseModel<ThreadRecord>,
+                               public gui::ListItemProvider,
+                               public db::QueryListener
 {
   public:
-    BaseThreadRecordModel() = delete;
-    BaseThreadRecordModel(app::Application *app);
+    BaseThreadsRecordModel() = delete;
+    BaseThreadsRecordModel(app::Application *app);
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records) override;

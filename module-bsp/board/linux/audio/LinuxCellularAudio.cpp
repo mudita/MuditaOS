@@ -102,8 +102,9 @@ namespace bsp
 
         if (inputBuffer) {
             int16_t *pBuff = reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer));
-            std::transform(pBuff, pBuff + framesToFetch, pBuff, [ptr](int16_t c) -> int16_t {
-                return (float)c * ptr->currentFormat.inputGain;
+            constexpr float scaleFactor = .1f;
+            std::transform(pBuff, pBuff + framesToFetch, pBuff, [ptr, &scaleFactor](int16_t c) -> int16_t {
+                return static_cast<float>(c * ptr->currentFormat.inputGain * scaleFactor);
             });
         }
 
@@ -117,8 +118,9 @@ namespace bsp
             // Scale output buffer
             if (outputBuffer) {
                 int16_t *pBuff = reinterpret_cast<int16_t *>(outputBuffer);
+                constexpr float scaleFactor = .1f;
                 std::transform(pBuff, pBuff + framesToFetch, pBuff, [ptr](int16_t c) -> int16_t {
-                    return (float)c * ptr->currentFormat.outputVolume;
+                    return static_cast<float>(c * ptr->currentFormat.outputVolume / 10.f);
                 });
             }
             return paContinue;

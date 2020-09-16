@@ -3,18 +3,43 @@
 ## [Current release]
 
 ### Added
-* `[phonebook]` NoName contacts at the end of contacts list.
+
+* `[desktop]` info on how to unlock
+* `[settings]` pin change option in settings main window
+* `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
 
 ### Changed
 
+* `[phonebook]` Replace vCard encoding with plain text for exporting contact data.
+
 ### Fixed
 
-* `[desktopApp]` Fixed endpoint handling.
+* `[gui]` Fixed notifications display on unlocked screen.
+* `[audio]` `[music player]` Fixed audio files meta tags parsing
+
+## [0.37.1 2020-09-11]
+
+### Added
+
+* `[audio]` Add storing and updating audio settings in database.
+
+### Changed
+
+* `[listview]` List returns to previously focused element on CRUD notifications (messages and phonebook).
+* `[messages]` Use different thread for each of contact's number.
+* `[phonebook]` Sort list of contacts by first name if there is no second name.
+* `[phonebook]` Unnamed contacts at the end of contacts list.
+* `[phonebook]` Change name of alternative/other number to second number.
+
+### Fixed
+
+* `[desktop]` Fixed endpoint handling.
+* `[database]` Fixed boot error caused by new settings table.
+* `[phonebook]` Fix speed dial number conflict resolution.
 
 ### Other
-* `[desktopApp]` Added functional tests.
 
-
+* `[desktop]` Added functional tests.
 
 ## [0.36.1 2020-09-04]
 
@@ -334,3 +359,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+

@@ -988,7 +988,17 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             LOG_INFO("Invalid csq - ignore");
         }
         else {
-            SignalStrength signalStrength(std::stoi(qind.tokens[at::urc::QIND::RSSI]));
+            auto token_val = 0;
+            try {
+                token_val = std::stoi(qind.tokens[at::urc::QIND::RSSI]);
+            }
+            catch (const std::exception &e) {
+                LOG_ERROR("Conversion error of %s, taking default value %d",
+                          qind.tokens[at::urc::QIND::RSSI].c_str(),
+                          token_val);
+            }
+
+            SignalStrength signalStrength(token_val);
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 return std::make_shared<CellularNotificationMessage>(

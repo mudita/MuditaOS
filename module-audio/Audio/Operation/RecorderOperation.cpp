@@ -26,7 +26,8 @@ namespace audio
 
     using namespace bsp;
 
-    RecorderOperation::RecorderOperation(const char *file)
+    RecorderOperation::RecorderOperation(
+        const char *file, std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
     {
 
         audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
@@ -47,9 +48,19 @@ namespace audio
             return ret;
         };
 
-        // TODO:M.P should be fetched from DB
-        availableProfiles.push_back(std::make_unique<ProfileRecordingOnBoardMic>(nullptr, 20.0));
-        availableProfiles.push_back(std::make_unique<ProfileRecordingHeadset>(nullptr, 10.0));
+        constexpr audio::Gain defaultRecordingOnBoardMicGain = 200;
+        constexpr audio::Gain defaultRecordingHeadsetGain    = 100;
+
+        const auto dbRecordingOnBoardMicGainPath =
+            audio::str(audio::Profile::Type::RecordingBuiltInMic, audio::ProfileSetup::Gain);
+        const auto recordingOnBoardMicGain = dbCallback(dbRecordingOnBoardMicGainPath, defaultRecordingOnBoardMicGain);
+
+        const auto dbRecordingHeadsetGainPath =
+            audio::str(audio::Profile::Type::RecordingHeadset, audio::ProfileSetup::Gain);
+        const auto recordingHeadsetGain = dbCallback(dbRecordingHeadsetGainPath, defaultRecordingHeadsetGain);
+
+        availableProfiles.push_back(std::make_unique<ProfileRecordingOnBoardMic>(nullptr, recordingOnBoardMicGain));
+        availableProfiles.push_back(std::make_unique<ProfileRecordingHeadset>(nullptr, recordingHeadsetGain));
 
         currentProfile = availableProfiles[0].get();
 

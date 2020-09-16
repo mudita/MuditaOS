@@ -117,6 +117,9 @@ namespace app
     auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
     {
         assert(msg);
+        if (msg->interface == db::Interface::Name::Settings) {
+            reloadSettings();
+        }
 
         if (msg->interface == db::Interface::Name::Notifications && msg->type == db::Query::Type::Update) {
             return requestNotSeenNotifications();
@@ -199,31 +202,14 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationDesktop::InitHandler()
     {
-
         auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
-
-        // if value of the pin hash is different than 0 it means that home screen is pin protected
-        if (settings.lockPassHash != 0) {
-            pinLocked = true;
-        }
-
-        switch (settings.activeSIM) {
-        case SettingsRecord::ActiveSim::NONE:
-            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-            need_sim_select             = true;
-            break;
-        case SettingsRecord::ActiveSim::SIM1:
-            Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
-            break;
-        case SettingsRecord::ActiveSim::SIM2:
-            Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
-            break;
         }
 
         screenLocked = true;
 
+        reloadSettings();
         requestNotReadNotifications();
         requestNotSeenNotifications();
 
@@ -255,7 +241,7 @@ namespace app
         auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateCheckForUpdateOnce);
         sys::Bus::SendBroadcast(msgToSend, this);
 
-        return ret;
+        return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ApplicationDesktop::DeinitHandler()
@@ -292,4 +278,24 @@ namespace app
 
     void ApplicationDesktop::destroyUserInterface()
     {}
+
+    void ApplicationDesktop::reloadSettings()
+    {
+        settings = DBServiceAPI::SettingsGet(this);
+
+        pinLocked = settings.lockPassHash != 0;
+
+        switch (settings.activeSIM) {
+        case SettingsRecord::ActiveSim::NONE:
+            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+            need_sim_select             = true;
+            break;
+        case SettingsRecord::ActiveSim::SIM1:
+            Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+            break;
+        case SettingsRecord::ActiveSim::SIM2:
+            Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
+            break;
+        }
+    }
 } // namespace app
