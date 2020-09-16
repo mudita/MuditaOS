@@ -4,9 +4,11 @@
 #include "Record.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
+#include <module-apps/application-phonebook/data/ContactsMap.hpp>
 
 #include <string>
 #include <vector>
+#include <map>
 
 struct ContactsTableRow : public Record
 {
@@ -77,6 +79,11 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
                                                    std::uint32_t groupId,
                                                    std::uint32_t limit  = 0,
                                                    std::uint32_t offset = 0);
+
+    std::vector<std::uint32_t> GetIDsSortedByName(std::uint32_t limit = 0, std::uint32_t offset = 0);
+
+    ContactsMapData GetPosOfFirstLetters();
+    std::string GetSortedByNameQueryString(std::uint32_t limit = 0, std::uint32_t offset = 0);
 
   private:
     const char *createTableQuery =
