@@ -62,7 +62,7 @@ struct ContactRecord : public Record
 
     inline auto getFormattedName(const NameFormatType type = NameFormatType::Default) const -> UTF8
     {
-        if (isTemporrary()) {
+        if (isTemporary()) {
             LOG_DEBUG("temporary contact, numer as name: '%s'", getNumberAsName().c_str());
             return getNumberAsName();
         }
@@ -90,7 +90,7 @@ struct ContactRecord : public Record
     [[nodiscard]] bool isOnIce() const;
     [[nodiscard]] bool isOnBlocked() const;
     [[nodiscard]] bool isOnGroup(uint32_t groupId) const;
-    [[nodiscard]] bool isTemporrary() const;
+    [[nodiscard]] bool isTemporary() const;
 };
 
 enum class ContactRecordField

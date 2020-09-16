@@ -1068,7 +1068,7 @@ bool ContactRecord::isOnGroup(uint32_t groupId) const
     return groups.find(groupId) != groups.end();
 }
 
-bool ContactRecord::isTemporrary() const
+bool ContactRecord::isTemporary() const
 {
     return isOnGroup(ContactsDB::temporaryGroupId());
 }
