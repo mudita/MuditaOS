@@ -92,7 +92,7 @@ namespace gui
             contactAction = ContactAction::Add;
             setSaveButtonVisible(false);
         }
-        else if (contact->isTemporrary()) {
+        else if (contact->isTemporary()) {
             contactAction = ContactAction::EditTemporary;
         }
         else {
@@ -120,7 +120,7 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
             LOG_DEBUG("Enter pressed!");
-            if (!contact->isTemporrary()) {
+            if (!contact->isTemporary()) {
                 auto tmpId  = contact->ID;
                 contact     = std::make_shared<ContactRecord>();
                 contact->ID = tmpId;
@@ -141,7 +141,7 @@ namespace gui
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
         LOG_DEBUG("%s", __FUNCTION__);
-        if (!contact->isTemporrary()) {
+        if (!contact->isTemporary()) {
             auto err = DBServiceAPI::verifyContact(application, *contact);
             LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
             switch (err) {
