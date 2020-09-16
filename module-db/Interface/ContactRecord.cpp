@@ -132,6 +132,9 @@ auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::
     if (typeid(*query) == typeid(db::query::ContactGet)) {
         return getQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::ContactGetLetterMap)) {
+        return getLetterMapQuery(query);
+    }
     else if (typeid(*query) == typeid(db::query::ContactGetByID)) {
         return getByIDQuery(query);
     }
@@ -182,14 +185,28 @@ auto ContactRecordInterface::getQuery(std::shared_ptr<db::Query> query) -> std::
     }
     LOG_DEBUG("Contact match Type: %lu", static_cast<unsigned long int>(matchType));
 
-    auto ids = contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
+    std::vector<std::uint32_t> ids;
 
+    if (readQuery->getContactDisplayMode() == static_cast<uint32_t>(ContactDisplayMode::Regular)) {
+        ids = contactDB->contacts.GetIDsSortedByField(matchType, readQuery->getFilterData(), groupID, limit, offset);
+    }
+    else {
+        ids = contactDB->contacts.GetIDsSortedByName(limit, offset);
+    }
     LOG_DEBUG("Received records: %lu", static_cast<unsigned long int>(ids.size()));
 
     std::vector<ContactRecord> result(ids.size());
     std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
 
     auto response = std::make_unique<db::query::ContactGetResult>(result);
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto ContactRecordInterface::getLetterMapQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+{
+    ContactsMapData result = contactDB->contacts.GetPosOfFirstLetters();
+    auto response          = std::make_unique<db::query::ContactGetLetterMapResult>(result);
     response->setRequestQuery(query);
     return response;
 }
@@ -224,15 +241,28 @@ auto ContactRecordInterface::getSizeQuery(std::shared_ptr<db::Query> query) -> s
                         .size();
         }
         else {
-            count = contactDB->contacts.count();
+            if (countQuery->getContactDisplayMode() == static_cast<uint32_t>(ContactDisplayMode::Regular)) {
+                count = contactDB->contacts.count();
+            }
+            else {
+                count = contactDB->contacts.GetIDsSortedByName().size();
+            }
         }
     }
     else if (searchByNumber) {
-        count = contactDB->contacts
-                    .GetIDsSortedByField(
-                        ContactsTable::MatchType::TextNumber, countQuery->getFilterData(), favouritesGroupId)
-                    .size();
+
+        uint32_t groupID = countQuery->getGroupFilterData();
+        // incl search by letter
+        if (groupID != DB_ID_NONE) {
+            count = contactDB->contacts
+                        .GetIDsSortedByField(ContactsTable::MatchType::Group, countQuery->getFilterData(), groupID)
+                        .size();
+        }
+        else {
+            count = contactDB->contacts.count();
+        }
     }
+
     else {
         count = contactDB->name.GetCountByName(countQuery->getFilterData());
     }

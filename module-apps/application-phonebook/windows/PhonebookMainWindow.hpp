@@ -6,6 +6,8 @@
 
 #include <gui/widgets/ListView.hpp>
 
+#include <application-phonebook/data/ContactsMap.hpp>
+
 namespace gui
 {
 
@@ -21,6 +23,8 @@ namespace gui
         Image *searchImage     = nullptr;
         bool enableNewContact  = true;
         bool requestedSearch   = false;
+        InputMode *inputMode   = nullptr;
+        gui::KeyInputMappedTranslation translator;
 
       public:
         PhonebookMainWindow(app::Application *app);
@@ -37,6 +41,7 @@ namespace gui
         void destroyInterface() override;
 
         bool isSearchRequested() const;
+        void HandleFilteringByLetter(const InputEvent &inputEvent);
     };
 
 } /* namespace gui */

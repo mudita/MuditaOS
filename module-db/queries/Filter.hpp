@@ -101,4 +101,30 @@ namespace db::query
         }
     };
 
+    class ContactDisplayMode
+    {
+      protected:
+        std::uint32_t displayMode = 0;
+
+      public:
+        /**
+         * @brief Default constructor
+         *
+         */
+        ContactDisplayMode() = default;
+
+        /**
+         * @brief Construct a new Contact Display Mode object
+         *
+         * @param mode contact display mode
+         */
+        ContactDisplayMode(const std::uint32_t &mode) : displayMode(std::move(mode))
+        {}
+
+        [[nodiscard]] const std::uint32_t &getContactDisplayMode() const noexcept
+        {
+            return displayMode;
+        }
+    };
+
 }; // namespace db::query

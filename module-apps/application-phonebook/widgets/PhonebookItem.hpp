@@ -18,6 +18,7 @@ namespace gui
         bool favourite = false;
         void markFavourite(bool val);
         void markBlocked(bool val);
+        LabelMarkerDisplayMode labeMarkerDisplayMode = LabelMarkerDisplayMode::IncludeFavourites;
 
       public:
         std::shared_ptr<ContactRecord> contact = nullptr;
@@ -31,6 +32,7 @@ namespace gui
         UTF8 getLabelMarker();
 
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        void setLabelMarkerDisplayMode(LabelMarkerDisplayMode mode);
     };
 
 } /* namespace gui */
