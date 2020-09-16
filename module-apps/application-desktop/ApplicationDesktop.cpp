@@ -84,8 +84,8 @@ namespace app
 
             if (updateMessage != nullptr) {
                 if (updateMessage->messageType == sdesktop::UpdateFoundOnBoot &&
-                    updateMessage->updateFile.has_filename()) {
-                    LOG_DEBUG("ApplicationDesktop::handle pending update found: %s", updateMessage->updateFile.c_str());
+                    updateMessage->updateStats.updateFile.has_filename()) {
+                    LOG_DEBUG("ApplicationDesktop::handle pending update found: %s", updateMessage->updateStats.updateFile.c_str());
                 }
             }
         }
@@ -220,14 +220,21 @@ namespace app
         setActiveWindow(gui::name::window::main_window);
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
-          LOG_INFO("InitHandler UpdateOsMessage handler");
+
           auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
           if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateFoundOnBoot) {
-              LOG_INFO("InitHandler got updateMsg: %s", updateMsg->updateFile.c_str());
+
               if (getWindow(app::window::name::desktop_update)) {
-                  std::unique_ptr<gui::UpdateFileData> data = make_unique<gui::UpdateFileData>();
-                  data->setFile(updateMsg->updateFile);
+                  std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
+
                   switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+              }
+          }
+
+          if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateInform) {
+              if (getWindow(app::window::name::desktop_update)) {
+                  std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
+                  getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
               }
           }
           return std::make_shared<sys::ResponseMessage>();

@@ -10,6 +10,7 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 
 #include "gui/SwitchData.hpp"
+#include <service-desktop/ServiceDesktop.hpp>
 #include <filesystem>
 
 namespace gui
@@ -46,16 +47,20 @@ namespace gui
         };
     };
 
-    class UpdateFileData : public gui::SwitchData
+  class UpdateSwitchData : public gui::SwitchData
     {
-        std::filesystem::path updateFilePath;
-
       public:
-        void setFile(const std::filesystem::path &file)
-        {
-            updateFilePath = file;
-        }
-        std::filesystem::path getFile() { return updateFilePath; }
+      UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom)
+      {
+          updateOsMessage = *messageToCopyFrom;
+      }
+
+      sdesktop::UpdateOsMessage getUpdateOsMessage()
+      {
+          return updateOsMessage;
+      }
+      private:
+      sdesktop::UpdateOsMessage updateOsMessage;
     };
 
 } // namespace gui
