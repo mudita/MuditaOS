@@ -20,7 +20,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"
@@ -28,7 +28,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.hpp"
-	"${CMAKE_CURRENT_LIST_DIR}/windows/Update.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Names.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
 )

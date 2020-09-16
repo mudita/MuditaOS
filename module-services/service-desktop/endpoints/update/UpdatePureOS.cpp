@@ -3,8 +3,9 @@
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
 #include <service-desktop/ServiceDesktop.hpp>
-#include <source/version.hpp>
+#include <service-gui/ServiceGUI.hpp>
 #include <math.h>
+#include <module-apps/application-desktop/ApplicationDesktop.hpp>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
@@ -28,11 +29,12 @@ UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
 
 updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
 {
-    informDebug("UpdatePureOS::setUpdateFile updateFileToUse:%s", updateFileToUse.c_str());
     updateFile = purefs::dir::os_updates / updateFileToUse;
-    informDebug("UpdatePureOS::setUpdateFile updateFile:%s", updateFile.c_str());
     if (vfs.fileExists(updateFile.c_str())) {
+        versioInformation = UpdatePureOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
+
+            totalBytes = vfs.filelength(updateTar.stream);
             informUpdate("UpdatePureOS::setUpdateFile TAR_FILE: %s opened", updateFile.c_str());
         }
         else {
@@ -359,6 +361,8 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
             return false;
         }
 
+        currentExtractedBytes += dataWritten;
+
         *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
     }
     vfs.fclose(fp);
@@ -580,9 +584,6 @@ void UpdatePureOS::informError(const char *format, ...)
     vsnprintf (readBuf.get(), purefs::buffer::tar_buf, format, argptr);
     va_end(argptr);
 
-    auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateError);
-    sys::Bus::SendBroadcast(msgToSend, nullptr);
-
     LOG_ERROR("UPDATE_ERRROR %s", readBuf.get());
 }
 
@@ -608,7 +609,7 @@ void UpdatePureOS::informUpdate(const char *format, ...)
     LOG_INFO("UPDATE_INFO %s", readBuf.get());
 
     auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateMessageType::UpdateInform);
-    // msgToSend->messageText = std::string(readBuf.get());
-
-    //sys::Bus::SendBroadcast(msgToSend, nullptr);
+    messageText = std::string(readBuf.get());
+    msgToSend->updateStats = (sdesktop::UpdateStats)(*this);
+    sys::Bus::SendUnicast (msgToSend, app::name_desktop, owner);
 }
