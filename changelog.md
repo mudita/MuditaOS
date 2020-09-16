@@ -16,7 +16,8 @@
 
 ### Other
 
-
+* `[build]` Move user data to SDRAM during linking.
+* `[build]` RT1051's linker script cleanup.
 
 ## [0.38.1 2020-09-18]
 
