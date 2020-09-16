@@ -66,7 +66,7 @@ struct FileInfo
     unsigned long fileCRC32;
 };
 
-class UpdatePureOS
+  class UpdatePureOS : public sdesktop::UpdateStats
 {
   public:
     UpdatePureOS(ServiceDesktop *ownerService);
@@ -97,10 +97,9 @@ class UpdatePureOS
     static const json11::Json getVersionInfoFromFile(const fs::path &updateFile);
     static bool isUpgradeToCurrent(const std::string &versionToCompare);
     static const fs::path checkForUpdate();
+
   private:
-    fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
     mtar_t updateTar      = {};
     ServiceDesktop *owner = nullptr;
-    fs::path updateFile;
 };
