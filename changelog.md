@@ -7,6 +7,7 @@
 * `[GUI]` Added rich text parsing for full text styling needs
 * `[Audio]` New volume buttons features
 * `[settings]` Add basic bluetooth options window.
+* `[phonebook]`Scrolling contacts list with a particular letter - part 1
 
 ### Other
 
