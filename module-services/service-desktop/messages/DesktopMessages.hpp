@@ -53,6 +53,7 @@ namespace sdesktop
 
         UpdateStats updateStats = {};
         UpdateMessageType messageType = UpdateNow;
+        int rebootDelay = 0;
     };
 
     class BackupMessage : public sys::DataMessage

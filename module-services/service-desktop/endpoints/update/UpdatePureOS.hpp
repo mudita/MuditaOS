@@ -30,6 +30,7 @@ namespace updateos
         CantCreateTempDir,
         CantCreateUpdatesDir,
         CantRemoveUniqueTmpDir,
+        CantRemoveUpdateFile,
         CantCreateUniqueTmpDir,
         CantCreateExtractedFile,
         CantOpenChecksumsFile,
@@ -54,6 +55,18 @@ namespace updateos
         CantLoadBootloaderFile
     };
 
+    enum class UpdateState
+    {
+        Initial,
+        UpdateFileSet,
+        CreatingDirectories,
+        ExtractingFiles,
+        UpdatingBootloader,
+        ChecksumVerification,
+        VersionVerificiation,
+        ReadyForReset
+    };
+
 }; // namespace updateos
 
 struct FileInfo
@@ -66,12 +79,12 @@ struct FileInfo
     unsigned long fileCRC32;
 };
 
-  class UpdatePureOS : public sdesktop::UpdateStats
+class UpdatePureOS : public sdesktop::UpdateStats
 {
   public:
     UpdatePureOS(ServiceDesktop *ownerService);
 
-    updateos::UpdateError runUpdate();
+    updateos::UpdateError runUpdate(const int resetDelay);
     updateos::UpdateError prepareTempDirForUpdate();
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();
@@ -82,6 +95,8 @@ struct FileInfo
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
+    updateos::UpdateError resetNow();
+    updateos::UpdateError startResetTimer(int delay);
 
     void informError(const char *format, ...);
     void informDebug(const char *format, ...);
