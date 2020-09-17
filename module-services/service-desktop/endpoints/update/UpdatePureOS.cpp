@@ -25,7 +25,9 @@ json11::Json FileInfo::to_json() const
 }
 
 UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
-{}
+{
+    status = (uint8_t)(updateos::UpdateState::Initial);
+}
 
 updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
 {
@@ -33,9 +35,7 @@ updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
     if (vfs.fileExists(updateFile.c_str())) {
         versioInformation = UpdatePureOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
-
             totalBytes = vfs.filelength(updateTar.stream);
-            informUpdate("UpdatePureOS::setUpdateFile TAR_FILE: %s opened", updateFile.c_str());
         }
         else {
             informError("UpdatePureOS::setUpdateFile can't open TAR file %s", updateFile.c_str());
@@ -46,12 +46,14 @@ updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
         informError("UpdatePureOS::setUpdateFile %s does not exist", updateFile.c_str());
         return updateos::UpdateError::CantOpenUpdateFile;
     }
+
+    status = (uint8_t)(updateos::UpdateState::UpdateFileSet);
     return updateos::UpdateError::NoError;
 }
 
-updateos::UpdateError UpdatePureOS::runUpdate()
+updateos::UpdateError UpdatePureOS::runUpdate(const int resetDelay)
 {
-    informDebug("runUpdate updateFile:%s", updateFile.c_str());
+    informDebug("Prepraring temp dir");
 
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
@@ -59,56 +61,79 @@ updateos::UpdateError UpdatePureOS::runUpdate()
         return err;
     }
 
+    informDebug("Unpacking update");
     if ((err = unpackUpdate()) == updateos::UpdateError::NoError) {
-        informUpdate("runUpdate %s unpacked", updateFile.c_str());
+        informUpdate("Unpacked");
     }
     else {
-        informError("runUpdate %s can't be unpacked", updateFile.c_str());
+        informError("%s can't be unpacked", updateFile.c_str());
         return err;
     }
 
     if ((err = verifyChecksums()) == updateos::UpdateError::NoError) {
-        informUpdate("runUpdate %s verifyChecksums success", updateFile.c_str());
+        informUpdate("Verify checksums");
     }
     else {
-        informError("runUpdate %s checksum verification failed", updateFile.c_str());
+        informError("Checksum verification failed");
         return err;
     }
 
     if ((err = verifyVersion()) == updateos::UpdateError::NoError) {
-        informUpdate("runUpdate %s verifyVersion success", updateFile.c_str());
+        informUpdate("Verify version");
     }
     else {
-        informError("runUpdate %s version verification failed", updateFile.c_str());
+        informError("Can't verify version");
         return err;
     }
 
     if ((err = updateBootloader()) == updateos::UpdateError::NoError) {
-        informUpdate("runUpdate %s updateBootloader success", updateFile.c_str());
+        informUpdate("Update bootloader");
     }
     else {
-        informError("runUpdate %s version updateBootloader failed", updateFile.c_str());
+        informError("Failed to update the bootloader");
         return err;
     }
 
     if ((err = prepareRoot()) == updateos::UpdateError::NoError) {
-        informUpdate("runUpdate %s root ready for reset", updateFile.c_str());
+        informUpdate("Ready for reset");
     }
     else {
-        informError("runUpdate %s can't prepare root dir for reset", updateFile.c_str());
+        informError("Can't prepare root dir for reset");
     }
 
-    return cleanupAfterUpdate();
+    if ( (err =  cleanupAfterUpdate()) == updateos::UpdateError::NoError) {
+        if (resetDelay == -1)
+            return err;
+
+        if (resetDelay == 0) {
+            sys::SystemManager::Reboot(owner);
+        }
+
+        if (resetDelay > 0)
+            startResetTimer(resetDelay);
+    }
+
+    return err;
+}
+
+updateos::UpdateError UpdatePureOS::startResetTimer(int delay)
+{
+    return updateos::UpdateError::NoError;
+}
+
+updateos::UpdateError UpdatePureOS::resetNow()
+{
+    return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdatePureOS::unpackUpdate()
 {
     mtar_header_t tarHeader;
     filesInUpdatePackage.clear();
+    status = (uint8_t)(updateos::UpdateState::ExtractingFiles);
 
     while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
         unsigned long fileCRC32 = 0;
-        informUpdate("unpackUpdate: reading tar header name %s...", tarHeader.name);
 
         if (tarHeader.type == MTAR_TDIR) {
             fs::path tmpPath = getUpdateTmpChild(tarHeader.name);
@@ -122,19 +147,20 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
                 informError("unpackUpdate failed to extract update file %s", tarHeader.name);
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
-
+            informUpdate("Unpacked: %s", tarHeader.name);
             filesInUpdatePackage.emplace_back(FileInfo(tarHeader, fileCRC32));
         }
 
         mtar_next(&updateTar);
     }
 
-    informUpdate("unpackUpdate last header: %s file count: %d", tarHeader.name, filesInUpdatePackage.size());
     return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdatePureOS::verifyChecksums()
 {
+    status = (uint8_t)(updateos::UpdateState::ChecksumVerification);
+
     std::unique_ptr<char[]> lineBuff(
         new char[purefs::buffer::tar_buf]); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
@@ -162,14 +188,13 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
         }
     }
     vfs.fclose(fpChecksums);
-
-    informDebug("verifyChecksums noError");
     return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdatePureOS::verifyVersion()
 {
-    informDebug("verifyVersion noError");
+    status = (uint8_t)(updateos::UpdateState::VersionVerificiation);
+
     if (!vfs.fileExists(getUpdateTmpChild(updateos::file::version).c_str())) {
         informError("verifyVersion %s does not exist", getUpdateTmpChild(updateos::file::version).c_str());
         return updateos::UpdateError::VerifyVersionFailure;
@@ -318,10 +343,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
     uint32_t sizeToRead   = purefs::buffer::tar_buf;
 
-    informDebug("unpackFileToTemp %s blocksToRead %u sizeToRead %u",
-              fullPath.c_str(),
-              (unsigned int)blocksToRead,
-              (unsigned int)sizeToRead);
+    informUpdate("Unpack %s size %ul", h.name, sizeToRead);
 
     if (crc32 != nullptr) {
         *crc32 = 0;
@@ -375,6 +397,11 @@ updateos::UpdateError UpdatePureOS::cleanupAfterUpdate()
         informError("ff_deltree failed on %s", updateTempDirectory.c_str());
         return updateos::UpdateError::CantRemoveUniqueTmpDir;
     }
+    if (vfs.remove(updateFile.c_str())) {
+        informError("Failed to delete %s", updateFile.c_str());
+        return updateos::UpdateError::CantRemoveUpdateFile;
+    }
+    status = (uint8_t)(updateos::UpdateState::ReadyForReset);
     return updateos::UpdateError::NoError;
 }
 
@@ -385,12 +412,13 @@ const fs::path UpdatePureOS::getUpdateTmpChild(const fs::path &childPath)
 
 updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
 {
+    status = (uint8_t)(updateos::UpdateState::CreatingDirectories);
+
     updateTempDirectory = purefs::dir::tmp / vfs::generateRandomId(updateos::prefix_len);
 
-    informDebug("prepareTempDirForUpdate %s", updateTempDirectory.c_str());
+    informDebug("Temp dir for update %s", updateTempDirectory.c_str());
 
     if (vfs.isDir(purefs::dir::os_updates.c_str()) == false) {
-        informDebug("prepareTempDirForUpdate %s is not a directory", purefs::dir::os_updates.c_str());
         if (vfs.mkdir(purefs::dir::os_updates.c_str()) != 0) {
             informError("%s can't create it %s", purefs::dir::os_updates.c_str(), vfs.lastErrnoToStr().c_str());
             return updateos::UpdateError::CantCreateUpdatesDir;
@@ -436,12 +464,12 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
         return updateos::UpdateError::CantCreateUniqueTmpDir;
     }
 
-    informUpdate("prepareTempDirForUpdate tempDir selected %s", updateTempDirectory.c_str());
     return updateos::UpdateError::NoError;
 }
 
 updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloaderFile)
 {
+    status = (uint8_t)(updateos::UpdateState::UpdatingBootloader);
 
 #if defined(TARGET_Linux)
     return updateos::BootloaderUpdateError::NoError;
@@ -545,19 +573,14 @@ bool UpdatePureOS::isUpgradeToCurrent(const std::string &versionToCompare)
 
 const fs::path UpdatePureOS::checkForUpdate()
 {
-    LOG_INFO("checkForUpdate %s", purefs::dir::os_updates.c_str());
     std::vector<vfs::DirectoryEntry> fileList = vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
     for (auto &file : fileList) {
-        LOG_INFO("\t%s:%lu", file.fileName.c_str(), file.fileSize);
+
         json11::Json versionInfo = UpdatePureOS::getVersionInfoFromFile(purefs::dir::os_updates / file.fileName);
         if (versionInfo.is_null())
             continue;
 
-        LOG_INFO("\t%s", versionInfo.dump().c_str());
-
         if (versionInfo[purefs::json::os_version][purefs::json::version_string].is_string()) {
-            LOG_INFO("\t%slooks like a vlid update image, see if it's an update to us", file.fileName.c_str());
-
             if (UpdatePureOS::isUpgradeToCurrent(versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
                 return purefs::dir::os_updates / file.fileName;
             }
@@ -569,9 +592,8 @@ const fs::path UpdatePureOS::checkForUpdate()
 
 updateos::UpdateError UpdatePureOS::updateUserData()
 {
-    informDebug("updateUserData filesToCheck %d", filesInUpdatePackage.size());
     for (unsigned int x=0; x < filesInUpdatePackage.size(); x++) {
-        informDebug("file %u: %s", x, fs::path(filesInUpdatePackage[x].fileName).c_str());
+        // informDebug("file %u: %s", x, fs::path(filesInUpdatePackage[x].fileName).c_str());
     }
     return updateos::UpdateError::NoError;
 }

@@ -2,6 +2,7 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "../data/LockPhoneData.hpp"
+#include <source/version.hpp>
 
 // module-utils
 #include "i18/i18.hpp"
@@ -44,32 +45,34 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        powerImage     = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
-        powerDownImage = new gui::Image(this, 0, 0, 0, 0, "logo");
-        powerDownImage->setVisible(false);
+        questionImage = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
 
         // title label
         titleLabel = new gui::Label(this, 0, 60, 480, 40);
         titleLabel->setFilled(false);
         titleLabel->setBorderColor(gui::ColorFullBlack);
         titleLabel->setFont(style::header::font::title);
-        UTF8 updateText ("Update OS with \"");
-        updateText += updateFile.filename().c_str();
-        updateText += "\"";
-        titleLabel->setText(updateText);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+        titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
         // label with question for powering down
-        infoLabel = new gui::Label(this, 0, 294, 480, 30);
+        infoLabel = new gui::Label(this, 20, 294, 440, 40);
         infoLabel->setFilled(false);
         infoLabel->setBorderColor(gui::ColorNoColor);
         infoLabel->setFont(style::window::font::medium);
         infoLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         infoLabel->setText("Do you want to apply this update?");
 
+        // label with question for powering down
+        percentLabel = new gui::Label(this, 0, 294, 480, 128);
+        percentLabel->setFilled(false);
+        percentLabel->setBorderColor(gui::ColorNoColor);
+        percentLabel->setFont(style::window::font::largelight);
+        percentLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+        percentLabel->setVisible(false);
+
         uint32_t pinLabelX = 46;
-        uint32_t pinLabelY = 350;
+        uint32_t pinLabelY = 360;
         for (uint32_t i = 0; i < 4; i++) {
             gui::Label *label = new gui::Label(this, pinLabelX, pinLabelY, 193, 75);
             label->setFilled(false);
@@ -83,9 +86,6 @@ namespace gui
             selectionLabels.push_back(label);
             pinLabelX += 193;
         }
-
-        progressBar = new gui::Progress(this, 20, 440, 440, 32);
-
         selectionLabels[0]->setText(utils::localize.get(style::strings::common::no));
         selectionLabels[1]->setText(utils::localize.get(style::strings::common::yes));
 
@@ -116,18 +116,17 @@ namespace gui
 
     void UpdateWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        LOG_DEBUG("onBeforeShow");
-        // on entering screen always set default result as returning to home screen and set focus to "No" label
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
         } else {
             gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
             if (item != nullptr) {
+                std::stringstream title;
                 sdesktop::UpdateOsMessage msg = item->getUpdateOsMessage();
                 updateFile = msg.updateStats.updateFile;
-                progressBar->setTotalProgress(msg.updateStats.totalBytes);
-                LOG_DEBUG("totalBytes %lu", msg.updateStats.totalBytes);
-                titleLabel->setText(updateFile.filename().c_str());
+                title << "Update to: ";
+                title << msg.updateStats.versioInformation[purefs::json::os_version][purefs::json::version_string].string_value();
+                titleLabel->setText(title.str());
             }
         }
 
@@ -152,13 +151,17 @@ namespace gui
                 application->switchWindow("MainWindow");
             }
             if (state == State::UpdateNow) {
-                LOG_DEBUG("onInput sending update now message with file: %s", updateFile.c_str());
-
                 bottomBar->setActive(BottomBar::Side::CENTER, false);
                 bottomBar->setActive(BottomBar::Side::RIGHT, false);
 
+                selectionLabels[0]->setVisible(false);
+                selectionLabels[1]->setVisible(false);
+
+                percentLabel->setVisible(true);
+                percentLabel->setText("Update start");
                 auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateFile.c_str(), 0);
-                sys::Bus::SendBroadcast(msgToSend, application);
+                sys::Bus::SendUnicast (msgToSend, service::name::service_desktop, application);
+
                 return true;
             }
         }
@@ -170,10 +173,24 @@ namespace gui
     {
         gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
         if (item != nullptr) {
-            progressBar->setCurrentProgress(item->getUpdateOsMessage().updateStats.currentExtractedBytes);
+            std::stringstream ssi;
+            updateos::UpdateState status = static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
+
+            if (status == updateos::UpdateState::ReadyForReset) {
+                percentLabel->setText("Resetting ...");
+            }
+
+            if (status == updateos::UpdateState::ExtractingFiles) {
+                progressPercent = static_cast<int>(((float)item->getUpdateOsMessage().updateStats.currentExtractedBytes / (float)item->getUpdateOsMessage().updateStats.totalBytes) * 100.0);
+                ssi << "Unpacking: ";
+                ssi << std::to_string(progressPercent);
+                ssi << " %";
+                percentLabel->setText(ssi.str());
+            }
+            if (item->getUpdateOsMessage().updateStats.messageText != "")
+                infoLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
 
             this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            LOG_DEBUG("currentExtractedBytes %lu", item->getUpdateOsMessage().updateStats.currentExtractedBytes);
         }
 
         return true;

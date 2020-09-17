@@ -4,6 +4,7 @@
 #include <module-gui/gui/widgets/Progress.hpp>
 #include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
+#include "gui/widgets/TextFixedSize.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
 
@@ -20,13 +21,11 @@ namespace gui
 
         gui::Label *titleLabel = nullptr;
         gui::Label *infoLabel  = nullptr;
-
+        gui::Label *percentLabel  = nullptr;
+        gui::Image *questionImage = nullptr;
         std::vector<gui::Label *> selectionLabels;
-        gui::Image *powerImage     = nullptr;
-        gui::Image *powerDownImage = nullptr;
-        gui::Progress *progressBar  = nullptr;
         State state                = State::Return;
-
+        int progressPercent = 0;
       public:
         UpdateWindow(app::Application *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
