@@ -6,5 +6,4 @@
 namespace phonebookUtils
 {
     void fillContactData(std::string &data, ContactRecord &contact);
-    auto formatVCard(const ContactRecord &) -> const UTF8;
 } // namespace phonebookUtils

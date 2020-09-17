@@ -40,31 +40,36 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::FirstName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [this]() { this->ContactDataChanged(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::SecondName,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [this]() { this->ContactDataChanged(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::Number,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [this]() { this->ContactDataChanged(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
-        phonebookInternals::ListItemName::OtherNumber,
+        phonebookInternals::ListItemName::SecondNumber,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [this]() { this->ContactDataChanged(); }));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::Email,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [this]() { this->ContactDataChanged(); }));
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(phonebookInternals::ListItemName::SpeedDialKey));
 
@@ -83,6 +88,7 @@ void NewContactModel::createData()
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        nullptr,
         2));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
@@ -104,7 +110,7 @@ void NewContactModel::clearData()
 
     createData();
 
-    requestRecords(0, internalData.size());
+    list->rebuildList();
 }
 
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
@@ -123,4 +129,18 @@ void NewContactModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
             item->onLoadCallback(contactRecord);
         }
     }
+}
+
+void NewContactModel::ContactDataChanged()
+{
+    for (auto item : internalData) {
+        if (item->onEmptyCallback) {
+            if (!item->onEmptyCallback()) {
+                application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::CENTER, true); // SAVE button
+                return;
+            }
+        }
+    }
+    application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::CENTER, false); // SAVE button
+    return;
 }

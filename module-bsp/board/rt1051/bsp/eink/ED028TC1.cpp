@@ -963,17 +963,19 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
     uint8_t background = colorFill;
 
-    char *bg = (char *)malloc(BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
-    if (bg == NULL) {
-        //        LOG_ERROR("Could not create the buffer for the background plane");
+    std::unique_ptr<char[]> bg;
+    try {
+        bg = std::unique_ptr<char[]>(new char[BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8]);
+    }
+    catch (const std::bad_alloc &exception) {
+        LOG_ERROR("Could not create the buffer for the background plane");
         return EinkNoMem;
     }
 
-    memset(bg, background, BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
+    memset(bg.get(), background, BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
 
-    if (BSP_EinkWriteData(bg, BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8, SPI_MANUAL_CS) != 0) {
+    if (BSP_EinkWriteData(bg.get(), BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8, SPI_MANUAL_CS) != 0) {
         //        LOG_ERROR("Eink: transmitting the display update image FAILED");
-        free(bg);
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -981,7 +983,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
 
-    free(bg);
     EinkRefreshImage(0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y, EinkDisplayTimingsDeepCleanMode);
 
     return EinkOK;

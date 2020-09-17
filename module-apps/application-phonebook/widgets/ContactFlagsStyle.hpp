@@ -6,13 +6,13 @@ namespace style
 {
     namespace widget
     {
-        namespace ContatFlas
+        namespace ContactFlag
         {
-            const uint32_t iconsSize   = 32;
+            const uint32_t iconsSize   = 35;
             const uint32_t height      = 74;
-            const uint32_t itemWidth   = 90;
+            const uint32_t itemWidth   = 110;
             const uint32_t itemHeight  = 55;
             const uint32_t labelHeight = 20;
-        } // namespace ContatFlas
+        } // namespace ContactFlag
     }     // namespace widget
 } // namespace style

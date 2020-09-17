@@ -37,6 +37,8 @@ namespace audio
         uint32_t sample_rate = 0;
         /* Number of channels */
         uint32_t num_channel = 0;
+        /* bitrate */
+        uint32_t bitrate = 0;
 
         std::string artist   = "";
         std::string genre    = "";
@@ -51,7 +53,6 @@ namespace audio
         // Copy constructor
         Tags(const Tags &p2)
         {
-
             total_duration_s = p2.total_duration_s;
             duration_hour    = p2.duration_hour;
             duration_min     = p2.duration_min;
@@ -77,7 +78,7 @@ namespace audio
 
         virtual uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) = 0;
 
-        virtual std::unique_ptr<Tags> fetchTags() = 0;
+        std::unique_ptr<Tags> fetchTags();
 
         // Range 0 - 1
         virtual void setPosition(float pos) = 0;
@@ -101,6 +102,8 @@ namespace audio
         static std::unique_ptr<decoder> Create(const char *file);
 
       protected:
+        virtual void fetchTagsSpecific(){};
+
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
 
         const uint32_t workerBufferSize = 1024 * 8;
@@ -114,7 +117,7 @@ namespace audio
 
         // Worker buffer used for converting mono stream to stereo
         std::unique_ptr<int16_t[]> workerBuffer;
-
+        std::unique_ptr<Tags> tag;
         bool isInitialized = false;
     };
 

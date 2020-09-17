@@ -15,18 +15,24 @@ const char *ServiceAudio::serviceName = "ServiceAudio";
 using namespace audio;
 
 ServiceAudio::ServiceAudio()
-    : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle), audio([this](AudioEvents event) -> int32_t {
-          switch (event) {
-          case AudioEvents::EndOfFile: {
-              auto msg = std::make_shared<AudioNotificationMessage>(
-                  static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::EndOfFile));
-              sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceAudioNotifications, this);
-          } break;
-          case AudioEvents::FileSystemNoSpace:
-              break;
-          }
-          return 0;
-      })
+    : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle),
+      audio(
+          [this](AudioEvents event) -> int32_t {
+              switch (event) {
+              case AudioEvents::EndOfFile: {
+                  auto msg = std::make_shared<AudioNotificationMessage>(
+                      static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::EndOfFile));
+                  sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceAudioNotifications, this);
+              } break;
+              case AudioEvents::FileSystemNoSpace:
+                  break;
+              }
+              return 0;
+          },
+          [this](const std::string &path, const float &defaultValue) -> uint32_t {
+              this->addOrIgnoreEntry(path, defaultValue);
+              return this->fetchAudioSettingFromDb(path, defaultValue);
+          })
 {
 
     busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
@@ -147,10 +153,12 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         case MessageType::AudioSetOutputVolume: {
             responseMsg = std::make_shared<AudioResponseMessage>(audio.SetOutputVolume(msg->val));
+            updateDbValue(audio.GetCurrentOperation(), audio::ProfileSetup::Volume);
         } break;
 
         case MessageType::AudioSetInputGain: {
             responseMsg = std::make_shared<AudioResponseMessage>(audio.SetInputGain(msg->val));
+            updateDbValue(audio.GetCurrentOperation(), audio::ProfileSetup::Gain);
         } break;
 
         case MessageType::AudioGetOutputVolume: {
@@ -172,4 +180,25 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
 
     return responseMsg;
+}
+
+void ServiceAudio::updateDbValue(const audio::Operation *currentOperation, const audio::ProfileSetup &profileSetup)
+{
+    if (currentOperation == nullptr) {
+        return;
+    }
+    const auto *currentProfile = currentOperation->GetProfile();
+    if (currentProfile == nullptr) {
+        return;
+    }
+
+    auto dbPath = audio::str(currentProfile->GetType(), profileSetup);
+    auto volume = std::to_string(audio.GetOutputVolume());
+    auto query  = std::make_unique<db::query::settings::UpdateQuery>(
+        SettingsRecord_v2({{.ID = DB_ID_NONE}, .path = dbPath, .value = volume}));
+
+    if (dbPath.empty()) {
+        return;
+    }
+    DBServiceAPI::GetQuery(this, db::Interface::Name::Settings_v2, std::move(query));
 }

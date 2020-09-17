@@ -106,6 +106,13 @@ namespace gui
                 }
             }
 
+            auto linesHAlign(Length parentSize)
+            {
+                for (auto &line : lines) {
+                    line.alignH(parent->getAlignment(Axis::X), parentSize);
+                }
+            }
+
         } lines;
 
         TextCursor *cursor                     = nullptr;
@@ -167,6 +174,7 @@ namespace gui
         void addText(const UTF8 &text);
         void addText(TextBlock text);
         virtual void clear();
+        bool isEmpty();
         virtual UTF8 getText();
         /// saves text from widget to file at specified path
         virtual bool saveText(UTF8 path);

@@ -24,14 +24,16 @@ bool ThreadsTable::create()
 bool ThreadsTable::add(ThreadsTableRow entry)
 {
 
-    return db->execute("INSERT or ignore INTO threads ( date, msg_count, read, contact_id, snippet, last_dir ) VALUES "
-                       "( %lu, %lu, %lu, %lu, '%q', %lu );",
-                       entry.date,
-                       entry.msgCount,
-                       entry.unreadMsgCount,
-                       entry.contactID,
-                       entry.snippet.c_str(),
-                       entry.type);
+    return db->execute(
+        "INSERT or ignore INTO threads ( date, msg_count, read, contact_id, number_id, snippet, last_dir ) VALUES "
+        "( %lu, %lu, %lu, %lu, %lu, '%q', %lu );",
+        entry.date,
+        entry.msgCount,
+        entry.unreadMsgCount,
+        entry.contactID,
+        entry.numberID,
+        entry.snippet.c_str(),
+        entry.type);
 }
 
 bool ThreadsTable::removeById(uint32_t id)
@@ -41,12 +43,14 @@ bool ThreadsTable::removeById(uint32_t id)
 
 bool ThreadsTable::update(ThreadsTableRow entry)
 {
-    return db->execute("UPDATE threads SET date = %lu, msg_count = %lu ,read = %lu, contact_id = %lu, snippet = '%q', "
+    return db->execute("UPDATE threads SET date = %lu, msg_count = %lu ,read = %lu, contact_id = %lu, number_id = %lu, "
+                       "snippet = '%q', "
                        "last_dir = %lu WHERE _id=%lu;",
                        entry.date,
                        entry.msgCount,
                        entry.unreadMsgCount,
                        entry.contactID,
+                       entry.numberID,
                        entry.snippet.c_str(),
                        entry.type,
                        entry.ID);
@@ -66,8 +70,9 @@ ThreadsTableRow ThreadsTable::getById(uint32_t id)
         (*retQuery)[2].getUInt32(),                       // msgCount
         (*retQuery)[3].getUInt32(),                       // unreadMsgCount
         (*retQuery)[4].getUInt32(),                       // contactID
-        (*retQuery)[5].getString(),                       // snippet
-        static_cast<SMSType>((*retQuery)[6].getUInt32()), // type/last-dir
+        (*retQuery)[5].getUInt32(),                       // numberID
+        (*retQuery)[6].getString(),                       // snippet
+        static_cast<SMSType>((*retQuery)[7].getUInt32()), // type/last-dir
     };
 }
 
@@ -80,8 +85,9 @@ void fillRetQuery(std::vector<ThreadsTableRow> &ret, const std::unique_ptr<Query
             (*retQuery)[2].getUInt32(),                       // msgCount
             (*retQuery)[3].getUInt32(),                       // unreadMsgCount
             (*retQuery)[4].getUInt32(),                       // contactID
-            (*retQuery)[5].getString(),                       // snippet
-            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type/last-dir
+            (*retQuery)[5].getUInt32(),                       // numberID
+            (*retQuery)[6].getString(),                       // snippet
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type/last-dir
         });
     } while (retQuery->nextRow());
 }
@@ -116,6 +122,9 @@ std::vector<ThreadsTableRow> ThreadsTable::getLimitOffsetByField(uint32_t offset
         break;
     case ThreadsTableFields ::ContactID:
         fieldName = "contact_id";
+        break;
+    case ThreadsTableFields ::NumberID:
+        fieldName = "number_id";
         break;
     default:
         return std::vector<ThreadsTableRow>();

@@ -275,19 +275,18 @@ namespace gui
             int x = wgtR, y = 0;
 
             // Calculate coordinates of the points on the circle's quarter.
-            int16_t *Px = (int16_t *)malloc(2 * wgtR * sizeof(int16_t));
-            int16_t *Py = (int16_t *)malloc(2 * wgtR * sizeof(int16_t));
-
-            // if any of the vector failed to be created exit the function
-            if ((Px == NULL) || (Py == NULL)) {
-                if (Py)
-                    free(Py);
-                if (Px)
-                    free(Px);
+            std::unique_ptr<int16_t[]> Px, Py;
+            try {
+                Px = std::unique_ptr<int16_t[]>(new int16_t[2 * wgtR * sizeof(int16_t)]);
+                Py = std::unique_ptr<int16_t[]>(new int16_t[2 * wgtR * sizeof(int16_t)]);
+            }
+            catch (const std::bad_alloc &) {
+                LOG_ERROR("Allocation error");
                 return;
             }
-            memset(Px, 0, 2 * wgtR * sizeof(int16_t));
-            memset(Py, 0, 2 * wgtR * sizeof(int16_t));
+
+            memset(Px.get(), 0, 2 * wgtR * sizeof(int16_t));
+            memset(Py.get(), 0, 2 * wgtR * sizeof(int16_t));
             int32_t index = 0;
             // index where middle point of quarter of arc is located. This means that Y starts to grow faster than X
             int32_t middleIndex = 0;
@@ -321,7 +320,7 @@ namespace gui
                 if (x <= y) {
 
                     int16_t pointsLeft = 0;
-                    int indexOut = index;
+                    int indexOut       = index;
                     if (x == y) {
                         // we have a central point. it can be drawn with either type of line
                         middleIndex = index;
@@ -663,9 +662,6 @@ namespace gui
                 }
             }
 
-            free(Px);
-            free(Py);
-
             // render edges between corners
             int16_t xs, ys, le;
             if (cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP) {
@@ -895,11 +891,11 @@ namespace gui
 
             // do not start drawing outside of draw context.
             if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0)) {
-                LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
+                LOG_FATAL("Drawing outside context's X boundary for glyph: %" PRIu32, glyph->id);
                 return;
             }
             if ((wgtY + posY >= drawCtx->getH()) || (wgtY + posY < 0)) {
-                LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
+                LOG_FATAL("Drawing outside context's Y boundary for glyph: %" PRIu32, glyph->id);
                 return;
             }
 

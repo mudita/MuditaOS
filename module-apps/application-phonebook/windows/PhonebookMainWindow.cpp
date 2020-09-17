@@ -7,7 +7,6 @@
 #include <queries/phonebook/QueryContactGet.hpp>
 
 #include <service-appmgr/ApplicationManager.hpp>
-#include <module-services/service-db/messages/DBContactMessage.hpp>
 #include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
@@ -21,7 +20,7 @@ namespace gui
 
     void PhonebookMainWindow::rebuild()
     {
-        contactsList->rebuildList();
+        contactsList->rebuildList(style::listview::RebuildType::Partial);
     }
 
     void PhonebookMainWindow::buildInterface()
@@ -84,7 +83,6 @@ namespace gui
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
-
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         requestedSearch     = contactRequest != nullptr;
         if (requestedSearch) {

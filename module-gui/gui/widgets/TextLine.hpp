@@ -25,6 +25,9 @@ namespace gui
         bool drawUnderline                  = false;
         UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
         Position underlinePadding           = 0;
+        TextBlock::End end                  = TextBlock::End::None;
+        unsigned int block_nr               = text::npos;
+        Position storedYOffset              = 0;
 
         void createUnderline(unsigned int max_width, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
@@ -66,6 +69,11 @@ namespace gui
             return height_used;
         }
 
+        TextBlock::End getEnd() const
+        {
+            return end;
+        }
+
         const Item *getElement(unsigned int pos) const
         {
             unsigned int local_pos = 0;
@@ -83,6 +91,11 @@ namespace gui
             return elements_to_show_in_line.front()->area().pos(Axis::X);
         }
 
+        unsigned int getBlockNr() const
+        {
+            return block_nr;
+        }
+
         void setPosition(const short &x, const short &y);
         void setParent(Item *parent);
         [[nodiscard]] Length getWidth() const;
@@ -92,6 +105,6 @@ namespace gui
         ///
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
         void alignH(Alignment align, Length parent_length) const;
-        void alignV(Alignment align, Length parent_length, Length lines_height) const;
+        void alignV(Alignment align, Length parent_length, Length lines_height);
     };
 } // namespace gui

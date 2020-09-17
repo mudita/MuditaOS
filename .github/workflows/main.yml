@@ -19,14 +19,16 @@ jobs:
       run: |
         ./configure.sh linux Debug && \
         pushd build-linux-Debug && \
-        echo "JOBS=${JOBS:-8} | set to 8" &&\
-        make -j 8 check && \
+        export JOBS=${JOBS:-`nproc`} &&\
+        echo "JOBS=${JOBS}" &&\
+        make -j ${JOBS} check && \
         popd 
     - name: "Build for RT1051"
       run: |
         ./configure.sh rt1051 Debug && \
         pushd build-rt1051-Debug && \
-        echo "JOBS=${JOBS:-8} | set to 8" &&\
-        make -j 8 && \
+        export JOBS=${JOBS:-`nproc`} && \
+        echo "JOBS=${JOBS}" && \
+        make -j ${JOBS} && \
         popd && \
         uptime

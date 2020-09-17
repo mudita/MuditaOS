@@ -393,8 +393,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
     case CodecParamsMAX98090::OutputPath::Headphones:
     case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
-        float scale_factor               = 0.31;
-        uint8_t volume                   = (float)(vol * 100 * scale_factor);
+        constexpr float scale_factor     = .31f * 10.f;
+        uint8_t volume                   = static_cast<float>(vol * scale_factor);
         max98090_reg_lhp_vol_ctrl_t lvol = {0};
         max98090_reg_rhp_vol_ctrl_t rvol = {0};
 
@@ -412,8 +412,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
 
     case CodecParamsMAX98090::OutputPath::Earspeaker: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
-        float scale_factor               = 0.31;
-        uint8_t volume                   = (float)(vol * 100 * scale_factor);
+        constexpr float scale_factor     = .31f * 10.f;
+        uint8_t volume                   = static_cast<float>(vol * scale_factor);
         max98090_reg_recv_vol_ctrl_t vol = {0};
 
         vol.rcvlm   = mute;
@@ -425,8 +425,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
 
     case CodecParamsMAX98090::OutputPath::Loudspeaker: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
-        float scale_factor = 0.39;
-        uint8_t volume     = (float)(vol * 100 * scale_factor) + 0x18;
+        constexpr float scale_factor = .39f * 10.f;
+        uint8_t volume               = static_cast<float>(vol * scale_factor) + 0x18;
 
         max98090_reg_lspk_vol_ctrl_t lvol = {0};
         max98090_reg_rspk_vol_ctrl_t rvol = {0};
@@ -453,7 +453,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
 
 CodecRetCode CodecMAX98090::SetInputGain(const float gain)
 {
-    float gainToSet = gain;
+    constexpr float scaleFactor = .1f;
+    float gainToSet             = gain * scaleFactor;
 
     if (gain > 10) {
         gainToSet = 10;

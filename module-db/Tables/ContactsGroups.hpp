@@ -79,6 +79,7 @@ class ContactsGroupsTable : public Table<ContactsGroupsTableRow, ContactsGroupsT
     [[nodiscard]] uint32_t favouritesId() const;
     [[nodiscard]] uint32_t iceId() const;
     [[nodiscard]] uint32_t blockedId() const;
+    [[nodiscard]] uint32_t temporaryId() const;
     /** Returns id of the grup
      */
     uint32_t getId(const std::string &name);

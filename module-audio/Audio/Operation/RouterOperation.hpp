@@ -33,7 +33,8 @@ namespace audio
         friend void recorderWorker(void *pvp);
 
       public:
-        RouterOperation(const char *file);
+        RouterOperation(const char *file,
+                        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback);
 
         ~RouterOperation();
 

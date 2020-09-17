@@ -1,5 +1,9 @@
 #include "ThreadRecord.hpp"
 #include "SMSRecord.hpp"
+#include "ContactRecord.hpp"
+
+#include <queries/sms/QueryThreadGetByNumber.hpp>
+
 #include <cassert>
 #include <log/log.hpp>
 
@@ -14,6 +18,7 @@ bool ThreadRecordInterface::Add(const ThreadRecord &rec)
                                                   .msgCount       = rec.msgCount,
                                                   .unreadMsgCount = rec.unreadMsgCount,
                                                   .contactID      = rec.contactID,
+                                                  .numberID       = rec.numberID,
                                                   .snippet        = rec.snippet,
                                                   .type           = rec.type});
 
@@ -38,6 +43,7 @@ bool ThreadRecordInterface::Update(const ThreadRecord &rec)
                                                  .msgCount       = rec.msgCount,
                                                  .unreadMsgCount = rec.unreadMsgCount,
                                                  .contactID      = rec.contactID,
+                                                 .numberID       = rec.numberID,
                                                  .snippet        = rec.snippet,
                                                  .type           = rec.type
 
@@ -74,14 +80,22 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 {
     auto records = std::make_unique<std::vector<ThreadRecord>>();
 
+    ThreadsTableFields threadsField;
     switch (field) {
     case ThreadRecordField::ContactID: {
-        auto ret = smsDB->threads.getLimitOffsetByField(offset, limit, ThreadsTableFields::ContactID, str);
-
-        for (const auto &w : ret) {
-            records->push_back(w);
-        }
+        threadsField = ThreadsTableFields::ContactID;
     } break;
+    case ThreadRecordField::NumberID: {
+        threadsField = ThreadsTableFields::NumberID;
+    } break;
+    default:
+        LOG_ERROR("Invalid field type %u", static_cast<unsigned>(field));
+        return records;
+    }
+
+    auto ret = smsDB->threads.getLimitOffsetByField(offset, limit, threadsField, str);
+    for (const auto &w : ret) {
+        records->push_back(w);
     }
 
     return records;
@@ -119,6 +133,24 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
     return ThreadRecord(ret[0]);
 }
 
+ThreadRecord ThreadRecordInterface::GetByNumber(const utils::PhoneNumber::View &phoneNumber)
+{
+    auto contactInterface = ContactRecordInterface(contactsDB);
+    auto match            = contactInterface.MatchByNumber(phoneNumber);
+
+    if (!match.has_value()) {
+        return ThreadRecord();
+    }
+
+    auto threadRec = GetLimitOffsetByField(0, 1, ThreadRecordField::NumberID, std::to_string(match->numberId).c_str());
+
+    if (threadRec->size() == 0) {
+        return ThreadRecord();
+    }
+
+    return threadRec->at(0);
+}
+
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
     if (const auto localQuery = dynamic_cast<const db::query::SMSSearch *>(query.get())) {
@@ -138,8 +170,17 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr
     }
 
     if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query.get())) {
-        return runQueryImpl(local_query);
+        auto response = runQueryImpl(local_query);
+        response->setRequestQuery(query);
+        return response;
     }
+
+    if (const auto local_query = dynamic_cast<const db::query::ThreadGetByNumber *>(query.get())) {
+        auto response = std::make_unique<db::query::ThreadGetByNumberResult>(GetByNumber(local_query->getNumber()));
+        response->setRequestQuery(query);
+        return response;
+    }
+
     return nullptr;
 }
 

@@ -1,20 +1,18 @@
 #include "Common/Common.hpp"
 #include "ContactRecord.hpp"
-#include "MessageType.hpp"
 #include "ParserUtils.hpp"
-#include "Service/Common.hpp"
-#include "UpdatePureOS.hpp"
-#include "FactoryReset.hpp"
-#include "ParserStateMachine.hpp"
-#include "EndpointHandler.hpp"
+#include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
+#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
+#include "ParserFSM.hpp"
+#include "contacts/ContactHelper.hpp"
+#include "messages/MessageHelper.hpp"
 #include "queries/sms/QuerySMSSearchByType.hpp"
-#include "service-desktop/ServiceDesktop.hpp"
-
+#include "EndpointFactory.hpp"
+#include "contacts/ContactsEndpoint.hpp"
 #include "json/json11.hpp"
 #include <memory>
 #include <vfs.hpp>
 #include <catch2/catch.hpp>
-#include <iostream>
 
 class vfs vfs;
 
@@ -46,7 +44,7 @@ TEST_CASE("Factory Reset Test")
     REQUIRE(FactoryReset::CopyDirContent(factorydir, sysdir) == true);
 }
 
-using namespace ParserStateMachine;
+using namespace parserFSM;
 
 TEST_CASE("Parser Test")
 {
@@ -139,12 +137,12 @@ TEST_CASE("DB Helpers test - json decoding")
         auto helper = std::make_unique<ContactHelper>(nullptr);
 
         auto contact = helper->from_json(contactJson);
-        REQUIRE(contact->address == "6 Czeczota St.\n02600 Warsaw");
-        REQUIRE(contact->alternativeName == "Cic");
-        REQUIRE(contact->isOnBlocked() == true);
-        REQUIRE(contact->isOnFavourites() == true);
-        REQUIRE(contact->numbers.at(0).number.getFormatted() == "724 842 187");
-        REQUIRE(contact->primaryName == "Baatek");
+        REQUIRE(contact.address == "6 Czeczota St.\n02600 Warsaw");
+        REQUIRE(contact.alternativeName == "Cic");
+        REQUIRE(contact.isOnBlocked() == true);
+        REQUIRE(contact.isOnFavourites() == true);
+        REQUIRE(contact.numbers.at(0).number.getFormatted() == "724 842 187");
+        REQUIRE(contact.primaryName == "Baatek");
     }
     SECTION("incorrect json")
     {
@@ -154,15 +152,13 @@ TEST_CASE("DB Helpers test - json decoding")
         REQUIRE(err.empty());
 
         auto helper = std::make_unique<ContactHelper>(nullptr);
-
         auto contact = helper->from_json(contactJson);
-        REQUIRE(contact->address == "");
-        REQUIRE(contact->alternativeName == "Cic");
-        REQUIRE(contact->isOnBlocked() == true);
-        REQUIRE(contact->isOnFavourites() == true);
-        REQUIRE(contact->numbers.empty());
-        REQUIRE(contact->primaryName == "Baatek");
-        REQUIRE(helper->createDBEntry(recordPayload, 123) == sys::ReturnCodes::Failure);
+        REQUIRE(contact.address == "");
+        REQUIRE(contact.alternativeName == "Cic");
+        REQUIRE(contact.isOnBlocked() == true);
+        REQUIRE(contact.isOnFavourites() == true);
+        REQUIRE(contact.numbers.empty());
+        REQUIRE(contact.primaryName == "Baatek");
     }
 }
 
@@ -230,17 +226,65 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     REQUIRE(messageTemplateJson[json::messages::id] == 1);
 }
 
-TEST_CASE("Simple response builder test")
+TEST_CASE("Context class test")
 {
-    auto resp =
-        EndpointHandler::createSimpleResponse(sys::ReturnCodes::Success, static_cast<int>(Endpoint::contacts), 1234);
-    std::string err;
-    REQUIRE(resp.substr(0, 10) == "#000000060");
-    resp.erase(0, 10);
+    SECTION("Correct message")
+    {
+        auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
 
-    auto responseJson = json11::Json::parse(resp, err);
-    REQUIRE(err.empty());
-    REQUIRE(responseJson[json::endpoint] == static_cast<int>(Endpoint::contacts));
-    REQUIRE(responseJson[json::status] == static_cast<int>(http::Code::OK));
-    REQUIRE(responseJson[json::uuid].dump() == "\"1234\"");
+        Context context(msgJson);
+        REQUIRE(context.getBody()["test"] == "test");
+        REQUIRE(context.getMethod() == http::Method::get);
+        REQUIRE(context.getUuid() == 12345);
+        REQUIRE(context.getEndpoint() == EndpointType::contacts);
+        REQUIRE(context.createSimpleResponse() ==
+                R"(#000000061{"body": null, "endpoint": 6, "status": 200, "uuid": "12345"})");
+
+        context.setResponseBody(context.getBody());
+        REQUIRE(context.createSimpleResponse() ==
+                R"(#000000073{"body": {"test": "test"}, "endpoint": 6, "status": 200, "uuid": "12345"})");
+    }
+    SECTION("Invalid message")
+    {
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"0", "body":{"te":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        REQUIRE(context.getBody()["test"] == json11::Json());
+        REQUIRE(context.getMethod() == http::Method::get);
+        REQUIRE(context.getUuid() == invalidUuid);
+        REQUIRE(context.getEndpoint() == EndpointType::invalid);
+    }
+}
+
+TEST_CASE("Endpoint Factory test")
+{
+    SECTION("Proper endpoint")
+    {
+        auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto handler = EndpointFactory::create(context, nullptr);
+        REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
+    }
+
+    SECTION("Wrong endpoint")
+    {
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto handler = EndpointFactory::create(context, nullptr);
+        REQUIRE(handler == nullptr);
+    }
 }

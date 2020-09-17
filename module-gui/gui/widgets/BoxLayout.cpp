@@ -64,6 +64,12 @@ namespace gui
         resizeItems();
     }
 
+    template <Axis axis> void BoxLayout::addWidget(Item *item)
+    {
+        Rect::addWidget(item);
+        resizeItems<axis>();
+    }
+
     bool BoxLayout::removeWidget(Item *item)
     {
         bool ret = Rect::removeWidget(item);
@@ -146,8 +152,10 @@ namespace gui
         if (children.size() != 0) {
             for (auto it : outOfDrawAreaItems) {
                 it->setVisible(true);
+                it->setFocusItem(nullptr);
             }
         }
+
         outOfDrawAreaItems.clear();
         resizeItems();
     }
@@ -157,9 +165,9 @@ namespace gui
     // not needed now == not implemented
     template <Axis axis> void BoxLayout::resizeItems()
     {
-        Position pos      = reverseOrder ? this->area().size(axis) : 0;
-        Position pos_left = this->getSize(axis);
-        Position to_split = sizeLeft<axis>(this);
+        Position startingPosition = reverseOrder ? this->area().size(axis) : 0;
+        Position leftPosition     = this->getSize(axis);
+        Length toSplit            = sizeLeft<axis>(this);
 
         for (auto &el : children) {
 
@@ -169,66 +177,25 @@ namespace gui
             auto axisItemPosition       = 0;
             auto orthogonalItemPosition = 0;
             auto axisItemSize           = 0;
+            auto calculatedResize       = 0;
             auto orthogonalItemSize     = 0;
-            auto grantedSize            = sizeStore->get(el);
-            // Check if item can be resized
-            Position left_in_el = 0;
-            if (!grantedSize.isZero()) {
-                left_in_el = grantedSize.get(axis) - el->area(Area::Min).size(axis);
-            }
-            else {
-                left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
-            }
-            if (to_split > 0 && left_in_el > 0) {
-                int32_t resize = std::min(left_in_el, to_split);
-                axisItemSize   = el->area(Area::Min).size(axis) + resize;
-                to_split -= resize;
-            }
-            else {
-                axisItemSize = el->area(Area::Min).size(axis);
-            }
 
-            Length maxOrthogonalItemInParentSize =
-                this->area(Area::Normal).size(orthogonal(axis)) <= el->getMargins().getSumInAxis(orthogonal(axis))
-                    ? 0
-                    : this->area(Area::Normal).size(orthogonal(axis)) - el->getMargins().getSumInAxis(orthogonal(axis));
+            // 1. Calculate element axis resize.
+            calculatedResize = calculateElemResize<axis>(el, toSplit);
 
-            Length maxOrthogonalItemSize =
-                el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
-                    ? el->area(Area::Max).size(orthogonal(axis))
-                    : el->area(Area::Min).size(orthogonal(axis));
+            // 2. Check if new size in axis can be applied and set it or use element minimal size in axis.
+            axisItemSize = calculateElemAxisSize<axis>(el, calculatedResize, toSplit);
 
-            orthogonalItemSize = std::min(maxOrthogonalItemInParentSize, maxOrthogonalItemSize);
+            // 3. Calculate orthogonal axis size.
+            orthogonalItemSize = calculateElemOrtAxisSize<axis>(el);
 
-            // Check if there is still position left
-            if (axisItemSize <= pos_left) {
+            // 4. Calculate element position in axis and apply in axis alignment.
+            axisItemPosition = calculateElemAxisPosition<axis>(el, axisItemSize, startingPosition, leftPosition);
 
-                if (reverseOrder) {
-                    pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
-                    pos -= axisItemSize;
-                    axisItemPosition = pos;
-                    pos -= el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
-                }
+            // 5. Calculate element orthogonal axis position based on Layout alignment or on element alignment.
+            orthogonalItemPosition = calculateElemOrtAxisPosition<axis>(el, orthogonalItemSize);
 
-                if (!reverseOrder) {
-                    pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
-                    axisItemPosition = pos;
-                    pos += axisItemSize;
-                    pos += el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
-                }
-
-                pos_left -= axisItemSize + el->getMargins().getSumInAxis(axis);
-            }
-            else {
-                addToOutOfDrawAreaList(el);
-            }
-
-            // Recalculate lead Axis position if lead axis alignment provided.
-            axisItemPosition = getAxisAlignmentValue<axis>(axisItemPosition, axisItemSize, el);
-
-            // Calculate orthogonal Axis position based on Box Alignment or if not specified child Alignment.
-            orthogonalItemPosition = el->getAxisAlignmentValue(orthogonal(axis), orthogonalItemSize);
-
+            // 6. If element still visible (not added to outOfDrawAreaList) set it Area with calculated values.
             if (el->visible)
                 el->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
         }
@@ -236,10 +203,108 @@ namespace gui
         Rect::updateDrawArea();
     }
 
-    template <Axis axis> void BoxLayout::addWidget(Item *item)
+    template <Axis axis> Length BoxLayout::calculateElemResize(Item *el, Length &toSplit)
     {
-        Rect::addWidget(item);
-        resizeItems<axis>();
+        auto grantedSize        = sizeStore->get(el);
+        Length calculatedResize = 0;
+
+        // Check if element has stored requested size in axis.
+        if (!grantedSize.isZero()) {
+            calculatedResize = grantedSize.get(axis) < el->area(Area::Min).size(axis)
+                                   ? 0
+                                   : grantedSize.get(axis) - el->area(Area::Min).size(axis);
+
+            // If requested size bigger than left size in layout push out last visible element in layout into
+            // outOfDrawAreaList.
+            if (sizeLeft<axis>(this) < calculatedResize) {
+                addToOutOfDrawAreaList(getLastVisibleElement());
+                toSplit = sizeLeft<axis>(this);
+            }
+        }
+        else {
+            // If not calculate possible size in axis from min-max difference.
+            calculatedResize = el->area(Area::Max).size(axis) < el->area(Area::Min).size(axis)
+                                   ? 0
+                                   : el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
+        }
+
+        return calculatedResize;
+    }
+
+    template <Axis axis> Length BoxLayout::calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit)
+    {
+        Length axisItemSize = 0;
+
+        if (toSplit > 0 && calculatedResize > 0) {
+            axisItemSize = el->area(Area::Min).size(axis) + std::min(calculatedResize, toSplit);
+            toSplit -= std::min(calculatedResize, toSplit);
+        }
+        else {
+            axisItemSize = el->area(Area::Min).size(axis);
+        }
+
+        return axisItemSize;
+    }
+
+    template <Axis axis> Length BoxLayout::calculateElemOrtAxisSize(Item *el)
+    {
+        // Get maximum size that element in orthogonal axis can occupy in current layout size.
+        Length maxOrthogonalItemInParentSize =
+            this->area(Area::Normal).size(orthogonal(axis)) <= el->getMargins().getSumInAxis(orthogonal(axis))
+                ? 0
+                : this->area(Area::Normal).size(orthogonal(axis)) - el->getMargins().getSumInAxis(orthogonal(axis));
+
+        // Get maximum size of element in orthogonal axis based on its min-max.
+        Length maxOrthogonalItemSize =
+            el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
+                ? el->area(Area::Max).size(orthogonal(axis))
+                : el->area(Area::Min).size(orthogonal(axis));
+
+        // Return minimal from both max sizes.
+        return std::min(maxOrthogonalItemInParentSize, maxOrthogonalItemSize);
+    }
+
+    template <Axis axis>
+    Position BoxLayout::calculateElemAxisPosition(Item *el,
+                                                  Length axisItemSize,
+                                                  Position &startingPosition,
+                                                  Position &leftPosition)
+    {
+        auto axisItemPosition = 0;
+
+        // Check if elements in axis can fit with margins in layout free space.
+        if (((Position)axisItemSize + el->getMargins().getSumInAxis(axis)) <= leftPosition) {
+
+            if (reverseOrder) {
+                startingPosition -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
+                startingPosition -= axisItemSize;
+                axisItemPosition = startingPosition;
+                startingPosition -= el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
+            }
+
+            if (!reverseOrder) {
+                startingPosition += el->getMargins().getMarginInAxis(axis, MarginInAxis::First);
+                axisItemPosition = startingPosition;
+                startingPosition += axisItemSize;
+                startingPosition += el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
+            }
+
+            leftPosition -= axisItemSize + el->getMargins().getSumInAxis(axis);
+
+            // Recalculate element axis position if axis alignment provided.
+            axisItemPosition = getAxisAlignmentValue<axis>(axisItemPosition, axisItemSize, el);
+        }
+        else {
+            // If not add it to outOfDrawAreaList.
+            addToOutOfDrawAreaList(el);
+        }
+
+        return axisItemPosition;
+    }
+
+    template <Axis axis> Position BoxLayout::calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize)
+    {
+        return el->getAxisAlignmentValue(orthogonal(axis), orthogonalItemSize);
     }
 
     template <Axis axis> Position BoxLayout::getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el)
@@ -251,20 +316,20 @@ namespace gui
         switch (getAlignment(axis).vertical) {
         case gui::Alignment::Vertical::Top:
             if (reverseOrder) {
-                return calcPos - offset;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset;
             }
             break;
         case gui::Alignment::Vertical::Center:
             if (reverseOrder) {
-                return calcPos - offset / 2;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset / 2;
             }
             else {
-                return calcPos + offset / 2;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset / 2;
             }
             break;
         case gui::Alignment::Vertical::Bottom:
             if (!reverseOrder) {
-                return calcPos + offset;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset;
             }
             break;
         default:
@@ -274,20 +339,20 @@ namespace gui
         switch (getAlignment(axis).horizontal) {
         case gui::Alignment::Horizontal::Left:
             if (reverseOrder) {
-                return calcPos - offset;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset;
             }
             break;
         case gui::Alignment::Horizontal::Center:
             if (reverseOrder) {
-                return calcPos - offset / 2;
+                return calcPos + el->getMargins().getSumInAxis(axis) - offset / 2;
             }
             else {
-                return calcPos + offset / 2;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset / 2;
             }
             break;
         case gui::Alignment::Horizontal::Right:
             if (!reverseOrder) {
-                return calcPos + offset;
+                return calcPos - el->getMargins().getSumInAxis(axis) + offset;
             }
             break;
         default:
@@ -324,6 +389,13 @@ namespace gui
                                            *previous);
                 previous = next;
             }
+
+            if (previous != children.end()) {
+                if ((*previous) != nullptr) {
+                    (*previous)->setNavigationItem(reverseOrder ? NavigationDirection::UP : NavigationDirection::DOWN,
+                                                   nullptr);
+                }
+            }
         }
 
         if (type == ItemType::HBOX) {
@@ -335,23 +407,12 @@ namespace gui
                                            *previous);
                 previous = next;
             }
-        }
-    }
 
-    void BoxLayout::setFocusOnElement(unsigned int elementNumber)
-    {
-        unsigned int i = 0;
-        for (auto child : children) {
-            if (child->activeItem == true && child->visible == true) {
-
-                if (elementNumber == i) {
-                    child->setFocus(true);
-                    focusItem = child;
+            if (previous != children.end()) {
+                if ((*previous) != nullptr) {
+                    (*previous)->setNavigationItem(
+                        reverseOrder ? NavigationDirection::LEFT : NavigationDirection::RIGHT, nullptr);
                 }
-                else {
-                    child->setFocus(false);
-                }
-                ++i;
             }
         }
     }
@@ -372,9 +433,48 @@ namespace gui
 
         Size granted = {std::min((*el)->area(Area::Max).w, request_w), std::min((*el)->area(Area::Max).h, request_h)};
 
+        // Currently not used option for Layouts that don't push out objects.
+        if (!sizeStore->getReleaseSpaceFlag()) {
+            if ((granted.get(axis) + (*el)->getMargins().getSumInAxis(axis)) >=
+                sizeLeftWithoutElem<axis>(this, *el, Area::Min)) {
+
+                granted = Size((*el)->area(Area::Normal).w, (*el)->area(Area::Normal).h);
+            }
+        }
+
+        // If granted size decreased check if pushed out elements can fit
+        if (sizeStore->isSizeSmaller(*el, granted, axis)) {
+            addFromOutOfDrawAreaList();
+        }
+
         sizeStore->store(*el, granted);
-        BoxLayout::resizeItems<axis>(); // vs mark dirty
+        resizeItems(); // vs mark dirty
+        setNavigation();
+
         return granted;
+    }
+
+    bool BoxLayout::setFocusOnElement(unsigned int elementNumber)
+    {
+        unsigned int i = 0;
+        bool success   = false;
+
+        for (auto child : children) {
+            if (child->activeItem && child->visible) {
+
+                if (elementNumber == i) {
+                    child->setFocus(true);
+                    focusItem = child;
+                    success   = true;
+                }
+                else {
+                    child->setFocus(false);
+                }
+                ++i;
+            }
+        }
+
+        return success;
     }
 
     void BoxLayout::setFocusOnLastElement()
@@ -391,6 +491,32 @@ namespace gui
                 (*child)->setFocus(false);
             }
         }
+    }
+
+    unsigned int BoxLayout::getFocusItemIndex() const
+    {
+        auto index     = 0;
+        auto focusItem = getFocusItem();
+
+        for (auto child : children) {
+            if (child == focusItem) {
+                break;
+            }
+            if (child->activeItem && child->visible) {
+                index++;
+            }
+        }
+        return index;
+    }
+
+    Item *BoxLayout::getLastVisibleElement()
+    {
+        for (auto child = children.rbegin(); child != children.rend(); child++) {
+            if ((*child)->visible) {
+                return (*child);
+            }
+        }
+        return nullptr;
     }
 
     auto BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool

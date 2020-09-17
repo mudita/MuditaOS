@@ -42,6 +42,8 @@ namespace style
     const auto design_border_offset        = 20;
     const auto design_option_span          = 8;
     const auto design_notifications_offset = 284;
+    const auto digit_normal_size              = 13;
+    const auto notification_icon_unified_size = 35;
 }; // namespace style
 
 namespace gui
@@ -86,15 +88,16 @@ namespace gui
 
     void DesktopMainWindow::setVisibleState()
     {
-
         auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (!app) {
-            return;
-        }
+        assert(app != nullptr);
 
         if (app->getScreenLocked()) {
+            bottomBar->restore();
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             topBar->setActive(TopBar::Elements::LOCK, true);
+            inputCallback = nullptr;
+            setFocusItem(nullptr);
+            erase(notifications);
         }
         else {
             auto app = dynamic_cast<app::ApplicationDesktop *>(application);
@@ -145,57 +148,66 @@ namespace gui
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
 
         // process shortpress
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-
+        if (inputEvent.isShortPress()) {
             if (app->getScreenLocked()) {
                 // if enter was pressed
-                if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-                    unlockStartTime = xTaskGetTickCount();
-                    enterPressed    = true;
-                }
-                else if ((inputEvent.keyCode == KeyCode::KEY_PND) && enterPressed) {
+                if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
                     // if interval between enter and pnd keys is less than time defined for unlocking
-                    if (xTaskGetTickCount() - unlockStartTime < unclockTime) {
-                        // display pin lock screen or simply refresh current window to update labels
-                        if (app->getPinLocked())
-                            // if there was no application on to before closing proceed normally to pin protection
-                            // window.
-                            if (lockTimeoutApplilcation.empty()) {
-                                application->switchWindow("PinLockWindow");
-                            }
-                            else {
-                                std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>();
-                                data->setPrevApplication(lockTimeoutApplilcation);
-                                lockTimeoutApplilcation = "";
-                                application->switchWindow("PinLockWindow", std::move(data));
-                            }
-
+                    // display pin lock screen or simply refresh current window to update labels
+                    if (app->getPinLocked()) {
+                        std::unique_ptr<LockPhoneData> data =
+                            std::make_unique<LockPhoneData>(LockPhoneData::Request::Pin);
+                        // if there was no application on to before closing proceed normally to pin protection
+                        if (lockTimeoutApplilcation.empty()) {
+                            application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
+                            return true;
+                        }
                         else {
-
-                            // if phone was locked by user show unlocked main window
-                            if (lockTimeoutApplilcation.empty()) {
-                                app->setScreenLocked(false);
-                                setVisibleState();
-                                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                            }
-                            // if there was application on top when timeout occurred
-                            else {
-                                lockTimeoutApplilcation = "";
-                                sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-                            }
+                            data->setPrevApplication(lockTimeoutApplilcation);
+                            lockTimeoutApplilcation = "";
+                            application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
+                            return true;
                         }
                     }
-                    enterPressed = false;
+                    else {
+
+                        // if phone was locked by user show unlocked main window
+                        if (lockTimeoutApplilcation.empty()) {
+                            app->setScreenLocked(false);
+                            setVisibleState();
+                            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+                            return true;
+                        }
+                        // if there was application on top when timeout occurred
+                        else {
+                            lockTimeoutApplilcation = "";
+                            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+                        }
+                    }
                 }
-                else {
-                    enterPressed = false;
+                // not locked && not unlock -> show prompt
+                if ((app->getPinLocked() == false) && ((!inputEvent.is(KeyCode::KEY_ENTER)) ||
+                                                       (inputEvent.is(KeyCode::KEY_ENTER) && enter_cache.cached()))) {
+                    if (inputEvent.is(KeyCode::KEY_ENTER) && enter_cache.cached()) {
+                        enter_cache.clear();
+                    }
+                    application->switchWindow(app::window::name::desktop_pin_lock,
+                                              std::make_unique<LockPhoneData>(LockPhoneData::Request::NoPin));
+                    return true;
                 }
+                if (!inputEvent.is(KeyCode::KEY_ENTER)) { // TODO TUTAJ BREAKPOINT
+                    application->switchWindow(app::window::name::desktop_pin_lock,
+                                              std::make_unique<LockPhoneData>(LockPhoneData::Request::ShowPrompt));
+                    return true;
+                }
+                if (enter_cache.storeEnter(inputEvent)) {}
             }
             // screen is unlocked
             else {
                 // pressing enter moves user to menu screen
                 if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
                     application->switchWindow("MenuWindow");
+                    return true;
                 }
                 // if numeric key was pressed record that key and send it to call application
                 else if (code != 0) {
@@ -203,7 +215,7 @@ namespace gui
                 }
             }
         }
-        else if (inputEvent.state == InputEvent::State::keyReleasedLong) {
+        else if (inputEvent.isLongPress()) {
             // long press of # locks screen if it was unlocked
             if ((inputEvent.keyCode == KeyCode::KEY_PND) && (app->getScreenLocked() == false)) {
                 app->setScreenLocked(true);
@@ -252,11 +264,20 @@ namespace gui
         return gui::AppWindow::buildDrawList();
     }
 
-    auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
+    auto add_image_inactive(UTF8 img)
     {
-        auto thumbnail        = new gui::Image(icon);
+        auto thumbnail        = new gui::Image(img);
         thumbnail->activeItem = false;
-        layout->addWidget(thumbnail);
+        return thumbnail;
+    }
+
+    auto add_box_icon(UTF8 icon)
+    {
+        auto thumbnail = add_image_inactive(icon);
+        thumbnail->setMinimumWidth(style::notification_icon_unified_size);
+        thumbnail->setMargins(
+            gui::Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
+        return thumbnail;
     }
 
     /// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of
@@ -268,12 +289,11 @@ namespace gui
                           std::function<bool()> showCallback,
                           std::function<bool()> clearCallback) -> bool
     {
-        const auto text_normal_size        = 200;
-        const auto size_needed_for_2digits = 30;
         // 1. create hbox for all elements
         auto el = new gui::HBox(nullptr, 0, 0, style::window::default_body_width, style::window::label::default_h);
         el->setAlignment(Alignment(gui::Alignment::Vertical::Center));
-        auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
+
+        auto text = new gui::Label();
         text->setMaximumSize(el->area().w, Axis::X);
         text->setText(name);
         text->setFont(style::window::font::medium);
@@ -281,23 +301,28 @@ namespace gui
         text->setPenWidth(style::window::default_border_no_focus_w);
         text->activeItem = false;
 
-        auto number = new gui::Label();
-        number->setText(indicator);
+        auto number = new gui::Text();
+        if (indicator.length() > 2) {
+            const UTF8 max_notification_value = "99+";
+            number->setText(max_notification_value);
+            number->setMinimumWidth(max_notification_value.length() * style::digit_normal_size);
+        }
+        else {
+            number->setText(indicator);
+            number->setMinimumWidth(indicator.length() * style::digit_normal_size);
+        }
         number->setFont(style::window::font::mediumbold);
         number->setPenWidth(style::window::default_border_no_focus_w);
-        number->setSize(size_needed_for_2digits, el->area().h);
-        number->setMinimumWidth(size_needed_for_2digits);
+        number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
         number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         number->activeItem = false;
+
         // 2. Add all elements to hbox layout
-        new gui::Span(el, Axis::X, style::design_border_offset);
-        add_box_icon(el, icon);
-        new gui::Span(el, Axis::X, style::design_border_offset);
+        el->addWidget(add_box_icon(icon));
         el->addWidget(text);
-        add_box_icon(el, "dot_12px_hard_alpha_W_G");
+        el->addWidget(add_image_inactive("dot_12px_hard_alpha_W_G"));
         el->addWidget(number);
-        // box right inner margin
-        new gui::Span(el, Axis::X, style::design_border_offset);
+
         // 3. Set hbox layout properties
         el->setPenWidth(style::window::default_border_no_focus_w);
         el->setPenFocusWidth(style::window::default_border_focus_w);
@@ -326,7 +351,7 @@ namespace gui
 
     auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
     {
-        bottomBar->restore(BottomBar::Side::RIGHT);
+        bottomBar->restore();
         erase(notifications);
         // 1. create notifications box
         notifications = new gui::VBox(nullptr,
@@ -365,10 +390,10 @@ namespace gui
                 },
                 [app]() -> bool { return app->clearMessagesNotification(); });
         }
+        bottomBar->store();
         if (app->notifications.notSeen.areEmpty() != true) {
             setFocusItem(notifications);
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_show"));
-            bottomBar->store(BottomBar::Side::RIGHT);
             bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"));
         }
         else {

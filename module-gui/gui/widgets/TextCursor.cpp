@@ -24,7 +24,7 @@ namespace gui
         pos_on_screen = document->getText().length();
     }
 
-    TextCursor::Move TextCursor::move(NavigationDirection direction)
+    TextCursor::Move TextCursor::move_cursor(NavigationDirection direction)
     {
         debug_text_cursor("cursor: screen pos: %d block: %d pos: %d %s",
                           pos_on_screen,
@@ -49,6 +49,11 @@ namespace gui
             if (nr == getBlockNr() || nr == text::npos) {
                 --pos_on_screen;
             }
+            else {
+                auto block    = document->getBlock(this);
+                auto len      = block->getText().length();
+                pos_on_screen = len - 1;
+            }
             return Move::InLine;
         }
 
@@ -60,6 +65,28 @@ namespace gui
             return Move::InLine;
         }
 
+        if (direction == NavigationDirection::DOWN) {
+
+            if (document->isEmpty()) {
+                return Move::Error;
+            }
+
+            operator++();
+
+            auto block = document->getBlock(this);
+
+            if (block == nullptr) {
+                return Move::Error;
+            }
+
+            auto len = block->getText().length();
+
+            if (len < pos_on_screen) {
+                pos_on_screen = len;
+            }
+
+            return Move::Down;
+        }
         return Move::Error;
     }
 
@@ -67,17 +94,24 @@ namespace gui
     {
         unsigned int offset_pos = 0;
         unsigned int row        = 0;
+
         if (text == nullptr) {
             return {nullptr, text::npos, text::npos};
         }
+
+        auto block = getBlockNr();
+
         for (auto &line : text->lines.get()) {
-            if (offset_pos + line.length() >= pos_on_screen) {
-                auto column = pos_on_screen - offset_pos;
-                return {&line, column, row};
+            if (line.getBlockNr() == block) {
+                if (offset_pos + line.length() >= pos_on_screen) {
+                    auto column = pos_on_screen - offset_pos;
+                    return {&line, column, row};
+                }
+                offset_pos += line.length();
             }
-            offset_pos += line.length();
             ++row;
         }
+
         return {nullptr, text::npos, text::npos};
     }
 
@@ -91,8 +125,8 @@ namespace gui
         }
         if (document->isEmpty() && text->font != nullptr) {
             h += text->font->info.line_height;
-            x = getAxisAlignmentValue(Axis::X, widgetArea.w);
-            y = getAxisAlignmentValue(Axis::Y, widgetArea.h);
+            x = getAxisAlignmentValue(Axis::X, w);
+            y = getAxisAlignmentValue(Axis::Y, h);
         }
         else if (text != nullptr || text->lines.size() > 0) {
             auto [line, column, row] = getLine();
@@ -112,7 +146,12 @@ namespace gui
     void TextCursor::addChar(uint32_t utf_val)
     {
         BlockCursor::addChar(utf_val);
-        move(NavigationDirection::RIGHT);
+        if (utf_val == text::newline) {
+            move_cursor(NavigationDirection::DOWN);
+        }
+        else {
+            move_cursor(NavigationDirection::RIGHT);
+        }
     }
 
     TextCursor &TextCursor::operator<<(const UTF8 &text)
@@ -129,14 +168,14 @@ namespace gui
         BlockCursor::addTextBlock(std::move(textblock));
         // +1 is for block barier
         for (unsigned int i = 0; i < len + 1; ++i) {
-            move(NavigationDirection::RIGHT);
+            move_cursor(NavigationDirection::RIGHT);
         }
         return *this;
     }
 
     void TextCursor::removeChar()
     {
-        move(NavigationDirection::LEFT);
+        move_cursor(NavigationDirection::LEFT);
         BlockCursor::removeChar();
     }
 } // namespace gui

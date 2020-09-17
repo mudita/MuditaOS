@@ -11,7 +11,9 @@ namespace audio
     class PlaybackOperation : public Operation
     {
       public:
-        PlaybackOperation(const char *file);
+        PlaybackOperation(
+            const char *file,
+            std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
         audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) override final;
 

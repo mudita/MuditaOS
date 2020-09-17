@@ -43,6 +43,7 @@ set(SOURCES
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
         Tables/EventsTable.cpp
+        Tables/SettingsTable_v2.cpp
 
         Interface/Record.cpp
         Interface/SMSRecord.cpp
@@ -55,22 +56,42 @@ set(SOURCES
         Interface/SMSTemplateRecord.cpp
         Interface/NotificationsRecord.cpp
         Interface/EventsRecord.cpp
+        Interface/SettingsRecord_v2.cpp
 
         queries/RecordQuery.cpp
         queries/sms/QuerySMSSearch.cpp
         queries/sms/QuerySMSThreadsGet.cpp
         queries/sms/QuerySMSSearchByType.cpp
         queries/sms/QuerySmsThreadMarkAsRead.cpp
+        queries/sms/QuerySMSGet.cpp
+        queries/sms/QuerySMSGetCount.cpp
         queries/sms/QuerySMSGetByID.cpp
         queries/sms/QuerySMSGetByContactID.cpp
+        queries/sms/QuerySMSGetByThreadID.cpp
         queries/sms/QuerySMSGetByText.cpp
+        queries/sms/QuerySMSRemove.cpp
+        queries/sms/QuerySMSTemplateAdd.cpp
         queries/sms/QuerySMSTemplateGetByID.cpp
+        queries/sms/QuerySMSTemplateGet.cpp
+        queries/sms/QuerySMSTemplateGetCount.cpp
+        queries/sms/QuerySMSTemplateRemove.cpp
+        queries/sms/QuerySMSTemplateUpdate.cpp
+        queries/sms/QueryThreadGetByNumber.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
+        queries/calllog/QueryCalllogGet.cpp
+        queries/calllog/QueryCalllogGetCount.cpp
+        queries/calllog/QueryCalllogRemove.cpp
+        queries/calllog/QueryCalllogGetByContactID.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
         queries/notifications/QueryNotificationsGetAll.cpp
         queries/phonebook/QueryContactGet.cpp
+        queries/phonebook/QueryContactGetByID.cpp
+        queries/phonebook/QueryContactAdd.cpp
+        queries/phonebook/QueryContactUpdate.cpp
+        queries/phonebook/QueryContactRemove.cpp
+        queries/phonebook/QueryNumberGetByID.cpp
         queries/calendar/QueryEventsRemove.cpp
         queries/calendar/QueryEventsGet.cpp
         queries/calendar/QueryEventsGetAll.cpp
@@ -78,7 +99,10 @@ set(SOURCES
         queries/calendar/QueryEventsEdit.cpp
         queries/calendar/QueryEventsGetFiltered.hpp
         queries/calendar/QueryEventsGetFiltered.cpp
-        )
+        queries/settings/QuerySettingsGet_v2.cpp
+        queries/settings/QuerySettingsUpdate_v2.cpp
+        queries/settings/QuerySettingsAddOrIgnore_v2.cpp
+)
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)

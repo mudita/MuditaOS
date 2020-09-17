@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WorkerDesktop.hpp"
-#include "UpdatePureOS.hpp"
+#include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
 
 namespace service::name
 {

@@ -17,9 +17,10 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
 {
   private:
     std::string queryFilter;
+    std::uint32_t queryGroupFilter;
 
   public:
-    PhonebookModel(app::Application *app, std::string filter = "");
+    PhonebookModel(app::Application *app, std::string filter = "", std::uint32_t groupFilter = 0);
     ~PhonebookModel() override = default;
 
     // virtual methods from DatabaseModel

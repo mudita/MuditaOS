@@ -1,9 +1,8 @@
 #include "NewMessage.hpp"
 
-#include "ThreadViewWindow.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/data/SMSdata.hpp"
-#include "application-messages/MessagesStyle.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
@@ -29,7 +28,10 @@ namespace gui
 
     void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        data->ignoreCurrentWindowOnStack = true;
+        if (data == nullptr) {
+            return;
+        }
+
         if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
             LOG_INFO("received search results");
             recipient->setText(pdata->result->getFormattedName());
@@ -43,11 +45,12 @@ namespace gui
         }
         if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
             LOG_INFO("recieved sms send request");
-            auto number     = pdata->getPhoneNumber();
-            auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, number);
+            phoneNumber = pdata->getPhoneNumber();
+            LOG_INFO("Number to send sms to: %s", phoneNumber.getFormatted().c_str());
+            auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
             if (!retContact) {
-                LOG_WARN("not valid contact for number %s", number.getEntered().c_str());
-                recipient->setText(number.getFormatted());
+                LOG_WARN("not valid contact for number %s", phoneNumber.getEntered().c_str());
+                recipient->setText(phoneNumber.getFormatted());
                 message->setText(pdata->textData);
                 return;
             }
@@ -75,9 +78,16 @@ namespace gui
     {
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
-        // if a valid contact was found, choose it. Otherwise, get a raw entered number
-        auto number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].number
-                                                                : utils::PhoneNumber(recipient->getText()).getView();
+        utils::PhoneNumber::View number;
+
+        if (phoneNumber.getEntered().size() > 0) {
+            number = phoneNumber;
+        }
+        else {
+            number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].number
+                                                               : utils::PhoneNumber(recipient->getText()).getView();
+        }
+
         auto ret = app->sendSms(number, message->getText());
         if (!ret) {
             LOG_ERROR("sendSms failed");
@@ -100,22 +110,11 @@ namespace gui
 
     bool NewSMS_Window::switchToThreadWindow(const utils::PhoneNumber::View &number)
     {
-        uint32_t contactId;
-        if (!contact || contact->numbers.size() == 0) {
-            // once the sms is send, there is assumption that contact exists
-            auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, number);
-            if (!retContact) {
-                LOG_ERROR("not valid contact for number %s", number.getFormatted().c_str());
-                return false;
-            }
-            contact = std::move(retContact);
-        }
-        contactId = contact->ID;
-
-        auto thread = DBServiceAPI::ThreadGetByContact(application, contactId);
+        auto thread = DBServiceAPI::ThreadGetByNumber(application, number, getThreadTimeout);
         if (thread) {
             // clear data only when message is sent
             contact = nullptr;
+            phoneNumber.clear();
             recipient->setText("");
             message->setText("");
             setFocusItem(body);

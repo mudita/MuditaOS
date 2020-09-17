@@ -11,14 +11,16 @@
 
 #include "Database/Database.hpp"
 #include "../Tables/SettingsTable.hpp"
+#include "../Tables/SettingsTable_v2.hpp"
 
 class SettingsDB : public Database
 {
   public:
     SettingsDB();
-    ~SettingsDB();
+    ~SettingsDB() override = default;
 
     SettingsTable settings;
+    SettingsTable_v2 settings_v2;
 
     static const char *GetDBName()
     {

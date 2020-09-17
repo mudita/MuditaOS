@@ -32,6 +32,7 @@ namespace gui
         auto verifyAndSave() -> bool;
         void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber);
         void showDialogDuplicatedSpeedDialNumber();
+        void setSaveButtonVisible(bool visible);
 
         std::shared_ptr<ContactRecord> contact           = nullptr;
         std::shared_ptr<NewContactModel> newContactModel = nullptr;

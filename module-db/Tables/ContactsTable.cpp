@@ -8,9 +8,21 @@ namespace ColumnName
     const uint8_t numbers_id = 2;
     const uint8_t ring_id    = 3;
     const uint8_t address_id = 4;
-    const uint8_t type       = 5;
-    const uint8_t speeddial  = 6;
+    const uint8_t speeddial  = 5;
 }; // namespace ColumnName
+
+namespace statements
+{
+    const auto selectWithoutTemp = "SELECT * FROM contacts WHERE _id= %lu"
+                                   " AND "
+                                   " contacts._id NOT IN ( "
+                                   "   SELECT cmg.contact_id "
+                                   "   FROM contact_match_groups cmg, contact_groups cg "
+                                   "   WHERE cmg.group_id = cg._id "
+                                   "       AND cg.name = 'Temporary' "
+                                   "   ) ";
+    const auto selectWithTemp = "SELECT * FROM contacts WHERE _id= %lu";
+} // namespace statements
 
 ContactsTable::ContactsTable(Database *db) : Table(db)
 {}
@@ -25,13 +37,12 @@ bool ContactsTable::create()
 
 bool ContactsTable::add(ContactsTableRow entry)
 {
-    return db->execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, speeddial) "
-                       " VALUES (%lu, '%q', %lu, %lu, %lu, '%q');",
+    return db->execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, speeddial) "
+                       " VALUES (%lu, '%q', %lu, %lu, '%q');",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
                        entry.addressID,
-                       entry.type,
                        entry.speedDial.c_str());
 }
 
@@ -47,33 +58,46 @@ bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 
 bool ContactsTable::update(ContactsTableRow entry)
 {
-    return db->execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, type "
-                       " = %lu, speeddial = '%q' WHERE _id=%lu;",
+    return db->execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, "
+                       " speeddial = '%q' WHERE _id=%lu;",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
                        entry.addressID,
-                       entry.type,
                        entry.speedDial.c_str(),
                        entry.ID);
 }
 
 ContactsTableRow ContactsTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM contacts WHERE _id= %lu;", id);
+    auto retQuery = db->query(statements::selectWithoutTemp, id);
+    return getByIdCommon(std::move(retQuery));
+}
 
+ContactsTableRow ContactsTable::getByIdWithTemporary(uint32_t id)
+{
+    LOG_DEBUG("%s", __FUNCTION__);
+    auto retQuery = db->query(statements::selectWithTemp, id);
+    return getByIdCommon(std::move(retQuery));
+}
+
+ContactsTableRow ContactsTable::getByIdCommon(std::unique_ptr<QueryResult> retQuery)
+{
+    LOG_DEBUG("%s", __FUNCTION__);
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        LOG_DEBUG("no results");
         return ContactsTableRow();
     }
 
+    LOG_DEBUG(
+        "got results: %" PRIu32 "; ID: %" PRIu32, retQuery->getRowCount(), (*retQuery)[ColumnName::id].getInt32());
     return ContactsTableRow{
-        (*retQuery)[ColumnName::id].getUInt32(),
-        (*retQuery)[ColumnName::name_id].getUInt32(),
-        (*retQuery)[ColumnName::numbers_id].getString(),
-        (*retQuery)[ColumnName::ring_id].getUInt32(),
-        (*retQuery)[ColumnName::address_id].getUInt32(),
-        static_cast<ContactType>((*retQuery)[ColumnName::type].getUInt32()),
-        (*retQuery)[ColumnName::speeddial].getString(),
+        {.ID = (*retQuery)[ColumnName::id].getUInt32()},
+        .nameID    = (*retQuery)[ColumnName::name_id].getUInt32(),
+        .numbersID = (*retQuery)[ColumnName::numbers_id].getString(),
+        .ringID    = (*retQuery)[ColumnName::ring_id].getUInt32(),
+        .addressID = (*retQuery)[ColumnName::address_id].getUInt32(),
+        .speedDial = (*retQuery)[ColumnName::speeddial].getString(),
     };
 }
 
@@ -115,12 +139,11 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryNa
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[ColumnName::id].getUInt32(),
+            {(*retQuery)[ColumnName::id].getUInt32()},
             (*retQuery)[ColumnName::name_id].getUInt32(),
             (*retQuery)[ColumnName::numbers_id].getString(),
             (*retQuery)[ColumnName::ring_id].getUInt32(),
             (*retQuery)[ColumnName::address_id].getUInt32(),
-            static_cast<ContactType>((*retQuery)[ColumnName::type].getUInt32()),
             (*retQuery)[ColumnName::speeddial].getString(),
             (*retQuery)[ColumnName::speeddial + 1].getString(), // primaryName
             (*retQuery)[ColumnName::speeddial + 2].getString(), // alternativeName (WTF!)
@@ -142,33 +165,61 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
              "contact_match_groups.group_id = " +
              std::to_string(groupId);
 
-    if (!name.empty()) {
-        switch (matchType) {
-        case MatchType::Name: {
-            query += " WHERE contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
-            query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%'";
-        } break;
+    switch (matchType) {
+    case MatchType::Name: {
+        if (!name.empty()) {
+            query += " WHERE contacts._id not in ( "
+                     "   SELECT cmg.contact_id "
+                     "   FROM contact_match_groups cmg, contact_groups cg "
+                     "   WHERE cmg.group_id = cg._id "
+                     "       AND cg.name = 'Temporary' "
+                     "   ) ";
+            query += " AND ( contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
+            query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%')";
+        }
+    } break;
 
-        case MatchType::TextNumber: {
+    case MatchType::TextNumber: {
+        if (!name.empty()) {
             query += " INNER JOIN contact_number ON contact_number.contact_id == contacts._id AND "
                      "contact_number.number_user LIKE '%%" +
                      name + "%%'";
-        } break;
-
-        case MatchType::None:
-            break;
+            query += " WHERE contacts._id not in ( "
+                     "   SELECT cmg.contact_id "
+                     "   FROM contact_match_groups cmg, contact_groups cg "
+                     "   WHERE cmg.group_id = cg._id "
+                     "       AND cg.name = 'Temporary' "
+                     "   ) ";
         }
+    } break;
+
+    case MatchType::Group:
+        query += " WHERE contact_match_groups.group_id == " + std::to_string(groupId);
+        break;
+
+    case MatchType::None: {
+        query += " WHERE contacts._id not in ( "
+                 "   SELECT cmg.contact_id "
+                 "   FROM contact_match_groups cmg, contact_groups cg "
+                 "   WHERE cmg.group_id = cg._id "
+                 "       AND cg.name = 'Temporary' "
+                 "   ) ";
+    } break;
     }
 
-    query += " ORDER BY group_id DESC, contact_name.name_alternative || ' ' || contact_name.name_primary";
+    query += " ORDER BY group_id DESC ";
+    query += " , (contact_name.name_alternative IS NULL OR contact_name.name_alternative ='') ";
+    query += " AND (contact_name.name_primary IS NULL OR contact_name.name_primary ='') ASC ";
+    query += " , UPPER(contact_name.name_alternative || contact_name.name_primary) ";
 
     if (limit > 0) {
         query += " LIMIT " + std::to_string(limit);
         query += " OFFSET " + std::to_string(offset);
     }
 
-    query += " COLLATE NOCASE;";
+    query += " ;";
 
+    LOG_DEBUG("query: %s", query.c_str());
     auto queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;
@@ -183,7 +234,15 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
 
 std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from contacts WHERE contacts._id NOT IN "
+                              " ( SELECT cmg.contact_id "
+                              "    FROM contact_match_groups cmg, contact_groups cg "
+                              "    WHERE cmg.group_id = cg._id "
+                              "        AND cg.name = 'Temporary' "
+                              " ) "
+                              "ORDER BY name_id LIMIT %lu OFFSET %lu;",
+                              limit,
+                              offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
@@ -193,13 +252,12 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[ColumnName::id].getUInt32(),                             // ID
-            (*retQuery)[ColumnName::name_id].getUInt32(),                        // nameID
-            (*retQuery)[ColumnName::numbers_id].getString(),                     // numbersID
-            (*retQuery)[ColumnName::ring_id].getUInt32(),                        // ringID
-            (*retQuery)[ColumnName::address_id].getUInt32(),                     // addressID
-            static_cast<ContactType>((*retQuery)[ColumnName::type].getUInt32()), // type
-            (*retQuery)[ColumnName::speeddial].getString(),                      // speed dial key
+            {(*retQuery)[ColumnName::id].getUInt32()},       // ID
+            (*retQuery)[ColumnName::name_id].getUInt32(),    // nameID
+            (*retQuery)[ColumnName::numbers_id].getString(), // numbersID
+            (*retQuery)[ColumnName::ring_id].getUInt32(),    // ringID
+            (*retQuery)[ColumnName::address_id].getUInt32(), // addressID
+            (*retQuery)[ColumnName::speeddial].getString(),  // speed dial key
         });
     } while (retQuery->nextRow());
 
@@ -235,12 +293,11 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
 
     do {
         ret.push_back(ContactsTableRow{
-            (*retQuery)[ColumnName::id].getUInt32(),
+            {(*retQuery)[ColumnName::id].getUInt32()},
             (*retQuery)[ColumnName::name_id].getUInt32(),
             (*retQuery)[ColumnName::numbers_id].getString(),
             (*retQuery)[ColumnName::ring_id].getUInt32(),
             (*retQuery)[ColumnName::address_id].getUInt32(),
-            static_cast<ContactType>((*retQuery)[5].getUInt32()),
             (*retQuery)[ColumnName::speeddial].getString(),
         });
     } while (retQuery->nextRow());
@@ -250,7 +307,13 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
 
 uint32_t ContactsTable::count()
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM contacts;");
+    auto queryRet = db->query("SELECT COUNT(*) FROM contacts "
+                              " WHERE contacts._id not in ( "
+                              "    SELECT cmg.contact_id "
+                              "    FROM contact_match_groups cmg, contact_groups cg "
+                              "    WHERE cmg.group_id = cg._id "
+                              "        AND cg.name = 'Temporary' "
+                              "    ); ");
 
     if (queryRet->getRowCount() == 0) {
         return 0;

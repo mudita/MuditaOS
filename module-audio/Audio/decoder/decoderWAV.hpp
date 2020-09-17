@@ -24,8 +24,6 @@ namespace audio
         ~decoderWAV()
         {}
 
-        std::unique_ptr<Tags> fetchTags() override;
-
         uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
 
         void setPosition(float pos) override;
@@ -52,7 +50,6 @@ namespace audio
         std::vector<int32_t> pcmsamplesbuffer;
         WAVE_FormatTypeDef waveHeader;
         uint32_t bitsPerSample;
-        std::unique_ptr<Tags> tag = nullptr;
     };
 
 } // namespace audio

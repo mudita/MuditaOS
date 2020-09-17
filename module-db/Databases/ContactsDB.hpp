@@ -38,10 +38,15 @@ class ContactsDB : public Database
     {
         return blockedId;
     }
+    static uint32_t temporaryGroupId()
+    {
+        return temporaryId;
+    }
 
   private:
     static const char *dbName;
     static uint32_t favouritesId;
     static uint32_t iceId;
     static uint32_t blockedId;
+    static uint32_t temporaryId;
 };

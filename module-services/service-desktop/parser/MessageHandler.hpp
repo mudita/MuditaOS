@@ -9,7 +9,7 @@ extern "C"
 #include <queue.h>
 }
 
-namespace ParserStateMachine
+namespace parserFSM
 {
     class MessageHandler
     {
@@ -38,4 +38,4 @@ namespace ParserStateMachine
         std::string JsonErrorMsg;
         sys::Service *OwnerServicePtr = nullptr;
     };
-} // namespace ParserStateMachine
+} // namespace parserFSM

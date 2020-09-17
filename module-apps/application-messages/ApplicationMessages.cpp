@@ -5,8 +5,7 @@
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
-#include "windows/OptionsWindow.hpp"
-#include "windows/ThreadViewWindow.hpp"
+#include "windows/SMSThreadViewWindow.hpp"
 #include "windows/SearchStart.hpp"
 #include "windows/SMSTemplatesWindow.hpp"
 #include "windows/SearchResults.hpp"
@@ -15,6 +14,8 @@
 #include <Dialog.hpp>
 #include <i18/i18.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
+#include <OptionWindow.hpp>
+
 #include <cassert>
 #include <time/time_conversion.hpp>
 
@@ -119,7 +120,7 @@ namespace app
         windowOptions = gui::newOptionWindow(this);
 
         windows.insert({gui::name::window::main_window, new gui::MessagesMainWindow(this)});
-        windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
+        windows.insert({gui::name::window::thread_view, new gui::SMSThreadViewWindow(this)});
         windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
         windows.insert({windowOptions->getName(), windowOptions});
         windows.insert(

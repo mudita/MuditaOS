@@ -16,6 +16,7 @@ namespace gui::window::name
     inline const std::string dialog_confirm   = "DialogConfirm";
     inline const std::string dialog           = "Dialog";
     inline const std::string dialog_yes_no_icon_txt = "DialogYesNoIconTxt";
+    inline const std::string ice_contacts           = "IceContacts";
 
 } // namespace gui::window::name
 

@@ -7,7 +7,7 @@ namespace gui
 {
 
     ContactFlagIconWidget::ContactFlagIconWidget(const std::string &iconName, const std::string &itemText, Item *parent)
-        : Rect(parent, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight),
+        : Rect(parent, 0, 0, style::widget::ContactFlag::itemWidth, style::widget::ContactFlag::itemHeight),
           iconName(iconName), itemText(itemText)
     {
         buildItemWithIcon();
@@ -15,7 +15,7 @@ namespace gui
     }
 
     ContactFlagIconWidget::ContactFlagIconWidget(uint8_t iconNumber, const std::string &itemText, Item *parent)
-        : Rect(parent, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight),
+        : Rect(parent, 0, 0, style::widget::ContactFlag::itemWidth, style::widget::ContactFlag::itemHeight),
           number(iconNumber), itemText(itemText), numericIcon(true)
     {
         buildItemWithText();
@@ -32,15 +32,15 @@ namespace gui
 
     void ContactFlagIconWidget::buildItemWithIcon()
     {
-        icon =
-            new Image(this, 0, 0, style::widget::ContatFlas::iconsSize, style::widget::ContatFlas::iconsSize, iconName);
+        icon = new Image(
+            this, 0, 0, style::widget::ContactFlag::iconsSize, style::widget::ContactFlag::iconsSize, iconName);
         icon->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     }
 
     void ContactFlagIconWidget::buildItemWithText()
     {
         numericLabel =
-            new Label(this, 0, 0, style::widget::ContatFlas::iconsSize, style::widget::ContatFlas::iconsSize);
+            new Label(this, 0, 0, style::widget::ContactFlag::iconsSize, style::widget::ContactFlag::iconsSize);
         numericLabel->setFont(style::window::font::bigbold);
         numericLabel->setText(std::to_string(number));
         numericLabel->setAlignment(Alignment(Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
@@ -51,7 +51,7 @@ namespace gui
     {
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
-        label = new Label(this, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::labelHeight);
+        label = new Label(this, 0, 0, style::widget::ContactFlag::itemWidth, style::widget::ContactFlag::labelHeight);
         label->setFilled(false);
         label->setFont(style::window::font::verysmall);
         label->setText(itemText);
@@ -59,7 +59,7 @@ namespace gui
         label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         label->setAlignment(Alignment(Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        mainBox = new VBox(this, 0, 0, style::widget::ContatFlas::itemWidth, style::widget::ContatFlas::itemHeight);
+        mainBox = new VBox(this, 0, 0, style::widget::ContactFlag::itemWidth, style::widget::ContactFlag::itemHeight);
         mainBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         mainBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         if (numericIcon) {

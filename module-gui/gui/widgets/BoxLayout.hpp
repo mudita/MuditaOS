@@ -21,37 +21,39 @@ namespace gui
             bool noUpdate;
         };
 
-        template <Axis axis> Length sizeUsed(Item *it, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeUsed(Item *box, Area area = Area::Min)
         {
             Length sum = 0;
 
-            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
+            std::for_each(box->children.begin(), box->children.end(), [&](auto &child) {
+                sum += child->visible ? child->area(area).size(axis) + child->getMargins().getSumInAxis(axis) : 0;
             });
             return sum;
         };
 
-        template <Axis axis> Length sizeUsedWithoutElem(Item *it, Item *elem, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeUsedWithoutElem(Item *box, Item *elem, Area area = Area::Min)
         {
             Length sum = 0;
 
-            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area(area).size(axis) + el->getMargins().getSumInAxis(axis) : 0;
+            std::for_each(box->children.begin(), box->children.end(), [&](auto &child) {
+                if (child != elem) {
+                    sum += child->visible ? child->area(area).size(axis) + child->getMargins().getSumInAxis(axis) : 0;
+                }
             });
-
-            return sum <= elem->area(area).size(axis) ? 0 : sum - elem->area(area).size(axis);
+            return sum;
         };
 
-        template <Axis axis> Length sizeLeft(Item *it, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeLeft(Item *box, Area area = Area::Min)
         {
-            return (sizeUsed<axis>(it, area) >= it->getSize(axis)) ? 0 : it->getSize(axis) - sizeUsed<axis>(it, area);
+            return (sizeUsed<axis>(box, area) >= box->getSize(axis)) ? 0
+                                                                     : box->getSize(axis) - sizeUsed<axis>(box, area);
         };
 
-        template <Axis axis> Length sizeLeftWithoutElem(Item *it, Item *elem, Item::Area area = Item::Area::Min)
+        template <Axis axis> Length sizeLeftWithoutElem(Item *box, Item *elem, Area area = Area::Min)
         {
-            return (sizeUsedWithoutElem<axis>(it, elem, area) >= it->getSize(axis))
+            return (sizeUsedWithoutElem<axis>(box, elem, area) >= box->getSize(axis))
                        ? 0
-                       : it->getSize(axis) - sizeUsedWithoutElem<axis>(it, elem, area);
+                       : box->getSize(axis) - sizeUsedWithoutElem<axis>(box, elem, area);
         };
 
         template <Axis axis> void resizeItems();
@@ -62,6 +64,19 @@ namespace gui
         void addFromOutOfDrawAreaList();
         virtual void resizeItems();
         bool reverseOrder = false;
+
+        template <Axis axis>[[nodiscard]] Length calculateElemResize(Item *el, Length &toSplit);
+        template <Axis axis>
+        [[nodiscard]] Length calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit);
+        template <Axis axis>[[nodiscard]] Length calculateElemOrtAxisSize(Item *el);
+        template <Axis axis>
+        [[nodiscard]] Position calculateElemAxisPosition(Item *el,
+                                                         Length axisItemSize,
+                                                         Position &startingPosition,
+                                                         Position &leftPosition);
+        template <Axis axis>[[nodiscard]] Position calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize);
+
+        Item *getLastVisibleElement();
 
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items
         std::list<Item *>::iterator nextNavigationItem(std::list<Item *>::iterator from);
@@ -86,6 +101,7 @@ namespace gui
         /// set navigation from last to fist element in box
         virtual void setNavigation();
         std::list<Item *>::iterator getNavigationFocusedItem();
+        unsigned int getFocusItemIndex() const;
         void setVisible(bool value) override;
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
@@ -94,7 +110,7 @@ namespace gui
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
         // set focus on specified box element
-        void setFocusOnElement(unsigned int elementNumber);
+        bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
         template <Axis axis>
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;

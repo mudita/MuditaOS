@@ -20,10 +20,10 @@ TEST_CASE("Calllog Record tests")
     vfs.remove(ContactsDB::GetDBName());
 
     CalllogDB calllogDb;
-    ContactsDB contactsDd;
+    ContactsDB contactsDb;
 
     REQUIRE(calllogDb.isInitialized());
-    REQUIRE(contactsDd.isInitialized());
+    REQUIRE(contactsDb.isInitialized());
 
     SECTION("Default Constructor")
     {
@@ -34,19 +34,19 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(testRec.duration == 0);
         REQUIRE(testRec.type == CallType::CT_NONE);
         REQUIRE(testRec.name == "");
-        REQUIRE(testRec.contactId == "");
+        REQUIRE(testRec.contactId == 0);
         REQUIRE(!testRec.phoneNumber.isValid());
         REQUIRE(testRec.isRead == true);
     }
 
-    CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDd);
+    CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDb);
     CalllogRecord testRec;
     testRec.presentation = PresentationType::PR_ALLOWED;
     testRec.date         = 100;
     testRec.duration     = 100;
     testRec.type         = CallType::CT_INCOMING;
     testRec.name         = "Test name";
-    testRec.contactId    = "2";
+    testRec.contactId    = 2;
     testRec.phoneNumber  = utils::PhoneNumber("600123456").getView();
     testRec.isRead       = false;
 
@@ -60,8 +60,8 @@ TEST_CASE("Calllog Record tests")
 
     SECTION("Get entry by ID")
     {
-        auto call = calllogRecordInterface.GetByID(4);
-        REQUIRE(call.ID == 4);
+        auto call = calllogRecordInterface.GetByID(1);
+        REQUIRE(call.ID == 1);
         REQUIRE(call.presentation == testRec.presentation);
         REQUIRE(call.date == testRec.date);
         REQUIRE(call.duration == testRec.duration);
@@ -70,14 +70,14 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.isRead == testRec.isRead);
         // below fields will be filled in with contact data
         REQUIRE_FALSE(call.contactId == testRec.contactId);
-        REQUIRE(call.contactId == "1");
+        REQUIRE(call.contactId == 1);
         REQUIRE_FALSE(call.name == testRec.name);
         REQUIRE(call.name == "600 123 456");
     }
 
     SECTION("Entry update")
     {
-        auto callPre         = calllogRecordInterface.GetByID(4);
+        auto callPre         = calllogRecordInterface.GetByID(1);
         callPre.presentation = PresentationType::PR_PAYPHONE;
         callPre.date         = callPre.date + 100;
         callPre.duration     = callPre.duration + 100;
@@ -86,7 +86,7 @@ TEST_CASE("Calllog Record tests")
 
         REQUIRE(calllogRecordInterface.Update(callPre));
 
-        auto callPost = calllogRecordInterface.GetByID(4);
+        auto callPost = calllogRecordInterface.GetByID(1);
         REQUIRE(callPost.presentation == callPre.presentation);
         REQUIRE(callPost.date == callPre.date);
         REQUIRE(callPost.duration == callPre.duration);
@@ -106,7 +106,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.duration == 0);
         REQUIRE(call.type == CallType::CT_NONE);
         REQUIRE(call.name == "");
-        REQUIRE(call.contactId == "");
+        REQUIRE(call.contactId == 0);
         REQUIRE(!call.phoneNumber.isValid());
         REQUIRE(call.isRead == true);
     }

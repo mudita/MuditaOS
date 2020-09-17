@@ -1,5 +1,72 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+* `[desktop]` info on how to unlock
+* `[settings]` pin change option in settings main window
+* `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
+
+### Changed
+
+* `[phonebook]` Replace vCard encoding with plain text for exporting contact data.
+
+### Fixed
+
+* `[gui]` Fixed notifications display on unlocked screen.
+* `[audio]` `[music player]` Fixed audio files meta tags parsing
+
+## [0.37.1 2020-09-11]
+
+### Added
+
+* `[audio]` Add storing and updating audio settings in database.
+
+### Changed
+
+* `[listview]` List returns to previously focused element on CRUD notifications (messages and phonebook).
+* `[messages]` Use different thread for each of contact's number.
+* `[phonebook]` Sort list of contacts by first name if there is no second name.
+* `[phonebook]` Unnamed contacts at the end of contacts list.
+* `[phonebook]` Change name of alternative/other number to second number.
+
+### Fixed
+
+* `[desktop]` Fixed endpoint handling.
+* `[database]` Fixed boot error caused by new settings table.
+* `[phonebook]` Fix speed dial number conflict resolution.
+
+### Other
+
+* `[desktop]` Added functional tests.
+
+## [0.36.1 2020-09-04]
+
+### Added
+
+* `[fonts]` Added phone emoji support.
+* `[phonebook]` ICE contacts window.
+
+### Changed
+
+* `[messages]` Improved sms input.
+
+### Fixed
+
+* `[messages]` Fixed crashing in the new message window.
+* `[home screen]``[notifications]` Fixed notifications widget when phone is locked.
+* `[text]`	Handling new line when entering text.
+
+### Other
+
+* `[build]` Allow excluding applications from the build to decrease debug firmware size.
+* `[build]` Allow choosing which applications are optimized to decrease debug firmware size.
+* `[doc]` Procedure on flashing a phone without ecoboot using D1 flash loader.
+* `[database]` Message handling refactor.
+* `[database]` Add new settings table in database.
+
+
 ## [0.35.1 2020-08-28]
 
 ### Added
@@ -57,6 +124,7 @@
 
 * `[torch]` Toggle torch colours for certification purposes (redish, blueish, off).
 * `[calendar]` database structure
+* `[music player]` Added simple volume indicator.
 
 ### Changed
 
@@ -286,9 +354,9 @@
 * `[sms]` Fix thread view refresh on a new message.
 * `[sms]` Fix message reordering on page change.
 * `[sms]` Remove empty screen view at the top of a thread view.
-* `[music player]` Added simple player volume indicator.
 
 ### Other
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+

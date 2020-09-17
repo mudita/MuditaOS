@@ -14,7 +14,6 @@ struct ContactsTableRow : public Record
     std::string numbersID = "";
     uint32_t ringID       = DB_ID_NONE;
     uint32_t addressID    = DB_ID_NONE;
-    ContactType type      = ContactType::TEMPORARY;
     std::string speedDial = "";
     UTF8 namePrimary      = "";
     UTF8 nameAlternative  = "";
@@ -32,6 +31,7 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     {
         Name,
         TextNumber,
+        Group,
 
         None,
     };
@@ -49,7 +49,12 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     bool update(ContactsTableRow entry) override final;
 
     ContactsTableRow getById(uint32_t id) override final;
+    ContactsTableRow getByIdWithTemporary(uint32_t id);
 
+  private:
+    ContactsTableRow getByIdCommon(std::unique_ptr<QueryResult> retQuery);
+
+  public:
     bool BlockByID(uint32_t id, bool shouldBeBlocked);
 
     std::vector<ContactsTableRow> Search(const std::string &primaryName,
@@ -81,7 +86,6 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
         "numbers_id       TEXT NOT NULL,"
         "ring_id          INTEGER,"
         "address_id       INTEGER,"
-        "type             INTEGER,"
         "speeddial        TEXT NOT NULL,"
         "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
         ");";

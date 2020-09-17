@@ -343,6 +343,7 @@ By default sepecial gorups are created:
 | 1 | Favourites | Defines favourites group. |
 | 2 | ICE | Defines ICE group. |
 | 3 | Blocked | Defines Blocked group. |
+| 4 | Temporary | Defines temporary or deleted contacts. |
 
 #### 16. Joining table for groups and contacts
 | Field | Scope | Type | Description |
@@ -364,6 +365,15 @@ Name: events
 | reminder | (m) | INTEGER | Event reminder time provided by the user. |
 | repeat | (m) | INTEGER | Event repeat option provided by the user. |
 | time_zone | (m) | INTEGER | Event creation time zone imported from settings. Needed to calculate the offset of event while changing time zone |
+
+#### 18. Settins table - newer approach
+Name: settings_v2
+
+| ID | Path | Value |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
+| path | (um) | TEXT | Path of setting. |
+| value | (m) | TEXT | Value of setting. |
 
 ## Database Triggers <a name="triggers"></a>
 

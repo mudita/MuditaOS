@@ -12,7 +12,7 @@ extern "C"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
-#include "parser/ParserStateMachine.hpp"
+#include "parser/ParserFSM.hpp"
 
 #include "bsp/usb_cdc/usb_cdc.hpp"
 
@@ -29,5 +29,5 @@ class WorkerDesktop : public sys::Worker
     virtual bool deinit() override;
     bool handleMessage(uint32_t queueID) override final;
     sys::Service *ownerService = nullptr;
-    ParserStateMachine::StateMachine parser;
+    parserFSM::StateMachine parser;
 };

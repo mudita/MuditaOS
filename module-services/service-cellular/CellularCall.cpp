@@ -7,6 +7,7 @@
 #include "bsp/rtc/rtc.hpp"
 #include <sstream>
 #include <time/time_conversion.hpp>
+#include <menums/magic_enum.hpp>
 
 namespace ModemCall
 {
@@ -34,14 +35,48 @@ namespace ModemCall
             LOG_ERROR("wrong number of tokens %u", static_cast<unsigned int>(numberOfTokens));
             throw std::runtime_error("No valid prefix");
         }
-        // TODO: alek: add paramters validation
+
         idx              = std::stoul(tokens[0]);
-        dir              = static_cast<CallDir>(std::stoul(tokens[1]));
-        state            = static_cast<CallState>(std::stoul(tokens[2]));
-        mode             = static_cast<CallMode>(std::stoul(tokens[3]));
+        auto conv_val    = std::stoul(tokens[1]);
+        auto tmp_dir     = magic_enum::enum_cast<CallDir>(conv_val);
+        if (tmp_dir.has_value()) {
+            dir = tmp_dir.value();
+        }
+        else {
+            throw std::runtime_error("dir value out of range CallDir enum");
+        }
+
+        conv_val       = std::stoul(tokens[2]);
+        auto tmp_state = magic_enum::enum_cast<CallState>(conv_val);
+        if (tmp_state.has_value()) {
+            state = tmp_state.value();
+        }
+        else {
+            throw std::runtime_error("state value out of range CallState enum");
+        }
+
+        conv_val      = std::stoul(tokens[3]);
+        auto tmp_mode = magic_enum::enum_cast<CallMode>(conv_val);
+        if (tmp_mode.has_value()) {
+            mode = tmp_mode.value();
+        }
+        else {
+            throw std::runtime_error("mode value out of range CallMode enum");
+        }
+
         isConferenceCall = static_cast<bool>(std::stoul(tokens[4]));
         phoneNumber      = tokens[5];
-        type             = static_cast<CallType>(std::stoul(tokens[6]));
+
+        conv_val = std::stoul(tokens[6]);
+
+        auto tmp_type = magic_enum::enum_cast<CallType>(conv_val);
+        if (tmp_type.has_value()) {
+            type = tmp_type.value();
+        }
+        else {
+            throw std::runtime_error("type value out of range CallType enum");
+        }
+
         if (numberOfTokens == 8) {
             phoneBookName = tokens[7];
         }

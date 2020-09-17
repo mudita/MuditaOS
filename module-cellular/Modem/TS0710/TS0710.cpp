@@ -1,7 +1,3 @@
-/**
- * Project Untitled
- */
-
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "projdefs.h"
@@ -9,9 +5,10 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include <at/URC_QIND.hpp>
+#include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <cassert>
 #include <sstream>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <memory>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
@@ -397,7 +394,16 @@ TS0710::ConfState TS0710::StartMultiplexer()
         if (res) {
             auto beg = res.response[0].find(" ");
             auto end = res.response[0].find(",", 1);
-            SignalStrength signalStrength(std::stoi(res.response[0].substr(beg + 1, end - beg - 1)));
+            auto input_val = res.response[0].substr(beg + 1, end - beg - 1);
+            auto strength  = 0;
+            try {
+                strength = std::stoi(input_val);
+            }
+            catch (const std::exception &e) {
+                LOG_ERROR("Conversion error of %s, taking default value %d", input_val.c_str(), strength);
+            }
+
+            SignalStrength signalStrength(strength);
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 auto msg = std::make_shared<CellularNotificationMessage>(
@@ -482,33 +488,32 @@ void workerTaskFunction(void *ptr)
 
 ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout)
 {
-    ssize_t ret         = -1;
-    static uint8_t *buf = nullptr;
-    buf                 = reinterpret_cast<uint8_t *>(malloc(startParams.MaxFrameSize));
-    bool complete       = false;
-    uint32_t _timeout   = timeout;
+    ssize_t ret = -1;
+    std::unique_ptr<uint8_t[]> buf(new uint8_t[startParams.MaxFrameSize]);
+    bool complete     = false;
+    uint32_t _timeout = timeout;
 
     while ((!complete) && (--_timeout)) {
-        ret = pv_cellular->Read(reinterpret_cast<void *>(buf), startParams.MaxFrameSize);
+        ret = pv_cellular->Read(reinterpret_cast<void *>(buf.get()), startParams.MaxFrameSize);
         if (ret > 0) {
             // LOG_DEBUG("Received %i bytes", ret);
-            for (int i = 0; i < ret; i++)
+            for (int i = 0; i < ret; i++) {
                 data.push_back(buf[i]);
+            }
             complete = TS0710_Frame::isComplete(data);
         }
         vTaskDelay(pdMS_TO_TICKS(1));
     }
-    if ((!complete) && (_timeout))
+    if ((!complete) && (_timeout)) {
         LOG_ERROR("Incomplete frame received");
-
-    free(buf);
+    }
 
     return ret;
 }
 
 void TS0710::SelectAntenna(bsp::cellular::antenna antenna)
 {
-        pv_cellular->SelectAntenna(antenna);
+    pv_cellular->SelectAntenna(antenna);
 }
 
 bsp::cellular::antenna TS0710::GetAntenna()

@@ -20,6 +20,7 @@
 
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
+#include <application-phonebook/ApplicationPhonebook.hpp>
 #include <Style.hpp>
 
 namespace gui
@@ -105,8 +106,26 @@ namespace gui
     void PinLockWindow::setVisibleState(const State &state)
     {
         this->state = state;
-        // show pin labels for entering pin and erase their's content
-        if (state == State::EnteringPin) {
+
+        auto uiNoPinPrompt = [&]() {
+            infoLabels[1]->setVisible(false);
+            infoLabels[0]->setText(utils::localize.get("app_desktop_no_pin_lock"));
+            for (int i = 0; i < 4; ++i) {
+                pinLabels[i]->setVisible(false);
+            }
+        };
+
+        // there is no pinlock
+        if (state == State::SimpleUnlock) {
+            uiNoPinPrompt();
+        }
+        // there is prompt because of bad key presses for unlock
+        else if (state == State::ShowPrompt) {
+            uiNoPinPrompt();
+        }
+        else
+            // show pin labels for entering pin and erase their's content
+            if (state == State::EnteringPin) {
             charCount = 0;
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(true);
@@ -182,22 +201,36 @@ namespace gui
 
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-
-        // check if there was a signal to lock the phone due to inactivity.
-        if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
-            LockPhoneData *lockData = reinterpret_cast<LockPhoneData *>(data);
+        if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
             lockTimeoutApplilcation = lockData->getPreviousApplication();
+            switch (lockData->request) {
+            case LockPhoneData::Request::NoPin:
+                state = State::SimpleUnlock;
+                break;
+            case LockPhoneData::Request::ShowPrompt:
+                state = State::ShowPrompt;
+                break;
+            case LockPhoneData::Request::Pin:
+                state = State::EnteringPin;
+                break;
+            }
         }
-        // set state
         setVisibleState(state);
     }
 
     bool PinLockWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
+        if (inputEvent.isShortPress() && (state == State::SimpleUnlock)) {
+            return AppWindow::onInput(inputEvent);
+        }
+
+        if (inputEvent.isShortPress()) {
             // accept only LF, enter, RF, #, and numeric values
             if (state == State::EnteringPin) {
                 if (inputEvent.keyCode == KeyCode::KEY_LF) {
+                    sapm::ApplicationManager::messageSwitchApplication(
+                        application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
+
                     return true;
                 }
                 else if (inputEvent.keyCode == KeyCode::KEY_RF) {

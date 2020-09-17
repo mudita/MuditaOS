@@ -27,6 +27,7 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
+#include "windows/SettingsChange.hpp"
 
 #include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
 
@@ -108,6 +109,9 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = newOptionWindow(this, app::change_setting, settingsChangeWindow(this));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         if (board == bsp::Board::T4) {

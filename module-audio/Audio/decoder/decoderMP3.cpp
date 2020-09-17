@@ -13,34 +13,27 @@
 
 #include "decoderMP3.hpp"
 
-#include "atag.hpp"
-
 #include <array>
 
 namespace audio
 {
 
-    decoderMP3::decoderMP3(const char *fileName) : decoder(fileName), tag(std::make_unique<Tags>())
+    decoderMP3::decoderMP3(const char *fileName) : decoder(fileName)
     {
 
         if (fileSize == 0) {
             return;
         }
 
-        mp3d = static_cast<mp3dec_t *>(malloc(sizeof(mp3dec_t)));
+        mp3d = std::make_unique<mp3dec_t>();
 
-        mp3dec_init(mp3d);
+        mp3dec_init(mp3d.get());
 
         if (!find_first_valid_frame()) {
             return;
         }
 
         isInitialized = true;
-    }
-
-    decoderMP3::~decoderMP3()
-    {
-        free(mp3d);
     }
 
     void decoderMP3::setPosition(float pos)
@@ -53,7 +46,7 @@ namespace audio
         // position += (float) ((float) (samplesToReadChann / chanNumber) / (float) sampleRate);
     }
 
-    std::unique_ptr<Tags> decoderMP3::fetchTags()
+    void decoderMP3::fetchTagsSpecific()
     {
 
         vfs.fseek(fd, firstValidFrameFileOffset + 4, SEEK_SET);
@@ -72,52 +65,7 @@ namespace audio
             tag->total_duration_s = frames_count * (samplesPerFrame) / sampleRate;
         }
 
-        tag->num_channel = chanNumber;
-        tag->sample_rate = sampleRate;
-        tag->filePath.append(filePath);
-
-        tag->duration_min  = tag->total_duration_s / 60;
-        tag->duration_hour = tag->duration_min / 60;
-        tag->duration_sec  = tag->total_duration_s % 60;
-
         vfs.rewind(fd);
-
-        // Parse ID3 tags
-        // Allocate buffer for fetching two parts of MP3: init and last, 512Kbytes should be sufficient to fetch all
-        // necessary tags
-        auto source = std::make_unique<std::array<char, 512 * 1024>>();
-
-        // Read beginning of MP3(256kbytes)
-        vfs.fread(&(*source)[0], 1, source->size() / 2, fd);
-
-        // Read last section of MP3(256kbytes)
-        vfs.fseek(fd, -(source->size() / 2), SEEK_END);
-        vfs.fread(&(*source)[source->size() / 2], 1, source->size() / 2, fd);
-
-        if (atag::id3v2::is_tagged(*source)) {
-
-            atag::simple_tag idtag = atag::id3v2::simple_parse(*source);
-
-            tag->title  = idtag.title;
-            tag->artist = idtag.artist;
-            tag->album  = idtag.album;
-            tag->year   = std::to_string(idtag.year);
-        }
-
-        // If title tag empty fill it with raw file name
-        if (tag->title.size() == 0) {
-            auto pos = filePath.rfind("/");
-            if (pos == std::string::npos) {
-                tag->title.append(filePath);
-            }
-            else {
-                tag->title.append(&filePath[pos + 1]);
-            }
-        }
-
-        vfs.rewind(fd);
-
-        return std::make_unique<Tags>(*tag);
     }
 
     bool decoderMP3::find_first_valid_frame()
@@ -153,7 +101,7 @@ namespace audio
 
         while (1) {
 
-            uint32_t smpl = mp3dec_decode_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
+            uint32_t smpl = mp3dec_decode_frame(mp3d.get(), &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
             bufferIndex += info.frame_bytes;
             bytesAvailable -= info.frame_bytes;
 
@@ -218,7 +166,7 @@ namespace audio
 
         while (1) {
 
-            uint32_t smpl = mp3dec_decode_frame(mp3d, &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
+            uint32_t smpl = mp3dec_decode_frame(mp3d.get(), &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
             bufferIndex += info.frame_bytes;
             bytesAvailable -= info.frame_bytes;
 
@@ -290,7 +238,7 @@ namespace audio
         while (1) {
             uint32_t smpl = 0;
             if (samplesFetched < samplesToReadChann) {
-                smpl = mp3dec_decode_frame(mp3d,
+                smpl = mp3dec_decode_frame(mp3d.get(),
                                            &decoderBuffer[decoderBufferIdx],
                                            bytesAvailable,
                                            (short *)&pcmsamplesbuffer[samplesFetched],

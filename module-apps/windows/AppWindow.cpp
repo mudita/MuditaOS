@@ -197,6 +197,16 @@ namespace gui
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
+    void AppWindow::setBottomBarText(const UTF8 &text, BottomBar::Side side)
+    {
+        bottomBar->setText(side, text);
+    }
+
+    void AppWindow::clearBottomBarText(BottomBar::Side side)
+    {
+        bottomBar->setText(side, "");
+    }
+
     bool AppWindow::selectSpecialCharacter()
     {
         return sapm::ApplicationManager::messageSwitchSpecialInput(
@@ -210,6 +220,11 @@ namespace gui
                 title->offset_h(),
                 this->getWidth(),
                 this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
+    }
+
+    void AppWindow::setBottomBarActive(BottomBar::Side side, bool value)
+    {
+        bottomBar->setActive(side, value);
     }
 
 } /* namespace gui */

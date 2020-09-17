@@ -44,10 +44,15 @@ namespace audio
         return "";
     }
 
+    const std::string str(const Profile::Type &type, const ProfileSetup &setup)
+    {
+        std::stringstream ss;
+        ss << "audio/" << str(type) << ((setup == ProfileSetup::Volume) ? "/volume" : "/gain");
+        return ss.str();
+    }
+
     auto GetVolumeText(const audio::Volume &volume) -> const std::string
     {
-        auto roundedVolume = static_cast<uint8_t>(std::round(volume * 10)); // Converts 0-1 volume to 0 - 10
-        return (static_cast<std::ostringstream &&>(std::ostringstream() << "Vol: " << std::to_string(roundedVolume)))
-            .str();
+        return (static_cast<std::ostringstream &&>(std::ostringstream() << "Vol: " << std::to_string(volume))).str();
     }
 } // namespace audio

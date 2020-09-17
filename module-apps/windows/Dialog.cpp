@@ -163,7 +163,7 @@ DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string 
 
 void DialogYesNoIconTxt::update(const Meta &meta)
 {
-    Dialog::update(meta);
+    DialogYesNo::update(meta);
     iconText->setText(textStr);
     topBar->setActive(TopBar::Elements::BATTERY, false);
     topBar->setActive(TopBar::Elements::SIM, false);

@@ -276,7 +276,7 @@ UTF8 &UTF8::operator=(UTF8 &&utf) noexcept
 {
     // prevent moving if object is moved to itself
     if (this != &utf) {
-            delete[] data;
+        delete[] data;
         data          = utf.data;
         utf.data      = nullptr;
         sizeAllocated = utf.sizeAllocated;
@@ -778,7 +778,7 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
              UTF8_HEADER_3) // characters number is written on 3 bytes. 1110xxxx 10xxxxxx 10xxxxxx
     {
         if (((*(utf8_char + 1) & UTF8_EXT_MASK) == UTF8_EXT) && ((*(utf8_char + 2) & UTF8_EXT_MASK) == UTF8_EXT)) {
-            ret = (*utf8_char) & 0x7F;
+            ret = (*utf8_char) & 0x0F;
             ret <<= 6;
             ret += *(utf8_char + 1) & 0x3F;
             ret <<= 6;
@@ -790,11 +790,11 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
         }
     }
     else if (((*(utf8_char)&UTF8_HEADER_4_MASK) ==
-              UTF8_HEADER_4)) // characters number is written on 3 bytes. 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+              UTF8_HEADER_4)) // characters number is written on 4 bytes. 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
     {
         if (((*(utf8_char + 1) & UTF8_EXT_MASK) == UTF8_EXT) && ((*(utf8_char + 2) & UTF8_EXT_MASK) == UTF8_EXT) &&
             ((*(utf8_char + 3) & UTF8_EXT_MASK) == UTF8_EXT)) {
-            ret = (*utf8_char) & 0x7F;
+            ret = (*utf8_char) & 0x07;
             ret <<= 6;
             ret += *(utf8_char + 1) & 0x3F;
             ret <<= 6;

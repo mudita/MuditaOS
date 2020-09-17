@@ -9,11 +9,14 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Bus.hpp"
+#include "Interface/SettingsRecord_v2.hpp"
 
 #include <Common/Query.hpp>
 #include <PhoneNumber.hpp>
 
 #include <Service/Message.hpp>
+
+class DBContactMessage;
 
 class DBServiceAPI
 {
@@ -55,6 +58,9 @@ class DBServiceAPI
 
     static std::unique_ptr<ThreadRecord> ThreadGet(sys::Service *serv, uint32_t id);
     static std::unique_ptr<ThreadRecord> ThreadGetByContact(sys::Service *serv, uint32_t contactID);
+    static std::unique_ptr<ThreadRecord> ThreadGetByNumber(sys::Service *serv,
+                                                           const utils::PhoneNumber::View &phoneNumber,
+                                                           std::uint32_t timeout);
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
     static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static uint32_t ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
@@ -90,6 +96,14 @@ class DBServiceAPI
                                                                         UTF8 primaryName,
                                                                         UTF8 alternativeName);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByIDWithTemporary(sys::Service *serv,
+                                                                                   uint32_t contactID);
+
+  private:
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByIDCommon(
+        sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg);
+
+  public:
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
 
@@ -112,6 +126,9 @@ class DBServiceAPI
                                                                      UTF8 primaryName,
                                                                      UTF8 alternativeName,
                                                                      UTF8 number);
+    static std::unique_ptr<utils::PhoneNumber::View> GetNumberById(sys::Service *serv,
+                                                                   std::uint32_t numberId,
+                                                                   std::uint32_t timeout);
     static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
     static bool AlarmRemove(sys::Service *serv, uint32_t id);
     static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);

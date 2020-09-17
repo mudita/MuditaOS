@@ -18,12 +18,21 @@ namespace gui
     class LockPhoneData : public gui::SwitchData
     {
         std::string previousApplication;
+        LockPhoneData() = default;
 
       public:
-        LockPhoneData() : SwitchData()
+        enum class Request
+        {
+            NoPin,
+            Pin,
+            ShowPrompt,
+        } request;
+
+        LockPhoneData(Request request) : SwitchData(), request(request)
         {
             description = "LockPhoneData";
-        };
+        }
+
         virtual ~LockPhoneData(){};
 
         void setPrevApplication(const std::string &prevApp)

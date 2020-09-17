@@ -16,6 +16,7 @@ set(BOARD_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/freeRTOS_FAT/ff_time.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/freeRTOS_FAT/portable/ff_eMMC_user_disk.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/freeRTOS_FAT/portable/common.cpp
 
 
         CACHE INTERNAL ""

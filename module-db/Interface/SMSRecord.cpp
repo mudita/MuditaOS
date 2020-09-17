@@ -2,15 +2,19 @@
 #include "Common/Query.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
+#include "queries/sms/QuerySMSGet.hpp"
 #include "queries/sms/QuerySMSGetByContactID.hpp"
 #include "queries/sms/QuerySMSGetByID.hpp"
 #include "queries/sms/QuerySMSGetByText.hpp"
+#include "queries/sms/QuerySMSGetCount.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
+#include "queries/sms/QuerySMSRemove.hpp"
 #include "queries/sms/QuerySMSSearchByType.hpp"
 #include <log/log.hpp>
 
 #include <PhoneNumber.hpp>
 #include <optional>
+#include <module-db/queries/sms/QuerySMSGetByThreadID.hpp>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
     : date(w.date), dateSent(w.dateSent), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
@@ -25,29 +29,32 @@ SMSRecordInterface::SMSRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb) : s
 bool SMSRecordInterface::Add(const SMSRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.MatchByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
-    if (contactRec == std::nullopt) {
+    auto contactMatch = contactInterface.MatchByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
+    if (contactMatch == std::nullopt) {
         LOG_ERROR("Cannot find contact, for number %s", rec.number.getFormatted().c_str());
         return false;
     }
-    uint32_t contactID = contactRec->ID;
+    auto contactID = contactMatch->contactId;
+    auto numberID  = contactMatch->numberId;
+
     // Search for a thread with specified contactID
     ThreadRecordInterface threadInterface(smsDB, contactsDB);
     auto threadRec =
-        threadInterface.GetLimitOffsetByField(0, 1, ThreadRecordField::ContactID, std::to_string(contactID).c_str());
+        threadInterface.GetLimitOffsetByField(0, 1, ThreadRecordField::NumberID, std::to_string(numberID).c_str());
 
     // Thread not found, create one
     if (threadRec->size() == 0) {
 
         ThreadRecord re;
         re.contactID = contactID;
+        re.numberID  = numberID;
         if (!threadInterface.Add(re)) {
             LOG_ERROR("Cannot create new thread");
             return false;
         }
 
-        threadRec = threadInterface.GetLimitOffsetByField(
-            0, 1, ThreadRecordField::ContactID, std::to_string(contactID).c_str());
+        threadRec =
+            threadInterface.GetLimitOffsetByField(0, 1, ThreadRecordField::NumberID, std::to_string(numberID).c_str());
         if (threadRec->size() == 0) {
             LOG_ERROR("Thread not found");
             return false;
@@ -125,7 +132,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
     ContactRecordInterface contactInterface(contactsDB);
     for (const auto &w : smses) {
 
-        auto contactRec = contactInterface.GetByID(w.contactID);
+        auto contactRec = contactInterface.GetByIdWithTemporary(w.contactID);
 
         if (contactRec.numbers.size() != 0) {
             // TODO: or numberUser? or other number?
@@ -145,7 +152,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
     ContactRecordInterface contactInterface(contactsDB);
     for (const auto &w : smses) {
 
-        auto contactRec = contactInterface.GetByID(w.contactID);
+        auto contactRec = contactInterface.GetByIdWithTemporary(w.contactID);
         if (contactRec.numbers.size() != 0) {
             // TODO: or numberUser? or other number
             records->push_back({w, contactRec.numbers[0].number});
@@ -285,67 +292,36 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id)
 
     ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetByID(sms.contactID);
-    // TODO: or numberUser?
-    auto number = contactRec.numbers.size() != 0 ? contactRec.numbers[0].number : utils::PhoneNumber::View();
+    auto number     = contactRec.numbers.size() != 0 ? contactRec.numbers[0].number : utils::PhoneNumber::View();
 
     return SMSRecord{sms, number};
 }
 
 std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto localQuery = dynamic_cast<const db::query::SMSSearchByType *>(query.get())) {
-        return runQueryImpl(localQuery);
+    if (typeid(*query) == typeid(db::query::SMSSearchByType)) {
+        return runQueryImpl(static_cast<const db::query::SMSSearchByType *>(query.get()));
     }
-    else if (const auto localQuery = dynamic_cast<const db::query::SMSGetByID *>(query.get())) {
-        auto sms = smsDB->sms.getById(localQuery->id);
-        SMSRecord record;
-
-        record.body      = sms.body;
-        record.contactID = sms.contactID;
-        record.date      = sms.date;
-        record.dateSent  = sms.dateSent;
-        record.errorCode = sms.errorCode;
-        record.threadID  = sms.threadID;
-        record.type      = sms.type;
-        record.ID        = sms.ID;
-
-        return std::make_unique<db::query::SMSGetByIDResult>(record);
+    else if (typeid(*query) == typeid(db::query::SMSGetByID)) {
+        return getByIDQuery(query);
     }
-    else if (const auto localQuery = dynamic_cast<const db::query::SMSGetByContactID *>(query.get())) {
-        auto smsVector = smsDB->sms.getByContactId(localQuery->contactId);
-        std::vector<SMSRecord> recordVector;
-        for (auto sms : smsVector) {
-            SMSRecord record;
-            record.body      = sms.body;
-            record.contactID = sms.contactID;
-            record.date      = sms.date;
-            record.dateSent  = sms.dateSent;
-            record.errorCode = sms.errorCode;
-            record.threadID  = sms.threadID;
-            record.type      = sms.type;
-            record.ID        = sms.ID;
-            recordVector.emplace_back(record);
-        }
-
-        return std::make_unique<db::query::SMSGetByContactIDResult>(recordVector);
+    else if (typeid(*query) == typeid(db::query::SMSGetByContactID)) {
+        return getByContactIDQuery(query);
     }
-    else if (const auto localQuery = dynamic_cast<const db::query::SMSGetByText *>(query.get())) {
-        auto smsVector = smsDB->sms.getByText(localQuery->text);
-        std::vector<SMSRecord> recordVector;
-        for (auto sms : smsVector) {
-            SMSRecord record;
-            record.body      = sms.body;
-            record.contactID = sms.contactID;
-            record.date      = sms.date;
-            record.dateSent  = sms.dateSent;
-            record.errorCode = sms.errorCode;
-            record.threadID  = sms.threadID;
-            record.type      = sms.type;
-            record.ID        = sms.ID;
-            recordVector.emplace_back(record);
-        }
-
-        return std::make_unique<db::query::SMSGetByContactIDResult>(recordVector);
+    else if (typeid(*query) == typeid(db::query::SMSGetByThreadID)) {
+        return getByThreadIDQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::SMSGetByText)) {
+        return getByTextQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::SMSGetCount)) {
+        return getCountQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::SMSRemove)) {
+        return removeQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::SMSGet)) {
+        return getQuery(query);
     }
 
     return nullptr;
@@ -363,9 +339,131 @@ std::unique_ptr<db::query::SMSSearchByTypeResult> SMSRecordInterface::runQueryIm
 
         auto contactRec = contactInterface.GetByID(w.contactID);
         if (contactRec.numbers.size() != 0) {
-            // TODO: or numberUser? or other number
             records->push_back({w, contactRec.numbers[0].number});
         }
     }
     return std::make_unique<db::query::SMSSearchByTypeResult>(db_result.first, *records);
+}
+
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getByIDQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetByID *>(query.get());
+    auto sms              = smsDB->sms.getById(localQuery->id);
+    SMSRecord record;
+
+    record.body      = sms.body;
+    record.contactID = sms.contactID;
+    record.date      = sms.date;
+    record.dateSent  = sms.dateSent;
+    record.errorCode = sms.errorCode;
+    record.threadID  = sms.threadID;
+    record.type      = sms.type;
+    record.ID        = sms.ID;
+    auto response    = std::make_unique<db::query::SMSGetByIDResult>(record);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getByContactIDQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetByContactID *>(query.get());
+    auto smsVector        = smsDB->sms.getByContactId(localQuery->contactId);
+    std::vector<SMSRecord> recordVector;
+    for (auto sms : smsVector) {
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        recordVector.emplace_back(record);
+    }
+
+    auto response = std::make_unique<db::query::SMSGetByContactIDResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getByTextQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetByText *>(query.get());
+    auto smsVector        = smsDB->sms.getByText(localQuery->text);
+    std::vector<SMSRecord> recordVector;
+    for (auto sms : smsVector) {
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        recordVector.emplace_back(record);
+    }
+
+    auto response = std::make_unique<db::query::SMSGetByTextResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getCountQuery(std::shared_ptr<db::Query> query)
+{
+    auto response = std::make_unique<db::query::SMSGetCountResult>(smsDB->sms.count());
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSRecordInterface::removeQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSRemove *>(query.get());
+    auto ret              = smsDB->sms.removeById(localQuery->id);
+    auto response         = std::make_unique<db::query::SMSRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGet *>(query.get());
+
+    auto smsVector = smsDB->sms.getLimitOffset(localQuery->getOffset(), localQuery->getLimit());
+    std::vector<SMSRecord> recordVector;
+    for (auto sms : smsVector) {
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        recordVector.emplace_back(record);
+    }
+
+    auto response = std::make_unique<db::query::SMSGetResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
+}
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getByThreadIDQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetByThreadID *>(query.get());
+    auto smsVector        = smsDB->sms.getByThreadId(localQuery->threadId);
+    std::vector<SMSRecord> recordVector;
+    for (auto sms : smsVector) {
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        recordVector.emplace_back(record);
+    }
+
+    auto response = std::make_unique<db::query::SMSGetByThreadIDResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
 }

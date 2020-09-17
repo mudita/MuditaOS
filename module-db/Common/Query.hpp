@@ -2,6 +2,11 @@
 
 #include <memory>
 #include <string>
+#include <functional>
+#include <log/log.hpp>
+#include <module-services/service-desktop/endpoints/Context.hpp>
+
+using namespace parserFSM;
 
 namespace db
 {
@@ -11,6 +16,35 @@ namespace db
     {
       public:
         virtual bool handleQueryResponse(QueryResult *) = 0;
+        virtual ~QueryListener()                        = default;
+    };
+
+    using QueryCallback = std::function<bool(db::QueryResult *, Context &)>;
+
+    class EndpointListener : public db::QueryListener
+    {
+      private:
+        Context context = Context();
+
+      public:
+        EndpointListener(QueryCallback callback, Context &context)
+            : context(std::move(context)), callback(std::move(callback)){};
+        EndpointListener() : callback(nullptr){};
+        ~EndpointListener()    = default;
+        QueryCallback callback = nullptr;
+        auto handleQueryResponse(db::QueryResult *result) -> bool override
+        {
+            if (callback != nullptr) {
+                LOG_DEBUG("Executing callback...");
+                auto ret = callback(result, context);
+                LOG_DEBUG("Callback finished");
+                return ret;
+            }
+            else {
+                LOG_ERROR("callback is nullptr!");
+                return false;
+            }
+        }
     };
 
     /// virtual query input interface
@@ -31,13 +65,15 @@ namespace db
 
         QueryListener *getQueryListener() const noexcept;
         void setQueryListener(QueryListener *queryListener) noexcept;
+        void setQueryListener(std::unique_ptr<QueryListener> listener) noexcept;
 
         const Type type;
 
         [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
 
       private:
-        QueryListener *listener = nullptr;
+        QueryListener *queryListener                          = nullptr;
+        std::unique_ptr<QueryListener> queryListenerUniqueptr = nullptr;
     };
 
     /// virtual query output (result) interface

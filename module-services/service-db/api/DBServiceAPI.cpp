@@ -10,6 +10,11 @@
 #include <messages/DBCalllogMessage.hpp>
 #include <messages/DBCountryCodeMessage.hpp>
 #include <messages/DBServiceMessage.hpp>
+#include <messages/QueryMessage.hpp>
+
+#include <Common/Query.hpp>
+#include <queries/phonebook/QueryNumberGetByID.hpp>
+#include <queries/sms/QueryThreadGetByNumber.hpp>
 
 #include <ServiceDB.hpp>
 #include <includes/DBServiceName.hpp>
@@ -191,6 +196,27 @@ std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGetByContact(sys::Service *ser
     }
 }
 
+std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
+                                                              const utils::PhoneNumber::View &phoneNumber,
+                                                              std::uint32_t timeout)
+{
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
+        serv, db::Interface::Name::SMSThread, std::make_unique<db::query::ThreadGetByNumber>(phoneNumber), timeout);
+
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        assert(queryResponse != nullptr);
+
+        auto threadResponse = queryResponse->getResult();
+        auto threadResult   = dynamic_cast<db::query::ThreadGetByNumberResult *>(threadResponse.get());
+        assert(threadResult != nullptr);
+
+        return std::make_unique<ThreadRecord>(std::move(threadResult->getThread()));
+    }
+
+    return nullptr;
+}
+
 bool DBServiceAPI::ThreadRemove(sys::Service *serv, uint32_t id)
 {
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadRemove);
@@ -328,8 +354,23 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Se
     rec.ID = contactID;
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
+    return std::move(ContactGetByIDCommon(serv, std::move(msg)));
+}
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByIDWithTemporary(sys::Service *serv,
+                                                                                      uint32_t contactID)
+{
+    ContactRecord rec;
+    rec.ID                                = contactID;
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
+    msg->withTemporary                    = true;
+    return std::move(ContactGetByIDCommon(serv, std::move(msg)));
+}
+
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByIDCommon(
+    sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
+{
+    auto ret                                  = sys::Bus::SendUnicast(contactMsg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
@@ -363,8 +404,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
 {
     ContactRecord rec;
-    utils::PhoneNumber contactNumber(phoneNumber);
-    auto number = ContactRecord::Number(contactNumber.get(), contactNumber.toE164(), ContactNumberType ::PAGER);
+    auto number = ContactRecord::Number(utils::PhoneNumber(phoneNumber).getView(), ContactNumberType ::PAGER);
     rec.numbers.push_back(number);
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber, rec);
@@ -442,7 +482,6 @@ std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationEr
 bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec)
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd, rec);
-    msg->record.contactType               = ContactType::USER;
 
     auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
@@ -805,4 +844,25 @@ bool DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath)
         LOG_ERROR("DBBackup error, return code: %s", c_str(ret.first));
         return false;
     }
+}
+
+std::unique_ptr<utils::PhoneNumber::View> DBServiceAPI::GetNumberById(sys::Service *serv,
+                                                                      std::uint32_t numberId,
+                                                                      std::uint32_t timeout)
+{
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
+        serv, db::Interface::Name::Contact, std::make_unique<db::query::NumberGetByID>(numberId), timeout);
+
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        assert(queryResponse != nullptr);
+
+        auto numberResponse = queryResponse->getResult();
+        auto numberResult   = dynamic_cast<db::query::NumberGetByIDResult *>(numberResponse.get());
+        assert(numberResult != nullptr);
+
+        return std::make_unique<utils::PhoneNumber::View>(std::move(numberResult->getNumber()));
+    }
+
+    return nullptr;
 }
