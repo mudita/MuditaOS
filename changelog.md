@@ -11,6 +11,7 @@
 
 ### Changed
 
+* `[calendar]` Fixed custom repeat option.
 * `[antenna-app]` Added parameter history window.
 * `[phonenumber]` Change default country to unknown.
 

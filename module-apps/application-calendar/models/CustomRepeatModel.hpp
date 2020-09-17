@@ -19,11 +19,7 @@ class CustomRepeatModel : public app::InternalModel<gui::CalendarListItem *>, pu
     [[nodiscard]] unsigned int requestRecordsCount() override;
     gui::ListItem *getItem(gui::Order order) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
-
-    std::vector<gui::CalendarListItem *> getInternalData()
-    {
-        return internalData;
-    }
+    std::vector<bool> getIsCheckedData();
 
   private:
     void createData(const std::shared_ptr<WeekDaysRepeatData> &data);

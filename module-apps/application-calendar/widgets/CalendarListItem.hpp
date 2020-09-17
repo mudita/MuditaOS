@@ -9,6 +9,7 @@ namespace gui
       public:
         std::function<void(std::shared_ptr<EventsRecord> event)> onSaveCallback = nullptr;
         std::function<void(std::shared_ptr<EventsRecord> event)> onLoadCallback = nullptr;
+        std::function<bool()> onContentChangeCallback                           = nullptr;
     };
 
 } /* namespace gui */

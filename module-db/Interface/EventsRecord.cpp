@@ -49,12 +49,10 @@ bool EventsRecordInterface::Add(const EventsRecord &rec)
         return eventsDb->events.addYear(entry);
     }
     default: {
-        break;
-        eventsDb->events.addCustom(entry);
+        return eventsDb->events.addCustom(entry);
     }
     }
 
-    return true;
 }
 
 std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(TimePoint filter_from, TimePoint filter_till)
@@ -151,11 +149,9 @@ bool EventsRecordInterface::Update(const EventsRecord &rec)
         return (eventsDb->events.addYear(entry) && result);
     }
     default: {
-        break;
-        eventsDb->events.addCustom(entry);
+        return eventsDb->events.addCustom(entry);
     }
     }
-    return false;
 }
 
 bool EventsRecordInterface::RemoveByID(uint32_t id)
