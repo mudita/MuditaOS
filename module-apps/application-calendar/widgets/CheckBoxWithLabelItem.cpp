@@ -68,6 +68,7 @@ namespace gui
         if (checkBoxData != nullptr) {
             setCheckBoxes();
         }
+        onContentChangeCallback = [&]() { return checkBox->isChecked(); };
     }
 
     void CheckBoxWithLabelItem::applyCallbacks()
@@ -87,6 +88,7 @@ namespace gui
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (checkBox->onInput(event)) {
                 checkBox->resizeItems();
+                onContentChangeCallback = [&]() { return checkBox->isChecked(); };
                 return true;
             }
             return false;

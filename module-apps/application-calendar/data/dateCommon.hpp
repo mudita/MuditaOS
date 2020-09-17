@@ -97,6 +97,16 @@ inline std::string TimePointToString(const TimePoint &tp)
     return date::format("%F %T", time_point_cast<seconds>(tp));
 }
 
+inline TimePoint getFirstWeekDay(const TimePoint &tp)
+{
+    date::year_month_day yearMonthDay = date::year_month_day{date::floor<date::days>(tp)};
+    while (date::weekday{yearMonthDay} != date::mon) {
+        auto decrementedDay = --yearMonthDay.day();
+        yearMonthDay        = yearMonthDay.year() / yearMonthDay.month() / decrementedDay;
+    }
+    return date::sys_days{yearMonthDay.year() / yearMonthDay.month() / yearMonthDay.day()};
+}
+
 inline std::string TimePointToString(const TimePoint &tp, date::months months)
 {
     date::year_month_day yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};

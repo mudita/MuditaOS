@@ -276,49 +276,44 @@ std::vector<bool> parseOptions(const uint32_t &dataDB)
     }
     for (uint32_t i = startBit; i < startBit + numberOfOptions; i++) {
         if (dataDB & (1 << i)) {
-            LOG_DEBUG("SET OPTION ARRAY! %d", static_cast<int>(i));
+            LOG_DEBUG("Set option array %d", static_cast<int>(i));
             weekDayOptions[i - startBit] = true;
         }
     }
     return weekDayOptions;
 }
 
-std::string concatenate(const char *format, ...)
-{
-    std::string result = format;
-    return result;
-}
-
 bool EventsTable::addCustom(EventsTableRow entry)
 {
     // OptionParser parser;
+    const uint32_t numberOfWeeks    = 4;
+    const uint32_t numberOfWeekDays = 7;
+    bool result                     = true;
     std::vector<bool> weekDayOptions;
-    weekDayOptions = parseOptions(entry.repeat);
+    weekDayOptions          = parseOptions(entry.repeat);
+    uint32_t incrementation = 0;
 
-    std::string request = "INSERT or IGNORE INTO events (title, date_from, date_till, reminder, repeat) VALUES ";
-    //    for (uint32_t i = 0; i < 7 ;i++)
-    //    {
-    //        if (weekDayOptions[i]){
-    request = request + concatenate("('%q', datetime('%q',('+%u year')),datetime('%q',('+%u year')), %u, %u), ",
-                                    entry.title.c_str(),
-                                    TimePointToString(entry.date_from).c_str(),
-                                    1,
-                                    TimePointToString(entry.date_till).c_str(),
-                                    1,
-                                    entry.reminder,
-                                    entry.repeat);
+    auto dateFrom = getFirstWeekDay(entry.date_from);
+    auto dateTill = getFirstWeekDay(entry.date_till);
 
-    request = request + concatenate("('%q', datetime('%q',('+%u day')),datetime('%q',('+%u day')), %u, %u); ",
-                                    entry.title.c_str(),
-                                    TimePointToString(entry.date_from).c_str(),
-                                    2,
-                                    TimePointToString(entry.date_till).c_str(),
-                                    2,
-                                    entry.reminder,
-                                    entry.repeat);
-    //        }
-    //    }
-    return db->execute(request.c_str());
+    for (uint32_t i = 1; i <= numberOfWeeks; i++) {
+        for (auto option : weekDayOptions) {
+            if (option) {
+                result =
+                    result &&
+                    db->execute("INSERT or IGNORE INTO events (title, date_from, date_till, reminder, repeat) VALUES"
+                                "('%q', '%q','%q', %u, %u);",
+                                entry.title.c_str(),
+                                TimePointToString(dateFrom + date::days{incrementation}).c_str(),
+                                TimePointToString(dateTill + date::days{incrementation}).c_str(),
+                                entry.reminder,
+                                entry.repeat);
+            }
+            ++incrementation;
+        }
+        incrementation = i * numberOfWeekDays;
+    }
+    return result;
 }
 
 bool EventsTable::removeById(uint32_t id)

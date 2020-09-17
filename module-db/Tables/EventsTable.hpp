@@ -12,8 +12,8 @@ struct EventsTableRow : public Record
     std::string title;
     TimePoint date_from = TIME_POINT_INVALID;
     TimePoint date_till = TIME_POINT_INVALID;
-    uint32_t reminder  = 0;
-    uint32_t repeat    = 0;
+    uint32_t reminder   = 0;
+    uint32_t repeat     = 0;
 };
 
 enum class EventsTableFields
@@ -58,5 +58,6 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                    "date_from DATETIME,"
                                    "date_till DATETIME,"
                                    "reminder INTEGER,"
-                                   "repeat INTEGER);";
+                                   "repeat INTEGER,"
+                                   "UNIQUE (title, date_from, date_till));";
 };
