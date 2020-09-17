@@ -12,6 +12,7 @@
 
 ### Fixed
 
+* `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
 
 
 ### Other
