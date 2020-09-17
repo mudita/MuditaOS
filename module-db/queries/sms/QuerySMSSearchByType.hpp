@@ -2,8 +2,7 @@
 
 #include <Common/Query.hpp>
 #include <Common/Common.hpp>
-
-class SMSRecord;
+#include <module-db/Interface/SMSRecord.hpp>
 
 namespace db::query
 {
