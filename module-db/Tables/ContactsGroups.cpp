@@ -35,7 +35,7 @@ const char *createTableGroupsProtected = "CREATE TABLE IF NOT EXISTS contact_gro
 const char *protectSpecialGroups = "INSERT INTO contact_group_protected "
                                    " (group_id) "
                                    " VALUES "
-                                   " (1),(2),(3);";
+                                   " (1),(2),(3),(4);";
 
 namespace statements
 {
