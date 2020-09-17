@@ -62,9 +62,9 @@ namespace gui
         if (mode == ShowMode::GUI_SHOW_RETURN) {
             auto receivedData = dynamic_cast<WeekDaysRepeatData *>(data);
             if (receivedData != nullptr) {
-                auto parser         = new OptionParser();
+                auto parser         = std::make_unique<OptionParser>();
                 auto uniqueData     = std::make_unique<WeekDaysRepeatData>(*receivedData);
-                eventRecord->repeat = eventRecord->repeat + parser->getDatabaseFieldValue(std::move(uniqueData));
+                eventRecord->repeat = parser->getDatabaseFieldValue(std::move(uniqueData));
                 newEditEventModel->loadRepeat(eventRecord);
             }
         }

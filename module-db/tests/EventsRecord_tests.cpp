@@ -245,7 +245,6 @@ TEST_CASE("Events Record tests")
         auto ret    = eventsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::events::EditResult *>(ret.get());
         REQUIRE(result != nullptr);
-        REQUIRE(result->getResult());
 
         auto queryGet  = std::make_shared<db::query::events::Get>(id);
         auto retGet    = eventsRecordInterface.runQuery(queryGet);
@@ -292,7 +291,7 @@ TEST_CASE("Events Record tests")
 
     SECTION("Update via query")
     {
-        EditQuery(2, "Event3", TimePointFromString("2021-10-20 14:24"), TimePointFromString("2021-10-20 15:36"), 1, 2);
+        EditQuery(2, "Event1", TimePointFromString("2021-10-20 14:24"), TimePointFromString("2021-10-20 15:36"), 1, 2);
     }
 
     SECTION("Get All via query")
