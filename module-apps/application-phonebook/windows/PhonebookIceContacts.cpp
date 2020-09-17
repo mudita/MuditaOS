@@ -73,4 +73,9 @@ namespace gui
 
         return false;
     }
+
+    void PhonebookIceContacts::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        rebuild();
+    }
 } /* namespace gui */
