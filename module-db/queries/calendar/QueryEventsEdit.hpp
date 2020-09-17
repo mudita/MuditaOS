@@ -9,13 +9,10 @@ namespace db::query::events
     class Edit : public Query
     {
         EventsRecord record;
-        /// Check value
-        uint32_t dateFrom;
 
       public:
-        Edit(EventsRecord record, const uint32_t &dateFrom);
+        Edit(EventsRecord record);
 
-        [[nodiscard]] auto getDateFrom() const -> uint32_t;
         [[nodiscard]] auto getRecord() const -> EventsRecord;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };

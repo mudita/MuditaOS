@@ -101,7 +101,7 @@ updateos::UpdateError UpdatePureOS::runUpdate(const int resetDelay)
         informError("Can't prepare root dir for reset");
     }
 
-    if ( (err =  cleanupAfterUpdate()) == updateos::UpdateError::NoError) {
+    if ((err = cleanupAfterUpdate()) == updateos::UpdateError::NoError) {
         if (resetDelay == -1)
             return err;
 
@@ -237,10 +237,10 @@ void UpdatePureOS::getChecksumInfo(const std::string &infoLine, std::string &fil
         if (fileCRC32Long != nullptr) {
             *fileCRC32Long = strtoull(fileCRC32Str.c_str(), nullptr, purefs::buffer::crc_radix);
             informDebug("getChecksumInfo filePath: %s fileCRC32Str: %s fileCRC32Long: %lu fileCRC32Hex: %lX",
-                      filePath.c_str(),
-                      fileCRC32Str.c_str(),
-                      *fileCRC32Long,
-                      *fileCRC32Long);
+                        filePath.c_str(),
+                        fileCRC32Str.c_str(),
+                        *fileCRC32Long,
+                        *fileCRC32Long);
         }
     }
 }
@@ -264,8 +264,8 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
 
     if (ret != 0) {
         informError("prepareRoot ff_deltree on %s caused an error %s",
-                  purefs::dir::os_previous.c_str(),
-                  vfs.lastErrnoToStr().c_str());
+                    purefs::dir::os_previous.c_str(),
+                    vfs.lastErrnoToStr().c_str());
     }
 
     if (vfs.isDir(purefs::dir::os_previous.c_str())) {
@@ -278,9 +278,9 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
 
     if (ret != 0) {
         informError("prepareRoot can't rename %s -> %s error %s",
-                  purefs::dir::os_current.c_str(),
-                  purefs::dir::os_previous.c_str(),
-                  vfs.lastErrnoToStr().c_str());
+                    purefs::dir::os_current.c_str(),
+                    purefs::dir::os_previous.c_str(),
+                    vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantRenameCurrentToPrevious;
     }
 
@@ -290,9 +290,9 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
 
     if (ret != 0) {
         informError("prepareRoot can't rename %s -> %s error %s",
-                  updateTempDirectory.c_str(),
-                  purefs::dir::os_current.c_str(),
-                  vfs.lastErrnoToStr().c_str());
+                    updateTempDirectory.c_str(),
+                    purefs::dir::os_current.c_str(),
+                    vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantRenameTempToCurrent;
     }
 
@@ -459,8 +459,8 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
     informDebug("prepareTempDirForUpdate trying to create %s as tempDir", updateTempDirectory.c_str());
     if (vfs.mkdir(updateTempDirectory.c_str()) != 0) {
         informError("prepareTempDirForUpdate failed to create: %s error: %s",
-                  updateTempDirectory.c_str(),
-                  vfs.lastErrnoToStr().c_str());
+                    updateTempDirectory.c_str(),
+                    vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantCreateUniqueTmpDir;
     }
 
@@ -573,7 +573,8 @@ bool UpdatePureOS::isUpgradeToCurrent(const std::string &versionToCompare)
 
 const fs::path UpdatePureOS::checkForUpdate()
 {
-    std::vector<vfs::DirectoryEntry> fileList = vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
+    std::vector<vfs::DirectoryEntry> fileList =
+        vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
     for (auto &file : fileList) {
 
         json11::Json versionInfo = UpdatePureOS::getVersionInfoFromFile(purefs::dir::os_updates / file.fileName);
@@ -581,7 +582,8 @@ const fs::path UpdatePureOS::checkForUpdate()
             continue;
 
         if (versionInfo[purefs::json::os_version][purefs::json::version_string].is_string()) {
-            if (UpdatePureOS::isUpgradeToCurrent(versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
+            if (UpdatePureOS::isUpgradeToCurrent(
+                    versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
                 return purefs::dir::os_updates / file.fileName;
             }
         }
@@ -592,7 +594,7 @@ const fs::path UpdatePureOS::checkForUpdate()
 
 updateos::UpdateError UpdatePureOS::updateUserData()
 {
-    for (unsigned int x=0; x < filesInUpdatePackage.size(); x++) {
+    for (unsigned int x = 0; x < filesInUpdatePackage.size(); x++) {
         // informDebug("file %u: %s", x, fs::path(filesInUpdatePackage[x].fileName).c_str());
     }
     return updateos::UpdateError::NoError;
@@ -603,7 +605,7 @@ void UpdatePureOS::informError(const char *format, ...)
     va_list argptr;
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
     va_start(argptr, format);
-    vsnprintf (readBuf.get(), purefs::buffer::tar_buf, format, argptr);
+    vsnprintf(readBuf.get(), purefs::buffer::tar_buf, format, argptr);
     va_end(argptr);
 
     LOG_ERROR("UPDATE_ERRROR %s", readBuf.get());
@@ -614,7 +616,7 @@ void UpdatePureOS::informDebug(const char *format, ...)
     va_list argptr;
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
     va_start(argptr, format);
-    vsnprintf (readBuf.get(), purefs::buffer::tar_buf, format, argptr);
+    vsnprintf(readBuf.get(), purefs::buffer::tar_buf, format, argptr);
     va_end(argptr);
 
     LOG_DEBUG("UPDATE_DEBUG %s", readBuf.get());
@@ -625,13 +627,13 @@ void UpdatePureOS::informUpdate(const char *format, ...)
     va_list argptr;
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
     va_start(argptr, format);
-    vsnprintf (readBuf.get(), purefs::buffer::tar_buf, format, argptr);
+    vsnprintf(readBuf.get(), purefs::buffer::tar_buf, format, argptr);
     va_end(argptr);
 
     LOG_INFO("UPDATE_INFO %s", readBuf.get());
 
-    auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateMessageType::UpdateInform);
-    messageText = std::string(readBuf.get());
+    auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateMessageType::UpdateInform);
+    messageText            = std::string(readBuf.get());
     msgToSend->updateStats = (sdesktop::UpdateStats)(*this);
-    sys::Bus::SendUnicast (msgToSend, app::name_desktop, owner);
+    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 }

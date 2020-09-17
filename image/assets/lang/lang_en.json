@@ -58,6 +58,8 @@
     "locale_24hour_min" : "%H:%M",
     "locale_date_full" : "%m/%d/%y",
     "locale_date_short" : "%d/%m",
+    "common_AM" : "AM",
+    "common_PM" : "PM",
 
     "duration_min_0sec" : "%M:%0S",
     "duration_0min_0sec" : "%0M:%0S",
@@ -98,6 +100,7 @@
     "app_calendar_edit": "EDIT",
     "app_calendar_new_edit_event_name": "Event name",
     "app_calendar_new_edit_event_allday": "All day event",
+    "app_calendar_all_day": "All day",
     "app_calendar_new_edit_event_start": "Start",
     "app_calendar_new_edit_event_end": "End",
 

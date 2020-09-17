@@ -1,8 +1,15 @@
 #include "AllEventsWindow.hpp"
+#include "module-apps/application-calendar/ApplicationCalendar.hpp"
+#include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
+
+#include <module-services/service-db/messages/QueryMessage.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <time/time_conversion.hpp>
 
 namespace gui
 {
@@ -41,16 +48,18 @@ namespace gui
                                                   style::window::calendar::listView_w,
                                                   style::window::calendar::listView_h,
                                                   allEventsModel);
-
-        allEventsList->setPenFocusWidth(style::window::default_border_no_focus_w);
-        allEventsList->setPenWidth(style::window::default_border_no_focus_w);
-
         setFocusItem(allEventsList);
     }
 
     void AllEventsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         allEventsList->rebuildList();
+        auto dataReceived = dynamic_cast<PrevWindowData *>(data);
+        if (dataReceived != nullptr) {
+            if (dataReceived->getData() == PrevWindowData::PrevWindow::Delete) {
+                checkEmpty = true;
+            }
+        }
     }
 
     bool AllEventsWindow::onInput(const gui::InputEvent &inputEvent)
@@ -71,8 +80,13 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
             LOG_DEBUG("Switch to new event window");
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<SwitchData>();
+            std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
             data->setDescription("New");
+            auto event       = std::make_shared<EventsRecord>();
+            event->date_from = TimePointNow();
+            event->date_till = TimePointNow();
+            data->setData(event);
+            data->setWindowName(style::window::calendar::name::all_events_window);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
@@ -84,6 +98,35 @@ namespace gui
             return true;
         }
 
+        return false;
+    }
+
+    bool AllEventsWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
+        if (msg != nullptr) {
+            auto temp = msg->getResult();
+            if (auto response = dynamic_cast<db::query::events::GetAllLimitedResult *>(temp.get())) {
+                auto records_data = response->getResult();
+                allEventsModel->setRecordsCount(*response->getCountResult());
+                auto records = std::make_unique<std::vector<EventsRecord>>(records_data->begin(), records_data->end());
+                if (checkEmpty) {
+                    if (records->size() == 0) {
+                        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+                        assert(application != nullptr);
+                        auto filter = std::chrono::system_clock::now();
+                        app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"),
+                                                    filter,
+                                                    style::window::calendar::name::all_events_window);
+                    }
+                }
+                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+                return allEventsModel->updateRecords(std::move(records));
+            }
+            LOG_DEBUG("Response False");
+            return false;
+        }
+        LOG_DEBUG("AllEventsWindow DB Message != QueryResponse");
         return false;
     }
 } /* namespace gui */

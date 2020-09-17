@@ -1,6 +1,7 @@
 #pragma once
 #include "CalendarListItem.hpp"
 #include "Application.hpp"
+#include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <Label.hpp>
 #include <Image.hpp>
 #include <BoxLayout.hpp>
@@ -13,14 +14,17 @@ namespace gui
     {
         gui::HBox *hBox           = nullptr;
         app::Application *app     = nullptr;
+        std::shared_ptr<WeekDaysRepeatData> checkBoxData = nullptr;
         bool checkIsOnLeftBarSide = false;
 
         virtual void applyCallbacks();
+        void setCheckBoxes();
 
       public:
         CheckBoxWithLabelItem(app::Application *application,
                               const std::string &description,
-                              bool checkIsOnLeftBarSide = false);
+                              std::shared_ptr<WeekDaysRepeatData> data = nullptr,
+                              bool checkIsOnLeftBarSide                = false);
         virtual ~CheckBoxWithLabelItem() override = default;
 
         gui::Label *descriptionLabel = nullptr;

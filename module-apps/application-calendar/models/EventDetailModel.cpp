@@ -29,15 +29,18 @@ gui::ListItem *EventDetailModel::getItem(gui::Order order)
 
 void EventDetailModel::createData()
 {
+    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+    assert(app != nullptr);
+
     internalData.push_back(new gui::EventDetailDescriptionItem());
-    internalData.push_back(new gui::RepeatAndReminderItem());
+    internalData.push_back(new gui::RepeatAndReminderItem(app));
 
     for (auto &item : internalData) {
         item->deleteByList = false;
     }
 }
 
-void EventDetailModel::loadData()
+void EventDetailModel::loadData(std::shared_ptr<EventsRecord> record)
 {
     list->clear();
     eraseInternalData();
@@ -46,7 +49,7 @@ void EventDetailModel::loadData()
 
     for (auto &item : internalData) {
         if (item->onLoadCallback) {
-            item->onLoadCallback();
+            item->onLoadCallback(record);
         }
     }
 

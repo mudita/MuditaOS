@@ -68,7 +68,8 @@ namespace gui
         percentLabel->setFilled(false);
         percentLabel->setBorderColor(gui::ColorNoColor);
         percentLabel->setFont(style::window::font::largelight);
-        percentLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+        percentLabel->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         percentLabel->setVisible(false);
 
         uint32_t pinLabelX = 46;
@@ -98,15 +99,15 @@ namespace gui
 
         // callbacks for getting focus
         selectionLabels[0]->focusChangedCallback = [=](gui::Item &item) {
-          if (item.focus)
-              this->state = State::Return;
-          return true;
+            if (item.focus)
+                this->state = State::Return;
+            return true;
         };
 
         selectionLabels[1]->focusChangedCallback = [=](gui::Item &item) {
-          if (item.focus)
-              this->state = State::UpdateNow;
-          return true;
+            if (item.focus)
+                this->state = State::UpdateNow;
+            return true;
         };
     }
     void UpdateWindow::destroyInterface()
@@ -118,14 +119,16 @@ namespace gui
     {
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
-        } else {
+        }
+        else {
             gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
             if (item != nullptr) {
                 std::stringstream title;
                 sdesktop::UpdateOsMessage msg = item->getUpdateOsMessage();
-                updateFile = msg.updateStats.updateFile;
+                updateFile                    = msg.updateStats.updateFile;
                 title << "Update to: ";
-                title << msg.updateStats.versioInformation[purefs::json::os_version][purefs::json::version_string].string_value();
+                title << msg.updateStats.versioInformation[purefs::json::os_version][purefs::json::version_string]
+                             .string_value();
                 titleLabel->setText(title.str());
             }
         }
@@ -160,7 +163,7 @@ namespace gui
                 percentLabel->setVisible(true);
                 percentLabel->setText("Update start");
                 auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateFile.c_str(), 0);
-                sys::Bus::SendUnicast (msgToSend, service::name::service_desktop, application);
+                sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, application);
 
                 return true;
             }
@@ -174,14 +177,18 @@ namespace gui
         gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
         if (item != nullptr) {
             std::stringstream ssi;
-            updateos::UpdateState status = static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
+            updateos::UpdateState status =
+                static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
 
             if (status == updateos::UpdateState::ReadyForReset) {
                 percentLabel->setText("Resetting ...");
             }
 
             if (status == updateos::UpdateState::ExtractingFiles) {
-                progressPercent = static_cast<int>(((float)item->getUpdateOsMessage().updateStats.currentExtractedBytes / (float)item->getUpdateOsMessage().updateStats.totalBytes) * 100.0);
+                progressPercent =
+                    static_cast<int>(((float)item->getUpdateOsMessage().updateStats.currentExtractedBytes /
+                                      (float)item->getUpdateOsMessage().updateStats.totalBytes) *
+                                     100.0);
                 ssi << "Unpacking: ";
                 ssi << std::to_string(progressPercent);
                 ssi << " %";

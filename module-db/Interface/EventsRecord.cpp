@@ -6,14 +6,15 @@
 #include "module-db/queries/calendar/QueryEventsEdit.hpp"
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <log/log.hpp>
 #include <Utils.hpp>
 #include <cassert>
 #include <vector>
 
 EventsRecord::EventsRecord(const EventsTableRow &tableRow)
-    : Record{tableRow.ID}, title{tableRow.title}, description{tableRow.description}, date_from{tableRow.date_from},
-      date_till{tableRow.date_till}, reminder{tableRow.reminder}, repeat{tableRow.repeat}, time_zone{tableRow.time_zone}
+    : Record{tableRow.ID}, title{tableRow.title}, date_from{tableRow.date_from}, date_till{tableRow.date_till},
+      reminder{tableRow.reminder}, repeat{tableRow.repeat}
 {}
 
 EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(eventsDb)
@@ -21,21 +22,44 @@ EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(even
 
 bool EventsRecordInterface::Add(const EventsRecord &rec)
 {
-    eventsDb->events.add(EventsTableRow{{.ID = rec.ID},
-                                        .title       = rec.title,
-                                        .description = rec.description,
-                                        .date_from   = rec.date_from,
-                                        .date_till   = rec.date_till,
-                                        .reminder    = rec.reminder,
-                                        .repeat      = rec.repeat,
-                                        .time_zone   = rec.time_zone});
+    auto entry = EventsTableRow{{.ID = rec.ID},
+                                .title     = rec.title,
+                                .date_from = rec.date_from,
+                                .date_till = rec.date_till,
+                                .reminder  = rec.reminder,
+                                .repeat    = rec.repeat};
+
+    switch (RepeatOption(rec.repeat)) {
+    case RepeatOption::Never: {
+        return eventsDb->events.add(entry);
+    }
+    case RepeatOption::Daily: {
+        return eventsDb->events.addDaily(entry);
+    }
+    case RepeatOption::Weekly: {
+        return eventsDb->events.addWeekly(entry);
+    }
+    case RepeatOption::TwoWeeks: {
+        return eventsDb->events.addTwoWeeks(entry);
+    }
+    case RepeatOption::Month: {
+        return eventsDb->events.addMonth(entry);
+    }
+    case RepeatOption::Year: {
+        return eventsDb->events.addYear(entry);
+    }
+    default: {
+        break;
+        eventsDb->events.addCustom(entry);
+    }
+    }
 
     return true;
 }
 
-std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(uint32_t from, uint32_t till)
+std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(TimePoint filter_from, TimePoint filter_till)
 {
-    auto rows = eventsDb->events.selectByDatePeriod(from, till);
+    auto rows = eventsDb->events.selectByDatePeriod(filter_from, filter_till);
 
     auto records = std::make_unique<std::vector<EventsRecord>>();
 
@@ -73,22 +97,65 @@ std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::GetLimitOffset
     return records;
 }
 
-bool EventsRecordInterface::Update(const EventsRecord &rec, const uint32_t &checkValue)
+std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::GetLimitOffsetByDate(uint32_t offset, uint32_t limit)
 {
-    auto entry = eventsDb->events.getById(rec.ID);
-    if (!entry.isValid() || entry.date_from != checkValue) {
+    if (limit == 0) {
+        limit = GetCount();
+    }
+
+    auto rows = eventsDb->events.getLimitOffsetByDate(offset, limit);
+
+    auto records = std::make_unique<std::vector<EventsRecord>>();
+
+    for (auto &r : rows) {
+        records->push_back(r);
+    }
+
+    return records;
+}
+
+bool EventsRecordInterface::Update(const EventsRecord &rec)
+{
+    auto record = eventsDb->events.getById(rec.ID);
+    if (!record.isValid()) {
         LOG_DEBUG("IS NOT VALID");
         return false;
     }
 
-    return eventsDb->events.update(EventsTableRow{{.ID = rec.ID},
-                                                  .title       = rec.title,
-                                                  .description = rec.description,
-                                                  .date_from   = rec.date_from,
-                                                  .date_till   = rec.date_till,
-                                                  .reminder    = rec.reminder,
-                                                  .repeat      = rec.repeat,
-                                                  .time_zone   = rec.time_zone});
+    auto entry = EventsTableRow{{.ID = rec.ID},
+                                .title     = rec.title,
+                                .date_from = rec.date_from,
+                                .date_till = rec.date_till,
+                                .reminder  = rec.reminder,
+                                .repeat    = rec.repeat};
+
+    bool result = eventsDb->events.update(entry);
+
+    switch (RepeatOption(rec.repeat)) {
+    case RepeatOption::Never: {
+        return (eventsDb->events.add(entry) && result);
+    }
+    case RepeatOption::Daily: {
+        return (eventsDb->events.addDaily(entry) && result);
+    }
+    case RepeatOption::Weekly: {
+        return (eventsDb->events.addWeekly(entry) && result);
+    }
+    case RepeatOption::TwoWeeks: {
+        return (eventsDb->events.addTwoWeeks(entry) && result);
+    }
+    case RepeatOption::Month: {
+        return (eventsDb->events.addMonth(entry) && result);
+    }
+    case RepeatOption::Year: {
+        return (eventsDb->events.addYear(entry) && result);
+    }
+    default: {
+        break;
+        eventsDb->events.addCustom(entry);
+    }
+    }
+    return false;
 }
 
 bool EventsRecordInterface::RemoveByID(uint32_t id)
@@ -124,6 +191,10 @@ std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr
         const auto local_query = dynamic_cast<const db::query::events::GetAll *>(query.get());
         return runQueryImpl(local_query);
     }
+    if (typeid(*query) == typeid(db::query::events::GetAllLimited)) {
+        const auto local_query = dynamic_cast<const db::query::events::GetAllLimited *>(query.get());
+        return runQueryImpl(local_query);
+    }
     if (typeid(*query) == typeid(db::query::events::GetFiltered)) {
         const auto local_query = dynamic_cast<const db::query::events::GetFiltered *>(query.get());
         return runQueryImpl(local_query);
@@ -157,10 +228,19 @@ std::unique_ptr<db::query::events::GetAllResult> EventsRecordInterface::runQuery
     return std::make_unique<db::query::events::GetAllResult>(std::move(records));
 }
 
+std::unique_ptr<db::query::events::GetAllLimitedResult> EventsRecordInterface::runQueryImpl(
+    const db::query::events::GetAllLimited *query)
+{
+    auto count   = GetCount();
+    auto records = GetLimitOffsetByDate(query->offset, query->limit);
+    return std::make_unique<db::query::events::GetAllLimitedResult>(std::move(records),
+                                                                    std::make_unique<uint32_t>(count));
+}
+
 std::unique_ptr<db::query::events::GetFilteredResult> EventsRecordInterface::runQueryImpl(
     const db::query::events::GetFiltered *query)
 {
-    auto records = Select(query->date_from, query->date_till);
+    auto records = Select(query->filter_from, query->filter_till);
     return std::make_unique<db::query::events::GetFilteredResult>(std::move(records));
 }
 
@@ -179,6 +259,6 @@ std::unique_ptr<db::query::events::RemoveResult> EventsRecordInterface::runQuery
 
 std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryImpl(const db::query::events::Edit *query)
 {
-    bool ret = Update(query->getRecord(), query->getDateFrom());
+    bool ret = Update(query->getRecord());
     return std::make_unique<db::query::events::EditResult>(ret);
 }

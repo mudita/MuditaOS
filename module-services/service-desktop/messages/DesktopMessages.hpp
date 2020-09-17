@@ -17,43 +17,45 @@ namespace sdesktop
 
     struct UpdateStats
     {
-        fs::path updateFile = "";
-        fs::path fileExtracted = "";
-        fs::path updateTempDirectory = PATH_SYS "/" PATH_TMP;
-        uint32_t totalBytes = 0;
+        fs::path updateFile            = "";
+        fs::path fileExtracted         = "";
+        fs::path updateTempDirectory   = PATH_SYS "/" PATH_TMP;
+        uint32_t totalBytes            = 0;
         uint32_t currentExtractedBytes = 0;
-        uint32_t uuid = 0;
-        std::string messageText = "";
+        uint32_t uuid                  = 0;
+        std::string messageText        = "";
         uint8_t status;
         json11::Json versioInformation;
     };
 
     class UpdateOsMessage : public sys::DataMessage
     {
-    public:
+      public:
         UpdateOsMessage(const std::string updateFilePath, const uint32_t requestUUID)
-                : sys::DataMessage(MessageType::UpdateOS)
-                {
-                    updateStats.updateFile = updateFilePath;
-                    updateStats.uuid = requestUUID;
-                };
+            : sys::DataMessage(MessageType::UpdateOS)
+        {
+            updateStats.updateFile = updateFilePath;
+            updateStats.uuid       = requestUUID;
+        };
 
-        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS) {}
+        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
+        {}
 
         UpdateOsMessage(const sdesktop::UpdateMessageType updateMessageType)
-                : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType) {}
+            : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
+        {}
 
         UpdateOsMessage(const sdesktop::UpdateMessageType updateMessageType, fs::path updateFileFoundOnBoot)
-                : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
+            : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
         {
             updateStats.updateFile = updateFileFoundOnBoot;
         }
 
         ~UpdateOsMessage() override = default;
 
-        UpdateStats updateStats = {};
+        UpdateStats updateStats       = {};
         UpdateMessageType messageType = UpdateNow;
-        int rebootDelay = 0;
+        int rebootDelay               = 0;
     };
 
     class BackupMessage : public sys::DataMessage

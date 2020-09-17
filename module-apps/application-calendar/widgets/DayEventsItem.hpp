@@ -1,10 +1,10 @@
 #pragma once
-
-#include "application-calendar/models/DayEventsModel.hpp"
 #include <Label.hpp>
 #include <ListItem.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
 #include <BoxLayout.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
+#include <Image.hpp>
 
 namespace gui
 
