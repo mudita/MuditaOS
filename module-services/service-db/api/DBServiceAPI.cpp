@@ -354,8 +354,23 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Se
     rec.ID = contactID;
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
+    return std::move(ContactGetByIDCommon(serv, std::move(msg)));
+}
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByIDWithTemporary(sys::Service *serv,
+                                                                                      uint32_t contactID)
+{
+    ContactRecord rec;
+    rec.ID                                = contactID;
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
+    msg->withTemporary                    = true;
+    return std::move(ContactGetByIDCommon(serv, std::move(msg)));
+}
+
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByIDCommon(
+    sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
+{
+    auto ret                                  = sys::Bus::SendUnicast(contactMsg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
@@ -467,7 +482,6 @@ std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationEr
 bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec)
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd, rec);
-    msg->record.contactType               = ContactType::USER;
 
     auto ret                                  = sys::Bus::SendUnicast(msg, service::name::db, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());

@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <mock/BlockFactory.hpp>
 #include <RawFont.hpp>
-
+#include <iostream>
 TEST_CASE("Text ctor")
 {
     using namespace gui;
@@ -105,11 +105,11 @@ TEST_CASE("Text drawLines")
         REQUIRE(lines_to_show < lines_count);
         auto testline    = mockup::multiLineString(lines_count);
         auto font        = fontmanager.getFont(0);
+        REQUIRE(font != nullptr);
         auto line_height = font->info.line_height;
         auto text        = TestText();
-        text.setMaximumSize(6, line_height * lines_to_show);
-        text.setText(std::make_unique<TextDocument>(
-            textToTextBlocks(testline, fontmanager.getFont(0), TextBlock::End::Newline)));
+        text.setMaximumSize(8, line_height * lines_to_show);
+        text.setText(std::make_unique<TextDocument>(textToTextBlocks(testline, font, TextBlock::End::Newline)));
 
         text.drawLines();
         REQUIRE(text.linesSize() == lines_to_show);

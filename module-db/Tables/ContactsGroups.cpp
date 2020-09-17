@@ -25,7 +25,8 @@ const char *addSpecialGroups = "INSERT OR REPLACE INTO contact_groups "
                                "VALUES"
                                " (1, 'Favourites'),"
                                " (2, 'ICE'),"
-                               " (3, 'Blocked');";
+                               " (3, 'Blocked'),"
+                               " (4, 'Temporary');";
 
 namespace statements
 {
@@ -34,6 +35,7 @@ namespace statements
     const char *favouritesId = "SELECT _id FROM contact_groups WHERE name = 'Favourites';";
     const char *iceId        = "SELECT _id FROM contact_groups WHERE name = 'ICE';";
     const char *blockedId    = "SELECT _id FROM contact_groups WHERE name = 'Blocked';";
+    const char *temporaryId  = "SELECT _id FROM contact_groups WHERE name = 'Temporary';";
 
     const char *getId      = "SELECT _id FROM contact_groups WHERE name = '%q';";
     const char *getById    = "SELECT _id, name FROM contact_groups WHERE _id = %u;";
@@ -196,6 +198,11 @@ uint32_t ContactsGroupsTable::iceId() const
 uint32_t ContactsGroupsTable::blockedId() const
 {
     return getIdOrCount(statements::blockedId);
+}
+
+uint32_t ContactsGroupsTable::temporaryId() const
+{
+    return getIdOrCount(statements::temporaryId);
 }
 
 uint32_t ContactsGroupsTable::getId(const std::string &name)

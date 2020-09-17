@@ -303,7 +303,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     case MessageType::DBContactGetByID: {
         auto time             = utils::time::Scoped("DBContactGetByID");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->GetByID(msg->record.ID);
+        auto ret              = (msg->withTemporary ? contactRecordInterface->GetByIdWithTemporary(msg->record.ID)
+                                       : contactRecordInterface->GetByID(msg->record.ID));
         auto records          = std::make_unique<std::vector<ContactRecord>>();
         records->push_back(ret);
         responseMsg = std::make_shared<DBContactResponseMessage>(

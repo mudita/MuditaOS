@@ -5,16 +5,15 @@
 #include <Database/Database.hpp>
 #include <Common/Common.hpp>
 #include <utf8/UTF8.hpp>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
 
 struct EventsTableRow : public Record
 {
     std::string title;
-    std::string description;
-    uint32_t date_from = 0;
-    uint32_t date_till = 0;
+    TimePoint date_from = TIME_POINT_INVALID;
+    TimePoint date_till = TIME_POINT_INVALID;
     uint32_t reminder  = 0;
     uint32_t repeat    = 0;
-    uint32_t time_zone = 0;
 };
 
 enum class EventsTableFields
@@ -31,11 +30,17 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
 
     bool create() override final;
     bool add(EventsTableRow entry) override final;
+    bool addDaily(EventsTableRow entry);
+    bool addWeekly(EventsTableRow entry);
+    bool addTwoWeeks(EventsTableRow entry);
+    bool addMonth(EventsTableRow entry);
+    bool addYear(EventsTableRow entry);
+    bool addCustom(EventsTableRow entry);
     bool removeById(uint32_t id) override final;
     bool removeByField(EventsTableFields field, const char *str) override final;
     bool update(EventsTableRow entry) override final;
     EventsTableRow getById(uint32_t id) override final;
-    std::vector<EventsTableRow> selectByDatePeriod(uint32_t date_from, uint32_t date_till);
+    std::vector<EventsTableRow> selectByDatePeriod(TimePoint filter_from, TimePoint filter_till);
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     std::vector<EventsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
@@ -44,14 +49,14 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                                       EventsTableFields field,
                                                       const char *str) override final;
 
+    std::vector<EventsTableRow> getLimitOffsetByDate(uint32_t offset, uint32_t limit);
+
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS events("
                                    "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                                    "title TEXT,"
-                                   "description TEXT,"
-                                   "date_from INTEGER,"
-                                   "date_till INTEGER,"
+                                   "date_from DATETIME,"
+                                   "date_till DATETIME,"
                                    "reminder INTEGER,"
-                                   "repeat INTEGER,"
-                                   "time_zone INTEGER);";
+                                   "repeat INTEGER);";
 };

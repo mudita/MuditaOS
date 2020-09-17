@@ -4,18 +4,18 @@
 
 namespace gui
 {
-    class CheckBoxWithLabelAndModel : public CheckBoxWithLabelItem
+    class NewEventCheckBoxWithLabel : public CheckBoxWithLabelItem
     {
         NewEditEventModel *model = nullptr;
         app::Application *app    = nullptr;
         void applyCallbacks() override;
 
       public:
-        CheckBoxWithLabelAndModel(app::Application *application,
+        NewEventCheckBoxWithLabel(app::Application *application,
                                   const std::string &description,
                                   bool checkIsOnLeftBarSide = false,
                                   NewEditEventModel *model  = nullptr);
-        virtual ~CheckBoxWithLabelAndModel() override = default;
+        virtual ~NewEventCheckBoxWithLabel() override = default;
     };
 
 } /* namespace gui */

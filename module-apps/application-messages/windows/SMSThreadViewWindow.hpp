@@ -16,7 +16,7 @@
 
 namespace gui
 {
-    class ThreadViewWindow : public AppWindow
+    class SMSThreadViewWindow : public AppWindow
     {
       private:
         gui::VBox *body         = nullptr;
@@ -54,9 +54,9 @@ namespace gui
         inline static const std::uint32_t numberIdTimeout = 1000;
 
       public:
-        ThreadViewWindow(app::Application *app);
+        SMSThreadViewWindow(app::Application *app);
 
-        virtual ~ThreadViewWindow();
+        virtual ~SMSThreadViewWindow();
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
 

@@ -6,23 +6,35 @@
 #include "windows/EventDetailWindow.hpp"
 #include "windows/NewEditEventWindow.hpp"
 #include "windows/CustomRepeatWindow.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
 #include <time/time_conversion.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
-#include <module-db/queries/calendar/QueryEventsGet.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
-#include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <module-db/queries/calendar/QueryEventsGetAll.hpp>
-#include <module-db/queries/calendar/QueryEventsRemove.hpp>
-#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <module-services/service-db/messages/QueryMessage.hpp>
-#include <messages/QueryMessage.hpp>
-#include <map>
 
 namespace app
 {
+    const map<Reminder, const char *> ApplicationCalendar::reminderOptions = {
+        {Reminder::never, "app_calendar_reminder_never"},
+        {Reminder::event_time, "app_calendar_reminder_event_time"},
+        {Reminder::five_min_before, "app_calendar_reminder_5_min_before"},
+        {Reminder::fifteen_min_before, "app_calendar_reminder_15_min_before"},
+        {Reminder::thirty_min_before, "app_calendar_reminder_30_min_before"},
+        {Reminder::one_hour_before, "app_calendar_reminder_1_hour_before"},
+        {Reminder::two_hour_before, "app_calendar_reminder_2_hour_before"},
+        {Reminder::one_day_before, "app_calendar_reminder_1_day_before"},
+        {Reminder::two_days_before, "app_calendar_reminder_2_days_before"},
+        {Reminder::one_week_before, "app_calendar_reminder_1_week_before"}};
+
+    const map<Repeat, const char *> ApplicationCalendar::repeatOptions = {
+        {Repeat::never, "app_calendar_repeat_never"},
+        {Repeat::daily, "app_calendar_repeat_daily"},
+        {Repeat::weekly, "app_calendar_repeat_weekly"},
+        {Repeat::two_weeks, "app_calendar_repeat_two_weeks"},
+        {Repeat::month, "app_calendar_repeat_month"},
+        {Repeat::year, "app_calendar_repeat_year"},
+        {Repeat::custom, "app_calendar_repeat_custom"}};
 
     ApplicationCalendar::ApplicationCalendar(std::string name,
                                              std::string parent,
@@ -33,20 +45,38 @@ namespace app
 
     sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        return Application::DataReceivedHandler(msgl);
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        // if message was handled by application's template there is no need to process further.
+        if (retMsg && (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+            return retMsg;
+        }
+        // this variable defines whether message was processed.
+        bool handled = false;
+        // handle database response
+        if (resp != nullptr) {
+            handled = true;
+            switch (resp->responseTo) {
+            case MessageType::DBQuery: {
+                if (getCurrentWindow()->onDatabaseMessage(resp))
+                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            } break;
+            default:
+                break;
+            }
+        }
+        if (handled) {
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        auto timestamp       = new utils::time::Timestamp();
-        applicationStartTime = timestamp->getTime();
+        utils::time::Timestamp timestamp;
+        applicationStartTime = timestamp.getTime();
         auto ret             = Application::InitHandler();
-        EventsRecord event(EventsTableRow{{1}, "TEST", "TEST", 191020142, 191020153, 1, 2, 1});
-        EventsRecord event2(EventsTableRow{{2}, "TEST2", "TEST2", 191020152, 191020163, 1, 2, 1});
-        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event));
-        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event));
-        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event2));
-        DBServiceAPI::GetQuery(this, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(event2));
         createUserInterface();
         return ret;
     }
@@ -88,5 +118,35 @@ namespace app
 
     void ApplicationCalendar::destroyUserInterface()
     {}
+
+    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title,
+                                                     const TimePoint &dateFilter,
+                                                     const std::string &goBackWindow)
+    {
+        auto dialog = dynamic_cast<gui::NoEvents *>(getWindow(style::window::calendar::name::no_events_window));
+        assert(dialog != nullptr);
+        auto meta  = dialog->meta;
+        meta.text  = "app_calendar_no_events_information";
+        meta.title = title;
+        meta.icon  = "phonebook_empty_grey_circle_W_G";
+
+        meta.action = [=]() -> bool {
+            LOG_DEBUG("Switch to new event window");
+            std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
+            eventData->setDescription(style::window::calendar::new_event);
+            auto event       = std::make_shared<EventsRecord>();
+            event->date_from = dateFilter;
+            event->date_till = dateFilter;
+            eventData->setData(event);
+            eventData->setWindowName(goBackWindow);
+            switchWindow(
+                style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
+            return true;
+        };
+        dialog->update(meta);
+        switchWindow(gui::name::window::main_window);
+        switchWindow(dialog->getName());
+        LOG_DEBUG("Switch to no events window");
+    }
 
 } /* namespace app */
