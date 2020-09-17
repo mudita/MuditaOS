@@ -1,4 +1,5 @@
 #include <messages/QueryMessage.hpp>
+#include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
@@ -65,7 +66,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
               /* send info to applicationDesktop that there is an update waiting */
 
               auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateFoundOnBoot, file);
-              sys::Bus::SendBroadcast(msgToSend, this);
+              msgToSend->updateStats.versioInformation = UpdatePureOS::getVersionInfoFromFile(file);
+              sys::Bus::SendUnicast (msgToSend, app::name_desktop, this);
           }
       }
 
@@ -75,7 +77,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                     updateOsMsg->updateStats.uuid);
 
           if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
-              updateOS->runUpdate();
+              updateOS->runUpdate(updateOsMsg->rebootDelay);
       }
       return std::make_shared<sys::ResponseMessage>();
     });

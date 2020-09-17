@@ -55,7 +55,7 @@ namespace gui
           updateOsMessage = *messageToCopyFrom;
       }
 
-      sdesktop::UpdateOsMessage getUpdateOsMessage()
+      const sdesktop::UpdateOsMessage &getUpdateOsMessage()
       {
           return updateOsMessage;
       }
