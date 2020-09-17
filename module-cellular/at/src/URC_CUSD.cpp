@@ -4,12 +4,7 @@
 using namespace at::urc;
 
 CUSD::CUSD(const std::string &val) : Any(val, '\"')
-{
-
-    for (auto token : tokens) {
-        LOG_INFO("Token : %s", token.c_str());
-    }
-}
+{}
 
 auto CUSD::what() -> std::string
 {

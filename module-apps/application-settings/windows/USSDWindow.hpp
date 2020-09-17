@@ -22,14 +22,11 @@ namespace gui
     class USSDWindow : public AppWindow
     {
       protected:
-        gui::Label *pushLabel     = nullptr;
-        gui::Label *pullLabel     = nullptr;
         gui::Label *incomingLabel = nullptr;
         gui::Label *outgoingLabel = nullptr;
 
-        gui::Text *pushCode     = nullptr;
         gui::Text *pullToSend   = nullptr;
-        gui::Text *pullReceived = nullptr;
+        gui::Text *received     = nullptr;
 
         gui::VBox *box = nullptr;
 

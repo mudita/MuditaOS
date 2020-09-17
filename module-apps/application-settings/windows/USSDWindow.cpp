@@ -38,24 +38,13 @@ namespace gui
 
         uint32_t h = 120; // this->getHeight() - title->offset_h() - bottomBar->getHeight();
 
-        pushLabel = addTitle("Push code");
-        h += style::settings::ussd::commonLabelH;
-
-        pushCode = addText();
-        pushCode->setPosition(style::settings::ussd::commonXPos, h);
-        h += style::settings::ussd::commonTextH;
-
-        pullLabel = addTitle("Pull code");
-        pullLabel->setPosition(style::settings::ussd::commonXPos, h);
-        h += style::settings::ussd::commonLabelH;
-
         incomingLabel = addTitle("Incoming code");
         incomingLabel->setPosition(style::settings::ussd::commonXPos, h);
         h += style::settings::ussd::commonLabelH;
 
-        pullReceived = addText();
+        received = addText();
 
-        pullReceived->setPosition(style::settings::ussd::commonXPos, h);
+        received->setPosition(style::settings::ussd::commonXPos, h);
         h += style::settings::ussd::commonTextH;
 
         outgoingLabel = addTitle("Outgoing code");
@@ -124,6 +113,6 @@ namespace gui
 
     void USSDWindow::handleIncomingUSSD(const std::string &data)
     {
-        pullReceived->setText(UTF8(data));
+        received->setText(UTF8(data));
     }
 } // namespace gui

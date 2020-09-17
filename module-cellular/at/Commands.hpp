@@ -110,6 +110,7 @@ namespace at
         CUSD_OPEN_SESSION,
         CUSD_CLOSE_SESSION,
         CUSD_SEND,
+        SET_SMS_STORAGE,
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -168,6 +169,7 @@ namespace at
             {AT::CUSD_OPEN_SESSION, {"AT+CUSD=1\r"}},
             {AT::CUSD_CLOSE_SESSION, {"AT+CUSD=2\r"}},
             {AT::CUSD_SEND, {"AT+CUSD=1,"}},
+            {AT::SET_SMS_STORAGE, {"AT+CPMS=\"ME\",\"ME\",\"ME\"\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);
