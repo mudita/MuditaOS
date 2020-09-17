@@ -6,6 +6,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include <module-db/queries/messages/threads/QueryThreadsSearch.hpp>
 #include <module-apps/application-messages/ApplicationMessages.hpp>
+#include "application-messages/data/MessagesStyle.hpp"
 
 namespace gui::model
 {
@@ -15,7 +16,7 @@ namespace gui::model
 
     auto ThreadsSearchResultsModel::getMinimalItemHeight() const -> unsigned int
     {
-        return style::window::messages::sms_thread_item_h;
+        return style::messages::threadItem::sms_thread_item_h;
     }
 
     auto ThreadsSearchResultsModel::getItem(gui::Order order) -> gui::ListItem *

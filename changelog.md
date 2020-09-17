@@ -19,6 +19,7 @@
 
 * `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
 * `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
+* `[messages]` Refactored messages SMS thread window to use ListView. 
 
 ### Fixed
 

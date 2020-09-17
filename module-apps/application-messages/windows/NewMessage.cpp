@@ -177,7 +177,7 @@ namespace gui
         reciepientHbox->setAlignment(gui::Alignment::Vertical::Center);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         reciepientHbox->setPenFocusWidth(style::window::default_border_focus_w);
-        reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
+        reciepientHbox->setPenWidth(style::window::default_border_rect_no_focus);
 
         recipient = new gui::Text(reciepientHbox,
                                   0,
@@ -221,7 +221,7 @@ namespace gui
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         message->setPenFocusWidth(style::window::default_border_focus_w);
-        message->setPenWidth(style::window::messages::sms_border_no_focus);
+        message->setPenWidth(style::window::default_border_rect_no_focus);
         message->setFont(style::window::font::medium);
         message->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         message->activatedCallback = [=](Item &) -> bool {
