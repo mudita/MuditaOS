@@ -47,6 +47,11 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
     std::vector<SMSTableRow> getByContactId(uint32_t contactId);
     std::vector<SMSTableRow> getByText(std::string text);
     std::vector<SMSTableRow> getByThreadId(uint32_t threadId, uint32_t offset, uint32_t limit);
+    std::vector<SMSTableRow> getByThreadIdWithoutDraftWithEmptyInput(uint32_t threadId,
+                                                                     uint32_t offset,
+                                                                     uint32_t limit);
+    uint32_t countWithoutDraftsByThreadId(uint32_t threadId);
+    SMSTableRow getDraftByThreadId(uint32_t threadId);
 
     std::pair<uint32_t, std::vector<SMSTableRow>> getManyByType(SMSType type, uint32_t offset, uint32_t limit);
 

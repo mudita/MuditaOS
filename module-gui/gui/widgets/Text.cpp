@@ -333,8 +333,9 @@ namespace gui
                                                                : area(Area::Max).h;
         }
 
-        Length w             = sizeMinusPadding(Axis::X, Area::Max);
-        Length h             = area(Area::Normal).size(Axis::Y);
+        Length w = sizeMinusPadding(Axis::X, Area::Max);
+        Length h = sizeMinusPadding(Axis::Y, Area::Max);
+
         auto line_y_position = padding.top;
         auto cursor          = 0;
 
@@ -393,12 +394,13 @@ namespace gui
         // should be done on each loop
         {
             uint16_t h_used = line_y_position + padding.bottom;
-            uint16_t w_used = lines.maxWidth();
+            uint16_t w_used = lines.maxWidth() + padding.getSumInAxis(Axis::X);
+
             if (lines.size() == 0) {
                 debug_text("No lines to show, try to at least fit in cursor");
-                if (format.getFont() != nullptr) {
-                    h_used += format.getFont()->info.line_height;
-                    w_used += TextCursor::default_width;
+                if (format.getFont() != nullptr && line_y_position < format.getFont()->info.line_height) {
+                    h_used = format.getFont()->info.line_height;
+                    w_used = TextCursor::default_width;
                     debug_text("empty line height: %d", h_used);
                 }
             }

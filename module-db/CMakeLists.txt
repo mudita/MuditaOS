@@ -67,6 +67,7 @@ set(SOURCES
         queries/messages/sms/QuerySMSGetByID.cpp
         queries/messages/sms/QuerySMSGetByContactID.cpp
         queries/messages/sms/QuerySMSGetByThreadID.cpp
+        queries/messages/sms/QuerySMSGetForList.cpp
         queries/messages/sms/QuerySMSGetByText.cpp
         queries/messages/sms/QuerySMSAdd.cpp
         queries/messages/sms/QuerySMSRemove.cpp

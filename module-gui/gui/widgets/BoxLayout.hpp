@@ -101,11 +101,15 @@ namespace gui
         /// set navigation from last to fist element in box
         virtual void setNavigation();
         std::list<Item *>::iterator getNavigationFocusedItem();
-        unsigned int getFocusItemIndex() const;
+        [[nodiscard]] unsigned int getFocusItemIndex() const;
+        [[nodiscard]] unsigned int getVisibleChildrenCount();
+        /// If requested causes box to change its structure parent may need to do some actions via this callback.
+        std::function<void()> parentOnRequestedResizeCallback = nullptr;
         void setVisible(bool value) override;
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);
         void setReverseOrder(bool value);
+        [[nodiscard]] bool getReverseOrder();
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;

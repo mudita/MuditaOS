@@ -20,6 +20,7 @@ enum class SMSType : uint32_t
     INBOX   = 0x04,
     OUTBOX  = 0x08,
     QUEUED  = 0x10,
+    INPUT   = 0x12,
     UNKNOWN = 0xFF
 };
 
