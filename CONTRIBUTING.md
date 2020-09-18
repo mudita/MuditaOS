@@ -25,7 +25,6 @@ Feel free to add any screenshots or gifs/screencasts to illustrate the issue.
 
 If you have an idea for a feature that could possibly land in MuditaOS please let us know by simply creating an issue on Github in which you **describe the feature**, **why it would be useful** and **how it should work**. Before you create a Feature request on GitHub please:
 
-- make sure you're using the latest MuditaOS release when spotting the bug by heading to the `Settings` -> `Information` section on your Phone or emulator. Here you can see the all the details about the version of MuditaOS you're currently using. Please compare it with the latest stable release of MuditaOS which is always available at the top of our [changelog](https://github.com/mudita/PurePhone/blob/master/changelog.md).
 
 - make sure that the feature request hasn't been already reported on GitHub issues (if it has, please add a 👍 reaction to it).
 
