@@ -9,6 +9,8 @@
 #include <map>
 #include <memory>
 #include <string>
+#include "FontGlyph.hpp"   // for FontGlyph
+#include "FontKerning.hpp" // for FontKerning
 
 namespace gui
 {
@@ -38,12 +40,10 @@ namespace gui
         uint32_t image_data_offset;
         // id of the font asigned by the font manager
         uint32_t id;
-        std::map<uint32_t, FontGlyph *> glyphs;
-        std::map<uint32_t, std::map<uint32_t, FontKerning *> *> kerning;
 
         /// return glyph for selected code
-        /// if code is not found - unsupportedGlyph returned
-        std::unique_ptr<FontGlyph> getGlyph(uint32_t id) const;
+        /// if code is not found in font, it is searched in the fallback font, if not found - unsupportedGlyph returned
+        FontGlyph *getGlyph(uint32_t id) const;
 
         /**
          * @brief Returns kerning value for pair of the two characters.
@@ -92,14 +92,34 @@ namespace gui
         /// this essentially means:
         /// return test with "..." if needed in text begin / end if needed
         UTF8 getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const;
-
-        std::unique_ptr<FontGlyph> getGlyphUnsupported() const;
+        /**
+         * @brief Sets a font used as a glyphs collection of a "second chance"
+         */
+        void setFallbackFont(RawFont *font);
 
       private:
+        std::map<uint32_t, std::unique_ptr<FontGlyph>> glyphs;
+        std::map<uint32_t, std::map<uint32_t, std::unique_ptr<FontKerning>>> kerning;
+        /// if the fallback font is set it is used in case of a glyph being unsupported in the primary font
+        RawFont *fallback_font = nullptr;
+        /// the glyph used when requested glyph is unsupported in the font (and the fallback font if one is set)
+        std::unique_ptr<FontGlyph> unsupported = nullptr;
+
         /// set ellipsis on text in first parameter
         /// @note our UTF8 doesn't provide way to replace single character
         ///
         /// this is lazy done implementation - we just try to replace first/last 3 characters that would fit
         void setEllipsis(std::string &text, Ellipsis ellipsis) const;
+        /**
+         * @brief creates the glyph to be used in case of a requested glyph could not be found in a font
+         */
+        void createGlyphUnsupported();
+
+        /// return glyph for selected code
+        /// if code is not found - nullptr is returned
+        FontGlyph *findGlyph(uint32_t id) const;
+        /// return glyph for selected code
+        /// if code is not found - nullptr is returned
+        FontGlyph *findGlyphFallback(uint32_t id) const;
     };
 } /* namespace gui */

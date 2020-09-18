@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[gui]` fallback font used before displaying unsupported glyph
 * `[calendar]` Communication between windows.
 * `[calendar]` Add/Edit/Remove events functionality.
 * `[calendar]` Display events in day window and allEvents window.
