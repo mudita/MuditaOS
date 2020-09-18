@@ -60,7 +60,7 @@ make doc
 If you prefer to build documentation always with `all` target instead, configure `cmake`
 with `BUILD_DOC_WITH_ALL` option set to `ON`, e.g.:
 ```sh
-cmake -DBUILD_DOC_WITH_ALL=ON . build/
+./configure <target> <build_type> -DBUILD_DOC_WITH_ALL=ON
 ```
 
 Documentation is generated in the `doc/html` subdirectory of the build directory. To view it open `index.html` using a web browser, e.g.:
