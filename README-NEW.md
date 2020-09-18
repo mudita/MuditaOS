@@ -55,6 +55,8 @@ A fully detailed documentation can be build locally using [Doxygen](https://www.
 
 You can build code documentation with the following command:
 ```sh
+./configure linux Debug
+cd build-linux-Debug
 make doc
 ```
 If you prefer to build documentation always with `all` target instead, configure `cmake`
