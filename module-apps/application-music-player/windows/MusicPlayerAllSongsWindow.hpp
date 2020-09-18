@@ -3,7 +3,7 @@
 #include "application-music-player/models/SongsModel.hpp"
 #include "AppWindow.hpp"
 #include "ListView.hpp"
-#include "Label.hpp"
+#include <TextFixedSize.hpp>
 
 #include <vector>
 #include <string>
@@ -11,7 +11,7 @@
 namespace gui
 {
 
-    class MusicPlayerMainWindow : public AppWindow
+    class MusicPlayerAllSongsWindow : public AppWindow
     {
         std::shared_ptr<SongsModel> songsModel = nullptr;
 
@@ -22,7 +22,7 @@ namespace gui
                               const std::function<void(const audio::Volume &)> &errCallback = nullptr) -> bool;
 
       public:
-        MusicPlayerMainWindow(app::Application *app);
+        MusicPlayerAllSongsWindow(app::Application *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

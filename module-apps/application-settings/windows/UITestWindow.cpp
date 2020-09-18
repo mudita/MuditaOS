@@ -37,7 +37,8 @@ namespace gui
                       Font(27).raw(),
                       TextBlock::End::None));
         text->addText(
-            TextBlock("😁emoji😂emoji😃", Font("dejavu_sans", 27, Font::Weight::Bold).raw(), TextBlock::End::None));
+            TextBlock("↠😁😂😃emoji😁😂😃emoji😁😂😃", Font("dejavu_sans", 27, Font::Weight::Bold).raw(), TextBlock::End::None));
+        text->addText(TextBlock("Use fallback font:↠😁😂😃emoji😁😂😃emoji😁😂😃", Font(27).raw(), TextBlock::End::None));
         text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
         text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
         text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
