@@ -1,27 +1,31 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.38.1 2020-09-18]
 
 ### Added
 
-* `[gui]` fallback font used before displaying unsupported glyph
-* `[calendar]` Communication between windows.
-* `[calendar]` Add/Edit/Remove events functionality.
-* `[calendar]` Display events in day window and allEvents window.
-* `[calendar]` Marking days witch contains events in Calendar Main Window.
-* `[calendar]` Add repeated events.
-* `[desktop]` info on how to unlock
-* `[settings]` pin change option in settings main window
-* `[phonebook]` Make SAVE button appear when at least one field is fulfilled.
+* `[calendar]` Add/Edit/Remove events capability.
+* `[calendar]` Add recurring events.
+* `[desktop]` Add info on how to unlock the phone.
+* `[settings]` Add PIN change option in settings' main window.
 
 ### Changed
 
-* `[phonebook]` Replace vCard encoding with plain text for exporting contact data.
+* `[calendar]` Marking days which have events in Calendar Main Window.
+* `[calendar]` Display events in "Day" and "All Events" windows.
+* `[gui]` Fallback font is used before displaying unsupported glyph.
+* `[phonebook]` Replace vCard encoding with plain text when exporting contact data.
+* `[phonebook]` Make SAVE button appear when at least one field is filled up.
 
 ### Fixed
 
-* `[gui]` Fixed notifications display on unlocked screen.
-* `[audio]` `[music player]` Fixed audio files meta tags parsing
+* `[gui]` Fixed displaying notifications on an unlocked screen.
+* `[audio]` `[music player]` Fixed meta tags parsing in audio files.
+
+### Other
+
+* `[doc]` Updated development documentation.
+* `[db]` Treat temporary contacts as a group.
 
 ## [0.37.1 2020-09-11]
 
