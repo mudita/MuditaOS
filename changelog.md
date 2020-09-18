@@ -1,18 +1,10 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.38.2 2020-09-18]
 
 ### Added
 
-* `[music player]` Added Empty window
-
-### Changed
-
-
-
-### Fixed
-
-
+* `[music player]` Add layout for the playback window.
 
 ### Other
 
