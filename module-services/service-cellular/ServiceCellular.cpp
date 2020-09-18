@@ -1272,13 +1272,8 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
     if (channel) {
         auto resp = channel->cmd(at::AT::CSQ);
         if (resp.code == at::Result::Code::OK) {
-            std::string ret;
-            if (at::response::parseCSQ(resp.response[0], ret)) {
-                data.push_back(ret);
-            }
-            else {
-                data.push_back("");
-            }
+
+            data.push_back(resp.response[0]);
         }
         else {
             data.push_back("");
@@ -1286,13 +1281,8 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 
         resp = channel->cmd(at::AT::CREG);
         if (resp.code == at::Result::Code::OK) {
-            std::string ret;
-            if (at::response::parseCREG(resp.response[0], ret)) {
-                data.push_back(ret);
-            }
-            else {
-                data.push_back("");
-            }
+
+            data.push_back(resp.response[0]);
         }
         else {
             data.push_back("");

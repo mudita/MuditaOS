@@ -1,9 +1,3 @@
-/*
- * ScanModeWindow.cpp
- *
- *  Created on: 31 mar 2020
- *      Author: kuba
- */
 
 #include "ScanModesWindow.hpp"
 #include "gui/widgets/BoxLayout.hpp"
