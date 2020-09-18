@@ -478,7 +478,6 @@ namespace gui
 
     bool Item::onFocus(bool state)
     {
-        focus = state;
         return true;
     }
 

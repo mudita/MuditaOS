@@ -26,5 +26,8 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         void set_navigation();
+
+      private:
+        void invalidate() noexcept;
     };
 } // namespace gui

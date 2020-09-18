@@ -92,9 +92,16 @@ namespace gui
             options[i]->setNavigationItem(NavigationDirection::UP, options[(size + i - 1) % size]);
         }
     }
+
     void LanguageWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void LanguageWindow::invalidate() noexcept
+    {
+        options.clear();
     }
 
     gui::Item *LanguageWindow::addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback)

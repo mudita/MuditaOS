@@ -57,5 +57,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
+        void invalidate() noexcept;
     };
 } /* namespace gui */

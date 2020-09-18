@@ -60,6 +60,12 @@ namespace gui
     void Info::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void Info::invalidate() noexcept
+    {
+        box = nullptr;
     }
 
     void Info::addAlignedLabelWithValue(BoxLayout *layout, const string &labelText, const string &valueText)

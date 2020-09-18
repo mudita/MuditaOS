@@ -79,6 +79,14 @@ namespace gui
     void DesktopMainWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void DesktopMainWindow::invalidate() noexcept
+    {
+        time          = nullptr;
+        dayText       = nullptr;
+        notifications = nullptr;
     }
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)

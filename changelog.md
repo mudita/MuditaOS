@@ -6,6 +6,10 @@
 
 * `[music player]` Add layout for the playback window.
 
+### Fixed
+
+* `[settings]` Fixed a system crash on language change.
+
 ### Other
 
 * `[build]` Move user data to SDRAM during linking.
