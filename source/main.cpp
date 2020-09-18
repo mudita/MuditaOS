@@ -174,7 +174,7 @@ int main()
             sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAntenna>(), sysmgr.get());
+//        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAntenna>(), sysmgr.get());
 #if defined(TARGET_Linux) && not defined(SERIAL_PORT)
         // For now disable pernamenlty Service cellular when there is no GSM configured
         LOG_INFO("ServiceCellular (GSM) - Disabled");

@@ -8,7 +8,7 @@
 
 ### Changed
 
-
+* `[antenna-app]` Added parameter history window.
 
 ### Fixed
 
