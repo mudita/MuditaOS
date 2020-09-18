@@ -75,5 +75,8 @@ namespace gui
         bool set(PassthroughState pass_to_set, BootPinState dfu_to_set);
 
         void setWindowState(State state);
+
+      private:
+        void invalidate() noexcept;
     };
 } // namespace gui

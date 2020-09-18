@@ -70,6 +70,12 @@ namespace gui
     void UiTestWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void UiTestWindow::invalidate() noexcept
+    {
+        text = nullptr;
     }
 
     void UiTestWindow::onBeforeShow(ShowMode mode, SwitchData *data)

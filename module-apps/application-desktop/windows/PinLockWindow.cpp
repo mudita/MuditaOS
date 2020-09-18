@@ -98,9 +98,20 @@ namespace gui
         infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
         infoLabels[1]->setText(utils::localize.get("app_desktop_pin_info2"));
     }
+
     void PinLockWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void PinLockWindow::invalidate() noexcept
+    {
+        titleLabel = nullptr;
+        lockImage  = nullptr;
+        infoImage  = nullptr;
+        infoLabels.clear();
+        pinLabels.clear();
     }
 
     void PinLockWindow::setVisibleState(const State &state)
