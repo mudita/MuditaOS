@@ -67,7 +67,7 @@ with `BUILD_DOC_WITH_ALL` option set to `ON`, e.g.:
 
 Documentation is generated in the `doc/html` subdirectory of the build directory. To view it open `index.html` using a web browser, e.g.:
 ```sh
-firefox build/doc/html/index.html
+firefox build-<target>-<build_type>/doc/html/index.html
 ```
 
 ## Changelog
