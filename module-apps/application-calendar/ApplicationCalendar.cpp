@@ -160,8 +160,8 @@ namespace app
             std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
             eventData->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
-            event->date_from = dateFilter;
-            event->date_till = dateFilter;
+            event->date_from = dateFilter + 12h;
+            event->date_till = dateFilter + 13h;
             eventData->setData(event);
             eventData->setWindowName(goBackWindow);
             switchWindow(

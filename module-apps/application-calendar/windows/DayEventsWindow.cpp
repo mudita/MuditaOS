@@ -119,14 +119,12 @@ namespace gui
     auto DayEventsWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
         if (const auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
-            std::unique_ptr<std::vector<EventsRecord>> records = response->getResult();
-            if (checkEmpty) {
-                if (records->empty()) {
-                    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-                    assert(application != nullptr);
-                    auto name = dayMonthTitle;
-                    app->switchToNoEventsWindow(name, filterFrom, style::window::calendar::name::day_events_window);
-                }
+            unique_ptr<std::vector<EventsRecord>> records = response->getResult();
+            if (records->empty()) {
+                auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+                assert(application != nullptr);
+                auto name = dayMonthTitle;
+                app->switchToNoEventsWindow(name, filterFrom, style::window::calendar::name::day_events_window);
             }
             dayEventsModel->loadData(std::move(records));
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
@@ -135,7 +133,6 @@ namespace gui
         LOG_DEBUG("Response False");
         return false;
     }
-
     bool DayEventsWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
