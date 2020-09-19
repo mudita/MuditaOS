@@ -203,6 +203,20 @@ namespace app
         }
     }
 
+    void Application::returnToPreviousWindow(const uint32_t times)
+    {
+        auto prevWindow = getPrevWindow(times);
+        if (prevWindow == gui::name::window::no_window) {
+            LOG_INFO("Back to previous application");
+            cleanPrevWindw();
+            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+        }
+        else {
+            LOG_INFO("Back to previous window %s", prevWindow.c_str());
+            switchWindow(prevWindow, gui::ShowMode::GUI_SHOW_RETURN);
+        }
+    }
+
     void Application::refreshWindow(gui::RefreshModes mode)
     {
         auto msg = std::make_shared<AppRefreshMessage>(mode);
@@ -605,6 +619,14 @@ namespace app
             return gui::name::window::no_window;
         }
         return *std::prev(windowStack.end(), count + 1);
+    }
+
+    const std::string Application::getPrevWindow(uint32_t count) const
+    {
+        if (this->windowStack.size() <= 1 || count > this->windowStack.size()) {
+            return gui::name::window::no_window;
+        }
+        return *std::prev(windowStack.end(), count);
     }
 
     void Application::Application::cleanPrevWindw()

@@ -1,0 +1,8 @@
+//
+// Created by tomasz on 29.09.2020.
+//
+
+#ifndef PUREPHONE_PARSERICS_HPP
+#define PUREPHONE_PARSERICS_HPP
+
+#endif // PUREPHONE_PARSERICS_HPP
