@@ -86,6 +86,11 @@ inline TimePoint TimePointFromTimeT(const time_t &time)
     return system_clock::from_time_t(time);
 }
 
+inline time_t TimePointToTimeT(const TimePoint &tp)
+{
+    return system_clock::to_time_t(tp);
+}
+
 inline TimePoint TimePointNow()
 {
     utils::time::Timestamp timestamp;
@@ -144,11 +149,6 @@ inline TimePoint TimePointFromString(const char *s1)
     return tp;
 }
 
-inline time_t TimePointToTimeT(const TimePoint &tp)
-{
-    return system_clock::to_time_t(tp);
-}
-
 inline YearMonthDay TimePointToYearMonthDay(const TimePoint &tp)
 {
     return date::year_month_day{date::floor<date::days>(tp)};
@@ -157,6 +157,71 @@ inline YearMonthDay TimePointToYearMonthDay(const TimePoint &tp)
 inline TimePoint TimePointFromYearMonthDay(const YearMonthDay &ymd)
 {
     return date::sys_days{ymd.year() / ymd.month() / ymd.day()};
+}
+
+// inline time_t TimePointToMin(const TimePoint &tp)
+//{
+//    auto time = TimePointToTimeT(tp);
+//    auto duration = new utils::time::Duration(time);
+//    auto minutes = duration->getMinutes();
+//    return minutes;
+//}
+
+inline uint32_t TimePointToHour12H(const TimePoint &tp)
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Timestamp timestamp(time);
+    auto hour = timestamp.get_date_time_sub_value(utils::time::GetParameters::Hour);
+    if (hour > 12) {
+        hour -= 12;
+    }
+    return hour;
+}
+
+inline uint32_t TimePointToHour24H(const TimePoint &tp)
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Timestamp timestamp(time);
+    auto hour = timestamp.get_date_time_sub_value(utils::time::GetParameters::Hour);
+    return hour;
+}
+
+inline std::string TimePointToHourString12H(const TimePoint &tp)
+{
+    auto hour       = TimePointToHour12H(tp);
+    auto hourString = std::to_string(hour);
+    if (hour < 10) {
+        hourString = "0" + hourString;
+    }
+    return hourString;
+}
+
+inline std::string TimePointToHourString24H(const TimePoint &tp)
+{
+    auto hour       = TimePointToHour24H(tp);
+    auto hourString = std::to_string(hour);
+    if (hour < 10) {
+        hourString = "0" + hourString;
+    }
+    return hourString;
+}
+
+inline uint32_t TimePointToMinutes(const TimePoint &tp)
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Timestamp timestamp(time);
+    auto minute = timestamp.get_date_time_sub_value(utils::time::GetParameters::Minute);
+    return minute;
+}
+
+inline std::string TimePointToMinutesString(const TimePoint &tp)
+{
+    auto minute       = TimePointToMinutes(tp);
+    auto minuteString = std::to_string(minute);
+    if (minute < 10) {
+        minuteString = "0" + minuteString;
+    }
+    return minuteString;
 }
 
 inline auto TimePointToHourMinSec(const TimePoint &tp)
