@@ -18,6 +18,7 @@
 ### Other
 
 * `[system_features]` Sprintf clean up.
+* `[listview]` Added ability to rebuild on provided data offset. 
 
 ## [0.38.2 2020-09-18]
 

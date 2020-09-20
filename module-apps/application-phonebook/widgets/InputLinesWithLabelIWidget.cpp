@@ -72,7 +72,9 @@ namespace gui
 
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto result = inputText->onInput(event);
-            checkTextContent();
+            if (checkTextContent != nullptr) {
+                checkTextContent();
+            }
             return result;
         };
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);

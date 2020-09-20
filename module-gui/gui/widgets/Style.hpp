@@ -172,22 +172,29 @@ namespace style
 
     namespace listview
     {
-        enum class Type
+        /// Possible List boundaries handling types
+        enum class Boundaries
         {
-            TopDown,
-            Continuous
+            Fixed,     ///< Fixed - list will stop scrolling on first or last elements on appropriate top or bottom
+                       ///< directions.
+            Continuous ///< Continuous - list will continue to beginning or end on first or last elements on
+                       ///< appropriate top or bottom directions.
         };
 
+        /// Possible List scrolling directions
         enum class Direction
         {
             Top,
             Bottom
         };
 
+        /// Possible List rebuild types
         enum class RebuildType
         {
-            Full,
-            Partial
+            Full,    ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
+            InPlace, ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
+            OnOffset ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
+                     ///< offset.
         };
 
         namespace scroll
