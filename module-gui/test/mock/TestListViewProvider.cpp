@@ -55,7 +55,7 @@ namespace gui
     {
         unsigned int index = 0;
         if (order == gui::Order::Previous) {
-            index = internalLimit - modelIndex - 1;
+            index = internalOffset + internalLimit - 1 - modelIndex;
         }
         if (order == gui::Order::Next) {
             index = internalOffset + modelIndex;
@@ -88,6 +88,9 @@ namespace gui
                 }
 
                 internalData[index]->setVisible(true);
+                internalData[index]->setFocus(false);
+                internalData[index]->clearNavigationItem(gui::NavigationDirection::UP);
+                internalData[index]->clearNavigationItem(gui::NavigationDirection::DOWN);
                 internalData[index]->setMargins(testItemMargins);
 
                 modelIndex++;
