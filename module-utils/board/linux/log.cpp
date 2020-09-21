@@ -72,15 +72,25 @@ static void _log_Log(
 
     char *ptr = loggerBuffer;
 
-    ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+    ptr += snprintf(ptr,
+                    &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr,
+                    "%d ms ",
+                    cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
-    ptr += sprintf(ptr, "%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ", level_colors[level], level_names[level], file, line);
+    ptr += snprintf(ptr,
+                    &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr,
+                    "%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
+                    level_colors[level],
+                    level_names[level],
+                    file,
+                    line);
 #else
-    ptr += sprintf(ptr, "%-5s %s:%s:%d: ", level_names[level], file, function, line);
+    ptr += snprintf(
+        ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, "%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
     ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
-    ptr += sprintf(ptr, "\n");
+    ptr += snprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, "\n");
 
     std::cout << loggerBuffer;
 }

@@ -146,6 +146,12 @@ struct Logger
 static Logger logger;
 static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
 
+static inline size_t loggerBufferSizeLeft(char *ptr)
+{
+    assert(&loggerBuffer[LOGGER_BUFFER_SIZE] - ptr > 0);
+    return &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr;
+}
+
 void log_Printf(const char *fmt, ...)
 {
     if (!logger.logLock()) {
@@ -156,7 +162,7 @@ void log_Printf(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
+    ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), fmt, args);
     va_end(args);
 
     log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
@@ -190,22 +196,24 @@ static void _log_Log(
         return;
     }
 
-    ptr += sprintf(ptr, "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+    ptr += snprintf(
+        ptr, loggerBufferSizeLeft(ptr), "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
 
-    ptr += sprintf(ptr,
-                   "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
-                   level_colors[level],
-                   level_names[level],
-                   getTaskDesc(),
-                   file,
-                   line);
+    ptr += snprintf(ptr,
+                    loggerBufferSizeLeft(ptr),
+                    "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
+                    level_colors[level],
+                    level_names[level],
+                    getTaskDesc(),
+                    file,
+                    line);
 #else
-    ptr += sprintf(ptr, "%-5s %s:%s:%d: ", level_names[level], file, function, line);
+    ptr += snprintf(ptr, loggerBufferSizeLeft(ptr), "%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
-    ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
-    ptr += sprintf(ptr, "\n");
+    ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), fmt, args);
+    ptr += snprintf(ptr, loggerBufferSizeLeft(ptr), "\n");
 
     log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
 
@@ -252,7 +260,7 @@ extern "C"
         va_list args;
 
         va_start(args, __format);
-        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, args);
+        ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), __format, args);
         va_end(args);
 
         unsigned int numBytes = ptr - loggerBuffer;
@@ -271,7 +279,7 @@ extern "C"
             return -1;
         }
         char *ptr = loggerBuffer;
-        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, __arg);
+        ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), __format, __arg);
 
         unsigned int numBytes = ptr - loggerBuffer;
         SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
@@ -290,17 +298,19 @@ extern "C"
         }
 
         char *ptr = loggerBuffer;
-        ptr += sprintf(ptr, "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        ptr += snprintf(
+            ptr, loggerBufferSizeLeft(ptr), "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
         logger_level level = LOGFATAL;
-        ptr += sprintf(ptr,
-                       "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET,
-                       level_colors[level],
-                       level_names[level],
-                       getTaskDesc());
+        ptr += snprintf(ptr,
+                        loggerBufferSizeLeft(ptr),
+                        "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET,
+                        level_colors[level],
+                        level_names[level],
+                        getTaskDesc());
 
         va_list args;
         va_start(args, __format);
-        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, args);
+        ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), __format, args);
         va_end(args);
 
         unsigned int numBytes = ptr - loggerBuffer;
