@@ -5,6 +5,7 @@
 ### Added
 
 * `[music player]` Add layout for the playback window.
+* `[messages]` Save unsent messages as SMS drafts.
 
 ### Fixed
 
