@@ -13,6 +13,7 @@
 ### Fixed
 
 * `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
+* `[messages]` Fixed sending sms to new or deleted contact
 
 
 ### Other
