@@ -7,11 +7,16 @@
 #include "ThreadRecord.hpp"
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
-#include "module-db/queries/sms/QuerySMSSearchByType.hpp"
 #include "module-db/Common/Common.hpp"
 
 #include <utf8/UTF8.hpp>
 #include <PhoneNumber.hpp>
+
+namespace db::query
+{
+    class SMSSearchByType;       // Forward declaration
+    class SMSSearchByTypeResult; // Forward declaration
+} // namespace db::query
 
 struct SMSRecord : public Record
 {
@@ -69,7 +74,9 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     std::unique_ptr<db::QueryResult> getByContactIDQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getByTextQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getCountQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> addQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> updateQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getByThreadIDQuery(std::shared_ptr<db::Query> query);
 };

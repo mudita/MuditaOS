@@ -60,21 +60,71 @@ namespace gui
         setFocusItem(body);
     }
 
+    void SMSThreadViewWindow::handleDraftMessage()
+    {
+        if (const auto &text = inputMessage->inputText->getText(); text.empty()) {
+            clearDraftMessage();
+        }
+        else {
+            updateDraftMessage(text);
+        }
+    }
+
+    void SMSThreadViewWindow::clearDraftMessage()
+    {
+        if (!SMS.draft.has_value()) {
+            displayDraftMessage();
+            return;
+        }
+
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+        if (const auto removed = app->removeDraft(SMS.draft.value()); removed) {
+            SMS.draft = std::nullopt;
+            displayDraftMessage();
+        }
+    }
+
+    void SMSThreadViewWindow::displayDraftMessage() const
+    {
+        if (SMS.draft.has_value()) {
+            inputMessage->inputText->setText(SMS.draft->body);
+        }
+        else {
+            inputMessage->inputText->clear();
+        }
+    }
+
+    void SMSThreadViewWindow::updateDraftMessage(const UTF8 &inputText)
+    {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+
+        if (SMS.draft.has_value()) {
+            app->updateDraft(SMS.draft.value(), inputText);
+        }
+        else {
+            const auto &[draft, success] = app->createDraft(*number, inputText);
+            if (success) {
+                SMS.draft = draft;
+            }
+        }
+    }
+
     void SMSThreadViewWindow::refreshTextItem()
     {
         if (inputMessage != nullptr) {
             return;
         }
 
-        inputMessage = new SMSInputWidget(body, application);
-
-        inputMessage->activatedCallback = [&](gui::Item &item) {
+        inputMessage                    = new SMSInputWidget(body, application);
+        inputMessage->activatedCallback = [this]([[maybe_unused]] gui::Item &item) {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
             if (app->handleSendSmsFromThread(*number, inputMessage->inputText->getText())) {
                 LOG_ERROR("handleSendSmsFromThread failed");
             }
-            inputMessage->inputText->clear();
+            clearDraftMessage();
             return true;
         };
     }
@@ -179,6 +229,13 @@ namespace gui
             application->switchWindow(gui::name::window::main_window);
             return;
         }
+
+        if (what == Action::Init) {
+            const auto &lastSms = SMS.sms->front();
+            SMS.draft           = lastSms.type == SMSType::DRAFT ? std::optional<SMSRecord>{lastSms} : std::nullopt;
+            displayDraftMessage();
+        }
+
         // 3. add them to box
         this->cleanView();
         // if we are going from 0 then we want to show text prompt
@@ -189,10 +246,12 @@ namespace gui
         // rebuild bubbles
         SMS.end = SMS.start;
         for (auto &el : *SMS.sms) {
-            if (!smsBuild(el)) {
-                break;
+            if (el.type != SMSType::DRAFT) {
+                if (!smsBuild(el)) {
+                    break;
+                }
+                ++SMS.end;
             }
-            ++SMS.end;
         }
 
         body->setNavigation();
@@ -219,6 +278,7 @@ namespace gui
         switch (el.type) {
         case SMSType::QUEUED:
             // Handle in the same way as case below. (pending sending display as already sent)
+            [[fallthrough]];
         case SMSType::OUTBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
             smsBubble->setX(body->getWidth() - smsBubble->getWidth());
@@ -241,6 +301,7 @@ namespace gui
             labelSpan->setReverseOrder(true);
             addErrorIcon(labelSpan);
             labelSpan->addWidget(smsBubble);
+            break;
         default:
             break;
         }
@@ -391,6 +452,11 @@ namespace gui
     bool SMSThreadViewWindow::onInput(const InputEvent &inputEvent)
     {
         return AppWindow::onInput(inputEvent);
+    }
+
+    void SMSThreadViewWindow::onClose()
+    {
+        handleDraftMessage();
     }
 
     bool SMSThreadViewWindow::onDatabaseMessage(sys::Message *msgl)

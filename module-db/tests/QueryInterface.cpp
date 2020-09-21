@@ -7,6 +7,9 @@
 #include "SMSRecord.hpp"
 #include "ThreadRecord.hpp"
 #include "queries/sms/QuerySMSSearch.hpp"
+#include "queries/sms/QuerySMSAdd.hpp"
+#include "queries/sms/QuerySMSRemove.hpp"
+#include "queries/sms/QuerySMSUpdate.hpp"
 
 #include <memory>
 #include <module-db/queries/sms/QuerySMSGetCount.hpp>
@@ -85,5 +88,46 @@ TEST_CASE("Query interface")
         auto result        = smsInterface->runQuery(query);
         auto queryListener = result->getRequestQuery()->getQueryListener();
         REQUIRE(queryListener->handleQueryResponse(result.get()) == true);
+    }
+
+    SECTION("SMS create -> update -> remove")
+    {
+        constexpr char smsBody[] = "text";
+
+        SMSRecord record{};
+        record.body = smsBody;
+
+        using db::query::SMSAdd;
+        using db::query::SMSAddResult;
+
+        auto addQuery          = std::make_shared<SMSAdd>(record);
+        const auto response    = smsInterface->runQuery(addQuery);
+        const auto addResponse = static_cast<SMSAddResult *>(response.get());
+        REQUIRE(addResponse->result == true);
+        REQUIRE(addResponse->record.ID != DB_ID_NONE);
+
+        record = addResponse->record;
+
+        SECTION("Update SMS entry")
+        {
+            using db::query::SMSUpdate;
+            using db::query::SMSUpdateResult;
+            constexpr char updatedSmsBody[] = "updated_text";
+
+            record.body               = updatedSmsBody;
+            auto updateQuery          = std::make_shared<SMSUpdate>(record);
+            const auto updateResponse = smsInterface->runQuery(updateQuery);
+            REQUIRE(static_cast<SMSUpdateResult *>(updateResponse.get())->result == true);
+        }
+
+        SECTION("Remove SMS entry")
+        {
+            using db::query::SMSRemove;
+            using db::query::SMSRemoveResult;
+
+            auto removeQuery          = std::make_shared<SMSRemove>(record.ID);
+            const auto removeResponse = smsInterface->runQuery(removeQuery);
+            REQUIRE(static_cast<SMSRemoveResult *>(removeResponse.get())->getResults() == true);
+        }
     }
 }

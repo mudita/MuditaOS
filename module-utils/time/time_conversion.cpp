@@ -269,5 +269,9 @@ namespace utils
             return data;
         }
 
+        Timestamp getCurrentTimestamp()
+        {
+            return Timestamp{};
+        }
     }; // namespace time
 };     // namespace utils
