@@ -20,6 +20,7 @@
 
 * `[system_features]` Sprintf clean up.
 * `[listview]` Added ability to rebuild on provided data offset. 
+* `[messages]` Cleanup of database service API.
 
 ## [0.38.2 2020-09-18]
 

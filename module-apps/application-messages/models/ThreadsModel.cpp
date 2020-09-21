@@ -9,12 +9,12 @@
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}
 
-unsigned int ThreadsModel::getMinimalItemHeight() const
+auto ThreadsModel::getMinimalItemHeight() const -> unsigned int
 {
     return style::window::messages::sms_thread_item_h;
 }
 
-gui::ListItem *ThreadsModel::getItem(gui::Order order)
+auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
 {
     std::shared_ptr<ThreadRecord> thread = getRecord(order);
 
@@ -54,7 +54,8 @@ gui::ListItem *ThreadsModel::getItem(gui::Order order)
 void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::SMSThreadsGet>(offset, limit);
-    query->setQueryListener(this);
+    query->setQueryListener(
+        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
 }
 
@@ -65,6 +66,5 @@ auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 
     auto records_data = msgResponse->getResults();
     auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
-
     return this->updateRecords(std::move(records));
 }

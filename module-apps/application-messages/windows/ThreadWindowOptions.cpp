@@ -34,7 +34,7 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
 
     options.emplace_back(gui::Option{utils::localize.get("sms_delete_conversation"), [=](gui::Item &item) {
                                          LOG_INFO("Removing sms thread!");
-                                         return app->removeSMS_thread(record);
+                                         return app->removeSmsThread(record);
                                      }});
 
     // TODO

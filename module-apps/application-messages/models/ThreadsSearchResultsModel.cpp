@@ -13,12 +13,12 @@ namespace gui::model
     ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app) : BaseThreadsRecordModel(app)
     {}
 
-    unsigned int ThreadsSearchResultsModel::getMinimalItemHeight() const
+    auto ThreadsSearchResultsModel::getMinimalItemHeight() const -> unsigned int
     {
         return style::window::messages::sms_thread_item_h;
     }
 
-    gui::ListItem *ThreadsSearchResultsModel::getItem(gui::Order order)
+    auto ThreadsSearchResultsModel::getItem(gui::Order order) -> gui::ListItem *
     {
 
         std::shared_ptr<ThreadRecord> thread = getRecord(order);
@@ -46,7 +46,8 @@ namespace gui::model
     {
         if (std::string(search_value).compare("") != 0) {
             auto query = std::make_unique<db::query::SMSSearch>(search_value, offset, limit);
-            query->setQueryListener(this);
+            query->setQueryListener(
+                db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
             DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
         }
     }
