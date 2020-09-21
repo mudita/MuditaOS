@@ -345,7 +345,7 @@ std::unique_ptr<db::query::SMSSearchByTypeResult> SMSRecordInterface::runQueryIm
     ContactRecordInterface contactInterface(contactsDB);
     for (const auto &w : db_result.second) {
 
-        auto contactRec = contactInterface.GetByID(w.contactID);
+        auto contactRec = contactInterface.GetByIdWithTemporary(w.contactID);
         if (contactRec.numbers.size() != 0) {
             records->push_back({w, contactRec.numbers[0].number});
         }
