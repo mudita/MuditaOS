@@ -47,7 +47,8 @@ namespace gui
             int end                                     = 7;       // actual shown position end
             int thread                                  = 0;       // thread we are showing
             int dbsize                                  = 0;       // size of elements in db
-            std::unique_ptr<std::vector<SMSRecord>> sms = nullptr; // loaded sms from db
+            std::unique_ptr<std::vector<SMSRecord>> sms;           // loaded sms from db
+            std::optional<SMSRecord> draft; // draft message of the thread we are showing, if exists.
         } SMS;
 
         gui::SMSInputWidget *inputMessage                 = nullptr;
@@ -61,6 +62,7 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onClose() override;
 
         bool onDatabaseMessage(sys::Message *msgl) override;
         void rebuild() override;
@@ -71,6 +73,11 @@ namespace gui
         void refreshTextItem();
         void addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const;
         void addErrorIcon(HBox *layout) const;
+
+        void handleDraftMessage();
+        void clearDraftMessage();
+        void updateDraftMessage(const UTF8 &inputText);
+        void displayDraftMessage() const;
     };
 
 } /* namespace gui */

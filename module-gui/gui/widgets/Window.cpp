@@ -13,12 +13,13 @@
 
 namespace gui
 {
-
-    Window::Window(std::string name, uint32_t id)
-        : Item(), windowID{id}, refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
+    Window::Window(std::string name) : Item(), refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
     {}
 
     void Window::onBeforeShow(ShowMode mode, SwitchData *data)
+    {}
+
+    void Window::onClose()
     {}
 
     void Window::getRefreshArea(RefreshModes &mode, uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)

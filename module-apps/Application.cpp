@@ -405,6 +405,7 @@ namespace app
             if (switchData && switchData->ignoreCurrentWindowOnStack) {
                 popToWindow(getPrevWindow());
             }
+            getCurrentWindow()->onClose();
             setActiveWindow(msg->getWindowName());
 
             getCurrentWindow()->handleSwitchData(switchData.get());
@@ -484,6 +485,16 @@ namespace app
         sapm::ApplicationManager::messageRegisterApplication(this, initState, startBackground);
         sys::ReturnCodes retCode = (initState ? sys::ReturnCodes::Success : sys::ReturnCodes::Failure);
         return retCode;
+    }
+
+    sys::ReturnCodes Application::DeinitHandler()
+    {
+        LOG_INFO("Closing an application: %s", GetName().c_str());
+        for (const auto &[windowName, window] : windows) {
+            LOG_INFO("Closing a window: %s", windowName.c_str());
+            window->onClose();
+        }
+        return sys::ReturnCodes::Success;
     }
 
     void Application::setActiveWindow(const std::string &windowName)

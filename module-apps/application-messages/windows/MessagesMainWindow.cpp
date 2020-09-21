@@ -116,6 +116,7 @@ namespace gui
         }
         else {
             emptyListIcon->setVisible(false);
+            list->rebuildList(style::listview::RebuildType::Partial);
         }
 
         DBServiceAPI::GetQuery(application,

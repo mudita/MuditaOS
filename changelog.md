@@ -1,10 +1,30 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+
+
+### Changed
+
+
+
+### Fixed
+
+* `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
+
+
+### Other
+
+* `[system_features]` Sprintf clean up.
+
 ## [0.38.2 2020-09-18]
 
 ### Added
 
 * `[music player]` Add layout for the playback window.
+* `[messages]` Save unsent messages as SMS drafts.
 
 ### Fixed
 

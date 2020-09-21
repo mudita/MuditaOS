@@ -189,7 +189,7 @@ namespace gui
                     updateFileDetails << std::to_string(vfs.filelength(f) / 1024);
                     updateFileDetails << "Kb (";
                     updateFileDetails << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate]
-                                         .string_value();
+                                             .string_value();
                     updateFileDetails << ")";
                     vfs.fclose(f);
                 }
@@ -259,7 +259,8 @@ namespace gui
                 ssi << " %";
                 percentLabel->setText(ssi.str());
                 infoLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
-            } else if (item->getUpdateOsMessage().updateStats.messageText != "") {
+            }
+            else if (item->getUpdateOsMessage().updateStats.messageText != "") {
                 percentLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
             }
 

@@ -119,17 +119,13 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            LOG_DEBUG("Enter pressed!");
-            if (!contact->isTemporary()) {
-                auto tmpId  = contact->ID;
-                contact     = std::make_shared<ContactRecord>();
-                contact->ID = tmpId;
-            }
-            LOG_DEBUG("moving data to model");
-            LOG_DEBUG("nubers.size: %" PRIuPTR, contact->numbers.size());
+            auto tmpId  = contact->ID;
+            contact     = std::make_shared<ContactRecord>();
+            contact->ID = tmpId;
+
             newContactModel->saveData(contact);
-            LOG_DEBUG("nubers.size: %" PRIuPTR, contact->numbers.size());
             verifyAndSave();
+
             return true;
         }
 

@@ -52,6 +52,7 @@
 #include <country.hpp>
 #include <PhoneNumber.hpp>
 #include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
+#include <module-db/queries/sms/QuerySMSSearchByType.hpp>
 
 #include <log/log.hpp>
 

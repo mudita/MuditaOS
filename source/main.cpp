@@ -19,7 +19,6 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-settings/ApplicationSettings.hpp"
 #include "application-special-input/AppSpecialInput.hpp"
-#include "application-viewer/ApplicationViewer.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-music-player/ApplicationMusicPlayer.hpp"
 
@@ -189,9 +188,6 @@ int main()
 
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
-#ifdef ENABLE_APP_VIEWER
-        applications.push_back(app::CreateLauncher<app::ApplicationViewer>(app::name_viewer));
-#endif
 #ifdef ENABLE_APP_DESKTOP
         applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
 #endif

@@ -19,14 +19,14 @@ namespace gui
             Return,
         };
 
-        gui::Label *titleLabel    = nullptr;
-        gui::Label *infoLabel     = nullptr;
-        gui::Label *detailLabel   = nullptr;
-        gui::Label *percentLabel  = nullptr;
+        gui::Label *titleLabel   = nullptr;
+        gui::Label *infoLabel    = nullptr;
+        gui::Label *detailLabel  = nullptr;
+        gui::Label *percentLabel = nullptr;
 
-        gui::Label *currentVersionInfo    = nullptr;
-        gui::Label *updateVersionInfo    = nullptr;
-        gui::Label *updateDetails    = nullptr;
+        gui::Label *currentVersionInfo = nullptr;
+        gui::Label *updateVersionInfo  = nullptr;
+        gui::Label *updateDetails      = nullptr;
 
         std::vector<gui::Label *> selectionLabels;
         State state         = State::Return;

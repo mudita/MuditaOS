@@ -8,8 +8,6 @@
 namespace gui
 {
 
-    static uint32_t GUIWindowID = 0;
-
     /// Base window for all UI windows
     ///
     /// It consists of:
@@ -29,24 +27,20 @@ namespace gui
     class Window : public Item
     {
       protected:
-        /// unique ID of the window on phone (based on static GUIWindowID)
-        uint32_t windowID;
         RefreshModes refreshMode;
         /// name of window used for windows switching
         std::string name;
 
       public:
-        Window(std::string name, uint32_t id = GUIWindowID++);
+        explicit Window(std::string name);
 
         /// run every time in Application prior to showing window, except for when we came back to first window with no
         /// switch data to show
         /// @note this is most likely being duplicated by handleSwitchData
         virtual void onBeforeShow(ShowMode mode, SwitchData *data);
+        virtual void onClose();
         virtual void getRefreshArea(RefreshModes &mode, uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h);
-        virtual int getWindowID()
-        {
-            return windowID;
-        };
+
         /// run prior to onBeforeShow
         /// @note this is most likely duplicate of onBeforeShow
         virtual bool handleSwitchData(SwitchData *data);

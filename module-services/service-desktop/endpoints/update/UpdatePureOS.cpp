@@ -316,7 +316,7 @@ updateos::UpdateError UpdatePureOS::updateBootJSON()
         vfs::FILE *fpCRC = vfs.fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
             std::array<char, purefs::buffer::crc_char_size> crcBuf;
-            sprintf(crcBuf.data(), "%08lX", bootJSONAbsoulteCRC);
+            snprintf(crcBuf.data(), crcBuf.size(), "%lX", bootJSONAbsoulteCRC);
             vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
             vfs.fclose(fpCRC);
         }
@@ -339,10 +339,10 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     std::unique_ptr<unsigned char[]> readBuf(new unsigned char[purefs::buffer::tar_buf]);
     const fs::path fullPath = getUpdateTmpChild(h.name);
 
-    uint32_t blocksToRead   = (h.size / purefs::buffer::tar_buf) + 1;
-    uint32_t sizeToRead     = purefs::buffer::tar_buf;
-    fileExtracted           = h.name;
-    fileExtractedSize       = h.size;
+    uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
+    uint32_t sizeToRead   = purefs::buffer::tar_buf;
+    fileExtracted         = h.name;
+    fileExtractedSize     = h.size;
 
     informUpdate("Unpack %s", fullPath.filename().c_str());
 
