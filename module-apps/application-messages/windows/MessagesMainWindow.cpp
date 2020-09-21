@@ -28,7 +28,7 @@ namespace gui
 
     void MessagesMainWindow::rebuild()
     {
-        list->rebuildList(style::listview::RebuildType::Partial);
+        list->rebuildList(style::listview::RebuildType::InPlace);
     }
 
     void MessagesMainWindow::buildInterface()
@@ -116,7 +116,7 @@ namespace gui
         }
         else {
             emptyListIcon->setVisible(false);
-            list->rebuildList(style::listview::RebuildType::Partial);
+            list->rebuildList(style::listview::RebuildType::InPlace);
         }
 
         DBServiceAPI::GetQuery(application,

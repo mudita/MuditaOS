@@ -97,14 +97,14 @@ namespace gui
         clearItems();
     }
 
-    void ListView::setElementsCount(int count)
+    void ListView::setElementsCount(unsigned int count)
     {
         elementsCount = count;
     }
 
-    void ListView::setListViewType(style::listview::Type type)
+    void ListView::setBoundaries(style::listview::Boundaries value)
     {
-        listType = type;
+        boundaries = value;
     }
 
     void ListView::setScrollTopMargin(int value)
@@ -122,12 +122,12 @@ namespace gui
         }
     }
 
-    void ListView::rebuildList(style::listview::RebuildType rebuildType)
+    void ListView::rebuildList(style::listview::RebuildType rebuildType, unsigned int dataOffset)
     {
-        setup(rebuildType);
-        clearItems();
-
         setElementsCount(provider->requestRecordsCount());
+
+        setup(rebuildType, dataOffset);
+        clearItems();
 
         // If deletion operation caused last page to be removed request previous one.
         if (startIndex != 0 && startIndex == elementsCount) {
@@ -138,13 +138,22 @@ namespace gui
         }
     };
 
-    void ListView::setup(style::listview::RebuildType rebuildType)
+    void ListView::setup(style::listview::RebuildType rebuildType, unsigned int dataOffset)
     {
         if (rebuildType == style::listview::RebuildType::Full) {
             startIndex       = 0;
             storedFocusIndex = 0;
         }
-        else {
+        else if (rebuildType == style::listview::RebuildType::OnOffset) {
+            if (dataOffset < elementsCount) {
+                startIndex       = dataOffset;
+                storedFocusIndex = 0;
+            }
+            else {
+                LOG_ERROR("Requested rebuild on index greater than elements count");
+            }
+        }
+        else if (rebuildType == style::listview::RebuildType::InPlace) {
             storedFocusIndex = body->getFocusItemIndex();
 
             if (direction == style::listview::Direction::Top) {
@@ -344,11 +353,11 @@ namespace gui
         direction = style::listview::Direction::Bottom;
         body->setReverseOrder(false);
 
-        if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::Continuous) {
+        if (startIndex + currentPageSize >= elementsCount && boundaries == style::listview::Boundaries::Continuous) {
 
             startIndex = 0;
         }
-        else if (startIndex + currentPageSize >= elementsCount && listType == style::listview::Type::TopDown) {
+        else if (startIndex + currentPageSize >= elementsCount && boundaries == style::listview::Boundaries::Fixed) {
 
             return true;
         }
@@ -369,23 +378,26 @@ namespace gui
         direction = style::listview::Direction::Top;
         body->setReverseOrder(true);
         auto topFetchIndex = 0;
+        auto limit         = 0;
 
-        if (startIndex == 0 && listType == style::listview::Type::Continuous) {
+        if (startIndex == 0 && boundaries == style::listview::Boundaries::Continuous) {
 
             topFetchIndex = elementsCount - (elementsCount % currentPageSize);
             startIndex    = elementsCount;
+            limit         = calculateLimit() - topFetchIndex;
         }
-        else if (startIndex == 0 && listType == style::listview::Type::TopDown) {
+        else if (startIndex == 0 && boundaries == style::listview::Boundaries::Fixed) {
 
             return true;
         }
         else {
 
+            limit         = calculateLimit();
             topFetchIndex = startIndex - calculateLimit() > 0 ? startIndex - calculateLimit() : 0;
         }
 
         pageLoaded = false;
-        provider->requestRecords(topFetchIndex, calculateLimit());
+        provider->requestRecords(topFetchIndex, limit);
 
         return true;
     }

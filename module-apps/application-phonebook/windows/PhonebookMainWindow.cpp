@@ -20,7 +20,7 @@ namespace gui
 
     void PhonebookMainWindow::rebuild()
     {
-        contactsList->rebuildList(style::listview::RebuildType::Partial);
+        contactsList->rebuildList(style::listview::RebuildType::InPlace);
     }
 
     void PhonebookMainWindow::buildInterface()
