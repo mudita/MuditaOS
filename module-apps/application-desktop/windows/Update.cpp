@@ -45,7 +45,7 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        questionImage = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
+        // questionImage = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
 
         // title label
         titleLabel = new gui::Label(this, 0, 60, 480, 40);
@@ -54,17 +54,55 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        titleLabel->setText("Apply update?");
 
-        // label with question for powering down
-        infoLabel = new gui::Label(this, 20, 294, 440, 40);
+        // Update version information
+        updateVersionInfo = new gui::Label(this, 10, 132, 480, 40);
+        updateVersionInfo->setFilled(false);
+        updateVersionInfo->setBorderColor(gui::ColorFullBlack);
+        updateVersionInfo->setFont(style::window::font::smallbold);
+        updateVersionInfo->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        updateVersionInfo->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        updateVersionInfo->setText("Update: ");
+
+        // Update details
+        updateDetails = new gui::Label(this, 40, 172, 440, 40);
+        updateDetails->setFilled(false);
+        updateDetails->setBorderColor(gui::ColorFullBlack);
+        updateDetails->setFont(style::window::font::verysmall);
+        updateDetails->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        updateDetails->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        updateDetails->setText("Update: ");
+
+        // Current version information
+        currentVersionInfo = new gui::Label(this, 10, 222, 480, 40);
+        currentVersionInfo->setFilled(false);
+        currentVersionInfo->setBorderColor(gui::ColorFullBlack);
+        currentVersionInfo->setFont(style::window::font::small);
+        currentVersionInfo->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        currentVersionInfo->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+        currentVersionInfo->setText("Current: ");
+
+        // Label Info
+        infoLabel = new gui::Label(this, 20, 304, 440, 40);
         infoLabel->setFilled(false);
         infoLabel->setBorderColor(gui::ColorNoColor);
         infoLabel->setFont(style::window::font::medium);
         infoLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         infoLabel->setText("Do you want to apply this update?");
 
-        // label with question for powering down
-        percentLabel = new gui::Label(this, 0, 294, 480, 128);
+        // Details during update
+        detailLabel = new gui::Label(this, 20, 354, 440, 20);
+        detailLabel->setFilled(false);
+        detailLabel->setBorderColor(gui::ColorNoColor);
+        detailLabel->setFont(style::window::font::small);
+        detailLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
+        detailLabel->setText("");
+
+        // update progress
+        percentLabel = new gui::Label(this, 0, 374, 520, 128);
         percentLabel->setFilled(false);
         percentLabel->setBorderColor(gui::ColorNoColor);
         percentLabel->setFont(style::window::font::largelight);
@@ -72,7 +110,7 @@ namespace gui
         percentLabel->setVisible(false);
 
         uint32_t pinLabelX = 46;
-        uint32_t pinLabelY = 360;
+        uint32_t pinLabelY = 410;
         for (uint32_t i = 0; i < 4; i++) {
             gui::Label *label = new gui::Label(this, pinLabelX, pinLabelY, 193, 75);
             label->setFilled(false);
@@ -121,12 +159,42 @@ namespace gui
         } else {
             gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
             if (item != nullptr) {
-                std::stringstream title;
+                std::stringstream currentVersion;
+                std::stringstream updateVersion;
+                std::stringstream updateFileDetails;
+
                 sdesktop::UpdateOsMessage msg = item->getUpdateOsMessage();
-                updateFile = msg.updateStats.updateFile;
-                title << "Update to: ";
-                title << msg.updateStats.versioInformation[purefs::json::os_version][purefs::json::version_string].string_value();
-                titleLabel->setText(title.str());
+                updateFile                    = msg.updateStats.updateFile;
+                currentVersion << "Current: ";
+                currentVersion << VERSION;
+                currentVersion << " (";
+                currentVersion << GIT_REV;
+                currentVersion << ")";
+
+                updateVersion << "Update to: ";
+                updateVersion << msg.updateStats
+                                     .versioInformation[purefs::json::os_version][purefs::json::version_string]
+                                     .string_value();
+                updateVersion << " (";
+                updateVersion << msg.updateStats
+                                     .versioInformation[purefs::json::git_info][purefs::json::os_git_revision]
+                                     .string_value();
+                updateVersion << ")";
+
+                vfs::FILE *f = vfs.fopen(updateFile.c_str(), "r");
+                if (f != nullptr) {
+                    updateFileDetails << "Size: ";
+                    updateFileDetails << std::to_string(vfs.filelength(f) / 1024);
+                    updateFileDetails << "Kb (";
+                    updateFileDetails << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate]
+                                         .string_value();
+                    updateFileDetails << ")";
+                    vfs.fclose(f);
+                }
+
+                currentVersionInfo->setText(currentVersion.str());
+                updateVersionInfo->setText(updateVersion.str());
+                updateDetails->setText(updateFileDetails.str());
             }
         }
 
@@ -174,11 +242,10 @@ namespace gui
         gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
         if (item != nullptr) {
             std::stringstream ssi;
-            updateos::UpdateState status = static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
+            std::stringstream sizeStream;
 
-            if (status == updateos::UpdateState::ReadyForReset) {
-                percentLabel->setText("Resetting ...");
-            }
+            updateos::UpdateState status =
+                static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
 
             if (status == updateos::UpdateState::ExtractingFiles) {
                 progressPercent = static_cast<int>(((float)item->getUpdateOsMessage().updateStats.currentExtractedBytes / (float)item->getUpdateOsMessage().updateStats.totalBytes) * 100.0);
@@ -186,14 +253,18 @@ namespace gui
                 ssi << std::to_string(progressPercent);
                 ssi << " %";
                 percentLabel->setText(ssi.str());
-            }
-            if (item->getUpdateOsMessage().updateStats.messageText != "")
                 infoLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
+            } else if (item->getUpdateOsMessage().updateStats.messageText != "") {
+                percentLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
+            }
 
+            sizeStream << "size: ";
+            sizeStream << std::to_string(item->getUpdateOsMessage().updateStats.fileExtractedSize);
+            sizeStream << " bytes";
+            detailLabel->setText(sizeStream.str());
             this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         return true;
     }
-
 } /* namespace gui */
