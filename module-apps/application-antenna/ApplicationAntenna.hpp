@@ -61,6 +61,7 @@ namespace app
         void handleNetworkParams(std::vector<std::string> &data);
         bsp::cellular::antenna getAntenna(void)
         {
+            CellularServiceAPI::GetAntenna(this, antenna);
             return antenna;
         }
 

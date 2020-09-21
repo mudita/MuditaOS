@@ -11,6 +11,8 @@
 #include "../ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
+using StringList = std::list<std::string>;
+
 namespace gui
 {
 
@@ -119,8 +121,8 @@ namespace gui
             return;
         }
 
-        std::list<std::string> *list;
-        gui::VBox *box;
+        StringList *list = nullptr;
+        gui::VBox *box   = nullptr;
         if (app->getAntenna() == bsp::cellular::antenna::lowBand) {
             list = &lowBandParams;
             box  = lowBandBox;
@@ -145,8 +147,8 @@ namespace gui
 
     void AlgoParamsWindow::handleAntennaChanged(bsp::cellular::antenna antenna, bool refresh)
     {
-        std::list<std::string> *list;
-        gui::VBox *box;
+        StringList *list    = nullptr;
+        gui::VBox *box      = nullptr;
         auto currentAntenna = app->getAntenna();
         if (currentAntenna == bsp::cellular::antenna::lowBand) {
             list = &lowBandParams;
