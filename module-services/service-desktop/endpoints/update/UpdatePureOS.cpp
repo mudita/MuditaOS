@@ -147,7 +147,6 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
                 informError("unpackUpdate failed to extract update file %s", tarHeader.name);
                 return (updateos::UpdateError::CantCreateExtractedFile);
             }
-            informUpdate("Unpacked: %s", tarHeader.name);
             filesInUpdatePackage.emplace_back(FileInfo(tarHeader, fileCRC32));
         }
 
@@ -340,10 +339,12 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     std::unique_ptr<unsigned char[]> readBuf(new unsigned char[purefs::buffer::tar_buf]);
     const fs::path fullPath = getUpdateTmpChild(h.name);
 
-    uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
-    uint32_t sizeToRead   = purefs::buffer::tar_buf;
+    uint32_t blocksToRead   = (h.size / purefs::buffer::tar_buf) + 1;
+    uint32_t sizeToRead     = purefs::buffer::tar_buf;
+    fileExtracted           = h.name;
+    fileExtractedSize       = h.size;
 
-    informUpdate("Unpack %s size %ul", h.name, sizeToRead);
+    informUpdate("Unpack %s", fullPath.filename().c_str());
 
     if (crc32 != nullptr) {
         *crc32 = 0;
@@ -397,6 +398,7 @@ updateos::UpdateError UpdatePureOS::cleanupAfterUpdate()
         informError("ff_deltree failed on %s", updateTempDirectory.c_str());
         return updateos::UpdateError::CantRemoveUniqueTmpDir;
     }
+    mtar_close(&updateTar);
     if (vfs.remove(updateFile.c_str())) {
         informError("Failed to delete %s", updateFile.c_str());
         return updateos::UpdateError::CantRemoveUpdateFile;
@@ -607,6 +609,11 @@ void UpdatePureOS::informError(const char *format, ...)
     va_end(argptr);
 
     LOG_ERROR("UPDATE_ERRROR %s", readBuf.get());
+
+    auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateMessageType::UpdateError);
+    messageText            = std::string(readBuf.get());
+    msgToSend->updateStats = (sdesktop::UpdateStats)(*this);
+    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 }
 
 void UpdatePureOS::informDebug(const char *format, ...)
