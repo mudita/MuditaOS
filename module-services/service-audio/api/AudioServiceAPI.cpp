@@ -16,7 +16,7 @@ namespace AudioServiceAPI
 {
     namespace
     {
-        auto SendAudioRequest(sys::Service *serv, std::shared_ptr<AudioRequestMessage> msg)
+        auto SendAudioRequest(sys::Service *serv, std::shared_ptr<AudioMessage> msg)
         {
             auto msgType = static_cast<int>(msg->type);
             LOG_DEBUG("Msg type %d", msgType);
@@ -34,11 +34,12 @@ namespace AudioServiceAPI
         }
     } // namespace
 
-    RetCode PlaybackStart(sys::Service *serv, const std::string &fileName)
+    RetCode PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
     {
         std::shared_ptr<AudioRequestMessage> msg =
             std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
         msg->fileName = fileName;
+        msg->playbackType = playbackType;
 
         return SendAudioRequest(serv, msg)->retCode;
     }
@@ -145,6 +146,30 @@ namespace AudioServiceAPI
         msg->val = vol;
 
         return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    audio::RetCode SetVolume(sys::Service *serv,
+                             const audio::Volume &vol,
+                             const Profile::Type &profileType,
+                             const audio::PlaybackType &playbackType)
+    {
+        auto msg = std::make_shared<AudioSetSetting>(profileType, playbackType, vol);
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    audio::RetCode GetVolume(sys::Service *serv,
+                             audio::Volume &vol,
+                             const Profile::Type &profileType,
+                             const audio::PlaybackType &playbackType)
+    {
+        auto msg  = std::make_shared<AudioGetSetting>(profileType, playbackType);
+        auto resp = SendAudioRequest(serv, msg);
+        if (resp->retCode == RetCode::Success) {
+            vol = resp->val;
+        }
+
+        return resp->retCode;
     }
 
     RetCode GetOutputVolume(sys::Service *serv, Volume &vol)

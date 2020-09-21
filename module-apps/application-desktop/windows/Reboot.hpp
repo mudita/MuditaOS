@@ -8,9 +8,6 @@ namespace gui
 {
     class RebootWindow : public AppWindow
     {
-
-        Text *text = nullptr;
-
       public:
         RebootWindow(app::Application *app);
         ~RebootWindow() override = default;
@@ -19,6 +16,11 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
+        void invalidate() noexcept;
+
+        Text *text = nullptr;
     };
 
 } /* namespace gui */

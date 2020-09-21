@@ -59,10 +59,15 @@ namespace audio
             return currentOperation.get();
         }
 
-        // TODO:M.P Set/Get inputGain/outputVolume for each profile
+        [[nodiscard]] inline bool GetHeadphonesInserted() const
+        {
+            return headphonesInserted;
+        }
 
         // Operations
-        audio::RetCode Start(Operation::Type op, const char *fileName = "");
+        audio::RetCode Start(Operation::Type op,
+                             const char *fileName                    = "",
+                             const audio::PlaybackType &playbackType = audio::PlaybackType::None);
 
         audio::RetCode Stop();
 

@@ -139,6 +139,19 @@ namespace gui
     void CellularPassthroughWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void CellularPassthroughWindow::invalidate() noexcept
+    {
+        layout               = nullptr;
+        passNormal           = nullptr;
+        passDFU              = nullptr;
+        noPass               = nullptr;
+        statusHbox           = nullptr;
+        currentStateConst    = nullptr;
+        currentStateVariable = nullptr;
+        note                 = nullptr;
     }
 
     void CellularPassthroughWindow::addSeparator(VBox *layout)

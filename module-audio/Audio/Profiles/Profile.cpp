@@ -142,7 +142,7 @@ namespace audio
             return "SystemSoundBTA2DP";
         }
         case Profile::Type::Idle: {
-            return "Idle";
+            return "";
         }
         }
         return "";

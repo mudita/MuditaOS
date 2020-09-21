@@ -40,7 +40,13 @@ namespace gui
 
     void RebootWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
+        erase();
+        invalidate();
+    }
+
+    void RebootWindow::invalidate() noexcept
+    {
+        text = nullptr;
     }
 
     void RebootWindow::onBeforeShow(ShowMode mode, SwitchData *data)

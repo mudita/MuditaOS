@@ -88,7 +88,9 @@ class ServiceAudio : public sys::Service
         }
         return defaultValue;
     }
-    void updateDbValue(const audio::Operation *currentOperation, const audio::ProfileSetup &profileSetup);
+
+    void updateDbValue(const std::string &path, const audio::Setting &setting, const uint32_t &value);
+    void updateDbValue(const audio::Operation *currentOperation, const audio::Setting &setting, const uint32_t &value);
 };
 
 #endif // PUREPHONE_SERVICEAUDIO_HPP

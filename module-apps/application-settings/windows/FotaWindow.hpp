@@ -45,7 +45,6 @@ namespace gui
         Label *addBoxLabel(BoxLayout *layout, const std::string &text);
 
         Label *currentFirmwareLabel = nullptr;
-        Label *availablUpdateLabel  = nullptr;
         Label *statusLabel          = nullptr;
         Label *newFirmwareLabelText = nullptr;
         Label *newFirmwareLabel     = nullptr;
@@ -53,6 +52,8 @@ namespace gui
         VBox *mainBox               = nullptr;
 
       private:
+        void invalidate() noexcept;
+
         std::unique_ptr<Fota> fotaUpdater;
     };
 } // namespace gui

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(module-audio VERSION 1.0
         DESCRIPTION "Audio module library")
 
-add_subdirectory(Audio/decoder/taglib)
+add_subdirectory(Audio/decoder/taglib EXCLUDE_FROM_ALL)
 
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}/Audio/decoder/taglib

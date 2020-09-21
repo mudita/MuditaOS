@@ -157,9 +157,21 @@ namespace gui
             return true;
         };
     }
+
     void PowerOffWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void PowerOffWindow::invalidate() noexcept
+    {
+        titleLabel     = nullptr;
+        infoLabel      = nullptr;
+        eventMgrLabel  = nullptr;
+        powerImage     = nullptr;
+        powerDownImage = nullptr;
+        selectionLabels.clear();
     }
 
     void PowerOffWindow::onBeforeShow(ShowMode mode, SwitchData *data)

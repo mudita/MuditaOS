@@ -16,7 +16,6 @@ namespace gui
     class BtWindow : public AppWindow
     {
       protected:
-        std::vector<gui::Item *> options;
         VBox *box;
 
         gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
@@ -30,5 +29,8 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         void destroyInterface() override;
         void set_navigation();
+
+      private:
+        void invalidate() noexcept;
     };
 } // namespace gui

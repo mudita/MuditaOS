@@ -1,23 +1,20 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.38.2 2020-09-18]
 
 ### Added
 
-* `[music player]` Added Empty window
-
-### Changed
-
-
+* `[music player]` Add layout for the playback window.
 
 ### Fixed
 
-
+* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
 * `[build]` Move user data to SDRAM during linking.
 * `[build]` RT1051's linker script cleanup.
+* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.1 2020-09-18]
 

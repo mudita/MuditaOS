@@ -492,6 +492,14 @@ namespace app
         acceptInput = true;
     }
 
+    bool Application::setVolume(const audio::Volume &value,
+                                const audio::Profile::Type &profileType,
+                                const audio::PlaybackType &playbackType)
+    {
+        const auto ret = AudioServiceAPI::SetVolume(this, value, profileType, playbackType);
+        return ret == audio::RetCode::Success;
+    }
+
     bool Application::adjustCurrentVolume(const int step)
     {
         audio::Volume vol;
