@@ -27,7 +27,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 set(APPLICATIONS
     clock
     calendar
-    viewer
     desktop
     settings
     call
