@@ -94,6 +94,7 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
                      -MMD
                      -MP
                      -fno-builtin
+                     -fno-diagnostics-color
                      # warning flags
                      -Wall -Wextra -Werror -Wno-unused-parameter)
 

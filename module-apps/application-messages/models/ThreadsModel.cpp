@@ -1,10 +1,11 @@
-#include <module-services/service-db/messages/DBThreadMessage.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include "ThreadsModel.hpp"
+#include "InputEvent.hpp"
 #include "OptionWindow.hpp"
-#include "application-messages/windows/ThreadWindowOptions.hpp"
-#include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/data/SMSdata.hpp"
+#include "application-messages/widgets/ThreadItem.hpp"
+#include "application-messages/windows/ThreadWindowOptions.hpp"
+#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <module-services/service-db/messages/DBThreadMessage.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}

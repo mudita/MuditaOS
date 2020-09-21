@@ -8,6 +8,8 @@
  */
 #include "CallWindow.hpp"
 
+#include "GuiTimer.hpp"
+#include "InputEvent.hpp"
 #include "application-call/widgets/Icons.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
@@ -192,6 +194,8 @@ namespace gui
             setFocusItem(nullptr);
             speakerIcon->set(SpeakerIconState::SPEAKER);
             microphoneIcon->set(MicrophoneIconState::MUTE);
+
+            connectTimerOnExit();
         } break;
         case State::CALL_IN_PROGRESS: {
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
@@ -233,7 +237,9 @@ namespace gui
 
     void CallWindow::updateDuration(const utils::time::Duration &duration)
     {
-        durationLabel->setText(duration.str());
+        if (durationLabel != nullptr) {
+            durationLabel->setText(duration.str());
+        }
     }
 
     bool CallWindow::handleSwitchData(SwitchData *data)
@@ -365,6 +371,22 @@ namespace gui
         else {
             return AppWindow::onInput(inputEvent);
         }
+    }
+
+    void CallWindow::connectTimerOnExit()
+    {
+        auto app = dynamic_cast<app::ApplicationCall *>(application);
+        assert(app != nullptr);
+        auto timer = std::make_unique<app::GuiTimer>(app);
+        timer->setInterval(app->getDelayedStopTime());
+        timerCallback = [app, this](Item &, Timer &timer) {
+            app->stopCallTimer();
+            setState(State::IDLE);
+            detachTimer(timer);
+            sapm::ApplicationManager::messageSwitchPreviousApplication(app);
+            return true;
+        };
+        app->connect(std::move(timer), this);
     }
 
 } /* namespace gui */

@@ -46,26 +46,23 @@ by inheriting from base `sys::ResponseMessage` class.
 
 Please check existing services for more examples of use    
 Please check "Caveats & good practices" chapter for more info   
-#### `void TickHandler(uint32_t id)`  
-This is optional timer handler. Only define it if you plan to use service timers functionality. It will be invoked upon specified timer expiration.
-`uint32_t id` is the unique number of timer which invoked this handler.
-
-Each service can be registered to any number of multicast channels. If you do so then service will receive messages from this channel. By default
-every service is registered to `System` and `SystemManager` channels which control the lifetime of the service. You don't have to explicitly 
-register new service to this channels as it is done internally.  
-
-Custom user channels should be placed into `BusChannelsCustom.hpp` which can be found in `PROJECT_DIR/sources` folder.  
-
-After defining channel registering service to it is as simple as invoking:
-`busChannels.push_back(sys::BusChannels::YOUR_CUSTOM_CHANNEl_NAME);`  
-preferably from `InitHandler` or service's constructor.
-
 
 ## Timers
-Each service can create unlimited number of timers which can trigger various actions. API for controlling timer functionality
-is self-explaining and very easy to use.  
-Please check `Service.hpp` header for info    
-Please check "Caveats & good practices" chapter for more info  
+
+Timers are system feature and is Service/Application thread safe. Timer callback life expectancy should be as short as possible for system to work smoothly (as with any other message call)
+
+### System Timers
+System have basic coarse sys::Timer capability. There are two ways to handle actions on timer:
+* assign callback to Timer with method: `void sys::Timer::connect(std::function<void(Timer &)> new_callback)`
+* overwrite `sys::Timer::onTimer()` function - overriding it means that callback wont be triggered if not requested manually!
+
+
+### GUI Timers
+
+* Build on top of `sys::Timer` is `GuiTimer` which is meant as a connector between System <=> GUI.
+* Each service can have any amount of timers.
+* For timer to work one have to first start it. Otherwise timer is created and not started.
+* After creating `GuiTimer` one can `connect` it to `gui::Item` related element with `Application::connect(GuiTimer &&, gui::Item*)` so that timer life-cycle would be same as Item referenced
 
 ## Bus
 Bus subsystem was developed in order for services to be able to communicate with each other. Bus consists of four main methods:
@@ -159,17 +156,6 @@ For more info please check RT1051 Reference Manual, Chapter 18 "DCDC Converter" 
 
 
 # Caveats & good practices #
-
-#### It is not possible to use Bus blocking API within `TickHandler`. Only non-blocking variant of Bus API is available to use.
-This is due to `TickHandler` body being invoked from different context, specifically tick handlers are invoked in 
-FreeRTOS timer context. It is to be considered if current mechanism fulfills system requirements. If not, `TickHandler`
-should be invoked from service context and triggered by special sys message (mechanism similar to Ping/Pong system messages).
-
-#### Due to the point above `TickHandler` implementation should fast and efficient. In general it ought to be treated similar to
-interrupt routine except that in `TickHandler` body it is allowed to use dynamic memory allocations, stdlib functions, file system and so on.
-This requirement is due to specific implementation of FreeRTOS software timers which is the basis of tick handlers. For more detailed info please
-refer to [Software Timers](https://www.freertos.org/FreeRTOS-Software-Timer-API-Functions.html)
- 
 
 #### DataReceivedHandler should not block for long period of time.  
 It is okay to do some minor blocking tasks but blocking for longer periods will make whole system unpredictable or behave

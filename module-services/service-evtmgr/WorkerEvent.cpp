@@ -32,9 +32,10 @@ extern "C"
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/torch/torch.hpp"
 
+#include "Constants.hpp"
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
-#include "Constants.hpp"
+#include <Service/Bus.hpp>
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {

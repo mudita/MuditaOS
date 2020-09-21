@@ -1,4 +1,5 @@
 #include "PageLayout.hpp"
+#include "InputEvent.hpp"
 #include "Style.hpp"
 #include <log/log.hpp>
 

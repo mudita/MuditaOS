@@ -1,5 +1,6 @@
 #include "MenuWindow.hpp"
 #include "../ApplicationDesktop.hpp"
+#include "InputEvent.hpp"
 #include "Item.hpp"
 #include "Navigation.hpp"
 #include "service-appmgr/ApplicationManager.hpp"

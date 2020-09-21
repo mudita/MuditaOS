@@ -1,5 +1,19 @@
 # MuditaOS changelog
 
+## [Current release]
+
+### Added
+
+* `[gui]` Added GUI timers capability
+
+### Changed
+* `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
+* `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
+
+### Fixed
+
+* `[system]` Timers race condition, Timers should be thread safe for Services/Applications
+
 ## [0.40.1 2020-10-02]
 
 ### Added

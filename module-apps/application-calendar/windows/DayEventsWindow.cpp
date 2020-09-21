@@ -119,7 +119,7 @@ namespace gui
     auto DayEventsWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
         if (const auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
-            unique_ptr<vector<EventsRecord>> records = response->getResult();
+            std::unique_ptr<std::vector<EventsRecord>> records = response->getResult();
             if (checkEmpty) {
                 if (records->empty()) {
                     auto app = dynamic_cast<app::ApplicationCalendar *>(application);

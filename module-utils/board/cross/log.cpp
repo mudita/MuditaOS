@@ -124,6 +124,12 @@ struct Logger
     std::map<std::string, logger_level> filtered = {
         // {"ServiceDB", logger_level::LOGFATAL},
         {"ApplicationManager", logger_level::LOGINFO},
+        {"TS0710Worker", logger_level::LOGINFO},
+        {"ServiceCellular", logger_level::LOGINFO},
+        {"ServiceFota", logger_level::LOGINFO},
+        {"ServiceEink", logger_level::LOGINFO},
+        {"ServiceDB", logger_level::LOGINFO},
+        // make sure that we got defined map entries for at least crit and irq
         // make sure that we got defined map entries for at least crit and irq
         {critStr, logger_level::LOGTRACE},
         {irqStr, logger_level::LOGTRACE}};
@@ -210,7 +216,14 @@ static void _log_Log(
                     file,
                     line);
 #else
-    ptr += snprintf(ptr, loggerBufferSizeLeft(ptr), "%-5s %s:%s:%d: ", level_names[level], file, function, line);
+    ptr += snprintf(ptr,
+                    loggerBufferSizeLeft(ptr),
+                    "%-5s [%s] %s:%s:%d: ",
+                    level_names[level],
+                    getTaskDesc(),
+                    file,
+                    function,
+                    line);
 #endif
     ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), fmt, args);
     ptr += snprintf(ptr, loggerBufferSizeLeft(ptr), "\n");

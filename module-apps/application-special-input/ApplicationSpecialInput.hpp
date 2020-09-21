@@ -2,6 +2,7 @@
 
 #include "Application.hpp"
 #include "SwitchData.hpp"
+#include <AppWindow.hpp>
 
 namespace app
 {
