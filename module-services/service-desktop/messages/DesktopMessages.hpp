@@ -22,6 +22,7 @@ namespace sdesktop
         fs::path updateTempDirectory   = PATH_SYS "/" PATH_TMP;
         uint32_t totalBytes            = 0;
         uint32_t currentExtractedBytes = 0;
+        uint32_t fileExtractedSize     = 0;
         uint32_t uuid                  = 0;
         std::string messageText        = "";
         uint8_t status;

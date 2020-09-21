@@ -1,9 +1,9 @@
 {
 	"git":
 	{
-		"branch":   "__GIT_BRANCH__",
-		"revision": "__GIT_REVISION__",
-		"tag":      "__GIT_TAG__"
+		"git_branch":   "__GIT_BRANCH__",
+		"git_commit": "__GIT_REVISION__",
+		"git_tag":      "__GIT_TAG__"
 	},
 	"misc":
 	{
