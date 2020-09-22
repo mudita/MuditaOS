@@ -19,6 +19,9 @@
 #include <module-db/queries/sms/QuerySMSAdd.hpp>
 #include <module-db/queries/sms/QuerySMSRemove.hpp>
 #include <module-db/queries/sms/QuerySMSUpdate.hpp>
+#include <module-db/queries/sms/QueryThreadGetByID.hpp>
+#include <module-db/queries/sms/QueryThreadRemove.hpp>
+#include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
 #include <cassert>
 #include <time/time_conversion.hpp>
@@ -68,49 +71,43 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBThreadGetLimitOffset:
-            case MessageType::DBSMSTemplateGetLimitOffset: {
-
-                if (getCurrentWindow()->onDatabaseMessage(resp))
+                [[fallthrough]];
+            case MessageType::DBSMSTemplateGetLimitOffset:
+                if (getCurrentWindow()->onDatabaseMessage(resp)) {
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-
+                }
                 break;
-            }
             case MessageType::DBQuery:
-
                 if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
                     auto result = queryResponse->getResult();
-
                     if (result->hasListener()) {
                         if (result->handle()) {
                             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                         }
                     }
                 }
-
                 break;
             default:
                 break;
             }
         }
 
-        if (handled)
+        if (handled) {
             return std::make_shared<sys::ResponseMessage>();
-        else
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
     // Invoked during initialization
     sys::ReturnCodes ApplicationMessages::InitHandler()
     {
-
         auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
+        }
 
         createUserInterface();
-
         setActiveWindow(gui::name::window::main_window);
-
         return ret;
     }
 
@@ -154,65 +151,112 @@ namespace app
         return true;
     }
 
-    bool ApplicationMessages::removeSMS_thread(const ThreadRecord *record)
+    bool ApplicationMessages::removeSmsThread(const ThreadRecord *record)
     {
+        using db::query::ContactGetByID;
+        using db::query::ContactGetByIDResult;
+
         if (record == nullptr) {
-            LOG_ERROR("removing null SMS thread!");
+            LOG_ERROR("Trying to remove a null SMS thread!");
             return false;
         }
-        else {
-            LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
-            auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialog_yes_no]);
-            assert(dialog != nullptr);
-            auto meta   = dialog->meta;
-            meta.action = [=]() -> bool {
-                if (!DBServiceAPI::ThreadRemove(this, record->ID)) {
-                    LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->ID);
-                    return false;
-                }
-                this->switchWindow(gui::name::window::main_window);
+        LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
+
+        auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialog_yes_no]);
+        assert(dialog != nullptr);
+
+        auto query = std::make_unique<ContactGetByID>(record->contactID);
+        query->setQueryListener(db::QueryCallback::fromFunction([this, dialog, record](auto response) {
+            auto result = dynamic_cast<ContactGetByIDResult *>(response);
+            if (result != nullptr) {
+                const auto &contact = result->getResult();
+                auto meta           = dialog->meta;
+                meta.action         = [this, record]() { return onRemoveSmsThreadConfirmed(*record); };
+                meta.text           = utils::localize.get("app_messages_thread_delete_confirmation");
+                meta.title          = contact.getFormattedName();
+                meta.icon           = "phonebook_contact_delete_trashcan";
+                dialog->update(meta);
+                switchWindow(dialog->getName());
                 return true;
-            };
-            meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
-            auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
-            auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-            meta.title      = cont.getFormattedName();
-            meta.icon       = "phonebook_contact_delete_trashcan";
-            dialog->update(meta);
-            switchWindow(dialog->getName());
-            return true;
-        }
+            }
+            return false;
+        }));
+        return DBServiceAPI::GetQuery(this, db::Interface::Name::Contact, std::move(query));
     }
 
-    bool ApplicationMessages::removeSMS(const SMSRecord &record)
+    bool ApplicationMessages::onRemoveSmsThreadConfirmed(const ThreadRecord &record)
+    {
+        using db::query::ThreadRemove;
+        using db::query::ThreadRemoveResult;
+
+        auto query = std::make_unique<ThreadRemove>(record.ID);
+        query->setQueryListener(db::QueryCallback::fromFunction([this, threadId = record.ID](auto response) {
+            const auto result = dynamic_cast<ThreadRemoveResult *>(response);
+            if ((result != nullptr) && result->success()) {
+                switchWindow(gui::name::window::main_window);
+                return true;
+            }
+            LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", threadId);
+            return false;
+        }));
+
+        if (const auto ok = DBServiceAPI::GetQuery(this, db::Interface::Name::SMSThread, std::move(query)); !ok) {
+            LOG_ERROR("Unable to query DBServiceAPI");
+            return false;
+        }
+        return true;
+    }
+
+    bool ApplicationMessages::removeSms(const SMSRecord &record)
     {
         LOG_DEBUG("Removing sms: %" PRIu32, record.ID);
         auto dialog = dynamic_cast<gui::DialogYesNo *>(windows[gui::name::window::dialog_yes_no]);
         assert(dialog != nullptr);
 
         auto meta   = dialog->meta;
-        meta.action = [=]() -> bool {
-            if (!DBServiceAPI::SMSRemove(this, record)) {
-                LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
-                return false;
-            }
-            // if this was the last message in the thread, there won't be no thread. goto main window
-            std::unique_ptr<ThreadRecord> threadDetails = DBServiceAPI::ThreadGet(this, record.threadID);
-            if (threadDetails == nullptr || !threadDetails->isValid()) {
-                this->switchWindow(gui::name::window::main_window);
-                return true;
-            }
-            else {
-                this->switchWindow(gui::name::window::thread_view);
-                return true;
-            }
-        };
-        meta.text  = utils::localize.get("app_messages_message_delete_confirmation");
-        meta.title = record.body;
-        meta.icon  = "phonebook_contact_delete_trashcan";
+        meta.action = [this, record] { return onRemoveSmsConfirmed(record); };
+        meta.text   = utils::localize.get("app_messages_message_delete_confirmation");
+        meta.title  = record.body;
+        meta.icon   = "phonebook_contact_delete_trashcan";
+
         dialog->update(meta);
         switchWindow(dialog->getName());
         return true;
+    }
+
+    bool ApplicationMessages::onRemoveSmsConfirmed(const SMSRecord &record)
+    {
+        using db::query::SMSRemove;
+        using db::query::SMSRemoveResult;
+        using db::query::ThreadGetByID;
+        using db::query::ThreadGetByIDResult;
+
+        auto query = std::make_unique<SMSRemove>(record.ID);
+        query->setQueryListener(db::QueryCallback::fromFunction([this, record](auto response) {
+            auto result = dynamic_cast<SMSRemoveResult *>(response);
+            if (result != nullptr && result->getResults()) {
+                auto query = std::make_unique<ThreadGetByID>(record.threadID);
+                query->setQueryListener(db::QueryCallback::fromFunction([this](auto response) {
+                    const auto result = dynamic_cast<ThreadGetByIDResult *>(response);
+                    if (result != nullptr) {
+                        const auto thread = result->getRecord();
+                        if (thread.has_value()) {
+                            this->switchWindow(gui::name::window::thread_view);
+                        }
+                        else {
+                            this->switchWindow(gui::name::window::main_window);
+                        }
+                        return true;
+                    }
+                    return false;
+                }));
+                return DBServiceAPI::GetQuery(this, db::Interface::Name::SMSThread, std::move(query));
+            }
+            LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
+            return false;
+        }));
+
+        return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
     }
 
     bool ApplicationMessages::searchEmpty(const std::string &query)
@@ -297,15 +341,21 @@ namespace app
         record.body   = body;
         record.type   = SMSType::QUEUED;
         record.date   = utils::time::getCurrentTimestamp().getTime();
-        return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
+
+        using db::query::SMSAdd;
+        return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSAdd>(record));
     }
+
     bool ApplicationMessages::resendSms(const SMSRecord &record)
     {
         auto resendRecord = record;
         resendRecord.type = SMSType::QUEUED;
-        // update date sent - it will display an old, failed sms at the the bottom, but this is correct
-        resendRecord.date = utils::time::getCurrentTimestamp().getTime();
-        return DBServiceAPI::SMSUpdate(this, resendRecord);
+        resendRecord.date =
+            utils::time::getCurrentTimestamp().getTime(); // update date sent - it will display an old, failed sms at
+                                                          // the the bottom, but this is correct
+
+        using db::query::SMSUpdate;
+        return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSUpdate>(resendRecord));
     }
 
     bool ApplicationMessages::handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body)

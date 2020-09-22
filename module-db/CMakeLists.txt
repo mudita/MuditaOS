@@ -78,7 +78,10 @@ set(SOURCES
         queries/sms/QuerySMSTemplateGetCount.cpp
         queries/sms/QuerySMSTemplateRemove.cpp
         queries/sms/QuerySMSTemplateUpdate.cpp
+        queries/sms/QueryThreadGetByID.cpp
         queries/sms/QueryThreadGetByNumber.cpp
+        queries/sms/QueryThreadGetByContactID.cpp
+        queries/sms/QueryThreadRemove.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetCount.cpp

@@ -45,7 +45,8 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query = std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter);
-    query->setQueryListener(this);
+    query->setQueryListener(
+        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
 }
 
