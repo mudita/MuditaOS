@@ -7,24 +7,24 @@
 namespace db::query
 {
     /// implements search for SMS by text
-    class SMSSearch : public Query
+    class ThreadsSearch : public Query
     {
       public:
         std::string text;
-        unsigned int starting_postion;
+        unsigned int startingPosition;
         unsigned int depth;
-        SMSSearch(std::string text_to_search, unsigned int starting_position, unsigned int depth);
+        ThreadsSearch(std::string text_to_search, unsigned int starting_position, unsigned int depth);
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class SMSSearchResult : public QueryResult
+    class ThreadsSearchResult : public QueryResult
     {
         unsigned int results_max_depth = 0;
         std::vector<ThreadsTableRow> results;
 
       public:
-        SMSSearchResult(unsigned int results_max_depth, std::vector<ThreadsTableRow> result_rows);
+        ThreadsSearchResult(unsigned int results_max_depth, std::vector<ThreadsTableRow> result_rows);
         [[nodiscard]] auto getMax() const -> unsigned int;
         [[nodiscard]] auto getResults() const -> std::vector<ThreadsTableRow>;
         [[nodiscard]] auto debugInfo() const -> std::string override;

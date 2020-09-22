@@ -53,7 +53,7 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
 
 void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 {
-    auto query = std::make_unique<db::query::SMSThreadsGet>(offset, limit);
+    auto query = std::make_unique<db::query::ThreadsGet>(offset, limit);
     query->setQueryListener(
         db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
@@ -61,7 +61,7 @@ void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 
 auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
-    auto msgResponse = dynamic_cast<db::query::SMSThreadsGetResults *>(queryResult);
+    auto msgResponse = dynamic_cast<db::query::ThreadsGetResults *>(queryResult);
     assert(msgResponse != nullptr);
 
     auto records_data = msgResponse->getResults();

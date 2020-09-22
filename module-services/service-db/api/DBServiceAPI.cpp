@@ -14,7 +14,7 @@
 
 #include <Common/Query.hpp>
 #include <queries/phonebook/QueryNumberGetByID.hpp>
-#include <queries/sms/QueryThreadGetByNumber.hpp>
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
 
 #include <ServiceDB.hpp>
 #include <includes/DBServiceName.hpp>

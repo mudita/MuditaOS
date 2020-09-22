@@ -6,11 +6,11 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
-#include "queries/sms/QuerySmsThreadMarkAsRead.hpp"
-#include "queries/sms/QuerySMSSearch.hpp"
-#include "queries/sms/QueryThreadGetByID.hpp"
-#include "queries/sms/QueryThreadGetByContactID.hpp"
-#include "queries/sms/QueryThreadRemove.hpp"
+#include "queries/messages/threads/QueryThreadMarkAsRead.hpp"
+#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/threads/QueryThreadGetByID.hpp"
+#include "queries/messages/threads/QueryThreadGetByContactID.hpp"
+#include "queries/messages/threads/QueryThreadRemove.hpp"
 #include "vfs.hpp"
 
 #include <algorithm>
@@ -81,9 +81,9 @@ TEST_CASE("Thread Record tests")
     }
     SECTION("Get all available records with query")
     {
-        auto query  = std::make_shared<db::query::SMSThreadsGet>(0, 100);
+        auto query  = std::make_shared<db::query::ThreadsGet>(0, 100);
         auto ret    = threadRecordInterface1.runQuery(query);
-        auto result = dynamic_cast<db::query::SMSThreadsGetResults *>(ret.get());
+        auto result = dynamic_cast<db::query::ThreadsGetResults *>(ret.get());
         REQUIRE(result != nullptr);
         auto results = result->getResults();
         REQUIRE(results.size() == 2);
@@ -212,18 +212,18 @@ TEST_CASE("Thread Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
 
         {
-            auto query  = std::make_shared<db::query::SMSSearch>("A", 0, 10);
+            auto query  = std::make_shared<db::query::ThreadsSearch>("A", 0, 10);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            auto result = dynamic_cast<db::query::ThreadsSearchResult *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 2);
         }
 
         {
-            auto query  = std::make_shared<db::query::SMSSearch>("O", 0, 10);
+            auto query  = std::make_shared<db::query::ThreadsSearch>("O", 0, 10);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            auto result = dynamic_cast<db::query::ThreadsSearchResult *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 1);
