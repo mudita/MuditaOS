@@ -16,11 +16,11 @@
 #include <service-db/api/DBServiceAPI.hpp>
 #include <OptionWindow.hpp>
 
-#include <module-db/queries/sms/QuerySMSAdd.hpp>
-#include <module-db/queries/sms/QuerySMSRemove.hpp>
-#include <module-db/queries/sms/QuerySMSUpdate.hpp>
-#include <module-db/queries/sms/QueryThreadGetByID.hpp>
-#include <module-db/queries/sms/QueryThreadRemove.hpp>
+#include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
+#include <module-db/queries/messages/sms/QuerySMSRemove.hpp>
+#include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
+#include <module-db/queries/messages/threads/QueryThreadGetByID.hpp>
+#include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
 #include <cassert>

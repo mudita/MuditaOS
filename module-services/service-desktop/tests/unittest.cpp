@@ -6,7 +6,7 @@
 #include "ParserFSM.hpp"
 #include "contacts/ContactHelper.hpp"
 #include "messages/MessageHelper.hpp"
-#include "queries/sms/QuerySMSSearchByType.hpp"
+#include "queries/messages/sms/QuerySMSSearchByType.hpp"
 #include "EndpointFactory.hpp"
 #include "contacts/ContactsEndpoint.hpp"
 #include "json/json11.hpp"

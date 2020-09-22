@@ -11,8 +11,11 @@ namespace db::query
     class SMSGetByThreadID : public Query
     {
       public:
-        SMSGetByThreadID(unsigned int id);
         unsigned int threadId;
+        unsigned int offset;
+        unsigned int limit;
+
+        SMSGetByThreadID(unsigned int id, unsigned int offset = 0, unsigned int limit = 0);
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

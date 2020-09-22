@@ -79,4 +79,5 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     std::unique_ptr<db::QueryResult> updateQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getByThreadIDQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> getCountByThreadIDQuery(std::shared_ptr<db::Query> query);
 };

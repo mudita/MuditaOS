@@ -1,4 +1,4 @@
-#include "QuerySmsThreadMarkAsRead.hpp"
+#include "QueryThreadMarkAsRead.hpp"
 
 namespace db::query::smsthread
 {

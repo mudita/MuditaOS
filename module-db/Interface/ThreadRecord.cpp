@@ -2,10 +2,10 @@
 #include "SMSRecord.hpp"
 #include "ContactRecord.hpp"
 
-#include <queries/sms/QueryThreadGetByID.hpp>
-#include <queries/sms/QueryThreadGetByNumber.hpp>
-#include <queries/sms/QueryThreadGetByContactID.hpp>
-#include <queries/sms/QueryThreadRemove.hpp>
+#include <queries/messages/threads/QueryThreadGetByID.hpp>
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <queries/messages/threads/QueryThreadGetByContactID.hpp>
+#include <queries/messages/threads/QueryThreadRemove.hpp>
 
 #include <cassert>
 #include <log/log.hpp>
@@ -156,18 +156,18 @@ ThreadRecord ThreadRecordInterface::GetByNumber(const utils::PhoneNumber::View &
 
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto localQuery = dynamic_cast<const db::query::SMSSearch *>(query.get())) {
-        auto dbResult = smsDB->threads.getBySMSQuery(localQuery->text, localQuery->starting_postion, localQuery->depth);
+    if (const auto localQuery = dynamic_cast<const db::query::ThreadsSearch *>(query.get())) {
+        auto dbResult = smsDB->threads.getBySMSQuery(localQuery->text, localQuery->startingPosition, localQuery->depth);
 
-        auto response = std::make_unique<db::query::SMSSearchResult>(dbResult.first, dbResult.second);
+        auto response = std::make_unique<db::query::ThreadsSearchResult>(dbResult.first, dbResult.second);
         response->setRequestQuery(query);
         return response;
     }
 
-    if (const auto localQuery = dynamic_cast<const db::query::SMSThreadsGet *>(query.get())) {
+    if (const auto localQuery = dynamic_cast<const db::query::ThreadsGet *>(query.get())) {
         auto dbResult = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
 
-        auto response = std::make_unique<db::query::SMSThreadsGetResults>(dbResult);
+        auto response = std::make_unique<db::query::ThreadsGetResults>(dbResult);
         response->setRequestQuery(query);
         return response;
     }

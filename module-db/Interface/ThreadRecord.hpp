@@ -4,9 +4,9 @@
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
-#include "module-db/queries/sms/QuerySMSSearch.hpp"
-#include "module-db/queries/sms/QuerySMSThreadsGet.hpp"
-#include "module-db/queries/sms/QuerySmsThreadMarkAsRead.hpp"
+#include "module-db/queries/messages/threads/QueryThreadsSearch.hpp"
+#include "module-db/queries/messages/threads/QueryThreadsGet.hpp"
+#include "module-db/queries/messages/threads/QueryThreadMarkAsRead.hpp"
 #include <PhoneNumber.hpp>
 
 #include <utf8/UTF8.hpp>

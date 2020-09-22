@@ -107,9 +107,13 @@ std::vector<SMSTableRow> SMSTable::getByContactId(uint32_t contactId)
 
     return ret;
 }
-std::vector<SMSTableRow> SMSTable::getByThreadId(uint32_t threadId)
+std::vector<SMSTableRow> SMSTable::getByThreadId(uint32_t threadId, uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u;", threadId);
+    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u", threadId);
+
+    if (limit != 0) {
+        retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u LIMIT %u OFFSET %u", threadId, limit, offset);
+    }
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
