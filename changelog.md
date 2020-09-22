@@ -10,6 +10,7 @@
 ### Changed
 
 * `[antenna-app]` Added parameter history window.
+* `[phonenumber]` Change default country to unknown.
 
 ### Fixed
 
