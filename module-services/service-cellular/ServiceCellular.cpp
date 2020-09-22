@@ -1575,6 +1575,7 @@ bool ServiceCellular::handle_fatal_failure()
 bool ServiceCellular::handle_ready()
 {
     LOG_DEBUG("%s", state.c_str());
+
     return true;
 }
 

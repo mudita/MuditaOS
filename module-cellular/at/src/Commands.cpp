@@ -21,7 +21,6 @@ namespace at
             ret.push_back(AT::URC_UART1);
             ret.push_back(AT::AT_PIN_READY_LOGIC);
             ret.push_back(AT::URC_NOTIF_SIGNAL);
-            ret.push_back(AT::SET_SMS_STORAGE);
             break;
         case commadsSet::simInit:
             ret.push_back(AT::CALLER_NUMBER_PRESENTATION);

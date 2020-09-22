@@ -67,7 +67,6 @@ namespace at
         SMS_TEXT_FORMAT,            /// Set Message format to Text
         SMS_UCSC2,                  /// Set ucs2 message format
         SMS_GSM,                    /// Set gsm message format
-        SMS_STORAGE,                /// Set SMS preferred storage
         QSCLK_ON,                   /// Configure Whether or Not to Enter into Sleep Mode
         QDAI,                       /// GSM audio initialization check
         QDAI_INIT, /// Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
@@ -133,7 +132,6 @@ namespace at
             {AT::SMS_TEXT_FORMAT, {"AT+CMGF=1\r"}},
             {AT::SMS_UCSC2, {"AT+CSCS=\"UCS2\"\r"}},
             {AT::SMS_GSM, {"AT+CSCS=\"GSM\"\r"}},
-            {AT::SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"\r"}},
             {AT::QSCLK_ON, {"AT+QSCLK=1\r", 3000}},
             {AT::QDAI, {"AT+QDAI?\r"}},
             {AT::QDAI_INIT, {"AT+QDAI=1,0,0,5,0,1\r"}},
@@ -169,7 +167,7 @@ namespace at
             {AT::CUSD_OPEN_SESSION, {"AT+CUSD=1\r"}},
             {AT::CUSD_CLOSE_SESSION, {"AT+CUSD=2\r"}},
             {AT::CUSD_SEND, {"AT+CUSD=1,"}},
-            {AT::SET_SMS_STORAGE, {"AT+CPMS=\"ME\",\"ME\",\"ME\"\r"}},
+            {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"\r", 300}},
         };
         if (fact.count(at)) {
             return fact.at(at);
