@@ -180,81 +180,102 @@ uint32_t EventsRecordInterface::GetCount()
 std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
     if (typeid(*query) == typeid(db::query::events::Get)) {
-        const auto local_query = dynamic_cast<const db::query::events::Get *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplGetResult(query);
     }
     if (typeid(*query) == typeid(db::query::events::GetAll)) {
-        const auto local_query = dynamic_cast<const db::query::events::GetAll *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplGetAllResult(query);
     }
     if (typeid(*query) == typeid(db::query::events::GetAllLimited)) {
-        const auto local_query = dynamic_cast<const db::query::events::GetAllLimited *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplGetAllLimitedResult(query);
     }
     if (typeid(*query) == typeid(db::query::events::GetFiltered)) {
-        const auto local_query = dynamic_cast<const db::query::events::GetFiltered *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplGetFilteredResult(query);
     }
     if (typeid(*query) == typeid(db::query::events::Add)) {
-        const auto local_query = dynamic_cast<const db::query::events::Add *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplAdd(query);
     }
     if (typeid(*query) == typeid(db::query::events::Remove)) {
-        const auto local_query = dynamic_cast<const db::query::events::Remove *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplRemove(query);
     }
     if (typeid(*query) == typeid(db::query::events::Edit)) {
-        const auto local_query = dynamic_cast<const db::query::events::Edit *>(query.get());
-        return runQueryImpl(local_query);
+        return runQueryImplEdit(query);
     }
     return nullptr;
 }
 
-std::unique_ptr<db::query::events::GetResult> EventsRecordInterface::runQueryImpl(const db::query::events::Get *query)
+std::unique_ptr<db::query::events::GetResult> EventsRecordInterface::runQueryImplGetResult(
+    std::shared_ptr<db::Query> query)
 {
-    auto value = GetByID(query->id);
-    return std::make_unique<db::query::events::GetResult>(value);
+    auto getQuery = dynamic_cast<db::query::events::Get *>(query.get());
+    assert(getQuery != nullptr);
+    auto records  = GetByID(getQuery->id);
+    auto response = std::make_unique<db::query::events::GetResult>(records);
+    response->setRequestQuery(query);
+    return response;
 }
 
-std::unique_ptr<db::query::events::GetAllResult> EventsRecordInterface::runQueryImpl(
-    const db::query::events::GetAll *query)
+std::unique_ptr<db::query::events::GetAllResult> EventsRecordInterface::runQueryImplGetAllResult(
+    std::shared_ptr<db::Query> query)
 {
     auto numberOfEvents = GetCount();
     auto records        = GetLimitOffset(0, numberOfEvents);
-    return std::make_unique<db::query::events::GetAllResult>(std::move(records));
+    auto response       = std::make_unique<db::query::events::GetAllResult>(std::move(records));
+    response->setRequestQuery(query);
+    return response;
 }
 
-std::unique_ptr<db::query::events::GetAllLimitedResult> EventsRecordInterface::runQueryImpl(
-    const db::query::events::GetAllLimited *query)
+std::unique_ptr<db::query::events::GetAllLimitedResult> EventsRecordInterface::runQueryImplGetAllLimitedResult(
+    std::shared_ptr<db::Query> query)
 {
+
+    auto getAllLimitedQuery = dynamic_cast<db::query::events::GetAllLimited *>(query.get());
+    assert(getAllLimitedQuery != nullptr);
+    auto records = GetLimitOffsetByDate(getAllLimitedQuery->offset, getAllLimitedQuery->limit);
     auto count   = GetCount();
-    auto records = GetLimitOffsetByDate(query->offset, query->limit);
-    return std::make_unique<db::query::events::GetAllLimitedResult>(std::move(records),
-                                                                    std::make_unique<uint32_t>(count));
+    auto response =
+        std::make_unique<db::query::events::GetAllLimitedResult>(std::move(records), std::make_unique<uint32_t>(count));
+    response->setRequestQuery(query);
+    return response;
 }
 
-std::unique_ptr<db::query::events::GetFilteredResult> EventsRecordInterface::runQueryImpl(
-    const db::query::events::GetFiltered *query)
+std::unique_ptr<db::query::events::GetFilteredResult> EventsRecordInterface::runQueryImplGetFilteredResult(
+    std::shared_ptr<db::Query> query)
 {
-    auto records = Select(query->filter_from, query->filter_till);
-    return std::make_unique<db::query::events::GetFilteredResult>(std::move(records));
+    auto getFilteredQuery = dynamic_cast<db::query::events::GetFiltered *>(query.get());
+    assert(getFilteredQuery != nullptr);
+    auto records  = Select(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
+    auto response = std::make_unique<db::query::events::GetFilteredResult>(std::move(records));
+    response->setRequestQuery(query);
+    return response;
 }
 
-std::unique_ptr<db::query::events::AddResult> EventsRecordInterface::runQueryImpl(const db::query::events::Add *query)
+std::unique_ptr<db::query::events::AddResult> EventsRecordInterface::runQueryImplAdd(std::shared_ptr<db::Query> query)
 {
-    bool ret = Add(query->getRecord());
-    return std::make_unique<db::query::events::AddResult>(ret);
+    auto addQuery = dynamic_cast<db::query::events::Add *>(query.get());
+    assert(addQuery != nullptr);
+    bool ret      = Add(addQuery->getRecord());
+    auto response = std::make_unique<db::query::events::AddResult>(ret);
+    response->setRequestQuery(query);
+    return response;
 }
 
-std::unique_ptr<db::query::events::RemoveResult> EventsRecordInterface::runQueryImpl(
-    const db::query::events::Remove *query)
+std::unique_ptr<db::query::events::RemoveResult> EventsRecordInterface::runQueryImplRemove(
+    std::shared_ptr<db::Query> query)
 {
-    bool ret = RemoveByID(query->id);
-    return std::make_unique<db::query::events::RemoveResult>(ret);
+    auto removeQuery = dynamic_cast<db::query::events::Remove *>(query.get());
+    assert(removeQuery != nullptr);
+    bool ret      = RemoveByID(removeQuery->id);
+    auto response = std::make_unique<db::query::events::RemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
 }
 
-std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryImpl(const db::query::events::Edit *query)
+std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryImplEdit(std::shared_ptr<db::Query> query)
 {
-    bool ret = Update(query->getRecord());
-    return std::make_unique<db::query::events::EditResult>(ret);
+    auto editQuery = dynamic_cast<db::query::events::Edit *>(query.get());
+    assert(editQuery != nullptr);
+    bool ret      = Update(editQuery->getRecord());
+    auto response = std::make_unique<db::query::events::EditResult>(ret);
+    response->setRequestQuery(query);
+    return response;
 }

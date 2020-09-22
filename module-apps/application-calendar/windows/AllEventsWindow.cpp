@@ -1,5 +1,4 @@
 #include "AllEventsWindow.hpp"
-#include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/BottomBar.hpp>
@@ -10,6 +9,7 @@
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
+#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
 {
@@ -53,7 +53,6 @@ namespace gui
 
     void AllEventsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        allEventsList->rebuildList();
         auto dataReceived = dynamic_cast<PrevWindowData *>(data);
         if (dataReceived != nullptr) {
             if (dataReceived->getData() == PrevWindowData::PrevWindow::Delete) {
@@ -81,7 +80,7 @@ namespace gui
         if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
             LOG_DEBUG("Switch to new event window");
             std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
-            data->setDescription("New");
+            data->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
             event->date_from = TimePointNow();
             event->date_till = TimePointNow();
@@ -103,30 +102,16 @@ namespace gui
 
     bool AllEventsWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
-        if (msg != nullptr) {
-            auto temp = msg->getResult();
-            if (auto response = dynamic_cast<db::query::events::GetAllLimitedResult *>(temp.get())) {
-                auto records_data = response->getResult();
-                allEventsModel->setRecordsCount(*response->getCountResult());
-                auto records = std::make_unique<std::vector<EventsRecord>>(records_data->begin(), records_data->end());
-                if (checkEmpty) {
-                    if (records->size() == 0) {
-                        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-                        assert(application != nullptr);
-                        auto filter = std::chrono::system_clock::now();
-                        app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"),
-                                                    filter,
-                                                    style::window::calendar::name::all_events_window);
-                    }
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr) {
+            if (msgNotification->interface == db::Interface::Name::Events) {
+                if (msgNotification->dataModified()) {
+                    allEventsList->rebuildList(style::listview::RebuildType::InPlace);
+                    return true;
                 }
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                return allEventsModel->updateRecords(std::move(records));
             }
-            LOG_DEBUG("Response False");
-            return false;
         }
-        LOG_DEBUG("AllEventsWindow DB Message != QueryResponse");
+
         return false;
     }
 } /* namespace gui */

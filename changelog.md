@@ -1,5 +1,12 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+* `[calendar]` Add notifications from database handling.
+
+
 ## [0.39.1 2020-09-25]
 
 ### Added

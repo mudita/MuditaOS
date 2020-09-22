@@ -41,8 +41,8 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        bool onDatabaseMessage(sys::Message *msgl) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
         std::unique_ptr<MonthModel> getMonthModel()
         {
             return std::move(monthModel);

@@ -2,6 +2,7 @@
 #include "application-calendar/widgets/AllEventsItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
+#include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include <ListView.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <queries/calendar/QueryEventsGetAllLimited.hpp>
@@ -20,6 +21,8 @@ unsigned int AllEventsModel::requestRecordsCount()
 void AllEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query = std::make_unique<db::query::events::GetAllLimited>(offset, limit);
+    query->setQueryListener(
+        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
 }
 
@@ -56,7 +59,23 @@ bool AllEventsModel::updateRecords(std::unique_ptr<std::vector<EventsRecord>> re
     list->onProviderDataUpdate();
     return true;
 }
-void AllEventsModel::setRecordsCount(const uint32_t count)
+
+auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
-    list->setElementsCount(count);
+    auto response = dynamic_cast<db::query::events::GetAllLimitedResult *>(queryResult);
+    assert(response != nullptr);
+
+    auto records_data = response->getResult();
+    list->setElementsCount(*response->getCountResult());
+    auto records = std::make_unique<std::vector<EventsRecord>>(records_data->begin(), records_data->end());
+
+    if (records->empty()) {
+        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+        assert(application != nullptr);
+        auto filter = std::chrono::system_clock::now();
+        app->switchToNoEventsWindow(
+            utils::localize.get("app_calendar_title_main"), filter, style::window::calendar::name::all_events_window);
+    }
+
+    return this->updateRecords(std::move(records));
 }
