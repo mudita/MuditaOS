@@ -13,7 +13,7 @@
 
 #include <string>
 
-class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider, public db::QueryListener
+class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider
 {
   private:
     std::string queryFilter;
@@ -31,8 +31,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
     auto getItem(gui::Order order) -> gui::ListItem * override;
 
-    // virtual method for db::QueryListener
-    auto handleQueryResponse(db::QueryResult *) -> bool override;
+    auto handleQueryResponse(db::QueryResult *) -> bool;
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 

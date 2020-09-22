@@ -17,27 +17,23 @@ namespace gui
     class MessagesMainWindow : public AppWindow
     {
       protected:
-        Image *leftArrowImage  = nullptr;
-        Image *rightArrowImage = nullptr;
-        Image *newMessageImage = nullptr;
-        Image *searchImage     = nullptr;
-
+        Image *leftArrowImage                      = nullptr;
+        Image *rightArrowImage                     = nullptr;
+        Image *newMessageImage                     = nullptr;
+        Image *searchImage                         = nullptr;
+        Icon *emptyListIcon                        = nullptr;
         std::shared_ptr<ThreadsModel> threadsModel = nullptr;
-        gui::ListView *list                      = nullptr;
-
-        Icon *emptyListIcon = nullptr;
+        gui::ListView *list                        = nullptr;
 
       public:
-        MessagesMainWindow(app::Application *app);
+        explicit MessagesMainWindow(app::Application *app);
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         bool onDatabaseMessage(sys::Message *msgl) override;
 
         void rebuild() override;
         void buildInterface() override;
     };
-
 } /* namespace gui */
