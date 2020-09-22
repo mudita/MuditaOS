@@ -72,7 +72,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE_FALSE(call.contactId == testRec.contactId);
         REQUIRE(call.contactId == 1);
         REQUIRE_FALSE(call.name == testRec.name);
-        REQUIRE(call.name == "600 123 456");
+        REQUIRE(call.name == "600123456");
     }
 
     SECTION("Entry update")
