@@ -40,14 +40,14 @@ namespace gui
 
     auto PhonebookNamecardOptions::sendViaSms() -> bool
     {
-        const UTF8 vcard = phonebookUtils::formatVCard(*contact);
+        const UTF8 contactData = contact->getAsString();
         const utils::PhoneNumber::View emptyNumber;
-        return app::sms(application, app::SmsOperation::New, emptyNumber, vcard);
+        return app::sms(application, app::SmsOperation::New, emptyNumber, contactData);
     }
 
     void PhonebookNamecardOptions::sendViaBluetooth()
     {
-        const UTF8 vcard = phonebookUtils::formatVCard(*contact);
+        const UTF8 contactData = contact->getAsString();
     }
 
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>

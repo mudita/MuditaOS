@@ -106,6 +106,13 @@ namespace gui
                 }
             }
 
+            auto linesHAlign(Length parentSize)
+            {
+                for (auto &line : lines) {
+                    line.alignH(parent->getAlignment(Axis::X), parentSize);
+                }
+            }
+
         } lines;
 
         TextCursor *cursor                     = nullptr;

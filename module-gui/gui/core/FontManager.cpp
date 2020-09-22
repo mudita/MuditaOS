@@ -5,6 +5,11 @@
 #include "log/log.hpp"  // for LOG_ERROR, LOG_INFO, LOG_WARN
 #include "vfs.hpp"      // for vfs, vfs::DirectoryEntry, vfs::FileAttributes
 
+namespace style::window::font
+{
+    const inline std::string default_fallback_font = "dejavu_sans_bold_27";
+}
+
 namespace gui
 {
 
@@ -103,6 +108,13 @@ namespace gui
     bool FontManager::init(std::string baseDirectory)
     {
         loadFonts(baseDirectory);
+
+        auto fallback_font = find(style::window::font::default_fallback_font);
+        if (fallback_font != nullptr) {
+            for (auto font : fonts) {
+                font->setFallbackFont(fallback_font);
+            }
+        }
         initialized = true;
         return initialized;
     }

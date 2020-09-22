@@ -69,7 +69,9 @@ set(SOURCES
         queries/sms/QuerySMSGetByContactID.cpp
         queries/sms/QuerySMSGetByThreadID.cpp
         queries/sms/QuerySMSGetByText.cpp
+        queries/sms/QuerySMSAdd.cpp
         queries/sms/QuerySMSRemove.cpp
+        queries/sms/QuerySMSUpdate.cpp
         queries/sms/QuerySMSTemplateAdd.cpp
         queries/sms/QuerySMSTemplateGetByID.cpp
         queries/sms/QuerySMSTemplateGet.cpp
@@ -97,8 +99,8 @@ set(SOURCES
         queries/calendar/QueryEventsGetAll.cpp
         queries/calendar/QueryEventsAdd.cpp
         queries/calendar/QueryEventsEdit.cpp
-        queries/calendar/QueryEventsGetFiltered.hpp
         queries/calendar/QueryEventsGetFiltered.cpp
+        queries/calendar/QueryEventsGetAllLimited.cpp
         queries/settings/QuerySettingsGet_v2.cpp
         queries/settings/QuerySettingsUpdate_v2.cpp
         queries/settings/QuerySettingsAddOrIgnore_v2.cpp

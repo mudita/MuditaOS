@@ -219,6 +219,13 @@ namespace gui
     void MenuWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void MenuWindow::invalidate() noexcept
+    {
+        mainMenu  = nullptr;
+        toolsMenu = nullptr;
     }
 
     void MenuWindow::onBeforeShow(ShowMode mode, SwitchData *data)

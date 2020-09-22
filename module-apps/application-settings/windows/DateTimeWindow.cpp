@@ -36,6 +36,7 @@ namespace gui
         destroyInterface();
         buildInterface();
     }
+
     void DateTimeWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -151,9 +152,19 @@ namespace gui
 
         dateBody->setNavigationItem(NavigationDirection::DOWN, timeBody);
     }
+
     void DateTimeWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void DateTimeWindow::invalidate() noexcept
+    {
+        dateBody = nullptr;
+        timeBody = nullptr;
+        dateItems.clear();
+        timeItems.clear();
     }
 
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)

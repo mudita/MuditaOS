@@ -53,6 +53,9 @@ namespace gui
         void destroyInterface() override;
 
         void switchMenu(MenuPage *page);
+
+      private:
+        void invalidate() noexcept;
     };
 
 } /* namespace gui */

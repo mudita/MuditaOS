@@ -19,6 +19,7 @@ namespace gui
                                    std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                                    std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
                                    std::function<void()> selectSpecialCharacter                 = nullptr,
+                                   std::function<void()> contentChanged                         = nullptr,
                                    unsigned int lines                                           = 1);
 
         ~InputLinesWithLabelIWidget() override = default;
@@ -28,6 +29,7 @@ namespace gui
         TextFixedSize *inputText = nullptr;
 
       private:
+        std::function<void()> checkTextContent = nullptr;
         void applyItemNameSpecificSettings();
 
         void firstNameHandler();

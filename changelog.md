@@ -1,10 +1,69 @@
 # Mudita PurePhone changelog
 
-## [0.37.1 2020-09-11]
+## [Current release]
+
+### Added
+
+
+
+### Changed
+
+
 
 ### Fixed
 
-* `[gui]` Fixed notifications display on unlocked screen.
+* `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
+* `[messages]` Fixed sending sms to new or deleted contact
+
+
+### Other
+
+* `[system_features]` Sprintf clean up.
+* `[listview]` Added ability to rebuild on provided data offset. 
+
+## [0.38.2 2020-09-18]
+
+### Added
+
+* `[music player]` Add layout for the playback window.
+* `[messages]` Save unsent messages as SMS drafts.
+
+### Fixed
+
+* `[settings]` Fixed a system crash on language change.
+
+### Other
+
+* `[build]` Move user data to SDRAM during linking.
+* `[build]` RT1051's linker script cleanup.
+* `[audio]` Add audio volume control per functionality.
+
+## [0.38.1 2020-09-18]
+
+### Added
+
+* `[calendar]` Add/Edit/Remove events capability.
+* `[calendar]` Add recurring events.
+* `[desktop]` Add info on how to unlock the phone.
+* `[settings]` Add PIN change option in settings' main window.
+
+### Changed
+
+* `[calendar]` Marking days which have events in Calendar Main Window.
+* `[calendar]` Display events in "Day" and "All Events" windows.
+* `[gui]` Fallback font is used before displaying unsupported glyph.
+* `[phonebook]` Replace vCard encoding with plain text when exporting contact data.
+* `[phonebook]` Make SAVE button appear when at least one field is filled up.
+
+### Fixed
+
+* `[gui]` Fixed displaying notifications on an unlocked screen.
+* `[audio]` `[music player]` Fixed meta tags parsing in audio files.
+
+### Other
+
+* `[doc]` Updated development documentation.
+* `[db]` Treat temporary contacts as a group.
 
 ## [0.37.1 2020-09-11]
 
@@ -348,4 +407,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-

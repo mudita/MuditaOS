@@ -3,6 +3,8 @@
 #include <Label.hpp>
 #include <Text.hpp>
 #include <BoxLayout.hpp>
+#include <module-apps/Application.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 namespace gui
 
@@ -16,9 +18,10 @@ namespace gui
         gui::Label *repeat        = nullptr;
         gui::Label *reminderTitle = nullptr;
         gui::Label *reminder      = nullptr;
+        app::ApplicationCalendar *app = nullptr;
 
       public:
-        RepeatAndReminderItem();
+        RepeatAndReminderItem(app::ApplicationCalendar *application);
         virtual ~RepeatAndReminderItem() = default;
 
         void descriptionHandler();

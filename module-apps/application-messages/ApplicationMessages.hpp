@@ -42,7 +42,6 @@ namespace app
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {
@@ -64,6 +63,10 @@ namespace app
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
         bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
         bool handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body);
+
+        std::pair<SMSRecord, bool> createDraft(const utils::PhoneNumber::View &number, const UTF8 &body);
+        bool updateDraft(SMSRecord &record, const UTF8 &body);
+        bool removeDraft(const SMSRecord &record);
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;

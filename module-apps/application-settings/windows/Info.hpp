@@ -21,7 +21,7 @@ namespace gui
     class Info : public AppWindow
     {
       protected:
-        VBox *box;
+        VBox *box = nullptr;
 
       public:
         Info(app::Application *app);
@@ -33,5 +33,7 @@ namespace gui
 
       private:
         void addAlignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText);
+
+        void invalidate() noexcept;
     };
 } // namespace gui

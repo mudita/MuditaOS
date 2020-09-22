@@ -2,6 +2,8 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CalendarMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DayEventsWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CalendarEventsOptionsWindow.cpp"
@@ -9,13 +11,12 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NewEditEventWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CustomRepeatWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/EventDetailModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/CustomRepeatModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/NewEditEventModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsInternalModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/AllEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListView.cpp"
@@ -25,11 +26,16 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventTimeItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/SeveralOptionsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/TextWithLabelItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxWithLabelAndModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/NewEventCheckBoxWithLabel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayLabel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/MonthBox.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListItem.hpp"
-
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarStyle.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/OptionParser.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/TimeDisplayParser.hpp"
 )
 

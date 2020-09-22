@@ -58,6 +58,8 @@
     "locale_24hour_min" : "%H:%M",
     "locale_date_full" : "%m/%d/%y",
     "locale_date_short" : "%d/%m",
+    "common_AM" : "AM",
+    "common_PM" : "PM",
 
     "duration_min_0sec" : "%M:%0S",
     "duration_0min_0sec" : "%0M:%0S",
@@ -98,6 +100,7 @@
     "app_calendar_edit": "EDIT",
     "app_calendar_new_edit_event_name": "Event name",
     "app_calendar_new_edit_event_allday": "All day event",
+    "app_calendar_all_day": "All day",
     "app_calendar_new_edit_event_start": "Start",
     "app_calendar_new_edit_event_end": "End",
 
@@ -133,6 +136,7 @@
     "app_desktop_menu": "MENU",
     "app_desktop_emergency": "EMERG.",
     "app_desktop_pin_lock": "Enter passcode",
+    "app_desktop_no_pin_lock": "Press Unlock and then #",
     "app_desktop_pin_info1": "Wrong passcode",
     "app_desktop_pin_info2": "Allowed unlock attempts",
     "app_desktop_pin_blocked1": "Sorry, phone blocked",
@@ -260,6 +264,9 @@
 
     "app_music_player_all_songs": "All songs",
     "app_music_player_play": "PLAY",
+    "app_music_player_music_library": "MUSIC LIBRARY",
+    "app_music_player_quit": "QUIT",
+    "app_music_player_music_empty_window_notification": "Press Music Library to choose\n a song from the library",
 
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",

@@ -14,6 +14,7 @@ namespace consts
     uint32_t favouritesId = 1;
     uint32_t iceId        = 2;
     uint32_t blocked      = 3;
+    uint32_t temporaryId  = 4;
 } // namespace consts
 
 void addSomeContacts(ContactsDB &contactsDb);
@@ -32,10 +33,11 @@ TEST_CASE("Contact Groups tests", "[Groups]")
 
     SECTION("Adding checking standard groups")
     {
-        REQUIRE(contactGroupsTable.count() == 3);
+        REQUIRE(contactGroupsTable.count() == 4);
         REQUIRE(contactGroupsTable.favouritesId() == consts::favouritesId);
         REQUIRE(contactGroupsTable.iceId() == consts::iceId);
         REQUIRE(contactGroupsTable.blockedId() == consts::blocked);
+        REQUIRE(contactGroupsTable.temporaryId() == consts::temporaryId);
     }
 
     SECTION("CRUD")
@@ -91,13 +93,13 @@ TEST_CASE("Contact Groups tests", "[Groups]")
         REQUIRE(contactGroupsTable.getAllRows().size() == currentItemsCount);
 
         uint32_t group_000_id = contactGroupsTable.getId("group_000");
-        REQUIRE(group_000_id == 6);
+        REQUIRE(group_000_id == 7);
 
-        auto someGroups = contactGroupsTable.getLimitOffset(6, 10);
+        auto someGroups = contactGroupsTable.getLimitOffset(7, 10);
         REQUIRE(someGroups.size() == 10);
         REQUIRE(someGroups[0].name == "group_001");
         REQUIRE(someGroups[9].name == "group_010");
-        REQUIRE(someGroups[9].ID == 16);
+        REQUIRE(someGroups[9].ID == 17);
 
         INFO("Adding some contacts");
         addSomeContacts(contactDb);

@@ -4,6 +4,8 @@
 #include "Service/Message.hpp"
 #include "SystemManager/SystemManager.hpp"
 #include "gui/widgets/Label.hpp"
+#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include "application-calendar/widgets/CalendarStyle.hpp"
 
 namespace app
 {
@@ -13,6 +15,7 @@ namespace app
     class ApplicationCalendar : public Application
     {
         time_t applicationStartTime = 0;
+        int eventShift              = 0;
 
       public:
         ApplicationCalendar(std::string name,
@@ -35,6 +38,11 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-    };
+        void switchToNoEventsWindow(const std::string &title,
+                                    const TimePoint &dateFilter,
+                                    const std::string &goBackWindow);
 
+        static const std::map<Reminder, const char *> reminderOptions;
+        static const std::map<Repeat, const char *> repeatOptions;
+    };
 } /* namespace app */

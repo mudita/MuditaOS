@@ -5,8 +5,7 @@
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
-#include "windows/OptionsWindow.hpp"
-#include "windows/ThreadViewWindow.hpp"
+#include "windows/SMSThreadViewWindow.hpp"
 #include "windows/SearchStart.hpp"
 #include "windows/SMSTemplatesWindow.hpp"
 #include "windows/SearchResults.hpp"
@@ -15,6 +14,12 @@
 #include <Dialog.hpp>
 #include <i18/i18.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
+#include <OptionWindow.hpp>
+
+#include <module-db/queries/sms/QuerySMSAdd.hpp>
+#include <module-db/queries/sms/QuerySMSRemove.hpp>
+#include <module-db/queries/sms/QuerySMSUpdate.hpp>
+
 #include <cassert>
 #include <time/time_conversion.hpp>
 
@@ -109,17 +114,12 @@ namespace app
         return ret;
     }
 
-    sys::ReturnCodes ApplicationMessages::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationMessages::createUserInterface()
     {
         windowOptions = gui::newOptionWindow(this);
 
         windows.insert({gui::name::window::main_window, new gui::MessagesMainWindow(this)});
-        windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
+        windows.insert({gui::name::window::thread_view, new gui::SMSThreadViewWindow(this)});
         windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
         windows.insert({windowOptions->getName(), windowOptions});
         windows.insert(
@@ -253,6 +253,39 @@ namespace app
         return true;
     }
 
+    bool ApplicationMessages::updateDraft(SMSRecord &record, const UTF8 &body)
+    {
+        assert(!body.empty()); // precondition check.
+
+        record.body = body;
+        record.date = utils::time::getCurrentTimestamp().getTime();
+
+        using db::query::SMSUpdate;
+        return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSUpdate>(record));
+    }
+
+    std::pair<SMSRecord, bool> ApplicationMessages::createDraft(const utils::PhoneNumber::View &number,
+                                                                const UTF8 &body)
+    {
+        assert(!body.empty()); // precondition check.
+
+        SMSRecord record;
+        record.number = number;
+        record.body   = body;
+        record.type   = SMSType::DRAFT;
+        record.date   = utils::time::getCurrentTimestamp().getTime();
+
+        using db::query::SMSAdd;
+        const auto success = DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSAdd>(record));
+        return std::make_pair(record, success);
+    }
+
+    bool ApplicationMessages::removeDraft(const SMSRecord &record)
+    {
+        using db::query::SMSRemove;
+        return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSRemove>(record.ID));
+    }
+
     bool ApplicationMessages::sendSms(const utils::PhoneNumber::View &number, const UTF8 &body)
     {
         if (number.getEntered().size() == 0 || body.length() == 0) {
@@ -263,8 +296,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::QUEUED;
-        auto time     = utils::time::Timestamp();
-        record.date   = time.getTime();
+        record.date   = utils::time::getCurrentTimestamp().getTime();
         return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
     }
     bool ApplicationMessages::resendSms(const SMSRecord &record)
@@ -272,8 +304,7 @@ namespace app
         auto resendRecord = record;
         resendRecord.type = SMSType::QUEUED;
         // update date sent - it will display an old, failed sms at the the bottom, but this is correct
-        auto time         = utils::time::Timestamp();
-        resendRecord.date = time.getTime();
+        resendRecord.date = utils::time::getCurrentTimestamp().getTime();
         return DBServiceAPI::SMSUpdate(this, resendRecord);
     }
 

@@ -2,7 +2,7 @@
 
 namespace db::query
 {
-    SMSRemove::SMSRemove(unsigned int id) : Query(Query::Type::Read), id(id)
+    SMSRemove::SMSRemove(unsigned int id) : Query(Query::Type::Delete), id(id)
     {}
 
     auto SMSRemove::debugInfo() const -> std::string

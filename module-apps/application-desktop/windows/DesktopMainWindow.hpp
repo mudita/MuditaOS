@@ -15,23 +15,42 @@ namespace gui
     class DesktopMainWindow : public AppWindow
     {
       protected:
-        gui::Label *description   = nullptr;
         gui::Label *time          = nullptr;
         gui::Label *dayText       = nullptr;
-        gui::Image *messagesImage = nullptr;
         gui::VBox *notifications  = nullptr;
-        /**
-         * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
-         */
-        uint32_t unclockTime = 3000;
-        /**
-         * value of the system time when enter key was pressed.
-         */
-        uint32_t unlockStartTime = 0;
-        /**
-         * Flag used in detecting unlock seqience
-         */
-        bool enterPressed = false;
+
+        /// Timed enter value cache, could be templated to any value really
+        class EnterCache
+        {
+            /// to tell if enter was pressed or not
+            bool enterPressed = false;
+            /// val to check timeout
+            uint32_t unlockStartTime = 0;
+            /// val to clear start time
+            uint32_t unclockTime = 3000;
+
+          public:
+            bool storeEnter(const InputEvent &evt)
+            {
+                enterPressed    = evt.is(KeyCode::KEY_ENTER);
+                unlockStartTime = xTaskGetTickCount();
+                return enterPressed;
+            }
+
+            void clear()
+            {
+                enterPressed = false;
+            }
+
+            bool cached()
+            {
+                // value timed out -> clear cache
+                if (!(xTaskGetTickCount() - unlockStartTime < unclockTime)) {
+                    enterPressed = false;
+                }
+                return enterPressed;
+            }
+        } enter_cache;
         /**
          * Name of the appliction that was on top when lock timeout occured
          */
@@ -56,6 +75,8 @@ namespace gui
         std::list<DrawCommand *> buildDrawList() override;
 
       private:
+        void invalidate() noexcept;
+
         gui::KeyInputMappedTranslation translator;
     };
 

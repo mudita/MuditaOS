@@ -89,23 +89,22 @@ namespace audio
         constexpr audio::Volume defaultRoutingHeadsetVolume      = 10;
 
         const auto dbRoutingEarspeakerGainPath =
-            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::ProfileSetup::Gain);
+            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::Setting::Gain);
         const auto routingEarspeakerGain = dbCallback(dbRoutingEarspeakerGainPath, defaultRoutingEarspeakerGain);
         const auto dbRoutingEarspeakerVolumePath =
-            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::ProfileSetup::Volume);
+            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::Setting::Volume);
         const auto routingEarspeakerVolume = dbCallback(dbRoutingEarspeakerVolumePath, defaultRoutingEarspeakerVolume);
         const auto dbRoutingSpeakerphoneGainPath =
-            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::ProfileSetup::Gain);
+            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::Setting::Gain);
         const auto routingSpeakerphoneGain = dbCallback(dbRoutingSpeakerphoneGainPath, defaultRoutingSpeakerphoneGain);
         const auto dbRoutingSpeakerphoneVolumePath =
-            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::ProfileSetup::Volume);
+            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::Setting::Volume);
         const auto routingSpeakerphoneVolume =
             dbCallback(dbRoutingSpeakerphoneVolumePath, defaultRoutingSpeakerphoneVolume);
-        const auto dbRoutingHeadsetGainPath =
-            audio::str(audio::Profile::Type::RoutingHeadset, audio::ProfileSetup::Gain);
+        const auto dbRoutingHeadsetGainPath = audio::str(audio::Profile::Type::RoutingHeadset, audio::Setting::Gain);
         const auto routingHeadsetGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadsetGain);
         const auto dbRoutingHeadsetVolumePath =
-            audio::str(audio::Profile::Type::RoutingHeadset, audio::ProfileSetup::Volume);
+            audio::str(audio::Profile::Type::RoutingHeadset, audio::Setting::Volume);
         const auto routingHeadsetVolume = dbCallback(dbRoutingHeadsetVolumePath, defaultRoutingHeadsetVolume);
 
         availableProfiles.push_back(

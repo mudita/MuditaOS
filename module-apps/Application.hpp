@@ -205,6 +205,10 @@ namespace app
         /// 2. It gets settings from database
         sys::ReturnCodes InitHandler() override;
 
+        /// Deinitialization function.
+        /// Called upon Application exit and/or termination request.
+        sys::ReturnCodes DeinitHandler() override;
+
         /// function to set active window for application
         /// if none window is selected main window is used
         /// if window name is "LastWindow" then previous window is selected
@@ -227,6 +231,17 @@ namespace app
         {
             shutdownInProgress = true;
         };
+
+        bool setVolume(const audio::Volume &value,
+                       const audio::Profile::Type &profileType,
+                       const audio::PlaybackType &playbackType);
+
+        auto getVolume(audio::Volume &volume,
+                       const audio::Profile::Type &profileType,
+                       const audio::PlaybackType &playbackType)
+        {
+            return AudioServiceAPI::GetVolume(this, volume, profileType, playbackType);
+        }
 
         bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)

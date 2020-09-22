@@ -11,7 +11,7 @@ using namespace style::header;
 namespace gui
 {
 
-    AppWindow::AppWindow(app::Application *app, std::string name, uint32_t id) : Window(name, id), application{app}
+    AppWindow::AppWindow(app::Application *app, std::string name) : Window(name), application{app}
     {
         setSize(style::window_width, style::window_height);
     }
@@ -220,6 +220,11 @@ namespace gui
                 title->offset_h(),
                 this->getWidth(),
                 this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
+    }
+
+    void AppWindow::setBottomBarActive(BottomBar::Side side, bool value)
+    {
+        bottomBar->setActive(side, value);
     }
 
 } /* namespace gui */

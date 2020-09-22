@@ -78,8 +78,18 @@ namespace gui
 
     void FotaWindow::destroyInterface()
     {
-        this->focusItem = nullptr;
-        AppWindow::destroyInterface();
+        erase();
+        invalidate();
+    }
+
+    void FotaWindow::invalidate() noexcept
+    {
+        currentFirmwareLabel = nullptr;
+        statusLabel          = nullptr;
+        newFirmwareLabelText = nullptr;
+        newFirmwareLabel     = nullptr;
+        downloadProgress     = nullptr;
+        mainBox              = nullptr;
     }
 
     BottomBar *FotaWindow::getBottomBar()

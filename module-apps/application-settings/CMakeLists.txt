@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
         ApplicationSettings.cpp
         windows/SettingsMainWindow.cpp
         windows/LanguageWindow.cpp
+        windows/BtWindow.cpp
 
         windows/UITestWindow.cpp
         windows/Info.cpp
@@ -25,6 +26,7 @@ target_sources( ${PROJECT_NAME}
         windows/CellularPassthroughWindow.cpp
         windows/FotaWindow.cpp
         windows/Fota.cpp
+        windows/SettingsChange.cpp
 
     PUBLIC
         ApplicationSettings.hpp

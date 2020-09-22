@@ -14,7 +14,9 @@ namespace gui
         {
             EnteringPin,
             WrongPinInfo,
-            PhoneBlocked
+            PhoneBlocked,
+            SimpleUnlock, /// when there is no pin -> use this
+            ShowPrompt,   /// when wrong key instead/after enter -> show prompt
         };
 
         gui::Label *titleLabel = nullptr;
@@ -44,6 +46,9 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
+        void invalidate() noexcept;
     };
 
 } /* namespace gui */

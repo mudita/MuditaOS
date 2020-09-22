@@ -11,6 +11,7 @@
 #include "MessageType.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/LanguageWindow.hpp"
+#include "windows/BtWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
 #include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
@@ -27,6 +28,7 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
+#include "windows/SettingsChange.hpp"
 
 #include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
 
@@ -94,6 +96,9 @@ namespace app
         window = new gui::LanguageWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
+        window = new gui::BtWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
         window = new gui::UiTestWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
@@ -108,6 +113,9 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = newOptionWindow(this, app::change_setting, settingsChangeWindow(this));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         if (board == bsp::Board::T4) {

@@ -49,10 +49,10 @@ TEST_CASE("TextLine - non fitting text")
     {
         auto text             = mockup::multiWordString(5);
         auto [document, font] = mockup::buildOnelineTestDocument(text);
-        auto line             = gui::TextLine(&document, 0, 30);
+        auto line             = gui::TextLine(&document, 0, std::numeric_limits<unsigned int>::max());
 
         REQUIRE(line.length() != 0);
-        REQUIRE(line.length() < text.length());
+        REQUIRE(line.length() <= text.length());
     }
 }
 
