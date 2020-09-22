@@ -5,6 +5,7 @@
 ### Added
 
 * `[GUI]` Added rich text parsing for full text styling needs
+* `[Audio]` New volume buttons features
 
 ### Other
 

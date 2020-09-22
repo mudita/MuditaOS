@@ -137,9 +137,7 @@ enum class MessageType
     AudioRoutingSpeakerhone,
     AudioRoutingHeadset,
 
-    AudioSetOutputVolume,
     AudioSetInputGain,
-    AudioGetOutputVolume,
     AudioGetInputGain,
     AudioGetFileTags,
 

@@ -4,6 +4,12 @@
 
 #include <bsp/audio/bsp_audio.hpp>
 
+namespace audio::playbackDefaults
+{
+    constexpr audio::Volume defaultLoudspeakerVolume = 10;
+    constexpr audio::Volume defaultHeadphonesVolume  = 2;
+} // namespace audio::playbackDefaults
+
 namespace audio
 {
     class decoder;
