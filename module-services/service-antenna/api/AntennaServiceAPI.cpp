@@ -6,7 +6,7 @@ namespace AntennaServiceAPI
     void CSQChange(sys::Service *serv)
     {
         auto msg = std::make_shared<sys::DataMessage>(MessageType::AntennaCSQChange);
-        sys::Bus::SendUnicast(msg, ServiceAntenna::serviceName, serv);
+        sys::Bus::SendMulticast(msg, sys::BusChannels::AntennaNotifications, serv);
     }
     bool LockRequest(sys::Service *serv, antenna::lockState request)
     {

@@ -24,10 +24,14 @@ namespace antenna
         constexpr uint32_t buttonH      = 33;
         constexpr uint32_t buttonSmallW = 130;
         constexpr uint32_t buttonBigW   = 400;
+        constexpr uint32_t buttonMidW   = 195;
 
         constexpr uint32_t buttonPosXLeft   = 35;
         constexpr uint32_t buttonPosXCenter = 175;
         constexpr uint32_t buttonPostXRight = 315;
+
+        constexpr uint32_t buttonPosXColumnLeft  = 40;
+        constexpr uint32_t buttonPosXColumnRight = 240;
 
         constexpr uint32_t buttonPosYRow1 = 441;
         constexpr uint32_t buttonPosYRow2 = 479;
@@ -53,6 +57,27 @@ namespace antenna
         constexpr uint32_t commonFocusPen   = 3;
         constexpr uint32_t commonNoFocusPen = 1;
     } // namespace scan_mode_window
+
+    namespace algo_window
+    {
+
+        constexpr uint32_t selectedAntennaYPos = 110;
+        constexpr uint32_t selectedAntennaH    = 50;
+        constexpr uint32_t infoYPos            = 160;
+        constexpr uint32_t culumnLabelYPos     = 199;
+        constexpr uint32_t commonH             = 33;
+
+        constexpr uint32_t leftColumnXPos  = 20;
+        constexpr uint32_t rightColumnXPos = 250;
+        constexpr uint32_t boxW            = 210;
+        constexpr uint32_t boxH            = 300;
+        constexpr uint32_t boxYPos         = 232;
+
+        constexpr uint32_t commonW = 440;
+
+        constexpr uint32_t commonNoFocusPen = 0;
+
+    } // namespace algo_window
 } // namespace antenna
 
 #endif /* MODULE_APPS_APPLICATION_ANTENNA_ANTENNAAPPSTYLE_HPP_ */

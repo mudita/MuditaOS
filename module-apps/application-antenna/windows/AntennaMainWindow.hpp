@@ -35,7 +35,8 @@ namespace gui
             AntennaB,
             StartScan,
             ScanMode,
-            LockAntennaManager
+            LockAntennaManager,
+            AlgoParams
         };
 
       public:
