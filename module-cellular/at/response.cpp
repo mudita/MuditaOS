@@ -8,25 +8,26 @@ namespace at
     namespace response
     {
 
-        bool parseCSQ(std::string &response, std::string &result)
+        bool parseCSQ(std::string response, std::string &result)
         {
             std::string toErase = "+CSQ: ";
-
             auto pos = response.find(toErase);
             if (pos != std::string::npos) {
                 response.erase(pos, toErase.length());
+
                 result = response;
                 return true;
             }
             return false;
         }
-        bool parseCSQ(std::string &cellularResponse, uint32_t &result)
+        bool parseCSQ(std::string cellularResponse, uint32_t &result)
         {
-
+            LOG_INFO("%s", cellularResponse.c_str());
             std::string CSQstring;
             if (parseCSQ(cellularResponse, CSQstring)) {
                 auto pos = CSQstring.find(',');
                 if (pos != std::string::npos) {
+                    LOG_INFO("%s", CSQstring.c_str());
                     CSQstring = CSQstring.substr(0, pos);
                     return utils::toNumeric(CSQstring, result);
                 }
@@ -50,11 +51,12 @@ namespace at
         } // namespace creg
         bool parseCREG(std::string &response, uint32_t &result)
         {
-            auto pos = response.find(',');
+            auto resp = response;
+            auto pos  = resp.find(',');
             if (pos != std::string::npos) {
                 auto constexpr digitLength = 1;
-                response                   = response.substr(pos + digitLength, digitLength);
-                return utils::toNumeric(response, result);
+                resp                       = resp.substr(pos + digitLength, digitLength);
+                return utils::toNumeric(resp, result);
             }
             return false;
         }
