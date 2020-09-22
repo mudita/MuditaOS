@@ -1,9 +1,9 @@
 #pragma once
-
 #include "Application.hpp"
 #include <ListItemProvider.hpp>
 #include <DatabaseModel.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
+#include <module-db/Common/Query.hpp>
 
 class AllEventsModel : public app::DatabaseModel<EventsRecord>, public gui::ListItemProvider
 {
@@ -13,10 +13,10 @@ class AllEventsModel : public app::DatabaseModel<EventsRecord>, public gui::List
     AllEventsModel(app::Application *app);
     virtual ~AllEventsModel() override = default;
 
-    void setRecordsCount(const uint32_t count);
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
     bool updateRecords(std::unique_ptr<std::vector<EventsRecord>> records) override;
 
+    auto handleQueryResponse(db::QueryResult *) -> bool;
     // virtual methods for ListViewProvider
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;

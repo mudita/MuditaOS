@@ -11,6 +11,7 @@
 #include <module-services/service-db/messages/QueryMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
 {
@@ -29,9 +30,10 @@ namespace gui
     void DayEventsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         auto filterTill = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode + 1);
-        DBServiceAPI::GetQuery(application,
-                               db::Interface::Name::Events,
-                               std::make_unique<db::query::events::GetFiltered>(filterFrom, filterTill));
+        auto query      = std::make_unique<db::query::events::GetFiltered>(filterFrom, filterTill);
+        query->setQueryListener(
+            db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
+        DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
         setTitle(dayMonthTitle);
         auto dataReceived = dynamic_cast<PrevWindowData *>(data);
         if (dataReceived != nullptr) {
@@ -100,7 +102,7 @@ namespace gui
         if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
             LOG_DEBUG("Switch to new window - edit window");
             std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
-            data->setDescription("New");
+            data->setDescription(style::window::calendar::new_event);
             auto rec       = new EventsRecord();
             rec->date_from = filterFrom;
             rec->date_till = filterFrom;
@@ -114,31 +116,37 @@ namespace gui
         return false;
     }
 
+    auto DayEventsWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
+    {
+        if (const auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
+            unique_ptr<vector<EventsRecord>> records = response->getResult();
+            if (checkEmpty) {
+                if (records->empty()) {
+                    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+                    assert(application != nullptr);
+                    auto name = dayMonthTitle;
+                    app->switchToNoEventsWindow(name, filterFrom, style::window::calendar::name::day_events_window);
+                }
+            }
+            dayEventsModel->loadData(std::move(records));
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            return true;
+        }
+        LOG_DEBUG("Response False");
+        return false;
+    }
+
     bool DayEventsWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
-        if (msg != nullptr) {
-            auto temp = msg->getResult();
-            if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(temp.get())) {
-                unique_ptr<vector<EventsRecord>> records = response->getResult();
-                for (auto &rec : *records) {
-                    LOG_DEBUG("record: %s", rec.title.c_str());
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr) {
+            if (msgNotification->interface == db::Interface::Name::Events) {
+                if (msgNotification->dataModified()) {
+                    dayEventsList->rebuildList(style::listview::RebuildType::InPlace);
+                    return true;
                 }
-                if (checkEmpty) {
-                    if (records->size() == 0) {
-                        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-                        assert(application != nullptr);
-                        auto name = dayMonthTitle;
-                        app->switchToNoEventsWindow(name, filterFrom, style::window::calendar::name::day_events_window);
-                    }
-                }
-                dayEventsModel->loadData(std::move(records));
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
-            LOG_DEBUG("Response False");
-            return false;
         }
-        LOG_DEBUG("DayWindow DB Message != QueryResponse");
         return false;
     }
 } /* namespace gui */
