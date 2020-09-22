@@ -177,8 +177,10 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
-            DBServiceAPI::GetQuery(
-                application, db::Interface::Name::Events, std::make_unique<db::query::events::GetAll>());
+            auto query = std::make_unique<db::query::events::GetAll>();
+            query->setQueryListener(
+                db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
+            DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
             return true;
         }
 
@@ -192,46 +194,41 @@ namespace gui
         auto filter_from       = TimePointFromYearMonthDay(date_from);
         auto filter_till       = TimePointFromYearMonthDay(date_till);
         LOG_DEBUG("filter:  %s", TimePointToString(filter_till).c_str());
-        DBServiceAPI::GetQuery(application,
-                               db::Interface::Name::Events,
-                               std::make_unique<db::query::events::GetFiltered>(filter_from, filter_till));
+        auto query = std::make_unique<db::query::events::GetFiltered>(filter_from, filter_till);
+        query->setQueryListener(
+            db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
+        DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
     }
 
-    bool CalendarMainWindow::onDatabaseMessage(sys::Message *msgl)
+    auto CalendarMainWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
         std::fill(begin(isDayEmpty), end(isDayEmpty), true);
-        auto msg = dynamic_cast<db::QueryResponse *>(msgl);
-        if (msg != nullptr) {
-            auto temp = msg->getResult();
-            if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(temp.get())) {
-                unique_ptr<vector<EventsRecord>> records = response->getResult();
-                for (auto &rec : *records) {
-                    date::year_month_day recordDate = TimePointToYearMonthDay(rec.date_from);
-                    uint32_t dayNumb                = static_cast<unsigned>(recordDate.day());
-                    isDayEmpty[dayNumb - 1]         = false;
-                }
-                refresh();
-                return true;
+        if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
+            const auto records = response->getResult();
+            for (auto &rec : *records) {
+                date::year_month_day recordDate = TimePointToYearMonthDay(rec.date_from);
+                uint32_t dayNumb                = static_cast<unsigned>(recordDate.day());
+                isDayEmpty[dayNumb - 1]         = false;
             }
-            if (auto response = dynamic_cast<db::query::events::GetAllResult *>(temp.get())) {
-                unique_ptr<vector<EventsRecord>> records = response->getResult();
-                if (records->size() != 0) {
-                    application->switchWindow(style::window::calendar::name::all_events_window);
-                }
-                else {
-                    auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
-                    assert(appCalendar != nullptr);
-                    auto filter = TimePointFromYearMonthDay(actualDate);
-                    appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"),
-                                                        filter,
-                                                        style::window::calendar::name::all_events_window);
-                }
-                return true;
-            }
-            LOG_DEBUG("Response False");
-            return false;
+            refresh();
+            return true;
         }
-        LOG_DEBUG("Calendar MainWindow DB Message != QueryResponse");
+        if (auto response = dynamic_cast<db::query::events::GetAllResult *>(queryResult)) {
+            const auto records = response->getResult();
+            if (!records->empty()) {
+                application->switchWindow(style::window::calendar::name::all_events_window);
+            }
+            else {
+                auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
+                assert(appCalendar != nullptr);
+                auto filter = TimePointFromYearMonthDay(actualDate);
+                appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"),
+                                                    filter,
+                                                    style::window::calendar::name::all_events_window);
+            }
+            return true;
+        }
+        LOG_DEBUG("Response False");
         return false;
     }
 
