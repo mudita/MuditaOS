@@ -16,6 +16,7 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         windows/SettingsMainWindow.cpp
+        windows/BluetoothWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
