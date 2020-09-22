@@ -14,7 +14,7 @@
 #include <log/log.hpp>
 
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <module-db/queries/sms/QueryThreadGetByContactID.hpp>
+#include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 
 #include <memory>
 #include <cassert>

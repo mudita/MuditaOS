@@ -2,7 +2,8 @@
 
 namespace db::query
 {
-    SMSGetByThreadID::SMSGetByThreadID(unsigned int threadId) : Query(Query::Type::Read), threadId(threadId)
+    SMSGetByThreadID::SMSGetByThreadID(unsigned int threadId, unsigned int offset, unsigned int limit)
+        : Query(Query::Type::Read), threadId(threadId), offset(offset), limit(limit)
     {}
 
     auto SMSGetByThreadID::debugInfo() const -> std::string

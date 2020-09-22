@@ -7,22 +7,22 @@
 namespace db::query
 {
 
-    class SMSThreadsGet : public Query
+    class ThreadsGet : public Query
     {
       public:
         unsigned int offset;
         unsigned int limit;
-        SMSThreadsGet(unsigned int offset, unsigned int limit);
+        ThreadsGet(unsigned int offset, unsigned int limit);
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class SMSThreadsGetResults : public QueryResult
+    class ThreadsGetResults : public QueryResult
     {
         std::vector<ThreadsTableRow> results;
 
       public:
-        SMSThreadsGetResults(std::vector<ThreadsTableRow> result_rows);
+        ThreadsGetResults(std::vector<ThreadsTableRow> result_rows);
         [[nodiscard]] auto getResults() const -> std::vector<ThreadsTableRow>;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
