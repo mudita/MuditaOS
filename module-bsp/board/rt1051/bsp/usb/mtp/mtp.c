@@ -183,12 +183,6 @@ static void MtpTask(void *handle)
     usb_mtp_struct_t* mtpApp = (usb_mtp_struct_t*)handle;
     mtp_responder_t* responder;
 
-#if 0
-    if (!(mtpApp->sd_disk = FF_SDDiskInit("/"))) {
-        PRINTF("[MTP APP]: SDDiskInit failed!\n");
-        return;
-    }
-#endif
     if (!(mtpApp->mtp_fs = mtp_fs_alloc(NULL))) {
         PRINTF("[MTP APP]: MTP FS initialization failed!\n");
         return;
