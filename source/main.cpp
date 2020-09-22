@@ -90,6 +90,7 @@ int main()
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
+#if 0
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
 #ifdef ENABLE_APP_DESKTOP
@@ -131,7 +132,7 @@ int main()
 #ifdef ENABLE_APP_MEDITATION
         applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
 #endif
-
+#endif
         // start application manager
         ret &= sysmgr->CreateService(
             std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications), sysmgr.get());

@@ -20,7 +20,7 @@ set(USB_SRC
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/libmtp/mtp_util.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp_db.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp_fs.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/mtp_fs.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/mtp/usb_device_mtp.c"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb/phy/usb_phy.c"
