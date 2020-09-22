@@ -254,7 +254,7 @@ namespace app
         }
         auto getCurrentVolume(audio::Volume &volume)
         {
-            return AudioServiceAPI::GetOutputVolume(this, volume);
+            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
         }
 
         void toggleTorchAndColourTemps()

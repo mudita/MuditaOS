@@ -55,22 +55,26 @@ class AudioSettingsMessage : public AudioMessage
   public:
     AudioSettingsMessage(const audio::Profile::Type &profileType,
                          const audio::PlaybackType &playbackType,
+                         const audio::Setting &setting,
                          const uint32_t &val = 0)
-        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, val{val}
+        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, setting{setting}, val{val}
     {}
 
     ~AudioSettingsMessage() override = default;
 
     audio::Profile::Type profileType = audio::Profile::Type::Idle;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
+    const audio::Setting setting;
     uint32_t val{};
 };
 
 class AudioGetSetting : public AudioSettingsMessage
 {
   public:
-    AudioGetSetting(const audio::Profile::Type &profileType, const audio::PlaybackType &playbackType)
-        : AudioSettingsMessage{profileType, playbackType}
+    AudioGetSetting(const audio::Profile::Type &profileType,
+                    const audio::PlaybackType &playbackType,
+                    const audio::Setting &setting)
+        : AudioSettingsMessage{profileType, playbackType, setting}
     {}
 
     ~AudioGetSetting() override = default;
@@ -81,8 +85,9 @@ class AudioSetSetting : public AudioSettingsMessage
   public:
     AudioSetSetting(const audio::Profile::Type &profileType,
                     const audio::PlaybackType &playbackType,
+                    const audio::Setting &setting,
                     const uint32_t &val)
-        : AudioSettingsMessage{profileType, playbackType, val}
+        : AudioSettingsMessage{profileType, playbackType, setting, val}
     {}
 
     ~AudioSetSetting() override = default;
