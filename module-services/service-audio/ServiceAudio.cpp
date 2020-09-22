@@ -9,10 +9,19 @@
 
 #include "ServiceAudio.hpp"
 #include "messages/AudioMessage.hpp"
+#include "Audio/Operation/IdleOperation.hpp"
+#include "Audio/Operation/PlaybackOperation.hpp"
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 
 using namespace audio;
+
+namespace audio::notifications
+{
+    constexpr std::array<audio::PlaybackType, 3> typesToMute = {audio::PlaybackType::Notifications,
+                                                                audio::PlaybackType::CallRingtone,
+                                                                audio::PlaybackType::TextMessageRingtone};
+}
 
 ServiceAudio::ServiceAudio()
     : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle),
@@ -88,14 +97,12 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         }
     }
     else if (auto *msg = dynamic_cast<AudioGetSetting *>(msgl)) {
-        const auto path = audio::str(msg->profileType, audio::Setting::Volume, msg->playbackType);
-        const auto vol  = fetchAudioSettingFromDb<audio::Volume>(path, 0);
-        responseMsg     = std::make_shared<AudioResponseMessage>(RetCode::Success, vol);
+        auto value  = getSetting(msg->setting, msg->profileType, msg->playbackType);
+        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, value);
     }
     else if (auto *msg = dynamic_cast<AudioSetSetting *>(msgl)) {
+        setSetting(msg->setting, msg->val, msg->profileType, msg->playbackType);
         responseMsg     = std::make_shared<AudioResponseMessage>(RetCode::Success);
-        const auto path = audio::str(msg->profileType, audio::Setting::Volume, msg->playbackType);
-        updateDbValue(path, audio::Setting::Volume, msg->val);
     }
     else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
         switch (msg->type) {
@@ -161,18 +168,9 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 audio.SendEvent(msg->enable ? Operation::Event::HeadphonesPlugin : Operation::Event::HeadphonesUnplug));
         } break;
 
-        case MessageType::AudioSetOutputVolume: {
-            responseMsg = std::make_shared<AudioResponseMessage>(audio.SetOutputVolume(msg->val));
-            updateDbValue(audio.GetCurrentOperation(), audio::Setting::Volume, audio.GetOutputVolume());
-        } break;
-
         case MessageType::AudioSetInputGain: {
             responseMsg = std::make_shared<AudioResponseMessage>(audio.SetInputGain(msg->val));
             updateDbValue(audio.GetCurrentOperation(), audio::Setting::Gain, audio.GetInputGain());
-        } break;
-
-        case MessageType::AudioGetOutputVolume: {
-            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, audio.GetOutputVolume());
         } break;
 
         case MessageType::AudioGetInputGain: {
@@ -216,6 +214,107 @@ void ServiceAudio::updateDbValue(const audio::Operation *currentOperation,
         return;
     }
 
-    auto dbPath = audio::str(currentProfile->GetType(), setting, currentOperation->GetplaybackType());
+    auto dbPath = audio::str(currentProfile->GetType(), setting, currentOperation->GetPlaybackType());
     updateDbValue(dbPath, setting, value);
+}
+
+void ServiceAudio::setSetting(const audio::Setting &setting,
+                              const uint32_t value,
+                              const audio::Profile::Type &profileType,
+                              const audio::PlaybackType &playbackType)
+{
+    if (profileType == Profile::Type::Idle) {
+        setCurrentSetting(setting, value);
+    }
+    const auto path = audio::str(profileType, audio::Setting::Volume, playbackType);
+    updateDbValue(path, audio::Setting::Volume, value);
+}
+
+uint32_t ServiceAudio::getSetting(const audio::Setting &setting,
+                                  const audio::Profile::Type &profileType,
+                                  const audio::PlaybackType &playbackType)
+{
+    if (profileType == audio::Profile::Type::Idle) {
+        return getCurrentVolume();
+    }
+    const auto path = audio::str(profileType, setting, playbackType);
+    return fetchAudioSettingFromDb<audio::Volume>(path, 0);
+}
+
+uint32_t ServiceAudio::getCurrentSetting(const audio::Setting &setting)
+{
+    switch (setting) {
+    case audio::Setting::Volume:
+        return getCurrentVolume();
+    default:
+        return {};
+    }
+}
+
+audio::Volume ServiceAudio::getCurrentVolume()
+{
+    const auto currentOperation   = audio.GetCurrentOperation();
+    const auto noOngoingOperation = [&currentOperation]() -> bool {
+        return currentOperation == nullptr || currentOperation->GetState() == audio::Operation::State::Idle;
+    };
+
+    if (noOngoingOperation()) {
+        const auto path =
+            audio::str(audio::PlaybackType::CallRingtone, audio::Setting::Volume, audio.GetHeadphonesInserted());
+        return fetchAudioSettingFromDb<audio::Volume>(path, 0);
+    }
+    else {
+        const auto path = audio::str(
+            currentOperation->GetProfile()->GetType(), audio::Setting::Volume, currentOperation->GetPlaybackType());
+        return fetchAudioSettingFromDb<audio::Volume>(path, 0);
+    }
+}
+
+void ServiceAudio::setCurrentSetting(const audio::Setting &setting, const int &step)
+{
+    switch (setting) {
+    case audio::Setting::Volume:
+        setCurrentVolume(step);
+    default:
+        break;
+    }
+}
+
+void ServiceAudio::setCurrentVolume(const uint32_t &value)
+{
+    const auto currentOperation  = audio.GetCurrentOperation();
+    const audio::Volume volToSet = std::clamp(value, minVolume, maxVolume);
+    auto idleOperation           = dynamic_cast<const IdleOperation *>(currentOperation);
+
+    const auto needsMuting = [&value](const audio::PlaybackType &currentPlaybackType,
+                                      const audio::Volume &currentVolume) -> bool {
+        auto res = std::find(std::begin(audio::notifications::typesToMute),
+                             std::end(audio::notifications::typesToMute),
+                             currentPlaybackType);
+        return value < currentVolume && res != std::end(audio::notifications::typesToMute);
+    };
+
+    const auto noOngoingOperation = [&currentOperation, &idleOperation]() -> bool {
+        return currentOperation == nullptr || idleOperation != nullptr ||
+               currentOperation->GetState() == audio::Operation::State::Idle;
+    };
+
+    if (noOngoingOperation()) {
+        const auto path =
+            audio::str(audio::PlaybackType::CallRingtone, audio::Setting::Volume, audio.GetHeadphonesInserted());
+        addOrIgnoreEntry(path, audio::playbackDefaults::defaultLoudspeakerVolume);
+        updateDbValue(path, Setting::Volume, volToSet);
+    }
+    else {
+        const auto currentPlaybackType = currentOperation->GetPlaybackType();
+        const auto currentVolume       = currentOperation->GetOutputVolume();
+
+        if (needsMuting(currentPlaybackType, currentVolume)) {
+            audio.Mute();
+        }
+        else {
+            audio.SetOutputVolume(volToSet);
+            updateDbValue(currentOperation, audio::Setting::Volume, volToSet);
+        }
+    }
 }

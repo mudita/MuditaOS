@@ -30,7 +30,36 @@ namespace AudioServiceAPI
     audio::RetCode Pause(sys::Service *serv);
     audio::RetCode Resume(sys::Service *serv);
     std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
-    audio::RetCode SetOutputVolume(sys::Service *serv, const audio::Volume vol);
+    // audio::RetCode AdjustVolume(sys::Service *serv, const int &step = 0);
+    /*! @brief Gets settings. Current profile is taken by default.
+     *
+     * @param serv - requesting service.
+     * @param setting - setting to be set eg. Gain, volume etc.
+     * @param value - requested value.
+     * @param profileType - selected profile type.
+     * @param playbackType -  type of playback. Not used when profileType is different than playback.
+     * @return           Standard service-api return code. Success if suitable.
+     */
+    audio::RetCode GetSetting(sys::Service *serv,
+                              const audio::Setting &setting,
+                              uint32_t &value,
+                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
+                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+    /*! @brief Sets settings. Current profile is taken by default.
+     *
+     * @param serv - requesting service.
+     * @param setting - setting to be set eg. Gain, volume etc.
+     * @param value - value to be set.
+     * @param profileType - selected profile type.
+     * @param playbackType -  type of playback. Not used when profileType is different than playback.
+     * @return           Standard service-api return code. Success if suitable.
+     */
+    audio::RetCode SetSetting(sys::Service *serv,
+                              const audio::Setting &setting,
+                              const uint32_t value,
+                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
+                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+
     /*! @brief Sets volume.
      *
      * @param serv - requesting service.
@@ -55,7 +84,6 @@ namespace AudioServiceAPI
                              audio::Volume &vol,
                              const audio::Profile::Type &profileType,
                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
-    audio::RetCode GetOutputVolume(sys::Service *serv, audio::Volume &vol);
     audio::RetCode SetInputGain(sys::Service *serv, const audio::Gain gain);
     audio::RetCode GetInputGain(sys::Service *serv, audio::Gain &gain);
 }; // namespace AudioServiceAPI
