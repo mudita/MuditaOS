@@ -261,7 +261,7 @@ namespace gui
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
                 if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
-                    auto start_time = TimePointToHourMinSec(event->date_from); // Maybe wont be needed
+                    auto start_time = TimePointToHourMinSec(event->date_from);
 
                     hourInput->setText(TimePointToHourString12H(event->date_from));
                     minuteInput->setText(TimePointToMinutesString(event->date_from));
