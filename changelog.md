@@ -1,5 +1,15 @@
 # MuditaOS changelog
 
+## Current release 
+
+## Added
+
+* `[calendar]` Added a new field for date of the event when the user adds/edits event.
+
+## Changed
+
+* `[calendar]` Set 'all day' as a default option
+
 ## [0.45.1 2020-11-06]
 
 ### Added

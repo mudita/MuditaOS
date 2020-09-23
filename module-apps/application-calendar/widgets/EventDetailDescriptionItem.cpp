@@ -21,12 +21,22 @@ namespace gui
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);
 
-        title = new gui::Label(vBox, 0, 0, 0, 0);
-        title->setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventDetail::title_h);
+        hBox = new HBox(vBox, 0, 0, 0, 0);
+        hBox->setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventDetail::title_h);
+        hBox->setEdges(RectangleEdge::None);
+
+        squareImage = new gui::Image();
+        squareImage->set("Rectangle");
+        squareImage->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        hBox->addWidget(squareImage);
+
+        title = new gui::Label(hBox, 0, 0, 0, 0);
+        title->setMinimumSize(style::window::default_body_width - 40,
+                              style::window::calendar::item::eventDetail::title_h);
+        title->setMargins(gui::Margins(style::margins::small, 0, 0, 0));
         title->setEdges(RectangleEdge::None);
         title->setFont(style::window::font::small);
         title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
-        title->setLineMode(true);
         title->activeItem = false;
 
         eventTime = new gui::Label(vBox, 0, 0, 0, 0);

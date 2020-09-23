@@ -17,6 +17,8 @@ namespace gui
         gui::HBox *hBox           = nullptr;
         gui::VBox *repeatVBox     = nullptr;
         gui::VBox *reminderVBox   = nullptr;
+        gui::HBox *repeatHBox         = nullptr;
+        gui::HBox *reminderHBox       = nullptr;
         gui::Label *repeatTitle   = nullptr;
         gui::Label *repeat        = nullptr;
         gui::Label *reminderTitle = nullptr;
