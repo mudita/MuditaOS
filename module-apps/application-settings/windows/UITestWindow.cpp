@@ -3,6 +3,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "i18/i18.hpp"
+#include "log/log.hpp"
 #include "messages/AppMessage.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <GridLayout.hpp>
@@ -24,13 +25,16 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         setTitle("UI TEST");
-        text = new gui::Text(this,
-                             style::window::default_left_margin,
-                             title->offset_h(),
-                             style::window_width - 2 * style::window::default_left_margin,
-                             300);
+        text = new gui::Text(
+            this, style::window::default_left_margin, title->offset_h(), style::window::default_body_width, 300);
         text->setEditMode(EditMode::EDIT);
         text->setFont(style::window::font::medium);
+        LOG_DEBUG(
+            "----------------------------------------------------------------------------------------------------");
+        text->addRichText("<p><text font='gt_pressura' color='12' size='30'>This</text><br>Text<text size='20' "
+                          "weight='bold'> is rich </text><text color='3'>example</text></br></p>");
+        LOG_DEBUG(
+            "----------------------------------------------------------------------------------------------------");
         text->addText(
             TextBlock("!#$%&'()*+,-.0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~"
                       "ĄąĆćĘęŁłŃńÓóŚśŹźŻżÀàÂâÇçÉéÈèÊêËëÎîÏïÔôÙûÛùÜüŸÿÄäÖößÁáÍíÚúÑñ¿¡",

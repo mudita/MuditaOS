@@ -46,4 +46,7 @@
 	branch = rt1051
 [submodule "module-bluetooth/lib/btstack"]
 	path = module-bluetooth/lib/btstack
-	url = git@github.com:mudita/btstack.git
+	url = ../btstack.git
+[submodule "module-utils/pugixml"]
+	path = module-utils/pugixml
+	url = ../pugixml.git

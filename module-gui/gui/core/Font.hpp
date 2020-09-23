@@ -29,12 +29,25 @@ namespace gui
       public:
         Font(std::string name, unsigned int size, Weight weight = Weight::Regular);
         Font(unsigned int size, Weight weight = Weight::Regular);
+        Font(RawFont *font);
         void setFont(std::string name, unsigned int size, Weight weight = Weight::Regular);
         /// just for gt_pressura - we have it as default
         void setFont(unsigned int size, Weight weight = Weight::Regular);
         void setSize(unsigned int size);
         void setWeight(Weight weight);
         auto raw() -> RawFont *;
+        [[nodiscard]] auto getSize() const
+        {
+            return size;
+        }
+        [[nodiscard]] auto getWeight() const
+        {
+            return weight;
+        }
+        [[nodiscard]] auto getName() const
+        {
+            return name;
+        }
     };
 }; // namespace gui
 
