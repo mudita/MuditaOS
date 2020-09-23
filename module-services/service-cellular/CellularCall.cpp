@@ -2,12 +2,15 @@
 #include <Modem/ATParser.hpp>
 #include <Utils.hpp>
 #include <log/log.hpp>
-#include <vector>
-
-#include "bsp/rtc/rtc.hpp"
-#include <sstream>
 #include <time/time_conversion.hpp>
+#include <bsp/rtc/rtc.hpp>
+
+#define MAGIC_ENUM_RANGE_MAX 256
 #include <menums/magic_enum.hpp>
+
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace ModemCall
 {
@@ -18,8 +21,6 @@ namespace ModemCall
 
         // Check for a valid prefix
         if (callEntry.rfind(prefix, 0) != 0) {
-            LOG_ERROR("no valid prefix");
-            LOG_ERROR("callEntry %s", callEntry.c_str());
 
             throw std::runtime_error("No valid prefix");
         }
@@ -32,8 +33,7 @@ namespace ModemCall
 
         auto numberOfTokens = tokens.size();
         if (numberOfTokens != 7 && numberOfTokens != 8) {
-            LOG_ERROR("wrong number of tokens %u", static_cast<unsigned int>(numberOfTokens));
-            throw std::runtime_error("No valid prefix");
+            throw std::runtime_error("Wrong number of tokens" + std::to_string(numberOfTokens));
         }
 
         idx              = std::stoul(tokens[0]);
@@ -43,7 +43,7 @@ namespace ModemCall
             dir = tmp_dir.value();
         }
         else {
-            throw std::runtime_error("dir value out of range CallDir enum");
+            throw std::runtime_error("dir value out of range CallDir enum - " + tokens[1]);
         }
 
         conv_val       = std::stoul(tokens[2]);
@@ -52,7 +52,7 @@ namespace ModemCall
             state = tmp_state.value();
         }
         else {
-            throw std::runtime_error("state value out of range CallState enum");
+            throw std::runtime_error("state value out of range CallState enum - " + tokens[2]);
         }
 
         conv_val      = std::stoul(tokens[3]);
@@ -61,7 +61,7 @@ namespace ModemCall
             mode = tmp_mode.value();
         }
         else {
-            throw std::runtime_error("mode value out of range CallMode enum");
+            throw std::runtime_error("mode value out of range CallMode enum - " + tokens[3]);
         }
 
         isConferenceCall = static_cast<bool>(std::stoul(tokens[4]));
@@ -74,7 +74,7 @@ namespace ModemCall
             type = tmp_type.value();
         }
         else {
-            throw std::runtime_error("type value out of range CallType enum");
+            throw std::runtime_error("type value out of range CallType enum - " + tokens[6]);
         }
 
         if (numberOfTokens == 8) {
