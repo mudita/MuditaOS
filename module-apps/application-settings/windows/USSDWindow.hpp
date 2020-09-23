@@ -25,8 +25,8 @@ namespace gui
         gui::Label *incomingLabel = nullptr;
         gui::Label *outgoingLabel = nullptr;
 
-        gui::Text *pullToSend   = nullptr;
-        gui::Text *received     = nullptr;
+        gui::Text *pullToSend = nullptr;
+        gui::Text *received   = nullptr;
 
         gui::VBox *box = nullptr;
 
