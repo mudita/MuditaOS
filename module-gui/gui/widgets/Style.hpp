@@ -111,6 +111,11 @@ namespace style
             const inline uint32_t date_time_item_title_height = 30;
             const inline uint32_t date_time_spacer_width      = 20;
             const inline uint32_t date_time_x_offset          = 30;
+
+            const inline uint32_t date_time_box_h = 107;
+            const inline uint32_t date_box_y_pos  = 123;
+            const inline uint32_t time_box_y_pos  = 285;
+
         } // namespace date
     }     // namespace settings
     namespace color
