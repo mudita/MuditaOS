@@ -27,6 +27,7 @@ struct KeyState
 enum class WorkerEventQueues
 {
     queueService = 0,
+    queueControl = 1,
     queueKeyboardIRQ,
     queueHeadsetIRQ,
     queueBattery,

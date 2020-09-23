@@ -3,6 +3,7 @@
 ## [Current release]
 
 ### Added
+
 * `[desktop][gui]` Added SIM and PUK lock-related windows
 * `[GUI]` Added rich text parsing for full text styling needs
 * `[calendar]` Add notifications from database handling.
@@ -20,7 +21,7 @@
 
 ### Other
 * `[audio]` Audio service and api cleanup/refactor.
-
+* `[system]` Improved destroying of worker threads.
 
 
 ## [0.39.1 2020-09-25]
