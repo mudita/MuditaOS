@@ -227,9 +227,6 @@ namespace FotaService
     void Service::handleChannelNotifications(std::string &data)
     {
         const std::string QHTTPGET("+QHTTPGET:");
-        //        std::vector<uint8_t> buffer(data.begin(), data.end());
-        //        TS0710_Frame::frame_t frame;
-        //        frame.deserialize(buffer);
 
         std::string response = data;
         LOG_DEBUG("URC: %s", response.c_str());

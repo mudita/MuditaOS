@@ -161,7 +161,6 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
-        //        TS0710_Frame frame(data);
         std::string message;
         auto msg = identifyNotification(data);
 
@@ -352,7 +351,7 @@ bool ServiceCellular::handle_power_up_procedure()
         // check baud once to determine if it's already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
-            // it's on aka hot start.EGD-2914
+            // it's on aka hot start.
             LOG_DEBUG("Linux - hot start");
             state.set(this, State::ST::CellularConfProcedure);
             break;

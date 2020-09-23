@@ -36,7 +36,7 @@ namespace gui
 
         setTitle("USSD test");
 
-        uint32_t h = 120; // this->getHeight() - title->offset_h() - bottomBar->getHeight();
+        uint32_t h = style::settings::ussd::commonYPos;
 
         incomingLabel = addTitle("Incoming code");
         incomingLabel->setPosition(style::settings::ussd::commonXPos, h);
@@ -52,7 +52,6 @@ namespace gui
         h += style::settings::ussd::commonLabelH;
 
         pullToSend = addText();
-        //        pullToSend->setText("*101#");
         pullToSend->setPosition(style::settings::ussd::commonXPos, h);
         pullToSend->activatedCallback = [=](gui::Item &) {
             std::string data = pullToSend->getText().c_str();

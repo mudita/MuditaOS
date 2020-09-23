@@ -361,7 +361,6 @@ TS0710::ConfState TS0710::StartMultiplexer()
     delete pv_TS0710_Start;
 
     controlCallback = [this](std::string &data) {
-        //        auto frame     = std::make_unique<TS0710_Frame>(data);
         auto frameData = data;
 
         if (frameData.size() < 4) {
