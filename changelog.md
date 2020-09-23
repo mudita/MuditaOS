@@ -4,6 +4,8 @@
 
 ### Added
 
+* `[GUI]` Added rich text parsing for full text styling needs
+
 ### Other
 
 

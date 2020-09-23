@@ -44,7 +44,9 @@ include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
+add_subdirectory(pugixml)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs pugixml)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

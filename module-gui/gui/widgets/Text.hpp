@@ -138,9 +138,8 @@ namespace gui
       protected:
         TextType textType = TextType::MULTI_LINE;
         /// points to default text font to use
-        RawFont *font = nullptr;
-        Color textColor;
         bool underline = false;
+        TextFormat format;
 
         bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
         bool handleNavigation(const InputEvent &inputEvent);
@@ -173,6 +172,13 @@ namespace gui
 
         void addText(const UTF8 &text);
         void addText(TextBlock text);
+        /// @defgroup richtext can be virtualized by parametrized RichTextParser virtual api ( as second param )
+        /// @{
+        /// set rich text with default RichTextParser - please see RichTextParser documentation on how to use format
+        void setRichText(const UTF8 &text);
+        /// add rich text with default RichTextParser - please see RichTextParser documentation on how to use format
+        void addRichText(const UTF8 &text);
+        /// @}
         virtual void clear();
         bool isEmpty();
         virtual UTF8 getText();
@@ -196,6 +202,10 @@ namespace gui
         void setRadius(int value) override;
         void setAlignment(const Alignment &value) override;
         void setPadding(const Padding &value) override;
+        [[nodiscard]] auto getTextFormat() const noexcept -> const TextFormat &
+        {
+            return format;
+        }
 
       private:
         gui::KeyInputMappedTranslation translator;

@@ -3,6 +3,7 @@
 #include "TextConstants.hpp"
 #include <cstdio>
 #include <stdint.h>
+#include <list>
 
 namespace gui
 {
@@ -77,5 +78,11 @@ namespace gui
         // return if handled ( this is not i.e. at begin/end)
         bool removeChar();
         const TextBlock &operator*();
+
+        /// iterable
+        /// {
+        auto begin() -> std::list<TextBlock>::iterator;
+        auto end() -> std::list<TextBlock>::iterator;
+        /// }
     };
 } // namespace gui

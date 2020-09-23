@@ -240,7 +240,6 @@ BaseType_t xReturn = pdPASS;
 
 		/* It is better not to use the 64-bit format such as %Lu because it
 		might not be implemented. */
-        LOG_PRINTF("Partition Nr   %lu\r\n", pxDisk->xStatus.bPartitionNumber);
         LOG_PRINTF("Type           %8u (%s)\r\n", pxIOManager->xPartition.ucType, pcTypeName);
         LOG_PRINTF( "VolLabel       '%8s' \r\n", pxIOManager->xPartition.pcVolumeLabel );
 		LOG_PRINTF( "TotalSectors   %8lu\r\n", pxIOManager->xPartition.ulTotalSectors );
