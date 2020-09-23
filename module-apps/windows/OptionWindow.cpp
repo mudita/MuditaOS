@@ -66,7 +66,7 @@ namespace gui
 
         topBar->setActive(TopBar::Elements::SIGNAL, true);
         topBar->setActive(TopBar::Elements::BATTERY, true);
-        setTitle(name);
+        setTitle(utils::localize.get(name));
 
         // magical offset on designs
         int32_t offset_h = 8;

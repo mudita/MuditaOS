@@ -27,6 +27,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
     addMenu(i18("Information"), gui::window::hw_info);
     addMenu("UI TEST", "TEST_UI");
     addMenu(i18("app_settings_bt"), "Bluetooth");
+    addMenu(i18("app_settings_display"), app::display_and_keypad);
     addMenu(i18("app_settings_language"), "Languages");
     addMenu("SIM SELECT", app::sim_select);
     addMenu("Change setting", app::change_setting);
@@ -35,7 +36,6 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
         addMenu(i18("app_settings_cellular_passthrough"), gui::window::cellular_passthrough::window_name);
     }
     addMenu(i18("Fota update"), gui::window::name::fota_window);
-    addMenu(i18("app_settings_display"));
     addMenu(i18("app_settings_phone_modes"));
     addMenu(i18("app_settings_security"));
     addMenu(i18("app_settings_about"));

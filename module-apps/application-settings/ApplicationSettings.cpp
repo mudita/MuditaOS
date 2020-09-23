@@ -17,6 +17,13 @@
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 
+#include "windows/display-and-keypad/DisplayAndKeypadWindow.hpp"
+#include "windows/display-and-keypad/InputLanguageWindow.hpp"
+#include "windows/display-and-keypad/LockedScreenWindow.hpp"
+#include "windows/display-and-keypad/FontSizeWindow.hpp"
+#include "windows/display-and-keypad/DisplayLightWindow.hpp"
+#include "windows/display-and-keypad/KeypadLightWindow.hpp"
+
 #include "windows/UITestWindow.hpp"
 
 #include "windows/TestMessageWindow.hpp"
@@ -104,6 +111,9 @@ namespace app
         window = new gui::DateTimeWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
+        window = newOptionWindow(this, app::display_and_keypad, gui::displayAndKeypadOptions(this));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
         window = new gui::FotaWindow(this);
         LOG_INFO("fota name: %s", window->getName().c_str());
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
@@ -118,6 +128,21 @@ namespace app
             window = new gui::CellularPassthroughWindow(this);
             windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
         }
+
+        window = new gui::DisplayLightWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::FontSizeWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::KeypadLightWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::LockedScreenWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::InputLanguageWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
     void ApplicationSettings::destroyUserInterface()
