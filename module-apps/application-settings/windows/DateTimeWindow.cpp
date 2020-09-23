@@ -60,7 +60,6 @@ namespace gui
         timeDateFormat             = appSettings.timeDateFormat;
 
         // create date widgets
-        LOG_INFO("offset = %u", (uint32_t)title->offset_h());
         dateBody = new gui::HBox(this,
                                  style::window::default_left_margin,
                                  style::settings::date::date_box_y_pos,
