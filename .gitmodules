@@ -50,3 +50,6 @@
 [submodule "module-utils/pugixml"]
 	path = module-utils/pugixml
 	url = ../pugixml.git
+[submodule "module-utils/magic_enum"]
+	path = module-utils/magic_enum
+	url = git@github.com:Neargye/magic_enum.git

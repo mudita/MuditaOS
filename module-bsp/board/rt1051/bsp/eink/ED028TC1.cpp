@@ -34,7 +34,7 @@
 #include "eink_binarization_luts.h"
 #include "macros.h"
 
-#include "menums/magic_enum.hpp"
+#include <magic_enum.hpp>
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
