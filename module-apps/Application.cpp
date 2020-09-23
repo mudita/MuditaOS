@@ -189,9 +189,9 @@ namespace app
         }
     }
 
-    void Application::returnToPreviousWindow()
+    void Application::returnToPreviousWindow(const uint32_t times)
     {
-        auto prevWindow = getPrevWindow();
+        auto prevWindow = getPrevWindow(times);
         if (prevWindow == gui::name::window::no_window) {
             LOG_INFO("Back to previous application");
             cleanPrevWindw();
@@ -599,12 +599,12 @@ namespace app
 #endif
     };
 
-    const std::string Application::getPrevWindow() const
+    const std::string Application::getPrevWindow(uint32_t count) const
     {
-        if (this->windowStack.size() <= 1) {
+        if (this->windowStack.size() <= 1 || count > this->windowStack.size()) {
             return gui::name::window::no_window;
         }
-        return *std::prev(windowStack.end(), 2);
+        return *std::prev(windowStack.end(), count + 1);
     }
 
     void Application::Application::cleanPrevWindw()
