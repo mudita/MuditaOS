@@ -72,16 +72,8 @@ namespace gui
                                   date::day(numb);
                 auto filter = TimePointFromYearMonthDay(dateFilter);
                 data->setData(number + " " + month, filter);
-                if (isDayEmpty) {
-                    auto application = dynamic_cast<app::ApplicationCalendar *>(app);
-                    assert(application != nullptr);
-                    auto name = data->getDayMonthText();
-                    application->switchToNoEventsWindow(name, filter, style::window::calendar::name::day_events_window);
-                }
-                else {
-                    LOG_DEBUG("Switch to DayEventsWindow");
-                    app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
-                }
+                LOG_DEBUG("Switch to DayEventsWindow");
+                app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
                 return true;
             };
             this->setPenWidth(style::window::default_border_no_focus_w);

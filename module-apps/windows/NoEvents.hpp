@@ -5,6 +5,14 @@
 #include <Text.hpp>
 #include <functional>
 
+/// Provides information witch window is equivalent to empty window (DayEvents window and AllEvents window may be empty)
+enum class EquivalentWindow
+{
+    DayEventsWindow,
+    AllEventsWindow,
+    EmptyWindow
+};
+
 namespace gui
 {
     /// @brief base NoEvents class

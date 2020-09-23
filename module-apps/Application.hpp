@@ -165,7 +165,9 @@ namespace app
             switchWindow(windowName, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         };
 
-        void returnToPreviousWindow();
+        /// Method used to go back to desired window by using the index difference on stack value
+        ///@param ignoredWindowsNumber: defines how many windows will be skipped while going back on stack
+        void returnToPreviousWindow(const uint32_t times = 1);
 
         /// Method refreshing active window
         void refreshWindow(gui::RefreshModes mode);
@@ -317,7 +319,7 @@ namespace app
         void pushWindow(const std::string &newWindow);
         /// getter for previous window name
         /// @ingrup AppWindowStack
-        const std::string getPrevWindow() const;
+        const std::string getPrevWindow(uint32_t count = 1) const;
         /// clears windows stack
         /// @ingrup AppWindowStack
         void cleanPrevWindw();
