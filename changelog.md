@@ -22,7 +22,7 @@
 * `[settings]` Fixed items sizes and positions in Date Time window.
 * `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
 * `[messages]` Fixed sending sms to new or deleted contact
-
+* `[cellular]``[call app]` Fixed outgoing call stuck in calling state
 
 ### Other
 

@@ -598,17 +598,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     } break;
 
     case MessageType::CellularListCurrentCalls: {
-        constexpr size_t numberOfExpectedTokens = 3;
         auto ret                                = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
-        if (ret && ret.response.size() == numberOfExpectedTokens) {
-            // TODO: alek: add case when more status calls is returned
-            // TODO: alek: add cellular call validation and check it with modemcall
-
-            // TODO: alek - just handle parts of response properly
-            // if CellularListCurrentCalls is recieved after the call is aborted it will return 2 tokens instead of 3
-            // this should be acceptable and hence warning instead of error is logged in such case
+        auto size                               = ret.response.size();
+        if (ret && size > 1) {
             bool retVal    = true;
-            auto callEntry = ret.response[1];
+            // sometimes there is additional active data connection, sometimes not
+            auto callEntry = ret.response[size == 2 ? 0 : 1];
 
             try {
                 ModemCall::ModemCall call(callEntry);
@@ -623,7 +618,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             catch (const std::exception &e) {
                 LOG_ERROR("exception \"%s\" was thrown", e.what());
-                assert(0);
                 retVal = false;
             }
             responseMsg = std::make_shared<CellularResponseMessage>(retVal);
