@@ -43,7 +43,7 @@ namespace audio
 #endif
             if (ret == 0) {
                 state = State::Idle;
-                eventCallback(AudioEvents::FileSystemNoSpace);
+                eventCallback({PlaybackEventType::FileSystemNoSpace, audio::Token::MakeBadToken()});
             }
             return ret;
         };
@@ -89,13 +89,13 @@ namespace audio
         isInitialized = true;
     }
 
-    audio::RetCode RecorderOperation::Start(std::function<int32_t(AudioEvents event)> callback)
+    audio::RetCode RecorderOperation::Start(audio::AsyncCallback callback, audio::Token token)
     {
 
         if (state == State::Paused || state == State::Active) {
             return RetCode::InvokedInIncorrectState;
         }
-
+        operationToken = token;
         eventCallback = callback;
         state         = State::Active;
 
@@ -186,7 +186,7 @@ namespace audio
 
         case State::Active:
             state = State::Idle;
-            Start(eventCallback);
+            Start(eventCallback, operationToken);
             break;
         }
 
