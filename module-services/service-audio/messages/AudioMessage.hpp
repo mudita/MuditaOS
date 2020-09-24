@@ -107,6 +107,15 @@ class AudioRequestMessage : public AudioMessage
     audio::PlaybackType playbackType = audio::PlaybackType::None;
 };
 
+class AudioStopMessage : public AudioMessage
+{
+  public:
+    AudioStopMessage(const std::vector<audio::PlaybackType> &stopVec = {}) : AudioMessage{}, stopVec{stopVec}
+    {}
+
+    const std::vector<audio::PlaybackType> stopVec;
+};
+
 class AudioResponseMessage : public sys::ResponseMessage
 {
   public:
