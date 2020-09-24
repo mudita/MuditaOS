@@ -12,91 +12,90 @@
 #include <BoxLayout.hpp>
 #include <Text.hpp>
 
+#include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
+#include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
+
 #include <cassert>
 
 namespace gui
 {
-    NewSMS_Window::NewSMS_Window(app::Application *app) : AppWindow(app, name::window::new_sms)
+    NewMessageWindow::NewMessageWindow(app::Application *app) : AppWindow(app, name::window::new_sms)
     {
         buildInterface();
     }
 
-    bool NewSMS_Window::onInput(const InputEvent &inputEvent)
+    bool NewMessageWindow::onInput(const InputEvent &inputEvent)
     {
         return AppWindow::onInput(inputEvent);
     }
 
-    void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
+    void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (data == nullptr) {
             return;
         }
 
-        if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
-            LOG_INFO("received search results");
-            recipient->setText(pdata->result->getFormattedName());
-            contact = pdata->result;
+        if (auto searchRequest = dynamic_cast<PhonebookSearchReuqest *>(data); searchRequest != nullptr) {
+            LOG_INFO("Received search results");
+            contact = searchRequest->result;
+            recipient->setText(contact->getFormattedName());
         }
-        if (auto pdata = dynamic_cast<SMSTextData *>(data); pdata != nullptr) {
-            auto text = pdata->text;
-            LOG_INFO("received sms text data \"%s\"", text.c_str());
-            pdata->concatenate == SMSTextData::Concatenate::True ? message->addText(text) : message->setText(text);
+        else if (auto textData = dynamic_cast<SMSTextData *>(data); textData != nullptr) {
+            const auto &text = textData->text;
+            LOG_INFO("Received sms text data \"%s\"", text.c_str());
+            if (textData->concatenate == SMSTextData::Concatenate::True) {
+                message->addText(text);
+            }
+            else {
+                message->setText(text);
+            }
             setFocusItem(message);
         }
-        if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
-            LOG_INFO("recieved sms send request");
-            phoneNumber = pdata->getPhoneNumber();
-            LOG_INFO("Number to send sms to: %s", phoneNumber.getFormatted().c_str());
+        else if (auto sendRequest = dynamic_cast<SMSSendRequest *>(data); sendRequest != nullptr) {
+            phoneNumber = sendRequest->getPhoneNumber();
+            LOG_INFO("Received sms send request to number: %s", phoneNumber.getFormatted().c_str());
             auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
             if (!retContact) {
-                LOG_WARN("not valid contact for number %s", phoneNumber.getEntered().c_str());
+                LOG_WARN("Not valid contact for number %s", phoneNumber.getEntered().c_str());
                 recipient->setText(phoneNumber.getFormatted());
-                message->setText(pdata->textData);
+                message->setText(sendRequest->textData);
                 return;
             }
+
             contact = std::move(retContact);
             recipient->setText(contact->getFormattedName());
-            message->setText(pdata->textData);
+            message->setText(sendRequest->textData);
         }
+
         updateBottomBar();
     }
 
-    bool NewSMS_Window::selectContact()
+    bool NewMessageWindow::selectContact()
     {
         // select contact only if there is no entered number
-        if (recipient->getText().length() == 0) {
-            std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
-            data->disableAppClose                        = true;
+        if (recipient->getText().empty()) {
+            auto data             = std::make_unique<PhonebookSearchReuqest>();
+            data->disableAppClose = true;
             return sapm::ApplicationManager::messageSwitchApplication(
                 application, app::name_phonebook, name::window::main_window, std::move(data));
         }
-
         return true;
     }
 
-    bool NewSMS_Window::sendSms()
+    bool NewMessageWindow::sendSms()
     {
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
-        utils::PhoneNumber::View number;
 
-        if (phoneNumber.getEntered().size() > 0) {
-            number = phoneNumber;
-        }
-        else {
-            number = (contact && contact->numbers.size() != 0) ? contact->numbers[0].number
-                                                               : utils::PhoneNumber(recipient->getText()).getView();
-        }
-
-        auto ret = app->sendSms(number, message->getText());
-        if (!ret) {
-            LOG_ERROR("sendSms failed");
+        const auto &number = getPhoneNumber();
+        if (const auto success = app->sendSms(number.getView(), message->getText()); !success) {
+            LOG_ERROR("Failed to send the SMS.");
             return false;
         }
-
         if (!Store::GSM::get()->simCardInserted()) {
-            auto action = [=]() -> bool {
-                if (!switchToThreadWindow(number)) {
+            auto action = [this, number]() {
+                if (!switchToThreadWindow(number.getView())) {
                     LOG_ERROR("switchToThreadWindow failed");
                 }
                 return true;
@@ -104,45 +103,53 @@ namespace gui
             app->showNotification(action, true);
             return true;
         }
-
-        return switchToThreadWindow(number);
+        return switchToThreadWindow(number.getView());
     }
 
-    bool NewSMS_Window::switchToThreadWindow(const utils::PhoneNumber::View &number)
+    auto NewMessageWindow::getPhoneNumber() const -> utils::PhoneNumber
     {
-        auto thread = DBServiceAPI::ThreadGetByNumber(application, number, getThreadTimeout);
-        if (thread) {
-            // clear data only when message is sent
-            contact = nullptr;
-            phoneNumber.clear();
-            recipient->setText("");
-            message->setText("");
-            setFocusItem(body);
-            auto switchData                        = std::make_unique<SMSThreadData>(std::move(thread));
-            switchData->ignoreCurrentWindowOnStack = true;
-            application->switchWindow(gui::name::window::thread_view, std::move(switchData));
+        if (phoneNumber.getEntered().empty()) {
+            if (contact && !(contact->numbers.empty())) {
+                return contact->numbers.front().number;
+            }
+            return utils::PhoneNumber{recipient->getText()};
         }
-        else {
+        return phoneNumber;
+    }
+
+    bool NewMessageWindow::switchToThreadWindow(const utils::PhoneNumber::View &number)
+    {
+        auto thread = DBServiceAPI::ThreadGetByNumber(application, number, getThreadTimeout.count());
+        if (!thread) {
             LOG_FATAL("No thread and thread not created!");
             return false;
         }
 
+        // clear data only when message is sent
+        contact = nullptr;
+        phoneNumber.clear();
+        recipient->clear();
+        message->clear();
+        setFocusItem(body);
+
+        auto switchData                        = std::make_unique<SMSThreadData>(std::move(thread));
+        switchData->ignoreCurrentWindowOnStack = true;
+        application->switchWindow(gui::name::window::thread_view, std::move(switchData));
         return true;
     }
 
-    void NewSMS_Window::updateBottomBar()
+    void NewMessageWindow::updateBottomBar()
     {
         if (getFocusItem() == recipient) {
-            if (recipient->getText().length() == 0) {
+            if (recipient->getText().empty()) {
                 bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
                 return;
             }
-
             bottomBar->setActive(BottomBar::Side::CENTER, false);
         }
-    };
+    }
 
-    void NewSMS_Window::buildInterface()
+    void NewMessageWindow::buildInterface()
     {
         namespace msgStyle = style::messages::newMessage;
         AppWindow::buildInterface();
@@ -189,14 +196,11 @@ namespace gui
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             return true;
         };
-        recipient->contentCallback = [=](Item &) -> bool {
-            updateBottomBar();
-            if (recipient->getText().length() == 0) {
+        recipient->setTextChangedCallback([this]([[maybe_unused]] Item &item, const UTF8 &text) {
+            if (recipient->getText().empty()) {
                 contact = nullptr;
             }
-
-            return true;
-        };
+        });
 
         auto img        = new gui::Image(reciepientHbox, 0, 0, 0, 0, "phonebook_small");
         img->activeItem = false;
@@ -249,4 +253,108 @@ namespace gui
         setFocusItem(body);
     }
 
-}; // namespace gui
+    void NewMessageWindow::onClose()
+    {
+        if (message->getText().empty()) {
+            // Nothing to do if text is empty.
+            return;
+        }
+
+        if (const auto handled = handleMessageText(); !handled) {
+            message->clear();
+        }
+    }
+
+    auto NewMessageWindow::handleMessageText() -> bool
+    {
+        if (contact && !(contact->numbers.empty())) {
+            return addDraft(*contact);
+        }
+        if (const auto &number = getPhoneNumber(); number.isValid()) {
+            return addDraft(number);
+        }
+        return false;
+    }
+
+    auto NewMessageWindow::addDraft(const ContactRecord &contactRecord) -> bool
+    {
+        auto number = contactRecord.numbers.front().number;
+        auto query  = std::make_unique<db::query::ThreadGetByContactID>(contactRecord.ID);
+        query->setQueryListener(db::QueryCallback::fromFunction([this, number](auto response) {
+            const auto result = dynamic_cast<db::query::ThreadGetByContactIDResult *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+
+            const auto &thread = result->getRecord();
+            if (!thread.has_value()) {
+                storeMessageDraft(number, message->getText());
+                return true;
+            }
+            return addDraftToExistingThread(thread->ID, number, message->getText());
+        }));
+
+        return DBServiceAPI::GetQuery(application, db::Interface::Name::SMSThread, std::move(query));
+    }
+
+    auto NewMessageWindow::addDraft(const utils::PhoneNumber &number) -> bool
+    {
+        auto query = std::make_unique<db::query::ThreadGetByNumber>(number.getView());
+        query->setQueryListener(db::QueryCallback::fromFunction([this, number](auto response) {
+            const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+
+            const auto &thread = result->getThread();
+            if (!thread.isValid()) {
+                storeMessageDraft(number.getView(), message->getText());
+                return true;
+            }
+            return addDraftToExistingThread(thread.ID, number.getView(), message->getText());
+        }));
+
+        return DBServiceAPI::GetQuery(application, db::Interface::Name::SMSThread, std::move(query));
+    }
+
+    auto NewMessageWindow::addDraftToExistingThread(unsigned int threadId,
+                                                    const utils::PhoneNumber::View &number,
+                                                    const UTF8 &text) -> bool
+    {
+        auto query = std::make_unique<db::query::SMSGetLastByThreadID>(threadId);
+        query->setQueryListener(db::QueryCallback::fromFunction([this, number](auto response) {
+            const auto result = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+
+            auto lastSms = result->record;
+            if (lastSms.has_value() && lastSms->type == SMSType::DRAFT) {
+                storeMessageDraft(lastSms.value(), message->getText());
+                return true;
+            }
+            storeMessageDraft(number, message->getText());
+            return true;
+        }));
+
+        return DBServiceAPI::GetQuery(application, db::Interface::Name::SMS, std::move(query));
+    }
+
+    void NewMessageWindow::storeMessageDraft(const utils::PhoneNumber::View &number, const UTF8 &text)
+    {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+
+        app->createDraft(number, text);
+        message->clear();
+    }
+
+    void NewMessageWindow::storeMessageDraft(SMSRecord &sms, const UTF8 &text)
+    {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+
+        app->updateDraft(sms, text);
+        message->clear();
+    }
+} // namespace gui

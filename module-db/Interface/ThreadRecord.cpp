@@ -119,8 +119,12 @@ ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
     auto ret =
         smsDB->threads.getLimitOffsetByField(0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
     if (ret.size() == 0) {
+        ContactRecordInterface contactInterface(contactsDB);
+        const auto &numbersIds = contactInterface.GetNumbersIdsByContact(contact_id);
+
         ThreadRecord re;
         re.contactID = contact_id;
+        re.numberID  = numbersIds.empty() ? DB_ID_NONE : numbersIds.front();
         if (!Add(re)) {
             LOG_ERROR("There is no thread but we cant add it");
             return ThreadRecord();

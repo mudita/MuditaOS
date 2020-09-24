@@ -153,6 +153,11 @@ namespace gui
         void drawCursor();
 
       public:
+        /// Callback when text changed
+        /// @param `this` item
+        /// @param new text
+        using TextChangedCallback = std::function<void(Item &, const UTF8 &)>;
+
         Text();
         Text(Item *parent,
              const uint32_t &x,
@@ -169,6 +174,7 @@ namespace gui
         void setUnderline(const bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
+        void setTextChangedCallback(TextChangedCallback &&callback);
 
         void addText(const UTF8 &text);
         void addText(TextBlock text);
@@ -209,6 +215,8 @@ namespace gui
 
       private:
         gui::KeyInputMappedTranslation translator;
+        TextChangedCallback textChangedCallback;
+
         bool handleRotateInputMode(const InputEvent &inputEvent);
         bool handleRestoreInputModeUI(const InputEvent &inputEvent);
         bool handleSelectSpecialChar(const InputEvent &inputEvent);
@@ -219,6 +227,7 @@ namespace gui
 
         bool addChar(uint32_t utf8);
         bool removeChar();
+        void onTextChanged();
     };
 
 } /* namespace gui */

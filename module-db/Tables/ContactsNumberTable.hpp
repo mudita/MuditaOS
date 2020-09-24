@@ -48,6 +48,8 @@ class ContactsNumberTable : public Table<ContactsNumberTableRow, ContactNumberTa
 
     ContactsNumberTableRow getById(uint32_t id) override final;
 
+    std::vector<ContactsNumberTableRow> getByContactId(uint32_t id);
+
     std::vector<ContactsNumberTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::vector<ContactsNumberTableRow> getLimitOffsetByField(uint32_t offset,
