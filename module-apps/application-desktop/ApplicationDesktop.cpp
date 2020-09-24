@@ -19,11 +19,11 @@
 #include <cassert>
 namespace app
 {
+    static const unsigned int default_screen_pin_size = 4;
+    static const unsigned int default_screen_attempts = 4;
 
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent), screenLock(this, gui::PinLock::LockType::Screen),
-          simLock(this, gui::PinLock::LockType::SIM1, gui::PinLock::State::EnterPin),
-          pukLock(this, gui::PinLock::LockType::PUK, gui::PinLock::State::VerifiedPin)
+        : Application(name, parent), lock(this)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
@@ -120,7 +120,7 @@ namespace app
     {
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
-            if (need_sim_select && !screenLock.isLocked()) {
+            if (need_sim_select && !lock.isLocked()) {
                 sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
             }
@@ -133,7 +133,6 @@ namespace app
         if (msg->request == cellular::State::ST::ModemFatalFailure) {
             switchWindow(app::window::name::desktop_reboot);
         }
-
         return false;
     }
 
@@ -209,12 +208,8 @@ namespace app
     {
         using namespace app::window::name;
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_main_window, new gui::DesktopMainWindow(this)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            desktop_pin_lock, new gui::PinLockWindow(this, desktop_pin_lock, &screenLock)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            desktop_sim_lock, new gui::PinLockWindow(this, desktop_sim_lock, &simLock)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            desktop_puk_lock, new gui::PinLockWindow(this, desktop_puk_lock, &pukLock)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_pin_lock,
+                                                                new gui::PinLockWindow(this, desktop_pin_lock, lock)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_menu, new gui::MenuWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_poweroff, new gui::PowerOffWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_reboot, new gui::RebootWindow(this)));
@@ -226,10 +221,6 @@ namespace app
     void ApplicationDesktop::reloadSettings()
     {
         settings = DBServiceAPI::SettingsGet(this);
-
-        screenLock.info.pinSize = settings.lockPassHash == 0 ? 0 : 4;
-        screenLock.reset(gui::PinLock::State::EnterPin);
-
         switch (settings.activeSIM) {
         case SettingsRecord::ActiveSim::NONE:
             Store::GSM::get()->selected = Store::GSM::SIM::NONE;
@@ -241,6 +232,32 @@ namespace app
         case SettingsRecord::ActiveSim::SIM2:
             Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
             break;
+        }
+
+        unsigned int pinSize = settings.lockPassHash == 0 ? 0 : default_screen_pin_size;
+        lock.reset(gui::PinLock::LockType::Screen, gui::PinLock::State::EnterPin, default_screen_attempts, pinSize);
+    }
+
+    void ApplicationDesktop::handlePin(const std::vector<unsigned int> &pin)
+    {
+        if (lock.getLockType() == gui::PinLock::LockType::Screen) {
+            if (lock.remainingAttempts > 0) {
+                uint32_t hash = 0;
+                for (auto i : pin) {
+                    hash = 10 * hash + i;
+                }
+                lock.remainingAttempts--;
+                if (hash == settings.lockPassHash) {
+                    lock.remainingAttempts = 4;
+                    lock.state             = gui::PinLock::State::VerifiedPin;
+                }
+                else if (lock.remainingAttempts > 1) {
+                    lock.state = gui::PinLock::State::InvalidPin;
+                }
+                else {
+                    lock.state = gui::PinLock::State::Blocked;
+                }
+            }
         }
     }
 } // namespace app

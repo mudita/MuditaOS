@@ -65,9 +65,7 @@ namespace gui
         auto fillNotifications(app::ApplicationDesktop *app) -> bool;
         bool processLongPressEvent(const InputEvent &inputEvent);
         bool processShortPressEventOnUnlocked(const InputEvent &inputEvent);
-        bool processShortPressEventOnLocked(const InputEvent &inputEvent, const std::string &nextWindow);
-        void updateLocksState();
-        std::string getNextWindowName() const;
+        bool processShortPressEventOnLocked(const InputEvent &inputEvent);
         app::ApplicationDesktop *getAppDesktop() const;
 
       public:

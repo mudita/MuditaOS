@@ -2,7 +2,6 @@
 
 #include "PinLockBox.hpp"
 #include "Label.hpp"
-#include "Text.hpp"
 
 namespace gui
 {
@@ -11,10 +10,10 @@ namespace gui
 
 namespace gui
 {
-    class ScreenLockBox : public PinLockBox
+    class PukLockBox : public PinLockBox
     {
       public:
-        ScreenLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
+        PukLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
         {}
 
       private:
@@ -24,8 +23,8 @@ namespace gui
 
         void setVisibleStateEnterPin() override final;
         void setVisibleStateVerifiedPin() override final;
-        void setVisibleStateInvalidPin(uint32_t remainingAttempts) override final;
-        void setVisibleStatePhoneBlocked() override final;
+        void setVisibleStateInvalidPin() override final;
+        void setVisibleStateBlocked() override final;
 
         void buildLockBox(unsigned int pinSize) override final;
         void buildPinLabels(unsigned int pinSize);

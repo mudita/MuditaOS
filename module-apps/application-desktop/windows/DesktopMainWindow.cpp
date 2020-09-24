@@ -7,10 +7,9 @@
  * @details
  */
 #include <memory>
-#include <functional>
 
-#include "../ApplicationDesktop.hpp"
-#include "../data/LockPhoneData.hpp"
+#include "application-desktop/ApplicationDesktop.hpp"
+#include "application-desktop/data/LockPhoneData.hpp"
 #include "Alignment.hpp"
 #include "Common.hpp"
 #include "BottomBar.hpp"
@@ -19,11 +18,8 @@
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/data/CallSwitchData.hpp"
 #include <UiCommonActions.hpp>
 
-#include <gui/tools/Common.hpp>
 #include "i18/i18.hpp"
 #include "log/log.hpp"
 #include <Span.hpp>
@@ -31,7 +27,6 @@
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
-#include <service-appmgr/ApplicationManager.hpp>
 #include <time/time_conversion.hpp>
 
 namespace style
@@ -52,7 +47,6 @@ namespace gui
 
     void DesktopMainWindow::buildInterface()
     {
-
         auto ttime = utils::time::Time();
         AppWindow::buildInterface();
 
@@ -100,10 +94,7 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app != nullptr);
 
-        if (app->pukLock.isLocked()) {
-            application->switchWindow(app::window::name::desktop_puk_lock);
-        }
-        else if (app->screenLock.isLocked()) {
+        if (app->lock.isLocked()) {
             bottomBar->restore();
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             topBar->setActive(TopBar::Elements::LOCK, true);
@@ -128,22 +119,19 @@ namespace gui
     {
         // update time
         time->setText(topBar->getTimeString());
-
         // check if there was a signal to lock the pone due to inactivity.
         if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
             auto app = dynamic_cast<app::ApplicationDesktop *>(application);
             if (!app) {
                 return;
             }
-            app->screenLock.lock();
+            app->lock.isLocked();
 
             LockPhoneData *lockData = reinterpret_cast<LockPhoneData *>(data);
             lockTimeoutApplilcation = lockData->getPreviousApplication();
 
             reinterpret_cast<app::ApplicationDesktop *>(application)->setSuspendFlag(true);
         }
-
-        updateLocksState();
         setVisibleState();
     }
 
@@ -155,8 +143,8 @@ namespace gui
             return AppWindow::onInput(inputEvent);
         }
 
-        if ((inputEvent.keyCode == KeyCode::KEY_PND) && (!app->screenLock.isLocked())) {
-            app->screenLock.lock();
+        if ((inputEvent.keyCode == KeyCode::KEY_PND) && (!app->lock.isLocked())) {
+            app->lock.lock();
             setVisibleState();
             app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             app->setSuspendFlag(true);
@@ -173,6 +161,7 @@ namespace gui
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
+
     bool DesktopMainWindow::processShortPressEventOnUnlocked(const InputEvent &inputEvent)
     {
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
@@ -187,7 +176,8 @@ namespace gui
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
-    bool DesktopMainWindow::processShortPressEventOnLocked(const InputEvent &inputEvent, const std::string &nextWindow)
+
+    bool DesktopMainWindow::processShortPressEventOnLocked(const InputEvent &inputEvent)
     {
         app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
         if (app == nullptr) {
@@ -198,33 +188,17 @@ namespace gui
         if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
-            if (app->screenLock.getState() != PinLock::State::VerifiedPin) {
-                std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>(LockPhoneData::Request::Pin);
-                // if there was no application on to before closing proceed normally to pin protection
-                if (lockTimeoutApplilcation.empty()) {
-                    application->switchWindow(nextWindow, std::move(data));
-                    return true;
-                }
-                else {
-                    data->setPrevApplication(lockTimeoutApplilcation);
-                    lockTimeoutApplilcation = "";
-                    application->switchWindow(nextWindow, std::move(data));
-                    return true;
-                }
+            std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>(LockPhoneData::Request::Pin);
+            // if there was no application on to before closing proceed normally to pin protection
+            if (lockTimeoutApplilcation.empty()) {
+                application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
+                return true;
             }
             else {
-                // if screenLock was provided with good pin/has no pin show unlocked main window
-                if (lockTimeoutApplilcation.empty()) {
-                    app->screenLock.unlock();
-                    setVisibleState();
-                    application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                    return true;
-                }
-                // if there was application on top when timeout occurred
-                else {
-                    lockTimeoutApplilcation = "";
-                    sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-                }
+                data->setPrevApplication(lockTimeoutApplilcation);
+                lockTimeoutApplilcation = "";
+                application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
+                return true;
             }
         }
         enter_cache.storeEnter(inputEvent);
@@ -232,58 +206,23 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    void DesktopMainWindow::updateLocksState()
-    {
-        app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("not ApplicationDesktop");
-            return;
-        }
-
-        if (app->simLock.getState() == PinLock::State::PhoneBlocked) {
-            if (app->pukLock.getState() == PinLock::State::Unlocked) {
-                app->pukLock.lock();
-            }
-        }
-        auto unlockIfVerifiedPin = [](PinLock &Lock) {
-            if (Lock.getState() == PinLock::State::VerifiedPin) {
-                Lock.unlock();
-            }
-        };
-        unlockIfVerifiedPin(app->pukLock);
-        unlockIfVerifiedPin(app->simLock);
-    }
-    std::string DesktopMainWindow::getNextWindowName() const
-    {
-        app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("not ApplicationDesktop");
-            return "";
-        }
-        // structure: pukLock is stronger than simLock, simLock stronger than screenLock, screenLock is final lock
-        if (app->pukLock.isLocked()) {
-            return app::window::name::desktop_puk_lock;
-        }
-        else if (app->simLock.isLocked()) {
-            return app::window::name::desktop_sim_lock;
-        }
-        else if (app->screenLock.isLocked()) {
-            return app::window::name::desktop_pin_lock;
-        }
-        return gui::name::window::no_window;
-    }
     bool DesktopMainWindow::onInput(const InputEvent &inputEvent)
     {
+        app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+        if (app == nullptr) {
+            LOG_ERROR("not ApplicationDesktop");
+            return AppWindow::onInput(inputEvent);
+        }
+
         if (inputEvent.isLongPress()) {
             return processLongPressEvent(inputEvent);
         }
         else if (inputEvent.isShortPress()) {
-            std::string nextWindow = getNextWindowName();
-            if (nextWindow == gui::name::window::no_window) {
-                return processShortPressEventOnUnlocked(inputEvent);
+            if (app->lock.isLocked()) {
+                return processShortPressEventOnLocked(inputEvent);
             }
             else {
-                return processShortPressEventOnLocked(inputEvent, nextWindow);
+                return processShortPressEventOnUnlocked(inputEvent);
             }
         }
         return AppWindow::onInput(inputEvent);

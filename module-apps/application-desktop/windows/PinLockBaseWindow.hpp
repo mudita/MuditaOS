@@ -13,7 +13,7 @@ namespace gui
     class PinLockBaseWindow : public AppWindow
     {
       public:
-        PinLockBaseWindow(app::Application *app, std::string name, PinLock *Lock) : AppWindow(app, name), Lock(Lock)
+        PinLockBaseWindow(app::Application *app, std::string name, PinLock &lock) : AppWindow(app, name), lock(lock)
         {}
         void build();
         void buildInfoText(unsigned int textHight);
@@ -31,7 +31,7 @@ namespace gui
         gui::Image *lockImage = nullptr;
         gui::Image *infoImage = nullptr;
 
-        PinLock *Lock = nullptr;
+        PinLock &lock;
 
       private:
         void buildBottomBar();

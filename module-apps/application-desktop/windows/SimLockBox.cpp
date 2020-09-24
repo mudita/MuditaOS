@@ -1,8 +1,8 @@
 #include "SimLockBox.hpp"
 
-#include "../windows/PinLockBaseWindow.hpp"
-#include "../widgets/PinLock.hpp"
-#include "../data/AppDesktopStyle.hpp"
+#include "PinLockBaseWindow.hpp"
+#include "application-desktop/widgets/PinLock.hpp"
+#include "application-desktop/data/AppDesktopStyle.hpp"
 #include "gui/widgets/Label.hpp"
 #include <i18/i18.hpp>
 #include <Style.hpp>
@@ -42,18 +42,17 @@ namespace gui
     }
     void SimLockBox::setVisibleStateEnterPin()
     {
-        LockWindow->clearPinLabels();
         LockWindow->pinLabel->setVisible(true);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_lock1"));
         LockWindow->infoText->addText(" ");
-        LockWindow->infoText->addText(LockWindow->Lock->getLockInfo(LockInfo::InfoName::LockName));
+        LockWindow->infoText->addText(LockWindow->lock.getLockInfo(PinLock::InfoName::LockName));
         LockWindow->infoText->addText(" ");
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_lock2"));
         LockWindow->infoText->addText("\n");
         LockWindow->infoText->addText("( ");
-        LockWindow->infoText->addText(LockWindow->Lock->getLockInfo(LockInfo::InfoName::PhoneNum));
+        LockWindow->infoText->addText(LockWindow->lock.getLockInfo(PinLock::InfoName::PhoneNum));
         LockWindow->infoText->addText(" )");
         LockWindow->infoText->addText("\n");
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_lock3"));
@@ -64,33 +63,35 @@ namespace gui
     }
     void SimLockBox::setVisibleStateVerifiedPin()
     {
+        LockWindow->clearPinLabels();
         LockWindow->infoText->clear();
         LockWindow->infoText->setVisible(false);
         LockWindow->pinLabel->setVisible(false);
     }
-    void SimLockBox::setVisibleStateInvalidPin(uint32_t remainingAttempts)
+    void SimLockBox::setVisibleStateInvalidPin()
     {
+        LockWindow->clearPinLabels();
         LockWindow->pinLabel->setVisible(false);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_info1")));
+        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_invalid_info1")));
         LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_info2")));
+        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_invalid_info2")));
         LockWindow->infoText->addText(" ");
-        LockWindow->infoText->addText(utils::localize.get(std::to_string(remainingAttempts)));
+        LockWindow->infoText->addText(std::to_string(LockWindow->lock.getRemainingAttempts()));
         LockWindow->infoText->addText(" ");
-        if (remainingAttempts > 1) {
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_info3"));
+        if (LockWindow->lock.getRemainingAttempts() > 1) {
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_invalid_info3"));
         }
         else {
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_info4"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_invalid_info4"));
         }
         LockWindow->infoText->setVisible(true);
 
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(true, true, true);
     }
-    void SimLockBox::setVisibleStatePhoneBlocked()
+    void SimLockBox::setVisibleStateBlocked()
     {
         LockWindow->pinLabel->setVisible(false);
         LockWindow->infoText->clear();

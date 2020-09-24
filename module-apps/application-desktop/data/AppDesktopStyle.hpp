@@ -17,5 +17,4 @@ namespace style::window::pin_lock
     const inline uint32_t info_text_h_screen = 60;
     const inline uint32_t info_text_h_sim    = 150;
     const inline uint32_t info_text_h_puk    = 180;
-    //    const inline uint32_t info_label_spacing = 40;
 } // namespace style::window::pin_lock

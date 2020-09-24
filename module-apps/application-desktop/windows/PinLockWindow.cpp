@@ -13,19 +13,18 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "PinLockWindow.hpp"
 
-#include "../ApplicationDesktop.hpp"
-#include "../data/LockPhoneData.hpp"
-#include "../widgets/ScreenLockBox.hpp"
-#include "../widgets/SimLockBox.hpp"
-#include "../widgets/PukLockBox.hpp"
+#include "application-desktop/ApplicationDesktop.hpp"
+#include "application-desktop/data/LockPhoneData.hpp"
+#include "ScreenLockBox.hpp"
+#include "SimLockBox.hpp"
+#include "PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
-#include <Style.hpp>
 
 namespace gui
 {
 
-    PinLockWindow::PinLockWindow(app::Application *app, const std::string &window_name, PinLock *Lock)
-        : PinLockBaseWindow(app, window_name, Lock), this_window_name(window_name)
+    PinLockWindow::PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock)
+        : PinLockBaseWindow(app, window_name, lock), this_window_name(window_name)
     {
         makePinLockBox();
         buildInterface();
@@ -38,13 +37,13 @@ namespace gui
         buildInterface();
         // set state
         focusItem = nullptr;
-        setVisibleState(Lock->getState());
+        setVisibleState(lock.getState());
     }
     void PinLockWindow::buildInterface()
     {
         AppWindow::buildInterface();
         PinLockBaseWindow::build();
-        LockBox->buildLockBox(Lock->getPinSize());
+        LockBox->buildLockBox(lock.getPinSize());
     }
 
     void PinLockWindow::destroyInterface()
@@ -72,10 +71,10 @@ namespace gui
             LockBox->setVisibleStateVerifiedPin();
         }
         else if (state == PinLock::State::InvalidPin) {
-            LockBox->setVisibleStateInvalidPin(Lock->getRemainingAttempts());
+            LockBox->setVisibleStateInvalidPin();
         }
-        else if (state == PinLock::State::PhoneBlocked) {
-            LockBox->setVisibleStatePhoneBlocked();
+        else if (state == PinLock::State::Blocked) {
+            LockBox->setVisibleStateBlocked();
         }
     }
 
@@ -84,21 +83,19 @@ namespace gui
         if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
             lockTimeoutApplication = lockData->getPreviousApplication();
         }
-        setVisibleState(Lock->getState());
+        if (lock.unlock()) {
+            application->switchWindow(gui::name::window::main_window);
+        }
+        setVisibleState(lock.getState());
     }
 
     bool PinLockWindow::onInput(const InputEvent &inputEvent)
     {
-        auto state = Lock->getState();
-        if (inputEvent.isShortPress() && (state == PinLock::State::VerifiedPin)) {
+        auto state = lock.getState();
+        if (!inputEvent.isShortPress() || state == PinLock::State::VerifiedPin) {
             return AppWindow::onInput(inputEvent);
         }
-
-        if (!inputEvent.isShortPress()) {
-            return AppWindow::onInput(inputEvent);
-        }
-        // accept only LF, enter, RF, #, and numeric values
-
+        // accept only LF, enter, RF, #, and numeric values;
         if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
             sapm::ApplicationManager::messageSwitchApplication(
                 application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
@@ -106,56 +103,52 @@ namespace gui
         }
         else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             if (state == PinLock::State::EnterPin) {
-                Lock->clearAttempt();
-                application->switchWindow(gui::name::window::main_window);
-                return true;
+                lock.clearAttempt();
+                clearPinLabels();
             }
             else if (state == PinLock::State::InvalidPin) {
-                Lock->consumeInvalidPinState();
-                application->switchWindow(gui::name::window::main_window);
-                return true;
+                LockBox->setVisibleStateInvalidPin();
+                lock.consumeInvalidPinState();
             }
-            else if (state == PinLock::State::PhoneBlocked) {
-                application->switchWindow(gui::name::window::main_window);
-                return true;
-            }
+            application->switchWindow(gui::name::window::main_window);
+            return true;
         }
         else if (inputEvent.keyCode == KeyCode::KEY_PND) {
             if (state == PinLock::State::EnterPin) {
-                Lock->popChar();
-                LockBox->popChar(Lock->getCharCount());
+                lock.popChar();
+                LockBox->popChar(lock.getCharCount());
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
                 return true;
             }
         }
         else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
             if (state == PinLock::State::EnterPin) {
-                LockBox->putChar(Lock->getCharCount());
-                Lock->putNextChar(gui::toNumeric(inputEvent.keyCode));
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+                LockBox->putChar(lock.getCharCount());
+                lock.putNextChar(gui::toNumeric(inputEvent.keyCode));
+                if (lock.getLockType() == PinLock::LockType::Screen) {
+                    lock.verifyPin();
+                }
 
-                state = Lock->getState();
+                state = lock.getState();
                 if (state == PinLock::State::VerifiedPin) {
                     LockBox->setVisibleStateVerifiedPin();
-                    Lock->unlock();
                     application->switchWindow(gui::name::window::main_window);
                 }
-                else if (state == PinLock::State::InvalidPin || state == PinLock::State::PhoneBlocked) {
-                    application->switchWindow(this_window_name);
-                }
+                application->switchWindow(this_window_name);
                 return true;
             }
         }
         else if (inputEvent.keyCode == KeyCode::KEY_ENTER && bottomBar->isActive(BottomBar::Side::CENTER)) {
             if (state == PinLock::State::InvalidPin) {
-                Lock->consumeInvalidPinState();
+                lock.consumeInvalidPinState();
                 application->switchWindow(this_window_name);
                 return true;
             }
-            else if (state == PinLock::State::PhoneBlocked) {
-                application->switchWindow(gui::name::window::main_window);
-                return true;
+            else if (state == PinLock::State::EnterPin) {
+                lock.verifyPin();
             }
+            application->switchWindow(gui::name::window::main_window);
+            return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
@@ -163,14 +156,14 @@ namespace gui
 
     void PinLockWindow::makePinLockBox()
     {
-        auto lockType = Lock->getLockType();
+        auto lockType = lock.getLockType();
         if (lockType == PinLock::LockType::Screen) {
             LockBox = std::make_unique<ScreenLockBox>(this);
         }
         else if (lockType == PinLock::LockType::PUK) {
             LockBox = std::make_unique<PukLockBox>(this);
         }
-        else if (lockType == PinLock::LockType::SIM1 || lockType == PinLock::LockType::SIM2) {
+        else if (lockType == PinLock::LockType::SIM) {
             LockBox = std::make_unique<SimLockBox>(this);
         }
         assert(LockBox != nullptr);

@@ -10,10 +10,10 @@ namespace gui
 
 namespace gui
 {
-    class SimLockBox : public PinLockBox
+    class ScreenLockBox : public PinLockBox
     {
       public:
-        SimLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
+        ScreenLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
         {}
 
       private:
@@ -23,8 +23,8 @@ namespace gui
 
         void setVisibleStateEnterPin() override final;
         void setVisibleStateVerifiedPin() override final;
-        void setVisibleStateInvalidPin(uint32_t remainingAttempts) override final;
-        void setVisibleStatePhoneBlocked() override final;
+        void setVisibleStateInvalidPin() override final;
+        void setVisibleStateBlocked() override final;
 
         void buildLockBox(unsigned int pinSize) override final;
         void buildPinLabels(unsigned int pinSize);

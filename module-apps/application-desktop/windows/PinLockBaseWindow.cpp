@@ -1,6 +1,6 @@
 #include "PinLockBaseWindow.hpp"
-#include "../data/AppDesktopStyle.hpp"
-#include "../widgets/PinLock.hpp"
+#include "application-desktop/data/AppDesktopStyle.hpp"
+#include "application-desktop/widgets/PinLock.hpp"
 #include <i18/i18.hpp>
 
 namespace lock_style = style::window::pin_lock;

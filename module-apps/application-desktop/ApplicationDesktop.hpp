@@ -38,9 +38,7 @@ namespace app
 
         } notifications;
 
-        gui::PinLock screenLock;
-        gui::PinLock simLock;
-        gui::PinLock pukLock;
+        gui::PinLock lock;
 
         ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
         virtual ~ApplicationDesktop();
@@ -52,7 +50,6 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
-
         void createUserInterface() override;
         void destroyUserInterface() override;
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
@@ -70,6 +67,8 @@ namespace app
         bool clearMessagesNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
+
+        void handlePin(const std::vector<unsigned int> &);
     };
 
 } /* namespace app */
