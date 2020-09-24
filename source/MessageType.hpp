@@ -138,8 +138,6 @@ enum class MessageType
     AudioRoutingSpeakerhone,
     AudioRoutingHeadset,
 
-    AudioSetInputGain,
-    AudioGetInputGain,
     AudioGetFileTags,
 
     // application manager
