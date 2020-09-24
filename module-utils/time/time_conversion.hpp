@@ -297,5 +297,6 @@ namespace utils
             unsigned long seconds   = 0;
         };
 
+        Timestamp getCurrentTimestamp();
     } // namespace time
 } // namespace utils

@@ -22,6 +22,7 @@ extern "C"
 #include <FontManager.hpp>
 #include <FontGlyph.hpp>
 #include <RawFont.hpp>
+#include "Style.hpp"
 
 #if DEBUG_FONT == 1
 #define log_warn_glyph(...) LOG_WARN(__VA_ARGS__)
@@ -817,8 +818,7 @@ namespace gui
         }
     }
 
-    void Renderer::drawChar(
-        Context *context, const int16_t x, const int16_t y, RawFont *font, FontGlyph *glyph, const Color color)
+    void Renderer::drawChar(Context *context, const int16_t x, const int16_t y, FontGlyph *glyph, const Color color)
     {
         auto line_y_offset = (y - glyph->yoffset) * context->getW();
         auto *drawPtr      = context->getData() + x + line_y_offset;
@@ -852,7 +852,7 @@ namespace gui
         Context *drawCtx;
         bool copyContext = false;
         int16_t wgtX = 0, wgtY = 0;
-        // check if there is a need or making copy of context to use is as background
+        // check if there is a need or making copy of context to use it as background
         if ((cmd->areaW == cmd->w) && (cmd->areaH == cmd->h)) {
             drawCtx = ctx;
             wgtX    = cmd->x;
@@ -874,20 +874,7 @@ namespace gui
         uint32_t idLast = 0, idCurrent = 0;
         for (uint32_t i = 0; i < cmd->str.length(); ++i) {
             idCurrent        = cmd->str[i]; // id stands for glued together utf-16 with no order bytes (0xFF 0xFE)
-            auto glyph_found = font->glyphs.find(idCurrent);
-
-            std::unique_ptr<FontGlyph> unique_glyph;
-
-            FontGlyph *glyph = nullptr;
-            if (glyph_found != font->glyphs.end()) {
-                glyph = glyph_found->second;
-            }
-            else {
-                log_warn_glyph(
-                    "no glyph for character id:%" PRIu32 " in font \"%s\"", idCurrent, font->info.face.c_str());
-                unique_glyph = font->getGlyphUnsupported();
-                glyph        = unique_glyph.get();
-            }
+            FontGlyph *glyph = font->getGlyph(idCurrent);
 
             // do not start drawing outside of draw context.
             if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0)) {
@@ -903,7 +890,7 @@ namespace gui
             if (i > 0) {
                 kernValue = font->getKerning(idLast, idCurrent);
             }
-            drawChar(drawCtx, wgtX + posX + glyph->xoffset + kernValue, wgtY + posY, font, glyph, cmd->color);
+            drawChar(drawCtx, wgtX + posX + glyph->xoffset + kernValue, wgtY + posY, glyph, cmd->color);
             posX += glyph->xadvance + kernValue;
 
             idLast = idCurrent;

@@ -227,7 +227,7 @@
  * Definitions for BSP_BLUETOOTH pins configuration
  */
 
-#define BSP_BLUETOOTH_UART_BASE   LPUART2        ///< This macro indicate port to which GSM module is connected
+#define BSP_BLUETOOTH_UART_BASE   LPUART2        ///< This macro indicate port to which BT module is connected
 #define BSP_BLUETOOTH_UART_CLKSRC kCLOCK_PllUsb1 ///< This macro indicate LPUART clock source
 
 #define BSP_BLUETOOTH_UART_RTS_PORT GPIO1

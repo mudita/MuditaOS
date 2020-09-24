@@ -109,7 +109,7 @@ TEST_CASE("PhoneNumber - views")
         const std::string dummyNumber = "12345";
 
         auto invalid_view = PhoneNumber::parse(dummyNumber);
-        auto valid_view   = PhoneNumber::parse(pl_entered);
+        auto valid_view   = PhoneNumber::parse(pl_e164);
 
         REQUIRE_FALSE(invalid_view.isValid());
         REQUIRE(valid_view.isValid());

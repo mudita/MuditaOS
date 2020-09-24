@@ -24,13 +24,33 @@ namespace audio
 
     constexpr uint32_t audioOperationTimeout = 1000;
 
-    enum class ProfileSetup
+    enum class Setting
     {
         Volume,
         Gain
     };
 
-    [[nodiscard]] const std::string str(const Profile::Type &type, const ProfileSetup &setup);
+    enum class PlaybackType
+    {
+        None,
+        Multimedia,
+        Notifications,
+        KeypadSound,
+        CallRingtone,
+        TextMessageRingtone
+    };
+
+    [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
+
+    [[nodiscard]] const std::string str(const Setting &setting) noexcept;
+
+    [[nodiscard]] const std::string str(const Profile::Type &profileType,
+                                        const Setting &setup,
+                                        const PlaybackType &playbackType = PlaybackType::None);
+
+    [[nodiscard]] const std::string str(const PlaybackType &playbackType,
+                                        const Setting &setup,
+                                        const bool headphonesInserted = false);
 
     enum class RetCode
     {

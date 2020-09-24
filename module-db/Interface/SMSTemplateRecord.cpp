@@ -1,11 +1,10 @@
 #include "SMSTemplateRecord.hpp"
-#include "queries/sms/QuerySMSTemplateGetByID.hpp"
-#include "queries/sms/QuerySMSTemplateGet.hpp"
-#include "queries/sms/QuerySMSTemplateAdd.hpp"
-#include "queries/sms/QuerySMSTemplateGetCount.hpp"
-#include "queries/sms/QuerySMSTemplateRemove.hpp"
-#include "queries/sms/QuerySMSTemplateUpdate.hpp"
-#include "queries/sms/QuerySMSThreadsGet.hpp"
+#include "queries/messages/templates/QuerySMSTemplateGetByID.hpp"
+#include "queries/messages/templates/QuerySMSTemplateGet.hpp"
+#include "queries/messages/templates/QuerySMSTemplateAdd.hpp"
+#include "queries/messages/templates/QuerySMSTemplateGetCount.hpp"
+#include "queries/messages/templates/QuerySMSTemplateRemove.hpp"
+#include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"
 
 #include <log/log.hpp>
 

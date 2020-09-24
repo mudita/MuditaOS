@@ -27,7 +27,7 @@ namespace gui
         LockWindow->buildInfoText(lock_style::info_text_h_sim);
         buildPinLabels(pinSize);
     }
-    void SimLockBox::buildPinLabels(uint32_t pinSize)
+    void SimLockBox::buildPinLabels(unsigned int pinSize)
     {
         // labels with stars for displaying entered digits
         const uint32_t pinLabelWidth = style::window_width - 2 * lock_style::pin_label_x;

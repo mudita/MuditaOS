@@ -8,6 +8,7 @@
 #include "windows/Reboot.hpp"
 
 #include <service-db/api/DBServiceAPI.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-cellular/ServiceCellular.hpp>

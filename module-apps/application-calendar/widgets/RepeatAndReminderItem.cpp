@@ -2,11 +2,12 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include <Style.hpp>
 #include <Utils.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 namespace gui
 {
 
-    RepeatAndReminderItem::RepeatAndReminderItem()
+    RepeatAndReminderItem::RepeatAndReminderItem(app::ApplicationCalendar *application) : app(application)
     {
         activeItem = false;
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -40,7 +41,7 @@ namespace gui
         repeat->setMinimumSize(style::window::calendar::item::repeatAndReminder::description_w,
                                style::window::calendar::item::repeatAndReminder::description_h);
         repeat->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        repeat->setFont(style::window::font::small);
+        repeat->setFont(style::window::font::medium);
         repeat->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         repeat->activeItem = false;
 
@@ -59,7 +60,7 @@ namespace gui
         reminder->setMinimumSize(style::window::default_body_width / 2,
                                  style::window::calendar::item::repeatAndReminder::description_h);
         reminder->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        reminder->setFont(style::window::font::small);
+        reminder->setFont(style::window::font::medium);
         reminder->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         reminder->activeItem = false;
 
@@ -77,9 +78,16 @@ namespace gui
     {
         repeatTitle->setText(utils::localize.get("app_calendar_event_detail_repeat"));
         reminderTitle->setText(utils::localize.get("app_calendar_event_detail_reminder"));
-        onLoadCallback = [&]() {
-            repeat->setText(utils::localize.get("app_calendar_repeat_daily"));
-            reminder->setText(utils::localize.get("app_calendar_reminder_1_week_before"));
+        onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
+            if (event->repeat >= app::ApplicationCalendar::repeatOptions.size()) {
+                repeat->setText("app_calendar_custom_repeat_title");
+            }
+            else {
+                repeat->setText(utils::localize.get(
+                    app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
+            }
+            reminder->setText(utils::localize.get(
+                app::ApplicationCalendar::reminderOptions.at(static_cast<Reminder>(event->reminder))));
         };
     }
 

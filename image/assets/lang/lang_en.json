@@ -58,6 +58,8 @@
     "locale_24hour_min" : "%H:%M",
     "locale_date_full" : "%m/%d/%y",
     "locale_date_short" : "%d/%m",
+    "common_AM" : "AM",
+    "common_PM" : "PM",
 
     "duration_min_0sec" : "%M:%0S",
     "duration_0min_0sec" : "%0M:%0S",
@@ -98,6 +100,7 @@
     "app_calendar_edit": "EDIT",
     "app_calendar_new_edit_event_name": "Event name",
     "app_calendar_new_edit_event_allday": "All day event",
+    "app_calendar_all_day": "All day",
     "app_calendar_new_edit_event_start": "Start",
     "app_calendar_new_edit_event_end": "End",
 
@@ -163,6 +166,7 @@
     "app_desktop_menu_meditation": "MEDITATION",
     "app_desktop_menu_music": "MUSIC",
     "app_desktop_menu_tools": "TOOLS",
+    "app_desktop_menu_settings_new": "SETTINGS NEW",
     "app_desktop_menu_settings": "SETTINGS",
     "app_desktop_menu_phonebook": "PHONEBOOK",
     "app_desktop_menu_title": "Menu",
@@ -201,7 +205,7 @@
     "app_messages_new_message": "New Message",
     "app_messages_no_messages": "There are no messages yet.\nPress Left arrow to add new.",
     "app_messages_thread_delete_confirmation": "Do you really want to delete\nthis conversation?",
-    "app_messages_message_delete_confirmation": "Do you really want to delete\nthis message?",
+    "app_messages_message_delete_confirmation": "<text align='center'><p>Do you really want to <text weight='bold'>delete</text></p>this message?</text>",
     "app_messages_thread_no_result" : "There are no results",
     "app_messages_message": "Message",
     "app_messages_templates": "Templates",
@@ -212,7 +216,12 @@
     "app_messages_thread_you" : "You: ",
 
     "app_settings_title_main": "Settings",
+    "app_settings_title_main_new": "Settings New",
     "app_settings_bt" : "Bluetooth",
+    "app_settings_net" : "Network",
+    "app_settings_disp_key" : "Display and keypad",
+    "app_settings_system" : "System",
+    "app_settings_apps_tools" : "Apps and tools",
     "app_settings_date_and_time": "Date and Time",
 	"app_settings_title_day": "Day",
 	"app_settings_title_month": "Month",
@@ -277,6 +286,9 @@
 
     "app_music_player_all_songs": "All songs",
     "app_music_player_play": "PLAY",
+    "app_music_player_music_library": "MUSIC LIBRARY",
+    "app_music_player_quit": "QUIT",
+    "app_music_player_music_empty_window_notification": "Press Music Library to choose\n a song from the library",
 
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",

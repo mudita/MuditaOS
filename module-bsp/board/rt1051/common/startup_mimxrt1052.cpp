@@ -730,7 +730,9 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
         LoadAddr   = *SectionTableAddr++;
         ExeAddr    = *SectionTableAddr++;
         SectionLen = *SectionTableAddr++;
-        data_init(LoadAddr, ExeAddr, SectionLen);
+        if (LoadAddr != ExeAddr) {
+            data_init(LoadAddr, ExeAddr, SectionLen);
+        }
     }
 
     // Initialize BSS section
@@ -1047,8 +1049,6 @@ extern "C"
             LOG_FATAL(" - DTCM: Asynchronous fault on DTCM interface.");
         if (abfsr.ahbp)
             LOG_FATAL(" - AHBP: Asynchronous fault on AHBP interface");
-        if (abfsr.axim)
-            LOG_FATAL(" - AXIM: Asynchronous fault on AXIM interface, AXIMTYPE: 0x%0" PRIX32, abfsr.aximtype);
         if (abfsr.eppb)
             LOG_FATAL(" - EPPB: Asynchronous fault on EPPB interface");
 #endif // (DEBUG_DETAILED_HARD_FAULT_INFO == 1)
@@ -1076,24 +1076,6 @@ extern "C"
     {
         abort();
     }
-
-    /*    extern void failure_exit(syslog_exception_stack_frame_t* frame,syslog_exception_source_t source);
-
-
-
-
-
-        WEAK_AV void BusFault_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
-                            uint32_t lr __attribute__((unused)))
-        {
-            failure_exit(frame,SyslogExceptionSource_BusFault);
-        }
-
-        WEAK_AV void UsageFault_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
-                            uint32_t lr __attribute__((unused)))
-        {
-            failure_exit(frame,SyslogExceptionSource_UsageFault);
-        }*/
 
 #if defined(__cplusplus)
 }

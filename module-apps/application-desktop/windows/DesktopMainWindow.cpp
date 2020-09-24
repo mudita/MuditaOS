@@ -28,6 +28,7 @@
 #include "log/log.hpp"
 #include <Span.hpp>
 #include <Style.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
 #include <service-appmgr/ApplicationManager.hpp>
@@ -79,6 +80,14 @@ namespace gui
     void DesktopMainWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void DesktopMainWindow::invalidate() noexcept
+    {
+        time          = nullptr;
+        dayText       = nullptr;
+        notifications = nullptr;
     }
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
@@ -117,7 +126,6 @@ namespace gui
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-
         // update time
         time->setText(topBar->getTimeString());
 

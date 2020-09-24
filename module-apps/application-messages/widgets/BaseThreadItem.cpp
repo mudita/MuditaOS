@@ -1,5 +1,5 @@
 #include "BaseThreadItem.hpp"
-#include "../MessagesStyle.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
 
 namespace gui
 {

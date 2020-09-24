@@ -25,7 +25,7 @@ namespace gui
         LockWindow->buildInfoText(lock_style::info_text_h_puk);
         buildPinLabels(pinSize);
     }
-    void PukLockBox::buildPinLabels(uint32_t pinSize)
+    void PukLockBox::buildPinLabels(unsigned int pinSize)
     {
         // labels with stars for displaying entered digits
         uint32_t pinLabelX           = lock_style::pin_label_x;

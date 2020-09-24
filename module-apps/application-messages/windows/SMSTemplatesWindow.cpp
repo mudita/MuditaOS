@@ -2,7 +2,7 @@
 
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/widgets/SMSTemplateItem.hpp"
-#include "application-messages/MessagesStyle.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBSMSTemplateMessage.hpp>
@@ -11,7 +11,6 @@
 #include <log/log.hpp>
 
 #include <cassert>
-#include <functional>
 #include <memory>
 
 namespace gui

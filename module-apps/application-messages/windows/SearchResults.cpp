@@ -2,10 +2,10 @@
 #include "ThreadRecord.hpp"
 #include <application-messages/data/SMSTextToSearch.hpp>
 #include <application-messages/ApplicationMessages.hpp>
-#include "application-messages/MessagesStyle.hpp"
+#include "module-apps/application-messages/data/MessagesStyle.hpp"
 #include "messages/DBThreadMessage.hpp"
 #include "messages/QueryMessage.hpp"
-#include "queries/sms/QuerySMSSearch.hpp"
+#include "queries/messages/threads/QueryThreadsSearch.hpp"
 #include "service-db/messages/DBMessage.hpp"
 #include <i18/i18.hpp>
 
@@ -25,7 +25,7 @@ namespace gui
         body->setBoundingBox(bodySize());
         addWidget(body);
 
-        model = std::make_shared<model::SearchResultsModel>(application);
+        model = std::make_shared<model::ThreadsSearchResultsModel>(application);
 
         list = new gui::ListView(this,
                                  msgThreadStyle::listPositionX,

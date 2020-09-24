@@ -21,17 +21,19 @@ jobs:
       run: |
         ./configure.sh linux Debug && \
         pushd build-linux-Debug && \
-        echo "JOBS=${JOBS:-8} | set to 8" &&\
-        make -j 8 check && \
+        export JOBS=${JOBS:-`nproc`} && \
+        echo "JOBS=${JOBS}" && \
+        make -j ${JOBS} check && \
         popd
     - name: "Build and package for RT1051"
       id: build_release_package 
       run: |
         ./configure.sh rt1051 Debug && \
         pushd build-rt1051-Debug && \
-        echo "JOBS=${JOBS:-8} | set to 8" &&\
-        make -j 8 && \
-        make -j 8 package && \
+        export JOBS=${JOBS:-`nproc`} && \
+        echo "JOBS=${JOBS}" && \
+        make -j ${JOBS} && \
+        make -j ${JOBS}  package && \
         popd && \
         ./print_last_changes.sh && \
         uptime

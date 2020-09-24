@@ -73,8 +73,6 @@ class ContactTest:
                    "numbers": ["547623521"],
                    "priName": "Test2",
                    "id": contact_to_update["id"]}
-        print(result)
-        print(contact)
         if result != contact:
             print("updated record mismatch!")
             return False

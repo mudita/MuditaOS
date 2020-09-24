@@ -3,7 +3,7 @@
 #include "application-call/data/CallSwitchData.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/data/SMSdata.hpp"
-#include "application-messages/windows/ThreadViewWindow.hpp"
+#include "application-messages/windows/SMSThreadViewWindow.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "service-appmgr/ApplicationManager.hpp"

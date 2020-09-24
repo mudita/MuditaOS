@@ -52,6 +52,7 @@
 #include <country.hpp>
 #include <PhoneNumber.hpp>
 #include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
+#include <module-db/queries/messages/sms/QuerySMSSearchByType.hpp>
 
 #include <log/log.hpp>
 
@@ -1200,7 +1201,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                             db::Interface::Name::Notifications,
                             std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
                         const std::string ringtone_path = "assets/audio/sms_transformer.wav";
-                        AudioServiceAPI::PlaybackStart(this, ringtone_path);
+                        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
                     }
                     else {
                         LOG_ERROR("Failed to add text message to db");
@@ -1271,13 +1272,8 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
     if (channel) {
         auto resp = channel->cmd(at::AT::CSQ);
         if (resp.code == at::Result::Code::OK) {
-            std::string ret;
-            if (at::response::parseCSQ(resp.response[0], ret)) {
-                data.push_back(ret);
-            }
-            else {
-                data.push_back("");
-            }
+
+            data.push_back(resp.response[0]);
         }
         else {
             data.push_back("");
@@ -1285,13 +1281,8 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 
         resp = channel->cmd(at::AT::CREG);
         if (resp.code == at::Result::Code::OK) {
-            std::string ret;
-            if (at::response::parseCREG(resp.response[0], ret)) {
-                data.push_back(ret);
-            }
-            else {
-                data.push_back("");
-            }
+
+            data.push_back(resp.response[0]);
         }
         else {
             data.push_back("");

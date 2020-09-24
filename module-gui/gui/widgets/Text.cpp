@@ -19,6 +19,7 @@
 #include <cassert>
 #include <FontManager.hpp>
 #include <RawFont.hpp>
+#include <RichTextParser.hpp>
 
 #if DEBUG_GUI_TEXT == 1
 #define debug_text(...) LOG_DEBUG(__VA_ARGS__)
@@ -46,13 +47,13 @@ namespace gui
                const UTF8 &text,
                ExpandMode expandMode,
                TextType textType)
-        : Rect(parent, x, y, w, h), lines(this), expandMode{expandMode}, textType{textType}
+        : Rect(parent, x, y, w, h), lines(this), expandMode{expandMode}, textType{textType},
+          format(FontManager::getInstance().getFont(style::window::font::small))
     {
         alignment = style::text::defaultTextAlignment;
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
-        font = FontManager::getInstance().getFont(style::window::font::small);
         buildDocument(text);
 
         setBorderColor(gui::ColorFullBlack);
@@ -90,7 +91,8 @@ namespace gui
     void Text::setText(const UTF8 &text)
     {
         debug_text("setText: %s", text.c_str());
-        setText(std::make_unique<TextDocument>(textToTextBlocks(text, font, TextBlock::End::None)));
+        /// TODO here should be format passed
+        setText(std::make_unique<TextDocument>(textToTextBlocks(text, format.getFont(), TextBlock::End::None)));
     }
 
     void Text::setText(std::unique_ptr<TextDocument> &&document)
@@ -110,6 +112,25 @@ namespace gui
     void Text::addText(TextBlock text)
     {
         *cursor << text;
+        drawLines();
+    }
+
+    void Text::setRichText(const UTF8 &text)
+    {
+        setText("");
+        addRichText(text);
+    }
+
+    void Text::addRichText(const UTF8 &text)
+    {
+        auto tmp_document = text::RichTextParser().parse(text, &format);
+        if (tmp_document->isEmpty()) {
+            LOG_ERROR("Nothing to parse/parser error in rich text: %s", text.c_str());
+            addText(text); // fallback
+        }
+        for (auto block : tmp_document->getBlockCursor(0)) {
+            *cursor << block;
+        }
         drawLines();
     }
 
@@ -142,13 +163,13 @@ namespace gui
     void Text::setFont(const UTF8 &fontName)
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
-        font             = newFont;
+        format.setFont(newFont);
         buildCursor();
     }
 
-    void Text::setFont(RawFont *fontName)
+    void Text::setFont(RawFont *font)
     {
-        font = fontName;
+        format.setFont(font);
         buildCursor();
     }
 
@@ -367,8 +388,8 @@ namespace gui
             uint16_t w_used = lines.maxWidth();
             if (lines.size() == 0) {
                 debug_text("No lines to show, try to at least fit in cursor");
-                if (font != nullptr) {
-                    h_used += font->info.line_height;
+                if (format.getFont() != nullptr) {
+                    h_used += format.getFont()->info.line_height;
                     w_used += TextCursor::default_width;
                     debug_text("empty line height: %d", h_used);
                 }
@@ -413,7 +434,7 @@ namespace gui
 
     void Text::buildDocument(const UTF8 &text)
     {
-        buildDocument(std::make_unique<TextDocument>(textToTextBlocks(text, font, TextBlock::End::None)));
+        buildDocument(std::make_unique<TextDocument>(textToTextBlocks(text, format.getFont(), TextBlock::End::None)));
     }
 
     void Text::buildDocument(std::unique_ptr<TextDocument> &&document_moved)

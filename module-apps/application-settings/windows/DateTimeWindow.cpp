@@ -36,6 +36,7 @@ namespace gui
         destroyInterface();
         buildInterface();
     }
+
     void DateTimeWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -50,8 +51,8 @@ namespace gui
         setTitle(utils::localize.get("app_settings_date_and_time"));
 
         // create date widgets
-        uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
-        uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
+        uint32_t w = this->getWidth();
+
         utils::time::Timestamp time;
 
         SettingsRecord appSettings = application->getSettings();
@@ -59,7 +60,11 @@ namespace gui
         timeDateFormat             = appSettings.timeDateFormat;
 
         // create date widgets
-        dateBody = new gui::HBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
+        dateBody = new gui::HBox(this,
+                                 style::window::default_left_margin,
+                                 style::settings::date::date_box_y_pos,
+                                 w,
+                                 style::settings::date::date_time_box_h);
 
         auto item = addDateTimeItem(nullptr,
                                     utils::localize.get("app_settings_title_day"),
@@ -118,7 +123,11 @@ namespace gui
             }
         }
 
-        timeBody = new gui::HBox(this, style::window::default_left_margin, (uint32_t)title->offset_h() * 2, w, h);
+        timeBody = new gui::HBox(this,
+                                 style::window::default_left_margin,
+                                 style::settings::date::time_box_y_pos,
+                                 w,
+                                 style::settings::date::date_time_box_h);
         item     = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_time"), std::to_string(hourValue));
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
         timeBody->addWidget(item);
@@ -151,9 +160,19 @@ namespace gui
 
         dateBody->setNavigationItem(NavigationDirection::DOWN, timeBody);
     }
+
     void DateTimeWindow::destroyInterface()
     {
         erase();
+        invalidate();
+    }
+
+    void DateTimeWindow::invalidate() noexcept
+    {
+        dateBody = nullptr;
+        timeBody = nullptr;
+        dateItems.clear();
+        timeItems.clear();
     }
 
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -181,7 +200,7 @@ namespace gui
                                            0,
                                            style::settings::date::date_time_item_width,
                                            style::settings::date::date_time_item_height);
-        label->setMargins(gui::Margins(16, 0, 0, 0));
+        label->setMargins(gui::Margins(0, 0, 0, 0));
         label->setFilled(false);
         label->setPenFocusWidth(3);
         label->setPenWidth(1);

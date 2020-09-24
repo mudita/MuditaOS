@@ -16,6 +16,7 @@ class TestListView : public gui::ListView
     FRIEND_TEST(ListViewTesting, Navigate_Test);
     FRIEND_TEST(ListViewTesting, Continuous_Type_Test);
     FRIEND_TEST(ListViewTesting, Data_Deletion_Test);
+    FRIEND_TEST(ListViewTesting, Rebuild_Type_Test);
 
     bool listBorderReached = false;
 
@@ -225,7 +226,7 @@ TEST_F(ListViewTesting, Navigate_Test)
 TEST_F(ListViewTesting, Continuous_Type_Test)
 {
     // set list type to Continuous
-    testListView->setListViewType(style::listview::Type::Continuous);
+    testListView->setBoundaries(style::listview::Boundaries::Continuous);
 
     // 10 provider elements, 100 h each, list 600 -> 6 elements on page.
     testListView->provider->requestRecords(0, 10);
@@ -234,7 +235,7 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change to last page";
     testListView->listBorderReached = false;
     ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed";
-    //
+
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
         << "First element ID should be 9";
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
@@ -315,4 +316,58 @@ TEST_F(ListViewTesting, Data_Deletion_Test)
         << "Pointer to first element should match";
     ASSERT_NE(pointerToLast, dynamic_cast<gui::TestListItem *>(testListView->body->children.back()))
         << "Pointer to last element should match";
+}
+
+TEST_F(ListViewTesting, Rebuild_Type_Test)
+{
+    // Internal data -> do not delete
+    testProvider->dataSource = gui::TestListViewDataSource::Internal;
+
+    // Do full list rebuild
+    testListView->rebuildList(style::listview::RebuildType::Full);
+
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
+    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 0 has focus";
+
+    moveNTimes(3, style::listview::Direction::Bottom);
+    ASSERT_FALSE(testListView->listBorderReached) << "Navigate bot by 3 - page should not change";
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 3 has focus";
+
+    auto pointerToFocusedElement = dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem());
+
+    // Do in place rebuild
+    testListView->rebuildList(style::listview::RebuildType::InPlace);
+
+    // Check if focused item did not change
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 3 has focus";
+    ASSERT_EQ(pointerToFocusedElement, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem()))
+        << "Focused item should be same";
+
+    // Do on offset rebuild on 8 element
+    testListView->rebuildList(style::listview::RebuildType::OnOffset, 8);
+
+    // Page should change and 2 elements should fit (10 - 8)
+    ASSERT_EQ(2, testListView->currentPageSize) << "2 elements should fit into list.";
+    ASSERT_EQ(8, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 8 has focus";
+
+    moveNTimes(2, style::listview::Direction::Top);
+    ASSERT_TRUE(testListView->listBorderReached) << "Navigate Top by 3 - page should change";
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 5 has focus";
+
+    pointerToFocusedElement = dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem());
+
+    // Do in place rebuild
+    testListView->rebuildList(style::listview::RebuildType::InPlace);
+
+    // Check if focused item did not change
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 6 has focus";
+    ASSERT_EQ(pointerToFocusedElement, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem()))
+        << "Focused item should be same";
 }

@@ -59,24 +59,30 @@ set(SOURCES
         Interface/SettingsRecord_v2.cpp
 
         queries/RecordQuery.cpp
-        queries/sms/QuerySMSSearch.cpp
-        queries/sms/QuerySMSThreadsGet.cpp
-        queries/sms/QuerySMSSearchByType.cpp
-        queries/sms/QuerySmsThreadMarkAsRead.cpp
-        queries/sms/QuerySMSGet.cpp
-        queries/sms/QuerySMSGetCount.cpp
-        queries/sms/QuerySMSGetByID.cpp
-        queries/sms/QuerySMSGetByContactID.cpp
-        queries/sms/QuerySMSGetByThreadID.cpp
-        queries/sms/QuerySMSGetByText.cpp
-        queries/sms/QuerySMSRemove.cpp
-        queries/sms/QuerySMSTemplateAdd.cpp
-        queries/sms/QuerySMSTemplateGetByID.cpp
-        queries/sms/QuerySMSTemplateGet.cpp
-        queries/sms/QuerySMSTemplateGetCount.cpp
-        queries/sms/QuerySMSTemplateRemove.cpp
-        queries/sms/QuerySMSTemplateUpdate.cpp
-        queries/sms/QueryThreadGetByNumber.cpp
+        queries/messages/sms/QuerySMSSearchByType.cpp
+        queries/messages/sms/QuerySMSGet.cpp
+        queries/messages/sms/QuerySMSGetCount.cpp
+        queries/messages/sms/QuerySMSGetCountByThreadID.cpp
+        queries/messages/sms/QuerySMSGetByID.cpp
+        queries/messages/sms/QuerySMSGetByContactID.cpp
+        queries/messages/sms/QuerySMSGetByThreadID.cpp
+        queries/messages/sms/QuerySMSGetByText.cpp
+        queries/messages/sms/QuerySMSAdd.cpp
+        queries/messages/sms/QuerySMSRemove.cpp
+        queries/messages/sms/QuerySMSUpdate.cpp
+        queries/messages/templates/QuerySMSTemplateAdd.cpp
+        queries/messages/templates/QuerySMSTemplateGetByID.cpp
+        queries/messages/templates/QuerySMSTemplateGet.cpp
+        queries/messages/templates/QuerySMSTemplateGetCount.cpp
+        queries/messages/templates/QuerySMSTemplateRemove.cpp
+        queries/messages/templates/QuerySMSTemplateUpdate.cpp
+        queries/messages/threads/QueryThreadsSearch.cpp
+        queries/messages/threads/QueryThreadsGet.cpp
+        queries/messages/threads/QueryThreadGetByID.cpp
+        queries/messages/threads/QueryThreadGetByNumber.cpp
+        queries/messages/threads/QueryThreadGetByContactID.cpp
+        queries/messages/threads/QueryThreadRemove.cpp
+        queries/messages/threads/QueryThreadMarkAsRead.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetCount.cpp
@@ -97,8 +103,8 @@ set(SOURCES
         queries/calendar/QueryEventsGetAll.cpp
         queries/calendar/QueryEventsAdd.cpp
         queries/calendar/QueryEventsEdit.cpp
-        queries/calendar/QueryEventsGetFiltered.hpp
         queries/calendar/QueryEventsGetFiltered.cpp
+        queries/calendar/QueryEventsGetAllLimited.cpp
         queries/settings/QuerySettingsGet_v2.cpp
         queries/settings/QuerySettingsUpdate_v2.cpp
         queries/settings/QuerySettingsAddOrIgnore_v2.cpp

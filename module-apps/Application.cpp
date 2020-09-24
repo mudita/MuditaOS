@@ -405,6 +405,7 @@ namespace app
             if (switchData && switchData->ignoreCurrentWindowOnStack) {
                 popToWindow(getPrevWindow());
             }
+            getCurrentWindow()->onClose();
             setActiveWindow(msg->getWindowName());
 
             getCurrentWindow()->handleSwitchData(switchData.get());
@@ -486,10 +487,28 @@ namespace app
         return retCode;
     }
 
+    sys::ReturnCodes Application::DeinitHandler()
+    {
+        LOG_INFO("Closing an application: %s", GetName().c_str());
+        for (const auto &[windowName, window] : windows) {
+            LOG_INFO("Closing a window: %s", windowName.c_str());
+            window->onClose();
+        }
+        return sys::ReturnCodes::Success;
+    }
+
     void Application::setActiveWindow(const std::string &windowName)
     {
         pushWindow(windowName);
         acceptInput = true;
+    }
+
+    bool Application::setVolume(const audio::Volume &value,
+                                const audio::Profile::Type &profileType,
+                                const audio::PlaybackType &playbackType)
+    {
+        const auto ret = AudioServiceAPI::SetVolume(this, value, profileType, playbackType);
+        return ret == audio::RetCode::Success;
     }
 
     bool Application::adjustCurrentVolume(const int step)

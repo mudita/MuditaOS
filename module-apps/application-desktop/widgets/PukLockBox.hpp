@@ -18,15 +18,15 @@ namespace gui
 
       private:
         PinLockBaseWindow *LockWindow;
-        void popChar(uint32_t charNum) override;
-        void putChar(uint32_t charNum) override;
+        void popChar(uint32_t charNum) override final;
+        void putChar(uint32_t charNum) override final;
 
-        void setVisibleStateEnterPin() override;
-        void setVisibleStateVerifiedPin() override;
-        void setVisibleStateInvalidPin(uint32_t remainingAttempts) override;
-        void setVisibleStatePhoneBlocked() override;
+        void setVisibleStateEnterPin() override final;
+        void setVisibleStateVerifiedPin() override final;
+        void setVisibleStateInvalidPin(uint32_t remainingAttempts) override final;
+        void setVisibleStatePhoneBlocked() override final;
 
         void buildLockBox(unsigned int pinSize) override final;
-        void buildPinLabels(uint32_t pinSize);
+        void buildPinLabels(unsigned int pinSize);
     };
 } // namespace gui

@@ -35,8 +35,8 @@ namespace gui
         bool focusOnLastItem         = false;
         int scrollTopMargin          = style::margins::big;
 
-        style::listview::Type listType       = style::listview::Type::TopDown;
-        style::listview::Direction direction = style::listview::Direction::Bottom;
+        style::listview::Boundaries boundaries = style::listview::Boundaries::Fixed;
+        style::listview::Direction direction   = style::listview::Direction::Bottom;
 
         void clearItems();
         virtual void addItemsOnPage();
@@ -50,19 +50,20 @@ namespace gui
         Order getOrderFromDirection();
         virtual bool requestNextPage();
         virtual bool requestPreviousPage();
-        void setup(style::listview::RebuildType rebuildType);
+        void setup(style::listview::RebuildType rebuildType, unsigned int dataOffset = 0);
 
       public:
         ListView();
         ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov);
         ~ListView();
 
-        void setElementsCount(int count);
+        void setElementsCount(unsigned int count);
         void setProvider(std::shared_ptr<ListItemProvider> provider);
-        void rebuildList(style::listview::RebuildType rebuildType = style::listview::RebuildType::Full);
+        void rebuildList(style::listview::RebuildType rebuildType = style::listview::RebuildType::Full,
+                         unsigned int dataOffset                  = 0);
         void clear();
         std::shared_ptr<ListItemProvider> getProvider();
-        void setListViewType(style::listview::Type type);
+        void setBoundaries(style::listview::Boundaries value);
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();

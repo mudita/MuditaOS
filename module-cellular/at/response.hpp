@@ -12,8 +12,8 @@ namespace at
     namespace response
     {
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
-        bool parseCSQ(std::string &response, std::string &result);
-        bool parseCSQ(std::string &cellularResponse, uint32_t &result);
+        bool parseCSQ(std::string response, std::string &result);
+        bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);
         bool parseCREG(std::string &response, std::string &result);
         bool parseQNWINFO(std::string &response, std::string &result);

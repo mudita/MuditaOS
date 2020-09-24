@@ -28,6 +28,6 @@ namespace gui
         void setVisibleStatePhoneBlocked() override final;
 
         void buildLockBox(unsigned int pinSize) override final;
-        void buildPinLabels(uint32_t pinSize);
+        void buildPinLabels(unsigned int pinSize);
     };
 } // namespace gui

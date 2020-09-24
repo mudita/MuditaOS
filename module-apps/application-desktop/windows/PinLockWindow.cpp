@@ -46,11 +46,13 @@ namespace gui
         PinLockBaseWindow::build();
         LockBox->buildLockBox(Lock->getPinSize());
     }
+
     void PinLockWindow::destroyInterface()
     {
         erase();
         invalidate();
     }
+
     void PinLockWindow::invalidate() noexcept
     {
         titleLabel = nullptr;
@@ -60,6 +62,7 @@ namespace gui
         pinLabel   = nullptr;
         pinLabels.clear();
     }
+
     void PinLockWindow::setVisibleState(const PinLock::State state)
     {
         if (state == PinLock::State::EnterPin) {

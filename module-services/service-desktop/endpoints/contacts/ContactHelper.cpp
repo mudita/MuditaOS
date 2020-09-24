@@ -40,8 +40,6 @@ auto ContactHelper::from_json(json11::Json contactJSON) -> ContactRecord
     newRecord.alternativeName = UTF8(contactJSON[json::contacts::alternativeName].string_value());
     newRecord.address         = UTF8(contactJSON[json::contacts::address].string_value());
 
-    newRecord.contactType = ContactType::USER;
-
     for (auto num : contactJSON[json::contacts::numbers].array_items()) {
         utils::PhoneNumber phoneNumber(num.string_value());
         auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType ::CELL);

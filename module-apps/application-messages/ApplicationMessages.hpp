@@ -42,7 +42,6 @@ namespace app
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {
@@ -52,8 +51,8 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
-        bool removeSMS(const SMSRecord &record);
-        bool removeSMS_thread(const ThreadRecord *record);
+        bool removeSms(const SMSRecord &record);
+        bool removeSmsThread(const ThreadRecord *record);
         bool markSmsThreadAsRead(const uint32_t id);
         bool markSmsThreadAsUnread(const uint32_t id);
         /// show dialog with big search icon and text which was used for query
@@ -64,6 +63,13 @@ namespace app
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
         bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
         bool handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body);
+
+        std::pair<SMSRecord, bool> createDraft(const utils::PhoneNumber::View &number, const UTF8 &body);
+        bool updateDraft(SMSRecord &record, const UTF8 &body);
+        bool removeDraft(const SMSRecord &record);
+
+        bool onRemoveSmsThreadConfirmed(const ThreadRecord &record);
+        bool onRemoveSmsConfirmed(const SMSRecord &record);
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;
