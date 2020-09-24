@@ -13,7 +13,7 @@ namespace at::urc
         CUSD(const std::string &val);
         ~CUSD() override = default;
 
-        enum Tokens
+        enum class Tokens
         {
             Status,
             Response,

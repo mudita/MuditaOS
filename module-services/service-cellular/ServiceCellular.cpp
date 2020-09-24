@@ -869,7 +869,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     } break;
    case MessageType::CellularUSSDRequest: {
         auto msg    = dynamic_cast<CellularUSSDMessage *>(msgl);
-        responseMsg = std::make_shared<CellularResponseMessage>(handleUSSDRequest(msg->type, msg->data));
+        if (msg != nullptr) {
+            responseMsg = std::make_shared<CellularResponseMessage>(handleUSSDRequest(msg->type, msg->data));
+        }
         break;
     }
     default:
@@ -1677,12 +1679,15 @@ void ServiceCellular::handleStateTimer(void)
 
 bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
 {
+    constexpr uint32_t commandTimeout        = 120000;
+    constexpr uint32_t commandExpectedTokens = 2;
+
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel != nullptr) {
         if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
             channel->cmd(at::AT::SMS_GSM);
             std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15\r";
-            auto result         = channel->cmd(command, 120000, 2);
+            auto result         = channel->cmd(command, commandTimeout, commandExpectedTokens);
             if (result.code == at::Result::Code::OK) {
                 ussdState = ussd::State::pullRequestSent;
                 setUSSDTimer();
@@ -1693,11 +1698,9 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
             ussdState   = ussd::State::sesionAborted;
             auto result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
             if (result.code == at::Result::Code::OK) {
-                LOG_INFO("USSD sesion aborted, reopening push session.");
                 CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::pushSesionRequest);
             }
             else {
-                LOG_WARN("Session close failed, retry.");
                 CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
             }
         }
@@ -1706,7 +1709,6 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
             ussdState   = ussd::State::pushSesion;
             auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
             if (result.code == at::Result::Code::OK) {
-                LOG_INFO("Push session opened.");
             }
         }
         return true;
@@ -1731,10 +1733,12 @@ void ServiceCellular::setUSSDTimer(void)
     case ussd::State::pullRequestSent:
         ussdTimeout = ussd::pullResponseTimeout;
         break;
-    case ::ussd::State::pullResponseReceived:
+    case ussd::State::pullResponseReceived:
         ussdTimeout = ussd::pullSesionTimeout;
         break;
-    default:
+    case ussd::State::pushSesion:
+    case ussd::State::sesionAborted:
+    case ussd::State::none:
         ussdTimeout = ussd::noTimeout;
         break;
     }

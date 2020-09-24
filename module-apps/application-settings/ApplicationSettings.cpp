@@ -72,13 +72,13 @@ namespace app
         bool handled = true;
 
         if (msgl->messageType == MessageType::CellularNotification) {
-            auto msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+            auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
             if (msg != nullptr) {
                 if (msg->type == CellularNotificationMessage::Type::NewIncomingUSSD) {
 
                     auto window = this->getCurrentWindow();
                     if (window->getName() == gui::window::name::ussd_window) {
-                        auto ussdWindow = reinterpret_cast<gui::USSDWindow *>(window);
+                        auto ussdWindow = dynamic_cast<gui::USSDWindow *>(window);
                         if (ussdWindow != nullptr) {
                             ussdWindow->handleIncomingUSSD(msg->data);
                         }

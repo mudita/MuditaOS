@@ -209,9 +209,5 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> &data)
         }
     }
 
-    // else{
-    //     LOG_DEBUG("Dropping unneeded frame");
-    // }
-
     return 1;
 }

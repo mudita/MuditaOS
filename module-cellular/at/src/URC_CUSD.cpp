@@ -15,9 +15,9 @@ bool CUSD::isActionNeeded(void)
 {
     constexpr uint32_t actionNeeded = 2;
 
-    utils::findAndReplaceAll(tokens[CUSD::Tokens::Status], ",", "");
+    utils::findAndReplaceAll(tokens[static_cast<uint32_t>(CUSD::Tokens::Status)], ",", "");
     uint32_t status = 0;
-    if (utils::toNumeric(tokens[CUSD::Tokens::Status], status)) {
+    if (utils::toNumeric(tokens[static_cast<uint32_t>(CUSD::Tokens::Status)], status)) {
         if (status == actionNeeded) {
             return true;
         }
@@ -27,5 +27,5 @@ bool CUSD::isActionNeeded(void)
 
 std::string CUSD::message(void)
 {
-    return tokens[CUSD::Tokens::Response];
+    return tokens[static_cast<uint32_t>(CUSD::Tokens::Response)];
 }
