@@ -172,8 +172,6 @@ namespace gui
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-            auto calendarApp = dynamic_cast<app::ApplicationCalendar *>(application);
-            assert(calendarApp != nullptr);
             if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
                 if (event->repeat < optionsNames.size() - 1) {
                     actualVectorIndex = event->repeat;
