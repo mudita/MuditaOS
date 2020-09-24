@@ -16,6 +16,7 @@
 
 
 ### Other
+* `[audio]` Audio service and api cleanup/refactor.
 
 
 

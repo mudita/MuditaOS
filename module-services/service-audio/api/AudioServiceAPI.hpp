@@ -26,7 +26,15 @@ namespace AudioServiceAPI
     audio::RetCode RoutingMute(sys::Service *serv, bool enable);
     audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable);
     audio::RetCode RoutingHeadset(sys::Service *serv, bool enable);
-    audio::RetCode Stop(sys::Service *serv);
+    /// Stops current audio operation.
+    ///
+    /// Stops current audio operation when it's valid and not idle.
+    /// @param serv requesting service
+    /// @param stopVec vector that contains playback types to be stopped.
+    /// When no vector is passed it stops current operation.
+    /// When stop vector is passed it stops current operation only if it's type is contained in the vector.
+    /// @return Standard service-api return code. Success if suitable.
+    audio::RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec = {});
     audio::RetCode Pause(sys::Service *serv);
     audio::RetCode Resume(sys::Service *serv);
     std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
@@ -60,30 +68,4 @@ namespace AudioServiceAPI
                               const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
                               const audio::PlaybackType &playbackType = audio::PlaybackType::None);
 
-    /*! @brief Sets volume.
-     *
-     * @param serv - requesting service.
-     * @param vol - volume to be set.
-     * @param profileType - selected profile type.
-     * @param playbackType -  type of playback. Not used when profileType is different than playback.
-     * @return           Standard service-api return code. Success if suitable.
-     */
-    audio::RetCode SetVolume(sys::Service *serv,
-                             const audio::Volume &vol,
-                             const audio::Profile::Type &profileType,
-                             const audio::PlaybackType &playbackType = audio::PlaybackType::None);
-    /*! @brief Gets volume.
-     *
-     * @param serv - requesting service.
-     * @param vol - requested volume.
-     * @param profileType - selected profile type.
-     * @param playbackType - type of playback. Not used when profileType is different than playback.
-     * @return           Standard service-api return code. Success if suitable.
-     */
-    audio::RetCode GetVolume(sys::Service *serv,
-                             audio::Volume &vol,
-                             const audio::Profile::Type &profileType,
-                             const audio::PlaybackType &playbackType = audio::PlaybackType::None);
-    audio::RetCode SetInputGain(sys::Service *serv, const audio::Gain gain);
-    audio::RetCode GetInputGain(sys::Service *serv, audio::Gain &gain);
 }; // namespace AudioServiceAPI
