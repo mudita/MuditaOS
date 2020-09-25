@@ -1049,8 +1049,6 @@ extern "C"
             LOG_FATAL(" - DTCM: Asynchronous fault on DTCM interface.");
         if (abfsr.ahbp)
             LOG_FATAL(" - AHBP: Asynchronous fault on AHBP interface");
-        if (abfsr.axim)
-            LOG_FATAL(" - AXIM: Asynchronous fault on AXIM interface, AXIMTYPE: 0x%0" PRIX32, abfsr.aximtype);
         if (abfsr.eppb)
             LOG_FATAL(" - EPPB: Asynchronous fault on EPPB interface");
 #endif // (DEBUG_DETAILED_HARD_FAULT_INFO == 1)

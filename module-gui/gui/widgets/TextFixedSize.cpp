@@ -47,7 +47,7 @@ namespace gui
         auto cursor          = 0;
 
         unsigned int currentLine = 0;
-        unsigned int lineHeight  = font->info.line_height + underlinePadding;
+        unsigned int lineHeight  = format.getFont()->info.line_height + underlinePadding;
 
         auto line_x_position = padding.left;
         do {

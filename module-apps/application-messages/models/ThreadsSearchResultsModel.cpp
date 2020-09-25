@@ -4,7 +4,7 @@
 #include "application-messages/widgets/SearchResultsItem.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
-#include <module-db/queries/sms/QuerySMSSearch.hpp>
+#include <module-db/queries/messages/threads/QueryThreadsSearch.hpp>
 #include <module-apps/application-messages/ApplicationMessages.hpp>
 
 namespace gui::model
@@ -13,12 +13,12 @@ namespace gui::model
     ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app) : BaseThreadsRecordModel(app)
     {}
 
-    unsigned int ThreadsSearchResultsModel::getMinimalItemHeight() const
+    auto ThreadsSearchResultsModel::getMinimalItemHeight() const -> unsigned int
     {
         return style::window::messages::sms_thread_item_h;
     }
 
-    gui::ListItem *ThreadsSearchResultsModel::getItem(gui::Order order)
+    auto ThreadsSearchResultsModel::getItem(gui::Order order) -> gui::ListItem *
     {
 
         std::shared_ptr<ThreadRecord> thread = getRecord(order);
@@ -45,8 +45,9 @@ namespace gui::model
     void ThreadsSearchResultsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         if (std::string(search_value).compare("") != 0) {
-            auto query = std::make_unique<db::query::SMSSearch>(search_value, offset, limit);
-            query->setQueryListener(this);
+            auto query = std::make_unique<db::query::ThreadsSearch>(search_value, offset, limit);
+            query->setQueryListener(
+                db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
             DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
         }
     }
@@ -58,7 +59,7 @@ namespace gui::model
 
     auto ThreadsSearchResultsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
-        auto msgResponse = dynamic_cast<db::query::SMSSearchResult *>(queryResult);
+        auto msgResponse = dynamic_cast<db::query::ThreadsSearchResult *>(queryResult);
         assert(msgResponse != nullptr);
 
         auto records_data = msgResponse->getResults();

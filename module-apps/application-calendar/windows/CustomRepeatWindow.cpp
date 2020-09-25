@@ -67,13 +67,10 @@ namespace gui
         switch (inputEvent.keyCode) {
         case KeyCode::KEY_RF: {
             if (weekDaysOptData != nullptr) {
-                auto items = customRepeatModel->getInternalData();
+                auto isCheckedData = customRepeatModel->getIsCheckedData();
                 uint32_t i = 0;
-                for (auto it : items) {
-                    auto item = dynamic_cast<CheckBoxWithLabelItem *>(it);
-                    if (item && item->checkBox->isChecked()) {
-                        weekDaysOptData->setData(i);
-                    }
+                for (auto checked : isCheckedData) {
+                    weekDaysOptData->setData(i, checked);
                     ++i;
                 }
                 auto data = weekDaysOptData.get();

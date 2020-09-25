@@ -6,13 +6,13 @@
 #include "Databases/SmsDB.hpp"
 #include "SMSRecord.hpp"
 #include "ThreadRecord.hpp"
-#include "queries/sms/QuerySMSSearch.hpp"
-#include "queries/sms/QuerySMSAdd.hpp"
-#include "queries/sms/QuerySMSRemove.hpp"
-#include "queries/sms/QuerySMSUpdate.hpp"
+#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/sms/QuerySMSAdd.hpp"
+#include "queries/messages/sms/QuerySMSRemove.hpp"
+#include "queries/messages/sms/QuerySMSUpdate.hpp"
 
 #include <memory>
-#include <module-db/queries/sms/QuerySMSGetCount.hpp>
+#include <module-db/queries/messages/sms/QuerySMSGetCount.hpp>
 #include <module-utils/json/json11.hpp>
 
 namespace db
@@ -48,7 +48,7 @@ TEST_CASE("Query interface")
         REQUIRE(smsInterface->runQuery(std::make_shared<db::TestQuery>()) == nullptr);
     }
 
-    auto query = std::make_shared<db::query::SMSSearch>("a", 0, 10);
+    auto query = std::make_shared<db::query::ThreadsSearch>("a", 0, 10);
 
     SECTION("known query, wrong interface")
     {
@@ -59,7 +59,7 @@ TEST_CASE("Query interface")
     SECTION("proper result returned")
     {
         auto result = threadInterface->runQuery(query);
-        REQUIRE(dynamic_cast<db::query::SMSSearchResult *>(result.get()));
+        REQUIRE(dynamic_cast<db::query::ThreadsSearchResult *>(result.get()));
     }
 
     SECTION("Endpoint callback test")

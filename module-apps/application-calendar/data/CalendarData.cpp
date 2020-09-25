@@ -8,7 +8,7 @@ WeekDaysRepeatData::WeekDaysRepeatData()
     }
 }
 
-[[nodiscard]] auto WeekDaysRepeatData::getData(const uint32_t &weekDay) const -> bool
+[[nodiscard]] auto WeekDaysRepeatData::getData(const uint32_t weekDay) const -> bool
 {
     if (weekDay >= style::window::calendar::week_days_number) {
         LOG_ERROR("Weekday out of range (%d)", static_cast<int>(weekDay));
@@ -17,7 +17,7 @@ WeekDaysRepeatData::WeekDaysRepeatData()
     return weekDays[weekDay];
 }
 
-void WeekDaysRepeatData::setData(const uint32_t &weekDay)
+void WeekDaysRepeatData::setData(const uint32_t weekDay)
 {
     if (weekDay >= style::window::calendar::week_days_number) {
         LOG_ERROR("Weekday out of range (%d)", static_cast<int>(weekDay));
@@ -29,4 +29,12 @@ void WeekDaysRepeatData::setData(const uint32_t &weekDay)
     else {
         weekDays[weekDay] = true;
     }
+}
+void WeekDaysRepeatData::setData(const uint32_t weekDay, const bool value)
+{
+    if (weekDay >= style::window::calendar::week_days_number) {
+        LOG_ERROR("Weekday out of range (%d)", static_cast<int>(weekDay));
+        return;
+    }
+    weekDays[weekDay] = value;
 }

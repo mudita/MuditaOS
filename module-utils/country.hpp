@@ -260,7 +260,7 @@ namespace utils::country
     };
 
     constexpr std::size_t count = static_cast<std::size_t>(Id::UNKNOWN) + 1;
-    constexpr Id defaultCountry = Id::POLAND;
+    constexpr Id defaultCountry = Id::UNKNOWN;
 
     struct Data
     {

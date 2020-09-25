@@ -44,7 +44,7 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         }}.build());
     options.push_back(gui::Option{
         UTF8(utils::localize.get("sms_delete_message")), [=](gui::Item &item) {
-            return app->removeSMS(record);
+            return app->removeSms(record);
         }}.build());
 
     return options;

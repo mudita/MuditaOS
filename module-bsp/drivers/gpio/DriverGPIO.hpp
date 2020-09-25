@@ -12,7 +12,7 @@
 
 #include <memory>
 #include <functional>
-#include "menums/magic_enum.hpp"
+#include <magic_enum.hpp>
 
 namespace drivers
 {

@@ -18,6 +18,7 @@
 #include "application-notes/ApplicationNotes.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-settings/ApplicationSettings.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
 #include "application-special-input/AppSpecialInput.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-music-player/ApplicationMusicPlayer.hpp"
@@ -26,6 +27,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
+#include "service-bluetooth/ServiceBluetooth.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-db/ServiceDB.hpp"
@@ -33,6 +35,7 @@
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManager.hpp"
+#include "service-lwip/ServiceLwIP.hpp"
 #include "service-fota/ServiceFota.hpp"
 #include "service-antenna/ServiceAntenna.hpp"
 
@@ -182,6 +185,8 @@ int main()
         ret |= sys::SystemManager::CreateService(std::make_shared<FotaService::Service>(), sysmgr.get());
 #endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
 
         // Service Desktop disabled on master - pulling read on usb driver
         // ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
@@ -196,6 +201,7 @@ int main()
 #endif
 #ifdef ENABLE_APP_SETTINGS
         applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
+        applications.push_back(app::CreateLauncher<app::ApplicationSettingsNew>(app::name_settings_new));
 #endif
 #ifdef ENABLE_APP_NOTES
         applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));

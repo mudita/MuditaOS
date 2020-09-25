@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationAntenna.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/AntennaMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/ScanModesWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/AlgoParamsWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationAntenna.hpp"
 )

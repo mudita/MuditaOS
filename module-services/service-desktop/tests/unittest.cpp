@@ -6,7 +6,7 @@
 #include "ParserFSM.hpp"
 #include "contacts/ContactHelper.hpp"
 #include "messages/MessageHelper.hpp"
-#include "queries/sms/QuerySMSSearchByType.hpp"
+#include "queries/messages/sms/QuerySMSSearchByType.hpp"
 #include "EndpointFactory.hpp"
 #include "contacts/ContactsEndpoint.hpp"
 #include "json/json11.hpp"
@@ -142,7 +142,7 @@ TEST_CASE("DB Helpers test - json decoding")
         REQUIRE(contact.alternativeName == "Cic");
         REQUIRE(contact.isOnBlocked() == true);
         REQUIRE(contact.isOnFavourites() == true);
-        REQUIRE(contact.numbers.at(0).number.getFormatted() == "724 842 187");
+        REQUIRE(contact.numbers.at(0).number.getEntered() == "724842187");
         REQUIRE(contact.primaryName == "Baatek");
     }
     SECTION("incorrect json")
@@ -152,7 +152,7 @@ TEST_CASE("DB Helpers test - json decoding")
         auto contactJson = json11::Json::parse(recordPayload, err);
         REQUIRE(err.empty());
 
-        auto helper = std::make_unique<ContactHelper>(nullptr);
+        auto helper  = std::make_unique<ContactHelper>(nullptr);
         auto contact = helper->from_json(contactJson);
         REQUIRE(contact.address == "");
         REQUIRE(contact.alternativeName == "Cic");

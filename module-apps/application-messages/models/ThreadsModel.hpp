@@ -5,12 +5,11 @@
 class ThreadsModel : public BaseThreadsRecordModel
 {
   public:
-    ThreadsModel(app::Application *app);
-
-    // virtual method for db::QueryListener
-    auto handleQueryResponse(db::QueryResult *) -> bool override;
+    explicit ThreadsModel(app::Application *app);
 
     void requestRecords(uint32_t offset, uint32_t limit) override;
-    unsigned int getMinimalItemHeight() const override;
-    gui::ListItem *getItem(gui::Order order) override;
+    [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
+    [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
+
+    auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
 };

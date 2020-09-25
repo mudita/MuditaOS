@@ -149,4 +149,9 @@ namespace audio
         return currentOperation->Resume();
     }
 
+    audio::RetCode Audio::Mute()
+    {
+        return SetOutputVolume(0);
+    }
+
 } // namespace audio

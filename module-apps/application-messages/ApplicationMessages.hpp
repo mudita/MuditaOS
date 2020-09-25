@@ -51,8 +51,8 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
-        bool removeSMS(const SMSRecord &record);
-        bool removeSMS_thread(const ThreadRecord *record);
+        bool removeSms(const SMSRecord &record);
+        bool removeSmsThread(const ThreadRecord *record);
         bool markSmsThreadAsRead(const uint32_t id);
         bool markSmsThreadAsUnread(const uint32_t id);
         /// show dialog with big search icon and text which was used for query
@@ -67,6 +67,9 @@ namespace app
         std::pair<SMSRecord, bool> createDraft(const utils::PhoneNumber::View &number, const UTF8 &body);
         bool updateDraft(SMSRecord &record, const UTF8 &body);
         bool removeDraft(const SMSRecord &record);
+
+        bool onRemoveSmsThreadConfirmed(const ThreadRecord &record);
+        bool onRemoveSmsConfirmed(const SMSRecord &record);
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;

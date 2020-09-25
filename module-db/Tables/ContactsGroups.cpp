@@ -28,6 +28,15 @@ const char *addSpecialGroups = "INSERT OR REPLACE INTO contact_groups "
                                " (3, 'Blocked'),"
                                " (4, 'Temporary');";
 
+const char *createTableGroupsProtected = "CREATE TABLE IF NOT EXISTS contact_group_protected"
+                                         "(  _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                                         "   group_id INTEGER)";
+
+const char *protectSpecialGroups = "INSERT INTO contact_group_protected "
+                                   " (group_id) "
+                                   " VALUES "
+                                   " (1),(2),(3),(4);";
+
 namespace statements
 {
     const char *countGroups = "SELECT COUNT(*) FROM contact_groups;";
@@ -39,11 +48,21 @@ namespace statements
 
     const char *getId      = "SELECT _id FROM contact_groups WHERE name = '%q';";
     const char *getById    = "SELECT _id, name FROM contact_groups WHERE _id = %u;";
-    const char *deleteById = "DELETE FROM contact_groups WHERE _id = %u;";
+
+    /**
+     * delete a group only if it is not a "special group"
+     * the logic behind is: delete the group only if it is not in contact_group_protected
+     * sqlite does not support joins in delete which should look like:
+     * delete cg from contact_groups cg left join contact_group_protected cgp on cg._id=cgp.group_id where cgp._id is
+     * null; so we have the following statement
+     */
+    const char *deleteById = "DELETE FROM contact_groups WHERE _id = %u "
+                             "AND NOT EXISTS (SELECT * FROM contact_group_protected WHERE group_id=contact_groups._id)";
 
     const char *getAllLimtOfset = "SELECT _id, name FROM contact_groups ORDER BY _id LIMIT %lu OFFSET %lu;";
 
     const char *addGrup         = "INSERT INTO contact_groups (name) VALUES ('%q');";
+    const char *addProtectedGroup = "INSERT INTO conctact_group_protected (group_id) VALUES ('%u');";
     const char *updateGroupName = "UPDATE contact_groups SET name = '%q' WHERE _id = '%u';";
     const char *deleteGroup     = "DELETE FROM table_name WHERE _id = :id;";
 
@@ -77,7 +96,11 @@ bool ContactsGroupsTable::create()
     if (db->execute(createTablesQuery)) {
         if (db->execute(createIndices)) {
             if (db->execute(addSpecialGroups)) {
-                return true;
+                if (db->execute(createTableGroupsProtected)) {
+                    if (db->execute(protectSpecialGroups)) {
+                        return true;
+                    }
+                }
             }
         }
     }

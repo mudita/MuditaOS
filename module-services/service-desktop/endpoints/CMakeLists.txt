@@ -4,7 +4,7 @@ target_include_directories(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/.."
 		"${CMAKE_CURRENT_LIST_DIR}/../messages"
 		"${CMAKE_CURRENT_LIST_DIR}/messages"
-		"${CMAKE_CURRENT_LIST_DIR}/contacts"
+		"${CMAKE_CURRENT_LIST_DIR}/calllog"
 		"${CMAKE_CURRENT_LIST_DIR}/backup"
 		"${CMAKE_CURRENT_LIST_DIR}/deviceInfo"
 		"${CMAKE_CURRENT_LIST_DIR}/factoryReset"
@@ -19,8 +19,8 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 target_sources(${PROJECT_NAME}
 	PRIVATE
 		"deviceInfo/DeviceInfoEndpoint.cpp"
-		/*"Update.cpp"*/
-		/*"Restore.cpp"*/
+		"calllog/CalllogHelper.cpp"
+		"calllog/CalllogEndpoint.cpp"
 		"contacts/ContactHelper.cpp"
 		"contacts/ContactsEndpoint.cpp"
 		"messages/MessageHelper.cpp"

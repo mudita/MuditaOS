@@ -25,8 +25,8 @@ jobs:
         popd 
     - name: "Build for RT1051"
       run: |
-        ./configure.sh rt1051 Debug && \
-        pushd build-rt1051-Debug && \
+        ./configure.sh rt1051 Release && \
+        pushd build-rt1051-Release && \
         export JOBS=${JOBS:-`nproc`} && \
         echo "JOBS=${JOBS}" && \
         make -j ${JOBS} && \

@@ -39,8 +39,9 @@ class WeekDaysRepeatData : public gui::SwitchData
   public:
     WeekDaysRepeatData();
     virtual ~WeekDaysRepeatData() = default;
-    [[nodiscard]] auto getData(const uint32_t &weekDay) const -> bool;
-    virtual void setData(const uint32_t &weekDay);
+    [[nodiscard]] auto getData(const uint32_t weekDay) const -> bool;
+    virtual void setData(const uint32_t weekDay, const bool value);
+    virtual void setData(const uint32_t weekDay);
 };
 
 class DayMonthData : public gui::SwitchData

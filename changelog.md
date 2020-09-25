@@ -1,40 +1,46 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.39.1 2020-09-25]
 
 ### Added
 
-
+* `[gui]` Add rich text parsing for text styling needs.
+* `[audio]` New volume buttons features.
+* `[settings]` Add basic Bluetooth options window.
+* `[phonebook]`Scrolling contacts list with a particular letter.
+* `[antenna-app]` Added parameter history window.
 
 ### Changed
 
-
+* `[phonenumber]` Change default country to unknown.
+* `[messages]` Save unsent messages as SMS drafts.
+* `[settings]` Update main screen.
 
 ### Fixed
 
-* `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
-
+* `[calendar]` Fixed custom repeat option.
+* `[settings]` Fixed items sizes and positions in Date/Time window.
+* `[phonebook]` Fixed duplication of a phone number when adding or editing an ex-temporary contact.
+* `[messages]` Fixed sending SMS to new or deleted contact.
+* `[cellular]` Fixed outgoing call stuck in the calling state.
+* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
-* `[system_features]` Sprintf clean up.
+* `[listview]` Added ability to rebuild on provided data offset.
+* `[messages]` Cleanup of database service API.
+* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.2 2020-09-18]
 
 ### Added
 
 * `[music player]` Add layout for the playback window.
-* `[messages]` Save unsent messages as SMS drafts.
-
-### Fixed
-
-* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
 * `[build]` Move user data to SDRAM during linking.
 * `[build]` RT1051's linker script cleanup.
-* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.1 2020-09-18]
 

@@ -1,3 +1,7 @@
+[submodule "module-lwip/lib/lwip"]
+	path = module-lwip/lib/lwip
+	url = ../lwip.git
+	shallow = true
 [submodule "module-utils/microtar"]
 	path = module-utils/microtar
 	url = ../microtar.git
@@ -31,12 +35,21 @@
 	url = https://github.com/catchorg/Catch2
 [submodule "module-utils/date"]
 	path = module-utils/date
-	url = ../date.git
+	url = git@github.com:mudita/date.git
 [submodule "module-audio/Audio/decoder/minimp3"]
 	path = module-audio/Audio/decoder/minimp3
-	url = ../minimp3.git
+	url = git@github.com:mudita/minimp3.git
     branch = RT1051
 [submodule "module-audio/Audio/decoder/taglib"]
 	path = module-audio/Audio/decoder/taglib
 	url = ../taglib.git
 	branch = rt1051
+[submodule "module-bluetooth/lib/btstack"]
+	path = module-bluetooth/lib/btstack
+	url = ../btstack.git
+[submodule "module-utils/pugixml"]
+	path = module-utils/pugixml
+	url = ../pugixml.git
+[submodule "module-utils/magic_enum"]
+	path = module-utils/magic_enum
+	url = git@github.com:Neargye/magic_enum.git

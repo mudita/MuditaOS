@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
         ApplicationSettings.cpp
         windows/SettingsMainWindow.cpp
         windows/LanguageWindow.cpp
+        windows/BtWindow.cpp
 
         windows/UITestWindow.cpp
         windows/Info.cpp

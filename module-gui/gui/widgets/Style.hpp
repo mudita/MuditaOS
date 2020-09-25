@@ -111,6 +111,11 @@ namespace style
             const inline uint32_t date_time_item_title_height = 30;
             const inline uint32_t date_time_spacer_width      = 20;
             const inline uint32_t date_time_x_offset          = 30;
+
+            const inline uint32_t date_time_box_h = 107;
+            const inline uint32_t date_box_y_pos  = 123;
+            const inline uint32_t time_box_y_pos  = 285;
+
         } // namespace date
     }     // namespace settings
     namespace color
@@ -172,22 +177,29 @@ namespace style
 
     namespace listview
     {
-        enum class Type
+        /// Possible List boundaries handling types
+        enum class Boundaries
         {
-            TopDown,
-            Continuous
+            Fixed,     ///< Fixed - list will stop scrolling on first or last elements on appropriate top or bottom
+                       ///< directions.
+            Continuous ///< Continuous - list will continue to beginning or end on first or last elements on
+                       ///< appropriate top or bottom directions.
         };
 
+        /// Possible List scrolling directions
         enum class Direction
         {
             Top,
             Bottom
         };
 
+        /// Possible List rebuild types
         enum class RebuildType
         {
-            Full,
-            Partial
+            Full,    ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
+            InPlace, ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
+            OnOffset ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
+                     ///< offset.
         };
 
         namespace scroll

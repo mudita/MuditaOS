@@ -3,7 +3,7 @@
 
 namespace gui
 {
-    auto textToTextBlocks(const UTF8 &text, RawFont *font, TextBlock::End end) -> std::list<TextBlock>
+    auto textToTextBlocks(const UTF8 &text, const RawFont *font, TextBlock::End end) -> std::list<TextBlock>
     {
         std::list<TextBlock> blocks;
         std::stringstream ss(text.c_str());

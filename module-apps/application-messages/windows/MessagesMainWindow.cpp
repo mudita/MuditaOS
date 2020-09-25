@@ -12,7 +12,9 @@
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
+
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 
 #include <memory>
 #include <cassert>
@@ -20,7 +22,6 @@
 
 namespace gui
 {
-
     MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
     {
         buildInterface();
@@ -28,17 +29,19 @@ namespace gui
 
     void MessagesMainWindow::rebuild()
     {
-        list->rebuildList(style::listview::RebuildType::Partial);
+        if (list == nullptr) {
+            return;
+        }
+        list->rebuildList(style::listview::RebuildType::InPlace);
     }
 
     void MessagesMainWindow::buildInterface()
     {
-
         namespace msgThreadStyle = style::messages::threads;
 
         AppWindow::buildInterface();
 
-        threadsModel = std::make_shared<ThreadsModel>(this->application);
+        threadsModel = std::make_shared<ThreadsModel>(application);
 
         list = new gui::ListView(this,
                                  msgThreadStyle::listPositionX,
@@ -73,7 +76,7 @@ namespace gui
                                  utils::localize.get("app_messages_no_messages"));
 
         list->setVisible(true);
-        list->focusChangedCallback = [=](gui::Item & /*item*/) {
+        list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             bottomBar->setActive(BottomBar::Side::CENTER, true);
             rightArrowImage->setVisible(true);
@@ -81,32 +84,39 @@ namespace gui
             return true;
         };
 
-        setFocusItem(list);
-
         emptyListIcon->setVisible(false);
-        emptyListIcon->focusChangedCallback = [=](gui::Item & /*item*/) {
+        emptyListIcon->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             rightArrowImage->setVisible(false);
             searchImage->setVisible(false);
             return true;
         };
+
+        setFocusItem(list);
     }
 
     void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-
         LOG_INFO("Data: %s", data ? data->getDescription().c_str() : "");
         {
-            if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data)) {
-                auto thread = DBServiceAPI::ThreadGetByContact(application, pdata->result->ID);
-                if (thread) {
-                    application->switchWindow(gui::name::window::thread_view,
-                                              std::make_unique<SMSThreadData>(std::move(thread)));
-                }
-                else {
+            auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data);
+            if (pdata != nullptr) {
+                using db::query::ThreadGetByContactID;
+                auto query = std::make_unique<ThreadGetByContactID>(pdata->result->ID);
+                query->setQueryListener(db::QueryCallback::fromFunction([app = application](auto response) {
+                    using db::query::ThreadGetByContactIDResult;
+                    const auto result = dynamic_cast<ThreadGetByContactIDResult *>(response);
+                    if ((result != nullptr) && result->getRecord().has_value()) {
+                        auto thread = result->getRecord().value();
+                        app->switchWindow(gui::name::window::thread_view,
+                                          std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread)));
+                        return true;
+                    }
                     LOG_FATAL("No thread and thread not created!");
-                }
+                    return false;
+                }));
+                DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
             }
         }
 
@@ -116,7 +126,7 @@ namespace gui
         }
         else {
             emptyListIcon->setVisible(false);
-            list->rebuildList(style::listview::RebuildType::Partial);
+            list->rebuildList(style::listview::RebuildType::InPlace);
         }
 
         DBServiceAPI::GetQuery(application,
@@ -128,24 +138,22 @@ namespace gui
     {
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app);
+
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        else {
-            if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-                switch (inputEvent.keyCode) {
-                case gui::KeyCode::KEY_LEFT:
-                    application->switchWindow(gui::name::window::new_sms, nullptr);
-                    return true;
-                case gui::KeyCode::KEY_RIGHT: {
-                    app->switchWindow(gui::name::window::thread_sms_search, nullptr);
-                    return true;
-                } break;
-                default:
-                    LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
-                    break;
-                }
+        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
+            switch (inputEvent.keyCode) {
+            case gui::KeyCode::KEY_LEFT:
+                application->switchWindow(gui::name::window::new_sms, nullptr);
+                return true;
+            case gui::KeyCode::KEY_RIGHT:
+                app->switchWindow(gui::name::window::thread_sms_search, nullptr);
+                return true;
+            default:
+                LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
+                break;
             }
         }
         return false;
@@ -157,16 +165,12 @@ namespace gui
         if (msgNotification != nullptr) {
             if (msgNotification->interface == db::Interface::Name::SMSThread ||
                 msgNotification->interface == db::Interface::Name::SMS) {
-
                 if (msgNotification->dataModified()) {
-
                     rebuild();
-
                     return true;
                 }
             }
         }
         return false;
-    } // namespace gui
-
-} /* namespace gui */
+    }
+} // namespace gui
