@@ -1,52 +1,46 @@
 # Mudita PurePhone changelog
 
-## [Current release]
+## [0.39.1 2020-09-25]
 
 ### Added
 
-* `[GUI]` Added rich text parsing for full text styling needs
-* `[Audio]` New volume buttons features
-* `[settings]` Add basic bluetooth options window.
-* `[phonebook]`Scrolling contacts list with a particular letter - part 1
-
-### Other
-
+* `[gui]` Add rich text parsing for text styling needs.
+* `[audio]` New volume buttons features.
+* `[settings]` Add basic Bluetooth options window.
+* `[phonebook]`Scrolling contacts list with a particular letter.
+* `[antenna-app]` Added parameter history window.
 
 ### Changed
 
-* `[calendar]` Fixed custom repeat option.
-* `[antenna-app]` Added parameter history window.
 * `[phonenumber]` Change default country to unknown.
+* `[messages]` Save unsent messages as SMS drafts.
+* `[settings]` Update main screen.
 
 ### Fixed
 
-* `[settings]` Fixed items sizes and positions in Date Time window.
-* `[phonebook]` Fixed duplication of phone number when adding or editing ex-temporary contact.
-* `[messages]` Fixed sending sms to new or deleted contact
-* `[cellular]``[call app]` Fixed outgoing call stuck in calling state
+* `[calendar]` Fixed custom repeat option.
+* `[settings]` Fixed items sizes and positions in Date/Time window.
+* `[phonebook]` Fixed duplication of a phone number when adding or editing an ex-temporary contact.
+* `[messages]` Fixed sending SMS to new or deleted contact.
+* `[cellular]` Fixed outgoing call stuck in the calling state.
+* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
-* `[system_features]` Sprintf clean up.
-* `[listview]` Added ability to rebuild on provided data offset. 
+* `[listview]` Added ability to rebuild on provided data offset.
 * `[messages]` Cleanup of database service API.
+* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.2 2020-09-18]
 
 ### Added
 
 * `[music player]` Add layout for the playback window.
-* `[messages]` Save unsent messages as SMS drafts.
-
-### Fixed
-
-* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
 * `[build]` Move user data to SDRAM during linking.
 * `[build]` RT1051's linker script cleanup.
-* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.1 2020-09-18]
 
