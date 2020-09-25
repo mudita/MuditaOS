@@ -24,6 +24,7 @@ target_sources( ${PROJECT_NAME}
         windows/KeypadLightWindow.cpp
         windows/LockedScreenWindow.cpp
         windows/DisplayAndKeypadWindow.cpp
+        windows/NetworkWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
