@@ -10,6 +10,7 @@
 #include "windows/DisplayLightWindow.hpp"
 #include "windows/KeypadLightWindow.hpp"
 #include "windows/AppsAndToolsWindow.hpp"
+#include "windows/NetworkWindow.hpp"
 
 #include "ApplicationSettings.hpp"
 
@@ -73,6 +74,7 @@ namespace app
         attachWindow(new gui::FontSizeWindow(this));
         attachWindow(new gui::DisplayLightWindow(this));
         attachWindow(new gui::AppsAndToolsWindow(this));
+        attachWindow(new gui::NetworkWindow(this));
     }
 
     void ApplicationSettingsNew::destroyUserInterface()
