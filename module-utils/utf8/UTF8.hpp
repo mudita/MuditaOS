@@ -98,10 +98,12 @@ class UTF8
     {
         return strLength;
     }
+
     bool empty() const noexcept
     {
         return strLength == 0U;
     }
+
     uint32_t used() const
     {
         return sizeUsed;

@@ -89,6 +89,17 @@ class ServiceAudio : public sys::Service
         return defaultValue;
     }
 
+    void setCurrentSetting(const audio::Setting &setting, const int &step);
+    void setCurrentVolume(const uint32_t &value);
+    void setSetting(const audio::Setting &setting,
+                    const uint32_t value,
+                    const audio::Profile::Type &profileType,
+                    const audio::PlaybackType &playbackType);
+    [[nodiscard]] uint32_t getSetting(const audio::Setting &setting,
+                                      const audio::Profile::Type &profileType,
+                                      const audio::PlaybackType &playbackType);
+    [[nodiscard]] uint32_t getCurrentSetting(const audio::Setting &setting);
+    [[nodiscard]] uint32_t getCurrentVolume();
     void updateDbValue(const std::string &path, const audio::Setting &setting, const uint32_t &value);
     void updateDbValue(const audio::Operation *currentOperation, const audio::Setting &setting, const uint32_t &value);
 };

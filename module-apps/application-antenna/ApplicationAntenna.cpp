@@ -11,6 +11,7 @@
 
 #include "windows/AntennaMainWindow.hpp"
 #include "windows/ScanModesWindow.hpp"
+#include "windows/AlgoParamsWindow.hpp"
 
 #include <ticks.hpp>
 namespace app
@@ -19,15 +20,12 @@ namespace app
     void ApplicationAntenna::timerHandler(void)
     {
         auto win = getCurrentWindow();
-
-        if (win->getName() == gui::name::window::main_window) {
-            auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
-            if (window != nullptr) {
-                if (!cellularRequestInProgress) {
-                    LOG_INFO("Get Network info");
-                    cellularRequestInProgress = true;
-                    CellularServiceAPI::GetNetworkInfo(this);
-                }
+        auto windowName = win->getName();
+        if ((windowName == gui::name::window::main_window) || (windowName == gui::name::window::algo_window)) {
+            if (!cellularRequestInProgress) {
+                LOG_INFO("Get Network info");
+                cellularRequestInProgress = true;
+                CellularServiceAPI::GetNetworkInfo(this);
             }
         }
     }
@@ -38,7 +36,7 @@ namespace app
 
     {
         busChannels.push_back(sys::BusChannels::AntennaNotifications);
-
+        busChannels.push_back(sys::BusChannels::AntennaNotifications);
         appTimer.restart();
     }
 
@@ -75,6 +73,7 @@ namespace app
         if (msgl->messageType == MessageType::CellularNetworkInfoResult) {
             auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
             if (msg != nullptr) {
+                handleNetworkParams(msg->data);
                 auto win = getCurrentWindow();
 
                 if (win->getName() == gui::name::window::main_window) {
@@ -84,6 +83,7 @@ namespace app
                         window->updateDebugInfo(msg->data);
                     }
                 }
+
                 cellularRequestInProgress = false;
             }
             handled = true;
@@ -105,7 +105,7 @@ namespace app
             handled = true;
         }
         if (msgl->messageType == MessageType::AntennaChanged) {
-            bsp::cellular::antenna antenna;
+
             CellularServiceAPI::GetAntenna(this, antenna);
             auto win = getCurrentWindow();
 
@@ -116,7 +116,21 @@ namespace app
                     window->updateAntennaButtons(antenna);
                 }
             }
+
+            bool refresh = false;
+            if (win->getName() == gui::name::window::algo_window) {
+                refresh = true;
+            }
+            auto window     = getWindow(gui::name::window::algo_window);
+            auto algoWindow = dynamic_cast<gui::AlgoParamsWindow *>(window);
+            if (algoWindow != nullptr) {
+                algoWindow->handleAntennaChanged(antenna, refresh);
+            }
             handled = true;
+        }
+        if (msgl->messageType == MessageType::AntennaCSQChange) {
+            csqUpdated = true;
+            handled    = true;
         }
         if (handled)
             return std::make_shared<sys::ResponseMessage>();
@@ -136,6 +150,8 @@ namespace app
 
         setActiveWindow(gui::name::window::main_window);
 
+        CellularServiceAPI::GetAntenna(this, antenna);
+
         return ret;
     }
 
@@ -152,9 +168,42 @@ namespace app
 
         win = new gui::ScanModesWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::scan_window, win));
+
+        win = new gui::AlgoParamsWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::algo_window, win));
     }
 
     void ApplicationAntenna::destroyUserInterface()
     {}
 
+    void ApplicationAntenna::handleNetworkParams(std::vector<std::string> &data)
+    {
+
+        uint32_t creg;
+        at::response::parseCREG(data[1], creg);
+
+        uint32_t bandFreq = at::response::qnwinfo::parseNetworkFrequency(data[2]);
+
+        if ((csqUpdated) || lastCreg != creg || lastFreq != bandFreq) {
+            std::string param;
+            at::response::parseCSQ(data[0], param);
+            param += " | " + std::to_string(creg);
+            param += " | " + std::to_string(bandFreq);
+
+            csqUpdated = false;
+            lastCreg   = creg;
+            lastFreq   = bandFreq;
+
+            bool refresh = false;
+            auto win     = getWindow(gui::name::window::algo_window);
+            if (win == getCurrentWindow()) {
+                refresh = true;
+            }
+            auto window = dynamic_cast<gui::AlgoParamsWindow *>(win);
+            if (window != nullptr) {
+
+                window->handleNewParams(param, refresh);
+            }
+        }
+    }
 } /* namespace app */

@@ -235,4 +235,14 @@ namespace gui
     {
         return *currentBlock();
     }
+
+    auto BlockCursor::begin() -> std::list<TextBlock>::iterator
+    {
+        return document == nullptr ? document->blocks.end() : document->blocks.begin();
+    }
+
+    auto BlockCursor::end() -> std::list<TextBlock>::iterator
+    {
+        return document->blocks.end();
+    }
 } // namespace gui

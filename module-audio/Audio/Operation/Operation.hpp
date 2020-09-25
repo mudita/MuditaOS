@@ -116,7 +116,7 @@ namespace audio
             return currentProfile;
         }
 
-        audio::PlaybackType GetplaybackType() const noexcept
+        audio::PlaybackType GetPlaybackType() const noexcept
         {
             return playbackType;
         }

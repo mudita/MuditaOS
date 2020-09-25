@@ -17,7 +17,9 @@ namespace gui
 
     TextCursor::TextCursor(gui::Text *parent, gui::TextDocument *document)
         : Rect(parent, 0, 0, default_width, 1),
-          BlockCursor(document, text::npos, text::npos, parent != nullptr ? parent->font : nullptr), text(parent)
+          BlockCursor(
+              document, text::npos, text::npos, parent != nullptr ? parent->getTextFormat().getFont() : nullptr),
+          text(parent)
     {
         setFilled(true);
         setVisible(false);
@@ -123,8 +125,9 @@ namespace gui
             setArea({x, y, w, h});
             return;
         }
-        if (document->isEmpty() && text->font != nullptr) {
-            h += text->font->info.line_height;
+        auto default_font = text->format.getFont();
+        if (document->isEmpty() && default_font != nullptr) {
+            h += default_font->info.line_height;
             x = getAxisAlignmentValue(Axis::X, w);
             y = getAxisAlignmentValue(Axis::Y, h);
         }

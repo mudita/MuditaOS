@@ -513,12 +513,14 @@ namespace app
 
     bool Application::adjustCurrentVolume(const int step)
     {
-        audio::Volume vol;
-        auto ret = AudioServiceAPI::GetOutputVolume(this, vol);
+        audio::Volume volume;
+        auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
         if (ret == audio::RetCode::Success) {
-            ret = ((static_cast<int>(vol) + step) < 0) ? audio::RetCode::Success
-                                                       : AudioServiceAPI::SetOutputVolume(this, vol + step);
+            ret = ((static_cast<int>(volume) + step) < 0)
+                      ? audio::RetCode::Success
+                      : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
         }
+
         return ret == audio::RetCode::Success;
     }
 

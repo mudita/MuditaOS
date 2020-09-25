@@ -8,9 +8,7 @@
 
 #include <vector>
 
-class BaseThreadsRecordModel : public app::DatabaseModel<ThreadRecord>,
-                               public gui::ListItemProvider,
-                               public db::QueryListener
+class BaseThreadsRecordModel : public app::DatabaseModel<ThreadRecord>, public gui::ListItemProvider
 {
   public:
     BaseThreadsRecordModel() = delete;

@@ -58,3 +58,18 @@ void CustomRepeatModel::loadData(const std::shared_ptr<WeekDaysRepeatData> &data
 
     list->rebuildList();
 }
+
+std::vector<bool> CustomRepeatModel::getIsCheckedData()
+{
+    std::vector<bool> isCheckedData;
+    for (auto item : internalData) {
+        if (item->onContentChangeCallback && item->onContentChangeCallback()) {
+            isCheckedData.push_back(true);
+        }
+        else {
+            isCheckedData.push_back(false);
+        }
+    }
+
+    return isCheckedData;
+}

@@ -15,6 +15,7 @@
 
 #include "../AntennaAppStyle.hpp"
 #include "ScanModesWindow.hpp"
+#include "AlgoParamsWindow.hpp"
 #include "../ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-antenna/api/AntennaServiceAPI.hpp"
@@ -102,6 +103,11 @@ namespace gui
             return true;
         }));
 
+        buttons.push_back(addLabel("Algo Parms", [=](gui::Item &) {
+            this->application->switchWindow(gui::name::window::algo_window, nullptr);
+            return true;
+        }));
+
         uint32_t posX = antenna::main_window::commonXPos;
         for (uint32_t i = 0; i < buttons.size(); i++) {
             buttons[i]->setFont(style::window::font::medium);
@@ -130,11 +136,14 @@ namespace gui
         buttons[buttonDescriotion::ScanMode]->setSize(antenna::main_window::buttonSmallW,
                                                       antenna::main_window::buttonH);
 
-        buttons[buttonDescriotion::LockAntennaManager]->setPosition(antenna::main_window::buttonPosXLeft,
+        buttons[buttonDescriotion::LockAntennaManager]->setPosition(antenna::main_window::buttonPosXColumnLeft,
                                                                     antenna::main_window::buttonPosYRow3);
-        buttons[buttonDescriotion::LockAntennaManager]->setSize(antenna::main_window::buttonBigW,
+        buttons[buttonDescriotion::LockAntennaManager]->setSize(antenna::main_window::buttonMidW,
                                                                 antenna::main_window::buttonH);
-
+        buttons[buttonDescriotion::AlgoParams]->setPosition(antenna::main_window::buttonPosXColumnRight,
+                                                            antenna::main_window::buttonPosYRow3);
+        buttons[buttonDescriotion::AlgoParams]->setSize(antenna::main_window::buttonMidW,
+                                                        antenna::main_window::buttonH);
         operators = new gui::Text(this,
                                   antenna::main_window::commonXPos,
                                   antenna::main_window::scanListPosY,
@@ -178,6 +187,13 @@ namespace gui
 
         buttons[buttonDescriotion::LockAntennaManager]->setNavigationItem(NavigationDirection::UP,
                                                                           buttons[buttonDescriotion::AntennaA]);
+        buttons[buttonDescriotion::LockAntennaManager]->setNavigationItem(NavigationDirection::RIGHT,
+                                                                          buttons[buttonDescriotion::AlgoParams]);
+
+        buttons[buttonDescriotion::AlgoParams]->setNavigationItem(NavigationDirection::UP,
+                                                                  buttons[buttonDescriotion::AntennaA]);
+        buttons[buttonDescriotion::AlgoParams]->setNavigationItem(NavigationDirection::LEFT,
+                                                                  buttons[buttonDescriotion::LockAntennaManager]);
         setFocusItem(buttons[buttonDescriotion::AntennaA]);
 
         antenna::lockState antennaServiceState;
@@ -185,9 +201,9 @@ namespace gui
             updateLockedButton(antennaServiceState);
         }
 
-        bsp::cellular::antenna antenna;
-        if (CellularServiceAPI::GetAntenna(this->application, antenna)) {
-            updateAntennaButtons(antenna);
+        auto app = dynamic_cast<app::ApplicationAntenna *>(this->application);
+        if (app != nullptr) {
+            updateAntennaButtons(app->getAntenna());
         }
     }
     void AntennaMainWindow::destroyInterface()
@@ -237,12 +253,13 @@ namespace gui
 
     void AntennaMainWindow::updateDebugInfo(std::vector<std::string> &data)
     {
-        LOG_INFO("AntennaMainWindow::updateDebugInfo vector size %u", static_cast<unsigned int>(data.size()));
         if (data.size() == 3) {
             titles[static_cast<uint32_t>(labelDescripion::csq)]->setText(
                 titlesText[static_cast<uint32_t>(labelDescripion::csq)] + data[0]);
+            std::string creg;
+            at::response::parseCREG(data[1], creg);
             titles[static_cast<uint32_t>(labelDescripion::status)]->setText(
-                titlesText[static_cast<uint32_t>(labelDescripion::status)] + data[1]);
+                titlesText[static_cast<uint32_t>(labelDescripion::status)] + creg);
 
             auto bandFrequency = at::response::qnwinfo::parseNetworkFrequency(data[2]);
             titles[static_cast<uint32_t>(labelDescripion::band)]->setText(

@@ -16,17 +16,21 @@
 
 const static std::uint32_t phonebookModelTimeout = 1000;
 
-PhonebookModel::PhonebookModel(app::Application *app, std::string filter, std::uint32_t groupFilter)
-    : DatabaseModel(app), queryFilter(std::move(filter)), queryGroupFilter(std::move(groupFilter))
+PhonebookModel::PhonebookModel(app::Application *app,
+                               std::string filter,
+                               std::uint32_t groupFilter,
+                               std::uint32_t displayMode)
+    : DatabaseModel(app), queryFilter(std::move(filter)), queryGroupFilter(std::move(groupFilter)),
+      queryDisplayMode(std::move(displayMode))
 {}
 
 auto PhonebookModel::requestRecordsCount() -> unsigned int
 {
-    auto [code, msg] =
-        DBServiceAPI::GetQueryWithReply(application,
-                                        db::Interface::Name::Contact,
-                                        std::make_unique<db::query::ContactGetSize>(queryFilter, queryGroupFilter),
-                                        phonebookModelTimeout);
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
+        application,
+        db::Interface::Name::Contact,
+        std::make_unique<db::query::ContactGetSize>(queryFilter, queryGroupFilter, queryDisplayMode),
+        phonebookModelTimeout);
 
     if (code == sys::ReturnCodes::Success && msg != nullptr) {
         auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
@@ -44,9 +48,36 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
 
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    auto query = std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter);
-    query->setQueryListener(this);
+    auto query =
+        std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter, queryDisplayMode);
+    query->setQueryListener(
+        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
+    lastRequestedOffset = offset;
+}
+
+auto PhonebookModel::requestLetterMap() -> ContactsMapData
+{
+
+    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
+        application,
+        db::Interface::Name::Contact,
+        std::make_unique<db::query::ContactGetLetterMap>(queryFilter, queryGroupFilter, queryDisplayMode),
+        phonebookModelTimeout);
+
+    ContactsMapData contactMapData;
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        if (queryResponse != nullptr) {
+            auto letterMapResultResponse = queryResponse->getResult();
+            auto letterMapResult         = dynamic_cast<db::query::LetterMapResult *>(letterMapResultResponse.get());
+            if (letterMapResult != nullptr) {
+                contactMapData = letterMapResult->getLetterMap();
+            }
+        }
+    }
+
+    return contactMapData;
 }
 
 auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records) -> bool
@@ -86,6 +117,7 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
     auto item = new gui::PhonebookItem();
 
     item->setContact(contact);
+    item->setLabelMarkerDisplayMode(getLabelMarkerDisplayMode());
     item->activatedCallback = [this, item, contact](gui::Item &) {
         if (messagesSelectCallback && messagesSelectCallback(item)) {
             return true;
@@ -118,6 +150,16 @@ auto PhonebookModel::getFilter() const -> const std::string &
     return queryFilter;
 }
 
+void PhonebookModel::setDisplayMode(std::uint32_t displayMode)
+{
+    queryDisplayMode = displayMode;
+}
+
+auto PhonebookModel::getDisplayMode() -> std::uint32_t
+{
+    return queryDisplayMode;
+}
+
 auto PhonebookModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
     auto contactsResponse = dynamic_cast<db::query::ContactGetResult *>(queryResult);
@@ -126,4 +168,19 @@ auto PhonebookModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     auto records = std::make_unique<std::vector<ContactRecord>>(contactsResponse->getRecords());
 
     return this->updateRecords(std::move(records));
+}
+
+auto PhonebookModel::getLastRequestedOffset() -> std::uint32_t
+{
+    return lastRequestedOffset;
+}
+
+auto PhonebookModel::getLabelMarkerDisplayMode() -> LabelMarkerDisplayMode
+{
+    if (getLastRequestedOffset() < letterMap.favouritesCount) {
+        return LabelMarkerDisplayMode::IncludeFavourites;
+    }
+    else {
+        return LabelMarkerDisplayMode::IgnoreFavourites;
+    }
 }

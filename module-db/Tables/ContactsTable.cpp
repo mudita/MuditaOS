@@ -153,6 +153,78 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryNa
     return ret;
 }
 
+std::string ContactsTable::GetSortedByNameQueryString(std::uint32_t limit, std::uint32_t offset)
+{
+    std::string query = "SELECT contacts._id, contact_name.name_alternative, 'Favourites' AS ContactType  FROM contacts"
+                        " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
+                        " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
+                        " contact_match_groups.group_id = 1 "
+                        " WHERE group_id= 1 "
+                        " UNION  ALL "
+                        " SELECT contacts._id, contact_name.name_alternative, 'All'  FROM contacts "
+                        " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
+                        " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
+                        " contact_match_groups.group_id = 1 "
+                        " ORDER BY ContactType DESC, contact_name.name_alternative  ";
+    if (limit > 0) {
+        query += " LIMIT " + std::to_string(limit);
+        query += " OFFSET " + std::to_string(offset);
+    }
+    query += " ;";
+    return query;
+}
+
+std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit, std::uint32_t offset)
+{
+    std::vector<std::uint32_t> ids;
+    std::string query = GetSortedByNameQueryString(limit, offset);
+
+    LOG_DEBUG("query: %s", query.c_str());
+    auto queryRet = db->query(query.c_str());
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
+        return ids;
+    }
+    do {
+        ids.push_back((*queryRet)[0].getUInt32());
+    } while (queryRet->nextRow());
+
+    return ids;
+}
+
+ContactsMapData ContactsTable::GetPosOfFirstLetters()
+{
+    ContactsMapData contactMap;
+    std::string FirstLetterOfName;
+    std::string FirstLetterOfNameOld;
+    std::uint32_t PositionOnList  = 0;
+    std::uint32_t favouritesCount = 0;
+    std::string query             = GetSortedByNameQueryString();
+
+    LOG_DEBUG("query: %s", query.c_str());
+    auto queryRet = db->query(query.c_str());
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
+        return contactMap;
+    }
+    do {
+        if ((*queryRet)[2].getString() == "All") {
+            UTF8 FirstLetterOfNameUtf = (*queryRet)[1].getString();
+            FirstLetterOfName         = FirstLetterOfNameUtf.substr(0, 1);
+            if (FirstLetterOfName != FirstLetterOfNameOld) {
+                contactMap.firstLetterDictionary.insert(
+                    std::pair<std::string, std::uint32_t>(FirstLetterOfName, PositionOnList));
+            }
+            FirstLetterOfNameOld = FirstLetterOfName;
+        }
+        else {
+            favouritesCount++;
+        }
+        PositionOnList++;
+    } while (queryRet->nextRow());
+    contactMap.favouritesCount = favouritesCount;
+
+    return contactMap;
+}
+
 std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
     MatchType matchType, const std::string &name, std::uint32_t groupId, std::uint32_t limit, std::uint32_t offset)
 {
@@ -160,7 +232,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
 
     std::string query = "SELECT DISTINCT contacts._id FROM contacts";
 
-    query += " INNER JOIN contact_name ON contact_name.contact_id == contacts._id";
+    query += " INNER JOIN contact_name ON contact_name.contact_id == contacts._id ";
     query += " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
              "contact_match_groups.group_id = " +
              std::to_string(groupId);
@@ -174,6 +246,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
                      "   WHERE cmg.group_id = cg._id "
                      "       AND cg.name = 'Temporary' "
                      "   ) ";
+
             query += " AND ( contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
             query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%')";
         }

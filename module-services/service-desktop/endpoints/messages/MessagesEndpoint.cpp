@@ -1,6 +1,6 @@
 
 #include "MessagesEndpoint.hpp"
-#include "queries/sms/QuerySMSTemplateGetByID.hpp"
+#include "module-db/queries/messages/templates/QuerySMSTemplateGetByID.hpp"
 
 using namespace parserFSM;
 

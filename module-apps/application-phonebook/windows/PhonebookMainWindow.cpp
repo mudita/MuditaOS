@@ -68,6 +68,13 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+
+        auto app  = application;
+        inputMode = new InputMode(
+            {InputMode::ABC, InputMode::abc},
+            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
+            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
     }
 
     void PhonebookMainWindow::destroyInterface()
@@ -83,6 +90,7 @@ namespace gui
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
+        rebuild();
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         requestedSearch     = contactRequest != nullptr;
         if (requestedSearch) {
@@ -100,8 +108,29 @@ namespace gui
         }
     }
 
+    void PhonebookMainWindow::HandleFilteringByLetter(const InputEvent &inputEvent)
+    {
+        auto code = translator.handle(inputEvent.key, inputMode != nullptr ? inputMode->get() : "");
+        if (code != KeyProfile::none_key) {
+            LOG_INFO("char=' %c'", static_cast<char>(code));
+            char letter = static_cast<char>(code);
+            std::string filterLetter;
+            filterLetter.push_back(letter);
+            phonebookModel->letterMap = phonebookModel->requestLetterMap();
+
+            LOG_DEBUG("Number of favourites contacts : %" PRIu32, phonebookModel->letterMap.favouritesCount);
+            uint32_t dataOffset = phonebookModel->letterMap.firstLetterDictionary[filterLetter];
+            if (dataOffset != phonebookContacMap::NO_MATCH_FOUND) {
+                LOG_DEBUG("PhoneBook Data Offset : %" PRIu32, dataOffset);
+                phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
+                contactsList->rebuildList(style::listview::RebuildType::OnOffset, dataOffset);
+            }
+        }
+    }
+
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
     {
+
         // process only if key is released
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             switch (inputEvent.keyCode) {
@@ -120,6 +149,7 @@ namespace gui
                 return true;
 
             default:
+                HandleFilteringByLetter(inputEvent);
                 break;
             }
         }

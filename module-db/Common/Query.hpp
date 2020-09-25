@@ -10,41 +10,42 @@ using namespace parserFSM;
 
 namespace db
 {
-    class QueryResult;
+    class QueryResult; // Forward declaration
+    using QueryCallbackFunction         = std::function<bool(db::QueryResult *)>;
+    using EndpointQueryCallbackFunction = std::function<bool(db::QueryResult *, Context &)>;
 
     class QueryListener
     {
       public:
-        virtual bool handleQueryResponse(QueryResult *) = 0;
-        virtual ~QueryListener()                        = default;
+        virtual ~QueryListener() = default;
+
+        virtual bool handleQueryResponse(QueryResult *response) = 0;
     };
 
-    using QueryCallback = std::function<bool(db::QueryResult *, Context &)>;
+    class QueryCallback : public db::QueryListener
+    {
+      public:
+        static std::unique_ptr<QueryCallback> fromFunction(QueryCallbackFunction &&callbackFunction);
+
+        explicit QueryCallback(QueryCallbackFunction &&_callback);
+
+        bool handleQueryResponse(QueryResult *response) override;
+
+      private:
+        QueryCallbackFunction callback;
+    };
 
     class EndpointListener : public db::QueryListener
     {
-      private:
-        Context context = Context();
-
       public:
-        EndpointListener(QueryCallback callback, Context &context)
-            : context(std::move(context)), callback(std::move(callback)){};
-        EndpointListener() : callback(nullptr){};
-        ~EndpointListener()    = default;
-        QueryCallback callback = nullptr;
-        auto handleQueryResponse(db::QueryResult *result) -> bool override
-        {
-            if (callback != nullptr) {
-                LOG_DEBUG("Executing callback...");
-                auto ret = callback(result, context);
-                LOG_DEBUG("Callback finished");
-                return ret;
-            }
-            else {
-                LOG_ERROR("callback is nullptr!");
-                return false;
-            }
-        }
+        EndpointListener() = default;
+        EndpointListener(EndpointQueryCallbackFunction &&_callback, Context &_context);
+
+        bool handleQueryResponse(db::QueryResult *result) override;
+
+      private:
+        EndpointQueryCallbackFunction callback;
+        Context context;
     };
 
     /// virtual query input interface
@@ -59,34 +60,31 @@ namespace db
             Delete
         };
 
-        Query() = delete;
-        Query(Type type, QueryListener *listener = nullptr);
+        explicit Query(Type type);
         virtual ~Query() = default;
 
         QueryListener *getQueryListener() const noexcept;
-        void setQueryListener(QueryListener *queryListener) noexcept;
-        void setQueryListener(std::unique_ptr<QueryListener> listener) noexcept;
-
-        const Type type;
+        void setQueryListener(std::unique_ptr<QueryListener> &&listener) noexcept;
 
         [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;
 
+        const Type type;
+
       private:
-        QueryListener *queryListener                          = nullptr;
-        std::unique_ptr<QueryListener> queryListenerUniqueptr = nullptr;
+        std::unique_ptr<QueryListener> queryListener;
     };
 
     /// virtual query output (result) interface
     class QueryResult
     {
       public:
-        QueryResult(std::shared_ptr<Query> requestQuery = nullptr);
+        explicit QueryResult(std::shared_ptr<Query> requestQuery = nullptr);
         virtual ~QueryResult() = default;
 
-        void setRequestQuery(std::shared_ptr<Query> requestQueryToSet);
+        void setRequestQuery(const std::shared_ptr<Query> &requestQueryToSet);
         std::shared_ptr<Query> getRequestQuery() const noexcept;
 
-        virtual bool handle();
+        bool handle();
 
         [[nodiscard]] bool hasListener() const noexcept;
         [[nodiscard]] virtual auto debugInfo() const -> std::string = 0;

@@ -13,7 +13,7 @@
 #include "drivers/sai/DriverSAI.hpp"
 
 #include <functional>
-#include "menums/magic_enum.hpp"
+#include <magic_enum.hpp>
 #include "../fsl_drivers/fsl_sai.h"
 #include "../fsl_drivers/fsl_sai_edma.h"
 

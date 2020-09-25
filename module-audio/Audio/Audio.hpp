@@ -75,6 +75,8 @@ namespace audio
 
         audio::RetCode Resume();
 
+        audio::RetCode Mute();
+
       private:
         bool headphonesInserted = false;
         State currentState = State::Idle;

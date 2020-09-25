@@ -1,4 +1,3 @@
-
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
@@ -7,8 +6,11 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
-#include "queries/sms/QuerySmsThreadMarkAsRead.hpp"
-#include "queries/sms/QuerySMSSearch.hpp"
+#include "queries/messages/threads/QueryThreadMarkAsRead.hpp"
+#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/threads/QueryThreadGetByID.hpp"
+#include "queries/messages/threads/QueryThreadGetByContactID.hpp"
+#include "queries/messages/threads/QueryThreadRemove.hpp"
 #include "vfs.hpp"
 
 #include <algorithm>
@@ -79,9 +81,9 @@ TEST_CASE("Thread Record tests")
     }
     SECTION("Get all available records with query")
     {
-        auto query  = std::make_shared<db::query::SMSThreadsGet>(0, 100);
+        auto query  = std::make_shared<db::query::ThreadsGet>(0, 100);
         auto ret    = threadRecordInterface1.runQuery(query);
-        auto result = dynamic_cast<db::query::SMSThreadsGetResults *>(ret.get());
+        auto result = dynamic_cast<db::query::ThreadsGetResults *>(ret.get());
         REQUIRE(result != nullptr);
         auto results = result->getResults();
         REQUIRE(results.size() == 2);
@@ -108,10 +110,45 @@ TEST_CASE("Thread Record tests")
         }
     }
 
+    SECTION("Get record by id with query")
+    {
+        auto query  = std::make_shared<db::query::ThreadGetByID>(1);
+        auto ret    = threadRecordInterface1.runQuery(query);
+        auto result = dynamic_cast<db::query::ThreadGetByIDResult *>(ret.get());
+
+        REQUIRE(result->getRecord().has_value());
+    }
+
+    SECTION("Get record by contact id")
+    {
+        auto query  = std::make_shared<db::query::ThreadGetByContactID>(contactIDTest);
+        auto ret    = threadRecordInterface1.runQuery(query);
+        auto result = dynamic_cast<db::query::ThreadGetByContactIDResult *>(ret.get());
+
+        REQUIRE(result->getRecord().has_value());
+        REQUIRE(result->getRecord()->contactID == contactIDTest);
+    }
+
     SECTION("Remove records one by one")
     {
         REQUIRE(threadRecordInterface1.RemoveByID(1));
         REQUIRE(threadRecordInterface1.RemoveByID(2));
+
+        // SMS database should not contain any records
+        REQUIRE(threadRecordInterface1.GetCount() == 0);
+    }
+
+    SECTION("Remove records with query")
+    {
+        auto query1  = std::make_shared<db::query::ThreadRemove>(1);
+        auto ret1    = threadRecordInterface1.runQuery(query1);
+        auto result1 = dynamic_cast<db::query::ThreadRemoveResult *>(ret1.get());
+        REQUIRE(result1->success());
+
+        auto query2  = std::make_shared<db::query::ThreadRemove>(2);
+        auto ret2    = threadRecordInterface1.runQuery(query2);
+        auto result2 = dynamic_cast<db::query::ThreadRemoveResult *>(ret2.get());
+        REQUIRE(result2->success());
 
         // SMS database should not contain any records
         REQUIRE(threadRecordInterface1.GetCount() == 0);
@@ -175,18 +212,18 @@ TEST_CASE("Thread Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
 
         {
-            auto query  = std::make_shared<db::query::SMSSearch>("A", 0, 10);
+            auto query  = std::make_shared<db::query::ThreadsSearch>("A", 0, 10);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            auto result = dynamic_cast<db::query::ThreadsSearchResult *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 2);
         }
 
         {
-            auto query  = std::make_shared<db::query::SMSSearch>("O", 0, 10);
+            auto query  = std::make_shared<db::query::ThreadsSearch>("O", 0, 10);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::SMSSearchResult *>(ret.get());
+            auto result = dynamic_cast<db::query::ThreadsSearchResult *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 1);
