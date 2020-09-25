@@ -62,5 +62,7 @@ namespace app
         void handleAddContactEvent(const std::string &number);
 
         bool showNotification(std::function<bool()> action);
+
+        void transmitDtmfTone(uint32_t digit);
     };
 } /* namespace app */

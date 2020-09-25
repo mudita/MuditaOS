@@ -91,7 +91,7 @@ namespace at
         CMUX, /// setup cmux params
         CMGS, /// sms
         QCMGS,
-        CREG,       /// networ registration status
+        CREG,       /// network registration status
         QNWINFO,    /// network informations (band etc)
         COPS,       /// operators scan
         SIM_DET,    /// sim detection on/off status (1,0)
@@ -104,6 +104,8 @@ namespace at
         STORE_SETTINGS_ATW, /// required to save in firmware ex SIMSTAT_ON
         CEER,               /// get error description from modem
         QIGETERROR,         /// get tcp/ip error code
+        VTS,                /// DTMF and Tone Generation
+        QLDTMF,             /// Play Local DTMF
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -156,6 +158,8 @@ namespace at
             {AT::STORE_SETTINGS_ATW, {"AT&W\r"}},
             {AT::CEER, {"AT+CEER\r"}},
             {AT::QIGETERROR, {"AT+QIGETERROR\r"}},
+            {AT::VTS, {"AT+VTS="}},
+            {AT::QLDTMF, {"AT+QLDTMF=1,"}},
         };
         if (fact.count(at)) {
             return fact.at(at);

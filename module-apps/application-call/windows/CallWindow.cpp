@@ -26,6 +26,7 @@
 
 #include <UiCommonActions.hpp>
 #include <application-messages/data/SMSdata.hpp>
+#include <InputMode.hpp>
 
 #include <memory>
 #include <functional>
@@ -321,9 +322,16 @@ namespace gui
         return false;
     }
 
+    bool CallWindow::handleDigit(const uint32_t digit)
+    {
+        auto app = dynamic_cast<app::ApplicationCall *>(application);
+        assert(app != nullptr);
+        app->transmitDtmfTone(digit);
+        return true;
+    }
+
     bool CallWindow::onInput(const InputEvent &inputEvent)
     {
-
         LOG_INFO("key code: %" PRIu32 ", state: %" PRIu32,
                  static_cast<uint32_t>(inputEvent.keyCode),
                  static_cast<uint32_t>(inputEvent.state));
@@ -334,6 +342,7 @@ namespace gui
         // InputEvent::State::keyReleasedLong is necessary for KeyCode::KEY_RF to properly abort the active call
         if (inputEvent.state == InputEvent::State::keyReleasedShort ||
             inputEvent.state == InputEvent::State::keyReleasedLong) {
+            auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LF:
                 handled = handleLeftButton();
@@ -343,6 +352,9 @@ namespace gui
                 break;
             default:
                 break;
+            }
+            if (!handled && code != 0) {
+                handled = handleDigit(code);
             }
         }
 

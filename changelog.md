@@ -5,6 +5,18 @@
 ### Added
 
 * `[calendar]` Add notifications from database handling.
+* `[cellular]``[call app]` Added DTMF tone generation 
+
+### Changed
+
+
+
+### Fixed
+
+
+
+### Other
+
 
 
 ## [0.39.1 2020-09-25]
