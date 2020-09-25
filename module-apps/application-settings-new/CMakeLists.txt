@@ -25,6 +25,7 @@ target_sources( ${PROJECT_NAME}
         windows/LockedScreenWindow.cpp
         windows/DisplayAndKeypadWindow.cpp
         windows/AppsAndToolsWindow.cpp
+        windows/NetworkWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
