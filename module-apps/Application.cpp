@@ -518,22 +518,6 @@ namespace app
         return ret == audio::RetCode::Success;
     }
 
-    bool Application::adjustCurrentVolume(const int step)
-    {
-        audio::Volume volume;
-        if (step < 0) {
-            AudioServiceAPI::Stop(this, app::audioConsts::typesToMute);
-        }
-        auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
-        if (ret == audio::RetCode::Success) {
-            ret = ((static_cast<int>(volume) + step) < 0)
-                      ? audio::RetCode::Success
-                      : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
-        }
-
-        return ret == audio::RetCode::Success;
-    }
-
     void Application::messageSwitchApplication(sys::Service *sender,
                                                std::string application,
                                                std::string window,

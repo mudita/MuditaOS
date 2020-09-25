@@ -243,14 +243,46 @@ namespace app
             return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, profileType, playbackType);
         }
 
-        bool adjustCurrentVolume(const int step);
-        bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        template <typename T>
+        bool adjustCurrentVolume(const int step,
+                                 T *obj,
+                                 std::function<bool(T *,
+                                                    const audio::Volume &currentVolume,
+                                                    const audio::Volume &minVolume,
+                                                    const audio::Volume &maxVolume)> window)
         {
-            return adjustCurrentVolume(step);
+            audio::Volume volume;
+            auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
+            if (window) {
+                window(obj, volume, audio::minVolume, audio::maxVolume);
+            }
+            if (ret == audio::RetCode::Success) {
+                ret = ((static_cast<int>(volume) + step) < 0)
+                          ? audio::RetCode::Success
+                          : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
+            }
+
+            return ret == audio::RetCode::Success;
         }
-        bool decreaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        template <typename T>
+        bool increaseCurrentVolume(T *obj,
+                                   std::function<bool(T *,
+                                                      const audio::Volume &currentVolume,
+                                                      const audio::Volume &minVolume,
+                                                      const audio::Volume &maxVolume)> window,
+                                   const audio::Volume step = audio::defaultVolumeStep)
         {
-            return adjustCurrentVolume(-step);
+            return adjustCurrentVolume(step, obj, window);
+        }
+        template <typename T>
+        bool decreaseCurrentVolume(T *obj,
+                                   std::function<bool(T *,
+                                                      const audio::Volume &currentVolume,
+                                                      const audio::Volume &minVolume,
+                                                      const audio::Volume &maxVolume)> window,
+                                   const audio::Volume step = audio::defaultVolumeStep)
+        {
+            return adjustCurrentVolume(-step, obj, window);
         }
         auto getCurrentVolume(audio::Volume &volume)
         {

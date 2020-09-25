@@ -83,6 +83,9 @@ namespace gui
         void setBottomBarText(const UTF8 &text, BottomBar::Side side);
         void clearBottomBarText(BottomBar::Side side);
         bool selectSpecialCharacter();
+        bool volumeBarPopup([[maybe_unused]] const audio::Volume &currentVolume,
+                            [[maybe_unused]] const audio::Volume &minVolume,
+                            [[maybe_unused]] const audio::Volume &maxVolume);
         void setBottomBarActive(BottomBar::Side side, bool value);
 
         /// get BoundingBox size of Window "body" area

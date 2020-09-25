@@ -132,11 +132,17 @@ namespace gui
 
         switch (inputEvent.keyCode) {
         case KeyCode::KEY_VOLUP: {
-            application->increaseCurrentVolume();
+            application->increaseCurrentVolume(
+                this,
+                std::function<bool(AppWindow *, const audio::Volume &, const audio::Volume &, const audio::Volume &)>{
+                    &AppWindow::volumeBarPopup});
             return true;
         }
         case KeyCode::KEY_VOLDN: {
-            application->decreaseCurrentVolume();
+            application->decreaseCurrentVolume(
+                this,
+                std::function<bool(AppWindow *, const audio::Volume &, const audio::Volume &, const audio::Volume &)>{
+                    &AppWindow::volumeBarPopup});
             return true;
         }
         case KeyCode::KEY_RF: {
@@ -208,6 +214,15 @@ namespace gui
     }
 
     bool AppWindow::selectSpecialCharacter()
+    {
+        return sapm::ApplicationManager::messageSwitchSpecialInput(
+            application,
+            std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+    }
+
+    bool AppWindow::volumeBarPopup([[maybe_unused]] const audio::Volume &currentVolume,
+                                   [[maybe_unused]] const audio::Volume &minVolume,
+                                   [[maybe_unused]] const audio::Volume &maxVolume)
     {
         return sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
