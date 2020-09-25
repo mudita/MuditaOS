@@ -110,6 +110,7 @@ enum class MessageType
     CellularGetCREG,
     CellularGetNWINFO,
     CellularGetAntenna,
+    CellularTransmitDtmfTones,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record

@@ -285,4 +285,11 @@ namespace app
         app::contact(this, app::ContactOperation::Add, number);
     }
 
+    void ApplicationCall::transmitDtmfTone(uint32_t digit)
+    {
+        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
+            LOG_ERROR("transmitDtmfTone failed");
+        }
+    }
+
 } // namespace app

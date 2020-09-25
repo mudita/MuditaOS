@@ -88,12 +88,26 @@ class CellularNotificationMessage : public CellularMessage
 class CellularRequestMessage : public CellularMessage
 {
   public:
-    CellularRequestMessage(MessageType messageType) : CellularMessage(messageType)
+    CellularRequestMessage(MessageType messageType, std::string data = "") : CellularMessage(messageType), data(data)
     {}
     ~CellularRequestMessage()
     {}
 
     std::string data;
+};
+
+class CellularDtmfRequestMessage : public CellularMessage
+{
+    uint32_t digit = 0;
+
+  public:
+    CellularDtmfRequestMessage(uint32_t digit) : CellularMessage(MessageType::CellularTransmitDtmfTones), digit(digit)
+    {}
+
+    uint32_t getDigit() const
+    {
+        return digit;
+    }
 };
 
 class CellularAntennaRequestMessage : public CellularMessage
