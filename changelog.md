@@ -14,6 +14,10 @@
 
 * `[alarms]` Database refactor
 
+### Other
+
+* `[utils]` Added unit tests for time display.
+
 ## [0.48.1 2020-11-23]
 
 ### Added

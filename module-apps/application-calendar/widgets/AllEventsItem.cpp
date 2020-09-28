@@ -3,12 +3,11 @@
 
 #include "AllEventsItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/data/TimeDisplayParser.hpp"
 #include "CalendarListItem.hpp"
 #include <Style.hpp>
 #include <gui/widgets/Label.hpp>
 #include <time/time_conversion.hpp>
-#include <module-utils/date/include/date/date.h>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -82,7 +81,8 @@ namespace gui
         this->record = rec;
         if (rec != nullptr) {
             description->setText(this->record->title.c_str());
-            startTime->setText(TimeDisplayParser().getTimeString(record, true));
+            startTime->setText(utils::time::TimeRangeParser().getCalendarTimeString(
+                record->date_from, record->date_till, utils::time::Version::abbrev));
         }
     }
 } /* namespace gui */
