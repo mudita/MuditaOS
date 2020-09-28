@@ -6,6 +6,7 @@
 
 * `[calendar]` Add notifications from database handling.
 * `[cellular]``[call app]` Added DTMF tone generation 
+* `[audio]` Enabled sounds priorities
 
 ### Changed
 

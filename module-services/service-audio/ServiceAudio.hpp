@@ -13,7 +13,9 @@
 #include "Service/Service.hpp"
 #include <functional>
 #include "Audio/Audio.hpp"
+#include "Audio/AudioMux.hpp"
 #include "MessageType.hpp"
+#include "messages/AudioMessage.hpp"
 
 #include <service-db/api/DBServiceAPI.hpp>
 #include <queries/settings/QuerySettingsGet_v2.hpp>
@@ -45,8 +47,20 @@ class ServiceAudio : public sys::Service
     static const char *serviceName;
 
   private:
-    audio::Audio audio;
-    std::function<uint32_t(audio::AudioEvents event)> audioCallback = nullptr;
+    audio::AudioMux audioMux;
+    auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
+    auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
+
+    template <typename... Args>
+    std::unique_ptr<AudioResponseMessage> HandleStart(std::optional<audio::AudioMux::Input *> input,
+                                                      AudioRequestMessage *msg,
+                                                      audio::Operation::Type opType,
+                                                      Args... args);
+    std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
+    std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
+
+    auto IsResumable(const audio::PlaybackType &type) -> bool;
+    auto IsMergable(const audio::PlaybackType &type) -> bool;
 
     template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
     {
