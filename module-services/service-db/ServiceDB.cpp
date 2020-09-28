@@ -609,6 +609,14 @@ sys::ReturnCodes ServiceDB::InitHandler()
     notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
     eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
     settingsRecordInterface_v2   = std::make_unique<SettingsRecordInterface_v2>(settingsDB.get());
+
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
+
+    for (auto &dbAgent : databaseAgents) {
+        dbAgent->initDb();
+        dbAgent->registerMessages();
+    }
+
     return sys::ReturnCodes::Success;
 }
 
