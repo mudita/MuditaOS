@@ -10,7 +10,7 @@
 #   include <fsl_debug_console.h>
 #   define LOG(format...) PRINTF("[MTPDB]: "format)
 #else
-#   define LOG(format...)
+#   define LOG(...) LOG_INFO(__VA_ARGS__)
 #endif
 
 typedef char db_entry[MAX_FILENAME_LENGTH];
@@ -73,7 +73,7 @@ uint32_t mtp_db_add(struct mtp_db *db, const char *key)
     handle = db_alloc(db);
     if (handle) {
         strncpy(db->map[handle], key, 64);
-        LOG("add [%u]: %s\n", handle, db->map[handle]);
+        LOG("add [%u]: %s\n", (unsigned int)handle, db->map[handle]);
         return handle;
     }
     return NO_HANDLE;
@@ -113,7 +113,7 @@ void mtp_db_del(struct mtp_db *db, uint32_t handle)
     assert(db);
 
     if (handle > 0 && handle < MAX_HANDLES) {
-        LOG("drop [%u]: %s\n", handle, db->map[handle]);
+        LOG("drop [%u]: %s\n", (unsigned int)handle, db->map[handle]);
         db_free(db, handle);
     }
 }

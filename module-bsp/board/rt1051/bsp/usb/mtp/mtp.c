@@ -12,7 +12,7 @@
 #include "mtp_responder.h"
 #include "mtp_fs.h"
 
-#define PRINTF(...) while(0) {}
+#define PRINTF(...)
 
 USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) uint8_t rx_buffer[512];
 USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) uint8_t tx_buffer[512];
