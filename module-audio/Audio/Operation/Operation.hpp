@@ -80,7 +80,7 @@ namespace audio
             const audio::PlaybackType &operations = audio::PlaybackType::None,
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
-        virtual audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) = 0;
+        virtual audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) = 0;
 
         virtual audio::RetCode Stop() = 0;
 
@@ -125,7 +125,8 @@ namespace audio
         Profile *currentProfile = nullptr;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
         State state                                             = State::Idle;
-        std::function<int32_t(AudioEvents event)> eventCallback = nullptr;
+        audio::AsyncCallback eventCallback                      = nullptr;
+        audio::Token operationToken;
 
         bool isInitialized = false;
         audio::PlaybackType playbackType = audio::PlaybackType::None;

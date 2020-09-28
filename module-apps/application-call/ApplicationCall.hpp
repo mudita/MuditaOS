@@ -31,6 +31,8 @@ namespace app
         void RingingHandler(const CellularCallMessage *const msg);
 
       protected:
+        audio::Handle routingAudioHandle;
+        audio::Handle callringAudioHandle;
         AppTimer timerCall;
         utils::time::Timestamp callStartTime = 0;
         utils::time::Duration callDuration;
@@ -62,5 +64,7 @@ namespace app
         void handleAddContactEvent(const std::string &number);
 
         bool showNotification(std::function<bool()> action);
+
+        void transmitDtmfTone(uint32_t digit);
     };
 } /* namespace app */

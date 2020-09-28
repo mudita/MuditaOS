@@ -128,6 +128,7 @@ class ServiceCellular : public sys::Service
 
     /// @}
 
+    bool transmitDtmfTone(uint32_t digit);
     /// Handle message CellularGetChannelMessage
     void handle_CellularGetChannelMessage();
 

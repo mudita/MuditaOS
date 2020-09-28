@@ -26,7 +26,7 @@ namespace audio
 
         ~IdleOperation() = default;
 
-        audio::RetCode Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final
+        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) override final
         {
             return audio::RetCode::Success;
         }

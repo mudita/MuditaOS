@@ -13,7 +13,9 @@
 #include "Service/Service.hpp"
 #include <functional>
 #include "Audio/Audio.hpp"
+#include "Audio/AudioMux.hpp"
 #include "MessageType.hpp"
+#include "messages/AudioMessage.hpp"
 
 #include <service-db/api/DBServiceAPI.hpp>
 #include <queries/settings/QuerySettingsGet_v2.hpp>
@@ -45,8 +47,20 @@ class ServiceAudio : public sys::Service
     static const char *serviceName;
 
   private:
-    audio::Audio audio;
-    std::function<uint32_t(audio::AudioEvents event)> audioCallback = nullptr;
+    audio::AudioMux audioMux;
+    auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
+    auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
+
+    template <typename... Args>
+    std::unique_ptr<AudioResponseMessage> HandleStart(std::optional<audio::AudioMux::Input *> input,
+                                                      AudioRequestMessage *msg,
+                                                      audio::Operation::Type opType,
+                                                      Args... args);
+    std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
+    std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
+
+    auto IsResumable(const audio::PlaybackType &type) -> bool;
+    auto IsMergable(const audio::PlaybackType &type) -> bool;
 
     template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
     {
@@ -89,7 +103,7 @@ class ServiceAudio : public sys::Service
         return defaultValue;
     }
 
-    void setCurrentSetting(const audio::Setting &setting, const int &step);
+    void setCurrentSetting(const audio::Setting &setting, const uint32_t &value);
     void setCurrentVolume(const uint32_t &value);
     void setSetting(const audio::Setting &setting,
                     const uint32_t value,
@@ -98,8 +112,7 @@ class ServiceAudio : public sys::Service
     [[nodiscard]] uint32_t getSetting(const audio::Setting &setting,
                                       const audio::Profile::Type &profileType,
                                       const audio::PlaybackType &playbackType);
-    [[nodiscard]] uint32_t getCurrentSetting(const audio::Setting &setting);
-    [[nodiscard]] uint32_t getCurrentVolume();
+    std::optional<uint32_t> getCurrentSetting(const audio::Setting &setting);
     void updateDbValue(const std::string &path, const audio::Setting &setting, const uint32_t &value);
     void updateDbValue(const audio::Operation *currentOperation, const audio::Setting &setting, const uint32_t &value);
 };

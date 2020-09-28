@@ -12,6 +12,7 @@
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-services/service-db/messages/QueryMessage.hpp>
+#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace app
 {
@@ -41,7 +42,9 @@ namespace app
                                              uint32_t stackDepth,
                                              sys::ServicePriority priority)
         : Application(name, parent, false, stackDepth, priority)
-    {}
+    {
+        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    }
 
     sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
@@ -50,6 +53,19 @@ namespace app
         if (retMsg && (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
             return retMsg;
         }
+
+        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            LOG_DEBUG("Received notification");
+            // window-specific actions
+            if (msg->interface == db::Interface::Name::Events) {
+                for (auto &[name, window] : windows) {
+                    window->onDatabaseMessage(msg);
+                }
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        }
+
         // this variable defines whether message was processed.
         bool handled = false;
         // handle database response
@@ -57,8 +73,17 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBQuery: {
-                if (getCurrentWindow()->onDatabaseMessage(resp))
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+
+                if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+                    auto result = queryResponse->getResult();
+                    LOG_DEBUG("queryResponse != nullptr");
+                    if (result->hasListener()) {
+                        LOG_DEBUG("Has listener");
+                        if (result->handle()) {
+                            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                        }
+                    }
+                }
             } break;
             default:
                 break;
