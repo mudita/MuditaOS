@@ -11,34 +11,47 @@ namespace AudioServiceAPI
 {
     /*! @brief Starts playback operation.
      *
-     * @param serv - requesting service.
-     * @param playbackType - type of playback.
-     * If none, request would still be valid and default volume would be used.
-     * @param fileName - name of the file.
-     * @return           Standard service-api return code. Success if suitable.
+     * @param serv Requesting service.
+     * @param playbackType Type of playback.
+     * @param fileName Name of the file.
+     * @return audio::Handle Handle to operation to be used in subsequent operation.
      */
-    audio::RetCode PlaybackStart(sys::Service *serv,
-                                 const audio::PlaybackType &playbackType,
-                                 const std::string &fileName);
-    audio::RetCode RecordingStart(sys::Service *serv, const std::string &fileName);
-    audio::RetCode RoutingStart(sys::Service *serv);
+    audio::Handle PlaybackStart(sys::Service *serv,
+                                const audio::PlaybackType &playbackType,
+                                const std::string &fileName);
+    audio::Handle RecordingStart(sys::Service *serv, const std::string &fileName);
+    audio::Handle RoutingStart(sys::Service *serv);
     audio::RetCode RoutingRecordCtrl(sys::Service *serv, bool enable);
     audio::RetCode RoutingMute(sys::Service *serv, bool enable);
     audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable);
     audio::RetCode RoutingHeadset(sys::Service *serv, bool enable);
-    /// Stops current audio operation.
-    ///
-    /// Stops current audio operation when it's valid and not idle.
-    /// @param serv requesting service
-    /// @param stopVec vector that contains playback types to be stopped.
-    /// When no vector is passed it stops current operation.
-    /// When stop vector is passed it stops current operation only if it's type is contained in the vector.
-    /// @return Standard service-api return code. Success if suitable.
     audio::RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec = {});
-    audio::RetCode Pause(sys::Service *serv);
-    audio::RetCode Resume(sys::Service *serv);
+    /*!
+     * @brief Stops playback operation.
+     *
+     * @param serv Requesting service
+     * @param handle Handle to controlled operation
+     * @return audio::RetCode standard service-api return code
+     */
+    audio::RetCode Stop(sys::Service *serv, const audio::Handle &handle);
+    /*!
+     * @brief Pauses playback operation. Can be resumed by Resume()
+     *
+     * @param serv Requesting service
+     * @param handle Handle to controlled operation
+     * @return audio::RetCode standard service-api return code
+     */
+    audio::RetCode Pause(sys::Service *serv, const audio::Handle &handle);
+    /*!
+     * @brief Resumes paused operation.
+     *
+     * @param serv Requesting service
+     * @param handle Handle to controlled operation
+     * @return audio::RetCode standard service-api return code
+     */
+    audio::RetCode Resume(sys::Service *serv, const audio::Handle &handle);
+
     std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
-    // audio::RetCode AdjustVolume(sys::Service *serv, const int &step = 0);
     /*! @brief Gets settings. Current profile is taken by default.
      *
      * @param serv - requesting service.
