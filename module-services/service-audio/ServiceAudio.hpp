@@ -61,6 +61,7 @@ class ServiceAudio : public sys::Service
 
     auto IsResumable(const audio::PlaybackType &type) -> bool;
     auto IsMergable(const audio::PlaybackType &type) -> bool;
+    auto IsLooping(const audio::PlaybackType &type) -> bool;
 
     template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
     {

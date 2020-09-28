@@ -100,6 +100,11 @@ bool ServiceAudio::IsMergable(const audio::PlaybackType &type)
     return false;
 }
 
+bool ServiceAudio::IsLooping(const audio::PlaybackType &type)
+{
+    return type == audio::PlaybackType::CallRingtone;
+}
+
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioRequestMessage *> msg)
 {
 
@@ -219,9 +224,14 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         switch (msg->type) {
 
         case AudioNotificationMessage::Type::EndOfFile: {
-            std::shared_ptr<AudioRequestMessage> newMsg =
-                std::make_shared<AudioRequestMessage>(MessageType::AudioStop, msg->token);
-            sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
+            auto input = audioMux.GetInput(msg->token);
+            if (input && IsLooping((*input)->audio.GetCurrentOperation()->GetPlaybackType())) {
+                (*input)->audio.Start();
+            }
+            else {
+                std::shared_ptr<AudioStopMessage> newMsg = std::make_shared<AudioStopMessage>(msg->token);
+                sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
+            }
         } break;
 
         case AudioNotificationMessage::Type::Stop: {

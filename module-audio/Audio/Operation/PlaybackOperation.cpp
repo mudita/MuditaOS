@@ -36,7 +36,7 @@ namespace audio
 #endif
             if (ret == 0) {
                 state = State::Idle;
-                eventCallback({PlaybackEventType::EndOfFile, audio::Token::MakeBadToken()});
+                eventCallback({PlaybackEventType::EndOfFile, operationToken});
             }
             return ret;
         };

@@ -83,6 +83,7 @@ namespace audio
 
       private:
         auto GetPlaybackPriority(const audio::PlaybackType &type) -> uint8_t;
+        auto IsMergable(const audio::PlaybackType &type) -> uint8_t;
         std::vector<Input> audioInputs;
         audio::Token refToken;
     };

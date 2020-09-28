@@ -111,7 +111,8 @@ namespace audio
         std::optional<AudioMux::Input *> overridableInput;
 
         for (auto &audioInput : audioInputs) {
-            auto currentInputPrior = GetPlaybackPriority(audioInput.audio.GetCurrentOperation()->GetPlaybackType());
+            auto currentPlaybackType = audioInput.audio.GetCurrentOperation()->GetPlaybackType();
+            auto currentInputPrior   = GetPlaybackPriority(currentPlaybackType);
 
             // check busy input
             if (audioInput.audio.GetCurrentState() != Audio::State::Idle) {
@@ -120,6 +121,11 @@ namespace audio
                     return std::nullopt;
                 }
                 else if (GetPlaybackPriority(playbackType) <= currentInputPrior) {
+                    if (currentPlaybackType == playbackType && IsMergable(currentPlaybackType)) {
+                        // merge the sound if needed
+                        overridableInput = std::nullopt;
+                        break;
+                    }
                     overridableInput = &audioInput;
                 }
             }
@@ -146,5 +152,10 @@ namespace audio
             return pmap.at(type);
         }
         return static_cast<uint8_t>(PlaybackType::Last);
+    }
+
+    uint8_t AudioMux::IsMergable(const audio::PlaybackType &type)
+    {
+        return !(type == audio::PlaybackType::Multimedia);
     }
 } // namespace audio

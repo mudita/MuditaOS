@@ -121,6 +121,11 @@ namespace audio
             return playbackType;
         }
 
+        const audio::Token &GetToken() noexcept
+        {
+            return operationToken;
+        }
+
       protected:
         Profile *currentProfile = nullptr;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
