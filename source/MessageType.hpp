@@ -227,6 +227,8 @@ enum class MessageType
     AntennaLockService,
     AntennaGetLockState,
     AntennaLockNotification,
+
+    Settings,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
