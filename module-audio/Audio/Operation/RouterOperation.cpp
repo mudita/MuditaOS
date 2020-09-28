@@ -152,12 +152,12 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    audio::RetCode RouterOperation::Start(std::function<int32_t(audio::AudioEvents)> callback)
+    audio::RetCode RouterOperation::Start(audio::AsyncCallback callback, audio::Token token)
     {
         if (state == State::Paused || state == State::Active) {
             return RetCode::InvokedInIncorrectState;
         }
-
+        operationToken = token;
         eventCallback = callback;
         state         = State::Active;
 
@@ -282,7 +282,7 @@ namespace audio
 
         case State::Active:
             state = State::Idle;
-            Start(eventCallback);
+            Start(eventCallback, operationToken);
             break;
         }
 

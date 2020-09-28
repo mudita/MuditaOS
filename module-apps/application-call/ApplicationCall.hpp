@@ -31,6 +31,8 @@ namespace app
         void RingingHandler(const CellularCallMessage *const msg);
 
       protected:
+        audio::Handle routingAudioHandle;
+        audio::Handle callringAudioHandle;
         AppTimer timerCall;
         utils::time::Timestamp callStartTime = 0;
         utils::time::Duration callDuration;
