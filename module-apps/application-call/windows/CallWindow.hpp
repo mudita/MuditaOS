@@ -2,10 +2,11 @@
 
 #include "application-call/ApplicationCall.hpp"
 #include "AppWindow.hpp"
-#include "Rect.hpp"
-#include "Image.hpp"
 #include "application-call/widgets/Icons.hpp"
 
+#include <gui/input/Translator.hpp>
+#include <Rect.hpp>
+#include <Image.hpp>
 namespace gui
 {
     class CallWindow : public AppWindow
@@ -19,6 +20,9 @@ namespace gui
             CALL_IN_PROGRESS,
             CALL_ENDED
         };
+
+      private:
+        gui::KeyInputMappedTranslation translator;
 
       protected:
         // used to display both nnumber and name of contact
@@ -60,6 +64,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+        bool handleDigit(const uint32_t digit);
     };
 
 } /* namespace gui */

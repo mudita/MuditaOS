@@ -82,11 +82,11 @@ namespace style
 
                 namespace eventDetail
                 {
-                    const inline int height_min    = 90;
+                    const inline int height_min        = 90;
                     const inline int height_max        = 155;
                     const inline int margin_top        = 2 * style::margins::big;
                     const inline int event_time_margin = 25;
-                    const inline int title_h       = 20;
+                    const inline int title_h           = 20;
                     const inline int label_h           = 35;
                 } // namespace eventDetail
 

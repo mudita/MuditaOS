@@ -375,7 +375,7 @@ EventsTableRow EventsTable::getById(uint32_t id)
 std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint date_filter, TimePoint filter_till)
 {
     auto retQuery =
-        db->query("SELECT * FROM events WHERE date_from >= date('%q') AND date_till < date('%q', 'start of day');",
+        db->query("SELECT * FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of day');",
                   TimePointToString(date_filter).c_str(),
                   TimePointToString(filter_till).c_str());
 

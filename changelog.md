@@ -1,5 +1,25 @@
 # Mudita PurePhone changelog
 
+## [Current release]
+
+### Added
+
+* `[calendar]` Add notifications from database handling.
+* `[cellular]``[call app]` Added DTMF tone generation 
+
+### Changed
+
+
+
+### Fixed
+
+
+
+### Other
+* `[audio]` Audio service and api cleanup/refactor.
+
+
+
 ## [0.39.1 2020-09-25]
 
 ### Added
