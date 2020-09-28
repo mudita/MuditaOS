@@ -320,6 +320,8 @@ namespace app
         virtual void createUserInterface() = 0;
         /// Method closing application's windows.
         virtual void destroyUserInterface() = 0;
+        /// Helper method to attach new window to application
+        void attachWindow(gui::AppWindow *window);
         /// Map containing application's windows
         /// Right now all application windows are being created on application start in createUserInterface
         /// then all windows are removed at the end of application
