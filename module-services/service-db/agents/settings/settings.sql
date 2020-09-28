@@ -1,3 +1,4 @@
+--x, R"dbInitStr( 
 /*
  * Create Settings tables
  */
@@ -38,11 +39,12 @@ CREATE TABLE IF NOT EXISTS notifications_tab (
 
 -- ----------- insert default values ----------------------
 INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
-    ("system/phone_mode", "online"),
-    ("system/phone_mode", "offline"),
-    ("system/phone_mode", "dnd");
+    ('system/phone_mode', 'online'),
+    ('system/phone_mode', 'offline'),
+    ('system/phone_mode', 'dnd');
 
 INSERT OR REPLACE INTO settings_tab (path, value) VALUES
-    ("system/phone_mode", "online");
+    ('system/phone_mode', 'online');
 
 COMMIT TRANSACTION;
+-- )dbInitStr"
