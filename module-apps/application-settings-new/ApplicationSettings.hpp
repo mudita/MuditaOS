@@ -11,12 +11,20 @@ namespace gui::window::name
     inline const std::string phone_name  = "PhoneName";
     inline const std::string add_device  = "AddDevice";
 
-    inline const std::string network            = "Network";
+    inline const std::string network        = "Network";
+    inline const std::string phone_modes    = "PhoneModes";
+    inline const std::string apps_and_tools = "AppsAndTools";
+    inline const std::string security       = "Security";
+    inline const std::string system         = "System";
+
+    inline const std::string display_light  = "DisplayLight";
+    inline const std::string font_size      = "FontSize";
+    inline const std::string keypad_light   = "KeypadLight";
+    inline const std::string input_language = "InputLanguage";
+    inline const std::string locked_screen  = "LockedScreen";
+
     inline const std::string display_and_keypad = "DisplayAndKeypad";
-    inline const std::string phone_modes        = "PhoneModes";
-    inline const std::string apps_and_tools     = "AppsAndTools";
-    inline const std::string security           = "Security";
-    inline const std::string system             = "System";
+
 } // namespace gui::window::name
 
 namespace app
