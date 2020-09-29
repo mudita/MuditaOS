@@ -29,19 +29,16 @@ namespace Settings
         class SettingsMessage : public sys::DataMessage
         {
           public:
-            explicit SettingsMessage() : sys::DataMessage(MessageType::Settings){};
+            explicit SettingsMessage(MessageType type = MessageType::Settings) : sys::DataMessage(type){};
             ~SettingsMessage() override = default;
         };
 
         /// Variable manipulation
-        class VariableSettingsMessage : public SettingsMessage
+        class Variable : public SettingsMessage
         {
           public:
-            VariableSettingsMessage() : SettingsMessage()
-            {}
-
-            explicit VariableSettingsMessage(EntryPath path,
-                                             std::optional<std::string> value = std::make_optional<std::string>())
+            Variable() = default;
+            explicit Variable(EntryPath path, std::optional<std::string> value = {})
                 : SettingsMessage(), path(std::move(path)), value(std::move(value))
             {}
 
@@ -60,45 +57,44 @@ namespace Settings
             std::optional<std::string> value;
         };
 
-        class GetVariable : public VariableSettingsMessage
+        class GetVariable : public Variable
         {
           public:
             GetVariable() = default;
-            explicit GetVariable(EntryPath path) : VariableSettingsMessage(path)
+            explicit GetVariable(EntryPath path) : Variable(path)
             {}
-            ~GetVariable() override = default;
         };
 
-        class SetVariable : public VariableSettingsMessage
+        class SetVariable : public Variable
         {
           public:
             SetVariable() = default;
-            SetVariable(EntryPath path, std::string value) : VariableSettingsMessage(path, value)
+            SetVariable(EntryPath path, std::string value) : Variable(path, value)
             {}
         };
 
-        class RegisterOnVariableChange : public VariableSettingsMessage
+        class RegisterOnVariableChange : public Variable
         {
           public:
             RegisterOnVariableChange() = default;
-            explicit RegisterOnVariableChange(EntryPath path) : VariableSettingsMessage(path)
+            explicit RegisterOnVariableChange(EntryPath path) : Variable(path)
             {}
         };
 
-        class UnregisterOnVariableChange : public VariableSettingsMessage
+        class UnregisterOnVariableChange : public Variable
         {
           public:
             UnregisterOnVariableChange() = default;
-            explicit UnregisterOnVariableChange(EntryPath path) : VariableSettingsMessage(path)
+            explicit UnregisterOnVariableChange(EntryPath path) : Variable(path)
             {}
         };
 
-        class SettingsVariableChanged : public VariableSettingsMessage
+        class VariableChanged : public Variable
         {
           public:
-            SettingsVariableChanged() = default;
-            explicit SettingsVariableChanged(EntryPath path, std::string value, std::string old_value)
-                : VariableSettingsMessage(path, value), old_value(std::move(old_value))
+            VariableChanged() = default;
+            explicit VariableChanged(EntryPath path, std::string value, std::string old_value)
+                : Variable(path, value), old_value(std::move(old_value))
             {}
 
             [[nodiscard]] auto getOldValue() const -> std::string
@@ -106,6 +102,7 @@ namespace Settings
                 return old_value;
             }
 
+          protected:
             std::string old_value;
         };
 
@@ -113,7 +110,7 @@ namespace Settings
         class ListProfiles : public SettingsMessage
         {
           public:
-            auto getProfiles() -> const std::set<std::string> &
+            [[nodiscard]] auto getProfiles() const -> std::set<std::string>
             {
                 return profiles;
             }
@@ -125,7 +122,7 @@ namespace Settings
         class ProfileSettingsMessage : public SettingsMessage
         {
           public:
-            auto getProfileName() -> std::string
+            [[nodiscard]] auto getProfileName() const -> std::string
             {
                 return profile;
             }
@@ -164,18 +161,10 @@ namespace Settings
         };
 
         class RegisterOnProfileChange : public SettingsMessage
-        {
-          public:
-            RegisterOnProfileChange()           = default;
-            ~RegisterOnProfileChange() override = default;
-        };
+        {};
 
         class UnregisterOnProfileChange : public SettingsMessage
-        {
-          public:
-            UnregisterOnProfileChange()           = default;
-            ~UnregisterOnProfileChange() override = default;
-        };
+        {};
 
         class CurrentProfileChanged : public ProfileSettingsMessage
         {
@@ -189,7 +178,7 @@ namespace Settings
         class ListModes : public SettingsMessage
         {
           public:
-            auto getModes() -> const std::set<std::string> &
+            [[nodiscard]] auto getModes() const -> std::set<std::string>
             {
                 return modes;
             }
@@ -198,17 +187,17 @@ namespace Settings
             std::set<std::string> modes;
         };
 
-        class ModeSettingsMessage : public SettingsMessage
+        class Mode : public SettingsMessage
         {
           public:
-            auto getModeName() -> std::string
+            [[nodiscard]] auto getModeName() const -> std::string
             {
                 return mode;
             }
 
           protected:
-            ModeSettingsMessage() = default;
-            explicit ModeSettingsMessage(std::string mode) : SettingsMessage(), mode(std::move(mode))
+            Mode() = default;
+            explicit Mode(std::string mode) : SettingsMessage(), mode(std::move(mode))
             {}
 
           protected:
@@ -240,18 +229,10 @@ namespace Settings
         };
 
         class RegisterOnModeChange : public SettingsMessage
-        {
-          public:
-            RegisterOnModeChange()           = default;
-            ~RegisterOnModeChange() override = default;
-        };
+        {};
 
         class UnregisterOnModeChange : public SettingsMessage
-        {
-          public:
-            UnregisterOnModeChange()           = default;
-            ~UnregisterOnModeChange() override = default;
-        };
+        {};
 
         class CurrentModeChanged : public ProfileSettingsMessage
         {
@@ -261,16 +242,28 @@ namespace Settings
             {}
         };
 
-        // Response handling
-        class SettingsResponseMessage : public sys::ResponseMessage
-        {};
-
-        class VariableSettingsResponse : public sys::ResponseMessage
+        class ValueResponse : sys::ResponseMessage
         {
           public:
-            explicit VariableSettingsResponse(EntryPath path,
-                                              std::optional<std::string> value,
-                                              sys::ReturnCodes code = sys::ReturnCodes::Success)
+            ValueResponse() = default;
+            ValueResponse(std::string value) : sys::ResponseMessage(), value(std::move(value))
+            {}
+
+            [[nodiscard]] auto getValue() const -> std::string
+            {
+                return value;
+            }
+
+          private:
+            std::string value;
+        };
+
+        class VariableResponse : public sys::ResponseMessage
+        {
+          public:
+            explicit VariableResponse(EntryPath path,
+                                      std::optional<std::string> value,
+                                      sys::ReturnCodes code = sys::ReturnCodes::Success)
                 : sys::ResponseMessage(code), path(std::move(path)), value(std::move(value))
             {}
 
@@ -289,13 +282,28 @@ namespace Settings
             std::optional<std::string> value;
         };
 
-        class ListSettingsResponse : public sys::ResponseMessage
+        class ProfileResponse : public ValueResponse
         {
           public:
-            ListSettingsResponse() = default;
-            explicit ListSettingsResponse(std::list<std::string> value,
-                                          sys::ReturnCodes code = sys::ReturnCodes::Success)
-                : sys::ResponseMessage(code)
+            ProfileResponse() = default;
+            explicit ProfileResponse(std::string profile) : ValueResponse(profile)
+            {}
+        };
+
+        class ModeResponse : public ValueResponse
+        {
+          public:
+            ModeResponse() = default;
+            explicit ModeResponse(std::string mode) : ValueResponse(mode)
+            {}
+        };
+
+        class ListResponse : public sys::ResponseMessage
+        {
+          public:
+            ListResponse() = default;
+            explicit ListResponse(std::list<std::string> value, sys::ReturnCodes code = sys::ReturnCodes::Success)
+                : sys::ResponseMessage(code), value(std::move(value))
             {}
 
             [[nodiscard]] auto getValue() const -> std::list<std::string>
@@ -307,19 +315,19 @@ namespace Settings
             std::list<std::string> value;
         };
 
-        class ProfileListSettingsResponse : public ListSettingsResponse
+        class ProfileListResponse : public ListResponse
         {
           public:
-            ProfileListSettingsResponse() = default;
-            explicit ProfileListSettingsResponse(std::list<std::string> profiles) : ListSettingsResponse(profiles)
+            ProfileListResponse() = default;
+            explicit ProfileListResponse(std::list<std::string> profiles) : ListResponse(profiles)
             {}
         };
 
-        class ModeListSettingsResponse : public ListSettingsResponse
+        class ModeListResponse : public ListResponse
         {
           public:
-            ModeListSettingsResponse() = default;
-            explicit ModeListSettingsResponse(std::list<std::string> modes) : ListSettingsResponse(modes)
+            ModeListResponse() = default;
+            explicit ModeListResponse(std::list<std::string> modes) : ListResponse(modes)
             {}
         };
 

@@ -57,7 +57,7 @@ namespace Settings
                 auto path  = msg->getPath();
                 auto value = getValue(path);
 
-                return std::make_shared<Settings::Messages::VariableSettingsResponse>(path, value);
+                return std::make_shared<Settings::Messages::VariableResponse>(path, value);
             }
             return std::make_shared<sys::ResponseMessage>();
         };
@@ -70,7 +70,7 @@ namespace Settings
                 auto value     = msg->getValue().value_or("");
                 auto old_value = setValue(path, msg->getValue().value_or(""));
 
-                auto update_msg = std::make_shared<Settings::Messages::SettingsVariableChanged>(path, value, old_value);
+                auto update_msg = std::make_shared<Settings::Messages::VariableChanged>(path, value, old_value);
                 sys::Bus::SendUnicast(std::move(update_msg), "db-worker", this);
             }
             return std::make_shared<sys::ResponseMessage>();
