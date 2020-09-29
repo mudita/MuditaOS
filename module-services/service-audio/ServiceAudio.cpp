@@ -70,34 +70,9 @@ sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMod
 void ServiceAudio::TickHandler(uint32_t id)
 {}
 
-bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
+constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 {
-    switch (type) {
-    case audio::PlaybackType::Multimedia:
-        return true;
-    case audio::PlaybackType::None:
-    case audio::PlaybackType::TextMessageRingtone:
-    case audio::PlaybackType::Notifications:
-    case audio::PlaybackType::KeypadSound:
-    case audio::PlaybackType::CallRingtone:
-        return false;
-    }
-    return false;
-}
-
-bool ServiceAudio::IsMergable(const audio::PlaybackType &type) const
-{
-    switch (type) {
-    case audio::PlaybackType::KeypadSound:
-    case audio::PlaybackType::Notifications:
-    case audio::PlaybackType::TextMessageRingtone:
-        return true;
-    case audio::PlaybackType::None:
-    case audio::PlaybackType::Multimedia:
-    case audio::PlaybackType::CallRingtone:
-        return false;
-    }
-    return false;
+    return type == audio::PlaybackType::Multimedia;
 }
 
 constexpr bool ServiceAudio::ShouldLoop(const audio::PlaybackType &type) const
