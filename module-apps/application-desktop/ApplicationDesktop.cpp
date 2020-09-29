@@ -75,18 +75,13 @@ namespace app
 
     auto ApplicationDesktop::handle(sdesktop::UpdateOsMessage *msg) -> bool
     {
-        if (msg->messageType == sdesktop::UpdateFoundOnBoot) {
-            LOG_DEBUG("ApplicationDesktop::handle updateFoundOnBoot message");
-            auto *updateMessage = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+        if (msg != nullptr && msg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
-            if (updateMessage != nullptr) {
-                if (updateMessage->messageType == sdesktop::UpdateFoundOnBoot &&
-                    updateMessage->updateStats.updateFile.has_filename()) {
-                    LOG_DEBUG("ApplicationDesktop::handle pending update found: %s",
-                              updateMessage->updateStats.updateFile.c_str());
-                }
+            if (msg->updateStats.updateFile.has_filename()) {
+                LOG_DEBUG("ApplicationDesktop::handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
         }
+
         return true;
     }
 
@@ -221,7 +216,7 @@ namespace app
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
             auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
-            if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateFoundOnBoot) {
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
                 if (getWindow(app::window::name::desktop_update)) {
                     std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
@@ -230,7 +225,7 @@ namespace app
                 }
             }
 
-            if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateInform) {
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateInform) {
                 if (getWindow(app::window::name::desktop_update)) {
                     std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
                     getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
@@ -239,7 +234,8 @@ namespace app
             return std::make_shared<sys::ResponseMessage>();
         });
 
-        auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateCheckForUpdateOnce);
+        auto msgToSend =
+            std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         sys::Bus::SendBroadcast(msgToSend, this);
 
         return sys::ReturnCodes::Success;

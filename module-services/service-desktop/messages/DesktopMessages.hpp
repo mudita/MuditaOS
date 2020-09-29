@@ -2,33 +2,11 @@
 
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
+#include "UpdatePureOS.hpp"
 #include <vfs.hpp>
 
 namespace sdesktop
 {
-    enum UpdateMessageType
-    {
-        UpdateFoundOnBoot,
-        UpdateCheckForUpdateOnce,
-        UpdateNow,
-        UpdateError,
-        UpdateInform
-    };
-
-    struct UpdateStats
-    {
-        fs::path updateFile            = "";
-        fs::path fileExtracted         = "";
-        fs::path updateTempDirectory   = PATH_SYS "/" PATH_TMP;
-        uint32_t totalBytes            = 0;
-        uint32_t currentExtractedBytes = 0;
-        uint32_t fileExtractedSize     = 0;
-        uint32_t uuid                  = 0;
-        std::string messageText        = "";
-        uint8_t status;
-        json11::Json versioInformation;
-    };
-
     class UpdateOsMessage : public sys::DataMessage
     {
       public:
@@ -42,11 +20,11 @@ namespace sdesktop
         UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
         {}
 
-        UpdateOsMessage(const sdesktop::UpdateMessageType updateMessageType)
+        UpdateOsMessage(const updateos::UpdateMessageType updateMessageType)
             : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
         {}
 
-        UpdateOsMessage(const sdesktop::UpdateMessageType updateMessageType, fs::path updateFileFoundOnBoot)
+        UpdateOsMessage(const updateos::UpdateMessageType updateMessageType, fs::path updateFileFoundOnBoot)
             : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
         {
             updateStats.updateFile = updateFileFoundOnBoot;
@@ -54,9 +32,9 @@ namespace sdesktop
 
         ~UpdateOsMessage() override = default;
 
-        UpdateStats updateStats       = {};
-        UpdateMessageType messageType = UpdateNow;
-        int rebootDelay               = 0;
+        updateos::UpdateStats updateStats       = {};
+        updateos::UpdateMessageType messageType = updateos::UpdateMessageType::UpdateNow;
+        int rebootDelay                         = 0;
     };
 
     class BackupMessage : public sys::DataMessage

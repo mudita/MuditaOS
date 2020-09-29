@@ -59,19 +59,21 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
         sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
 
-        if (updateOsMsg != nullptr && updateOsMsg->messageType == sdesktop::UpdateCheckForUpdateOnce) {
+        if (updateOsMsg != nullptr &&
+            updateOsMsg->messageType == updateos::UpdateMessageType::UpdateCheckForUpdateOnce) {
             fs::path file = UpdatePureOS::checkForUpdate();
 
             if (file.has_filename()) {
                 /* send info to applicationDesktop that there is an update waiting */
 
-                auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateFoundOnBoot, file);
+                auto msgToSend =
+                    std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
                 msgToSend->updateStats.versioInformation = UpdatePureOS::getVersionInfoFromFile(file);
                 sys::Bus::SendUnicast(msgToSend, app::name_desktop, this);
             }
         }
 
-        if (updateOsMsg != nullptr && updateOsMsg->messageType == sdesktop::UpdateNow) {
+        if (updateOsMsg != nullptr && updateOsMsg->messageType == updateos::UpdateMessageType::UpdateNow) {
             LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
                       updateOsMsg->updateStats.updateFile.c_str(),
                       updateOsMsg->updateStats.uuid);
