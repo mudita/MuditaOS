@@ -80,7 +80,7 @@ namespace Settings
         {
             if (dynamic_cast<Settings::Messages::ListProfiles *>(req) != nullptr) {
                 std::list<std::string> profiles = {"silent", "loud"};
-                return std::make_shared<Settings::Messages::ProfileListSettingsResponse>(profiles);
+                return std::make_shared<Settings::Messages::ProfileListResponse>(profiles);
             }
             return std::make_shared<sys::ResponseMessage>();
         };
@@ -89,7 +89,7 @@ namespace Settings
         {
             if (dynamic_cast<Settings::Messages::ListProfiles *>(req) != nullptr) {
                 std::list<std::string> modes = {"mode1", "mode2"};
-                return std::make_shared<Settings::Messages::ModeListSettingsResponse>(modes);
+                return std::make_shared<Settings::Messages::ModeListResponse>(modes);
             }
             return std::make_shared<sys::ResponseMessage>();
         };
