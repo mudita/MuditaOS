@@ -6,8 +6,7 @@
 namespace audio
 {
 
-    Audio::Audio(std::function<int32_t(AudioEvents event)> asyncCallback,
-                 std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
+    Audio::Audio(AsyncCallback asyncCallback, DbCallback dbCallback)
         : currentOperation(), asyncCallback(asyncCallback), dbCallback(dbCallback)
     {
 
@@ -74,7 +73,10 @@ namespace audio
         return currentOperation->SetInputGain(gainToSet);
     }
 
-    audio::RetCode Audio::Start(Operation::Type op, const char *fileName, const audio::PlaybackType &playbackType)
+    audio::RetCode Audio::Start(Operation::Type op,
+                                audio::Token token,
+                                const char *fileName,
+                                const audio::PlaybackType &playbackType)
     {
 
         auto ret = Operation::Create(op, fileName, playbackType, dbCallback);
@@ -107,7 +109,7 @@ namespace audio
             return RetCode::OperationCreateFailed;
         }
 
-        return currentOperation->Start(asyncCallback);
+        return currentOperation->Start(asyncCallback, token);
     }
 
     audio::RetCode Audio::Stop()
@@ -147,6 +149,11 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         return currentOperation->Resume();
+    }
+
+    audio::RetCode Audio::Mute()
+    {
+        return SetOutputVolume(0);
     }
 
 } // namespace audio

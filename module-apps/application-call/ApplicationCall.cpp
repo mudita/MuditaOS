@@ -59,7 +59,8 @@ namespace app
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------CallAborted");
-        AudioServiceAPI::Stop(this);
+        AudioServiceAPI::Stop(this, routingAudioHandle);
+        AudioServiceAPI::Stop(this, callringAudioHandle);
         callDelayedStopTime = utils::time::Timestamp() + delayToSwitchToPreviousApp;
         callWindow->setState(gui::CallWindow::State::CALL_ENDED);
         if (getState() == State::ACTIVE_FORGROUND && getCurrentWindow() != callWindow) {
@@ -80,7 +81,7 @@ namespace app
         gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
         assert(callWindow != nullptr);
 
-        AudioServiceAPI::RoutingStart(this);
+        routingAudioHandle = AudioServiceAPI::RoutingStart(this);
         runCallTimer();
 
         LOG_INFO("---------------------------------CallActive");
@@ -98,7 +99,8 @@ namespace app
             LOG_INFO("ignoring call incoming");
         }
         else {
-            AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
+            callringAudioHandle =
+                AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
             runCallTimer();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncomingCallData>(msg->number);
             // send to itself message to switch (run) call application
@@ -121,7 +123,7 @@ namespace app
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------Ringing");
-        AudioServiceAPI::RoutingStart(this);
+        routingAudioHandle = AudioServiceAPI::RoutingStart(this);
         runCallTimer();
 
         std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->number);
@@ -283,6 +285,13 @@ namespace app
     {
         LOG_INFO("add contact information: %s", number.c_str());
         app::contact(this, app::ContactOperation::Add, number);
+    }
+
+    void ApplicationCall::transmitDtmfTone(uint32_t digit)
+    {
+        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
+            LOG_ERROR("transmitDtmfTone failed");
+        }
     }
 
 } // namespace app

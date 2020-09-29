@@ -246,3 +246,10 @@ bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &
     }
     return false;
 }
+
+bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, uint32_t digit)
+{
+    auto msg = std::make_shared<CellularDtmfRequestMessage>(digit);
+
+    return sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+}

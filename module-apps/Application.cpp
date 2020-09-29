@@ -25,6 +25,13 @@
 
 #include "common_data/EventStore.hpp"
 
+namespace app::audioConsts
+{
+    const std::vector<audio::PlaybackType> typesToMute = {audio::PlaybackType::Notifications,
+                                                          audio::PlaybackType::CallRingtone,
+                                                          audio::PlaybackType::TextMessageRingtone};
+} // namespace app::audioConsts
+
 namespace app
 {
 
@@ -507,18 +514,23 @@ namespace app
                                 const audio::Profile::Type &profileType,
                                 const audio::PlaybackType &playbackType)
     {
-        const auto ret = AudioServiceAPI::SetVolume(this, value, profileType, playbackType);
+        const auto ret = AudioServiceAPI::SetSetting(this, audio::Setting::Volume, value, profileType, playbackType);
         return ret == audio::RetCode::Success;
     }
 
     bool Application::adjustCurrentVolume(const int step)
     {
-        audio::Volume vol;
-        auto ret = AudioServiceAPI::GetOutputVolume(this, vol);
-        if (ret == audio::RetCode::Success) {
-            ret = ((static_cast<int>(vol) + step) < 0) ? audio::RetCode::Success
-                                                       : AudioServiceAPI::SetOutputVolume(this, vol + step);
+        audio::Volume volume;
+        if (step < 0) {
+            AudioServiceAPI::Stop(this, app::audioConsts::typesToMute);
         }
+        auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
+        if (ret == audio::RetCode::Success) {
+            ret = ((static_cast<int>(volume) + step) < 0)
+                      ? audio::RetCode::Success
+                      : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
+        }
+
         return ret == audio::RetCode::Success;
     }
 

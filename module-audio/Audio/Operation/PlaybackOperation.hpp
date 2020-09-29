@@ -4,6 +4,12 @@
 
 #include <bsp/audio/bsp_audio.hpp>
 
+namespace audio::playbackDefaults
+{
+    constexpr audio::Volume defaultLoudspeakerVolume = 10;
+    constexpr audio::Volume defaultHeadphonesVolume  = 2;
+} // namespace audio::playbackDefaults
+
 namespace audio
 {
     class decoder;
@@ -16,7 +22,7 @@ namespace audio
             const audio::PlaybackType &playbackType,
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
-        audio::RetCode Start(std::function<int32_t(AudioEvents event)> callback) override final;
+        audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) override final;
 
         audio::RetCode Stop() override final;
 

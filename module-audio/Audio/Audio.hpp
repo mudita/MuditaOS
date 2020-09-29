@@ -22,8 +22,7 @@ namespace audio
             Routing,
         };
 
-        Audio(std::function<int32_t(AudioEvents event)> asyncCallback,
-              std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback);
+        Audio(AsyncCallback asyncCallback, DbCallback dbCallback);
 
         // Events
         audio::RetCode SendEvent(const Operation::Event evt, const EventData *data = nullptr);
@@ -66,6 +65,7 @@ namespace audio
 
         // Operations
         audio::RetCode Start(Operation::Type op,
+                             audio::Token token                      = audio::Token::MakeBadToken(),
                              const char *fileName                    = "",
                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
 
@@ -75,13 +75,15 @@ namespace audio
 
         audio::RetCode Resume();
 
+        audio::RetCode Mute();
+
       private:
         bool headphonesInserted = false;
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 
-        std::function<int32_t(AudioEvents event)> asyncCallback = nullptr;
-        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr;
+        AsyncCallback asyncCallback;
+        DbCallback dbCallback;
     };
 
 } // namespace audio

@@ -240,7 +240,7 @@ namespace app
                        const audio::Profile::Type &profileType,
                        const audio::PlaybackType &playbackType)
         {
-            return AudioServiceAPI::GetVolume(this, volume, profileType, playbackType);
+            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, profileType, playbackType);
         }
 
         bool adjustCurrentVolume(const int step);
@@ -254,7 +254,7 @@ namespace app
         }
         auto getCurrentVolume(audio::Volume &volume)
         {
-            return AudioServiceAPI::GetOutputVolume(this, volume);
+            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
         }
 
         void toggleTorchAndColourTemps()

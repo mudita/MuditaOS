@@ -1,6 +1,7 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
+#include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 
 #include "ApplicationSettings.hpp"
@@ -17,8 +18,8 @@ namespace app
     {}
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationSettingsNew::DataReceivedHandler(sys::DataMessage *msgl,
-                                                               [[maybe_unused]] sys::ResponseMessage *resp)
+    auto ApplicationSettingsNew::DataReceivedHandler(sys::DataMessage *msgl,
+                                                     [[maybe_unused]] sys::ResponseMessage *resp) -> sys::Message_t
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
@@ -31,7 +32,7 @@ namespace app
     }
 
     // Invoked during initialization
-    sys::ReturnCodes ApplicationSettingsNew::InitHandler()
+    auto ApplicationSettingsNew::InitHandler() -> sys::ReturnCodes
     {
         board = EventManagerServiceAPI::GetBoard(this);
 
@@ -55,6 +56,8 @@ namespace app
         window = newOptionWindow(this, gui::name::window::main_window, mainWindowOptionsNew(this));
         window->setTitle(utils::localize.get("app_settings_title_main_new"));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        windows.insert({gui::window::name::bluetooth, new gui::BluetoothWindow(this)});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

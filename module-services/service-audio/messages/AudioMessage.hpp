@@ -20,15 +20,19 @@
 class AudioMessage : public sys::DataMessage
 {
   public:
-    AudioMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType)
-    {}
-
     AudioMessage() : sys::DataMessage(MessageType::MessageTypeUninitialized)
     {}
 
-    virtual ~AudioMessage() = default;
+    AudioMessage(MessageType messageType,
+                 audio::PlaybackType playbackType = audio::PlaybackType::None,
+                 audio::Token token               = audio::Token())
+        : sys::DataMessage(messageType), type(messageType), playbackType(playbackType), token(token)
+    {}
 
+    virtual ~AudioMessage() = default;
     MessageType type = MessageType::MessageTypeUninitialized;
+    audio::PlaybackType playbackType = audio::PlaybackType::None;
+    audio::Token token;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -41,7 +45,8 @@ class AudioNotificationMessage : public AudioMessage
         Stop
     };
 
-    AudioNotificationMessage(Type type) : AudioMessage(MessageType::AudioNotification), type(type)
+    AudioNotificationMessage(Type type, audio::Token token)
+        : AudioMessage(MessageType::AudioNotification, audio::PlaybackType::None, token), type(type)
     {}
 
     ~AudioNotificationMessage()
@@ -55,22 +60,26 @@ class AudioSettingsMessage : public AudioMessage
   public:
     AudioSettingsMessage(const audio::Profile::Type &profileType,
                          const audio::PlaybackType &playbackType,
+                         const audio::Setting &setting,
                          const uint32_t &val = 0)
-        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, val{val}
+        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, setting{setting}, val{val}
     {}
 
     ~AudioSettingsMessage() override = default;
 
     audio::Profile::Type profileType = audio::Profile::Type::Idle;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
+    const audio::Setting setting;
     uint32_t val{};
 };
 
 class AudioGetSetting : public AudioSettingsMessage
 {
   public:
-    AudioGetSetting(const audio::Profile::Type &profileType, const audio::PlaybackType &playbackType)
-        : AudioSettingsMessage{profileType, playbackType}
+    AudioGetSetting(const audio::Profile::Type &profileType,
+                    const audio::PlaybackType &playbackType,
+                    const audio::Setting &setting)
+        : AudioSettingsMessage{profileType, playbackType, setting}
     {}
 
     ~AudioGetSetting() override = default;
@@ -81,8 +90,9 @@ class AudioSetSetting : public AudioSettingsMessage
   public:
     AudioSetSetting(const audio::Profile::Type &profileType,
                     const audio::PlaybackType &playbackType,
+                    const audio::Setting &setting,
                     const uint32_t &val)
-        : AudioSettingsMessage{profileType, playbackType, val}
+        : AudioSettingsMessage{profileType, playbackType, setting, val}
     {}
 
     ~AudioSetSetting() override = default;
@@ -91,15 +101,29 @@ class AudioSetSetting : public AudioSettingsMessage
 class AudioRequestMessage : public AudioMessage
 {
   public:
-    AudioRequestMessage(MessageType messageType) : AudioMessage(messageType)
+    AudioRequestMessage(MessageType messageType, audio::Token token = audio::Token())
+        : AudioMessage(messageType, audio::PlaybackType::None, token)
     {}
+
     ~AudioRequestMessage()
     {}
 
     std::string fileName;
     float val;
     bool enable;
-    audio::PlaybackType playbackType = audio::PlaybackType::None;
+};
+
+class AudioStopMessage : public AudioMessage
+{
+  public:
+    AudioStopMessage(const std::vector<audio::PlaybackType> &stopVec = {}) : AudioMessage(), stopVec(stopVec)
+    {}
+
+    AudioStopMessage(const audio::Token &token) : AudioMessage(), token(token)
+    {}
+
+    const std::vector<audio::PlaybackType> stopVec;
+    const audio::Token token;
 };
 
 class AudioResponseMessage : public sys::ResponseMessage
@@ -107,17 +131,22 @@ class AudioResponseMessage : public sys::ResponseMessage
   public:
     AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
                          const audio::Tags &tags = {},
+                         audio::Token token      = audio::Token(),
                          const float val         = 0.0)
-        : sys::ResponseMessage(), tags(tags), val(val)
+        : sys::ResponseMessage(), tags(tags), val(val), token(token)
     {}
-    AudioResponseMessage(audio::RetCode retCode, const float val) : AudioResponseMessage(retCode, {}, val)
+
+    AudioResponseMessage(audio::RetCode retCode, const float val)
+        : AudioResponseMessage(retCode, {}, audio::Token(), val)
     {}
+
     virtual ~AudioResponseMessage()
     {}
 
     audio::RetCode retCode = audio::RetCode::Success;
     audio::Tags tags       = {};
     float val              = 0.0;
+    audio::Token token;
 };
 
 #endif // PUREPHONE_AUDIOMESSAGE_HPP

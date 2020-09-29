@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Common/Query.hpp>
+#include <module-apps/application-phonebook/data/ContactsMap.hpp>
 
 #include <string>
 #include <utility>
@@ -100,6 +101,27 @@ namespace db::query
          *
          * @return class name
          */
+        [[nodiscard]] auto debugInfo() const -> std::string override
+        {
+            return "RecordQueryResult";
+        }
+    };
+
+    class LetterMapResult : public db::QueryResult
+    {
+      private:
+        ContactsMapData letterMap;
+
+      public:
+        LetterMapResult() noexcept = default;
+        LetterMapResult(ContactsMapData result) noexcept : letterMap(std::move(result))
+        {}
+
+        [[nodiscard]] const ContactsMapData &getLetterMap() const noexcept
+        {
+            return letterMap;
+        }
+
         [[nodiscard]] auto debugInfo() const -> std::string override
         {
             return "RecordQueryResult";

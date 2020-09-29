@@ -40,6 +40,7 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/models/NewContactModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"
+                "${CMAKE_CURRENT_LIST_DIR}/data/ContactsMap.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactListItem.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/InformationWidget.hpp"
                 "${CMAKE_CURRENT_LIST_DIR}/widgets/InputBoxWithLabelAndIconWidget.hpp"

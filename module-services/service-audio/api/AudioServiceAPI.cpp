@@ -34,37 +34,34 @@ namespace AudioServiceAPI
         }
     } // namespace
 
-    RetCode PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
+    Handle PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
+        auto msg          = std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
         msg->fileName = fileName;
         msg->playbackType = playbackType;
-
-        return SendAudioRequest(serv, msg)->retCode;
+        auto ret          = SendAudioRequest(serv, msg);
+        return Handle(ret->retCode, ret->token);
     }
 
-    RetCode RecordingStart(sys::Service *serv, const std::string &fileName)
+    Handle RecordingStart(sys::Service *serv, const std::string &fileName)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
+        auto msg      = std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
         msg->fileName = fileName;
-
-        return SendAudioRequest(serv, msg)->retCode;
+        auto ret      = SendAudioRequest(serv, msg);
+        return Handle(ret->retCode, ret->token);
     }
 
-    audio::RetCode RoutingStart(sys::Service *serv)
+    Handle RoutingStart(sys::Service *serv)
     {
         std::shared_ptr<AudioRequestMessage> msg =
             std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingStart);
-
-        return SendAudioRequest(serv, msg)->retCode;
+        auto ret = SendAudioRequest(serv, msg);
+        return Handle(ret->retCode, ret->token);
     }
 
     audio::RetCode RoutingRecordCtrl(sys::Service *serv, bool enable)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingRecordCtrl);
+        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingRecordCtrl);
         msg->enable = enable;
 
         return SendAudioRequest(serv, msg)->retCode;
@@ -72,7 +69,7 @@ namespace AudioServiceAPI
 
     audio::RetCode RoutingMute(sys::Service *serv, bool enable)
     {
-        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
+        auto msg                                 = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
         msg->enable                              = enable;
 
         return SendAudioRequest(serv, msg)->retCode;
@@ -80,8 +77,7 @@ namespace AudioServiceAPI
 
     audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
+        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
         msg->enable = enable;
 
         return SendAudioRequest(serv, msg)->retCode;
@@ -89,105 +85,68 @@ namespace AudioServiceAPI
 
     audio::RetCode RoutingHeadset(sys::Service *serv, bool enable)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingHeadset);
+        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingHeadset);
         msg->enable = enable;
 
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    RetCode Stop(sys::Service *serv)
+    RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
     {
-        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioStop);
+        auto msg = std::make_shared<AudioStopMessage>(stopVec);
 
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    RetCode Pause(sys::Service *serv)
+    RetCode Stop(sys::Service *serv, const audio::Handle &handle)
     {
-        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioPause);
-
+        auto msg = std::make_shared<AudioStopMessage>(handle.GetToken());
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    RetCode Resume(sys::Service *serv)
-    {
-        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioResume);
-
-        return SendAudioRequest(serv, msg)->retCode;
-    }
-
-    RetCode SetInputGain(sys::Service *serv, const Gain gain)
+    RetCode Pause(sys::Service *serv, const audio::Handle &handle)
     {
         std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioSetInputGain);
-        msg->val = gain;
-
+            std::make_shared<AudioRequestMessage>(MessageType::AudioPause, handle.GetToken());
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    RetCode GetInputGain(sys::Service *serv, Gain &gain)
+    RetCode Resume(sys::Service *serv, const audio::Handle &handle)
     {
         std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioGetInputGain);
-
-        auto resp = SendAudioRequest(serv, msg);
-        if (resp->retCode == audio::RetCode::Success) {
-            gain = resp->val;
-        }
-        gain = 0;
-        return resp->retCode;
-    }
-
-    RetCode SetOutputVolume(sys::Service *serv, const Volume vol)
-    {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioSetOutputVolume);
-        msg->val = vol;
-
+            std::make_shared<AudioRequestMessage>(MessageType::AudioResume, handle.GetToken());
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    audio::RetCode SetVolume(sys::Service *serv,
-                             const audio::Volume &vol,
-                             const Profile::Type &profileType,
-                             const audio::PlaybackType &playbackType)
+    audio::RetCode GetSetting(sys::Service *serv,
+                              const audio::Setting &setting,
+                              uint32_t &value,
+                              const audio::Profile::Type &profileType,
+                              const audio::PlaybackType &playbackType)
     {
-        auto msg = std::make_shared<AudioSetSetting>(profileType, playbackType, vol);
-
-        return SendAudioRequest(serv, msg)->retCode;
-    }
-
-    audio::RetCode GetVolume(sys::Service *serv,
-                             audio::Volume &vol,
-                             const Profile::Type &profileType,
-                             const audio::PlaybackType &playbackType)
-    {
-        auto msg  = std::make_shared<AudioGetSetting>(profileType, playbackType);
+        auto msg  = std::make_shared<AudioGetSetting>(profileType, playbackType, setting);
         auto resp = SendAudioRequest(serv, msg);
         if (resp->retCode == RetCode::Success) {
-            vol = resp->val;
+            value = resp->val;
         }
 
         return resp->retCode;
     }
 
-    RetCode GetOutputVolume(sys::Service *serv, Volume &vol)
+    audio::RetCode SetSetting(sys::Service *serv,
+                              const audio::Setting &setting,
+                              const uint32_t value,
+                              const audio::Profile::Type &profileType,
+                              const audio::PlaybackType &playbackType)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioGetOutputVolume);
+        auto msg = std::make_shared<AudioSetSetting>(profileType, playbackType, setting, value);
 
-        auto resp = SendAudioRequest(serv, msg);
-        if (resp->retCode == RetCode::Success) {
-            vol = resp->val;
-        }
-
-        return resp->retCode;
+        return SendAudioRequest(serv, msg)->retCode;
     }
 
     std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
     {
-        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
+        auto msg                                 = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
         msg->fileName                            = fileName;
 
         auto resp = SendAudioRequest(serv, msg);

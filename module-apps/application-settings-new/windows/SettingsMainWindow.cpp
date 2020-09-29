@@ -1,8 +1,9 @@
 #include "SettingsMainWindow.hpp"
-#include "../ApplicationSettings.hpp"
-#include "i18/i18.hpp"
-#include "log/log.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
+
+#include <i18/i18.hpp>
+#include <log/log.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
 
 std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
 {
@@ -37,12 +38,12 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
     };
 
     addApp(i18("app_desktop_menu_settings"), "Settings");
-    addMenu(i18("app_settings_bt"), "Bluetooth");
-    addMenu(i18("app_settings_net"), "Network");
-    addMenu(i18("app_settings_disp_key"), "Display and keypad");
-    addMenu(i18("app_settings_phone_modes"), "Phone modes");
-    addMenu(i18("app_settings_apps_tools"), "Apps and tools");
-    addMenu(i18("app_settings_security"), "Security");
-    addMenu(i18("app_settings_system"), "System");
+    addMenu(i18("app_settings_bt"), gui::window::name::bluetooth);
+    addMenu(i18("app_settings_net"), gui::window::name::network);
+    addMenu(i18("app_settings_disp_key"), gui::window::name::display_and_keypad);
+    addMenu(i18("app_settings_phone_modes"), gui::window::name::phone_modes);
+    addMenu(i18("app_settings_apps_tools"), gui::window::name::apps_and_tools);
+    addMenu(i18("app_settings_security"), gui::window::name::security);
+    addMenu(i18("app_settings_system"), gui::window::name::system);
     return l;
 }

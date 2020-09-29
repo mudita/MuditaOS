@@ -11,6 +11,7 @@
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
 #include "module-gui/gui/widgets/TextConstants.hpp"
+#include <module-apps/application-phonebook/data/ContactsMap.hpp>
 
 #include <memory>
 #include <optional>
@@ -227,6 +228,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     const std::uint32_t favouritesGroupId;
     auto getQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto getLetterMapQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+
     auto getByIDQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto getSizeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto addQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;

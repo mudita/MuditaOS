@@ -83,11 +83,13 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
   private:
     EventsDB *eventsDb = nullptr;
 
-    std::unique_ptr<db::query::events::GetResult> runQueryImpl(const db::query::events::Get *query);
-    std::unique_ptr<db::query::events::GetAllResult> runQueryImpl(const db::query::events::GetAll *query);
-    std::unique_ptr<db::query::events::GetAllLimitedResult> runQueryImpl(const db::query::events::GetAllLimited *query);
-    std::unique_ptr<db::query::events::GetFilteredResult> runQueryImpl(const db::query::events::GetFiltered *query);
-    std::unique_ptr<db::query::events::AddResult> runQueryImpl(const db::query::events::Add *query);
-    std::unique_ptr<db::query::events::RemoveResult> runQueryImpl(const db::query::events::Remove *query);
-    std::unique_ptr<db::query::events::EditResult> runQueryImpl(const db::query::events::Edit *query);
+    std::unique_ptr<db::query::events::GetResult> runQueryImplGetResult(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::GetAllResult> runQueryImplGetAllResult(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::GetAllLimitedResult> runQueryImplGetAllLimitedResult(
+        std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::GetFilteredResult> runQueryImplGetFilteredResult(
+        std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::AddResult> runQueryImplAdd(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::RemoveResult> runQueryImplRemove(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::EditResult> runQueryImplEdit(std::shared_ptr<db::Query> query);
 };

@@ -1,11 +1,3 @@
-/*
- * @file EnterNumberWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "EnterNumberWindow.hpp"
 
 #include "../ApplicationCall.hpp"

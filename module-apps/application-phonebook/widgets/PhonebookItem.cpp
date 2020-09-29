@@ -55,7 +55,7 @@ namespace gui
 
     UTF8 PhonebookItem::getLabelMarker()
     {
-        if (favourite) {
+        if (favourite && (labeMarkerDisplayMode == LabelMarkerDisplayMode::IncludeFavourites)) {
             // If contact is favorite return proper UTF string
             return phonebookStyle::contactItem::favourites_string;
         }
@@ -81,6 +81,11 @@ namespace gui
             blockedIcon->setAlignment(Alignment(gui::Alignment::Vertical::Center));
             blockedIcon->setMargins(Margins(0, 0, phonebookStyle::contactItem::blocked_right_margin, 0));
         }
+    }
+
+    void PhonebookItem::setLabelMarkerDisplayMode(LabelMarkerDisplayMode mode)
+    {
+        labeMarkerDisplayMode = mode;
     }
 
 } /* namespace gui */

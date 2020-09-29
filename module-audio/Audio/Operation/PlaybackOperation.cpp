@@ -36,7 +36,7 @@ namespace audio
 #endif
             if (ret == 0) {
                 state = State::Idle;
-                eventCallback(AudioEvents::EndOfFile); // TODO:M.P pass proper err code
+                eventCallback({PlaybackEventType::EndOfFile, audio::Token::MakeBadToken()});
             }
             return ret;
         };
@@ -71,13 +71,13 @@ namespace audio
         isInitialized = true;
     }
 
-    audio::RetCode PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback)
+    audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
     {
 
         if (state == State::Active || state == State::Paused) {
             return RetCode::InvokedInIncorrectState;
         }
-
+        operationToken = token;
         auto tags = dec->fetchTags();
 
         eventCallback = callback;
@@ -194,7 +194,7 @@ namespace audio
 
         case State::Active:
             state = State::Idle;
-            Start(eventCallback);
+            Start(eventCallback, operationToken);
             break;
         }
 
