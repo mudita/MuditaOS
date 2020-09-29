@@ -7,7 +7,7 @@
 
 class Service;
 
-/*!
+/**
  * Audio service API.
  */
 namespace AudioServiceAPI
@@ -46,9 +46,9 @@ namespace AudioServiceAPI
      * @brief Stops playback operations by type.
      *
      * @param serv Requesting service
-     * @param stopVec Contains playback types to be stopped.
-     *  Routing and recording operations will not be stopped, to stop one of those use handle or stop all operations.
+     * @param stopVec Playback types to be stopped.
      *  When stop vector is passed it stops current operation only if it's type is contained in the vector.
+     *  Otherwise does not have effect.
      * @return audio::RetCode standard service-api return code
      */
     audio::RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec);
@@ -66,7 +66,7 @@ namespace AudioServiceAPI
      * @param serv Requesting service
      * @return audio::RetCode standard service-api return code
      */
-    audio::RetCode Stop(sys::Service *serv);
+    audio::RetCode StopAll(sys::Service *serv);
     /**
      * @brief Pauses playback operation. Can be resumed by Resume()
      *

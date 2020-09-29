@@ -70,7 +70,7 @@ sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMod
 void ServiceAudio::TickHandler(uint32_t id)
 {}
 
-bool ServiceAudio::IsResumable(const audio::PlaybackType &type)
+bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 {
     switch (type) {
     case audio::PlaybackType::Multimedia:
@@ -85,7 +85,7 @@ bool ServiceAudio::IsResumable(const audio::PlaybackType &type)
     return false;
 }
 
-bool ServiceAudio::IsMergable(const audio::PlaybackType &type)
+bool ServiceAudio::IsMergable(const audio::PlaybackType &type) const
 {
     switch (type) {
     case audio::PlaybackType::KeypadSound:
@@ -100,7 +100,7 @@ bool ServiceAudio::IsMergable(const audio::PlaybackType &type)
     return false;
 }
 
-bool ServiceAudio::IsLooping(const audio::PlaybackType &type)
+bool ServiceAudio::ShouldLoop(const audio::PlaybackType &type) const
 {
     return type == audio::PlaybackType::CallRingtone;
 }
@@ -225,11 +225,11 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         case AudioNotificationMessage::Type::EndOfFile: {
             auto input = audioMux.GetInput(msg->token);
-            if (input && IsLooping((*input)->audio.GetCurrentOperation()->GetPlaybackType())) {
+            if (input && ShouldLoop((*input)->audio.GetCurrentOperation()->GetPlaybackType())) {
                 (*input)->audio.Start();
             }
             else {
-                std::shared_ptr<AudioStopMessage> newMsg = std::make_shared<AudioStopMessage>(msg->token);
+                auto newMsg = std::make_shared<AudioStopMessage>(msg->token);
                 sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
             }
         } break;

@@ -145,7 +145,7 @@ namespace audio
         return Token::MakeBadToken();
     }
 
-    uint8_t AudioMux::GetPlaybackPriority(const audio::PlaybackType &type)
+    uint8_t AudioMux::GetPlaybackPriority(const audio::PlaybackType &type) const
     {
         const auto &pmap = audio::PlaybackTypePriority;
         if (pmap.find(type) != pmap.end()) {
@@ -154,7 +154,7 @@ namespace audio
         return static_cast<uint8_t>(PlaybackType::Last);
     }
 
-    uint8_t AudioMux::IsMergable(const audio::PlaybackType &type)
+    bool AudioMux::IsMergable(const audio::PlaybackType &type) const
     {
         return !(type == audio::PlaybackType::Multimedia);
     }

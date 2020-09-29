@@ -121,7 +121,7 @@ namespace audio
             return playbackType;
         }
 
-        const audio::Token &GetToken() noexcept
+        const audio::Token &GetToken() const noexcept
         {
             return operationToken;
         }
