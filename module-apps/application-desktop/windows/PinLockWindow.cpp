@@ -11,23 +11,22 @@
 
 // module-gui
 #include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
-
-// module-utils
-#include "i18/i18.hpp"
-
 #include "PinLockWindow.hpp"
 
-#include "../ApplicationDesktop.hpp"
-#include "../data/LockPhoneData.hpp"
+#include "application-desktop/ApplicationDesktop.hpp"
+#include "application-desktop/data/LockPhoneData.hpp"
+#include "ScreenLockBox.hpp"
+#include "SimLockBox.hpp"
+#include "PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
-#include <Style.hpp>
 
 namespace gui
 {
 
-    PinLockWindow::PinLockWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_pin_lock)
+    PinLockWindow::PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock)
+        : PinLockBaseWindow(app, window_name, lock), this_window_name(window_name)
     {
+        makePinLockBox();
         buildInterface();
     }
 
@@ -38,65 +37,13 @@ namespace gui
         buildInterface();
         // set state
         focusItem = nullptr;
-        setVisibleState(state);
+        setVisibleState(lock.getState());
     }
     void PinLockWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_emergency"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-        topBar->setActive(TopBar::Elements::LOCK, true);
-
-        lockImage = new gui::Image(this, 177, 132, 0, 0, "pin_lock");
-        infoImage = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
-        infoImage->setVisible(false);
-
-        // title label
-        titleLabel = new gui::Label(this, 0, 60, 480, 40);
-        titleLabel->setFilled(false);
-        titleLabel->setVisible(false);
-        titleLabel->setBorderColor(gui::ColorFullBlack);
-        titleLabel->setFont(style::header::font::title);
-        titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-
-        // labels with stars for displaying entered digits
-        uint32_t pinLabelX = 82;
-        for (uint32_t i = 0; i < 4; i++) {
-            gui::Label *label = new gui::Label(this, pinLabelX, 442 - 100, 63, 100);
-            label->setFilled(false);
-            label->setBorderColor(gui::ColorFullBlack);
-            label->setPenWidth(2);
-            label->setFont(style::window::font::largelight);
-            label->setText("*");
-            label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-            pinLabels.push_back(label);
-            pinLabelX += 84;
-        }
-
-        // labels with stars for displaying entered digits
-        uint32_t infoLabelY = 316 - 22;
-        for (uint32_t i = 0; i < 2; i++) {
-            gui::Label *label = new gui::Label(this, 0, infoLabelY, 480, 30);
-            label->setFilled(false);
-            label->setBorderColor(gui::ColorNoColor);
-            label->setFont(style::window::font::medium);
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-            infoLabels.push_back(label);
-            infoLabelY += 40;
-        }
-
-        infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
-        infoLabels[1]->setText(utils::localize.get("app_desktop_pin_info2"));
+        PinLockBaseWindow::build();
+        LockBox->buildLockBox(lock.getPinSize());
     }
 
     void PinLockWindow::destroyInterface()
@@ -110,216 +57,115 @@ namespace gui
         titleLabel = nullptr;
         lockImage  = nullptr;
         infoImage  = nullptr;
-        infoLabels.clear();
+        infoText   = nullptr;
+        pinLabel   = nullptr;
         pinLabels.clear();
     }
 
-    void PinLockWindow::setVisibleState(const State &state)
+    void PinLockWindow::setVisibleState(const PinLock::State state)
     {
-        this->state = state;
-
-        auto uiNoPinPrompt = [&]() {
-            infoLabels[1]->setVisible(false);
-            infoLabels[0]->setText(utils::localize.get("app_desktop_no_pin_lock"));
-            for (int i = 0; i < 4; ++i) {
-                pinLabels[i]->setVisible(false);
-            }
-        };
-
-        // there is no pinlock
-        if (state == State::SimpleUnlock) {
-            uiNoPinPrompt();
+        if (state == PinLock::State::EnterPin) {
+            LockBox->setVisibleStateEnterPin();
         }
-        // there is prompt because of bad key presses for unlock
-        else if (state == State::ShowPrompt) {
-            uiNoPinPrompt();
+        else if (state == PinLock::State::VerifiedPin) {
+            LockBox->setVisibleStateVerifiedPin();
         }
-        else
-            // show pin labels for entering pin and erase their's content
-            if (state == State::EnteringPin) {
-            charCount = 0;
-            for (uint32_t i = 0; i < 4; i++) {
-                pinLabels[i]->setVisible(true);
-                pinLabels[i]->clear();
-            }
-            // hide second info label
-            infoLabels[0]->setVisible(true);
-            infoLabels[1]->setVisible(false);
-            infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
-            infoLabels[1]->clear();
-
-            // show pin icon
-            lockImage->setVisible(true);
-            infoImage->setVisible(false);
+        else if (state == PinLock::State::InvalidPin) {
+            LockBox->setVisibleStateInvalidPin();
         }
-        else if (state == State::WrongPinInfo) {
-            for (uint32_t i = 0; i < 4; i++) {
-                pinLabels[i]->setVisible(false);
-                pinLabels[i]->clear();
-            }
-            // hide second info label
-            titleLabel->setVisible(true);
-            infoLabels[0]->setVisible(true);
-            infoLabels[1]->setVisible(true);
-            titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
-            infoLabels[0]->setText(utils::localize.get("app_desktop_pin_info2"));
-            infoLabels[1]->setText(std::to_string(remainingAttempts));
-
-            // show pin icon
-            lockImage->setVisible(false);
-            infoImage->setVisible(true);
+        else if (state == PinLock::State::Blocked) {
+            LockBox->setVisibleStateBlocked();
         }
-        else if (state == State::PhoneBlocked) {
-            for (uint32_t i = 0; i < 4; i++) {
-                pinLabels[i]->setVisible(false);
-                pinLabels[i]->clear();
-            }
-            // hide second info label
-            titleLabel->setVisible(false);
-            infoLabels[0]->setVisible(true);
-            infoLabels[1]->setVisible(false);
-            infoLabels[0]->setText(utils::localize.get("app_desktop_pin_blocked1"));
-            infoLabels[1]->clear();
-
-            // show pin icon
-            lockImage->setVisible(false);
-            infoImage->setVisible(true);
-        }
-    }
-
-    bool PinLockWindow::isPinValid()
-    {
-        if (application->getSettings().lockPassHash ==
-            (1000 * charValue[0] + 100 * charValue[1] + 10 * charValue[2] + charValue[3])) {
-            remainingAttempts            = maxPasswordAttempts;
-            app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
-            if (app) {
-                app->setScreenLocked(false);
-
-                // if there is no application to return to simply return to main window
-                if (lockTimeoutApplilcation.empty()) {
-                    application->switchWindow(gui::name::window::main_window);
-                }
-                else {
-                    lockTimeoutApplilcation = "";
-                    sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
-            lockTimeoutApplilcation = lockData->getPreviousApplication();
-            switch (lockData->request) {
-            case LockPhoneData::Request::NoPin:
-                state = State::SimpleUnlock;
-                break;
-            case LockPhoneData::Request::ShowPrompt:
-                state = State::ShowPrompt;
-                break;
-            case LockPhoneData::Request::Pin:
-                state = State::EnteringPin;
-                break;
-            }
+            lockTimeoutApplication = lockData->getPreviousApplication();
         }
-        setVisibleState(state);
+        if (lock.unlock()) {
+            application->switchWindow(gui::name::window::main_window);
+        }
+        setVisibleState(lock.getState());
     }
 
     bool PinLockWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress() && (state == State::SimpleUnlock)) {
+        auto state = lock.getState();
+        if (!inputEvent.isShortPress() || state == PinLock::State::VerifiedPin) {
             return AppWindow::onInput(inputEvent);
         }
-
-        if (inputEvent.isShortPress()) {
-            // accept only LF, enter, RF, #, and numeric values
-            if (state == State::EnteringPin) {
-                if (inputEvent.keyCode == KeyCode::KEY_LF) {
-                    sapm::ApplicationManager::messageSwitchApplication(
-                        application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
-
-                    return true;
-                }
-                else if (inputEvent.keyCode == KeyCode::KEY_RF) {
-                    application->switchWindow(gui::name::window::main_window);
-                    return true;
-                }
-                else if (inputEvent.keyCode == KeyCode::KEY_PND) {
-                    if (charCount > 0) {
-                        pinLabels[charCount - 1]->clear();
-                        charCount--;
-                        bottomBar->setActive(BottomBar::Side::CENTER, false);
-                        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                    }
-                    return true;
-                }
-                else if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-                    if ((state == State::EnteringPin) && (charCount == 4)) {
-
-                        if (isPinValid()) {
-                            return true;
-                        }
-                        if (remainingAttempts == 1) {
-                            state = State::PhoneBlocked;
-                            bottomBar->setActive(BottomBar::Side::CENTER, false);
-                            setVisibleState(State::PhoneBlocked);
-                        }
-                        else {
-                            remainingAttempts--;
-                            setVisibleState(State::WrongPinInfo);
-                        }
-                        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                    }
-                    else if (state == State::WrongPinInfo) {
-                        setVisibleState(State::EnteringPin);
-                        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                    }
-                    return true;
-                }
-                else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
-                    // fill next field with star and store value in array
-                    if (charCount < 4) {
-                        pinLabels[charCount]->setText("*");
-                        charValue[charCount] = gui::toNumeric(inputEvent.keyCode);
-                        charCount++;
-
-                        // if 4 char has been entered show bottom bar confirm
-                        if (charCount == 4) {
-                            if (isPinValid()) {
-                                return true;
-                            }
-                            bottomBar->setActive(BottomBar::Side::CENTER, true);
-                        }
-                        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                    }
-                    return true;
-                }
+        // accept only LF, enter, RF, #, and numeric values;
+        if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
+            sapm::ApplicationManager::messageSwitchApplication(
+                application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
+            return true;
+        }
+        else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+            if (state == PinLock::State::EnterPin) {
+                lock.clearAttempt();
+                clearPinLabels();
             }
-            else if (state == State::WrongPinInfo) {
-                if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-                    state = State::EnteringPin;
-                    setVisibleState(State::EnteringPin);
-                    application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-                }
-                else if (inputEvent.keyCode == KeyCode::KEY_RF) {
-                    state = State::EnteringPin;
-                    application->switchWindow(gui::name::window::main_window);
-                }
+            else if (state == PinLock::State::InvalidPin) {
+                LockBox->setVisibleStateInvalidPin();
+                lock.consumeInvalidPinState();
             }
-            else if (state == State::PhoneBlocked) {
-                if (inputEvent.keyCode == KeyCode::KEY_RF) {
-                    application->switchWindow(gui::name::window::main_window);
-                    return true;
-                }
+            application->switchWindow(gui::name::window::main_window);
+            return true;
+        }
+        else if (inputEvent.keyCode == KeyCode::KEY_PND) {
+            if (state == PinLock::State::EnterPin) {
+                lock.popChar();
+                LockBox->popChar(lock.getCharCount());
+                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+                return true;
             }
         }
+        else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
+            if (state == PinLock::State::EnterPin) {
+                LockBox->putChar(lock.getCharCount());
+                lock.putNextChar(gui::toNumeric(inputEvent.keyCode));
+                if (lock.getLockType() == PinLock::LockType::Screen) {
+                    lock.verifyPin();
+                }
 
+                state = lock.getState();
+                if (state == PinLock::State::VerifiedPin) {
+                    LockBox->setVisibleStateVerifiedPin();
+                    application->switchWindow(gui::name::window::main_window);
+                }
+                application->switchWindow(this_window_name);
+                return true;
+            }
+        }
+        else if (inputEvent.keyCode == KeyCode::KEY_ENTER && bottomBar->isActive(BottomBar::Side::CENTER)) {
+            if (state == PinLock::State::InvalidPin) {
+                lock.consumeInvalidPinState();
+                application->switchWindow(this_window_name);
+                return true;
+            }
+            else if (state == PinLock::State::EnterPin) {
+                lock.verifyPin();
+            }
+            application->switchWindow(gui::name::window::main_window);
+            return true;
+        }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
 
+    void PinLockWindow::makePinLockBox()
+    {
+        auto lockType = lock.getLockType();
+        if (lockType == PinLock::LockType::Screen) {
+            LockBox = std::make_unique<ScreenLockBox>(this);
+        }
+        else if (lockType == PinLock::LockType::PUK) {
+            LockBox = std::make_unique<PukLockBox>(this);
+        }
+        else if (lockType == PinLock::LockType::SIM) {
+            LockBox = std::make_unique<SimLockBox>(this);
+        }
+        assert(LockBox != nullptr);
+    }
 } /* namespace gui */

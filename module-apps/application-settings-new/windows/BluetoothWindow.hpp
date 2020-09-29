@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OptionWindow.hpp"
+#include <OptionWindow.hpp>
 
 namespace gui
 {

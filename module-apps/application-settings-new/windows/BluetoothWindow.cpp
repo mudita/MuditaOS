@@ -1,6 +1,6 @@
 #include "BluetoothWindow.hpp"
-#include "application-settings-new/ApplicationSettings.hpp"
 
+#include <application-settings-new/ApplicationSettings.hpp>
 #include <i18/i18.hpp>
 
 namespace gui
