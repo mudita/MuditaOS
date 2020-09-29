@@ -7,6 +7,7 @@
 #include <utility>
 #include <variant>
 #include <set>
+#include <list>
 
 namespace Settings
 {
@@ -286,6 +287,40 @@ namespace Settings
           protected:
             EntryPath path;
             std::optional<std::string> value;
+        };
+
+        class ListSettingsResponse : public sys::ResponseMessage
+        {
+          public:
+            ListSettingsResponse() = default;
+            explicit ListSettingsResponse(std::list<std::string> value,
+                                          sys::ReturnCodes code = sys::ReturnCodes::Success)
+                : sys::ResponseMessage(code)
+            {}
+
+            [[nodiscard]] auto getValue() const -> std::list<std::string>
+            {
+                return value;
+            }
+
+          protected:
+            std::list<std::string> value;
+        };
+
+        class ProfileListSettingsResponse : public ListSettingsResponse
+        {
+          public:
+            ProfileListSettingsResponse() = default;
+            explicit ProfileListSettingsResponse(std::list<std::string> profiles) : ListSettingsResponse(profiles)
+            {}
+        };
+
+        class ModeListSettingsResponse : public ListSettingsResponse
+        {
+          public:
+            ModeListSettingsResponse() = default;
+            explicit ModeListSettingsResponse(std::list<std::string> modes) : ListSettingsResponse(modes)
+            {}
         };
 
     } // namespace Messages
