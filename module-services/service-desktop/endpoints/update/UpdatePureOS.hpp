@@ -3,7 +3,6 @@
 #include <module-utils/microtar/src/microtar.hpp>
 #include <vfs.hpp>
 #include <json/json11.hpp>
-#include <service-desktop/messages/DesktopMessages.hpp>
 
 class ServiceDesktop;
 namespace fs = std::filesystem;
@@ -67,6 +66,29 @@ namespace updateos
         ReadyForReset
     };
 
+    enum class UpdateMessageType
+    {
+        UpdateFoundOnBoot,
+        UpdateCheckForUpdateOnce,
+        UpdateNow,
+        UpdateError,
+        UpdateInform
+    };
+
+    struct UpdateStats
+    {
+        fs::path updateFile            = "";
+        fs::path fileExtracted         = "";
+        fs::path updateTempDirectory   = PATH_SYS "/" PATH_TMP;
+        uint32_t totalBytes            = 0;
+        uint32_t currentExtractedBytes = 0;
+        uint32_t fileExtractedSize     = 0;
+        uint32_t uuid                  = 0;
+        std::string messageText        = "";
+        updateos::UpdateState status;
+        json11::Json versioInformation;
+    };
+
 }; // namespace updateos
 
 struct FileInfo
@@ -79,7 +101,7 @@ struct FileInfo
     unsigned long fileCRC32;
 };
 
-class UpdatePureOS : public sdesktop::UpdateStats
+class UpdatePureOS : public updateos::UpdateStats
 {
   public:
     UpdatePureOS(ServiceDesktop *ownerService);

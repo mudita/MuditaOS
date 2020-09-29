@@ -45,8 +45,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        // questionImage = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
-
         // title label
         titleLabel = new gui::Label(this, 0, 60, 480, 40);
         titleLabel->setFilled(false);
@@ -216,7 +214,7 @@ namespace gui
         // if enter was pressed check state and power down or return to main desktop's window
         if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
             if (state == State::Return) {
-                application->switchWindow("MainWindow");
+                application->switchWindow(app::window::name::desktop_main_window);
             }
             if (state == State::UpdateNow) {
                 bottomBar->setActive(BottomBar::Side::CENTER, false);
@@ -248,7 +246,10 @@ namespace gui
                 static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
 
             if (status == updateos::UpdateState::ExtractingFiles) {
-                progressPercent = static_cast<int>(((float)item->getUpdateOsMessage().updateStats.currentExtractedBytes / (float)item->getUpdateOsMessage().updateStats.totalBytes) * 100.0);
+                progressPercent =
+                    static_cast<int>((static_cast<float>(item->getUpdateOsMessage().updateStats.currentExtractedBytes) /
+                                      static_cast<float>(item->getUpdateOsMessage().updateStats.totalBytes)) *
+                                     100.0);
                 ssi << "Unpacking: ";
                 ssi << std::to_string(progressPercent);
                 ssi << " %";
