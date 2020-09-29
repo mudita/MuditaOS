@@ -11,6 +11,7 @@
 
 #include "gui/SwitchData.hpp"
 #include <service-desktop/ServiceDesktop.hpp>
+#include "DesktopMessages.hpp"
 #include <filesystem>
 
 namespace gui
