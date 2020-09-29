@@ -212,6 +212,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     auto GetNumberById(std::uint32_t numberId) -> utils::PhoneNumber::View;
 
+    auto GetNumbersIdsByContact(std::uint32_t contactId) -> std::vector<std::uint32_t>;
+
   private:
     ContactsDB *contactDB;
 

@@ -1112,3 +1112,15 @@ auto ContactRecordInterface::GetNumberById(std::uint32_t numberId) -> utils::Pho
     auto row = contactDB->number.getById(numberId);
     return utils::PhoneNumber(row.numberUser, row.numbere164).getView();
 }
+
+auto ContactRecordInterface::GetNumbersIdsByContact(std::uint32_t contactId) -> std::vector<std::uint32_t>
+{
+    auto rows = contactDB->number.getByContactId(contactId);
+
+    std::vector<std::uint32_t> numbersIds;
+    numbersIds.reserve(rows.size());
+    for (const auto &row : rows) {
+        numbersIds.push_back(row.ID);
+    }
+    return numbersIds;
+}

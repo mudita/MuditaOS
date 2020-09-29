@@ -98,6 +98,12 @@ namespace gui
     void Text::setText(std::unique_ptr<TextDocument> &&document)
     {
         buildDocument(std::move(document));
+        onTextChanged();
+    }
+
+    void Text::setTextChangedCallback(TextChangedCallback &&callback)
+    {
+        textChangedCallback = std::move(callback);
     }
 
     void Text::addText(const UTF8 &text)
@@ -106,12 +112,14 @@ namespace gui
             return;
         }
         *cursor << text;
+        onTextChanged();
         drawLines();
     }
 
     void Text::addText(TextBlock text)
     {
         *cursor << text;
+        onTextChanged();
         drawLines();
     }
 
@@ -498,6 +506,7 @@ namespace gui
         }
         if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
             if (!document->isEmpty() && removeChar()) {
+                onTextChanged();
                 drawLines();
             }
             return true;
@@ -521,6 +530,7 @@ namespace gui
                 removeChar();
             }
             addChar(code);
+            onTextChanged();
             drawLines();
 
             debug_text("handleAddChar -> End(true)");
@@ -546,6 +556,7 @@ namespace gui
         auto val = toNumeric(inputEvent.keyCode);
         if (val != InvalidNumericKeyCode) {
             addChar(intToAscii(val));
+            onTextChanged();
             drawLines();
             return true;
         }
@@ -559,6 +570,13 @@ namespace gui
             return true;
         }
         return false;
+    }
+
+    void Text::onTextChanged()
+    {
+        if (textChangedCallback) {
+            textChangedCallback(*this, getText());
+        }
     }
 
 } /* namespace gui */

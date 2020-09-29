@@ -64,6 +64,28 @@ ContactsNumberTableRow ContactsNumberTable::getById(uint32_t id)
     };
 }
 
+std::vector<ContactsNumberTableRow> ContactsNumberTable::getByContactId(uint32_t id)
+{
+    auto retQuery = db->query("SELECT * FROM contact_number WHERE contact_id = %lu;", id);
+    if (!retQuery || (retQuery->getRowCount() == 0U)) {
+        return {};
+    }
+
+    std::vector<ContactsNumberTableRow> ret;
+    ret.reserve(retQuery->getRowCount());
+    do {
+        ContactsNumberTableRow row{
+            (*retQuery)[0].getUInt32(),                                 // ID
+            (*retQuery)[1].getUInt32(),                                 // contactID
+            (*retQuery)[2].getString(),                                 // numberUser
+            (*retQuery)[3].getString(),                                 // numbere164
+            static_cast<ContactNumberType>((*retQuery)[4].getUInt32()), // type
+        };
+        ret.push_back(std::move(row));
+    } while (retQuery->nextRow());
+    return ret;
+}
+
 std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->query("SELECT * from contact_number ORDER BY number_user LIMIT %lu OFFSET %lu;", limit, offset);
