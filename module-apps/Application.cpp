@@ -658,6 +658,11 @@ namespace app
         return timer; // return ptr to the timer on the list
     }
 
+    void Application::attachWindow(gui::AppWindow *window)
+    {
+        windows.insert({window->getName(), window});
+    }
+
     AppTimer::AppTimer(Application *parent, uint32_t id, std::function<void()> callback, const std::string &name)
         : parent(parent)
     {
