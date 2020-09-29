@@ -13,6 +13,7 @@
 #include "queries/messages/sms/QuerySMSSearchByType.hpp"
 #include "queries/messages/sms/QuerySMSGetByThreadID.hpp"
 #include "queries/messages/sms/QuerySMSGetCountByThreadID.hpp"
+#include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
 #include <log/log.hpp>
 
 #include <PhoneNumber.hpp>
@@ -32,7 +33,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
     auto contactMatch = contactInterface.MatchByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
-    if (contactMatch == std::nullopt) {
+    if (!contactMatch.has_value()) {
         LOG_ERROR("Cannot find contact, for number %s", rec.number.getFormatted().c_str());
         return false;
     }
@@ -264,11 +265,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     }
 
     // Remove SMS
-    if (smsDB->sms.removeById(id) == false) {
-        return false;
-    }
-
-    return true;
+    return smsDB->sms.removeById(id);
 }
 
 bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str)
@@ -318,6 +315,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
     }
     else if (typeid(*query) == typeid(db::query::SMSGetByText)) {
         return getByTextQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::SMSGetLastByThreadID)) {
+        return getLastByThreadIDQuery(query);
     }
     else if (typeid(*query) == typeid(db::query::SMSGetCount)) {
         return getCountQuery(query);
@@ -505,6 +505,29 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::getByThreadIDQuery(std::sha
     }
 
     auto response = std::make_unique<db::query::SMSGetByThreadIDResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getLastByThreadIDQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetLastByThreadID *>(query.get());
+    const auto &result    = smsDB->sms.getByThreadId(localQuery->threadId, 0, 0);
+    std::optional<SMSRecord> lastRecord;
+    if (!result.empty()) {
+        const auto &sms = result.back();
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        lastRecord       = record;
+    }
+    auto response = std::make_unique<db::query::SMSGetLastByThreadIDResult>(lastRecord);
     response->setRequestQuery(query);
     return response;
 }

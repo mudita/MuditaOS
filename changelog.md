@@ -9,6 +9,7 @@
 * `[cellular]``[call app]` Added DTMF tone generation 
 * `[settings]` Add basic display and keypad options window
 * `[audio]` Enabled sounds priorities
+* `[messages]` Save a new message as a message draft, if not sent.
 
 ### Changed
 
