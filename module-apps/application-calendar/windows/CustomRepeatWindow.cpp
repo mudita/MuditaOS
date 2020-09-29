@@ -68,7 +68,7 @@ namespace gui
         case KeyCode::KEY_RF: {
             if (weekDaysOptData != nullptr) {
                 auto isCheckedData = customRepeatModel->getIsCheckedData();
-                uint32_t i = 0;
+                uint32_t i         = 0;
                 for (auto checked : isCheckedData) {
                     weekDaysOptData->setData(i, checked);
                     ++i;
