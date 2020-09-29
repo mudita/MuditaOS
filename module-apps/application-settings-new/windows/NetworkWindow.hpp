@@ -28,8 +28,8 @@ namespace gui
         void rebuildOptList();
 
       public:
-        NetworkWindow(app::Application *app, const std::string &name);
-        void onBeforeShow(ShowMode m, SwitchData *d);
+        NetworkWindow(app::Application *app);
+        void onBeforeShow(ShowMode m, SwitchData *d) override;
     };
 
     class NetworkOption : public option::Base
@@ -47,7 +47,7 @@ namespace gui
                       std::function<bool(Item &)> cbFocus,
                       AppWindow *app,
                       NetworkArrow arrow = NetworkArrow::Disabled)
-            : text(text), activatedCallback(cb), focusCb(cbFocus), app(app)
+            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app)
         {}
         [[nodiscard]] auto build() const -> Item * override;
     };

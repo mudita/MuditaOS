@@ -74,7 +74,7 @@ namespace app
         attachWindow(new gui::DisplayLightWindow(this));
         /*window = new gui::NetworkWindow(this, app::name_network);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));*/
-        attachWindow(new gui::NetworkWindow(this, app::name_network));
+        attachWindow(new gui::NetworkWindow(this));
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

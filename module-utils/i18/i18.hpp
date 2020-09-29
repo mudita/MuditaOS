@@ -165,6 +165,7 @@ namespace utils
 
     // Global instance of i18 class
     extern i18 localize;
+    auto translateI18 = [](const std::string &text) { return utils::localize.get(text); };
 } // namespace utils
 
 #endif // UNTITLED_I18_HPP

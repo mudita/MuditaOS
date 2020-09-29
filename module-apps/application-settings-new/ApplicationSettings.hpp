@@ -25,12 +25,17 @@ namespace gui::window::name
 
     inline const std::string display_and_keypad = "DisplayAndKeypad";
 
+    inline const std::string sim1            = ":sim1";
+    inline const std::string sim2            = ":sim2";
+    inline const std::string change_settings = "ChangeSettings";
+    inline const std::string all_operators   = "AllOperators";
+    inline const std::string import_contacts = "ImportContacts";
+
 } // namespace gui::window::name
 
 namespace app
 {
     inline const std::string name_settings_new = "ApplicationSettingsNew";
-    inline const std::string name_network      = "Network";
 
     class ApplicationSettingsNew : public app::Application
     {

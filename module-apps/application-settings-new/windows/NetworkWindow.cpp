@@ -1,16 +1,12 @@
 #include "NetworkWindow.hpp"
 
 #include <i18/i18.hpp>
-
-namespace style::option
-{
-    const gui::Position arrow_position_x = 408;
-    const gui::Position arrow_positon_y  = 24;
-} // namespace style::option
+#include "OptionsStyle.hpp"
+#include <application-settings-new/ApplicationSettings.hpp>
 
 namespace gui
 {
-    NetworkWindow::NetworkWindow(app::Application *app, const std::string &name) : OptionWindow(app, name)
+    NetworkWindow::NetworkWindow(app::Application *app) : OptionWindow(app, gui::window::name::network)
     {
         operatorsOn = false;
     }
@@ -20,18 +16,16 @@ namespace gui
     }
     auto NetworkWindow::netOptList() -> std::list<gui::Option>
     {
-        std::list<gui::Option> l;
-        auto i18     = [](const std::string &text) { return utils::localize.get(text); };
-        auto sim     = Store::GSM::get()->selected;
-        auto sim_str = "";
-        if (sim == Store::GSM::SIM::SIM1)
-            sim_str = ": sim1";
-        else if (sim == Store::GSM::SIM::SIM2)
-            sim_str = ": sim2";
-        l.emplace_back(std::make_unique<gui::NetworkOption>(
-            i18("app_settings_network_active_card") + sim_str,
+        std::list<gui::Option> optList;
+        auto sim    = Store::GSM::get()->selected;
+        auto simStr = gui::window::name::sim1;
+        if (sim == Store::GSM::SIM::SIM2) {
+            simStr = gui::window::name::sim2;
+        }
+        optList.emplace_back(std::make_unique<gui::NetworkOption>(
+            utils::translateI18("app_settings_network_active_card") + simStr,
             [=](gui::Item &item) {
-                this->application->switchWindow("ChangeSetting", nullptr);
+                this->application->switchWindow(gui::window::name::change_settings, nullptr);
                 return true;
             },
             [=](gui::Item &item) {
@@ -50,8 +44,8 @@ namespace gui
             },
             this,
             gui::NetworkArrow::Border));
-        l.emplace_back(std::make_unique<gui::NetworkOption>(
-            i18("app_settings_network_operator_auto_select"),
+        optList.emplace_back(std::make_unique<gui::NetworkOption>(
+            utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {
                 operatorsOn = !operatorsOn;
                 rebuildOptList();
@@ -61,24 +55,26 @@ namespace gui
             nullptr,
             operatorsOn ? NetworkArrow::On : NetworkArrow::Off));
         if (operatorsOn) {
-            l.emplace_back(gui::Option{i18("app_settings_network_all_operators"),
-                                       [=](gui::Item &item) {
-                                           this->application->switchWindow("AllOperators", nullptr);
-                                           return true;
-                                       },
-                                       gui::Arrow::Enabled});
+            optList.emplace_back(gui::Option{utils::translateI18("app_settings_network_all_operators"),
+                                             [=](gui::Item &item) {
+                                                 this->application->switchWindow(gui::window::name::all_operators,
+                                                                                 nullptr);
+                                                 return true;
+                                             },
+                                             gui::Arrow::Enabled});
         }
-        l.emplace_back(gui::Option{i18("app_settings_network_import_contacts_from_sim_card"), [=](gui::Item &item) {
-                                       this->application->switchWindow("ImportContacts", nullptr);
-                                       return true;
-                                   }});
+        optList.emplace_back(gui::Option{
+            utils::translateI18("app_settings_network_import_contacts_from_sim_card"), [=](gui::Item &item) {
+                this->application->switchWindow(gui::window::name::import_contacts, nullptr);
+                return true;
+            }});
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
 
         topBar->setActive(TopBar::Elements::SIGNAL, false);
         topBar->setActive(TopBar::Elements::BATTERY, false);
         topBar->setActive(TopBar::Elements::SIM, false);
-        return l;
+        return optList;
     }
     void NetworkWindow::rebuildOptList()
     {
@@ -95,7 +91,7 @@ namespace gui
                                      text);
         style::window::decorateOption(label);
         label->activatedCallback = activatedCallback;
-        std::string img          = "";
+        std::string img;
         switch (arrow) {
         case NetworkArrow::Enabled:
             img = "right_label_arrow";
