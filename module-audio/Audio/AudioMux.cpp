@@ -5,11 +5,13 @@
 namespace audio
 {
     AudioMux::AudioMux(audio::AsyncCallback asyncClbk, audio::DbCallback dbClbk, size_t audioInputsCount)
+        : audioInputs(audioInputsInternal)
     {
         audioInputsCount = audioInputsCount > 0 ? audioInputsCount : 1;
-        audioInputs.reserve(audioInputsCount);
+        audioInputsInternal.reserve(audioInputsCount);
         for (size_t i = 0; i < audioInputsCount; i++) {
-            audioInputs.emplace_back(Input(Audio(asyncClbk, dbClbk), refToken.IncrementToken()));
+            audioInputsInternal.emplace_back(
+                Input(std::make_unique<Audio>(asyncClbk, dbClbk), refToken.IncrementToken()));
         }
     }
 
@@ -22,8 +24,8 @@ namespace audio
         if (force) {
             auto *lowInput = &audioInputs.front();
             for (auto &audioInput : audioInputs) {
-                auto lowestPrio  = GetPlaybackPriority(lowInput->audio.GetCurrentOperation()->GetPlaybackType());
-                auto currentPrio = GetPlaybackPriority(audioInput.audio.GetCurrentOperation()->GetPlaybackType());
+                auto lowestPrio  = GetPlaybackPriority(lowInput->audio->GetCurrentOperationPlaybackType());
+                auto currentPrio = GetPlaybackPriority(audioInput.audio->GetCurrentOperationPlaybackType());
 
                 if (currentPrio > lowestPrio) {
                     lowInput = &audioInput;
@@ -54,8 +56,12 @@ namespace audio
         if (auto input = GetInput(token)) {
             return input;
         }
+        if (token.IsValid()) {
+            // reject since operation does not exist
+            return std::nullopt;
+        }
         // try get with priority
-        if (auto input = GetInput(playbackType)) {
+        if (auto input = GetAvailableInput(playbackType)) {
             return input;
         }
         return std::nullopt;
@@ -69,11 +75,11 @@ namespace audio
     std::optional<AudioMux::Input *> AudioMux::GetActiveInput()
     {
         for (auto &audioInput : audioInputs) {
-            if (!audioInput.audio.GetCurrentOperation()) {
+            if (!audioInput.audio->GetCurrentOperation()) {
                 continue;
             }
-            if (audioInput.audio.GetCurrentState() != Audio::State::Idle &&
-                audioInput.audio.GetCurrentOperation()->GetState() == audio::Operation::State::Active) {
+            if (audioInput.audio->GetCurrentState() != Audio::State::Idle &&
+                audioInput.audio->GetCurrentOperationState() == audio::Operation::State::Active) {
                 return &audioInput;
             }
         }
@@ -83,7 +89,7 @@ namespace audio
     std::optional<AudioMux::Input *> AudioMux::GetInput(const std::vector<Audio::State> &states)
     {
         for (auto &audioInput : audioInputs) {
-            if (std::find(states.begin(), states.end(), audioInput.audio.GetCurrentState()) != std::end(states)) {
+            if (std::find(states.begin(), states.end(), audioInput.audio->GetCurrentState()) != std::end(states)) {
                 return &audioInput;
             }
         }
@@ -105,17 +111,17 @@ namespace audio
         return std::nullopt;
     }
 
-    std::optional<AudioMux::Input *> AudioMux::GetInput(const audio::PlaybackType &playbackType)
+    std::optional<AudioMux::Input *> AudioMux::GetAvailableInput(const audio::PlaybackType &playbackType)
     {
         std::optional<AudioMux::Input *> idleInput;
         std::optional<AudioMux::Input *> overridableInput;
 
         for (auto &audioInput : audioInputs) {
-            auto currentPlaybackType = audioInput.audio.GetCurrentOperation()->GetPlaybackType();
+            auto currentPlaybackType = audioInput.audio->GetCurrentOperationPlaybackType().value_or(PlaybackType::None);
             auto currentInputPrior   = GetPlaybackPriority(currentPlaybackType);
 
             // check busy input
-            if (audioInput.audio.GetCurrentState() != Audio::State::Idle) {
+            if (audioInput.audio->GetCurrentState() != Audio::State::Idle) {
                 // handle priorities
                 if (GetPlaybackPriority(playbackType) > currentInputPrior) {
                     return std::nullopt;
@@ -145,11 +151,11 @@ namespace audio
         return Token::MakeBadToken();
     }
 
-    uint8_t AudioMux::GetPlaybackPriority(const audio::PlaybackType &type) const
+    uint8_t AudioMux::GetPlaybackPriority(const std::optional<audio::PlaybackType> type)
     {
         const auto &pmap = audio::PlaybackTypePriority;
-        if (pmap.find(type) != pmap.end()) {
-            return pmap.at(type);
+        if (type && pmap.find(*type) != pmap.end()) {
+            return pmap.at(*type);
         }
         return static_cast<uint8_t>(PlaybackType::Last);
     }
