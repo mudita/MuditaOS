@@ -19,13 +19,13 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built from s
 
 You can quickstart the project by going through one of the following guides:
 
-- [Quickstart using Docker]()
-- [Quickstart in your local environment]()
-- [Super dirty quickstart on Linux]()
-- [Super dirty quickstart with unit tests]()
-- [Super dirty quickstart on the phone]()
-- [Longstart]()
-- [Building your own Docker image]()
+- [Quickstart using Docker](#)
+- [Quickstart in your local environment](#)
+- [Super dirty quickstart on Linux](#)
+- [Super dirty quickstart with unit tests](#)
+- [Super dirty quickstart on the phone](#)
+- [Longstart](#)
+- [Building your own Docker image](#)
 
 ## Contributing
 
@@ -33,9 +33,7 @@ Pull requests are welcome. Please follow the guidelines in the ["Contributing to
 
 ### Discussions
 
-[Stack Overflow](#) is the best place for developers to share their problems and solutions with the community. Please make sure to tag your questions with `muditaos` to reach the widest audience. We’ll do our best to address your issues by answering them promptly on Stack Overflow.
-
-For general questions and ideas regarding MuditaOS please post in the [“MuditaOS Suggestions” thread on Mudita Forum](#). Please explore all existing posts to make sure you’re not posting about an issue that has already been discussed.
+For general questions and ideas regarding MuditaOS please post in the [“MuditaOS” section on Mudita Forum](#). Please explore all existing posts to make sure you’re not posting about an issue that has already been discussed.
 
 ### Reporting bugs and feature requests
 
