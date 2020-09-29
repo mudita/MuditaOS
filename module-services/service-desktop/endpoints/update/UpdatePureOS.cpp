@@ -26,7 +26,7 @@ json11::Json FileInfo::to_json() const
 
 UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
 {
-    status = (uint8_t)(updateos::UpdateState::Initial);
+    status = updateos::UpdateState::Initial;
 }
 
 updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
@@ -47,7 +47,7 @@ updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
         return updateos::UpdateError::CantOpenUpdateFile;
     }
 
-    status = (uint8_t)(updateos::UpdateState::UpdateFileSet);
+    status = updateos::UpdateState::UpdateFileSet;
     return updateos::UpdateError::NoError;
 }
 
@@ -130,7 +130,7 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
 {
     mtar_header_t tarHeader;
     filesInUpdatePackage.clear();
-    status = (uint8_t)(updateos::UpdateState::ExtractingFiles);
+    status = updateos::UpdateState::ExtractingFiles;
 
     while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
         unsigned long fileCRC32 = 0;
@@ -158,7 +158,7 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
 
 updateos::UpdateError UpdatePureOS::verifyChecksums()
 {
-    status = (uint8_t)(updateos::UpdateState::ChecksumVerification);
+    status = updateos::UpdateState::ChecksumVerification;
 
     std::unique_ptr<char[]> lineBuff(
         new char[purefs::buffer::tar_buf]); // max line should be freertos max path + checksum, so this is enough
@@ -192,7 +192,7 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
 
 updateos::UpdateError UpdatePureOS::verifyVersion()
 {
-    status = (uint8_t)(updateos::UpdateState::VersionVerificiation);
+    status = updateos::UpdateState::VersionVerificiation;
 
     if (!vfs.fileExists(getUpdateTmpChild(updateos::file::version).c_str())) {
         informError("verifyVersion %s does not exist", getUpdateTmpChild(updateos::file::version).c_str());
@@ -296,7 +296,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     }
 
     // move the contents of /sys/current/user if it exists to /user
-    ret = (int)updateUserData();
+    ret = static_cast<int>(updateUserData());
 
     return updateBootJSON();
 }
@@ -403,7 +403,7 @@ updateos::UpdateError UpdatePureOS::cleanupAfterUpdate()
         informError("Failed to delete %s", updateFile.c_str());
         return updateos::UpdateError::CantRemoveUpdateFile;
     }
-    status = (uint8_t)(updateos::UpdateState::ReadyForReset);
+    status = updateos::UpdateState::ReadyForReset;
     return updateos::UpdateError::NoError;
 }
 
@@ -414,7 +414,7 @@ const fs::path UpdatePureOS::getUpdateTmpChild(const fs::path &childPath)
 
 updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
 {
-    status = (uint8_t)(updateos::UpdateState::CreatingDirectories);
+    status = updateos::UpdateState::CreatingDirectories;
 
     updateTempDirectory = purefs::dir::tmp / vfs::generateRandomId(updateos::prefix_len);
 
@@ -471,7 +471,7 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
 
 updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloaderFile)
 {
-    status = (uint8_t)(updateos::UpdateState::UpdatingBootloader);
+    status = updateos::UpdateState::UpdatingBootloader;
 
 #if defined(TARGET_Linux)
     return updateos::BootloaderUpdateError::NoError;
@@ -538,7 +538,7 @@ const json11::Json UpdatePureOS::getVersionInfoFromFile(const fs::path &updateFi
         }
 
         /* this file should never be larger then purefs::buffer::tar_buf */
-        std::unique_ptr<unsigned char[]> readBuf(new unsigned char[purefs::buffer::tar_buf]);
+        std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
         if (mtar_read_data(&tar, readBuf.get(), h.size) != MTAR_ESUCCESS) {
             LOG_INFO("UpdatePureOS::getVersionInfoFromFile can't read %s in %s",
                      updateos::file::version.c_str(),
@@ -551,7 +551,8 @@ const json11::Json UpdatePureOS::getVersionInfoFromFile(const fs::path &updateFi
         mtar_close(&tar);
 
         std::string parserError;
-        json11::Json versionInfo = json11::Json::parse(std::string((const char *)readBuf.get(), h.size), parserError);
+        std::string dataPackage  = std::string(static_cast<char *>(readBuf.get()), h.size);
+        json11::Json versionInfo = json11::Json::parse(dataPackage, parserError);
         if (parserError != "") {
             LOG_INFO("UpdatePureOS::getVersionInfoFromFile can't parse %s as JSON error: \"%s\"",
                      updateos::file::version.c_str(),
@@ -594,9 +595,6 @@ const fs::path UpdatePureOS::checkForUpdate()
 
 updateos::UpdateError UpdatePureOS::updateUserData()
 {
-    for (unsigned int x=0; x < filesInUpdatePackage.size(); x++) {
-        // informDebug("file %u: %s", x, fs::path(filesInUpdatePackage[x].fileName).c_str());
-    }
     return updateos::UpdateError::NoError;
 }
 
@@ -610,9 +608,9 @@ void UpdatePureOS::informError(const char *format, ...)
 
     LOG_ERROR("UPDATE_ERRROR %s", readBuf.get());
 
-    auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateMessageType::UpdateError);
+    auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateError);
     messageText            = std::string(readBuf.get());
-    msgToSend->updateStats = (sdesktop::UpdateStats)(*this);
+    msgToSend->updateStats = (updateos::UpdateStats)(*this);
     sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 }
 
@@ -637,8 +635,8 @@ void UpdatePureOS::informUpdate(const char *format, ...)
 
     LOG_INFO("UPDATE_INFO %s", readBuf.get());
 
-    auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateMessageType::UpdateInform);
-    messageText = std::string(readBuf.get());
-    msgToSend->updateStats = (sdesktop::UpdateStats)(*this);
-    sys::Bus::SendUnicast (msgToSend, app::name_desktop, owner);
+    auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateInform);
+    messageText            = std::string(readBuf.get());
+    msgToSend->updateStats = (updateos::UpdateStats)(*this);
+    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 }

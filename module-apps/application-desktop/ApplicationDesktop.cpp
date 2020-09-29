@@ -52,10 +52,12 @@ namespace app
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
-        else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
-            handled = lockHandler.handle(msg);
+
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
+        }
+        else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
+            handled = lockHandler.handle(msg);
         }
 
         // handle database response
@@ -78,17 +80,13 @@ namespace app
 
     auto ApplicationDesktop::handle(sdesktop::UpdateOsMessage *msg) -> bool
     {
-        if (msg->messageType == sdesktop::UpdateFoundOnBoot) {
-            LOG_DEBUG("ApplicationDesktop::handle updateFoundOnBoot message");
-            auto *updateMessage = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+        if (msg != nullptr && msg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
-            if (updateMessage != nullptr) {
-                if (updateMessage->messageType == sdesktop::UpdateFoundOnBoot &&
-                    updateMessage->updateStats.updateFile.has_filename()) {
-                    LOG_DEBUG("ApplicationDesktop::handle pending update found: %s", updateMessage->updateStats.updateFile.c_str());
-                }
+            if (msg->updateStats.updateFile.has_filename()) {
+                LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
         }
+
         return true;
     }
 
@@ -220,30 +218,30 @@ namespace app
         setActiveWindow(gui::name::window::main_window);
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+            auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
-          auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
-          if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateFoundOnBoot) {
+                if (getWindow(app::window::name::desktop_update)) {
+                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
 
-              if (getWindow(app::window::name::desktop_update)) {
-                  std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
+                    switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                }
+            }
 
-                  switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-              }
-          }
-
-          if (updateMsg != nullptr && updateMsg->messageType == sdesktop::UpdateInform) {
-              if (getWindow(app::window::name::desktop_update)) {
-                  std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
-                  getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
-              }
-          }
-          return std::make_shared<sys::ResponseMessage>();
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateInform) {
+                if (getWindow(app::window::name::desktop_update)) {
+                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
+                    getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
+                }
+            }
+            return std::make_shared<sys::ResponseMessage>();
         });
 
-        auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(sdesktop::UpdateCheckForUpdateOnce);
-        sys::Bus::SendBroadcast(msgToSend, this);
+        auto msgToSend =
+            std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
+        sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
 
-        return ret;
+        return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ApplicationDesktop::DeinitHandler()
@@ -273,6 +271,9 @@ namespace app
         windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
             return std::make_unique<gui::RebootWindow>(app);
         });
+        windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::UpdateWindow>(app);
+        });
     }
 
     void ApplicationDesktop::destroyUserInterface()
@@ -295,11 +296,4 @@ namespace app
         }
     }
 
-    void ApplicationDesktop::setScreenLocked(bool val)
-    {
-        screenLocked = val;
-    };
-
-    void ApplicationDesktop::destroyUserInterface()
-    {}
 } // namespace app
