@@ -100,7 +100,7 @@ bool ServiceAudio::IsMergable(const audio::PlaybackType &type) const
     return false;
 }
 
-bool ServiceAudio::ShouldLoop(const audio::PlaybackType &type) const
+constexpr bool ServiceAudio::ShouldLoop(const audio::PlaybackType &type) const
 {
     return type == audio::PlaybackType::CallRingtone;
 }

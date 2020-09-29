@@ -154,7 +154,7 @@ namespace audio
         return static_cast<uint8_t>(PlaybackType::Last);
     }
 
-    bool AudioMux::IsMergable(const audio::PlaybackType &type) const
+    constexpr bool AudioMux::IsMergable(const audio::PlaybackType &type) const
     {
         return !(type == audio::PlaybackType::Multimedia);
     }
