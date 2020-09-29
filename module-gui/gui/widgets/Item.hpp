@@ -124,9 +124,6 @@ namespace gui
         /// @param `this` item
         /// @param `InputEvent`
         std::function<bool(Item &, const InputEvent &inputEvent)> inputCallback;
-        /// callback when element insides are changed
-        /// @param `this` item
-        std::function<bool(Item &)> contentCallback;
         /// callback on navigation, called when item passes navigation to handle by it's children
         /// @attention when child handles navigation it should return true, so that parent won't perform action for that
         std::function<bool(const InputEvent &)> itemNavigation = nullptr;
@@ -163,10 +160,6 @@ namespace gui
         /// calls: none, inconsistent api
         /// @note TODO should be fixed so that api would be consistent
         virtual bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
-        /// (should be) called each time content in item was changed, added for gui::Text widget
-        /// calls: none, inconsistent behaviour
-        /// @note TODO should be fixed so that api would be consistent
-        virtual bool onContent();
 
         /// @}
 

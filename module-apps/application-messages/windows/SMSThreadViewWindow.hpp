@@ -43,12 +43,12 @@ namespace gui
 
         struct
         {
-            int start                                   = 0;       // actual shown position start
-            int end                                     = 7;       // actual shown position end
-            int thread                                  = 0;       // thread we are showing
-            int dbsize                                  = 0;       // size of elements in db
-            std::unique_ptr<std::vector<SMSRecord>> sms;           // loaded sms from db
-            std::optional<SMSRecord> draft; // draft message of the thread we are showing, if exists.
+            int start  = 0;                              // actual shown position start
+            int end    = 7;                              // actual shown position end
+            int thread = 0;                              // thread we are showing
+            int dbsize = 0;                              // size of elements in db
+            std::unique_ptr<std::vector<SMSRecord>> sms; // loaded sms from db
+            std::optional<SMSRecord> draft;              // draft message of the thread we are showing, if exists.
         } SMS;
 
         gui::SMSInputWidget *inputMessage                 = nullptr;

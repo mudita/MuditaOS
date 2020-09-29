@@ -3,17 +3,19 @@
 ## [Current release]
 
 ### Added
-
+* `[desktop][gui]` Added SIM and PUK lock-related windows
+* `[GUI]` Added rich text parsing for full text styling needs
 * `[calendar]` Add notifications from database handling.
 * `[cellular]``[call app]` Added DTMF tone generation 
+* `[settings]` Add basic display and keypad options window
 * `[audio]` Enabled sounds priorities
+* `[messages]` Save a new message as a message draft, if not sent.
 
 ### Changed
 
 
 
 ### Fixed
-
 
 
 ### Other
@@ -432,3 +434,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+

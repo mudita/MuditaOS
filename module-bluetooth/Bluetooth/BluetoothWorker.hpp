@@ -95,4 +95,6 @@ class BluetoothWorker : private sys::Worker
     Error aud_init();
     /// bluetooth stack id in use
     unsigned long active_features;
+    void stop_scan();
+    void set_addr(uint8_t *);
 };

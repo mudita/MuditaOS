@@ -3,6 +3,12 @@
 #include "MessageType.hpp"
 #include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/DisplayAndKeypadWindow.hpp"
+#include "windows/InputLanguageWindow.hpp"
+#include "windows/LockedScreenWindow.hpp"
+#include "windows/FontSizeWindow.hpp"
+#include "windows/DisplayLightWindow.hpp"
+#include "windows/KeypadLightWindow.hpp"
 
 #include "ApplicationSettings.hpp"
 
@@ -58,6 +64,13 @@ namespace app
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
         windows.insert({gui::window::name::bluetooth, new gui::BluetoothWindow(this)});
+
+        attachWindow(new gui::DisplayAndKeypadWindow(this));
+        attachWindow(new gui::InputLanguageWindow(this));
+        attachWindow(new gui::LockedScreenWindow(this));
+        attachWindow(new gui::KeypadLightWindow(this));
+        attachWindow(new gui::FontSizeWindow(this));
+        attachWindow(new gui::DisplayLightWindow(this));
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

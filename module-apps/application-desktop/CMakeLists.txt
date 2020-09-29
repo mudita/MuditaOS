@@ -15,7 +15,12 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBox.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/SimLockBox.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/PukLockBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.cpp"
@@ -23,13 +28,19 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBox.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBox.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/SimLockBox.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/PukLockBox.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Names.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
 )
 
