@@ -14,6 +14,8 @@
 * `[audio]` Enabled sounds priorities, looping and merging
 * `[renderer]` Add drawing circles and arcs functionality.
 * `[bluetooth]` Added scan and pairing support.
+* `[phonebook]` Scrolling contacts list with a particular letter - part 2.
+
 
 ### Changed
 * `[special input]` Added emoji selector and changed special character selector.

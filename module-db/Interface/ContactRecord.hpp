@@ -21,6 +21,7 @@ struct ContactRecord : public Record
 {
     UTF8 primaryName     = "";
     UTF8 alternativeName = "";
+    uint32_t contactPosOnList = 0;
 
     struct Number
     {

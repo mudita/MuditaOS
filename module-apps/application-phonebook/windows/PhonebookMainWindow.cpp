@@ -90,7 +90,11 @@ namespace gui
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
-        rebuild();
+
+        phonebookModel->letterMap = phonebookModel->requestLetterMap();
+        phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
+        contactsList->rebuildList(style::listview::RebuildType::Full, 0);
+
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         requestedSearch     = contactRequest != nullptr;
         if (requestedSearch) {
@@ -116,11 +120,10 @@ namespace gui
             char letter = static_cast<char>(code);
             std::string filterLetter;
             filterLetter.push_back(letter);
-            phonebookModel->letterMap = phonebookModel->requestLetterMap();
 
             LOG_DEBUG("Number of favourites contacts : %" PRIu32, phonebookModel->letterMap.favouritesCount);
             uint32_t dataOffset = phonebookModel->letterMap.firstLetterDictionary[filterLetter];
-            if (dataOffset != phonebookContacMap::NO_MATCH_FOUND) {
+            if (dataOffset != phonebookContactsMap::NO_MATCH_FOUND) {
                 LOG_DEBUG("PhoneBook Data Offset : %" PRIu32, dataOffset);
                 phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
                 contactsList->rebuildList(style::listview::RebuildType::OnOffset, dataOffset);
@@ -166,6 +169,7 @@ namespace gui
 
                 if (msgNotification->dataModified()) {
 
+                    phonebookModel->letterMap = phonebookModel->requestLetterMap();
                     rebuild();
 
                     return true;

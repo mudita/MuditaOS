@@ -153,40 +153,61 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryNa
     return ret;
 }
 
-std::string ContactsTable::GetSortedByNameQueryString(std::uint32_t limit, std::uint32_t offset)
+std::string ContactsTable::GetSortedByNameQueryString(ContactQuerySection section)
 {
-    std::string query = "SELECT contacts._id, contact_name.name_alternative, 'Favourites' AS ContactType  FROM contacts"
-                        " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
-                        " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
-                        " contact_match_groups.group_id = 1 "
-                        " WHERE group_id= 1 "
-                        " UNION  ALL "
-                        " SELECT contacts._id, contact_name.name_alternative, 'All'  FROM contacts "
-                        " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
-                        " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
-                        " contact_match_groups.group_id = 1 "
-                        " ORDER BY ContactType DESC, contact_name.name_alternative  ";
-    if (limit > 0) {
-        query += " LIMIT " + std::to_string(limit);
-        query += " OFFSET " + std::to_string(offset);
+    std::string query;
+    if (section == ContactQuerySection::Favourites) {
+        query = "SELECT contacts._id  FROM contacts"
+                " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
+                " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
+                " contact_match_groups.group_id = 1 "
+                " WHERE group_id= 1 "
+                " ORDER BY  (contact_name.name_alternative ='') ASC "
+                " , UPPER(contact_name.name_alternative) ; ";
     }
-    query += " ;";
+    else if (section == ContactQuerySection::Mixed) {
+        query = " SELECT contacts._id, contact_name.name_alternative  FROM contacts "
+                " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
+                " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
+                " contact_match_groups.group_id = 1 "
+                " ORDER BY  (contact_name.name_alternative ='') ASC "
+                " , UPPER(contact_name.name_alternative) ; ";
+    }
     return query;
 }
 
 std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit, std::uint32_t offset)
 {
     std::vector<std::uint32_t> ids;
-    std::string query = GetSortedByNameQueryString(limit, offset);
+    std::vector<std::uint32_t> ids_limit;
 
+    std::string query = GetSortedByNameQueryString(ContactQuerySection::Favourites);
     LOG_DEBUG("query: %s", query.c_str());
     auto queryRet = db->query(query.c_str());
+    if (queryRet == nullptr) {
+
+        return ids;
+    }
+    do {
+        ids.push_back((*queryRet)[0].getUInt32());
+    } while (queryRet->nextRow());
+
+    query = GetSortedByNameQueryString(ContactQuerySection::Mixed);
+    LOG_DEBUG("query: %s", query.c_str());
+    queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;
     }
     do {
         ids.push_back((*queryRet)[0].getUInt32());
     } while (queryRet->nextRow());
+
+    if (limit > 0) {
+        for (uint32_t a = 0; a < limit; a++) {
+            ids_limit.push_back(ids[a + offset]);
+        }
+        return ids_limit;
+    }
 
     return ids;
 }
@@ -198,29 +219,36 @@ ContactsMapData ContactsTable::GetPosOfFirstLetters()
     std::string FirstLetterOfNameOld;
     std::uint32_t PositionOnList  = 0;
     std::uint32_t favouritesCount = 0;
-    std::string query             = GetSortedByNameQueryString();
+    std::string query;
 
-    LOG_DEBUG("query: %s", query.c_str());
+    query         = GetSortedByNameQueryString(ContactQuerySection::Favourites);
     auto queryRet = db->query(query.c_str());
+    if (queryRet == nullptr) {
+        return contactMap;
+    }
+    do {
+        favouritesCount++;
+        PositionOnList++;
+    } while (queryRet->nextRow());
+
+    query    = GetSortedByNameQueryString(ContactQuerySection::Mixed);
+    queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return contactMap;
     }
     do {
-        if ((*queryRet)[2].getString() == "All") {
-            UTF8 FirstLetterOfNameUtf = (*queryRet)[1].getString();
-            FirstLetterOfName         = FirstLetterOfNameUtf.substr(0, 1);
-            if (FirstLetterOfName != FirstLetterOfNameOld) {
-                contactMap.firstLetterDictionary.insert(
-                    std::pair<std::string, std::uint32_t>(FirstLetterOfName, PositionOnList));
-            }
-            FirstLetterOfNameOld = FirstLetterOfName;
+        UTF8 FirstLetterOfNameUtf = (*queryRet)[1].getString();
+        FirstLetterOfName         = FirstLetterOfNameUtf.substr(0, 1);
+        if (FirstLetterOfName != FirstLetterOfNameOld) {
+            contactMap.firstLetterDictionary.insert(
+                std::pair<std::string, std::uint32_t>(FirstLetterOfName, PositionOnList));
         }
-        else {
-            favouritesCount++;
-        }
+        FirstLetterOfNameOld = FirstLetterOfName;
         PositionOnList++;
     } while (queryRet->nextRow());
+
     contactMap.favouritesCount = favouritesCount;
+    contactMap.itemCount       = PositionOnList;
 
     return contactMap;
 }

@@ -83,7 +83,7 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     std::vector<std::uint32_t> GetIDsSortedByName(std::uint32_t limit = 0, std::uint32_t offset = 0);
 
     ContactsMapData GetPosOfFirstLetters();
-    std::string GetSortedByNameQueryString(std::uint32_t limit = 0, std::uint32_t offset = 0);
+    std::string GetSortedByNameQueryString(ContactQuerySection section);
 
   private:
     const char *createTableQuery =
