@@ -94,7 +94,7 @@ class MockAudio : public audio::Audio
         return state;
     }
 
-    State state;
+    State state = State::Idle;
     std::optional<audio::PlaybackType> plbckType;
     std::optional<audio::Operation::State> opState;
 };
@@ -269,14 +269,6 @@ TEST_CASE("Test AudioMux")
                 REQUIRE(retInput != std::nullopt);
                 REQUIRE((*retInput)->token == Token(tkId));
             }
-            // Temporarily turned off until merging\looping is merged to master
-            /*WHEN("Should merge due to same mergable type active")
-            {
-                tkId = insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
-                REQUIRE(retInput == std::nullopt);
-            }*/
         }
 
         GIVEN("N Inputs")
@@ -314,22 +306,6 @@ TEST_CASE("Test AudioMux")
                 REQUIRE(retInput != std::nullopt);
                 REQUIRE((*retInput)->token == Token(tkId));
             }
-            // Temporarily turned off until merging\looping is merged to master
-            /*WHEN("Should merge due to same mergable type active")
-            {
-                insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
-                REQUIRE(retInput == std::nullopt);
-            }
-            WHEN("Should merge due to same mergable type active even if Idle available")
-            {
-                insertAudio(audioInputs, Audio::State::Idle, PlaybackType::None, Operation::State::Idle, tokenIdx);
-                insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
-                REQUIRE(retInput != std::nullopt);
-            }*/
         }
     }
 
