@@ -9,6 +9,7 @@ You can quickstart the project by going through one of the following guides:
 - [Super dirty quickstart on Linux](#)
 - [Super dirty quickstart with unit tests](#)
 - [Super dirty quickstart on the phone](#)
+- [Preparing packages](#)
 
 
 ## Quickstart using Docker
@@ -30,40 +31,51 @@ you will see the list of groups your user is assigned to.
 4. Build linux Debug: `./in_docker.sh make build-linux-Debug`
 
 5. Build RT1051 Release
-
-`./in_docker.sh config rt1051 Release`
-`./in_docker.sh make build-rt1051-Release`
-
+```bash
+./in_docker.sh config rt1051 Release
+./in_docker.sh make build-rt1051-Release
+```
 6. Build and run tests (Linux only)
 
-`./in_docker.sh make build-linux-Debug`
-`./in_docker.sh make check`
-
+```bash
+./in_docker.sh make build-linux-Debug
+./in_docker.sh make check
+```
 To build selected test manually in the working directory of attached Docker image run:
-`cd ./build-linux-Debug ; make <test_name>; ./<test_name>`
+```bash
+cd ./build-linux-Debug ; make <test_name>; ./<test_name>
+```
 i.e.:
-`cd ./build-linux-Debug ; make unittest_gui && ./unittest_gui`
-
+```bash
+cd ./build-linux-Debug ; make unittest_gui && ./unittest_gui
+```
 Running tests checks memory leaks too - this might be helpful in creation of new widgets.
 
-## Building own docker image
+## Building your own Docker image
 
-If for some reason you don't want to use existing (on hub.docker.com) docker image you can build your own:
-1. download toolchain
+If for some reason you don't want to use [the existing Docker image](https://hub.docker.com/r/rwicik/pure_phone_build) you can build your own by following 
+
+1. Download the necessery toolchain:
+
 ```bash
 ./config/download_assets
 ```
-2. build image
+2. Build a new Docker image
+
 ```bash
 docker build docker/ -t rwicik/pure_phone_build:latest
 ```
-please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if docker couldn't find it locally it will download it from hub.docker.com
+
+Please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if Docker wouldn't be able to find it locally it will download it from Docker Hub.
 
 ## Quickstart in your local environment
 
-Prior to setting up your environment, please run the following command: `cd config && ./bootstrap.sh`
+Prior to setting up your environment, please run the following command: `cd config && ./bootstrap.sh` The script is written for Ubuntu and tested on 20.04.
 
-A provisioning script named `boostrap.sh` will go through installation steps described below and show you a list of changes that may be required for you to set up the environment locally.
+* This script will require `sudo` (for `apt`)
+* It will install `cmake` and `gcc` by default in `${HOME}` directory - in case of other needs, please change the script
+* The script doesn't install `ccache`, but if `ccache` is on the system - its support is added to `env.cmake.sample`
+* The script needs to be run only once
 
 If the script is run after a fresh `git clone` you need to update your git config (step 0 and 1).
 
@@ -87,7 +99,7 @@ By default commit hook only checks if your changes have the appropriate style, i
 
 If you prefer "notification than fix" workflow (so you can examine the changes), use the default hook behaviour (for notifications) and then call `./config/pre-commit.hook --fix`, this checks and fixes files in "stage", files that have status "changed" are not tested.
 
-```
+```bash
 git commit 
 <stele error - commit aborted>
 ./config/pre-commit.hook --fix
@@ -102,26 +114,25 @@ To fix the style for Pull Request CI:
 
 ## Longstart
 
-Run the provisioning script `./config/bootstrap.sh` to install all dependencies - written for Ubuntu, tested on 18.10
+Run the provisioning script `./config/bootstrap.sh` to install all dependencies. The script is written for Ubuntu and tested on 20.04.
 
-* This script will require sudo (for apt)
-* needed cmake and GCC will be installed by default to `${HOME}` - in case of other needs, change it
-* script doesn't install ccache, but if ccache is on system - it's support is added to env.cmake.sample
-* need to be run once (not more on restart or anything)
+To run the script execute the following command: `cd config && ./bootstrap.sh`
 
-`cd config && ./bootstrap.sh`
+After running provisioning you are ready to checkout and build project for both linux and RT1051. Pleasse follow these steps:
 
-After running provisioning you are ready to checkout and build project for both linux and rt1051 target:
-* checking out project with submodules for the first time
-```sh
+1. Check out the project with submodules for the first time:
+
+```bash
 git submodule update --init --recursive
 ```
-* repo update with submodules
-```sh
+2. Update the repository with submodules
+
+```bash
 git pull --recurse-submodules
 ```
-* building project
-```sh
+3. Build the project
+
+```bash
 ./configure.sh [rt1051|linux] [release|debug|relwithdebinfo]
 cd build-[rt1051|linux]-[release|debug|relwithdebinfo]
 make
@@ -131,7 +142,7 @@ make
 
 Here's the bare minimum that will enable you to bootstrap the environment on Linux.
 
-```
+```bash
 git submodule update --init --recursive                        # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                       # bootstrap requirements
 ./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
@@ -154,7 +165,7 @@ make check
 
 2. Please run the following commands:
 
-```
+```bash
 cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake
 git submodule update --init --recursive
 cd ./config/ && ./bootstrap.sh && cd ../
@@ -170,7 +181,6 @@ make -j
  - Load app with GDB via J-Link connected to Mudita Pure: `./run.sh <build folder>`
  - Catch logs from Mudita Pure from J-Link RTT and write them to `/tmp/log.txt`: `JLinkRTTClient | tee /tmp/log.txt`
 
-
 ### Catching logs using UART
 
 If you want to catch logs from Mudita Pure from UART please follow these steps:
@@ -181,21 +191,15 @@ If you want to catch logs from Mudita Pure from UART please follow these steps:
 
 Please mind that logs on UART are more costly, so these might cause timing issues and slow down the phone too. To avoid that consider `release` build for tests with `uart` enabled.
 
-
-
-
-
 ## Preparing Packages
 
-If you need a package, containing everything needed to run application (on target device or on linux)
-in the build directory call
-```bash
-make package
-```
-on finish command will display the name of the package that was created.
+If you need a package, containing everything needed to run the application (on target device or Linux), in the build directory run the following command: `make package`
 
-Package name is: *PurePhone-<version>-<target>.<extension>*
+After executing this command, the name of the package that was created will be displayed on the screen.
+
+Package name is: `PurePhone-<version>-<target>.<extension>`
 where:
-    <version>   - is readed from the latest "release-x.y.z" tag
-    <target>    - RT1051 or Linux 
-    <extension> - `zip` for RT1051 and `tar.gz` for Linux
+
+- `<version>`   - is read from the latest "release-x.y.z" tag
+- `<target>`    - RT1051 or Linux 
+- `<extension>` - `zip` for RT1051 and `tar.gz` for Linux
