@@ -3,7 +3,9 @@
 #include "Service.hpp"
 
 #include <memory>
+#include <map>
 #include <string>
+#include <vector>
 
 namespace sys
 {
@@ -30,60 +32,118 @@ namespace sys
      * - call init method and provide list of parameters to create queues. Those queues can be later
      * used to wake up the worker.
      * - call run method to start the worker.
+     *
      * Flow for closing the worker is as follows:
-     * - call stop method - task will send a close confirmation to the service after exiting its main loop
-     * - call deinit to destroy all queues ued by the worker
+     * - call stop method - task will end itself
+     * - call join method to wait for the task to end
+     * - call deinit to destroy all resources owned by the worker
      * - delete the object.
      *
      */
     class Worker
     {
+      private:
+        enum class ControlMessage
+        {
+            Stop,
+            MessageCount
+        };
+
+        enum class State
+        {
+            New,
+            Initiated,
+            Running,
+            Stopping,
+            Stopped,
+            Destroyed,
+            Invalid
+        };
+
+        using Id = unsigned int;
+
+        static void taskAdapter(void *taskParam);
+        bool handleControlMessage();
+        void task();
+        void addQueueInfo(xQueueHandle queue, std::string queueName);
+        void setState(State newState);
+        std::string getControlQueueName() const;
+
+        static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
+        static constexpr std::size_t defaultStackSize     = 2048;
+        static constexpr TickType_t defaultJoinTimeout    = portMAX_DELAY;
+        static inline std::string controlQueueNamePrefix  = "wctrl";
+
+        xQueueHandle controlQueue      = nullptr;
+        xSemaphoreHandle joinSemaphore = nullptr;
+        xTaskHandle runnerTask         = nullptr;
+        xSemaphoreHandle stateMutex    = nullptr;
+        xTaskHandle taskHandle         = nullptr;
+
+        Id id;
+        std::string name;
+        State state = State::New;
+
       protected:
+        virtual bool handleMessage(uint32_t queueID) = 0;
+        xQueueHandle getQueueByName(std::string queueName);
+        bool sendControlMessage(ControlMessage message);
+        State getState() const;
+
         const static uint32_t SERVICE_QUEUE_LENGTH = 10;
+        const static uint32_t CONTROL_QUEUE_LENGTH = 4;
         const static uint32_t SERVICE_QUEUE_SIZE   = sizeof(WorkerCommand);
         const std::string SERVICE_QUEUE_NAME       = "ServiceQueue";
 
-        sys::Service *service;
-        // queue used by service to send commands to service.
-        xQueueHandle serviceQueue;
-        std::vector<xQueueHandle> queues;
-        QueueSetHandle_t queueSet;
-        std::map<xQueueHandle, std::string> queueNameMap;
-        xTaskHandle taskHandle;
+        static unsigned int count;
 
-        friend void workerTaskFunction(void *ptr);
+        sys::Service *service     = nullptr;
+        xQueueHandle serviceQueue = nullptr;
+        QueueSetHandle_t queueSet = nullptr;
+        std::vector<xQueueHandle> queues;
+        std::map<xQueueHandle, std::string> queueNameMap;
 
       public:
         Worker(sys::Service *service);
-        virtual ~Worker() = default;
+        virtual ~Worker();
 
         /**
-         * This function is responsible for creating all queues provided in the constructor.
+         * @brief This function is responsible for creating all queues provided in the constructor.
          * When all queues are created this method creates set of queues.
          */
         virtual bool init(std::list<WorkerQueueInfo> queues = std::list<WorkerQueueInfo>());
+        /**
+         * @brief This function is responsible for destroying all resources created in the
+         * init mehtod.
+         */
         virtual bool deinit();
         /**
-         * This method starts RTOS thread that waits for incoming queue events.
+         * @brief Starts RTOS thread that waits for incoming queue events.
          */
         virtual bool run();
         /**
-         * Sends stop command to worker.
+         * @brief Sends stop command to worker.
          */
         virtual bool stop();
         /**
-         * This method is called from thread when new message arrives in queue.
-         * @param queueID Index of the queue in the queues vector.
+         * @brief Joins the thread
+         *
+         * @param timeout - ticks to wait for the thread to end
          */
-        virtual bool handleMessage(uint32_t queueID);
+        bool join(TickType_t timeout = defaultJoinTimeout);
         /**
          * @brief Sends command and pointer to data to worker
          */
         virtual bool send(uint32_t cmd, uint32_t *data);
         /**
-         * @brief Returns handle to queue by its name
+         * @brief Closes worker by combining stop, join and deinit operations in a single call.
+         * If it is not possible to close the worker gently it would kill it forcibly.
          */
-        virtual xQueueHandle getQueueByName(std::string);
+        void close();
+        /**
+         * @brief Kills the worker. Does not deinit it.
+         */
+        void kill();
     };
 
 } /* namespace sys */
