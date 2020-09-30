@@ -195,8 +195,13 @@ namespace gui
                                       application, "ApplicationNotes", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
-                new gui::Tile{
-                    "menu_tools_calculator_W_G", "app_desktop_tools_calculator", [=](gui::Item &item) { return true; }},
+                new gui::Tile{"menu_tools_calculator_W_G",
+                              "app_desktop_tools_calculator",
+                              [=](gui::Item &item) {
+                                  sapm::ApplicationManager::messageSwitchApplication(
+                                      application, "ApplicationCalculator", gui::name::window::main_window, nullptr);
+                                  return true;
+                              }},
                 new gui::Tile{"menu_tools_recorder_W_G",
                               "app_desktop_tools_antenna",
                               [=](gui::Item &item) {
