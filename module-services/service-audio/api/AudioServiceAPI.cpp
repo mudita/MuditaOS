@@ -93,14 +93,22 @@ namespace AudioServiceAPI
 
     RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
     {
+        if (stopVec.empty()) {
+            return RetCode::Success;
+        }
         auto msg = std::make_shared<AudioStopMessage>(stopVec);
-
         return SendAudioRequest(serv, msg)->retCode;
     }
 
     RetCode Stop(sys::Service *serv, const audio::Handle &handle)
     {
         auto msg = std::make_shared<AudioStopMessage>(handle.GetToken());
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode Stop(sys::Service *serv)
+    {
+        auto msg = std::make_shared<AudioStopMessage>();
         return SendAudioRequest(serv, msg)->retCode;
     }
 

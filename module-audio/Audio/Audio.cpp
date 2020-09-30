@@ -112,6 +112,11 @@ namespace audio
         return currentOperation->Start(asyncCallback, token);
     }
 
+    audio::RetCode Audio::Start()
+    {
+        return currentOperation->Start(asyncCallback, currentOperation->GetToken());
+    }
+
     audio::RetCode Audio::Stop()
     {
         if (currentState == State::Idle) {

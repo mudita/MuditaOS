@@ -69,6 +69,8 @@ namespace audio
                              const char *fileName                    = "",
                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
 
+        audio::RetCode Start();
+
         audio::RetCode Stop();
 
         audio::RetCode Pause();
