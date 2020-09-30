@@ -94,7 +94,7 @@ namespace app
     {
         auto handle = AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::Multimedia, fileName);
         if (handle.GetLastRetCode() != audio::RetCode::Success) {
-            LOG_ERROR("play failed with %s", audio::c_str(handle.GetLastRetCode()));
+            LOG_ERROR("play failed with %s", audio::str(handle.GetLastRetCode()).c_str());
             return false;
         }
         return true;

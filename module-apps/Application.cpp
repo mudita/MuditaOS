@@ -501,7 +501,7 @@ namespace app
                                 const audio::Profile::Type &profileType,
                                 const audio::PlaybackType &playbackType)
     {
-        const auto ret = AudioServiceAPI::SetSetting(this, audio::Setting::Volume, value, profileType, playbackType);
+        const auto ret = AudioServiceAPI::SetSetting(this, audio::Setting::Volume, value, playbackType, profileType);
         return ret == audio::RetCode::Success;
     }
 

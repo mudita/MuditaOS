@@ -12,10 +12,12 @@
 #include "ProfileRoutingHeadset.hpp"
 #include "ProfileRoutingSpeakerphone.hpp"
 
+#include <Utils.hpp>
+
 namespace audio
 {
 
-    std::unique_ptr<Profile> Profile::Create(const Type t, std::function<int32_t()> callback, float vol, float gain)
+    std::unique_ptr<Profile> Profile::Create(const Type t, std::function<int32_t()> callback, Volume vol, Gain gain)
     {
         std::unique_ptr<Profile> inst;
 
@@ -59,7 +61,7 @@ namespace audio
         : audioFormat(fmt), audioDeviceType(devType), name(name), type(type), dbAccessCallback(callback)
     {}
 
-    void Profile::SetInputGain(float gain)
+    void Profile::SetInputGain(Gain gain)
     {
         audioFormat.inputGain = gain;
         if (dbAccessCallback) {
@@ -67,7 +69,7 @@ namespace audio
         }
     }
 
-    void Profile::SetOutputVolume(float vol)
+    void Profile::SetOutputVolume(Volume vol)
     {
         audioFormat.outputVolume = vol;
         if (dbAccessCallback) {
@@ -103,53 +105,9 @@ namespace audio
 
     const std::string str(const Profile::Type &profileType)
     {
-        switch (profileType) {
-        case Profile::Type::RoutingSpeakerphone: {
-            return "RoutingSpeakerphone";
-        }
-        case Profile::Type::RoutingHeadset: {
-            return "RoutingHeadset";
-        }
-        case Profile::Type::RoutingBTHeadset: {
-            return "RoutingBTHeadset";
-        }
-        case Profile::Type::RoutingHeadphones: {
-            return "RoutingHeadphones";
-        }
-        case Profile::Type::RoutingEarspeaker: {
-            return "RoutingEarspeaker";
-        }
-        case Profile::Type::RecordingBuiltInMic: {
-            return "RecordingBuiltInMic";
-        }
-        case Profile::Type::RecordingHeadset: {
-            return "RecordingHeadset";
-        }
-        case Profile::Type::RecordingBTHeadset: {
-            return "RecordingBTHeadset";
-        }
-        case Profile::Type::PlaybackLoudspeaker: {
-            return "PlaybackLoudspeaker";
-        }
-        case Profile::Type::PlaybackHeadphones: {
-            return "PlaybackHeadphones";
-        }
-        case Profile::Type::PlaybackBTA2DP: {
-            return "PlaybackBTA2DP";
-        }
-        case Profile::Type::SystemSoundLoudspeaker: {
-            return "SystemSoundLoudspeaker";
-        }
-        case Profile::Type::SystemSoundHeadphones: {
-            return "SystemSoundHeadphones";
-        }
-        case Profile::Type::SystemSoundBTA2DP: {
-            return "SystemSoundBTA2DP";
-        }
-        case Profile::Type::Idle: {
+        if (profileType == Profile::Type::Idle) {
             return "";
         }
-        }
-        return "";
+        return utils::enumToString(profileType);
     }
 } // namespace audio
