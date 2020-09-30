@@ -163,4 +163,19 @@ namespace gui
         }
     }
 
+    void BottomBar::setFont(Side side, const UTF8 &fontName)
+    {
+        switch (side) {
+        case Side::LEFT:
+            left->setFont(fontName);
+            break;
+        case Side::CENTER:
+            center->setFont(fontName);
+            break;
+        case Side::RIGHT:
+            right->setFont(fontName);
+            break;
+        }
+    }
+
 } /* namespace gui */

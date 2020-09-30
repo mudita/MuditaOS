@@ -106,6 +106,11 @@
     "app_calendar_new_edit_event_start": "Start",
     "app_calendar_new_edit_event_end": "End",
 
+    "app_calculator_title_main": "Calculator",
+    "app_calculator_equals": "EQUALS",
+    "app_calculator_decimal_separator": ".",
+    "app_calculator_error": "Error",
+
     "app_options_invalid_option": " <Invalid Option> ",
     "app_options_contact_details": "Contact details",
     "app_options_contact_add": "Add to contacts",

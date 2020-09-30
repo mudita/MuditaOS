@@ -43,6 +43,7 @@ include(segger/rtt/CMakeLists.txt)
 include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
+include(third-party/tinyexpr.cmake)
 
 add_subdirectory(pugixml)
 

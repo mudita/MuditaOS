@@ -43,6 +43,7 @@ set(APPLICATIONS
     antenna
     music-player
     meditation
+    calculator
 )
 
 list(SORT APPLICATIONS)
