@@ -70,34 +70,14 @@ sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMod
 void ServiceAudio::TickHandler(uint32_t id)
 {}
 
-bool ServiceAudio::IsResumable(const audio::PlaybackType &type)
+constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 {
-    switch (type) {
-    case audio::PlaybackType::Multimedia:
-        return true;
-    case audio::PlaybackType::None:
-    case audio::PlaybackType::TextMessageRingtone:
-    case audio::PlaybackType::Notifications:
-    case audio::PlaybackType::KeypadSound:
-    case audio::PlaybackType::CallRingtone:
-        return false;
-    }
-    return false;
+    return type == audio::PlaybackType::Multimedia;
 }
 
-bool ServiceAudio::IsMergable(const audio::PlaybackType &type)
+constexpr bool ServiceAudio::ShouldLoop(const audio::PlaybackType &type) const
 {
-    switch (type) {
-    case audio::PlaybackType::KeypadSound:
-    case audio::PlaybackType::Notifications:
-    case audio::PlaybackType::TextMessageRingtone:
-        return true;
-    case audio::PlaybackType::None:
-    case audio::PlaybackType::Multimedia:
-    case audio::PlaybackType::CallRingtone:
-        return false;
-    }
-    return false;
+    return type == audio::PlaybackType::CallRingtone;
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioRequestMessage *> msg)
@@ -219,9 +199,14 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         switch (msg->type) {
 
         case AudioNotificationMessage::Type::EndOfFile: {
-            std::shared_ptr<AudioRequestMessage> newMsg =
-                std::make_shared<AudioRequestMessage>(MessageType::AudioStop, msg->token);
-            sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
+            auto input = audioMux.GetInput(msg->token);
+            if (input && ShouldLoop((*input)->audio.GetCurrentOperation()->GetPlaybackType())) {
+                (*input)->audio.Start();
+            }
+            else {
+                auto newMsg = std::make_shared<AudioStopMessage>(msg->token);
+                sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
+            }
         } break;
 
         case AudioNotificationMessage::Type::Stop: {

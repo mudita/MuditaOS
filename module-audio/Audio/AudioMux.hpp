@@ -82,7 +82,8 @@ namespace audio
         auto IncrementToken(std::optional<AudioMux::Input *> input) -> Token;
 
       private:
-        auto GetPlaybackPriority(const audio::PlaybackType &type) -> uint8_t;
+        auto GetPlaybackPriority(const audio::PlaybackType &type) const -> uint8_t;
+        constexpr auto IsMergable(const audio::PlaybackType &type) const -> bool;
         std::vector<Input> audioInputs;
         audio::Token refToken;
     };

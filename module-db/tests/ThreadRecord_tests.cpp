@@ -10,7 +10,9 @@
 #include "queries/messages/threads/QueryThreadsSearch.hpp"
 #include "queries/messages/threads/QueryThreadGetByID.hpp"
 #include "queries/messages/threads/QueryThreadGetByContactID.hpp"
+#include "queries/messages/threads/QueryThreadGetByNumber.hpp"
 #include "queries/messages/threads/QueryThreadRemove.hpp"
+#include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
 #include "vfs.hpp"
 
 #include <algorithm>
@@ -198,17 +200,21 @@ TEST_CASE("Thread Record tests")
 
     SECTION("SMS search")
     {
+        const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
+        const std::string lastSmsBody = "Ola";
+
         SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
         SMSRecord recordIN;
         recordIN.date      = 123456789;
         recordIN.dateSent  = 987654321;
         recordIN.errorCode = 0;
-        recordIN.number    = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
+        recordIN.number    = phoneNumber.getView();
         recordIN.body      = "Ala";
         recordIN.type      = SMSType ::DRAFT;
 
         REQUIRE(smsRecInterface.Add(recordIN));
-        recordIN.body = "Ola";
+
+        recordIN.body = lastSmsBody;
         REQUIRE(smsRecInterface.Add(recordIN));
 
         {
@@ -227,6 +233,24 @@ TEST_CASE("Thread Record tests")
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 1);
+        }
+
+        SECTION("Get last SMS by thread id")
+        {
+            auto getThreadQuery  = std::make_shared<db::query::ThreadGetByNumber>(phoneNumber.getView());
+            auto getThreadRet    = threadRecordInterface1.runQuery(getThreadQuery);
+            auto getThreatResult = dynamic_cast<db::query::ThreadGetByNumberResult *>(getThreadRet.get());
+            REQUIRE(getThreatResult != nullptr);
+            auto threadRec = getThreatResult->getThread();
+            REQUIRE(threadRec.isValid());
+
+            auto getLastQuery  = std::make_shared<db::query::SMSGetLastByThreadID>(threadRec.ID);
+            auto getLastRet    = smsRecInterface.runQuery(getLastQuery);
+            auto getLastResult = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(getLastRet.get());
+            REQUIRE(getLastResult != nullptr);
+            auto smsRec = getLastResult->record;
+            REQUIRE(smsRec.has_value());
+            REQUIRE(smsRec->body == lastSmsBody);
         }
     }
 

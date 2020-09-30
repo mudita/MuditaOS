@@ -20,8 +20,10 @@ namespace gui
         std::stringstream ss(text.c_str());
         std::string line;
         while (std::getline(ss, line)) {
+            if (!blocks.empty()) {
+                blocks.back().setEnd(TextBlock::End::Newline);
+            }
             blocks.emplace_back(TextBlock(line, std::make_unique<TextFormat>(format)));
-            blocks.back().setEnd(TextBlock::End::Newline);
         }
         return blocks;
     }

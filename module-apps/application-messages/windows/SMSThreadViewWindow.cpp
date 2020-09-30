@@ -62,7 +62,8 @@ namespace gui
 
     void SMSThreadViewWindow::handleDraftMessage()
     {
-        if (const auto &text = inputMessage->inputText->getText(); text.empty()) {
+        if (const auto &text = inputMessage->inputText->getText();
+            text.empty() || (text == utils::localize.get("sms_temp_reply"))) {
             clearDraftMessage();
         }
         else {
