@@ -148,3 +148,33 @@ TEST_CASE("findAndReplaceAll tests")
 
     REQUIRE(retVal == true);
 }
+
+TEST_CASE("Converts enum to string")
+{
+    enum class Test : bool
+    {
+        True  = true,
+        False = false
+    };
+
+    REQUIRE(utils::enumToString(Test::True) == "True");
+    REQUIRE(utils::enumToString(Test::False) == "False");
+}
+
+TEST_CASE("Get value from string")
+{
+    SECTION("UInt32_t")
+    {
+        std::string testString = "10";
+        const auto testValue   = utils::getValue<uint32_t>(testString);
+        REQUIRE(testValue == 10);
+    }
+
+    SECTION("float")
+    {
+        std::string testString = "1.f";
+        const auto testValue   = utils::getValue<float>(testString);
+        Approx target          = Approx(1.f).margin(.01f);
+        REQUIRE(testValue == target);
+    }
+}
