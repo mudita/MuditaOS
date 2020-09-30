@@ -67,7 +67,7 @@ class AudioSettingsMessage : public AudioMessage
     AudioSettingsMessage(const audio::Profile::Type &profileType,
                          const audio::PlaybackType &playbackType,
                          const audio::Setting &setting,
-                         const uint32_t &val = 0)
+                         const std::string &val = {})
         : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, setting{setting}, val{val}
     {}
 
@@ -76,7 +76,7 @@ class AudioSettingsMessage : public AudioMessage
     audio::Profile::Type profileType = audio::Profile::Type::Idle;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
     const audio::Setting setting;
-    uint32_t val{};
+    std::string val{};
 };
 
 class AudioGetSetting : public AudioSettingsMessage
@@ -97,7 +97,7 @@ class AudioSetSetting : public AudioSettingsMessage
     AudioSetSetting(const audio::Profile::Type &profileType,
                     const audio::PlaybackType &playbackType,
                     const audio::Setting &setting,
-                    const uint32_t &val)
+                    const std::string &val)
         : AudioSettingsMessage{profileType, playbackType, setting, val}
     {}
 
