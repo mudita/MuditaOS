@@ -3,10 +3,16 @@
 #include <cstdint>
 #include <map>
 
-namespace phonebookContacMap
+namespace phonebookContactsMap
 {
     constexpr uint32_t NO_MATCH_FOUND = 0;
 }
+
+enum class ContactQuerySection
+{
+    Favourites = 0,
+    Mixed,
+};
 
 enum class ContactDisplayMode
 {
@@ -24,4 +30,5 @@ struct ContactsMapData
 {
     std::map<std::string, std::uint32_t> firstLetterDictionary;
     std::uint32_t favouritesCount;
+    std::uint32_t itemCount;
 };
