@@ -7,16 +7,22 @@ PureOS's audio subsystem was heavily inspired by two fine pieces of software:
 Implementation of module-audio was developed after going through [Linux Sound Subsystem Documentation](https://www.kernel.org/doc/html/latest/sound/index.html) and various other
 documents describing audio Linux audio. These documents were mainly used as inspiration as requested PureOS audio functionality is much less sophisticated. Also due to 
 hardware limitations (mainly processor speed and hardware audio codec features) some additional assumptions were made.
+#### Paths
+
+ * [../module-bsp/bsp/audio](../module-bsp/bsp/audio) - audio device interface and switching logic
+ * [../module-bsp/board/linux/audio](../module-bsp/board/linux/audio) - Linux audio devices
+ * [../module-bsp/board/rt1051/bsp/audio](../module-bsp/board/rt1051/bsp/audio) - RT1051 audio devices
+ * [../module-audio/Audio/](../module-audio/Audio) - audio module
+
 #### [PortAudio library](http://www.portaudio.com/)
-Whole audio device layer which can be found in [bsp-audio](../module-bsp/bsp/audio) and concept of audio devices were based on this library.
-Even API is quite similar to PortAudio's one. 
+Audio device layer (which can be found in [audio paths](#paths)), concept of audio devices and API were based on PortAudio library.
 
 # Features
 * Playback/Recording/Routing(voice calls) operations
 * MP3/FLAC/WAV mono/stereo audio files supported
 * Voice calls recording (currently only WAV encoder is supported)
-* FLAC tags support
-* ID3V1 & ID3V2 tags support via [atag](https://github.com/mandreyel/atag)
+* MP3/FLAC/WAV tags support
+* ID3V1 & ID3V2 tags support via [taglib](https://github.com/taglib/taglib)
 * Supported frame rates: 8/16/32/44,1/48/96kHz in case of using headphones/loudspeaker
 * Supported frame rates: `TODO` in case of using bluetooth 
 * External events capturing (audio jack insert/remove)
@@ -26,7 +32,6 @@ Even API is quite similar to PortAudio's one.
 * Support for different audio profiles
 * 16kHz samplerate during voice calls
 * Mute/unmute/speakerphone during voice calls
-* OPTIONAL: encrypted voice calls (not implemented yet but quite possible to do)
 * BT A2DP and headset profile (not implemented yet)
 * Headset volume control
 * Automatic low-power management
@@ -38,12 +43,11 @@ Due to limited processor speed it wasn't possible to implement dynamic re-sampli
 hardware audio codec and & BT configuration need to be switched according to specified audio file format which is
 currently being played.
 #### There is no possibility to mix audio channels
-Due to not having re-sampling ability, mixing channels which have different audio formats is considered to be impossible.There is not even a audio channels or
-mixer implemented! This has even further implications as it won't be possible for instance to play notification during voice call or song. 
+Due to lack of re-sampling ability, channel abstraction does not exist thus it is not possible to play notification during voice call or media playback. 
 #### 16bit stereo/mono PCM samples are used as internal audio samples format
 This format was picked as it is commonly used. Additionally moving raw PCM samples from one point to another is the easiest method and the most error resilient.
 #### 16 bit audio files are only supported
-Currently due to some limitations in hardware audio codec only 16-bit PCM samples are supported. It is possible to add support for 8/24 or even 32 bit samples. This should be done
+Currently due to limitations of hardware audio codec only 16-bit PCM samples are supported. It is possible to add support for 8/24 or even 32 bit samples. This should be done
 in audio device layer inside `module-bsp/bsp/audio`
 #### There is no possibility to record and playback at the same time
 This is self-explanatory. Whole switching logic is implemented inside `module-audio` 
@@ -52,9 +56,9 @@ IPhone headphones have very specific format of handling vol up/down buttons whic
 
 # How it works
 ### Audio devices
-Audio devices that can be found in [bsp_audio](../module-bsp/bsp/audio) are generic abstraction over different kinds of output/input audio devices.
-For instance: audio codecs, GSM audio and so on.The main purpose of using this abstraction is to have one unified interface (API) by which we
-can control and manage audio devices. This way we can also very easily support different compile target (currently Linux & RT1051). It is only a matter of
+Audio devices that can be found in [audio paths](#paths) are generic abstraction over different kinds of output/input audio devices.
+For instance: audio codecs, GSM audio and so on.The main purpose of using this abstraction is to have one unified interface (API) for
+controlling and managing audio devices. This way we can also easily support different compile targets (currently Linux & RT1051). It is only a matter of
 implementing a new audio device.
 
 Currently we have four implementations of audio devices
@@ -63,7 +67,7 @@ Currently we have four implementations of audio devices
 * Linux audio (via PortAudio library)
 * Linux audio cellular (also via PortAudio library)
 
-Each audio device must conform to API interface which is specified in `AudioDevice` class in [bsp_audio](../module-bsp/bsp/audio/bsp_audio.hpp)
+Each audio device must conform to API interface which is specified in `bsp::AudioDevice` class in [bsp_audio](../module-bsp/bsp/audio/bsp_audio.hpp)
 
 ### Decoders
 Decoders layer was developed in order to have unified API over vast range of audio decoders. Another very important part of decoders
@@ -97,32 +101,26 @@ enum class Type {
 
 Each state supports various methods which can be invoked in any time:
 ````
-int32_t Start(std::function<int32_t(AudioEvents event)> callback)
+RetCode Start(...)
+RetCode Stop()
+RetCode Pause()
+RetCode Resume()
 
-int32_t Stop()
+RetCode SendEvent(const Event evt, const EventData *data=nullptr)
 
-int32_t Pause()
+RetCode SetOutputVolume(Volume vol)
+RetCode SetInputGain(Gain gain)
 
-int32_t Resume()
-
-int32_t SendEvent(const Event evt, const EventData *data=nullptr)
-
-int32_t SetOutputVolume(float vol)
-
-int32_t SetInputGain(float gain)
-
+Volume   GetOutputVolume();
+Gain     GetInputGain()
 Position GetPosition()
 
-Volume GetOutputVolume();
-
-Gain GetInputGain()
-
-State GetState()
-
-const Profile *GetProfile()
+State       GetCurrentState()
+Operation * GetCurrentOperation()
 ````
-Vast majority of them is self-explanatory except `SendEvent` method. This method is mainly used to send various external events to current state.
-All available events that can be passed to this method are listed below:
+
+API names mimic the actions behind them. `SendEvent` method is mainly used to send various external events to current Operation.
+Available events that can be passed to this method are in Operation::Event enum:
 ````
 enum class Event {
     HeadphonesPlugin,
@@ -139,22 +137,22 @@ enum class Event {
     CallSpeakerphoneOff,
 };
 ````
-As you can see there are lots of them by not every event is supported in every state. For instance, `StartCallRecording` and `StopCallRecording` are not supported
+Not all events are supported in every state. For instance, `StartCallRecording` and `StopCallRecording` are not supported
 in `Playback` operation and will be ignored upon receiving.
 
 ##### Idle
-This is default state of audio subsystem. Audio subsystem always operates in this state when:
-* there is no music being played
-* nothing is recorded
-* there is no routing activity (during voice calls)
+This is default state of audio subsystem. Audio subsystem always operates in this state when none of below is active:
+* media playback
+* recording
+* routing (voice calls)
 
-Audio subsystem will also transition to this state upon several events:
+Audio subsystem will also transition to this state upon following events:
 * receiving `Stop` request no matter in what current state
 * playback end 
 * recording failure (for instance running out of disk space)
-* any other failure during switching between different states. Audio will always fallback to idle state if there is any kind of error.
+* any other failure during switching between different states or internal error 
 
-Also in this state audio subsystem tries to optimize power consumption by closing/removing all audio devices and limiting internal operations to minimum.
+In this state audio subsystem tries to optimize power consumption by closing/removing all audio devices and limiting internal operations to minimum.
 
 ##### Playback
 Playback operation is used when user wants to play audio file. File's extension is used to deduce which decoder to use. 
@@ -168,7 +166,7 @@ as full-duplex(both Rx and Tx channels) and routes audio samples between them. A
 This feature is currently mainly used to record voice-calls into the file.
 
 ### Audio profiles
-There is one more very important element of this puzzle and it is concept of `Audio Profiles`. List of supported audio profiles is listed below:
+In order to store `Operation` configuration a concept of `Audio Profile` has been introduced. List of supported audio profiles is listed in Profile::Type enum:
 ````
 enum class Type {
     // Profiles used only during call
@@ -179,17 +177,17 @@ enum class Type {
     RoutingEarspeaker,
 
     // Recording profiles
-            RecordingBuiltInMic,
+    RecordingBuiltInMic,
     RecordingHeadset,
     RecordingBTHeadset,
 
     // Profiles used by music player
-            PlaybackLoudspeaker,
+    PlaybackLoudspeaker,
     PlaybackHeadphones,
     PlaybackBTA2DP,
 
     // Profiles used by system sounds
-            SystemSoundLoudspeaker,
+    SystemSoundLoudspeaker,
     SystemSoundHeadphones,
     SystemSoundBTA2DP,
 
@@ -198,10 +196,9 @@ enum class Type {
 };
 ````
 
-In contrast to `Operations` which are functional blocks of audio subsystem `AudioProfiles` serve different purpose. They exist to complement `Operations` as they main
-job is to store audio configuration which then `Operations` use to configure audio devices. Each `Operation` supports its specific set of profiles which can be switched back and forth. To do so
-mechanism od sending external events is used which was described earlier. For instance sending `HeadphonesPlugin` event when in `Playback` will result in switching from current profile
-which can be for example `PlaybackLoudspeaker` to `PlaybackHeadphones` profile. Switching profile triggers some additional internal actions:
+`Audio Profiles` exist to complement `Operations`. They store audio configuration which then `Operations` use to configure audio devices. Each `Operation` supports its specific set of `Audio Profiles` which can be switched back and forth. To do so
+mechanism of sending external events is used which was described earlier. For instance sending `HeadphonesPlugin` event when in `Playback` will result in switching from current profile
+i.e.`PlaybackLoudspeaker` to `PlaybackHeadphones` profile. Switching profile triggers some additional internal actions:
 * current profile is replaced with new one
 * current audio device is reloaded with the new parameters
 * in case of any error system will fallback to `Idle` operation and report error
@@ -221,37 +218,28 @@ ProfilePlaybackHeadphones(std::function<int32_t()> callback, float volume) : Pro
         bsp::AudioDevice::Type::Audiocodec,
         callback) {}
 ````
-Profile configuration can be found here: [Profiles](./Audio/Profiles)
+Profiles configurations can be found here: [Profiles](./Audio/Profiles)
+`Operations` may not implement support for all possible `Profile` parameters i.e. `inputGain` and `inputPath` will be ignored in playback `Operation`.
 
-Not every parameter is used, for example setting `inputGain` for playback does not have any sense so does `inputPath` hence they are omitted.
-`callback` parameter was designed to be invoked asynchronously when audio subsystem updates profile's data. This way those changes can be also updated in database.  
 **IMPORTANT:** For the time being profiles are not loaded and stored into database. This should be fixed.  
 **IMPORTANT:** Callbacks mechanism is only experimental and should be considered as incomplete.
 
 # Audio class
-Audio class is main interface to audio subsystem: [Audio class](./Audio/Audio.hpp)  which is exclusively used by [audio-service](../module-services/service-audio)
-Audio class stores internally current `Operation` and bunch of other things like its state and async callback.  
-Async callback which is described below:
+Audio class [Audio class](./Audio/Audio.hpp) is main interface to audio subsystem. It is exclusively used by [audio-service](../module-services/service-audio)
+Audio class stores internally current `Operation`, `Profile`, `State`, async callback, db callback etc. 
+
+`AsyncCallback` holds a wrapper for function that is invoked asynchronously when audio subsystem event occurs. It can be used for signalling user of audio subsystem about audio events.
+Possible events are listen in enum class audio::PlaybackEventType:
 ````
-enum class AudioEvents {
+enum class PlaybackEventType {
     EndOfFile,
     FileSystemNoSpace
 };
 ````
-is mainly used for signaling various events to the audio subsystem user. For now list of events is not very long but mechanism is here and it can be extended if needed.  
 
-API is quite straightforward, methods are self-explanatory hence I will not describe them thoroughly. What is worth noticing is:
-````
-enum class State {
-    Idle,
-    Playback,
-    Recording,
-    Routing,
-};
-````
-This structure describes all possible states in which audio subsystem can be. This states are directly related to this four methods:
+API methods are self-explanatory: 
 ```` 
-int32_t Start(Operation::Type op, const char *fileName="");
+int32_t Start(Operation::Type op, ...);
 
 int32_t Stop();
 
@@ -260,18 +248,28 @@ int32_t Pause();
 int32_t Resume();
 ````
 
-By invoking them user internally changes audio subsystem state therefore there are some assumptions and constraints:
+Invoking those APIs may change `State` of audio subsystem. Following 'States' are possible:
+````
+enum class State {
+    Idle,
+    Playback,
+    Recording,
+    Routing,
+};
+````
+
+User should be aware of following constraints:
 * It is possible to invoke `Start` from any state
 * It is possible to invoke `Stop` from any state
 * `Pause` can be invoked only when **not** in `Idle` state
 * `Resume` can be invoked only **after** successful `Pause` request.
-If user messes switching logic appropriate error code will be returned.  
+
+Failing to adhere will end in returning appropriate error.  
 
 
 ##### std::optional<Tags> GetFileTags(const char *filename);
 
-is used for fetching metadata of specified audio file. There are no constraints on using it, it can be invoked in any time.
-If file exists and its extension is supported Tags structure will be returned containing all necessary data about audio file.
+Fetches metadata of specified audio file. It can be invoked in any time. If file exists and is supported, audio meta tags structure will be returned.
 
 # Missing features
 #### Bluetooth audio device support
@@ -290,29 +288,5 @@ communication between audio subsystem and event system.
 #### Storing & loading profiles
 As described earlier dedicated async callback were added into each profile. It is to be considered if this mechanism is sufficient enough or should be reimplemented.
 Currently profiles configuration is not sustained and loaded upon start. It should be stored in DB.
-
-#### Control profile's parameters
-Currently there are four methods used for controlling profile's parameters, [Audio Class](./Audio/Audio.hpp)
-````
-int32_t SetOutputVolume(Volume vol);
-
-int32_t SetInputGain(Gain gain);
-
-Volume GetOutputVolume();
-
-Gain GetInputGain();
-````
-These methods are designed to operate on current Operation/Profile pair. What it means is that invoking them will only change parameters of currently used profile.  
-Another variant of this set should be developed which would allow for changing any profile's parameters.  
-For instance:
-````
-int32_t SetOutputVolume(Profile::Type profile, Volume vol);
-
-int32_t SetInputGain(Profile::Type profile,Gain gain);
-
-Volume GetOutputVolume(Profile::Type profile);
-
-Gain GetInputGain(Profile::Type profile);
-````
 
 Some missing features are also described in [TODO](./TODO)
