@@ -26,6 +26,12 @@ PhonebookModel::PhonebookModel(app::Application *app,
 
 auto PhonebookModel::requestRecordsCount() -> unsigned int
 {
+
+    auto dispMode = static_cast<ContactDisplayMode>(getDisplayMode());
+    if (dispMode == ContactDisplayMode::SortedByLetter) {
+        return letterMap.itemCount;
+    }
+
     auto [code, msg] = DBServiceAPI::GetQueryWithReply(
         application,
         db::Interface::Name::Contact,
@@ -53,7 +59,6 @@ void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
     query->setQueryListener(
         db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
-    lastRequestedOffset = offset;
 }
 
 auto PhonebookModel::requestLetterMap() -> ContactsMapData
@@ -117,7 +122,7 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
     auto item = new gui::PhonebookItem();
 
     item->setContact(contact);
-    item->setLabelMarkerDisplayMode(getLabelMarkerDisplayMode());
+    item->setLabelMarkerDisplayMode(getLabelMarkerDisplayMode(contact->contactPosOnList));
     item->activatedCallback = [this, item, contact](gui::Item &) {
         if (messagesSelectCallback && messagesSelectCallback(item)) {
             return true;
@@ -170,14 +175,9 @@ auto PhonebookModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     return this->updateRecords(std::move(records));
 }
 
-auto PhonebookModel::getLastRequestedOffset() -> std::uint32_t
+auto PhonebookModel::getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarkerDisplayMode
 {
-    return lastRequestedOffset;
-}
-
-auto PhonebookModel::getLabelMarkerDisplayMode() -> LabelMarkerDisplayMode
-{
-    if (getLastRequestedOffset() < letterMap.favouritesCount) {
+    if (posOnList < letterMap.favouritesCount) {
         return LabelMarkerDisplayMode::IncludeFavourites;
     }
     else {
