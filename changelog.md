@@ -11,6 +11,7 @@
 * `[settings]` Add basic display and keypad options window
 * `[messages]` Save a new message as a message draft, if not sent.
 * `[audio]` Enabled sounds priorities, looping and merging
+* `[renderer]` Add drawing circles and arcs functionality.
 
 ### Changed
 
