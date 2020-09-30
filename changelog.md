@@ -7,6 +7,7 @@
 * `[gui]` Dynamic Windows building and handling implemented
 * `[audio]` Added A2DP playback backend
 * `[audio]` Added SendEvent audio API
+* `[calculator]` Add calculator application.
 
 ### Fixed
 

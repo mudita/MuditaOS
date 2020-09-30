@@ -56,3 +56,6 @@
 [submodule "module-vfs/board/cross/freeRTOS_FAT"]
 	path = module-vfs/board/cross/freeRTOS_FAT
 	url = ../Lab-Project-FreeRTOS-FAT.git
+[submodule "module-utils/tinyexpr"]
+	path = module-utils/tinyexpr
+	url = https://github.com/codeplea/tinyexpr.git

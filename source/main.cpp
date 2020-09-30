@@ -14,6 +14,7 @@
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
+#include <application-calculator/ApplicationCalculator.hpp>
 
 // services
 #include <service-appmgr/ApplicationManager.hpp>
@@ -129,6 +130,9 @@ int main()
 #endif
 #ifdef ENABLE_APP_MEDITATION
         applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
+#endif
+#ifdef ENABLE_APP_CALCULATOR
+        applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
 #endif
 
         // start application manager
