@@ -26,7 +26,6 @@ namespace gui
     PinLockWindow::PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock)
         : PinLockBaseWindow(app, window_name, lock), this_window_name(window_name)
     {
-        makePinLockBox();
         buildInterface();
     }
 
@@ -43,6 +42,7 @@ namespace gui
     {
         AppWindow::buildInterface();
         PinLockBaseWindow::build();
+        makePinLockBox();
         LockBox->buildLockBox(lock.getPinSize());
     }
 
@@ -76,6 +76,7 @@ namespace gui
         else if (state == PinLock::State::Blocked) {
             LockBox->setVisibleStateBlocked();
         }
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
 
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -84,6 +85,7 @@ namespace gui
             lockTimeoutApplication = lockData->getPreviousApplication();
         }
         if (lock.unlock()) {
+            setVisibleState(PinLock::State::VerifiedPin);
             application->switchWindow(gui::name::window::main_window);
         }
         setVisibleState(lock.getState());
@@ -117,24 +119,19 @@ namespace gui
             if (state == PinLock::State::EnterPin) {
                 lock.popChar();
                 LockBox->popChar(lock.getCharCount());
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
                 return true;
             }
         }
         else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
-            if (state == PinLock::State::EnterPin) {
+            if (state == PinLock::State::EnterPin && lock.canPut()) {
                 LockBox->putChar(lock.getCharCount());
                 lock.putNextChar(gui::toNumeric(inputEvent.keyCode));
                 if (lock.getLockType() == PinLock::LockType::Screen) {
                     lock.verifyPin();
                 }
-
-                state = lock.getState();
-                if (state == PinLock::State::VerifiedPin) {
-                    LockBox->setVisibleStateVerifiedPin();
-                    application->switchWindow(gui::name::window::main_window);
+                else if (!lock.canPut()) {
+                    bottomBar->setActive(BottomBar::Side::CENTER, true);
                 }
-                application->switchWindow(this_window_name);
                 return true;
             }
         }
@@ -142,12 +139,13 @@ namespace gui
             if (state == PinLock::State::InvalidPin) {
                 lock.consumeInvalidPinState();
                 application->switchWindow(this_window_name);
-                return true;
             }
             else if (state == PinLock::State::EnterPin) {
                 lock.verifyPin();
             }
-            application->switchWindow(gui::name::window::main_window);
+            else if (state == PinLock::State::Blocked) {
+                application->switchWindow(gui::name::window::main_window);
+            }
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event

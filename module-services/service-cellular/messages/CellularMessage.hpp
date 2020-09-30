@@ -128,6 +128,57 @@ class CellularCallRequestMessage : public CellularMessage
     utils::PhoneNumber::View number;
 };
 
+class CellularSimMessage : public CellularMessage
+{
+  public:
+    enum class SimCard
+    {
+        SIM1,
+        SIM2
+    };
+
+    CellularSimMessage(SimCard sim) : CellularMessage(MessageType::CellularSimProcedure), sim(sim)
+    {}
+    virtual ~CellularSimMessage() = default;
+
+    SimCard sim;
+};
+
+class CellularSimResponseMessage : public CellularSimMessage
+{
+  public:
+    enum class SimState
+    {
+        SIMUnlocked,
+        PINRequired,
+        PINInvalidRetryPossible,
+        PUKRequired,
+        PUKInvalidRetryPossible,
+        SIMBlocked
+    };
+    CellularSimResponseMessage(SimCard sim,
+                               SimState state,
+                               const utils::PhoneNumber::View &number,
+                               unsigned int pinSize,
+                               unsigned int attemptsLeft = 0)
+        : CellularSimMessage(sim), state(state), number(number), pinSize(pinSize), attemptsLeft(attemptsLeft)
+    {}
+    SimState state;
+    utils::PhoneNumber::View number;
+    unsigned int pinSize;
+    /// ignored if state is not one of { PINInvalidRetryPossible, PUKInvalidRetryPossible }
+    unsigned int attemptsLeft;
+};
+
+class CellularSimVerifyPinRequestMessage : public CellularSimMessage
+{
+  public:
+    CellularSimVerifyPinRequestMessage(SimCard sim, std::vector<unsigned int> pinValue)
+        : CellularSimMessage(sim), pinValue(std::move(pinValue))
+    {}
+    std::vector<unsigned int> pinValue;
+};
+
 class CellularGetChannelMessage : public sys::DataMessage
 {
   public:

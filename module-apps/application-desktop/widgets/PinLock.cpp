@@ -1,8 +1,9 @@
 #include "PinLock.hpp"
-#include "application-desktop/ApplicationDesktop.hpp"
+#include "PinLockHandler.hpp"
+
 namespace gui
 {
-    PinLock::PinLock(app::ApplicationDesktop *app) : appDesktop(app)
+    PinLock::PinLock(gui::PinLockHandler *handler) : handler(handler)
     {}
 
     void PinLock::consumeInvalidPinState() noexcept
@@ -22,7 +23,7 @@ namespace gui
     void PinLock::verifyPin() noexcept
     {
         if (charCount == pinValue.size()) {
-            appDesktop->handlePin(pinValue);
+            handler->handle(pinValue);
             clearAttempt();
         }
     }
