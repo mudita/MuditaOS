@@ -12,6 +12,7 @@
 * `[messages]` Save a new message as a message draft, if not sent.
 * `[audio]` Enabled sounds priorities, looping and merging
 * `[renderer]` Add drawing circles and arcs functionality.
+* `[bluetooth]` Added scan and pairing support.
 
 ### Changed
 * `[special input]` Added emoji selector and changed special character selector.
