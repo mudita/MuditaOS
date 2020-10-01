@@ -79,7 +79,8 @@ Prior to setting up your environment, please run the following command: `cd conf
 
 If the script is run after a fresh `git clone` you need to update your git config (step 0 and 1).
 
-### `bootstrap.sh` steps:
+### `bootstrap.sh` steps, line by line
+
 * `./config/bootstrap.sh 0`  - install style checking scripts to be automatically run on commit
 * `./config/bootstrap.sh 1`  - `git blame` will ignore style changing commit
 * `./config/bootstrap.sh 2`  - list packages required for setting up the environment *which are currently not installed*
@@ -152,7 +153,7 @@ make -j                                                        # build
 ```
 ## Super dirty quickstart with unit tests
 
-After going through the Super dirty quickstart on Linux, run the following commands:
+After going through the Super dirty quickstart on Linux, run the following commands to build and run all unit tests:
 
 ```bash
 ./configure.sh linux debug
