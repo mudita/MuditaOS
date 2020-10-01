@@ -117,6 +117,15 @@ namespace style
             const inline uint32_t time_box_y_pos  = 285;
 
         } // namespace date
+        namespace ussd
+        {
+            constexpr uint32_t commonXPos = 40;
+            constexpr uint32_t commonYPos = 110;
+
+            constexpr uint32_t commonW      = 420;
+            constexpr uint32_t commonLabelH = 33;
+            constexpr uint32_t commonTextH  = 99;
+        } // namespace ussd
     }     // namespace settings
     namespace color
     {

@@ -12,7 +12,6 @@
 
 namespace gui
 {
-
     class UiTestWindow : public AppWindow
     {
       protected:

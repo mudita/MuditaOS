@@ -11,6 +11,7 @@
 #define PUREPHONE_SERVICECELLULAR_HPP
 
 #include "CellularCall.hpp"
+#include "USSD.hpp"
 #include "SMSRecord.hpp"
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
@@ -72,6 +73,7 @@ class ServiceCellular : public sys::Service
     // used for polling for call state
     uint32_t callStateTimerId = 0;
     uint32_t stateTimerId     = 0;
+    uint32_t ussdTimerId      = 0;
     void CallStateTimerHandler();
     DLC_channel::Callback_t notificationCallback = nullptr;
 
@@ -79,11 +81,13 @@ class ServiceCellular : public sys::Service
     bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
-    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::vector<uint8_t> &data);
+    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
 
     std::vector<std::string> messageParts;
 
     CellularCall::CellularCall ongoingCall;
+
+    ussd::State ussdState = ussd::State::none;
 
     /// one point of state change handling
     void change_state(cellular::StateChange *msg);
@@ -139,9 +143,16 @@ class ServiceCellular : public sys::Service
     void startStateTimer(uint32_t timeout);
     void stopStateTimer(void);
     void handleStateTimer(void);
+    void setUSSDTimer(void);
 
     // db response handlers
     auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
+
+    // ussd handlers
+    uint32_t ussdTimeout = 0;
+    bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
+    bool handleUSSDURC(void);
+    void handleUSSDTimer(void);
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP
