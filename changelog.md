@@ -3,6 +3,7 @@
 ## [Current release]
 
 ### Added
+* `[cellular]` Added USSD codes handling.
 * `[desktop][gui]` Added SIM and PUK lock-related windows
 * `[GUI]` Added rich text parsing for full text styling needs
 * `[calendar]` Add notifications from database handling.
@@ -10,9 +11,11 @@
 * `[settings]` Add basic display and keypad options window
 * `[messages]` Save a new message as a message draft, if not sent.
 * `[audio]` Enabled sounds priorities, looping and merging
+* `[renderer]` Add drawing circles and arcs functionality.
+* `[bluetooth]` Added scan and pairing support.
 
 ### Changed
-
+* `[special input]` Added emoji selector and changed special character selector.
 
 
 ### Fixed
@@ -20,7 +23,7 @@
 
 ### Other
 * `[audio]` Audio service and api cleanup/refactor.
-
+* `[system]` Improved destroying of worker threads.
 
 
 ## [0.39.1 2020-09-25]
@@ -35,6 +38,8 @@
 
 ### Changed
 
+* `[calendar]` Fixed custom repeat option.
+* `[antenna-app]` Added parameter history window.
 * `[phonenumber]` Change default country to unknown.
 * `[messages]` Save unsent messages as SMS drafts.
 * `[settings]` Update main screen.
@@ -59,11 +64,17 @@
 ### Added
 
 * `[music player]` Add layout for the playback window.
+* `[messages]` Save unsent messages as SMS drafts.
+
+### Fixed
+
+* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
 * `[build]` Move user data to SDRAM during linking.
 * `[build]` RT1051's linker script cleanup.
+* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.1 2020-09-18]
 
@@ -434,4 +445,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-

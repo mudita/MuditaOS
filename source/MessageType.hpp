@@ -111,6 +111,7 @@ enum class MessageType
     CellularGetNWINFO,
     CellularGetAntenna,
     CellularTransmitDtmfTones,
+    CellularUSSDRequest,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -138,6 +139,8 @@ enum class MessageType
     AudioRoutingSpeakerhone,
     AudioRoutingHeadset,
 
+    AudioSetInputGain,
+    AudioGetInputGain,
     AudioGetFileTags,
 
     // application manager
@@ -194,6 +197,7 @@ enum class MessageType
     BluetoothRequest,
     BluetoothScanResult,
     BluetoothAddrResult,
+    BluetoothPairResult,
 
     LwIP_request,
     EVM_GPIO,
@@ -223,6 +227,8 @@ enum class MessageType
     AntennaLockService,
     AntennaGetLockState,
     AntennaLockNotification,
+
+    Settings,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

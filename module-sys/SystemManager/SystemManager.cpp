@@ -89,7 +89,7 @@ namespace sys
         };
     }
 
-    void SystemManager::StartSystem(std::function<int()> init)
+    void SystemManager::StartSystem(InitFunction init)
     {
         LOG_FATAL("Initializing system...");
 

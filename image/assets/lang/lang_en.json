@@ -21,6 +21,8 @@
     "common_information": "Information",
     "common_check": "CHECK",
     "common_uncheck": "UNCHECK",
+    "common_emoji": "EMOJI",
+    "common_special_characters": "SPECIAL",
 
     "common_mo":"MO",
     "common_tu":"TU",
@@ -298,6 +300,9 @@
     "app_music_player_music_library": "MUSIC LIBRARY",
     "app_music_player_quit": "QUIT",
     "app_music_player_music_empty_window_notification": "Press Music Library to choose\n a song from the library",
+
+    "app_special_input_window": "Special characters",
+    "app_emoji_input_window": "Emoji",
 
     "sms_add_rec_num" : "Add recipient or type a number",
     "sms_title_message": "New message",

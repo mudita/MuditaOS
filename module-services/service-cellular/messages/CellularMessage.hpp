@@ -70,6 +70,7 @@ class CellularNotificationMessage : public CellularMessage
         RawCommand,               // send raw command to modem -> returns raw, tokenised result
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
+        NewIncomingUSSD           // modem received new ussd code from network
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -85,6 +86,23 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
+class CellularUSSDMessage : public CellularMessage
+{
+  public:
+    enum class RequestType
+    {
+        pullSesionRequest,
+        pushSesionRequest,
+        abortSesion
+    };
+    CellularUSSDMessage() = delete;
+    CellularUSSDMessage(RequestType requestType, const std::string &data = "")
+        : CellularMessage(MessageType::CellularUSSDRequest), type(requestType), data(data)
+    {}
+
+    RequestType type;
+    std::string data;
+};
 class CellularRequestMessage : public CellularMessage
 {
   public:
