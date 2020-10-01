@@ -36,10 +36,8 @@ namespace AudioServiceAPI
 
     Handle PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
     {
-        auto msg          = std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
-        msg->fileName = fileName;
-        msg->playbackType = playbackType;
-        auto ret          = SendAudioRequest(serv, msg);
+        auto msg = std::make_shared<AudioStartMessage>(fileName, playbackType);
+        auto ret = SendAudioRequest(serv, msg);
         return Handle(ret->retCode, ret->token);
     }
 

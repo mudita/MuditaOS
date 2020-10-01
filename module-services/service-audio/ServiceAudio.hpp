@@ -43,17 +43,27 @@ class ServiceAudio : public sys::Service
     static const char *serviceName;
 
   private:
+    enum class VibrationType
+    {
+        OneShot,
+        Continuous
+    };
+
     audio::AudioMux audioMux;
     auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
     auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
 
     template <typename... Args>
     std::unique_ptr<AudioResponseMessage> HandleStart(std::optional<audio::AudioMux::Input *> input,
-                                                      AudioRequestMessage *msg,
                                                       audio::Operation::Type opType,
                                                       Args... args);
     std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
     std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
+
+    void VibrationUpdate(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
+    void VibrationStop(const audio::Token &token);
+    auto GetVibrationType(const audio::PlaybackType &type) -> std::optional<VibrationType>;
+    audio::Token vibrationToken;
 
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;

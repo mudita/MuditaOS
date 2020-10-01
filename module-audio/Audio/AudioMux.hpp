@@ -86,7 +86,7 @@ namespace audio
         {
             return audioInputs;
         };
-        auto IncrementToken(std::optional<AudioMux::Input *> input) -> Token;
+        auto IncrementToken(std::optional<AudioMux::Input *> input = std::nullopt) -> const Token;
 
       private:
         auto GetPlaybackPriority(const std::optional<audio::PlaybackType> type) -> uint8_t;

@@ -79,6 +79,77 @@ constexpr bool ServiceAudio::ShouldLoop(const std::optional<audio::PlaybackType>
     return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone;
 }
 
+// below static methods will be replaced by final vibration API
+static void ExtVibrateOnce()
+{
+    LOG_ERROR("[Vibration] - Unimplemented - vibration one shot");
+}
+static void ExtVibrationStart()
+{
+    LOG_ERROR("[Vibration] - Unimplemented - vibration start");
+}
+static void ExtVibrationStop()
+{
+    LOG_ERROR("[Vibration] - Unimplemented - vibration stop");
+}
+// below static members will be replaced by accessors to DB entries
+static bool IsVibrationEnabled(const audio::PlaybackType &type)
+{
+    return true;
+}
+static bool IsPlaybackEnabled(const audio::PlaybackType &type)
+{
+    return true;
+}
+
+std::optional<ServiceAudio::VibrationType> ServiceAudio::GetVibrationType(const audio::PlaybackType &type)
+{
+    if (!IsVibrationEnabled(type)) {
+        return std::nullopt;
+    }
+
+    if (type == PlaybackType::CallRingtone) {
+        return VibrationType::Continuous;
+    }
+    else if (type == PlaybackType::Notifications || type == PlaybackType::TextMessageRingtone) {
+        return VibrationType::OneShot;
+    }
+    return std::nullopt;
+}
+
+void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp)
+{
+    auto vibType = GetVibrationType(type);
+    if (!vibType || vibrationToken.IsValid()) {
+        return;
+    }
+
+    if (vibType == VibrationType::OneShot) {
+        vibrationToken = Token();
+        ExtVibrateOnce();
+    }
+    else if (vibType == VibrationType::Continuous) {
+        if (resp && resp->token.IsValid()) {
+            // audio has started
+            vibrationToken = resp->token;
+        }
+        else {
+            // audio did not start but we still want vibration
+            vibrationToken = audioMux.IncrementToken();
+            resp           = std::make_unique<AudioResponseMessage>(RetCode::Success, Tags(), vibrationToken);
+        }
+        ExtVibrationStart();
+    }
+}
+
+void ServiceAudio::VibrationStop(const Token &token)
+{
+    if (vibrationToken.IsValid() && vibrationToken == token) {
+        ExtVibrationStop();
+        vibrationToken = Token();
+    }
+}
+
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioRequestMessage *> msg)
 {
 
@@ -121,7 +192,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<Au
 
 template <typename... Args>
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(std::optional<AudioMux::Input *> input,
-                                                                AudioRequestMessage *msg,
                                                                 Operation::Type opType,
                                                                 Args... args)
 {
@@ -190,14 +260,13 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(AudioStopMessage 
 
 sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-    std::shared_ptr<sys::ResponseMessage> responseMsg;
+    std::shared_ptr<AudioResponseMessage> responseMsg;
 
     auto msgType = static_cast<int>(msgl->messageType);
     LOG_DEBUG("msgType %d", msgType);
 
     if (auto *msg = dynamic_cast<AudioNotificationMessage *>(msgl)) {
         switch (msg->type) {
-
         case AudioNotificationMessage::Type::EndOfFile: {
             auto input = audioMux.GetInput(msg->token);
             if (input && ShouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
@@ -226,17 +295,19 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         responseMsg     = std::make_shared<AudioResponseMessage>(RetCode::Success);
     }
     else if (auto *msg = dynamic_cast<AudioStopMessage *>(msgl)) {
+        VibrationStop(msg->token);
         responseMsg = HandleStop(msg);
+    }
+    else if (auto *msg = dynamic_cast<AudioStartMessage *>(msgl)) {
+        if (IsPlaybackEnabled(msg->playbackType)) {
+            if (auto input = audioMux.GetPlaybackInput(msg->token, msg->playbackType)) {
+                responseMsg = HandleStart(input, Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
+            }
+        }
+        VibrationUpdate(msg->playbackType, responseMsg);
     }
     else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
         switch (msg->type) {
-        case MessageType::AudioPlaybackStart: {
-            if (auto input = audioMux.GetPlaybackInput(msg->token, msg->playbackType)) {
-                responseMsg =
-                    HandleStart(input, msg, Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
-            }
-        } break;
-
         case MessageType::AudioRecorderStart: {
             if (auto input = audioMux.GetRecordingInput()) {
                 responseMsg = std::make_shared<AudioResponseMessage>(
@@ -247,7 +318,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         case MessageType::AudioRoutingStart: {
             LOG_DEBUG("AudioRoutingStart");
             if (auto input = audioMux.GetRoutingInput(true)) {
-                responseMsg = HandleStart(input, msg, Operation::Type::Router);
+                responseMsg = HandleStart(input, Operation::Type::Router);
             }
         } break;
 
