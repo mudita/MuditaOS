@@ -7,7 +7,7 @@
 // TODO read from keymap file ...
 namespace gui
 {
-    inline const std::vector<char> special_chars = {'.', ',', '_', ':', ';', ')', '(', '?', '!', '/', '*', '+'};
+    inline const std::vector<char> special_chars = {'.', ',', '_', ':', ';', ')', '(', '?', '!', '/', '*', '+', '#'};
 }
 
 /// this element has one goal - nicely change input parsing which is done in application in it's widgets

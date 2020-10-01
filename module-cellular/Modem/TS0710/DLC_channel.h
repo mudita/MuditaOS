@@ -17,7 +17,7 @@
 class DLC_channel : public at::Chanel
 {
   public:
-    using Callback_t = std::function<void(std::vector<uint8_t> &data)>;
+    using Callback_t = std::function<void(std::string &data)>;
 
   private:
     std::string pv_name;
@@ -28,6 +28,8 @@ class DLC_channel : public at::Chanel
 
     std::string responseBuffer;
     bsp::Cellular *pv_cellular;
+
+    std::string part;
 
   public:
     // TS0710_DLC_ESTABL ctrlChanEstabl = TS0710_DLC_ESTABL(0);  //use default values to create control channel DLCI0
@@ -71,7 +73,7 @@ class DLC_channel : public at::Chanel
 
     int ParseInputData(std::vector<uint8_t> &data);
 
-    void callback(std::vector<uint8_t> &data)
+    void callback(std::string &data)
     {
         pv_callback(data);
     }

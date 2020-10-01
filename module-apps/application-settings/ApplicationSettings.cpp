@@ -18,6 +18,7 @@
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/USSDWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -40,7 +41,9 @@ namespace app
 
     ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound)
         : Application(name, parent, startBackgound)
-    {}
+    {
+        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+    }
 
     ApplicationSettings::~ApplicationSettings()
     {}
@@ -67,6 +70,22 @@ namespace app
         }
         // this variable defines whether message was processed.
         bool handled = true;
+
+        if (msgl->messageType == MessageType::CellularNotification) {
+            auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+            if (msg != nullptr) {
+                if (msg->type == CellularNotificationMessage::Type::NewIncomingUSSD) {
+
+                    auto window = this->getCurrentWindow();
+                    if (window->getName() == gui::window::name::ussd_window) {
+                        auto ussdWindow = dynamic_cast<gui::USSDWindow *>(window);
+                        if (ussdWindow != nullptr) {
+                            ussdWindow->handleIncomingUSSD(msg->data);
+                        }
+                    }
+                }
+            }
+        }
 
         if (handled)
             return std::make_shared<sys::ResponseMessage>();
@@ -137,6 +156,9 @@ namespace app
             window = new gui::CellularPassthroughWindow(this);
             windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
         }
+
+        window = new gui::USSDWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
     void ApplicationSettings::destroyUserInterface()
