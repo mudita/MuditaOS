@@ -19,6 +19,8 @@ namespace Bt
         auto scan() -> Error;
         void stop_scan();
         auto set_visibility(bool visibility) -> Error;
+        auto do_pairing(uint8_t *addr) -> bool;
+
         void setOwnerService(sys::Service *service);
     }; // namespace GAP
     namespace PAN
