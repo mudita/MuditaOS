@@ -184,5 +184,6 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
 }
 void BluetoothWorker::set_addr(uint8_t *addr)
 {
+    Bt::GAP::do_pairing(addr);
     LOG_INFO("ADDRESS %s SET!", bd_addr_to_str(addr));
 }
