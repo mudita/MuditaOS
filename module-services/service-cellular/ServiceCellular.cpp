@@ -867,8 +867,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto resp   = transmitDtmfTone(msg->getDigit());
         responseMsg = std::make_shared<CellularResponseMessage>(resp);
     } break;
-   case MessageType::CellularUSSDRequest: {
-        auto msg    = dynamic_cast<CellularUSSDMessage *>(msgl);
+    case MessageType::CellularUSSDRequest: {
+        auto msg = dynamic_cast<CellularUSSDMessage *>(msgl);
         if (msg != nullptr) {
             responseMsg = std::make_shared<CellularResponseMessage>(handleUSSDRequest(msg->type, msg->data));
         }
@@ -1708,8 +1708,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
 
             ussdState   = ussd::State::pushSesion;
             auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
-            if (result.code == at::Result::Code::OK) {
-            }
+            if (result.code == at::Result::Code::OK) {}
         }
         return true;
     }
