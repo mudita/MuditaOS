@@ -3,6 +3,7 @@
 ## [Current release]
 
 ### Added
+* `[desktop][gui]` Added app_desktop-sev_cellular messaging
 * `[desktop][gui]` Added SIM and PUK lock-related windows
 * `[GUI]` Added rich text parsing for full text styling needs
 * `[calendar]` Add notifications from database handling.

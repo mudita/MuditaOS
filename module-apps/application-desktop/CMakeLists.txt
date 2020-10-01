@@ -29,6 +29,7 @@ target_sources( ${PROJECT_NAME}
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinHash.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"

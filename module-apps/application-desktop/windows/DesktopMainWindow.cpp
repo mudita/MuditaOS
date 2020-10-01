@@ -128,10 +128,10 @@ namespace gui
                 return;
             }
 
-            auto *lockData          = reinterpret_cast<LockPhoneData *>(data);
+            auto *lockData          = dynamic_cast<LockPhoneData *>(data);
             lockTimeoutApplilcation = lockData->getPreviousApplication();
 
-            reinterpret_cast<app::ApplicationDesktop *>(application)->setSuspendFlag(true);
+            dynamic_cast<app::ApplicationDesktop *>(application)->setSuspendFlag(true);
         }
         setVisibleState();
     }

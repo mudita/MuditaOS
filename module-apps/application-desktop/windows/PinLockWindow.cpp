@@ -42,7 +42,7 @@ namespace gui
     {
         AppWindow::buildInterface();
         PinLockBaseWindow::build();
-        makePinLockBox();
+        buildPinLockBox();
         LockBox->buildLockBox(lock.getPinSize());
     }
 
@@ -152,7 +152,7 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    void PinLockWindow::makePinLockBox()
+    void PinLockWindow::buildPinLockBox()
     {
         auto lockType = lock.getLockType();
         if (lockType == PinLock::LockType::Screen) {

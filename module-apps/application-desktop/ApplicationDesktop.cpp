@@ -21,10 +21,9 @@ namespace app
 {
 
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent), lockHandler(this)
+        : Application(name, parent), lockHandler(this, settings)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
-        lockHandler.init(&settings);
     }
 
     ApplicationDesktop::~ApplicationDesktop()
@@ -38,7 +37,7 @@ namespace app
 
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
-        if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
+        if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
 
@@ -192,7 +191,7 @@ namespace app
         reloadSettings();
         requestNotReadNotifications();
         requestNotSeenNotifications();
-        lockHandler.init(&settings);
+        lockHandler.reloadScreenLock();
 
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);

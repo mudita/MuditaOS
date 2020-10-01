@@ -1,11 +1,18 @@
 #include "PinLockHandler.hpp"
+#include "PinHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include <service-cellular/ServiceCellular.hpp>
 
 namespace gui
 {
-    static const unsigned int default_screen_pin_size = 4;
-    static const unsigned int default_screen_attempts = 4;
+    constexpr unsigned int default_screen_pin_size = 4;
+    constexpr unsigned int default_screen_attempts = 4;
+
+    PinLockHandler::PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings)
+        : app(app), appSettings(settings), lock(this)
+    {
+        reloadScreenLock();
+    }
 
     auto PinLockHandler::handle(CellularSimResponseMessage *msg) -> bool
     {
@@ -14,7 +21,7 @@ namespace gui
         parseSimCard(msg);
         parseSimState(msg);
         parseAttemptsAndPinSize(msg);
-        lock.additionalLockInfo[gui::PinLock::InfoName::PhoneNum] = msg->number.getFormatted();
+        lock.additionalLockInfo[gui::PinLock::InfoName::PhoneNum] = msg->getPhoneNumber().getFormatted();
 
         app->getWindow(app::window::name::desktop_pin_lock)->rebuild();
         app->switchWindow(gui::name::window::main_window);
@@ -33,7 +40,8 @@ namespace gui
 
     void PinLockHandler::parseSimState(CellularSimResponseMessage *msg)
     {
-        switch (msg->state) {
+        assert(msg);
+        switch (msg->getSimState()) {
         case CellularSimResponseMessage::SimState::SIMUnlocked:
             lock.type  = gui::PinLock::LockType::Screen;
             lock.state = gui::PinLock::State::EnterPin;
@@ -63,7 +71,8 @@ namespace gui
 
     void PinLockHandler::parseSimCard(CellularSimResponseMessage *msg)
     {
-        switch (msg->sim) {
+        assert(msg);
+        switch (msg->getSimCard()) {
         case CellularSimMessage::SimCard::SIM1:
             lock.additionalLockInfo[gui::PinLock::InfoName::LockName] = "SIM1";
             break;
@@ -75,24 +84,22 @@ namespace gui
 
     void PinLockHandler::parseAttemptsAndPinSize(CellularSimResponseMessage *msg)
     {
-        if (msg->state == CellularSimResponseMessage::SimState::SIMUnlocked) {
+        if (msg->getSimState() == CellularSimResponseMessage::SimState::SIMUnlocked) {
             reloadScreenLock();
         }
         else {
-            lock.pinValue          = std::vector<unsigned int>(msg->pinSize, 0);
-            lock.remainingAttempts = msg->attemptsLeft;
+            lock.pinValue          = std::vector<unsigned int>(msg->getPinSize(), 0);
+            lock.remainingAttempts = msg->getAttemptsLeft();
         }
     }
 
     void PinLockHandler::handleScreenPin(const std::vector<unsigned int> &pin)
     {
         if (lock.remainingAttempts > 0) {
-            uint32_t hash = 0;
-            for (auto i : pin) {
-                hash = 10 * hash + i;
-            }
+            std::hash<std::vector<unsigned int>> hashEngine;
+            uint32_t hash = hashEngine(pin);
             lock.remainingAttempts--;
-            if (hash == appSettings->lockPassHash) {
+            if (hash == appSettings.lockPassHash) {
                 lock.remainingAttempts = default_screen_attempts;
                 lock.state             = gui::PinLock::State::VerifiedPin;
             }
@@ -119,13 +126,9 @@ namespace gui
         lock.type  = gui::PinLock::LockType::Screen;
         lock.state = gui::PinLock::State::EnterPin;
 
-        unsigned int pinSize   = appSettings->lockPassHash == 0 ? 0 : default_screen_pin_size;
+        unsigned int pinSize   = appSettings.lockPassHash == 0 ? 0 : default_screen_pin_size;
         lock.pinValue          = std::vector<unsigned int>(pinSize, 0);
         lock.remainingAttempts = default_screen_attempts;
     }
-    void PinLockHandler::init(SettingsRecord *settings)
-    {
-        appSettings = settings;
-        reloadScreenLock();
-    }
+
 } // namespace gui
