@@ -6,6 +6,7 @@ add_catch2_executable(
                 main.cpp
                 test-service-db-api.cpp
                 test-service-db-settings-messages.cpp
+                test-service-db-settings-api.cpp
         LIBS
                 module-services
 )
