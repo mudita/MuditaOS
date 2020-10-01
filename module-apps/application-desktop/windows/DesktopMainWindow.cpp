@@ -201,9 +201,15 @@ namespace gui
                 return true;
             }
         }
-        enter_cache.storeEnter(inputEvent);
+        else if (enter_cache.storeEnter(inputEvent)) {
+            return true;
+        }
         // check if any of the lower inheritance onInput methods catch the event
-        return AppWindow::onInput(inputEvent);
+        else if (AppWindow::onInput(inputEvent)) {
+            return true;
+        }
+        application->switchWindow(app::window::name::desktop_locked);
+        return true;
     }
 
     bool DesktopMainWindow::onInput(const InputEvent &inputEvent)

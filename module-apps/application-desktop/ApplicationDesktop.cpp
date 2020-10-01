@@ -5,6 +5,7 @@
 #include "windows/MenuWindow.hpp"
 #include "windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
+#include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 
 #include <service-db/api/DBServiceAPI.hpp>
@@ -212,6 +213,7 @@ namespace app
                                                                 new gui::PinLockWindow(this, desktop_pin_lock, lock)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_menu, new gui::MenuWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_poweroff, new gui::PowerOffWindow(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_locked, new gui::LockedInfoWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_reboot, new gui::RebootWindow(this)));
     }
 
