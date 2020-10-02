@@ -5,6 +5,7 @@
 ### Added
 
 * `[gui]` Added GUI timers capability
+* `[fonts]` Added multiplication and division sign to the font files 
 
 ### Changed
 * `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
