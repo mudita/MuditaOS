@@ -46,7 +46,7 @@ class ServiceAntenna : public sys::Service
     utils::state::State<antenna::State> *state;
     bool HandleStateChange(antenna::State state);
 
-    uint32_t timerID = 0;
+    std::unique_ptr<sys::Timer> timer;
 
     bsp::cellular::antenna currentAntenna;
     uint32_t lastCsq    = 0;
@@ -74,8 +74,6 @@ class ServiceAntenna : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-
-    void TickHandler(uint32_t id) override;
 
     void storeCurrentState(void);
 

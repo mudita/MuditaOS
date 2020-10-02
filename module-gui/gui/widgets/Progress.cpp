@@ -6,6 +6,7 @@
  */
 
 #include "Progress.hpp"
+#include "DrawCommand.hpp"
 
 namespace gui
 {

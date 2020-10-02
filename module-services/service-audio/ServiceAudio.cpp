@@ -67,8 +67,6 @@ sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMod
     return sys::ReturnCodes::Success;
 }
 
-void ServiceAudio::TickHandler(uint32_t id)
-{}
 
 constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 {

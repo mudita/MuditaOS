@@ -1,30 +1,20 @@
-/*
- * Mailbox.hpp
- *
- *  Created on: Mar 7, 2019
- *      Author: mati
- */
-
-#ifndef SYSTEMMANAGER_MAILBOX_HPP_
-#define SYSTEMMANAGER_MAILBOX_HPP_
+#pragma once
 
 #include <deque>
 #include "thread.hpp"
 #include <mutex.hpp>
 #include <condition_variable.hpp>
 
-using namespace cpp_freertos;
-
 template <typename T> class Mailbox
 {
   public:
-    Mailbox(Thread *thread) : thread_(thread)
+    Mailbox(cpp_freertos::Thread *thread) : thread_(thread)
     {}
 
     T peek()
     {
 
-        LockGuard mlock(mutex_);
+        cpp_freertos::LockGuard mlock(mutex_);
         while (queue_.empty()) {
             thread_->Wait(cond_, mutex_);
         }
@@ -35,7 +25,7 @@ template <typename T> class Mailbox
     T pop(uint32_t timeout = portMAX_DELAY)
     {
 
-        LockGuard mlock(mutex_);
+        cpp_freertos::LockGuard mlock(mutex_);
         while (queue_.empty()) {
             if (thread_->Wait(cond_, mutex_, timeout) == false) {
                 return nullptr;
@@ -48,7 +38,7 @@ template <typename T> class Mailbox
 
     void pop(T &item)
     {
-        LockGuard mlock(mutex_);
+        cpp_freertos::LockGuard mlock(mutex_);
         while (queue_.empty()) {
             thread_->Wait(cond_, mutex_);
         }
@@ -80,10 +70,8 @@ template <typename T> class Mailbox
     }
 
   private:
-    Thread *thread_;
+    cpp_freertos::Thread *thread_;
     std::deque<T> queue_;
-    MutexStandard mutex_;
-    ConditionVariable cond_;
+    cpp_freertos::MutexStandard mutex_;
+    cpp_freertos::ConditionVariable cond_;
 };
-
-#endif /* SYSTEMMANAGER_MAILBOX_HPP_ */

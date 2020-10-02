@@ -5,6 +5,7 @@
 #include <Service/Message.hpp>
 
 #include <functional>
+#include <module-sys/Service/Bus.hpp>
 
 namespace Settings
 {

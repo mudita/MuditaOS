@@ -31,12 +31,9 @@ class ServiceCellular : public sys::Service
   public:
     ServiceCellular();
 
-    ~ServiceCellular();
+    ~ServiceCellular() override;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
-
-    // Invoked when timer ticked
-    void TickHandler(uint32_t id) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
@@ -71,9 +68,9 @@ class ServiceCellular : public sys::Service
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
     // used for polling for call state
-    uint32_t callStateTimerId = 0;
-    uint32_t stateTimerId     = 0;
-    uint32_t ussdTimerId      = 0;
+    std::unique_ptr<sys::Timer> callStateTimer;
+    std::unique_ptr<sys::Timer> stateTimer;
+    std::unique_ptr<sys::Timer> ussdTimer;
     void CallStateTimerHandler();
     DLC_channel::Callback_t notificationCallback = nullptr;
 

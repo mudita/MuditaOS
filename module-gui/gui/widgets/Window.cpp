@@ -6,10 +6,11 @@
  */
 #include <algorithm>
 // gui
-#include "../core/BoundingBox.hpp"
 #include "../Common.hpp"
-#include "Window.hpp"
+#include "../core/BoundingBox.hpp"
 #include "../core/DrawCommand.hpp"
+#include "Window.hpp"
+#include <InputEvent.hpp>
 
 namespace gui
 {

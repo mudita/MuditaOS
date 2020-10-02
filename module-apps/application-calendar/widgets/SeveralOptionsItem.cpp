@@ -1,4 +1,5 @@
 #include "SeveralOptionsItem.hpp"
+#include "InputEvent.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"

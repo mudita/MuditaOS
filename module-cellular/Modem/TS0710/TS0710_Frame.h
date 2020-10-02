@@ -10,8 +10,6 @@
 #define TS0710_FLAG          0xF9
 #define TS0710_FRAME_HDR_LEN 6 // without extended address byte
 
-using namespace std;
-
 class TS0710_Frame
 {
   private:

@@ -4,6 +4,7 @@
 #include "application-phonebook/models/PhonebookModel.hpp"
 #include "application-phonebook/widgets/PhonebookListView.hpp"
 
+#include <AppWindow.hpp>
 #include <Text.hpp>
 
 namespace gui
