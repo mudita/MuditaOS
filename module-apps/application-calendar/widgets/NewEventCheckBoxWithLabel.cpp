@@ -1,4 +1,5 @@
 #include "NewEventCheckBoxWithLabel.hpp"
+#include "AppWindow.hpp"
 
 namespace gui
 {

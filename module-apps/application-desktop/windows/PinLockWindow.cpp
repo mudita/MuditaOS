@@ -7,6 +7,7 @@
  * @details
  */
 // application manager
+#include "InputEvent.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 // module-gui

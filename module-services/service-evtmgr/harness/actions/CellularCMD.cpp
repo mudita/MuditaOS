@@ -1,4 +1,5 @@
 #include "CellularCMD.hpp"
+#include <Service/Bus.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 

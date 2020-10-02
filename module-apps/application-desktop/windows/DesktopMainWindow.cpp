@@ -8,12 +8,13 @@
  */
 #include <memory>
 
+#include "Alignment.hpp"
+#include "BottomBar.hpp"
+#include "Common.hpp"
+#include "DesktopMainWindow.hpp"
+#include "GuiTimer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/data/LockPhoneData.hpp"
-#include "Alignment.hpp"
-#include "Common.hpp"
-#include "BottomBar.hpp"
-#include "DesktopMainWindow.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"

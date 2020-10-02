@@ -2,6 +2,7 @@
 
 #include "Application.hpp"
 #include "Service/Message.hpp"
+#include "Service/Timer.hpp"
 #include "SystemManager/SystemManager.hpp"
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <time/time_conversion.hpp>
@@ -33,15 +34,14 @@ namespace app
       protected:
         audio::Handle routingAudioHandle;
         audio::Handle callringAudioHandle;
-        AppTimer timerCall;
+        std::unique_ptr<sys::Timer> timerCall;
         utils::time::Timestamp callStartTime = 0;
         utils::time::Duration callDuration;
-        utils::time::Timestamp callDelayedStopTime = 0;
+        sys::ms callDelayedStopTime = 3000;
         void timerCallCallback();
 
       public:
         ApplicationCall(std::string name = name_call, std::string parent = "", bool startBackgound = false);
-        ~ApplicationCall() override = default;
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -64,7 +64,10 @@ namespace app
         void handleAddContactEvent(const std::string &number);
 
         bool showNotification(std::function<bool()> action);
-
         void transmitDtmfTone(uint32_t digit);
+        auto getDelayedStopTime() const
+        {
+            return callDelayedStopTime;
+        }
     };
 } /* namespace app */

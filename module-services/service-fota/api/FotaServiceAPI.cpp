@@ -42,7 +42,7 @@ namespace FotaService
         sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
     }
 
-    void API::FotaStart(sys::Service *serv, const string &url)
+    void API::FotaStart(sys::Service *serv, const std::string &url)
     {
         LOG_DEBUG("Fota Star: %s", url.c_str());
         std::shared_ptr<FotaService::FOTAStart> msg = std::make_shared<FotaService::FOTAStart>();
@@ -52,7 +52,7 @@ namespace FotaService
         sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
     }
 
-    void API::sendRawProgress(sys::Service *serv, const string &rawQind)
+    void API::sendRawProgress(sys::Service *serv, const std::string &rawQind)
     {
         LOG_DEBUG("Fota sending Raw progress");
         std::shared_ptr<FotaService::FOTARawProgress> msg = std::make_shared<FotaService::FOTARawProgress>();

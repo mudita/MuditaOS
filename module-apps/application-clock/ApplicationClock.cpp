@@ -8,6 +8,7 @@
  */
 
 // module-gui
+#include "Service/Timer.hpp"
 #include "gui/widgets/Window.hpp"
 
 // module-utils
@@ -29,10 +30,11 @@ namespace app
                                        std::string parent,
                                        uint32_t stackDepth,
                                        sys::ServicePriority priority)
-        : Application(name, parent, false, stackDepth, priority),
-          timerClock(CreateAppTimer(1000, true, [=]() { timerClockCallback(); }))
+        : Application(name, parent, false, stackDepth, priority)
     {
-        timerClock.restart();
+        timerClock = std::make_unique<sys::Timer>("Clock", this, 1000);
+        timerClock->connect([&](sys::Timer &) { timerClockCallback(); });
+        timerClock->start();
     }
 
     void ApplicationClock::timerClockCallback()
@@ -81,7 +83,7 @@ namespace app
 
     sys::ReturnCodes ApplicationClock::DeinitHandler()
     {
-        DeleteTimer(timerClock);
+        timerClock->stop();
         return sys::ReturnCodes::Success;
     }
 

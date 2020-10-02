@@ -1,12 +1,14 @@
+#include "Service/Timer.hpp"
 #include "api/FotaServiceAPI.hpp"
 
 #include "ServiceFota.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 
+#include <Service/Bus.hpp>
+#include <module-cellular/Modem/TS0710/TS0710.h>
 #include <module-cellular/at/Result.hpp>
 #include <module-cellular/at/URC_QIND.hpp>
-#include <module-cellular/Modem/TS0710/TS0710.h>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 
 #include "MessageType.hpp"
@@ -39,7 +41,12 @@ namespace FotaService
         busChannels.push_back(sys::BusChannels::ServiceFotaNotifications);
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 
-        connectionTimer = CreateTimer(defaultTimer, true);
+        connectionTimer = std::make_unique<sys::Timer>("Fota", this, defaultTimer);
+        connectionTimer->connect([&](sys::Timer &) {
+            std::shared_ptr<InternetRequestMessage> msg =
+                std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
+            sys::Bus::SendUnicast(msg, Service::serviceName, this);
+        });
         registerMessageHandlers();
     }
 
@@ -48,16 +55,6 @@ namespace FotaService
         LOG_INFO("[ServiceFota] Cleaning resources");
     }
 
-    // Invoked when timer ticked
-    void Service::TickHandler(uint32_t /*id*/)
-    {
-        std::shared_ptr<InternetRequestMessage> msg =
-            std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
-
-        sys::Bus::SendUnicast(msg, Service::serviceName, this);
-    }
-
-    // Invoked during initialization
     sys::ReturnCodes Service::InitHandler()
     {
         return sys::ReturnCodes::Success;
@@ -312,7 +309,7 @@ namespace FotaService
                     const std::string QICSGP_prefix("+QICSGP:");
                     for (auto &line : data.response) {
                         if (line.find(QICSGP_prefix) != std::string::npos) {
-                            istringstream raw_data(line.substr(QICSGP_prefix.size()));
+                            std::istringstream raw_data(line.substr(QICSGP_prefix.size()));
                             std::vector<std::string> data;
                             std::string subitem;
                             while (std::getline(raw_data, subitem, ',')) {
@@ -377,7 +374,7 @@ namespace FotaService
             if (line.find(QIACT_prefix) != std::string::npos) {
                 APN::Config apnConfig;
                 std::vector<std::string> data;
-                istringstream raw_data(line.substr(QIACT_prefix.size()));
+                std::istringstream raw_data(line.substr(QIACT_prefix.size()));
                 std::string subItem;
                 while (std::getline(raw_data, subItem, ',')) {
                     LOG_DEBUG("QIACT-: %s", subItem.c_str());
@@ -417,36 +414,36 @@ namespace FotaService
         std::transform(url.begin(), url.end(), url.begin(), [](unsigned char chr) { return std::tolower(chr); });
     }
 
-    string Service::prepareQIACT(unsigned char contextId)
+    std::string Service::prepareQIACT(unsigned char contextId)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QIACT=" << static_cast<int>(contextId) << "\r";
         return cmd.str();
     }
 
     std::string Service::prepareQICSGPcmd(const APN::Config &apn)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId) << "," << static_cast<int>(apn.type) << ",\"" << apn.apn
             << "\",\"" << apn.username << "\",\"" << apn.password << "\"," << static_cast<int>(apn.authMethod) << "\r";
         return cmd.str();
     }
 
-    string Service::prepareQICSGPquery(const APN::Config &apn)
+    std::string Service::prepareQICSGPquery(const APN::Config &apn)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId) << "\r";
         return cmd.str();
     }
 
-    string Service::prepareQIDEACT(unsigned char contextId)
+    std::string Service::prepareQIDEACT(unsigned char contextId)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QIDEACT=" << static_cast<int>(contextId) << "\r";
         return cmd.str();
     }
 
-    string Service::prepareQFOTADLcmd(const string &url)
+    std::string Service::prepareQFOTADLcmd(const std::string &url)
     {
         std::string fotaCmd("AT+QFOTADL=\"");
         fotaCmd += url;
@@ -454,23 +451,23 @@ namespace FotaService
         return fotaCmd;
     }
 
-    string Service::prepareQHTTPGET(unsigned int timeout)
+    std::string Service::prepareQHTTPGET(unsigned int timeout)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QHTTPGET=" << timeout << "\r";
         return cmd.str();
     }
 
-    string Service::prepareQHTTPREAD(unsigned int timeout)
+    std::string Service::prepareQHTTPREAD(unsigned int timeout)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QHTTPREAD=" << timeout << "\r";
         return cmd.str();
     }
 
-    string Service::prepareQHTTPURL(const string &url)
+    std::string Service::prepareQHTTPURL(const std::string &url)
     {
-        ostringstream cmd;
+        std::ostringstream cmd;
         cmd << "AT+QHTTPURL=" << url.size() << "\r";
         return cmd.str();
     }
@@ -488,7 +485,7 @@ namespace FotaService
         }
     }
 
-    bool Service::openURL(const string &url)
+    bool Service::openURL(const std::string &url)
     {
         auto response = dataChannel->cmd(prepareQHTTPURL(url));
         if (response.response[0] == "CONNECT") {
@@ -511,7 +508,7 @@ namespace FotaService
         return result;
     }
 
-    at::Result Service::sendAndLogError(const string &msg, uint32_t timeout) const
+    at::Result Service::sendAndLogError(const std::string &msg, uint32_t timeout) const
     {
         at::Result result = dataChannel->cmd(msg, timeout);
         logIfError(result, msg);
@@ -538,7 +535,7 @@ namespace FotaService
             Body
         } part;
         part = HTTPResponsePart::URC;
-        std::vector<string> headers;
+        std::vector<std::string> headers;
         std::string body;
         std::string line;
         while (std::getline(input, line, '\n')) {
@@ -574,7 +571,7 @@ namespace FotaService
         sys::Bus::SendUnicast(msg, receiverServiceName, this);
     }
 
-    void Service::parseQIND(const string &message)
+    void Service::parseQIND(const std::string &message)
     {
         auto qind = at::urc::QIND(message);
         if (qind.is()) {
@@ -611,16 +608,16 @@ namespace FotaService
         }
     }
 
-    void Service::sendProgress(unsigned int progress, const string &receiver)
+    void Service::sendProgress(unsigned int progress, const std::string &receiver)
     {
         auto progressMsg      = std::make_shared<FOTAProgres>();
         progressMsg->progress = progress;
         sys::Bus::SendUnicast(progressMsg, receiver, this);
     }
 
-    void Service::sendFotaFinshed(const string &receiver)
+    void Service::sendFotaFinshed(const std::string &receiver)
     {
-        auto msg = make_shared<FOTAFinished>();
+        auto msg = std::make_shared<FOTAFinished>();
         sys::Bus::SendUnicast(std::move(msg), receiver, this);
     }
 

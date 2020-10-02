@@ -10,7 +10,7 @@ namespace app
 
     class ApplicationClock : public Application
     {
-        AppTimer timerClock;
+        std::unique_ptr<sys::Timer> timerClock;
         void timerClockCallback();
 
       public:

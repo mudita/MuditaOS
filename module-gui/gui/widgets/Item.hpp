@@ -1,24 +1,35 @@
 #pragma once
 
-#include <vector>
-#include <list>
-#include <functional>
-
-#include "KeyEvent.hpp"
-#include "Common.hpp"
-#include "core/DrawCommand.hpp"
-#include "core/BoundingBox.hpp"
-#include "input/InputEvent.hpp"
-#include "Layout.hpp"
-#include "Navigation.hpp"
-#include "Margins.hpp"
-#include "Alignment.hpp"
+#include "Alignment.hpp"        // for Alignment
+#include "Axes.hpp"             // for Axis
+#include "Common.hpp"           // for NavigationDirection, Size
+#include "Layout.hpp"           // for LayoutHorizontalPolicy, LayoutVertic...
+#include "Margins.hpp"          // for Padding, Margins
+#include "core/BoundingBox.hpp" // for BoundingBox, BoundingBox::(anonymous)
+#include <cstdint>              // for uint32_t, int32_t, uint16_t
+#include <functional>           // for function
+#include <list>                 // for list
+#include <memory>               // for unique_ptr
+#include <utility>              // for move
+namespace gui
+{
+    class DrawCommand;
+}
+namespace gui
+{
+    class InputEvent;
+}
+namespace gui
+{
+    class Navigation;
+} // namespace gui
+namespace gui
+{
+    class Timer;
+}
 
 namespace gui
 {
-
-    class Navigation;
-
     enum class ItemType
     {
         ITEM = 0,
@@ -38,6 +49,10 @@ namespace gui
 
     class Item
     {
+      private:
+        /// list of timers so that item could have it's timers in itself
+        std::list<std::unique_ptr<Timer>> timers;
+
       public:
         // flag that informs whether item has a focus
         bool focus;
@@ -124,6 +139,14 @@ namespace gui
         /// @param `this` item
         /// @param `InputEvent`
         std::function<bool(Item &, const InputEvent &inputEvent)> inputCallback;
+        /// callback when element insides are changed
+        /// @param `this` item
+        std::function<bool(Item &)> contentCallback;
+        /// callback when timer is called on Item and onTimer is executed
+        /// @param `this` item
+        /// @param `timer` which triggered this callback
+        std::function<bool(Item &, Timer &)> timerCallback = nullptr;
+
         /// callback on navigation, called when item passes navigation to handle by it's children
         /// @attention when child handles navigation it should return true, so that parent won't perform action for that
         std::function<bool(const InputEvent &)> itemNavigation = nullptr;
@@ -160,6 +183,13 @@ namespace gui
         /// calls: none, inconsistent api
         /// @note TODO should be fixed so that api would be consistent
         virtual bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
+        /// (should be) called each time content in item was changed, added for gui::Text widget
+        /// calls: none, inconsistent behaviour
+        /// @note TODO should be fixed so that api would be consistent
+        virtual bool onContent();
+        /// called on Timer event in application, triggeres timerCallback
+        /// @param timer timer element which triggered this action
+        virtual bool onTimer(Timer &timer);
 
         /// @}
 
@@ -303,6 +333,17 @@ namespace gui
             return this->widgetArea.size(axis) + this->widgetArea.pos(axis);
         };
         /// @}
+
+        /// adds timer to gui item
+        /// this is needed so that timer for element would live as long as element lives
+        void attachTimer(std::unique_ptr<Timer> &&timer)
+        {
+            timers.emplace_back(std::move(timer));
+        }
+
+        /// remove timer from item and as a result - destory it
+        void detachTimer(Timer &timer);
+
       protected:
         /// On change of position or size this method will recalculate visible part of the widget
         /// considering widgets hierarchy and calculate absolute position of drawing primitives.

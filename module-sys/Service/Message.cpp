@@ -46,6 +46,10 @@ namespace sys
             service->CloseHandler();
             break;
 
+        case SystemMessageType::Timer:
+            ret = service->TimerHandle(*this);
+            break;
+
         case SystemMessageType::Start:
             ret = service->InitHandler();
             if (ret == ReturnCodes::Success) {

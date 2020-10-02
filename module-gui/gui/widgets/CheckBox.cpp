@@ -1,4 +1,5 @@
 #include "CheckBox.hpp"
+#include "InputEvent.hpp"
 #include "Style.hpp"
 #include "Utils.hpp"
 

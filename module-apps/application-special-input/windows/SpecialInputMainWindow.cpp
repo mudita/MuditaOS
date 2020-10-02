@@ -3,6 +3,7 @@
 #include "Style.hpp"
 #include "messages/AppMessage.hpp"
 #include <i18/i18.hpp>
+#include <cassert>
 
 using namespace gui;
 
