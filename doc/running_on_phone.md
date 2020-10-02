@@ -1,4 +1,4 @@
-# Running MuditaOS on the phone
+# Running MuditaOS on the Mudita Pure phone
 
 The Mudita Pure phone (RT1051 target platform) has and eMMC storage of 16GB.
 
@@ -39,7 +39,7 @@ You need to upload the `boot.bin` file and then:
 
 ## How to mount Mudita Pure as a USB MSC
 
-There are two ways to mount the phone as USB MSC - using a bootloader or Ozone debugger.
+There are two ways to mount the phone as a USB MSC - using a bootloader or Ozone debugger.
 
 ### Mountin using a bootloader
 
@@ -54,5 +54,3 @@ If you have a bootloader flashed and working use the following key combination, 
 ### Ozone
 
 If you don't have a bootloader, you can temporarily load a binary that will make the phone appear as a USB MSC. From there you can flash the eMMC as described [above](#Upload-to-eMMC).
-
-Details can be found here: [D1_eMMC_FlashLoader](https://github.com/muditacom/D1_eMMC_FlashLoader) 
