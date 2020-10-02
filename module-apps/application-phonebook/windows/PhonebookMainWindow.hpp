@@ -24,7 +24,7 @@ namespace gui
         Image *searchImage     = nullptr;
         bool enableNewContact  = true;
         bool requestedSearch   = false;
-        InputMode *inputMode   = nullptr;
+        std::unique_ptr<InputMode> inputMode;
         gui::KeyInputMappedTranslation translator;
 
       public:
