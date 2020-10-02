@@ -3,6 +3,7 @@
 ## [Current release]
 
 ### Added
+* `[desktop][gui]` Added app_desktop-sev_cellular messaging
 * `[cellular]` Added USSD codes handling.
 * `[desktop][gui]` Added SIM and PUK lock-related windows
 * `[GUI]` Added rich text parsing for full text styling needs
@@ -445,3 +446,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+
