@@ -74,8 +74,8 @@ namespace gui
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         auto app  = application;
-        inputMode = new InputMode(
-            {InputMode::ABC, InputMode::abc},
+        inputMode = std::make_unique<InputMode>(
+            std::list<InputMode::Mode>{InputMode::ABC, InputMode::abc},
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
             [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
@@ -114,7 +114,7 @@ namespace gui
 
     void PhonebookMainWindow::HandleFilteringByLetter(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.key, inputMode != nullptr ? inputMode->get() : "");
+        auto code = translator.handle(inputEvent.key, inputMode ? inputMode->get() : "");
         if (code != KeyProfile::none_key) {
             LOG_INFO("char=' %c'", static_cast<char>(code));
             char letter = static_cast<char>(code);
