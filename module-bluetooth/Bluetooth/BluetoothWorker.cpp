@@ -2,13 +2,18 @@
 #include "log/log.hpp"
 #include "BtCommand.hpp"
 
+extern "C"
+{
+#include "module-bluetooth/lib/btstack/src/btstack_util.h"
+};
+
 using namespace bsp;
 
 const char *c_str(Bt::Error::Code code)
 {
     switch (code) {
-    case Bt::Error::Code::Succes:
-        return "Succes";
+    case Bt::Error::Code::Success:
+        return "Success";
     case Bt::Error::Code::NotReady:
         return "NotReady";
     case Bt::Error::Code::SystemError:
@@ -49,7 +54,7 @@ bool BluetoothWorker::run()
         std::string name = "PurePhone";
         Bt::set_name(name);
         // set local namne
-        // set discoverable (on)
+        Bt::GAP::set_visibility(true);
         // Bt::GAP::
         Bt::run_stack(&this->bt_worker_task);
         return true;
@@ -62,21 +67,29 @@ bool BluetoothWorker::run()
 bool BluetoothWorker::scan()
 {
     std::vector<Device> empty;
-
+    Bt::GAP::setOwnerService(service);
     auto ret = Bt::GAP::scan();
-    if (ret.err != Bt::Error::Succes) {
+    if (ret.err != Bt::Error::Success) {
         LOG_ERROR("Cant start scan!: %s %" PRIu32 "", c_str(ret.err), ret.lib_code);
         return false;
     }
     else {
         LOG_INFO("Scan started!");
+        // open new scan window
         return true;
     }
 }
 
+void BluetoothWorker::stop_scan()
+{
+    Bt::GAP::stop_scan();
+}
+
 bool BluetoothWorker::set_visible()
 {
-    LOG_ERROR("TODO");
+    static bool visibility = true;
+    Bt::GAP::set_visibility(visibility);
+    visibility = !visibility;
 
     return false;
 }
@@ -85,7 +98,7 @@ bool BluetoothWorker::start_pan()
 {
     Bt::PAN::bnep_setup();
     auto err = Bt::PAN::bnep_start();
-    if (err.err != Bt::Error::Succes) {
+    if (err.err != Bt::Error::Success) {
         LOG_ERROR("PAN setup error: %s %" PRIu32, c_str(err.err), err.lib_code);
     }
     return false;
@@ -168,4 +181,9 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     }
 
     return true;
+}
+void BluetoothWorker::set_addr(uint8_t *addr)
+{
+    Bt::GAP::do_pairing(addr);
+    LOG_INFO("ADDRESS %s SET!", bd_addr_to_str(addr));
 }

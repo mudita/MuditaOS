@@ -18,6 +18,7 @@ target_sources( ${PROJECT_NAME}
         windows/SettingsMainWindow.cpp
         windows/LanguageWindow.cpp
         windows/BtWindow.cpp
+        windows/BtScanWindow.cpp
 
         windows/UITestWindow.cpp
         windows/Info.cpp
@@ -27,12 +28,14 @@ target_sources( ${PROJECT_NAME}
         windows/FotaWindow.cpp
         windows/Fota.cpp
         windows/SettingsChange.cpp
+		windows/USSDWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
         windows/SettingsMainWindow.hpp
         windows/LanguageWindow.hpp
         windows/DateTimeWindow.hpp
+        windows/USSDWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

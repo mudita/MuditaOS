@@ -224,14 +224,11 @@ namespace FotaService
         return std::make_shared<FotaResponseMessage>(false);
     }
 
-    void Service::handleChannelNotifications(std::vector<uint8_t> &data)
+    void Service::handleChannelNotifications(std::string &data)
     {
         const std::string QHTTPGET("+QHTTPGET:");
-        std::vector<uint8_t> buffer(data.begin(), data.end());
-        TS0710_Frame::frame_t frame;
-        frame.deserialize(buffer);
 
-        std::string response(frame.data.begin(), frame.data.end());
+        std::string response = data;
         LOG_DEBUG("URC: %s", response.c_str());
 
         if (auto begin = response.find(QHTTPGET) != std::string::npos) {

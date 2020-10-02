@@ -11,13 +11,13 @@ namespace Bt
     {
         enum Code
         {
-            Succes,
+            Success,
             NotReady,
             SystemError,
             LibraryError,
-        } err             = Succes;
+        } err             = Success;
         uint32_t lib_code = 0;
-        Error(enum Code err = Succes, int lib_code = Succes) : err(err), lib_code(0)
+        Error(enum Code err = Success, int lib_code = Success) : err(err), lib_code(0)
         {}
     };
 

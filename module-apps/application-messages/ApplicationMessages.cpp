@@ -117,7 +117,7 @@ namespace app
 
         windows.insert({gui::name::window::main_window, new gui::MessagesMainWindow(this)});
         windows.insert({gui::name::window::thread_view, new gui::SMSThreadViewWindow(this)});
-        windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
+        windows.insert({gui::name::window::new_sms, new gui::NewMessageWindow(this)});
         windows.insert({windowOptions->getName(), windowOptions});
         windows.insert(
             {gui::name::window::dialog, new gui::Dialog(this, gui::name::window::dialog, gui::Dialog::Meta())});

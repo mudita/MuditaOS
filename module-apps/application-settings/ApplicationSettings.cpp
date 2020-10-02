@@ -12,11 +12,13 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
+#include "windows/BtScanWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
 #include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/USSDWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -31,7 +33,7 @@
 #include "windows/SettingsChange.hpp"
 
 #include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
-
+#include <service-bluetooth/messages/BluetoothMessage.hpp>
 #include <i18/i18.hpp>
 
 namespace app
@@ -39,7 +41,9 @@ namespace app
 
     ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound)
         : Application(name, parent, startBackgound)
-    {}
+    {
+        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+    }
 
     ApplicationSettings::~ApplicationSettings()
     {}
@@ -53,9 +57,43 @@ namespace app
         if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+        if (auto btmsg = dynamic_cast<BluetoothScanResultMessage *>(msgl); btmsg != nullptr) {
+            auto devices = btmsg->devices;
+            LOG_INFO("received BT Scan message!");
+            auto window = new gui::BtScanWindow(this, devices);
+            windows.erase(gui::name::window::name_btscan);
+            windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
+            setActiveWindow(gui::name::window::name_btscan);
+            // this->switchWindow("BT_SCAN",nullptr);
+            render(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        if (auto btmsg = dynamic_cast<BluetoothPairResultMessage *>(msgl); btmsg != nullptr) {
+            if (btmsg->status) {
+                LOG_INFO("Paired successfully");
+            }
+            else {
+                LOG_ERROR("Pairing error!");
+            }
+        }
         // this variable defines whether message was processed.
         bool handled = true;
+
+        if (msgl->messageType == MessageType::CellularNotification) {
+            auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+            if (msg != nullptr) {
+                if (msg->type == CellularNotificationMessage::Type::NewIncomingUSSD) {
+
+                    auto window = this->getCurrentWindow();
+                    if (window->getName() == gui::window::name::ussd_window) {
+                        auto ussdWindow = dynamic_cast<gui::USSDWindow *>(window);
+                        if (ussdWindow != nullptr) {
+                            ussdWindow->handleIncomingUSSD(msg->data);
+                        }
+                    }
+                }
+            }
+        }
 
         if (handled)
             return std::make_shared<sys::ResponseMessage>();
@@ -99,6 +137,10 @@ namespace app
         window = new gui::BtWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
+        window = new gui::BtScanWindow(this, std::vector<Devicei>());
+        window->setVisible(false);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
         window = new gui::UiTestWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
@@ -122,6 +164,9 @@ namespace app
             window = new gui::CellularPassthroughWindow(this);
             windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
         }
+
+        window = new gui::USSDWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }
 
     void ApplicationSettings::destroyUserInterface()

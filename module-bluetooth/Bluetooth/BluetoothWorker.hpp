@@ -63,6 +63,7 @@ class BluetoothWorker : private sys::Worker
     enum WorkerEventQueues
     {
         queueService = 0,
+        queueControl = 1,
         queueIO_handle, /// bsp support queue
         queue_profiles, /// queue for communication between profile workers,
                         /// main bt_worker_task should dispatch these in events
@@ -95,4 +96,6 @@ class BluetoothWorker : private sys::Worker
     Error aud_init();
     /// bluetooth stack id in use
     unsigned long active_features;
+    void stop_scan();
+    void set_addr(uint8_t *);
 };

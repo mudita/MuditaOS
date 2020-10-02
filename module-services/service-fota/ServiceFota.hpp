@@ -67,7 +67,7 @@ namespace FotaService
         sys::Message_t handleFotaStart(sys::DataMessage *req, sys::ResponseMessage *response);
         /** Handle URC from modem, support for asynchronious commands
          */
-        void handleChannelNotifications(std::vector<uint8_t> &data);
+        void handleChannelNotifications(std::string &data);
         /** Handle fota progress notification (in cellular)
          */
         sys::Message_t handleRawProgress(sys::DataMessage *req, sys::ResponseMessage *response);

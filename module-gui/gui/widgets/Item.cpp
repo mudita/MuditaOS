@@ -42,11 +42,6 @@ namespace gui
         activatedCallback        = [](Item &) { return false; };
         inputCallback            = [](Item &, const InputEvent &inputEvent) { return false; };
         dimensionChangedCallback = [](Item &, void *data) { return false; };
-        contentCallback          = [=](Item &) {
-            if (parent != nullptr)
-                return parent->onContent();
-            return false;
-        };
     }
 
     Item::~Item()
@@ -503,10 +498,4 @@ namespace gui
         }
         return false;
     }
-
-    bool Item::onContent()
-    {
-        return false;
-    }
-
 } /* namespace gui */
