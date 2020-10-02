@@ -1,33 +1,37 @@
-# Mudita PurePhone changelog
+# MuditaOS changelog
 
-## [Current release]
+## [0.40.1 2020-10-02]
 
 ### Added
-* `[desktop][gui]` Added app_desktop-sev_cellular messaging
-* `[cellular]` Added USSD codes handling.
-* `[desktop][gui]` Added SIM and PUK lock-related windows
-* `[GUI]` Added rich text parsing for full text styling needs
-* `[calendar]` Add notifications from database handling.
-* `[cellular]``[call app]` Added DTMF tone generation 
-* `[settings]` Add basic display and keypad options window
-* `[messages]` Save a new message as a message draft, if not sent.
-* `[audio]` Enabled sounds priorities, looping and merging
-* `[renderer]` Add drawing circles and arcs functionality.
-* `[bluetooth]` Added scan and pairing support.
-* `[phonebook]` Scrolling contacts list with a particular letter - part 2.
 
+* `[antenna]` Add parameter history window.
+* `[cellular]` Added USSD codes handling.
+* `[desktop]` Add SIM and PUK lock-related windows.
+* `[calendar]` Add handling of notifications from the database.
+* `[cellular]` Add DTMF tone generation.
+* `[settings]` Add basic display and keypad options window.
+* `[renderer]` Add ability to draw circles and arcs.
+* `[bluetooth]` Add support for scanning and pairing.
 
 ### Changed
-* `[special input]` Added emoji selector and changed special character selector.
 
+* `[specialinput]` Added emoji selector and changed special character selector.
+* `[messages]` Save a new message as a message draft, if not sent.
+* `[messages]` Save unsent messages as SMS drafts.
+* `[audio]` Enabled sounds priorities, looping and merging.
+* `[phonebook]` Updated scrolling contacts list with a particular letter.
 
 ### Fixed
 
+* `[calendar]` Fixed custom repeat option.
+* `[settings]` Fixed a system crash on language change.
 
 ### Other
-* `[audio]` Audio service and api cleanup/refactor.
-* `[system]` Improved destroying of worker threads.
 
+* `[audio]` Audio service and API cleanup/refactor.
+* `[audio]` Add audio volume control per functionality.
+* `[doc]` Updated user documentation.
+* `[system]` Improved destroying of worker threads.
 
 ## [0.39.1 2020-09-25]
 
@@ -41,8 +45,6 @@
 
 ### Changed
 
-* `[calendar]` Fixed custom repeat option.
-* `[antenna-app]` Added parameter history window.
 * `[phonenumber]` Change default country to unknown.
 * `[messages]` Save unsent messages as SMS drafts.
 * `[settings]` Update main screen.
@@ -67,17 +69,11 @@
 ### Added
 
 * `[music player]` Add layout for the playback window.
-* `[messages]` Save unsent messages as SMS drafts.
-
-### Fixed
-
-* `[settings]` Fixed a system crash on language change.
 
 ### Other
 
 * `[build]` Move user data to SDRAM during linking.
 * `[build]` RT1051's linker script cleanup.
-* `[audio]` Add audio volume control per functionality.
 
 ## [0.38.1 2020-09-18]
 
