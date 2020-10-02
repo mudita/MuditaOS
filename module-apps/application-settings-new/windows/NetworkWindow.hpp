@@ -47,7 +47,7 @@ namespace gui
                       std::function<bool(Item &)> cbFocus,
                       AppWindow *app,
                       NetworkArrow arrow = NetworkArrow::Disabled)
-            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app)
+            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app), arrow(arrow)
         {}
         [[nodiscard]] auto build() const -> Item * override;
     };

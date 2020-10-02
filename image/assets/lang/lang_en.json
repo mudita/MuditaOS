@@ -253,6 +253,8 @@
     "app_settings_network_operator_auto_select": "Operator auto-select",
     "app_settings_network_all_operators": "All Operators",
     "app_settings_network_import_contacts_from_sim_card": "Import contacts from SIM card",
+    "app_settings_network_sim1": "Sim1",
+    "app_settings_network_sim2": "Sim2",
 
     "app_phonebook_title_main": "Contacts",
     "app_phonebook_search_win_contacts": "Contacts",

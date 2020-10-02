@@ -18,12 +18,12 @@ namespace gui
     {
         std::list<gui::Option> optList;
         auto sim    = Store::GSM::get()->selected;
-        auto simStr = gui::window::name::sim1;
+        auto simStr = utils::translateI18("app_settings_network_sim1");
         if (sim == Store::GSM::SIM::SIM2) {
-            simStr = gui::window::name::sim2;
+            simStr = utils::translateI18("app_settings_network_sim2");
         }
         optList.emplace_back(std::make_unique<gui::NetworkOption>(
-            utils::translateI18("app_settings_network_active_card") + simStr,
+            utils::translateI18("app_settings_network_active_card") + ":" + simStr,
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::change_settings, nullptr);
                 return true;
@@ -42,8 +42,7 @@ namespace gui
                 }
                 return true;
             },
-            this,
-            gui::NetworkArrow::Border));
+            this));
         optList.emplace_back(std::make_unique<gui::NetworkOption>(
             utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {

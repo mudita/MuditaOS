@@ -72,8 +72,6 @@ namespace app
         attachWindow(new gui::KeypadLightWindow(this));
         attachWindow(new gui::FontSizeWindow(this));
         attachWindow(new gui::DisplayLightWindow(this));
-        /*window = new gui::NetworkWindow(this, app::name_network);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));*/
         attachWindow(new gui::NetworkWindow(this));
     }
 
