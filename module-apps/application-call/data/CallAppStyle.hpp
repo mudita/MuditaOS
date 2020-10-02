@@ -19,7 +19,6 @@ namespace callAppStyle
         const inline std::string iscalling = "app_call_is_calling";
         const inline std::string calling   = "app_call_calling";
         const inline std::string callended = "app_call_call_ended";
-        const inline std::string add       = "app_call_add";
         const inline std::string contact   = "app_call_contact";
         const inline std::string mute      = "app_call_mute";
         const inline std::string MUTED     = "app_call_muted";
