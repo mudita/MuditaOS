@@ -36,6 +36,8 @@ namespace audio
         }
 
         if (inst->isInitialized) {
+            inst->opType   = t;
+            inst->filePath = fileName;
             return inst;
         }
         else {

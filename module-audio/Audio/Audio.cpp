@@ -114,7 +114,14 @@ namespace audio
 
     audio::RetCode Audio::Start()
     {
-        return currentOperation->Start(asyncCallback, currentOperation->GetToken());
+        if (!currentOperation) {
+            return audio::RetCode::Success;
+        }
+
+        return Start(currentOperation->GetOperationType(),
+                     currentOperation->GetToken(),
+                     currentOperation->GetFilePath().c_str(),
+                     currentOperation->GetPlaybackType());
     }
 
     audio::RetCode Audio::Stop()

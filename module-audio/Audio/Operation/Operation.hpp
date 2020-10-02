@@ -126,12 +126,25 @@ namespace audio
             return operationToken;
         }
 
+        Type GetOperationType() const noexcept
+        {
+            return opType;
+        }
+
+        std::string GetFilePath() const noexcept
+        {
+            return filePath;
+        }
+
       protected:
         Profile *currentProfile = nullptr;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
         State state                                             = State::Idle;
         audio::AsyncCallback eventCallback                      = nullptr;
+
         audio::Token operationToken;
+        Type opType = Type::Idle;
+        std::string filePath;
 
         bool isInitialized = false;
         audio::PlaybackType playbackType = audio::PlaybackType::None;
