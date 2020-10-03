@@ -44,8 +44,10 @@ namespace gui
     UTF8 TextDocument::getText() const
     {
         UTF8 output;
-        for (auto &el : blocks) {
-            output += el.getText();
+        if (blocks.size() != 0) {
+            for (auto &el : blocks) {
+                output += el.getText();
+            }
         }
 
         return output;

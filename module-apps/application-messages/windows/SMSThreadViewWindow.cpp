@@ -5,7 +5,6 @@
 #include "application-messages/data/MessagesStyle.hpp"
 
 #include "OptionsMessages.hpp"
-#include <OptionWindow.hpp>
 #include "Service/Message.hpp"
 
 #include <TextBubble.hpp>

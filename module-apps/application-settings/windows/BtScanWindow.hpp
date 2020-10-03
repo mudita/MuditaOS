@@ -24,7 +24,7 @@ namespace gui
         VBox *box;
 
       public:
-        BtScanWindow(app::Application *app, std::vector<Devicei> devices);
+        BtScanWindow(app::Application *app, std::vector<Devicei> devices = {});
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
