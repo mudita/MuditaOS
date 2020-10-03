@@ -2,12 +2,14 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "i18/i18.hpp"
+#include "log/log.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <Style.hpp>
 #include <cassert>
 #include <functional>
 #include <memory>
-#include "OptionsStyle.hpp"
+#include <utility>
+#include <messages/OptionsWindow.hpp>
 
 namespace gui
 {
@@ -17,34 +19,32 @@ namespace gui
         buildInterface();
     }
 
+    OptionWindow::OptionWindow(app::Application *app, const std::string &name, std::list<Option> options)
+        : AppWindow(app, name), options(std::move(options))
+    {
+        buildInterface();
+    }
+
     void OptionWindow::rebuild()
     {}
-
-    Item *newOptionLabel(const Option &option)
-    {
-        return option.build();
-    }
 
     void OptionWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
         body->addWidget(Option(text, activatedCallback, arrow).build());
     }
 
-    void OptionWindow::addOptions(std::list<Option> options)
+    void OptionWindow::addOptions(std::list<Option> &options)
     {
         for (auto &option : options) {
-            // LOG_INFO("adding option: %s", option.str().c_str());
             body->addWidget(option.build());
         }
         body->switchPage(0);
     }
 
-    void OptionWindow::addOptions(std::list<Item *> items)
+    void OptionWindow::addOptions(std::list<Option> &&options)
     {
-        for (auto &el : items) {
-            body->addWidget(el);
-        }
-        body->switchPage(0);
+        this->options = std::move(options);
+        addOptions(this->options);
     }
 
     void OptionWindow::clearOptions()
@@ -73,8 +73,11 @@ namespace gui
                                     this->getWidth(),
                                     this->getHeight() - offset_h - this->title->offset_h() - bottomBar->getHeight()});
 
+        clearOptions();
+        addOptions(options);
         setFocusItem(body);
     }
+
     void OptionWindow::destroyInterface()
     {
         erase();
@@ -86,45 +89,11 @@ namespace gui
     }
 
     void OptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
-
-    OptionWindow *newOptionWindow(app::Application *app, std::string name, std::list<Option> options)
     {
-        if (name == "") {
-            LOG_DEBUG("no name for window - take default");
-            name = utils::localize.get("app_phonebook_options_title");
+        if (auto message = dynamic_cast<gui::OptionsWindowOptions *>(data)) {
+            LOG_DEBUG("Options load!");
+            options = message->takeOptions();
+            addOptions(options);
         }
-        auto window = new OptionWindow(app, name);
-        window->addOptions(std::move(options));
-        return window;
     }
-
-    // TODO move it to separate file
-
-    [[nodiscard]] auto Option::build() const -> Item *
-    {
-        assert(option);
-        return option->build();
-    }
-
-    namespace option
-    {
-        auto Simple::build() const -> Item *
-        {
-            auto *label = new gui::Label(nullptr,
-                                         style::window::default_left_margin,
-                                         0,
-                                         style::window_width - 2 * style::window::default_left_margin,
-                                         style::window::label::big_h,
-                                         text);
-            style::window::decorateOption(label);
-            label->activatedCallback = activatedCallback;
-            if (arrow == Arrow::Enabled) {
-                new gui::Image(
-                    label, style::option::arrow_position_x, style::option::arrow_positon_y, 0, 0, "right_label_arrow");
-            }
-            return label;
-        }
-    } // namespace option
-
 } /* namespace gui */

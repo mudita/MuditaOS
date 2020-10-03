@@ -1,5 +1,11 @@
 # MuditaOS changelog
 
+## current
+
+### Added:
+
+* `[gui]` Dynamic Windows building and handling implemented
+
 ## [0.42.1 2020-10-12]
 
 ### Added
