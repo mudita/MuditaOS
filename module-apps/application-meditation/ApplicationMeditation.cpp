@@ -32,8 +32,9 @@ namespace app
 
     void ApplicationMeditation::createUserInterface()
     {
-        auto meditationWindow = new gui::MeditationWindow(this);
-        windows.insert({gui::name::window::main_window, meditationWindow});
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MeditationWindow>(app);
+        });
     }
 
     void ApplicationMeditation::destroyUserInterface()

@@ -38,8 +38,6 @@ namespace app
         ApplicationMessages(std::string name = name_messages, std::string parent = "", bool startBackgound = false);
         virtual ~ApplicationMessages();
 
-        gui::OptionWindow *windowOptions = nullptr;
-
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
 

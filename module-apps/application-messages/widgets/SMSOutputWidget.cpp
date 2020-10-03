@@ -6,6 +6,7 @@
 
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
+#include <OptionsWindow.hpp>
 
 namespace gui
 {
@@ -83,11 +84,8 @@ namespace gui
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                if (app->windowOptions != nullptr) {
-                    app->windowOptions->clearOptions();
-                    app->windowOptions->addOptions(smsWindowOptions(app, *record));
-                    app->switchWindow(app->windowOptions->getName(), nullptr);
-                }
+                app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                                  std::make_unique<gui::OptionsWindowOptions>(smsWindowOptions(app, *record)));
                 return true;
             }
             return false;

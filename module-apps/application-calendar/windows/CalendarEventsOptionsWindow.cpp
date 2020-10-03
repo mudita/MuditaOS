@@ -1,4 +1,5 @@
 #include "CalendarEventsOptionsWindow.hpp"
+#include "DialogMetadataMessage.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "Dialog.hpp"
 #include <Utils.hpp>
@@ -45,17 +46,16 @@ namespace gui
 
         eventRecord      = item->getData();
         clearOptions();
-        addOptions(eventsOptionsList());
+        options = eventsOptionsList();
+        addOptions(options);
         return true;
     }
 
     auto CalendarEventsOptions::eventDelete() -> bool
     {
         LOG_DEBUG("Switch to delete event window");
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(
-            this->application->getWindow(style::window::calendar::name::dialog_yes_no));
-        assert(dialog != nullptr);
-        auto meta   = dialog->meta;
+        gui::DialogMetadata meta;
+
         meta.action = [=]() -> bool {
             LOG_INFO("Delete calendar event %d", static_cast<int>(eventRecord->ID));
             DBServiceAPI::GetQuery(
@@ -67,8 +67,9 @@ namespace gui
         meta.text  = utils::localize.get("app_calendar_event_delete_confirmation");
         meta.title = eventRecord->title;
         meta.icon  = "phonebook_contact_delete_trashcan";
-        dialog->update(meta);
-        this->application->switchWindow(dialog->getName());
+
+        this->application->switchWindow(style::window::calendar::name::dialog_yes_no,
+                                        std::make_unique<gui::DialogMetadataMessage>(meta));
         return true;
     }
 } // namespace gui

@@ -78,14 +78,12 @@ namespace app
 
     void ApplicationNotes::createUserInterface()
     {
-
-        gui::AppWindow *window = nullptr;
-
-        window = new gui::NotesMainWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::NotesEditWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NotesMainWindow>(app);
+        });
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NotesEditWindow>(app);
+        });
     }
 
     void ApplicationNotes::destroyUserInterface()

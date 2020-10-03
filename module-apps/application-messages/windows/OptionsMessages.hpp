@@ -2,8 +2,9 @@
 
 #include "../ApplicationMessages.hpp"
 #include "Interface/SMSRecord.hpp"
+#include <OptionsWindowOption.hpp>
 
-std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
+std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
 
 /// @brief options for New Message Window
 ///
@@ -12,6 +13,6 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
 /// @param text - text object to be eventually modified by options operations
 ///
 /// @return list of options
-std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app,
+std::list<gui::Option> newMessageWindowOptions(app::ApplicationMessages *app,
                                                const std::string &requestingWindow,
                                                gui::Text *text);
