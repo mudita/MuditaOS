@@ -14,7 +14,7 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES} service-desktop/endpoints/filesystem/FilesystemEndpoint.cpp service-desktop/endpoints/filesystem/FilesystemEndpoint.hpp)
 
 add_subdirectory( service-gui )
 add_subdirectory( service-eink )

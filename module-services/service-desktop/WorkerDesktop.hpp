@@ -29,7 +29,7 @@ extern "C"
 #include "vfs.hpp"
 #include "timer.hpp"
 
-class WorkerDesktop : public sys::Worker, public Timer
+class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer
 {
   public:
     enum class TransferType : uint8_t
@@ -60,9 +60,9 @@ class WorkerDesktop : public sys::Worker, public Timer
     }
     static void deviceTask(void *);
 
-    sys::ReturnCodes startDownload(const fs::path &filePath, const uint32_t fileSize);
-    sys::ReturnCodes startUpload(const fs::path &filePath, const uint32_t fileSize);
-    void stopTransfer();
+    sys::ReturnCodes startDownload(const fs::path &destinationPath, const uint32_t fileSize);
+    sys::ReturnCodes startUpload(const fs::path &sourcePath, const uint32_t fileSize);
+    void stopTransfer(const bool moveFileToUpdatesDir=false);
     void transferDataReceived(const char *data, uint32_t dataLen);
     WorkerDesktop::TransferType getTransferType();
     void Run();
@@ -73,7 +73,7 @@ class WorkerDesktop : public sys::Worker, public Timer
     vfs::FILE *fileDes = nullptr;
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
-
+    fs::path filePath;
     volatile TransferType currentTransferType = TransferType::JSONCommands;
     cpp_freertos::MutexStandard mutex;
 };

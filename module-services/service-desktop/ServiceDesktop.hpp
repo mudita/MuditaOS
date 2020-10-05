@@ -40,8 +40,8 @@ class ServiceDesktop : public sys::Service
     sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
     // upload and download from the service perspective (download to phone, upload to computer)
-    sys::ReturnCodes startDownload(const fs::path &filePath, const uint32_t fileSize);
-    sys::ReturnCodes startUpload(const fs::path &filePath, const uint32_t fileSize);
+    sys::ReturnCodes startDownload(const fs::path &destinationFile, const uint32_t fileSize);
+    sys::ReturnCodes startUpload(const fs::path &sourceFile, const uint32_t fileSize);
 
     std::unique_ptr<UpdatePureOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;

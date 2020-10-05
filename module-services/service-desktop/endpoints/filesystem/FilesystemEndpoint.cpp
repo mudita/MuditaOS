@@ -27,7 +27,8 @@ auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
     if (owner) {
         if (cmd == parserFSM::json::filesystem::commands::download) {
             fs::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
-            fs::path tmpFilePath = vfs.getTempPath(filePath);
+            // fs::path tmpFilePath = vfs.getTempPath(filePath);
+            fs::path tmpFilePath = purefs::dir::os_updates / filePath;
 
             uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
 

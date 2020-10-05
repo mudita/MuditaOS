@@ -114,8 +114,9 @@ WorkerDesktop::TransferType WorkerDesktop::getTransferType()
     return currentTransferType;
 }
 
-sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &filePath, const uint32_t fileSize)
+sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &destinationPath, const uint32_t fileSize)
 {
+    filePath = destinationPath;
     fileDes = vfs.fopen(filePath.c_str(), "w");
 
     if (fileDes == nullptr)
@@ -129,18 +130,23 @@ sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &filePath, const ui
 
     writeFileSizeExpected = fileSize;
     currentTransferType = TransferType::DownloadFile;
+
+    LOG_DEBUG("startDownload all checks passed starting download");
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes WorkerDesktop::startUpload(const fs::path &filePath, const uint32_t fileSize)
+sys::ReturnCodes WorkerDesktop::startUpload(const fs::path &sourcePath, const uint32_t fileSize)
 {
     currentTransferType = TransferType::UploadFile;
     return sys::ReturnCodes::Success;
 }
 
-void WorkerDesktop::stopTransfer()
+void WorkerDesktop::stopTransfer(const bool moveFileToUpdatesDir)
 {
     LOG_DEBUG("stopTransfer");
+    parser.setState(parserFSM::State::NoMsg);
+    currentTransferType = TransferType::JSONCommands;
+
     // close the file descriptor
     vfs.fclose(fileDes);
 
@@ -150,8 +156,16 @@ void WorkerDesktop::stopTransfer()
     // reset all counters
     writeFileSizeExpected = 0;
     writeFileDataWritten  = 0;
-    parser.setState(parserFSM::State::NoMsg);
-    currentTransferType = TransferType::JSONCommands;
+
+    /*LOG_INFO("stopTransfer moving file %s to %s", filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str());
+    if (moveFileToUpdatesDir) {
+        if (vfs.rename(filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str())) {
+            // zero is ok anything else is an error
+            LOG_ERROR("stopTransfer failed to move file %s to %s", filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str());
+        } else {
+            LOG_INFO("stopTransfer moved file %s to %s", filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str());
+        }
+    }*/
 }
 
 void WorkerDesktop::transferDataReceived(const char *data, uint32_t dataLen)
@@ -173,9 +187,13 @@ void WorkerDesktop::transferDataReceived(const char *data, uint32_t dataLen)
 
         writeFileDataWritten += dataLen;
 
+
         if (writeFileDataWritten >= writeFileSizeExpected) {
-            stopTransfer();
+            LOG_INFO("transferDataReceived all data transferred, stop now");
+            stopTransfer(true);
         }
+    } else {
+        LOG_DEBUG("transferDataReceived not in a transfer state");
     }
 }
 
