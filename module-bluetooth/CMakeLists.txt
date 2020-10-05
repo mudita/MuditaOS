@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtstackWorker.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtKeysStorage.cpp
 )
 
 message("Build with BlueKitchen")

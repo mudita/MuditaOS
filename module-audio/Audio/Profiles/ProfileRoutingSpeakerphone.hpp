@@ -7,8 +7,7 @@
  *  @details
  */
 
-#ifndef PUREPHONE_PROFILEROUTINGSPEAKERPHONE_HPP
-#define PUREPHONE_PROFILEROUTINGSPEAKERPHONE_HPP
+#pragma once
 
 #include "Profile.hpp"
 
@@ -37,5 +36,3 @@ namespace audio
     };
 
 } // namespace audio
-
-#endif // PUREPHONE_PROFILEROUTINGSPEAKERPHONE_HPP

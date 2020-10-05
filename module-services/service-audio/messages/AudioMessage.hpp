@@ -29,10 +29,16 @@ class AudioMessage : public sys::DataMessage
         : sys::DataMessage(messageType), type(messageType), playbackType(playbackType), token(token)
     {}
 
-    virtual ~AudioMessage() = default;
+    explicit AudioMessage(audio::Token token) : sys::DataMessage(MessageType::MessageTypeUninitialized), token(token)
+    {}
+
+    explicit AudioMessage(const audio::PlaybackType &playbackType)
+        : sys::DataMessage(MessageType::MessageTypeUninitialized), playbackType(playbackType)
+    {}
+
     MessageType type = MessageType::MessageTypeUninitialized;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
-    audio::Token token;
+    const audio::Token token;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -107,7 +113,6 @@ class AudioRequestMessage : public AudioMessage
 
     ~AudioRequestMessage()
     {}
-
     std::string fileName;
     float val;
     bool enable;
@@ -119,11 +124,20 @@ class AudioStopMessage : public AudioMessage
     AudioStopMessage(const std::vector<audio::PlaybackType> &stopVec = {}) : AudioMessage(), stopVec(stopVec)
     {}
 
-    AudioStopMessage(const audio::Token &token) : AudioMessage(), token(token)
+    AudioStopMessage(const audio::Token &token) : AudioMessage(token)
     {}
 
     const std::vector<audio::PlaybackType> stopVec;
-    const audio::Token token;
+};
+
+class AudioStartMessage : public AudioMessage
+{
+  public:
+    AudioStartMessage(const std::string &fileName, const audio::PlaybackType &playbackType)
+        : AudioMessage(playbackType), fileName(fileName)
+    {}
+
+    const std::string fileName;
 };
 
 class AudioResponseMessage : public sys::ResponseMessage

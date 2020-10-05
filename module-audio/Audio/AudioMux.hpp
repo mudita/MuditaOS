@@ -14,9 +14,9 @@ namespace audio
       public:
         struct Input
         {
-            Input(audio::Audio &&a, audio::Token handle) : audio(std::move(a)), token(handle)
+            Input(std::unique_ptr<audio::Audio> a, audio::Token handle) : audio(std::move(a)), token(handle)
             {}
-            audio::Audio audio;
+            std::unique_ptr<audio::Audio> audio;
             audio::Token token;
         };
         /**
@@ -26,6 +26,12 @@ namespace audio
          * @param audioInputsCount Number of inputs managed and internal audio::Audio() classes created
          */
         AudioMux(audio::AsyncCallback asyncClbk, audio::DbCallback dbClbk, size_t audioInputsCount = 1);
+        /**
+         * Constructs mux managing externally allocated instances of Input
+         * @param extAudioInputs Instances of Input to be managed
+         */
+        AudioMux(std::vector<Input> &extAudioInputs) : audioInputs(extAudioInputs)
+        {}
         /**
          * Gets input related to given token
          * @param token Token to compare
@@ -44,7 +50,8 @@ namespace audio
          * @return Idle input if found, otherwise one of inputs that can be overridden.
          * nullopt if none of the inputs is not available (higher priority operation is active)
          */
-        auto GetInput(const audio::PlaybackType &playbackType = audio::PlaybackType::None) -> std::optional<Input *>;
+        auto GetAvailableInput(const audio::PlaybackType &playbackType = audio::PlaybackType::None)
+            -> std::optional<Input *>;
         /**
          * Gets first Idle input
          * @return nullopt if input not found
@@ -79,13 +86,15 @@ namespace audio
         {
             return audioInputs;
         };
-        auto IncrementToken(std::optional<AudioMux::Input *> input) -> Token;
+        auto IncrementToken(std::optional<AudioMux::Input *> input = std::nullopt) -> const Token;
 
       private:
-        auto GetPlaybackPriority(const audio::PlaybackType &type) const -> uint8_t;
+        auto GetPlaybackPriority(const std::optional<audio::PlaybackType> type) -> uint8_t;
         constexpr auto IsMergable(const audio::PlaybackType &type) const -> bool;
-        std::vector<Input> audioInputs;
+
         audio::Token refToken;
+        std::vector<Input> audioInputsInternal;
+        std::vector<Input> &audioInputs;
     };
 
 } // namespace audio
