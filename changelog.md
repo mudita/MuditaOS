@@ -15,7 +15,7 @@
 * `[audio]` Added vibration/enable sound database logic
 * `[settings]` Create main window for apps and tools 
 * `[meditation]` Added a meditation progress bar with simple implementation of meditation application.
-
+* `[settings]` Create set of queries required for settings.
 
 ### Changed
 
