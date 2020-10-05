@@ -136,6 +136,7 @@ list(APPEND TARGET_LIBRARIES_INCLUDES
     )
 
 set(BOARD_DIR_SOURCES
+            ${BT_INT}/Worker.cpp
             ${BT_INT}/GAP.cpp
             ${BT_INT}/PAN.cpp
 
