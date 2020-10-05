@@ -1,6 +1,6 @@
 # Running MuditaOS on the Mudita Pure phone
 
-The Mudita Pure phone (RT1051 target platform) has and eMMC storage of 16GB.
+The Mudita Pure phone (RT1051 target platform) has an eMMC storage of 16GB.
 
 Due to RT1051 architecture, the executable can be run from SRAM, DRAM or external SPI flash (eMMC).
 
