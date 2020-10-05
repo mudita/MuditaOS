@@ -85,6 +85,15 @@ namespace Bt::GAP
         LOG_INFO("Visibility: %s", visibility ? "true" : "false");
         return Error();
     }
+
+    auto do_pairing(uint8_t *addr) -> bool
+    {
+        if (hci_get_state() == HCI_STATE_WORKING) {
+            gap_dedicated_bonding(addr, 0);
+            return true;
+        }
+        return false;
+    }
 } // namespace Bt::GAP
 
 #define INQUIRY_INTERVAL 5
@@ -204,8 +213,8 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
                 dev.state = REMOTE_NAME_REQUEST;
             }
             devices.push_back(dev);
-            auto msg = std::make_shared<BluetoothScanMessage>(devices);
-            auto ret = sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService, 5000);
+            auto msg = std::make_shared<BluetoothScanResultMessage>(devices);
+            sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService);
 
         } break;
 
@@ -239,7 +248,11 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
             }
             continue_remote_names();
         } break;
-
+        case GAP_EVENT_DEDICATED_BONDING_COMPLETED: {
+            auto result = packet[2];
+            auto msg    = std::make_shared<BluetoothPairResultMessage>(result == 0u);
+            sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService);
+        } break;
         default:
             break;
         }

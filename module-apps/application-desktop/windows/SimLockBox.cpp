@@ -45,17 +45,17 @@ namespace gui
         LockWindow->pinLabel->setVisible(true);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_lock1"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_to_unlock"));
         LockWindow->infoText->addText(" ");
         LockWindow->infoText->addText(LockWindow->lock.getLockInfo(PinLock::InfoName::LockName));
         LockWindow->infoText->addText(" ");
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_lock2"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_card"));
         LockWindow->infoText->addText("\n");
         LockWindow->infoText->addText("( ");
         LockWindow->infoText->addText(LockWindow->lock.getLockInfo(PinLock::InfoName::PhoneNum));
         LockWindow->infoText->addText(" )");
         LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_lock3"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_type_pin"));
         LockWindow->infoText->setVisible(true);
 
         LockWindow->setImagesVisible(true, false);
@@ -74,17 +74,17 @@ namespace gui
         LockWindow->pinLabel->setVisible(false);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_invalid_info1")));
+        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_wrong_pin")));
         LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_invalid_info2")));
+        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_you_have")));
         LockWindow->infoText->addText(" ");
         LockWindow->infoText->addText(std::to_string(LockWindow->lock.getRemainingAttempts()));
         LockWindow->infoText->addText(" ");
         if (LockWindow->lock.getRemainingAttempts() > 1) {
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_invalid_info3"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_attempt_left_plural"));
         }
         else {
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_invalid_info4"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_attempt_left_singular"));
         }
         LockWindow->infoText->setVisible(true);
 

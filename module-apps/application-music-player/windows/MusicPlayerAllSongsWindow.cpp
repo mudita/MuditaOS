@@ -2,6 +2,7 @@
 #include "application-music-player/ApplicationMusicPlayer.hpp"
 
 #include <Style.hpp>
+#include <cassert>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
 #include <service-audio/api/AudioServiceAPI.hpp>

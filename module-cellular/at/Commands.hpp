@@ -66,7 +66,7 @@ namespace at
         CALLER_NUMBER_PRESENTATION, /// Turn on caller's number presentation
         SMS_TEXT_FORMAT,            /// Set Message format to Text
         SMS_UCSC2,                  /// Set ucs2 message format
-        SMS_STORAGE,                /// Set SMS preferred storage
+        SMS_GSM,                    /// Set gsm message format
         QSCLK_ON,                   /// Configure Whether or Not to Enter into Sleep Mode
         QDAI,                       /// GSM audio initialization check
         QDAI_INIT, /// Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
@@ -106,6 +106,10 @@ namespace at
         QIGETERROR,         /// get tcp/ip error code
         VTS,                /// DTMF and Tone Generation
         QLDTMF,             /// Play Local DTMF
+        CUSD_OPEN_SESSION,
+        CUSD_CLOSE_SESSION,
+        CUSD_SEND,
+        SET_SMS_STORAGE,
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -127,7 +131,7 @@ namespace at
             {AT::CALLER_NUMBER_PRESENTATION, {"AT+CLIP=1\r", 18000}},
             {AT::SMS_TEXT_FORMAT, {"AT+CMGF=1\r"}},
             {AT::SMS_UCSC2, {"AT+CSCS=\"UCS2\"\r"}},
-            {AT::SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"\r"}},
+            {AT::SMS_GSM, {"AT+CSCS=\"GSM\"\r"}},
             {AT::QSCLK_ON, {"AT+QSCLK=1\r", 3000}},
             {AT::QDAI, {"AT+QDAI?\r"}},
             {AT::QDAI_INIT, {"AT+QDAI=1,0,0,5,0,1\r"}},
@@ -160,6 +164,10 @@ namespace at
             {AT::QIGETERROR, {"AT+QIGETERROR\r"}},
             {AT::VTS, {"AT+VTS="}},
             {AT::QLDTMF, {"AT+QLDTMF=1,"}},
+            {AT::CUSD_OPEN_SESSION, {"AT+CUSD=1\r"}},
+            {AT::CUSD_CLOSE_SESSION, {"AT+CUSD=2\r"}},
+            {AT::CUSD_SEND, {"AT+CUSD=1,"}},
+            {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"\r", 300}},
         };
         if (fact.count(at)) {
             return fact.at(at);

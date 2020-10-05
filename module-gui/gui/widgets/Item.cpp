@@ -1,17 +1,17 @@
-/*
- * Item.cpp
- *
- *  Created on: 4 mar 2019
- *      Author: robert
- */
-
-#include <list>
-#include <algorithm>
-#include <cstring>
-#include "Navigation.hpp"
 #include "Item.hpp"
-#include "BoundingBox.hpp"
-#include "log/log.hpp"
+#include "BoundingBox.hpp" // for BoundingBox, BoundingBox::(anonymous)
+#include "InputEvent.hpp"  // for InputEvent, KeyCode, InputEvent::State
+#include "Navigation.hpp"  // for Navigation
+#include "Timer.hpp"       // for Timer
+#include <Timer.hpp>
+#include <algorithm> // for find
+#include <list>      // for list<>::iterator, list, operator!=, _List...
+#include <memory>
+
+namespace gui
+{
+    class DrawCommand;
+}
 
 namespace gui
 {
@@ -498,4 +498,24 @@ namespace gui
         }
         return false;
     }
+
+    bool Item::onContent()
+    {
+        return false;
+    }
+
+    auto Item::onTimer(Timer &timer) -> bool
+    {
+        if (timerCallback != nullptr) {
+            return timerCallback(*this, timer);
+        }
+        return false;
+    }
+
+    void Item::detachTimer(Timer &timer)
+    {
+        auto el = std::find_if(timers.begin(), timers.end(), [&](auto &el) -> bool { return el.get() == &timer; });
+        timers.erase(el);
+    }
+
 } /* namespace gui */

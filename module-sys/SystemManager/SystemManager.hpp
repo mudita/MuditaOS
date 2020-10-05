@@ -10,7 +10,6 @@
 
 #include <functional>
 #include "thread.hpp"
-#include "timer.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
 #include "Service/Mailbox.hpp"
@@ -41,6 +40,8 @@ namespace sys
     class SystemManager : public Service
     {
       public:
+        using InitFunction = std::function<bool()>;
+
         enum class State
         {
             Running,
@@ -54,7 +55,7 @@ namespace sys
 
         ~SystemManager();
 
-        void StartSystem(std::function<int()> init);
+        void StartSystem(InitFunction init);
 
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
@@ -87,7 +88,6 @@ namespace sys
         void kill(std::shared_ptr<Service> const &toKill);
 
       private:
-        void TickHandler(uint32_t id) override;
 
         Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
 
@@ -125,7 +125,7 @@ namespace sys
         TickType_t pingInterval;
         uint32_t pingPongTimerID;
 
-        std::function<int()> userInit;
+        InitFunction userInit;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
         static cpp_freertos::MutexStandard destroyMutex;

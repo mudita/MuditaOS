@@ -13,6 +13,7 @@ endif()
 
 set( SOURCES 
     "Application.cpp"
+    "GuiTimer.cpp"
     "UiCommonActions.cpp" 
     "windows/AppWindow.cpp" 
     "windows/OptionWindow.cpp"

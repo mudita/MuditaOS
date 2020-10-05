@@ -1,52 +1,32 @@
 #pragma once
 
-#include "Common.hpp"
-#include "Message.hpp"
-#include "Mailbox.hpp"
-#include "Bus.hpp"
-#include <memory>
-#include <queue>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include "thread.hpp"
-#include "timer.hpp"
-#include <typeindex>
-#include <functional>
+#include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
+#include "Mailbox.hpp" // for Mailbox
+#include "Message.hpp" // for Message_t
+#include "thread.hpp"  // for Thread
+#include <algorithm>   // for find, max
+#include <cstdint>     // for uint32_t, uint64_t
+#include <functional>  // for function
+#include <iterator>    // for end
+#include <map>         // for map
+#include <memory>      // for allocator, shared_ptr, enable_shared_from_this
+#include <string>      // for string
+#include <typeindex>   // for type_index
+#include <utility>     // for pair
+#include <vector>      // for vector<>::iterator, vector
+
+namespace sys
+{
+    class Timer;
+} // namespace sys
+namespace sys
+{
+    struct Proxy;
+} // namespace sys
 
 namespace sys
 {
     using MessageHandler = std::function<Message_t(DataMessage *, ResponseMessage *)>;
-
-    class ServiceTimer : public Timer
-    {
-      public:
-        ServiceTimer(const std::string &name, TickType_t tick, bool isPeriodic, uint32_t idx, Service *service);
-
-        [[nodiscard]] uint32_t GetId() const
-        {
-            return m_id;
-        }
-        static uint32_t GetNextUniqueID()
-        {
-            return ++m_timers_unique_idx;
-        }
-
-        void Run() override;
-
-      private:
-        bool m_isPeriodic;
-        TickType_t m_interval;
-        uint32_t m_id;
-        Service *m_service;
-        static uint32_t m_timers_unique_idx;
-    };
-
-    /// proxy has one objective - be friend for Service, so that Message which is not a friend could access
-    /// one and only one entrypoint to messages entrypoint (MessageEntry)
-    /// MessageEntry calls overridable DataReceivedHandler for Service instance and all Calls that are 100% neccessary
-    /// for service
-    struct Proxy;
 
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
@@ -60,31 +40,13 @@ namespace sys
                 uint32_t stackDepth      = 4096,
                 ServicePriority priority = ServicePriority::Idle);
 
-        virtual ~Service();
+        ~Service() override;
 
         void StartService();
-
-        // Create service timer
-        uint32_t CreateTimer(TickType_t interval, bool isPeriodic, const std::string &name = "");
-        // Reload service timer
-        void ReloadTimer(uint32_t id);
-        // Delete timer
-        void DeleteTimer(uint32_t id);
-        void setTimerPeriod(uint32_t id, uint32_t period);
-        /**
-         * @brief Stops a timer with specified ID
-         * @param id ID of the timer;
-         */
-        void stopTimer(uint32_t id);
 
         // Invoked for not processed already messages
         // override should in in either callback, function or whatever...
         virtual Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) = 0;
-
-        // TODO register message -> function handler ;) add map/-> :( no can do: array/variant ) <-/ whatever for it
-        // (with check if already registered sth Invoked when timer ticked
-        // TODO this is crap - it should be done via message, in DataReceivedHandler :/
-        virtual void TickHandler(uint32_t id){};
 
         // Invoked during initialization
         virtual ReturnCodes InitHandler() = 0;
@@ -117,10 +79,6 @@ namespace sys
 
         void Run() override;
 
-        std::vector<std::unique_ptr<ServiceTimer>> timersList;
-
-        friend class ServiceTimer;
-
         std::map<std::type_index, MessageHandler> message_handlers;
 
       private:
@@ -130,8 +88,51 @@ namespace sys
         virtual auto MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t final;
 
         friend Proxy;
+
+        class Timers
+        {
+
+            friend Timer;
+
+          private:
+            std::vector<Timer *> list;
+            auto attach(Timer *timer)
+            {
+                list.push_back(timer);
+            }
+
+            void detach(Timer *timer)
+            {
+                list.erase(std::find(list.begin(), list.end(), timer));
+            }
+
+          public:
+            void stop();
+
+            [[nodiscard]] auto get(Timer *timer) const
+            {
+                return std::find(list.begin(), list.end(), timer);
+            }
+
+            [[nodiscard]] auto noTimer() const
+            {
+                return std::end(list);
+            }
+        } timers;
+
+      public:
+        auto getTimers() -> auto &
+        {
+            return timers;
+        }
+
+        auto TimerHandle(SystemMessage &message) -> ReturnCodes;
     };
 
+    /// proxy has one objective - be friend for Service, so that Message which is not a friend could access
+    /// one and only one entrypoint to messages entrypoint (MessageEntry)
+    /// MessageEntry calls overridable DataReceivedHandler for Service instance and all Calls that are 100% neccessary
+    /// for service
     struct Proxy
     {
         static auto handle(Service *service, DataMessage *message, ResponseMessage *response) -> Message_t
@@ -139,5 +140,4 @@ namespace sys
             return service->MessageEntry(message, response);
         }
     };
-
 } // namespace sys

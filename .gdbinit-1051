@@ -1,4 +1,5 @@
-target remote 172.17.0.1:2331
+target remote localhost:2331
+source tools/gdb_crash_extend.py
 monitor reset 0
 monitor halt
 monitor memU32 0x401BC000 = 128;

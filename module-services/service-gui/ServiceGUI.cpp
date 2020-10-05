@@ -63,8 +63,6 @@ namespace sgui
             delete renderContext;
         if (transferContext)
             delete transferContext;
-
-        worker->deinit();
     }
 
     void ServiceGUI::sendBuffer()
@@ -96,7 +94,7 @@ namespace sgui
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage * msgl, sys::ResponseMessage * resp)
+    sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         sgui::GUIMessage *msg = static_cast<sgui::GUIMessage *>(msgl);
@@ -223,11 +221,6 @@ namespace sgui
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    // Invoked when timer ticked
-    void ServiceGUI::TickHandler(uint32_t id)
-    {}
-
-    // Invoked during initialization
     sys::ReturnCodes ServiceGUI::InitHandler()
     {
 
@@ -262,6 +255,10 @@ namespace sgui
         if (semCommands != NULL)
             vSemaphoreDelete(semCommands);
         semCommands = NULL;
+
+        worker->stop();
+        worker->join();
+        worker->deinit();
 
         return sys::ReturnCodes::Success;
     }

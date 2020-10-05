@@ -15,9 +15,6 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
 ServiceDesktop::~ServiceDesktop()
 {
     LOG_INFO("[ServiceDesktop] Cleaning resources");
-    if (desktopWorker != nullptr) {
-        desktopWorker->deinit();
-    }
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
@@ -75,6 +72,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
+    desktopWorker->close();
     return sys::ReturnCodes::Success;
 }
 

@@ -1,6 +1,7 @@
 #include "FactoryResetEndpoint.hpp"
 #include "DesktopMessages.hpp"
 #include "ServiceDesktop.hpp"
+#include <Service/Bus.hpp>
 
 auto FactoryResetEndpoint::handle(Context &context) -> void
 {

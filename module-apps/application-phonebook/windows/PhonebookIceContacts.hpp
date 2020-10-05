@@ -3,6 +3,7 @@
 #include "application-phonebook/models/PhonebookModel.hpp"
 #include "application-phonebook/widgets/PhonebookListView.hpp"
 
+#include <AppWindow.hpp>
 #include <gui/widgets/ListView.hpp>
 
 namespace gui

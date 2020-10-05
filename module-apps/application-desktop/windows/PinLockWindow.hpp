@@ -20,7 +20,7 @@ namespace gui
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState(const PinLock::State state);
-        void makePinLockBox();
+        void buildPinLockBox();
         void invalidate() noexcept;
 
       public:

@@ -1,6 +1,7 @@
 #include "UpdateEndpoint.hpp"
 #include "DesktopMessages.hpp"
 #include "ServiceDesktop.hpp"
+#include <Service/Bus.hpp>
 
 auto UpdateEndpoint::handle(Context &context) -> void
 {

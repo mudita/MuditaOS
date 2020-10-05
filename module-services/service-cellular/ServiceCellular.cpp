@@ -21,9 +21,8 @@
 
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
+#include "Service/Timer.hpp"
 #include "ServiceCellular.hpp"
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
 
 #include "MessageType.hpp"
 
@@ -35,6 +34,7 @@
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "ucs2/UCS2.hpp"
 
+#include "api/CellularServiceAPI.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 #include "service-db/messages/QueryMessage.hpp"
@@ -46,6 +46,7 @@
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
+#include <at/URC_CUSD.hpp>
 #include <at/response.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -136,8 +137,12 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
-    callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
-    stateTimerId     = CreateTimer(Ticks::MsToTicks(1000), true);
+    callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
+    callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
+    stateTimer = std::make_unique<sys::Timer>("state", this, 1000);
+    stateTimer->connect([&](sys::Timer &) { handleStateTimer(); });
+    ussdTimer = std::make_unique<sys::Timer>("ussd", this, 1000);
+    ussdTimer->connect([&](sys::Timer &) { handleUSSDTimer(); });
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
@@ -157,11 +162,10 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         return true;
     });
 
-    notificationCallback = [this](std::vector<uint8_t> &data) {
+    notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
-        TS0710_Frame frame(data);
         std::string message;
-        auto msg = identifyNotification(frame.getFrame().data);
+        auto msg = identifyNotification(data);
 
         if (msg == std::nullopt) {
             LOG_INFO("Skipped unknown notification");
@@ -183,21 +187,6 @@ void ServiceCellular::CallStateTimerHandler()
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
-}
-
-// Invoked when timer ticked
-void ServiceCellular::TickHandler(uint32_t id)
-{
-    if (id == callStateTimerId) {
-        CallStateTimerHandler();
-    }
-    else if (id == stateTimerId) {
-        LOG_INFO("State timer tick");
-        handleStateTimer();
-    }
-    else {
-        LOG_ERROR("Unrecognized timer ID = %" PRIu32, id);
-    }
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
@@ -529,7 +518,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             break;
         }
         case CellularNotificationMessage::Type::CallAborted: {
-            stopTimer(callStateTimerId);
+            callStateTimer->stop();
             auto ret    = ongoingCall.endCall();
             responseMsg = std::make_shared<CellularResponseMessage>(ret);
             break;
@@ -574,6 +563,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 for (auto const &el : respMsg->response) {
                     LOG_DEBUG("> %s", el.c_str());
                 }
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                break;
             }
             responseMsg = respMsg;
             break;
@@ -582,6 +573,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
                 state.set(this, cellular::State::ST::SimInit);
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
+                break;
             }
             break;
         default: {
@@ -611,7 +603,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     auto msg =
                         std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
                     sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
-                    stopTimer(callStateTimerId);
+                    callStateTimer->stop();
                 }
             }
             catch (const std::exception &e) {
@@ -631,7 +623,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         if (channel) {
             if (channel->cmd(at::AT::ATH)) {
                 AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-                stopTimer(callStateTimerId);
+                callStateTimer->stop();
                 if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                     LOG_ERROR("Failed to end ongoing call");
                 }
@@ -674,7 +666,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             if (ret) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
-                ReloadTimer(callStateTimerId);
+                callStateTimer->reload();
                 // Propagate "Ringing" notification into system
                 sys::Bus::SendMulticast(
                     std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, msg->number),
@@ -860,6 +852,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto resp   = transmitDtmfTone(msg->getDigit());
         responseMsg = std::make_shared<CellularResponseMessage>(resp);
     } break;
+    case MessageType::CellularUSSDRequest: {
+        auto msg = dynamic_cast<CellularUSSDMessage *>(msgl);
+        if (msg != nullptr) {
+            responseMsg = std::make_shared<CellularResponseMessage>(handleUSSDRequest(msg->type, msg->data));
+        }
+        break;
+    }
     default:
         break;
 
@@ -903,15 +902,15 @@ namespace
     }
     namespace powerdown
     {
-        static const string powerDownNormal = "NORMAL POWER DOWN";
-        static const string poweredDown     = "POWERED DOWN";
+        static const std::string powerDownNormal = "NORMAL POWER DOWN";
+        static const std::string poweredDown     = "POWERED DOWN";
 
-        bool isNormalPowerDown(const string str)
+        bool isNormalPowerDown(const std::string str)
         {
             std::string stripped = utils::removeNewLines(str);
             return stripped.find(powerDownNormal) == 0;
         }
-        bool isPoweredDown(const string str)
+        bool isPoweredDown(const std::string str)
         {
             std::string stripped = utils::removeNewLines(str);
             return stripped.find(poweredDown) == 0;
@@ -919,7 +918,7 @@ namespace
     } // namespace powerdown
 } // namespace
 
-std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
+std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
     std::string str(data.begin(), data.end());
 
@@ -1008,6 +1007,25 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         cmux->setMode(TS0710::Mode::AT);
     }
 
+    auto cusd = at::urc::CUSD(str);
+    if (cusd.is()) {
+
+        if (cusd.isActionNeeded()) {
+            if (ussdState == ussd::State::pullRequestSent) {
+                ussdState = ussd::State::pullResponseReceived;
+                setUSSDTimer();
+            }
+        }
+        else {
+            CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
+            ussdState = ussd::State::sesionAborted;
+            setUSSDTimer();
+        }
+
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
+                                                             cusd.message());
+    }
+
     // Power Down
     if (powerdown::isNormalPowerDown(str)) {
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistering);
@@ -1031,6 +1049,8 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
     if (channel) {
+
+        channel->cmd(at::AT::SMS_UCSC2);
         // if text fit in single message send
         if (textLen < singleMessageLen) {
 
@@ -1102,14 +1122,21 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     }
     DBServiceAPI::SMSUpdate(this, record);
 
+    channel->cmd(at::AT::SMS_GSM);
     return result;
 }
 
 bool ServiceCellular::receiveSMS(std::string messageNumber)
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel == nullptr) {
+        return false;
+    }
+
+    channel->cmd(at::AT::SMS_UCSC2);
 
     auto cmd = at::factory(at::AT::QCMGR);
-    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(cmd + messageNumber + "\r", cmd.timeout);
+    auto ret = channel->cmd(cmd + messageNumber + "\r", cmd.timeout);
 
     bool messageParsed = false;
 
@@ -1207,8 +1234,9 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
             }
         }
     }
+    channel->cmd(at::AT::SMS_GSM);
     // delete message from modem memory
-    cmux->get(TS0710::Channel::Commands)->cmd(at::factory(at::AT::CMGD) + messageNumber);
+    channel->cmd(at::factory(at::AT::CMGD) + messageNumber);
     return true;
 }
 
@@ -1533,6 +1561,7 @@ bool ServiceCellular::handle_fatal_failure()
 bool ServiceCellular::handle_ready()
 {
     LOG_DEBUG("%s", state.c_str());
+
     return true;
 }
 
@@ -1614,13 +1643,13 @@ bool ServiceCellular::handle_status_check(void)
 void ServiceCellular::startStateTimer(uint32_t timeout)
 {
     stateTimeout = timeout;
-    ReloadTimer(stateTimerId);
+    stateTimer->reload();
 }
 
 void ServiceCellular::stopStateTimer()
 {
     stateTimeout = 0;
-    stopTimer(stateTimerId);
+    stateTimer->stop();
 }
 
 void ServiceCellular::handleStateTimer(void)
@@ -1631,4 +1660,75 @@ void ServiceCellular::handleStateTimer(void)
         LOG_FATAL("State %s timeout occured!", state.c_str(state.get()));
         state.set(this, cellular::State::ST::ModemFatalFailure);
     }
+}
+
+bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
+{
+    constexpr uint32_t commandTimeout        = 120000;
+    constexpr uint32_t commandExpectedTokens = 2;
+
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel != nullptr) {
+        if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
+            channel->cmd(at::AT::SMS_GSM);
+            std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15\r";
+            auto result         = channel->cmd(command, commandTimeout, commandExpectedTokens);
+            if (result.code == at::Result::Code::OK) {
+                ussdState = ussd::State::pullRequestSent;
+                setUSSDTimer();
+            }
+        }
+        else if (requestType == CellularUSSDMessage::RequestType::abortSesion) {
+
+            ussdState   = ussd::State::sesionAborted;
+            auto result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
+            if (result.code == at::Result::Code::OK) {
+                CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::pushSesionRequest);
+            }
+            else {
+                CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
+            }
+        }
+        else if (requestType == CellularUSSDMessage::RequestType::pushSesionRequest) {
+
+            ussdState   = ussd::State::pushSesion;
+            auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
+            if (result.code == at::Result::Code::OK) {}
+        }
+        return true;
+    }
+    return false;
+}
+
+void ServiceCellular::handleUSSDTimer(void)
+{
+    if (ussdTimeout > 0) {
+        ussdTimeout -= 1;
+    }
+    else {
+        LOG_WARN("USSD timeout occured, abotrig current session");
+        ussdTimer->stop();
+        CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
+    }
+}
+void ServiceCellular::setUSSDTimer(void)
+{
+    switch (ussdState) {
+    case ussd::State::pullRequestSent:
+        ussdTimeout = ussd::pullResponseTimeout;
+        break;
+    case ussd::State::pullResponseReceived:
+        ussdTimeout = ussd::pullSesionTimeout;
+        break;
+    case ussd::State::pushSesion:
+    case ussd::State::sesionAborted:
+    case ussd::State::none:
+        ussdTimeout = ussd::noTimeout;
+        break;
+    }
+    if (ussdTimeout == ussd::noTimeout) {
+        ussdTimer->stop();
+        return;
+    }
+    ussdTimer->reload();
 }

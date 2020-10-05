@@ -43,11 +43,11 @@ namespace gui
         LockWindow->pinLabel->setVisible(true);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_screen_lock"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_screen_enter_passcode"));
         LockWindow->infoText->setVisible(true);
 
         LockWindow->setImagesVisible(true, false);
-        LockWindow->setBottomBarWidgetsActive(false, false, true);
+        LockWindow->setBottomBarWidgetsActive(true, false, true);
     }
     void ScreenLockBox::setVisibleStateVerifiedPin()
     {
@@ -61,10 +61,10 @@ namespace gui
         LockWindow->pinLabel->setVisible(false);
 
         LockWindow->titleLabel->setVisible(true);
-        LockWindow->titleLabel->setText(utils::localize.get("app_desktop_pin_invalid_info1"));
+        LockWindow->titleLabel->setText(utils::localize.get("app_desktop_screen_wrong_pin"));
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_pin_invalid_info4")));
+        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_screen_allowed_attempts")));
         LockWindow->infoText->addText("\n");
         LockWindow->infoText->addText(std::to_string(LockWindow->lock.getRemainingAttempts()));
         LockWindow->infoText->setVisible(true);
@@ -78,10 +78,10 @@ namespace gui
         LockWindow->titleLabel->setVisible(false);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_pin_blocked_info1")));
+        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_screen_blocked_info")));
         LockWindow->infoText->setVisible(true);
 
         LockWindow->setImagesVisible(false, true);
-        LockWindow->setBottomBarWidgetsActive(false, true, true);
+        LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
 } // namespace gui

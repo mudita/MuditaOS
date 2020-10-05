@@ -48,7 +48,6 @@ To run the project in Eclipse:
   - CMake options:
     ```
     -DCMAKE_EXPORT_COMPILE_COMMANDS=True
-    -DCMAKE_BUILD_TYPE=Debug
     -DCMAKE_TOOLCHAIN_FILE=../Target_Linux.cmake 
     -DCMAKE_EXPORT_COMPILE_COMMANDS=1
     ```
@@ -64,9 +63,8 @@ To run the project in Eclipse:
   - CMake options:
     ```
     -DCMAKE_EXPORT_COMPILE_COMMANDS=True
-    -DCMAKE_BUILD_TYPE=Debug
     -DCMAKE_TOOLCHAIN_FILE=../Target_RT1051.cmake
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 'DBT_STACK_SEL="Bluetopia"' ../
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
     ```
   - Select appropriate Toolchain created above
   - Generation path: `build-rt1051`

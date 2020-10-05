@@ -1,5 +1,6 @@
 #include "NewContactModel.hpp"
 
+#include "AppWindow.hpp"
 #include "application-phonebook/widgets/ContactListItem.hpp"
 #include "application-phonebook/widgets/InputBoxWithLabelAndIconWidget.hpp"
 #include "application-phonebook/widgets/InputLinesWithLabelIWidget.hpp"

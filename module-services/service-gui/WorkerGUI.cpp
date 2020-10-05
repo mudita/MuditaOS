@@ -21,6 +21,7 @@ extern "C"
 #include "WorkerGUI.hpp"
 // module-utils
 #include "log/log.hpp"
+#include <Service/Bus.hpp>
 
 namespace sgui
 {

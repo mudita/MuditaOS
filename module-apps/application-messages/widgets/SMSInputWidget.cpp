@@ -1,6 +1,7 @@
-#include <module-apps/application-messages/ApplicationMessages.hpp>
 #include "SMSInputWidget.hpp"
+#include "AppWindow.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
+#include <module-apps/application-messages/ApplicationMessages.hpp>
 
 #include <Style.hpp>
 #include <i18/i18.hpp>

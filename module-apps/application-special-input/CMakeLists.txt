@@ -1,5 +1,12 @@
-target_sources( ${PROJECT_NAME}
-    PRIVATE
-    "${CMAKE_CURRENT_LIST_DIR}/windows/InputSelector.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/AppSpecialInput.cpp"
-)
+target_sources(${PROJECT_NAME}
+        PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/windows/SpecialInputMainWindow.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/ApplicationSpecialInput.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/widgets/SpecialInputTableWidget.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/models/SpecialInputModel.cpp"
+        PUBLIC
+        "${CMAKE_CURRENT_LIST_DIR}/ApplicationSpecialInput.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/widgets/SpecialInputTableWidget.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/SpecialInputMainWindow.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/models/SpecialInputModel.hpp"
+        )

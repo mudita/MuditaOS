@@ -3,8 +3,9 @@
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/models/NewContactModel.hpp"
 
-#include <Text.hpp>
+#include <AppWindow.hpp>
 #include <ListView.hpp>
+#include <Text.hpp>
 
 namespace gui
 {

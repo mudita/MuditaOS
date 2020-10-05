@@ -26,10 +26,11 @@
 
 #include "log/log.hpp"
 
-#include <cassert>
-#include <time/ScopedTime.hpp>
 #include "includes/DBServiceName.hpp"
 #include "messages/QueryMessage.hpp"
+#include <Service/Bus.hpp>
+#include <cassert>
+#include <time/ScopedTime.hpp>
 
 static const auto service_db_stack = 1024 * 24;
 
@@ -580,11 +581,6 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     return responseMsg;
 }
 
-// Invoked when timer ticked
-void ServiceDB::TickHandler(uint32_t id)
-{}
-
-// Invoked during initialization
 sys::ReturnCodes ServiceDB::InitHandler()
 {
     Database::initialize();

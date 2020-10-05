@@ -9,6 +9,7 @@
 #define MODULE_APPS_APPLICATION_ANTENNA_APPLICATIONANTENNA_HPP_
 
 #include "Application.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "windows/AppWindow.hpp"
 
 namespace app
@@ -29,7 +30,7 @@ namespace app
     class ApplicationAntenna : public app::Application
     {
       protected:
-        AppTimer appTimer;
+        std::unique_ptr<sys::Timer> appTimer;
         void timerHandler(void);
         bool cellularRequestInProgress = false;
         bsp::cellular::antenna antenna;

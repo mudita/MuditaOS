@@ -5,6 +5,7 @@ add_catch2_executable(
         SRCS
                 main.cpp
                 test-service-db-api.cpp
+                test-service-db-settings-messages.cpp
         LIBS
                 module-services
 )

@@ -11,18 +11,12 @@ const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
 ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName)
 {
     LOG_INFO("[ServiceBluetooth] Initializing");
-    testTimerID = CreateTimer(3000, true);
-    ReloadTimer(testTimerID);
 }
 
 ServiceBluetooth::~ServiceBluetooth()
 {
     LOG_INFO("[ServiceBluetooth] Cleaning resources");
 }
-
-// Invoked when timer ticked
-void ServiceBluetooth::TickHandler(uint32_t id)
-{}
 
 // This code is experimental:
 // this means it is an init point of bluetooth feature handling

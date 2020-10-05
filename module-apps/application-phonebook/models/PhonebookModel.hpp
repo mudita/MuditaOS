@@ -48,7 +48,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     void setDisplayMode(std::uint32_t displayMode);
     auto getDisplayMode() -> std::uint32_t;
     auto getLastRequestedOffset() -> std::uint32_t;
-    auto getLabelMarkerDisplayMode() -> LabelMarkerDisplayMode;
+    auto getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarkerDisplayMode;
 
     // onClick callback to register
     std::function<bool(gui::PhonebookItem *item)> messagesSelectCallback = nullptr;

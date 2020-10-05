@@ -46,9 +46,9 @@ using namespace cpp_freertos;
 Timer::Timer(   const char * const TimerName,
                 TickType_t PeriodInTicks,
                 bool Periodic
-                )
+                ) : name ( TimerName ) 
 {
-    handle = xTimerCreate(  TimerName,
+    handle = xTimerCreate(  name.c_str(),
                             PeriodInTicks,
                             Periodic ? pdTRUE : pdFALSE,
                             this,
@@ -63,29 +63,13 @@ Timer::Timer(   const char * const TimerName,
     }
 }
 
-
-Timer::Timer(   TickType_t PeriodInTicks,
-                bool Periodic
-                )
-{
-    handle = xTimerCreate(  "Default",
-                            PeriodInTicks,
-                            Periodic ? pdTRUE : pdFALSE,
-                            this,
-                            TimerCallbackFunctionAdapter);
-
-    if (handle == NULL) {
-#ifndef CPP_FREERTOS_NO_EXCEPTIONS
-        throw TimerCreateException();
-#else
-        configASSERT(!"Timer Constructor Failed");
-#endif
-    }
-}
-
+Timer::Timer(TickType_t PeriodInTicks, bool Periodic) : Timer("Default", PeriodInTicks, Periodic)
+{}
 
 Timer::~Timer()
 {
+    // IMPORTANT pt1 - without it we have race condition with timer thread
+    vTimerSetTimerID(handle, nullptr);
     xTimerDelete(handle, portMAX_DELAY);
 }
 
@@ -164,6 +148,9 @@ TaskHandle_t Timer::GetTimerDaemonHandle()
 
 void Timer::TimerCallbackFunctionAdapter(TimerHandle_t xTimer)
 {
-    Timer *timer = static_cast<Timer *>(pvTimerGetTimerID(xTimer));
-    timer->Run();
+    auto *timer = static_cast<Timer *>(pvTimerGetTimerID(xTimer));
+    // IMPORTANT pt2 - without it we have race condition with timer thread
+    if (timer != nullptr && timer->handle != nullptr) {
+        timer->Run();
+    }
 }

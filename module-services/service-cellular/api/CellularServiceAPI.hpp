@@ -55,4 +55,6 @@ namespace CellularServiceAPI
     bool GetAntenna(sys::Service *serv, bsp::cellular::antenna &response);
 
     bool TransmitDtmfTones(sys::Service *serv, uint32_t digit);
+
+    bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
 }; // namespace CellularServiceAPI

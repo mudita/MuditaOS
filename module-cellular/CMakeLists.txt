@@ -25,6 +25,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_WAKEUP.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_Any.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )

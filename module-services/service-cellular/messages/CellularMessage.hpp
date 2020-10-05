@@ -70,6 +70,7 @@ class CellularNotificationMessage : public CellularMessage
         RawCommand,               // send raw command to modem -> returns raw, tokenised result
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
+        NewIncomingUSSD           // modem received new ussd code from network
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -85,6 +86,23 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
+class CellularUSSDMessage : public CellularMessage
+{
+  public:
+    enum class RequestType
+    {
+        pullSesionRequest,
+        pushSesionRequest,
+        abortSesion
+    };
+    CellularUSSDMessage() = delete;
+    CellularUSSDMessage(RequestType requestType, const std::string &data = "")
+        : CellularMessage(MessageType::CellularUSSDRequest), type(requestType), data(data)
+    {}
+
+    RequestType type;
+    std::string data;
+};
 class CellularRequestMessage : public CellularMessage
 {
   public:
@@ -126,6 +144,93 @@ class CellularCallRequestMessage : public CellularMessage
         : CellularMessage(MessageType::CellularCallRequest), number(number)
     {}
     utils::PhoneNumber::View number;
+};
+
+class CellularSimMessage : public CellularMessage
+{
+  public:
+    enum class SimCard
+    {
+        SIM1,
+        SIM2
+    };
+
+    CellularSimMessage(SimCard sim) : CellularMessage(MessageType::CellularSimProcedure), sim(sim)
+    {}
+    virtual ~CellularSimMessage() = default;
+    SimCard getSimCard() const noexcept
+    {
+        return sim;
+    }
+
+  private:
+    SimCard sim                         = defaultSimCard;
+    static const SimCard defaultSimCard = SimCard::SIM1;
+};
+
+class CellularSimResponseMessage : public CellularSimMessage
+{
+  public:
+    enum class SimState
+    {
+        SIMUnlocked,
+        PINRequired,
+        PINInvalidRetryPossible,
+        PUKRequired,
+        PUKInvalidRetryPossible,
+        SIMBlocked
+    };
+    CellularSimResponseMessage(SimCard sim,
+                               SimState state,
+                               const utils::PhoneNumber::View &number,
+                               unsigned int pinSize,
+                               unsigned int attemptsLeft = defaultAttemptsLeft)
+        : CellularSimMessage(sim), state(state), number(number), pinSize(pinSize), attemptsLeft(attemptsLeft)
+    {}
+
+    SimState getSimState() const noexcept
+    {
+        return state;
+    }
+    utils::PhoneNumber::View getPhoneNumber() const noexcept
+    {
+        return number;
+    }
+    unsigned int getPinSize() const noexcept
+    {
+        return pinSize;
+    }
+    unsigned int getAttemptsLeft() const noexcept
+    {
+        return attemptsLeft;
+    }
+
+  private:
+    SimState state = defaultSimState;
+    utils::PhoneNumber::View number;
+    unsigned int pinSize = defaultPinSize;
+    /// ignored if state is not one of { PINInvalidRetryPossible, PUKInvalidRetryPossible }
+    unsigned int attemptsLeft = defaultAttemptsLeft;
+
+    static const unsigned int defaultPinSize      = 4;
+    static const unsigned int defaultAttemptsLeft = 4;
+    static const SimState defaultSimState         = SimState::SIMUnlocked;
+};
+
+class CellularSimVerifyPinRequestMessage : public CellularSimMessage
+{
+  public:
+    CellularSimVerifyPinRequestMessage(SimCard sim, std::vector<unsigned int> pinValue)
+        : CellularSimMessage(sim), pinValue(std::move(pinValue))
+    {}
+
+    std::vector<unsigned int> gePinValue() const noexcept
+    {
+        return pinValue;
+    }
+
+  private:
+    std::vector<unsigned int> pinValue;
 };
 
 class CellularGetChannelMessage : public sys::DataMessage

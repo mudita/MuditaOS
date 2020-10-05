@@ -42,9 +42,12 @@ namespace gui
          *
          */
       protected:
-        /**
-         * @brief Function for drawing horizontal line with given width in specified direction
-         */
+        void drawPixel(Context *ctx, Point point, Color color);
+
+        void drawLine(Context *ctx, CommandLine *cmd);
+
+        void drawLine(Context *ctx, Point start, Point end, Color color);
+
         void drawHorizontalLine(Context *ctx,
                                 int16_t x,
                                 int16_t y,
@@ -52,9 +55,7 @@ namespace gui
                                 uint16_t penWidth,
                                 Color color,
                                 LineExpansionDirection dir);
-        /**
-         * @brief Function for drawing vertical line with given width in specified direction
-         */
+
         void drawVerticalLine(Context *ctx,
                               int16_t x,
                               int16_t y,
@@ -62,6 +63,7 @@ namespace gui
                               uint16_t penWidth,
                               Color color,
                               LineExpansionDirection dir);
+
         /**
          * @brief Function for drawing a line skewed at 45 deg with given width in specified direction. by default the
          * line is drawn from top to bottom in V-dim and from left to right in H-dim.
@@ -76,25 +78,27 @@ namespace gui
                            LineExpansionDirection dir,
                            bool toRight,
                            Line45degEnd lineEnds = Line45degEnd::TOP_FLAT | Line45degEnd::BOTTOM_FLAT);
-        /**
-         * @brief Function that draws line on the given context
-         */
-        void drawLine(Context *ctx, CommandLine *cmd);
-        /**
-         * @brief Function draws rectangle on the given context;
-         */
+
         void drawRectangle(Context *ctx, CommandRectangle *cmd);
-        /**
-         * @brief Function draws line of text with specified font on the given context;
-         */
+
+        void drawArc(Context *ctx, CommandArc *cmd);
+
+        void drawArc(Context *ctx, Point center, Length radius, AngleDegrees begin, AngleDegrees sweep, Color color);
+
+        void drawArc(
+            Context *ctx, Point center, Length radius, AngleDegrees begin, AngleDegrees sweep, Color color, int width);
+
+        void drawCircle(Context *ctx, CommandCircle *cmd);
+
+        void drawCircle(Context *ctx, Point center, Length radius, Color color, int width);
+
+        void drawFilledCircle(
+            Context *ctx, Point center, Length radius, Color borderColor, int borderWidth, Color fillColor);
+
         void drawText(Context *ctx, CommandText *cmd);
-        /**
-         * @brief Draws single glyph to specified context
-         */
+
         void drawChar(Context *context, const int16_t x, const int16_t y, FontGlyph *glyph, const Color color);
-        /**
-         * @brief Draws an image with specified ID on given coordinates.
-         */
+
         void drawImage(Context *ctx, CommandImage *cmd);
 
       public:
