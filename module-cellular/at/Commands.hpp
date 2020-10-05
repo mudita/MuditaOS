@@ -110,8 +110,10 @@ namespace at
         CUSD_CLOSE_SESSION,
         CUSD_SEND,
         SET_SMS_STORAGE,
-	ENABLE_TIME_ZONE_UPDATE,
-        SET_TIME_ZONE_REPORTING
+        ENABLE_TIME_ZONE_UPDATE,
+        SET_TIME_ZONE_REPORTING,
+        DISABLE_TIME_ZONE_UPDATE,
+        DISABLE_TIME_ZONE_REPORTING
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -172,6 +174,8 @@ namespace at
             {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"\r", 300}},
             {AT::ENABLE_TIME_ZONE_UPDATE, {"AT+CTZU=3\r"}},
             {AT::SET_TIME_ZONE_REPORTING, {"AT+CTZR=2\r"}},
+            {AT::DISABLE_TIME_ZONE_UPDATE, {"AT+CTZU=0\r"}},
+            {AT::DISABLE_TIME_ZONE_REPORTING, {"AT+CTZR=0\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);

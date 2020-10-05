@@ -879,8 +879,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     case MessageType::EVMTimeUpdated: {
         auto channel = cmux->get(TS0710::Channel::Commands);
-        channel->cmd("AT+CTZU=0\r");
-        channel->cmd("AT+CTZR=0\r");
+        channel->cmd(at::AT::DISABLE_TIME_ZONE_REPORTING);
+        channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
     } break;
     default:
         break;
