@@ -34,5 +34,6 @@ namespace gui
     static inline constexpr Color ColorFullBlack{Color::Black, Color::Opaque};
     static inline constexpr Color ColorFullWhite{Color::White, Color::Opaque};
     static inline constexpr Color ColorNoColor{Color::White, Color::FullTransparent};
+    static inline constexpr Color ColorGrey{9, Color::Opaque};
     static inline constexpr Color ColorTray{13, Color::Opaque};
 } // namespace gui

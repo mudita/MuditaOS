@@ -166,8 +166,14 @@ namespace gui
                                       application, "ApplicationMusicPlayer", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
-                new gui::Tile{
-                    "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
+                new gui::Tile{"menu_meditation_W_G",
+                              "app_desktop_menu_meditation",
+                              [=](gui::Item &item) {
+                                  LOG_INFO("Meditation");
+                                  sapm::ApplicationManager::messageSwitchApplication(
+                                      application, "ApplicationMeditation", gui::name::window::main_window, nullptr);
+                                  return true;
+                              }},
                 new gui::Tile{"menu_settings_W_G",
                               "app_desktop_menu_settings_new",
                               [=](gui::Item &item) {

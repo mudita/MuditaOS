@@ -14,6 +14,7 @@
 * `[settings]` Added DatabaseAgent base class and SettingsAgent.
 * `[audio]` Added vibration/enable sound database logic
 * `[settings]` Create main window for apps and tools 
+* `[meditation]` Added a meditation progress bar with simple implementation of meditation application.
 
 
 ### Changed

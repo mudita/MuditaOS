@@ -348,6 +348,7 @@ namespace gui
         /// On change of position or size this method will recalculate visible part of the widget
         /// considering widgets hierarchy and calculate absolute position of drawing primitives.
         virtual void updateDrawArea();
+        std::list<DrawCommand *> buildChildrenDrawList();
         /// Pointer to navigation object. It is added when object is set for one of the directions
         gui::Navigation *navigationDirections = nullptr;
     };

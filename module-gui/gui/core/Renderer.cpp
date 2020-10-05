@@ -32,14 +32,6 @@ extern "C"
 #define log_warn_glyph(...)
 #endif
 
-namespace
-{
-    constexpr auto toRadians(gui::AngleDegrees degrees) noexcept -> gui::AngleRadians
-    {
-        return degrees * M_PI / gui::HalfAngle;
-    }
-} // namespace
-
 namespace gui
 {
     void Renderer::drawPixel(Context *ctx, Point point, Color color)
@@ -855,45 +847,54 @@ namespace gui
         drawArc(ctx, center, radius, startAngle, sweepAngle, color, width);
     }
 
-    void Renderer::drawArc(
-        Context *ctx, Point center, Length radius, AngleDegrees begin, AngleDegrees sweep, Color color, int width)
+    void Renderer::drawArc(Context *ctx,
+                           Point center,
+                           Length radius,
+                           trigonometry::Degrees begin,
+                           trigonometry::Degrees sweep,
+                           Color color,
+                           int width)
     {
         if (width == 1) {
             drawArc(ctx, center, radius, begin, sweep, color);
             return;
         }
 
-        const auto start = toRadians(begin);
-        const auto end   = toRadians(begin + sweep);
+        const auto start = trigonometry::toRadians(begin);
+        const auto end   = trigonometry::toRadians(begin + sweep);
         constexpr double step{0.001};
 
-        double cos = .0;
-        double sin = .0;
+        double cosine = .0;
+        double sine   = .0;
         for (double radians = start; radians <= end; radians += step) {
-            cos = std::cos(radians);
-            sin = std::sin(radians);
+            cosine = std::cos(radians);
+            sine   = std::sin(radians);
             for (int i = 0; i < width; ++i) {
                 const auto r = radius - i;
-                const auto x = std::lround(r * sin);
-                const auto y = std::lround(r * cos);
-                drawPixel(ctx, Point(center.x + x, center.y - y), color);
+                const auto x = trigonometry::AdjacentSide::fromCosine(cosine, r);
+                const auto y = trigonometry::OppositeSide::fromSine(sine, r);
+                drawPixel(ctx, Point(center.x + x, center.y + y), color);
             }
         }
     }
 
-    void Renderer::drawArc(
-        Context *ctx, Point center, Length radius, AngleDegrees begin, AngleDegrees sweep, Color color)
+    void Renderer::drawArc(Context *ctx,
+                           Point center,
+                           Length radius,
+                           trigonometry::Degrees begin,
+                           trigonometry::Degrees sweep,
+                           Color color)
     {
-        const auto start = toRadians(begin);
-        const auto end   = toRadians(begin + sweep);
+        const auto start = trigonometry::toRadians(begin);
+        const auto end   = trigonometry::toRadians(begin + sweep);
         constexpr double step{0.001};
 
         long int x{0};
-        long int y = radius;
+        long int y{0};
         for (double radians = start; radians <= end; radians += step) {
-            x = std::lround(radius * std::sin(radians));
-            y = std::lround(radius * std::cos(radians));
-            drawPixel(ctx, Point(center.x + x, center.y - y), color);
+            x = trigonometry::AdjacentSide::fromAngle(radians, radius);
+            y = trigonometry::OppositeSide::fromAngle(radians, radius);
+            drawPixel(ctx, Point(center.x + x, center.y + y), color);
         }
     }
 
@@ -931,7 +932,7 @@ namespace gui
 
     void Renderer::drawCircle(Context *ctx, Point center, Length radius, Color color, int width)
     {
-        drawArc(ctx, center, radius, 0, 360, color, width);
+        drawArc(ctx, center, radius, 0, trigonometry::FullAngle, color, width);
     }
 
     void Renderer::drawChar(Context *context, const int16_t x, const int16_t y, FontGlyph *glyph, const Color color)
