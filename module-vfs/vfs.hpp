@@ -157,6 +157,7 @@ class vfs
     std::string lastErrnoToStr();
     bool isDir(const char *path);
     bool fileExists(const char *path);
+    bool isWritable (const char *path);
     int deltree(const char *path);
     int mkdir(const char *dir);
     int rename(const char *oldname, const char *newname);
@@ -177,6 +178,7 @@ class vfs
     static bool verifyCRC(const std::string filePath, const unsigned long crc32);
     static bool verifyCRC(const fs::path filePath);
     static std::string generateRandomId(size_t length);
+    static fs::path getTempPath(const fs::path &fileName);
 
   private:
     bool updateFileCRC32(const fs::path &file);

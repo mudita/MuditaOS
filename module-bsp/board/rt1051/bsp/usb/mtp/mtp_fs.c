@@ -106,7 +106,7 @@ int fs_create(void *arg, const mtp_object_info_t *info, uint32_t *handle)
     return -1;
 }
 
-int fs_open(void *arg, uint32_t handle, const char *mode)
+int fs_open_(void *arg, uint32_t handle, const char *mode)
 {
     struct mtp_fs *fs = (struct mtp_fs*)arg;
     return -1;
@@ -129,7 +129,7 @@ int fs_remove(void *arg, uint32_t handle)
     return -1;
 }
 
-void fs_close(void *arg)
+void fs_close_(void *arg)
 {
     struct mtp_fs *fs = (struct mtp_fs*)arg;
 }
@@ -144,10 +144,10 @@ const struct mtp_storage_api simple_fs_api =
     .rename = fs_rename,
     .create = fs_create,
     .remove = fs_remove,
-    .open = fs_open,
+    .open = fs_open_,
     .read = fs_read,
     .write = fs_write,
-    .close = fs_close
+    .close = fs_close_
 };
 
 struct mtp_fs* mtp_fs_alloc(void *disk)

@@ -10,7 +10,7 @@ namespace parserFSM
         NoMsg,
         ReceivedPartialHeader,
         ReceivedPartialPayload,
-        ReceivedPayload,
+        ReceivedPayload
     };
 
     class StateMachine
@@ -22,6 +22,11 @@ namespace parserFSM
         {
             return state;
         };
+
+        void setState(const parserFSM::State newState)
+        {
+            state = newState;
+        }
 
       private:
         std::string *receivedMsgPtr = nullptr;

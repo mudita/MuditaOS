@@ -24,7 +24,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
     desktopWorker = std::make_unique<WorkerDesktop>(this);
     desktopWorker->init(
-        {{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+        { {desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
          {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
     desktopWorker->run();
 
@@ -104,4 +104,14 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
     }
 
     return std::make_shared<sys::ResponseMessage>();
+}
+
+sys::ReturnCodes ServiceDesktop::startDownload(const fs::path &filePath, const uint32_t fileSize)
+{
+    return desktopWorker->startDownload(filePath, fileSize);
+}
+
+sys::ReturnCodes ServiceDesktop::startUpload(const fs::path &filePath, const uint32_t fileSize)
+{
+    return desktopWorker->startUpload(filePath, fileSize);
 }

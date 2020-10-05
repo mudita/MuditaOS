@@ -1,4 +1,3 @@
-
 #include "UpdateEndpoint.hpp"
 #include "DesktopMessages.hpp"
 #include "ServiceDesktop.hpp"
@@ -19,7 +18,7 @@ auto UpdateEndpoint::handle(Context &context) -> void
 
 auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 {
-    std::string fileName = context.getBody()["fileName"].string_value();
+    std::string fileName = context.getBody()[parserFSM::json::fileName].string_value();
     auto path            = purefs::dir::os_updates / fileName;
     auto fileExists      = vfs.fileExists(path.c_str());
     if (fileExists) {

@@ -8,9 +8,10 @@
 
 #include "virtual_com_demo.h"
 
+#define RX_CHUNK 512
+
 static void VirtualComConsumerTask(void *handle)
 {
-#define RX_CHUNK 512
     char *input = pvPortMalloc(RX_CHUNK);
     usb_cdc_vcom_struct_t *cdcVcom = handle;
     size_t len;
@@ -29,6 +30,7 @@ static void VirtualComConsumerTask(void *handle)
     {
         //if VirtualComConfigured() {
         //}
+
         len = VirtualComRecv(cdcVcom, input, RX_CHUNK);
         if (len > 0)
         {
@@ -49,7 +51,7 @@ static void VirtualComConsumerTask(void *handle)
 
 void VirtualComDemoInit(usb_cdc_vcom_struct_t *cdcVcom)
 {
-    if (xTaskCreate(VirtualComConsumerTask,
+    /*if (xTaskCreate(VirtualComConsumerTask,
                     "VirtualComDemo",
                     2048L / sizeof(portSTACK_TYPE),
                     cdcVcom,
@@ -58,6 +60,6 @@ void VirtualComDemoInit(usb_cdc_vcom_struct_t *cdcVcom)
                     ) != pdPASS)
     {
         LOG_ERROR("VirtualComDemo xTaskCreate failed");
-    }
+    }*/
 }
 

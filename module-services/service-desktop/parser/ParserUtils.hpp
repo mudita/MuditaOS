@@ -13,6 +13,7 @@ namespace parserFSM
         invalid = 0,
         deviceInfo,
         update,
+        filesystemUpload,
         backup,
         restore,
         factory,
@@ -110,6 +111,19 @@ namespace parserFSM
         const inline std::string backupUpload   = "backupUpload";
         const inline std::string restoreRequest = "restoreRequest";
         const inline std::string factoryRequest = "factoryRequest";
+        const inline std::string fileName       = "fileName";
+        const inline std::string fileSize       = "fileSize";
+
+        namespace filesystem
+        {
+            const inline std::string command  = "command";
+            namespace commands
+            {
+                const inline std::string upload   = "upload";
+                const inline std::string rm       = "rm";
+                const inline std::string download = "download";
+            }
+        }
 
         namespace messages
         {

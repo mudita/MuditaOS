@@ -270,3 +270,20 @@ int purefs::BootConfig::version_compare(const std::string &v1, const std::string
     }
     return 0;
 }
+
+bool vfs::isWritable(const char *path)
+{
+    vfs::FILE *fp = fopen(path, "w");
+    if (fp != nullptr) {
+        fclose(fp);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+fs::path vfs::getTempPath(const fs::path &fileName)
+{
+    return purefs::dir::tmp / fileName;
+}

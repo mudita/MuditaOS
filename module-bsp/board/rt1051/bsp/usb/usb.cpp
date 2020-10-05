@@ -23,7 +23,7 @@ extern "C"
 namespace bsp
 {
 
-    int usbInit(void)
+    usb_cdc_vcom_struct_t *usbInit()
     {
         return composite_init();
     }

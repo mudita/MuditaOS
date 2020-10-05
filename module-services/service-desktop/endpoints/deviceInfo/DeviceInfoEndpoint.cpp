@@ -8,6 +8,7 @@
 
 auto DeviceInfoEndpoint::handle(Context &context) -> void
 {
+    LOG_INFO("handle");
     switch (context.getMethod()) {
     case http::Method::get:
         getDeviceInfo(context);
@@ -20,6 +21,7 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
 }
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
+    LOG_INFO("getDeviceInfo");
     vfs::FilesystemStats fsStats = vfs.getFilesystemStats();
 
     context.setResponseBody(json11::Json::object(

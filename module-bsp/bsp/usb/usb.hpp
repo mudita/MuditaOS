@@ -4,7 +4,17 @@ extern "C"
 {
 #include "FreeRTOS.h"
 #include "task.h"
-#include <queue.h>
+#include "semphr.h"
+#include "stream_buffer.h"
+#include "message_buffer.h"
+#include "event_groups.h"
+#include "usb.h"
+#include "usb_device.h"
+#include "usb_device_class.h"
+#include "usb_device_cdc_acm.h"
+#include "usb_device_ch9.h"
+#include "usb_device_descriptor.h"
+#include "composite.h"
 }
 
 #include <errno.h>
@@ -14,6 +24,7 @@ extern "C"
 #include <string.h>
 #include <unistd.h>
 
+
 #define SERIAL_TRANSMISSION_START 0x02
 #define SERIAL_TRANSMISSION_END 0x03
 #define SERIAL_SHELL_START 0x33
@@ -22,7 +33,7 @@ extern "C"
 
 namespace bsp
 {
-    int usbInit(void);
+    usb_cdc_vcom_struct_t *usbInit();
 
     // TODO: refactor it, to fit more to existing codebase
     void usbCDCReceive(void *ptr);
