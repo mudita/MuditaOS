@@ -137,7 +137,7 @@ class AudioStartMessage : public AudioMessage
         : AudioMessage(playbackType), fileName(fileName)
     {}
 
-    std::string fileName;
+    const std::string fileName;
 };
 
 class AudioResponseMessage : public sys::ResponseMessage

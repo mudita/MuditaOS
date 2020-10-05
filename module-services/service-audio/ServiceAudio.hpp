@@ -50,6 +50,8 @@ class ServiceAudio : public sys::Service
     };
 
     audio::AudioMux audioMux;
+    audio::Token vibrationToken;
+
     auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
     auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
 
@@ -63,7 +65,6 @@ class ServiceAudio : public sys::Service
     void VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
     void VibrationStop(const audio::Token &token);
     auto GetVibrationType(const audio::PlaybackType &type) -> std::optional<VibrationType>;
-    audio::Token vibrationToken;
 
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
