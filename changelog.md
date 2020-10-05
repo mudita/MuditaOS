@@ -7,7 +7,7 @@
 * `[gui]` Added GUI timers capability
 * `[fonts]` Added multiplication and division sign to the font files 
 * `[bluetooth]` Added storing of BT link keys.
-
+* `[audio]` AudioMux tests
 
 ### Changed
 * `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
