@@ -43,6 +43,12 @@ namespace AudioServiceAPI
         return Handle(ret->retCode, ret->token);
     }
 
+    std::shared_ptr<AudioRequest> PlaybackStartRequest(const std::string fileName,
+                                                       const audio::PlaybackType playbackType)
+    {
+        return std::make_shared<PlaybackStartReq>(fileName, playbackType);
+    }
+
     Handle RecordingStart(sys::Service *serv, const std::string &fileName)
     {
         auto msg      = std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);

@@ -23,6 +23,9 @@ namespace AudioServiceAPI
     audio::Handle PlaybackStart(sys::Service *serv,
                                 const audio::PlaybackType &playbackType,
                                 const std::string &fileName);
+
+    std::shared_ptr<AudioRequest> PlaybackStartRequest(const std::string fileName,
+                                                       const audio::PlaybackType playbackType);
     /**
      * @brief Starts recording.
      *

@@ -17,7 +17,9 @@
 #include "Audio/AudioCommon.hpp"
 #include "Audio/decoder/decoder.hpp"
 
-class AudioMessage : public sys::DataMessage
+#include "Service/Bus.hpp"
+
+class AudioMessage : public std::enable_shared_from_this<AudioMessage>, public sys::DataMessage
 {
   public:
     AudioMessage() : sys::DataMessage(MessageType::MessageTypeUninitialized)
@@ -33,6 +35,74 @@ class AudioMessage : public sys::DataMessage
     MessageType type = MessageType::MessageTypeUninitialized;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
     audio::Token token;
+};
+
+class AudioResponseMessage : public sys::ResponseMessage
+{
+  public:
+    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
+                         const audio::Tags &tags = {},
+                         audio::Token token      = audio::Token(),
+                         const float val         = 0.0)
+        : sys::ResponseMessage(), tags(tags), val(val), token(token)
+    {}
+
+    AudioResponseMessage(audio::RetCode retCode, const float val)
+        : AudioResponseMessage(retCode, {}, audio::Token(), val)
+    {}
+
+    virtual ~AudioResponseMessage()
+    {}
+
+    audio::RetCode retCode = audio::RetCode::Success;
+    audio::Tags tags       = {};
+    float val              = 0.0;
+    audio::Token token;
+};
+
+class AudioRequestSync : virtual public AudioMessage
+{
+  public:
+    AudioRequestSync()
+    {}
+    virtual ~AudioRequestSync()
+    {}
+    using enable_shared_from_this<AudioMessage>::shared_from_this;
+    audio::Handle SendSync(sys::Service *serv);
+};
+
+class AudioRequestAsync : virtual public AudioMessage
+{
+  public:
+    AudioRequestAsync()
+    {}
+    virtual ~AudioRequestAsync()
+    {}
+    using enable_shared_from_this<AudioMessage>::shared_from_this;
+    bool SendAsync(sys::Service *serv);
+};
+
+class AudioRequest : public AudioRequestAsync, public AudioRequestSync
+{
+  public:
+    AudioRequest()
+    {}
+    virtual ~AudioRequest()
+    {}
+};
+
+class PlaybackStartReq : public AudioRequest
+{
+  public:
+    PlaybackStartReq(const std::string fileName, const audio::PlaybackType playbackType)
+        : fileName(fileName), playbackType(playbackType)
+    {}
+
+    ~PlaybackStartReq()
+    {}
+
+    const std::string fileName;
+    const audio::PlaybackType playbackType;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -124,29 +194,6 @@ class AudioStopMessage : public AudioMessage
 
     const std::vector<audio::PlaybackType> stopVec;
     const audio::Token token;
-};
-
-class AudioResponseMessage : public sys::ResponseMessage
-{
-  public:
-    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
-                         const audio::Tags &tags = {},
-                         audio::Token token      = audio::Token(),
-                         const float val         = 0.0)
-        : sys::ResponseMessage(), tags(tags), val(val), token(token)
-    {}
-
-    AudioResponseMessage(audio::RetCode retCode, const float val)
-        : AudioResponseMessage(retCode, {}, audio::Token(), val)
-    {}
-
-    virtual ~AudioResponseMessage()
-    {}
-
-    audio::RetCode retCode = audio::RetCode::Success;
-    audio::Tags tags       = {};
-    float val              = 0.0;
-    audio::Token token;
 };
 
 #endif // PUREPHONE_AUDIOMESSAGE_HPP

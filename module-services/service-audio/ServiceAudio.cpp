@@ -23,6 +23,14 @@ ServiceAudio::ServiceAudio()
 {
     busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
     LOG_INFO("[ServiceAudio] Initializing");
+
+    // this is just a test
+    connect(PlaybackStartReq("", PlaybackType::None), [&](sys::DataMessage *req, sys::ResponseMessage *response) {
+        if (auto *audioReq = dynamic_cast<PlaybackStartReq *>(req)) {
+            LOG_ERROR("Play %s", audioReq->fileName.c_str());
+        }
+        return std::make_shared<AudioResponseMessage>(audio::RetCode::Success, 1.55);
+    });
 }
 
 ServiceAudio::~ServiceAudio()

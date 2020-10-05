@@ -24,6 +24,9 @@ namespace app
 
     sys::Message_t ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
+        if (auto r = dynamic_cast<AudioResponseMessage *>(resp)) {
+            LOG_INFO("[HUBERT] HERE ! %f", r->val);
+        }
         return Application::DataReceivedHandler(msgl);
     }
 
@@ -92,10 +95,13 @@ namespace app
 
     bool ApplicationMusicPlayer::play(const std::string &fileName)
     {
-        auto handle = AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::Multimedia, fileName);
-        if (handle.GetLastRetCode() != audio::RetCode::Success) {
-            LOG_ERROR("play failed with %s", audio::c_str(handle.GetLastRetCode()));
-            return false;
+        // this is how we send async
+        auto a = AudioServiceAPI::PlaybackStartRequest(fileName, audio::PlaybackType::Multimedia);
+        a->SendAsync(this);
+        // this is how we send sync
+        auto ret = AudioServiceAPI::PlaybackStartRequest(fileName, audio::PlaybackType::Multimedia)->SendSync(this);
+        if (ret.GetLastRetCode() == audio::RetCode::Success) {
+            // do something
         }
         return true;
     }

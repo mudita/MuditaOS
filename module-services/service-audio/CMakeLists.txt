@@ -17,5 +17,6 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceAudio.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/api/AudioServiceAPI.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/AudioMessage.cpp"
 )
 
