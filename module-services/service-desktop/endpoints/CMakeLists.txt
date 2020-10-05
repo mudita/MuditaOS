@@ -25,6 +25,8 @@ target_sources(${PROJECT_NAME}
 		"contacts/ContactsEndpoint.cpp"
 		"messages/MessageHelper.cpp"
 		"messages/MessagesEndpoint.cpp"
+		"calendarEvents/EventsHelper.cpp"
+		"calendarEvents/EventsEndpoint.cpp"
 		"backup/BackupEndpoint.cpp"
 		"backup/BackupRestore.cpp"
 		"deviceInfo/DeviceInfoEndpoint.cpp"

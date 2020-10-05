@@ -53,3 +53,6 @@
 [submodule "module-utils/magic_enum"]
 	path = module-utils/magic_enum
 	url = git@github.com:Neargye/magic_enum.git
+[submodule "module-utils/icalendarlib"]
+	path = module-utils/icalendarlib
+	url = git@github.com:jgonera/icalendarlib.git

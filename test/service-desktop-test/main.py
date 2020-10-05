@@ -9,7 +9,7 @@ from tests.calllog import *
 from termcolor import colored
 
 
-def main(port_name='/dev/ttyACM1'):
+def main(port_name='/dev/ttyACM0'):
     phone.port = port_name
     phone.timeout = 10
     phone.open()
