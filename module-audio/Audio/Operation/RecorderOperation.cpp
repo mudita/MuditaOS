@@ -59,10 +59,11 @@ namespace audio
             audio::str(audio::Profile::Type::RecordingHeadset, audio::Setting::Gain);
         const auto recordingHeadsetGain = dbCallback(dbRecordingHeadsetGainPath, defaultRecordingHeadsetGain);
 
-        availableProfiles.push_back(std::make_unique<ProfileRecordingOnBoardMic>(nullptr, recordingOnBoardMicGain));
-        availableProfiles.push_back(std::make_unique<ProfileRecordingHeadset>(nullptr, recordingHeadsetGain));
+        availableProfiles.push_back(
+            Profile::Create(Profile::Type::RecordingBuiltInMic, nullptr, 0, recordingOnBoardMicGain));
+        availableProfiles.push_back(Profile::Create(Profile::Type::RecordingHeadset, nullptr, 0, recordingHeadsetGain));
 
-        currentProfile = availableProfiles[0].get();
+        currentProfile = availableProfiles[0];
 
         uint32_t channels = 0;
         if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) ||

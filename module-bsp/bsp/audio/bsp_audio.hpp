@@ -29,6 +29,7 @@ namespace bsp {
         };
 
     	enum class Type {
+            None,
             Audiocodec,
             Cellular,
             Bluetooth
