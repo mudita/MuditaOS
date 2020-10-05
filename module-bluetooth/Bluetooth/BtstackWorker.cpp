@@ -1,18 +1,10 @@
 #include <log/log.hpp>
-
-// #define __BTSTACK_FILE__ ".c"
+#include <cstdlib>
 
 extern "C"
 {
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-
-#include "btstack_config.h"
-
 #include <btstack_event.h>
-// #include <btstack_link_key_db_fs.h>
+
 #include <btstack_memory.h>
 #include <btstack_run_loop.h>
 #include <bluetooth_company_id.h>
@@ -37,6 +29,7 @@ extern "C"
 
 #include <Error.hpp>
 #include <functional>
+#include "BtKeysStorage.hpp"
 
 // #define TLV_DB_PATH_PREFIX "/tmp/btstack_"
 // #define TLV_DB_PATH_POSTFIX ".tlv"
@@ -51,7 +44,7 @@ static hci_transport_config_uart_t config = {
     .baudrate_init = 115200,
     .baudrate_main = 0, // main baudrate
     .flowcontrol   = 1, // flow control
-    .device_name   = NULL,
+    .device_name   = nullptr,
 };
 
 static btstack_packet_callback_registration_t hci_event_callback_registration;
@@ -59,12 +52,14 @@ static btstack_packet_callback_registration_t hci_event_callback_registration;
 static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size)
 {
     bd_addr_t addr;
-    if (packet_type != HCI_EVENT_PACKET)
+    if (packet_type != HCI_EVENT_PACKET) {
         return;
+    }
     switch (hci_event_packet_get_type(packet)) {
     case BTSTACK_EVENT_STATE:
-        if (btstack_event_state_get_state(packet) != HCI_STATE_WORKING)
+        if (btstack_event_state_get_state(packet) != HCI_STATE_WORKING) {
             break;
+        }
         gap_local_bd_addr(addr);
         LOG_INFO("BTstack up and running at %s", bd_addr_to_str(addr));
         // setup TLV
@@ -76,7 +71,7 @@ static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *p
         break;
     case HCI_EVENT_COMMAND_COMPLETE:
         if (HCI_EVENT_IS_COMMAND_COMPLETE(packet, hci_read_local_name)) {
-            if (hci_event_command_complete_get_return_parameters(packet)[0])
+            if (hci_event_command_complete_get_return_parameters(packet)[0] != 0u)
                 break;
             // terminate, name 248 chars
             packet[6 + 248] = 0;
@@ -107,12 +102,12 @@ static void sigint_handler(int param)
 }
 
 static int led_state = 0;
-void hal_led_toggle(void)
+void hal_led_toggle()
 {
     led_state = 1 - led_state;
     LOG_INFO("LED State %u", led_state);
 }
-static void use_fast_uart(void)
+static void use_fast_uart()
 {
 #if defined(HAVE_POSIX_B240000_MAPPED_TO_3000000) || defined(HAVE_POSIX_B600_MAPPED_TO_3000000)
     LOG_INFO("Using 3000000 baud.");
@@ -181,7 +176,7 @@ namespace Bt
         btstack_run_loop_execute();
     }
 
-    Error initialize_stack()
+    auto initialize_stack() -> Error
     {
         btstack_memory_init();
 #ifdef TARGET_RT1051
@@ -193,10 +188,10 @@ namespace Bt
         LOG_INFO("H4 device: %s", config.device_name);
         const btstack_uart_block_t *uart_driver = btstack_uart_block_posix_instance();
 #endif
-        const hci_transport_t *transport         = hci_transport_h4_instance(uart_driver);
-        const btstack_link_key_db_t *link_key_db = btstack_link_key_db_memory_instance();
+        const hci_transport_t *transport = hci_transport_h4_instance(uart_driver);
+
         hci_init(transport, (void *)&config);
-        hci_set_link_key_db(link_key_db);
+        hci_set_link_key_db(KeyStorage::getKeyStorage());
 
         hci_event_callback_registration.callback = &hci_packet_handler;
         hci_add_event_handler(&hci_event_callback_registration);
@@ -204,7 +199,7 @@ namespace Bt
         return Error();
     }
 
-    Error register_hw_error_callback(std::function<void(uint8_t)> new_callback)
+    auto register_hw_error_callback(std::function<void(uint8_t)> new_callback) -> Error
     {
         static std::function<void(uint8_t)> callback = nullptr;
         callback                                     = new_callback;
@@ -217,7 +212,7 @@ namespace Bt
         return Error();
     }
 
-    Error run_stack(TaskHandle_t *handle)
+    auto run_stack(TaskHandle_t *handle) -> Error
     {
         BaseType_t taskerr = 0;
         LOG_INFO("Past last moment for Bt registration prior to RUN state");

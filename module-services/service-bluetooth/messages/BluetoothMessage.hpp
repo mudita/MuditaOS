@@ -41,7 +41,7 @@ class BluetoothAddrMessage : public sys::DataMessage
 {
   public:
     bd_addr_t addr;
-    BluetoothAddrMessage(std::string addr) : sys::DataMessage(MessageType::BluetoothAddrResult)
+    explicit BluetoothAddrMessage(std::string addr) : sys::DataMessage(MessageType::BluetoothAddrResult)
     {
         sscanf_bd_addr(addr.c_str(), this->addr);
     };
@@ -52,7 +52,8 @@ class BluetoothPairResultMessage : public sys::DataMessage
 {
   public:
     bool status;
-    BluetoothPairResultMessage(bool status) : sys::DataMessage(MessageType::BluetoothPairResult), status(status){};
+    explicit BluetoothPairResultMessage(bool status)
+        : sys::DataMessage(MessageType::BluetoothPairResult), status(status){};
 
     ~BluetoothPairResultMessage() override = default;
 };

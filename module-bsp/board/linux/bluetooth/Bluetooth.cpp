@@ -111,7 +111,3 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
     return 0;
 }
 
-ssize_t Bluetopia::read(void *buf, size_t nbytes)
-{
-    return 0;
-}
