@@ -8,6 +8,14 @@ std::string Bt::KeyStorage::fileContent;
 
 namespace Bt
 {
+    namespace strings
+    {
+        inline std::string keysFilename = USER_PATH("btkeys.json");
+        inline std::string keys         = "keys";
+        inline std::string link_key     = "link_key";
+        inline std::string bd_addr      = "bd_addr";
+        inline std::string type         = "type";
+    } // namespace strings
 
     auto KeyStorage::getKeyStorage() -> btstack_link_key_db_t *
     {
@@ -26,8 +34,6 @@ namespace Bt
 
     void KeyStorage::openStorage()
     {
-        std::string err;
-
         LOG_INFO("opening storage from API");
         fileContent.clear();
         fileContent = vfs.loadFileAsString(strings::keysFilename);
@@ -36,6 +42,7 @@ namespace Bt
             return;
         }
 
+        std::string err;
         fileJson = json11::Json::parse(fileContent.c_str(), err);
         if (!err.empty()) {
             LOG_ERROR("Error while parsing json: %s", err.c_str());
@@ -65,7 +72,9 @@ namespace Bt
             if (bd_addr_cmp(addr, bd_addr) == 0) {
                 auto foundLinkKey = key[strings::link_key].string_value().c_str();
                 memcpy(link_key, foundLinkKey, sizeof(link_key_t));
-                *type = static_cast<link_key_type_t>(key[strings::type].int_value());
+                if (type != nullptr) {
+                    *type = static_cast<link_key_type_t>(key[strings::type].int_value());
+                }
                 return 1;
             }
         }
@@ -89,7 +98,7 @@ namespace Bt
         auto end = std::remove_if(keys.begin(), keys.end(), [&](auto &key) {
             bd_addr_t addr;
             sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
-            return !bd_addr_cmp(addr, bd_addr);
+            return bd_addr_cmp(addr, bd_addr) == 0;
         });
 
         keys.erase(end, keys.end());
