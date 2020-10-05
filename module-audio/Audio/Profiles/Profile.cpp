@@ -1,5 +1,7 @@
 #include "Profile.hpp"
 
+#include "ProfileIdle.hpp"
+
 #include "ProfileRecordingOnBoardMic.hpp"
 #include "ProfileRecordingHeadset.hpp"
 
@@ -38,6 +40,9 @@ namespace audio
             break;
         case Type::RoutingEarspeaker:
             inst = std::make_unique<ProfileRoutingEarspeaker>(callback, vol, gain);
+            break;
+        case Type::Idle:
+            inst = std::make_unique<ProfileIdle>();
             break;
         default:
             break;

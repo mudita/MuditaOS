@@ -9,11 +9,15 @@
 
 #include "IdleOperation.hpp"
 
+#include "Audio/Profiles/ProfileIdle.hpp"
+
 namespace audio
 {
 
     IdleOperation::IdleOperation([[maybe_unused]] const char *file) : Operation{true}
     {
+        availableProfiles.push_back(Profile::Create(Profile::Type::Idle, nullptr));
+        currentProfile = availableProfiles[0];
     }
 
     audio::RetCode IdleOperation::SetOutputVolume(float vol)

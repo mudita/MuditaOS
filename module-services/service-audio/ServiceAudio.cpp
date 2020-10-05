@@ -336,10 +336,7 @@ void ServiceAudio::updateDbValue(const audio::Operation *currentOperation,
     if (currentOperation == nullptr) {
         return;
     }
-    const auto *currentProfile = currentOperation->GetProfile();
-    if (currentProfile == nullptr) {
-        return;
-    }
+    const auto currentProfile = currentOperation->GetProfile();
 
     auto dbPath = audio::str(currentProfile->GetType(), setting, currentOperation->GetPlaybackType());
     updateDbValue(dbPath, setting, value);

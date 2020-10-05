@@ -48,12 +48,6 @@ namespace audio
         Profile()
         {}
 
-        Profile(const std::string &name,
-                const Type type,
-                const bsp::AudioDevice::Format &fmt,
-                bsp::AudioDevice::Type devType,
-                std::function<int32_t()> callback);
-
         void SetOutputVolume(float vol);
 
         void SetInputGain(float gain);
@@ -117,6 +111,12 @@ namespace audio
         }
 
       protected:
+        Profile(const std::string &name,
+                const Type type,
+                const bsp::AudioDevice::Format &fmt,
+                bsp::AudioDevice::Type devType,
+                std::function<int32_t()> callback);
+
         bsp::AudioDevice::Format audioFormat{};
         bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
 

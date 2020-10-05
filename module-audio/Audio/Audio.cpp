@@ -114,10 +114,6 @@ namespace audio
 
     audio::RetCode Audio::Start()
     {
-        if (!currentOperation) {
-            return audio::RetCode::Success;
-        }
-
         return Start(currentOperation->GetOperationType(),
                      currentOperation->GetToken(),
                      currentOperation->GetFilePath().c_str(),
