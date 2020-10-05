@@ -2,6 +2,7 @@
 
 #include <i18/i18.hpp>
 #include "OptionsStyle.hpp"
+#include "OptionSetting.hpp"
 #include <application-settings-new/ApplicationSettings.hpp>
 
 namespace gui
@@ -22,7 +23,7 @@ namespace gui
         if (sim == Store::GSM::SIM::SIM2) {
             simStr = utils::translateI18("app_settings_network_sim2");
         }
-        optList.emplace_back(std::make_unique<gui::NetworkOption>(
+        optList.emplace_back(std::make_unique<gui::OptionSettings>(
             utils::translateI18("app_settings_network_active_card") + ":" + simStr,
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::change_settings, nullptr);
@@ -43,7 +44,7 @@ namespace gui
                 return true;
             },
             this));
-        optList.emplace_back(std::make_unique<gui::NetworkOption>(
+        optList.emplace_back(std::make_unique<gui::OptionSettings>(
             utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {
                 operatorsOn = !operatorsOn;
@@ -52,7 +53,7 @@ namespace gui
             },
             nullptr,
             nullptr,
-            operatorsOn ? NetworkArrow::On : NetworkArrow::Off));
+            operatorsOn ? RightIcon::On : RightIcon::Off));
         if (operatorsOn) {
             optList.emplace_back(gui::Option{utils::translateI18("app_settings_network_all_operators"),
                                              [=](gui::Item &item) {
@@ -79,39 +80,5 @@ namespace gui
     {
         clearOptions();
         addOptions(netOptList());
-    }
-    auto NetworkOption::build() const -> Item *
-    {
-        auto *label = new gui::Label(nullptr,
-                                     style::window::default_left_margin,
-                                     0,
-                                     style::window_width - 2 * style::window::default_left_margin,
-                                     style::window::label::big_h,
-                                     text);
-        style::window::decorateOption(label);
-        label->activatedCallback = activatedCallback;
-        std::string img;
-        switch (arrow) {
-        case NetworkArrow::Enabled:
-            img = "right_label_arrow";
-            break;
-        case NetworkArrow::Border:
-            img = "right_label_arrow_border";
-            break;
-        case NetworkArrow::On:
-            img = "right_label_on";
-            break;
-        case NetworkArrow::Off:
-            img = "right_label_off";
-            break;
-        default:
-            break;
-        }
-
-        if (!img.empty()) {
-            new gui::Image(label, style::option::arrow_position_x, style::option::arrow_positon_y, 0, 0, img);
-        }
-        label->focusChangedCallback = focusCb;
-        return label;
     }
 } // namespace gui
