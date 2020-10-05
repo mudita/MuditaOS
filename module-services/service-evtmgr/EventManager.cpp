@@ -209,7 +209,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             return message;
         }
     }
- else if (msgl->messageType == MessageType::CellularNotification) {
+    else if (msgl->messageType == MessageType::CellularNotification) {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
             if (msg->type == CellularNotificationMessage::Type::NetworkTimeUpdated) {

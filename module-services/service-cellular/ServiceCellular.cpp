@@ -24,7 +24,6 @@
 #include "Service/Timer.hpp"
 #include "ServiceCellular.hpp"
 
-
 #include "MessageType.hpp"
 
 #include "messages/CellularMessage.hpp"
@@ -190,21 +189,6 @@ void ServiceCellular::CallStateTimerHandler()
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
-}
-
-// Invoked when timer ticked
-void ServiceCellular::TickHandler(uint32_t id)
-{
-    if (id == callStateTimerId) {
-        CallStateTimerHandler();
-    }
-    else if (id == stateTimerId) {
-        LOG_INFO("State timer tick");
-        handleStateTimer();
-    }
-    else {
-        LOG_ERROR("Unrecognized timer ID = %" PRIu32, id);
-    }
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
