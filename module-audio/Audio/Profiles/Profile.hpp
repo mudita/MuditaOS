@@ -45,9 +45,6 @@ namespace audio
                                                float vol                         = 0,
                                                float gain                        = 0.0);
 
-        Profile()
-        {}
-
         void SetOutputVolume(float vol);
 
         void SetInputGain(float gain);
