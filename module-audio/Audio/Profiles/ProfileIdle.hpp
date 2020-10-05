@@ -1,5 +1,4 @@
-#ifndef PUREPHONE_PROFILEIDLE_HPP
-#define PUREPHONE_PROFILEIDLE_HPP
+#pragma once
 
 #include "Profile.hpp"
 
@@ -15,4 +14,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // PUREPHONE_PROFILEIDLE_HPP
