@@ -61,22 +61,21 @@ namespace Bt
     //
     auto KeyStorage::getLinkKey(uint8_t *bd_addr, link_key_t link_key, link_key_type_t *type) -> int
     {
-        if (type != nullptr && bd_addr != nullptr) {
-            LOG_INFO("getting key for address %s from API", bd_addr_to_str(bd_addr));
-            if (keys.size() == 0) {
-                return 0;
-            }
-            for (auto key : keys) {
-                bd_addr_t addr;
-                sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
+        LOG_INFO("getting key for address %s from API", bd_addr_to_str(bd_addr));
+        if (keys.size() == 0) {
+            return 0;
+        }
+        for (auto key : keys) {
+            bd_addr_t addr;
+            sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
 
-                if (bd_addr_cmp(addr, bd_addr) == 0) {
-                    auto foundLinkKey = key[strings::link_key].string_value().c_str();
-                    memcpy(link_key, foundLinkKey, sizeof(link_key_t));
+            if (bd_addr_cmp(addr, bd_addr) == 0) {
+                auto foundLinkKey = key[strings::link_key].string_value().c_str();
+                memcpy(link_key, foundLinkKey, sizeof(link_key_t));
+                if (type != nullptr) {
                     *type = static_cast<link_key_type_t>(key[strings::type].int_value());
-
-                    return 1;
                 }
+                return 1;
             }
         }
         return 0;
