@@ -28,11 +28,12 @@ You need to upload the `PurePhone.elf` file and then:
 
 The firmware is copied as a file to a special partition. When running from eMMC, the phone will always boot the image file which means it's permanently "flashed".
 
-Booting from eMMC involves bootloader. There needs to be a working bootloader. The bootloader copies the firmware from the file to SRAM and executes it.
-
+Booting from eMMC involves bootloader. There needs to be a working bootloader. The bootloader copies the firmware from the file to SRAM and executes it each time the phone is started.
+Files required to boot from eMMC are:
+- firmware image `boot.bin`
+- firmware image checksum files: `.boot.json` and `.boot.json.crc32`
+- assets (images, fonts, sounds, databases)
 ### Upload to eMMC
-
-You need to upload the `boot.bin` file and then:
 
 - [Mount Mudita Pure as a USB MSC (disk drive)](#How-to-mount-Mudita-Pure-as-a-USB-MSC)
 - Use convenience script `flash_eMMC.sh <build_folder; default="build">` to copy both the executable **AND** the assets.
