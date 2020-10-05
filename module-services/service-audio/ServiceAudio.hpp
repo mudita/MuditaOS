@@ -60,7 +60,7 @@ class ServiceAudio : public sys::Service
     std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
     std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
 
-    void VibrationUpdate(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
+    void VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
     void VibrationStop(const audio::Token &token);
     auto GetVibrationType(const audio::PlaybackType &type) -> std::optional<VibrationType>;
     audio::Token vibrationToken;

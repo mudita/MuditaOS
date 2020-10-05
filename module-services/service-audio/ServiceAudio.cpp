@@ -117,7 +117,7 @@ std::optional<ServiceAudio::VibrationType> ServiceAudio::GetVibrationType(const 
     return std::nullopt;
 }
 
-void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp)
+void ServiceAudio::VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp)
 {
     auto vibType = GetVibrationType(type);
     if (!vibType || vibrationToken.IsValid()) {
@@ -304,7 +304,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 responseMsg = HandleStart(input, Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
             }
         }
-        VibrationUpdate(msg->playbackType, responseMsg);
+        VibrationStart(msg->playbackType, responseMsg);
     }
     else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
         switch (msg->type) {
