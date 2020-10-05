@@ -1,8 +1,11 @@
 #include <log/log.hpp>
-#include <cstdlib>
 
 extern "C"
 {
+#include <cstdint>
+#include <cstdlib>
+#include <csignal>
+
 #include <btstack_event.h>
 
 #include <btstack_memory.h>
