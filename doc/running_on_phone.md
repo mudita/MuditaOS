@@ -36,7 +36,7 @@ Files required to boot from eMMC are:
 ### Upload to eMMC
 
 - [Mount Mudita Pure as a USB MSC (disk drive)](#How-to-mount-Mudita-Pure-as-a-USB-MSC)
-- Use convenience script `flash_eMMC.sh <build_folder; default="build">` to copy both the executable **AND** the assets.
+- Use convenience script `flash_eMMC.sh <build_folder; default="build">` to copy both the executable **AND** the assets. **Note:** databases will be restored to their default.
 
 ## How to mount Mudita Pure as a USB MSC
 
