@@ -8,8 +8,10 @@
 * `[fonts]` Added multiplication and division sign to the font files 
 * `[bluetooth]` Added storing of BT link keys.
 * `[audio]` AudioMux tests
+* `[audio]` Added vibration logic (effect is visible in logs only)
 
 ### Changed
+
 * `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
 * `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
 

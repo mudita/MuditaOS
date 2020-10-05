@@ -75,6 +75,7 @@ namespace audio
     std::optional<AudioMux::Input *> AudioMux::GetActiveInput()
     {
         for (auto &audioInput : audioInputs) {
+
             if (!audioInput.audio->GetCurrentOperation()) {
                 continue;
             }
@@ -143,12 +144,12 @@ namespace audio
         return idleInput ? idleInput : overridableInput;
     }
 
-    Token AudioMux::IncrementToken(std::optional<AudioMux::Input *> input)
+    const Token AudioMux::IncrementToken(std::optional<AudioMux::Input *> input)
     {
         if (input) {
             return (*input)->token = refToken.IncrementToken();
         }
-        return Token::MakeBadToken();
+        return refToken.IncrementToken();
     }
 
     uint8_t AudioMux::GetPlaybackPriority(const std::optional<audio::PlaybackType> type)
