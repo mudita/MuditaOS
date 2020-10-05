@@ -56,7 +56,7 @@ class ServiceAudio : public sys::Service
     std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
 
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
-    constexpr auto ShouldLoop(const audio::PlaybackType &type) const -> bool;
+    constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
 
     template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
     {
