@@ -36,6 +36,8 @@ namespace audio
         }
 
         if (inst->isInitialized) {
+            inst->opType   = t;
+            inst->filePath = fileName;
             return inst;
         }
         else {
@@ -43,15 +45,15 @@ namespace audio
         }
     }
 
-    std::optional<Profile *> Operation::GetProfile(const Profile::Type type)
+    std::optional<std::shared_ptr<Profile>> Operation::GetProfile(const Profile::Type type)
     {
         auto ret = std::find_if(
             availableProfiles.begin(), availableProfiles.end(), [type](const auto &w) { return w->GetType() == type; });
         if (ret == availableProfiles.end()) {
-            return {};
+            return std::nullopt;
         }
         else {
-            return (*ret).get();
+            return *ret;
         }
     }
 

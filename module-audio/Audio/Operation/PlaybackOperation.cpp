@@ -52,10 +52,10 @@ namespace audio
             audio::str(audio::Profile::Type::PlaybackHeadphones, audio::Setting::Volume, playbackType);
         const auto headphonesVolume = dbCallback(dbHeadphonesVolumePath, defaultHeadphonesVolume);
 
-        availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, loudspeakerVolume));
-        availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, headphonesVolume));
+        availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume));
+        availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume));
 
-        currentProfile = availableProfiles[0].get();
+        currentProfile = availableProfiles[0];
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
