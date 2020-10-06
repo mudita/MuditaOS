@@ -27,11 +27,14 @@ void LockedInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 void LockedInfoWindow::setVisibleState()
 {
     lockImage->setVisible(true);
+
     bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, false);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
+
     topBar->setActive(TopBar::Elements::LOCK, true);
     topBar->setActive(TopBar::Elements::BATTERY, true);
+    topBar->setActive(TopBar::Elements::SIGNAL, true);
 }
 
 bool LockedInfoWindow::onInput(const InputEvent &inputEvent)
@@ -76,7 +79,6 @@ void LockedInfoWindow::buildInterface()
     text::RichTextParser rtParser;
     auto parsedText = rtParser.parse(utils::localize.get("app_desktop_no_pin_lock"), &format);
 
-    infoText->setRichText(utils::localize.get("app_desktop_no_pin_lock"));
     infoText->setText(std::move(parsedText));
     infoText->setAlignment(Alignment::Horizontal::Center);
 }

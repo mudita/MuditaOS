@@ -25,7 +25,7 @@ namespace gui::text
     inline const auto node_text = "text";
     inline const auto node_br   = "br";
     inline const auto node_p    = "p";
-    inline const auto shortened_bold = "b";
+    inline const auto short_bold = "b";
 
     /// Rich text parser utility
     /// supported specifiers

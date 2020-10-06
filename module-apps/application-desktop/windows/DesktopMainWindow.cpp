@@ -91,8 +91,7 @@ namespace gui
 
     void DesktopMainWindow::setVisibleState()
     {
-        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        assert(app != nullptr);
+        auto app = getAppDesktop();
 
         if (app->lockHandler.lock.isLocked() && app->lockHandler.lock.getLockType() == PinLock::LockType::Screen) {
             bottomBar->restore();
@@ -124,32 +123,28 @@ namespace gui
         time->setText(topBar->getTimeString());
         // check if there was a signal to lock the pone due to inactivity.
         if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
-            auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-            if (!app || app->lockHandler.lock.isLocked()) {
+            auto app = getAppDesktop();
+            if (app->lockHandler.lock.isLocked()) {
                 return;
             }
 
             auto *lockData          = dynamic_cast<LockPhoneData *>(data);
             lockTimeoutApplilcation = lockData->getPreviousApplication();
 
-            dynamic_cast<app::ApplicationDesktop *>(application)->setSuspendFlag(true);
+            application->setSuspendFlag(true);
         }
         setVisibleState();
     }
 
     bool DesktopMainWindow::processLongPressEvent(const InputEvent &inputEvent)
     {
-        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("not ApplicationDesktop");
-            return AppWindow::onInput(inputEvent);
-        }
+        auto *app = getAppDesktop();
 
         if ((inputEvent.keyCode == KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
             app->lockHandler.lock.lock();
             setVisibleState();
-            app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-            app->setSuspendFlag(true);
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            application->setSuspendFlag(true);
             return true;
         }
         else if (inputEvent.keyCode == KeyCode::KEY_RF) {
@@ -181,11 +176,6 @@ namespace gui
 
     bool DesktopMainWindow::processShortPressEventOnLocked(const InputEvent &inputEvent)
     {
-        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("not ApplicationDesktop");
-            return AppWindow::onInput(inputEvent);
-        }
         // if enter was pressed
         if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
             // if interval between enter and pnd keys is less than time defined for unlocking
@@ -216,11 +206,7 @@ namespace gui
 
     bool DesktopMainWindow::onInput(const InputEvent &inputEvent)
     {
-        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("not ApplicationDesktop");
-            return AppWindow::onInput(inputEvent);
-        }
+        auto *app = getAppDesktop();
 
         if (inputEvent.isLongPress()) {
             return processLongPressEvent(inputEvent);
@@ -406,4 +392,10 @@ namespace gui
         return true;
     }
 
+    app::ApplicationDesktop *DesktopMainWindow::getAppDesktop() const
+    {
+        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
+        assert(app);
+        return app;
+    }
 } /* namespace gui */
