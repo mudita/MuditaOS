@@ -35,8 +35,6 @@ auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
             LOG_DEBUG("got owner, file %s", tmpFilePath.c_str());
 
             if (vfs.isWritable(tmpFilePath.c_str())) {
-                LOG_INFO("download %lu bytes to: %s", fileSize, tmpFilePath.c_str());
-
                 if (owner->startDownload(tmpFilePath, fileSize) == sys::ReturnCodes::Success) {
                     context.setResponseBody(json11::Json::object(
                         {{json::status, std::to_string(static_cast<int>(sys::ReturnCodes::Success))},
@@ -46,7 +44,8 @@ auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
                 }
             }
             else {
-                LOG_ERROR("download command failed, can't write %lu bytes to: %s", fileSize, tmpFilePath.c_str());
+                LOG_ERROR(
+                    "download command failed, can't write %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
             }
         }
         else {

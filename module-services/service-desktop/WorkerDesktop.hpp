@@ -11,6 +11,7 @@ extern "C"
 #include "stream_buffer.h"
 #include "message_buffer.h"
 #include "event_groups.h"
+#ifndef TARGET_Linux
 #include "usb.h"
 #include "usb_device.h"
 #include "usb_device_class.h"
@@ -19,6 +20,7 @@ extern "C"
 #include "usb_device_descriptor.h"
 #include "composite.h"
 #include "virtual_com_demo.h"
+#endif
 }
 
 #include "Service/Message.hpp"
@@ -28,6 +30,12 @@ extern "C"
 #include "bsp/usb/usb.hpp"
 #include "vfs.hpp"
 #include "timer.hpp"
+
+#ifdef TARGET_Linux
+struct usb_cdc_vcom_struct_t;
+int VirtualComSend(usb_cdc_vcom_struct_t *cdcVcom, const void *data, size_t length);
+int VirtualComRecv(usb_cdc_vcom_struct_t *cdcVcom, void *data, size_t length);
+#endif
 
 class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer
 {

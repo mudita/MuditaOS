@@ -2,6 +2,24 @@
 #include "MessageHandler.hpp"
 #include "ServiceDesktop.hpp"
 
+#ifdef TARGET_Linux
+int VirtualComSend(usb_cdc_vcom_struct_t *cdcVcom, const void *data, size_t length)
+{
+    return -1;
+}
+int VirtualComRecv(usb_cdc_vcom_struct_t *cdcVcom, void *data, size_t length)
+{
+    return -1;
+}
+namespace bsp
+{
+    usb_cdc_vcom_struct_t *usbInit()
+    {
+        return nullptr;
+    }
+} // namespace bsp
+#endif
+
 using namespace cpp_freertos;
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
@@ -179,7 +197,9 @@ void WorkerDesktop::transferDataReceived(const char *data, uint32_t dataLen)
         const uint32_t bytesWritten = vfs.fwrite(data, 1, dataLen, fileDes);
 
         if (bytesWritten != dataLen) {
-            LOG_ERROR("transferDataReceived vfs write failed bytesWritten=%lu != dataLen=%lu", bytesWritten, dataLen);
+            LOG_ERROR("transferDataReceived vfs write failed bytesWritten=%" PRIu32 " != dataLen=%" PRIu32 "",
+                      bytesWritten,
+                      dataLen);
             return;
         }
 

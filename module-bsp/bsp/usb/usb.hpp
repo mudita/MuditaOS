@@ -8,6 +8,7 @@ extern "C"
 #include "stream_buffer.h"
 #include "message_buffer.h"
 #include "event_groups.h"
+#ifndef TARGET_Linux
 #include "usb.h"
 #include "usb_device.h"
 #include "usb_device_class.h"
@@ -15,6 +16,7 @@ extern "C"
 #include "usb_device_ch9.h"
 #include "usb_device_descriptor.h"
 #include "composite.h"
+#endif
 }
 
 #include <errno.h>
@@ -30,6 +32,10 @@ extern "C"
 #define SERIAL_SHELL_START 0x33
 #define SERIAL_BAUDRATE 115200
 #define SERIAL_BUFFER_LEN 512 // this matches the buffer length in rt1051 cdc implementaion
+
+#ifdef TARGET_Linux
+struct usb_cdc_vcom_struct_t;
+#endif
 
 namespace bsp
 {
