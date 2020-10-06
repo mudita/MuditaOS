@@ -45,7 +45,6 @@ gui::ListItem *AllEventsModel::getItem(gui::Order order)
         LOG_INFO("Switch to event details window");
         auto rec  = std::make_unique<EventsRecord>(*record);
         auto data = std::make_unique<EventRecordData>(std::move(rec));
-        data->setWindowName(style::window::calendar::name::all_events_window);
         application->switchWindow(style::window::calendar::name::details_window, std::move(data));
         return true;
     };
@@ -69,13 +68,21 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     list->setElementsCount(*response->getCountResult());
     auto records = std::make_unique<std::vector<EventsRecord>>(records_data->begin(), records_data->end());
 
-    if (records->empty()) {
-        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-        assert(application != nullptr);
-        auto filter = std::chrono::system_clock::now();
-        app->switchToNoEventsWindow(
-            utils::localize.get("app_calendar_title_main"), filter, style::window::calendar::name::all_events_window);
-    }
+    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+    assert(application != nullptr);
 
+    if (records->empty()) {
+
+        if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+            app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"));
+        }
+    }
+    auto eventShift = app->getEventShift();
+    if (eventShift) {
+        for (auto &record : *records) {
+            record.date_from += hours(eventShift);
+            record.date_till += hours(eventShift);
+        }
+    }
     return this->updateRecords(std::move(records));
 }

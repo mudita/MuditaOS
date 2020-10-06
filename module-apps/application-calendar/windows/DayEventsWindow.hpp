@@ -31,8 +31,6 @@ namespace gui
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
-
-        bool checkEmpty = false;
     };
 
 } /* namespace app */

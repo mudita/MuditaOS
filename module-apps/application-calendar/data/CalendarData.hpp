@@ -6,7 +6,6 @@
 class EventRecordData : public gui::SwitchData
 {
   protected:
-    std::string backWindowName;
     std::shared_ptr<EventsRecord> record;
 
   public:
@@ -20,14 +19,6 @@ class EventRecordData : public gui::SwitchData
     virtual void setData(std::shared_ptr<EventsRecord> rec)
     {
         record = std::move(rec);
-    };
-    std::string getWindowName()
-    {
-        return backWindowName;
-    };
-    virtual void setWindowName(const std::string &windowName)
-    {
-        backWindowName = windowName;
     };
 };
 
@@ -67,33 +58,5 @@ class DayMonthData : public gui::SwitchData
     {
         dayMonth   = dayMonthText;
         dateFilter = dateNumb;
-    };
-};
-
-class PrevWindowData : public gui::SwitchData
-{
-  public:
-    enum PrevWindow
-    {
-        Delete = 0,
-        Edit,
-        Add
-    };
-
-  protected:
-    PrevWindow prevWindow;
-
-  public:
-    PrevWindowData()          = default;
-    virtual ~PrevWindowData() = default;
-
-    PrevWindow getData()
-    {
-        return prevWindow;
-    };
-
-    virtual void setData(PrevWindow data)
-    {
-        prevWindow = data;
     };
 };

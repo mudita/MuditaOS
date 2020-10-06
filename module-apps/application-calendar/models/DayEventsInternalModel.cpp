@@ -1,6 +1,7 @@
 #include "DayEventsInternalModel.hpp"
 #include "application-calendar/widgets/DayEventsItem.hpp"
 #include "application-calendar/data/CalendarData.hpp"
+#include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include <ListView.hpp>
 #include <algorithm>
 
@@ -30,7 +31,7 @@ gui::ListItem *DayEventsInternalModel::getItem(gui::Order order)
 
 void DayEventsInternalModel::loadData(std::unique_ptr<std::vector<EventsRecord>> records)
 {
-    auto app = application;
+    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
     assert(app != nullptr);
 
     list->clear();
@@ -40,13 +41,20 @@ void DayEventsInternalModel::loadData(std::unique_ptr<std::vector<EventsRecord>>
         return first.date_from < second.date_from;
     });
 
+    auto eventShift = app->getEventShift();
+    if (eventShift) {
+        for (auto &record : *records) {
+            record.date_from += hours(eventShift);
+            record.date_till += hours(eventShift);
+        }
+    }
+
     for (auto &record : *records) {
         auto item = new gui::DayEventsItem();
         item->setEvent(std::make_shared<EventsRecord>(record));
         item->activatedCallback = [=](gui::Item &item) {
             auto rec  = std::make_unique<EventsRecord>(record);
             auto data = std::make_unique<EventRecordData>(std::move(rec));
-            data->setWindowName(style::window::calendar::name::day_events_window);
             app->switchWindow(style::window::calendar::name::details_window, std::move(data));
             return true;
         };

@@ -80,9 +80,6 @@ namespace gui
                                           std::make_unique<WeekDaysRepeatData>(*data));
                 return true;
             }
-            else {
-                application->returnToPreviousWindow();
-            }
         }
         default:
             break;

@@ -25,7 +25,6 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
 
-        bool checkEmpty = false;
     };
 
 } // namespace gui

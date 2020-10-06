@@ -1,6 +1,10 @@
 #include "NoEvents.hpp"
 #include <service-appmgr/ApplicationManager.hpp>
 #include <i18/i18.hpp>
+#include <module-services/service-db/messages/QueryMessage.hpp>
+#include <module-db/Interface/EventsRecord.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 
 using namespace gui;
 
@@ -31,6 +35,12 @@ void NoEvents::buildInterface()
     bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
     bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
+    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+    assert(app != nullptr);
+    if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_calendar_bar_month"));
+    }
+
     setTitle(meta.title);
     leftArrowImage = new gui::Image(this, style::arrow::x, style::arrow::y, 0, 0, "arrow_left");
     newEventImage  = new gui::Image(this, style::cross::x, style::cross::y, 0, 0, "cross");
@@ -59,6 +69,19 @@ void NoEvents::rebuild()
 
 bool NoEvents::onInput(const gui::InputEvent &inputEvent)
 {
+    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+    assert(app != nullptr);
+
+    if (inputEvent.keyCode == gui::KeyCode::KEY_RF && inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
+        if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
+            app->returnToPreviousWindow();
+        }
+        else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+            LOG_DEBUG("Switch to desktop");
+            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+        }
+    }
+
     if (AppWindow::onInput(inputEvent)) {
         return true;
     }
@@ -69,6 +92,13 @@ bool NoEvents::onInput(const gui::InputEvent &inputEvent)
 
     if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
         return meta.action();
+    }
+
+    if (inputEvent.keyCode == gui::KeyCode::KEY_LF &&
+        app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+        application->switchWindow(gui::name::window::main_window);
+        LOG_DEBUG("Switch to month view - main window");
+        return true;
     }
 
     return false;
