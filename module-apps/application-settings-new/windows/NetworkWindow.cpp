@@ -55,13 +55,15 @@ namespace gui
             nullptr,
             operatorsOn ? RightIcon::On : RightIcon::Off));
         if (operatorsOn) {
-            optList.emplace_back(gui::Option{utils::translateI18("app_settings_network_all_operators"),
-                                             [=](gui::Item &item) {
-                                                 this->application->switchWindow(gui::window::name::all_operators,
-                                                                                 nullptr);
-                                                 return true;
-                                             },
-                                             gui::Arrow::Enabled});
+            optList.emplace_back(std::make_unique<gui::OptionSettings>(
+                utils::translateI18("app_settings_network_all_operators"),
+                [=](gui::Item &item) {
+                    this->application->switchWindow(gui::window::name::all_operators, nullptr);
+                    return true;
+                },
+                nullptr,
+                nullptr,
+                RightIcon::Border));
         }
         optList.emplace_back(gui::Option{
             utils::translateI18("app_settings_network_import_contacts_from_sim_card"), [=](gui::Item &item) {

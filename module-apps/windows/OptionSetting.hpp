@@ -11,7 +11,8 @@ namespace gui
         Enabled,
         Border,
         On,
-        Off
+        Off,
+        Bt
     };
 
     class OptionSettings : public option::Base

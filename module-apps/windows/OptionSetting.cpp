@@ -22,10 +22,13 @@ namespace gui
             img = "right_label_arrow_border";
             break;
         case RightIcon::On:
-            img = "btn_on";
+            img = "btn_off";
             break;
         case RightIcon::Off:
             img = "btn_off";
+            break;
+        case RightIcon::Bt:
+            img = "bt";
             break;
         default:
             break;
