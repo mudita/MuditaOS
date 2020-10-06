@@ -9,9 +9,9 @@ class FilesystemEndpoint : public Endpoint
 {
   public:
     FilesystemEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
-        {
-            debugName = "FilesystemEndpoint";
-        }
+    {
+        debugName = "FilesystemEndpoint";
+    }
     auto handle(Context &context) -> void override;
     auto run(Context &context) -> sys::ReturnCodes;
     auto getUpdates(Context &context) -> sys::ReturnCodes;

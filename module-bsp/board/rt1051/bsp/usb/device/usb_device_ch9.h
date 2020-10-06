@@ -50,25 +50,26 @@ typedef enum _usb_device_control_read_write_sequence
 } usb_device_control_read_write_sequence_t;
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
-/*******************************************************************************
- * API
- ******************************************************************************/
+    /*******************************************************************************
+     * API
+     ******************************************************************************/
 
-/*!
- * @brief Initializes the control pipes.
- *
- * The function is used to initialize the control pipes. This function should be called when event
- * kUSB_DeviceEventBusReset is received.
- *
- * @param[in] handle      The device handle.
- * @param[in] param       The event parameter.
- *
- * @return A USB error code or kStatus_USB_Success.
- */
-extern usb_status_t USB_DeviceControlPipeInit(usb_device_handle handle, void *param);
+    /*!
+     * @brief Initializes the control pipes.
+     *
+     * The function is used to initialize the control pipes. This function should be called when event
+     * kUSB_DeviceEventBusReset is received.
+     *
+     * @param[in] handle      The device handle.
+     * @param[in] param       The event parameter.
+     *
+     * @return A USB error code or kStatus_USB_Success.
+     */
+    extern usb_status_t USB_DeviceControlPipeInit(usb_device_handle handle, void *param);
 
 #if defined(__cplusplus)
 }

@@ -47,8 +47,6 @@ typedef enum _usb_device_state
     kUSB_DeviceStateTestMode,        /*!< Device state, Test mode*/
 } usb_device_state_t;
 
-
-
 /*! @brief Defines endpoint state */
 typedef enum _usb_endpoint_status
 {
@@ -81,7 +79,7 @@ typedef enum _usb_device_event
     kUSB_DeviceEventResume,    /*!< USB bus resume signal detected. The resume signal is driven by itself or a host */
     kUSB_DeviceEventSleeped,   /*!< USB bus LPM suspend signal detected */
     kUSB_DeviceEventLPMResume, /*!< USB bus LPM resume signal detected. The resume signal is driven by itself or a host
-                                  */
+                                */
     kUSB_DeviceEventError,     /*!< An error is happened in the bus. */
     kUSB_DeviceEventDetach,    /*!< USB device is disconnected from a host. */
     kUSB_DeviceEventAttach,    /*!< USB device is connected to a host. */
@@ -102,7 +100,7 @@ typedef enum _usb_device_event
     kUSB_DeviceEventGetInterface,                 /*!< Get current interface alternate setting value */
     kUSB_DeviceEventSetBHNPEnable,
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-    kUSB_DeviceEventDcdDetectionfinished,         /*!< The DCD detection finished */
+    kUSB_DeviceEventDcdDetectionfinished, /*!< The DCD detection finished */
 #endif
 } usb_device_event_t;
 
@@ -172,297 +170,292 @@ typedef struct _usb_device_endpoint_status_struct
     uint16_t endpointStatus; /*!< Endpoint status : idle or stalled */
 } usb_device_endpoint_status_struct_t;
 
-
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif /* __cplusplus*/
 
-/*!
- * @name USB device APIs
- * @{
- */
+    /*!
+     * @name USB device APIs
+     * @{
+     */
 
-/*******************************************************************************
- * API
- ******************************************************************************/
+    /*******************************************************************************
+     * API
+     ******************************************************************************/
 
-/*!
- * @brief Initializes the USB device stack.
- *
- * This function initializes the USB device module specified by the controllerId.
- *
- * @param[in] controllerId   The controller ID of the USB IP. See the enumeration #usb_controller_index_t.
- * @param[in] deviceCallback Function pointer of the device callback.
- * @param[out] handle          It is an out parameter used to return the pointer of the device handle to the caller.
- *
- * @retval kStatus_USB_Success              The device is initialized successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer.
- * @retval kStatus_USB_Busy                 Cannot allocate a device handle.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller according to the controller id.
- * @retval kStatus_USB_InvalidControllerInterface  The controller driver interfaces is invalid. There is an empty
- *                                                     interface entity.
- * @retval kStatus_USB_Error                The macro USB_DEVICE_CONFIG_ENDPOINTS is more than the IP's endpoint number.
- *                                          Or, the device has been initialized.
- *                                          Or, the mutex or message queue is created failed.
- */
-extern usb_status_t USB_DeviceInit(uint8_t controllerId,
-                                   usb_device_callback_t deviceCallback,
-                                   usb_device_handle *handle);
+    /*!
+     * @brief Initializes the USB device stack.
+     *
+     * This function initializes the USB device module specified by the controllerId.
+     *
+     * @param[in] controllerId   The controller ID of the USB IP. See the enumeration #usb_controller_index_t.
+     * @param[in] deviceCallback Function pointer of the device callback.
+     * @param[out] handle          It is an out parameter used to return the pointer of the device handle to the caller.
+     *
+     * @retval kStatus_USB_Success              The device is initialized successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer.
+     * @retval kStatus_USB_Busy                 Cannot allocate a device handle.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller according to the controller id.
+     * @retval kStatus_USB_InvalidControllerInterface  The controller driver interfaces is invalid. There is an empty
+     *                                                     interface entity.
+     * @retval kStatus_USB_Error                The macro USB_DEVICE_CONFIG_ENDPOINTS is more than the IP's endpoint
+     * number. Or, the device has been initialized. Or, the mutex or message queue is created failed.
+     */
+    extern usb_status_t USB_DeviceInit(uint8_t controllerId,
+                                       usb_device_callback_t deviceCallback,
+                                       usb_device_handle *handle);
 
-/*!
- * @brief Enables the device functionality.
- *
- * The function enables the device functionality, so that the device can be recognized by the host when the device
- * detects that it has been connected to a host.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- *
- * @retval kStatus_USB_Success              The device is run successfully.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is invalid.
- *
- */
-extern usb_status_t USB_DeviceRun(usb_device_handle handle);
+    /*!
+     * @brief Enables the device functionality.
+     *
+     * The function enables the device functionality, so that the device can be recognized by the host when the device
+     * detects that it has been connected to a host.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     *
+     * @retval kStatus_USB_Success              The device is run successfully.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is
+     * invalid.
+     *
+     */
+    extern usb_status_t USB_DeviceRun(usb_device_handle handle);
 
-/*!
- * @brief Disables the device functionality.
- *
- * The function disables the device functionality. After this function called, even if the device is detached to the
- * host,
- * it can't work.
- *
- * @param[in] handle The device handle received from #USB_DeviceInit.
- *
- * @retval kStatus_USB_Success              The device is stopped successfully.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer or the controller handle is invalid.
- */
-extern usb_status_t USB_DeviceStop(usb_device_handle handle);
+    /*!
+     * @brief Disables the device functionality.
+     *
+     * The function disables the device functionality. After this function called, even if the device is detached to the
+     * host,
+     * it can't work.
+     *
+     * @param[in] handle The device handle received from #USB_DeviceInit.
+     *
+     * @retval kStatus_USB_Success              The device is stopped successfully.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer or the controller handle is invalid.
+     */
+    extern usb_status_t USB_DeviceStop(usb_device_handle handle);
 
-/*!
- * @brief De-initializes the device controller.
- *
- * The function de-initializes the device controller specified by the handle.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- *
- * @retval kStatus_USB_Success              The device is stopped successfully.
- * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer or the controller handle is invalid.
- */
-extern usb_status_t USB_DeviceDeinit(usb_device_handle handle);
+    /*!
+     * @brief De-initializes the device controller.
+     *
+     * The function de-initializes the device controller specified by the handle.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     *
+     * @retval kStatus_USB_Success              The device is stopped successfully.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer or the controller handle is invalid.
+     */
+    extern usb_status_t USB_DeviceDeinit(usb_device_handle handle);
 
-/*!
- * @brief Sends data through a specified endpoint.
- *
- * The function is used to send data through a specified endpoint.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] endpointAddress Endpoint index.
- * @param[in] buffer The memory address to hold the data need to be sent. The function is not reentrant.
- * @param[in] length The data length need to be sent.
- *
- * @retval kStatus_USB_Success              The send request is sent successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_Busy                 Cannot allocate DTDS for current transfer in EHCI driver.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_Error                The device is doing reset.
- *
- * @note The return value indicates whether the sending request is successful or not. The transfer done is notified by
- * the
- * corresponding callback function.
- * Currently, only one transfer request can be supported for one specific endpoint.
- * If there is a specific requirement to support multiple transfer requests for one specific endpoint, the application
- * should implement a queue on the application level.
- * The subsequent transfer can begin only when the previous transfer is done (get notification through the endpoint
- * callback).
- */
-extern usb_status_t USB_DeviceSendRequest(usb_device_handle handle,
-                                          uint8_t endpointAddress,
-                                          uint8_t *buffer,
-                                          uint32_t length);
+    /*!
+     * @brief Sends data through a specified endpoint.
+     *
+     * The function is used to send data through a specified endpoint.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] endpointAddress Endpoint index.
+     * @param[in] buffer The memory address to hold the data need to be sent. The function is not reentrant.
+     * @param[in] length The data length need to be sent.
+     *
+     * @retval kStatus_USB_Success              The send request is sent successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_Busy                 Cannot allocate DTDS for current transfer in EHCI driver.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_Error                The device is doing reset.
+     *
+     * @note The return value indicates whether the sending request is successful or not. The transfer done is notified
+     * by the corresponding callback function. Currently, only one transfer request can be supported for one specific
+     * endpoint. If there is a specific requirement to support multiple transfer requests for one specific endpoint, the
+     * application should implement a queue on the application level. The subsequent transfer can begin only when the
+     * previous transfer is done (get notification through the endpoint callback).
+     */
+    extern usb_status_t USB_DeviceSendRequest(usb_device_handle handle,
+                                              uint8_t endpointAddress,
+                                              uint8_t *buffer,
+                                              uint32_t length);
 
-/*!
- * @brief Receives data through a specified endpoint.
- *
- * The function is used to receive data through a specified endpoint. The function is not reentrant.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] endpointAddress Endpoint index.
- * @param[in] buffer The memory address to save the received data.
- * @param[in] length The data length want to be received.
- *
- * @retval kStatus_USB_Success              The receive request is sent successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_Busy                 Cannot allocate DTDS for current transfer in EHCI driver.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_Error                The device is doing reset.
- *
- * @note The return value indicates whether the receiving request is successful or not. The transfer done is notified by
- * the
- * corresponding callback function.
- * Currently, only one transfer request can be supported for one specific endpoint.
- * If there is a specific requirement to support multiple transfer requests for one specific endpoint, the application
- * should implement a queue on the application level.
- * The subsequent transfer can begin only when the previous transfer is done (get notification through the endpoint
- * callback).
- */
-extern usb_status_t USB_DeviceRecvRequest(usb_device_handle handle,
-                                          uint8_t endpointAddress,
-                                          uint8_t *buffer,
-                                          uint32_t length);
+    /*!
+     * @brief Receives data through a specified endpoint.
+     *
+     * The function is used to receive data through a specified endpoint. The function is not reentrant.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] endpointAddress Endpoint index.
+     * @param[in] buffer The memory address to save the received data.
+     * @param[in] length The data length want to be received.
+     *
+     * @retval kStatus_USB_Success              The receive request is sent successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_Busy                 Cannot allocate DTDS for current transfer in EHCI driver.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_Error                The device is doing reset.
+     *
+     * @note The return value indicates whether the receiving request is successful or not. The transfer done is
+     * notified by the corresponding callback function. Currently, only one transfer request can be supported for one
+     * specific endpoint. If there is a specific requirement to support multiple transfer requests for one specific
+     * endpoint, the application should implement a queue on the application level. The subsequent transfer can begin
+     * only when the previous transfer is done (get notification through the endpoint callback).
+     */
+    extern usb_status_t USB_DeviceRecvRequest(usb_device_handle handle,
+                                              uint8_t endpointAddress,
+                                              uint8_t *buffer,
+                                              uint32_t length);
 
-/*!
- * @brief Cancels the pending transfer in a specified endpoint.
- *
- * The function is used to cancel the pending transfer in a specified endpoint.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
- *
- * @retval kStatus_USB_Success              The transfer is cancelled.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer or the controller handle is invalid.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- */
-extern usb_status_t USB_DeviceCancel(usb_device_handle handle, uint8_t endpointAddress);
+    /*!
+     * @brief Cancels the pending transfer in a specified endpoint.
+     *
+     * The function is used to cancel the pending transfer in a specified endpoint.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
+     *
+     * @retval kStatus_USB_Success              The transfer is cancelled.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer or the controller handle is invalid.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     */
+    extern usb_status_t USB_DeviceCancel(usb_device_handle handle, uint8_t endpointAddress);
 
-/*!
- * @brief Initializes a specified endpoint.
- *
- * The function is used to initialize a specified endpoint. The corresponding endpoint callback is also initialized.
- *
- * @param[in] handle The device handle received from #USB_DeviceInit.
- * @param[in] epInit Endpoint initialization structure. See the structure usb_device_endpoint_init_struct_t.
- * @param[in] epCallback Endpoint callback structure. See the structure
- * usb_device_endpoint_callback_struct_t.
- *
- * @retval kStatus_USB_Success              The endpoint is initialized successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_InvalidParameter     The epInit or epCallback is NULL pointer. Or the endpoint number is
- * more than USB_DEVICE_CONFIG_ENDPOINTS.
- * @retval kStatus_USB_Busy                 The endpoint is busy in EHCI driver.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- */
-extern usb_status_t USB_DeviceInitEndpoint(usb_device_handle handle,
-                                           usb_device_endpoint_init_struct_t *epInit,
-                                           usb_device_endpoint_callback_struct_t *epCallback);
+    /*!
+     * @brief Initializes a specified endpoint.
+     *
+     * The function is used to initialize a specified endpoint. The corresponding endpoint callback is also initialized.
+     *
+     * @param[in] handle The device handle received from #USB_DeviceInit.
+     * @param[in] epInit Endpoint initialization structure. See the structure usb_device_endpoint_init_struct_t.
+     * @param[in] epCallback Endpoint callback structure. See the structure
+     * usb_device_endpoint_callback_struct_t.
+     *
+     * @retval kStatus_USB_Success              The endpoint is initialized successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidParameter     The epInit or epCallback is NULL pointer. Or the endpoint number is
+     * more than USB_DEVICE_CONFIG_ENDPOINTS.
+     * @retval kStatus_USB_Busy                 The endpoint is busy in EHCI driver.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     */
+    extern usb_status_t USB_DeviceInitEndpoint(usb_device_handle handle,
+                                               usb_device_endpoint_init_struct_t *epInit,
+                                               usb_device_endpoint_callback_struct_t *epCallback);
 
-/*!
- * @brief Deinitializes a specified endpoint.
- *
- * The function is used to deinitializes a specified endpoint.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
- *
- * @retval kStatus_USB_Success              The endpoint is de-initialized successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_InvalidParameter     The endpoint number is more than USB_DEVICE_CONFIG_ENDPOINTS.
- * @retval kStatus_USB_Busy                 The endpoint is busy in EHCI driver.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- */
-extern usb_status_t USB_DeviceDeinitEndpoint(usb_device_handle handle, uint8_t endpointAddress);
+    /*!
+     * @brief Deinitializes a specified endpoint.
+     *
+     * The function is used to deinitializes a specified endpoint.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
+     *
+     * @retval kStatus_USB_Success              The endpoint is de-initialized successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidParameter     The endpoint number is more than USB_DEVICE_CONFIG_ENDPOINTS.
+     * @retval kStatus_USB_Busy                 The endpoint is busy in EHCI driver.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     */
+    extern usb_status_t USB_DeviceDeinitEndpoint(usb_device_handle handle, uint8_t endpointAddress);
 
-/*!
- * @brief Stalls a specified endpoint.
- *
- * The function is used to stall a specified endpoint.
- *
- * @param[in] handle The device handle received from #USB_DeviceInit.
- * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
- *
- * @retval kStatus_USB_Success              The endpoint is stalled successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_InvalidParameter     The endpoint number is more than USB_DEVICE_CONFIG_ENDPOINTS.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- */
-extern usb_status_t USB_DeviceStallEndpoint(usb_device_handle handle, uint8_t endpointAddress);
+    /*!
+     * @brief Stalls a specified endpoint.
+     *
+     * The function is used to stall a specified endpoint.
+     *
+     * @param[in] handle The device handle received from #USB_DeviceInit.
+     * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
+     *
+     * @retval kStatus_USB_Success              The endpoint is stalled successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidParameter     The endpoint number is more than USB_DEVICE_CONFIG_ENDPOINTS.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     */
+    extern usb_status_t USB_DeviceStallEndpoint(usb_device_handle handle, uint8_t endpointAddress);
 
-/*!
- * @brief Un-stall a specified endpoint.
- *
- * The function is used to unstall a specified endpoint.
- *
- * @param[in] handle The device handle received from #USB_DeviceInit.
- * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
- *
- * @retval kStatus_USB_Success              The endpoint is un-stalled successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_InvalidParameter     The endpoint number is more than USB_DEVICE_CONFIG_ENDPOINTS.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- */
-extern usb_status_t USB_DeviceUnstallEndpoint(usb_device_handle handle, uint8_t endpointAddress);
+    /*!
+     * @brief Un-stall a specified endpoint.
+     *
+     * The function is used to unstall a specified endpoint.
+     *
+     * @param[in] handle The device handle received from #USB_DeviceInit.
+     * @param[in] endpointAddress Endpoint address, bit7 is the direction of endpoint, 1U - IN, and 0U - OUT.
+     *
+     * @retval kStatus_USB_Success              The endpoint is un-stalled successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidParameter     The endpoint number is more than USB_DEVICE_CONFIG_ENDPOINTS.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     */
+    extern usb_status_t USB_DeviceUnstallEndpoint(usb_device_handle handle, uint8_t endpointAddress);
 
-/*!
- * @brief Gets the status of the selected item.
- *
- * The function is used to get the status of the selected item.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] type   The selected item. See the structure #usb_device_status_t.
- * @param[out] param  The parameter type is determined by the selected item.
- *
- * @retval kStatus_USB_Success              Get status successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_InvalidParameter     The parameter is NULL pointer.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_Error                Unsupported type.
- */
-extern usb_status_t USB_DeviceGetStatus(usb_device_handle handle, usb_device_status_t type, void *param);
+    /*!
+     * @brief Gets the status of the selected item.
+     *
+     * The function is used to get the status of the selected item.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] type   The selected item. See the structure #usb_device_status_t.
+     * @param[out] param  The parameter type is determined by the selected item.
+     *
+     * @retval kStatus_USB_Success              Get status successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidParameter     The parameter is NULL pointer.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_Error                Unsupported type.
+     */
+    extern usb_status_t USB_DeviceGetStatus(usb_device_handle handle, usb_device_status_t type, void *param);
 
-/*!
- * @brief Sets the status of the selected item.
- *
- * The function is used to set the status of the selected item.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] type The selected item. See the structure #usb_device_status_t.
- * @param[in] param The parameter type is determined by the selected item.
- *
- * @retval kStatus_USB_Success              Set status successfully.
- * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_Error                Unsupported type or the parameter is NULL pointer.
- */
-extern usb_status_t USB_DeviceSetStatus(usb_device_handle handle, usb_device_status_t type, void *param);
+    /*!
+     * @brief Sets the status of the selected item.
+     *
+     * The function is used to set the status of the selected item.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] type The selected item. See the structure #usb_device_status_t.
+     * @param[in] param The parameter type is determined by the selected item.
+     *
+     * @retval kStatus_USB_Success              Set status successfully.
+     * @retval kStatus_USB_InvalidHandle        The handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_Error                Unsupported type or the parameter is NULL pointer.
+     */
+    extern usb_status_t USB_DeviceSetStatus(usb_device_handle handle, usb_device_status_t type, void *param);
 
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-/*!
- * @brief Enable the device dcd module.
- *
- * The function enable the device dcd module.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- *
- * @retval kStatus_USB_Success              The device could run.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is invalid.
- *
- */
-extern usb_status_t  USB_DeviceDcdEnable(usb_device_handle handle);
+    /*!
+     * @brief Enable the device dcd module.
+     *
+     * The function enable the device dcd module.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     *
+     * @retval kStatus_USB_Success              The device could run.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is
+     * invalid.
+     *
+     */
+    extern usb_status_t USB_DeviceDcdEnable(usb_device_handle handle);
 
-/*!
- * @brief Disable the device dcd module.
- *
- * The function disable the device dcd module.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- *
- * @retval kStatus_USB_Success              The dcd is reset and stopped.
- * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
- * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer or the controller handle is invalid.
- *
- */
-extern usb_status_t  USB_DeviceDcdDisable(usb_device_handle handle);
+    /*!
+     * @brief Disable the device dcd module.
+     *
+     * The function disable the device dcd module.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     *
+     * @retval kStatus_USB_Success              The dcd is reset and stopped.
+     * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer or the controller handle is invalid.
+     *
+     */
+    extern usb_status_t USB_DeviceDcdDisable(usb_device_handle handle);
 #endif
-/*!
- * @brief Device task function.
- *
- * The function is used to handle the controller message.
- * This function should not be called in the application directly.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceTaskFunction(void *deviceHandle);
+    /*!
+     * @brief Device task function.
+     *
+     * The function is used to handle the controller message.
+     * This function should not be called in the application directly.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceTaskFunction(void *deviceHandle);
 
 #if ((defined(USB_DEVICE_CONFIG_KHCI)) && (USB_DEVICE_CONFIG_KHCI > 0U))
 /*!
@@ -489,18 +482,18 @@ extern void USB_DeviceTaskFunction(void *deviceHandle);
  */
 #define USB_DeviceEhciTaskFunction(deviceHandle) USB_DeviceTaskFunction(deviceHandle)
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-/*!
- * @brief Device ehci DCD ISR function.
- *
- * The function is the ehci DCD interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceEhciIsrHSDCDFunction(void *deviceHandle);
+    /*!
+     * @brief Device ehci DCD ISR function.
+     *
+     * The function is the ehci DCD interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceEhciIsrHSDCDFunction(void *deviceHandle);
 #endif
 #endif
 
-#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) || \
+#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) ||                             \
      ((defined(USB_DEVICE_CONFIG_LPCIP3511HS)) && (USB_DEVICE_CONFIG_LPCIP3511HS > 0U)))
 /*!
  * @brief Device LPC ip3511 controller task function.
@@ -513,98 +506,98 @@ extern void USB_DeviceEhciIsrHSDCDFunction(void *deviceHandle);
  */
 #define USB_DeviceLpcIp3511TaskFunction(deviceHandle) USB_DeviceTaskFunction(deviceHandle)
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-/*!
- * @brief Device IP3511 DCD ISR function.
- *
- * The function is the IP3511 DCD interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceLpcIp3511IsrDCDFunction(void *deviceHandle);
+    /*!
+     * @brief Device IP3511 DCD ISR function.
+     *
+     * The function is the IP3511 DCD interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceLpcIp3511IsrDCDFunction(void *deviceHandle);
 #endif
 #endif
 
 #if ((defined(USB_DEVICE_CONFIG_KHCI)) && (USB_DEVICE_CONFIG_KHCI > 0U))
-/*!
- * @brief Device KHCI ISR function.
- *
- * The function is the KHCI interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceKhciIsrFunction(void *deviceHandle);
+    /*!
+     * @brief Device KHCI ISR function.
+     *
+     * The function is the KHCI interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceKhciIsrFunction(void *deviceHandle);
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-/*!
- * @brief Device KHCI DCD ISR function.
- *
- * The function is the KHCI DCD interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceDcdIsrFunction(void *deviceHandle);
+    /*!
+     * @brief Device KHCI DCD ISR function.
+     *
+     * The function is the KHCI DCD interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceDcdIsrFunction(void *deviceHandle);
 #endif
 #endif
 
 #if ((defined(USB_DEVICE_CONFIG_EHCI)) && (USB_DEVICE_CONFIG_EHCI > 0U))
-/*!
- * @brief Device EHCI ISR function.
- *
- * The function is the EHCI interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceEhciIsrFunction(void *deviceHandle);
+    /*!
+     * @brief Device EHCI ISR function.
+     *
+     * The function is the EHCI interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceEhciIsrFunction(void *deviceHandle);
 #endif
 
-#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) || \
+#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) ||                             \
      ((defined(USB_DEVICE_CONFIG_LPCIP3511HS)) && (USB_DEVICE_CONFIG_LPCIP3511HS > 0U)))
-/*!
- * @brief Device LPC USB ISR function.
- *
- * The function is the LPC USB interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceLpcIp3511IsrFunction(void *deviceHandle);
+    /*!
+     * @brief Device LPC USB ISR function.
+     *
+     * The function is the LPC USB interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceLpcIp3511IsrFunction(void *deviceHandle);
 #endif
 
-#if (((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)) || \
+#if (((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)) ||                                           \
      ((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)))
-/*!
- * @brief Device USB DWC3 ISR function.
- *
- * The function is the USB interrupt service routine.
- *
- * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
- */
-extern void USB_DeviceDwc3IsrFunction(void *deviceHandle);
+    /*!
+     * @brief Device USB DWC3 ISR function.
+     *
+     * The function is the USB interrupt service routine.
+     *
+     * @param[in] deviceHandle The device handle got from #USB_DeviceInit.
+     */
+    extern void USB_DeviceDwc3IsrFunction(void *deviceHandle);
 #endif
 
-/*!
- * @brief Gets the device stack version function.
- *
- * The function is used to get the device stack version.
- *
- * @param[out] version The version structure pointer to keep the device stack version.
- *
- */
-extern void USB_DeviceGetVersion(uint32_t *version);
+    /*!
+     * @brief Gets the device stack version function.
+     *
+     * The function is used to get the device stack version.
+     *
+     * @param[out] version The version structure pointer to keep the device stack version.
+     *
+     */
+    extern void USB_DeviceGetVersion(uint32_t *version);
 
-#if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U)) || \
+#if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U)) ||                          \
     ((defined(FSL_FEATURE_SOC_USB_ANALOG_COUNT) && (FSL_FEATURE_SOC_USB_ANALOG_COUNT > 0U)))
-/*!
- * @brief Update the hardware tick.
- *
- * The function is used to update the hardware tick.
- *
- * @param[in] handle The device handle got from #USB_DeviceInit.
- * @param[in] tick Current hardware tick(uint is ms).
- *
- */
-extern usb_status_t USB_DeviceUpdateHwTick(usb_device_handle handle, uint64_t tick);
+    /*!
+     * @brief Update the hardware tick.
+     *
+     * The function is used to update the hardware tick.
+     *
+     * @param[in] handle The device handle got from #USB_DeviceInit.
+     * @param[in] tick Current hardware tick(uint is ms).
+     *
+     */
+    extern usb_status_t USB_DeviceUpdateHwTick(usb_device_handle handle, uint64_t tick);
 #endif
 
-/*! @}*/
+    /*! @}*/
 
 #if defined(__cplusplus)
 }

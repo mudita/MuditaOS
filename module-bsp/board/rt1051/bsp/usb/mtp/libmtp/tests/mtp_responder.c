@@ -47,4 +47,3 @@ Ensure(mtp_responder, add_storage_fails_if_api_not_provided)
     error = mtp_responder_set_storage(mtp, 0x00010001, NULL, NULL);
     assert_that(error, is_not_equal_to(0));
 }
-

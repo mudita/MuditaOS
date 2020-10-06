@@ -62,7 +62,7 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer
 
     sys::ReturnCodes startDownload(const fs::path &destinationPath, const uint32_t fileSize);
     sys::ReturnCodes startUpload(const fs::path &sourcePath, const uint32_t fileSize);
-    void stopTransfer(const bool removeDestinationFile=false);
+    void stopTransfer(const bool removeDestinationFile = false);
     void transferDataReceived(const char *data, uint32_t dataLen);
     WorkerDesktop::TransferType getTransferType();
     void Run();
@@ -70,9 +70,9 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer
   private:
     xQueueHandle receiveQueue;
     usb_cdc_vcom_struct_t *cdcVcomStruct = nullptr;
-    vfs::FILE *fileDes = nullptr;
-    uint32_t writeFileSizeExpected = 0;
-    uint32_t writeFileDataWritten  = 0;
+    vfs::FILE *fileDes                   = nullptr;
+    uint32_t writeFileSizeExpected       = 0;
+    uint32_t writeFileDataWritten        = 0;
     fs::path filePath;
     volatile TransferType currentTransferType = TransferType::JSONCommands;
     cpp_freertos::MutexStandard mutex;

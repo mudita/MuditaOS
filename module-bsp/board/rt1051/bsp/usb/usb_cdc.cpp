@@ -1,8 +1,7 @@
 #include "bsp/usb_cdc/usb_cdc.hpp"
 
 extern "C"
-{
-}
+{}
 
 namespace bsp
 {

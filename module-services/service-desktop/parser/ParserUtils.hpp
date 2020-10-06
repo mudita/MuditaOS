@@ -116,14 +116,14 @@ namespace parserFSM
 
         namespace filesystem
         {
-            const inline std::string command  = "command";
+            const inline std::string command = "command";
             namespace commands
             {
                 const inline std::string upload   = "upload";
                 const inline std::string rm       = "rm";
                 const inline std::string download = "download";
-            }
-        }
+            } // namespace commands
+        }     // namespace filesystem
 
         namespace messages
         {

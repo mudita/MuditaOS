@@ -14,4 +14,3 @@ int put_date(uint8_t *buffer, time_t time);
 int get_date(const uint8_t *buffer, time_t *time);
 
 #endif /* _MTP_UTIL_H */
-

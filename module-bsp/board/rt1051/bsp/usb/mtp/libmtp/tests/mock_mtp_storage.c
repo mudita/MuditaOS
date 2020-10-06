@@ -13,7 +13,7 @@ uint32_t serialize_storage_info(mtp_storage_t *storage, uint8_t *data)
     return (uint32_t)mock(storage, data);
 }
 
-uint32_t serialize_storage_ids(mtp_storage_t *storage, int count,  uint8_t *data)
+uint32_t serialize_storage_ids(mtp_storage_t *storage, int count, uint8_t *data)
 {
     return (uint32_t)mock(storage, data);
 }

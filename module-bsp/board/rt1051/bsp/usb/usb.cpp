@@ -29,14 +29,11 @@ namespace bsp
     }
 
     void usbCDCReceive(void *ptr)
-    {
-    }
+    {}
 
     int usbCDCSend(std::string *sendMsg)
     {
         return -1;
     }
 
-}
-
-
+} // namespace bsp

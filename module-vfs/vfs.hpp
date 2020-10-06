@@ -158,7 +158,7 @@ class vfs
     std::string lastErrnoToStr();
     bool isDir(const char *path);
     bool fileExists(const char *path);
-    bool isWritable (const char *path);
+    bool isWritable(const char *path);
     int deltree(const char *path);
     int mkdir(const char *dir);
     int rename(const char *oldname, const char *newname);

@@ -16,9 +16,8 @@
  */
 // http://supp.iar.com/Support/?note=24725
 
-#define MISRAC_DISABLE \
-    _Pragma(           \
-        "diag_suppress=                       \
+#define MISRAC_DISABLE                                                                                                 \
+    _Pragma("diag_suppress=                       \
     Pm001,Pm002,Pm003,Pm004,Pm005,Pm006,Pm007,Pm008,Pm009,Pm010,Pm011,\
     Pm012,Pm013,Pm014,Pm015,Pm016,Pm017,Pm018,Pm019,Pm020,Pm021,Pm022,\
     Pm023,Pm024,Pm025,Pm026,Pm027,Pm028,Pm029,Pm030,Pm031,Pm032,Pm033,\
@@ -35,9 +34,8 @@
     Pm144,Pm145,Pm146,Pm147,Pm148,Pm149,Pm150,Pm151,Pm152,Pm153,Pm154,\
     Pm155")
 
-#define MISRAC_ENABLE \
-    _Pragma(          \
-        "diag_default=                         \
+#define MISRAC_ENABLE                                                                                                  \
+    _Pragma("diag_default=                         \
     Pm001,Pm002,Pm003,Pm004,Pm005,Pm006,Pm007,Pm008,Pm009,Pm010,Pm011,\
     Pm012,Pm013,Pm014,Pm015,Pm016,Pm017,Pm018,Pm019,Pm020,Pm021,Pm022,\
     Pm023,Pm024,Pm025,Pm026,Pm027,Pm028,Pm029,Pm030,Pm031,Pm032,Pm033,\
@@ -104,7 +102,7 @@ extern void DefaultISR(void);
 /*!
  * @brief To provide unified task piority for upper layer, OSA layer makes conversion.
  */
-#define PRIORITY_OSA_TO_RTOS(osa_prio) ((UBaseType_t)configMAX_PRIORITIES - (osa_prio)-2U)
+#define PRIORITY_OSA_TO_RTOS(osa_prio)  ((UBaseType_t)configMAX_PRIORITIES - (osa_prio)-2U)
 #define PRIORITY_RTOS_TO_OSA(rtos_prio) ((UBaseType_t)configMAX_PRIORITIES - (rtos_prio)-2U)
 
 /* @}*/

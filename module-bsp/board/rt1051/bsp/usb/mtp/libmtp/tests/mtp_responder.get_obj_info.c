@@ -12,7 +12,7 @@ static mtp_responder_t *mtp = NULL;
 static size_t given_data_size;
 static uint16_t error;
 static uint8_t given_data[512];
-static const mtp_op_cntr_t *given = (mtp_op_cntr_t*)given_data;
+static const mtp_op_cntr_t *given = (mtp_op_cntr_t *)given_data;
 
 Describe(get_object_info);
 
@@ -35,11 +35,9 @@ AfterEach(get_object_info)
 Ensure(get_object_info, return_error_if_requested_wrong_handle)
 {
     const uint8_t request[] = {
-        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x10,
-        0x0F, 0x00, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00
-    };
+        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x10, 0x0F, 0x00, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00};
 
-    error = mtp_responder_handle_request(mtp, request, sizeof(request));
+    error           = mtp_responder_handle_request(mtp, request, sizeof(request));
     given_data_size = mtp_responder_get_data(mtp);
 
     assert_that(error, is_equal_to(MTP_RESPONSE_INVALID_OBJECT_HANDLE));
@@ -49,39 +47,29 @@ Ensure(get_object_info, return_error_if_requested_wrong_handle)
 Ensure(get_object_info, returns_error_code_if_storage_does_not_find_object)
 {
     const uint8_t request[] = {
-        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x10,
-        0x0F, 0x00, 0x00, 0xF0, 0x0a, 0x00, 0x00, 0x00
-    };
+        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x10, 0x0F, 0x00, 0x00, 0xF0, 0x0a, 0x00, 0x00, 0x00};
 
-    expect(mock_stat,
-            when(handle, is_equal_to(0x0000000a)),
-            will_return(-1));
+    expect(mock_stat, when(handle, is_equal_to(0x0000000a)), will_return(-1));
 
-    error = mtp_responder_handle_request(mtp, request, sizeof(request));
+    error           = mtp_responder_handle_request(mtp, request, sizeof(request));
     given_data_size = mtp_responder_get_data(mtp);
 
     assert_that(error, is_equal_to(MTP_RESPONSE_INVALID_OBJECT_HANDLE));
     assert_that(given_data_size, is_equal_to(0));
-
 }
 
 Ensure(get_object_info, calls_for_serializator_and_returns_container)
 {
     const uint8_t request[] = {
-        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x10,
-        0x0F, 0x00, 0x00, 0xF0, 0x0a, 0x00, 0x00, 0x00
-    };
+        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x08, 0x10, 0x0F, 0x00, 0x00, 0xF0, 0x0a, 0x00, 0x00, 0x00};
 
     const uint32_t expected_length = 12 + 100;
 
-    expect(mock_stat,
-            when(handle, is_equal_to(0x0000000a)),
-            will_return(0));
+    expect(mock_stat, when(handle, is_equal_to(0x0000000a)), will_return(0));
 
-    expect(serialize_object_info,
-            will_return(100));
+    expect(serialize_object_info, will_return(100));
 
-    error = mtp_responder_handle_request(mtp, request, sizeof(request));
+    error           = mtp_responder_handle_request(mtp, request, sizeof(request));
     given_data_size = mtp_responder_get_data(mtp);
 
     assert_that(error, is_equal_to(MTP_RESPONSE_OK));

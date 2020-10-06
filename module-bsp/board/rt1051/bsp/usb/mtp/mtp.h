@@ -5,7 +5,8 @@
 #include "mtp_fs.h"
 
 // refactor name to mtp_app_struct_t
-typedef struct {
+typedef struct
+{
     class_handle_t classHandle;
     mtp_responder_t *responder;
     struct mtp_fs *mtp_fs;
@@ -19,6 +20,5 @@ typedef struct {
 usb_status_t MtpUSBCallback(uint32_t event, void *param, void *userArg);
 usb_status_t MtpInit(usb_mtp_struct_t *mtpApp, class_handle_t classHandle);
 void MtpDetached(usb_mtp_struct_t *mtpApp);
-
 
 #endif /* _MTP_H_ */

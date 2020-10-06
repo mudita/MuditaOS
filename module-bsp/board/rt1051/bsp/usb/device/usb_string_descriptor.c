@@ -6,11 +6,9 @@
 USB_DMA_INIT_DATA_ALIGN(USB_DATA_ALIGN_SIZE)
 uint8_t USB_StringDescriptorBuffer[128];
 
-const char* USB_STRING_VALUE[] = {
-    USB_STRINGS(VALUE)
-};
+const char *USB_STRING_VALUE[] = {USB_STRINGS(VALUE)};
 
-static const char* usb_string(uint8_t id)
+static const char *usb_string(uint8_t id)
 {
     if (id > USB_STRING_MAX_ID)
         return NULL;
@@ -29,21 +27,21 @@ static uint16_t languages_descriptor(uint8_t *ptr)
 static uint16_t string_descriptor(uint8_t *ptr, const char *ascii)
 {
     uint16_t *utf16;
-    uint8_t len = strlen(ascii);
-    uint8_t total = 2 + 2*len;
+    uint8_t len   = strlen(ascii);
+    uint8_t total = 2 + 2 * len;
     int i;
     *ptr++ = total;
     *ptr++ = USB_DESCRIPTOR_TYPE_STRING;
-    utf16 = (uint16_t*)ptr;
-    for(i = 0; i < len; i++)
+    utf16  = (uint16_t *)ptr;
+    for (i = 0; i < len; i++)
         *utf16++ = (uint16_t)ascii[i];
 
     return total;
 }
 
-uint16_t USB_StringDescriptor(void* buffer, uint8_t id)
+uint16_t USB_StringDescriptor(void *buffer, uint8_t id)
 {
-    uint8_t* ptr = buffer;
+    uint8_t *ptr = buffer;
     const char *ascii;
     if (id == 0)
         return languages_descriptor(ptr);

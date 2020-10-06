@@ -8,8 +8,7 @@ WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
     : sys::Worker(ownerServicePtr),
       Timer("WorkerDesktop::Timeout", cpp_freertos::Ticks::MsToTicks(sdesktop::file_transfer_timeout), false),
       ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
-{
-}
+{}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
@@ -142,7 +141,7 @@ sys::ReturnCodes WorkerDesktop::startUpload(const fs::path &sourcePath, const ui
 
 void WorkerDesktop::stopTransfer(const bool removeDestinationFile)
 {
-    LOG_DEBUG("stopTransfer %s", removeDestinationFile ? "remove desination file" : "" );
+    LOG_DEBUG("stopTransfer %s", removeDestinationFile ? "remove desination file" : "");
     parser.setState(parserFSM::State::NoMsg);
     currentTransferType = TransferType::JSONCommands;
 

@@ -263,5 +263,5 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
 
 int vfs::getErrno()
 {
-    return errno();
+    return errno;
 }

@@ -3,9 +3,9 @@
 #include "mtp_responder.h"
 #include "mtp_storage.h"
 
-const mtp_storage_properties_t* mock_get_properties(void *arg)
+const mtp_storage_properties_t *mock_get_properties(void *arg)
 {
-    return (mtp_storage_properties_t*)mock();
+    return (mtp_storage_properties_t *)mock();
 }
 
 uint32_t mock_find_first(void *arg, uint32_t parent, uint32_t *count)
@@ -58,18 +58,16 @@ void mock_close(void *arg)
     mock(arg);
 }
 
-const struct mtp_storage_api mock_api =
-{
+const struct mtp_storage_api mock_api = {
     .get_properties = mock_get_properties,
-    .find_first = mock_find_first,
-    .find_next = mock_find_next,
+    .find_first     = mock_find_first,
+    .find_next      = mock_find_next,
     .get_free_space = mock_free_space,
-    .stat = mock_stat,
-    .create = mock_create,
-    .remove = mock_remove,
-    .open = mock_open,
-    .read = mock_read,
-    .write = mock_write,
-    .close = mock_close,
+    .stat           = mock_stat,
+    .create         = mock_create,
+    .remove         = mock_remove,
+    .open           = mock_open,
+    .read           = mock_read,
+    .write          = mock_write,
+    .close          = mock_close,
 };
-

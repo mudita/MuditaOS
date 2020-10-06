@@ -287,4 +287,3 @@ fs::path vfs::getTempPath(const fs::path &fileName)
 {
     return purefs::dir::tmp / fileName;
 }
-

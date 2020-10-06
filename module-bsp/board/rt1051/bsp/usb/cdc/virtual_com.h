@@ -7,31 +7,31 @@
 #define _USB_CDC_VCOM_H_
 
 /* Currently configured line coding */
-#define LINE_CODING_DTERATE (115200)
+#define LINE_CODING_DTERATE    (115200)
 #define LINE_CODING_CHARFORMAT (0x00)
 #define LINE_CODING_PARITYTYPE (0x00)
-#define LINE_CODING_DATABITS (0x08)
+#define LINE_CODING_DATABITS   (0x08)
 
 /* Communications feature */
 #define COMM_FEATURE_DATA_SIZE (0x02)
-#define STATUS_ABSTRACT_STATE (0x0000)
-#define COUNTRY_SETTING (0x0000)
+#define STATUS_ABSTRACT_STATE  (0x0000)
+#define COUNTRY_SETTING        (0x0000)
 
 /* Notification of serial state */
-#define NOTIF_PACKET_SIZE (0x08)
-#define UART_BITMAP_SIZE (0x02)
+#define NOTIF_PACKET_SIZE  (0x08)
+#define UART_BITMAP_SIZE   (0x02)
 #define NOTIF_REQUEST_TYPE (0xA1)
 
-#define VCOM_INPUT_STREAM_SIZE (512)
+#define VCOM_INPUT_STREAM_SIZE  (512)
 #define VCOM_OUTPUT_STREAM_SIZE (512)
 
 /* Define the types for application */
 typedef struct _usb_cdc_vcom_struct
 {
-    class_handle_t cdcAcmHandle;    /* USB CDC ACM class handle. */
-    uint8_t configured;             /* Host is connected and interface is configured */
-    uint8_t startTransactions;      /* A flag to indicate whether a CDC device is ready to transmit and receive data. */
-    uint8_t currentConfiguration;   /* Current configuration value. */
+    class_handle_t cdcAcmHandle;  /* USB CDC ACM class handle. */
+    uint8_t configured;           /* Host is connected and interface is configured */
+    uint8_t startTransactions;    /* A flag to indicate whether a CDC device is ready to transmit and receive data. */
+    uint8_t currentConfiguration; /* Current configuration value. */
 
     StreamBufferHandle_t inputStream;
     StreamBufferHandle_t outputStream;
@@ -65,14 +65,14 @@ void VirtualComReset(usb_cdc_vcom_struct_t *cdcVcom);
  * @reutrn negative value on error (usb subsystem status code),
  *         number bytes enqueued to send
  */
-int VirtualComSend(usb_cdc_vcom_struct_t *cdcVcom, const void* data, size_t length);
+int VirtualComSend(usb_cdc_vcom_struct_t *cdcVcom, const void *data, size_t length);
 
 /**
  * @brief Pick received data from stream
  * @param Buffer where data would be copied from stream
  * @return length of data, 0 if data not available,
  */
-int VirtualComRecv(usb_cdc_vcom_struct_t *cdcVcom, void* data, size_t length);
+int VirtualComRecv(usb_cdc_vcom_struct_t *cdcVcom, void *data, size_t length);
 
 /*!
  * @brief Handles events comming from USB sub system
@@ -96,6 +96,5 @@ usb_status_t VirtualComUSBCallback(uint32_t event, void *param, void *userArg);
  * @return A USB error code or kStatus_USB_Success.
  */
 usb_status_t VirtualComUSBSetConfiguration(usb_cdc_vcom_struct_t *cdcVcom, uint8_t configure);
-
 
 #endif /* _USB_CDC_VCOM_H_ */
