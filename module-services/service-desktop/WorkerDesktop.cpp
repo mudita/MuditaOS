@@ -5,10 +5,10 @@
 using namespace cpp_freertos;
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
-    : sys::Worker(ownerServicePtr), Timer("WorkerDesktop::Timeout", cpp_freertos::Ticks::MsToTicks(sdesktop::file_transfer_timeout), false),
+    : sys::Worker(ownerServicePtr),
+      Timer("WorkerDesktop::Timeout", cpp_freertos::Ticks::MsToTicks(sdesktop::file_transfer_timeout), false),
       ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
 {
-    LOG_DEBUG("ctor");
 }
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
@@ -24,7 +24,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     parserFSM::MessageHandler::sendQueue = Worker::getQueueByName(WorkerDesktop::SEND_QUEUE_BUFFER_NAME);
 
     if (xTaskCreate(
-        &WorkerDesktop::deviceTask, "WorkerDesktop::deviceTask", 2048L / sizeof(portSTACK_TYPE), this, 2, NULL) !=
+            &WorkerDesktop::deviceTask, "WorkerDesktop::deviceTask", 2048L / sizeof(portSTACK_TYPE), this, 2, NULL) !=
         pdPASS) {
         LOG_ERROR("xTaskCreate failed");
     }
@@ -61,7 +61,6 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         }
     }
 
-    // TODO: Consider moving sendBuffer receive to bsp driver
     if (qname == SEND_QUEUE_BUFFER_NAME) {
         if (xQueueReceive(queue, &sendMsg, 0) != pdTRUE)
             return false;
@@ -81,13 +80,13 @@ void WorkerDesktop::deviceTask(void *handle)
     size_t len;
 
     if (!input) {
-        LOG_ERROR("Buffer allocation failed");
+        LOG_ERROR("deviceTask buffer allocation failed");
         return;
     }
 
     vTaskDelay(3000 / portTICK_PERIOD_MS);
 
-    LOG_INFO("Task started");
+    LOG_INFO("deviceTask task started");
 
     while (1) {
         len = VirtualComRecv(cdcVcom, input.get(), SERIAL_BUFFER_LEN);
@@ -117,7 +116,7 @@ WorkerDesktop::TransferType WorkerDesktop::getTransferType()
 sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &destinationPath, const uint32_t fileSize)
 {
     filePath = destinationPath;
-    fileDes = vfs.fopen(filePath.c_str(), "w");
+    fileDes  = vfs.fopen(filePath.c_str(), "w");
 
     if (fileDes == nullptr)
         return sys::ReturnCodes::Failure;
@@ -129,7 +128,7 @@ sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &destinationPath, c
         return sys::ReturnCodes::Failure;
 
     writeFileSizeExpected = fileSize;
-    currentTransferType = TransferType::DownloadFile;
+    currentTransferType   = TransferType::DownloadFile;
 
     LOG_DEBUG("startDownload all checks passed starting download");
     return sys::ReturnCodes::Success;
@@ -141,9 +140,9 @@ sys::ReturnCodes WorkerDesktop::startUpload(const fs::path &sourcePath, const ui
     return sys::ReturnCodes::Success;
 }
 
-void WorkerDesktop::stopTransfer(const bool moveFileToUpdatesDir)
+void WorkerDesktop::stopTransfer(const bool removeDestinationFile)
 {
-    LOG_DEBUG("stopTransfer");
+    LOG_DEBUG("stopTransfer %s", removeDestinationFile ? "remove desination file" : "" );
     parser.setState(parserFSM::State::NoMsg);
     currentTransferType = TransferType::JSONCommands;
 
@@ -157,15 +156,15 @@ void WorkerDesktop::stopTransfer(const bool moveFileToUpdatesDir)
     writeFileSizeExpected = 0;
     writeFileDataWritten  = 0;
 
-    /*LOG_INFO("stopTransfer moving file %s to %s", filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str());
-    if (moveFileToUpdatesDir) {
-        if (vfs.rename(filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str())) {
-            // zero is ok anything else is an error
-            LOG_ERROR("stopTransfer failed to move file %s to %s", filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str());
-        } else {
-            LOG_INFO("stopTransfer moved file %s to %s", filePath.c_str(), (purefs::dir::os_updates / filePath.filename()).c_str());
+    if (removeDestinationFile) {
+        if (vfs.remove(filePath.c_str()) != 0) {
+            int currentErrno = vfs.getErrno();
+            LOG_ERROR("stopTransfer can't delete file(requested) %s errno: %d/%s",
+                      filePath.c_str(),
+                      currentErrno,
+                      strerror(currentErrno));
         }
-    }*/
+    }
 }
 
 void WorkerDesktop::transferDataReceived(const char *data, uint32_t dataLen)
@@ -187,12 +186,12 @@ void WorkerDesktop::transferDataReceived(const char *data, uint32_t dataLen)
 
         writeFileDataWritten += dataLen;
 
-
         if (writeFileDataWritten >= writeFileSizeExpected) {
             LOG_INFO("transferDataReceived all data transferred, stop now");
-            stopTransfer(true);
+            stopTransfer(false);
         }
-    } else {
+    }
+    else {
         LOG_DEBUG("transferDataReceived not in a transfer state");
     }
 }
@@ -203,6 +202,6 @@ void WorkerDesktop::Run()
 
     if (getTransferType() != TransferType::JSONCommands) {
         LOG_DEBUG("timeout timer: stopping transfer");
-        stopTransfer();
+        stopTransfer(true);
     }
 }

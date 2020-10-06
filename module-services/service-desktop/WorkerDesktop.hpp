@@ -62,7 +62,7 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer
 
     sys::ReturnCodes startDownload(const fs::path &destinationPath, const uint32_t fileSize);
     sys::ReturnCodes startUpload(const fs::path &sourcePath, const uint32_t fileSize);
-    void stopTransfer(const bool moveFileToUpdatesDir=false);
+    void stopTransfer(const bool removeDestinationFile=false);
     void transferDataReceived(const char *data, uint32_t dataLen);
     WorkerDesktop::TransferType getTransferType();
     void Run();
