@@ -1032,10 +1032,11 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
                                                              cusd.message());
     }
- if (str.find("+CTZE: ") != std::string::npos) {
+    if (str.find("+CTZE: ") != std::string::npos) {
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
                                                              str);
-    } if (str.find("+CTZE: ") != std::string::npos) {
+    }
+    if (str.find("+CTZE: ") != std::string::npos) {
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
                                                              str);
     }
