@@ -22,6 +22,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
 #if ENABLE_GSM == 1
 #include <service-fota/ServiceFota.hpp>
 #include <service-cellular/ServiceCellular.hpp>
