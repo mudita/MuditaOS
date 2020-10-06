@@ -5,6 +5,7 @@
 #include "TextDocument.hpp"
 #include <sstream>
 #include <string>
+#include <map>
 #include <log/log.hpp>
 #include "TextFormat.hpp"
 
@@ -27,7 +28,7 @@ namespace text
 
       public:
         Attribute() = delete;
-        /// return true on success, othervise set fallback value and return false
+        /// return true on success, otherwise set fallback value and return false
         /// @note could run: preVisitHook -> visit -> postVisit hook
         virtual auto visit(gui::TextFormat &fmt, std::string value) -> bool = 0;
         [[nodiscard]] auto getName() const -> const std::string &
@@ -162,12 +163,13 @@ namespace text
 
     class AttributeWeight : public Attribute
     {
+      protected:
         const std::string regular = "regular";
         const std::string bold    = "bold";
         const std::string light   = "light";
 
       public:
-        AttributeWeight() : Attribute("weight")
+        AttributeWeight() : Attribute(gui::text::weight)
         {}
 
         auto visit(gui::TextFormat &fmt, std::string value) -> bool final
@@ -233,6 +235,40 @@ namespace text
             return *ptr;
         }
     };
+
+    class ShortenedTextNodes
+    {
+        using singleAttributedNode = std::map<std::string, std::pair<std::string, std::string>> const;
+        static singleAttributedNode nodes;
+
+      public:
+        enum class AttributeContent
+        {
+            Name,
+            Value
+        };
+
+        [[nodiscard]] static auto is(const char *nodeName)
+        {
+            return nodes.count(std::string(nodeName)) > 0;
+        }
+
+        [[nodiscard]] static auto get(const char *nodeName, AttributeContent content)
+        {
+            try {
+                if (content == AttributeContent::Name) {
+                    return nodes.at(nodeName).first;
+                }
+                return nodes.at(nodeName).second;
+            }
+            catch (std::out_of_range &) {
+                return std::string{};
+            }
+        }
+    };
+
+    ShortenedTextNodes::singleAttributedNode ShortenedTextNodes::nodes = {
+        {gui::text::shortened_bold, {gui::text::weight, gui::text::bold}}};
 }; // namespace text
 
 struct walker : pugi::xml_tree_walker
@@ -273,6 +309,11 @@ struct walker : pugi::xml_tree_walker
         return std::string(node.name()) == gui::text::node_br || std::string(node.name()) == gui::text::node_p;
     }
 
+    auto is_shortened_text_node(pugi::xml_node &node) const
+    {
+        return text::ShortenedTextNodes::is(node.name());
+    }
+
     auto push_text_node(pugi::xml_node &node)
     {
         auto local_style = style_stack.back();
@@ -281,6 +322,20 @@ struct walker : pugi::xml_tree_walker
             auto &decor = text::NodeDecor::get();
             decor.stack_visit(local_style, attribute.name(), attribute.value());
         }
+        style_stack.push_back(local_style);
+        log_parser("Attr loaded: %s", style_stack.back().str().c_str());
+    }
+
+    auto push_text_shortened_node(pugi::xml_node &node)
+    {
+        log_parser("shortened text node name: %s", node.name());
+        auto local_style = style_stack.back();
+        auto &decor      = text::NodeDecor::get();
+
+        using stNodes   = text::ShortenedTextNodes;
+        using stContent = stNodes::AttributeContent;
+        decor.stack_visit(
+            local_style, stNodes::get(node.name(), stContent::Name), stNodes::get(node.name(), stContent::Value));
         style_stack.push_back(local_style);
         log_parser("Attr loaded: %s", style_stack.back().str().c_str());
     }
@@ -303,6 +358,10 @@ struct walker : pugi::xml_tree_walker
         if (node.type() == pugi::xml_node_type::node_element) {
             if (std::string(node.name()) == gui::text::node_text) {
                 push_text_node(node);
+                return true;
+            }
+            if (is_shortened_text_node(node)) {
+                push_text_shortened_node(node);
                 return true;
             }
             if (is_newline_node(node)) {
@@ -335,7 +394,7 @@ struct walker : pugi::xml_tree_walker
         log_node(node, Action::Exit);
 
         if (node.type() == pugi::xml_node_type::node_element) {
-            if (std::string(node.name()) == gui::text::node_text) {
+            if (std::string(node.name()) == gui::text::node_text || is_shortened_text_node(node)) {
                 pop_text_node(node);
                 return true;
             }

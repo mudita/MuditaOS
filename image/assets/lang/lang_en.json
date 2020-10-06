@@ -143,7 +143,7 @@
     "app_desktop_sim_lock3": "please type a PIN code:",
     "app_desktop_puk_lock1": "The SIM card is blocked.",
     "app_desktop_puk_lock2": "To unblock it, type the PUK code:",
-    "app_desktop_no_pin_lock": "<text>Press <text weight=\"bold\">Unlock</text> and then <text weight=\"bold\">#</text> </text>",
+    "app_desktop_no_pin_lock": "<text>Press <b>Unlock</b> and then <b>#</b> </text>",
     "app_desktop_pin_invalid_info1": "Wrong passcode",
     "app_desktop_pin_invalid_info2": "Wrong PIN code",
     "app_desktop_pin_invalid_info3": "Wrong PUK code",

@@ -25,6 +25,7 @@ namespace gui::text
     inline const auto node_text = "text";
     inline const auto node_br   = "br";
     inline const auto node_p    = "p";
+    inline const auto shortened_bold = "b";
 
     /// Rich text parser utility
     /// supported specifiers
@@ -37,8 +38,8 @@ namespace gui::text
     ///        * gui::text::weight - weight of font to use, one of: gui::text::bold, gui::text::regular,
     ///        gui::text::light
     /// please mind that selected font must exist on system, othervise closest relative will be selected
-    /// * gui::text::node_p `<p> </p>` and gui::text::node_br `<br> </br>` now working identical - marking start and end
-    /// with newline
+    /// * gui::text::node_p `<p> </p>`, gui::text::node_br `<br> </br>` and gui::text::shortened_bold `<b> </b>` now
+    /// working identical - marking start and end with newline
     /// @return empty document on error
     class RichTextParser
     {
