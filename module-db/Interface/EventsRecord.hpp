@@ -95,9 +95,6 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     std::unique_ptr<db::query::events::AddResult> runQueryImplAdd(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::RemoveResult> runQueryImplRemove(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::EditResult> runQueryImplEdit(std::shared_ptr<db::Query> query);
-    // mlucki
-    /*std::unique_ptr<db::query::events::SelectFirstUpcomingResult> runQueryImpl(
-        const db::query::events::SelectFirstUpcoming *query);*/
     std::unique_ptr<db::query::events::SelectFirstUpcomingResult> runQueryImplSelectFirstUpcoming(
         std::shared_ptr<db::Query> query);
 };
