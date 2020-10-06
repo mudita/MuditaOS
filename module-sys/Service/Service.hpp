@@ -31,10 +31,6 @@ namespace sys
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
       public:
-        /// TODO this should be split in two...
-        /// only ServiceManager should be able to not tell who is it's parent :/
-        /// parent ... should be (sharet) pointer at least.. (to be able to tell if parent exists (shared) and to
-        /// identify parent nicelly)
         Service(std::string name,
                 std::string parent       = "",
                 uint32_t stackDepth      = 4096,
@@ -51,12 +47,20 @@ namespace sys
         // Invoked during initialization
         virtual ReturnCodes InitHandler() = 0;
 
-        // Invoked upon receiving close request
+        /**
+         * @brief Handler to gently release system resources, such as worker
+         * threads. All other resources should be freed in a destructor.
+         *
+         * @return ReturnCodes
+         */
         virtual ReturnCodes DeinitHandler() = 0;
 
         virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 
-        void CloseHandler();
+        /**
+         * @brief Ends stops service's thread and its timers.
+         */
+        virtual void CloseHandler() final;
 
         std::string parent;
 
