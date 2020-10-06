@@ -59,13 +59,24 @@ void vfs::Init()
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
     if (isDir(purefs::dir::user_disk.c_str()) == false) {
-        LOG_ERROR("vfs::Init looks like %s does not exist, try to create it", purefs::dir::user_disk.c_str());
+        LOG_ERROR("vfs:init looks like %s does not exist, try to create it", purefs::dir::user_disk.c_str());
         if (ff_mkdir(purefs::dir::user_disk.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't create %s directory", purefs::dir::user_disk.c_str());
+            LOG_ERROR("init can't create %s directory", purefs::dir::user_disk.c_str());
         }
     }
     else {
-        LOG_INFO("vfs::Init looks like %s exists", purefs::dir::user_disk.c_str());
+        LOG_INFO("init looks like %s exists", purefs::dir::user_disk.c_str());
+    }
+
+    // create the updates dir if it does not exist
+    if (isDir(purefs::dir::os_updates.c_str()) == false) {
+        LOG_ERROR("init looks like %s does not exist, try to create it", purefs::dir::os_updates.c_str());
+        if (ff_mkdir(purefs::dir::os_updates.c_str()) != 0) {
+            LOG_ERROR("init nit can't create %s directory", purefs::dir::os_updates.c_str());
+        }
+    }
+    else {
+        LOG_INFO("init looks like %s exists", purefs::dir::os_updates.c_str());
     }
 }
 
@@ -363,4 +374,9 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
 
     ffconfigFREE(buffer);
     return count;
+}
+
+int vfs::getErrno()
+{
+    return stdioGET_ERRNO();
 }

@@ -260,3 +260,8 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
     va_end(argList);
     return ret;
 }
+
+int vfs::getErrno()
+{
+    return errno();
+}
