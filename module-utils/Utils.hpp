@@ -183,18 +183,14 @@ namespace utils
         return false;
     }
 
-    static inline uint32_t fromBigEndian(const uint8_t buf[])
+    static inline uint32_t swapBytes(uint32_t toSwap)
     {
-        return (((((uint8_t)buf[0]) << 24U) | (((uint8_t)buf[1]) << 16U) | (((uint8_t)buf[2]) << 8U) |
-                 (((uint8_t)buf[3]) << 0U)));
-    }
-
-    static inline void toBigEndian(const uint32_t in, uint8_t inplace[])
-    {
-        inplace[0] = ((((uint32_t)(in)) >> 24U) & 0xFFU);
-        inplace[1] = ((((uint32_t)(in)) >> 16U) & 0xFFU);
-        inplace[2] = ((((uint32_t)(in)) >> 8U) & 0xFFU);
-        inplace[3] = (((uint32_t)(in)) & 0xFFU);
+#ifdef __GNUC__
+        return __builtin_bswap32(toSwap);
+#else
+        return ((((toSwap)&0xff000000) >> 24) | (((toSwap)&0x00ff0000) >> 8) | (((toSwap)&0x0000ff00) << 8) |
+                (((toSwap)&0x000000ff) << 24));
+#endif
     }
 
 } // namespace utils

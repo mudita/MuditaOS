@@ -11,6 +11,7 @@
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
 * `[settings]` Added sql script for file indexer DB schema
 * `[settings][bluetooth]` Create "Add device" windows
+* `[hardware]` Slider driver (offline/online mode selection)
 
 ### Fixed
 

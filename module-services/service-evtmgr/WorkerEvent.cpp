@@ -179,20 +179,10 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             return false;
         }
 
-        bsp::magnetometer::setPowerState(0);
-        std::pair<bool, bsp::magnetometer::Measurements> newMeasurement = bsp::magnetometer::getMeasurements();
-        auto const &[isNewData, measurements]                           = newMeasurement;
-        if (isNewData == true) {
-            //            auto const [X, Y, Z, tempC] = measurements;
-            LOG_DEBUG("Worker magneto on IRQ: new data");
-            //                        LOG_DEBUG("IRQ magneto: %d, %d, %d", X, Y, Z);
+        if (std::optional<bsp::KeyCodes> key = bsp::magnetometer::WorkerEventHandler()) {
+            LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
+            processKeyEvent(bsp::KeyEvents::Pressed, *key);
         }
-        else {
-            LOG_DEBUG("Worker magneto on IRQ: no new data");
-        }
-        bsp::magnetometer::setPowerState(2);
-
-        bsp::magnetometer::enableIRQ();
     }
 
     return true;

@@ -1,45 +1,47 @@
 #pragma once
 
-#include <module-bsp/bsp/keyboard/key_codes.hpp>
+#include <bsp/keyboard/key_codes.hpp>
 
-#include <stdint.h>
+#include <cstdint>
 #include <optional>
 
-extern "C" {
-	#include "FreeRTOS.h"
-	#include "task.h"
-	#include "queue.h"
+extern "C"
+{
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 }
 
 #include "../common.hpp"
-#include "../../../../../../../usr/include/c++/10.2.0/utility"
 
-namespace bsp {
+namespace bsp
+{
 
-namespace magnetometer{
+    namespace magnetometer
+    {
 
-    int32_t init(xQueueHandle qHandle);
+        int32_t init(xQueueHandle qHandle);
 
-    bool isPresent(void);
+        bool isPresent(void);
 
-    bsp::Board GetBoard(void);
+        bsp::Board GetBoard(void);
 
-    bool setPowerState(const uint8_t pwr_value);
+        /// unit: 4 LSB/Gauss
+        struct Measurements
+        {
+            int16_t X;
+            int16_t Y;
+            int16_t Z;
+        };
 
-    struct Measurements {
-        int16_t X;
-        int16_t Y;
-        int16_t Z; // Z is useless
-        float tempC;
-    } typedef Measurements;
+        /// returns a pair of <new_data_read?, values>
+        std::pair<bool, Measurements> getMeasurement();
 
-    /// returns a pair of <new_data_read?, values>
-    std::pair<bool, Measurements> getMeasurements();
+        bsp::KeyCodes parse(const Measurements &measurements);
+        std::optional<bsp::KeyCodes> WorkerEventHandler();
 
-    bsp::KeyCodes getDiscrete(const Measurements &measurements);
+        BaseType_t IRQHandler();
+        void enableIRQ();
+    } // namespace magnetometer
 
-    BaseType_t IRQHandler();
-    void enableIRQ();
-}
-
-}
+} // namespace bsp
