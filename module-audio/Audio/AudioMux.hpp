@@ -75,12 +75,10 @@ namespace audio
         auto GetRecordingInput() -> std::optional<Input *>;
         /**
          * Gets input for playback
-         * @param token Token to compare
          * @param playbackType Playback type to compare
          * @return nullopt if input not found
          */
-        auto GetPlaybackInput(const Token &token, const audio::PlaybackType &playbackType)
-            -> std::optional<AudioMux::Input *>;
+        auto GetPlaybackInput(const audio::PlaybackType &playbackType) -> std::optional<AudioMux::Input *>;
 
         auto GetAllInputs() -> std::vector<Input> &
         {

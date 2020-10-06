@@ -13,75 +13,82 @@ class Service;
 namespace AudioServiceAPI
 {
     /**
-     * @brief Starts playback operation.
+     * @brief Starts playback operation. Asynchronous call.
      *
      * @param serv Requesting service.
      * @param playbackType Type of playback.
      * @param fileName Name of the file.
-     * @return audio::Handle Handle to operation to be used in subsequent operations.
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioStartPlaybackResponse
      */
-    audio::Handle PlaybackStart(sys::Service *serv,
-                                const audio::PlaybackType &playbackType,
-                                const std::string &fileName);
+    bool PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName);
+
     /**
-     * @brief Starts recording.
+     * @brief Starts recording. Asynchronous call.
      *
      * @param serv Requesting service.
      * @param fileName Path to file where recording is to be saved.
-     * @return audio::Handle Handle to operation to be used in subsequent operations.
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioStartRecordingResponse
      */
-    audio::Handle RecordingStart(sys::Service *serv, const std::string &fileName);
+    bool RecordingStart(sys::Service *serv, const std::string &fileName);
     /**
-     * @brief Starts routing.
+     * @brief Starts routing. Asynchronous call.
      *
      * @param serv Requesting service.
-     * @return audio::Handle Handle to operation to be used in subsequent operations.
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioStartRoutingResponse
      */
-    audio::Handle RoutingStart(sys::Service *serv);
-    audio::RetCode RoutingMute(sys::Service *serv, bool enable);
-    audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable);
-    audio::RetCode RoutingHeadset(sys::Service *serv, bool enable);
+    bool RoutingStart(sys::Service *serv);
+    bool RoutingMute(sys::Service *serv, bool enable);
+    bool RoutingSpeakerPhone(sys::Service *serv, bool enable);
+    bool RoutingHeadset(sys::Service *serv, bool enable);
     /**
-     * @brief Stops playback operations by type.
+     * @brief Stops playback operations by type. Asynchronous call.
      *
      * @param serv Requesting service
      * @param stopVec Playback types to be stopped.
      *  When stop vector is passed it stops current operation only if it's type is contained in the vector.
      *  Otherwise does not have effect.
-     * @return audio::RetCode standard service-api return code
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioStopResponse for all stopped inputs
      */
-    audio::RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec);
+    bool Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec);
     /**
      * @brief Stops playback operation.
      *
      * @param serv Requesting service
-     * @param handle Handle to controlled operation
+     * @param token Identifier of related operation
      * @return audio::RetCode standard service-api return code
+     *  Response will come as message AudioStopResponse
      */
-    audio::RetCode Stop(sys::Service *serv, const audio::Handle &handle);
+    bool Stop(sys::Service *serv, const audio::Token &token);
     /**
-     * @brief Stops all active playback operation. Stopped operations cannot be resumed.
+     * @brief Stops all active playback operation. Stopped operations cannot be resumed. Asynchronous call.
      *
      * @param serv Requesting service
-     * @return audio::RetCode standard service-api return code
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioStopResponse for all stopped inputs
      */
-    audio::RetCode StopAll(sys::Service *serv);
+    bool StopAll(sys::Service *serv);
     /**
-     * @brief Pauses playback operation. Can be resumed by Resume()
+     * @brief Pauses playback operation. Can be resumed by Resume(). Asynchronous call.
      *
      * @param serv Requesting service
-     * @param handle Handle to controlled operation
-     * @return audio::RetCode standard service-api return code
+     * @param token Identifier of related operation
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioPauseResponse
      */
-    audio::RetCode Pause(sys::Service *serv, const audio::Handle &handle);
+    bool Pause(sys::Service *serv, const audio::Token &token);
     /**
-     * @brief Resumes paused operation.
+     * @brief Resumes paused operation. Asynchronous call.
      *
      * @param serv Requesting service
-     * @param handle Handle to controlled operation
-     * @return audio::RetCode standard service-api return code
+     * @param token Identifier of related operation
+     * @return True is request has been sent successfully, false otherwise
+     *  Response will come as message AudioResumeResponse
      */
-    audio::RetCode Resume(sys::Service *serv, const audio::Handle &handle);
+    bool Resume(sys::Service *serv, const audio::Token &token);
     /**
      * @brief Attempts to parse audio file for metatags.
      *
@@ -97,7 +104,7 @@ namespace AudioServiceAPI
      * @param value - requested value.
      * @param profileType - selected profile type.
      * @param playbackType -  type of playback. Not used when profileType is different than playback.
-     * @return           Standard service-api return code. Success if suitable.
+     * @return Standard service-api return code. Success if suitable.
      */
     template <typename T>
     audio::RetCode GetSetting(sys::Service *serv,
@@ -112,7 +119,7 @@ namespace AudioServiceAPI
      * @param value - value to be set.
      * @param profileType - selected profile type.
      * @param playbackType -  type of playback. Not used when profileType is different than playback.
-     * @return           Standard service-api return code. Success if suitable.
+     * @return Standard service-api return code. Success if suitable.
      */
     template <typename T>
     audio::RetCode SetSetting(sys::Service *serv,

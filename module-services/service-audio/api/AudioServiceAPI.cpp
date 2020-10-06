@@ -34,86 +34,75 @@ namespace AudioServiceAPI
         }
     } // namespace
 
-    Handle PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
+    bool PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
     {
-        auto msg = std::make_shared<AudioStartMessage>(fileName, playbackType);
-        auto ret = SendAudioRequest(serv, msg);
-        return Handle(ret->retCode, ret->token);
+        auto msg = std::make_shared<AudioStartPlaybackRequest>(fileName, playbackType);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    Handle RecordingStart(sys::Service *serv, const std::string &fileName)
+    bool RecordingStart(sys::Service *serv, const std::string &fileName)
     {
-        auto msg      = std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
-        msg->fileName = fileName;
-        auto ret      = SendAudioRequest(serv, msg);
-        return Handle(ret->retCode, ret->token);
+        auto msg = std::make_shared<AudioStartRecorderRequest>(fileName);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    Handle RoutingStart(sys::Service *serv)
+    bool RoutingStart(sys::Service *serv)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingStart);
-        auto ret = SendAudioRequest(serv, msg);
-        return Handle(ret->retCode, ret->token);
+        auto msg = std::make_shared<AudioStartRoutingRequest>();
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    audio::RetCode RoutingMute(sys::Service *serv, bool enable)
+    bool RoutingMute(sys::Service *serv, bool enable)
     {
-        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
-        msg->enable = enable;
-
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioRoutingControlRequest>(AudioRoutingControlRequest::ControlType::Mute, enable);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable)
+    bool RoutingSpeakerPhone(sys::Service *serv, bool enable)
     {
-        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
-        msg->enable = enable;
-
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioRoutingControlRequest>(
+            AudioRoutingControlRequest::ControlType::SwitchSpeakerphone, enable);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    audio::RetCode RoutingHeadset(sys::Service *serv, bool enable)
+    bool RoutingHeadset(sys::Service *serv, bool enable)
     {
-        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingHeadset);
-        msg->enable = enable;
-
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioRoutingControlRequest>(
+            AudioRoutingControlRequest::ControlType::SwitchHeadphones, enable);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
+    bool Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
     {
         if (stopVec.empty()) {
-            return RetCode::Success;
+            return true;
         }
-        auto msg = std::make_shared<AudioStopMessage>(stopVec);
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioStopRequest>(stopVec);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    RetCode Stop(sys::Service *serv, const audio::Handle &handle)
+    bool Stop(sys::Service *serv, const audio::Token &token)
     {
-        auto msg = std::make_shared<AudioStopMessage>(handle.GetToken());
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioStopRequest>(token);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    RetCode Stop(sys::Service *serv)
+    bool StopAll(sys::Service *serv)
     {
-        auto msg = std::make_shared<AudioStopMessage>();
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioStopRequest>();
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    RetCode Pause(sys::Service *serv, const audio::Handle &handle)
+    bool Pause(sys::Service *serv, const audio::Token &token)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioPause, handle.GetToken());
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioPauseRequest>(token);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    RetCode Resume(sys::Service *serv, const audio::Handle &handle)
+    bool Resume(sys::Service *serv, const audio::Token &token)
     {
-        std::shared_ptr<AudioRequestMessage> msg =
-            std::make_shared<AudioRequestMessage>(MessageType::AudioResume, handle.GetToken());
-        return SendAudioRequest(serv, msg)->retCode;
+        auto msg = std::make_shared<AudioResumeRequest>(token);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
     template <typename T>
@@ -170,8 +159,7 @@ namespace AudioServiceAPI
 
     std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
     {
-        auto msg      = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
-        msg->fileName = fileName;
+        auto msg = std::make_shared<AudioGetFileTagsRequest>(fileName);
 
         auto resp = SendAudioRequest(serv, msg);
         if (resp->retCode == audio::RetCode::Success) {

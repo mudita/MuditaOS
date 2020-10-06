@@ -157,8 +157,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         handled = true;
     }
-    else if (msgl->messageType == MessageType::AudioRoutingHeadset && msgl->sender == this->GetName()) {
-        auto *msg = dynamic_cast<AudioRequestMessage *>(msgl);
+    else if (auto msg = dynamic_cast<AudioRoutingControlRequest *>(msgl); msg && msgl->sender == this->GetName()) {
         if (msg != nullptr) {
             AudioServiceAPI::RoutingHeadset(this, msg->enable);
             handled = true;

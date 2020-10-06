@@ -45,19 +45,10 @@ namespace audio
         return std::nullopt;
     }
 
-    std::optional<AudioMux::Input *> AudioMux::GetPlaybackInput(const Token &token,
-                                                                const audio::PlaybackType &playbackType)
+    std::optional<AudioMux::Input *> AudioMux::GetPlaybackInput(const audio::PlaybackType &playbackType)
     {
         // if routing or recording we cannot continue
         if (GetInput({Audio::State::Routing, Audio::State::Recording})) {
-            return std::nullopt;
-        }
-        // try get with token
-        if (auto input = GetInput(token)) {
-            return input;
-        }
-        if (token.IsValid()) {
-            // reject since operation does not exist
             return std::nullopt;
         }
         // try get with priority

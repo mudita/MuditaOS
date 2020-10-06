@@ -26,7 +26,6 @@
 
 class ServiceAudio : public sys::Service
 {
-
   public:
     ServiceAudio();
 
@@ -55,14 +54,15 @@ class ServiceAudio : public sys::Service
     auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
     auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
 
-    template <typename... Args>
-    std::unique_ptr<AudioResponseMessage> HandleStart(std::optional<audio::AudioMux::Input *> input,
-                                                      audio::Operation::Type opType,
-                                                      Args... args);
-    std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
-    std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
+    std::unique_ptr<AudioResponseMessage> HandleStart(
+        const std::optional<audio::AudioMux::Input *> input,
+        const audio::Operation::Type opType,
+        const char *fileName                    = "",
+        const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+    std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<audio::AudioMux::Input *> input);
+    std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopRequest *msg);
 
-    void VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
+    void VibrationStart(const audio::PlaybackType &type, audio::Token &token);
     void VibrationStop(const audio::Token &token);
     auto GetVibrationType(const audio::PlaybackType &type) -> std::optional<VibrationType>;
 

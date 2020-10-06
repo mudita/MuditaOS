@@ -46,8 +46,7 @@ int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
 {
     switch (e.event) {
     case audio::PlaybackEventType::EndOfFile: {
-        auto msg = std::make_shared<AudioNotificationMessage>(
-            static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::EndOfFile), e.token);
+        auto msg = std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::EndOfFile, e.token);
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceAudioNotifications, this);
     } break;
     case audio::PlaybackEventType::FileSystemNoSpace:
@@ -118,7 +117,7 @@ std::optional<ServiceAudio::VibrationType> ServiceAudio::GetVibrationType(const 
     return std::nullopt;
 }
 
-void ServiceAudio::VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp)
+void ServiceAudio::VibrationStart(const audio::PlaybackType &type, Token &token)
 {
     auto vibType = GetVibrationType(type);
     if (!vibType || vibrationToken.IsValid()) {
@@ -130,14 +129,14 @@ void ServiceAudio::VibrationStart(const audio::PlaybackType &type, std::shared_p
         ExtVibrateOnce();
     }
     else if (vibType == VibrationType::Continuous) {
-        if (resp && resp->token.IsValid()) {
+        if (token.IsValid()) {
             // audio has started
-            vibrationToken = resp->token;
+            vibrationToken = token;
         }
         else {
             // audio did not start but we still want vibration
             vibrationToken = audioMux.IncrementToken();
-            resp           = std::make_unique<AudioResponseMessage>(RetCode::Success, Tags(), vibrationToken);
+            token          = vibrationToken;
         }
         ExtVibrationStart();
     }
@@ -169,67 +168,77 @@ void ServiceAudio::addOrIgnoreEntry(const std::string &profilePath, const std::s
     }
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioRequestMessage *> msg)
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioMux::Input *> input)
 {
+    auto retCode  = audio::RetCode::Failed;
+    auto retToken = Token();
 
-    audio::RetCode retCode = audio::RetCode::Failed;
-    audio::Token retToken  = Token::MakeBadToken();
+    if (!input) {
+        return std::make_unique<AudioPauseResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
+    }
 
-    auto pauseInput = [this](AudioMux::Input &audioInput) {
-        auto playbackType = audioInput.audio->GetCurrentOperationPlaybackType();
-        if (playbackType && IsResumable(*playbackType)) {
-            audioInput.audio->Pause();
-            return audioInput.token;
-        }
-        else {
-            audioInput.audio->Stop();
-            auto broadMsg = std::make_shared<AudioNotificationMessage>(
-                static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::Stop), audioInput.token);
-            sys::Bus::SendMulticast(broadMsg, sys::BusChannels::ServiceAudioNotifications, this);
-            audioMux.IncrementToken(&audioInput);
-            return Token::MakeBadToken();
-        }
-    };
+    auto &audioInput = input.value();
 
-    if (msg) {
-        std::optional<AudioMux::Input *> input = audioMux.GetInput((*msg)->token);
-        if (!input) {
-            retToken = pauseInput(**input);
-        }
+    auto playbackType = audioInput->audio->GetCurrentOperationPlaybackType();
+    if (playbackType && IsResumable(*playbackType)) {
+        retCode  = audioInput->audio->Pause();
+        retToken = audioInput->token;
     }
     else {
-        for (auto &audioInput : audioMux.GetAllInputs()) {
-            if (audioInput.audio->GetCurrentOperation()->GetState() == Operation::State::Active) {
-                pauseInput(audioInput);
-            }
-        }
-        return std::make_unique<AudioResponseMessage>(audio::RetCode::Success, Tags(), retToken);
+        retCode = audioInput->audio->Stop();
+        auto broadMsg =
+            std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, audioInput->token);
+        sys::Bus::SendMulticast(broadMsg, sys::BusChannels::ServiceAudioNotifications, this);
+        audioMux.IncrementToken(audioInput);
     }
-
-    return std::make_unique<AudioResponseMessage>(retCode, Tags(), retToken);
+    return std::make_unique<AudioPauseResponse>(retCode, retToken);
 }
 
-template <typename... Args>
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(std::optional<AudioMux::Input *> input,
-                                                                Operation::Type opType,
-                                                                Args... args)
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const std::optional<AudioMux::Input *> input,
+                                                                const Operation::Type opType,
+                                                                const char *fileName,
+                                                                const audio::PlaybackType &playbackType)
 {
-    audio::RetCode retCode = audio::RetCode::Failed;
-    audio::Token retToken  = Token::MakeBadToken();
+    auto retCode  = audio::RetCode::Failed;
+    auto retToken = Token::MakeBadToken();
 
-    if (input) {
+    if (input && IsPlaybackEnabled(playbackType)) {
+        for (auto &audioInput : audioMux.GetAllInputs()) {
+            HandlePause(&audioInput);
+        }
+        if (opType == Operation::Type::Recorder) {
+            // since recording works on the same audio as routing
+            retToken = input.value()->token;
+        }
+        else {
+            retToken = audioMux.IncrementToken(input);
+        }
 
-        HandlePause();
-        retToken = audioMux.IncrementToken(input);
-        retCode  = (*input)->audio->Start(opType, retToken, args...);
+        retCode = (*input)->audio->Start(opType, retToken, fileName, playbackType);
     }
-    if (retCode != audio::RetCode::Success) {
-        retToken = Token::MakeBadToken();
+
+    // token may get updated inside vibration handler if necessary
+    VibrationStart(playbackType, retToken);
+
+    if (retToken.IsValid()) {
+        retCode = audio::RetCode::Success;
     }
-    return std::make_unique<AudioResponseMessage>(retCode, Tags(), retToken);
+
+    if (opType == Operation::Type::Playback) {
+        return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
+    }
+    else if (opType == Operation::Type::Recorder) {
+        return std::make_unique<AudioStartRecorderResponse>(retCode, retToken);
+    }
+    else if (opType == Operation::Type::Router) {
+        return std::make_unique<AudioStartRoutingResponse>(retCode, retToken);
+    }
+    else {
+        return std::make_unique<AudioResponseMessage>(retCode);
+    }
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(AudioStopMessage *msg)
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(AudioStopRequest *msg)
 {
     const auto playbackTypesToStop       = msg->stopVec;
     std::vector<audio::RetCode> retCodes = {audio::RetCode::Success};
@@ -240,8 +249,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(AudioStopMessage 
         }
         auto rCode = inp->audio->Stop();
         // Send notification that audio file was stopped
-        auto msgStop = std::make_shared<AudioNotificationMessage>(
-            static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::Stop), inp->token);
+        auto msgStop = std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, inp->token);
         sys::Bus::SendMulticast(msgStop, sys::BusChannels::ServiceAudioNotifications, this);
         audioMux.IncrementToken(inp);
         return rCode;
@@ -292,7 +300,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 (*input)->audio->Start();
             }
             else {
-                auto newMsg = std::make_shared<AudioStopMessage>(msg->token);
+                auto newMsg = std::make_shared<AudioStopRequest>(msg->token);
                 sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
             }
         } break;
@@ -313,80 +321,60 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         setSetting(msg->setting, msg->val, msg->profileType, msg->playbackType);
         responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success);
     }
-    else if (auto *msg = dynamic_cast<AudioStopMessage *>(msgl)) {
+    else if (auto *msg = dynamic_cast<AudioStopRequest *>(msgl)) {
         VibrationStop(msg->token);
         responseMsg = HandleStop(msg);
     }
-    else if (auto *msg = dynamic_cast<AudioStartMessage *>(msgl)) {
-        if (IsPlaybackEnabled(msg->playbackType)) {
-            if (auto input = audioMux.GetPlaybackInput(msg->token, msg->playbackType)) {
-                responseMsg = HandleStart(input, Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
+    else if (auto *msg = dynamic_cast<AudioStartPlaybackRequest *>(msgl)) {
+        auto input  = audioMux.GetPlaybackInput(msg->playbackType);
+        responseMsg = HandleStart(input, Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
+    }
+    else if (auto *msg = dynamic_cast<AudioStartRecorderRequest *>(msgl)) {
+        if (auto input = audioMux.GetRecordingInput()) {
+            responseMsg = HandleStart(input, Operation::Type::Recorder, msg->fileName.c_str());
+        }
+    }
+    else if (dynamic_cast<AudioStartRoutingRequest *>(msgl)) {
+        LOG_DEBUG("AudioRoutingStart");
+        if (auto input = audioMux.GetRoutingInput(true)) {
+            responseMsg = HandleStart(input, Operation::Type::Router);
+        }
+    }
+    else if (auto *msg = dynamic_cast<AudioPauseRequest *>(msgl)) {
+        if (auto input = audioMux.GetInput(msg->token)) {
+            responseMsg = HandlePause(input);
+        }
+    }
+    else if (auto *msg = dynamic_cast<AudioResumeRequest *>(msgl)) {
+        if (auto input = audioMux.GetInput(msg->token)) {
+            responseMsg = std::make_shared<AudioResumeResponse>((*input)->audio->Resume(), msg->token);
+        }
+    }
+    else if (auto *msg = dynamic_cast<AudioGetFileTagsRequest *>(msgl)) {
+        if (auto input = audioMux.GetAvailableInput()) {
+            auto tag = (*input)->audio->GetFileTags(msg->fileName.c_str());
+            if (tag) {
+                responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, tag.value());
+            }
+            else {
+                responseMsg = std::make_shared<AudioResponseMessage>(RetCode::FileDoesntExist);
             }
         }
-        VibrationStart(msg->playbackType, responseMsg);
     }
-    else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
-        switch (msg->type) {
-        case MessageType::AudioRecorderStart: {
-            if (auto input = audioMux.GetRecordingInput()) {
-                responseMsg = std::make_shared<AudioResponseMessage>(
-                    (*input)->audio->Start(Operation::Type::Recorder, (*input)->token, msg->fileName.c_str()));
-            }
-        } break;
+    else if (auto *msg = dynamic_cast<AudioRoutingControlRequest *>(msgl)) {
+        std::optional<Operation::Event> evt;
+        else if (msg->cType == AudioRoutingControlRequest::ControlType::Mute) {
+            evt = msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute;
+        }
+        else if (msg->cType == AudioRoutingControlRequest::ControlType::SwitchSpeakerphone) {
+            evt = msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff;
+        }
+        else if (msg->cType == AudioRoutingControlRequest::ControlType::SwitchHeadphones) {
+            evt = msg->enable ? Operation::Event::HeadphonesPlugin : Operation::Event::HeadphonesUnplug;
+        }
 
-        case MessageType::AudioRoutingStart: {
-            LOG_DEBUG("AudioRoutingStart");
-            if (auto input = audioMux.GetRoutingInput(true)) {
-                responseMsg = HandleStart(input, Operation::Type::Router);
-            }
-        } break;
-
-        case MessageType::AudioPause: {
-            responseMsg = HandlePause(msg);
-        } break;
-
-        case MessageType::AudioResume: {
-            if (auto input = audioMux.GetInput(msg->token)) {
-                responseMsg = std::make_shared<AudioResponseMessage>((*input)->audio->Resume());
-            }
-        } break;
-
-        case MessageType::AudioGetFileTags: {
-            if (auto input = audioMux.GetAvailableInput()) {
-                auto tag = (*input)->audio->GetFileTags(msg->fileName.c_str());
-                if (tag) {
-                    responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, tag.value());
-                }
-                else {
-                    responseMsg = std::make_shared<AudioResponseMessage>(RetCode::FileDoesntExist);
-                }
-            }
-        } break;
-
-        case MessageType::AudioRoutingMute: {
-            if (auto input = audioMux.GetRecordingInput()) {
-                responseMsg = std::make_shared<AudioResponseMessage>((*input)->audio->SendEvent(
-                    msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute));
-            }
-        } break;
-
-        case MessageType::AudioRoutingSpeakerhone: {
-            if (auto input = audioMux.GetRecordingInput()) {
-                responseMsg = std::make_shared<AudioResponseMessage>((*input)->audio->SendEvent(
-                    msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff));
-            }
-        } break;
-        case MessageType::AudioRoutingHeadset: {
-            if (auto input = audioMux.GetRecordingInput()) {
-                responseMsg = std::make_shared<AudioResponseMessage>((*input)->audio->SendEvent(
-                    msg->enable ? Operation::Event::HeadphonesPlugin : Operation::Event::HeadphonesUnplug));
-            }
-        } break;
-
-        default:
-            LOG_ERROR("Unhandled AudioRequestMessage");
-            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Failed);
-            break;
+        if (auto input = audioMux.GetRecordingInput(); evt && input) {
+            responseMsg = std::make_shared<AudioResponseMessage>((*input)->audio->SendEvent(evt.value()));
         }
     }
     else {
@@ -397,7 +385,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         return responseMsg;
     }
     else {
-        return std::make_shared<AudioResponseMessage>(RetCode::Failed, Tags{}, Token::MakeBadToken());
+        return std::make_shared<AudioResponseMessage>(RetCode::Failed);
     }
 }
 
