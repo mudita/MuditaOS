@@ -14,6 +14,3 @@ conn.key(3)
 conn.key(3)
 conn.key(3)
 conn.key(3)
-conn.key(ord('\n'))
-# enter menu
-conn.key(ord('\n'))

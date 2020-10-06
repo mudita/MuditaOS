@@ -41,12 +41,13 @@ namespace gui
     }
     void PukLockBox::setVisibleStateEnterPin()
     {
+        LockWindow->clearPinLabels();
         LockWindow->pinLabel->setVisible(true);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_puk_lock1"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked"));
         LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_puk_lock2"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_type_puk"));
         LockWindow->infoText->setVisible(true);
 
         LockWindow->setImagesVisible(true, false);
@@ -64,24 +65,24 @@ namespace gui
         LockWindow->pinLabel->setVisible(false);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info3"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_wrong_puk"));
         LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info5"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_you_have"));
         LockWindow->infoText->addText(" ");
         LockWindow->infoText->addText(std::to_string(LockWindow->lock.getRemainingAttempts()));
         LockWindow->infoText->addText(" ");
 
         if (LockWindow->lock.getRemainingAttempts() > 1) {
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info6"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_attempt_left_plural"));
         }
         else {
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info7"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_attempt_left_singular"));
             LockWindow->infoText->addText("\n\n");
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info8"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_warning1"));
             LockWindow->infoText->addText("\n");
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info9"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_warning2"));
             LockWindow->infoText->addText("\n");
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_invalid_info10"));
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_warning3"));
         }
         LockWindow->infoText->setVisible(true);
 
@@ -93,9 +94,9 @@ namespace gui
         LockWindow->pinLabel->setVisible(false);
 
         LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_blocked_info2"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked_info1"));
         LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_pin_blocked_info3"));
+        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked_info2"));
         LockWindow->infoText->setVisible(true);
 
         LockWindow->setImagesVisible(false, true);

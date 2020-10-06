@@ -6,13 +6,14 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "service-db/api/DBServiceAPI.hpp"
-#include "widgets/CalllogItem.hpp"
-#include "data/CallLogSwitchData.hpp"
-#include "data/CallLogInternals.hpp"
 #include "CalllogModel.hpp"
+#include "InputEvent.hpp"
 #include "ListView.hpp"
 #include "UiCommonActions.hpp"
+#include "data/CallLogInternals.hpp"
+#include "data/CallLogSwitchData.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
+#include "widgets/CalllogItem.hpp"
 
 using namespace calllog;
 

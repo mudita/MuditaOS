@@ -1,8 +1,9 @@
 #include "CustomRepeatWindow.hpp"
-#include "module-apps/application-calendar/data/CalendarData.hpp"
+#include "InputEvent.hpp"
 #include "application-calendar/widgets/CheckBoxWithLabelItem.hpp"
-#include <gui/widgets/Window.hpp>
+#include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <Utils.hpp>
+#include <gui/widgets/Window.hpp>
 
 namespace gui
 {

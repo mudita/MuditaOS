@@ -6,6 +6,7 @@
 #include <Image.hpp>
 #include <ImageBox.hpp>
 #include <TextFixedSize.hpp>
+#include <module-utils/PhoneNumber.hpp>
 
 namespace gui
 {

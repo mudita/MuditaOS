@@ -20,7 +20,7 @@ namespace gui
         std::chrono::system_clock::time_point tp =
             std::chrono::system_clock::from_time_t(appCalendar->getCurrentTimeStamp());
         this->actualDate = date::year_month_day{date::floor<date::days>(tp)};
-        std::fill(begin(isDayEmpty), end(isDayEmpty), true);
+        std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         buildInterface();
     }
 
@@ -202,7 +202,7 @@ namespace gui
 
     auto CalendarMainWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
-        std::fill(begin(isDayEmpty), end(isDayEmpty), true);
+        std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
             const auto records = response->getResult();
             for (auto &rec : *records) {

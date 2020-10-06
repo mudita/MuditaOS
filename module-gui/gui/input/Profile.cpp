@@ -151,11 +151,42 @@ namespace gui
         return true;
     }
 
+    int is_utf8_character(unsigned char c)
+    {
+        if ((c >> 7) == 0b1) {
+            if ((c >> 6) == 0b10) {
+                return 2; // 2nd, 3rd or 4th byte of a utf-8 character
+            }
+            else {
+                return 1; // 1st byte of a utf-8 character
+            }
+        }
+        else {
+            return 0; // a single byte character
+        }
+    }
+
+    static std::vector<std::string> split_str(const std::string &s, int chars_number, int start_pos)
+    {
+        int pos = start_pos, char_pos, bytes_to_write;
+        std::vector<std::string> elems;
+        while (pos < (int)s.length()) {
+            bytes_to_write = chars_number;
+            char_pos       = pos + 1;
+            if (is_utf8_character(s[char_pos]) > 0) {
+                bytes_to_write = bytes_to_write + 1;
+            }
+            elems.push_back(s.substr(pos, bytes_to_write));
+            pos = pos + bytes_to_write + 1;
+        }
+        return elems;
+    }
+
     void Profile::addCharacters(KeyProfile *pk, const std::string &s)
     {
 
         uint32_t charKey;
-        std::vector<std::string> vec = split(s, ',');
+        std::vector<std::string> vec = split_str(s, 3, 0);
         for (std::string s : vec) {
             std::string ts = trim(s);
             if (ts[0] == '\'') {

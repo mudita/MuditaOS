@@ -24,13 +24,15 @@ namespace audio
 
         Audio(AsyncCallback asyncCallback, DbCallback dbCallback);
 
+        virtual ~Audio() = default;
+
         // Events
         audio::RetCode SendEvent(const Operation::Event evt, const EventData *data = nullptr);
 
         // utilities
         Position GetPosition();
 
-        State GetCurrentState() const
+        virtual State GetCurrentState() const
         {
             return currentState;
         }
@@ -58,24 +60,42 @@ namespace audio
             return currentOperation.get();
         }
 
+        virtual std::optional<audio::PlaybackType> GetCurrentOperationPlaybackType() const
+        {
+            if (currentOperation.get()) {
+                return currentOperation.get()->GetPlaybackType();
+            }
+            return std::nullopt;
+        }
+
+        virtual std::optional<Operation::State> GetCurrentOperationState() const
+        {
+            if (currentOperation.get()) {
+                return currentOperation.get()->GetState();
+            }
+            return std::nullopt;
+        }
+
         [[nodiscard]] inline bool GetHeadphonesInserted() const
         {
             return headphonesInserted;
         }
 
         // Operations
-        audio::RetCode Start(Operation::Type op,
-                             audio::Token token                      = audio::Token::MakeBadToken(),
-                             const char *fileName                    = "",
-                             const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+        virtual audio::RetCode Start(Operation::Type op,
+                                     audio::Token token                      = audio::Token::MakeBadToken(),
+                                     const char *fileName                    = "",
+                                     const audio::PlaybackType &playbackType = audio::PlaybackType::None);
 
-        audio::RetCode Stop();
+        virtual audio::RetCode Start();
 
-        audio::RetCode Pause();
+        virtual audio::RetCode Stop();
 
-        audio::RetCode Resume();
+        virtual audio::RetCode Pause();
 
-        audio::RetCode Mute();
+        virtual audio::RetCode Resume();
+
+        virtual audio::RetCode Mute();
 
       private:
         bool headphonesInserted = false;

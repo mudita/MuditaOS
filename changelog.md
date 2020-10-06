@@ -1,27 +1,57 @@
-# Mudita PurePhone changelog
+# MuditaOS changelog
 
 ## [Current release]
 
 ### Added
-* `[desktop][gui]` Added SIM and PUK lock-related windows
-* `[GUI]` Added rich text parsing for full text styling needs
-* `[calendar]` Add notifications from database handling.
-* `[cellular]``[call app]` Added DTMF tone generation 
-* `[settings]` Add basic display and keypad options window
-* `[audio]` Enabled sounds priorities
-* `[messages]` Save a new message as a message draft, if not sent.
+
+* `[gui]` Added GUI timers capability
+* `[fonts]` Added multiplication and division sign to the font files 
+* `[bluetooth]` Added storing of BT link keys.
+* `[audio]` AudioMux tests
+* `[audio]` Added vibration logic (effect is visible in logs only)
 
 ### Changed
 
-
+* `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
+* `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
 
 ### Fixed
 
+* `[audio]` Fix audio looping so it did not log errors
+* `[system]` Timers race condition, Timers should be thread safe for Services/Applications
+
+## [0.40.1 2020-10-02]
+
+### Added
+
+* `[antenna]` Add parameter history window.
+* `[cellular]` Added USSD codes handling.
+* `[desktop]` Add SIM and PUK lock-related windows.
+* `[calendar]` Add handling of notifications from the database.
+* `[cellular]` Add DTMF tone generation.
+* `[settings]` Add basic display and keypad options window.
+* `[renderer]` Add ability to draw circles and arcs.
+* `[bluetooth]` Add support for scanning and pairing.
+
+### Changed
+
+* `[specialinput]` Added emoji selector and changed special character selector.
+* `[messages]` Save a new message as a message draft, if not sent.
+* `[messages]` Save unsent messages as SMS drafts.
+* `[audio]` Enabled sounds priorities, looping and merging.
+* `[phonebook]` Updated scrolling contacts list with a particular letter.
+
+### Fixed
+
+* `[calendar]` Fixed custom repeat option.
+* `[settings]` Fixed a system crash on language change.
 
 ### Other
-* `[audio]` Audio service and api cleanup/refactor.
 
-
+* `[audio]` Audio service and API cleanup/refactor.
+* `[audio]` Add audio volume control per functionality.
+* `[doc]` Updated user documentation.
+* `[system]` Improved destroying of worker threads.
 
 ## [0.39.1 2020-09-25]
 

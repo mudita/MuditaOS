@@ -25,9 +25,10 @@
 #include "service-eink/ServiceEink.hpp"
 #include "service-gui/ServiceGUI.hpp"
 
+#include "Service/Timer.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-special-input/AppSpecialInput.hpp"
+#include "application-special-input/ApplicationSpecialInput.hpp"
 
 /// Auto phone lock disabled for now till the times when it's debugged
 /// #define AUTO_PHONE_LOCK_ENABLED
@@ -163,7 +164,9 @@ namespace sapm
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers)
         : Service(name), VirtualAppManager(launchers), systemManager{sysmgr}
     {
-        blockingTimerID = CreateTimer(0xFFFFFFFF, false);
+        blockingTimer = std::make_unique<sys::Timer>(
+            "BlockTimer", this, std::numeric_limits<sys::ms>().max(), sys::Timer::Type::SingleShot);
+        blockingTimer->connect([&](sys::Timer &) { phoneLockCB(); });
     }
 
     ApplicationManager::~ApplicationManager()
@@ -235,8 +238,7 @@ namespace sapm
             handlePowerSavingModeInit();
         } break;
         case MessageType::APMPreventBlocking: {
-            //			LOG_INFO("Restarting screen locking timer");
-            ReloadTimer(blockingTimerID);
+            blockingTimer->reload();
         } break;
         case MessageType::APMSwitch: {
             sapm::APMSwitch *msg = reinterpret_cast<sapm::APMSwitch *>(msgl);
@@ -297,40 +299,38 @@ namespace sapm
 
         return std::make_shared<sys::ResponseMessage>();
     }
-    // Invoked when timer ticked
-    void ApplicationManager::TickHandler(uint32_t id)
+
+    void ApplicationManager::phoneLockCB()
     {
 #ifdef AUTO_PHONE_LOCK_ENABLED
-        if (id == blockingTimerID) {
-            LOG_INFO("screen Locking Timer Triggered");
-            stopTimer(blockingTimerID);
 
-            // check if application that has focus doesn't have a flag that prevents system from blocking and going to
-            // low power mode
-            ApplicationDescription *appDescription = applications.find(focusApplicationName)->second;
-            if (appDescription->preventLocking) {
-                // restart timer
-                ReloadTimer(blockingTimerID);
-                return;
-            }
+        LOG_INFO("screen Locking Timer Triggered");
+        blockingTimer->stop();
 
-            // if desktop has focus switch to main window and set it locked.
-            if (focusApplicationName == "ApplicationDesktop") {
-                // switch data must contain target window and information about blocking
+        // check if application that has focus doesn't have a flag that prevents system from blocking and going to
+        // low power mode
+        ApplicationDescription *appDescription = appGet(focusApplicationName);
+        if (appDescription->preventsLocking()) {
+            blockingTimer->reload();
+            return;
+        }
 
-                app::Application::messageSwitchApplication(
-                    this, "ApplicationDesktop", gui::name::window::main_window, std::make_unique<gui::LockPhoneData>());
-            }
-            else {
-                // get the application description for application that is on top and set blocking flag for it
-                appDescription->blockClosing = true;
+        // if desktop has focus switch to main window and set it locked.
+        if (focusApplicationName == app::name_desktop) {
+            // switch data must contain target window and information about blocking
 
-                std::unique_ptr<gui::LockPhoneData> data = std::make_unique<gui::LockPhoneData>();
-                data->setPrevApplication(focusApplicationName);
+            app::Application::messageSwitchApplication(
+                this, app::name_desktop, gui::name::window::main_window, std::make_unique<gui::LockPhoneData>());
+        }
+        else {
+            // get the application description for application that is on top and set blocking flag for it
+            appDescription->blockClosing = true;
 
-                // run normal flow of applications change
-                messageSwitchApplication(this, "ApplicationDesktop", gui::name::window::main_window, std::move(data));
-            }
+            std::unique_ptr<gui::LockPhoneData> data = std::make_unique<gui::LockPhoneData>();
+            data->setPrevApplication(focusApplicationName);
+
+            // run normal flow of applications change
+            messageSwitchApplication(this, app::name_desktop, gui::name::window::main_window, std::move(data));
         }
 #endif
     }
@@ -347,7 +347,7 @@ namespace sapm
         if (lockTime == 0) {
             lockTime = default_application_locktime;
         }
-        setTimerPeriod(blockingTimerID, lockTime);
+        blockingTimer->setInterval(lockTime);
 
         if (settings.language == SettingsLanguage::ENGLISH) {
             utils::localize.Switch(utils::Lang::En);

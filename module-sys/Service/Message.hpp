@@ -19,6 +19,7 @@ namespace sys
         Ping,
         SwitchPowerMode,
         Start,
+        Timer,
         Exit
     };
 

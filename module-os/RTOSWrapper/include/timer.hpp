@@ -48,9 +48,9 @@
  *  it's a fatal error. In the cases when you've defined this, the new 
  *  default behavior will be to issue a configASSERT() instead.
  */
+#include <string>
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
 #include <exception>
-#include <string>
 #include <cstdio>
 #ifdef CPP_FREERTOS_NO_CPP_STRINGS
 #error "FreeRTOS-Addons require C++ Strings if you are using exceptions"
@@ -106,6 +106,7 @@ class TimerCreateException  : public std::exception {
  */
 class Timer {
 
+    const std::string name = "Default";
     /////////////////////////////////////////////////////////////////////////
     //
     //  Public API

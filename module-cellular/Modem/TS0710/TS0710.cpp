@@ -4,11 +4,12 @@
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
+#include <Service/Bus.hpp>
 #include <at/URC_QIND.hpp>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <cassert>
-#include <sstream>
 #include <memory>
+#include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <sstream>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
@@ -239,19 +240,34 @@ TS0710::ConfState TS0710::ConfProcedure()
         }
     }
 
+    bool timed_out                = false;
+    constexpr uint32_t cpmsTmeout = 5;
+    const auto cpmsTmeoutTicks =
+        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(cpmsTmeout * utils::time::milisecondsInSecond);
+    while (!timed_out) {
+        if (parser->cmd(at::AT::SET_SMS_STORAGE)) {
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(utils::time::milisecondsInSecond));
+        timed_out = cpp_freertos::Ticks::GetTicks() > cpmsTmeoutTicks;
+        if (timed_out) {
+            return ConfState::Failure;
+        }
+    }
+
     LOG_WARN("TODO: determine while this retry loop is necessary");
 
-    bool timed_out             = false;
-    constexpr uint32_t timeout = 30;
-    const auto timeout_ticks =
-        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(timeout * utils::time::milisecondsInSecond);
+    timed_out                      = false;
+    constexpr uint32_t qsclkTmeout = 30;
+    const auto qsclkTmeoutTicks =
+        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(qsclkTmeout * utils::time::milisecondsInSecond);
     while (!timed_out) {
         if (parser->cmd(at::AT::QSCLK_ON)) {
             break;
         }
         // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
         vTaskDelay(pdMS_TO_TICKS(utils::time::milisecondsInSecond));
-        timed_out = cpp_freertos::Ticks::GetTicks() > timeout_ticks;
+        timed_out = cpp_freertos::Ticks::GetTicks() > qsclkTmeoutTicks;
         if (timed_out) {
             return ConfState::Failure;
         }
@@ -345,9 +361,8 @@ TS0710::ConfState TS0710::StartMultiplexer()
     }
     delete pv_TS0710_Start;
 
-    controlCallback = [this](std::vector<uint8_t> &data) {
-        auto frame     = std::make_unique<TS0710_Frame>(data);
-        auto frameData = frame->getFrame().data;
+    controlCallback = [this](std::string &data) {
+        auto frameData = data;
 
         if (frameData.size() < 4) {
             LOG_ERROR("frame too short");

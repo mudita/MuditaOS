@@ -64,8 +64,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-
         bool handleDigit(const uint32_t digit);
+        void connectTimerOnExit();
     };
 
 } /* namespace gui */

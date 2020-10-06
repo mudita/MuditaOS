@@ -13,6 +13,8 @@ extern "C"
 #include "lwip/tcpip.h"
 };
 
+#include <Service/Bus.hpp>
+
 #define NUM_DHCP_ENTRY 3
 
 extern "C"
@@ -48,18 +50,11 @@ const char *ServiceLwIP::serviceName = "ServiceLwIP";
 ServiceLwIP::ServiceLwIP() : sys::Service(serviceName)
 {
     LOG_INFO("[ServiceLwIP] Initializing");
-    testTimerID = CreateTimer(3000, true);
-    ReloadTimer(testTimerID);
-
-    LOG_INFO("Start lwip!");
     tcpip_init(nullptr, nullptr);
     // lwip_init();
     dhserv_init(&dhcp_config);
     httpd_init();
 }
-
-void ServiceLwIP::TickHandler(uint32_t id)
-{}
 
 sys::ReturnCodes ServiceLwIP::InitHandler()
 {

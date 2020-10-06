@@ -43,13 +43,13 @@ enum class EinkWorkerCommands
 
 ServiceEink::ServiceEink(const std::string &name, std::string parent)
     : sys::Service(name, parent, 4096 + 1024), timerID{0}, selfRefereshTriggerCount{0},
-      temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0}
+      temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0},
+      powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
 {
     // initialize initial eink parameters
     memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
     waveformSettings.mode        = EinkWaveformGC16;
     waveformSettings.temperature = -1000;
-    timerPowerOffID              = CreateTimer(3000, false);
 }
 
 ServiceEink::~ServiceEink()
@@ -72,7 +72,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::Res
     switch (msg->messageType) {
 
     case MessageType::EinkImageData: {
-        stopTimer(timerPowerOffID);
+        powerOffTimer.stop();
         auto dmsg = static_cast<seink::ImageMessage *>(msgl);
         //			LOG_INFO("[%s] EinkImageData", GetName().c_str());
         memcpy(einkRenderBuffer, dmsg->getData(), dmsg->getSize());
@@ -134,7 +134,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::Res
                 LOG_FATAL("Failed to refresh frame");
             //			uint32_t end_tick = xTaskGetTickCount();
 
-            ReloadTimer(timerPowerOffID);
+            powerOffTimer.reload();
 
             auto msg =
                 std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress, shutdownInProgress);
@@ -159,17 +159,6 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::Res
     };
 
     return std::make_shared<sys::ResponseMessage>();
-}
-
-// Invoked when timer ticked
-void ServiceEink::TickHandler(uint32_t id)
-{
-    auto findID =
-        std::find_if(timersList.begin(), timersList.end(), [id](auto &timer) { return (timer->GetId() == id); });
-    if (findID != timersList.end()) {
-        LOG_INFO("[ServiceEink] Power down eink after 3 seconds");
-        EinkPowerOff();
-    }
 }
 
 // Invoked during initialization
@@ -258,7 +247,7 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
     case sys::ServicePowerMode ::SuspendToRAM:
     case sys::ServicePowerMode ::SuspendToNVM:
         suspended = true;
-        stopTimer(timerPowerOffID);
+        powerOffTimer.stop();
         EinkPowerDown();
         break;
     }

@@ -111,7 +111,7 @@ namespace audio
             return state;
         }
 
-        const Profile *GetProfile() const
+        const std::shared_ptr<const Profile> GetProfile() const
         {
             return currentProfile;
         }
@@ -121,19 +121,37 @@ namespace audio
             return playbackType;
         }
 
+        const audio::Token &GetToken() const noexcept
+        {
+            return operationToken;
+        }
+
+        Type GetOperationType() const noexcept
+        {
+            return opType;
+        }
+
+        std::string GetFilePath() const noexcept
+        {
+            return filePath;
+        }
+
       protected:
-        Profile *currentProfile = nullptr;
-        std::vector<std::unique_ptr<Profile>> availableProfiles;
+        std::shared_ptr<Profile> currentProfile;
+        std::vector<std::shared_ptr<Profile>> availableProfiles;
         State state                                             = State::Idle;
-        audio::AsyncCallback eventCallback                      = nullptr;
+        audio::AsyncCallback eventCallback;
+
         audio::Token operationToken;
+        Type opType = Type::Idle;
+        std::string filePath;
 
         bool isInitialized = false;
         audio::PlaybackType playbackType = audio::PlaybackType::None;
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
 
-        std::optional<Profile *> GetProfile(const Profile::Type type);
+        std::optional<std::shared_ptr<Profile>> GetProfile(const Profile::Type type);
 
         std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;

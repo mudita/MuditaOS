@@ -1,13 +1,11 @@
 #pragma once
 
 #include "PhoneNumber.hpp"
-namespace app
-{
-    class ApplicationDesktop;
-}
 
 namespace gui
 {
+    class PinLockHandler;
+
     class PinLock
     {
       public:
@@ -32,22 +30,26 @@ namespace gui
             Unlocked
         };
 
-        State getState() const noexcept
+        [[nodiscard]] State getState() const noexcept
         {
             return state;
         }
-        unsigned int getPinSize() const noexcept
+        [[nodiscard]] unsigned int getPinSize() const noexcept
         {
             return pinValue.size();
         }
         /// returns current position of a PIN character to be inserted
-        unsigned int getCharCount() const noexcept
+        [[nodiscard]] unsigned int getCharCount() const noexcept
         {
             return charCount;
         }
-        unsigned int getRemainingAttempts() const noexcept
+        [[nodiscard]] unsigned int getRemainingAttempts() const noexcept
         {
             return remainingAttempts;
+        }
+        [[nodiscard]] bool canPut() const noexcept
+        {
+            return getCharCount() != getPinSize();
         }
         void putNextChar(unsigned int c) noexcept;
         void verifyPin() noexcept;
@@ -58,20 +60,20 @@ namespace gui
         /// if Lock is in the State::InvalidPin state, changes it's state to the State::EnterPin
         void consumeInvalidPinState() noexcept;
 
-        bool isLocked() const noexcept;
+        [[nodiscard]] bool isLocked() const noexcept;
         bool unlock() noexcept;
         void lock() noexcept;
 
-        std::string getLockInfo(const InfoName name) const;
-        LockType getLockType() const noexcept
+        [[nodiscard]] std::string getLockInfo(const InfoName name) const;
+        [[nodiscard]] LockType getLockType() const noexcept
         {
             return type;
         }
-        PinLock(app::ApplicationDesktop *);
+        PinLock(gui::PinLockHandler *);
 
       private:
         /// for PIN verification purposes as PIN storage and management is out of scope of PinLock class
-        app::ApplicationDesktop *appDesktop;
+        gui::PinLockHandler *handler;
 
         LockType type                  = LockType::Unknown;
         State state                    = State::EnterPin;
@@ -84,7 +86,7 @@ namespace gui
 
         void reset(LockType, State, unsigned int remainingAttempts, unsigned int pinSize) noexcept;
 
-        friend class app::ApplicationDesktop;
+        friend class gui::PinLockHandler;
     };
 
 } // namespace gui

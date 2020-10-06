@@ -144,26 +144,44 @@ namespace gui
         }
     };
 
+    class CommandArc : public DrawCommand
+    {
+      public:
+        CommandArc(
+            Point _center, Length _radius, AngleDegrees _start, AngleDegrees _sweep, uint8_t _width, Color _color)
+            : center{_center}, radius{_radius}, start{_start}, sweep{_sweep}, width{_width}, borderColor{_color}
+        {
+            id = DrawCommandID::GUI_DRAW_ARC;
+        }
+
+        const Point center;
+        const Length radius;
+        const AngleDegrees start;
+        const AngleDegrees sweep;
+        const uint8_t width;
+        const Color borderColor;
+    };
+
     /**
      * @brief Draw command for circle.
      */
-    class CommandCircle : public DrawCommand
+    class CommandCircle : public CommandArc
     {
       public:
-        int16_t xc;
-        int16_t yc;
-        uint16_t r;
-        uint8_t penWidth;
-        bool filled;
-
-        Color fillColor;
-        Color borderColor;
-
-        CommandCircle()
-            : xc{0}, yc{0}, r{1}, penWidth{1}, filled{false}, fillColor(ColorFullBlack), borderColor(ColorFullBlack)
+        CommandCircle(Point _center,
+                      Length _radius,
+                      uint8_t _borderWidth,
+                      Color _borderColor,
+                      bool _filled     = false,
+                      Color _fillColor = {})
+            : CommandArc{_center, _radius, 0, FullAngle, _borderWidth, _borderColor}, filled{_filled}, fillColor{
+                                                                                                           _fillColor}
         {
             id = DrawCommandID::GUI_DRAW_CIRCLE;
         }
+
+        const bool filled;
+        const Color fillColor;
     };
 
     /**

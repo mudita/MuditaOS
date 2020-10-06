@@ -331,8 +331,6 @@ TEST_CASE("UTF8: insert whole string which doesn't work")
             uint32_t code;
         } tmp;
         tmp.code = fin[i];
-
-        printf("insert: 0x%x    which is: >%s<: ", tmp.code, std::string(tmp.ch).c_str());
         lol.insertCode(tmp.code);
     }
     REQUIRE(lol == fin);

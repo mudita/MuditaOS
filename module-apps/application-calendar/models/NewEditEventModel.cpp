@@ -1,11 +1,12 @@
 #include "NewEditEventModel.hpp"
+#include "AppWindow.hpp"
 #include "application-calendar/widgets/NewEventCheckBoxWithLabel.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
-#include <ListView.hpp>
 #include <BottomBar.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <ListView.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
 NewEditEventModel::NewEditEventModel(app::Application *app, bool mode24H) : application(app), mode24H(mode24H)

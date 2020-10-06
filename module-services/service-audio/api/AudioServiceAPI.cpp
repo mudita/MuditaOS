@@ -36,10 +36,8 @@ namespace AudioServiceAPI
 
     Handle PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
     {
-        auto msg          = std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
-        msg->fileName = fileName;
-        msg->playbackType = playbackType;
-        auto ret          = SendAudioRequest(serv, msg);
+        auto msg = std::make_shared<AudioStartMessage>(fileName, playbackType);
+        auto ret = SendAudioRequest(serv, msg);
         return Handle(ret->retCode, ret->token);
     }
 
@@ -93,14 +91,22 @@ namespace AudioServiceAPI
 
     RetCode Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
     {
+        if (stopVec.empty()) {
+            return RetCode::Success;
+        }
         auto msg = std::make_shared<AudioStopMessage>(stopVec);
-
         return SendAudioRequest(serv, msg)->retCode;
     }
 
     RetCode Stop(sys::Service *serv, const audio::Handle &handle)
     {
         auto msg = std::make_shared<AudioStopMessage>(handle.GetToken());
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode Stop(sys::Service *serv)
+    {
+        auto msg = std::make_shared<AudioStopMessage>();
         return SendAudioRequest(serv, msg)->retCode;
     }
 

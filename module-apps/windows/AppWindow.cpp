@@ -1,9 +1,10 @@
 #include "AppWindow.hpp"
 #include "Application.hpp"
-#include <i18/i18.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include "InputEvent.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
+#include <i18/i18.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
 #include <service-audio/api/AudioServiceAPI.hpp>
 
 using namespace style::header;

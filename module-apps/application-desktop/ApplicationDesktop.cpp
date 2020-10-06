@@ -22,11 +22,9 @@
 #include <cassert>
 namespace app
 {
-    static const unsigned int default_screen_pin_size = 4;
-    static const unsigned int default_screen_attempts = 4;
 
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent), lock(this)
+        : Application(name, parent), lockHandler(this, settings)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
@@ -42,7 +40,7 @@ namespace app
 
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
-        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+        if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
 
@@ -53,8 +51,12 @@ namespace app
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
+
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
+        }
+        else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
+            handled = lockHandler.handle(msg);
         }
 
         // handle database response
@@ -80,7 +82,7 @@ namespace app
         if (msg != nullptr && msg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
             if (msg->updateStats.updateFile.has_filename()) {
-                LOG_DEBUG("ApplicationDesktop::handle pending update found: %s", msg->updateStats.updateFile.c_str());
+                LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
         }
 
@@ -138,7 +140,7 @@ namespace app
     {
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
-            if (need_sim_select && !lock.isLocked()) {
+            if (need_sim_select && !lockHandler.lock.isLocked()) {
                 sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
             }
@@ -168,7 +170,7 @@ namespace app
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
         notifications.notSeen.Calls = 0;
-        getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
+        getCurrentWindow()->rebuild(); // triggers rebuild - shouldn't be needed, but is
         return true;
     }
 
@@ -179,7 +181,7 @@ namespace app
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
         notifications.notSeen.SMS = 0;
-        getCurrentWindow()->rebuild(); // triger rebuild - shouldn't be needed, but is
+        getCurrentWindow()->rebuild(); // triggers rebuild - shouldn't be needed, but is
         return true;
     }
 
@@ -208,9 +210,9 @@ namespace app
         reloadSettings();
         requestNotReadNotifications();
         requestNotSeenNotifications();
+        lockHandler.reloadScreenLock();
 
         createUserInterface();
-
         setActiveWindow(gui::name::window::main_window);
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
@@ -218,7 +220,7 @@ namespace app
             if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
                 if (getWindow(app::window::name::desktop_update)) {
-                    std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
+                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
 
                     switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 }
@@ -226,7 +228,7 @@ namespace app
 
             if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateInform) {
                 if (getWindow(app::window::name::desktop_update)) {
-                    std::unique_ptr<gui::UpdateSwitchData> data = make_unique<gui::UpdateSwitchData>(updateMsg);
+                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
                     getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
                 }
             }
@@ -250,8 +252,8 @@ namespace app
     {
         using namespace app::window::name;
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_main_window, new gui::DesktopMainWindow(this)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_pin_lock,
-                                                                new gui::PinLockWindow(this, desktop_pin_lock, lock)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            desktop_pin_lock, new gui::PinLockWindow(this, desktop_pin_lock, lockHandler.lock)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_menu, new gui::MenuWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_poweroff, new gui::PowerOffWindow(this)));
         windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_reboot, new gui::RebootWindow(this)));
@@ -276,31 +278,6 @@ namespace app
             Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
             break;
         }
-
-        unsigned int pinSize = settings.lockPassHash == 0 ? 0 : default_screen_pin_size;
-        lock.reset(gui::PinLock::LockType::Screen, gui::PinLock::State::EnterPin, default_screen_attempts, pinSize);
     }
 
-    void ApplicationDesktop::handlePin(const std::vector<unsigned int> &pin)
-    {
-        if (lock.getLockType() == gui::PinLock::LockType::Screen) {
-            if (lock.remainingAttempts > 0) {
-                uint32_t hash = 0;
-                for (auto i : pin) {
-                    hash = 10 * hash + i;
-                }
-                lock.remainingAttempts--;
-                if (hash == settings.lockPassHash) {
-                    lock.remainingAttempts = 4;
-                    lock.state             = gui::PinLock::State::VerifiedPin;
-                }
-                else if (lock.remainingAttempts > 1) {
-                    lock.state = gui::PinLock::State::InvalidPin;
-                }
-                else {
-                    lock.state = gui::PinLock::State::Blocked;
-                }
-            }
-        }
-    }
 } // namespace app

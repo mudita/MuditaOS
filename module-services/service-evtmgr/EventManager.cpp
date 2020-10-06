@@ -33,6 +33,8 @@
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/common.hpp"
 
+#include <cassert>
+
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
     LOG_INFO("[%s] Initializing", name.c_str());
@@ -44,9 +46,6 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
 EventManager::~EventManager()
 {
     LOG_INFO("[%s] Cleaning resources", GetName().c_str());
-    if (EventWorker != nullptr) {
-        EventWorker->deinit();
-    }
 }
 
 // Invoked upon receiving data message
@@ -253,9 +252,7 @@ sys::ReturnCodes EventManager::InitHandler()
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
-
-    EventWorker->deinit();
-    EventWorker.reset();
+    EventWorker->close();
     return sys::ReturnCodes::Success;
 }
 

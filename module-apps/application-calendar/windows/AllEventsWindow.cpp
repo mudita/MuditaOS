@@ -1,8 +1,10 @@
 #include "AllEventsWindow.hpp"
+#include "InputEvent.hpp"
+#include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
-#include <gui/widgets/Window.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
+#include <gui/widgets/Window.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 
 #include <module-services/service-db/messages/QueryMessage.hpp>

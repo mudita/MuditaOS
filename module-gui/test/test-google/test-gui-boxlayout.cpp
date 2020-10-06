@@ -2,6 +2,7 @@
 #include <module-utils/log/log.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/test/mock/TestListViewProvider.hpp>
+#include <gui/input/InputEvent.hpp>
 
 namespace testStyle
 {

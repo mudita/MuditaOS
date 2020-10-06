@@ -34,10 +34,6 @@ class ServiceAudio : public sys::Service
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
 
-    // Invoked when timer ticked
-    void TickHandler(uint32_t id) override;
-
-    // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
 
     sys::ReturnCodes DeinitHandler() override;
@@ -47,20 +43,31 @@ class ServiceAudio : public sys::Service
     static const char *serviceName;
 
   private:
+    enum class VibrationType
+    {
+        OneShot,
+        Continuous
+    };
+
     audio::AudioMux audioMux;
+    audio::Token vibrationToken;
+
     auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
     auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
 
     template <typename... Args>
     std::unique_ptr<AudioResponseMessage> HandleStart(std::optional<audio::AudioMux::Input *> input,
-                                                      AudioRequestMessage *msg,
                                                       audio::Operation::Type opType,
                                                       Args... args);
     std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
     std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
 
-    auto IsResumable(const audio::PlaybackType &type) -> bool;
-    auto IsMergable(const audio::PlaybackType &type) -> bool;
+    void VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
+    void VibrationStop(const audio::Token &token);
+    auto GetVibrationType(const audio::PlaybackType &type) -> std::optional<VibrationType>;
+
+    constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
+    constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
 
     template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
     {

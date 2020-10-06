@@ -1,7 +1,8 @@
-#include "ParserUtils.hpp"
-#include "DesktopMessages.hpp"
-#include "ServiceDesktop.hpp"
 #include "RestoreEndpoint.hpp"
+#include "DesktopMessages.hpp"
+#include "ParserUtils.hpp"
+#include "ServiceDesktop.hpp"
+#include <Service/Bus.hpp>
 
 auto RestoreEndpoint::handle(Context &context) -> void
 {
