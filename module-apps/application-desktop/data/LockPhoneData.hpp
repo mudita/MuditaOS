@@ -51,10 +51,12 @@ namespace gui
   class UpdateSwitchData : public gui::SwitchData
     {
       public:
-      UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom)
-      {
-          updateOsMessage = *messageToCopyFrom;
-      }
+        UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
+        {}
+        const sdesktop::UpdateOsMessage &getUpdateOsMessage()
+        {
+            return updateOsMessage;
+        }
 
       const sdesktop::UpdateOsMessage &getUpdateOsMessage()
       {
