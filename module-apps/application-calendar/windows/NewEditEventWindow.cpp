@@ -55,7 +55,6 @@ namespace gui
             auto rec = dynamic_cast<EventRecordData *>(data);
             if (rec != nullptr) {
                 eventRecord    = rec->getData();
-                prevWindowName = rec->getWindowName();
             }
             newEditEventModel->loadData(eventRecord);
         }
@@ -90,7 +89,7 @@ namespace gui
                 edit = false;
             }
 
-            newEditEventModel->saveData(eventRecord, edit, prevWindowName);
+            newEditEventModel->saveData(eventRecord, edit);
             return true;
         }
 

@@ -15,6 +15,8 @@
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "messages/DBNotificationMessage.hpp"
+#include "agents/DatabaseAgent.hpp"
+#include "agents/settings/SettingsAgent.hpp"
 
 class ServiceDB : public sys::Service
 {
@@ -44,6 +46,7 @@ class ServiceDB : public sys::Service
 
   protected:
     db::Interface *getInterface(db::Interface::Name interface);
+    std::set<std::unique_ptr<DatabaseAgent>> databaseAgents;
 
   public:
     ServiceDB();
@@ -60,4 +63,3 @@ class ServiceDB : public sys::Service
     bool StoreIntoBackup(const std::string &backupPath);
     void sendUpdateNotification(db::Interface::Name interface, db::Query::Type type);
 };
-

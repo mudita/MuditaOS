@@ -177,6 +177,9 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+            auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+            assert(application != nullptr);
+            app->setEquivalentToEmptyWindow(EquivalentWindow::AllEventsWindow);
             auto query = std::make_unique<db::query::events::GetAll>();
             query->setQueryListener(
                 db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
@@ -222,9 +225,7 @@ namespace gui
                 auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
                 assert(appCalendar != nullptr);
                 auto filter = TimePointFromYearMonthDay(actualDate);
-                appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"),
-                                                    filter,
-                                                    style::window::calendar::name::all_events_window);
+                appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
             }
             return true;
         }

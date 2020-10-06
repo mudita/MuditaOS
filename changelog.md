@@ -5,10 +5,12 @@
 ### Added
 
 * `[gui]` Added GUI timers capability
-* `[fonts]` Added multiplication and division sign to the font files 
+* `[fonts]` Added multiplication and division sign to the font files
 * `[bluetooth]` Added storing of BT link keys.
 * `[audio]` AudioMux tests
 * `[audio]` Added vibration logic (effect is visible in logs only)
+* `[settings]` Added DatabaseAgent base class and SettingsAgent.
+
 
 ### Changed
 

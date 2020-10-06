@@ -223,6 +223,11 @@ namespace utils
                 return duration;
             }
 
+            time_t getMinutes() const
+            {
+                return minutes;
+            }
+
             UTF8 str(DisplayedFormat displayedFormat = DisplayedFormat::Auto0M) const;
 
             // uses default format

@@ -64,24 +64,34 @@ class TimeDisplayParser
 
             if (isShortVersion) {
                 if (!isMode24H) {
-                    return start_h + ":" + start_min + " " + getAMorPM(start_is_am);
+                    return TimePointToHourString12H(event->date_from) + ":" +
+                           TimePointToMinutesString(event->date_from) + " " + getAMorPM(start_is_am);
                 }
                 else {
-                    return start_h + ":" + start_min;
+                    return TimePointToHourString24H(event->date_from) + ":" +
+                           TimePointToMinutesString(event->date_from);
                 }
             }
             else {
                 if (!isMode24H) {
                     if (start_is_am != end_is_am) {
-                        return start_h + ":" + start_min + " " + getAMorPM(start_is_am) + " - " + end_h + ":" +
-                               end_min + " " + getAMorPM(end_is_am);
+                        return TimePointToHourString12H(event->date_from) + ":" +
+                               TimePointToMinutesString(event->date_from) + " " + getAMorPM(start_is_am) + " - " +
+                               TimePointToHourString12H(event->date_till) + ":" +
+                               TimePointToMinutesString(event->date_till) + " " + getAMorPM(end_is_am);
                     }
                     else {
-                        return start_h + ":" + start_min + " - " + end_h + ":" + end_min + " " + getAMorPM(start_is_am);
+                        return TimePointToHourString12H(event->date_from) + ":" +
+                               TimePointToMinutesString(event->date_from) + " - " +
+                               TimePointToHourString12H(event->date_till) + ":" +
+                               TimePointToMinutesString(event->date_till) + " " + getAMorPM(start_is_am);
                     }
                 }
                 else {
-                    return start_h + ":" + start_min + " - " + end_h + ":" + end_min;
+                    return TimePointToHourString24H(event->date_from) + ":" +
+                           TimePointToMinutesString(event->date_from) + " - " +
+                           TimePointToMinutesString(event->date_till) + ":" +
+                           TimePointToMinutesString(event->date_till);
                 }
             }
         }
