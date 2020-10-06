@@ -4,12 +4,6 @@
 #include <gui/widgets/Icon.hpp>
 #include <Text.hpp>
 #include <functional>
-enum class EquivalentWindow
-{
-    DayEventsWindow,
-    AllEventsWindow,
-    EmptyWindow
-};
 
 /// Provides information witch window is equivalent to empty window (DayEvents window and AllEvents window may be empty)
 enum class EquivalentWindow

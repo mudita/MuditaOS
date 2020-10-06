@@ -18,6 +18,7 @@ namespace parserFSM
     {
         http::Code status = http::Code::OK;
         json11::Json body = json11::Json();
+        std::string ics;
     };
 
     constexpr int invalidUuid = 0;
@@ -25,6 +26,7 @@ namespace parserFSM
     class Context
     {
       private:
+        std::string ics;
         json11::Json body;
         EndpointType endpoint;
         uint32_t uuid;
@@ -73,6 +75,13 @@ namespace parserFSM
             method   = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
+        Context(const std::string &ics)
+        {
+            this->ics = ics;
+            endpoint  = EndpointType::invalid;
+            uuid      = invalidUuid;
+            method    = http::Method::get;
+        }
         Context()
         {
             body     = json11::Json();
@@ -89,6 +98,16 @@ namespace parserFSM
                                                              {json::body, responseContext.body}};
             return buildResponseStr(responseJson.dump().size(), responseJson.dump());
         }
+        auto createSimpleICSResponse() -> std::string
+        { /// TODO: change to ICS format (maybe not needed)
+            /// EVENT structure from ICALENDAR LIB is most similar (maybe replace the std::string ics variable with this
+            /// object)
+            json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
+                                                             {json::status, static_cast<int>(responseContext.status)},
+                                                             {json::uuid, std::to_string(getUuid())},
+                                                             {json::body, responseContext.ics}};
+            return buildResponseStr(responseJson.dump().size(), responseJson.dump());
+        }
         auto setResponseStatus(http::Code status)
         {
             responseContext.status = status;
@@ -97,9 +116,17 @@ namespace parserFSM
         {
             responseContext.body = respBody;
         }
+        auto setResponseICS(const std::string &respBody)
+        {
+            responseContext.ics = respBody;
+        }
         auto getBody() -> json11::Json
         {
             return body;
+        }
+        auto getICS() -> std::string
+        {
+            return ics;
         }
         auto getEndpoint() -> EndpointType
         {

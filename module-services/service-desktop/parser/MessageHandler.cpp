@@ -10,7 +10,7 @@ using namespace parserFSM;
 xQueueHandle MessageHandler::sendQueue;
 
 MessageHandler::MessageHandler(std::string &message, sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
-{
+{ /// TODO: Add messageICS option
     try {
         messageJson = json11::Json::parse(message, JsonErrorMsg);
     }
@@ -21,6 +21,7 @@ MessageHandler::MessageHandler(std::string &message, sys::Service *OwnerService)
 
 void MessageHandler::processMessage()
 {
+    /// TODO: Create messageICS option
     Context context(messageJson);
 
     LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %" PRIu32 "\nbody: %s\n",
