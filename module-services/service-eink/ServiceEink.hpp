@@ -14,6 +14,7 @@
 #include "Service/Message.hpp"
 // eink bsp
 #include "EinkIncludes.hpp"
+#include "Service/Timer.hpp"
 
 class ServiceEink : public sys::Service
 {
@@ -49,15 +50,15 @@ class ServiceEink : public sys::Service
 
     uint8_t einkRenderBuffer[600 * 480];
     bool deepRefresh         = false;
-    uint32_t timerPowerOffID = 0;
+
+    sys::ms powerOffTime = 3000;
+    sys::Timer powerOffTimer;
 
   public:
     ServiceEink(const std::string &name, std::string parent = "");
     ~ServiceEink();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-    // Invoked when timer ticked
-    void TickHandler(uint32_t id) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

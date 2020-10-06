@@ -16,7 +16,7 @@
 
 namespace app
 {
-    const map<Reminder, const char *> ApplicationCalendar::reminderOptions = {
+    const std::map<Reminder, const char *> ApplicationCalendar::reminderOptions = {
         {Reminder::never, "app_calendar_reminder_never"},
         {Reminder::event_time, "app_calendar_reminder_event_time"},
         {Reminder::five_min_before, "app_calendar_reminder_5_min_before"},
@@ -28,7 +28,7 @@ namespace app
         {Reminder::two_days_before, "app_calendar_reminder_2_days_before"},
         {Reminder::one_week_before, "app_calendar_reminder_1_week_before"}};
 
-    const map<Repeat, const char *> ApplicationCalendar::repeatOptions = {
+    const std::map<Repeat, const char *> ApplicationCalendar::repeatOptions = {
         {Repeat::never, "app_calendar_repeat_never"},
         {Repeat::daily, "app_calendar_repeat_daily"},
         {Repeat::weekly, "app_calendar_repeat_weekly"},
@@ -73,7 +73,6 @@ namespace app
             handled = true;
             switch (resp->responseTo) {
             case MessageType::DBQuery: {
-
                 if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
                     auto result = queryResponse->getResult();
                     LOG_DEBUG("queryResponse != nullptr");
@@ -144,10 +143,9 @@ namespace app
     void ApplicationCalendar::destroyUserInterface()
     {}
 
-    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title,
-                                                     const TimePoint &dateFilter,
-                                                     const std::string &goBackWindow)
+    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const TimePoint &dateFilter)
     {
+
         auto dialog = dynamic_cast<gui::NoEvents *>(getWindow(style::window::calendar::name::no_events_window));
         assert(dialog != nullptr);
         auto meta  = dialog->meta;
@@ -163,13 +161,17 @@ namespace app
             event->date_from = dateFilter;
             event->date_till = dateFilter;
             eventData->setData(event);
-            eventData->setWindowName(goBackWindow);
+
             switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
             return true;
         };
+
+        if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
+            popToWindow(gui::name::window::main_window);
+        }
+
         dialog->update(meta);
-        switchWindow(gui::name::window::main_window);
         switchWindow(dialog->getName());
         LOG_DEBUG("Switch to no events window");
     }

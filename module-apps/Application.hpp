@@ -1,67 +1,59 @@
-/*
- * @file Application.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_HPP_
-#define MODULE_APPS_APPLICATION_HPP_
+#pragma once
 
-#include <map>
-// module-gui
-#include "gui/Common.hpp"
-//#include "gui/widgets/Window.hpp"
-#include "gui/input/Translator.hpp"
-// module-sys
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "Service/Common.hpp"
-#include "SystemManager/SystemManager.hpp"
-// module-db
-#include "Interface/SettingsRecord.hpp"
+#include "Audio/AudioCommon.hpp"                        // for Volume, Play...
+#include "Audio/Profiles/Profile.hpp"                   // for Profile, Pro...
+#include "AudioServiceAPI.hpp"                          // for GetOutputVolume
+#include "Interface/SettingsRecord.hpp"                 // for SettingsRecord
+#include "Service/Bus.hpp"                              // for Bus
+#include "Service/Common.hpp"                           // for ReturnCodes
+#include "Service/Message.hpp"                          // for Message_t
+#include "Service/Service.hpp"                          // for Service
+#include "SwitchData.hpp"                               // for SwitchData
+#include "SystemManager/SystemManager.hpp"              // for SystemManager
+#include "bsp/keyboard/key_codes.hpp"                   // for bsp
+#include "gui/Common.hpp"                               // for ShowMode
+#include "projdefs.h"                                   // for pdMS_TO_TICKS
+#include "service-evtmgr/messages/EVMessages.hpp"       // for TorchStateMe...
+#include <list>                                         // for list
+#include <map>                                          // for allocator, map
+#include <memory>                                       // for make_shared
+#include <module-bsp/bsp/torch/torch.hpp>               // for State, State...
+#include <module-services/service-evtmgr/Constants.hpp> // for evt_manager
+#include <stdint.h>                                     // for uint32_t
+#include <string>                                       // for string
+#include <utility>                                      // for move, pair
+#include <vector>                                       // for vector
 
-#include <module-bsp/bsp/torch/torch.hpp>
-#include <module-services/service-evtmgr/Constants.hpp>
-#include "service-evtmgr/messages/EVMessages.hpp"
-
-#include "SwitchData.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include "windows/AppWindow.hpp"
-
+namespace app
+{
+    class GuiTimer;
+} // namespace app
 namespace gui
 {
     class AppWindow;
-};
+} // namespace gui
+namespace gui
+{
+    class InputEvent;
+}
+namespace gui
+{
+    class Item;
+}
+namespace gui
+{
+    class KeyInputSimpleTranslation;
+}
+namespace sys
+{
+    class Timer;
+}
 
 namespace app
 {
 
     class Application;
-
-    class AppTimer // this should inherit from ServiceTimer, but *bodge*
-    {
-      private:
-        uint32_t id                    = 0; // let's say 0 indicates not initalized timer
-        std::function<void()> callback = nullptr;
-        Application *parent            = nullptr;
-
-        void registerCallback(std::function<void()>);
-        AppTimer();
-
-      public:
-        AppTimer(Application *parent, uint32_t id, std::function<void()> callback, const std::string &name);
-        ~AppTimer();
-        void runCallback();
-        uint32_t getID();
-        static uint32_t getNextUniqueID();
-        // timer controls:
-        void restart();
-        void stop();
-        bool operator==(const AppTimer &rhs) const;
-        bool operator==(const uint32_t &rhs) const;
-    };
+    class GuiTimer;
 
     inline auto msgHandled() -> sys::Message_t
     {
@@ -129,10 +121,10 @@ namespace app
         sys::Message_t handleAppRefresh(sys::DataMessage *msgl);
         sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
 
+        std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
+
       public:
-        std::list<uint32_t> timerIDs;
-        std::list<AppTimer> appTimers; // @TODO decide on type
-        AppTimer longPressTimer;
+        std::unique_ptr<sys::Timer> longPressTimer;
         Application(std::string name,
                     std::string parent            = "",
                     bool startBackground          = false,
@@ -142,22 +134,6 @@ namespace app
 
         Application::State getState();
         void setState(State st);
-
-        /// @defgroup AppTimers Application timers
-        /// @note Please mind that timers are from Service and implementation in service should be revritten to send
-        /// notify instead of calling callback
-        ///       Right now timers can create races.
-        /// @{
-        /// Method to register callback function to be run on timer.
-        AppTimer CreateAppTimer(TickType_t interval,
-                                bool isPeriodic,
-                                std::function<void()> callback,
-                                const std::string &name = "");
-        /// Remove previousy registered AppTimer by object
-        void DeleteTimer(AppTimer &timer);
-        /// Remove previousy registered AppTimer by id
-        void DeleteTimer(uint32_t id);
-        /// @}
 
         /// Method responsible for rendering currently active window.
         /// 1. queries for static data for all windows form Store (i.e. battery level, sim card level)
@@ -189,10 +165,15 @@ namespace app
             switchWindow(windowName, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         };
 
-        void returnToPreviousWindow();
+        /// Method used to go back to desired window by using the index difference on stack value
+        ///@param ignoredWindowsNumber: defines how many windows will be skipped while going back on stack
+        void returnToPreviousWindow(const uint32_t times = 1);
 
         /// Method refreshing active window
         void refreshWindow(gui::RefreshModes mode);
+
+        /// to not hide overload from parent
+        using Service::DataReceivedHandler;
 
         /// Mehtod to handle bus messages, all message types are defined in Message.hpp
         /// Message types are in MessageType
@@ -313,9 +294,6 @@ namespace app
         SettingsRecord settings;
 
         void longPressTimerCallback();
-        /// function executing functions registered by CreateAppTimer
-        /// @param id - timer identification number
-        virtual void TickHandler(uint32_t id) override final;
         /// Method used to register all windows and widgets in application
         virtual void createUserInterface() = 0;
         /// Method closing application's windows.
@@ -341,7 +319,7 @@ namespace app
         void pushWindow(const std::string &newWindow);
         /// getter for previous window name
         /// @ingrup AppWindowStack
-        const std::string getPrevWindow() const;
+        const std::string getPrevWindow(uint32_t count = 1) const;
         /// clears windows stack
         /// @ingrup AppWindowStack
         void cleanPrevWindw();
@@ -352,6 +330,10 @@ namespace app
         /// getter for current wisible window in application
         /// @ingrup AppWindowStack
         gui::AppWindow *getCurrentWindow();
+        /// to avoid conflicts with connect below
+        using Service::connect;
+        /// connects item with GuiTimer and stores it in app
+        void connect(std::unique_ptr<GuiTimer> &&timer, gui::Item *item);
 
       protected:
         /// Flag defines whether keyboard input should be processed
@@ -451,5 +433,3 @@ namespace app
     }
 
 } /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_HPP_ */

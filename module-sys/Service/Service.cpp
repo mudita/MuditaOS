@@ -1,10 +1,22 @@
-#include <algorithm>
 #include "Service.hpp"
-#include "Service/Message.hpp"
-#include "thread.hpp"
-#include "ticks.hpp"
-#include "timer.hpp"
-#include "Bus.hpp"
+#include "Bus.hpp"             // for Bus
+#include "FreeRTOSConfig.h"    // for configASSERT
+#include "MessageType.hpp"     // for MessageType, MessageType::MessageType...
+#include "Service/Common.hpp"  // for BusChannels, ReturnCodes, ReturnCodes...
+#include "Service/Mailbox.hpp" // for Mailbox
+#include "Service/Message.hpp" // for Message, Message_t, DataMessage, Resp...
+#include "Timer.hpp"           // for Timer
+#include "TimerMessage.hpp"    // for TimerMessage
+#include "log/debug.hpp"       // for DEBUG_SERVICE_MESSAGES
+#include "log/log.hpp"         // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
+#include "mutex.hpp"           // for cpp_freertos
+#include "portmacro.h"         // for UBaseType_t
+#include "thread.hpp"          // for Thread
+#include "ticks.hpp"           // for Ticks
+#include <algorithm>           // for remove_if
+#include <cstdint>             // for uint32_t, uint64_t, UINT32_MAX
+#include <iosfwd>              // for std
+#include <typeinfo>            // for type_info
 
 // this could use Scoped() class from utils to print execution time too
 void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
@@ -120,100 +132,34 @@ namespace sys
         return Service::connect(&msg, handler);
     }
 
-    // Create service timer
-    uint32_t Service::CreateTimer(uint32_t interval, bool isPeriodic, const std::string &name)
-    {
-        uint32_t unique     = ServiceTimer::GetNextUniqueID();
-        std::string nameNew = name;
-        if (name.empty()) {
-            nameNew = GetName() + "Timer" + std::to_string(unique);
-        }
-        // this is bad... timer should message service, not run code on it
-        timersList.push_back(
-            std::make_unique<ServiceTimer>(nameNew, Ticks::MsToTicks(interval), isPeriodic, unique, this));
-        LOG_DEBUG("%s", std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
-        return unique;
-    }
-
-    // Reload service timer
-    void Service::ReloadTimer(uint32_t id)
-    {
-        auto it = std::find_if(timersList.begin(), timersList.end(), [&](std::unique_ptr<ServiceTimer> const &s) {
-            return s->GetId() == id;
-        });
-        if (it == timersList.end()) {
-            // not found, error
-        }
-        else {
-            (*it)->Start(0);
-        }
-    }
-    // Delete timer
-    void Service::DeleteTimer(uint32_t id)
-    {
-        auto it = std::find_if(timersList.begin(), timersList.end(), [&](std::unique_ptr<ServiceTimer> const &s) {
-            return s->GetId() == id;
-        });
-        if (it == timersList.end()) {
-            // not found, error
-        }
-        else {
-            (*it)->Stop(0);
-            timersList.erase(it);
-        }
-    }
-
-    // Set period
-    void Service::setTimerPeriod(uint32_t id, uint32_t period)
-    {
-        auto it = std::find_if(timersList.begin(), timersList.end(), [&](std::unique_ptr<ServiceTimer> const &s) {
-            return s->GetId() == id;
-        });
-        if (it == timersList.end()) {
-            // not found, error
-        }
-        else {
-            (*it)->SetPeriod(period, 0);
-        }
-    }
-
-    // Set period
-    void Service::stopTimer(uint32_t id)
-    {
-        auto it = std::find_if(timersList.begin(), timersList.end(), [&](std::unique_ptr<ServiceTimer> const &s) {
-            return s->GetId() == id;
-        });
-        if (it == timersList.end()) {
-            // not found, error
-        }
-        else {
-            (*it)->Stop(0);
-        }
-    }
-
     void Service::CloseHandler()
     {
-
-        // Stop currently active timers
-        for (auto &w : timersList) {
-            w->Stop(0);
-        }
-
+        timers.stop();
         enableRunLoop = false;
     };
 
-    ServiceTimer::ServiceTimer(
-        const std::string &name, TickType_t tick, bool isPeriodic, uint32_t idx, Service *service)
-        : Timer(name.c_str(), tick, isPeriodic), m_isPeriodic(isPeriodic), m_interval(tick), m_id(idx),
-          m_service(service)
-
-    {}
-
-    void ServiceTimer::Run()
+    auto Service::TimerHandle(SystemMessage &message) -> ReturnCodes
     {
-        m_service->TickHandler(m_id);
+        auto timer_message = dynamic_cast<sys::TimerMessage *>(&message);
+        if (timer_message == nullptr) {
+            LOG_ERROR("Wrong message in system message handler");
+            return ReturnCodes::Failure;
+        }
+
+        auto timer = timers.get(timer_message->getTimer());
+        if (timer == timers.noTimer()) {
+            LOG_ERROR("No such timer registered in Service");
+            return ReturnCodes::Failure;
+        }
+
+        (*timer)->onTimeout();
+        return ReturnCodes::Success;
     }
 
-    uint32_t ServiceTimer::m_timers_unique_idx = 0;
-
+    void Service::Timers::stop()
+    {
+        for (auto timer : list) {
+            timer->stop();
+        }
+    }
 } // namespace sys

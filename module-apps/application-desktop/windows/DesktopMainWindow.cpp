@@ -8,12 +8,13 @@
  */
 #include <memory>
 
+#include "Alignment.hpp"
+#include "BottomBar.hpp"
+#include "Common.hpp"
+#include "DesktopMainWindow.hpp"
+#include "GuiTimer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/data/LockPhoneData.hpp"
-#include "Alignment.hpp"
-#include "Common.hpp"
-#include "BottomBar.hpp"
-#include "DesktopMainWindow.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -44,7 +45,6 @@ namespace style
 
 namespace gui
 {
-
     void DesktopMainWindow::buildInterface()
     {
         auto ttime = utils::time::Time();
@@ -94,13 +94,16 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app != nullptr);
 
-        if (app->lock.isLocked()) {
+        if (app->lockHandler.lock.isLocked() && app->lockHandler.lock.getLockType() == PinLock::LockType::Screen) {
             bottomBar->restore();
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             topBar->setActive(TopBar::Elements::LOCK, true);
             inputCallback = nullptr;
             setFocusItem(nullptr);
             erase(notifications);
+        }
+        else if (app->lockHandler.lock.isLocked()) {
+            application->switchWindow(app::window::name::desktop_pin_lock);
         }
         else {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
@@ -122,29 +125,28 @@ namespace gui
         // check if there was a signal to lock the pone due to inactivity.
         if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
             auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-            if (!app) {
+            if (!app || app->lockHandler.lock.isLocked()) {
                 return;
             }
-            app->lock.isLocked();
 
-            LockPhoneData *lockData = reinterpret_cast<LockPhoneData *>(data);
+            auto *lockData          = dynamic_cast<LockPhoneData *>(data);
             lockTimeoutApplilcation = lockData->getPreviousApplication();
 
-            reinterpret_cast<app::ApplicationDesktop *>(application)->setSuspendFlag(true);
+            dynamic_cast<app::ApplicationDesktop *>(application)->setSuspendFlag(true);
         }
         setVisibleState();
     }
 
     bool DesktopMainWindow::processLongPressEvent(const InputEvent &inputEvent)
     {
-        app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
         if (app == nullptr) {
             LOG_ERROR("not ApplicationDesktop");
             return AppWindow::onInput(inputEvent);
         }
 
-        if ((inputEvent.keyCode == KeyCode::KEY_PND) && (!app->lock.isLocked())) {
-            app->lock.lock();
+        if ((inputEvent.keyCode == KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
+            app->lockHandler.lock.lock();
             setVisibleState();
             app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             app->setSuspendFlag(true);
@@ -179,7 +181,7 @@ namespace gui
 
     bool DesktopMainWindow::processShortPressEventOnLocked(const InputEvent &inputEvent)
     {
-        app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
         if (app == nullptr) {
             LOG_ERROR("not ApplicationDesktop");
             return AppWindow::onInput(inputEvent);
@@ -214,7 +216,7 @@ namespace gui
 
     bool DesktopMainWindow::onInput(const InputEvent &inputEvent)
     {
-        app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
         if (app == nullptr) {
             LOG_ERROR("not ApplicationDesktop");
             return AppWindow::onInput(inputEvent);
@@ -224,7 +226,7 @@ namespace gui
             return processLongPressEvent(inputEvent);
         }
         else if (inputEvent.isShortPress()) {
-            if (app->lock.isLocked()) {
+            if (app->lockHandler.lock.isLocked()) {
                 return processShortPressEventOnLocked(inputEvent);
             }
             else {

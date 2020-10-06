@@ -7,8 +7,7 @@
  *  @details
  */
 
-#ifndef PUREPHONE_PROFILERECORDINGHEADSET_HPP
-#define PUREPHONE_PROFILERECORDINGHEADSET_HPP
+#pragma once
 
 #include "Profile.hpp"
 
@@ -37,4 +36,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // PUREPHONE_PROFILERECORDINGHEADSET_HPP

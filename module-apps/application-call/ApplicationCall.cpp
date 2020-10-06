@@ -25,9 +25,11 @@ namespace app
 {
 
     ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent, startBackground, app::call_stack_size),
-          timerCall(CreateAppTimer(1000, true, [=]() { timerCallCallback(); }))
-    {}
+        : Application(name, parent, startBackground, app::call_stack_size)
+    {
+        timerCall = std::make_unique<sys::Timer>("Call", this, 1000);
+        timerCall->connect([this](sys::Timer &) { timerCallCallback(); });
+    }
 
     //  number of seconds after end call to switch back to previous application
     const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
@@ -40,17 +42,12 @@ namespace app
         if (getCurrentWindow() == it->second) {
             auto callWindow = dynamic_cast<gui::CallWindow *>(getCurrentWindow());
 
-            if (callWindow && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS) {
+            if (callWindow != nullptr && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS) {
                 callWindow->updateDuration(callDuration);
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
 
-        // delayed switch to previous application
-        if (callDelayedStopTime != 0 && utils::time::Timestamp() >= callDelayedStopTime) {
-            stopCallTimer();
-            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
-        }
     }
 
     void ApplicationCall::CallAbortHandler()
@@ -61,7 +58,6 @@ namespace app
         LOG_INFO("---------------------------------CallAborted");
         AudioServiceAPI::Stop(this, routingAudioHandle);
         AudioServiceAPI::Stop(this, callringAudioHandle);
-        callDelayedStopTime = utils::time::Timestamp() + delayToSwitchToPreviousApp;
         callWindow->setState(gui::CallWindow::State::CALL_ENDED);
         if (getState() == State::ACTIVE_FORGROUND && getCurrentWindow() != callWindow) {
             switchWindow(window::name_call);
@@ -249,16 +245,14 @@ namespace app
     {
         callStartTime       = utils::time::Timestamp();
         callDuration        = 0;
-        callDelayedStopTime = 0;
-        timerCall.restart();
+        timerCall->reload();
     }
 
     void ApplicationCall::stopCallTimer()
     {
         callStartTime       = 0;
         callDuration        = 0;
-        callDelayedStopTime = 0;
-        timerCall.stop();
+        timerCall->stop();
     }
 
     void ApplicationCall::destroyUserInterface()

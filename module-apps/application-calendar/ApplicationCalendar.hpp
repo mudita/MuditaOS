@@ -6,6 +6,7 @@
 #include "gui/widgets/Label.hpp"
 #include <module-apps/application-calendar/data/dateCommon.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "NoEvents.hpp"
 
 namespace app
 {
@@ -15,7 +16,8 @@ namespace app
     class ApplicationCalendar : public Application
     {
         time_t applicationStartTime = 0;
-        int eventShift              = 0;
+        int eventShift                    = 0;
+        EquivalentWindow equivalentWindow = EquivalentWindow::EmptyWindow;
 
       public:
         ApplicationCalendar(std::string name,
@@ -35,12 +37,21 @@ namespace app
         {
             return applicationStartTime;
         }
-
+        void setEquivalentToEmptyWindow(EquivalentWindow window)
+        {
+            equivalentWindow = window;
+        };
+        EquivalentWindow getEquivalentToEmptyWindow() const
+        {
+            return equivalentWindow;
+        };
+        int getEventShift()
+        {
+            return eventShift;
+        }
         void createUserInterface() override;
         void destroyUserInterface() override;
-        void switchToNoEventsWindow(const std::string &title,
-                                    const TimePoint &dateFilter,
-                                    const std::string &goBackWindow);
+        void switchToNoEventsWindow(const std::string &title = "", const TimePoint &dateFilter = TimePoint());
 
         static const std::map<Reminder, const char *> reminderOptions;
         static const std::map<Repeat, const char *> repeatOptions;

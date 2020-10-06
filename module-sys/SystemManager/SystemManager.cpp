@@ -303,25 +303,6 @@ namespace sys
         return ReturnCodes::Success;
     }
 
-    void SystemManager::TickHandler(uint32_t id)
-    {
-        if (id == pingPongTimerID) {
-
-            for (auto &w : servicesList) {
-                if (w->pingTimestamp == 0) {
-                    // no reponse for ping messages, restart system
-                    LOG_FATAL("%s", (w->GetName() + " failed to response to ping message").c_str());
-                    exit(1);
-                }
-                else {
-                    w->pingTimestamp = 0;
-                }
-            }
-
-            Bus::SendBroadcast(std::make_shared<SystemMessage>(SystemMessageType::Ping), this);
-        }
-    }
-
     Message_t SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
     {
         return std::make_shared<ResponseMessage>();
@@ -330,8 +311,6 @@ namespace sys
     void SystemManager::CloseSystemHandler()
     {
         LOG_DEBUG("Invoking closing procedure...");
-
-        DeleteTimer(pingPongTimerID);
 
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();

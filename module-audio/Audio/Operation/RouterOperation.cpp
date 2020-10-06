@@ -108,13 +108,13 @@ namespace audio
         const auto routingHeadsetVolume = dbCallback(dbRoutingHeadsetVolumePath, defaultRoutingHeadsetVolume);
 
         availableProfiles.push_back(
-            std::make_unique<ProfileRoutingEarspeaker>(nullptr, routingEarspeakerVolume, routingEarspeakerGain));
+            Profile::Create(Profile::Type::RoutingEarspeaker, nullptr, routingEarspeakerVolume, routingEarspeakerGain));
+        availableProfiles.push_back(Profile::Create(
+            Profile::Type::RoutingSpeakerphone, nullptr, routingSpeakerphoneVolume, routingSpeakerphoneGain));
         availableProfiles.push_back(
-            std::make_unique<ProfileRoutingSpeakerphone>(nullptr, routingSpeakerphoneVolume, routingSpeakerphoneGain));
-        availableProfiles.push_back(
-            std::make_unique<ProfileRoutingHeadset>(nullptr, routingHeadsetVolume, routingHeadsetGain));
+            Profile::Create(Profile::Type::RoutingHeadset, nullptr, routingHeadsetVolume, routingHeadsetGain));
 
-        currentProfile = availableProfiles[0].get();
+        currentProfile = availableProfiles[0];
 
         audioDevice =
             bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(nullptr);

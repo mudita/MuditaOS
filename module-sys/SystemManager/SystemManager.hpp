@@ -10,7 +10,6 @@
 
 #include <functional>
 #include "thread.hpp"
-#include "timer.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
 #include "Service/Mailbox.hpp"
@@ -89,7 +88,6 @@ namespace sys
         void kill(std::shared_ptr<Service> const &toKill);
 
       private:
-        void TickHandler(uint32_t id) override;
 
         Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
 

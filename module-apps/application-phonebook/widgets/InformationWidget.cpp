@@ -1,5 +1,6 @@
 #include "InformationWidget.hpp"
 
+#include "AppWindow.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
 #include <ContactRecord.hpp>

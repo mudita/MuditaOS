@@ -7,8 +7,7 @@
  *  @details
  */
 
-#ifndef PUREPHONE_PROFILERECORDINGONBOARDMIC_HPP
-#define PUREPHONE_PROFILERECORDINGONBOARDMIC_HPP
+#pragma once
 
 #include "Profile.hpp"
 
@@ -36,4 +35,3 @@ namespace audio
     };
 
 } // namespace audio
-#endif // PUREPHONE_PROFILERECORDINGONBOARDMIC_HPP

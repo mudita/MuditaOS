@@ -1,13 +1,16 @@
 
 #include "ServiceAntenna.hpp"
-#include "messages/AntennaMessage.hpp"
+#include "Service/Timer.hpp"
 #include "api/AntennaServiceAPI.hpp"
 #include "log/log.hpp"
+#include "messages/AntennaMessage.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include <service-cellular/messages/CellularMessage.hpp>
-#include <module-utils/state/ServiceState.hpp>
 #include <at/response.hpp>
+#include <memory>
+#include <module-utils/state/ServiceState.hpp>
+#include <service-cellular/messages/CellularMessage.hpp>
 
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "time/time_conversion.hpp"
 #include <ticks.hpp>
 
@@ -47,7 +50,18 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
 {
     LOG_INFO("[%s] Initializing", serviceName);
 
-    timerID = CreateTimer(5000, true);
+    timer = std::make_unique<sys::Timer>("Antena", this, 5000);
+    timer->connect([&](sys::Timer &) {
+        timer->stop();
+        auto stateToSet = state->get();
+        if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
+            LOG_WARN("State [ %s ] timeout occured, setting [ %s ] state",
+                     c_str(state->get()),
+                     c_str(state->getTimeoutState()));
+            stateToSet = state->getTimeoutState();
+        }
+        state->set(stateToSet);
+    });
 
     state = new utils::state::State<antenna::State>(this);
 
@@ -124,7 +138,7 @@ sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::
         }
     } break;
     case MessageType::AntennaGetLockState: {
-        auto responseMessage = make_shared<AntennaLockRequestResponse>(true, serviceLocked);
+        auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
         return responseMessage;
     } break;
     default:
@@ -164,18 +178,6 @@ sys::ReturnCodes ServiceAntenna::SwitchPowerModeHandler(const sys::ServicePowerM
     }
 
     return sys::ReturnCodes::Success;
-}
-
-void ServiceAntenna::TickHandler(uint32_t id)
-{
-    stopTimer(timerID);
-    auto stateToSet = state->get();
-    if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
-        LOG_WARN(
-            "State [ %s ] timeout occured, setting [ %s ] state", c_str(state->get()), c_str(state->getTimeoutState()));
-        stateToSet = state->getTimeoutState();
-    }
-    state->set(stateToSet);
 }
 
 void ServiceAntenna::handleLockRequest(antenna::lockState request)
@@ -238,7 +240,7 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     }
     if (!ret) {
         LOG_WARN("State [ %s ] not handled. Reloading timer.", c_str(state));
-        ReloadTimer(timerID);
+        timer->reload();
     }
     return ret;
 }

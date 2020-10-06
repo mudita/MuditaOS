@@ -1,7 +1,8 @@
 #include "BackupEndpoint.hpp"
-#include "ParserUtils.hpp"
 #include "DesktopMessages.hpp"
+#include "ParserUtils.hpp"
 #include "ServiceDesktop.hpp"
+#include <Service/Bus.hpp>
 
 static bool backupReady = false;
 

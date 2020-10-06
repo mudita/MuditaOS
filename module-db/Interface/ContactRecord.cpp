@@ -197,7 +197,9 @@ auto ContactRecordInterface::getQuery(std::shared_ptr<db::Query> query) -> std::
 
     std::vector<ContactRecord> result(ids.size());
     std::transform(std::begin(ids), std::end(ids), std::begin(result), [this](uint32_t id) { return GetByID(id); });
-
+    for (uint32_t idx = 0; idx < static_cast<uint32_t>(ids.size()); idx++) {
+        result[idx].contactPosOnList = offset + idx;
+    }
     auto response = std::make_unique<db::query::ContactGetResult>(result);
     response->setRequestQuery(query);
     return response;

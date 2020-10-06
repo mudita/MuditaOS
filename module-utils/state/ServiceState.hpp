@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Service/Bus.hpp>
 #include <algorithm>
 #include <cassert>
 

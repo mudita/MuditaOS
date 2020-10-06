@@ -1,8 +1,10 @@
 #include "AllEventsWindow.hpp"
+#include "InputEvent.hpp"
+#include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
-#include <gui/widgets/Window.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
+#include <gui/widgets/Window.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
 
 #include <module-services/service-db/messages/QueryMessage.hpp>
@@ -53,12 +55,7 @@ namespace gui
 
     void AllEventsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        auto dataReceived = dynamic_cast<PrevWindowData *>(data);
-        if (dataReceived != nullptr) {
-            if (dataReceived->getData() == PrevWindowData::PrevWindow::Delete) {
-                checkEmpty = true;
-            }
-        }
+        allEventsList->rebuildList();
     }
 
     bool AllEventsWindow::onInput(const gui::InputEvent &inputEvent)
@@ -85,7 +82,6 @@ namespace gui
             event->date_from = TimePointNow();
             event->date_till = TimePointNow();
             data->setData(event);
-            data->setWindowName(style::window::calendar::name::all_events_window);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
@@ -111,7 +107,6 @@ namespace gui
                 }
             }
         }
-
         return false;
     }
 } /* namespace gui */

@@ -23,7 +23,6 @@ namespace gui
                                              auto rec  = std::make_unique<EventsRecord>(*eventRecord);
                                              auto data = std::make_unique<EventRecordData>(std::move(rec));
                                              data->setDescription("Edit");
-                                             data->setWindowName(goBackWindowName);
                                              application->switchWindow(style::window::calendar::name::new_edit_event,
                                                                        std::move(data));
                                              return true;
@@ -45,7 +44,6 @@ namespace gui
         }
 
         eventRecord      = item->getData();
-        goBackWindowName = item->getWindowName();
         clearOptions();
         addOptions(eventsOptionsList());
         return true;
@@ -62,9 +60,8 @@ namespace gui
             LOG_INFO("Delete calendar event %d", static_cast<int>(eventRecord->ID));
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Remove>(eventRecord->ID));
-            auto data = make_unique<PrevWindowData>();
-            data->setData(PrevWindowData::PrevWindow::Delete);
-            application->switchWindow(goBackWindowName, std::move(data));
+            const uint32_t numberOfIgnoredWindows = 3;
+            application->returnToPreviousWindow(numberOfIgnoredWindows);
             return true;
         };
         meta.text  = utils::localize.get("app_calendar_event_delete_confirmation");

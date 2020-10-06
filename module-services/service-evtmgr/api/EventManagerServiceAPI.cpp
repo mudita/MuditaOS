@@ -5,6 +5,7 @@
 #include "../messages/EVMessages.hpp"
 
 #include "../Constants.hpp"
+#include <Service/Bus.hpp>
 
 bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
 {
@@ -16,7 +17,7 @@ bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
     sevm::EVMBoardResponseMessage *response = dynamic_cast<sevm::EVMBoardResponseMessage *>(ret.second.get());
 
     if (response != nullptr) {
-        if ((ret.first == sys::ReturnCodes::Success)) {
+        if (ret.first == sys::ReturnCodes::Success) {
             return response->board;
         }
     }

@@ -9,6 +9,7 @@
 #include <memory>
 #include <functional>
 
+#include "InputEvent.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../ApplicationNotes.hpp"

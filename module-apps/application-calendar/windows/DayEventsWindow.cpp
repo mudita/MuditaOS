@@ -35,12 +35,6 @@ namespace gui
             db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
         DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
         setTitle(dayMonthTitle);
-        auto dataReceived = dynamic_cast<PrevWindowData *>(data);
-        if (dataReceived != nullptr) {
-            if (dataReceived->getData() == PrevWindowData::PrevWindow::Delete) {
-                checkEmpty = true;
-            }
-        }
     }
 
     auto DayEventsWindow::handleSwitchData(SwitchData *data) -> bool
@@ -108,7 +102,6 @@ namespace gui
             rec->date_till = filterFrom;
             auto event     = std::make_shared<EventsRecord>(*rec);
             data->setData(event);
-            data->setWindowName(style::window::calendar::name::day_events_window);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
@@ -119,14 +112,14 @@ namespace gui
     auto DayEventsWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
         if (const auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
-            unique_ptr<vector<EventsRecord>> records = response->getResult();
-            if (checkEmpty) {
-                if (records->empty()) {
-                    auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-                    assert(application != nullptr);
-                    auto name = dayMonthTitle;
-                    app->switchToNoEventsWindow(name, filterFrom, style::window::calendar::name::day_events_window);
-                }
+            std::unique_ptr<std::vector<EventsRecord>> records = response->getResult();
+            auto app                                           = dynamic_cast<app::ApplicationCalendar *>(application);
+            assert(application != nullptr);
+            app->setEquivalentToEmptyWindow(EquivalentWindow::DayEventsWindow);
+            if (records->empty()) {
+                auto name = dayMonthTitle;
+                app->switchToNoEventsWindow(name, filterFrom);
+                return true;
             }
             dayEventsModel->loadData(std::move(records));
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
@@ -135,7 +128,6 @@ namespace gui
         LOG_DEBUG("Response False");
         return false;
     }
-
     bool DayEventsWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);

@@ -53,7 +53,7 @@ class Fota
     void configureAPN();
     void connect();
     void downloadInfo();
-    void parseInfo(string data);
+    void parseInfo(std::string data);
     void checkIfUpdateRequired();
     void update();
     void reboot();

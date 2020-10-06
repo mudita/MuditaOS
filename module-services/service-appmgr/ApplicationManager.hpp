@@ -151,7 +151,7 @@ namespace sapm
         std::string launchApplicationName = "";
         // timer to count time from last user's activity. If it reaches time defined in settings database application
         // manager is sending signal to power manager and changing window to the desktop window in the blocked state.
-        uint32_t blockingTimerID = 0;
+        std::unique_ptr<sys::Timer> blockingTimer;
 
         // tries to switch the application
         bool handleSwitchApplication(APMSwitch *msg);
@@ -179,8 +179,6 @@ namespace sapm
         virtual ~ApplicationManager();
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-        // Invoked when timer ticked
-        void TickHandler(uint32_t id) override;
 
         // Invoked during initialization
         sys::ReturnCodes InitHandler() override;
@@ -249,6 +247,9 @@ namespace sapm
          * \returns true if app manager running and app is registered == running, false othervise
          */
         static bool appRunning(sys::Service *sender, const std::string &name);
+
+      private:
+        void phoneLockCB();
     };
 
 } /* namespace sapm */

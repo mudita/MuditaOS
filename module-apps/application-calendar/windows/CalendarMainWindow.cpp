@@ -20,7 +20,7 @@ namespace gui
         std::chrono::system_clock::time_point tp =
             std::chrono::system_clock::from_time_t(appCalendar->getCurrentTimeStamp());
         this->actualDate = date::year_month_day{date::floor<date::days>(tp)};
-        std::fill(begin(isDayEmpty), end(isDayEmpty), true);
+        std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         buildInterface();
     }
 
@@ -177,6 +177,9 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+            auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+            assert(application != nullptr);
+            app->setEquivalentToEmptyWindow(EquivalentWindow::AllEventsWindow);
             auto query = std::make_unique<db::query::events::GetAll>();
             query->setQueryListener(
                 db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
@@ -202,7 +205,7 @@ namespace gui
 
     auto CalendarMainWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
-        std::fill(begin(isDayEmpty), end(isDayEmpty), true);
+        std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
             const auto records = response->getResult();
             for (auto &rec : *records) {
@@ -222,9 +225,7 @@ namespace gui
                 auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
                 assert(appCalendar != nullptr);
                 auto filter = TimePointFromYearMonthDay(actualDate);
-                appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"),
-                                                    filter,
-                                                    style::window::calendar::name::all_events_window);
+                appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
             }
             return true;
         }

@@ -2,6 +2,7 @@
 #include <module-gui/gui/widgets/ListView.hpp>
 #include <module-utils/log/log.hpp>
 #include <mock/TestListViewProvider.hpp>
+#include <gui/input/InputEvent.hpp>
 
 class TestListView : public gui::ListView
 {

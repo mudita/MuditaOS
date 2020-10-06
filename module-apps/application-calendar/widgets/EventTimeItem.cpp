@@ -263,8 +263,9 @@ namespace gui
                 if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
                     auto start_time = TimePointToHourMinSec(event->date_from);
 
-                    hourInput->setText(std::to_string(date::make12(start_time.hours()).count()));
-                    minuteInput->setText(std::to_string(start_time.minutes().count()));
+                    hourInput->setText(TimePointToHourString12H(event->date_from));
+                    minuteInput->setText(TimePointToMinutesString(event->date_from));
+
                     if (date::is_am(start_time.hours())) {
                         mode12hInput->setText(timeConstants::before_noon);
                     }
@@ -275,8 +276,8 @@ namespace gui
                 else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
                     auto end_time = TimePointToHourMinSec(event->date_till);
 
-                    hourInput->setText(std::to_string(date::make12(end_time.hours()).count()));
-                    minuteInput->setText(std::to_string(end_time.minutes().count()));
+                    hourInput->setText(TimePointToHourString12H(event->date_till));
+                    minuteInput->setText(TimePointToMinutesString(event->date_till));
                     if (date::is_am(end_time.hours())) {
                         mode12hInput->setText(timeConstants::before_noon);
                     }

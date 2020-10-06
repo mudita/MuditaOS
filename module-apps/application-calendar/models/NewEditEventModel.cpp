@@ -1,12 +1,14 @@
 #include "NewEditEventModel.hpp"
+#include "AppWindow.hpp"
 #include "application-calendar/widgets/NewEventCheckBoxWithLabel.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
-#include <ListView.hpp>
 #include <BottomBar.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <ListView.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 NewEditEventModel::NewEditEventModel(app::Application *app, bool mode24H) : application(app), mode24H(mode24H)
 {}
@@ -163,7 +165,7 @@ void NewEditEventModel::reloadDataWithTimeItem()
     list->rebuildList();
 }
 
-void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit, const std::string &windowName)
+void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
 {
     for (auto &item : internalData) {
         if (item->onSaveCallback) {
@@ -177,7 +179,8 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit,
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*record));
         }
-        application->switchWindow(windowName);
+        const uint32_t numberOfIgnoredWindows = 3;
+        application->returnToPreviousWindow(numberOfIgnoredWindows);
     }
     else {
         auto record = event.get();
@@ -192,8 +195,16 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit,
                     utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
                 data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, record->date_from);
 
-                application->switchWindow(gui::name::window::main_window);
-                application->switchWindow(windowName, std::move(data));
+                auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+                assert(app != nullptr);
+                if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
+                    app->popToWindow(gui::name::window::main_window);
+                    app->switchWindow(style::window::calendar::name::day_events_window);
+                }
+                else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+                    app->popToWindow(gui::name::window::main_window);
+                    app->switchWindow(style::window::calendar::name::all_events_window);
+                }
             }
             else {
                 application->returnToPreviousWindow();

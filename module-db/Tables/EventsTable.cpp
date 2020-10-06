@@ -293,6 +293,14 @@ bool EventsTable::addCustom(EventsTableRow entry)
     weekDayOptions          = parseOptions(entry.repeat);
     uint32_t incrementation = 0;
 
+    result = result && db->execute("INSERT or IGNORE INTO events (title, date_from, date_till, reminder, repeat) VALUES"
+                                   "('%q', '%q','%q', %u, %u);",
+                                   entry.title.c_str(),
+                                   TimePointToString(entry.date_from).c_str(),
+                                   TimePointToString(entry.date_till).c_str(),
+                                   entry.reminder,
+                                   entry.repeat);
+
     auto dateFrom = getFirstWeekDay(entry.date_from);
     auto dateTill = getFirstWeekDay(entry.date_till);
 

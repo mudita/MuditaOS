@@ -1,7 +1,7 @@
 #pragma once
 
 #include "windows/Names.hpp"
-#include "widgets/PinLock.hpp"
+#include "widgets/PinLockHandler.hpp"
 
 #include <Application.hpp>
 #include <Service/Message.hpp>
@@ -38,7 +38,7 @@ namespace app
 
         } notifications;
 
-        gui::PinLock lock;
+        gui::PinLockHandler lockHandler;
 
         ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
         virtual ~ApplicationDesktop();
@@ -57,6 +57,7 @@ namespace app
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
+
         /**
          * This static method will be used to lock the phone
          */
@@ -68,7 +69,6 @@ namespace app
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
 
-        void handlePin(const std::vector<unsigned int> &);
     };
 
 } /* namespace app */

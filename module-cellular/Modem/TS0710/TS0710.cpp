@@ -4,11 +4,12 @@
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
+#include <Service/Bus.hpp>
 #include <at/URC_QIND.hpp>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <cassert>
-#include <sstream>
 #include <memory>
+#include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <sstream>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},

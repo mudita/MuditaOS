@@ -1,29 +1,37 @@
-#include <sstream>
-#include <iomanip>
-// module-utils
-#include "log/log.hpp"
-// module-services
-#include "service-gui/messages/DrawMessage.hpp"
-#include "service-appmgr/messages/APMMessage.hpp"
-#include "service-evtmgr/messages/EVMessages.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-cellular/ServiceCellular.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-// module-gui
-#include "gui/core/DrawCommand.hpp"
-#include "gui/input/InputEvent.hpp"
-// module-sys
-#include "SystemManager/SystemManager.hpp"
-
 #include "Application.hpp"
-#include "MessageType.hpp"
-#include "messages/AppMessage.hpp"
-#include "windows/AppWindow.hpp"
-#include <Text.hpp>
-#include <cassert>
+#include "BusChannelsCustom.hpp"                         // for BusChannels...
+#include "Common.hpp"                                    // for RefreshModes
+#include "GuiTimer.hpp"                                  // for GuiTimer
+#include "Item.hpp"                                      // for Item
+#include "MessageType.hpp"                               // for MessageType
+#include "Service/Timer.hpp"                             // for Timer
+#include "SettingsRecord.hpp"                            // for SettingsRecord
+#include "Timer.hpp"                                     // for Timer
+#include "Translator.hpp"                                // for KeyInputSim...
+#include "common_data/EventStore.hpp"                    // for Battery
+#include "common_data/RawKey.hpp"                        // for RawKey, key...
+#include "gui/input/InputEvent.hpp"                      // for InputEvent
+#include "log/debug.hpp"                                 // for DEBUG_APPLI...
+#include "log/log.hpp"                                   // for LOG_INFO
+#include "messages/AppMessage.hpp"                       // for AppSwitchMe...
+#include "service-appmgr/ApplicationManager.hpp"         // for Application...
+#include "service-cellular/messages/CellularMessage.hpp" // for CellularNot...
+#include "service-db/api/DBServiceAPI.hpp"               // for DBServiceAPI
+#include "service-evtmgr/messages/BatteryMessages.hpp"   // for BatteryLeve...
+#include "service-evtmgr/messages/EVMessages.hpp"        // for RtcMinuteAl...
+#include "service-evtmgr/messages/KbdMessage.hpp"        // for KbdMessage
+#include "service-gui/messages/DrawMessage.hpp"          // for DrawMessage
+#include "task.h"                                        // for xTaskGetTic...
+#include "windows/AppWindow.hpp"                         // for AppWindow
+#include <Text.hpp>                                      // for Text
+#include <algorithm>                                     // for find
+#include <iterator>                                      // for distance, next
+#include <type_traits>                                   // for add_const<>...
 
-#include "common_data/EventStore.hpp"
+namespace gui
+{
+    class DrawCommand;
+}
 
 namespace app::audioConsts
 {
@@ -60,8 +68,6 @@ namespace app
     Application::Application(
         std::string name, std::string parent, bool startBackground, uint32_t stackDepth, sys::ServicePriority priority)
         : Service(name, parent, stackDepth, priority),
-          longPressTimer(CreateAppTimer(
-              key_timer_ms, true, [&]() { longPressTimerCallback(); }, "longPressTimer")),
           startBackground{startBackground}
     {
         keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
@@ -69,7 +75,9 @@ namespace app
         if (startBackground) {
             setState(State::ACTIVE_BACKGROUND);
         }
-        longPressTimer.restart();
+
+        longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
+        longPressTimer->connect([&](sys::Timer &) { longPressTimerCallback(); });
     }
 
     Application::~Application()
@@ -93,34 +101,6 @@ namespace app
         state = st;
     }
 
-    void Application::TickHandler(uint32_t id)
-    {
-        auto appTimer = std::find(appTimers.begin(), appTimers.end(), id);
-        if (appTimer != appTimers.end()) {
-            appTimer->runCallback();
-        }
-        else {
-            LOG_ERROR("Requested timer doesn't exist here (ID: %s)\n",
-                      std::to_string(id).c_str()); // either timer was deleted or this id should not arrive.
-        }
-    }
-
-    void Application::DeleteTimer(AppTimer &timer)
-    {
-        Service::DeleteTimer(timer.getID()); // remove the real FreeRTOS timer
-        auto timerOnTheList = std::find(appTimers.begin(), appTimers.end(), timer);
-        if (timerOnTheList != appTimers.end()) {
-            appTimers.erase(timerOnTheList);
-        }
-    }
-
-    [[deprecated("only for compatibility")]] void Application::DeleteTimer(uint32_t id)
-    {
-        auto found = std::find(appTimers.begin(), appTimers.end(), id);
-        if (found != appTimers.end()) {
-            DeleteTimer(*found);
-        }
-    }
 
     void Application::longPressTimerCallback()
     {
@@ -132,6 +112,7 @@ namespace app
             messageInputEventApplication(this, this->GetName(), iev);
             // clean previous key
             keyTranslator->prev_key_press = {};
+            longPressTimer->stop();
         }
     }
 
@@ -208,9 +189,9 @@ namespace app
         }
     }
 
-    void Application::returnToPreviousWindow()
+    void Application::returnToPreviousWindow(const uint32_t times)
     {
-        auto prevWindow = getPrevWindow();
+        auto prevWindow = getPrevWindow(times);
         if (prevWindow == gui::name::window::no_window) {
             LOG_INFO("Back to previous application");
             cleanPrevWindw();
@@ -281,6 +262,12 @@ namespace app
     sys::Message_t Application::handleInputEvent(sys::DataMessage *msgl)
     {
         AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
+        if (msg->getEvent().state == gui::InputEvent::State::keyPressed) {
+            longPressTimer->start();
+        }
+        else if (msg->getEvent().state == gui::InputEvent::State::keyReleasedShort) {
+            longPressTimer->stop();
+        }
         if (getCurrentWindow() != nullptr && getCurrentWindow()->onInput(msg->getEvent())) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
@@ -341,7 +328,7 @@ namespace app
 
     sys::Message_t Application::handleApplicationSwitch(sys::DataMessage *msgl)
     {
-        AppSwitchMessage *msg = reinterpret_cast<AppSwitchMessage *>(msgl);
+        auto *msg             = static_cast<AppSwitchMessage *>(msgl);
         bool handled          = false;
         LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
         // Application is starting or it is in the background. Upon switch command if name if correct it goes
@@ -612,12 +599,12 @@ namespace app
 #endif
     };
 
-    const std::string Application::getPrevWindow() const
+    const std::string Application::getPrevWindow(uint32_t count) const
     {
-        if (this->windowStack.size() <= 1) {
+        if (this->windowStack.size() <= 1 || count > this->windowStack.size()) {
             return gui::name::window::no_window;
         }
-        return *std::prev(windowStack.end(), 2);
+        return *std::prev(windowStack.end(), count + 1);
     }
 
     void Application::Application::cleanPrevWindw()
@@ -647,65 +634,14 @@ namespace app
         return getWindow(window);
     }
 
-    AppTimer Application::CreateAppTimer(TickType_t interval,
-                                         bool isPeriodic,
-                                         std::function<void()> callback,
-                                         const std::string &name)
-    {
-        auto id    = CreateTimer(interval, isPeriodic, name);
-        auto timer = AppTimer(this, id, callback, name);
-        appTimers.push_back(timer);
-        return timer; // return ptr to the timer on the list
-    }
-
     void Application::attachWindow(gui::AppWindow *window)
     {
         windows.insert({window->getName(), window});
     }
 
-    AppTimer::AppTimer(Application *parent, uint32_t id, std::function<void()> callback, const std::string &name)
-        : parent(parent)
+    void Application::connect(std::unique_ptr<app::GuiTimer> &&timer, gui::Item *item)
     {
-        this->id = id;
-        registerCallback(callback);
-    }
-    AppTimer::AppTimer() = default;
-
-    AppTimer::~AppTimer()
-    {
-        callback = nullptr;
-    }
-
-    void AppTimer::registerCallback(std::function<void()> callback)
-    {
-        this->callback = callback;
-    }
-    void AppTimer::runCallback()
-    {
-        callback();
-    }
-    uint32_t AppTimer::getID()
-    {
-        return id;
-    }
-    void AppTimer::stop()
-    {
-        if (parent) {
-            parent->stopTimer(getID());
-        }
-    }
-    void AppTimer::restart()
-    {
-        if (parent) {
-            parent->ReloadTimer(getID());
-        }
-    }
-    bool AppTimer::operator==(const AppTimer &rhs) const
-    {
-        return this->id == rhs.id;
-    }
-    bool AppTimer::operator==(const uint32_t &rhs) const
-    {
-        return this->id == rhs;
+        timer->sysapi.connect(item);
+        item->attachTimer(std::move(timer));
     }
 } /* namespace app */

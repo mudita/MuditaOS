@@ -6,8 +6,9 @@
  */
 
 #include "ApplicationAntenna.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include "Service/Timer.hpp"
 #include "module-cellular/at/response.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "windows/AntennaMainWindow.hpp"
 #include "windows/ScanModesWindow.hpp"
@@ -31,13 +32,13 @@ namespace app
     }
 
     ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, 4096 * 2),
-          appTimer(CreateAppTimer(2000, true, [=]() { timerHandler(); }))
-
+        : Application(name, parent, startBackgound, 4096 * 2)
     {
         busChannels.push_back(sys::BusChannels::AntennaNotifications);
         busChannels.push_back(sys::BusChannels::AntennaNotifications);
-        appTimer.restart();
+        appTimer = std::make_unique<sys::Timer>("Antena", this, 2000);
+        appTimer->connect([=](sys::Timer &) { timerHandler(); });
+        appTimer->start();
     }
 
     ApplicationAntenna::~ApplicationAntenna()

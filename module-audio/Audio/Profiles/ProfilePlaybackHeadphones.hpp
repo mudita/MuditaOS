@@ -7,8 +7,7 @@
  *  @details
  */
 
-#ifndef PUREPHONE_PROFILEPLAYBACKHEADPHONES_HPP
-#define PUREPHONE_PROFILEPLAYBACKHEADPHONES_HPP
+#pragma once
 
 #include "Profile.hpp"
 
@@ -35,4 +34,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // PUREPHONE_PROFILEPLAYBACKHEADPHONES_HPP

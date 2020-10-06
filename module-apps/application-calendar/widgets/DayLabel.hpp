@@ -4,6 +4,7 @@
 
 namespace gui
 {
+    class Image;
 
     class DayLabel : public Rect
     {

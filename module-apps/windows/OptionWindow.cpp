@@ -4,6 +4,7 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <Style.hpp>
+#include <cassert>
 #include <functional>
 #include <memory>
 

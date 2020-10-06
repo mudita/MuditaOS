@@ -26,10 +26,11 @@
 
 #include "log/log.hpp"
 
-#include <cassert>
-#include <time/ScopedTime.hpp>
 #include "includes/DBServiceName.hpp"
 #include "messages/QueryMessage.hpp"
+#include <Service/Bus.hpp>
+#include <cassert>
+#include <time/ScopedTime.hpp>
 
 static const auto service_db_stack = 1024 * 24;
 
@@ -580,11 +581,6 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     return responseMsg;
 }
 
-// Invoked when timer ticked
-void ServiceDB::TickHandler(uint32_t id)
-{}
-
-// Invoked during initialization
 sys::ReturnCodes ServiceDB::InitHandler()
 {
     Database::initialize();
@@ -613,6 +609,14 @@ sys::ReturnCodes ServiceDB::InitHandler()
     notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
     eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
     settingsRecordInterface_v2   = std::make_unique<SettingsRecordInterface_v2>(settingsDB.get());
+
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
+
+    for (auto &dbAgent : databaseAgents) {
+        dbAgent->initDb();
+        dbAgent->registerMessages();
+    }
+
     return sys::ReturnCodes::Success;
 }
 

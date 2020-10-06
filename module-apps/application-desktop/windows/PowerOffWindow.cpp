@@ -1,6 +1,7 @@
-#include "log/log.hpp"
+#include "InputEvent.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
+#include "log/log.hpp"
 
 // module-utils
 #include "i18/i18.hpp"

@@ -68,7 +68,7 @@ namespace gui
         box = nullptr;
     }
 
-    void Info::addAlignedLabelWithValue(BoxLayout *layout, const string &labelText, const string &valueText)
+    void Info::addAlignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText)
     {
         auto lineBox = new gui::VBox(layout, 0, 0, style::window_width, style::window::label::small_h * 2);
         lineBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);

@@ -79,10 +79,7 @@ namespace sgui
         ~ServiceGUI();
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-        // Invoked when timer ticked
-        void TickHandler(uint32_t id) override;
 
-        // Invoked during initialization
         sys::ReturnCodes InitHandler() override;
 
         sys::ReturnCodes DeinitHandler() override;
