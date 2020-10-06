@@ -9,14 +9,17 @@
 
 #include "drivers/i2c/DriverI2C.hpp"
 
-#include <board/rt1051/bsp/usb_cdc/driver/osa/usb_osa.h>                 // just for the define to populate
-#include <module-bsp/board/rt1051/bsp/usb_cdc/driver/include/usb_misc.h> // for endian-swapping macro
+#include <module-utils/Utils.hpp> // for byte conversion funcions
 
-#include "fsl_common.h"
+#include <fsl_common.h>
+#include <timers.h>
 
 using namespace drivers;
+using namespace utils;
 
 static std::shared_ptr<drivers::DriverI2C> i2c;
+
+static I2CAddress addr = {.deviceAddress = ALS31300_I2C_ADDRESS, .subAddressSize = 1};
 
 static xQueueHandle qHandleIrq = NULL;
 
@@ -24,11 +27,10 @@ namespace bsp
 {
     namespace magnetometer
     {
-        static I2CAddress addr = {.deviceAddress = ALS31300_I2C_ADDRESS, .subAddressSize = 1};
-
         std::shared_ptr<DriverGPIO> gpio;
 
         bool waitForWrite(uint32_t subAddress);
+
         int32_t init(xQueueHandle qHandle)
         {
             i2c = DriverI2C::Create(
@@ -42,7 +44,7 @@ namespace bsp
 
             // GET WRITE ACCESS
             addr.subAddress = ALS31300_CUSTOMER_ACCESS_REG;
-            USB_LONG_TO_BIG_ENDIAN_ADDRESS(ALS31300_CUSTOMER_ACCESS_REG_code, buf);
+            toBigEndian(ALS31300_CUSTOMER_ACCESS_REG_code, buf);
             assert(i2c->Write(addr, buf, 4) == 4);
             waitForWrite(addr.subAddress);
 
@@ -50,7 +52,7 @@ namespace bsp
             addr.subAddress = ALS31300_CONF_REG;
 
             i2c->Read(addr, buf, 4);
-            const als31300_conf_reg current_reg_conf(USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf));
+            const als31300_conf_reg current_reg_conf(fromBigEndian(buf));
             LOG_DEBUG("CONF read 1:\t%" PRIu32, static_cast<uint32_t>(current_reg_conf));
             als31300_conf_reg reg_conf = current_reg_conf;
             reg_conf.I2C_threshold     = ALS31300_CONF_REG_I2C_THRES_1V8;
@@ -59,21 +61,21 @@ namespace bsp
             reg_conf.channel_Y_en      = ALS31300_CONF_REG_CHANNEL_ENABLED;
             reg_conf.channel_Z_en      = ALS31300_CONF_REG_CHANNEL_DISABLED;
             reg_conf.bandwidth         = 1; // longest unit measurement
-            USB_LONG_TO_BIG_ENDIAN_ADDRESS(reg_conf, buf);
+            toBigEndian(reg_conf, buf);
             if (current_reg_conf != reg_conf) {
                 assert(i2c->Write(addr, buf, 4) == 4);
                 waitForWrite(addr.subAddress);
                 LOG_DEBUG("CONF wrote:\t%" PRIu32, static_cast<uint32_t>(reg_conf));
             }
             i2c->Read(addr, buf, 4);
-            auto reg_conf_2 = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+            auto reg_conf_2 = fromBigEndian(buf);
             LOG_DEBUG("CONF read 2:\t%" PRIu32, static_cast<uint32_t>(reg_conf_2));
 
             // INTERRUPTS register
             addr.subAddress = ALS31300_INT_REG;
 
             i2c->Read(addr, buf, 4);
-            const als31300_int_reg current_reg_int = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+            const als31300_int_reg current_reg_int = fromBigEndian(buf);
             LOG_DEBUG("INT read 1:\t%" PRIu32, static_cast<uint32_t>(current_reg_int));
             als31300_int_reg reg_int     = current_reg_int;
             reg_int.int_mode             = ALS31300_INT_REG_INT_MODE_threshold;
@@ -84,14 +86,14 @@ namespace bsp
             reg_int.int_X_threshold      = 1;
             reg_int.int_Y_threshold      = 4;
             reg_int.int_Z_threshold      = 0;
-            USB_LONG_TO_BIG_ENDIAN_ADDRESS(reg_int, buf);
+            toBigEndian(reg_int, buf);
             if (current_reg_int != reg_int) {
                 i2c->Write(addr, buf, 4);
                 waitForWrite(addr.subAddress);
                 LOG_DEBUG("INT wrote:\t%" PRIu32, static_cast<uint32_t>(reg_int));
             }
             i2c->Read(addr, buf, 4);
-            als31300_int_reg reg_int_2 = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+            als31300_int_reg reg_int_2 = fromBigEndian(buf);
             LOG_DEBUG("INT read 2:\t%" PRIu32, static_cast<uint32_t>(reg_int_2));
 
             // INTERRUPT PIN
@@ -111,13 +113,13 @@ namespace bsp
             addr.subAddress = ALS31300_PWR_REG;
 
             i2c->Read(addr, buf, 4);
-            const als31300_pwr_reg current_reg_pwr = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+            const als31300_pwr_reg current_reg_pwr = fromBigEndian(buf);
             LOG_DEBUG("POWER read 1:\t%" PRIu32, static_cast<uint32_t>(current_reg_pwr));
             als31300_pwr_reg reg_pwr  = current_reg_pwr;
             reg_pwr.I2C_loop_mode     = ALS31300_PWR_REG_LOOP_MODE_single; // we don't want constant data flow
             reg_pwr.sleep             = ALS31300_PWR_REG_SLEEP_MODE_active;
             reg_pwr.count_max_LP_mode = 3U; // get an update every 500 ms
-            USB_LONG_TO_BIG_ENDIAN_ADDRESS(reg_pwr, buf);
+            toBigEndian(reg_pwr, buf);
             //            if (current_reg_pwr != reg_pwr) {
             i2c->Write(addr, buf, 4);
             LOG_DEBUG("POWER wrote:\t%" PRIu32, static_cast<uint32_t>(reg_pwr));
@@ -148,7 +150,7 @@ namespace bsp
             }
             // is there anything new ?
             als31300_measurements_MSB_reg reg_msb =
-                USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf); // it arrives as big-endian, but we are little-endian
+                fromBigEndian(buf); // it arrives as big-endian, but we are little-endian
 
             if (reg_msb.int_flag == true) {
                 LOG_DEBUG("INT flag magneto");
@@ -160,7 +162,7 @@ namespace bsp
             else {
                 if (reg_msb.int_flag == true) {
                     // clear INT flag
-                    USB_LONG_TO_BIG_ENDIAN_ADDRESS(reg_msb, buf);
+                    toBigEndian(reg_msb, buf);
                     if (i2c->Write(addr, buf, 4) != 4) {
                         LOG_DEBUG("cannot clear INT flag. quitting");
                         return std::make_pair(false, Measurements());
@@ -171,7 +173,7 @@ namespace bsp
                 addr.subAddress = ALS31300_MEASUREMENTS_LSB_REG;
                 i2c->Read(addr, buf, 4);
 
-                als31300_measurements_LSB_reg reg_lsb = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+                als31300_measurements_LSB_reg reg_lsb = fromBigEndian(buf);
 
                 meas.X     = als31300_measurement_sign_convert(reg_msb.X_MSB << 4 | reg_lsb.X_LSB);
                 meas.Y     = als31300_measurement_sign_convert(reg_msb.Y_MSB << 4 | reg_lsb.Z_LSB);
@@ -194,13 +196,13 @@ namespace bsp
             als31300_pwr_reg reg_pwr;
 
             //            i2c->Read(addr, buf, 4);
-            //            const als31300_pwr_reg current_reg_pwr = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+            //            const als31300_pwr_reg current_reg_pwr = fromBigEndian(buf);
             //            als31300_pwr_reg reg_pwr(current_reg_pwr);
             //            LOG_DEBUG("POWER read 1:\t%" PRIu32, static_cast<uint32_t>(current_reg_pwr));
             reg_pwr.sleep             = pwr_value;
             reg_pwr.count_max_LP_mode = 3U;
             reg_pwr.I2C_loop_mode     = ALS31300_PWR_REG_LOOP_MODE_single;
-            USB_LONG_TO_BIG_ENDIAN_ADDRESS(reg_pwr, buf);
+            toBigEndian(reg_pwr, buf);
             //            if (current_reg_pwr != reg_pwr) {
             if(i2c->Write(addr, buf, 4) != 4){
                 return false;
@@ -213,7 +215,7 @@ namespace bsp
             if(i2c->Read(addr, buf, 4) != 4){
                 return false;
             }
-            const als31300_int_reg current_reg_int = USB_LONG_FROM_BIG_ENDIAN_ADDRESS(buf);
+            const als31300_int_reg current_reg_int = fromBigEndian(buf);
             als31300_int_reg reg_int(current_reg_int);
             switch (reg_pwr.sleep) {
             case ALS31300_PWR_REG_SLEEP_MODE_active:
@@ -228,7 +230,7 @@ namespace bsp
             }
 
             if (current_reg_int != reg_int) {
-                USB_LONG_TO_BIG_ENDIAN_ADDRESS(reg_int, buf);
+                toBigEndian(reg_int, buf);
                 i2c->Write(addr, buf, 4);
                 waitForWrite(addr.subAddress);
                 LOG_DEBUG("INT wrote:\t%" PRIu32, static_cast<uint32_t>(reg_int));

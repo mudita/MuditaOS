@@ -1,7 +1,9 @@
 #pragma once
 
-#include <stdint.h>
 #include <module-bsp/bsp/keyboard/key_codes.hpp>
+
+#include <stdint.h>
+#include <optional>
 
 extern "C" {
 	#include "FreeRTOS.h"
