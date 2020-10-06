@@ -11,7 +11,25 @@
 #include "Service/Bus.hpp"
 #include "../ServiceTime.hpp"
 
-namespace TimeServiceAPI
+bool TimeServiceAPI::messageReloadTimers(sys::Service *sender)
+{
+    auto msg = std::make_shared<ReloadTimersMessage>();
+    return sys::Bus::SendUnicast(msg, service::name::service_time, sender);
+}
+
+bool TimeServiceAPI::messageTimersProcessingStart(sys::Service *sender)
+{
+    auto msg = std::make_shared<TimersProcessingStartMessage>();
+    return sys::Bus::SendUnicast(msg, service::name::service_time, sender);
+}
+
+bool TimeServiceAPI::messageTimersProcessingStop(sys::Service *sender)
+{
+    auto msg = std::make_shared<TimersProcessingStopMessage>();
+    return sys::Bus::SendUnicast(msg, service::name::service_time, sender);
+}
+
+/*namespace TimeServiceAPI
 {
 
     uint32_t GetCurrentDT()
@@ -25,3 +43,4 @@ namespace TimeServiceAPI
     }
 
 } // namespace TimeServiceAPI
+*/

@@ -535,98 +535,26 @@ uint32_t EventsTable::countByFieldId(const char *field, uint32_t id)
     return 0;
 }
 
-// mlucki
-#if 0
-EventsTypedTableRow EventsTable::getClosestInsideDay1(uint32_t start_date, uint32_t day_date)
-{
-    /*
-    select 'event' as type, date_from as my_date,* from (select * from events where date_from >= 141020142 and
-    event_fired = -1 ORDER BY date_from LIMIT 1) UNION ALL select 'reminder' as type, reminder as my_date,* from (select
-    * from events where reminder >= 141020142 and reminder_fired = -1 ORDER BY reminder LIMIT 1) order by my_date  LIMIT
-    1
-     */
-    auto retQuery1 = db->query("SELECT 2 AS type, date_from AS date_selected,* FROM "
-                              "(SELECT * from events WHERE date_from >= %u AND date_from < %u AND event_fired = -1 "
-                              "ORDER BY date_from LIMIT 1) "
-                              "UNION ALL "
-                              "SELECT 1 as type, reminder AS date_selected,* FROM "
-                              "(SELECT * from events WHERE reminder >= %u AND reminder < %u AND reminder_fired = -1 "
-                              "ORDER BY reminder LIMIT 1) "
-                              "ORDER BY found_date LIMIT 1",
-                              start_date,
-                              day_date,
-                              start_date,
-                              day_date);
-
-    //select * from events where (date_from - reminder) >= 141020142 and event_fired = -1 ORDER BY (date_from - reminder)  LIMIT 1
-    //select datetime(date_from, '+' || reminder || ' minutes') AS calc_dt, * from events where calc_dt >= "2020-08-17 17:20" and event_fired = -1 and reminder <> -1 ORDER BY (calc_dt) LIMIT 1
-    //select datetime(date_from, '+' || reminder || ' minutes') AS calc_dt, * from events where calc_dt >= "2020-08-17 17:20" and calc_dt <= datetime("2020-08-17", "+1 day", "-1 second") and event_fired = -1 and reminder <> -1 ORDER BY (calc_dt) LIMIT 1
-
-    auto retQuery= db->query("SELECT DATETIME(date_from, '+' || reminder || ' minutes') AS calc_dt, * "
-                               "FROM events "
-                               "WHERE calc_dt >= %u "
-                               "AND calc_dt <= DATETIME(%u, '+1 day', '-1 second') "
-                               "AND event_fired = -1 "
-                               "AND reminder <> -1 "
-                               "ORDER BY calc_dt "
-                               "LIMIT 1",
-                               start_date,
-                               day_date);
-
-
-
-    // mlucki
-    // I tu zaczynają się małe schody:
-    //  - może być tak, że event jest ustawiony na jutro ale reminder (jako liczba minut przed eventem) trafia w dziś
-    //      trzeba to opanować w zapytaniu
-    //  - albo pytać bez filtra na "day_date" a tu w kodzie decydować czy zwrócona data jest z dzisiaj!!!
-
-    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-        return EventsTypedTableRow();
-    }
-
-    EventsTypedTableRow ret;
-
-    return EventsTypedTableRow{
-        /*(*retQuery)[2].getUInt32(), // ID
-        (*retQuery)[3].getString(), // title
-        (*retQuery)[4].getString(), // description
-        (*retQuery)[5].getUInt32(), // date_from
-        (*retQuery)[6].getUInt32(), // date_till
-        (*retQuery)[7].getUInt32(), // reminder
-        (*retQuery)[8].getUInt32(), // repeat
-        (*retQuery)[9].getUInt32(), // time_zone
-        (*retQuery)[1].getUInt32(), // date_selected
-        EventsTypedTableRow::typeFromUint((*retQuery)[0].getUInt32()),*/
-    };
-}
-#endif
-
 std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
 {
-    // select * from events where (date_from - reminder) >= 141020142 and event_fired = -1 ORDER BY (date_from -
-    // reminder)  LIMIT 1 select datetime(date_from, '+' || reminder || ' minutes') AS calc_dt, * from events where
-    // calc_dt >= "2020-08-17 17:20" and event_fired = -1 and reminder <> -1 ORDER BY (calc_dt) LIMIT 1 select
-    // datetime(date_from, '+' || reminder || ' minutes') AS calc_dt, * from events where calc_dt >= "2020-08-17 17:20"
-    // and calc_dt <= datetime("2020-08-17", "+1 day", "-1 second") and event_fired = -1 and reminder <> -1 ORDER BY
-    // (calc_dt) LIMIT 1
+    auto retQuery =
+        db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
+                  "FROM events "
+                  "WHERE calc_dt >= '%q' "
 
-    [[maybe_unused]] std::string fff = TimePointToString(TIME_POINT_INVALID).c_str();
+                  // TODO
+                  // Temporary calc_dt is not filtered as to be less-or-equal than date_from's end-of-day
+                  // (until we have implemented a notification of 'new day' for ServiceTime/CalendarTimeEvents)
+                  //"AND calc_dt <= DATETIME('%q', '+1 day', '-1 second') "
 
-    auto retQuery = db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
-                              //"SELECT date_from AS calc_dt, * "
-                              "FROM events "
-                              "WHERE calc_dt >= '%q' "
-                              // mlucki
-                              "AND calc_dt <= DATETIME('%q', '+1 day', '-1 second') "
-                              "AND reminder_fired = '%q' "
-                              //  "AND reminder_fired = '1970-01-01 00:00:00' "
-                              "AND reminder <> -1 "
-                              "ORDER BY calc_dt ",
-                              //"LIMIT 1",
-                              TimePointToString(filter_from).c_str(),
-                              TimePointToString(filter_till).c_str(),
-                              TimePointToString(TIME_POINT_INVALID).c_str());
+                  "AND reminder_fired = '%q' "
+                  "AND reminder <> -1 "
+                  "ORDER BY calc_dt "
+                  "LIMIT 1 ",
+                  TimePointToString(filter_from).c_str(),
+                  // As in 'to do' above
+                  // TimePointToString(filter_till).c_str(),
+                  TimePointToString(TIME_POINT_INVALID).c_str());
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<EventsTableRow>();

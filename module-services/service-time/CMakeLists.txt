@@ -17,9 +17,13 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceTime.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/api/TimeServiceAPI.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/timeEvents/TimeEvents.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/timeEvents/CalendarTimeEvents.cpp"
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceTime.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/api/TimeServiceAPI.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/timeEvents/TimeEvents.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/timeEvents/CalendarTimeEvents.hpp"
 )
 

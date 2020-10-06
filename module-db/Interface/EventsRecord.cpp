@@ -216,9 +216,6 @@ std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr
         return runQueryImplEdit(query);
     }
     if (typeid(*query) == typeid(db::query::events::SelectFirstUpcoming)) {
-        // mlucki
-        /*const auto local_query = dynamic_cast<const db::query::events::SelectFirstUpcoming *>(query.get());
-        return runQueryImpl(local_query);*/
         return runQueryImplSelectFirstUpcoming(query);
     }
     return nullptr;
@@ -300,15 +297,6 @@ std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryIm
     response->setRequestQuery(query);
     return response;
 }
-
-// mlucki
-/*
-std::unique_ptr<db::query::events::SelectFirstUpcomingResult> EventsRecordInterface::runQueryImpl(
-    const db::query::events::SelectFirstUpcoming *query)
-{
-    auto records = SelectFirstUpcoming(query->filter_from, query->filter_till);
-    return std::make_unique<db::query::events::SelectFirstUpcomingResult>(std::move(records));
-}*/
 
 std::unique_ptr<db::query::events::SelectFirstUpcomingResult> EventsRecordInterface::runQueryImplSelectFirstUpcoming(
     std::shared_ptr<db::Query> query)
