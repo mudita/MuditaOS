@@ -44,7 +44,7 @@ mkdir -p $PURE_PATH_ROOT/$PURE_OS_FACTORY
 # sudo sync $PURE_DEV
 
 echo "PurePhone copy build files"
-# cp -v $BUILD_PATH/boot.bin "$PURE_PATH_CURRENT"/  # | sed 's/'-\>'/'→'/g'
+cp -v $BUILD_PATH/boot.bin "$PURE_PATH_CURRENT"/  # | sed 's/'-\>'/'→'/g'
 
 for file in $IMAGE_FILES; do
 	echo Copying $file
