@@ -3,12 +3,27 @@
 #include "../messages/TimeMessage.hpp"
 #include <optional>
 
-class Service;
+class TimeServiceAPI
+{
+  public:
+    static bool messageReloadTimers(sys::Service *sender);
+    static bool messageTimersProcessingStart(sys::Service *sender);
+    static bool messageTimersProcessingStop(sys::Service *sender);
+};
 
-namespace TimeServiceAPI
+/*namespace TimeServiceAPI
 {
 
     uint32_t GetCurrentDT();
     int GetCurrentTimeZone();
 
-}; // namespace TimeServiceAPI
+    class TimeServiceAPI
+    {
+      public:
+
+        static bool messageReloadTimers(sys::Service *sender);
+        static bool messageTimersProcessingStart(sys::Service *sender);
+        static bool messageTimersProcessingStop(sys::Service *sender);
+
+    };
+}; // namespace TimeServiceAPI*/

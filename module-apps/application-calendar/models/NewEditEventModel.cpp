@@ -175,6 +175,7 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
 
     if (edit) {
         auto record = event.get();
+        record->reminder_fired = TIME_POINT_INVALID;
         if (record->title != "") {
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*record));

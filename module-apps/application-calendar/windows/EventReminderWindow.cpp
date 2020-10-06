@@ -3,36 +3,20 @@
 #include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
-
 #include "service-appmgr/ApplicationManager.hpp"
 
 namespace gui
 {
+    constexpr static const int reminderLifeDuration = 20000;
 
     EventReminderWindow::EventReminderWindow(app::Application *app, std::string name)
         : AppWindow(app, style::window::calendar::name::event_reminder_window)
     {
         buildInterface();
 
-        reminderTimer = std::make_unique<sys::Timer>("CalendarReminderTimer", app, 20000, sys::Timer::Type::SingleShot);
+        reminderTimer = std::make_unique<sys::Timer>(
+            "CalendarReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot);
         reminderTimer->connect([=](sys::Timer &) { reminderTimerCallback(); });
-
-        // reminderTimer
-
-        // reminderTimer->start();
-
-        /*auto app = dynamic_cast<app::ApplicationCall *>(application);
-        assert(app != nullptr);
-        auto timer = std::make_unique<app::GuiTimer>(app);
-        timer->setInterval(app->getDelayedStopTime());
-        timerCallback = [app, this](Item &, Timer &timer) {
-          app->stopCallTimer();
-          setState(State::IDLE);
-          detachTimer(timer);
-          sapm::ApplicationManager::messageSwitchPreviousApplication(app);
-          return true;
-        };
-        app->connect(std::move(timer), this);*/
     }
 
     EventReminderWindow::~EventReminderWindow()
@@ -84,8 +68,11 @@ namespace gui
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         descriptionLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
-        // setFocusItem(descriptionLabel);
         setFocusItem(nullptr);
+    }
+
+    void EventReminderWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
     }
 
     void EventReminderWindow::destroyInterface()
@@ -96,27 +83,13 @@ namespace gui
 
     void EventReminderWindow::startTimer()
     {
+        reminderTimer->connect([=](sys::Timer &) { reminderTimerCallback(); });
         reminderTimer->reload();
-
-        /*if (timerId > 0)
-        {
-            destroyTimer();
-        }
-        timerId = application->CreateTimer(20000, false, "EventReminderWindow_Timer");
-        application->ReloadTimer(timerId);*/
     }
 
     void EventReminderWindow::destroyTimer()
     {
         reminderTimer->stop();
-
-        /*if (timerId == 0)
-        {
-            return;
-        }
-        application->stopTimer(timerId);
-        application->DeleteTimer(timerId);
-        timerId = 0;*/
     }
 
     auto EventReminderWindow::handleSwitchData(SwitchData *data) -> bool
@@ -131,20 +104,9 @@ namespace gui
         }
 
         eventRecord    = item->getData();
-        prevWindowName = item->getWindowName();
-
         dateLabel->setText(TimePointToDateString(eventRecord->date_from));
-        timeLabel->setText(TimePointToTimeString(eventRecord->date_from));
+        timeLabel->setText(TimePointToMinuteTimeString(eventRecord->date_from));
         descriptionLabel->setText(eventRecord->title);
-
-        // setFocusItem(this);
-
-        // application->setActiveWindow("EventReminderWindow");
-
-        /*auto startDate = TimePointToYearMonthDay(eventRecord->date_from);
-        std::string monthStr =
-            utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
-        setTitle(std::to_string(unsigned(startDate.day())) + " " + monthStr);*/
 
         startTimer();
 
@@ -162,19 +124,9 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            /*auto rec  = std::make_unique<EventsRecord>(*eventRecord);
-            auto data = std::make_unique<EventRecordData>(std::move(rec));
-            data->setWindowName(prevWindowName);
-            application->switchWindow(style::window::calendar::name::events_options, std::move(data));*/
-
-            ////timeLabel->setText(TimePointToTimeString(TimePointNow()));
             closeReminder();
             return true;
         }
-        /*else if (inputEvent.keyCode == gui::KeyCode::KEY_2) {
-            closeReminder();
-            return true;
-        }*/
 
         return false;
     }
@@ -192,7 +144,8 @@ namespace gui
         sapm::ApplicationManager::messageSwitchApplication(
             application, "ApplicationDesktop", gui::name::window::main_window, nullptr);
 
-        // TODO: after rework of application switching we would switch here to the last opened window ot the last active
+        // TODO: after rework of application switching we would switch here to the last opened window
+        //  of the last active application
         // application sapm::ApplicationManager::messageSwitchPreviousApplication(application);
     }
 
