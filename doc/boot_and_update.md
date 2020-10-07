@@ -2,20 +2,30 @@
 
 ## Booting Mudita Pure
 
-To follow these steps please make sure that you have the latest `ecoboot` bootloader on the phone. We recommend [version 1.0.1](https://github.com/mudita/ecoboot/releases/tag/1.0.1) which will work even if you manage to break the filesystems in the next steps (it's goot to be prepared).
+To follow these steps please make sure that you have the latest `ecoboot` bootloader on the phone. We recommend [version 1.0.4](https://github.com/mudita/ecoboot/releases/tag/1.0.4) which will work even if you manage to break the filesystems in the next steps (it's goot to be prepared).
 
-1. `ecoboot` reads `/.boot.ini` and `/.boot.ini.crc32` and verifies if `crc32` in `/.boot.ini.crc32` matches the actual `crc32` of `/.boot.ini`
+1. `ecoboot` reads `/.boot.json` and `/.boot.json.crc32` and verifies if `crc32` in `/.boot.json.crc32` matches the actual `crc32` of `/.boot.json`
 
-2. If `ecoboot` can't read `/.boot.ini` and/or `/.boot.ini.crc32` it tries to read `/.boot.ini.bak` and `/.boot.ini.bak.crc32` and verifies the checksum of `/.boot.ini.bak`. If the `/.boot.ini.bak` file passes the checksum test ecoboot should fix `/.boot.ini` and `/.boot.ini.crc32` files so that MuditaOS can pick up what version is booted.
+2. If `ecoboot` can't read `/.boot.json` and/or `/.boot.json.crc32` it tries to read `/.boot.json.bak` and `/.boot.json.bak.crc32` and verifies the checksum of `/.boot.json.bak`. If the `/.boot.json.bak` file passes the checksum test ecoboot should fix `/.boot.json` and `/.boot.json.crc32` files so that MuditaOS can pick up what version is booted (not implemented, ecoboot will fallback to booting /sys/current/boot.bin).
 
-3. If both above steps fail, `ecoboot` reads `/boot.bin` and loads it (failsafe)
+3. If both above steps fail, `ecoboot` reads `/sys/current/boot.bin` and loads it (failsafe)
 
-4. `boot.ini` contains the filename to load in a simple INI format
+4. `boot.json` contains the filename to load in a simple INI format
 
 ```bash
-[global]  
-boot = current/boot.bin  
-type = current  
+{
+    "main": 
+    {
+        "ostype": "current",
+        "imagename": "boot.bin"
+    },
+    "bootloader":
+    {
+        "version":"0.0.0"
+    },
+    "git": {}
+}
+  
 ```
 
 There should be 2 instances of the MuditaOS on the phone (`/sys` is assumed at vfs class creation time).
@@ -25,9 +35,9 @@ There should be 2 instances of the MuditaOS on the phone (`/sys` is assumed at v
 "previous" -> /sys/previous  
 ```
 
-The type variable in `boot.ini` is for MuditaOS - this will indicate a subdirectory name to append for all file operations (loading assets, dbs, etc.) When the option becomes possible, it should be passed as a variable to the `boot.bin` (MuditaOS) as an argument.
+The type variable in `boot.json` is for MuditaOS - this will indicate a subdirectory name to append for all file operations (loading assets, dbs, etc.) When the option becomes possible, it should be passed as a variable to the `boot.bin` (MuditaOS) as an argument.
 
-4. `ecoboot` boots the "**boot**" filename in `boot.ini`. MuditaOS reads `/boot.ini` to find it's root directory and reads all assets and files from it. 
+4. `ecoboot` boots the "**boot**" filename in `boot.json`. MuditaOS reads `boot.json` to find it's root directory and reads all assets and files from it. 
    
 5. Updating from old style partitioning (1 partition) to new partition scheme (2 partitions). In case of problems see pt 6.
 
