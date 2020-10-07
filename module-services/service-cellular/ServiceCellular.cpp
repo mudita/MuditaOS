@@ -47,6 +47,7 @@
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
 #include <at/URC_CUSD.hpp>
+#include <at/URC_CTZE.hpp>
 #include <at/response.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -136,6 +137,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceEvtmgrNotifications);
 
     callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
     callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
@@ -164,11 +166,11 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
+
         std::string message;
         auto msg = identifyNotification(data);
 
         if (msg == std::nullopt) {
-            LOG_INFO("Skipped unknown notification");
             return;
         }
 
@@ -859,6 +861,11 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         break;
     }
+    case MessageType::EVMTimeUpdated: {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        channel->cmd(at::AT::DISABLE_TIME_ZONE_REPORTING);
+        channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
+    } break;
     default:
         break;
 
@@ -1024,6 +1031,12 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
                                                              cusd.message());
+    }
+    auto ctze = at::urc::CTZE(str);
+    if (ctze.is()) {
+        auto msg = std::make_shared<CellularTimeNotificationMessage>(ctze.getTimeInfo());
+        sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
+        return std::nullopt;
     }
 
     // Power Down
@@ -1517,6 +1530,9 @@ bool ServiceCellular::handle_modem_on()
 
 bool ServiceCellular::handle_URCReady()
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
+    channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
     LOG_DEBUG("%s", state.c_str());
     return true;
 }
@@ -1561,7 +1577,6 @@ bool ServiceCellular::handle_fatal_failure()
 bool ServiceCellular::handle_ready()
 {
     LOG_DEBUG("%s", state.c_str());
-
     return true;
 }
 

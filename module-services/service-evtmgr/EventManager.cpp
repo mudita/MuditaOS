@@ -27,11 +27,13 @@
 #include "harness/events/FocusApp.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
+
 #include <cassert>
 
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/common.hpp"
+#include "bsp/rtc/rtc.hpp"
 
 #include <cassert>
 
@@ -45,7 +47,9 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
 
 EventManager::~EventManager()
 {
-    LOG_INFO("[%s] Cleaning resources", GetName().c_str());
+    if (EventWorker != nullptr) {
+        EventWorker->close();
+    }
 }
 
 // Invoked upon receiving data message
@@ -200,6 +204,16 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 break;
             }
             return message;
+        }
+    }
+    else if (msgl->messageType == MessageType::CellularTimeUpdated) {
+        auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            auto time = msg->getTime();
+            bsp::rtc_SetDateTime(&time);
+            LOG_INFO("RTC set by network time.");
+            auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+            sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
         }
     }
     if (handled)
