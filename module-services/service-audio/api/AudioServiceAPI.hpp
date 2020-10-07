@@ -100,11 +100,12 @@ namespace AudioServiceAPI
      * @param playbackType -  type of playback. Not used when profileType is different than playback.
      * @return           Standard service-api return code. Success if suitable.
      */
+    template <typename T>
     audio::RetCode GetSetting(sys::Service *serv,
                               const audio::Setting &setting,
-                              uint32_t &value,
-                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
-                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+                              T &value,
+                              const audio::PlaybackType &playbackType = audio::PlaybackType::None,
+                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
     /** @brief Sets settings. Current profile is taken by default.
      *
      * @param serv - requesting service.
@@ -114,10 +115,11 @@ namespace AudioServiceAPI
      * @param playbackType -  type of playback. Not used when profileType is different than playback.
      * @return           Standard service-api return code. Success if suitable.
      */
+    template <typename T>
     audio::RetCode SetSetting(sys::Service *serv,
                               const audio::Setting &setting,
-                              const uint32_t value,
-                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
-                              const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+                              const T value,
+                              const audio::PlaybackType &playbackType = audio::PlaybackType::None,
+                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
 
 }; // namespace AudioServiceAPI

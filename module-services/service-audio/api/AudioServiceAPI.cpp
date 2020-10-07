@@ -124,11 +124,12 @@ namespace AudioServiceAPI
         return SendAudioRequest(serv, msg)->retCode;
     }
 
+    template <typename T>
     audio::RetCode GetSetting(sys::Service *serv,
                               const audio::Setting &setting,
-                              uint32_t &value,
-                              const audio::Profile::Type &profileType,
-                              const audio::PlaybackType &playbackType)
+                              T &value,
+                              const audio::PlaybackType &playbackType,
+                              const audio::Profile::Type &profileType)
     {
         auto msg  = std::make_shared<AudioGetSetting>(profileType, playbackType, setting);
         auto resp = SendAudioRequest(serv, msg);
@@ -139,16 +140,41 @@ namespace AudioServiceAPI
         return resp->retCode;
     }
 
+    template audio::RetCode GetSetting<uint32_t>(sys::Service *serv,
+                                                 const audio::Setting &setting,
+                                                 uint32_t &value,
+                                                 const audio::PlaybackType &playbackType,
+                                                 const audio::Profile::Type &profileType);
+
+    template audio::RetCode GetSetting<bool>(sys::Service *serv,
+                                             const audio::Setting &setting,
+                                             bool &value,
+                                             const audio::PlaybackType &playbackType,
+                                             const audio::Profile::Type &profileType);
+
+    template <typename T>
     audio::RetCode SetSetting(sys::Service *serv,
                               const audio::Setting &setting,
-                              const uint32_t value,
-                              const audio::Profile::Type &profileType,
-                              const audio::PlaybackType &playbackType)
+                              const T value,
+                              const audio::PlaybackType &playbackType,
+                              const audio::Profile::Type &profileType)
     {
-        auto msg = std::make_shared<AudioSetSetting>(profileType, playbackType, setting, value);
+        auto msg = std::make_shared<AudioSetSetting>(profileType, playbackType, setting, std::to_string(value));
 
         return SendAudioRequest(serv, msg)->retCode;
     }
+
+    template audio::RetCode SetSetting<uint32_t>(sys::Service *serv,
+                                                 const audio::Setting &setting,
+                                                 const uint32_t value,
+                                                 const audio::PlaybackType &playbackType,
+                                                 const audio::Profile::Type &profileType);
+
+    template audio::RetCode SetSetting<bool>(sys::Service *serv,
+                                             const audio::Setting &setting,
+                                             const bool value,
+                                             const audio::PlaybackType &playbackType,
+                                             const audio::Profile::Type &profileType);
 
     std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
     {

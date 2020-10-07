@@ -5,9 +5,6 @@
 #include <time/time_conversion.hpp>
 #include <bsp/rtc/rtc.hpp>
 
-#define MAGIC_ENUM_RANGE_MAX 256
-#include <magic_enum.hpp>
-
 #include <vector>
 #include <string>
 #include <sstream>

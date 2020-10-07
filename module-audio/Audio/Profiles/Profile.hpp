@@ -8,6 +8,11 @@
 
 namespace audio
 {
+    using Volume      = uint32_t;
+    using Gain        = uint32_t;
+    using Position    = float;
+    using Vibrate     = bool;
+    using EnableSound = bool;
 
     class Profile
     {
@@ -42,12 +47,12 @@ namespace audio
 
         static std::unique_ptr<Profile> Create(const Type t,
                                                std::function<int32_t()> callback = nullptr,
-                                               float vol                         = 0,
-                                               float gain                        = 0.0);
+                                               Volume vol                        = 0,
+                                               Gain gain                         = 0);
 
-        void SetOutputVolume(float vol);
+        void SetOutputVolume(Volume vol);
 
-        void SetInputGain(float gain);
+        void SetInputGain(Gain gain);
 
         void SetInOutFlags(uint32_t flags);
 
@@ -57,12 +62,12 @@ namespace audio
 
         void SetInputPath(bsp::AudioDevice::InputPath path);
 
-        float GetOutputVolume() const
+        Volume GetOutputVolume() const
         {
             return audioFormat.outputVolume;
         }
 
-        float GetInputGain() const
+        Gain GetInputGain() const
         {
             return audioFormat.inputGain;
         }
