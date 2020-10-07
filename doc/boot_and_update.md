@@ -6,9 +6,7 @@ To follow these steps please make sure that you have the latest `ecoboot` bootlo
 
 1. `ecoboot` reads `/.boot.ini` and `/.boot.ini.crc32` and verifies if `crc32` in `/.boot.ini.crc32` matches the actual `crc32` of `/.boot.ini`
 
-2. If `ecoboot` can't read `/.boot.ini` and/or `/.boot.ini.crc32` it tries to read `/.boot.ini.bak` and `/.boot.ini.bak.crc32` and verifies the checksum of `/.boot.ini.bak`.
-   
-If the `/.boot.ini.bak` file passes the checksum test ecoboot should fix `/.boot.ini` and `/.boot.ini.crc32` files so that MuditaOS can pick up what version is booted.
+2. If `ecoboot` can't read `/.boot.ini` and/or `/.boot.ini.crc32` it tries to read `/.boot.ini.bak` and `/.boot.ini.bak.crc32` and verifies the checksum of `/.boot.ini.bak`. If the `/.boot.ini.bak` file passes the checksum test ecoboot should fix `/.boot.ini` and `/.boot.ini.crc32` files so that MuditaOS can pick up what version is booted.
 
 3. If both above steps fail, `ecoboot` reads `/boot.bin` and loads it (failsafe)
 
@@ -263,7 +261,7 @@ Done. You can reset PurePhone now
 
 ```
 
-6. In case all of the above fails, try using [gparted](https://gparted.org/) on the destination device. You should see two FAT partitions on a single disk. If that's not the case, use `gparted` to create a new partition table and re-run the partition script.
+9. In case all of the above fails, try using [gparted](https://gparted.org/) on the destination device. You should see two FAT partitions on a single disk. If that's not the case, use `gparted` to create a new partition table and re-run the partition script.
    
 This is how gparted should look like if the disk is OK
    ![Gparted OK](./Images/gparted_ok.png "workflow")
