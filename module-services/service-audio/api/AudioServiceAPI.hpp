@@ -38,7 +38,6 @@ namespace AudioServiceAPI
      * @return audio::Handle Handle to operation to be used in subsequent operations.
      */
     audio::Handle RoutingStart(sys::Service *serv);
-    audio::RetCode RoutingRecordCtrl(sys::Service *serv, bool enable);
     audio::RetCode RoutingMute(sys::Service *serv, bool enable);
     audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable);
     audio::RetCode RoutingHeadset(sys::Service *serv, bool enable);

@@ -69,7 +69,6 @@ sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMod
     return sys::ReturnCodes::Success;
 }
 
-
 constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 {
     return type == audio::PlaybackType::Multimedia;
@@ -312,7 +311,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else if (auto *msg = dynamic_cast<AudioSetSetting *>(msgl)) {
         setSetting(msg->setting, msg->val, msg->profileType, msg->playbackType);
-        responseMsg     = std::make_shared<AudioResponseMessage>(RetCode::Success);
+        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success);
     }
     else if (auto *msg = dynamic_cast<AudioStopMessage *>(msgl)) {
         VibrationStop(msg->token);
@@ -361,13 +360,6 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 else {
                     responseMsg = std::make_shared<AudioResponseMessage>(RetCode::FileDoesntExist);
                 }
-            }
-        } break;
-
-        case MessageType::AudioRoutingRecordCtrl: {
-            if (auto input = audioMux.GetRecordingInput()) {
-                responseMsg = std::make_shared<AudioResponseMessage>((*input)->audio->SendEvent(
-                    msg->enable ? Operation::Event::StartCallRecording : Operation::Event::StopCallRecording));
             }
         } break;
 
