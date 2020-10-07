@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[sms]` Added network time synchronisation.
 * `[gui][desktop]` Added *how-to-unlock-screen-info* window.
 * `[gui]` Added GUI timers capability
 * `[fonts]` Added multiplication and division sign to the font files

@@ -112,6 +112,7 @@ enum class MessageType
     CellularGetAntenna,
     CellularTransmitDtmfTones,
     CellularUSSDRequest,
+    CellularTimeUpdated,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -185,7 +186,7 @@ enum class MessageType
     EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
-
+    EVMTimeUpdated,   // This message is send on every time update.
     // Torch messages
     EVMTorchStateMessage,
 
