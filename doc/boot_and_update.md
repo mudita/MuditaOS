@@ -1,79 +1,69 @@
-1. ecoboot reads /.boot.ini and /.boot.ini.crc32
-   and verifies if crc32 in /.boot.ini.crc32 matches
-   the actual crc32 of /.boot.ini
+# How to boot Mudita Pure and create a storage partition
 
-2. if ecoboot can't read /.boot.ini and/or /.boot.ini.crc32
-   it tries to read /.boot.ini.bak and /.boot.ini.bak.crc32
-   and verifies the checksum of /.boot.ini.bak.
-   If the /.boot.ini.bak file passes the checksum test ecoboot
-   should fix /.boot.ini and /.boot.ini.crc32 files so that
-   PureOS can pick up what version is booted.
+## Booting Mudita Pure
 
-3. if **(1)** and **(2)** fails ecoboot reads `/boot.bin` and loads it 
-   (failsafe)
+To follow these steps please make sure that you have the latest `ecoboot` bootloader on the phone. We recommend [version 1.0.1](https://github.com/mudita/ecoboot/releases/tag/1.0.1) which will work even if you manage to break the filesystems in the next steps (it's goot to be prepared).
 
-4. `boot.ini` contains the filename to load in a
-   simple INI format  
-```
+1. `ecoboot` reads `/.boot.ini` and `/.boot.ini.crc32` and verifies if `crc32` in `/.boot.ini.crc32` matches the actual `crc32` of `/.boot.ini`
+
+2. If `ecoboot` can't read `/.boot.ini` and/or `/.boot.ini.crc32` it tries to read `/.boot.ini.bak` and `/.boot.ini.bak.crc32` and verifies the checksum of `/.boot.ini.bak`.
+   
+If the `/.boot.ini.bak` file passes the checksum test ecoboot should fix `/.boot.ini` and `/.boot.ini.crc32` files so that MuditaOS can pick up what version is booted.
+
+3. If both above steps fail, `ecoboot` reads `/boot.bin` and loads it (failsafe)
+
+4. `boot.ini` contains the filename to load in a simple INI format
+
+```bash
 [global]  
 boot = current/boot.bin  
 type = current  
 ```
 
-There should be 2 instances of the OS on the
-phone (`/sys` is assumed at vfs class creation time)
+There should be 2 instances of the MuditaOS on the phone (`/sys` is assumed at vfs class creation time).
 
-```  
+```bash  
 "current"  -> /sys/current  
 "previous" -> /sys/previous  
 ```
 
-The type variable in `boot.ini` is for the PureOS
-this will indicate a subdirectory name to append
-for all file operations (loading assets dbs etc.) 
-When the option becoms possible this should be passed
-as a variable to the boot.bin (PureOS) as an argument
+The type variable in `boot.ini` is for MuditaOS - this will indicate a subdirectory name to append for all file operations (loading assets, dbs, etc.) When the option becomes possible, it should be passed as a variable to the `boot.bin` (MuditaOS) as an argument.
 
-4. ecoboot boots the "**boot**" filename in `boot.ini`.
-
-   PureOS reads `/boot.ini` to find it's root directory
-   and reads all assets and files from it. 
+4. `ecoboot` boots the "**boot**" filename in `boot.ini`. MuditaOS reads `/boot.ini` to find it's root directory and reads all assets and files from it. 
    
-5. updating from old style partitioning (1 partition)
-   to new partition scheme (2 partitions). In case of problems see pt 6.
-   
-_Make sure you have the latest ecoboot bootloader on the phone
-I 1.1 recommand https://github.com/muditacom/ecoboot/releases/tag/1.1
-that will work even if you manage to break the filesystems in the next steps
-(it's goot to be prepared)_
+5. Updating from old style partitioning (1 partition) to new partition scheme (2 partitions). In case of problems see pt 6.
 
-###### now let's go:
+## Creating a storage partition
  
-switch the phone to MSC mode (bootloader option 4)
+1. Switch the phone to MSC mode (bootloader option 4)
 
-unmount disk from the OS so that it's not used
-find the disk name that is assigned to the phone (sda, sdb etc.)
+2. Unmount disk from the OS so that it's not used
 
-Find out if the disk is mounted (assuming /dev/sda)
-```
-[atom@urethra:~/devel/PurePhone_14/doc]$ cat /etc/mtab | grep /dev/sda | awk '{print $2}'
+3. Find the disk name that is assigned to the phone (sda, sdb etc.)
+
+4. Find out if the disk is mounted (assuming /dev/sda)
+
+```bash
+[atom@nucleus:~/devel/PurePhone_14/doc]$ cat /etc/mtab | grep /dev/sda | awk '{print $2}'
 /mnt
 ```
 
-Umount /dev/sda from /mnt before you do anything else
-```
+5. Unmount `/dev/sda` from `/mnt` before you do anything else
+
+```bash
 # sudo umount /mnt 
 ```
 
-cd into project root dir and run the partitioning script,
+6. Move into the project root directory and run the partitioning script, but:
 
-``replace /dev/sdX with the disk name you found for your phone``
-```
+```bash
 $ sudo ./config/partition_emmc.sh /dev/sdX -f
 ```
-   example output would be:
+**Note:** Replace `/dev/sdX` with the disk name you found for your phone.
+   
+   Example output:
 ```
-[atom@urethra:~/devel/PurePhone_10]$ sudo ./config/partition_emmc.sh /dev/sda -f
+[atom@nucleus:~/devel/PurePhone_10]$ sudo ./config/partition_emmc.sh /dev/sda -f
 /dev/sda is not mounted
 /dev/sda has 2 partitions
 Checking that no-one is using this disk right now ... OK
@@ -121,16 +111,18 @@ FAT: RECOVER /dev/sda2
 mkfs.fat 4.1 (2017-01-24)
 probe new partitions to OS
 ```
-once completed, flash the phone with the latest os build, to do that
-mount the first partition of the phone to any location (ex. /mnt)
 
-`` replace /dev/sdX1 with the disk name``
+7. Once completed, flash the phone with the latest MuditaOS build. To do that
+mount the first partition of the phone to any location (ex. `/mnt`): `$ sudo mount /dev/sdX1 /mnt`
 
-``$ sudo mount /dev/sdX1 /mnt``
+**Note:** Replace `/dev/sdX1` with the disk name on your phone.
 
-now run the flash script (assuming you built your OS in the build-rt1051-Debug folder)
-```
-[atom@urethra:~/devel/PurePhone_10]$ sudo ./flash_eMMC.sh ./build-rt1051-Debug
+8. Run the flash script (assuming you built your MuditaOS in the build-rt1051-Debug folder)
+
+Example output:
+
+```bash
+[atom@nucleus:~/devel/PurePhone_10]$ sudo ./flash_eMMC.sh ./build-rt1051-Debug
 PurePhone remove all files
 Create directories
 PurePhone copy build files
@@ -271,18 +263,13 @@ Done. You can reset PurePhone now
 
 ```
 
-6. In case all above fails, try using gparted on the destination device
-   you should see two FAT partitions on a single disk, if that's not the case
-   use gparted to create a new partition table and re-run the partition script.
+6. In case all of the above fails, try using [gparted](https://gparted.org/) on the destination device. You should see two FAT partitions on a single disk. If that's not the case, use `gparted` to create a new partition table and re-run the partition script.
    
-   This is how gparted should look like if the disk is OK
+This is how gparted should look like if the disk is OK
    ![Gparted OK](./Images/gparted_ok.png "workflow")
    
-   This is a case if the disk is not correct
+This is a case if the disk is not correct
    ![Gparted OK](./Images/gparted_fail.png "workflow")
    
-   If the phone fails to start in MSC mode, you can try using the D1_Flash_Loader
-   program to rescue it. Go to https://github.com/muditacom/D1_eMMC_FlashLoader/ and clone
-   the project. Open it in Ozone and load the .axf file attached in the initial release
-   of the project. This will present the phones eMMC storage to the OS and you can
-   partition it correctly then.
+If the phone fails to start in MSC mode, you can try using the D1_Flash_Loader
+program to rescue it - [clone the GitHub repository](https://github.com/muditacom/D1_eMMC_FlashLoader/), open it in [Ozone](https://www.segger.com/products/development-tools/ozone-j-link-debugger/)) and load the `.axf` file attached in the initial release of the project. This will present the phones eMMC storage to the OS and you can partition it correctly then.
