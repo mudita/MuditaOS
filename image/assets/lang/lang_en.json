@@ -337,6 +337,14 @@
     "settings_lang_DE": "DE",
     "settings_lang_SP": "SP",
     "desktop_powerdown_info1": "Now It is truly...",
-    "desktop_powerdown_info2": "Disabled!!!"
-
+    "desktop_powerdown_info2": "Disabled!!!",
+    "app_desktop_update": "Update",
+    "app_desktop_update_to": "Update to",
+    "app_desktop_update_apply": "Do you want to apply this update?",
+    "app_desktop_update_current": "Current",
+    "app_desktop_update_apply": "Apply update?",
+    "app_desktop_update_start": "Update start",
+    "app_desktop_update_size": "size",
+    "app_desktop_update_bytes": "bytes",
+    "app_desktop_update_unpacking": "Unpacking"
 }
