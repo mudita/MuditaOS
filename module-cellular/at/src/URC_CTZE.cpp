@@ -14,7 +14,8 @@ auto CTZE::what() -> std::string
 struct tm CTZE::getTimeInfo(void)
 {
     struct tm timeinfo;
-    std::string dateTimeStr(tokens[tokensDescription::date] + "," + tokens[tokensDescription::time]);
+    std::string dateTimeStr(tokens[static_cast<uint32_t>(tokensDescription::date)] + "," +
+                            tokens[static_cast<uint32_t>(tokensDescription::time)]);
     utils::findAndReplaceAll(dateTimeStr, "\"", "");
 
     std::stringstream stream(dateTimeStr);
@@ -23,9 +24,9 @@ struct tm CTZE::getTimeInfo(void)
     constexpr uint32_t valueLength = 2;
     constexpr uint32_t signPos     = 0;
 
-    utils::findAndReplaceAll(tokens[tokensDescription::GMTdiference], "\"", "");
-    auto sign  = tokens[tokensDescription::GMTdiference].substr(signPos, signLenght);
-    auto value = tokens[tokensDescription::GMTdiference].substr(signLenght, valueLength);
+    utils::findAndReplaceAll(tokens[static_cast<uint32_t>(tokensDescription::GMTdiference)], "\"", "");
+    auto sign  = tokens[static_cast<uint32_t>(tokensDescription::GMTdiference)].substr(signPos, signLenght);
+    auto value = tokens[static_cast<uint32_t>(tokensDescription::GMTdiference)].substr(signLenght, valueLength);
 
     uint32_t offset;
     if (utils::toNumeric(value, offset)) {

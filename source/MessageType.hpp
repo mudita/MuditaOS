@@ -112,6 +112,7 @@ enum class MessageType
     CellularGetAntenna,
     CellularTransmitDtmfTones,
     CellularUSSDRequest,
+    CellularTimeUpdated,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -139,9 +140,7 @@ enum class MessageType
     AudioRoutingSpeakerhone,
     AudioRoutingHeadset,
 
-    AudioSetOutputVolume,
     AudioSetInputGain,
-    AudioGetOutputVolume,
     AudioGetInputGain,
     AudioGetFileTags,
 

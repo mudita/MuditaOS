@@ -27,7 +27,6 @@
 #include "harness/events/FocusApp.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <at/URC_CTZE.hpp>
 
 #include <cassert>
 
@@ -44,7 +43,6 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
     alarmTimestamp = 0;
     alarmID        = 0;
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
 EventManager::~EventManager()
@@ -209,17 +207,14 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             return message;
         }
     }
-    else if (msgl->messageType == MessageType::CellularNotification) {
-        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+    else if (msgl->messageType == MessageType::CellularTimeUpdated) {
+        auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
         if (msg != nullptr) {
-            if (msg->type == CellularNotificationMessage::Type::NetworkTimeUpdated) {
-                auto ctze     = at::urc::CTZE(msg->data);
-                auto timeinfo = ctze.getTimeInfo();
-                bsp::rtc_SetDateTime(&timeinfo);
+            auto time = msg->getTime();
+            bsp::rtc_SetDateTime(&time);
 
-                auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
-                sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
-            }
+            auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+            sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
         }
     }
     if (handled)

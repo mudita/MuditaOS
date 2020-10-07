@@ -9,13 +9,15 @@ namespace sys
     {
         System,
         SystemManagerRequests,
-        PowerManagerRequests
-#ifndef MODULE_CORE_CUSTOM_BUS
-
-#else
-        ,
-#include "BusChannelsCustom.hpp"
-#endif
+        PowerManagerRequests,
+        ServiceCellularNotifications,
+        Test2CustomBusChannel,
+        ServiceDBNotifications,
+        ServiceAudioNotifications,
+        AppManagerNotifications,
+        ServiceFotaNotifications,
+        AntennaNotifications,
+        ServiceEvtmgrNotifications
     };
 
     enum class ServicePriority

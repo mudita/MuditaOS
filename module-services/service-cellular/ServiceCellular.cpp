@@ -47,6 +47,7 @@
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
 #include <at/URC_CUSD.hpp>
+#include <at/URC_CTZE.hpp>
 #include <at/response.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -170,7 +171,6 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         auto msg = identifyNotification(data);
 
         if (msg == std::nullopt) {
-            LOG_INFO("Skipped unknown notification");
             return;
         }
 
@@ -1032,13 +1032,11 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
                                                              cusd.message());
     }
-    if (str.find("+CTZE: ") != std::string::npos) {
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
-                                                             str);
-    }
-    if (str.find("+CTZE: ") != std::string::npos) {
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkTimeUpdated,
-                                                             str);
+    auto ctze = at::urc::CTZE(str);
+    if (ctze.is()) {
+        auto msg = std::make_shared<CellularTimeNotificationMessage>(ctze.getTimeInfo());
+        sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
+        return std::nullopt;
     }
 
     // Power Down

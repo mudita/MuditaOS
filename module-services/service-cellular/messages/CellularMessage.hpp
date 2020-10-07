@@ -71,7 +71,6 @@ class CellularNotificationMessage : public CellularMessage
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
         NewIncomingUSSD,          // modem received new ussd code from network
-        NetworkTimeUpdated        // modem informed it has updated time
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -86,7 +85,20 @@ class CellularNotificationMessage : public CellularMessage
     Type type;
     std::string data;
 };
+class CellularTimeNotificationMessage : public CellularMessage
+{
+  private:
+    struct tm time;
 
+  public:
+    CellularTimeNotificationMessage() = delete;
+    CellularTimeNotificationMessage(struct tm time) : CellularMessage(MessageType::CellularTimeUpdated), time(time)
+    {}
+    struct tm getTime(void)
+    {
+        return time;
+    }
+};
 class CellularUSSDMessage : public CellularMessage
 {
   public:

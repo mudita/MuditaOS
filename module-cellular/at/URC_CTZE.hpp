@@ -13,7 +13,7 @@ namespace at::urc
         ~CTZE() override = default;
         auto what() -> std::string final;
 
-        enum tokensDescription
+        enum class tokensDescription
         {
             GMTdiference,
             daylightSavingsAdjustment,
