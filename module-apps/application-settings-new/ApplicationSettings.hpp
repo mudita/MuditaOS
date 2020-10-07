@@ -23,6 +23,9 @@ namespace gui::window::name
     inline const std::string input_language = "InputLanguage";
     inline const std::string locked_screen  = "LockedScreen";
 
+    inline const std::string messages = "Messages";
+    inline const std::string torch    = "Torch";
+
     inline const std::string display_and_keypad = "DisplayAndKeypad";
 
 } // namespace gui::window::name
