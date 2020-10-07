@@ -135,7 +135,6 @@ enum class MessageType
     AudioPause,
     AudioResume,
 
-    AudioRoutingRecordCtrl,
     AudioRoutingMute,
     AudioRoutingSpeakerhone,
     AudioRoutingHeadset,

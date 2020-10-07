@@ -64,8 +64,6 @@ namespace audio
             BTHeadsetOff,
             BTA2DPOn,
             BTA2DPOff,
-            StartCallRecording,
-            StopCallRecording,
             CallMute,
             CallUnmute,
             CallSpeakerphoneOn,
@@ -139,14 +137,14 @@ namespace audio
       protected:
         std::shared_ptr<Profile> currentProfile;
         std::vector<std::shared_ptr<Profile>> availableProfiles;
-        State state                                             = State::Idle;
+        State state = State::Idle;
         audio::AsyncCallback eventCallback;
 
         audio::Token operationToken;
         Type opType = Type::Idle;
         std::string filePath;
 
-        bool isInitialized = false;
+        bool isInitialized               = false;
         audio::PlaybackType playbackType = audio::PlaybackType::None;
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
