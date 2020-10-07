@@ -57,18 +57,10 @@ namespace AudioServiceAPI
         return Handle(ret->retCode, ret->token);
     }
 
-    audio::RetCode RoutingRecordCtrl(sys::Service *serv, bool enable)
-    {
-        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingRecordCtrl);
-        msg->enable = enable;
-
-        return SendAudioRequest(serv, msg)->retCode;
-    }
-
     audio::RetCode RoutingMute(sys::Service *serv, bool enable)
     {
-        auto msg                                 = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
-        msg->enable                              = enable;
+        auto msg    = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
+        msg->enable = enable;
 
         return SendAudioRequest(serv, msg)->retCode;
     }
@@ -178,8 +170,8 @@ namespace AudioServiceAPI
 
     std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
     {
-        auto msg                                 = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
-        msg->fileName                            = fileName;
+        auto msg      = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
+        msg->fileName = fileName;
 
         auto resp = SendAudioRequest(serv, msg);
         if (resp->retCode == audio::RetCode::Success) {
