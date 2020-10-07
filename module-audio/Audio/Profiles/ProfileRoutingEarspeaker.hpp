@@ -17,7 +17,7 @@ namespace audio
     class ProfileRoutingEarspeaker : public Profile
     {
       public:
-        ProfileRoutingEarspeaker(std::function<int32_t()> callback, float volume, float gain)
+        ProfileRoutingEarspeaker(std::function<int32_t()> callback, Volume volume, Gain gain)
             : Profile("Routing Earspeaker",
                       Type::RoutingEarspeaker,
                       bsp::AudioDevice::Format{
@@ -26,8 +26,8 @@ namespace audio
                           .flags         = static_cast<uint32_t>(
                                        bsp::AudioDevice::Flags::InputLeft) | // microphone use left audio channel
                                    static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono),
-                          .outputVolume = volume,
-                          .inputGain    = gain,
+                          .outputVolume = static_cast<float>(volume),
+                          .inputGain    = static_cast<float>(gain),
                           .inputPath    = bsp::AudioDevice::InputPath::Microphone,
                           .outputPath   = bsp::AudioDevice::OutputPath::Earspeaker},
                       bsp::AudioDevice::Type::Audiocodec,

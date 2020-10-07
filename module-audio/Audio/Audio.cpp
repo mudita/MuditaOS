@@ -128,7 +128,7 @@ namespace audio
 
         auto retStop = currentOperation->Stop();
         if (retStop != RetCode::Success) {
-            LOG_ERROR("Operation STOP failure: %s", audio::c_str(retStop));
+            LOG_ERROR("Operation STOP failure: %s", audio::str(retStop).c_str());
         }
 
         auto ret = Operation::Create(Operation::Type::Idle);

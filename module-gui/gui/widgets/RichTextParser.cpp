@@ -5,6 +5,7 @@
 #include "TextDocument.hpp"
 #include <sstream>
 #include <string>
+#include <map>
 #include <log/log.hpp>
 #include "TextFormat.hpp"
 
@@ -27,7 +28,7 @@ namespace text
 
       public:
         Attribute() = delete;
-        /// return true on success, othervise set fallback value and return false
+        /// return true on success, otherwise set fallback value and return false
         /// @note could run: preVisitHook -> visit -> postVisit hook
         virtual auto visit(gui::TextFormat &fmt, std::string value) -> bool = 0;
         [[nodiscard]] auto getName() const -> const std::string &
@@ -162,12 +163,13 @@ namespace text
 
     class AttributeWeight : public Attribute
     {
+      protected:
         const std::string regular = "regular";
         const std::string bold    = "bold";
         const std::string light   = "light";
 
       public:
-        AttributeWeight() : Attribute("weight")
+        AttributeWeight() : Attribute(gui::text::weight)
         {}
 
         auto visit(gui::TextFormat &fmt, std::string value) -> bool final
@@ -233,6 +235,40 @@ namespace text
             return *ptr;
         }
     };
+
+    class ShortTextNodes
+    {
+        using SingleAttributedNode = std::map<std::string, std::pair<std::string, std::string>>;
+        static const SingleAttributedNode nodes;
+
+      public:
+        enum class AttributeContent
+        {
+            Name,
+            Value
+        };
+
+        [[nodiscard]] static auto is(const char *nodeName) -> bool
+        {
+            return static_cast<bool>(nodes.count(std::string(nodeName)));
+        }
+
+        [[nodiscard]] static auto get(const char *nodeName, AttributeContent content) -> std::optional<std::string>
+        {
+            try {
+                auto attribute = nodes.at(nodeName);
+                return std::optional<std::string>(content == AttributeContent::Name ? attribute.first
+                                                                                    : attribute.second);
+            }
+            catch (std::out_of_range &) {
+                LOG_ERROR("ShortTextNode: %s not found", nodeName);
+                return {};
+            }
+        }
+    };
+
+    const ShortTextNodes::SingleAttributedNode ShortTextNodes::nodes = {
+        {gui::text::short_bold, {gui::text::weight, gui::text::bold}}};
 }; // namespace text
 
 struct walker : pugi::xml_tree_walker
@@ -273,6 +309,11 @@ struct walker : pugi::xml_tree_walker
         return std::string(node.name()) == gui::text::node_br || std::string(node.name()) == gui::text::node_p;
     }
 
+    auto is_short_text_node(pugi::xml_node &node) const
+    {
+        return text::ShortTextNodes::is(node.name());
+    }
+
     auto push_text_node(pugi::xml_node &node)
     {
         auto local_style = style_stack.back();
@@ -283,6 +324,21 @@ struct walker : pugi::xml_tree_walker
         }
         style_stack.push_back(local_style);
         log_parser("Attr loaded: %s", style_stack.back().str().c_str());
+    }
+
+    auto push_short_text_node(pugi::xml_node &node)
+    {
+        log_parser("shortened text node name: %s", node.name());
+        auto local_style = style_stack.back();
+        auto &decor      = text::NodeDecor::get();
+
+        auto attrName  = text::ShortTextNodes::get(node.name(), text::ShortTextNodes::AttributeContent::Name);
+        auto attrValue = text::ShortTextNodes::get(node.name(), text::ShortTextNodes::AttributeContent::Value);
+        if (attrName.has_value() && attrValue.has_value()) {
+            decor.stack_visit(local_style, attrName.value(), attrValue.value());
+            style_stack.push_back(local_style);
+            log_parser("Attr loaded: %s", style_stack.back().str().c_str());
+        }
     }
 
     auto push_newline_node(pugi::xml_node &)
@@ -303,6 +359,10 @@ struct walker : pugi::xml_tree_walker
         if (node.type() == pugi::xml_node_type::node_element) {
             if (std::string(node.name()) == gui::text::node_text) {
                 push_text_node(node);
+                return true;
+            }
+            if (is_short_text_node(node)) {
+                push_short_text_node(node);
                 return true;
             }
             if (is_newline_node(node)) {
@@ -335,7 +395,7 @@ struct walker : pugi::xml_tree_walker
         log_node(node, Action::Exit);
 
         if (node.type() == pugi::xml_node_type::node_element) {
-            if (std::string(node.name()) == gui::text::node_text) {
+            if (std::string(node.name()) == gui::text::node_text || is_short_text_node(node)) {
                 pop_text_node(node);
                 return true;
             }

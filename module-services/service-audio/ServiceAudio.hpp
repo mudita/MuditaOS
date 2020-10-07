@@ -69,25 +69,7 @@ class ServiceAudio : public sys::Service
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
 
-    template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
-    {
-        auto [code, msg] = DBServiceAPI::GetQueryWithReply(
-            this,
-            db::Interface::Name::Settings_v2,
-            std::make_unique<db::query::settings::AddOrIgnoreQuery>(
-                SettingsRecord_v2{SettingsTableRow_v2{{.ID = DB_ID_NONE},
-                                                      .path  = profilePath,
-                                                      .value = std::to_string(static_cast<uint32_t>(defaultValue))}}),
-            audio::audioOperationTimeout);
-
-        if (code == sys::ReturnCodes::Success && msg != nullptr) {
-            auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-            assert(queryResponse != nullptr);
-
-            auto settingsResultResponse = queryResponse->getResult();
-            assert(dynamic_cast<db::query::settings::AddOrIgnoreResult *>(settingsResultResponse.get()) != nullptr);
-        }
-    }
+    void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
 
     template <typename T>[[nodiscard]] T fetchAudioSettingFromDb(const std::string &profilePath, const T &defaultValue)
     {
@@ -110,18 +92,19 @@ class ServiceAudio : public sys::Service
         return defaultValue;
     }
 
-    void setCurrentSetting(const audio::Setting &setting, const uint32_t &value);
+    void setCurrentSetting(const audio::Setting &setting, const std::string &value);
     void setCurrentVolume(const uint32_t &value);
     void setSetting(const audio::Setting &setting,
-                    const uint32_t value,
+                    const std::string &value,
                     const audio::Profile::Type &profileType,
                     const audio::PlaybackType &playbackType);
-    [[nodiscard]] uint32_t getSetting(const audio::Setting &setting,
-                                      const audio::Profile::Type &profileType,
-                                      const audio::PlaybackType &playbackType);
-    std::optional<uint32_t> getCurrentSetting(const audio::Setting &setting);
-    void updateDbValue(const std::string &path, const audio::Setting &setting, const uint32_t &value);
+    [[nodiscard]] std::string getSetting(const audio::Setting &setting,
+                                         const audio::Profile::Type &profileType,
+                                         const audio::PlaybackType &playbackType);
+    std::optional<std::string> getCurrentSetting(const audio::Setting &setting);
+    void updateDbValue(const std::string &path, const audio::Setting &setting, const std::string &value);
     void updateDbValue(const audio::Operation *currentOperation, const audio::Setting &setting, const uint32_t &value);
+    void updateDbValue(const audio::Operation *currentOperation, const audio::Setting &setting, const bool &value);
 };
 
 #endif // PUREPHONE_SERVICEAUDIO_HPP

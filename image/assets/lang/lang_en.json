@@ -147,7 +147,7 @@
     "app_desktop_sim_type_pin": "please type a PIN code:",
     "app_desktop_sim_blocked": "The SIM card is blocked.",
     "app_desktop_sim_type_puk": "To unblock it, type the PUK code:",
-    "app_desktop_no_pin_lock": "Press Unlock and then #",
+    "app_desktop_no_pin_lock": "<text>Press <b>Unlock</b> and then <b>#</b></text>",
     "app_desktop_sim_wrong_pin": "Wrong PIN code",
     "app_desktop_sim_wrong_puk": "Wrong PUK code",
     "app_desktop_sim_you_have": "You have",

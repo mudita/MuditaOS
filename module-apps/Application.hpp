@@ -221,7 +221,7 @@ namespace app
                        const audio::Profile::Type &profileType,
                        const audio::PlaybackType &playbackType)
         {
-            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, profileType, playbackType);
+            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, playbackType, profileType);
         }
 
         bool adjustCurrentVolume(const int step);

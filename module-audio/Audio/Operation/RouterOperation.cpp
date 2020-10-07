@@ -1,45 +1,34 @@
-/*
- *  @file RouterOperation.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 25.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
 #include "RouterOperation.hpp"
 
-#include "../Profiles/ProfileRoutingEarspeaker.hpp"
-#include "../Profiles/ProfileRoutingHeadset.hpp"
-#include "../Profiles/ProfileRoutingSpeakerphone.hpp"
+#include <Audio/AudioCommon.hpp>
+#include <Audio/Profiles/Profile.hpp>
 
-#include "log/log.hpp"
+#include <bsp_audio.hpp>
+#include <log/log.hpp>
+
+#include <optional>
+#include <cstring>
 
 namespace audio
 {
 
     RouterOperation::RouterOperation(
         [[maybe_unused]] const char *file,
-        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
+        std::function<std::uint32_t(const std::string &path, const std::uint32_t &defaultValue)> dbCallback)
     {
 
         audioDeviceCallback =
-            [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
+            [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> std::int32_t {
             if (inputBuffer != nullptr) {
                 if (framesPerBuffer > audioDeviceBuffer.size()) {
                     audioDeviceBuffer.resize(framesPerBuffer, 0);
                 }
 
                 if (muteEnable) {
-                    memset(&audioDeviceBuffer[0], 0, framesPerBuffer * sizeof(int16_t));
+                    memset(&audioDeviceBuffer[0], 0, framesPerBuffer * sizeof(std::int16_t));
                 }
                 else {
-                    memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-                }
-
-                if (recorderWorkerHandle) {
-                    channel1Buffer = audioDeviceBuffer;
-                    xTaskNotify(recorderWorkerHandle, static_cast<uint32_t>(RecorderEvent ::Channel1Ready), eSetBits);
+                    memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(std::int16_t));
                 }
             }
 
@@ -48,24 +37,19 @@ namespace audio
                     audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
                 }
 
-                memcpy(outputBuffer, &audioDeviceCellularBuffer[0], framesPerBuffer * sizeof(int16_t));
+                memcpy(outputBuffer, &audioDeviceCellularBuffer[0], framesPerBuffer * sizeof(std::int16_t));
             }
             return framesPerBuffer;
         };
 
         audioDeviceCellularCallback =
-            [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
+            [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> std::int32_t {
             if (inputBuffer != nullptr) {
                 if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
                     audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
                 }
 
-                memcpy(&audioDeviceCellularBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-
-                if (recorderWorkerHandle) {
-                    channel2Buffer = audioDeviceCellularBuffer;
-                    xTaskNotify(recorderWorkerHandle, static_cast<uint32_t>(RecorderEvent::Channel2Ready), eSetBits);
-                }
+                memcpy(&audioDeviceCellularBuffer[0], inputBuffer, framesPerBuffer * sizeof(std::int16_t));
             }
 
             if (outputBuffer != nullptr) {
@@ -73,7 +57,7 @@ namespace audio
                     audioDeviceBuffer.resize(framesPerBuffer, 0);
                 }
 
-                memcpy(outputBuffer, &audioDeviceBuffer[0], framesPerBuffer * sizeof(int16_t));
+                memcpy(outputBuffer, &audioDeviceBuffer[0], framesPerBuffer * sizeof(std::int16_t));
             }
             return framesPerBuffer;
         };
@@ -89,22 +73,23 @@ namespace audio
         constexpr audio::Volume defaultRoutingHeadsetVolume      = 10;
 
         const auto dbRoutingEarspeakerGainPath =
-            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::Setting::Gain);
+            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
         const auto routingEarspeakerGain = dbCallback(dbRoutingEarspeakerGainPath, defaultRoutingEarspeakerGain);
         const auto dbRoutingEarspeakerVolumePath =
-            audio::str(audio::Profile::Type::RoutingEarspeaker, audio::Setting::Volume);
+            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
         const auto routingEarspeakerVolume = dbCallback(dbRoutingEarspeakerVolumePath, defaultRoutingEarspeakerVolume);
         const auto dbRoutingSpeakerphoneGainPath =
-            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::Setting::Gain);
+            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
         const auto routingSpeakerphoneGain = dbCallback(dbRoutingSpeakerphoneGainPath, defaultRoutingSpeakerphoneGain);
         const auto dbRoutingSpeakerphoneVolumePath =
-            audio::str(audio::Profile::Type::RoutingSpeakerphone, audio::Setting::Volume);
+            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
         const auto routingSpeakerphoneVolume =
             dbCallback(dbRoutingSpeakerphoneVolumePath, defaultRoutingSpeakerphoneVolume);
-        const auto dbRoutingHeadsetGainPath = audio::str(audio::Profile::Type::RoutingHeadset, audio::Setting::Gain);
+        const auto dbRoutingHeadsetGainPath =
+            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
         const auto routingHeadsetGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadsetGain);
         const auto dbRoutingHeadsetVolumePath =
-            audio::str(audio::Profile::Type::RoutingHeadset, audio::Setting::Volume);
+            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
         const auto routingHeadsetVolume = dbCallback(dbRoutingHeadsetVolumePath, defaultRoutingHeadsetVolume);
 
         availableProfiles.push_back(
@@ -133,11 +118,6 @@ namespace audio
         isInitialized = true;
     }
 
-    RouterOperation::~RouterOperation()
-    {
-        StopRecording();
-    }
-
     audio::RetCode RouterOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
@@ -158,13 +138,13 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
-        eventCallback = callback;
-        state         = State::Active;
+        eventCallback  = callback;
+        state          = State::Active;
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
             auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
             if (ret != bsp::AudioDevice::RetCode::Success) {
-                LOG_ERROR("Start error: %s", audio::c_str(audio::RetCode::DeviceFailure));
+                LOG_ERROR("Start error: %s", audio::str(audio::RetCode::DeviceFailure).c_str());
             }
         }
         else {
@@ -190,7 +170,6 @@ namespace audio
         audioDevice->Stop();
         audioDeviceCellular->Stop();
 
-        StopRecording();
         return RetCode::Success;
     }
 
@@ -225,20 +204,11 @@ namespace audio
             SwitchProfile(Profile::Type::RoutingHeadset);
             break;
         case Event::HeadphonesUnplug:
-            // TODO: Switch to routing bt profile if present
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         case Event::BTHeadsetOn:
-            // TODO:M.P SwitchProfile(Profile::Type::RecordingBTHeadset);
             break;
         case Event::BTHeadsetOff:
-            // TODO:M.P SwitchProfile(Profile::Type::RecordingBuiltInMic);
-            break;
-        case Event::StartCallRecording:
-            // StartRecording(); TODO: M.P For now it's still in development
-            break;
-        case Event::StopCallRecording:
-            // StopRecording(); TODO: M.P For now it's still in development
             break;
         case Event ::CallMute:
             Mute(true);
@@ -250,7 +220,6 @@ namespace audio
             SwitchProfile(Profile::Type::RoutingSpeakerphone);
             break;
         case Event ::CallSpeakerphoneOff:
-            // TODO: Switch to routing headphones/bt profile if present
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         default:
@@ -295,107 +264,9 @@ namespace audio
         return true;
     }
 
-    audio::RetCode RouterOperation::StartRecording()
+    Position RouterOperation::GetPosition()
     {
-        channel1Buffer.reserve(1024);
-        channel2Buffer.reserve(1024);
-        mixBuffer.reserve(1024);
-
-        uint32_t channels = 0;
-        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(bsp::AudioDevice::Flags::InputLeft)) ||
-            (currentProfile->GetInOutFlags() & static_cast<uint32_t>(bsp::AudioDevice::Flags::InputRight))) {
-            channels = 1;
-        }
-        else if (currentProfile->GetInOutFlags() & static_cast<uint32_t>(bsp::AudioDevice::Flags::InputStereo)) {
-            channels = 2;
-        }
-
-        // TODO:M.P create record file's name dynamically based on current date/time
-        enc = Encoder::Create("sys/callrec.wav",
-                              Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
-
-        if (enc == nullptr) {
-            return RetCode::FileDoesntExist;
-        }
-
-        if (xTaskCreate(recorderWorker, "recworker", 512, this, 0, &recorderWorkerHandle) != pdPASS) {
-            LOG_ERROR("Creating recworker failed");
-            return RetCode::FailedToAllocateMemory;
-        }
-
-        return RetCode::Success;
-    }
-
-    audio::RetCode RouterOperation::StopRecording()
-    {
-        cpp_freertos::LockGuard lock(mutex);
-        if (recorderWorkerHandle) {
-            vTaskDelete(recorderWorkerHandle);
-            enc.reset();
-        }
-        return RetCode::Success;
-    }
-
-    void recorderWorker(void *pvp)
-    {
-        uint32_t ulNotificationValue = 0;
-        RouterOperation *inst        = reinterpret_cast<RouterOperation *>(pvp);
-        static bool chan1_ready      = 0;
-        static bool chan2_ready      = 0;
-
-        while (1) {
-            xTaskNotifyWait(0x00,                 /* Don't clear any bits on entry. */
-                            UINT32_MAX,           /* Clear all bits on exit. */
-                            &ulNotificationValue, /* Receives the notification value. */
-                            portMAX_DELAY);       /* Block indefinitely. */
-            {
-                cpp_freertos::LockGuard lock(inst->mutex);
-
-                if (ulNotificationValue & static_cast<uint32_t>(RouterOperation::RecorderEvent::Channel1Ready)) {
-                    chan1_ready = true;
-                }
-
-                if (ulNotificationValue & static_cast<uint32_t>(RouterOperation::RecorderEvent::Channel2Ready)) {
-                    chan2_ready = true;
-                }
-
-                int16_t *chan1_ptr   = &inst->channel1Buffer[0];
-                int16_t *chan2_ptr   = &inst->channel2Buffer[0];
-                int16_t *mixed_ptr   = &inst->mixBuffer[0];
-                int32_t mixed_sample = 0;
-
-                inst->mixBuffer.resize(inst->channel1Buffer.size());
-
-                // Mix samples & encode them
-                if (chan1_ready && chan2_ready) {
-
-                    for (uint32_t i = 0; i < inst->mixBuffer.size(); i++) {
-                        mixed_sample = *chan1_ptr + *chan2_ptr;
-                        if (mixed_sample > INT16_MAX) {
-                            *mixed_ptr = INT16_MAX;
-                        }
-                        else if (mixed_sample < INT16_MIN) {
-                            *mixed_ptr = INT16_MIN;
-                        }
-                        else {
-                            *mixed_ptr = (int16_t)mixed_sample;
-                        }
-
-                        mixed_ptr++;
-                        chan1_ptr++;
-                        chan2_ptr++;
-                    }
-
-                    size_t bytesWritten = inst->enc->Encode(inst->mixBuffer.size(), &inst->mixBuffer[0]);
-                    if (bytesWritten == 0) {
-                        LOG_ERROR("Encoder failed");
-                    }
-
-                    chan1_ready = false;
-                    chan2_ready = false;
-                }
-            }
-        }
+        return 0.0;
     }
 
 } // namespace audio

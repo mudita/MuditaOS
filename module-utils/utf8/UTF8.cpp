@@ -607,7 +607,7 @@ bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
 // 0000 0080-0000 07FF | 110xxxxx 10xxxxxx
 // 0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
 // 0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-bool UTF8::encode(const uint16_t &code, uint32_t &dest, uint32_t &length)
+bool UTF8::encode(const uint32_t &code, uint32_t &dest, uint32_t &length)
 {
 
     dest   = 0;

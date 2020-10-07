@@ -1,6 +1,8 @@
 #include "AudioCommon.hpp"
 #include <cmath>
 #include <sstream>
+#include <Utils.hpp>
+#include "Profiles/Profile.hpp"
 
 namespace audio
 {
@@ -13,76 +15,25 @@ namespace audio
         return RetCode::DeviceFailure;
     }
 
-    const char *c_str(RetCode retcode)
+    const std::string str(RetCode retcode)
     {
-        switch (retcode) {
-        case RetCode::Success:
-            return "Success";
-        case RetCode::InvokedInIncorrectState:
-            return "InvokedInIncorrectState";
-        case RetCode::UnsupportedProfile:
-            return "UnsupportedProfile";
-        case RetCode::UnsupportedEvent:
-            return "UnsupportedEvent";
-        case RetCode::InvalidFormat:
-            return "InvalidFormat";
-        case RetCode::OperationCreateFailed:
-            return "OperationCreateFailed";
-        case RetCode::FileDoesntExist:
-            return "FileDoesntExist";
-        case RetCode::FailedToAllocateMemory:
-            return "FailedToAllocateMemory";
-        case RetCode::OperationNotSet:
-            return "OperationNotSet";
-        case RetCode::ProfileNotSet:
-            return "ProfileNotSet";
-        case RetCode::DeviceFailure:
-            return "DeviceFailure";
-        case RetCode::Failed:
-            return "Failed";
-        }
-        return "";
+        return utils::enumToString(retcode);
     }
 
     const std::string str(const PlaybackType &playbackType) noexcept
     {
-        switch (playbackType) {
-        case PlaybackType::None: {
+        if (playbackType == PlaybackType::None) {
             return "";
         }
-        case PlaybackType::Multimedia: {
-            return "Multimedia";
-        }
-        case PlaybackType::Notifications: {
-            return "Notifications";
-        }
-        case PlaybackType::KeypadSound: {
-            return "KeypadSound";
-        }
-        case PlaybackType::CallRingtone: {
-            return "CallRingtone";
-        }
-        case PlaybackType::TextMessageRingtone: {
-            return "TextMessageRingtone";
-        }
-        }
-        return "";
+        return utils::enumToString(playbackType);
     }
 
     const std::string str(const Setting &setting) noexcept
     {
-        switch (setting) {
-        case Setting::Volume:
-            return "volume";
-            break;
-        case Setting::Gain:
-            return "gain";
-            break;
-        }
-        return "";
+        return utils::enumToString(setting);
     }
 
-    const std::string str(const Profile::Type &profileType, const Setting &setup, const PlaybackType &playbackType)
+    const std::string str(const Setting &setting, const PlaybackType &playbackType, const Profile::Type &profileType)
     {
         std::stringstream ss;
         const auto typeStr = str(profileType);
@@ -91,18 +42,18 @@ namespace audio
         }
         const auto op = str(playbackType);
         if (op.empty()) {
-            ss << "audio/" << str(profileType) << "/" << str(setup);
+            ss << "audio/" << str(profileType) << "/" << str(setting);
         }
         else {
-            ss << "audio/" << str(profileType) << "/" << str(playbackType) << "/" << str(setup);
+            ss << "audio/" << str(profileType) << "/" << str(playbackType) << "/" << str(setting);
         }
         return ss.str();
     }
 
-    const std::string str(const PlaybackType &playbackType, const Setting &setup, const bool headphonesInserted)
+    const std::string str(const Setting &setting, const PlaybackType &playbackType, const bool headphonesInserted)
     {
-        const auto playbackCall = (headphonesInserted) ? str(Profile::Type::PlaybackHeadphones, setup, playbackType)
-                                                       : str(Profile::Type::PlaybackLoudspeaker, setup, playbackType);
+        const auto playbackCall = (headphonesInserted) ? str(setting, playbackType, Profile::Type::PlaybackHeadphones)
+                                                       : str(setting, playbackType, Profile::Type::PlaybackLoudspeaker);
         switch (playbackType) {
         case PlaybackType::None: {
             return "";
@@ -124,6 +75,17 @@ namespace audio
         }
         }
         return "";
+    }
+
+    const std::string str(const Setting &setting, const PlaybackType &playbackType)
+    {
+        std::stringstream ss;
+        const auto txtPlaybackType = str(playbackType);
+        if (txtPlaybackType.empty()) {
+            return "";
+        }
+        ss << "audio/" << txtPlaybackType << "/" << str(setting);
+        return ss.str();
     }
 
     auto GetVolumeText(const audio::Volume &volume) -> const std::string

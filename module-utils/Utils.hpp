@@ -5,6 +5,9 @@
 #include <sstream>
 #include <iomanip>
 
+#define MAGIC_ENUM_RANGE_MAX 256
+#include <magic_enum.hpp>
+
 namespace utils
 {
     static const std::string WHITESPACE = " \n\r\t\f\v";
@@ -89,6 +92,27 @@ namespace utils
         std::ostringstream ss;
         ss << std::setfill(leadingDigit) << std::setw(minStringLength) << t;
         return ss.str();
+    }
+
+    template <typename T>[[nodiscard]] const std::string enumToString(const T &t)
+    {
+        static_assert(std::is_enum_v<T>);
+        return std::string(magic_enum::enum_name(t));
+    }
+
+    /// Gets value of type T from string
+    ///
+    /// @param value to be converted
+    /// @return Value casted to type T
+    template <typename T>[[nodiscard]] T getValue(const std::string &value)
+    {
+        static_assert(std::is_arithmetic_v<T>);
+        if (value.empty()) {
+            return {};
+        }
+        T ret;
+        std::istringstream(value) >> ret;
+        return ret;
     }
 
     static inline void findAndReplaceAll(std::string &data,
