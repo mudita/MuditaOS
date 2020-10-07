@@ -52,7 +52,7 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        titleLabel->setText("Apply update?");
+        titleLabel->setText(utils::localize.get("app_desktop_update"));
 
         // Update version information
         updateVersionInfo = new gui::Label(this, 10, 132, 480, 40);
@@ -62,7 +62,7 @@ namespace gui
         updateVersionInfo->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         updateVersionInfo->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        updateVersionInfo->setText("Update: ");
+        updateVersionInfo->setText(utils::localize.get("app_desktop_update"));
 
         // Update details
         updateDetails = new gui::Label(this, 40, 172, 440, 40);
@@ -71,7 +71,7 @@ namespace gui
         updateDetails->setFont(style::window::font::verysmall);
         updateDetails->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         updateDetails->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        updateDetails->setText("Update: ");
+        updateDetails->setText(utils::localize.get("app_desktop_update"));
 
         // Current version information
         currentVersionInfo = new gui::Label(this, 10, 222, 480, 40);
@@ -81,7 +81,7 @@ namespace gui
         currentVersionInfo->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         currentVersionInfo->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        currentVersionInfo->setText("Current: ");
+        currentVersionInfo->setText(utils::localize.get("app_desktop_update_current"));
 
         // Label Info
         infoLabel = new gui::Label(this, 20, 304, 440, 40);
@@ -89,7 +89,7 @@ namespace gui
         infoLabel->setBorderColor(gui::ColorNoColor);
         infoLabel->setFont(style::window::font::medium);
         infoLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-        infoLabel->setText("Do you want to apply this update?");
+        infoLabel->setText(utils::localize.get("app_desktop_update_apply"));
 
         // Details during update
         detailLabel = new gui::Label(this, 20, 354, 440, 20);
@@ -97,7 +97,6 @@ namespace gui
         detailLabel->setBorderColor(gui::ColorNoColor);
         detailLabel->setFont(style::window::font::small);
         detailLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
-        detailLabel->setText("");
 
         // update progress
         percentLabel = new gui::Label(this, 0, 374, 520, 128);
@@ -171,7 +170,8 @@ namespace gui
                 currentVersion << GIT_REV;
                 currentVersion << ")";
 
-                updateVersion << "Update to: ";
+                updateVersion << utils::localize.get("app_desktop_update_to");
+                updateVersion << ": ";
                 updateVersion << msg.updateStats
                                      .versioInformation[purefs::json::os_version][purefs::json::version_string]
                                      .string_value();
@@ -183,7 +183,8 @@ namespace gui
 
                 vfs::FILE *f = vfs.fopen(updateFile.c_str(), "r");
                 if (f != nullptr) {
-                    updateFileDetails << "Size: ";
+                    updateFileDetails << utils::localize.get("app_desktop_update_size");
+                    updateFileDetails << ": ";
                     updateFileDetails << std::to_string(vfs.filelength(f) / 1024);
                     updateFileDetails << "Kb (";
                     updateFileDetails << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate]
@@ -226,7 +227,7 @@ namespace gui
                 selectionLabels[1]->setVisible(false);
 
                 percentLabel->setVisible(true);
-                percentLabel->setText("Update start");
+                percentLabel->setText(utils::localize.get("app_desktop_update_start"));
                 auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateFile.c_str(), 0);
                 sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, application);
 
@@ -252,7 +253,8 @@ namespace gui
                     static_cast<int>((static_cast<float>(item->getUpdateOsMessage().updateStats.currentExtractedBytes) /
                                       static_cast<float>(item->getUpdateOsMessage().updateStats.totalBytes)) *
                                      100.0);
-                ssi << "Unpacking: ";
+                ssi << utils::localize.get("app_desktop_update_unpacking");
+                ssi << ": ";
                 ssi << std::to_string(progressPercent);
                 ssi << " %";
                 percentLabel->setText(ssi.str());
@@ -262,9 +264,11 @@ namespace gui
                 percentLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
             }
 
-            sizeStream << "size: ";
+            sizeStream << utils::localize.get("app_desktop_update_size");
+            sizeStream << ": ";
             sizeStream << std::to_string(item->getUpdateOsMessage().updateStats.fileExtractedSize);
-            sizeStream << " bytes";
+            sizeStream << " ";
+            sizeStream << utils::localize.get("app_desktop_update_bytes");
             detailLabel->setText(sizeStream.str());
             this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
