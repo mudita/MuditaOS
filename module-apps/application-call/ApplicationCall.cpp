@@ -29,22 +29,6 @@ namespace app
     {
         timerCall = std::make_unique<sys::Timer>("Call", this, 1000);
         timerCall->connect([this](sys::Timer &) { timerCallCallback(); });
-
-        connect(typeid(AudioStartPlaybackResponse), [&](sys::DataMessage * /* req */, sys::ResponseMessage *response) {
-            auto rsp = dynamic_cast<AudioStartPlaybackResponse *>(response);
-            if (rsp && rsp->retCode == audio::RetCode::Success) {
-                ringtoneAudioToken = rsp->token;
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        });
-
-        connect(typeid(AudioStartRoutingResponse), [&](sys::DataMessage * /* req */, sys::ResponseMessage *response) {
-            auto rsp = dynamic_cast<AudioStartRoutingResponse *>(response);
-            if (rsp && rsp->retCode == audio::RetCode::Success) {
-                routingAudioToken = rsp->token;
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        });
     }
 
     //  number of seconds after end call to switch back to previous application
@@ -72,13 +56,7 @@ namespace app
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------CallAborted");
-        if (ringtoneAudioToken.IsValid() && routingAudioToken.IsValid()) {
-            AudioServiceAPI::Stop(this, ringtoneAudioToken);
-            AudioServiceAPI::Stop(this, routingAudioToken);
-        }
-        else {
-            AudioServiceAPI::StopAll(this);
-        }
+        AudioServiceAPI::StopAll(this);
 
         callWindow->setState(gui::CallWindow::State::CALL_ENDED);
         if (getState() == State::ACTIVE_FORGROUND && getCurrentWindow() != callWindow) {

@@ -12,12 +12,32 @@ namespace audio
     class AudioMux
     {
       public:
+        enum class VibrationStatus
+        {
+            On,
+            Off
+        };
+
         struct Input
         {
             Input(std::unique_ptr<audio::Audio> a, audio::Token handle) : audio(std::move(a)), token(handle)
             {}
             std::unique_ptr<audio::Audio> audio;
             audio::Token token;
+            VibrationStatus vibrationOn = VibrationStatus::Off;
+
+            void EnableVibration()
+            {
+                vibrationOn = VibrationStatus::On;
+            }
+            void DisableVibration()
+            {
+                vibrationOn = VibrationStatus::Off;
+            }
+            auto GetVibrationStatus() const -> VibrationStatus
+            {
+                return vibrationOn;
+            };
         };
         /**
          * Constructs class with fixed number of managed inputs
@@ -84,7 +104,7 @@ namespace audio
         {
             return audioInputs;
         };
-        auto IncrementToken(std::optional<AudioMux::Input *> input = std::nullopt) -> const Token;
+        auto ResetInput(std::optional<AudioMux::Input *> input = std::nullopt) -> const Token;
 
       private:
         auto GetPlaybackPriority(const std::optional<audio::PlaybackType> type) -> uint8_t;

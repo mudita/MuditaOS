@@ -23,8 +23,7 @@ class AudioMessage : public sys::DataMessage
     AudioMessage() : sys::DataMessage(MessageType::AudioMessage)
     {}
 
-    virtual ~AudioMessage()
-    {}
+    virtual ~AudioMessage() = default;
 };
 
 class AudioResponseMessage : public sys::ResponseMessage
@@ -242,11 +241,11 @@ class AudioRoutingControlRequest : public AudioMessage
         SwitchHeadphones
     };
 
-    AudioRoutingControlRequest(ControlType cType, bool enable) : enable(enable), cType(cType)
+    AudioRoutingControlRequest(ControlType controlType, bool enable) : enable(enable), controlType(controlType)
     {}
 
     const bool enable;
-    const ControlType cType;
+    const ControlType controlType;
 };
 
 #endif // PUREPHONE_AUDIOMESSAGE_HPP

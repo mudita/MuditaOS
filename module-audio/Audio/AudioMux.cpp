@@ -66,10 +66,6 @@ namespace audio
     std::optional<AudioMux::Input *> AudioMux::GetActiveInput()
     {
         for (auto &audioInput : audioInputs) {
-
-            if (!audioInput.audio->GetCurrentOperation()) {
-                continue;
-            }
             if (audioInput.audio->GetCurrentState() != Audio::State::Idle &&
                 audioInput.audio->GetCurrentOperationState() == audio::Operation::State::Active) {
                 return &audioInput;
@@ -109,7 +105,7 @@ namespace audio
         std::optional<AudioMux::Input *> overridableInput;
 
         for (auto &audioInput : audioInputs) {
-            auto currentPlaybackType = audioInput.audio->GetCurrentOperationPlaybackType().value_or(PlaybackType::None);
+            auto currentPlaybackType = audioInput.audio->GetCurrentOperationPlaybackType();
             auto currentInputPrior   = GetPlaybackPriority(currentPlaybackType);
 
             // check busy input
@@ -135,9 +131,10 @@ namespace audio
         return idleInput ? idleInput : overridableInput;
     }
 
-    const Token AudioMux::IncrementToken(std::optional<AudioMux::Input *> input)
+    const Token AudioMux::ResetInput(std::optional<AudioMux::Input *> input)
     {
         if (input) {
+            (*input)->DisableVibration();
             return (*input)->token = refToken.IncrementToken();
         }
         return refToken.IncrementToken();
