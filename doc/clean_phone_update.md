@@ -8,15 +8,13 @@ The application is Qt-based so to build it you'll need a couple of extra package
 
 2. Clone the [PureTesterPCApp repository](https://github.com/mudita/PureTesterPCApp) and build it using `qmake` and `make`.
 
-`# git clone git@github.com:mudita/PureTesterPCApp.git`
+`# git clone git@github.com:mudita/PureTesterPCApp.git` 
 
 This application is maintained by Mudita Electronics team and they are
-responsible for this repo in case on any errors please consult them for help.
+responsible for this repo in case on any errors please consult them for help. 
 
 By default this app looks for a binary file to load to memory of the phone, the
-path it uses is `../../PureHardwareTester/build/PureHardwareTester.bin` relative to the binary. You can either make those directories and use them or recompile the program with a different path (`connecttab.cpp` line #164)
-
-In the below steps we assume default compile with DEVELOPER_CASE enabled.
+path it uses is `../../PureHardwareTester/build/PureHardwareTester.bin` relative to the binary. You can either make those directories and use them or recompile the program with a different path (`connecttab.cpp` line #164). In the below steps we assume default compile with DEVELOPER_CASE enabled.
 
 3. Create the build directory:
 
