@@ -47,9 +47,8 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
 
 EventManager::~EventManager()
 {
-    LOG_INFO("[%s] Cleaning resources", GetName().c_str());
     if (EventWorker != nullptr) {
-        EventWorker->deinit();
+        EventWorker->close();
     }
 }
 
@@ -212,7 +211,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         if (msg != nullptr) {
             auto time = msg->getTime();
             bsp::rtc_SetDateTime(&time);
-
+            LOG_INFO("RTC set by network time.");
             auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
             sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
         }

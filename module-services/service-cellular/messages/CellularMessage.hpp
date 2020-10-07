@@ -92,7 +92,8 @@ class CellularTimeNotificationMessage : public CellularMessage
 
   public:
     CellularTimeNotificationMessage() = delete;
-    CellularTimeNotificationMessage(struct tm time) : CellularMessage(MessageType::CellularTimeUpdated), time(time)
+    explicit CellularTimeNotificationMessage(struct tm time)
+        : CellularMessage(MessageType::CellularTimeUpdated), time(time)
     {}
     struct tm getTime(void)
     {
