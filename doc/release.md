@@ -1,74 +1,47 @@
-# Release
+# How to create and delete a MuditaOS release
 
-## Create new release
+## Creating a new release
 
-### Checkout commit to make release of
-Usually this will be the current master/HEAD
+1. Checkout the commit to make the release of - usually this will be the current `master/HEAD`
 
 ```bash
 git checkout master
 git pull --ff-only
 ```
 
-### Run the tests
+2. Run all required tests
 
-Run all required tests
-
-### Tag Release
-After testing the commit on device you have to tag current commit:
+3. Tag the release. After testing the commit on a device you have to tag current commit:
 
 ```bash
 git tag release-x.y.z
 ```
 
-Tag has to start with `release-` pefix otherwise it will not be treated
-as a commit to create release from.
+Release tag has to start with `release-` prefix, otherwise it will not be treated as a commit to create the release from.
 
-### Push the Tempo
-Then you have to push the tag to the repository:
+4. Push the tag to the repository:
 
 ```bash
 git push origin release-x.y.z
 ```
 
-Pushing the tag to Github will start the release process,
-which will try to do following steps:
+Pushing the tag to GitHub will start the release process, which will try to complete the following steps:
+
 - check the style
 - build linux UT and run them
 - build RT1051 and package it
-- create draft release on Github
+- create draft release on GitHub
 - upload RT1051 package to the release
 
+To track the progress you can look at [GitHub actions](https://github.com/mudita/MuditaOS/actions)
 
-To track the progress you can look at [actions](https://github.com/muditacom/PurePhone/actions)
-After release is successfully build you have to manually publish it on github [releases page](https://github.com/muditacom/PurePhone/releases)
+After the release is successfully build you have to manually publish it on GitHub [releases page](https://github.com/mudita/MuditaOS/releases)
 
-# Delete release:
+## Deleting an existing release
 
-## Delete the release 
-On [release page](https://github.com/muditacom/PurePhone/releases) 
-click the release title, in it's subpage on the top right you will 
-see the "Delete" button -> click it.
+1. Delete the release by clicking on the release title on the [release page](https://github.com/mudita/MuditaOS/releases). In its subpage in the top right corner you will see the `Delete` button -> click it.
 
-## Delete the tag
+2. Delete the tags.
 
-### Delete local tag
-
-```bash
-git tag --delete release-x.y.z
-```
-
-### Delete remote tag
-
-Delete with `--delete` flag
-
-```bash
-git push --delete origin release-x.y.z
-```
-
-or by refs syntax
-
-```bash
-git push origin :refs/tags/release-x.y.z
-```
-
+ - Delete local tag: `git tag --delete release-x.y.z`
+ - Delete remote tag: `git push --delete origin release-x.y.z` or `git push origin :refs/tags/release-x.y.z`
