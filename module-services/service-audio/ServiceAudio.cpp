@@ -108,7 +108,7 @@ ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::Playback
         return VibrationType::None;
     }
 
-    if (type == PlaybackType::CallRingtone || type == PlaybackType::Multimedia) {
+    if (type == PlaybackType::CallRingtone) {
         return VibrationType::Continuous;
     }
     else if (type == PlaybackType::Notifications || type == PlaybackType::TextMessageRingtone) {
@@ -322,7 +322,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
         }
     }
     // stop all audio
-    else if (!token.IsUninitialized()) {
+    else if (token.IsUninitialized()) {
         for (auto &input : audioMux.GetAllInputs()) {
             retCodes.emplace_back(stopInput(&input));
         }
@@ -365,29 +365,29 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     LOG_DEBUG("msgType %d", static_cast<int>(msgl->messageType));
 
     if (msgType == typeid(AudioNotificationMessage)) {
-        auto *msg = dynamic_cast<AudioNotificationMessage *>(msgl);
+        auto *msg = static_cast<AudioNotificationMessage *>(msgl);
         HandleNotification(msg->type, msg->token);
     }
     else if (msgType == typeid(AudioGetSetting)) {
-        auto *msg   = dynamic_cast<AudioGetSetting *>(msgl);
+        auto *msg   = static_cast<AudioGetSetting *>(msgl);
         auto value  = getSetting(msg->setting, msg->profileType, msg->playbackType);
         responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, utils::getValue<float>(value));
     }
     else if (msgType == typeid(AudioSetSetting)) {
-        auto *msg = dynamic_cast<AudioSetSetting *>(msgl);
+        auto *msg = static_cast<AudioSetSetting *>(msgl);
         setSetting(msg->setting, msg->val, msg->profileType, msg->playbackType);
         responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success);
     }
     else if (msgType == typeid(AudioStopRequest)) {
-        auto *msg   = dynamic_cast<AudioStopRequest *>(msgl);
+        auto *msg   = static_cast<AudioStopRequest *>(msgl);
         responseMsg = HandleStop(msg->stopVec, msg->token);
     }
     else if (msgType == typeid(AudioStartPlaybackRequest)) {
-        auto *msg   = dynamic_cast<AudioStartPlaybackRequest *>(msgl);
+        auto *msg   = static_cast<AudioStartPlaybackRequest *>(msgl);
         responseMsg = HandleStart(Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
     }
     else if (msgType == typeid(AudioStartRecorderRequest)) {
-        auto *msg   = dynamic_cast<AudioStartRecorderRequest *>(msgl);
+        auto *msg   = static_cast<AudioStartRecorderRequest *>(msgl);
         responseMsg = HandleStart(Operation::Type::Recorder, msg->fileName.c_str());
     }
     else if (msgType == typeid(AudioStartRoutingRequest)) {
@@ -395,19 +395,19 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         responseMsg = HandleStart(Operation::Type::Router);
     }
     else if (msgType == typeid(AudioPauseRequest)) {
-        auto *msg   = dynamic_cast<AudioPauseRequest *>(msgl);
+        auto *msg   = static_cast<AudioPauseRequest *>(msgl);
         responseMsg = HandlePause(msg->token);
     }
     else if (msgType == typeid(AudioResumeRequest)) {
-        auto *msg   = dynamic_cast<AudioResumeRequest *>(msgl);
+        auto *msg   = static_cast<AudioResumeRequest *>(msgl);
         responseMsg = HandleResume(msg->token);
     }
     else if (msgType == typeid(AudioGetFileTagsRequest)) {
-        auto *msg = dynamic_cast<AudioGetFileTagsRequest *>(msgl);
-        HandleGetFileTags(msg->fileName);
+        auto *msg   = static_cast<AudioGetFileTagsRequest *>(msgl);
+        responseMsg = HandleGetFileTags(msg->fileName);
     }
     else if (msgType == typeid(AudioRoutingControlRequest)) {
-        auto *msg   = dynamic_cast<AudioRoutingControlRequest *>(msgl);
+        auto *msg   = static_cast<AudioRoutingControlRequest *>(msgl);
         responseMsg = HandleRoutingControl(msg->controlType, msg->enable);
     }
     else {
