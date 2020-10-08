@@ -18,12 +18,14 @@ target_sources( ${PROJECT_NAME}
         "widgets/SMSTemplateModel.cpp"
         "widgets/SMSTemplateItem.cpp"
         "widgets/SMSInputWidget.cpp"
+        "widgets/SMSOutputWidget.cpp"
         "widgets/SearchResultsItem.cpp"
         "widgets/BaseThreadItem.cpp"
 
         "models/BaseThreadsRecordModel.cpp"
         "models/ThreadsModel.cpp"
         "models/ThreadsSearchResultsModel.cpp"
+        "models/SMSThreadModel.cpp"
         
         "windows/MessagesMainWindow.cpp"
         "windows/SMSThreadViewWindow.cpp"
@@ -40,7 +42,9 @@ target_sources( ${PROJECT_NAME}
         "ApplicationMessages.hpp"
         "data/MessagesStyle.hpp"
         "models/ThreadsModel.hpp"
+        "models/SMSThreadModel.hpp"
         "widgets/ThreadItem.hpp"
         "widgets/SMSInputWidget.hpp"
+        "widgets/SMSOutputWidget.hpp"
 )
 
