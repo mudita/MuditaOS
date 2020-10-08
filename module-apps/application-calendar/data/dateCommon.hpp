@@ -184,6 +184,20 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
     return date::format("%F %T", time_point_cast<seconds>(timePoint));
 }
 
+inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Date timestamp(time);
+    return timestamp.str(format);
+}
+
+inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format)
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Time timestamp(time);
+    return timestamp.str(format);
+}
+
 inline TimePoint TimePointFromString(const char *s1)
 {
     TimePoint tp;

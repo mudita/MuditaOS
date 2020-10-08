@@ -2,7 +2,6 @@
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-calendar/models/MonthModel.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/models/AllEventsModel.hpp"
 #include "application-calendar/data/CalendarData.hpp"
 #include "NoEvents.hpp"
 #include <module-services/service-db/messages/QueryMessage.hpp>

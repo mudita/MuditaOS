@@ -8,8 +8,7 @@
 
 namespace stm
 {
-    ServiceTime::ServiceTime()
-        : sys::Service(service::name::service_time, "", 4096 * 2, sys::ServicePriority::Idle), calendarEvents(this)
+    ServiceTime::ServiceTime() : sys::Service(service::name::service_time), calendarEvents(this)
     {
         LOG_INFO("[ServiceTime] Initializing");
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
@@ -51,19 +50,22 @@ namespace stm
                 (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update ||
                  msg->type == db::Query::Type::Delete)) {
 
-                calendarEvents.ProcessNextEvent();
+                calendarEvents.processNextEvent();
 
                 return responseMsg;
             }
         } break;
         case MessageType::ReloadTimers: {
-            calendarEvents.ProcessNextEvent();
+            calendarEvents.processNextEvent();
+            return std::make_shared<sys::ResponseMessage>();
         } break;
         case MessageType::TimersProcessingStart: {
-            calendarEvents.StartProcessing();
+            calendarEvents.startProcessing();
+            return std::make_shared<sys::ResponseMessage>();
         } break;
         case MessageType::TimersProcessingStop: {
-            calendarEvents.StopProcessing();
+            calendarEvents.stopProcessing();
+            return std::make_shared<sys::ResponseMessage>();
         } break;
         default:
             break;
@@ -74,7 +76,6 @@ namespace stm
             return responseMsg;
         }
 
-        // handle database response
         bool responseHandled = false;
         if (resp != nullptr) {
             if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
@@ -82,7 +83,7 @@ namespace stm
 
                 if (dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(result.get())) {
 
-                    calendarEvents.ReceiveNextEventQuery(std::move(result));
+                    calendarEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }
             }

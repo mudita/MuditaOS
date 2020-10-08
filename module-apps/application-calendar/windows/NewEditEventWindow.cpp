@@ -101,6 +101,7 @@ namespace gui
         if (data == nullptr) {
             return false;
         }
+
         if (data->getDescription() == style::window::calendar::edit_event) {
             eventAction = EventAction::Edit;
         }

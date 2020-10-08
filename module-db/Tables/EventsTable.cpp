@@ -541,19 +541,11 @@ std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_fr
         db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
                   "FROM events "
                   "WHERE calc_dt >= '%q' "
-
-                  // TODO
-                  // Temporary calc_dt is not filtered as to be less-or-equal than date_from's end-of-day
-                  // (until we have implemented a notification of 'new day' for ServiceTime/CalendarTimeEvents)
-                  //"AND calc_dt <= DATETIME('%q', '+1 day', '-1 second') "
-
                   "AND reminder_fired = '%q' "
                   "AND reminder <> -1 "
                   "ORDER BY calc_dt "
                   "LIMIT 1 ",
                   TimePointToString(filter_from).c_str(),
-                  // As in 'to do' above
-                  // TimePointToString(filter_till).c_str(),
                   TimePointToString(TIME_POINT_INVALID).c_str());
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {

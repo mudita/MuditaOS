@@ -4,83 +4,83 @@ namespace stm
 {
     constexpr static const int eventTimerInitInterval = 1000;
 
-    TimeEvents::TimeEvents(sys::Service *service) : service(service)
+    TimeEvents::TimeEvents(sys::Service *service) : serv(service)
     {}
 
     TimeEvents::~TimeEvents()
     {
-        StopTimer();
+        stopTimer();
     }
 
-    std::unique_ptr<sys::Timer> &TimeEvents::Timer()
+    std::unique_ptr<sys::Timer> &TimeEvents::timer()
     {
         if (fireEventTimer == nullptr) {
             fireEventTimer = std::make_unique<sys::Timer>(
-                TimerName(), service, eventTimerInitInterval, sys::Timer::Type::SingleShot);
+                timerName(), service(), eventTimerInitInterval, sys::Timer::Type::SingleShot);
         }
         return fireEventTimer;
     }
 
-    void TimeEvents::StartProcessing()
+    void TimeEvents::startProcessing()
     {
         timersProcessingStarted = true;
-        ProcessNextEvent();
+        processNextEvent();
     }
 
-    void TimeEvents::StopProcessing()
+    void TimeEvents::stopProcessing()
     {
-        StopTimer();
+        stopTimer();
         timersProcessingStarted = false;
     }
 
-    void TimeEvents::ProcessNextEvent()
+    void TimeEvents::processNextEvent()
     {
-        StopTimer();
-        if (!IsStarted()) {
+        stopTimer();
+        if (!isStarted()) {
             return;
         }
 
-        SendNextEventQuery();
+        sendNextEventQuery();
     }
 
-    void TimeEvents::StopTimer()
+    void TimeEvents::stopTimer()
     {
-        Timer()->stop();
+        timer()->stop();
     }
 
-    void TimeEvents::RecreateTimer(uint32_t interval)
+    void TimeEvents::recreateTimer(uint32_t interval)
     {
-        StopTimer();
-        if (!IsStarted()) {
+        stopTimer();
+        if (!isStarted()) {
             return;
         }
 
-        Timer()->connect([=](sys::Timer &) { fireEventTimerCallback(); });
-        Timer()->reload(interval);
+        timer()->connect([=](sys::Timer &) { fireEventTimerCallback(); });
+        timer()->reload(interval);
     }
 
     void TimeEvents::fireEventTimerCallback()
     {
-        if (!IsStarted()) {
+        if (!isStarted()) {
             return;
         }
 
-        InvokeEvent();
-        SendEventFiredQuery();
+        invokeEvent();
+        sendEventFiredQuery();
     }
 
-    bool TimeEvents::ReceiveNextEventQuery(std::unique_ptr<db::QueryResult> nextEventQueryResult)
+    bool TimeEvents::receiveNextEventQuery(std::unique_ptr<db::QueryResult> nextEventQueryResult)
     {
-        if (!IsStarted()) {
+        if (!isStarted()) {
             return true;
         }
         if (nextEventQueryResult == nullptr) {
             return false;
         }
 
-        uint32_t interval = CalcToNextEventInterval(std::move(nextEventQueryResult));
+        uint32_t interval = calcToNextEventInterval(std::move(nextEventQueryResult));
         if (interval > 0) {
-            RecreateTimer(interval);
+            recreateTimer(interval);
         }
         return true;
     }

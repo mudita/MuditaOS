@@ -50,9 +50,6 @@ namespace gui
             if (record->reminder == static_cast<uint32_t>(Reminder::never)) {
                 clock->setVisible(false);
             }
-            if (record->reminder == style::window::calendar::reminder::never) {
-                clock->setVisible(false);
-            }
         }
     }
 
