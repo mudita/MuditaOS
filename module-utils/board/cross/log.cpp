@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by mati on 08.05.19.
 //
 
@@ -128,7 +128,7 @@ struct Logger
         {"ServiceCellular", logger_level::LOGINFO},
         {"ServiceFota", logger_level::LOGINFO},
         {"ServiceEink", logger_level::LOGINFO},
-        {"ServiceDB", logger_level::LOGINFO},
+        {"ServiceDB", logger_level::LOGTRACE},
         // make sure that we got defined map entries for at least crit and irq
         // make sure that we got defined map entries for at least crit and irq
         {critStr, logger_level::LOGTRACE},

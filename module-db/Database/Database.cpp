@@ -1,4 +1,4 @@
-
+﻿
 /*
  * @file Database.cpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
@@ -76,6 +76,9 @@ Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isIn
         LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
     }
     assert(rc == SQLITE_OK);
+    pragmaQuery("PRAGMA integrity_check;");
+    pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
+    pragmaQuery("PRAGMA journal_mode=WAL");
 }
 
 Database::~Database()
@@ -166,6 +169,24 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
 uint32_t Database::getLastInsertRowId()
 {
     return sqlite3_last_insert_rowid(dbConnection);
+}
+
+void Database::pragmaQuery(const std::string &pragmaStatemnt)
+{
+    auto results = query(pragmaStatemnt.c_str());
+    if (results) {
+        uint32_t fieldsCount = results->getFieldCount();
+        LOG_DEBUG("Row count: %" PRIu32 " Fields count:%" PRIu32, results->getRowCount(), fieldsCount);
+        do {
+            for (uint32_t i = 0; i < fieldsCount; i++) {
+                Field field = (*results)[i];
+                LOG_DEBUG("%s: '%s'", pragmaStatemnt.c_str(), field.getCString());
+            }
+        } while (results->nextRow());
+    }
+    else {
+        LOG_DEBUG("no results!");
+    }
 }
 
 bool Database::storeIntoFile(const std::string &backupPath)

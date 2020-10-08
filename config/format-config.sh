@@ -19,6 +19,7 @@ declare ignore_paths=(
     './module-vfs/board/cross/freeRTOS_FAT/'
     './module-db/[Dd]atabase/sqlite3.h'
     './module-db/[Dd]atabase/sqlite3.c'
+    './module-db/[Dd]atabase/sqlite3ext.h'
     './module-db/[Dd]atabase/config.h'
     './module-bluetooth/lib/btstack/'
     './module-lwip/lib/lwip/'
