@@ -1,4 +1,4 @@
-
+﻿
 /*
  * @file Database.hpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
@@ -39,6 +39,7 @@ class Database
     bool storeIntoFile(const std::string &backupPath);
 
     uint32_t getLastInsertRowId();
+    void pragmaQuery(const std::string &pragmaStatemnt);
 
   private:
     const uint32_t maxQueryLen = (8 * 1024);
