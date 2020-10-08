@@ -25,6 +25,7 @@ namespace gui::window::name
 
     inline const std::string messages = "Messages";
     inline const std::string torch    = "Torch";
+    inline const std::string templates = "Templates";
 
     inline const std::string display_and_keypad = "DisplayAndKeypad";
 
