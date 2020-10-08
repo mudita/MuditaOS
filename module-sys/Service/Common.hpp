@@ -9,13 +9,15 @@ namespace sys
     {
         System,
         SystemManagerRequests,
-        PowerManagerRequests
-#ifndef MODULE_CORE_CUSTOM_BUS
-
-#else
-        ,
-#include "BusChannelsCustom.hpp"
-#endif
+        PowerManagerRequests,
+        ServiceCellularNotifications,
+        Test2CustomBusChannel,
+        ServiceDBNotifications,
+        ServiceAudioNotifications,
+        AppManagerNotifications,
+        ServiceFotaNotifications,
+        AntennaNotifications,
+        ServiceEvtmgrNotifications
     };
 
     enum class ServicePriority
@@ -101,6 +103,8 @@ inline const char *c_str(sys::BusChannels channel)
         return "ServiceFotaNotifications";
     case sys::BusChannels::AntennaNotifications:
         return "AntennaNotifications";
+    case sys::BusChannels::ServiceEvtmgrNotifications:
+        return "ServiceEvtmgrNotifications";
     }
     return "";
 }

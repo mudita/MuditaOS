@@ -31,7 +31,7 @@ namespace gui
         /// mark if we japs should be painted. small protrusions indicating a speech bubble
         RectangleYapFlags yaps = {RectangleYapFlags::GUI_RECT_YAP_NO_YAPS};
         /// yap size in horizontal width.
-        unsigned short yapSize = {style::window::messages::yaps_size_default};
+        unsigned short yapSize = style::window::default_rect_yaps;
 
       public:
         Rect();

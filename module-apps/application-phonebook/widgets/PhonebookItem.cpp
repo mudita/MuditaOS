@@ -16,7 +16,7 @@ namespace gui
         hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
-        hBox->setPenWidth(style::window::messages::sms_border_no_focus);
+        hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
         contactName = new gui::Label(hBox, 0, 0, 0, 0);
         contactName->setPenFocusWidth(0);

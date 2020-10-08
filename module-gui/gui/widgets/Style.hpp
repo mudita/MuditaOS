@@ -37,6 +37,7 @@ namespace style
             const inline std::string medium = "gt_pressura_regular_24";
         }; // namespace font
     };     // namespace footer
+
     namespace window
     {
         const inline uint32_t default_left_margin  = 20;
@@ -48,6 +49,7 @@ namespace style
         const inline uint32_t default_border_focus_w       = 2;
         const inline uint32_t default_border_rect_no_focus = 1;
         const inline uint32_t default_border_no_focus_w    = 0;
+        const inline uint32_t default_rect_yaps            = 10;
         namespace font
         {
             const inline std::string supersizemelight = "gt_pressura_light_90";
@@ -79,32 +81,8 @@ namespace style
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
 
-        namespace messages
-        {
-            inline const uint32_t sms_radius                    = 7;
-            inline const uint32_t sms_border_no_focus           = 1;
-            inline const uint32_t sms_thread_item_h             = 100;
-            const inline unsigned short yaps_size_default       = 10;
-            const inline gui::Length sms_max_width              = 320;
-            const inline unsigned short sms_h_padding           = 15;
-            const inline unsigned short sms_h_left_padding      = 25;
-            const inline unsigned short sms_v_padding           = 10;
-            const inline unsigned short sms_vertical_spacer     = 10;
-            const inline unsigned short new_sms_vertical_spacer = 25;
-            const inline unsigned short sms_failed_offset       = 39;
-            const inline unsigned short sms_error_icon_offset   = 2;
-            const inline gui::Padding sms_left_bubble_padding =
-                gui::Padding(style::window::messages::sms_h_left_padding,
-                             style::window::messages::sms_v_padding,
-                             style::window::messages::sms_h_padding,
-                             style::window::messages::sms_v_padding);
-            const inline gui::Padding sms_right_bubble_padding = gui::Padding(style::window::messages::sms_h_padding,
-                                                                              style::window::messages::sms_v_padding,
-                                                                              style::window::messages::sms_h_padding,
-                                                                              style::window::messages::sms_v_padding);
-        } // namespace messages
-
     }; // namespace window
+
     namespace settings
     {
         namespace date
@@ -214,6 +192,12 @@ namespace style
             InPlace, ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
             OnOffset ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
                      ///< offset.
+        };
+
+        enum class Orientation
+        {
+            TopBottom,
+            BottomTop
         };
 
         namespace scroll

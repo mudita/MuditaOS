@@ -137,6 +137,73 @@ std::vector<SMSTableRow> SMSTable::getByThreadId(uint32_t threadId, uint32_t off
     return ret;
 }
 
+std::vector<SMSTableRow> SMSTable::getByThreadIdWithoutDraftWithEmptyInput(uint32_t threadId,
+                                                                           uint32_t offset,
+                                                                           uint32_t limit)
+{
+    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u AND type != %u UNION ALL SELECT 0 as _id, 0 as "
+                              "thread_id, 0 as contact_id, 0 as "
+                              "date, 0 as date_send, 0 as error_code, 0 as body, %u as type LIMIT %u OFFSET %u",
+                              threadId,
+                              SMSType::DRAFT,
+                              SMSType::INPUT,
+                              limit,
+                              offset);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<SMSTableRow>();
+    }
+
+    std::vector<SMSTableRow> ret;
+
+    do {
+        ret.push_back(SMSTableRow{
+            (*retQuery)[0].getUInt32(),                       // ID
+            (*retQuery)[1].getUInt32(),                       // threadID
+            (*retQuery)[2].getUInt32(),                       // contactID
+            (*retQuery)[3].getUInt32(),                       // date
+            (*retQuery)[4].getUInt32(),                       // dateSent
+            (*retQuery)[5].getUInt32(),                       // errorCode
+            (*retQuery)[6].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}
+
+uint32_t SMSTable::countWithoutDraftsByThreadId(uint32_t threadId)
+{
+    auto queryRet = db->query("SELECT COUNT(*) FROM sms WHERE thread_id= %u AND type != %u;", threadId, SMSType::DRAFT);
+
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
+        return 0;
+    }
+
+    return uint32_t{(*queryRet)[0].getUInt32()};
+}
+
+SMSTableRow SMSTable::getDraftByThreadId(uint32_t threadId)
+{
+    auto retQuery = db->query(
+        "SELECT * FROM sms WHERE thread_id= %u AND type = %u ORDER BY date DESC LIMIT 1;", threadId, SMSType::DRAFT);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return SMSTableRow();
+    }
+
+    return SMSTableRow{
+        (*retQuery)[0].getUInt32(),                       // ID
+        (*retQuery)[1].getUInt32(),                       // threadID
+        (*retQuery)[2].getUInt32(),                       // contactID
+        (*retQuery)[3].getUInt32(),                       // date
+        (*retQuery)[4].getUInt32(),                       // dateSent
+        (*retQuery)[5].getUInt32(),                       // errorCode
+        (*retQuery)[6].getString(),                       // body
+        static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+    };
+}
+
 std::vector<SMSTableRow> SMSTable::getByText(std::string text)
 {
 

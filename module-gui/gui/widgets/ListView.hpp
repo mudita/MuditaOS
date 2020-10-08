@@ -16,8 +16,8 @@ namespace gui
       public:
         ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
-        bool shouldShowScroll(int listPageSize, int elementsCount);
-        void update(int startIndex, int listPageSize, int elementsCount, int topMargin);
+        bool shouldShowScroll(unsigned int listPageSize, unsigned int elementsCount);
+        void update(unsigned int startIndex, unsigned int listPageSize, unsigned int elementsCount, int topMargin);
     };
 
     class ListView : public Rect
@@ -29,14 +29,16 @@ namespace gui
         std::shared_ptr<ListItemProvider> provider = nullptr;
         VBox *body                                 = nullptr;
         ListViewScroll *scroll                     = nullptr;
+        std::list<std::pair<style::listview::RebuildType, unsigned int>> rebuildRequests;
 
         unsigned int currentPageSize = 0;
-        bool pageLoaded              = false;
+        bool pageLoaded              = true;
         bool focusOnLastItem         = false;
         int scrollTopMargin          = style::margins::big;
 
-        style::listview::Boundaries boundaries = style::listview::Boundaries::Fixed;
-        style::listview::Direction direction   = style::listview::Direction::Bottom;
+        style::listview::Boundaries boundaries   = style::listview::Boundaries::Fixed;
+        style::listview::Direction direction     = style::listview::Direction::Bottom;
+        style::listview::Orientation orientation = style::listview::Orientation::TopBottom;
 
         void clearItems();
         virtual void addItemsOnPage();
@@ -45,8 +47,10 @@ namespace gui
         void resizeWithScroll();
         void recalculateStartIndex();
         void checkFirstPage();
+        void setStartIndex();
+        void recalculateOnBoxRequestedResize();
         unsigned int calculateMaxItemsOnPage();
-        unsigned int calculateLimit();
+        unsigned int calculateLimit(style::listview::Direction value = style::listview::Direction::Bottom);
         Order getOrderFromDirection();
         virtual bool requestNextPage();
         virtual bool requestPreviousPage();
@@ -60,9 +64,11 @@ namespace gui
         void setElementsCount(unsigned int count);
         void setProvider(std::shared_ptr<ListItemProvider> provider);
         void rebuildList(style::listview::RebuildType rebuildType = style::listview::RebuildType::Full,
-                         unsigned int dataOffset                  = 0);
+                         unsigned int dataOffset                  = 0,
+                         bool forceRebuild                        = false);
         void clear();
         std::shared_ptr<ListItemProvider> getProvider();
+        void setOrientation(style::listview::Orientation value);
         void setBoundaries(style::listview::Boundaries value);
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
@@ -72,6 +78,7 @@ namespace gui
         std::list<DrawCommand *> buildDrawList() override;
         bool onInput(const InputEvent &inputEvent) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 
 } /* namespace gui */
