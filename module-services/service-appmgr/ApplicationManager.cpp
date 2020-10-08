@@ -484,13 +484,7 @@ namespace sapm
         // this is applicable to all applications except desktop
         if ((focusApplicationName == msg->getName())) {
             LOG_WARN("Trying to return currently active application");
-
-            // TODO
-            // Before rework of ApplicationManager: there we have temporary simple switch to
-            // currently focused application
-            app::Application::messageSwitchApplication(
-                this, msg->getName(), msg->getWindow(), std::move(msg->getData()));
-            return true;
+            return false;
         }
 
         // store the name of the application to be executed and start closing previous application

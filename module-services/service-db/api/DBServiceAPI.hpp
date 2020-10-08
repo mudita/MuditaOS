@@ -152,9 +152,6 @@ class DBServiceAPI
     static uint32_t CalllogGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
     static bool CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
 
-    /* calendar events */
-    static uint32_t CalendarEventsGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
-
     /* country codes */
     static uint32_t GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc);
 

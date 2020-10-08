@@ -10,37 +10,41 @@ namespace stm
       private:
         bool timersProcessingStarted               = false;
         std::unique_ptr<sys::Timer> fireEventTimer = nullptr;
-        sys::Service *service                      = nullptr;
-        std::unique_ptr<sys::Timer> &Timer();
+        sys::Service *serv                         = nullptr;
+        std::unique_ptr<sys::Timer> &timer();
 
       protected:
-        sys::Service *Service()
+        sys::Service *service()
         {
-            return service;
+            return serv;
         };
-        virtual const std::string TimerName() = 0;
-        void StopTimer();
-        void RecreateTimer(uint32_t interval);
+        virtual const std::string timerName() = 0;
+        void stopTimer();
+        void recreateTimer(uint32_t interval);
         virtual void fireEventTimerCallback();
-        virtual uint32_t CalcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult) = 0;
+        virtual uint32_t calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult) = 0;
 
-        virtual bool SendNextEventQuery()  = 0;
-        virtual bool SendEventFiredQuery() = 0;
-        virtual void InvokeEvent(){};
+        virtual bool sendNextEventQuery()  = 0;
+        virtual bool sendEventFiredQuery() = 0;
+        virtual void invokeEvent(){};
 
       public:
         TimeEvents() = delete;
         TimeEvents(sys::Service *service);
         ~TimeEvents();
 
-        void StartProcessing();
-        void StopProcessing();
-        bool IsStarted()
+        /// startProcessing - starts processing of events
+        void startProcessing();
+        /// stopProcessing - stops processing of events
+        void stopProcessing();
+        /// isStarted - returns events' processing state
+        bool isStarted()
         {
             return timersProcessingStarted;
         };
-        void ProcessNextEvent();
-
-        virtual bool ReceiveNextEventQuery(std::unique_ptr<db::QueryResult> nextEventQueryResult);
+        /// processNextEvent - starts next event query
+        void processNextEvent();
+        /// receiveNextEventQuery - receives result of next event query
+        virtual bool receiveNextEventQuery(std::unique_ptr<db::QueryResult> nextEventQueryResult);
     };
 } // namespace stm

@@ -57,31 +57,6 @@ namespace style
                 const inline int max_minutes       = 59;
             } // namespace time
 
-            namespace reminder
-            {
-                const inline int never              = 0xFFFFFF;
-                const inline int event_time         = 0;
-                const inline int five_min_before    = 5;
-                const inline int fifteen_min_before = 15;
-                const inline int thirty_min_before  = 30;
-                const inline int one_hour_before    = 100;
-                const inline int two_hour_before    = 200;
-                const inline int one_day_before     = 10000;
-                const inline int two_days_before    = 20000;
-                const inline int one_week_before    = 70000;
-            } // namespace reminder
-
-            namespace repeat
-            {
-                const inline int never     = 0;
-                const inline int daily     = 1;
-                const inline int weekly    = 2;
-                const inline int two_weeks = 3;
-                const inline int month     = 4;
-                const inline int year      = 5;
-                const inline int custom    = 6;
-            } // namespace repeat
-
             namespace item
             {
                 namespace dayEvents

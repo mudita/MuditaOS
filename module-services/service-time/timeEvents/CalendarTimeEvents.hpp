@@ -11,15 +11,15 @@ namespace stm
         TimePoint startTP = TIME_POINT_INVALID;
 
       protected:
-        const std::string TimerName() override
+        const std::string timerName() override
         {
             return "CalendarTimeEvents_timer";
         };
-        uint32_t CalcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult) override;
+        uint32_t calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult) override;
 
-        bool SendNextEventQuery() override;
-        bool SendEventFiredQuery() override;
-        void InvokeEvent() override;
+        bool sendNextEventQuery() override;
+        bool sendEventFiredQuery() override;
+        void invokeEvent() override;
 
       public:
         CalendarTimeEvents() = delete;

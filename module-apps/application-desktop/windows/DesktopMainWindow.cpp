@@ -18,7 +18,8 @@
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-time/api/TimeServiceAPI.hpp"
+#include "service-time/ServiceTime.hpp"
+#include "service-time/messages/TimeMessage.hpp"
 #include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
@@ -101,16 +102,16 @@ namespace gui
             setFocusItem(nullptr);
             erase(notifications);
 
-            // TODO
-            // Temporary solution: blocking of ServiceTime timers when phone becomes locked
-            TimeServiceAPI::messageTimersProcessingStop(application);
+            // TimeServiceAPI::messageTimersProcessingStop(application);
+            auto msg = std::make_shared<TimersProcessingStopMessage>();
+            sys::Bus::SendUnicast(msg, service::name::service_time, application);
         }
         else if (app->lockHandler.lock.isLocked()) {
             application->switchWindow(app::window::name::desktop_pin_lock);
 
-            // TODO
-            // Temporary solution: blocking of ServiceTime timers when phone becomes locked
-            TimeServiceAPI::messageTimersProcessingStop(application);
+            // TimeServiceAPI::messageTimersProcessingStop(application);
+            auto msg = std::make_shared<TimersProcessingStopMessage>();
+            sys::Bus::SendUnicast(msg, service::name::service_time, application);
         }
         else {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
@@ -123,9 +124,9 @@ namespace gui
                     this->application, app::name_settings, app::sim_select, nullptr);
             }
 
-            // TODO
-            // Temporary solution: starting of ServiceTime timers when phone becomes unlocked
-            TimeServiceAPI::messageTimersProcessingStart(application);
+            // TimeServiceAPI::messageTimersProcessingStart(application);
+            auto msg = std::make_shared<TimersProcessingStartMessage>();
+            sys::Bus::SendUnicast(msg, service::name::service_time, application);
         }
     }
 
