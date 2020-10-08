@@ -5,16 +5,11 @@ extern "C"
 #include "cmsis/cmsis_gcc.h"
 #include "cmsis/core_cm7.h"
 #include "fsl_drivers/fsl_src.h"
+#include "macros.h"
 }
 #include <log/log.hpp>
 #include <map>
 #include <string>
-
-//! Test if in interrupt mode
-static inline bool isIRQ()
-{
-    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
-}
 
 static const std::map<uint32_t, std::string> bootReasonDef = {
     {SRC_SRSR_IPP_RESET_B_SHIFT, "ipp_reset_b pin (Power-up sequence)"},

@@ -13,6 +13,10 @@
 * `[audio]` Fix headphones autodetection.
 * `[audio]` Cumulative set of minor fixes and improvements
 
+### Other
+
+* `[audio]` Improve synchronization when switching operations.
+
 ## [0.42.2 2020-10-16]
 
 ### Added
