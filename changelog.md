@@ -8,6 +8,8 @@
 * `[audio]` Added A2DP playback backend
 * `[audio]` Added SendEvent audio API
 * `[calculator]` Add calculator application.
+* `[settings]` Create Messages window for apps and tools branch.
+
 
 ### Fixed
 

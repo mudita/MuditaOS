@@ -26,6 +26,7 @@ target_sources( ${PROJECT_NAME}
         windows/DisplayAndKeypadWindow.cpp
         windows/AppsAndToolsWindow.cpp
         windows/NetworkWindow.cpp
+        windows/MessagesWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -38,6 +39,7 @@ target_sources( ${PROJECT_NAME}
         windows/LockedScreenWindow.hpp
         windows/DisplayAndKeypadWindow.hpp
         windows/AppsAndToolsWindow.hpp
+        windows/MessagesWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
