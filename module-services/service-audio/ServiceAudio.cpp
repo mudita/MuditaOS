@@ -410,6 +410,11 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto *msg   = static_cast<AudioRoutingControlRequest *>(msgl);
         responseMsg = HandleRoutingControl(msg->controlType, msg->enable);
     }
+    else if (msgType == typeid(AudioKeyPressed)) {
+        auto *msg   = static_cast<AudioKeyPressed *>(msgl);
+        responseMsg = std::make_shared<AudioKeyPressedResponseMessage>(
+            RetCode::Success, static_cast<float>(msg->volume), msg->shouldPopup);
+    }
     else {
         LOG_DEBUG("Unhandled message");
     }

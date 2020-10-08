@@ -169,4 +169,32 @@ namespace AudioServiceAPI
             return std::nullopt;
         }
     }
+
+    bool GetSettingAsync(sys::Service *serv,
+                         const audio::Setting &setting,
+                         const audio::Profile::Type &profileType,
+                         const audio::PlaybackType &playbackType)
+    {
+        auto msg = std::make_shared<AudioGetSetting>(profileType, playbackType, setting);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
+    bool KeyPressed(sys::Service *serv, const int step, const std::vector<audio::PlaybackType> &typesToMute)
+    {
+        audio::Volume volume;
+        bool shouldPopup = false;
+        if (step < 0) {
+            AudioServiceAPI::Stop(serv, typesToMute);
+        }
+        auto ret = AudioServiceAPI::GetSetting(serv, audio::Setting::Volume, volume);
+        if (ret == audio::RetCode::Success) {
+            if ((static_cast<int>(volume) + step) >= 0) {
+                AudioServiceAPI::SetSetting(serv, audio::Setting::Volume, volume + step);
+                shouldPopup = true;
+            }
+        }
+
+        auto msg = std::make_shared<AudioKeyPressed>(shouldPopup, volume);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
 } // namespace AudioServiceAPI

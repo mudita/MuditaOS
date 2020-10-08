@@ -31,11 +31,13 @@ class AudioResponseMessage : public sys::ResponseMessage
   public:
     AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
                          const audio::Tags &tags = {},
-                         const float val         = 0.0)
+                         const float val         = 0.0,
+                         const bool shouldPopup  = false)
         : sys::ResponseMessage(), retCode(retCode), tags(tags), val(val)
     {}
 
-    AudioResponseMessage(audio::RetCode retCode, const float val) : AudioResponseMessage(retCode, {}, val)
+    AudioResponseMessage(audio::RetCode retCode, const float val, const bool shouldPopup = false)
+        : AudioResponseMessage(retCode, {}, val, shouldPopup)
     {}
 
     virtual ~AudioResponseMessage()
@@ -44,6 +46,26 @@ class AudioResponseMessage : public sys::ResponseMessage
     const audio::RetCode retCode = audio::RetCode::Success;
     audio::Tags tags             = {};
     float val                    = 0.0;
+    bool shouldPopup             = false;
+};
+
+class AudioKeyPressedResponseMessage : public AudioResponseMessage
+{
+  public:
+    AudioKeyPressedResponseMessage(audio::RetCode retCode, const float val, const bool shouldPopup = false)
+        : AudioResponseMessage(retCode, {}, val, shouldPopup)
+    {}
+};
+
+class AudioKeyPressed : public AudioMessage
+{
+  public:
+    AudioKeyPressed(const bool shouldPopup, const audio::Volume &volume)
+        : AudioMessage{}, shouldPopup{shouldPopup}, volume{volume}
+    {}
+
+    const bool shouldPopup{};
+    const audio::Volume volume{};
 };
 
 class AudioNotificationMessage : public AudioMessage

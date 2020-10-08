@@ -24,6 +24,7 @@ namespace app
 
     sys::Message_t ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
+        Application::DataReceivedHandler(msgl, resp);
         return Application::DataReceivedHandler(msgl);
     }
 

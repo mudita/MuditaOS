@@ -44,6 +44,13 @@ namespace audio
         Last = TextMessageRingtone,
     };
 
+    // enum class Key
+    // {
+    //     None,
+    //     VolumeUp,
+    //     VolumeDown
+    // }
+
     const static std::map<PlaybackType, uint8_t> PlaybackTypePriority = {
         {PlaybackType::CallRingtone, 2},
         {PlaybackType::TextMessageRingtone, 3},

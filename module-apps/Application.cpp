@@ -250,6 +250,17 @@ namespace app
         return msgNotHandled();
     }
 
+    sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    {
+        if (auto r = dynamic_cast<AudioKeyPressedResponseMessage *>(resp)) {
+            LOG_INFO("Get setting triggered %s", std::to_string(r->val).c_str());
+            assert(r->shouldPopup == false);
+        }
+        // return Service::DataReceivedHandler(msgl, resp);
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        // return
+    }
+
     sys::Message_t Application::handleSignalStrengthUpdate(sys::DataMessage *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
@@ -506,18 +517,19 @@ namespace app
 
     bool Application::adjustCurrentVolume(const int step)
     {
-        audio::Volume volume;
-        if (step < 0) {
-            AudioServiceAPI::Stop(this, app::audioConsts::typesToMute);
-        }
-        auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
-        if (ret == audio::RetCode::Success) {
-            ret = ((static_cast<int>(volume) + step) < 0)
-                      ? audio::RetCode::Success
-                      : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
-        }
+        // audio::Volume volume;
+        // if (step < 0) {
+        //     AudioServiceAPI::Stop(this, app::audioConsts::typesToMute);
+        // }
+        // auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
+        return AudioServiceAPI::KeyPressed(this, step, app::audioConsts::typesToMute);
+        // if (ret == audio::RetCode::Success) {
+        //     ret = ((static_cast<int>(volume) + step) < 0)
+        //               ? audio::RetCode::Success
+        //               : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
+        // }
 
-        return ret == audio::RetCode::Success;
+        // return ret == audio::RetCode::Success;
     }
 
     void Application::messageSwitchApplication(sys::Service *sender,

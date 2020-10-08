@@ -128,4 +128,11 @@ namespace AudioServiceAPI
                               const audio::PlaybackType &playbackType = audio::PlaybackType::None,
                               const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
 
+    bool GetSettingAsync(sys::Service *serv,
+                         const audio::Setting &setting,
+                         const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
+                         const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+
+    bool KeyPressed(sys::Service *serv, const int step, const std::vector<audio::PlaybackType> &typesToMute);
+
 }; // namespace AudioServiceAPI

@@ -173,11 +173,12 @@ namespace app
         void refreshWindow(gui::RefreshModes mode);
 
         /// to not hide overload from parent
-        using Service::DataReceivedHandler;
+        // using Service::DataReceivedHandler;
 
         /// Mehtod to handle bus messages, all message types are defined in Message.hpp
         /// Message types are in MessageType
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl);
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
         /// initialization function
         /// 1. it has to be called for each and every application instance, it registeres application in
