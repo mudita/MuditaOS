@@ -71,10 +71,6 @@ namespace gui
         setFocusItem(nullptr);
     }
 
-    void EventReminderWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-    }
-
     void EventReminderWindow::destroyInterface()
     {
         destroyTimer();
@@ -143,10 +139,6 @@ namespace gui
 
         sapm::ApplicationManager::messageSwitchApplication(
             application, "ApplicationDesktop", gui::name::window::main_window, nullptr);
-
-        // TODO: after rework of application switching we would switch here to the last opened window
-        //  of the last active application
-        // application sapm::ApplicationManager::messageSwitchPreviousApplication(application);
     }
 
 } /* namespace gui */

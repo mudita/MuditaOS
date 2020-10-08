@@ -7,6 +7,7 @@
 
 namespace db::query::events
 {
+    /// Query for getting calendar event whose reminder is first in filtered time range
     class SelectFirstUpcoming : public Query
     {
       public:
@@ -17,6 +18,7 @@ namespace db::query::events
         TimePoint filter_till;
     };
 
+    /// Result of SelectFirstUpcoming query
     class SelectFirstUpcomingResult : public QueryResult
     {
         std::unique_ptr<std::vector<EventsRecord>> records;

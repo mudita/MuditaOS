@@ -17,7 +17,7 @@ namespace stm
     CalendarTimeEvents::CalendarTimeEvents(sys::Service *service) : TimeEvents(service)
     {}
 
-    bool CalendarTimeEvents::SendNextEventQuery()
+    bool CalendarTimeEvents::sendNextEventQuery()
     {
         TimePoint filterFrom = TimePointNow();
         TimePoint filterTill = filterFrom;
@@ -26,12 +26,12 @@ namespace stm
             filterTill = filterFrom;
         }
 
-        return DBServiceAPI::GetQuery(Service(),
+        return DBServiceAPI::GetQuery(service(),
                                       db::Interface::Name::Events,
                                       std::make_unique<db::query::events::SelectFirstUpcoming>(filterFrom, filterTill));
     }
 
-    uint32_t CalendarTimeEvents::CalcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult)
+    uint32_t CalendarTimeEvents::calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult)
     {
         auto firstUpcomingQuery =
             dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(nextEventQueryResult.get());
@@ -54,14 +54,14 @@ namespace stm
         return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
 
-    bool CalendarTimeEvents::SendEventFiredQuery()
+    bool CalendarTimeEvents::sendEventFiredQuery()
     {
         eventRecord.reminder_fired = TimePointNow();
         return DBServiceAPI::GetQuery(
-            Service(), db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(eventRecord));
+            service(), db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(eventRecord));
     }
 
-    void CalendarTimeEvents::InvokeEvent()
+    void CalendarTimeEvents::invokeEvent()
     {
         std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
         eventData->setDescription(style::window::calendar::name::event_reminder_window);
@@ -69,6 +69,6 @@ namespace stm
         eventData->setData(event);
 
         sapm::ApplicationManager::messageSwitchApplication(
-            Service(), app::name_calendar, style::window::calendar::name::event_reminder_window, std::move(eventData));
+            service(), app::name_calendar, style::window::calendar::name::event_reminder_window, std::move(eventData));
     }
 } // namespace stm

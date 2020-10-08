@@ -29,7 +29,6 @@ struct NotificationsRecord : public Record
         NotValidKey = 0,
         Calls,
         Sms,
-        CalendarEvents,
         NumberOfKeys // do not use directly
     };
 

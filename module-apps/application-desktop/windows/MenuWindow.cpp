@@ -4,8 +4,6 @@
 #include "Item.hpp"
 #include "Navigation.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include "module-apps/application-calendar/data/CalendarData.hpp"
-#include "service-time/api/TimeServiceAPI.hpp"
 
 #include <tools/Common.hpp>
 #include <Style.hpp>
