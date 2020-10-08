@@ -127,21 +127,7 @@ enum class MessageType
     DBCalllogGetCount,       // Get Calllog reocrds count
 
     // Audio service messages
-    AudioNotification,
-    AudioPlaybackStart,
-    AudioRecorderStart,
-    AudioRoutingStart,
-    AudioStop,
-    AudioPause,
-    AudioResume,
-
-    AudioRoutingMute,
-    AudioRoutingSpeakerhone,
-    AudioRoutingHeadset,
-
-    AudioSetInputGain,
-    AudioGetInputGain,
-    AudioGetFileTags,
+    AudioMessage,
 
     // application manager
     APMCheckAppRunning, // check if application is running in application manager
