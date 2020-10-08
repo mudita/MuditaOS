@@ -17,10 +17,10 @@ namespace gui
         std::list<gui::Option> optionList;
 
         auto i18     = [](std::string text) { return utils::localize.get(text); };
-        auto addMenu = [&](UTF8 name, std::string window = "") {
+        auto addMenu = [&](UTF8 name, std::string window) {
             optionList.emplace_back(gui::Option{name,
                                                 [=](gui::Item &item) {
-                                                    if (window == "") {
+                                                    if (window.empty()) {
                                                         return false;
                                                     }
                                                     LOG_INFO("switching to %s page", window.c_str());
