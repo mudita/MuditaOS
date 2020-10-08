@@ -8,8 +8,8 @@ namespace gui
     {
         using namespace style;
         setMargins(Margins(0, style::margins::small, 0, style::margins::small));
-        setMinimumSize(window::default_body_width, style::window::messages::sms_thread_item_h);
-        setMaximumSize(window::default_body_width, style::window::messages::sms_thread_item_h);
+        setMinimumSize(window::default_body_width, style::messages::threadItem::sms_thread_item_h);
+        setMaximumSize(window::default_body_width, style::messages::threadItem::sms_thread_item_h);
 
         setRadius(0);
         setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);

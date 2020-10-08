@@ -80,6 +80,7 @@ namespace audio
         OperationNotSet,
         ProfileNotSet,
         DeviceFailure,
+        TokenNotFound,
         Failed
     };
 

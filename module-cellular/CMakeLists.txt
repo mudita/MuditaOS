@@ -25,7 +25,8 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_WAKEUP.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_Any.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp       
+	    ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CTZE.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )
@@ -63,6 +64,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/
         ${CMAKE_SOURCE_DIR}/module-services
 
 )

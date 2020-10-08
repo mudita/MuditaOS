@@ -84,47 +84,47 @@ namespace audio
             return false;
         }
 
-    refill:
+        for (;;) {
+            // refill buffer if necessary(only if over 87,5% of bytes are consumed)
+            if (bufferIndex > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8))) {
+                memcpy(&decBuffer[0], &decBuffer[bufferIndex], bytesAvailable);
+                uint32_t bytesRead = vfs.fread(&decBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
-        // refill buffer if necessary(only if over 87,5% of bytes are consumed)
-        if (bufferIndex > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8))) {
-            memcpy(&decBuffer[0], &decBuffer[bufferIndex], bytesAvailable);
-            uint32_t bytesRead = vfs.fread(&decBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+                if (bytesRead == 0) {
+                    return false;
+                }
 
-            if (bytesRead == 0) {
-                return false;
+                bytesAvailable += bytesRead;
+                bufferIndex = 0;
             }
 
-            bytesAvailable += bytesRead;
-            bufferIndex = 0;
-        }
+            for (;;) {
+                uint32_t smpl =
+                    mp3dec_decode_frame(mp3d.get(), &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
+                bufferIndex += info.frame_bytes;
+                bytesAvailable -= info.frame_bytes;
 
-        while (1) {
+                // Valid frame
+                if (smpl && info.frame_bytes) {
 
-            uint32_t smpl = mp3dec_decode_frame(mp3d.get(), &decBuffer[bufferIndex], bytesAvailable, nullptr, &info);
-            bufferIndex += info.frame_bytes;
-            bytesAvailable -= info.frame_bytes;
+                    // Fill necessary parameters
+                    samplesPerFrame           = smpl;
+                    sampleRate                = info.hz;
+                    chanNumber                = info.channels;
+                    firstValidFrameByteSize   = (144 * info.bitrate_kbps * 1000 / info.hz);
+                    firstValidFrameFileOffset = vfs.ftell(fd) - bytesAvailable - firstValidFrameByteSize;
 
-            // Valid frame
-            if (smpl && info.frame_bytes) {
+                    vfs.rewind(fd);
 
-                // Fill necessary parameters
-                samplesPerFrame           = smpl;
-                sampleRate                = info.hz;
-                chanNumber                = info.channels;
-                firstValidFrameByteSize   = (144 * info.bitrate_kbps * 1000 / info.hz);
-                firstValidFrameFileOffset = vfs.ftell(fd) - bytesAvailable - firstValidFrameByteSize;
-
-                vfs.rewind(fd);
-
-                return true;
-            }
-            // Decoder skipped ID3 or invalid data
-            else if ((smpl == 0) && info.frame_bytes) {
-            }
-            // insufficient data
-            else if ((info.frame_bytes == 0) && (smpl == 0)) {
-                goto refill;
+                    return true;
+                }
+                // Decoder skipped ID3 or invalid data
+                else if ((smpl == 0) && info.frame_bytes) {
+                }
+                // insufficient data
+                else if ((info.frame_bytes == 0) && (smpl == 0)) {
+                    break;
+                }
             }
         }
     }

@@ -4,6 +4,8 @@
 
 ### Added
 
+* `[sms]` Added network time synchronisation.
+* `[gui][desktop]` Added *how-to-unlock-screen-info* window.
 * `[gui]` Added GUI timers capability
 * `[fonts]` Added multiplication and division sign to the font files
 * `[bluetooth]` Added storing of BT link keys.
@@ -17,6 +19,8 @@
 
 * `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
 * `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
+* `[audio]` Made most audio api calls asynchronous
+* `[messages]` Refactored messages SMS thread window to use ListView. 
 
 ### Fixed
 
