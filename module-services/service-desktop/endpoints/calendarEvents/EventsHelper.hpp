@@ -22,16 +22,16 @@ namespace parserFSM
         auto updateDBEntry(Context &context) -> sys::ReturnCodes override;
         auto deleteDBEntry(Context &context) -> sys::ReturnCodes override;
 
-        auto createEvent(Context &context) -> sys::ReturnCodes;
-        auto requestEvent(Context &context) -> sys::ReturnCodes;
-        auto updateEvent(Context &context) -> sys::ReturnCodes;
-        auto deleteEvent(Context &context) -> sys::ReturnCodes;
-
         // auto createSimpleResponse(Context &context) -> std::string override;
 
-        static auto toICS(EventsRecord record) -> std::string;
-        static auto toICS(std::unique_ptr<std::vector<EventsRecord>> records) -> std::string;
-        static auto fromICS(std::string msgJson) -> EventsRecord;
+        static auto reminderToICS(uint32_t reminder) -> list<Alarm> *;
+        static auto reminderFromICS(list<Alarm> *alarm) -> uint32_t;
+
+        static auto repeatOptionToICS(uint32_t repeat) -> Recurrence;
+        static auto repeatOptionFromICS(const Recurrence &frequency) -> uint32_t;
+
+        static auto eventRecordsToICS(std::unique_ptr<std::vector<EventsRecord>> records) -> const char *;
+        static auto eventRecordsFromICS(const char *icsFile) -> EventsRecord;
 
       private:
         std::string receivedICS;

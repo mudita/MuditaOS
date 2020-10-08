@@ -18,74 +18,78 @@
 
 using namespace parserFSM;
 
-void ICSegzample()
+auto EventsHelper::reminderToICS(uint32_t reminder) -> list<Alarm> *
 {
-    Date a, b;
+    auto NewEvent = new Event;
+    return NewEvent->Alarms;
+}
 
-    a = "20080627T140000";
-    b = "20080626T100000";
+auto EventsHelper::reminderFromICS(list<Alarm> *alarm) -> uint32_t
+{
+    return 0;
+}
+auto EventsHelper::repeatOptionToICS(uint32_t repeat) -> Recurrence
+{
+    Event *NewEvent = new Event;
+    return NewEvent->RRule;
+}
+auto EventsHelper::repeatOptionFromICS(const Recurrence &frequency) -> uint32_t
+{
+    return 0;
+}
 
-    a[MINUTE] -= 65;
+auto EventsHelper::eventRecordsToICS(std::unique_ptr<std::vector<EventsRecord>> records) -> const char *
+{
+    const char *icsFile = "calendar.ics";
 
-    cout << a << endl;
-    cout << a.Difference(b, HOUR) << endl;
+    //    SearchQuery.Criteria.From = "20100927T000000";
+    //    SearchQuery.Criteria.To   = "20100927T235959";
+    //    // SearchQuery.Criteria.To[HOUR] = 23;
+    //    // SearchQuery.Criteria.To[MINUTE] = 59;
+    //    // SearchQuery.Criteria.To[SECOND] = 59;
 
-    ICalendar Calendar("calendar.ics");
-    Event *CurrentEvent;
-    ICalendar::Query SearchQuery(&Calendar);
+    ICalendar Calendar(icsFile);
 
-    srand(time(NULL));
-
-    SearchQuery.Criteria.From = "20100927T000000";
-    SearchQuery.Criteria.To   = "20100927T235959";
-    // SearchQuery.Criteria.To[HOUR] = 23;
-    // SearchQuery.Criteria.To[MINUTE] = 59;
-    // SearchQuery.Criteria.To[SECOND] = 59;
-
-    SearchQuery.ResetPosition();
-
-    while ((CurrentEvent = SearchQuery.GetNextEvent(false)) != NULL) {
-        cout << CurrentEvent->UID << endl;
-        cout << CurrentEvent->DtStart.Format() << endl;
-        cout << CurrentEvent->DtEnd.Format() << endl;
-        cout << CurrentEvent->Summary << endl;
-        cout << CurrentEvent->Categories << endl;
-        cout << "\t" << CurrentEvent->RRule.Freq << endl;
-        cout << "\t" << CurrentEvent->RRule.Interval << endl;
-        cout << "\t" << CurrentEvent->RRule.Until << endl << endl;
-
-        // CurrentEvent->BaseEvent->Description = "aasfjanfkjahsf";
-        // Calendar.ModifyEvent(CurrentEvent->BaseEvent);
+    for (auto currentRecord : *records) {
+        auto currentEvent     = new Event();
+        currentEvent->Summary = currentRecord.title;
+        currentEvent->DtStart = TimePointToString(currentRecord.date_from);
+        currentEvent->DtEnd   = TimePointToString(currentRecord.date_till);
+        currentEvent->RRule   = repeatOptionToICS(currentRecord.repeat);
+        currentEvent->Alarms  = reminderToICS(currentRecord.reminder);
+        Calendar.AddEvent(currentEvent);
     }
 
-    Event *NewEvent   = new Event;
-    NewEvent->Summary = "test";
-    a.SetToNow();
-    NewEvent->DtStart = a;
-    Calendar.AddEvent(NewEvent);
+    return icsFile;
 }
-auto EventsHelper::toICS(EventsRecord record) -> std::string
+
+auto EventsHelper::eventRecordsFromICS(const char *icsFile) -> std::vector<EventsRecord>
 {
-    Date from, till;
-    // TIMEPOINT TO STRING
-    from = "20080627T140000";
-    till = "20080626T100000";
+    /// TODO: Add repeat -> freq?? and reminder -> Alarm
+    /// TODO: get List of events or transfer one event?? (list will be faster and more universal)
+    ICalendar Calendar(icsFile);
+    Event *CurrentEvent;
+    ICalendar::Query SearchQuery(&Calendar);
+    SearchQuery.ResetPosition();
 
-    ICalendar Calendar("calendar.ics");
+    std::vector<EventsRecord> records;
 
-    Event *NewEvent   = new Event;
-    NewEvent->Summary = "test";
-    a.SetToNow();
-    NewEvent->DtStart = a;
-    Calendar.AddEvent(NewEvent);
+    while ((CurrentEvent = SearchQuery.GetNextEvent(false)) != NULL) {
+        EventsRecord currentRecord;
+        currentRecord.title     = CurrentEvent->Summary;
+        currentRecord.date_from = TimePointFromString(CurrentEvent->DtStart.Format().c_str());
+        currentRecord.date_till = TimePointFromString(CurrentEvent->DtEnd.Format().c_str());
+        currentRecord.repeat    = repeatOptionFromICS(CurrentEvent->RRule);
+        currentRecord.reminder  = reminderFromICS(CurrentEvent->Alarms);
+
+        records.push_back(currentRecord);
+    }
+    return records;
 }
-
-auto EventsHelper::fromICS(std::string msgJson) -> EventsRecord
-{}
 
 auto EventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    EventsRecord record = fromICS(context.getICS());
+    EventsRecord record = fromICS(context.getICS()); /// TODO: Get Event from ICS BY ID
 
     auto query    = std::make_unique<db::query::events::Add>(record);
     auto listener = std::make_unique<db::EndpointListener>(
@@ -149,7 +153,7 @@ auto EventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     auto listener = std::make_unique<db::EndpointListener>(
         [=](db::QueryResult *result, Context context) {
             if (auto EventsResult = dynamic_cast<db::query::events::GetAllResult *>(result)) {
-                context.setResponseICS(EventsHelper::toICS(std::move(EventsResult->getResult())));
+                context.setResponseICS(EventsHelper::eventRecordsToICS(std::move(EventsResult->getResult())));
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
