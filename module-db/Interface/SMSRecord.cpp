@@ -18,6 +18,7 @@
 
 #include <PhoneNumber.hpp>
 #include <optional>
+#include <module-db/queries/messages/sms/QuerySMSGetForList.hpp>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
     : date(w.date), dateSent(w.dateSent), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
@@ -310,6 +311,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
     else if (typeid(*query) == typeid(db::query::SMSGetByThreadID)) {
         return getByThreadIDQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::SMSGetForList)) {
+        return getForListQuery(query);
+    }
     else if (typeid(*query) == typeid(db::query::SMSGetCountByThreadID)) {
         return getCountByThreadIDQuery(query);
     }
@@ -505,6 +509,43 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::getByThreadIDQuery(std::sha
     }
 
     auto response = std::make_unique<db::query::SMSGetByThreadIDResult>(recordVector);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> SMSRecordInterface::getForListQuery(std::shared_ptr<db::Query> query)
+{
+    const auto localQuery = static_cast<const db::query::SMSGetForList *>(query.get());
+    auto smsVector =
+        smsDB->sms.getByThreadIdWithoutDraftWithEmptyInput(localQuery->threadId, localQuery->offset, localQuery->limit);
+    std::vector<SMSRecord> recordVector;
+    for (auto sms : smsVector) {
+        SMSRecord record;
+        record.body      = sms.body;
+        record.contactID = sms.contactID;
+        record.date      = sms.date;
+        record.dateSent  = sms.dateSent;
+        record.errorCode = sms.errorCode;
+        record.threadID  = sms.threadID;
+        record.type      = sms.type;
+        record.ID        = sms.ID;
+        recordVector.emplace_back(record);
+    }
+
+    auto count = smsDB->sms.countWithoutDraftsByThreadId(localQuery->threadId);
+    auto draft = smsDB->sms.getDraftByThreadId(localQuery->threadId);
+
+    SMSRecord record;
+    record.body      = draft.body;
+    record.contactID = draft.contactID;
+    record.date      = draft.date;
+    record.dateSent  = draft.dateSent;
+    record.errorCode = draft.errorCode;
+    record.threadID  = draft.threadID;
+    record.type      = draft.type;
+    record.ID        = draft.ID;
+
+    auto response = std::make_unique<db::query::SMSGetForListResult>(recordVector, count, record);
     response->setRequestQuery(query);
     return response;
 }

@@ -81,12 +81,12 @@ class MockAudio : public audio::Audio
           state(state), plbckType(plbckType), opState(opState)
     {}
 
-    std::optional<audio::PlaybackType> GetCurrentOperationPlaybackType() const override
+    audio::PlaybackType GetCurrentOperationPlaybackType() const override
     {
         return plbckType;
     }
 
-    std::optional<audio::Operation::State> GetCurrentOperationState() const override
+    audio::Operation::State GetCurrentOperationState() const override
     {
         return opState;
     }
@@ -97,8 +97,8 @@ class MockAudio : public audio::Audio
     }
 
     State state = State::Idle;
-    std::optional<audio::PlaybackType> plbckType;
-    std::optional<audio::Operation::State> opState;
+    audio::PlaybackType plbckType;
+    audio::Operation::State opState;
 };
 
 TEST_CASE("Test AudioMux")
@@ -344,33 +344,26 @@ TEST_CASE("Test AudioMux")
 
         GIVEN("One Input")
         {
-            WHEN("When token matches")
+            WHEN("When free inputs available")
             {
                 tkId = insertAudio(
                     audioInputs, Audio::State::Playback, PlaybackType::Multimedia, Operation::State::Active, tokenIdx);
-                auto retInput = aMux.GetPlaybackInput(Token(tkId), testPlaybackTypeLowPrio);
+                auto retInput = aMux.GetPlaybackInput(testPlaybackTypeLowPrio);
                 REQUIRE(retInput != std::nullopt);
                 REQUIRE((*retInput)->token == Token(tkId));
-            }
-            WHEN("When token not found")
-            {
-                tkId =
-                    insertAudio(audioInputs, Audio::State::Idle, PlaybackType::None, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetPlaybackInput(Token(tkId + 1), testPlaybackTypeLowPrio);
-                REQUIRE(retInput == std::nullopt);
             }
             WHEN("Should reject due to Recording active")
             {
                 tkId = insertAudio(
                     audioInputs, Audio::State::Recording, PlaybackType::None, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetPlaybackInput(Token(), testPlaybackTypeHighPrio);
+                auto retInput = aMux.GetPlaybackInput(testPlaybackTypeHighPrio);
                 REQUIRE(retInput == std::nullopt);
             }
             WHEN("Should reject due to Routing active")
             {
                 tkId = insertAudio(
                     audioInputs, Audio::State::Routing, PlaybackType::None, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetPlaybackInput(Token(), testPlaybackTypeHighPrio);
+                auto retInput = aMux.GetPlaybackInput(testPlaybackTypeHighPrio);
                 REQUIRE(retInput == std::nullopt);
             }
         }

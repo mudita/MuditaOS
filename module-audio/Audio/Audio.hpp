@@ -55,25 +55,20 @@ namespace audio
             return currentOperation->GetInputGain();
         }
 
-        const Operation *GetCurrentOperation() const
+        const Operation &GetCurrentOperation() const
         {
-            return currentOperation.get();
+            // currentOperation always exists - null pattern design
+            return *(currentOperation.get());
         }
 
-        virtual std::optional<audio::PlaybackType> GetCurrentOperationPlaybackType() const
+        virtual audio::PlaybackType GetCurrentOperationPlaybackType() const
         {
-            if (currentOperation.get()) {
-                return currentOperation.get()->GetPlaybackType();
-            }
-            return std::nullopt;
+            return GetCurrentOperation().GetPlaybackType();
         }
 
-        virtual std::optional<Operation::State> GetCurrentOperationState() const
+        virtual Operation::State GetCurrentOperationState() const
         {
-            if (currentOperation.get()) {
-                return currentOperation.get()->GetState();
-            }
-            return std::nullopt;
+            return GetCurrentOperation().GetState();
         }
 
         [[nodiscard]] inline bool GetHeadphonesInserted() const

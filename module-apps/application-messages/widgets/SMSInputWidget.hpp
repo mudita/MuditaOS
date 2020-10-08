@@ -4,20 +4,34 @@
 
 #include "Text.hpp"
 #include "Image.hpp"
+#include "ListItem.hpp"
 #include <BoxLayout.hpp>
+#include "Interface/SMSRecord.hpp"
 
 namespace gui
 {
 
-    class SMSInputWidget : public HBox
+    class SMSInputWidget : public ListItem
     {
-        gui::Image *replyImage = nullptr;
+        app::Application *application = nullptr;
+        HBox *body                    = nullptr;
+        gui::Image *replyImage        = nullptr;
 
       public:
         gui::Text *inputText = nullptr;
+        std::optional<SMSRecord> draft; // draft message of the thread we are showing, if exists.
+        std::unique_ptr<utils::PhoneNumber::View> number = nullptr;
 
-        SMSInputWidget(Item *parent, app::Application *application);
-        virtual ~SMSInputWidget() = default;
+        SMSInputWidget(app::Application *application);
+        ~SMSInputWidget() override = default;
+
+        void handleDraftMessage();
+        void clearDraftMessage();
+        void updateDraftMessage(const UTF8 &inputText);
+        void displayDraftMessage() const;
+
+        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 
 } /* namespace gui */

@@ -56,8 +56,8 @@ namespace app
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------CallAborted");
-        AudioServiceAPI::Stop(this, routingAudioHandle);
-        AudioServiceAPI::Stop(this, callringAudioHandle);
+        AudioServiceAPI::StopAll(this);
+
         callWindow->setState(gui::CallWindow::State::CALL_ENDED);
         if (getState() == State::ACTIVE_FORGROUND && getCurrentWindow() != callWindow) {
             switchWindow(window::name_call);
@@ -77,7 +77,7 @@ namespace app
         gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
         assert(callWindow != nullptr);
 
-        routingAudioHandle = AudioServiceAPI::RoutingStart(this);
+        AudioServiceAPI::RoutingStart(this);
         runCallTimer();
 
         LOG_INFO("---------------------------------CallActive");
@@ -95,8 +95,7 @@ namespace app
             LOG_INFO("ignoring call incoming");
         }
         else {
-            callringAudioHandle =
-                AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
+            AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
             runCallTimer();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncomingCallData>(msg->number);
             // send to itself message to switch (run) call application
@@ -119,7 +118,7 @@ namespace app
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------Ringing");
-        routingAudioHandle = AudioServiceAPI::RoutingStart(this);
+        AudioServiceAPI::RoutingStart(this);
         runCallTimer();
 
         std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->number);
