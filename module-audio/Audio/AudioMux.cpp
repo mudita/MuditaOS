@@ -45,19 +45,10 @@ namespace audio
         return std::nullopt;
     }
 
-    std::optional<AudioMux::Input *> AudioMux::GetPlaybackInput(const Token &token,
-                                                                const audio::PlaybackType &playbackType)
+    std::optional<AudioMux::Input *> AudioMux::GetPlaybackInput(const audio::PlaybackType &playbackType)
     {
         // if routing or recording we cannot continue
         if (GetInput({Audio::State::Routing, Audio::State::Recording})) {
-            return std::nullopt;
-        }
-        // try get with token
-        if (auto input = GetInput(token)) {
-            return input;
-        }
-        if (token.IsValid()) {
-            // reject since operation does not exist
             return std::nullopt;
         }
         // try get with priority
@@ -75,10 +66,6 @@ namespace audio
     std::optional<AudioMux::Input *> AudioMux::GetActiveInput()
     {
         for (auto &audioInput : audioInputs) {
-
-            if (!audioInput.audio->GetCurrentOperation()) {
-                continue;
-            }
             if (audioInput.audio->GetCurrentState() != Audio::State::Idle &&
                 audioInput.audio->GetCurrentOperationState() == audio::Operation::State::Active) {
                 return &audioInput;
@@ -118,7 +105,7 @@ namespace audio
         std::optional<AudioMux::Input *> overridableInput;
 
         for (auto &audioInput : audioInputs) {
-            auto currentPlaybackType = audioInput.audio->GetCurrentOperationPlaybackType().value_or(PlaybackType::None);
+            auto currentPlaybackType = audioInput.audio->GetCurrentOperationPlaybackType();
             auto currentInputPrior   = GetPlaybackPriority(currentPlaybackType);
 
             // check busy input
@@ -144,9 +131,10 @@ namespace audio
         return idleInput ? idleInput : overridableInput;
     }
 
-    const Token AudioMux::IncrementToken(std::optional<AudioMux::Input *> input)
+    const Token AudioMux::ResetInput(std::optional<AudioMux::Input *> input)
     {
         if (input) {
+            (*input)->DisableVibration();
             return (*input)->token = refToken.IncrementToken();
         }
         return refToken.IncrementToken();

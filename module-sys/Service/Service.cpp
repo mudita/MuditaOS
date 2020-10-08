@@ -114,9 +114,8 @@ namespace sys
         return ret;
     }
 
-    bool Service::connect(Message *msg, MessageHandler handler)
+    bool Service::connect(const type_info &type, MessageHandler handler)
     {
-        auto &type = typeid(*msg);
         auto idx   = type_index(type);
         if (message_handlers.find(idx) == message_handlers.end()) {
             LOG_DEBUG("Registering new message handler on %s", type.name());
@@ -125,6 +124,12 @@ namespace sys
         }
         LOG_ERROR("Handler for: %s already registered!", type.name());
         return false;
+    }
+
+    bool Service::connect(Message *msg, MessageHandler handler)
+    {
+        auto &type = typeid(*msg);
+        return connect(type, handler);
     }
 
     bool Service::connect(Message &&msg, MessageHandler handler)
