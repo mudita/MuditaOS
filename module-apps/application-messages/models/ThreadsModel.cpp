@@ -2,17 +2,17 @@
 #include "InputEvent.hpp"
 #include "OptionWindow.hpp"
 #include "application-messages/data/SMSdata.hpp"
+#include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
 #include <module-services/service-db/api/DBServiceAPI.hpp>
-#include <module-services/service-db/messages/DBThreadMessage.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}
 
 auto ThreadsModel::getMinimalItemHeight() const -> unsigned int
 {
-    return style::window::messages::sms_thread_item_h;
+    return style::messages::threadItem::sms_thread_item_h;
 }
 
 auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *

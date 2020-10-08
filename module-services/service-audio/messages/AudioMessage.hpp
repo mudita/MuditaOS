@@ -20,25 +20,30 @@
 class AudioMessage : public sys::DataMessage
 {
   public:
-    AudioMessage() : sys::DataMessage(MessageType::MessageTypeUninitialized)
+    AudioMessage() : sys::DataMessage(MessageType::AudioMessage)
     {}
 
-    AudioMessage(MessageType messageType,
-                 audio::PlaybackType playbackType = audio::PlaybackType::None,
-                 audio::Token token               = audio::Token())
-        : sys::DataMessage(messageType), type(messageType), playbackType(playbackType), token(token)
+    virtual ~AudioMessage() = default;
+};
+
+class AudioResponseMessage : public sys::ResponseMessage
+{
+  public:
+    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
+                         const audio::Tags &tags = {},
+                         const float val         = 0.0)
+        : sys::ResponseMessage(), retCode(retCode), tags(tags), val(val)
     {}
 
-    explicit AudioMessage(audio::Token token) : sys::DataMessage(MessageType::MessageTypeUninitialized), token(token)
+    AudioResponseMessage(audio::RetCode retCode, const float val) : AudioResponseMessage(retCode, {}, val)
     {}
 
-    explicit AudioMessage(const audio::PlaybackType &playbackType)
-        : sys::DataMessage(MessageType::MessageTypeUninitialized), playbackType(playbackType)
+    virtual ~AudioResponseMessage()
     {}
 
-    MessageType type = MessageType::MessageTypeUninitialized;
-    audio::PlaybackType playbackType = audio::PlaybackType::None;
-    const audio::Token token;
+    const audio::RetCode retCode = audio::RetCode::Success;
+    audio::Tags tags             = {};
+    float val                    = 0.0;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -51,14 +56,11 @@ class AudioNotificationMessage : public AudioMessage
         Stop
     };
 
-    AudioNotificationMessage(Type type, audio::Token token)
-        : AudioMessage(MessageType::AudioNotification, audio::PlaybackType::None, token), type(type)
+    explicit AudioNotificationMessage(Type type, audio::Token token) : type(type), token(token)
     {}
 
-    ~AudioNotificationMessage()
-    {}
-
-    Type type;
+    const Type type;
+    const audio::Token token;
 };
 
 class AudioSettingsMessage : public AudioMessage
@@ -104,63 +106,146 @@ class AudioSetSetting : public AudioSettingsMessage
     ~AudioSetSetting() override = default;
 };
 
-class AudioRequestMessage : public AudioMessage
+class AudioStopRequest : public AudioMessage
 {
   public:
-    AudioRequestMessage(MessageType messageType, audio::Token token = audio::Token())
-        : AudioMessage(messageType, audio::PlaybackType::None, token)
+    AudioStopRequest(const std::vector<audio::PlaybackType> &stopVec = {}) : stopVec(stopVec)
     {}
 
-    ~AudioRequestMessage()
-    {}
-    std::string fileName;
-    float val;
-    bool enable;
-};
-
-class AudioStopMessage : public AudioMessage
-{
-  public:
-    AudioStopMessage(const std::vector<audio::PlaybackType> &stopVec = {}) : AudioMessage(), stopVec(stopVec)
-    {}
-
-    AudioStopMessage(const audio::Token &token) : AudioMessage(token)
+    AudioStopRequest(const audio::Token &token) : token(token)
     {}
 
     const std::vector<audio::PlaybackType> stopVec;
+    const audio::Token token;
 };
 
-class AudioStartMessage : public AudioMessage
+class AudioStopResponse : public AudioResponseMessage
 {
   public:
-    AudioStartMessage(const std::string &fileName, const audio::PlaybackType &playbackType)
-        : AudioMessage(playbackType), fileName(fileName)
+    AudioStopResponse(audio::RetCode retCode, const audio::Token &token) : AudioResponseMessage(retCode), token(token)
+    {}
+
+    const audio::Token token;
+};
+
+class AudioStartPlaybackRequest : public AudioMessage
+{
+  public:
+    AudioStartPlaybackRequest(const std::string &fileName, const audio::PlaybackType &playbackType)
+        : AudioMessage(), fileName(fileName), playbackType(playbackType)
+    {}
+
+    const std::string fileName;
+    const audio::PlaybackType playbackType;
+};
+
+class AudioStartPlaybackResponse : public AudioResponseMessage
+{
+  public:
+    AudioStartPlaybackResponse(audio::RetCode retCode, const audio::Token &token)
+        : AudioResponseMessage(retCode), token(token)
+    {}
+
+    const audio::Token token;
+};
+
+class AudioStartRoutingRequest : public AudioMessage
+{
+  public:
+    AudioStartRoutingRequest()
+    {}
+};
+
+class AudioStartRoutingResponse : public AudioResponseMessage
+{
+  public:
+    AudioStartRoutingResponse(audio::RetCode retCode, const audio::Token &token)
+        : AudioResponseMessage(retCode), token(token)
+    {}
+
+    const audio::Token token;
+};
+
+class AudioStartRecorderRequest : public AudioMessage
+{
+  public:
+    AudioStartRecorderRequest(const std::string &fileName) : fileName(fileName)
     {}
 
     const std::string fileName;
 };
 
-class AudioResponseMessage : public sys::ResponseMessage
+class AudioStartRecorderResponse : public AudioResponseMessage
 {
   public:
-    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
-                         const audio::Tags &tags = {},
-                         audio::Token token      = audio::Token(),
-                         const float val         = 0.0)
-        : sys::ResponseMessage(), tags(tags), val(val), token(token)
+    AudioStartRecorderResponse(audio::RetCode retCode, const audio::Token &token)
+        : AudioResponseMessage(retCode), token(token)
     {}
 
-    AudioResponseMessage(audio::RetCode retCode, const float val)
-        : AudioResponseMessage(retCode, {}, audio::Token(), val)
+    const audio::Token token;
+};
+
+class AudioPauseRequest : public AudioMessage
+{
+  public:
+    AudioPauseRequest(const audio::Token &token) : token(token)
     {}
 
-    virtual ~AudioResponseMessage()
+    const audio::Token token;
+};
+
+class AudioPauseResponse : public AudioResponseMessage
+{
+  public:
+    AudioPauseResponse(audio::RetCode retCode, const audio::Token &token) : AudioResponseMessage(retCode), token(token)
     {}
 
-    audio::RetCode retCode = audio::RetCode::Success;
-    audio::Tags tags       = {};
-    float val              = 0.0;
-    audio::Token token;
+    const audio::Token token;
+};
+
+class AudioResumeRequest : public AudioMessage
+{
+  public:
+    AudioResumeRequest(const audio::Token &token) : token(token)
+    {}
+
+    const audio::Token token;
+};
+
+class AudioResumeResponse : public AudioResponseMessage
+{
+  public:
+    AudioResumeResponse(audio::RetCode retCode, const audio::Token &token) : AudioResponseMessage(retCode), token(token)
+    {}
+
+    const audio::Token token;
+};
+
+class AudioGetFileTagsRequest : public AudioMessage
+{
+  public:
+    AudioGetFileTagsRequest(const std::string &fileName) : fileName(fileName)
+    {}
+
+    const std::string fileName;
+};
+
+class AudioRoutingControlRequest : public AudioMessage
+{
+  public:
+    enum class ControlType
+    {
+        RecordCtrl,
+        Mute,
+        SwitchSpeakerphone,
+        SwitchHeadphones
+    };
+
+    AudioRoutingControlRequest(ControlType controlType, bool enable) : enable(enable), controlType(controlType)
+    {}
+
+    const bool enable;
+    const ControlType controlType;
 };
 
 #endif // PUREPHONE_AUDIOMESSAGE_HPP

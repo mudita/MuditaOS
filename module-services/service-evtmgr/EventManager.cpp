@@ -157,12 +157,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         handled = true;
     }
-    else if (msgl->messageType == MessageType::AudioRoutingHeadset && msgl->sender == this->GetName()) {
-        auto *msg = dynamic_cast<AudioRequestMessage *>(msgl);
-        if (msg != nullptr) {
-            AudioServiceAPI::RoutingHeadset(this, msg->enable);
-            handled = true;
-        }
+    else if (auto msg = dynamic_cast<AudioRoutingControlRequest *>(msgl); msg && msgl->sender == this->GetName()) {
+        AudioServiceAPI::RoutingHeadset(this, msg->enable);
+        handled = true;
     }
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
