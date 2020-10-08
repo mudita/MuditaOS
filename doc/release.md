@@ -43,5 +43,19 @@ After the release is successfully build you have to manually publish it on GitHu
 
 2. Delete the tags.
 
- - Delete local tag: `git tag --delete release-x.y.z`
- - Delete remote tag: `git push --delete origin release-x.y.z` or `git push origin :refs/tags/release-x.y.z`
+ - Delete local tag: 
+
+```bash
+git tag --delete release-x.y.z
+```
+
+ - Delete remote tag: 
+
+```bash
+git push --delete origin release-x.y.z
+``` 
+OR
+
+```bash
+git push origin :refs/tags/release-x.y.z
+```
