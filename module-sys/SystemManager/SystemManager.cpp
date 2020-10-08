@@ -317,23 +317,26 @@ namespace sys
         std::reverse(servicesList.begin(), servicesList.end());
         CriticalSection::Exit();
 
-    retry:
-        for (auto &service : servicesList) {
-            if (service->GetName() == service::name::evt_manager) {
-                LOG_DEBUG("Delay closing %s", service::name::evt_manager.c_str());
-                continue;
-            }
-            if (service->parent == "") {
-                auto ret = DestroyService(service->GetName(), this);
-                if (!ret) {
-                    // no response to exit message,
-                    LOG_FATAL("%s", (service->GetName() + " failed to response to exit message").c_str());
-                    kill(service);
+        for (bool retry{};; retry = false) {
+            for (auto &service : servicesList) {
+                if (service->GetName() == service::name::evt_manager) {
+                    LOG_DEBUG("Delay closing %s", service::name::evt_manager.c_str());
+                    continue;
                 }
-                goto retry;
+                if (service->parent == "") {
+                    const auto ret = DestroyService(service->GetName(), this);
+                    if (!ret) {
+                        // no response to exit message,
+                        LOG_FATAL("%s", (service->GetName() + " failed to response to exit message").c_str());
+                        kill(service);
+                    }
+                    retry = true;
+                    break;
+                }
             }
+            if (!retry)
+                break;
         }
-
         set(State::Shutdown);
     }
 

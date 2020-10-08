@@ -771,7 +771,8 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 2;
         }
         else {
-            goto wrong_utf8_character;
+            LOG_ERROR("wrong utf8 char");
+            return ret;
         }
     }
     else if (((*utf8_char) & UTF8_HEADER_3_MASK) ==
@@ -786,7 +787,8 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 3;
         }
         else {
-            goto wrong_utf8_character;
+            LOG_ERROR("wrong utf8 char");
+            return ret;
         }
     }
     else if (((*(utf8_char)&UTF8_HEADER_4_MASK) ==
@@ -804,13 +806,11 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 4;
         }
         else {
-            goto wrong_utf8_character;
+            LOG_ERROR("wrong utf8 char");
+            return ret;
         }
     }
     length = len;
-    return ret;
-wrong_utf8_character:
-    LOG_ERROR("wrong utf8 char");
     return ret;
 }
 

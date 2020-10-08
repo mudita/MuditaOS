@@ -111,11 +111,14 @@ namespace bsp
     {
 
         cpp_freertos::LockGuard lock(serOutMutex);
-    retry:
-        auto ret = read(fd, buf, nbytes);
-        if ((ret == -1) && (errno == EINTR)) {
-            goto retry;
+
+        int ret;
+        for (;;) {
+            ret = read(fd, buf, nbytes);
+            if (ret != -1 || errno != EINTR)
+                break;
         }
+
 #if _LINUX_UART_DEBUG
         if (ret > 0) {
             LOG_PRINTF("[RX] ");
@@ -138,10 +141,11 @@ namespace bsp
             LOG_PRINTF("%02X ", (uint8_t)*ptr++);
         LOG_PRINTF("\n");
 #endif
-    retry:
-        auto ret = write(fd, buf, nbytes);
-        if ((ret == -1) && (errno == EINTR)) {
-            goto retry;
+        int ret;
+        for (;;) {
+            ret = write(fd, buf, nbytes);
+            if (ret != -1 || errno != EINTR)
+                break;
         }
         return ret;
     }
@@ -165,23 +169,23 @@ namespace bsp
         uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
         uint32_t timeElapsed   = currentTime;
 
-    retry:
+        for (;;) {
+            if (timeElapsed >= timeoutNeeded) {
+                return 0; // timeout
+            }
 
-        if (timeElapsed >= timeoutNeeded) {
-            return 0; // timeout
-        }
+            auto event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, timeoutNeeded - timeElapsed);
+            timeElapsed      = cpp_freertos::Ticks::GetTicks();
 
-        auto event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, timeoutNeeded - timeElapsed);
-        timeElapsed      = cpp_freertos::Ticks::GetTicks();
-
-        if (event_count == 0) {
-            return 0; // timeout
-        }
-        else if ((event_count == -1) && (errno == EINTR)) {
-            goto retry;
-        }
-        else {
-            return 1;
+            if (event_count == 0) {
+                return 0; // timeout
+            }
+            else if ((event_count == -1) && (errno == EINTR)) {
+                continue;
+            }
+            else {
+                return 1;
+            }
         }
     }
 
