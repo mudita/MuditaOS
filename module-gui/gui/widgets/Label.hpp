@@ -108,8 +108,8 @@ namespace gui
         // Label's specific methods
         virtual void setText(const UTF8 &text);
         virtual void clear();
-        virtual const UTF8 &getText() const;
-        virtual unsigned int getTextLength() const;
+        virtual const UTF8 &getText() const noexcept;
+        virtual unsigned int getTextLength() const noexcept;
         void setAlignment(const Alignment &value) override;
         void setPadding(const Padding &padding) override;
         void setEllipsis(gui::Ellipsis ellipsis);
@@ -121,12 +121,13 @@ namespace gui
 
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
-        RawFont *getFont() const;
+        RawFont *getFont() const noexcept;
         // virtual methods
         std::list<DrawCommand *> buildDrawList() override;
-        uint32_t getTextNeedSpace() const;
+        uint32_t getTextNeedSpace() const noexcept;
         /// line: height
-        uint32_t getTextHeight() const;
+        uint32_t getTextHeight() const noexcept;
+        uint32_t getTextWidth() const noexcept;
 
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };

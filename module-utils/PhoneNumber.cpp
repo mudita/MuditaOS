@@ -305,7 +305,10 @@ PhoneNumber::View::View(const std::string &enteredNumber,
 
 bool PhoneNumber::View::operator==(const View &rhs) const
 {
-    return valid == rhs.valid && e164 == rhs.e164;
+    if (valid != rhs.valid) {
+        return false;
+    }
+    return valid ? e164 == rhs.e164 : entered == rhs.entered;
 }
 
 const std::string &PhoneNumber::View::getNonEmpty() const

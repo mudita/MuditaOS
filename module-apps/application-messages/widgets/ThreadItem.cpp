@@ -10,17 +10,24 @@ namespace gui
 {
     ThreadItem *ThreadItem::makeThreadItem(ThreadsModel *model, std::shared_ptr<ThreadRecord> thread)
     {
-        ThreadItem *threadItem = nullptr;
-        threadItem             = thread->isUnread() ? new ThreadItemNotRead(model) : new ThreadItem(model);
-
+        ThreadItem *threadItem = thread->isUnread() ? new ThreadItemNotRead(model) : new ThreadItem(model);
         threadItem->setThreadItem(thread);
-
         return threadItem;
     }
 
     ThreadItem::ThreadItem(ThreadsModel *model)
     {
         this->model = model;
+    }
+
+    auto ThreadItem::getThreadName() const -> UTF8
+    {
+        std::ostringstream name;
+        name << contact->getText();
+        if (const auto &importance = numberImportance->getText(); !importance.empty()) {
+            name << ' ' << importance;
+        }
+        return name.str();
     }
 
     void ThreadItem::setPreview()
@@ -43,19 +50,50 @@ namespace gui
         preview->setText(prefix + thread->snippet);
     }
 
-    void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> thread)
+    void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> _thread)
     {
-        this->thread = thread;
-
+        thread = std::move(_thread);
         if (model != nullptr) {
-            auto contactRec = DBServiceAPI::ContactGetByIDWithTemporary(model->getApplication(), thread->contactID);
-            auto cont       = contactRec->front();
-            contact->setText(cont.getFormattedName());
+            const auto &contact = getContactRecord();
+            setContactName(contact, getNumberImportance(contact));
         }
 
         timestamp->setText(utils::time::DateTime(thread->date));
-
         setPreview();
+    }
+
+    auto ThreadItem::getContactRecord() -> ContactRecord
+    {
+        auto contactRec = DBServiceAPI::ContactGetByIDWithTemporary(model->getApplication(), thread->contactID);
+        return contactRec->front();
+    }
+
+    auto ThreadItem::getNumberImportance(const ContactRecord &contact) -> std::optional<long>
+    {
+        if (contact.numbers.size() < 2) {
+            // At least two phone numbers are needed to indicate a number importance.
+            return std::nullopt;
+        }
+
+        const auto numberRec     = DBServiceAPI::GetNumberById(model->getApplication(), thread->numberID);
+        const auto &phoneNumbers = contact.numbers;
+
+        const auto it = std::find_if(phoneNumbers.begin(), phoneNumbers.end(), [&numberRec](const auto &phoneNumber) {
+            return phoneNumber.number == *numberRec;
+        });
+
+        if (it == phoneNumbers.end()) {
+            return std::nullopt;
+        }
+        return std::distance(phoneNumbers.begin(), it) + 1;
+    }
+
+    void ThreadItem::setContactName(const ContactRecord &contactInfo, std::optional<long int> numberImportance)
+    {
+        contact->setText(contactInfo.getFormattedName());
+        if (numberImportance.has_value()) {
+            displayNumberImportance(numberImportance.value());
+        }
     }
 
     ThreadItemWithIndicator::ThreadItemWithIndicator(ThreadsModel *model, const UTF8 &indicatorName) : ThreadItem(model)

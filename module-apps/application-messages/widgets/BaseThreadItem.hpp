@@ -10,12 +10,15 @@ namespace gui
     {
 
       protected:
-        gui::Label *contact   = nullptr;
-        gui::Label *timestamp = nullptr;
-        gui::Label *preview   = nullptr;
+        gui::Label *contact          = nullptr;
+        gui::Label *numberImportance = nullptr;
+        gui::Label *timestamp        = nullptr;
+        gui::Label *preview          = nullptr;
 
         virtual void onDimensionChangedTop(const BoundingBox &oldDim, const BoundingBox &newDim);
         virtual void onDimensionChangedBottom(const BoundingBox &oldDim, const BoundingBox &newDim);
+
+        void displayNumberImportance(long int importance);
 
       public:
         BaseThreadItem();
