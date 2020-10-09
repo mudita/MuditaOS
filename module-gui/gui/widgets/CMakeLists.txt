@@ -2,8 +2,10 @@ target_sources( ${PROJECT_NAME}
 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Arc.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/BottomBar.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/CheckBox.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Circle.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Icon.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Image.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ImageBox.cpp"
@@ -13,7 +15,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/ListView.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Margins.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Navigation.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/Progress.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/ProgressBar.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Rect.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Window.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/BoxLayout.cpp"
@@ -38,7 +40,9 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/TextFormat.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Arc.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/BottomBar.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Circle.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Image.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ImageBox.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Item.hpp"
@@ -48,7 +52,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/ListView.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Margins.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Navigation.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/Progress.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/ProgressBar.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Rect.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Window.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/BoxLayout.hpp"
