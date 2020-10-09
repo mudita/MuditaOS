@@ -1,11 +1,11 @@
 # Setting up an integrated development environment
 
 ## Table of contents
-- Setting up in [Eclipse](#Eclipse)
-- Setting up in [CLion](#CLion)
-- Additional info
-    + Prevent Git from suggesting commits
-    + Seperate build folders
+- [Setting up in Eclipse](#setting-up-in-eclipse)
+- [Setting up in CLion](#setting-up-in -clion)
+- [Additional info](#additional-info)
+    + [Prevent Git from suggesting commits](#prevent-git-from-suggesting- commits)
+    + [Seperate build folders](#separate-build-folders)
 
 ### Setting up in Eclipse
 
@@ -27,16 +27,16 @@ To run the project in Eclipse:
 
 1. Open settings (CTRL+ALT+S)
 2. Go to `Build, Execution, Deployment` -> `Toolchain`
-3. Add new toolchains for Linux and rt1051 (ALT+Ins) of `System` type
+3. Add new toolchains for Linux and RT1051 (ALT+Ins) of `System` type
     - Name: Linux
         - CMake should be autodetected - if not, run `which cmake`   
         - Select appropriate `gdb`
         - for x86 it's usually `/usr/bin/gdb`
 
-    - Name: rt1051
+    - Name: RT1051
         - CMake should be autodetected - if not, run `which cmake`
         - Select appropriate `gdb`
-        - for rt1051 it's usually `~/gcc-arm-eabi…`
+        - for RT1051 it's usually `~/gcc-arm-eabi…`
 
 #### Building configurations
 
@@ -55,7 +55,7 @@ To run the project in Eclipse:
   - Generation path: `build-linux`
   - Build options: `-j8`
 
-**Note:** you can set Generation path to `build` if you don't plan to configure CLion for rt1051.
+**Note:** you can set Generation path to `build` if you don't plan to configure CLion for RT1051.
 
 4. Add new CMake Profile (ALT+Ins)
   - Name: rt1051
@@ -81,7 +81,7 @@ In `Working directory` append `/build`.
 
 Now you can run/debug this configuration.
 
-##### rt1051 configuration
+##### RT1051 configuration
 
 Use file `.idea/JLink_server.xml` to setup IDE. It's already in the project folder, so CLion should pick it up automatically.
 
@@ -95,14 +95,14 @@ Try this command to input it there `ln -s %project_root%/.gdbinit-1051-clion ~/.
 
 In the debuging configuration dropdown select a pair of **<exec>** and **<toolchn>** (**[ \<exec\> | \<toolchn\> \]**):
 - **\[PurePhone | Linux\]** for run/debug on desktop (Linux)
-- **\[JLink server | rt1051\]** for debug on embedded (rt1051)
+- **\[JLink server | RT1051\]** for debug on embedded (RT1051)
 
-**Note:** rt1051 doesn't have *run* configuration. Only debug is available.
+**Note:** RT1051 doesn't have *run* configuration. Only debug is available.
 
 ![Profit](https://user-images.githubusercontent.com/56958031/71167426-f28ac780-2254-11ea-8efb-8375fb004004.png)
 
 ##### Running target
-It's possible to see logs from a rt1051 booted from eMMC and not from RAM. 
+It's possible to see logs from a RT1051 booted from eMMC and not from RAM. 
 To do so select `JLink server (no upload)` configuration.
 
 Open `JLinkRTTClient` in a separate terminal.
@@ -143,20 +143,20 @@ This will tell git to ignore local changes to the file. In above example we are 
 
 #### Separate build folders
 
-By default both targets (Linux & rt1051) are build into the same destination (the `build` folder).
+By default both targets (Linux & RT1051) are build into the same destination (the `build` folder).
 
-With this configuration you have to run `./rebuild.sh` every time you want to change target. Also you can't debug simultaneously Linux and rt1051.
+With this configuration you have to run `./rebuild.sh` every time you want to change target. Also you can't debug simultaneously Linux and RT1051.
 
 There is an option for both targets to have separate build folders.
 
 To enable it, set the environmental variable `SEPARATE_BUILDS` to any value (e.g. `=1`) inside `./rebuild.sh`.
 
 **Examples**:
-`env SEPARATE_BUILDS=1 ./rebuild.sh rt1051` will cause rt1051 to be build into a separate `build-rt1051` folder.
+`env SEPARATE_BUILDS=1 ./rebuild.sh rt1051` will cause RT1051 to be build into a separate `build-rt1051` folder.
 
 By default `./rebuild.sh rt1051` builds into `build`
 
-You can build only the Linux build inside its separate folder, and leave rt1051 in place, thus maintain compatibility with `./run.sh`. 
+You can build only the Linux build inside its separate folder, and leave RT1051 in place, thus maintain compatibility with `./run.sh`. 
 
 ```
 > env SEPARATE_BUILDS=1 ./rebuild.sh linux
@@ -167,7 +167,7 @@ You can build only the Linux build inside its separate folder, and leave rt1051 
 > ./run.sh
 ```
 
-Guide for CLion has a dedicated section entitled ["Separate build folders in CLion"]().
+Guide for CLion has a dedicated section entitled ["Separate build folders in CLion"](#separate-build-folders-in-clion).
 
 ##### How it works
 
