@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Service/Timer.hpp" // for Timer
-#include <module-gui/gui/core/Timer.hpp>         // for ms, Timer
-#include <string>            // for string
+#include "Service/Timer.hpp"             // for Timer
+#include <module-gui/gui/core/Timer.hpp> // for ms, Timer
+#include <string>                        // for string
 
 namespace app
 {
