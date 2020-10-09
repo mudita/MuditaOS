@@ -44,6 +44,7 @@ namespace sys
 
     Timer::~Timer()
     {
+        parent->getTimers().detach(this);
         stop();
     }
 

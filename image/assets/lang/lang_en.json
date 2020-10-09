@@ -299,6 +299,8 @@
     "app_phonebook_check": "CHECK",
     "app_phonebook_uncheck": "UNCHECK",
 
+    "app_meditation_title_main": "Meditation",
+
     "app_music_player_all_songs": "All songs",
     "app_music_player_play": "PLAY",
     "app_music_player_music_library": "MUSIC LIBRARY",

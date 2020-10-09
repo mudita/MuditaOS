@@ -53,6 +53,15 @@ add_catch2_executable(
         module-utils
 )
 
+# Math tests
+add_catch2_executable(
+    NAME
+        utils-math
+    SRCS
+        test_math.cpp
+    LIBS
+        module-utils
+)
 
 ###########################################
 # Log functional tests project

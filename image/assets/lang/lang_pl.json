@@ -170,6 +170,8 @@
     "app_phonebook_check": "ZAZNACZ",
     "app_phonebook_uncheck": "ODZNACZ",
 
+    "app_meditation_title_main": "Medytacja",
+
     "sms_call_text"  : "Call: ",
     "sms_contact_details" : "Contact details",
     "sms_delete_conversation" : "Delete conversation",

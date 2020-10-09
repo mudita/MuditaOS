@@ -6,6 +6,17 @@
 
 namespace app
 {
+    namespace
+    {
+        constexpr auto toSysTimerType(gui::Timer::Type type) noexcept -> sys::Timer::Type
+        {
+            if (type == gui::Timer::Type::Single) {
+                return sys::Timer::Type::SingleShot;
+            }
+            return sys::Timer::Type::Periodic;
+        }
+    } // namespace
+
     void GuiTimer::start()
     {
         sys::Timer::start();
@@ -29,12 +40,8 @@ namespace app
     GuiTimer::GuiTimer(Application *parent) : GuiTimer("GUI", parent)
     {}
 
-    GuiTimer::GuiTimer(const std::string &name, Application *parent)
-        : GuiTimer(name, parent, sys::Timer::timeout_infinite)
-    {}
-
-    GuiTimer::GuiTimer(const std::string &name, Application *parent, gui::ms timeout)
-        : sys::Timer(name, parent, timeout, sys::Timer::Type::SingleShot), sysapi(*this)
+    GuiTimer::GuiTimer(const std::string &name, Application *parent, gui::ms timeout, gui::Timer::Type type)
+        : sys::Timer(name, parent, timeout, toSysTimerType(type)), sysapi{*this}
     {}
 
     void GuiTimer::Sysapi::connect(gui::Item *item)

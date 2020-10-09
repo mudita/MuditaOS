@@ -106,15 +106,18 @@ namespace gui
 
     std::list<DrawCommand *> Item::buildDrawList()
     {
+        return buildChildrenDrawList();
+    }
 
+    std::list<DrawCommand *> Item::buildChildrenDrawList()
+    {
         std::list<DrawCommand *> commands;
-
-        for (auto &widget : children) {
-            std::list<DrawCommand *> widgetCommands = widget->buildDrawList();
-            if (!widgetCommands.empty())
-                commands.insert(commands.end(), widgetCommands.begin(), widgetCommands.end());
+        for (auto widget : children) {
+            auto drawCommands = widget->buildDrawList();
+            if (!drawCommands.empty()) {
+                commands.splice(commands.end(), drawCommands);
+            }
         }
-
         return commands;
     }
 

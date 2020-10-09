@@ -6,14 +6,8 @@
 
 namespace gui
 {
-    using Length       = std::uint32_t;
-    using Position     = std::int32_t;
-    using AngleDegrees = std::uint16_t;
-    using AngleRadians = double;
-
-    constexpr AngleDegrees FullAngle  = 360;
-    constexpr AngleDegrees HalfAngle  = 180;
-    constexpr AngleDegrees RightAngle = 90;
+    using Length   = std::uint32_t;
+    using Position = std::int32_t;
 
     struct Size
     {
