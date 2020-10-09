@@ -278,6 +278,3 @@ This is how gparted should look like if the disk is OK
    
 This is a case if the disk is not correct
    ![Gparted OK](./Images/gparted_fail.png "workflow")
-   
-If the phone fails to start in MSC mode, you can try using the D1_Flash_Loader
-program to rescue it - [clone the GitHub repository](https://github.com/muditacom/D1_eMMC_FlashLoader/), open it in [Ozone](https://www.segger.com/products/development-tools/ozone-j-link-debugger/)) and load the `.axf` file attached in the initial release of the project. This will present the phones eMMC storage to the OS and you can partition it correctly then.

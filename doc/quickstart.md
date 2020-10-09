@@ -2,14 +2,14 @@
 
 You can quickstart the project by going through one of the following guides:
 
-- [Quickstart using Docker](#)
-- [Building your own Docker image](#)
-- [Quickstart in your local environment](#)
-- [Longstart](#)
-- [Super dirty quickstart on Linux](#)
-- [Super dirty quickstart with unit tests](#)
-- [Super dirty quickstart on the phone](#)
-- [Preparing packages](#)
+- [Quickstart using Docker](#quickstart-using-docker)
+- [Building your own Docker image](#building-your-own-docker-image)
+- [Quickstart in your local environment](#quickstart-in-your-local-environment)
+- [Longstart](#longstart)
+- [Super dirty quickstart on Linux](#super-dirty-quickstart-on-linux)
+- [Super dirty quickstart with unit tests](#super-dirty-quickstart-with-unit-tests)
+- [Super dirty quickstart on the phone](#super-dirty-quickstart-on-the-phone)
+- [Preparing packages](#preparing-packages)
 
 
 ## Quickstart using Docker
@@ -192,7 +192,7 @@ If you want to catch logs from Mudita Pure from UART please follow these steps:
 
 Please mind that logs on UART are more costly, so these might cause timing issues and slow down the phone too. To avoid that consider `release` build for tests with `uart` enabled.
 
-## Preparing Packages
+## Preparing packages
 
 If you need a package, containing everything needed to run the application (on target device or Linux), in the build directory run the following command: `make package`
 

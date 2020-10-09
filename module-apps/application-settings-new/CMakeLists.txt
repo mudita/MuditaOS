@@ -24,6 +24,7 @@ target_sources( ${PROJECT_NAME}
         windows/KeypadLightWindow.cpp
         windows/LockedScreenWindow.cpp
         windows/DisplayAndKeypadWindow.cpp
+        windows/AppsAndToolsWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -35,6 +36,7 @@ target_sources( ${PROJECT_NAME}
         windows/KeypadLightWindow.hpp
         windows/LockedScreenWindow.hpp
         windows/DisplayAndKeypadWindow.hpp
+        windows/AppsAndToolsWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
