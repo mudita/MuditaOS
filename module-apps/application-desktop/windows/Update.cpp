@@ -179,17 +179,13 @@ namespace gui
                                      .string_value();
                 updateVersion << ")";
 
-                vfs::FILE *f = vfs.fopen(updateFile.c_str(), "r");
-                if (f != nullptr) {
-                    updateFileDetails << utils::localize.get("app_desktop_update_size");
-                    updateFileDetails << ": ";
-                    updateFileDetails << std::to_string(vfs.filelength(f) / 1024);
-                    updateFileDetails << "Kb (";
-                    updateFileDetails << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate]
-                                         .string_value();
-                    updateFileDetails << ")";
-                    vfs.fclose(f);
-                }
+                updateFileDetails << utils::localize.get("app_desktop_update_size");
+                updateFileDetails << ": ";
+                updateFileDetails << std::to_string(msg.updateStats.totalBytes / 1024);
+                updateFileDetails << "Kb (";
+                updateFileDetails
+                    << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate].string_value();
+                updateFileDetails << ")";
 
                 currentVersionInfo->setText(currentVersion.str());
                 updateVersionInfo->setText(updateVersion.str());
