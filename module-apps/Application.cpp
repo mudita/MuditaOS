@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "BusChannelsCustom.hpp"                         // for BusChannels...
 #include "Common.hpp"                                    // for RefreshModes
 #include "GuiTimer.hpp"                                  // for GuiTimer
 #include "Item.hpp"                                      // for Item
@@ -501,7 +500,7 @@ namespace app
                                 const audio::Profile::Type &profileType,
                                 const audio::PlaybackType &playbackType)
     {
-        const auto ret = AudioServiceAPI::SetSetting(this, audio::Setting::Volume, value, profileType, playbackType);
+        const auto ret = AudioServiceAPI::SetSetting(this, audio::Setting::Volume, value, playbackType, profileType);
         return ret == audio::RetCode::Success;
     }
 

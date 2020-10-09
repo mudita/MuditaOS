@@ -112,6 +112,7 @@ enum class MessageType
     CellularGetAntenna,
     CellularTransmitDtmfTones,
     CellularUSSDRequest,
+    CellularTimeUpdated,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -126,22 +127,7 @@ enum class MessageType
     DBCalllogGetCount,       // Get Calllog reocrds count
 
     // Audio service messages
-    AudioNotification,
-    AudioPlaybackStart,
-    AudioRecorderStart,
-    AudioRoutingStart,
-    AudioStop,
-    AudioPause,
-    AudioResume,
-
-    AudioRoutingRecordCtrl,
-    AudioRoutingMute,
-    AudioRoutingSpeakerhone,
-    AudioRoutingHeadset,
-
-    AudioSetInputGain,
-    AudioGetInputGain,
-    AudioGetFileTags,
+    AudioMessage,
 
     // application manager
     APMCheckAppRunning, // check if application is running in application manager
@@ -185,7 +171,7 @@ enum class MessageType
     EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
-
+    EVMTimeUpdated,   // This message is send on every time update.
     // Torch messages
     EVMTorchStateMessage,
 

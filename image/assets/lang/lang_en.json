@@ -147,7 +147,7 @@
     "app_desktop_sim_type_pin": "please type a PIN code:",
     "app_desktop_sim_blocked": "The SIM card is blocked.",
     "app_desktop_sim_type_puk": "To unblock it, type the PUK code:",
-    "app_desktop_no_pin_lock": "Press Unlock and then #",
+    "app_desktop_no_pin_lock": "<text>Press <b>Unlock</b> and then <b>#</b></text>",
     "app_desktop_sim_wrong_pin": "Wrong PIN code",
     "app_desktop_sim_wrong_puk": "Wrong PUK code",
     "app_desktop_sim_you_have": "You have",
@@ -235,6 +235,8 @@
     "app_settings_display_input_language": "Input language",
     "app_settings_system" : "System",
     "app_settings_apps_tools" : "Apps and tools",
+    "app_settings_apps_messages" : "Messages",
+    "app_settings_apps_torch" : "Torch",
     "app_settings_date_and_time": "Date and Time",
 	"app_settings_title_day": "Day",
 	"app_settings_title_month": "Month",
@@ -296,6 +298,8 @@
     "app_phonebook_new_add_to_ice": "Add to ICE",
     "app_phonebook_check": "CHECK",
     "app_phonebook_uncheck": "UNCHECK",
+
+    "app_meditation_title_main": "Meditation",
 
     "app_music_player_all_songs": "All songs",
     "app_music_player_play": "PLAY",

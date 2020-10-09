@@ -3,7 +3,7 @@
 #include "Service/Message.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
-#include "gui/widgets/Progress.hpp"
+#include "gui/widgets/ProgressBar.hpp"
 
 namespace app
 {

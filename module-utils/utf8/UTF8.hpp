@@ -213,7 +213,7 @@ class UTF8
      * @note function returns false if character is within prohibited range - <U+D800, U+DFFF> or above value of
      * U+10FFFF.
      */
-    static bool encode(const uint16_t &code, uint32_t &dest, uint32_t &length);
+    static bool encode(const uint32_t &code, uint32_t &dest, uint32_t &length);
 
     /// get utf16_t value from utf8 character
     static uint32_t decode(const char *utf8_char, uint32_t &length);

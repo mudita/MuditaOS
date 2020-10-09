@@ -1,10 +1,5 @@
-/*
- * Commands.cpp
- *
- *  Created on: 20 kwi 2020
- *      Author: kuba
- */
-#include "../Commands.hpp"
+
+#include <Commands.hpp>
 
 namespace at
 {

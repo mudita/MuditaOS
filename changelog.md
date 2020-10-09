@@ -4,23 +4,32 @@
 
 ### Added
 
+* `[sms]` Added network time synchronisation.
+* `[gui][desktop]` Added *how-to-unlock-screen-info* window.
 * `[gui]` Added GUI timers capability
 * `[fonts]` Added multiplication and division sign to the font files
 * `[bluetooth]` Added storing of BT link keys.
 * `[audio]` AudioMux tests
 * `[audio]` Added vibration logic (effect is visible in logs only)
 * `[settings]` Added DatabaseAgent base class and SettingsAgent.
+* `[audio]` Added vibration/enable sound database logic
+* `[settings]` Create main window for apps and tools 
+* `[meditation]` Added a meditation progress bar with simple implementation of meditation application.
 
 
 ### Changed
 
 * `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
 * `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
+* `[audio]` Made most audio api calls asynchronous
+* `[messages]` Refactored messages SMS thread window to use ListView. 
+* `[messages]` Split SMS thread for a specific contact into separate ones if multiple phone numbers are available.
 
 ### Fixed
 
 * `[audio]` Fix audio looping so it did not log errors
 * `[system]` Timers race condition, Timers should be thread safe for Services/Applications
+* `[phonebook]` Fix application hangup when contacts database is empty
 
 ## [0.40.1 2020-10-02]
 

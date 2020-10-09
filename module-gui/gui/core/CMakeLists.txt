@@ -1,7 +1,6 @@
 target_sources( ${PROJECT_NAME}
 
     PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/Color.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/DrawCommand.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Font.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/RawFont.cpp"

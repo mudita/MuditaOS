@@ -51,6 +51,7 @@ class ListViewTesting : public ::testing::Test
         ASSERT_EQ(0, testListView->currentPageSize) << "List should be empty";
 
         testListView->setProvider(testProvider);
+        testListView->rebuildList();
     }
 
     void TearDown() override

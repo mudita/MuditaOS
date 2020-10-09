@@ -607,7 +607,7 @@ bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
 // 0000 0080-0000 07FF | 110xxxxx 10xxxxxx
 // 0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
 // 0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-bool UTF8::encode(const uint16_t &code, uint32_t &dest, uint32_t &length)
+bool UTF8::encode(const uint32_t &code, uint32_t &dest, uint32_t &length)
 {
 
     dest   = 0;
@@ -771,7 +771,8 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 2;
         }
         else {
-            goto wrong_utf8_character;
+            LOG_ERROR("wrong utf8 char");
+            return ret;
         }
     }
     else if (((*utf8_char) & UTF8_HEADER_3_MASK) ==
@@ -786,7 +787,8 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 3;
         }
         else {
-            goto wrong_utf8_character;
+            LOG_ERROR("wrong utf8 char");
+            return ret;
         }
     }
     else if (((*(utf8_char)&UTF8_HEADER_4_MASK) ==
@@ -804,13 +806,11 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 4;
         }
         else {
-            goto wrong_utf8_character;
+            LOG_ERROR("wrong utf8 char");
+            return ret;
         }
     }
     length = len;
-    return ret;
-wrong_utf8_character:
-    LOG_ERROR("wrong utf8 char");
     return ret;
 }
 

@@ -3,6 +3,7 @@
 #include <InputEvent.hpp>
 #include <Label.hpp>
 #include <log/log.hpp>
+#include "assert.h"
 
 namespace gui
 {
@@ -135,9 +136,20 @@ namespace gui
         setVisible(value, false);
     }
 
+    unsigned int BoxLayout::getVisibleChildrenCount()
+    {
+        assert(children.size() >= outOfDrawAreaItems.size());
+        return children.size() - outOfDrawAreaItems.size();
+    }
+
     void BoxLayout::setReverseOrder(bool value)
     {
         reverseOrder = value;
+    }
+
+    bool BoxLayout::getReverseOrder()
+    {
+        return reverseOrder;
     }
 
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
@@ -451,6 +463,10 @@ namespace gui
         sizeStore->store(*el, granted);
         resizeItems(); // vs mark dirty
         setNavigation();
+
+        if (parentOnRequestedResizeCallback != nullptr) {
+            parentOnRequestedResizeCallback();
+        }
 
         return granted;
     }

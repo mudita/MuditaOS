@@ -1,270 +1,80 @@
-PurePhone repository
-====================
+# MuditaOS
 
-# Quickstart in docker
-You can build project in docker container, to that
+MuditaOS is a mobile operating system optimized for E Ink displays. Built from scratch with Mudita Pure minimalist phone in mind.
 
-1. Get docker
-`./config/bootstrap.sh 8`
+![MuditaOS screenshot]()
 
-2. Add yourself to a `docker` group
+## Table of contents
+
+* [Quickstart](#Quickstart)
+* [Contributing](#Contributing)
+   * [Discussions](#Discussions)
+   * [Reporting issues and feature requests](#Reporting-bugs-and-feature-requests)
+   * [Development workflow](#Development-workflow)
+* [Documentation](#documentation)
+   * [How to generate documentation using Doxygen](#How-to-generate-documentation-using-Doxygen)    
+* [License](#license)
+
+## Quickstart
+
+You can quickstart the project by going through one of the following guides:
+
+- [Quickstart using Docker](./doc/quickstart.md#quickstart-using-docker)
+- [Building your own Docker image](./doc/quickstart.md#building-your-own-docker-image)
+- [Quickstart in your local environment](./doc/quickstart.md#quickstart-in-your-local-environment)
+- [Longstart](./doc/quickstart.md#longstart)
+- [Super dirty quickstart on Linux](./doc/quickstart.md#super-dirty-quickstart-on-linux)
+- [Super dirty quickstart with unit tests](./doc/quickstart.md#super-dirty-quickstart-with-unit-tests)
+- [Super dirty quickstart on the phone](./doc/quickstart.md#super-dirty-quickstart-on-the-phone)
+- [Preparing packages](./doc/quickstart.md#preparing-packages)
+
+## Contributing
+
+Pull requests are welcome. Please follow the guidelines in the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article. Before contributing or starting a discussion, please make sure that you read our [Code of Conduct](./CODE_OF_CODUCT.md).
+
+### Discussions
+
+For general questions and ideas regarding MuditaOS please post in the [“MuditaOS” section on Mudita Forum](https://forum.mudita.com/c/MuditaOS/). Please explore all existing posts to make sure you’re not posting about an issue that has already been discussed.
+
+### Reporting bugs and feature requests
+
+You can report bugs and feature requests on [GitHub](https://github.com/mudita/MuditaOS/issues). This is also a good place to discuss architecture decisions and things that aren’t yet covered by the documentation. Please refer to the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article for more details.
+
+### Development workflow
+
+When contributing code or documentation changes please follow the guidleines inside the ["Development workflow"](./doc/development_workflow.md) article.
+
+## Documentation
+
+For everything that you need to kickstart your development environment please go to the [Documentation](./doc/) folder on Github.
+
+A fully detailed documentation can be build locally using [Doxygen](https://www.doxygen.nl/index.html).
+
+### How to generate documentation using Doxygen
+
+You can build code documentation with the following command:
+
 ```bash
-NAME=$(wohami)
-sudo usermod -aG docker ${NAME}
-```
-After that you have to logo out and login back, groups are set during the login process.
-To make sure you are in docker group call:
-`groups`
-you will see the list of groups your login is assigned to.
-
-3. configure for linux Debug
-`./in_docker.sh config linux Debug`
-
-4. build linux Debug
-`./in_docker.sh make build-linux-Debug`
-
-5. build rt1051 Release
-`./in_docker.sh config rt1051 Release`
-`./in_docker.sh make build-rt1051-Release`
-
-6. build & run tests (linux only)
-`./in_docker.sh make build-linux-Debug`
-`./in_docker.sh make check`
-__do not call `make test` it will make fool of you__
-
-To build manually selected test in work-dir in attached docker image:
-`cd ./build-linux-Debug ; make <test_name>; ./<test_name>`
-i.e.:
-`cd ./build-linux-Debug ; make unittest_gui && ./unittest_gui`
-
-Running tests checks memory leaks too. This might be helpful in creation of new widgets
-
-# Quickstart
-
-Prior to any build setup environment, need to be run once. (See: `## Run provisioning`)
-`cd config && ./bootstrap.sh`
-boostrap.sh will show you list of changes that may be required for you.
-If this is new checkout you need to update your git config (step 0 and 1).
-
-## Bootstrap steps:
-* `./config/bootstrap.sh 0`  - install style checking scripts to be automatically run on commit
-* `./config/bootstrap.sh 1`  - `git blame` will ignore style changing commit
-* `./config/bootstrap.sh 2`  - list packages required for builds *but it is not installed*
-* `./config/bootstrap.sh 3`  - setup arm toolchain, download and install in home dir
-* `./config/bootstrap.sh 4`  - setup cmake, download and install in home dir
-* `./config/bootstrap.sh 5`  - list of commands for required for switching default gcc/g++ to version 9
-* `./config/bootstrap.sh 6`  - adds Paths for arm toolchain to your PATH environment variable - this is also used by ./env.cmake
-* `./config/bootstrap.sh 7`  - adds Paths for cmake to your PATH environment variable
-* `./config/bootstrap.sh 8`  - install docker
-
-*6 add_to_path gcc_arm... is required because new ./env.cmake uses environment variables set by this target.*
-
-
-### Style git hooks
-During the bootstrap you can install git hooks for style checking.
-pre-commit.hook             - this hook automatically update style during commit
-if you haven't run `bootstrap.sh` you have to copy (or link) `pre-commit.hook` to your git conig directory
-`.git/config/hooks` directory, just:
-`ln -s `pwd`/config/pre-commit.hook .git/hooks/pre-commit`
-
-By default commit hook only checks if your changes have correct style, if you would like to fix
-the style automatically during `git commit` you have to configure your git, by adding new
-variable `user.fixinstage` and setting it to `true`, just call:
-`git config user.fixinstage true`
-
-If you prefer "notification than fix" work flow (so you can examine the changes), use default hook behaviour (to notify)
-and then call `./config/pre-commit.hoot --fix`, this checks and fixes files in "stage" are,
-files that have status "changed" are not tested.
-
-```
-git commit 
-<stele error - commit aborted>
-./config/pre-commit.hook --fix
-git diff
-git add -u
-git commit
-<commit accepted>
-```
-
-To fix style for Pull Request CI:
-`./config/pre-commit.hook --branch-fix`
-
-## Super quick and dirty to run app on linux:
-```
-git submodule update --init --recursive                                     # initialize submodules
-cd ./config/ && ./bootstrap.sh && cd ../                                    # bootstrap requirements
-./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo                    # configure build
-cd <build-dir>                                                              # build dir depends on configuration
-make -j                                                                     # build
-./PurePhone                                                                 # run PurePhone - emulator screen will pop up
-```
-## Super quick and dirty to run UT
-build the app (as in previous point)
-```bash
-./configure.sh linux debug
-cd <build-dir>
-make check
-```
-## Super quick and dirty to run app on Phone
-
-Prior to all - install JLink driver (see `## Install JLink driver`)
-
-```
-cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake
-git submodule update --init --recursive
-cd ./config/ && ./bootstrap.sh && cd ../
-./configure.sh rt1051 RelWithDebInfo
-cd build-arm-RelWithDebInfo
-make -j
-
-```
-
-*now in 3 separate consoles*
-
-Start JLink server
-```
-./StartJLinkServer.sh
-```
-
-Load app with GDB via JLink connected to PurePhone
-```
-./run.sh <build folder>
-```
-
-Catch logs from PurePhone from JLink RTT and write them to /tmp/log.txt
-```
-JLinkRTTClient | tee /tmp/log.txt
-```
-
-Catch logs from PurePhone from UART:
-1. in `config/ProjectConfig.cmake` change `RTT_JLINK` to `RTT_LUART`
-2. rebuild project
-3. catch log: `picocom /dev/ttyACM0 -b 115200  --imap lfcrlf`
-Please mind that logs on uart are more costly, so these might show unseen before timing issues.
-These might slow down phone too - to avoid that consider `release` build for tests with `uart` enabled
-
-# Longstart
-
-There is provisioning script `./config/bootstrap.sh` run it to install all dependencies - written for Ubuntu tested on 18.10
-* This script will require sudo (for apt)
-* needed cmake and GCC will be installed by default to `${HOME}` - in case of other needs, change it
-* script doesn't install ccache, but if ccache is on system - it's support is added to env.cmake.sample
-* need to be run once (not more on restart or anything)
-
-`cd config && ./bootstrap.sh`
-
-After running provisioning you are ready to checkout and build project for both linux and rt1051 target:
-* checking out project with submodules for the first time
-```sh
-git submodule update --init --recursive
-```
-* repo update with submodules
-```sh
-git pull --recurse-submodules
-```
-* building project
-```sh
-./configure.sh [rt1051|linux] [release|debug|relwithdebinfo]
-cd build-[rt1051|linux]-[release|debug|relwithdebinfo]
-make
-```
-
-## Building own docker image
-
-If for some reason you don't want to use existing (on hub.docker.com) docker image you can build your own:
-1. download toolchain
-```bash
-./config/download_assets
-```
-2. build image
-```bash
-docker build docker/ -t rwicik/pure_phone_build:latest
-```
-please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if docker couldn't find it locally it will download it from hub.docker.com
-
-## Installing JLink driver
-
-We use JLink driver in version JLink v634f, for ubuntu download from here:
-[tested JLink we use](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb)
-
-To install this driver on linux: `sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
-
-## Preparing Packages
-
-If you need a package, containing everything needed to run application (on target device or on linux)
-in the build directory call
-```bash
-make package
-```
-on finish command will display the name of the package that was created.
-
-Package name is: *PurePhone-<version>-<target>.<extension>*
-where:
-    <version>   - is readed from the latest "release-x.y.z" tag
-    <target>    - RT1051 or Linux 
-    <extension> - `zip` for RT1051 and `tar.gz` for Linux
-
-# Documentation
-
-* [doc/development_workflow](./doc/development_workflow.md)
-* [doc/config](./doc/config.linux.md)
-* [doc/running_on_phone](./doc/running_on_phone.md)
-* [GUI](./module-gui/README.md)
-* [doc/bluetooth](./doc/bluetooth.md)
-    * [./module-bsp/bsp/bluetooth](./module-bsp/bsp/bluetooth/)
-    * [./module-bluetooth/](./module-bluetooth/README.md)
-* [module-lwip](./module-lwip/README.md)
-* [doc/database](./doc/database_v2.md)
-* [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
-* [test/harness](./test/README.md)
-* [changelog](./changelog.md) and [changelog howto](./doc/changelog_howto.md)
-* [Creating Release](./doc/release.md)
-
-## Code documentation (doxygen)
-
-You can build code documentation with:
-```sh
+./configure linux Debug
+cd build-linux-Debug
 make doc
 ```
-If you prefer to build documentation always with `all` target instead, configure cmake
-with `BUILD_DOC_WITH_ALL` option set, e.g.:
-```sh
-cmake -DBUILD_DOC_WITH_ALL=ON . build/
+If you prefer to build documentation always with `all` target instead, configure `cmake`
+with `BUILD_DOC_WITH_ALL` option set to `ON`, e.g.:
+
+```bash
+./configure <target> <build_type> -DBUILD_DOC_WITH_ALL=ON
 ```
 
-Documentation is generated in the `doc/html` subdirectory of a build dir. To view
-open index with browser, e.g.:
-```sh
-firefox build/doc/html/index.html
+Documentation is generated in the `doc/html` subdirectory of the build directory. To view it open `index.html` using a web browser, e.g.:
+
+```bash
+firefox build-<target>-<build_type>/doc/html/index.html
 ```
 
-## Miscellaneous CMake configuration options
+## Changelog
 
-Following CMake options can be used:
- * `COLOR_OUTPUT` - enable/disable colored output (enabled by default). Useful when you need to process CMake output or your IDE does not support escape codes.
- * `BUILD_DOC_WITH_ALL` - enable/disable building code documentation with the `all` target (disabled by default).
- * `ENABLE_TEST_LOGS` - enable/disable test log output (disabled by default).
- * `LINUX_ENABLE_SANITIZER` - enable/disable building with address sanitizer for Linux (enabled by default). This option is handy when you need to run the app with valgrind.
- * `THIRD_PARTY_DEBUG_OPTIMIZE` - enable/disable third party size optimization for debug build type (enabled by default)
- * `ENABLE_APP_<app>` - enable building application `<app>` (enabled by default). `<app>` name must be consistent with module path, i.e. `module-apps/application-<app>/`.
- * `OPTIMIZE_APP_<app>` - allow optimization of app `<app>` in debug build type (disabled by default for Linux platform, enabled for others).
+The [MuditaOS changelog](./changelog.md) is regularly updated by the core development team.
 
-# Linux Bluetooth device
-
-Bluetooth service by default initializes bluetooth device. 
-On linux it's tellit developer kit plugged via USB-CDC. To properly
-inteface with bluetooth telit device (and not have conflicts in names)
-please add following script as: `/etc/udev/rules.d/99-purephone.rules` on linux.
-
-```
-ACTION=="add", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02ZDVH", GROUP="dialout", SYMLINK+="telit"
-ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="666", GROUP="dialout"
-```
-
-This will enable you to use Bluetooth telit board as `/dev/telit` which 
-is expected by code.
-To access devices without root priviledges add yourselve to dialout group.
-`sudo usermod -a -G dialout $USER`
-
-For changes to take place run:
-`sudo udevadm control --reload-rules && sudo udevadm trigger`
+## License
+MuditaOS is licensed on [GPL3](https://choosealicense.com/licenses/gpl-3.0/).

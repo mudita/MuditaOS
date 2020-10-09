@@ -14,6 +14,7 @@
 #include <typeindex>   // for type_index
 #include <utility>     // for pair
 #include <vector>      // for vector<>::iterator, vector
+#include <typeinfo>    // for connect by type
 
 namespace sys
 {
@@ -75,6 +76,7 @@ namespace sys
         std::vector<std::pair<uint64_t, uint32_t>> staleUniqueMsg;
 
         /// connect: register message handler
+        bool connect(const std::type_info &type, MessageHandler handler);
         bool connect(Message *msg, MessageHandler handler);
         bool connect(Message &&msg, MessageHandler handler);
 

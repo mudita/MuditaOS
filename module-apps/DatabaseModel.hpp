@@ -16,7 +16,7 @@ namespace app
       protected:
         /// Pointer to application that owns the model
         Application *application = nullptr;
-        uint32_t recordsCount;
+        uint32_t recordsCount    = 0;
         std::vector<std::shared_ptr<T>> records;
         uint32_t modelIndex = 0;
 

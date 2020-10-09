@@ -12,10 +12,6 @@ namespace audio
 
 namespace audio
 {
-    using Position = float;
-    using Volume   = uint32_t;
-    using Gain     = uint32_t;
-
     constexpr Volume defaultVolumeStep = 1;
     constexpr Gain defaultGainStep     = 10;
     constexpr Volume defaultVolume     = 5;
@@ -32,7 +28,9 @@ namespace audio
     enum class Setting
     {
         Volume,
-        Gain
+        Gain,
+        EnableVibration,
+        EnableSound
     };
 
     enum class PlaybackType
@@ -59,13 +57,15 @@ namespace audio
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
 
-    [[nodiscard]] const std::string str(const Profile::Type &profileType,
-                                        const Setting &setup,
-                                        const PlaybackType &playbackType = PlaybackType::None);
+    [[nodiscard]] const std::string str(const Setting &setting,
+                                        const PlaybackType &playbackType,
+                                        const Profile::Type &profileType);
 
-    [[nodiscard]] const std::string str(const PlaybackType &playbackType,
-                                        const Setting &setup,
-                                        const bool headphonesInserted = false);
+    [[nodiscard]] const std::string str(const Setting &setting,
+                                        const PlaybackType &playbackType,
+                                        const bool headphonesInserted);
+
+    [[nodiscard]] const std::string str(const Setting &setting, const PlaybackType &playbackType);
 
     enum class RetCode
     {
@@ -80,6 +80,7 @@ namespace audio
         OperationNotSet,
         ProfileNotSet,
         DeviceFailure,
+        TokenNotFound,
         Failed
     };
 
@@ -186,7 +187,7 @@ namespace audio
     typedef std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> DbCallback;
 
     RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
-    const char *c_str(RetCode retcode);
+    const std::string str(RetCode retcode);
     [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> const std::string;
 } // namespace audio
 

@@ -298,7 +298,7 @@ namespace bsp
                     auto framesFetched = inst->GetAudioCallback()(
                         inst->inBuffer, nullptr, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
                     if (framesFetched == 0) {
-                        goto cleanup;
+                        break;
                     }
                     else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->inBuffer[framesFetched],
@@ -315,7 +315,7 @@ namespace bsp
                                                  RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
                     if (framesFetched == 0) {
-                        goto cleanup;
+                        break;
                     }
                     else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
@@ -326,12 +326,12 @@ namespace bsp
             }
         }
 
-    cleanup : {
-        cpp_freertos::LockGuard lock(inst->mutex);
-        inst->InStop();
-        inst->inWorkerThread = nullptr;
-        vTaskDelete(NULL);
-    }
+        {
+            cpp_freertos::LockGuard lock(inst->mutex);
+            inst->InStop();
+            inst->inWorkerThread = nullptr;
+            vTaskDelete(NULL);
+        }
     }
 
     void outCellularWorkerTask(void *pvp)
@@ -352,7 +352,7 @@ namespace bsp
                     auto framesFetched = inst->GetAudioCallback()(
                         nullptr, inst->outBuffer, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
                     if (framesFetched == 0) {
-                        goto cleanup;
+                        break;
                     }
                     else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->outBuffer[framesFetched],

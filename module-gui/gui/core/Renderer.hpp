@@ -1,6 +1,9 @@
 #pragma once
 
 #include <vector>
+
+#include <module-utils/math/Math.hpp>
+
 #include "DrawCommand.hpp"
 #include "Context.hpp"
 
@@ -83,10 +86,20 @@ namespace gui
 
         void drawArc(Context *ctx, CommandArc *cmd);
 
-        void drawArc(Context *ctx, Point center, Length radius, AngleDegrees begin, AngleDegrees sweep, Color color);
+        void drawArc(Context *ctx,
+                     Point center,
+                     Length radius,
+                     trigonometry::Degrees begin,
+                     trigonometry::Degrees sweep,
+                     Color color);
 
-        void drawArc(
-            Context *ctx, Point center, Length radius, AngleDegrees begin, AngleDegrees sweep, Color color, int width);
+        void drawArc(Context *ctx,
+                     Point center,
+                     Length radius,
+                     trigonometry::Degrees begin,
+                     trigonometry::Degrees sweep,
+                     Color color,
+                     int width);
 
         void drawCircle(Context *ctx, CommandCircle *cmd);
 

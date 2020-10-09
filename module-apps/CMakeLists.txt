@@ -39,6 +39,7 @@ set(APPLICATIONS
     special-input
     antenna
     music-player
+    meditation
 )
 
 list(SORT APPLICATIONS)

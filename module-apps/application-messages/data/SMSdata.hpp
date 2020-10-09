@@ -12,10 +12,12 @@
 class SMSThreadData : public gui::SwitchData
 {
   public:
-    std::shared_ptr<ThreadRecord> thread = nullptr;
-    SMSThreadData(std::shared_ptr<ThreadRecord> thread) : thread(std::move(thread))
+    std::shared_ptr<ThreadRecord> thread;
+    std::optional<UTF8> threadName;
+
+    SMSThreadData(std::shared_ptr<ThreadRecord> _thread, std::optional<UTF8> _threadName = std::nullopt)
+        : thread(std::move(_thread)), threadName{std::move(_threadName)}
     {}
-    ~SMSThreadData() override = default;
 };
 
 class SMSRequest : public gui::SwitchData

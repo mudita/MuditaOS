@@ -26,7 +26,6 @@
 
 class ServiceAudio : public sys::Service
 {
-
   public:
     ServiceAudio();
 
@@ -45,49 +44,44 @@ class ServiceAudio : public sys::Service
   private:
     enum class VibrationType
     {
+        None,
         OneShot,
         Continuous
     };
 
     audio::AudioMux audioMux;
-    audio::Token vibrationToken;
+    audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
+
+    auto IsVibrationMotorOn()
+    {
+        return vibrationMotorStatus == audio::AudioMux::VibrationStatus::On;
+    }
 
     auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
     auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
 
-    template <typename... Args>
-    std::unique_ptr<AudioResponseMessage> HandleStart(std::optional<audio::AudioMux::Input *> input,
-                                                      audio::Operation::Type opType,
-                                                      Args... args);
-    std::unique_ptr<AudioResponseMessage> HandlePause(std::optional<AudioRequestMessage *> msg = std::nullopt);
-    std::unique_ptr<AudioResponseMessage> HandleStop(AudioStopMessage *msg);
+    auto HandleStart(const audio::Operation::Type opType,
+                     const std::string                       = "",
+                     const audio::PlaybackType &playbackType = audio::PlaybackType::None)
+        -> std::unique_ptr<AudioResponseMessage>;
+    auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
+        -> std::unique_ptr<AudioResponseMessage>;
+    auto HandleRoutingControl(const AudioRoutingControlRequest::ControlType &cType, const bool enable)
+        -> std::unique_ptr<AudioResponseMessage>;
+    auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
+    auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
+    auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
+    auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
+    void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
 
-    void VibrationStart(const audio::PlaybackType &type, std::shared_ptr<AudioResponseMessage> &resp);
-    void VibrationStop(const audio::Token &token);
-    auto GetVibrationType(const audio::PlaybackType &type) -> std::optional<VibrationType>;
+    void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
+                         std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
 
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
 
-    template <typename T> void addOrIgnoreEntry(const std::string &profilePath, const T &defaultValue)
-    {
-        auto [code, msg] = DBServiceAPI::GetQueryWithReply(
-            this,
-            db::Interface::Name::Settings_v2,
-            std::make_unique<db::query::settings::AddOrIgnoreQuery>(
-                SettingsRecord_v2{SettingsTableRow_v2{{.ID = DB_ID_NONE},
-                                                      .path  = profilePath,
-                                                      .value = std::to_string(static_cast<uint32_t>(defaultValue))}}),
-            audio::audioOperationTimeout);
-
-        if (code == sys::ReturnCodes::Success && msg != nullptr) {
-            auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-            assert(queryResponse != nullptr);
-
-            auto settingsResultResponse = queryResponse->getResult();
-            assert(dynamic_cast<db::query::settings::AddOrIgnoreResult *>(settingsResultResponse.get()) != nullptr);
-        }
-    }
+    void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
 
     template <typename T>[[nodiscard]] T fetchAudioSettingFromDb(const std::string &profilePath, const T &defaultValue)
     {
@@ -110,18 +104,19 @@ class ServiceAudio : public sys::Service
         return defaultValue;
     }
 
-    void setCurrentSetting(const audio::Setting &setting, const uint32_t &value);
+    void setCurrentSetting(const audio::Setting &setting, const std::string &value);
     void setCurrentVolume(const uint32_t &value);
     void setSetting(const audio::Setting &setting,
-                    const uint32_t value,
+                    const std::string &value,
                     const audio::Profile::Type &profileType,
                     const audio::PlaybackType &playbackType);
-    [[nodiscard]] uint32_t getSetting(const audio::Setting &setting,
-                                      const audio::Profile::Type &profileType,
-                                      const audio::PlaybackType &playbackType);
-    std::optional<uint32_t> getCurrentSetting(const audio::Setting &setting);
-    void updateDbValue(const std::string &path, const audio::Setting &setting, const uint32_t &value);
-    void updateDbValue(const audio::Operation *currentOperation, const audio::Setting &setting, const uint32_t &value);
+    [[nodiscard]] std::string getSetting(const audio::Setting &setting,
+                                         const audio::Profile::Type &profileType,
+                                         const audio::PlaybackType &playbackType);
+    std::optional<std::string> getCurrentSetting(const audio::Setting &setting);
+    void updateDbValue(const std::string &path, const audio::Setting &setting, const std::string &value);
+    void updateDbValue(const audio::Operation &currentOperation, const audio::Setting &setting, const uint32_t &value);
+    void updateDbValue(const audio::Operation &currentOperation, const audio::Setting &setting, const bool &value);
 };
 
 #endif // PUREPHONE_SERVICEAUDIO_HPP
