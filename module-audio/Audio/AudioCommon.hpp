@@ -57,15 +57,9 @@ namespace audio
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
 
-    [[nodiscard]] const std::string str(const Setting &setting,
-                                        const PlaybackType &playbackType,
-                                        const Profile::Type &profileType);
-
-    [[nodiscard]] const std::string str(const Setting &setting,
-                                        const PlaybackType &playbackType,
-                                        const bool headphonesInserted);
-
-    [[nodiscard]] const std::string str(const Setting &setting, const PlaybackType &playbackType);
+    [[nodiscard]] const std::string dbPath(const Setting &setting,
+                                           const PlaybackType &playbackType,
+                                           const Profile::Type &profileType);
 
     enum class EventType
     {

@@ -65,9 +65,12 @@ namespace audio
 
     std::optional<AudioMux::Input *> AudioMux::GetActiveInput()
     {
+        // first return active routing inputs
+        if (auto routingInput = GetInput({Audio::State::Routing}); routingInput) {
+            return routingInput;
+        }
         for (auto &audioInput : audioInputs) {
-            if (audioInput.audio->GetCurrentState() != Audio::State::Idle &&
-                audioInput.audio->GetCurrentOperationState() == audio::Operation::State::Active) {
+            if (audioInput.audio->GetCurrentState() != Audio::State::Idle) {
                 return &audioInput;
             }
         }
