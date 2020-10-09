@@ -13,10 +13,8 @@ SCRIPT=$(readlink -f $0)
 SCRIPT_DIR="$(dirname ${SCRIPT})"
 
 . ${SCRIPT_DIR}/bootstrap_config
+. ${SCRIPT_DIR}/common_scripsts_lib
 
-function printVar(){
-    echo "$1: '${!1}'"
-}
 
 function add_to_path() {
     echo -e "\e[32m${FUNCNAME[0]} $1 $2\e[0m"
@@ -66,15 +64,13 @@ function setup_gcc_alternatives() {
 function install_ubuntu_packages() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat <<-MSGEND
-		# Install neccessary packages more or less this should be complete list:
-		binutils wget git make pkg-config gtkmm-3.0 gcc-9 g++-9 portaudio19-dev
-		# for ubutnut 18.04 you can
-		sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-		sudo apt update
-		sudo apt install gcc-9 g++-9
-		# 
-		# don't forget to update alternatives:
+		# Install neccessary packages
 		MSGEND
+    echo "This will change your system, press CTRL+C if you do not want to install required packages, or press enter to continue..."
+    read asdfasraewrawesjr
+    INSTALL_PACKAGES=$( echo "${INSTALL_PACKAGES}" | tr "\n" " "|tr -s " ")
+    sudo apt-get update
+    sudo apt-get install ${INSTALL_PACKAGES}
     setup_gcc_alternatives
 }
 
@@ -83,7 +79,7 @@ function setup_arm_toolchain() {
     pushd /tmp
     echo "Download armgcc"
     [[ ! -f $ARM_GCC ]] &&
-        wget --no-verbose --show-progress -O ${ARM_GCC_PKG} ${ARM_GCC_SOURCE_LINK}
+        getArmCC
     # untar to HOME
     if [[ ! -d ${HOME}/${ARM_GCC} ]]; then
         echo "extracting: ${ARM_GCC_PKG} to ${HOME}"
@@ -97,7 +93,7 @@ function setup_cmake() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     pushd /tmp
     [[ ! -f ${CMAKE_NAME}.tgz ]] &&
-        wget --no-verbose -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
+        getCMake
     [[ ! -d ${HOME}/${CMAKE_NAME} ]] &&
         tar -xf ${CMAKE_PKG} -C ${HOME}/
     popd

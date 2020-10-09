@@ -39,6 +39,7 @@ LAST_STEP
 CMakeLists.txt.user
 config/runner_settings
 docker/Dockerfile.runner
+docker/Dockerfile
 docker/assets/actions*
 docker/assets/cmake*
 docker/assets/gcc-arm*

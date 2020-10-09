@@ -37,10 +37,8 @@ function get_gh_runner() {
     wget --no-verbose --show-progress -c -O ${GH_RUNNER_PKG} ${GH_RUNNER_LINK}
 }
 
-pushd ${DEST_DIR}
 get_arm_toolchain
 get_cmake
 get_gh_runner
-popd
 
 
