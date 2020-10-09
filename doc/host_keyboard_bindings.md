@@ -1,9 +1,10 @@
 # Keyboard bindinging on Linux
 
 ## Table of contents
-- [Functional buttons](#Functional-buttons)
-- [Numeric buttons](#Numeric-buttons)
-- [Battery "buttons"](#Battery-"buttons")
+
+- [Functional buttons](#functional-buttons)
+- [Numeric buttons](#numeric-buttons)
+- [Battery "buttons"](#battery-buttons)
 
 ### Functional buttons
 - Volume up         - key [ `R` ] 
@@ -34,7 +35,7 @@
 - Numeric Ast		- key [ `Z` ]
 - Numeric Pnd		- key [ `C` ]
 
-### Battery "buttons"
+### Battery buttons
  - Connect/disconnect wall adapter		- key [ `P` ]
  - Decrease battery level		- key [ `[` ]
  - Increase battery level		- key [ `]` ]
