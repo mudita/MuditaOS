@@ -8,7 +8,11 @@ source ${SRC_ROOT}/config/bootstrap_config
 
 DOCKER_DIR=${SRC_ROOT}/docker
 DOCKER_TEMPLATE=${DOCKER_DIR}/Dockerfile.runner.in
-DOCKER_DEST=${DOCKER_DIR}/Dockerfile.runner
+DOCKER_TIMEZONE="Europe/Warsaw"
+DOCKER_IMAGE_NAME="wearemudita/mudita_os_builder"
+DOCKER_IMAGE_TAG="latest"
+
+INSTALL_PACKAGES=$( echo "${INSTALL_PACKAGES}" | tr "\n" " "| tr -s " ") 
 
 function prepareDockerFile() {
     sed -e "s#@ARM_GCC_PKG@#${ARM_GCC_PKG}#g" \
@@ -16,8 +20,41 @@ function prepareDockerFile() {
         -e "s#@GH_RUNNER_PKG@#${GH_RUNNER_PKG}#g" \
         -e "s#@CMAKE_NAME@#${CMAKE_NAME}#g" \
         -e "s#@ARM_GCC@#${ARM_GCC}#g;" \
-        ${DOCKER_TEMPLATE} > ${DOCKER_DEST}
+        -e "s#@DOCKER_TIMEZONE@#${DOCKER_TIMEZONE}#g;" \
+        -e "s#@INSTALL_PACKAGES@#${INSTALL_PACKAGES}#g;" \
+        -e "s#@ENTRYPOINT@#${ENTRYPOINT}#g;" \
+        -s ${DOCKER_TEMPLATE} > ${DOCKER_DEST}
 }
 
+function help() {
+    echo "generates docker file for MuditaOS build environment"
+    echo "usage:"
+    echo "   $0 [runner|--help]"
+    echo "          runner - generate docker for github runner"
+    echo "          help   - this help message"
+    exit 0
+}
+
+case ${1} in
+    "runner")
+        ENTRYPOINT="cmd.sh"
+        DOCKER_DEST=${DOCKER_DIR}/Dockerfile.runner
+        ;;
+    "-h"|"--help")
+        help
+        ;;
+    *)
+        ENTRYPOINT="entrypoint.sh"
+        DOCKER_DEST=${DOCKER_DIR}/Dockerfile
+    ;;
+esac
+
+pushd ${DOCKER_DIR}/assets
+${SRC_ROOT}/config/download_assets
+popd
+
+
+echo $ENTRYPOINT
+#echo "--${INSTALL_PACKAGES}--"
 prepareDockerFile
-docker build ${DOCKER_DIR} -f ${DOCKER_DEST} -t "pure_builder:latest" 
+echo -e "now run \e[31m: \ndocker build ${DOCKER_DIR} -f ${DOCKER_DEST} -t \"${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}\" \n\e[0m"
