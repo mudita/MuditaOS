@@ -43,9 +43,8 @@ namespace gui
         uint32_t w           = sizeMinusPadding(Axis::X, Area::Normal);
         uint32_t h           = sizeMinusPadding(Axis::Y, Area::Normal);
         auto line_y_position = padding.top;
-        auto &draw_cursor    = *cursor;
 
-        draw_cursor.setToStart();
+        BlockCursor draw_cursor(cursor->getDocument(), 0, 0, cursor->getFont());
 
         unsigned int currentLine = 0;
         unsigned int lineHeight  = format.getFont()->info.line_height + underlinePadding;

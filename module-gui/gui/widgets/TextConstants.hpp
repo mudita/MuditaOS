@@ -32,6 +32,8 @@ namespace gui
 
     enum class InputBound
     {
+        UNDEFINED = 0x000,
+
         CANT_PROCESS = 0x100,
         NO_DATA      = 0x101,
         HIT_BOUND    = 0x110,
@@ -39,15 +41,6 @@ namespace gui
         CAN_ADD    = 0x1000,
         CAN_MOVE   = 0x10000,
         CAN_REMOVE = 0x100000
-    };
-
-    enum class Scroll
-    {
-        DOWN  = -1,
-        UP    = 1,
-        LEFT  = -1,
-        RIGHT = 1,
-        NONE  = 0
     };
 
 } // namespace gui

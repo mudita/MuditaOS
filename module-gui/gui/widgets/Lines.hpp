@@ -23,8 +23,7 @@ namespace gui
         std::list<TextLine> lines;
 
         uint32_t max_lines_count = 4;
-        uint32_t lower_bound     = 0;
-        uint32_t upper_bound     = max_lines_count;
+        uint32_t scroll_position = 0;
 
       public:
         Lines(Text *parent) : parent(parent)
@@ -44,9 +43,7 @@ namespace gui
 
         void emplace(TextLine &&line)
         {
-            if (max_lines_count > lines.size()) {
-                lines.emplace_back(std::move(line));
-            }
+            lines.emplace_back(std::move(line));
         }
 
         const auto &get()
@@ -88,13 +85,13 @@ namespace gui
         void linesHAlign(Length parentSize);
         void linesVAlign(Length parentSize);
         auto checkBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
-        void updateBounds(Scroll scroll, uint32_t factor = 1);
+        void updateScrollPosition(NavigationDirection scroll, uint32_t lines_to_scroll = 1);
 
       protected:
         auto processTextInput(TextLineCursor &cursor, const InputEvent &event) -> InputBound;
         auto processNavigation(TextLineCursor &cursor, const InputEvent &event) -> InputBound;
 
-        auto canMove(TextLineCursor &cursor, Scroll dir) -> InputBound;
+        auto canMove(TextLineCursor &cursor, NavigationDirection dir) -> InputBound;
         InputBound processRemoval(TextLineCursor &cursor);
         TextLine *getTextLine(uint32_t line);
         InputBound processAdding(TextLineCursor &cursor, const InputEvent &event);

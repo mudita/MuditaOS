@@ -42,7 +42,7 @@ namespace gui
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&);
 
-        TextLine(TextCursor &cursor,
+        TextLine(const BlockCursor &cursor,
                  unsigned int max_width,
                  unsigned int init_height,
                  bool drawUnderline,

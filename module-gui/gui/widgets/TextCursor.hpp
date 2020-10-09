@@ -57,11 +57,6 @@ namespace gui
         TextCursor &operator<<(TextBlock);
         void removeChar();
 
-        void setToStart()
-        {
-            while (moveCursor(NavigationDirection::LEFT) != Move::Start) {}
-        }
-
         auto getPosOnScreen() const
         {
             return pos_on_screen;

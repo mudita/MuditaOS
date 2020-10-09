@@ -190,10 +190,10 @@ namespace gui
         buildCursor();
     }
 
-    std::tuple<Scroll, uint32_t> scrollView(const TextCursor &cursor)
+    std::tuple<NavigationDirection, uint32_t> scrollView(const TextCursor &cursor)
     {
         uint32_t scrolledLines = 1;
-        return {Scroll::UP, scrolledLines};
+        return {NavigationDirection::UP, scrolledLines};
     }
 
     bool Text::onInput(const InputEvent &evt)
@@ -224,10 +224,14 @@ namespace gui
 
         if (bound == InputBound::HIT_BOUND) {
             auto [scroll, factor] = scrollView(*cursor);
-            lines->updateBounds(scroll, factor);
+            lines->updateScrollPosition(scroll, factor);
         }
 
-        return bound != InputBound::CANT_PROCESS;
+        if (bound != InputBound::CANT_PROCESS) {
+            return true;
+        }
+
+        return false;
     }
 
     bool Text::onFocus(bool state)
@@ -343,7 +347,7 @@ namespace gui
 
         auto line_y_position = padding.top;
 
-        BlockCursor draw_cursor = *cursor;
+        BlockCursor draw_cursor(cursor->getDocument(), 0, 0, cursor->getFont());
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 

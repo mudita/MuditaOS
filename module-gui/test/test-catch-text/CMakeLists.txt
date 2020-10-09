@@ -6,6 +6,7 @@ add_catch2_executable(
                 main.cpp
                 ../mock/buildTextDocument.cpp
                 ../mock/multi-line-string.cpp
+                ../mock/InitializedFontManager.cpp
                 test-gui-Text.cpp
                 test-gui-TextBlock.cpp
                 test-gui-TextBlockCursor.cpp
@@ -13,7 +14,8 @@ add_catch2_executable(
                 test-gui-TextLine.cpp
                 test-gui-TextParse.cpp
                 test-gui-Font.cpp
-                ../mock/InitializedFontManager.cpp
+                test-gui-TextLineCursor.cpp
+                test-gui-TextBounds.cpp
         INCLUDE
                 ..
                 ../mock/

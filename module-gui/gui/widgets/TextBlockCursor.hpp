@@ -52,6 +52,11 @@ namespace gui
             return pos;
         }
 
+        [[nodiscard]] auto getDocument() const -> TextDocument *
+        {
+            return document;
+        }
+
         [[nodiscard]] auto getBlockNr() const -> unsigned int
         {
             return block_nr;

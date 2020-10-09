@@ -71,11 +71,11 @@ namespace gui
         bool underline = false;
         TextFormat format;
 
-        bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
-        bool handleNavigation(const InputEvent &inputEvent);
-        bool handleEnter();
+        auto moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document) -> bool;
+        auto handleNavigation(const InputEvent &inputEvent) -> bool;
+        auto handleEnter() -> bool;
 
-        std::list<DrawCommand *> buildDrawList() override;
+        auto buildDrawList() -> std::list<DrawCommand *> override;
         /// redrawing lines
         /// it redraws visible lines on screen and if needed requests resize in parent
         virtual void drawLines();

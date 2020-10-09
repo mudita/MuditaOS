@@ -4,44 +4,49 @@
 
 namespace gui
 {
-    auto navigationToScroll(NavigationDirection dir)
-    {
-        switch (dir) {
-        case NavigationDirection::UP:
-            return Scroll::UP;
-        case NavigationDirection::DOWN:
-            return Scroll::DOWN;
-        case NavigationDirection::LEFT:
-            return Scroll::LEFT;
-        case NavigationDirection::RIGHT:
-            return Scroll::RIGHT;
-        default:
-            return Scroll::NONE;
-        }
-    }
 
     // LEFT/RIGHT/UP/DOWN
     auto Lines::processNavigation(TextLineCursor &cursor, const InputEvent &event) -> gui::InputBound
     {
         auto dir = inputToNavigation(event);
-        return canMove(cursor, navigationToScroll(dir));
+        if (dir == NavigationDirection::NONE) {
+            return InputBound::UNDEFINED;
+        }
+        return canMove(cursor, dir);
     }
 
-    auto Lines::canMove(TextLineCursor &cursor, Scroll dir) -> gui::InputBound
+    auto Lines::canMove(TextLineCursor &cursor, NavigationDirection dir) -> gui::InputBound
     {
-        auto screen_bound = lower_bound;
-        auto lines_bound  = lines.size();
+        auto screen_bound = scroll_position + max_lines_count - 1;
+        auto lines_bound  = lines.size() - 1;
 
-        if (dir == Scroll::UP || dir == Scroll::RIGHT) {
-            screen_bound = upper_bound;
+        if (dir == NavigationDirection::UP || dir == NavigationDirection::LEFT) {
+            screen_bound = 0;
             lines_bound  = 0;
         }
 
-        if (cursor.getScreenLine() == lines_bound) {
+        if (dir == NavigationDirection::LEFT && cursor.getPosOnScreen() > 0) {
+            return InputBound::CAN_MOVE;
+        }
+
+        unsigned int pos = cursor.BlockCursor::getPosition();
+        auto textLine    = getTextLine(cursor.getScreenLine());
+
+        if (textLine == nullptr) {
             return InputBound::NO_DATA;
         }
 
-        if (cursor.getScreenLine() == screen_bound) {
+        size_t lineLength = textLine->length();
+
+        if (dir == NavigationDirection::RIGHT && pos < lineLength) {
+            return InputBound::CAN_MOVE;
+        }
+
+        if (cursor.getScreenLine() >= lines_bound) {
+            return InputBound::NO_DATA;
+        }
+
+        if (cursor.getScreenLine() >= screen_bound) {
             return InputBound::HIT_BOUND;
         }
 
@@ -50,6 +55,13 @@ namespace gui
 
     gui::InputBound Lines::processAdding(TextLineCursor &cursor, const InputEvent &event)
     {
+        auto keymap = parent->mode != nullptr ? parent->mode->get() : "";
+        auto code   = gui::Profiles::get(keymap).get(event.key.key_code, 0);
+
+        if (code == KeyProfile::none_key && event.isShortPress()) {
+            return InputBound::CANT_PROCESS;
+        }
+
         auto format        = cursor->getFormat();
         uint32_t line      = cursor.getScreenLine();
         TextLine *textLine = getTextLine(line);
@@ -58,10 +70,8 @@ namespace gui
             return InputBound::CAN_ADD;
         }
 
-        auto code = parent->translator.handle(event.key, parent->mode != nullptr ? parent->mode->get() : "");
-
         auto bound = textLine->checkBounds(cursor, code, format);
-        if (bound == InputBound::CANT_PROCESS && line == lower_bound) {
+        if (bound == InputBound::CANT_PROCESS && line == scroll_position) {
             return InputBound::CANT_PROCESS;
         }
 
@@ -78,7 +88,7 @@ namespace gui
         uint32_t pos  = cursor.getPosOnScreen();
 
         if (pos == 0) {
-            if (line == upper_bound) {
+            if (line == scroll_position + max_lines_count) {
                 return InputBound::HIT_BOUND;
             }
             if (line == 0) {
@@ -103,10 +113,15 @@ namespace gui
         }
     }
 
-    void Lines::updateBounds(Scroll scroll, uint32_t factor)
+    void Lines::updateScrollPosition(NavigationDirection dir, uint32_t lines_to_scroll)
     {
-        lower_bound += (static_cast<int>(scroll) * factor);
-        upper_bound += (static_cast<int>(scroll) * factor);
+        if (dir == NavigationDirection::UP) {
+            scroll_position -= lines_to_scroll;
+        }
+
+        if (dir == NavigationDirection::DOWN) {
+            scroll_position += lines_to_scroll;
+        }
     }
 
     void Lines::linesVAlign(Length parentSize)
@@ -127,7 +142,7 @@ namespace gui
     {
         auto bound = processNavigation(cursor, event);
 
-        if (bound & InputBound::CANT_PROCESS) {
+        if (bound == InputBound::UNDEFINED) {
             bound = processTextInput(cursor, event);
         }
 
@@ -141,7 +156,7 @@ namespace gui
 
     TextLine *Lines::getTextLine(uint32_t line)
     {
-        if (lines.empty() || line > lines.size()) {
+        if (lines.empty() || line >= lines.size()) {
             return nullptr;
         }
 

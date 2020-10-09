@@ -27,34 +27,32 @@ namespace gui
     /// or via different block types (i.e. numeric block tyle could be not "breakable"
     TextLine::TextLine(const BlockCursor &cursor, unsigned int max_width) : max_width(max_width)
     {
-        auto cur = cursor;
-        cur.resetJumps();
+        BlockCursor localCursor = cursor;
+        localCursor.resetJumps();
 
         do {
-            if (!cur) { // cursor is faulty
+            if (!localCursor) { // cursor is faulty
                 return;
             }
 
-            if (cur.atEnd()) {
-                LOG_DEBUG("document end reached");
+            if (localCursor.atEnd()) {
                 return;
             }
 
-            if (cur.atEol()) {
+            if (localCursor.atEol()) {
                 width_used = max_width;
                 return;
             }
 
             // take text we want to show
-            auto text = cur.getUTF8Text();
+            auto text = localCursor.getUTF8Text();
 
             if (text.length() == 0) {
-                LOG_DEBUG("No more text in block");
-                ++cur;
+                ++localCursor;
                 continue;
             }
 
-            auto text_format = cur->getFormat();
+            auto text_format = localCursor->getFormat();
             if (text_format->getFont() == nullptr) {
                 break;
             }
@@ -86,7 +84,7 @@ namespace gui
                 break;
             }
 
-            cur += can_show;
+            localCursor += can_show;
         } while (true);
     }
 
@@ -102,6 +100,7 @@ namespace gui
         underlinePadding         = from.underlinePadding;
         end                      = from.end;
         block_nr                 = from.block_nr;
+        max_width                = from.max_width;
     }
 
     TextLine::~TextLine()
