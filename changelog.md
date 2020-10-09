@@ -23,6 +23,7 @@
 * `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
 * `[audio]` Made most audio api calls asynchronous
 * `[messages]` Refactored messages SMS thread window to use ListView. 
+* `[messages]` Split SMS thread for a specific contact into separate ones if multiple phone numbers are available.
 
 ### Fixed
 
