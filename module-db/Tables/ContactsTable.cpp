@@ -136,19 +136,19 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryNa
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
-
-    do {
-        ret.push_back(ContactsTableRow{
-            {(*retQuery)[ColumnName::id].getUInt32()},
-            (*retQuery)[ColumnName::name_id].getUInt32(),
-            (*retQuery)[ColumnName::numbers_id].getString(),
-            (*retQuery)[ColumnName::ring_id].getUInt32(),
-            (*retQuery)[ColumnName::address_id].getUInt32(),
-            (*retQuery)[ColumnName::speeddial].getString(),
-            (*retQuery)[ColumnName::speeddial + 1].getString(), // primaryName
-            (*retQuery)[ColumnName::speeddial + 2].getString(), // alternativeName (WTF!)
-        });
-    } while (retQuery->nextRow());
+    if (retQuery->getRowCount() > 0)
+        do {
+            ret.push_back(ContactsTableRow{
+                {(*retQuery)[ColumnName::id].getUInt32()},
+                (*retQuery)[ColumnName::name_id].getUInt32(),
+                (*retQuery)[ColumnName::numbers_id].getString(),
+                (*retQuery)[ColumnName::ring_id].getUInt32(),
+                (*retQuery)[ColumnName::address_id].getUInt32(),
+                (*retQuery)[ColumnName::speeddial].getString(),
+                (*retQuery)[ColumnName::speeddial + 1].getString(), // primaryName
+                (*retQuery)[ColumnName::speeddial + 2].getString(), // alternativeName (WTF!)
+            });
+        } while (retQuery->nextRow());
 
     return ret;
 }
@@ -188,9 +188,10 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit
 
         return ids;
     }
-    do {
-        ids.push_back((*queryRet)[0].getUInt32());
-    } while (queryRet->nextRow());
+    if (queryRet->getRowCount() > 0)
+        do {
+            ids.push_back((*queryRet)[0].getUInt32());
+        } while (queryRet->nextRow());
 
     query = GetSortedByNameQueryString(ContactQuerySection::Mixed);
     LOG_DEBUG("query: %s", query.c_str());
@@ -198,9 +199,10 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;
     }
-    do {
-        ids.push_back((*queryRet)[0].getUInt32());
-    } while (queryRet->nextRow());
+    if (queryRet->getRowCount() > 0)
+        do {
+            ids.push_back((*queryRet)[0].getUInt32());
+        } while (queryRet->nextRow());
 
     if (limit > 0) {
         for (uint32_t a = 0; a < limit; a++) {
@@ -226,26 +228,28 @@ ContactsMapData ContactsTable::GetPosOfFirstLetters()
     if (queryRet == nullptr) {
         return contactMap;
     }
-    do {
-        favouritesCount++;
-        PositionOnList++;
-    } while (queryRet->nextRow());
+    if (queryRet->getRowCount() > 0)
+        do {
+            favouritesCount++;
+            PositionOnList++;
+        } while (queryRet->nextRow());
 
     query    = GetSortedByNameQueryString(ContactQuerySection::Mixed);
     queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return contactMap;
     }
-    do {
-        UTF8 FirstLetterOfNameUtf = (*queryRet)[1].getString();
-        FirstLetterOfName         = FirstLetterOfNameUtf.substr(0, 1);
-        if (FirstLetterOfName != FirstLetterOfNameOld) {
-            contactMap.firstLetterDictionary.insert(
-                std::pair<std::string, std::uint32_t>(FirstLetterOfName, PositionOnList));
-        }
-        FirstLetterOfNameOld = FirstLetterOfName;
-        PositionOnList++;
-    } while (queryRet->nextRow());
+    if (queryRet->getRowCount() > 0)
+        do {
+            UTF8 FirstLetterOfNameUtf = (*queryRet)[1].getString();
+            FirstLetterOfName         = FirstLetterOfNameUtf.substr(0, 1);
+            if (FirstLetterOfName != FirstLetterOfNameOld) {
+                contactMap.firstLetterDictionary.insert(
+                    std::pair<std::string, std::uint32_t>(FirstLetterOfName, PositionOnList));
+            }
+            FirstLetterOfNameOld = FirstLetterOfName;
+            PositionOnList++;
+        } while (queryRet->nextRow());
 
     contactMap.favouritesCount = favouritesCount;
     contactMap.itemCount       = PositionOnList;
@@ -325,10 +329,10 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;
     }
-
-    do {
-        ids.push_back((*queryRet)[0].getUInt32());
-    } while (queryRet->nextRow());
+    if (queryRet->getRowCount() > 0)
+        do {
+            ids.push_back((*queryRet)[0].getUInt32());
+        } while (queryRet->nextRow());
 
     return ids;
 }
@@ -350,17 +354,17 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
     }
 
     std::vector<ContactsTableRow> ret;
-
-    do {
-        ret.push_back(ContactsTableRow{
-            {(*retQuery)[ColumnName::id].getUInt32()},       // ID
-            (*retQuery)[ColumnName::name_id].getUInt32(),    // nameID
-            (*retQuery)[ColumnName::numbers_id].getString(), // numbersID
-            (*retQuery)[ColumnName::ring_id].getUInt32(),    // ringID
-            (*retQuery)[ColumnName::address_id].getUInt32(), // addressID
-            (*retQuery)[ColumnName::speeddial].getString(),  // speed dial key
-        });
-    } while (retQuery->nextRow());
+    if (retQuery->getRowCount() > 0)
+        do {
+            ret.push_back(ContactsTableRow{
+                {(*retQuery)[ColumnName::id].getUInt32()},       // ID
+                (*retQuery)[ColumnName::name_id].getUInt32(),    // nameID
+                (*retQuery)[ColumnName::numbers_id].getString(), // numbersID
+                (*retQuery)[ColumnName::ring_id].getUInt32(),    // ringID
+                (*retQuery)[ColumnName::address_id].getUInt32(), // addressID
+                (*retQuery)[ColumnName::speeddial].getString(),  // speed dial key
+            });
+        } while (retQuery->nextRow());
 
     return ret;
 }
@@ -391,17 +395,17 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
     }
 
     std::vector<ContactsTableRow> ret;
-
-    do {
-        ret.push_back(ContactsTableRow{
-            {(*retQuery)[ColumnName::id].getUInt32()},
-            (*retQuery)[ColumnName::name_id].getUInt32(),
-            (*retQuery)[ColumnName::numbers_id].getString(),
-            (*retQuery)[ColumnName::ring_id].getUInt32(),
-            (*retQuery)[ColumnName::address_id].getUInt32(),
-            (*retQuery)[ColumnName::speeddial].getString(),
-        });
-    } while (retQuery->nextRow());
+    if (retQuery->getRowCount() > 0)
+        do {
+            ret.push_back(ContactsTableRow{
+                {(*retQuery)[ColumnName::id].getUInt32()},
+                (*retQuery)[ColumnName::name_id].getUInt32(),
+                (*retQuery)[ColumnName::numbers_id].getString(),
+                (*retQuery)[ColumnName::ring_id].getUInt32(),
+                (*retQuery)[ColumnName::address_id].getUInt32(),
+                (*retQuery)[ColumnName::speeddial].getString(),
+            });
+        } while (retQuery->nextRow());
 
     return ret;
 }
