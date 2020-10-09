@@ -17,7 +17,7 @@ class CrashDump(gdb.Command):
             "crash_dump", gdb.COMMAND_USER
         )
 
-    def _crash_dump(self, val=None) -> str:
+    def _crash_dump(self, val=None):
         """
         """
         value=gdb.parse_and_eval("*0xE000ED28");
