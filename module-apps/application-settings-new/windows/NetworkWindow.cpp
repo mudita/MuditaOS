@@ -4,6 +4,7 @@
 #include "OptionsStyle.hpp"
 #include "OptionSetting.hpp"
 #include <application-settings-new/ApplicationSettings.hpp>
+#include "SimSwitchWindow.hpp"
 
 namespace gui
 {
@@ -23,10 +24,11 @@ namespace gui
         if (sim == Store::GSM::SIM::SIM2) {
             simStr = utils::translateI18("app_settings_network_sim2");
         }
+        auto imsi = CellularServiceAPI::GetIMSI(getApplication(), true);
         optList.emplace_back(std::make_unique<gui::OptionSettings>(
-            utils::translateI18("app_settings_network_active_card") + ":" + simStr,
+            utils::translateI18("app_settings_network_active_card") + ":" + simStr + "/" + imsi,
             [=](gui::Item &item) {
-                this->application->switchWindow(gui::window::name::change_settings, nullptr);
+                showSwitchSim();
                 return true;
             },
             [=](gui::Item &item) {
@@ -82,5 +84,36 @@ namespace gui
     {
         clearOptions();
         addOptions(netOptList());
+    }
+    void NetworkWindow::showSwitchSim()
+    {
+        LOG_DEBUG("switch sim");
+        auto dialog = dynamic_cast<gui::SimSwitchWindow *>(this->application->getWindow(gui::window::name::switch_sim));
+        assert(dialog != nullptr);
+        auto meta   = dialog->meta;
+        meta.action = [=]() -> bool {
+            LOG_DEBUG("podpiecie akcji pod dialog");
+            switchSim();
+            return true;
+        };
+        meta.icon = "settings_sim_setup";
+
+        dialog->update(meta);
+        this->application->switchWindow(dialog->getName());
+    }
+    void NetworkWindow::switchSim()
+    {
+        auto dialog = dynamic_cast<gui::SimSwitchWindow *>(this->application->getWindow(gui::window::name::switch_sim));
+        assert(dialog != nullptr);
+        auto pass = dialog->getPassword();
+        if ("123456" == pass) {
+            auto sim = Store::GSM::get()->selected;
+            if (sim == Store::GSM::SIM::SIM1) {
+                Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
+            }
+            else {
+                Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+            }
+        }
     }
 } // namespace gui

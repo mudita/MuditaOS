@@ -21,5 +21,7 @@ namespace gui
       public:
         NetworkWindow(app::Application *app);
         void onBeforeShow(ShowMode m, SwitchData *d) override;
+        void showSwitchSim();
+        void switchSim();
     };
 } // namespace gui
