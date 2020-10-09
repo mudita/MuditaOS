@@ -13,6 +13,7 @@
 * `[audio]` Added vibration logic (effect is visible in logs only)
 * `[settings]` Added DatabaseAgent base class and SettingsAgent.
 * `[audio]` Added vibration/enable sound database logic
+* `[settings]` Create main window for apps and tools 
 
 
 ### Changed

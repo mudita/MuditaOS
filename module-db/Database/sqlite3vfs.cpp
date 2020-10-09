@@ -1,4 +1,4 @@
-/*
+﻿/*
 
  * @file sqlite3port.c
  * @author Lukasz Skrzypczak (lukasz.skrypczak@mudita.com)
@@ -126,6 +126,8 @@
 #include "task.h"
 #include "vfs.hpp"
 #include "config.h"
+
+//#include <log/log.hpp> //left for future debug
 
 /*
  ** Size of the write buffer used by journal files in bytes.
@@ -397,8 +399,12 @@ static int ecophoneCheckReservedLock(sqlite3_file *pFile, int *pResOut)
 static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg)
 {
     UNUSED(pFile);
-    UNUSED(op);
     UNUSED(pArg);
+    // LOG_DEBUG("OP Code: %d", op); left for future dbug
+    switch (op) {
+    case SQLITE_FCNTL_PRAGMA:
+        return SQLITE_NOTFOUND;
+    }
     return SQLITE_OK;
 }
 
