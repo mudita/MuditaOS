@@ -2,20 +2,11 @@
 
 This article includes details on how MuditaOS widgets are rendered and how the GUI handles key pressing.
 
-Schematics parts used:
-- `[name : part]` - [name of module : part of code responsible]
-- `=> / <=>` - direction of communication
-- `<>` event on diagrams, name placeholder of element in text
-
 ## Introduction
 
 ### How widgets are rendered
 
-Our UI is split into:
-
-```
-[bsp] <=> [renderer] <=> [application : widgets]
-```
+![Simplified UI](how_ui_work.svg "Simplified UI flow")
 
 * All widgets are children of `gui::Item`
 * There are two major commands to trigger screen redraw:
@@ -31,14 +22,7 @@ Our UI is split into:
 
 Please see `app::Application`, `sapm::ApplicationManager` for detailed information on how messages are handled between both. This is just general documentation.
 
-```
-[ApplicationManager]                 [Application]
-               <=>    START       <=>
-               <=>   Set focus    <=>
-               <=> Set keyboard   <=>
-               <=> Put background <=>
-               <=>      kill      <=>
-```
+![Simplified app start diagram](how_app_start_work.svg "Simplified hi level app start")
 
 These actions are done on a chained bus request between: `app::Application`, `sapm::ApplicationManager` and `sapm::EventWorker`
 
@@ -64,9 +48,7 @@ All of these are asynchronous and there is little state machine maintenance.
 
 ## What happens when you press a key?
 
-```
-[bsp] <basic freertos pipe> => [EventWorker : basic key translation] < key press event> => [Application with focus]
-```
+![Key Handling Diagram](how_keypress_work.svg "High level perspective of the key handling")
 
 * `bsp` handles key press on I2C IRQ and sends Event to event worker on naked FreeRTOS pipe (on target RT1051, on Linux `gtk` does that)
 * `EventWorker` worker of `EventService`:
