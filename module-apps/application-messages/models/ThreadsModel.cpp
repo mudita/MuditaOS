@@ -23,12 +23,13 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
         return nullptr;
     }
 
-    auto item = gui::ThreadItem::makeThreadItem(this, thread);
-    item->setThreadItem(thread);
-    item->activatedCallback = [=](gui::Item &item) {
+    auto item               = gui::ThreadItem::makeThreadItem(this, thread);
+    item->activatedCallback = [this, thread](gui::Item &item) {
         LOG_INFO("ThreadItem ActivatedCallback");
         if (application) {
-            application->switchWindow(gui::name::window::thread_view, std::make_unique<SMSThreadData>(thread));
+            const auto &threadItem = static_cast<gui::ThreadItem &>(item);
+            application->switchWindow(gui::name::window::thread_view,
+                                      std::make_unique<SMSThreadData>(thread, threadItem.getThreadName()));
         }
         else {
             LOG_ERROR("No application!");
