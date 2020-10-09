@@ -2,11 +2,13 @@
 
 MuditaOS is an open source project and we're more than happy to receive contributions from our community. There are many ways in which you can contribute to the project from reporting bugs, suggesting features to writing code and documentation.
 
+Before contributing please make sure that you read our [Code of Conduct](./CODE_OF_CODUCT.md).
+
 ## Reporting bugs
 
 If you think you found a bug or a security issue in MuditaOS, we'd love to hear from you. Before you create a relevant GitHub issue please:
 
-- make sure you're using the latest MuditaOS release when spotting the bug by heading to the `Settings` -> `Information` section on your Phone or emulator. Here you can see the all the details about the version of MuditaOS you're currently using. Please compare it with the latest stable release of MuditaOS which is always available at the top of our [changelog](https://github.com/mudita/PurePhone/blob/master/changelog.md).
+- make sure you're using the latest MuditaOS release when spotting the bug by heading to the `Settings` -> `Information` section on your Phone or emulator. Here you can see the all the details about the version of MuditaOS you're currently using. Please compare it with the latest stable release of MuditaOS which is always available at the top of our [changelog](./changelog.md).
 
 - make sure that the issue hasn't been already reported on GitHub issues (if it has, please add a 👍 reaction to it).
 
@@ -31,4 +33,4 @@ If you have an idea for a feature that could possibly land in MuditaOS please le
 
 If you would like to contribute a new feature or a bug fix to MuditaOS, please discuss your idea first in Github issues. If there is no Github issue for your idea, please open one. It may be that somebody from Mudita core team is already working on it, or that there are particular complexities that you should know about before starting the implementation.
 
-Please refer to the [Development workflow article](#) to learn how to submit code and documentation changes to the MuditaOS repository.
+Please refer to the [Development workflow article](#./doc/development_workflow.md) to learn how to submit code and documentation changes to the MuditaOS repository.
