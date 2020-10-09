@@ -1,5 +1,7 @@
 # MuditaOS
 
+[![Follow twitter](https://img.shields.io/badge/follow-twitter-00cc99.svg)](https://twitter.com/wearemudita)
+
 MuditaOS is a mobile operating system optimized for E Ink displays. Built from scratch with Mudita Pure minimalist phone in mind.
 
 ![MuditaOS screenshot]()
