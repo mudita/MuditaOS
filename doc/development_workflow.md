@@ -11,9 +11,10 @@ Create a branch, which name is connected to the feature, bug fix, or documentati
 ## Commit changes
 
 Commit your work. Each commit should have a description explaining:
-	- what are you changing,
-	- why are you making the changes (motivation),
-	- what is the result of your changes.
+
+- what are you changing,
+- why are you making the changes (motivation),
+- what is the result of your changes.
 
 If it's impossible to provide the above information then your commit is likely excessive or redundant and should be squashed with other commit(s).
 
@@ -24,19 +25,21 @@ Here's [a helpful article about writing good Git commit messages](https://chris.
 ## Basic checks before Pull Request
 
 Before submitting a Pull Request please go through some basic checks:
-	- test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling funcionality, check call log too)
-	- [include changelog description](./doc/changelog_howto.md) (if applicable),
-	- run unit tests (`make check`),
-	- check if your code formatting complies with [`.clang-format`](./.clang-format).
+
+- test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling funcionality, check call log too)
+- [include changelog description](./doc/changelog_howto.md) (if applicable),
+- run unit tests (`make check`),
+- check if your code formatting complies with [`.clang-format`](./.clang-format).
 
 ## Submit a Pull Request
 
 Submit a Pull Request. You can add labels that will help people who know the part of the code you are modifying in spotting the changes you are submitting and do a code review. 
 
 Please use the PR description to:
-	- explain what and why you are changing, 
-	- what decisions you had to take, 
-	- what you have been considering but eventually did not do (if applicable), 
+
+- explain what and why you are changing, 
+- what decisions you had to take, 
+- what you have been considering but eventually did not do (if applicable), 
 
 Include screenshots and gifs/screencasts if applicable. The more information you provide, the bigger chance that you'll receive a quick review.
 
@@ -78,7 +81,8 @@ git rebase origin/master  # update branch you are at to origin/master
 
 **Git rebase works on an actual branch copy.**
 
-`Rebase` changes your commit history (moves them on top). This means two things:  
+`Rebase` changes your commit history (moves them on top). This means two things:
+
  - when you did a lot of changes in a lot of places - either `git push` your branch on server, or make its copy
  - when you're happy of `git rebase` results - you'll need to push your branch with force to server - since you've changed its history (updated it) 
 
@@ -99,14 +103,17 @@ git status                                            # when done - check that y
 ```
 
 If there was something that broke your changes you can now either:
+
 * fix it in your next commit
 * try rebase again with:
     * `git reset origin/your_branch_name --hard`
 
 If your rebase succeeds:
+
 * `git push origin your_branch_name:your_branch_name`
 
 **Note:**
+
  - Rebase changes history - don't rebase branches that other people are working on (it's doable, but don't do this if you're not familiar with how to do it properly)
  - Always rebase your feature branches to `origin master`
 
