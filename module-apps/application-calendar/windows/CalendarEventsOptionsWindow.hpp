@@ -8,7 +8,6 @@ namespace gui
     class CalendarEventsOptions : public OptionWindow
     {
         std::shared_ptr<EventsRecord> eventRecord;
-        std::string goBackWindowName;
 
       public:
         CalendarEventsOptions(app::Application *app);
