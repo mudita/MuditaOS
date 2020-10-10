@@ -259,7 +259,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         return std::make_unique<AudioStartRecorderResponse>(retCode, retToken);
     }
     else if (opType == Operation::Type::Router) {
-        auto input = audioMux.GetRecordingInput();
+        auto input = audioMux.GetRoutingInput(true);
         AudioStart(input);
         return std::make_unique<AudioStartRoutingResponse>(retCode, retToken);
     }
