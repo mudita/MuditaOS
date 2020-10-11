@@ -23,7 +23,7 @@ USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) uint8_t event_response
 static mtp_device_info_t dummy_device = {
     .manufacturer = "Mudita",
     .model = "Pure",
-    .version = "0.0.1",
+    .version = "0.1",
     .serial = "0123456789ABCDEF0123456789ABCDEF",
 };
 
@@ -250,14 +250,23 @@ static void MtpTask(void *handle)
                 status = mtp_responder_set_data(responder, request, request_len);
                 if (status == MTP_RESPONSE_INCOMPLETE_TRANSFER)
                 {
-                    // TODO: incomplete transfer can happen under Ubuntu
+                    // This happens with Linux (Nautilus) client. Cancelation procedure
+                    // is to just stop sending data in this transaction.
+                    // When user triggers another action, client sends GET_OBJECT_INFO
+                    // request, which is valid MTP frame and has to be handled.
+                    // Don't use timeout here (Windows host can freeze communication
+                    // for a while, when assemling file at the end of transacion).
                     PRINTF("[MTP APP]: Incomplete transfer. Expected more data\n");
-                    mtpApp->in_reset = true;
-                } else if (status == MTP_RESPONSE_OK) {
-                    PRINTF("[MTP APP]: Incoming transfer complete\n");
-                    send_response(mtpApp, MTP_RESPONSE_OK);
+                    mtp_responder_transaction_reset(mtpApp->responder);
+                } else {
+                    if (status == MTP_RESPONSE_OK) {
+                        PRINTF("[MTP APP]: Incoming transfer complete\n");
+                    } else if (status == MTP_RESPONSE_OBJECT_TOO_LARGE) {
+                        PRINTF("[MTP APP]: Object is too large\n");
+                    }
+                    send_response(mtpApp, status);
+                    continue;
                 }
-                continue;
             }
 
             status = mtp_responder_handle_request(responder, request, request_len);
@@ -266,8 +275,18 @@ static void MtpTask(void *handle)
                 while((result_len = mtp_responder_get_data(responder)) && !mtpApp->in_reset) {
                     usb_status_t send_status;
 
-                    int retries = 10;
-                    uint32_t timeout_ms = 50;
+                    if (!xMessageBufferIsEmpty(mtpApp->inputBox)) {
+                        // According to spec, initiator can't issue new transacation, before
+                        // current one ends. In this case, assume initiator sends new frame
+                        // with cancellation request.
+                        PRINTF("[MTP APP]: incoming message during data transfer phase. Abort.");
+                        mtp_responder_transaction_reset(mtpApp->responder);
+                        status = 0;
+                        break;
+                    }
+
+                    int retries = 5;
+                    uint32_t timeout_ms = 5;
                     while((send_status = ScheduleSend(mtpApp, response, result_len)) == kStatus_USB_Busy
                             && --retries
                             && xMessageBufferIsEmpty(mtpApp->outputBox)
@@ -277,8 +296,7 @@ static void MtpTask(void *handle)
                         timeout_ms *= 2;
                     }
 
-                    if (!retries
-                            && !xMessageBufferIsEmpty(mtpApp->outputBox)
+                    if (!retries && !xMessageBufferIsEmpty(mtpApp->outputBox)
                             && !mtpApp->in_reset) {
                         PRINTF("[MTP APP]: Outgoing data canceled (unable to send)\n");
                         mtpApp->in_reset = true;
