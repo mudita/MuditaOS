@@ -39,9 +39,7 @@ struct mtp_responder
         size_t in_buffer;
         bool file_open;
         bool keep;
-        bool canceled;
-        union
-        {
+        union {
             size_t sent;
             size_t received;
         };
@@ -575,11 +573,11 @@ static uint16_t handle_command(mtp_responder_t *mtp, const mtp_op_cntr_t *reques
 
     mtp->transaction.id     = request->header.transaction_id;
     mtp->transaction.opcode = request->header.operation_code;
-    if (!mtp->transaction.keep || mtp->transaction.canceled) {
+    if (!mtp->transaction.keep)
+    {
         mtp->transaction.in_buffer = 0;
         mtp->transaction.total     = 0;
     }
-    mtp->transaction.canceled = false;
 
     log_info("OP> %s (0x%x)", dbg_operation(request->header.operation_code), (unsigned int) mtp->transaction.id);
 
@@ -793,9 +791,13 @@ size_t mtp_responder_get_data(mtp_responder_t *mtp)
             mtp->transaction.sent += cntr_length;
         }
     }
-    else if (mtp->transaction.opcode == MTP_OPERATION_GET_OBJECT) {
-        if (mtp->transaction.sent < mtp->transaction.total && !mtp->transaction.canceled) {
-            cntr_length = mtp->storage.api->read(mtp->storage.api_arg, mtp->buffer, mtp->buf_size);
+    else if (mtp->transaction.opcode == MTP_OPERATION_GET_OBJECT)
+    {
+        if (mtp->transaction.sent < mtp->transaction.total)
+        {
+            cntr_length = mtp->storage.api->read(mtp->storage.api_arg,
+                           mtp->buffer,
+                           mtp->buf_size);
             mtp->transaction.sent += cntr_length;
 
             log_info("DT+> %s: +%d", dbg_operation(mtp->transaction.opcode), cntr_length);
@@ -811,11 +813,6 @@ size_t mtp_responder_get_data(mtp_responder_t *mtp)
 bool mtp_responder_data_transaction_open(mtp_responder_t *mtp)
 {
     return (mtp->transaction.received) > 0 && (mtp->transaction.received < mtp->transaction.total);
-}
-
-bool mtp_responder_is_transaction_canceled(mtp_responder_t *mtp)
-{
-    return (mtp->transaction.canceled);
 }
 
 uint16_t mtp_responder_cancel_data_transaction(mtp_responder_t *mtp)
@@ -840,12 +837,6 @@ uint16_t mtp_responder_set_data(mtp_responder_t *mtp, void *incoming, size_t siz
 {
     uint16_t error     = 0;
     uint32_t size_left = mtp->transaction.total - mtp->transaction.received;
-
-    if (mtp->transaction.canceled) {
-        error = MTP_RESPONSE_INCOMPLETE_TRANSFER;
-        log_error("DT< %s: CANCELED", dbg_operation(mtp->transaction.opcode));
-        goto mtp_responder_receive_data_exit;
-    }
 
     // TODO: more elegant way to detect short write
     if ((size_left > 512 && size < 512)) {
@@ -892,7 +883,8 @@ void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_
     if (code == MTP_RESPONSE_TRANSACTION_CANCELLED)
         log_info("CANCELED TID: %x", (unsigned int) mtp->transaction.id);
 
-    if (mtp->transaction.handle && !mtp->transaction.canceled) {
+    if (mtp->transaction.handle)
+    {
         response->parameter[0] = mtp->storage.id;
         response->parameter[1] = 0xFFFFFFFF;
         response->parameter[2] = mtp->transaction.handle;
@@ -905,26 +897,19 @@ void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_
 
 void mtp_responder_transaction_reset(mtp_responder_t *mtp)
 {
-    if (!mtp->transaction.canceled) {
-        mtp->transaction.canceled = true;
-        if (mtp->transaction.opcode == MTP_OPERATION_SEND_OBJECT) {
-            mtp->storage.api->close(mtp->storage.api_arg);
-            mtp->storage.api->remove(mtp->storage.api_arg, mtp->transaction.handle);
-        } else if (mtp->transaction.opcode == MTP_OPERATION_GET_OBJECT) {
-            mtp->storage.api->close(mtp->storage.api_arg);
-        }
-        log_info("Transaction [0x%x] canceled", (unsigned int) mtp->transaction.id);
-
-    } else {
-        log_error("[0x%x] already canceled", (unsigned int) mtp->transaction.id);
+    if (mtp->transaction.opcode == MTP_OPERATION_SEND_OBJECT) {
+        mtp->storage.api->close(mtp->storage.api_arg);
+        mtp->storage.api->remove(mtp->storage.api_arg, mtp->transaction.handle);
+    } else if (mtp->transaction.opcode == MTP_OPERATION_GET_OBJECT) {
+        mtp->storage.api->close(mtp->storage.api_arg);
     }
 
     mtp->transaction.keep = false;
-    mtp->transaction.canceled = false;
     mtp->transaction.sent = 0;
     mtp->transaction.received = 0;
     mtp->transaction.in_buffer = 0;
     mtp->transaction.handle = 0;
+    log_info("mtp_responder: reset %u", (unsigned int) mtp->transaction.id);
 }
 
 void mtp_responder_get_event(mtp_responder_t *mtp, uint16_t code, void *data_out, size_t *size)
