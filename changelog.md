@@ -41,6 +41,7 @@
 * `[settings]` Improvements to API and logic.
 * `[gui]` Added timers.
 * `[doc]` Several updates to user and developer documentation.
+* `[audio]` Added volume popup logic.
 
 ## [0.40.1 2020-10-02]
 
