@@ -39,18 +39,17 @@ namespace audio
             return std::string();
         }
 
-        std::stringstream ss;
-        ss << "audio/";
+        std::string path(audioDbPrefix);
         if (auto s = str(profileType); !s.empty()) {
-            ss << s << "/";
+            path.append(s + "/");
         }
         if (auto s = str(playbackType); !s.empty()) {
-            ss << s << "/";
+            path.append(s + "/");
         }
         if (auto s = str(setting); !s.empty()) {
-            ss << s;
+            path.append(s);
         }
-        return ss.str();
+        return path;
     }
 
     auto GetVolumeText(const audio::Volume &volume) -> const std::string
