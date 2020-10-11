@@ -133,7 +133,7 @@ static usb_status_t OnGetStatus(usb_mtp_struct_t *mtpApp, void *param)
 {
     usb_device_control_request_struct_t *request = (usb_device_control_request_struct_t*)param;
     uint16_t status = 0x2001;
-    if (mtpApp->in_reset) {
+    if (mtpApp->in_reset || mtp_responder_data_transaction_open(mtpApp->responder)) {
         status = 0x2019;
     }
 
@@ -261,10 +261,11 @@ static void MtpTask(void *handle)
                 } else {
                     if (status == MTP_RESPONSE_OK) {
                         PRINTF("[MTP APP]: Incoming transfer complete\n");
+                        send_response(mtpApp, status);
                     } else if (status == MTP_RESPONSE_OBJECT_TOO_LARGE) {
                         PRINTF("[MTP APP]: Object is too large\n");
+                        send_response(mtpApp, status);
                     }
-                    send_response(mtpApp, status);
                     continue;
                 }
             }
