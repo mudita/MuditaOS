@@ -282,7 +282,6 @@ static void MtpTask(void *handle)
                             && !mtpApp->in_reset) {
                         PRINTF("[MTP APP]: Outgoing data canceled (unable to send)\n");
                         mtpApp->in_reset = true;
-                        // TODO: hard reset. Reset USB bus
                         break;
                     }
                 }
