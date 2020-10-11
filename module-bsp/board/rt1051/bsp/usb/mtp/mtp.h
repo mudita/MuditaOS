@@ -13,6 +13,7 @@ typedef struct
     void *sd_disk;
 
     uint8_t configured;
+    uint8_t in_reset;
     MessageBufferHandle_t inputBox;
     MessageBufferHandle_t outputBox;
 } usb_mtp_struct_t;

@@ -77,7 +77,7 @@ static const mtp_storage_properties_t* get_disk_properties(void* arg)
 
     disk_properties.capacity = data->capacity;
 
-    LOG("Capacity: %llu B, free: %llu\n", data->capacity, data->freespace);
+    //LOG("Capacity: %llu B, free: %llu", data->capacity, data->freespace);
 
     return &disk_properties;
 }
@@ -89,7 +89,7 @@ static uint64_t get_free_space(void *arg)
     uint64_t size = 0;
     stats = vfs.getFilesystemStats();
     size = stats.freeMbytes*1024llu*1024llu;
-    LOG("Free space: %llu KB\n", size / 1024);
+    //LOG("Free space: %llu KB", size / 1024);
     return size;
 }
 
@@ -114,11 +114,11 @@ static uint32_t fs_find_first(void *arg, uint32_t root, uint32_t *count)
     if (*count == 0)
         return 0;
 
-    LOG("found: %u files:\n", (unsigned int) *count);
+    LOG("found: %u files:", (unsigned int) *count);
 
     memset(find_data, 0, sizeof(FF_FindData_t));
     if (ff_findfirst(ROOT, find_data)) {
-        LOG("ff_findfirst failed\n");
+        LOG("ff_findfirst failed");
         return 0;
     }
 
@@ -147,7 +147,7 @@ static uint32_t fs_find_next(void* arg)
         handle = mtp_db_add(fs->db, find_data->pcFileName);
         return handle;
     }
-    LOG("Done. No more files\n");
+    LOG("Done. No more files");
     return 0;
 }
 
@@ -173,7 +173,7 @@ static int fs_stat(void *arg, uint32_t handle, mtp_object_info_t *info)
         return -1;
     }
 
-    LOG("[%u]: Get info for: %s\n", (unsigned int)handle, filename);
+    LOG("[%u]: Get info for: %s", (unsigned int)handle, filename);
 
     if (!ff_stat(abspath(filename), &stat)) {
         memset(info, 0, sizeof(mtp_object_info_t));
@@ -186,7 +186,7 @@ static int fs_stat(void *arg, uint32_t handle, mtp_object_info_t *info)
         strncpy(info->filename, filename, 64);
         return 0;
     } else {
-        LOG("[%u]: Stat error: %s\n", (unsigned int)handle, filename);
+        LOG("[%u]: Stat error: %s", (unsigned int)handle, filename);
     }
 
     return -1;
@@ -310,9 +310,11 @@ static int fs_write(void *arg, void *buffer, size_t count)
 static void fs_close(void *arg)
 {
     struct mtp_fs *fs = (struct mtp_fs*)arg;
-    ff_fclose(fs->file);
-    LOG("[]: Closed");
-    fs->file = NULL;
+    if (fs->file) {
+        ff_fclose(fs->file);
+        LOG("[]: Closed");
+        fs->file = NULL;
+    }
 }
 
 extern "C" const struct mtp_storage_api simple_fs_api =

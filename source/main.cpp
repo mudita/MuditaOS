@@ -20,6 +20,7 @@
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
@@ -75,9 +76,9 @@ int main()
 
         ret &=
             sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
+//        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
 
-#if ENABLE_GSM == 0
+#if ENABLE_GSM == 0 || 1
         // For now disable pernamenlty Service cellular when there is no GSM configured
         LOG_INFO("ServiceCellular (GSM) - Disabled");
 #else
@@ -85,14 +86,17 @@ int main()
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<FotaService::Service>(), sysmgr.get());
 #endif
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
+#if 0
+        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
+        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
+        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
+#endif
+        // Service Desktop disabled on master - pulling read on usb driver
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
-#if 0
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
+#if 0
 #ifdef ENABLE_APP_DESKTOP
         applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
 #endif

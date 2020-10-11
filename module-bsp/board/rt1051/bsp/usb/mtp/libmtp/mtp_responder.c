@@ -11,7 +11,9 @@
 #include "mtp_util.h"
 
 #if 0
-#include "log.h"
+#   include <stdio.h>
+#   define log_info(format, ...) printf(format"\n", __VA_ARGS__)
+#   define log_error(format,...) printf(format"\n", __VA_ARGS__)
 #else
 #define log_info(...)                                                                                                  \
     while (0) {}
@@ -21,8 +23,8 @@
 
 struct mtp_responder
 {
-    bool session_opened;
-    uint32_t session_id; /* not really used in USB implementation */
+    bool session_open;
+    uint32_t session_id;            /* not really used in USB implementation */
 
     mtp_storage_t storage;
     const mtp_device_info_t *device_info;
@@ -35,6 +37,7 @@ struct mtp_responder
         uint32_t handle;
         size_t total;
         size_t in_buffer;
+        bool file_open;
         bool keep;
         bool canceled;
         union
@@ -255,7 +258,7 @@ static uint16_t operation_open_session(mtp_responder_t *mtp, const mtp_op_cntr_t
     if (mtp_container_get_param_count(request) > 0)
         mtp->session_id = request->parameter[0];
 
-    mtp->session_opened = true;
+    mtp->session_open = true;
     return MTP_RESPONSE_OK;
 }
 
@@ -272,9 +275,10 @@ static uint16_t operation_get_device_info(mtp_responder_t *mtp, const mtp_op_cnt
 static uint16_t operation_close_session(mtp_responder_t *mtp, const mtp_op_cntr_t *request)
 {
     uint16_t error;
-    if (mtp->session_opened) {
-        mtp->session_opened = false;
-        error               = MTP_RESPONSE_OK;
+    if (mtp->session_open)
+    {
+        mtp->session_open = false;
+        error = MTP_RESPONSE_OK;
     }
     else {
         error = MTP_RESPONSE_SESSION_NOT_OPEN;
@@ -489,8 +493,11 @@ static uint16_t operation_get_object(mtp_responder_t *mtp, const mtp_op_cntr_t *
     uint32_t obj_handle = request->parameter[0];
     mtp_object_info_t info;
 
-    if (!obj_handle || mtp->storage.api->stat(mtp->storage.api_arg, obj_handle, &info) ||
-        mtp->storage.api->open(mtp->storage.api_arg, obj_handle, "r")) {
+    if (!obj_handle ||
+           mtp->storage.api->stat(mtp->storage.api_arg, obj_handle, &info) ||
+           mtp->storage.api->open(mtp->storage.api_arg, obj_handle, "r"))
+    {
+        mtp->transaction.file_open = true;
         error = MTP_RESPONSE_INVALID_OBJECT_HANDLE;
         goto get_object_exit;
     }
@@ -555,6 +562,8 @@ static uint16_t operation_send_object(mtp_responder_t *mtp, const mtp_op_cntr_t 
     /* TODO: restore open mode, we're opening for write. */
     if (mtp->storage.api->open(mtp->storage.api_arg, mtp->transaction.handle, "w+")) {
         error = MTP_RESPONSE_STORE_NOT_AVAILABLE;
+    } else {
+        mtp->transaction.file_open = true;
     }
 
     return error;
@@ -572,7 +581,7 @@ static uint16_t handle_command(mtp_responder_t *mtp, const mtp_op_cntr_t *reques
     }
     mtp->transaction.canceled = false;
 
-    log_info("OP> %s (0x%x)", dbg_operation(request->header.operation_code), mtp->transaction.id);
+    log_info("OP> %s (0x%x)", dbg_operation(request->header.operation_code), (unsigned int) mtp->transaction.id);
 
     switch (request->header.operation_code) {
     case MTP_OPERATION_OPEN_SESSION:
@@ -684,12 +693,14 @@ static uint16_t data_send_object(mtp_responder_t *mtp, const mtp_data_cntr_t *in
             error                 = MTP_RESPONSE_OBJECT_TOO_LARGE;
             mtp->transaction.keep = false;
             mtp->storage.api->close(mtp->storage.api_arg);
+            mtp->transaction.file_open = false;
             goto data_send_object_exit;
         }
     }
 
     if (plen >= mtp->transaction.total) {
         mtp->storage.api->close(mtp->storage.api_arg);
+        mtp->transaction.file_open = false;
         mtp->transaction.keep = false;
         error                 = MTP_RESPONSE_OK;
     }
@@ -731,39 +742,7 @@ handle_data_exit:
 
 void mtp_cancel_transaction_from_event(mtp_responder_t *mtp)
 {
-    if (!mtp->transaction.canceled) {
-        mtp->transaction.canceled = true;
-        log_info("Transaction [0x%x] canceled", mtp->transaction.id);
-    }
-    else {
-        log_error("[0x%x] already canceled", mtp->transaction.id);
-    }
 }
-
-#if 0
-void mtp_responder_handle_event(mtp_responder_t *mtp, void *event)
-{
-    mtp_event_t *mtp_event = (mtp_event_t*)event;
-
-
-    uint8_t *evt = event;
-    log_info("EVENT> %s (0x%x, 0x%x) current: 0x%x",
-            dbg_event(mtp_event->code),
-            mtp_event->code,
-            *(uint32_t*)&evt[2],
-            mtp->transaction.id);
-    switch(mtp_event->code)
-    {
-        case MTP_EVENT_CANCEL_TRANSACTION:
-            event_cancel_transaction(mtp, mtp_event);
-            break;
-        default:
-        {
-            log_error("Unknown event code: 0x%x", mtp_event->code);
-        }
-    }
-}
-#endif
 
 uint16_t mtp_responder_handle_request(mtp_responder_t *mtp, const void *request, const size_t req_size)
 {
@@ -823,6 +802,7 @@ size_t mtp_responder_get_data(mtp_responder_t *mtp)
         }
         else if (mtp->transaction.sent && mtp->transaction.sent >= mtp->transaction.total) {
             mtp->storage.api->close(mtp->storage.api_arg);
+            mtp->transaction.file_open = false;
         }
     }
     return cntr_length;
@@ -842,10 +822,12 @@ uint16_t mtp_responder_cancel_data_transaction(mtp_responder_t *mtp)
 {
     if (mtp->transaction.opcode == MTP_OPERATION_SEND_OBJECT) {
         mtp->storage.api->close(mtp->storage.api_arg);
+        mtp->transaction.file_open = false;
         mtp->storage.api->remove(mtp->storage.api_arg, mtp->transaction.handle);
     }
     else if (mtp->transaction.opcode == MTP_OPERATION_GET_OBJECT) {
         mtp->storage.api->close(mtp->storage.api_arg);
+        mtp->transaction.file_open = false;
     }
     mtp->transaction.received = 0;
     mtp->transaction.total    = 0;
@@ -875,6 +857,7 @@ uint16_t mtp_responder_set_data(mtp_responder_t *mtp, void *incoming, size_t siz
     if (mtp->storage.api->write(mtp->storage.api_arg, incoming, size) < 0) {
         error = MTP_RESPONSE_OBJECT_TOO_LARGE;
         mtp->storage.api->close(mtp->storage.api_arg);
+        mtp->transaction.file_open = false;
         mtp->transaction.keep = false;
 
         log_error("DT< %s Wrrite error", dbg_operation(mtp->transaction.opcode));
@@ -886,6 +869,7 @@ uint16_t mtp_responder_set_data(mtp_responder_t *mtp, void *incoming, size_t siz
     if (mtp->transaction.received >= mtp->transaction.total) {
         error = MTP_RESPONSE_OK;
         mtp->storage.api->close(mtp->storage.api_arg);
+        mtp->transaction.file_open = false;
         mtp->transaction.keep = false;
         goto mtp_responder_receive_data_exit;
     }
@@ -906,7 +890,7 @@ void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_
     memset(response->parameter, 0, 5 * sizeof(uint32_t));
 
     if (code == MTP_RESPONSE_TRANSACTION_CANCELLED)
-        log_info("CANCELED TID: %x\n", mtp->transaction.id);
+        log_info("CANCELED TID: %x", (unsigned int) mtp->transaction.id);
 
     if (mtp->transaction.handle && !mtp->transaction.canceled) {
         response->parameter[0] = mtp->storage.id;
@@ -917,6 +901,30 @@ void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_
     response->header.length = 12 + 5 * sizeof(uint32_t);
     *size                   = response->header.length;
     log_info("RP> %s: %s", dbg_operation(mtp->transaction.opcode), dbg_result(code));
+}
+
+void mtp_responder_transaction_reset(mtp_responder_t *mtp)
+{
+    if (!mtp->transaction.canceled) {
+        mtp->transaction.canceled = true;
+        if (mtp->transaction.opcode == MTP_OPERATION_SEND_OBJECT) {
+            mtp->storage.api->close(mtp->storage.api_arg);
+            mtp->storage.api->remove(mtp->storage.api_arg, mtp->transaction.handle);
+        } else if (mtp->transaction.opcode == MTP_OPERATION_GET_OBJECT) {
+            mtp->storage.api->close(mtp->storage.api_arg);
+        }
+        log_info("Transaction [0x%x] canceled", (unsigned int) mtp->transaction.id);
+
+    } else {
+        log_error("[0x%x] already canceled", (unsigned int) mtp->transaction.id);
+    }
+
+    mtp->transaction.keep = false;
+    mtp->transaction.canceled = false;
+    mtp->transaction.sent = 0;
+    mtp->transaction.received = 0;
+    mtp->transaction.in_buffer = 0;
+    mtp->transaction.handle = 0;
 }
 
 void mtp_responder_get_event(mtp_responder_t *mtp, uint16_t code, void *data_out, size_t *size)
