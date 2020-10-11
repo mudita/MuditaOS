@@ -1,14 +1,4 @@
-/*
- *  @file AudioMessage.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 29.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_AUDIOMESSAGE_HPP
-#define PUREPHONE_AUDIOMESSAGE_HPP
+#pragma once
 
 #include <memory>
 #include <variant>
@@ -248,4 +238,25 @@ class AudioRoutingControlRequest : public AudioMessage
     const ControlType controlType;
 };
 
-#endif // PUREPHONE_AUDIOMESSAGE_HPP
+class AudioKeyPressedRequest : public AudioMessage
+{
+  public:
+    AudioKeyPressedRequest(const int step) : AudioMessage{}, step{step}
+    {}
+    const int step{};
+};
+
+class AudioKeyPressedResponse : public sys::DataMessage
+{
+  public:
+    AudioKeyPressedResponse(audio::RetCode retCode,
+                            const audio::Volume &volume,
+                            const bool muted,
+                            const std::pair<audio::Profile::Type, audio::PlaybackType> &context)
+        : sys::DataMessage(MessageType::AudioMessage), volume(volume), muted(muted), context(context)
+    {}
+
+    const audio::Volume volume{};
+    const bool muted = false;
+    std::pair<audio::Profile::Type, audio::PlaybackType> context;
+};

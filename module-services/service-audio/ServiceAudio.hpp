@@ -1,14 +1,4 @@
-/*
- *  @file ServiceAudio.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 29.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_SERVICEAUDIO_HPP
-#define PUREPHONE_SERVICEAUDIO_HPP
+#pragma once
 
 #include "Service/Service.hpp"
 #include <functional>
@@ -64,6 +54,8 @@ class ServiceAudio : public sys::Service
                      const std::string                       = "",
                      const audio::PlaybackType &playbackType = audio::PlaybackType::None)
         -> std::unique_ptr<AudioResponseMessage>;
+    auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token, bool &muted)
+        -> std::unique_ptr<AudioResponseMessage>;
     auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>;
     auto HandleRoutingControl(const AudioRoutingControlRequest::ControlType &cType, const bool enable)
@@ -73,7 +65,7 @@ class ServiceAudio : public sys::Service
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
     void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
-
+    auto HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>;
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
@@ -117,6 +109,5 @@ class ServiceAudio : public sys::Service
     void updateDbValue(const std::string &path, const audio::Setting &setting, const std::string &value);
     void updateDbValue(const audio::Operation &currentOperation, const audio::Setting &setting, const uint32_t &value);
     void updateDbValue(const audio::Operation &currentOperation, const audio::Setting &setting, const bool &value);
+    [[nodiscard]] const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
 };
-
-#endif // PUREPHONE_SERVICEAUDIO_HPP

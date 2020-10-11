@@ -33,13 +33,6 @@ namespace gui
     class DrawCommand;
 }
 
-namespace app::audioConsts
-{
-    const std::vector<audio::PlaybackType> typesToMute = {audio::PlaybackType::Notifications,
-                                                          audio::PlaybackType::CallRingtone,
-                                                          audio::PlaybackType::TextMessageRingtone};
-} // namespace app::audioConsts
-
 namespace app
 {
 
@@ -241,6 +234,12 @@ namespace app
         }
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             return handleSIMMessage(msgl);
+        }
+        else if (auto msg = dynamic_cast<AudioKeyPressedResponse *>(msgl)) {
+            if (!msg->muted) {
+                // Popup should show up
+                LOG_ERROR("Popup with volume level %s", std::to_string(msg->volume).c_str());
+            }
         }
         return msgNotHandled();
     }
@@ -494,18 +493,7 @@ namespace app
 
     bool Application::adjustCurrentVolume(const int step)
     {
-        audio::Volume volume;
-        if (step < 0) {
-            AudioServiceAPI::Stop(this, app::audioConsts::typesToMute);
-        }
-        auto ret = AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
-        if (ret == audio::RetCode::Success) {
-            ret = ((static_cast<int>(volume) + step) < 0)
-                      ? audio::RetCode::Success
-                      : AudioServiceAPI::SetSetting(this, audio::Setting::Volume, volume + step);
-        }
-
-        return ret == audio::RetCode::Success;
+        return AudioServiceAPI::KeyPressed(this, step);
     }
 
     void Application::messageSwitchApplication(sys::Service *sender,
