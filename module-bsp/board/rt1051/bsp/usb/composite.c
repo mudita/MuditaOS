@@ -192,8 +192,10 @@ usb_cdc_vcom_struct_t *composite_init()
         LOG_ERROR("[Composite] USB Device init failed");
         return -1;
     }
-    else {
-        if (VirtualComInit(&composite.cdcVcom, g_CompositeClassConfig[0].classHandle) != kStatus_USB_Success)
+    else
+    {
+        /* TODO: pass event handling function here */
+        if (VirtualComInit(&composite.cdcVcom, g_CompositeClassConfig[0].classHandle, NULL, NULL) != kStatus_USB_Success)
             LOG_ERROR("[Composite] VirtualCom initialization failed");
 
         if (MtpInit(&composite.mtpApp, g_CompositeClassConfig[1].classHandle) != kStatus_USB_Success)
@@ -208,12 +210,7 @@ usb_cdc_vcom_struct_t *composite_init()
         LOG_ERROR("[Composite] USB Device run failed");
     }
 
-<<<<<<< HEAD
-    LOG_DEBUG("[===============] USB initialized");
-    return &composite.cdcVcom;
-=======
     LOG_DEBUG("[Composite] USB initialized");
     return 0;
 
->>>>>>> 9c769d5e... Change logging for composite
 }
