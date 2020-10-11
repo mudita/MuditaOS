@@ -98,8 +98,6 @@ size_t mtp_responder_get_data(mtp_responder_t *mtp);
  *  */
 bool mtp_responder_data_transaction_open(mtp_responder_t *mtp);
 
-uint16_t mtp_responder_cancel_data_transaction(mtp_responder_t *mtp);
-
 /** @brief Returns amount of data to be received in current transaction
  *  @param mtp library handle
  *  @param incoming data to be written
@@ -117,12 +115,8 @@ uint16_t mtp_responder_set_data(mtp_responder_t *mtp, void *incoming, size_t siz
  */
 void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_out, size_t *size);
 
+void mtp_responder_transaction_reset(mtp_responder_t *mtp);
 
-void mtp_responder_get_event(mtp_responder_t *mtp, uint16_t code, void *data_out, size_t *size);
-
-bool mtp_responder_is_transaction_canceled(mtp_responder_t *mtp);
-
-void mtp_cancel_transaction_from_event(mtp_responder_t *mtp);
 
 #endif /* _MTP_RESPONDER_H */
 

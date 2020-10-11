@@ -743,16 +743,11 @@ usb_status_t USB_DeviceControlCallback(usb_device_handle handle,
     {
         if ((USB_SETUP_PACKET_SIZE != message->length) || (NULL == message->buffer))
         {
-            /* If a invalid setup is received, the control pipes should be de-init and init again.
-             * Due to the IP can not meet this require, it is reserved for feature.
-             */
-            /*
             USB_DeviceDeinitEndpoint(handle,
                          USB_CONTROL_ENDPOINT | (USB_IN << USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_SHIFT));
             USB_DeviceDeinitEndpoint(handle,
                          USB_CONTROL_ENDPOINT | (USB_OUT << USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_SHIFT));
             USB_DeviceControlPipeInit(handle, callbackParam);
-            */
             return error;
         }
         /* Receive a setup request */
