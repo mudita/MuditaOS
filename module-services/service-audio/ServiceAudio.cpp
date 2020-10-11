@@ -143,16 +143,12 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleGetFileTags(const std::string &fileName)
 {
-    if (auto input = audioMux.GetAvailableInput()) {
-        auto tag = (*input)->audio->GetFileTags(fileName.c_str());
-        if (tag) {
-            return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
-        }
-        else {
-            return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
-        }
+    if (auto tag = Audio::GetFileTags(fileName.c_str())) {
+        return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
     }
-    return {};
+    else {
+        return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
+    }
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &token)
