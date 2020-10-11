@@ -207,7 +207,8 @@ int composite_init(void)
     }
     else
     {
-        if (VirtualComInit(&composite.cdcVcom, g_CompositeClassConfig[0].classHandle) != kStatus_USB_Success)
+        /* TODO: pass event handling function here */
+        if (VirtualComInit(&composite.cdcVcom, g_CompositeClassConfig[0].classHandle, NULL, NULL) != kStatus_USB_Success)
             LOG_ERROR("[Composite] VirtualCom initialization failed");
 
         if (MtpInit(&composite.mtpApp, g_CompositeClassConfig[1].classHandle) != kStatus_USB_Success)

@@ -25,6 +25,25 @@
 #define VCOM_INPUT_STREAM_SIZE (512)
 #define VCOM_OUTPUT_STREAM_SIZE (512)
 
+/* Events */
+enum vcomEvent {
+    VCOM_ATTACHED,
+    VCOM_CONFIGURED,
+    VCOM_DETACHED,
+    VCOM_RESET,
+    VCOM_ERROR_MALFORMED_USB_PACKET,
+    VCOM_ERROR_MISSED_INCOMING_DATA,
+    VCOM_ERROR_RX_BUFFER_OVERFLOW,
+    VCOM_ERROR_TX_BUFFER_OVERFLOW,
+    VCOM_WARNING_RESCHEDULE_BUSY,
+    VCOM_WARNING_NOT_CONFIGURED,
+};
+
+/* @brief Function to inform user code about events happening in
+ *        virtual com module.
+ * @NOTE: function may be called from ISR context. */
+typedef void (*userCbFunc)(void *userArg, enum vcomEvent);
+
 /* Define the types for application */
 typedef struct _usb_cdc_vcom_struct
 {
@@ -35,18 +54,27 @@ typedef struct _usb_cdc_vcom_struct
 
     StreamBufferHandle_t inputStream;
     StreamBufferHandle_t outputStream;
+
+    /* Event callback function prototype */
+    userCbFunc userCb;
+    void *userCbArg;
 } usb_cdc_vcom_struct_t;
+
+
 
 /*!
  * @brief Virtual COM device initialization function.
  *
  * This function initializes the device with the composite device class information.
  *
- * @param deviceComposite The pointer to the composite device structure.
+ * @param cdcVcom The pointer to the structure of CDC Virtual Com
+ * @param classHandle handle to lower layer USB class representation
+ * @param callback optional function for notifications
+ * @param userArg optional argument for user callback
  *
  * @return A USB error code or kStatus_USB_Success.
  */
-usb_status_t VirtualComInit(usb_cdc_vcom_struct_t *cdcVcom, class_handle_t classHandle);
+usb_status_t VirtualComInit(usb_cdc_vcom_struct_t *cdcVcom, class_handle_t classHandle, userCbFunc callback, void *userArg);
 
 /**
  * @brief Notify VirtualCom that USB cable is unplugged

@@ -21,6 +21,11 @@
 #   error "VCOM stream size has to be greater than single USB packet length"
 #endif
 
+#define call_user_cb(handle, id) do { \
+    if (handle->userCb) \
+            handle->userCb(handle->userCbArg, id); \
+    } while (0);
+
 
 /* Define the information relates to abstract control model */
 typedef struct _usb_cdc_acm_info {
@@ -85,6 +90,7 @@ static usb_status_t RescheduleRecv(usb_cdc_vcom_struct_t *cdcVcom)
                 endpoint_size)) != kStatus_USB_Success)
         {
             PRINTF("[VCOM]: Error: RescheduleRecv FAILED: %u\n", error);
+            call_user_cb(cdcVcom, VCOM_WARNING_RESCHEDULE_BUSY);
         }
     }
     return error;
@@ -104,6 +110,7 @@ static usb_status_t OnSendCompleted(usb_cdc_vcom_struct_t *cdcVcom,
             if ((error = USB_DeviceCdcAcmSend(cdcVcom->cdcAcmHandle,
                     USB_CDC_VCOM_DIC_BULK_IN_ENDPOINT, s_currSendBuf, to_send))) {
                 PRINTF("[VCOM] Error: dropped %u sending bytes", to_send);
+                call_user_cb(cdcVcom, VCOM_ERROR_TX_BUFFER_OVERFLOW);
             }
         } else {
             if (param->length > 0) {
@@ -126,13 +133,16 @@ static usb_status_t OnRecvCompleted(usb_cdc_vcom_struct_t *cdcVcom,
             length = xStreamBufferSendFromISR(cdcVcom->inputStream, param->buffer, param->length, NULL);
             if (length < param->length) {
                 PRINTF("[VCOM] Error: dropped %lu received bytes", param->length - length);
+                call_user_cb(cdcVcom, VCOM_ERROR_RX_BUFFER_OVERFLOW);
             }
         }
         error = RescheduleRecv(cdcVcom);
     } else if (param->length == 0xFFFFFFFF) {
         PRINTF("[VCOM] Warning: bus error");
+        call_user_cb(cdcVcom, VCOM_ERROR_MALFORMED_USB_PACKET);
     } else {
         PRINTF("[VCOM] Error: missed %lu received bytes", param->length);
+        call_user_cb(cdcVcom, VCOM_ERROR_MISSED_INCOMING_DATA);
     }
     return error;
 }
@@ -160,6 +170,7 @@ usb_status_t VirtualComUSBCallback(uint32_t event, void *param, void *userArg)
                 error = OnRecvCompleted(cdcVcom, epCbParam);
             } else {
                     PRINTF("[VCOM] Warning: received frame (%lu bytes) if not configured", epCbParam->length);
+                    call_user_cb(cdcVcom, VCOM_WARNING_NOT_CONFIGURED);
             }
         }
         break;
@@ -326,6 +337,7 @@ void VirtualComDetached(usb_cdc_vcom_struct_t *cdcVcom)
     PRINTF("[VCOM] Info: detached\r\n");
     cdcVcom->configured = false;
     xStreamBufferReceiveFromISR(cdcVcom->outputStream, s_currSendBuf, sizeof(s_currSendBuf), 0);
+    call_user_cb(cdcVcom, VCOM_DETACHED);
 }
 
 void VirtualComReset(usb_cdc_vcom_struct_t *cdcVcom)
@@ -333,8 +345,8 @@ void VirtualComReset(usb_cdc_vcom_struct_t *cdcVcom)
     PRINTF("[VCOM] Info: reset\r\n");
     cdcVcom->configured = false;
     xStreamBufferReceiveFromISR(cdcVcom->outputStream, s_currSendBuf, sizeof(s_currSendBuf), 0);
+    call_user_cb(cdcVcom, VCOM_RESET);
 }
-
 
 /*!
  * @brief Virtual COM device set configuration function.
@@ -355,6 +367,7 @@ usb_status_t VirtualComUSBSetConfiguration(usb_cdc_vcom_struct_t *cdcVcom, uint8
         PRINTF("[VCOM] Info: configured\r\n");
         /* Schedule buffer for receive */
         RescheduleRecv(cdcVcom);
+        call_user_cb(cdcVcom, VCOM_CONFIGURED);
     }
     return kStatus_USB_Success;
 }
@@ -368,9 +381,11 @@ usb_status_t VirtualComUSBSetConfiguration(usb_cdc_vcom_struct_t *cdcVcom, uint8
  *
  * @return A USB error code or kStatus_USB_Success.
  */
-usb_status_t VirtualComInit(usb_cdc_vcom_struct_t *cdcVcom, class_handle_t classHandle)
+usb_status_t VirtualComInit(usb_cdc_vcom_struct_t *cdcVcom, class_handle_t classHandle, userCbFunc callback, void *userArg)
 {
     cdcVcom->cdcAcmHandle = classHandle;
+    cdcVcom->userCb = callback;
+    cdcVcom->userCbArg = userArg;
 
     if ((cdcVcom->inputStream = xStreamBufferCreate(VCOM_INPUT_STREAM_SIZE, 0)) == NULL) {
         return kStatus_USB_AllocFail;

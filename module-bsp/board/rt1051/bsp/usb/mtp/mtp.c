@@ -312,7 +312,6 @@ static void MtpTask(void *handle)
     }
 }
 
-
 usb_status_t MtpInit(usb_mtp_struct_t *mtpApp, class_handle_t classHandle)
 {
     mtpApp->configured = 0;
