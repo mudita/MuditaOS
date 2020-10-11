@@ -191,7 +191,7 @@ static usb_status_t USB_DeviceCallback(usb_device_handle handle, uint32_t event,
 int composite_init(void)
 {
     if (USB_DeviceClockInit() != kStatus_USB_Success) {
-        LOG_ERROR("[===============] USB Device Clock init failed");
+        LOG_ERROR("[Composite] USB Device Clock init failed");
     }
 
     composite.speed = USB_SPEED_FULL;
@@ -202,16 +202,16 @@ int composite_init(void)
     if (kStatus_USB_Success !=
         USB_DeviceClassInit(CONTROLLER_ID, &g_UsbDeviceCompositeConfigList, &composite.deviceHandle))
     {
-        LOG_ERROR("[===============] USB Device init failed");
+        LOG_ERROR("[Composite] USB Device init failed");
         return -1;
     }
     else
     {
         if (VirtualComInit(&composite.cdcVcom, g_CompositeClassConfig[0].classHandle) != kStatus_USB_Success)
-            LOG_ERROR("[===============] VirtualCom initialization failed");
+            LOG_ERROR("[Composite] VirtualCom initialization failed");
 
         if (MtpInit(&composite.mtpApp, g_CompositeClassConfig[1].classHandle) != kStatus_USB_Success)
-            LOG_ERROR("[===============] MTP initialization failed");
+            LOG_ERROR("[Composite] MTP initialization failed");
     }
 
     VirtualComDemoInit(&composite.cdcVcom);
@@ -219,10 +219,10 @@ int composite_init(void)
     USB_DeviceIsrEnable();
 
     if (USB_DeviceRun(composite.deviceHandle) != kStatus_USB_Success) {
-        LOG_ERROR("[===============] USB Device run failed");
+        LOG_ERROR("[Composite] USB Device run failed");
     }
 
-    LOG_DEBUG("[===============] USB initialized");
+    LOG_DEBUG("[Composite] USB initialized");
     return 0;
 
 }
