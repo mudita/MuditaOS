@@ -890,9 +890,9 @@ void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_
         response->parameter[2] = mtp->transaction.handle;
     }
 
-    response->header.length = 12 + 5 * sizeof(uint32_t);
-    *size                   = response->header.length;
-    log_info("RP> %s: %s", dbg_operation(mtp->transaction.opcode), dbg_result(code));
+    response->header.length = 12 + 5*sizeof(uint32_t);
+    *size = response->header.length;
+    log_info("RP> %s: %s (0x%x)", dbg_operation(mtp->transaction.opcode), dbg_result(code), code);
 }
 
 void mtp_responder_transaction_reset(mtp_responder_t *mtp)
