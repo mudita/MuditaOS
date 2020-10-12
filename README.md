@@ -8,15 +8,28 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 
 ## Key features
 
-- hardware abstraction layer between the hardware and the OS 
-- secure database for storing contact information and messages 
+- 3 modes (offline, do not disturb, connected)
+- blocked/approved contacts list
+- threaded messaging with templates, drafts, UTF8 and emoji support
+- audio player supporting MP3, WAV, FLAC formats and indexed ID3 Tags
+- meditation app
+- notes app
+- voice recorder app
+- calendar app
+- calculator
+- alarm clock
+- displaying wallpapers and quotes
+- contacts and calendar synchronization via Mudita Center desktop app 
+- onboarding guide
+- maganetometer
+- flashlight
+- user interface optimized for E Ink displays with frontlight support
+- Bluetooth headset connectivity
+- USB-C Fast Charging
+- VoLTE and internet tethering support
+- HAL (Hardware Abstraction Layer) between the hardware and the OS
 - system manager that restores the system after switching on the device, monitors the system status or performs the initial start-up
-- optimized for E Ink displays
-- audio player for MP3, WAV and FLAC formats
-- Bluetooth headset connectivity 
-- contacts synchronization 
-- digitally signed system updates
-- threaded messaging
+- SQLite database for storing contacts and notes
 
 ## Table of contents
 
