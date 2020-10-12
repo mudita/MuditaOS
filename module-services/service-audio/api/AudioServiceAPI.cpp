@@ -52,26 +52,6 @@ namespace AudioServiceAPI
         return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    bool RoutingMute(sys::Service *serv, bool enable)
-    {
-        auto msg = std::make_shared<AudioRoutingControlRequest>(AudioRoutingControlRequest::ControlType::Mute, enable);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
-    }
-
-    bool RoutingSpeakerPhone(sys::Service *serv, bool enable)
-    {
-        auto msg = std::make_shared<AudioRoutingControlRequest>(
-            AudioRoutingControlRequest::ControlType::SwitchSpeakerphone, enable);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
-    }
-
-    bool RoutingHeadset(sys::Service *serv, bool enable)
-    {
-        auto msg = std::make_shared<AudioRoutingControlRequest>(
-            AudioRoutingControlRequest::ControlType::SwitchHeadphones, enable);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
-    }
-
     bool Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
     {
         if (stopVec.empty()) {
@@ -102,6 +82,38 @@ namespace AudioServiceAPI
     bool Resume(sys::Service *serv, const audio::Token &token)
     {
         auto msg = std::make_shared<AudioResumeRequest>(token);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
+    bool SendEvent(sys::Service *serv, std::unique_ptr<audio::Event> evt)
+    {
+        auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
+    bool SendEvent(sys::Service *serv, audio::EventType eType)
+    {
+        auto msg = std::make_shared<AudioEventRequest>(eType);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
+    bool RoutingMute(sys::Service *serv, bool enable)
+    {
+        auto msg = std::make_shared<AudioEventRequest>(enable ? EventType::CallMute : EventType::CallUnmute);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
+    bool RoutingSpeakerPhone(sys::Service *serv, bool enable)
+    {
+        auto msg = std::make_shared<AudioEventRequest>(enable ? EventType::CallSpeakerphoneOn
+                                                              : EventType::CallSpeakerphoneOff);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
+    bool RoutingHeadset(sys::Service *serv, bool enable)
+    {
+        auto msg =
+            std::make_shared<AudioEventRequest>(enable ? EventType::HeadphonesPlugin : EventType::HeadphonesUnplug);
         return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
@@ -145,17 +157,11 @@ namespace AudioServiceAPI
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    template audio::RetCode SetSetting<uint32_t>(sys::Service *serv,
-                                                 const audio::Setting &setting,
-                                                 const uint32_t value,
-                                                 const audio::PlaybackType &playbackType,
-                                                 const audio::Profile::Type &profileType);
+    template audio::RetCode SetSetting<uint32_t>(
+        sys::Service *, const Setting &, const uint32_t, const PlaybackType &, const Profile::Type &);
 
-    template audio::RetCode SetSetting<bool>(sys::Service *serv,
-                                             const audio::Setting &setting,
-                                             const bool value,
-                                             const audio::PlaybackType &playbackType,
-                                             const audio::Profile::Type &profileType);
+    template audio::RetCode SetSetting<bool>(
+        sys::Service *, const Setting &, const bool, const PlaybackType &, const Profile::Type &);
 
     std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
     {

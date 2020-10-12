@@ -28,7 +28,7 @@ namespace audio
         audio::RetCode Stop() override final;
         audio::RetCode Pause() override final;
         audio::RetCode Resume() override final;
-        audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) override final;
+        audio::RetCode SendEvent(std::unique_ptr<Event> evt) override final;
         audio::RetCode SwitchProfile(const Profile::Type type) override final;
         audio::RetCode SetOutputVolume(float vol) override final;
         audio::RetCode SetInputGain(float gain) override final;

@@ -40,9 +40,6 @@ namespace AudioServiceAPI
      *  Response will come as message AudioStartRoutingResponse
      */
     bool RoutingStart(sys::Service *serv);
-    bool RoutingMute(sys::Service *serv, bool enable);
-    bool RoutingSpeakerPhone(sys::Service *serv, bool enable);
-    bool RoutingHeadset(sys::Service *serv, bool enable);
     /**
      * @brief Stops playback operations by type. Asynchronous call.
      *
@@ -96,6 +93,26 @@ namespace AudioServiceAPI
      * @param fileName Path to file to be parsed.
      * @return audio::Tags on success, std::nullopt on failure
      */
+    bool RoutingMute(sys::Service *serv, bool enable);
+    bool RoutingSpeakerPhone(sys::Service *serv, bool enable);
+    bool RoutingHeadset(sys::Service *serv, bool enable);
+    /**
+     * @brief Sends audio event
+     * @param serv Requesting service.
+     * @param evt Event to be sent.
+     * @return True is request has been sent successfully, false otherwise
+     *   Response will come as message AudioSendEventResponse
+     */
+    bool SendEvent(sys::Service *serv, std::unique_ptr<audio::Event> evt);
+    /**
+     * @brief Sends audio event
+     * @param serv Requesting service.
+     * @param evt Event to be sent.
+     *  @return True is request has been sent successfully, false otherwise
+     *   Response will come as message AudioSendEventResponse
+     */
+    bool SendEvent(sys::Service *serv, audio::EventType evt);
+
     std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
     /** @brief Gets settings. Current profile is taken by default.
      *
@@ -127,7 +144,6 @@ namespace AudioServiceAPI
                               const T value,
                               const audio::PlaybackType &playbackType = audio::PlaybackType::None,
                               const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
-
     /** @brief Key pressed handler.
      *
      * @param serv - requesting service.

@@ -58,8 +58,7 @@ class ServiceAudio : public sys::Service
         -> std::unique_ptr<AudioResponseMessage>;
     auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>;
-    auto HandleRoutingControl(const AudioRoutingControlRequest::ControlType &cType, const bool enable)
-        -> std::unique_ptr<AudioResponseMessage>;
+    auto HandleSendEvent(std::unique_ptr<audio::Event> evt) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;

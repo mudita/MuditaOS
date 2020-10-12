@@ -11,13 +11,6 @@
 
 namespace audio
 {
-    class EventData
-    {
-      public:
-        ~EventData()
-        {}
-    };
-
     class Operation
     {
       public:
@@ -56,20 +49,6 @@ namespace audio
             return "";
         }
 
-        enum class Event
-        {
-            HeadphonesPlugin,
-            HeadphonesUnplug,
-            BTHeadsetOn,
-            BTHeadsetOff,
-            BTA2DPOn,
-            BTA2DPOff,
-            CallMute,
-            CallUnmute,
-            CallSpeakerphoneOn,
-            CallSpeakerphoneOff,
-        };
-
         virtual ~Operation() = default;
 
         static std::optional<std::unique_ptr<Operation>> Create(
@@ -86,7 +65,7 @@ namespace audio
 
         virtual audio::RetCode Resume() = 0;
 
-        virtual audio::RetCode SendEvent(const Event evt, const EventData *data = nullptr) = 0;
+        virtual audio::RetCode SendEvent(std::unique_ptr<Event> evt) = 0;
 
         virtual audio::RetCode SetOutputVolume(float vol) = 0;
 

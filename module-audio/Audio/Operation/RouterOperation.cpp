@@ -197,29 +197,25 @@ namespace audio
         return RetCode::Success;
     }
 
-    audio::RetCode RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
+    audio::RetCode RouterOperation::SendEvent(std::unique_ptr<Event> evt)
     {
-        switch (evt) {
-        case Event::HeadphonesPlugin:
+        switch (evt->getType()) {
+        case EventType::HeadphonesPlugin:
             SwitchProfile(Profile::Type::RoutingHeadset);
             break;
-        case Event::HeadphonesUnplug:
+        case EventType::HeadphonesUnplug:
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
-        case Event::BTHeadsetOn:
-            break;
-        case Event::BTHeadsetOff:
-            break;
-        case Event ::CallMute:
+        case EventType::CallMute:
             Mute(true);
             break;
-        case Event ::CallUnmute:
+        case EventType::CallUnmute:
             Mute(false);
             break;
-        case Event ::CallSpeakerphoneOn:
+        case EventType::CallSpeakerphoneOn:
             SwitchProfile(Profile::Type::RoutingSpeakerphone);
             break;
-        case Event ::CallSpeakerphoneOff:
+        case EventType::CallSpeakerphoneOff:
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         default:
