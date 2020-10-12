@@ -23,7 +23,7 @@ class SMSThreadModel : public app::DatabaseModel<SMSRecord>, public gui::ListIte
     auto handleQueryResponse(db::QueryResult *) -> bool;
 
     unsigned int requestRecordsCount() override;
-    bool updateRecords(std::unique_ptr<std::vector<SMSRecord>> records) override;
+    bool updateRecords(std::vector<SMSRecord> records) override;
     void requestRecords(uint32_t offset, uint32_t limit) override;
     unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;

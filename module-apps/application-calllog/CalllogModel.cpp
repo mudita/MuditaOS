@@ -1,11 +1,3 @@
-/*
- * @file CalllogModel.cpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 23.09.2019
- * @brief Call Log Model
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "CalllogModel.hpp"
 #include "InputEvent.hpp"
 #include "ListView.hpp"
@@ -31,7 +23,7 @@ void CalllogModel::requestRecords(const uint32_t offset, const uint32_t limit)
     DBServiceAPI::CalllogGetLimitOffset(application, offset, limit);
 }
 
-bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> records)
+bool CalllogModel::updateRecords(std::vector<CalllogRecord> records)
 {
 #if DEBUG_DB_MODEL_DATA == 1
     LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count: %" PRIu32 "", offset, limit, count);
