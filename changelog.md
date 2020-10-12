@@ -15,7 +15,7 @@
 * `[audio]` Added vibration/enable sound database logic
 * `[settings]` Create main window for apps and tools 
 * `[meditation]` Added a meditation progress bar with simple implementation of meditation application.
-
+* `[settings]` Create set of queries required for settings.
 
 ### Changed
 
@@ -43,6 +43,7 @@
 * `[settings]` Add basic display and keypad options window.
 * `[renderer]` Add ability to draw circles and arcs.
 * `[bluetooth]` Add support for scanning and pairing.
+* `[settings]` Settings provider - api to the settings subsytem.
 
 ### Changed
 
