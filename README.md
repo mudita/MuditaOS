@@ -2,9 +2,21 @@
 
 [![Follow twitter](https://img.shields.io/badge/follow-twitter-00cc99.svg)](https://twitter.com/wearemudita)
 
-MuditaOS is a mobile operating system optimized for E Ink displays. Built from scratch with Mudita Pure minimalist phone in mind.
+MuditaOS is a mobile operating system optimized for E Ink displays. Built on FreeRTOS™ with Mudita Pure minimalist phone in mind.
 
-![MuditaOS screenshot]()
+![MuditaOS interface screenshots](./MuditaOS-screens.png)
+
+## Key features
+
+- hardware abstraction layer between the hardware and the OS 
+- secure database for storing contact information and messages 
+- system manager that restores the system after switching on the device, monitors the system status or performs the initial start-up
+- optimized for E Ink displays
+- audio player for MP3, WAV and FLAC formats
+- Bluetooth headset connectivity 
+- contacts synchronization 
+- digitally signed system updates
+- threaded messaging
 
 ## Table of contents
 
