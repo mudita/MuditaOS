@@ -70,11 +70,7 @@ namespace gui
     bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         DBCalllogResponseMessage *msg = reinterpret_cast<DBCalllogResponseMessage *>(msgl);
-        if (calllogModel->updateRecords(std::move(msg->records))) {
-            return true;
-        }
-
-        return false;
+        return calllogModel->updateRecords(std::move(*msg->records));
     }
 
 } /* namespace gui */
