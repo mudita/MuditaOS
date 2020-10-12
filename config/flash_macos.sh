@@ -20,7 +20,7 @@ print_help() {
 	exit 1
 }
 
-while getopts "hf:c" arg; do
+while getopts ":hf:c" arg; do
 	case "${arg}" in
 		h)
 			print_help
@@ -36,8 +36,12 @@ while getopts "hf:c" arg; do
 			;;
 	esac
 done
-shift $((OPTIND-1))
 
+if [ $OPTIND -eq 1 ]; then
+	print_help
+fi
+
+shift $((OPTIND-1))
 PHONE_DEV=`diskutil list | grep $PHONE_PARTITION_NAME | awk '{print $6}'`
 if [ "$PHONE_DEV" == "" ]; then
 	echo "Can't find $PHONE_PARTITION_NAME device via diskutil, make sure that the phone is in USB-MSC mode"
