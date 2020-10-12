@@ -36,6 +36,7 @@
 #include "bsp/rtc/rtc.hpp"
 
 #include <cassert>
+#include <module-sys/Service/Timer.hpp>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -183,6 +184,35 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         }
         handled = true;
     }
+    else if (msgl->messageType == MessageType::EVMVibratorStateMessage) {
+        using namespace bsp;
+        auto msg = dynamic_cast<sevm::VibratorStateMessage *>(msgl);
+        if (msg != nullptr) {
+            auto message = std::make_shared<sevm::VibratorStateMessage>(msg->state, msg->duration);
+
+            switch (msg->state) {
+            case vibrator::State::on:
+                vibrator::enable();
+                break;
+            case vibrator::State::off:
+                vibrator::disable();
+                break;
+            }
+
+            if (msg->duration) {
+                static auto vibratorTimer = sys::Timer(this, *msg->duration, sys::Timer::Type::SingleShot);
+                switch (msg->state) {
+                case vibrator::State::on:
+                    vibratorTimer.connect([&](sys::Timer &) { vibrator::disable(); });
+                    break;
+                case vibrator::State::off:
+                    vibratorTimer.connect([&](sys::Timer &) { vibrator::enable(); });
+                    break;
+                }
+                vibratorTimer.start();
+            }
+        }
+    }
     else if (msgl->messageType == MessageType::EVMTorchStateMessage) {
         auto msg = dynamic_cast<sevm::TorchStateMessage *>(msgl);
         if (msg != nullptr) {
@@ -223,7 +253,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 sys::ReturnCodes EventManager::InitHandler()
 {
 
-    // initialize keyboard worker
+    // initialize bsp worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
     // create queues for worker

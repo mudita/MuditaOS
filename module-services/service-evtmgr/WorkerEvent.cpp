@@ -194,6 +194,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
 bool WorkerEvent::deinit(void)
 {
     Worker::deinit();
+    bsp::vibrator::deinit();
     bsp::keyboard_Deinit();
     bsp::headset::Deinit();
     bsp::battery_Deinit();

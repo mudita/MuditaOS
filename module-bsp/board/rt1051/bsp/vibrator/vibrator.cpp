@@ -23,6 +23,11 @@ namespace bsp
 
             disable();
         }
+        void deinit()
+        {
+            disable();
+        }
+
         void enable()
         {
             port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 1);
@@ -31,5 +36,6 @@ namespace bsp
         {
             port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 0);
         }
+
     } // namespace vibrator
 } // namespace bsp
