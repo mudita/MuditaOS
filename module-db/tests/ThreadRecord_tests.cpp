@@ -10,7 +10,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
 #include "queries/messages/threads/QueryThreadMarkAsRead.hpp"
-#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
 #include "queries/messages/threads/QueryThreadGetByID.hpp"
 #include "queries/messages/threads/QueryThreadGetByContactID.hpp"
 #include "queries/messages/threads/QueryThreadGetByNumber.hpp"
@@ -180,10 +180,9 @@ TEST_CASE("Thread Record tests")
         REQUIRE(rec.isUnread());
 
         {
-            auto query =
-                std::make_shared<db::query::smsthread::MarkAsRead>(3, db::query::smsthread::MarkAsRead::Read::True);
+            auto query  = std::make_shared<db::query::MarkAsRead>(3, db::query::MarkAsRead::Read::True);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
+            auto result = dynamic_cast<db::query::MarkAsReadResult *>(ret.get());
             REQUIRE(result != nullptr);
             REQUIRE(result->getResult());
             rec = threadRecordInterface1.GetByID(3);
@@ -191,10 +190,9 @@ TEST_CASE("Thread Record tests")
         }
 
         {
-            auto query =
-                std::make_shared<db::query::smsthread::MarkAsRead>(3, db::query::smsthread::MarkAsRead::Read::False);
+            auto query  = std::make_shared<db::query::MarkAsRead>(3, db::query::MarkAsRead::Read::False);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(ret.get());
+            auto result = dynamic_cast<db::query::MarkAsReadResult *>(ret.get());
             REQUIRE(result != nullptr);
             REQUIRE(result->getResult());
             rec = threadRecordInterface1.GetByID(3);
@@ -222,18 +220,18 @@ TEST_CASE("Thread Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
 
         {
-            auto query  = std::make_shared<db::query::ThreadsSearch>("A", 0, 10);
+            auto query  = std::make_shared<db::query::ThreadsSearchForList>("A", 0, 10);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::ThreadsSearchResult *>(ret.get());
+            auto result = dynamic_cast<db::query::ThreadsSearchResultForList *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 2);
         }
 
         {
-            auto query  = std::make_shared<db::query::ThreadsSearch>("O", 0, 10);
+            auto query  = std::make_shared<db::query::ThreadsSearchForList>("O", 0, 10);
             auto ret    = threadRecordInterface1.runQuery(query);
-            auto result = dynamic_cast<db::query::ThreadsSearchResult *>(ret.get());
+            auto result = dynamic_cast<db::query::ThreadsSearchResultForList *>(ret.get());
             REQUIRE(result != nullptr);
             auto results = result->getResults();
             REQUIRE(results.size() == 1);

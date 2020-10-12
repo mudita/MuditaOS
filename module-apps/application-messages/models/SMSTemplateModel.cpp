@@ -2,27 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateModel.hpp"
-#include "SMSTemplateItem.hpp"
 #include "ListView.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
+#include "application-messages/widgets/SMSTemplateItem.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include <service-db/api/DBServiceAPI.hpp>
+#include <module-db/queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 
 SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app)
 {}
 
 unsigned int SMSTemplateModel::requestRecordsCount()
 {
-    recordsCount = DBServiceAPI::SMSTemplateGetCount(application);
-    LOG_DEBUG("SMSTemplateGetCount %" PRIu32, recordsCount);
-
     return recordsCount;
-}
-
-void SMSTemplateModel::requestRecords(const uint32_t offset, const uint32_t limit)
-{
-    DBServiceAPI::SMSTemplateGetLimitOffset(application, offset, limit);
 }
 
 bool SMSTemplateModel::updateRecords(std::vector<SMSTemplateRecord> records)
@@ -60,4 +51,29 @@ gui::ListItem *SMSTemplateModel::getItem(gui::Order order)
     };
 
     return item;
+}
+
+void SMSTemplateModel::requestRecords(const uint32_t offset, const uint32_t limit)
+{
+    auto query = std::make_unique<db::query::SMSTemplateGetForList>(offset, limit);
+    query->setQueryListener(
+        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
+    DBServiceAPI::GetQuery(application, db::Interface::Name::SMSTemplate, std::move(query));
+}
+
+auto SMSTemplateModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+{
+    auto msgResponse = dynamic_cast<db::query::SMSTemplateGetForListResult *>(queryResult);
+    assert(msgResponse != nullptr);
+
+    // If list record count has changed we need to rebuild list.
+    if (recordsCount != (msgResponse->getCount())) {
+        recordsCount = msgResponse->getCount();
+        list->rebuildList(style::listview::RebuildType::Full, 0, true);
+        return false;
+    }
+
+    auto records = msgResponse->getResults();
+
+    return this->updateRecords(std::move(records));
 }

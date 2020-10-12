@@ -48,10 +48,11 @@ class SMSTemplateRecordInterface : public RecordInterface<SMSTemplateRecord, SMS
 
   private:
     SmsDB *smsDB = nullptr;
-    std::unique_ptr<db::QueryResult> getByIDQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> getCountQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> addQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::QueryResult> updateQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> getByIDQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> getQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> getForListQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> getCountQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> addQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> removeQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> updateQuery(const std::shared_ptr<db::Query> &query);
 };
