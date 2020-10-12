@@ -2,9 +2,13 @@
 
 ## current
 
-### Added:
+### Added
 
 * `[gui]` Dynamic Windows building and handling implemented
+
+### Fixed
+
+* `[audio]` Fix parsing audio meta tags during playback
 
 ## [0.42.1 2020-10-12]
 
