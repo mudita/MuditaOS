@@ -28,8 +28,8 @@ jobs:
     - name: "Build and package for RT1051"
       id: build_release_package 
       run: |
-        ./configure.sh rt1051 Debug && \
-        pushd build-rt1051-Debug && \
+        ./configure.sh rt1051 RelWithDebInfo && \
+        pushd build-rt1051-RelWithDebInfo && \
         export JOBS=${JOBS:-`nproc`} && \
         echo "JOBS=${JOBS}" && \
         make -j ${JOBS} && \
