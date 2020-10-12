@@ -146,9 +146,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleGetFileTags(const std:
     if (auto tag = Audio::GetFileTags(fileName.c_str())) {
         return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
     }
-    else {
-        return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
-    }
+    return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &token)
