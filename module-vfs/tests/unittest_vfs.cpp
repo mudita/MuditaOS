@@ -180,3 +180,52 @@ TEST_CASE("VFS lseek check")
     REQUIRE(buffer == buf_out);
     REQUIRE(vfs.fclose(fd) == 0);
 }
+
+TEST_CASE("Simple file notifier init")
+{
+    vfs.registerNotificationHandler(
+        [](std::string_view file, vfsn::utility::vfsNotifier::FsEvent ev, std::string_view old_file) {
+            using namespace std::string_literals;
+            REQUIRE(file == "/"s);
+            REQUIRE(ev == vfsn::utility::vfsNotifier::FsEvent::initialized);
+            REQUIRE(old_file.empty());
+        });
+    vfs.registerNotificationHandler(nullptr);
+}
+
+TEST_CASE("Simple file notifier write")
+{
+    vfs.registerNotificationHandler(
+        [](std::string_view file, vfsn::utility::vfsNotifier::FsEvent ev, std::string_view old_file) {
+            using namespace std::string_literals;
+            namespace fs = std::filesystem;
+            fs::path fspath(file);
+            REQUIRE(fspath.is_absolute());
+            REQUIRE(fspath.filename() == "testFileLB.txt"s);
+            REQUIRE(ev == vfsn::utility::vfsNotifier::FsEvent::modified);
+            REQUIRE(old_file.empty());
+        });
+
+    const size_t testBufferSize = 1024 * 1024;
+
+    uint8_t testBuffer[testBufferSize] = {0};
+
+    auto fd = vfs.fopen("testFileLB.txt", "w");
+    REQUIRE(fd != nullptr);
+
+    auto bytesWritten = vfs.fwrite(testBuffer, 1, testBufferSize, fd);
+    REQUIRE(bytesWritten == testBufferSize);
+
+    auto currFilePos = vfs.ftell(fd);
+    REQUIRE(currFilePos == testBufferSize);
+
+    auto fileSize = vfs.filelength(fd);
+    REQUIRE(fileSize == testBufferSize);
+
+    currFilePos = vfs.ftell(fd);
+    REQUIRE(currFilePos == testBufferSize);
+
+    REQUIRE(vfs.fclose(fd) == 0);
+
+    vfs.registerNotificationHandler(nullptr);
+}
