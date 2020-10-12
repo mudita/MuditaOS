@@ -341,10 +341,10 @@ namespace gui
         setFocusItem(body);
 
         if (storedFocusIndex != 0) {
-
             if (!body->setFocusOnElement(storedFocusIndex)) {
                 body->setFocusOnLastElement();
             }
+            storedFocusIndex = 0;
         }
 
         if (focusOnLastItem) {

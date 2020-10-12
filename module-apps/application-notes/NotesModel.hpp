@@ -26,7 +26,7 @@ class NotesModel : public app::DatabaseModel<NotesRecord>, public gui::ListItemP
     NotesModel(app::Application *app);
 
     // virtual methods
-    bool updateRecords(std::unique_ptr<std::vector<NotesRecord>> records) override;
+    bool updateRecords(std::vector<NotesRecord> records) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
