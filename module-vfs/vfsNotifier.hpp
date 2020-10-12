@@ -1,7 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 //
-// Created by lucck on 12.10.2020.
-//
-
 #pragma once
 #include "ff_stdio.h"
 #include <unordered_map>
@@ -13,38 +12,71 @@ namespace vfsn::utility
     class vfsNotifier
     {
         using FILE = FF_FILE;
+
       public:
+        //! Default constructor and destructor
+        vfsNotifier()                    = default;
+        vfsNotifier(const vfsNotifier &) = delete;
+        vfsNotifier &operator=(const vfsNotifier &) = delete;
         //! Event type notified for indexer
         enum class FsEvent
         {
-            initialized,
-            modified,
-            deleted,
+            initialized, //! Filesystem is intialized
+            modified,    //! File is modified
+            deleted,     //! File is deleted
             renamed
         };
-        // Notification handler type
+        /** Notification handler type
+         * Notify function callback defiinition
+         */
         using NotifyHandler = std::function<void(std::string_view, FsEvent, std::string_view)>;
-        // When file is opened
+        /** This method is called by the vfs layer when vfs open file
+         * @param[in] filename Opened file path
+         * @param[in] mode Open mode
+         * @param[in] Handle to opened file
+         * @return None
+         */
         auto onFileOpen(const char *filename, const char *mode, const FILE *file) noexcept -> void;
-        // When file is closed
+        /** This method is called by the vfs layer when vfs close file
+         * @param[in] filee Closed file handle
+         * @return None
+         */
         auto onFileClose(const FILE *file) noexcept -> void;
-        // When file is removed
+        /** This method is called by the vfs layer when file is removed
+         * @param[in] filename Removed file path
+         * @return None
+         */
         auto onFileRemove(std::string_view filename) noexcept -> void;
-        // When file is renamed
-        auto onFileRename(std::string_view new_file, std::string_view old_file) -> void;
-        // When filesystem is initialized
-        auto onFileSystemInitialized() -> void
+        /** This method is called by the vfs layer when the vfs rename file
+         * @param[in] new_file New path name for the file
+         * @param[in] old_file Old path for the file
+         * @return None
+         */
+        auto onFileRename(std::string_view new_file, std::string_view old_file) noexcept -> void;
+        /** This method is called by the vfs layer when the disk is intiialized
+         * @return None
+         */
+        auto onFileSystemInitialized() noexcept -> void
         {
             notify("/", FsEvent::initialized);
         }
-        // Register notification handler
+        /** Method for register notification handler
+         * @note This function is called from the thread contest which use vfs call
+         * @param[in] hwnd Notification handler funtion
+         * @return None
+         */
         auto registerNotificationHandler(NotifyHandler hwnd) -> void
         {
             notificationCallback = hwnd;
         }
 
       private:
-        // Notify event
+        /** Private notification helper internal method
+         * @param[in] file Modified file path
+         * @param[in] event Notification event type
+         * @param[in] old_file Old file path
+         * @return None
+         */
         auto notify(std::string_view file, FsEvent event, std::string_view old_file = "") -> void
         {
             if (notificationCallback)
@@ -52,11 +84,11 @@ namespace vfsn::utility
         }
 
       private:
-        // Map for opened handles and paths
+        //! Map for opened handles and paths
         std::unordered_map<const FILE *, std::string> mOpenedMap;
-        // Mutex for unordered map
+        //! Mutex for unordered map
         cpp_freertos::MutexStandard mMutex;
-        // Notification handler callback
+        //! Notification handler callback
         NotifyHandler notificationCallback;
     };
 } // namespace vfsn::utility

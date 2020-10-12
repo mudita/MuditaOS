@@ -1,6 +1,5 @@
-//
-// Created by lucck on 12.10.2020.
-//
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "vfsNotifier.hpp"
 #include <vfs.hpp>
@@ -34,7 +33,7 @@ namespace vfsn::utility
         notify(vfs.getAbsolutePath(filename), FsEvent::deleted);
     }
 
-    auto vfsNotifier::onFileRename(std::string_view new_file, std::string_view old_file) -> void
+    auto vfsNotifier::onFileRename(std::string_view new_file, std::string_view old_file) noexcept -> void
     {
         notify(vfs.getAbsolutePath(new_file), FsEvent::renamed, vfs.getAbsolutePath(old_file));
     }
