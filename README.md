@@ -21,7 +21,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 - displaying wallpapers and quotes
 - contacts and calendar synchronization via Mudita Center desktop app 
 - onboarding guide
-- maganetometer
+- magnetometer
 - flashlight
 - user interface optimized for E Ink displays with frontlight support
 - Bluetooth headset connectivity
