@@ -326,7 +326,7 @@ namespace bsp
                                 .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                            .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+                                            .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
                                             .defLogic = 1,
                                             .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN)});
 
@@ -401,7 +401,8 @@ namespace bsp
         // ENABLE INTERRUPTS
 
         gpio_1->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN));
-        gpio_2->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN));
+        gpio_2->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN) |
+                                1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN));
     }
 
     void RT1051Cellular::MSPDeinit()
@@ -592,5 +593,19 @@ namespace bsp
                 }
             }
         } // namespace sim
+
+        namespace ringIndicator
+        {
+            auto riIRQ_handler() -> BaseType_t
+            {
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                if (qhandle != NULL) {
+                    uint8_t val = static_cast<uint8_t>(IRQsource::ringIndicatorPin);
+                    xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
+                }
+                return xHigherPriorityTaskWoken;
+            }
+        } // namespace ringIndicator
+
     }     // namespace cellular
 } // namespace bsp

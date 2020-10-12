@@ -213,6 +213,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
         }
     }
+    else if (msgl->messageType == MessageType::EVMRingIndicator) {
+        sys::SystemManager::ResumeSystem(this);
+    }
+
     if (handled)
         return std::make_shared<sys::ResponseMessage>();
     else

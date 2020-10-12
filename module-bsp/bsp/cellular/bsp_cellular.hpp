@@ -74,6 +74,7 @@ namespace cellular
         enum IRQsource{
             statusPin,
             trayPin,
+			ringIndicatorPin,
         };
 
         /// initialize SIM queue directed to EventWorker
@@ -119,6 +120,13 @@ namespace cellular
             void hotswap_trigger();
             void sim_sel();
         } // namespace sim
+
+        namespace ringIndicator
+		{
+        	// handling incoming calls and sms - RI pin
+        	BaseType_t riIRQ_handler();
+		} // namespace RingIndicator
+
     }     // namespace cellular
 };        // namespace bsp
 

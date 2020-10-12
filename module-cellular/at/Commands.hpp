@@ -57,8 +57,12 @@ namespace at
         FLOW_CTRL_ON,
         FLOW_CTRL_OFF,
         URC_NOTIF_CHANNEL,          /// Route URCs to second (Notifications) MUX channel
+        RI_PIN_AUTO_CALL,           /// Turn on RI pin for incoming calls
         RI_PIN_OFF_CALL,            /// Turn off RI pin for incoming calls
+        RI_PIN_PULSE_SMS,           /// Turn on RI pin for incoming sms
         RI_PIN_OFF_SMS,             /// Turn off RI pin for incoming sms
+        RI_PIN_OFF_OTHER,           /// Turn off RI pin for other URCs
+        URC_DELAY_ON,               /// Enable delay the output of URC indication until ring indicator pulse ends
         URC_UART1,                  /// Route URCs to UART1
         AT_PIN_READY_LOGIC,         /// Configure AP_Ready pin logic ( enable, logic level 1, 200ms )
         URC_NOTIF_SIGNAL,           /// Turn on signal strength change URC
@@ -126,8 +130,12 @@ namespace at
             {AT::FLOW_CTRL_ON, {"AT+IFC=2,2\r\n", 500}},
             {AT::FLOW_CTRL_OFF, {"AT+IFC=0,0\r", 500}},
             {AT::URC_NOTIF_CHANNEL, {"AT+QCFG=\"cmux/urcport\",1\r"}},
+            {AT::RI_PIN_AUTO_CALL, {"AT+QCFG=\"urc/ri/ring\",\"auto\"\r"}},
             {AT::RI_PIN_OFF_CALL, {"AT+QCFG=\"urc/ri/ring\",\"off\"\r"}},
+            {AT::RI_PIN_PULSE_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"pulse\",200\r"}},
             {AT::RI_PIN_OFF_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r"}},
+            {AT::RI_PIN_OFF_OTHER, {"AT+QCFG=\"urc/ri/other\",\"off\"\r"}},
+            {AT::URC_DELAY_ON, {"AT+QCFG=\"urc/delay\",1\r"}},
             {AT::URC_UART1, {"AT+QURCCFG=\"urcport\",\"uart1\"\r"}},
             {AT::AT_PIN_READY_LOGIC, {"AT+QCFG=\"apready\",1,1,200\r"}},
             {AT::URC_NOTIF_SIGNAL, {"AT+QINDCFG=\"csq\",1\r"}},
