@@ -47,6 +47,9 @@ class EventManager : public sys::Service
     bool alarmIsValid = false;
     // flag informs about suspend/resume status
     bool suspended = false;
+    // vibration motor pattern timer
+    std::unique_ptr<sys::Timer> vibratorTimerPeriodic;
+    std::unique_ptr<sys::Timer> vibratorTimerOneshot;
 
   public:
     EventManager(const std::string &name);

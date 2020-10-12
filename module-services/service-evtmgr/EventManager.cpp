@@ -43,7 +43,11 @@
 #include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 #include "module-utils/time/time_conversion.hpp"       // for Time Zone handling
 
-EventManager::EventManager(const std::string &name) : sys::Service(name)
+EventManager::EventManager(const std::string &name)
+    : sys::Service(name), vibratorTimerPeriodic(std::make_unique<sys::Timer>(
+                              "VibrationPulse", this, sys::Timer::timeout_infinite, sys::Timer::Type::Periodic)),
+      vibratorTimerOneshot(std::make_unique<sys::Timer>(
+          "VibrationSubPulse", this, sys::Timer::timeout_infinite, sys::Timer::Type::SingleShot))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -200,6 +204,45 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         }
         handled = true;
     }
+    else if (msgl->messageType == MessageType::EVMVibratorStateMessage) {
+        using namespace bsp;
+
+        auto msgVibraState = static_cast<sevm::VibratorStateMessage *>(msgl);
+
+        // invalidate any pending timer regardless of its scheduled action, because there will be new action
+        vibratorTimerPeriodic->stop();
+        vibratorTimerOneshot->stop();
+
+        vibrator::set(msgVibraState->state);
+    }
+    else if (msgl->messageType == MessageType::EVMVibratorPulseMessage) {
+        using namespace bsp;
+
+        auto msgVibraPulse = static_cast<sevm::VibratorPulseMessage *>(msgl);
+
+        vibratorTimerPeriodic->stop();
+        vibratorTimerOneshot->stop();
+
+        if (msgVibraPulse->forever == false) {
+            vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.durationOn.count());
+            vibratorTimerOneshot->connect([&](sys::Timer &timer) { vibrator::set(vibrator::State::Off); });
+        }
+        else {
+            vibratorTimerPeriodic->setInterval(msgVibraPulse->vibration.durationOn.count() +
+                                               msgVibraPulse->vibration.durationOff.count());
+            vibratorTimerPeriodic->connect([&](sys::Timer &timer) {
+                vibrator::set(vibrator::State::On);
+                vibratorTimerOneshot->reload();
+            });
+
+            vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.durationOn.count());
+            vibratorTimerOneshot->connect([&](sys::Timer &) { vibrator::set(vibrator::State::Off); });
+            vibratorTimerPeriodic->start();
+        }
+        vibrator::set(vibrator::State::On);
+        vibratorTimerOneshot->start();
+    }
+
     else if (msgl->messageType == MessageType::EVMTorchStateMessage) {
         auto msg = dynamic_cast<sevm::TorchStateMessage *>(msgl);
         if (msg != nullptr) {
@@ -249,7 +292,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 sys::ReturnCodes EventManager::InitHandler()
 {
 
-    // initialize keyboard worker
+    // initialize bsp worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
     // create queues for worker

@@ -15,6 +15,7 @@
 #include "BatteryMessages.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/torch/torch.hpp"
+#include "bsp/vibrator/vibrator.hpp"
 
 namespace sevm
 {
@@ -111,7 +112,7 @@ namespace sevm
         TorchStateMessage(bsp::torch::Action direction) : Message(MessageType::EVMTorchStateMessage), action(direction)
         {}
         bsp::torch::Action action;
-        bsp::torch::State state = bsp::torch::State::off;
+        bsp::torch::State state                  = bsp::torch::State::off;
         bsp::torch::ColourTemperature colourTemp = bsp::torch::ColourTemperature::no_change;
     };
 
@@ -121,6 +122,28 @@ namespace sevm
         TorchStateResultMessage(bsp::torch::Action direction) : TorchStateMessage(direction)
         {}
         bool success = false;
+    };
+
+    class VibratorPulseMessage : public Message
+    {
+      public:
+        bsp::vibrator::Vibration vibration;
+        bool forever;
+        VibratorPulseMessage(std::chrono::milliseconds durationOn,
+                             std::chrono::milliseconds durationOff = std::chrono::milliseconds::zero(),
+                             bool forever                          = false)
+            : Message(MessageType::EVMVibratorPulseMessage), vibration{.durationOn  = durationOn,
+                                                                       .durationOff = durationOff},
+              forever(forever)
+        {}
+    };
+
+    class VibratorStateMessage : public Message
+    {
+      public:
+        bsp::vibrator::State state;
+        VibratorStateMessage(bsp::vibrator::State state) : Message(MessageType::EVMVibratorStateMessage), state(state)
+        {}
     };
 
 } /* namespace sevm*/

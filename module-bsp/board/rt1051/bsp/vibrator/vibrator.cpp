@@ -15,7 +15,15 @@ namespace bsp
 
         using namespace drivers;
 
-        void disable();
+        void enable()
+        {
+            port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 1);
+        }
+        void disable()
+        {
+            port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 0);
+        }
+
         void init()
         {
             port = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::VIBRATOR_GPIO), DriverGPIOParams{});
@@ -26,13 +34,14 @@ namespace bsp
 
             disable();
         }
-        void enable()
+
+        void deinit()
         {
-            port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 1);
+            disable();
         }
-        void disable()
+        void set(State state)
         {
-            port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 0);
+            state == State::On ? enable() : disable();
         }
     } // namespace vibrator
 } // namespace bsp

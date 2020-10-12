@@ -3,10 +3,13 @@
 
 #pragma once
 
+#include "bsp/vibrator/vibrator.hpp" // for vibrator State
+#include "bsp/common.hpp"            // for Board
+
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 
-#include "bsp/common.hpp" // for Board
+#include <chrono>
 
 namespace sys
 {
@@ -20,4 +23,10 @@ namespace EventManagerServiceAPI
      * @return board type
      */
     bsp::Board GetBoard(sys::Service *serv);
+
+    void TurnVibration(sys::Service *serv, bsp::vibrator::State state);
+    void PulseVibration(sys::Service *serv,
+                        std::chrono::milliseconds durationOn,
+                        std::chrono::milliseconds durationOff = std::chrono::milliseconds::zero(),
+                        bool forever                          = false);
 } // namespace EventManagerServiceAPI

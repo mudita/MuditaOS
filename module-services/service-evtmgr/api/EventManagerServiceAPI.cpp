@@ -24,7 +24,7 @@ bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
     constexpr uint32_t timeout = 1000;
 
     std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(MessageType::EVMGetBoard);
-    auto ret                              = sys::Bus::SendUnicast(msg, service::name::evt_manager, serv, timeout);
+    auto ret = sys::Bus::SendUnicast(msg, service::name::evt_manager, serv, pdMS_TO_TICKS(timeout));
 
     sevm::EVMBoardResponseMessage *response = dynamic_cast<sevm::EVMBoardResponseMessage *>(ret.second.get());
 
@@ -34,4 +34,25 @@ bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
         }
     }
     return bsp::Board::none;
+}
+
+void EventManagerServiceAPI::TurnVibration(sys::Service *serv, bsp::vibrator::State state)
+{
+    constexpr uint32_t timeout = 1000;
+
+    sys::Bus::SendUnicast(
+        std::make_shared<sevm::VibratorStateMessage>(state), service::name::evt_manager, serv, pdMS_TO_TICKS(timeout));
+}
+
+void EventManagerServiceAPI::PulseVibration(sys::Service *serv,
+                                            std::chrono::milliseconds durationOn,
+                                            std::chrono::milliseconds durationOff,
+                                            bool forever)
+{
+    constexpr uint32_t timeout = 1000;
+
+    sys::Bus::SendUnicast(std::make_shared<sevm::VibratorPulseMessage>(durationOn, durationOff, forever),
+                          service::name::evt_manager,
+                          serv,
+                          pdMS_TO_TICKS(timeout));
 }
