@@ -181,23 +181,17 @@ class CellularCallRequestMessage : public CellularMessage
 class CellularSimMessage : public CellularMessage
 {
   public:
-    enum class SimCard
-    {
-        SIM1,
-        SIM2
-    };
-
-    CellularSimMessage(SimCard sim) : CellularMessage(MessageType::CellularSimProcedure), sim(sim)
+    CellularSimMessage(MessageType messageType, Store::GSM::SIM sim) : CellularMessage(messageType), sim(sim)
     {}
     virtual ~CellularSimMessage() = default;
-    SimCard getSimCard() const noexcept
+    Store::GSM::SIM getSimCard() const noexcept
     {
         return sim;
     }
 
   private:
-    SimCard sim                         = defaultSimCard;
-    static const SimCard defaultSimCard = SimCard::SIM1;
+    Store::GSM::SIM sim                         = defaultSimCard;
+    static const Store::GSM::SIM defaultSimCard = Store::GSM::SIM::SIM1;
 };
 
 class CellularSimResponseMessage : public CellularSimMessage
@@ -212,12 +206,12 @@ class CellularSimResponseMessage : public CellularSimMessage
         PUKInvalidRetryPossible,
         SIMBlocked
     };
-    CellularSimResponseMessage(SimCard sim,
+    CellularSimResponseMessage(Store::GSM::SIM sim,
                                SimState state,
-                               const utils::PhoneNumber::View &number,
                                unsigned int pinSize,
                                unsigned int attemptsLeft = defaultAttemptsLeft)
-        : CellularSimMessage(sim), state(state), number(number), pinSize(pinSize), attemptsLeft(attemptsLeft)
+        : CellularSimMessage(MessageType::CellularSimResponse, sim), state(state),
+          attemptsLeft(attemptsLeft)
     {}
 
     SimState getSimState() const noexcept
@@ -245,15 +239,15 @@ class CellularSimResponseMessage : public CellularSimMessage
     unsigned int attemptsLeft = defaultAttemptsLeft;
 
     static const unsigned int defaultPinSize      = 4;
-    static const unsigned int defaultAttemptsLeft = 4;
+        static const unsigned int defaultAttemptsLeft = 4;
     static const SimState defaultSimState         = SimState::SIMUnlocked;
 };
 
 class CellularSimVerifyPinRequestMessage : public CellularSimMessage
 {
   public:
-    CellularSimVerifyPinRequestMessage(SimCard sim, std::vector<unsigned int> pinValue)
-        : CellularSimMessage(sim), pinValue(std::move(pinValue))
+    CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim, std::vector<unsigned int> pinValue)
+        : CellularSimMessage(MessageType::CellularSimVerifyPinRequest, sim), pinValue(std::move(pinValue))
     {}
 
     std::vector<unsigned int> gePinValue() const noexcept

@@ -6,7 +6,7 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
-#include "SwitchData.hpp"
+#include "module-gui/gui/SwitchData.hpp"
 
 #include "i18/i18.hpp"
 

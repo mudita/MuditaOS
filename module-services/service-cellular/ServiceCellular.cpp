@@ -64,6 +64,10 @@
 #include "service-cellular/CellularCall.hpp" // for CellularCall, ModemCall, operator<<, CallState, CallState::Active, Forced, Forced::True
 #include "service-cellular/State.hpp" // for State, State::ST, State::ST::CellularConfProcedure, State::ST::Failed, State::ST::PowerUpInProgress, State::ST::PowerUpProcedure, State::ST::ModemFatalFailure, State::ST::PowerDownWaiting, State::ST::AudioConfigurationProcedure, State::ST::Idle, State::ST::PowerDown, State::ST::SimInit, State::ST::ModemOn, State::ST::PowerDownStarted, State::ST::Ready, State::ST::SanityCheck, State::ST::SimSelect, State::ST::StatusCheck, State::ST::URCReady, cellular
 #include "service-cellular/USSD.hpp" // for State, State::pullRequestSent, State::sesionAborted, State::pullResponseReceived, State::pushSesion, noTimeout, State::none, pullResponseTimeout, pullSesionTimeout
+#include <service-appmgr/Controller.hpp>
+
+
+
 #include "task.h"                    // for vTaskDelay
 #include "utf8/UTF8.hpp"             // for UTF8
 
@@ -133,6 +137,7 @@ State::ST State::get() const
     return this->state;
 }
 
+
 ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle)
 {
 
@@ -192,6 +197,8 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 {
     return true;
 }
+
+
 
 void ServiceCellular::CallStateTimerHandler()
 {
@@ -629,11 +636,52 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         }
     } break;
-
     case MessageType::CellularSimProcedure: {
         state.set(this, State::ST::SimSelect);
-    } break;
+        break;
+    }
+    case MessageType::CellularSimVerifyPinRequest: {
+        auto msg = dynamic_cast<CellularSimVerifyPinRequestMessage *>(msgl);
+        if (msg != nullptr) {
+            auto channel = cmux->get(TS0710::Channel::Commands);
+            if (channel) {
 
+                auto vpin = msg->gePinValue();
+
+                std::stringstream ss;
+                for (unsigned int i : vpin) {
+                    ss << i;
+                }
+                std::string pin;
+                ss >> pin;
+                LOG_DEBUG("PIN SET %s", ss.str().c_str());
+
+                sys::Message_t rmsg;
+
+                if (Store::GSM::get()->selected == msg->getSimCard()) {
+
+                    auto resp = channel->cmd(at::factory(at::AT::CPIN) + pin + ";\r");
+
+                    if (resp.code == at::Result::Code::OK) {
+                        responseMsg = std::make_shared<CellularResponseMessage>(true);
+                    }
+                    else {
+                        responseMsg = std::make_shared<CellularResponseMessage>(false);
+
+                        app::manager::Controller::sendAction(this, simUnlockError(resp));
+                    }
+                }
+                else {
+                    LOG_ERROR("Selected SIM card differ from currently supported");
+                    responseMsg = std::make_shared<CellularResponseMessage>(false);
+                    at::Result fatalError;
+                    fatalError.code = at::Result::Code::ERROR;
+                    app::manager::Controller::sendAction(this, simUnlockError(fatalError));
+                }
+            }
+        }
+        break;
+    }
     case MessageType::CellularListCurrentCalls: {
         auto ret  = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
         auto size = ret.response.size();
@@ -983,14 +1031,21 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     std::string str(data.begin(), data.end());
 
     std::string logStr = utils::removeNewLines(str);
+    LOG_DEBUG("Notification:: %s", logStr.c_str());
     if (auto ret = str.find("+CPIN: ") != std::string::npos) {
         /// TODO handle different sim statuses - i.e. no sim, sim error, sim puk, sim pin etc.
         if (str.find("NOT READY", ret) == std::string::npos) {
-            if (Store::GSM::get()->selected == Store::GSM::SIM::SIM1) {
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM1;
+
+            Store::GSM::get()->sim = Store::GSM::get()->selected;
+            if (str.find("SIM PIN", ret) != std::string::npos) {
+                app::manager::Controller::sendAction(this, requestPin(3));
+            }
+            else if (str.find("READY", ret) != std::string::npos) {
+                app::manager::Controller::sendAction(this, simUnlocked());
             }
             else {
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM2;
+                LOG_WARN("Not supported: %s", logStr.c_str());
+                Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
             }
             LOG_DEBUG("SIM OK!");
         }
@@ -1541,6 +1596,7 @@ bool ServiceCellular::handle_sim_sanity_check()
     auto ret = sim_check_hot_swap(cmux->get(TS0710::Channel::Commands));
     if (ret) {
         state.set(this, State::ST::ModemOn);
+        bsp::cellular::sim::sim_sel();
     }
     else {
         LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
@@ -1551,7 +1607,6 @@ bool ServiceCellular::handle_sim_sanity_check()
 
 bool ServiceCellular::handle_select_sim()
 {
-
     bsp::cellular::sim::sim_sel();
     bsp::cellular::sim::hotswap_trigger();
 #if defined(TARGET_Linux)

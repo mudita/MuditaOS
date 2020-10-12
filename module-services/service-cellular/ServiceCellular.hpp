@@ -15,6 +15,7 @@
 #include <vector>   // for vector
 
 #include "CellularCall.hpp"             // for CellularCall
+#include <service-appmgr/messages/APMMessage.hpp>
 #include "USSD.hpp"                     // for State, State::none
 #include "SMSRecord.hpp"                // for SMSRecord
 #include "messages/CellularMessage.hpp" // for CellularUSSDMessage, CellularUSSDMessage::RequestType
@@ -23,6 +24,8 @@
 #include "Modem/TS0710/TS0710_types.h"  // for PS460800, PortSpeed_e
 #include "Service/Common.hpp"           // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp"          // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+
+
 
 class MuxDaemon;
 namespace db
@@ -51,6 +54,26 @@ class ServiceCellular : public sys::Service
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+
+
+    app::manager::Action simUnlockError(at::Result result)
+    {
+        return { "MainWindow", "PinLockWindow", nullptr };
+    }
+    app::manager::Action requestPuk(unsigned int attemptsLeft)
+    {
+        return { "MainWindow", "PinLockWindow", nullptr };
+    }
+
+    app::manager::Action requestPin(unsigned int attemptsLeft)
+    {
+        return { "MainWindow", "PinLockWindow", nullptr };
+    }
+
+    app::manager::Action simUnlocked()
+    {
+        return { "MainWindow", "PinLockWindow", nullptr };
+    }
 
     /** Register message handlers.
      */
