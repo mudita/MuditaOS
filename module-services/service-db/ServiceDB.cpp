@@ -643,7 +643,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
 
 sys::ReturnCodes ServiceDB::DeinitHandler()
 {
-
     return sys::ReturnCodes::Success;
 }
 

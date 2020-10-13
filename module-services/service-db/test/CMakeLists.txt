@@ -11,3 +11,4 @@ add_catch2_executable(
                 module-services
                 module-utils
 )
+
