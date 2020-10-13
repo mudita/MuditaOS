@@ -16,7 +16,7 @@
 namespace gui
 {
 
-    DayEventsWindow::DayEventsWindow(app::Application *app, std::string name)
+    DayEventsWindow::DayEventsWindow(app::Application *app)
         : AppWindow(app, style::window::calendar::name::day_events_window),
           dayEventsModel{std::make_shared<DayEventsInternalModel>(this->application)}
     {

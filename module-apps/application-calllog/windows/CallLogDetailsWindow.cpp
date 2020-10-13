@@ -11,6 +11,7 @@
 #include <memory>
 #include <functional>
 
+#include "OptionsWindow.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "bsp/rtc/rtc.hpp"
@@ -260,12 +261,8 @@ namespace gui
             (inputEvent.keyCode == KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCallLog *>(application);
             assert(app != nullptr);
-
-            if (app->windowOptions != nullptr) {
-                app->windowOptions->clearOptions();
-                app->windowOptions->addOptions(calllogWindowOptions(app, record));
-                app->switchWindow(app->windowOptions->getName(), nullptr);
-            }
+            app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                              std::make_unique<gui::OptionsWindowOptions>(calllogWindowOptions(app, record)));
 
             return true;
         }

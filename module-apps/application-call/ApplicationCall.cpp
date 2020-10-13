@@ -1,5 +1,7 @@
 #include "ApplicationCall.hpp"
 
+#include "DialogMetadata.hpp"
+#include "DialogMetadataMessage.hpp"
 #include "data/CallSwitchData.hpp"
 #include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
@@ -38,8 +40,7 @@ namespace app
     {
         callDuration = utils::time::Timestamp() - callStartTime;
 
-        auto it = windows.find(window::name_call);
-        if (getCurrentWindow() == it->second) {
+        if (getCurrentWindow() == windowsStack.get(window::name_call)) {
             auto callWindow = dynamic_cast<gui::CallWindow *>(getCurrentWindow());
 
             if (callWindow != nullptr && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS) {
@@ -47,12 +48,11 @@ namespace app
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
-
     }
 
     void ApplicationCall::CallAbortHandler()
     {
-        gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------CallAborted");
@@ -74,7 +74,7 @@ namespace app
 
     void ApplicationCall::CallActiveHandler()
     {
-        gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
         assert(callWindow != nullptr);
 
         AudioServiceAPI::RoutingStart(this);
@@ -87,7 +87,7 @@ namespace app
 
     void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
     {
-        gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------IncomingCall");
@@ -114,7 +114,7 @@ namespace app
 
     void ApplicationCall::RingingHandler(const CellularCallMessage *const msg)
     {
-        gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
         assert(callWindow != nullptr);
 
         LOG_INFO("---------------------------------Ringing");
@@ -134,7 +134,9 @@ namespace app
 
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
-        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+        auto response = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
+        assert(response);
+        if (response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
 
@@ -209,34 +211,30 @@ namespace app
 
     void ApplicationCall::createUserInterface()
     {
-        gui::AppWindow *window = nullptr;
-
-        window = new gui::CallMainWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::EnterNumberWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::CallWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::EmergencyCallWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::DialogConfirm(this, app::window::name_dialogConfirm);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(app::window::name_dialogConfirm, window));
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string name) {
+            return std::make_unique<gui::CallMainWindow>(app);
+        });
+        windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::EnterNumberWindow>(app);
+        });
+        windowsFactory.attach(app::window::name_call, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CallWindow>(app);
+        });
+        windowsFactory.attach(app::window::name_emergencyCall, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EmergencyCallWindow>(app);
+        });
+        windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, name);
+        });
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action)
     {
-        auto dialog = dynamic_cast<gui::DialogConfirm *>(windows[app::window::name_dialogConfirm]);
-        assert(dialog);
-        auto meta   = dialog->meta;
+        gui::DialogMetadata meta;
         meta.icon   = "info_big_circle_W_G";
         meta.text   = utils::localize.get("app_call_no_sim");
         meta.action = action;
-        dialog->update(meta);
-        switchWindow(dialog->getName());
+        switchWindow(app::window::name_dialogConfirm, std::make_unique<gui::DialogMetadataMessage>(meta));
         return true;
     }
 

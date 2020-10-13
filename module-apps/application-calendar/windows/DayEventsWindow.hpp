@@ -23,7 +23,7 @@ namespace gui
         std::shared_ptr<DayEventsInternalModel> dayEventsModel   = nullptr;
 
       public:
-        DayEventsWindow(app::Application *app, std::string name);
+        DayEventsWindow(app::Application *app);
         bool handleSwitchData(SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
         bool onDatabaseMessage(sys::Message *msgl) override;

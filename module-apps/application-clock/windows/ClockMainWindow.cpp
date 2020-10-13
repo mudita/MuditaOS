@@ -22,7 +22,7 @@
 namespace gui
 {
 
-    ClockMainWindow::ClockMainWindow(app::Application *app) : gui::AppWindow(app, "MainWindow")
+    ClockMainWindow::ClockMainWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
     {
         uint32_t xOffset = 0;
         uint32_t yOffset = 0;
