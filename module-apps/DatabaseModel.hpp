@@ -29,14 +29,14 @@ namespace app
             clear();
         }
 
-        virtual bool updateRecords(std::unique_ptr<std::vector<T>> dbRecords)
+        virtual bool updateRecords(std::vector<T> dbRecords)
         {
             modelIndex = 0;
             records.clear();
 
-            if (dbRecords != nullptr) {
-                for (uint32_t i = 0; i < dbRecords->size(); i++) {
-                    records.push_back(std::make_shared<T>(dbRecords.get()->operator[](i)));
+            if (!dbRecords.empty()) {
+                for (uint32_t i = 0; i < dbRecords.size(); i++) {
+                    records.push_back(std::make_shared<T>(dbRecords[i]));
                 }
 
                 return true;

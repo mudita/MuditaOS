@@ -54,7 +54,7 @@ void SMSThreadModel::requestRecords(uint32_t offset, uint32_t limit)
     DBServiceAPI::GetQuery(application, db::Interface::Name::SMS, std::move(query));
 }
 
-bool SMSThreadModel::updateRecords(std::unique_ptr<std::vector<SMSRecord>> records)
+bool SMSThreadModel::updateRecords(std::vector<SMSRecord> records)
 {
     DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
@@ -85,9 +85,7 @@ auto SMSThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
         smsInput->displayDraftMessage();
     }
 
-    auto records = std::make_unique<std::vector<SMSRecord>>(records_data.begin(), records_data.end());
-
-    return this->updateRecords(std::move(records));
+    return this->updateRecords(std::move(records_data));
 }
 
 void SMSThreadModel::addReturnNumber()

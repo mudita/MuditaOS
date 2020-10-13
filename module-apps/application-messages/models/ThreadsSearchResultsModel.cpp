@@ -64,7 +64,7 @@ namespace gui::model
         assert(msgResponse != nullptr);
 
         auto records_data = msgResponse->getResults();
-        auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+        auto records      = std::vector<ThreadRecord>(records_data.begin(), records_data.end());
 
         if (msgResponse->getMax() == 0) {
 

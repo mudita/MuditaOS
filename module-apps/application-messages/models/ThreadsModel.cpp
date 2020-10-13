@@ -6,6 +6,7 @@
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
 #include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}
@@ -67,6 +68,6 @@ auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     assert(msgResponse != nullptr);
 
     auto records_data = msgResponse->getResults();
-    auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+    auto records      = std::vector<ThreadRecord>(records_data.begin(), records_data.end());
     return this->updateRecords(std::move(records));
 }

@@ -21,6 +21,7 @@
 * `[db]` Fixed database corruption issues on abrupt phone reset.
 * `[audio]` Fix audio looping.
 * `[phonebook]` Fix phone freezing when contacts database is empty.
+* `[phonebook]` Contacts list rebuilding in place not from start.
 
 ### Other
 

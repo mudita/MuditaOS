@@ -62,6 +62,10 @@ namespace gui
                                                   phonebookModel);
         setFocusItem(contactsList);
 
+        phonebookModel->letterMap = phonebookModel->requestLetterMap();
+        phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
+        contactsList->rebuildList(style::listview::RebuildType::Full);
+
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
@@ -90,10 +94,6 @@ namespace gui
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
-
-        phonebookModel->letterMap = phonebookModel->requestLetterMap();
-        phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
-        contactsList->rebuildList(style::listview::RebuildType::Full, 0);
 
         auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
         requestedSearch     = contactRequest != nullptr;
