@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <module-gui/gui/widgets/Progress.hpp>
 #include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/TextFixedSize.hpp"
