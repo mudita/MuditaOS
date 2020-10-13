@@ -33,6 +33,10 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/state/ServiceState.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ParserICS.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/icalendarlib/icalendar.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/icalendarlib/types.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/icalendarlib/date.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})

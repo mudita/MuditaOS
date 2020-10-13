@@ -207,15 +207,25 @@ inline uint32_t TimePointToHour12H(const TimePoint &tp)
 
 inline std::string TimePointToHourString12H(const TimePoint &tp)
 {
-    auto hour       = TimePointToHour12H(tp);
-    auto hourString = std::to_string(hour);
+    std::string hourString;
+    char Buffer[16];
+    auto time = TimePointToTimeT(tp);
+    /// Fill the tm structure with UTC time
+    auto utcTime = gmtime(&time);
+    strftime(Buffer, 16, "%I", utcTime);
+    hourString += Buffer;
     return hourString;
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)
 {
-    auto hour       = TimePointToHour24H(tp);
-    auto hourString = std::to_string(hour);
+    std::string hourString;
+    char Buffer[16];
+    auto time = TimePointToTimeT(tp);
+    /// Fill the tm structure with UTC time
+    auto utcTime = gmtime(&time);
+    strftime(Buffer, 16, "%H", utcTime);
+    hourString += Buffer;
     return hourString;
 }
 
@@ -234,6 +244,22 @@ inline unsigned int WeekdayIndexFromTimePoint(const TimePoint &tp)
 {
     auto ymw = date::year_month_weekday{floor<date::days>(tp)};
     return ymw.weekday().iso_encoding() - 1;
+}
+
+inline std::string createUID()
+{
+    std::string UID;
+    char Buffer[16];
+    auto timePoint = TimePointNow();
+    auto time      = TimePointToTimeT(timePoint);
+    auto localTime = localtime(&time);
+    strftime(Buffer, 16, "%Y%m%dT%H%M%S", localTime);
+    UID = Buffer;
+    UID += '-';
+    sprintf(Buffer, "%d", rand());
+    UID += Buffer;
+
+    return UID;
 }
 
 #endif

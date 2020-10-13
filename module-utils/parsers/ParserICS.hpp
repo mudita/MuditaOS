@@ -1,19 +1,23 @@
 #pragma once
 #include <module-utils/icalendarlib/icalendar.h>
+#include <icalendarlib/date.h>
+#include <icalendarlib/types.h>
+#include <module-db/Interface/EventsRecord.hpp>
+#include "json/json11.hpp"
+#include <memory>
 
 class ParserICS
 {
-    std::unique_ptr<ICalendar> Calendar;
+    std::shared_ptr<ICalendar> Calendar;
     const char *icsFile = "events.ics";
 
   public:
     ParserICS()
     {
-        this->Calendar = std::make_unique<ICalendar>(this->icsFile);
+        this->Calendar = std::make_shared<ICalendar>(this->icsFile);
     };
 
-    auto updateICS(json11::Json body) -> void;
-    //    auto createUID() -> std::string;
+    auto updateICS(const std::string &data) -> void;
     auto stringFromICS() -> std::string;
 
     auto reminderToICS(uint32_t reminder) -> list<Alarm> *;

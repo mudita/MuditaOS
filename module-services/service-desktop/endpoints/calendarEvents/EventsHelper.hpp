@@ -8,7 +8,7 @@
 #include <memory>
 #include <service-db/api/DBServiceAPI.hpp>
 #include "Endpoint.hpp"
-#include "ical/ParserICS.hpp"
+#include <module-utils/parsers/ParserICS.hpp>
 
 namespace parserFSM
 {
@@ -32,6 +32,11 @@ namespace parserFSM
         std::unique_ptr<ParserICS> parser;
     };
 
-    namespace events
-    {}
+    namespace json::events
+    {
+        const inline std::string count = "count";
+        const inline std::string UID   = "UID";
+        const inline std::string data  = "data";
+    } // namespace json::events
+
 } // namespace parserFSM

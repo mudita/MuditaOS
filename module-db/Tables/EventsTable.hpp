@@ -2,8 +2,8 @@
 
 #include "Table.hpp"
 #include "Record.hpp"
-#include <Database/Database.hpp>
-#include <Common/Common.hpp>
+#include <module-db/Database/Database.hpp>
+#include <module-db/Common/Common.hpp>
 #include <utf8/UTF8.hpp>
 #include <module-apps/application-calendar/data/dateCommon.hpp>
 #include <module-utils/icalendarlib/icalendar.h>
@@ -26,8 +26,6 @@ enum class EventsTableFields
 
 class EventsTable : public Table<EventsTableRow, EventsTableFields>
 {
-    std::unique_ptr<ICalendar> icsParser;
-
   public:
     EventsTable(Database *db);
     ~EventsTable() override = default;
@@ -41,7 +39,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     bool addYear(EventsTableRow entry);
     bool addCustom(EventsTableRow entry);
     bool removeById(uint32_t id) override final;
-    bool removeById(std::string UID);
+    bool removeById(const std::string &UID);
     bool removeByField(EventsTableFields field, const char *str) override final;
     bool update(EventsTableRow entry) override final;
     EventsTableRow getById(uint32_t id) override final;

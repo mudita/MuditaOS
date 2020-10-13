@@ -5,6 +5,9 @@ namespace db::query::events
     Remove::Remove(const uint32_t &id) : Query(Query::Type::Delete), id(id)
     {}
 
+    Remove::Remove(const std::string &id) : Query(Query::Type::Delete), UID(id)
+    {}
+
     auto Remove::debugInfo() const -> std::string
     {
         return "Remove";

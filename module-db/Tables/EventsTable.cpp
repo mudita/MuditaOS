@@ -23,6 +23,9 @@ bool EventsTable::create()
 bool EventsTable::add(EventsTableRow entry)
 {
     // Prevent duplicates using ANDs:
+    if (entry.UID.empty()) {
+        entry.UID = createUID();
+    }
     return db->execute("INSERT or IGNORE INTO events (UID, title, date_from, date_till, reminder, repeat) "
                        "SELECT '%q','%q', '%q','%q', %lu, %lu "
                        "WHERE NOT EXISTS "
@@ -32,7 +35,7 @@ bool EventsTable::add(EventsTableRow entry)
                        "AND e.date_till='%q' "
                        "AND e.reminder=%lu "
                        "AND e.repeat=%lu );",
-                       icsParser->createUID().c_str(),
+                       entry.UID.c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from).c_str(),
                        TimePointToString(entry.date_till).c_str(),
@@ -55,43 +58,43 @@ bool EventsTable::addDaily(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u);",
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from).c_str(),
                        TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{1}).c_str(),
                        TimePointToString(entry.date_till + date::days{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{2}).c_str(),
                        TimePointToString(entry.date_till + date::days{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{3}).c_str(),
                        TimePointToString(entry.date_till + date::days{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{4}).c_str(),
                        TimePointToString(entry.date_till + date::days{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{5}).c_str(),
                        TimePointToString(entry.date_till + date::days{5}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{6}).c_str(),
                        TimePointToString(entry.date_till + date::days{6}).c_str(),
@@ -106,25 +109,25 @@ bool EventsTable::addWeekly(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u);",
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from).c_str(),
                        TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{7}).c_str(),
                        TimePointToString(entry.date_till + date::days{7}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{14}).c_str(),
                        TimePointToString(entry.date_till + date::days{14}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{21}).c_str(),
                        TimePointToString(entry.date_till + date::days{21}).c_str(),
@@ -139,25 +142,25 @@ bool EventsTable::addTwoWeeks(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u);",
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from).c_str(),
                        TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{14}).c_str(),
                        TimePointToString(entry.date_till + date::days{14}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{28}).c_str(),
                        TimePointToString(entry.date_till + date::days{28}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::days{42}).c_str(),
                        TimePointToString(entry.date_till + date::days{42}).c_str(),
@@ -180,79 +183,79 @@ bool EventsTable::addMonth(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u);",
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from).c_str(),
                        TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{1}).c_str(),
                        TimePointToString(entry.date_till, date::months{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{2}).c_str(),
                        TimePointToString(entry.date_till, date::months{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{3}).c_str(),
                        TimePointToString(entry.date_till, date::months{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{4}).c_str(),
                        TimePointToString(entry.date_till, date::months{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{5}).c_str(),
                        TimePointToString(entry.date_till, date::months{5}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{6}).c_str(),
                        TimePointToString(entry.date_till, date::months{6}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{7}).c_str(),
                        TimePointToString(entry.date_till, date::months{7}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{8}).c_str(),
                        TimePointToString(entry.date_till, date::months{8}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{9}).c_str(),
                        TimePointToString(entry.date_till, date::months{9}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{10}).c_str(),
                        TimePointToString(entry.date_till, date::months{10}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{11}).c_str(),
                        TimePointToString(entry.date_till, date::months{11}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from, date::months{12}).c_str(),
                        TimePointToString(entry.date_till, date::months{12}).c_str(),
@@ -268,31 +271,31 @@ bool EventsTable::addYear(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u),"
                        "('%q','%q', '%q','%q', %u, %u);",
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from).c_str(),
                        TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::years{1}).c_str(),
                        TimePointToString(entry.date_till + date::years{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::years{2}).c_str(),
                        TimePointToString(entry.date_till + date::years{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::years{3}).c_str(),
                        TimePointToString(entry.date_till + date::years{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       icsParser->createUID().c_str(),
+                       createUID().c_str(),
                        entry.title.c_str(),
                        TimePointToString(entry.date_from + date::years{4}).c_str(),
                        TimePointToString(entry.date_till + date::years{4}).c_str(),
@@ -330,7 +333,7 @@ bool EventsTable::addCustom(EventsTableRow entry)
     result =
         result && db->execute("INSERT or IGNORE INTO events (UID, title, date_from, date_till, reminder, repeat) VALUES"
                               "('%q','%q', '%q','%q', %u, %u);",
-                              icsParser->createUID().c_str(),
+                              createUID().c_str(),
                               entry.title.c_str(),
                               TimePointToString(entry.date_from).c_str(),
                               TimePointToString(entry.date_till).c_str(),
@@ -347,7 +350,7 @@ bool EventsTable::addCustom(EventsTableRow entry)
                          db->execute(
                              "INSERT or IGNORE INTO events (UID, title, date_from, date_till, reminder, repeat) VALUES"
                              "('%q','%q', '%q','%q', %u, %u);",
-                             icsParser->createUID().c_str(),
+                             createUID().c_str(),
                              entry.title.c_str(),
                              TimePointToString(dateFrom + date::days{incrementation}).c_str(),
                              TimePointToString(dateTill + date::days{incrementation}).c_str(),
@@ -366,9 +369,9 @@ bool EventsTable::removeById(uint32_t id)
     return db->execute("DELETE FROM events where _id = %u;", id);
 }
 
-bool EventsTable::removeById(std::string UID)
+bool EventsTable::removeById(const std::string &UID)
 {
-    return db->execute("DELETE FROM events where _UID = %q;", UID.c_str());
+    return db->execute("DELETE FROM events where _UID = %'q';", UID.c_str());
 }
 
 bool EventsTable::removeByField(EventsTableFields field, const char *str)
@@ -391,14 +394,26 @@ bool EventsTable::removeByField(EventsTableFields field, const char *str)
 
 bool EventsTable::update(EventsTableRow entry)
 {
-    return db->execute("UPDATE events SET title= '%q', date_from = '%q', date_till = '%q', reminder "
-                       "= %u, repeat = %u WHERE _id = %u;",
-                       entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
-                       entry.reminder,
-                       entry.repeat,
-                       entry.ID);
+    if (entry.ID != DB_ID_NONE) {
+        return db->execute("UPDATE events SET title= '%q', date_from = '%q', date_till = '%q', reminder "
+                           "= %u, repeat = %u WHERE _id = %u;",
+                           entry.title.c_str(),
+                           TimePointToString(entry.date_from).c_str(),
+                           TimePointToString(entry.date_till).c_str(),
+                           entry.reminder,
+                           entry.repeat,
+                           entry.ID);
+    }
+    else {
+        return db->execute("UPDATE events SET title= '%q', date_from = '%q', date_till = '%q', reminder "
+                           "= %u, repeat = %u WHERE _UID = '%q';",
+                           entry.title.c_str(),
+                           TimePointToString(entry.date_from).c_str(),
+                           TimePointToString(entry.date_till).c_str(),
+                           entry.reminder,
+                           entry.repeat,
+                           entry.UID.c_str());
+    }
 }
 
 EventsTableRow EventsTable::getById(uint32_t id)
@@ -412,8 +427,8 @@ EventsTableRow EventsTable::getById(uint32_t id)
     assert(retQuery->getRowCount() == 1);
 
     return EventsTableRow{
-        (*retQuery)[1].getUInt32(),                              // ID
-        (*retQuery)[0].getString(),                              // UID
+        (*retQuery)[0].getUInt32(),                              // ID
+        (*retQuery)[1].getString(),                              // UID
         (*retQuery)[2].getString(),                              // title
         TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
         TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
@@ -437,8 +452,8 @@ std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint date_filte
 
     do {
         ret.push_back(EventsTableRow{
-            (*retQuery)[1].getUInt32(),                              // ID
-            (*retQuery)[0].getString(),                              // UID
+            (*retQuery)[0].getUInt32(),                              // ID
+            (*retQuery)[1].getString(),                              // UID
             (*retQuery)[2].getString(),                              // title
             TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
             TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
@@ -464,8 +479,8 @@ std::vector<EventsTableRow> EventsTable::getLimitOffset(uint32_t offset, uint32_
 
     do {
         ret.push_back(EventsTableRow{
-            (*retQuery)[1].getUInt32(),                              // ID
-            (*retQuery)[0].getString(),                              // UID
+            (*retQuery)[0].getUInt32(),                              // ID
+            (*retQuery)[1].getString(),                              // UID
             (*retQuery)[2].getString(),                              // title
             TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
             TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
@@ -491,8 +506,8 @@ std::vector<EventsTableRow> EventsTable::getLimitOffsetByDate(uint32_t offset, u
 
     do {
         ret.push_back(EventsTableRow{
-            (*retQuery)[1].getUInt32(),                              // ID
-            (*retQuery)[0].getString(),                              // UID
+            (*retQuery)[0].getUInt32(),                              // ID
+            (*retQuery)[1].getString(),                              // UID
             (*retQuery)[2].getString(),                              // title
             TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
             TimePointFromString((*retQuery)[4].getString().c_str()), // date_till

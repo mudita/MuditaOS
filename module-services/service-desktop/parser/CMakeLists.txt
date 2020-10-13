@@ -8,5 +8,4 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ParserFSM.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ParserUtils.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/MessageHandler.cpp"
-
 )

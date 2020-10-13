@@ -25,9 +25,11 @@ auto EventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     auto listener = std::make_unique<db::EndpointListener>(
         [=](db::QueryResult *result, Context context) {
             if (auto EventsResult = dynamic_cast<db::query::events::GetAllResult *>(result)) {
-                /// This method updates also ics file
-                parser->eventRecordsToICS(EventsResult->getResult());
-                context.setResponseBody(parser->stringFromICS()); /// TODO: check if it work: conv string to json
+                auto records          = EventsResult->getResult();
+                uint32_t recordsCount = records->size();
+                parser->eventRecordsToICS(std::move(records));
+                context.setResponseBody(json11::Json::object({{json::events::data, parser->stringFromICS()},
+                                                              {json::events::count, std::to_string(recordsCount)}}));
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
@@ -45,7 +47,7 @@ auto EventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 
 auto EventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    parser->updateICS(context.getBody());
+    parser->updateICS(context.getBody()[json::events::data].string_value());
     auto records = parser->eventRecordsFromICS();
     assert(records.size() == 1);
     EventsRecord record = records[0];
@@ -71,7 +73,7 @@ auto EventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 
 auto EventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
 {
-    parser->updateICS(context.getBody());
+    parser->updateICS(context.getBody()[json::events::data].string_value());
     auto records = parser->eventRecordsFromICS();
     assert(records.size() == 1);
     EventsRecord record = records[0];
@@ -81,10 +83,8 @@ auto EventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
     auto listener = std::make_unique<db::EndpointListener>(
         [](db::QueryResult *result, Context context) {
             if (auto EventResult = dynamic_cast<db::query::events::EditResult *>(result)) {
-
                 context.setResponseStatus(EventResult->getResult() ? http::Code::OK : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
-
                 return true;
             }
             else {
@@ -101,12 +101,11 @@ auto EventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
 
 auto EventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto UID      = context.getBody();
-    auto query    = std::make_unique<db::query::events::Remove>(5); /// TODO:change to UID
+    auto UID      = context.getBody()[json::events::UID].string_value();
+    auto query    = std::make_unique<db::query::events::Remove>(UID);
     auto listener = std::make_unique<db::EndpointListener>(
         [=](db::QueryResult *result, Context context) {
             if (auto EventResult = dynamic_cast<db::query::events::RemoveResult *>(result)) {
-
                 context.setResponseStatus(EventResult->getResult() ? http::Code::OK : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;

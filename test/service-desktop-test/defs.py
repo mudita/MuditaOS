@@ -6,7 +6,8 @@ endpoint = {
     "factory": 5,
     "contacts": 6,
     "messages": 7,
-    "calllog": 8
+    "calllog": 8,
+    "events":9
 }
 
 method = {

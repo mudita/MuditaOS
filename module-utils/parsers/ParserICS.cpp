@@ -1,43 +1,18 @@
 #include "ParserICS.hpp"
 #include <module-apps/application-calendar/data/dateCommon.hpp>
 
-auto ParserICS::updateICS(json11::Json body) -> void
+auto ParserICS::updateICS(const std::string &data) -> void
 {
-    std::string icsString = body.string_value();
     std::ofstream file(this->icsFile);
-    file << icsString;
+    file << data;
     file.close();
 }
 
-// auto ParserICS::createUID() -> std::string
-//{
-//    auto tempEvent = std::make_unique<Event>();
-//    char Temp[16];
-//    string Line;
-//    streamoff Offset;
-//
-//    tempEvent->DtStamp.SetToNow();
-//    tempEvent->UID = NewEvent->DtStamp;
-//    tempEvent->UID += '-';
-//    sprintf(Temp, "%d", rand());
-//    tempEvent->UID += Temp;
-//
-//    return tempEvent->UID;
-//}
-
-// auto ParserICS::stringToICS(json11::Json body) -> void
-//{
-//    std::string icsString = body.string_value();
-//    std::ofstream file(this->icsFile);
-//    file << icsString;
-//    file.close();
-//}
-
 auto ParserICS::stringFromICS() -> std::string
 {
-    /// TODO: Maybe not needed (check text conversion to object json)
-    /// OR Implement string from file
-    return "";
+    std::ifstream fileStream("events.ics");
+    std::string content((std::istreambuf_iterator<char>(fileStream)), (std::istreambuf_iterator<char>()));
+    return content;
 }
 
 auto ParserICS::reminderToICS(uint32_t reminder) -> list<Alarm> *
@@ -48,17 +23,17 @@ auto ParserICS::reminderToICS(uint32_t reminder) -> list<Alarm> *
         alarm->Trigger.Value = reminder;
     }
 
-    std::list<Alarm> alarms;
-    alarms.push_back(alarm);
+    std::list<Alarm> *alarms = new std::list<Alarm>();
+    alarms->push_back(*alarm);
 
-    return &alarms;
+    return alarms;
 }
 
 auto ParserICS::reminderFromICS(list<Alarm> *alarms) -> uint32_t
 {
     auto alarm        = alarms->back();
     uint32_t reminder = 0xFF;
-    if (alarm->active) {
+    if (alarm.Active) {
         reminder = alarm.Trigger.Value;
     }
 
@@ -68,71 +43,75 @@ auto ParserICS::reminderFromICS(list<Alarm> *alarms) -> uint32_t
 auto ParserICS::repeatOptionToICS(uint32_t repeat) -> Recurrence
 {
     auto rule = Recurrence();
-    switch (repeat) {
+    switch (Repeat(repeat)) {
     case Repeat::never: {
         return rule;
     }
     case Repeat::daily: {
         rule.Freq     = DAY;
         rule.Interval = 1;
-        rule.Count(7);
+        rule.Count    = 7;
         return rule;
     }
     case Repeat::weekly: {
         rule.Freq     = WEEK;
         rule.Interval = 1;
-        rule.Count(4);
+        rule.Count    = 4;
         return rule;
     }
     case Repeat::two_weeks: {
         rule.Freq     = WEEK;
         rule.Interval = 2;
-        rule.Count(4);
+        rule.Count    = 4;
+        return rule;
     }
-    case Repeat::monthly: {
+    case Repeat::month: {
         rule.Freq     = MONTH;
         rule.Interval = 1;
-        rule.Count(12);
+        rule.Count    = 12;
         return rule;
     }
     case Repeat::year: {
         rule.Freq     = YEAR;
         rule.Interval = 1;
-        rule.Count(4);
+        rule.Count    = 4;
         return rule;
     }
     default: {
         /// Custom repeat
         rule.Interval = repeat;
+        return rule;
     }
     }
 }
 auto ParserICS::repeatOptionFromICS(const Recurrence &rule) -> uint32_t
 {
-    switch (rule.Freq) {
-    case Repeat::never: {
-        return Repeat::daily;
-    }
+    switch (TimeUnit(rule.Freq)) {
     case DAY: {
-        return Repeat::daily;
+        return static_cast<uint32_t>(Repeat::daily);
     }
     case WEEK: {
         if (rule.Interval == 1) {
-            return Repeat::weekly;
+            return static_cast<uint32_t>(Repeat::weekly);
         }
         else if (rule.Interval == 2) {
-            return Repeat::two_weeks;
+            return static_cast<uint32_t>(Repeat::two_weeks);
+        }
+        else {
+            LOG_ERROR("Wrong Event Rule interval value provided from ICS");
+            assert(false);
+            return 0;
         }
     }
     case MONTH: {
-        return Repeat::month;
+        return static_cast<uint32_t>(Repeat::month);
     }
     case YEAR: {
         if (rule.Interval == 1) {
-            return Repeat::year;
+            return static_cast<uint32_t>(Repeat::year);
         }
         else if (rule.Interval == 0) {
-            return Repeat::never;
+            return static_cast<uint32_t>(Repeat::never);
         }
         else {
             /// Custom repeat
@@ -151,13 +130,13 @@ auto ParserICS::eventRecordsToICS(std::unique_ptr<std::vector<EventsRecord>> rec
 {
     for (auto currentRecord : *records) {
         auto currentEvent     = new Event();
-        currentEvent->UID     = currentEvent.UID;
+        currentEvent->UID     = currentRecord.UID;
         currentEvent->Summary = currentRecord.title;
         currentEvent->DtStart = TimePointToString(currentRecord.date_from);
         currentEvent->DtEnd   = TimePointToString(currentRecord.date_till);
         currentEvent->RRule   = repeatOptionToICS(currentRecord.repeat);
         currentEvent->Alarms  = reminderToICS(currentRecord.reminder);
-        Calendar.AddEvent(currentEvent);
+        Calendar->AddEvent(currentEvent);
     }
     return;
 }
@@ -165,7 +144,7 @@ auto ParserICS::eventRecordsToICS(std::unique_ptr<std::vector<EventsRecord>> rec
 auto ParserICS::eventRecordsFromICS() -> std::vector<EventsRecord>
 {
     Event *CurrentEvent;
-    ICalendar::Query SearchQuery(&this->Calendar);
+    ICalendar::Query SearchQuery(this->Calendar.get());
     SearchQuery.ResetPosition();
 
     std::vector<EventsRecord> records;
@@ -186,14 +165,15 @@ auto ParserICS::eventRecordsFromICS() -> std::vector<EventsRecord>
 auto ParserICS::getEventByDatabaseID(uint32_t ID) -> EventsRecord
 {
     Event *CurrentEvent;
-    ICalendar::Query SearchQuery(&this->Calendar);
+    ICalendar::Query SearchQuery(this->Calendar.get());
     SearchQuery.ResetPosition();
 
+    EventsRecord currentRecord;
+
     while ((CurrentEvent = SearchQuery.GetNextEvent(false)) != NULL ||
-           currentRecord->Description == std::to_string(ID)) {}
+           CurrentEvent->Description == std::to_string(ID)) {}
     assert(CurrentEvent != NULL);
 
-    EventsRecord currentRecord;
     currentRecord.title     = CurrentEvent->Summary;
     currentRecord.date_from = TimePointFromString(CurrentEvent->DtStart.Format().c_str());
     currentRecord.date_till = TimePointFromString(CurrentEvent->DtEnd.Format().c_str());
@@ -205,7 +185,8 @@ auto ParserICS::getEventByDatabaseID(uint32_t ID) -> EventsRecord
 
 auto ParserICS::updateEvent(Event &event) -> EventsRecord
 {
-    ICalendar::Query SearchQuery(&this->Calendar);
+    Event *CurrentEvent;
+    ICalendar::Query SearchQuery(this->Calendar.get());
     SearchQuery.ResetPosition();
 
     while ((CurrentEvent = SearchQuery.GetNextEvent(false)) != NULL || CurrentEvent->Description == event.Description) {
@@ -215,13 +196,12 @@ auto ParserICS::updateEvent(Event &event) -> EventsRecord
     CurrentEvent->Summary = event.Summary;
     CurrentEvent->DtStart = event.DtStart;
     CurrentEvent->DtEnd   = event.DtEnd;
-    CurrentEvent->RRule   = event.PRule;
+    CurrentEvent->RRule   = event.RRule;
     CurrentEvent->Alarms  = event.Alarms;
 
-    Calendar->ModifyEvent(currentEvent);
+    Calendar->ModifyEvent(CurrentEvent);
 
     EventsRecord currentRecord;
-    currentRecord.ID        = std::atoi(CurrentEvent->Description);
     currentRecord.title     = CurrentEvent->Summary;
     currentRecord.date_from = TimePointFromString(CurrentEvent->DtStart.Format().c_str());
     currentRecord.date_till = TimePointFromString(CurrentEvent->DtEnd.Format().c_str());

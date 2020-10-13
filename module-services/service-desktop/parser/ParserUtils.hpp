@@ -18,7 +18,8 @@ namespace parserFSM
         factory,
         contacts,
         messages,
-        calllog
+        calllog,
+        events
     };
 
     constexpr int lastEndpoint = static_cast<int>(EndpointType::calllog);

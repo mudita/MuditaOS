@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Common/Common.hpp"
-#include "Databases/EventsDB.hpp"
+#include "module-db/Common/Common.hpp"
+#include "module-db/Databases/EventsDB.hpp"
 #include "Record.hpp"
 #include <utf8/UTF8.hpp>
 #include <cstdint>
@@ -67,6 +67,7 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
 
     bool Add(const EventsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
+    bool RemoveByID(const std::string &UID);
     bool RemoveByField(EventsRecordField field, const char *str) override final;
     bool Update(const EventsRecord &rec);
     EventsRecord GetByID(uint32_t id) override final;

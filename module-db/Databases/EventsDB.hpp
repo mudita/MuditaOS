@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Database/Database.hpp"
+#include "module-db/Database/Database.hpp"
 #include "module-db/Tables/EventsTable.hpp"
 
 class EventsDB : public Database

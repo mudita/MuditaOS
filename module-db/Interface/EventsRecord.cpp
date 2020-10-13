@@ -160,6 +160,11 @@ bool EventsRecordInterface::RemoveByID(uint32_t id)
     return eventsDb->events.removeById(id);
 }
 
+bool EventsRecordInterface::RemoveByID(const std::string &UID)
+{
+    return eventsDb->events.removeById(UID);
+}
+
 bool EventsRecordInterface::RemoveByField(EventsRecordField field, const char *str)
 {
     assert(0 && "Not implemented");

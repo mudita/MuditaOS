@@ -55,4 +55,4 @@
 	url = git@github.com:Neargye/magic_enum.git
 [submodule "module-utils/icalendarlib"]
 	path = module-utils/icalendarlib
-	url = git@github.com:jgonera/icalendarlib.git
+	url = git@github.com:mudita/icalendarlib.git

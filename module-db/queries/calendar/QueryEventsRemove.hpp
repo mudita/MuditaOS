@@ -11,9 +11,11 @@ namespace db::query::events
     {
       public:
         Remove(const uint32_t &id);
+        Remove(const std::string &id);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
         uint32_t id;
+        std::string UID;
     };
 
     class RemoveResult : public QueryResult
