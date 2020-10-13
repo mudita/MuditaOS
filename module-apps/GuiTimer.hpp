@@ -3,6 +3,7 @@
 #include "Service/Timer.hpp" // for Timer
 #include "Timer.hpp"         // for ms, Timer
 #include <string>            // for string
+
 namespace app
 {
     class Application;
@@ -23,11 +24,12 @@ namespace app
     {
       public:
         /// gui timer default named GUI, infinite timeout on start
-        GuiTimer(Application *parent);
+        explicit GuiTimer(Application *parent);
         /// gui timer with user name, infinite timeout on start
-        GuiTimer(const std::string &name, Application *parent);
-        /// gui timer with user name, variable timeout
-        GuiTimer(const std::string &name, Application *parent, gui::ms timeout);
+        GuiTimer(const std::string &name,
+                 Application *parent,
+                 gui::ms timeout       = sys::Timer::timeout_infinite,
+                 gui::Timer::Type type = gui::Timer::Single);
         /// there is no valid reason to create timer without app
         GuiTimer() = delete;
 

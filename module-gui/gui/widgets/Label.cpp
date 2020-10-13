@@ -162,12 +162,12 @@ namespace gui
         calculateDisplayText();
     }
 
-    const UTF8 &Label::getText() const
+    const UTF8 &Label::getText() const noexcept
     {
         return text;
     }
 
-    unsigned int Label::getTextLength() const
+    unsigned int Label::getTextLength() const noexcept
     {
         return text.length();
     }
@@ -281,7 +281,7 @@ namespace gui
         }
     }
 
-    RawFont *Label::getFont() const
+    RawFont *Label::getFont() const noexcept
     {
         return font;
     }
@@ -291,7 +291,7 @@ namespace gui
         textColor = color;
     }
 
-    uint32_t Label::getTextNeedSpace() const
+    uint32_t Label::getTextNeedSpace() const noexcept
     {
         if (font == nullptr) {
             return 0;
@@ -299,7 +299,7 @@ namespace gui
         return font->getPixelWidth(text);
     }
 
-    uint32_t Label::getTextHeight() const
+    uint32_t Label::getTextHeight() const noexcept
     {
         if (font == nullptr) {
             return 0;
@@ -307,4 +307,8 @@ namespace gui
         return font->info.line_height;
     }
 
+    uint32_t Label::getTextWidth() const noexcept
+    {
+        return textArea.w;
+    }
 } /* namespace gui */

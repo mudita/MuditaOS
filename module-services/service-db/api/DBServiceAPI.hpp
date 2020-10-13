@@ -21,6 +21,8 @@ class DBContactMessage;
 class DBServiceAPI
 {
   public:
+    static constexpr unsigned int DefaultTimeoutInMs = 5000U;
+
     enum ContactVerificationError
     {
         emptyContactError,
@@ -60,7 +62,7 @@ class DBServiceAPI
     static std::unique_ptr<ThreadRecord> ThreadGetByContact(sys::Service *serv, uint32_t contactID);
     static std::unique_ptr<ThreadRecord> ThreadGetByNumber(sys::Service *serv,
                                                            const utils::PhoneNumber::View &phoneNumber,
-                                                           std::uint32_t timeout);
+                                                           std::uint32_t timeout = DefaultTimeoutInMs);
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
     static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static uint32_t ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
@@ -128,7 +130,7 @@ class DBServiceAPI
                                                                      UTF8 number);
     static std::unique_ptr<utils::PhoneNumber::View> GetNumberById(sys::Service *serv,
                                                                    std::uint32_t numberId,
-                                                                   std::uint32_t timeout);
+                                                                   std::uint32_t timeout = DefaultTimeoutInMs);
     static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
     static bool AlarmRemove(sys::Service *serv, uint32_t id);
     static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);

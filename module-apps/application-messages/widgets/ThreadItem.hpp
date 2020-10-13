@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseThreadItem.hpp"
+#include "ContactRecord.hpp"
 #include "application-messages/models/ThreadsModel.hpp"
 
 namespace gui
@@ -8,14 +9,22 @@ namespace gui
 
     class ThreadItem : public BaseThreadItem
     {
-        ThreadsModel *model                  = nullptr;
-        std::shared_ptr<ThreadRecord> thread = nullptr;
+        ThreadsModel *model = nullptr;
+        std::shared_ptr<ThreadRecord> thread;
+
+        auto getContactRecord() -> ContactRecord;
+        auto getNumberImportance(const ContactRecord &contact) -> std::optional<long int>;
 
         void setPreview();
+        void setContactName(const ContactRecord &contactInfo, std::optional<long int> numberImportance = std::nullopt);
 
       public:
-        ThreadItem(ThreadsModel *model);
-        void setThreadItem(std::shared_ptr<ThreadRecord> thread);
+        explicit ThreadItem(ThreadsModel *model);
+
+        void setThreadItem(std::shared_ptr<ThreadRecord> _thread);
+
+        auto getThreadName() const -> UTF8;
+
         std::shared_ptr<ThreadRecord> getThreadItem()
         {
             return thread;

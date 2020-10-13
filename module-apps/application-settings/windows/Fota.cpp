@@ -284,7 +284,7 @@ void Fota::handleFotaProgres()
 {
     app->connect(FotaService::FOTAProgres(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
         if (auto msg = dynamic_cast<FotaService::FOTAProgres *>(req)) {
-            parent->downloadProgress->setCurrentProgress(msg->progress);
+            parent->downloadProgress->setValue(msg->progress);
             app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return std::make_shared<sys::ResponseMessage>();
