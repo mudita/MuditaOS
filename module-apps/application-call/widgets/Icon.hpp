@@ -42,17 +42,17 @@ namespace gui
         Icon(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w_margin, T state, const IconMap &data)
             : Rect(parent, x, y, icon::w + 2 * w_margin, icon::h), data(data)
         {
-            setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            setEdges(RectangleEdge::None);
             setPenFocusWidth(style::window::default_border_no_focus_w);
             setPenWidth(style::window::default_border_no_focus_w);
             boundingRect = new Rect(this, w_margin, 0, icon::w, icon::h);
-            boundingRect->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+            boundingRect->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
             boundingRect->setPenFocusWidth(style::window::default_border_focus_w);
             boundingRect->setPenWidth(style::window::default_border_no_focus_w);
 
             img   = new gui::Image(boundingRect, icon::img::x, icon::img::y, 0, 0);
             label = new gui::Label(this, icon::label::x, icon::label::y, icon::label::w + 2 * w_margin, icon::label::h);
-            label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            label->setEdges(RectangleEdge::None);
             label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             label->setFont(style::window::font::verysmall);
 

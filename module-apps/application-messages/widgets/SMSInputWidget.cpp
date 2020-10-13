@@ -18,10 +18,10 @@ namespace gui
     {
         setMinimumSize(style::window::default_body_width, style::messages::smsInput::min_h);
         setMargins(Margins(0, style::messages::smsInput::new_sms_vertical_spacer, 0, 0));
-        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(gui::RectangleEdge::None);
 
         body = new HBox(this, 0, 0, 0, 0);
-        body->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        body->setEdges(RectangleEdge::Bottom);
         body->setMaximumSize(style::window::default_body_width, style::messages::smsInput::max_input_h);
 
         deleteByList = false;
@@ -34,7 +34,7 @@ namespace gui
         inputText->setPadding(Padding(0, 0, 0, style::messages::smsInput::bottom_padding));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_focus_w);
-        inputText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        inputText->setEdges(gui::RectangleEdge::None);
 
         replyImage = new Image(body, 0, 0, "messages_reply");
         replyImage->setAlignment(Alignment(gui::Alignment::Vertical::Bottom));

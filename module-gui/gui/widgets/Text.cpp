@@ -57,7 +57,7 @@ namespace gui
         buildDocument(text);
 
         setBorderColor(gui::ColorFullBlack);
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setEdges(RectangleEdge::All);
     }
 
     Text::Text() : Text(nullptr, 0, 0, 0, 0)

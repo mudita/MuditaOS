@@ -309,7 +309,7 @@ namespace gui
         // 3. Set hbox layout properties
         el->setPenWidth(style::window::default_border_no_focus_w);
         el->setPenFocusWidth(style::window::default_border_focus_w);
-        el->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        el->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
         el->inputCallback = [showCallback, clearCallback](Item &, const InputEvent &event) -> bool {
             if (event.state != InputEvent::State::keyReleasedShort) {
                 return false;

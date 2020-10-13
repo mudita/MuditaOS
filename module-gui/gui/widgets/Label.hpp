@@ -38,10 +38,9 @@ namespace gui
                 return *this;
             }
             uint32_t x = 0, y = 0, w = 0, h = 0;
-            std::string font = style::window::font::medium;
-            Alignment align  = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center);
-            RectangleEdgeFlags edges =
-                gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM;
+            std::string font    = style::window::font::medium;
+            Alignment align     = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center);
+            RectangleEdge edges = gui::RectangleEdge::Top | gui::RectangleEdge::Bottom;
         };
 
         struct Label : public Rect

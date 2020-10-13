@@ -11,10 +11,10 @@ namespace gui
         setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
 
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
@@ -50,7 +50,7 @@ namespace gui
         contactName->setText(text);
         contactName->setLineMode(true);
         activeItem = false;
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
     }
 
     UTF8 PhonebookItem::getLabelMarker()

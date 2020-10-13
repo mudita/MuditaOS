@@ -59,7 +59,7 @@ namespace gui
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setPenWidth(numberLabel::borderW);
         numberLabel->setFont(style::window::font::largelight);
-        numberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        numberLabel->setEdges(RectangleEdge::Bottom);
         numberLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         numberLabel->setEllipsis(Ellipsis::Left);
 
