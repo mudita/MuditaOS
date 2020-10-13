@@ -1,10 +1,12 @@
 #pragma once
 
 #include "AppWindow.hpp"
-#include "application-meditation/widgets/MeditationTimer.hpp"
 
 namespace gui
 {
+    class MeditationTimer;
+    class Text;
+
     class MeditationTimerWindow : public AppWindow
     {
         MeditationTimer *timer      = nullptr;
@@ -17,6 +19,8 @@ namespace gui
         void setVisiblePaused();
         void setVisiblePreparation();
         void setVisibleMeditationEnd();
+
+        void invalidate() noexcept;
 
       public:
         explicit MeditationTimerWindow(app::Application *app);

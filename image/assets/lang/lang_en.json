@@ -23,6 +23,10 @@
     "common_uncheck": "UNCHECK",
     "common_emoji": "EMOJI",
     "common_special_characters": "SPECIAL",
+    "common_start" : "START",
+    "common_stop" : "STOP",
+    "common_resume" : "RESUME",
+    "common_pause" : "PAUSE",
 
     "common_mo":"MO",
     "common_tu":"TU",
@@ -306,8 +310,13 @@
     "app_phonebook_uncheck": "UNCHECK",
 
     "app_meditation_title_main": "Meditation",
+    "app_meditation_preparation_time" : "Preparation time",
     "app_meditation_put_down_phone_and_wait": "<text>Put down the phone and wait for<br>the gong.</text>",
     "app_meditation_thank_you_for_session": "<text>Thank you for this<br>meditation session.</text>",
+    "app_meditation_option_show_counter" : "Show meditation counter",
+    "app_meditation_interval_chime" : "Interval Chime",
+    "app_meditation_interval_none" : "None",
+    "app_meditation_interval_every_x_minutes" : "Every %0 minutes",
 
     "app_music_player_all_songs": "All songs",
     "app_music_player_play": "PLAY",

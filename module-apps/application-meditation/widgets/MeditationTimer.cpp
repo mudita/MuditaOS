@@ -35,6 +35,7 @@ namespace gui
         params.setCenterPoint(boxCenter)
             .setRadius(timerStyle::Radius)
             .setBorderColor(timerStyle::BorderColor)
+            .setFocusBorderColor(timerStyle::BorderColor)
             .setPenWidth(timerStyle::PenWidth)
             .setFocusPenWidth(timerStyle::PenWidth);
         progressBar = new CircularProgressBar(this, params);
@@ -105,11 +106,11 @@ namespace gui
 
     auto MeditationTimer::onTimerTimeout(Item &self, Timer &timerTask) -> bool
     {
-        if (isFinished()) {
+        if (isFinished() || isStopped()) {
             timerTask.stop();
             detachTimer(timerTask);
 
-            if (timeoutCallback != nullptr) {
+            if (isFinished() && timeoutCallback != nullptr) {
                 timeoutCallback();
             }
 
@@ -123,9 +124,13 @@ namespace gui
 
     auto MeditationTimer::isFinished() const noexcept -> bool
     {
-        return duration <= elapsed || !isRunning;
+        return duration <= elapsed;
     }
 
+    auto MeditationTimer::isStopped() const noexcept -> bool
+    {
+        return !isRunning;
+    }
     auto MeditationTimer::calculatePercentageValue() const noexcept -> unsigned int
     {
         const auto percentage = static_cast<float>(elapsed.count()) / duration.count();
@@ -135,11 +140,6 @@ namespace gui
     void MeditationTimer::stop()
     {
         isRunning = false;
-    }
-
-    auto MeditationTimer::running() const noexcept -> bool
-    {
-        return isRunning;
     }
 
     void MeditationTimer::setTimerVisible(bool isVisible) const noexcept

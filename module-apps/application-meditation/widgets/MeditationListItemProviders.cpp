@@ -2,12 +2,13 @@
 #include "MeditationListItems.hpp"
 
 #include "ListView.hpp"
-#include <algorithm>
 
 #include "application-meditation/windows/Names.hpp"
 #include "application-meditation/ApplicationMeditation.hpp"
+#include "application-meditation/data/Style.hpp"
 
 #include <cassert>
+#include <algorithm>
 
 using namespace gui;
 uint32_t MeditationListRecord::nextId = 1;
@@ -24,39 +25,39 @@ bool MeditationProvider::updateRecords(std::vector<MeditationListRecord> newdbRe
 
 unsigned int MeditationProvider::requestRecordsCount()
 {
-    return dbRecords->size();
+    return dbRecords.size();
 }
 
 unsigned int MeditationProvider::getMinimalItemHeight() const
 {
-    return style::meditation::item::text::h;
+    return style::meditation::itemList::text::Height;
 }
 
 void MeditationProvider::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto dbRecordsCopy = std::vector<MeditationListRecord>();
-    for (uint32_t i = offset; i < std::min<uint32_t>(offset + limit, dbRecords->size()); i++) {
-        dbRecordsCopy.push_back(MeditationListRecord(dbRecords->at(i)));
+    for (uint32_t i = offset; i < std::min<uint32_t>(offset + limit, dbRecords.size()); i++) {
+        dbRecordsCopy.push_back(MeditationListRecord(dbRecords.at(i)));
     }
     updateRecords(std::move(dbRecordsCopy));
 }
 
 PrepTimeProvider::PrepTimeProvider(app::Application *app) : MeditationProvider(app)
 {
-    dbRecords = std::make_unique<std::vector<MeditationListRecord>>();
-
-    dbRecords->push_back(PreparationTimeRecord(5));
-    dbRecords->push_back(PreparationTimeRecord(10));
-    dbRecords->push_back(PreparationTimeRecord(30));
-    dbRecords->push_back(PreparationTimeRecord(60));
-    dbRecords->push_back(PreparationTimeRecord(2 * 60));
-    dbRecords->push_back(PreparationTimeRecord(5 * 60));
-    dbRecords->push_back(PreparationTimeRecord(10 * 60));
-    dbRecords->push_back(PreparationTimeRecord(15 * 60));
-    dbRecords->push_back(PreparationTimeRecord(30 * 60));
-    dbRecords->push_back(PreparationTimeRecord(60 * 60));
+    constexpr auto secondsInMinute = 60;
+    dbRecords.clear();
+    dbRecords.push_back(PreparationTimeRecord(5));
+    dbRecords.push_back(PreparationTimeRecord(10));
+    dbRecords.push_back(PreparationTimeRecord(30));
+    dbRecords.push_back(PreparationTimeRecord(1 * secondsInMinute));
+    dbRecords.push_back(PreparationTimeRecord(2 * secondsInMinute));
+    dbRecords.push_back(PreparationTimeRecord(5 * secondsInMinute));
+    dbRecords.push_back(PreparationTimeRecord(10 * secondsInMinute));
+    dbRecords.push_back(PreparationTimeRecord(15 * secondsInMinute));
+    dbRecords.push_back(PreparationTimeRecord(30 * secondsInMinute));
+    dbRecords.push_back(PreparationTimeRecord(60 * secondsInMinute));
 }
-#include <iostream>
+
 gui::ListItem *PrepTimeProvider::getItem(gui::Order order)
 {
     std::shared_ptr<MeditationListRecord> record = getRecord(order);
@@ -67,11 +68,13 @@ gui::ListItem *PrepTimeProvider::getItem(gui::Order order)
     auto app = reinterpret_cast<app::ApplicationMeditation *>(application);
     assert(app);
 
-    auto item = new PrepTimeItem(record->getTextValue());
-    if (app->state->preparationRecordIndex == record->getId()) {
+    auto item = new PrepTimeItem(record->getText());
+    // check if record was already selected by id or value in case on default initialization
+    if (app->state->preparationRecordIndex == record->getId() ||
+        app->state->preparationTimeInSeconds == record->getValue()) {
         item->select(true);
         itemCurrentlySelected              = item;
-        app->state->preparationRecordIndex = record->getValue();
+        app->state->preparationRecordIndex = record->getId();
     }
 
     item->activatedCallback = [this, app, item, record](gui::Item &) {
@@ -98,9 +101,9 @@ void PrepTimeProvider::requestRecords(const uint32_t offset, const uint32_t limi
 
 MeditationOptionsProvider::MeditationOptionsProvider(app::Application *app) : MeditationProvider(app)
 {
-    dbRecords = std::make_unique<std::vector<MeditationListRecord>>();
-    dbRecords->push_back(MeditationOptionRecord(MeditationListRecord::Type::Option1));
-    dbRecords->push_back(MeditationOptionRecord(MeditationListRecord::Type::Option2));
+    dbRecords.clear();
+    dbRecords.push_back(MeditationOptionRecord(MeditationListRecord::Type::OptionMeditationCounter));
+    dbRecords.push_back(MeditationOptionRecord(MeditationListRecord::Type::OptionPreparation));
 }
 
 gui::ListItem *MeditationOptionsProvider::getItem(gui::Order order)
@@ -110,31 +113,27 @@ gui::ListItem *MeditationOptionsProvider::getItem(gui::Order order)
         return nullptr;
     }
     MeditationListItem *item = nullptr;
-    if (record->getType() == MeditationListRecord::Type::Option1) {
-        item     = new OptionItem1(record->getTextValue());
+    if (record->getType() == MeditationListRecord::Type::OptionMeditationCounter) {
         auto app = reinterpret_cast<app::ApplicationMeditation *>(application);
         assert(app);
+
+        item                    = new OptionItemMeditationCounter(record->getText(), app->state->showCounter);
         item->activatedCallback = [this, app, item](gui::Item &) {
-            LOG_DEBUG("Selecting OptionItem1");
+            LOG_DEBUG("Meditation options: selecting OptionMeditationCounter");
             app->state->showCounter = !app->state->showCounter;
             item->select(app->state->showCounter);
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             return true;
         };
     }
-    else if (record->getType() == MeditationListRecord::Type::Option2) {
-        item                    = new OptionItem2(record->getTextValue());
+    else if (record->getType() == MeditationListRecord::Type::OptionPreparation) {
+        item                    = new OptionItemPreparation(record->getText());
         item->activatedCallback = [this](gui::Item &) {
-            LOG_DEBUG("Selecting OptionItem2");
+            LOG_DEBUG("Meditation options: selecting OptionPreparation");
             application->switchWindow(app::window::name::meditation_preparation);
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             return true;
         };
     }
     return item;
-}
-
-void MeditationOptionsProvider::requestRecords(const uint32_t offset, const uint32_t limit)
-{
-    MeditationProvider::requestRecords(offset, limit);
 }

@@ -11,7 +11,7 @@ target_sources(${PROJECT_NAME}
         widgets/MeditationListItemProviders.cpp
         widgets/MeditationListItems.cpp
         widgets/IntervalBox.cpp
-        widgets/CircularTimeSelector.cpp
+        widgets/TimerSetter.cpp
     PUBLIC
         ApplicationMeditation.hpp
         data/Style.hpp
@@ -23,6 +23,6 @@ target_sources(${PROJECT_NAME}
         widgets/MeditationListItemProviders.hpp
         widgets/MeditationListItems.hpp
         widgets/IntervalBox.hpp
-        widgets/CircularTimeSelector.hpp
+        widgets/TimerSetter.hpp
 )
 

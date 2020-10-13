@@ -2,14 +2,6 @@
 
 #include "AppWindow.hpp"
 
-namespace style::meditation::window::main
-{
-    constexpr uint32_t x = style::window::default_left_margin;
-    constexpr uint32_t y = style::header::height;
-    constexpr uint32_t w = style::listview::body_width_with_scroll;
-    constexpr uint32_t h = style::window_height - y - style::footer::height;
-} // namespace style::meditation::window::main
-
 namespace gui
 {
     class ListView;

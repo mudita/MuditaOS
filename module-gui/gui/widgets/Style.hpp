@@ -142,6 +142,10 @@ namespace style
             const inline std::string search_results = "common_search_results";
             const inline std::string emoji          = "common_emoji";
             const inline std::string special_chars  = "common_special_characters";
+            const inline std::string start          = "common_start";
+            const inline std::string stop           = "common_stop";
+            const inline std::string resume         = "common_resume";
+            const inline std::string pause          = "common_pause";
             // days
             const inline std::string Monday    = "common_monday";
             const inline std::string Tuesday   = "common_tuesday";

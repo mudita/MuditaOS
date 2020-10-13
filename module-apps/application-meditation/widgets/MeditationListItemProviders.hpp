@@ -16,7 +16,7 @@ namespace gui
     {
       protected:
         explicit MeditationProvider(app::Application *app);
-        std::unique_ptr<std::vector<MeditationListRecord>> dbRecords = nullptr;
+        std::vector<MeditationListRecord> dbRecords;
 
       public:
         bool updateRecords(std::vector<MeditationListRecord> dbRecords) final;
@@ -35,7 +35,7 @@ namespace gui
         explicit PrepTimeProvider(app::Application *app);
 
         // virtual methods for ListViewProvider
-        gui::ListItem *getItem(gui::Order order) final;
+        [[nodiscard]] gui::ListItem *getItem(gui::Order order) final;
         void requestRecords(const uint32_t offset, const uint32_t limit) final;
     };
 
@@ -45,8 +45,7 @@ namespace gui
         explicit MeditationOptionsProvider(app::Application *app);
 
         // virtual methods for ListViewProvider
-        gui::ListItem *getItem(gui::Order order) final;
-        void requestRecords(const uint32_t offset, const uint32_t limit) final;
+        [[nodiscard]] gui::ListItem *getItem(gui::Order order) final;
     };
 
 } // namespace gui

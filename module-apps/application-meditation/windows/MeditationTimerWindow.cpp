@@ -1,8 +1,10 @@
 #include "MeditationTimerWindow.hpp"
+
+#include "application-meditation/widgets/MeditationTimer.hpp"
 #include "application-meditation/data/Style.hpp"
+#include "application-meditation/data/MeditationTimerData.hpp"
 #include "Names.hpp"
 
-#include "application-meditation/data/MeditationTimerData.hpp"
 #include <cassert>
 #include <i18/i18.hpp>
 
@@ -10,14 +12,6 @@
 #include "FontManager.hpp"
 
 using namespace gui;
-
-namespace meditationStyle::endWindow::text
-{
-    constexpr uint32_t x = style::window::default_left_margin;
-    constexpr uint32_t y = 0;
-    constexpr uint32_t w = style::window::default_body_width;
-    constexpr uint32_t h = style::window_height;
-} // namespace meditationStyle::endWindow::text
 
 MeditationTimerWindow::MeditationTimerWindow(app::Application *app) : AppWindow{app, name::window::main_window}
 {
@@ -38,8 +32,6 @@ void MeditationTimerWindow::buildInterface()
     AppWindow::buildInterface();
     setTitle(utils::localize.get("app_meditation_title_main"));
 
-    bottomBar->setText(BottomBar::Side::RIGHT, "stop");
-
     timer = new MeditationTimer(style::meditation::timer::X,
                                 style::meditation::timer::Y,
                                 style::meditation::timer::Width,
@@ -47,16 +39,32 @@ void MeditationTimerWindow::buildInterface()
                                 app,
                                 this);
 
-    namespace textStyle = meditationStyle::endWindow::text;
-    meditationInfo      = new Text(this, textStyle::x, textStyle::y, textStyle::w, textStyle::h);
+    meditationInfo = new Text(this,
+                              style::meditation::timer::infoText::X,
+                              style::meditation::timer::infoText::Y,
+                              style::meditation::timer::infoText::Width,
+                              style::meditation::timer::infoText::Height);
     meditationInfo->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+}
+
+void MeditationTimerWindow::destroyInterface()
+{
+    erase();
+    invalidate();
+}
+
+void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+{
+    auto timerData = reinterpret_cast<MeditationTimerData *>(data);
+    assert(timerData);
+    setVisiblePreparation();
+    meditationTimeInSeconds = timerData->getMeditationTimeInSeconds();
 
     auto onPreparation = [&]() -> void {
         setVisibleRunning();
         auto onMeditationEnd = [&]() -> void {
             setVisibleMeditationEnd();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-            finished = true;
         };
         timer->registerTimeoutCallback(onMeditationEnd);
         timer->reset(std::chrono::seconds(meditationTimeInSeconds));
@@ -65,31 +73,15 @@ void MeditationTimerWindow::buildInterface()
     };
 
     timer->registerTimeoutCallback(onPreparation);
-}
-
-void MeditationTimerWindow::destroyInterface()
-{
-    erase();
-    timer = nullptr;
-}
-
-void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    auto timerData = reinterpret_cast<MeditationTimerData *>(data);
-    assert(timerData);
-    meditationTimeInSeconds = timerData->getMeditationTimeInSeconds();
-    setVisiblePreparation();
     timer->setTimerVisible(timerData->getShowCounter());
     timer->reset(std::chrono::seconds(timerData->getPreparationTimeInSeconds()));
     timer->start();
 }
-#include <iostream>
+
 auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
 {
-    std::cout << "HERE I WORk onInput" << std::endl;
     if (inputEvent.isShortPress()) {
         if (finished) {
-            std::cout << "HERE I WORk onInput finished" << std::endl;
             application->switchWindow(app::window::name::meditation_main_window);
             return true;
         }
@@ -100,15 +92,15 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-            if (timer->running()) {
-                timer->stop();
-                bottomBar->setText(BottomBar::Side::CENTER, "start");
-                setWidgetVisible(true, true, true);
+            if (timer->isStopped()) {
+                timer->start();
+                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::pause));
+                setWidgetVisible(false, true, true);
             }
             else {
-                timer->start();
-                bottomBar->setText(BottomBar::Side::CENTER, "pause");
-                setWidgetVisible(false, true, true);
+                timer->stop();
+                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::start));
+                setWidgetVisible(true, true, true);
             }
             return true;
         }
@@ -124,18 +116,19 @@ void MeditationTimerWindow::setWidgetVisible(bool tBar, bool bBar, bool counter)
     bottomBar->setActive(BottomBar::Side::CENTER, bBar);
     bottomBar->setActive(BottomBar::Side::LEFT, bBar);
     timer->setVisible(counter);
-    //    timer->setTimerVisible(counter);
 }
 void MeditationTimerWindow::setVisibleRunning()
 {
     setWidgetVisible(false, true, true);
-    bottomBar->setText(BottomBar::Side::CENTER, "pause");
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::pause));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::stop));
     meditationInfo->setVisible(false);
 }
 void MeditationTimerWindow::setVisiblePaused()
 {
     setWidgetVisible(true, true, true);
-    bottomBar->setText(BottomBar::Side::CENTER, "resume");
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::resume));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::stop));
 }
 void MeditationTimerWindow::setVisiblePreparation()
 {
@@ -145,6 +138,9 @@ void MeditationTimerWindow::setVisiblePreparation()
     auto textParsed = parser.parse(utils::localize.get("app_meditation_put_down_phone_and_wait"), &format);
     meditationInfo->setText(std::move(textParsed));
     meditationInfo->setVisible(true);
+
+    finished = false;
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 }
 
 void MeditationTimerWindow::setVisibleMeditationEnd()
@@ -153,6 +149,14 @@ void MeditationTimerWindow::setVisibleMeditationEnd()
     TextFormat format(FontManager::getInstance().getFont(style::window::font::biglight));
     gui::text::RichTextParser parser;
     auto textParsed = parser.parse(utils::localize.get("app_meditation_thank_you_for_session"), &format);
+    finished        = true;
     meditationInfo->setText(std::move(textParsed));
     meditationInfo->setVisible(true);
+    bottomBar->setVisible(false);
+}
+
+void MeditationTimerWindow::invalidate() noexcept
+{
+    timer          = nullptr;
+    meditationInfo = nullptr;
 }

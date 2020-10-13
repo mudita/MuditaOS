@@ -1,13 +1,11 @@
 #pragma once
 
 #include <AppWindow.hpp>
-#include <Application.hpp>
-
 
 namespace gui
 {
     class IntervalBox;
-    class CircularTimeSelector;
+    class TimerSetter;
 
     class MeditationWindow : public AppWindow
     {
@@ -21,7 +19,8 @@ namespace gui
         void destroyInterface() override;
 
       private:
-        CircularTimeSelector *timeSelector = nullptr;
-        IntervalBox *intervalBox           = nullptr;
+        void invalidate() noexcept;
+        TimerSetter *timeSetter  = nullptr;
+        IntervalBox *intervalBox = nullptr;
     };
 } // namespace gui
