@@ -108,6 +108,11 @@ namespace gui
         if (isFinished()) {
             timerTask.stop();
             detachTimer(timerTask);
+
+            if (timeoutCallback != nullptr) {
+                timeoutCallback();
+            }
+
             return true;
         }
 
@@ -130,5 +135,20 @@ namespace gui
     void MeditationTimer::stop()
     {
         isRunning = false;
+    }
+
+    auto MeditationTimer::running() const noexcept -> bool
+    {
+        return isRunning;
+    }
+
+    void MeditationTimer::setTimerVisible(bool isVisible) const noexcept
+    {
+        timer->setVisible(isVisible);
+    }
+
+    void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)
+    {
+        timeoutCallback = cb;
     }
 } // namespace gui

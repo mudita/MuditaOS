@@ -19,6 +19,7 @@ namespace style::meditation
         constexpr auto Height = Width;
 
         constexpr auto BorderColor = gui::ColorGrey;
+        constexpr auto BorderColorOnFocused = gui::ColorFullBlack;
         constexpr auto PenWidth    = 3;
     } // namespace timer
 } // namespace style::meditation

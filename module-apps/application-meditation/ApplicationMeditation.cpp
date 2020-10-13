@@ -1,12 +1,17 @@
 #include "ApplicationMeditation.hpp"
 
 #include "windows/MeditationWindow.hpp"
+#include "windows/MeditationListViewWindows.hpp"
+#include "windows/MeditationTimerWindow.hpp"
+#include "windows/Names.hpp"
 
 namespace app
 {
     ApplicationMeditation::ApplicationMeditation(std::string name, std::string parent, bool startBackground)
         : Application{name, parent, startBackground}
-    {}
+    {
+        state = std::make_unique<gui::OptionsData>();
+    }
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes
     {
@@ -32,8 +37,10 @@ namespace app
 
     void ApplicationMeditation::createUserInterface()
     {
-        auto meditationWindow = new gui::MeditationWindow(this);
-        windows.insert({gui::name::window::main_window, meditationWindow});
+        windows.insert({app::window::name::meditation_main_window, new gui::MeditationWindow(this)});
+        windows.insert({app::window::name::meditation_timer, new gui::MeditationTimerWindow(this)});
+        windows.insert({app::window::name::meditation_options, new gui::MeditationOptionsWindow(this)});
+        windows.insert({app::window::name::meditation_preparation, new gui::PreparationTimeWindow(this)});
     }
 
     void ApplicationMeditation::destroyUserInterface()

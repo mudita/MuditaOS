@@ -27,6 +27,9 @@ namespace gui
         void start();
         void stop();
         void reset(std::chrono::seconds _duration) noexcept;
+        auto running() const noexcept -> bool;
+        void setTimerVisible(bool) const noexcept;
+        void registerTimeoutCallback(const std::function<void()> &);
 
       private:
         void build();
@@ -46,5 +49,7 @@ namespace gui
         app::ApplicationMeditation *application = nullptr;
         CircularProgressBar *progressBar        = nullptr;
         Text *timer                             = nullptr;
+
+        std::function<void()> timeoutCallback = nullptr;
     };
 } // namespace gui

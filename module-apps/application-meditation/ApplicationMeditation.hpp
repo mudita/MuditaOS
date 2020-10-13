@@ -3,6 +3,7 @@
 #include <string>
 
 #include <Application.hpp>
+#include "data/OptionsData.hpp"
 
 namespace app
 {
@@ -21,5 +22,6 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+        std::unique_ptr<gui::OptionsData> state;
     };
 } // namespace app
