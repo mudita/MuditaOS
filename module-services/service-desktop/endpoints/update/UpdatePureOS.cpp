@@ -105,25 +105,12 @@ updateos::UpdateError UpdatePureOS::runUpdate(const int resetDelay)
         if (resetDelay == -1)
             return err;
 
-        if (resetDelay == 0) {
+        if (resetDelay >= 0) { // no resetDelay implementation for now
             sys::SystemManager::Reboot(owner);
         }
-
-        if (resetDelay > 0)
-            startResetTimer(resetDelay);
     }
 
     return err;
-}
-
-updateos::UpdateError UpdatePureOS::startResetTimer(int delay)
-{
-    return updateos::UpdateError::NoError;
-}
-
-updateos::UpdateError UpdatePureOS::resetNow()
-{
-    return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdatePureOS::unpackUpdate()
