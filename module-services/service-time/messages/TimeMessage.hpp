@@ -1,28 +1,14 @@
-/*
- *  @file TimeMessage.hpp
- *  @author
- *  @date 08.05.20
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+#pragma once
 
-#ifndef PUREPHONE_TIMEMESSAGE_HPP
-#define PUREPHONE_TIMEMESSAGE_HPP
-
-#include <memory>
-#include <variant>
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
 class TimeMessage : public sys::DataMessage
 {
   public:
-    TimeMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
+    explicit TimeMessage(MessageType messageType) : sys::DataMessage(messageType){};
 
     virtual ~TimeMessage() = default;
-
-    MessageType type = MessageType::MessageTypeUninitialized;
 };
 
 class TimersProcessingStartMessage : public TimeMessage
@@ -55,10 +41,8 @@ class TimeResponseMessage : public sys::ResponseMessage
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
     TimeResponseMessage(bool retCode, MessageType responseTo)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
-    virtual ~TimeResponseMessage(){};
+    virtual ~TimeResponseMessage() = default;
 
     bool retCode;
     std::string data;
 };
-
-#endif // PUREPHONE_SERVICETIME_HPP

@@ -41,6 +41,7 @@
     "common_november": "November",
     "common_december": "December",
     "common_yesterday" : "Yesterday",
+    "common_today" : "Today",
     "locale_12hour_min" : "%I:%M %p",
     "locale_24hour_min" : "%H:%M",
     "locale_date_full" : "%m/%d/%y",

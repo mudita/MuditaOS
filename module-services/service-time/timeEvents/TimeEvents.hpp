@@ -30,7 +30,7 @@ namespace stm
 
       public:
         TimeEvents() = delete;
-        TimeEvents(sys::Service *service);
+        explicit TimeEvents(sys::Service *service);
         ~TimeEvents();
 
         /// startProcessing - starts processing of events

@@ -1,6 +1,4 @@
-#ifndef PUREPHONE_SERVICETIME_HPP
-#define PUREPHONE_SERVICETIME_HPP
-
+#pragma once
 #include "Service/Service.hpp"
 #include "ServiceTime.hpp"
 #include <functional>
@@ -35,5 +33,3 @@ namespace stm
     };
 
 } /* namespace stm */
-
-#endif // PUREPHONE_SERVICETIME_HPP

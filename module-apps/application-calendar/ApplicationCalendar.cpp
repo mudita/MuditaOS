@@ -143,10 +143,9 @@ namespace app
         windowsFactory.attach(custom_repeat_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::CustomRepeatWindow>(app, custom_repeat_window);
         });
-        // mlucki
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::event_reminder_window,
-            new gui::EventReminderWindow(this, style::window::calendar::name::event_reminder_window)));
+        windowsFactory.attach(event_reminder_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EventReminderWindow>(app, event_reminder_window);
+        });
     }
 
     void ApplicationCalendar::destroyUserInterface()
