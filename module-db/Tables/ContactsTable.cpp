@@ -170,6 +170,11 @@ std::string ContactsTable::GetSortedByNameQueryString(ContactQuerySection sectio
                 " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
                 " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
                 " contact_match_groups.group_id = 1 "
+                " WHERE contacts._id not in ( "
+                "    SELECT cmg.contact_id "
+                "    FROM contact_match_groups cmg, contact_groups cg "
+                "    WHERE cmg.group_id = cg._id "
+                "       AND cg.name = 'Temporary' ) "
                 " ORDER BY  (contact_name.name_alternative ='') ASC "
                 " , UPPER(contact_name.name_alternative) ; ";
     }
