@@ -284,6 +284,10 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleRoutingControl(
     if (auto input = audioMux.GetRoutingInput(); evt && input) {
         return std::make_unique<AudioResponseMessage>((*input)->audio->SendEvent(evt.value()));
     }
+    auto input = audioMux.GetActiveInput() ? audioMux.GetActiveInput() : audioMux.GetIdleInput();
+    if (input && evt && controlType == AudioRoutingControlRequest::ControlType::SwitchHeadphones) {
+        return std::make_unique<AudioResponseMessage>((*input)->audio->SendEvent(evt.value()));
+    }
 
     return {};
 }

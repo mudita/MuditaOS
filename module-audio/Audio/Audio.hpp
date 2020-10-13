@@ -93,7 +93,7 @@ namespace audio
         virtual audio::RetCode Mute();
 
       private:
-        bool headphonesInserted = false;
+        static bool headphonesInserted;
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 

@@ -5,6 +5,7 @@
 
 namespace audio
 {
+    bool Audio::headphonesInserted = false;
 
     Audio::Audio(AsyncCallback asyncCallback, DbCallback dbCallback)
         : currentOperation(), asyncCallback(asyncCallback), dbCallback(dbCallback)
