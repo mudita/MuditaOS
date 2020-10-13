@@ -8,6 +8,18 @@ namespace style
     {
         namespace calendar
         {
+            namespace imageCircleTop
+            {
+                constexpr uint32_t x = 116;
+                constexpr uint32_t y = 59;
+                constexpr auto name  = "circle_top";
+            } // namespace imageCircleTop
+            namespace imageCircleBottom
+            {
+                constexpr uint32_t x = 106;
+                constexpr uint32_t y = 240;
+                constexpr auto name  = "circle_bottom";
+            } // namespace imageCircleBottom
 
             namespace name
             {

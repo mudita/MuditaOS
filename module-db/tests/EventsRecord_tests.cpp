@@ -10,6 +10,7 @@
 #include "module-db/queries/calendar/QueryEventsAdd.hpp"
 #include "module-db/queries/calendar/QueryEventsRemove.hpp"
 #include "module-db/queries/calendar/QueryEventsEdit.hpp"
+#include "module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp"
 
 #include <vfs.hpp>
 
@@ -41,14 +42,14 @@ TEST_CASE("Events Record tests")
     {
         EventsTableRow tableRow{{.ID = 10},
                                 "Event3",
-                                TimePointFromString("2019-10-20 14:24"),
-                                TimePointFromString("2019-10-20 15:36"),
+                                TimePointFromString("2019-10-20 14:24:00"),
+                                TimePointFromString("2019-10-20 15:36:00"),
                                 1,
                                 2};
         EventsRecord testRec(tableRow);
         REQUIRE(testRec.title == "Event3");
-        REQUIRE(testRec.date_from == TimePointFromString("2019-10-20 14:24"));
-        REQUIRE(testRec.date_till == TimePointFromString("2019-10-20 15:36"));
+        REQUIRE(testRec.date_from == TimePointFromString("2019-10-20 14:24:00"));
+        REQUIRE(testRec.date_till == TimePointFromString("2019-10-20 15:36:00"));
         REQUIRE(testRec.reminder == 1);
         REQUIRE(testRec.repeat == 2);
         REQUIRE(testRec.isValid());
@@ -60,12 +61,16 @@ TEST_CASE("Events Record tests")
     auto numberOfEvents = eventsRecordInterface.GetCount();
     REQUIRE(numberOfEvents == 0);
 
-    EventsTableRow tableRow{
-        {.ID = 10}, "Event1", TimePointFromString("2019-10-20 14:24"), TimePointFromString("2019-10-20 15:36"), 1, 2};
+    EventsTableRow tableRow{{.ID = 10},
+                            "Event1",
+                            TimePointFromString("2019-10-20 14:24:00"),
+                            TimePointFromString("2019-10-20 15:36:00"),
+                            1,
+                            2};
     auto rec = EventsRecord(tableRow);
     REQUIRE(rec.title == "Event1");
-    REQUIRE(rec.date_from == TimePointFromString("2019-10-20 14:24"));
-    REQUIRE(rec.date_till == TimePointFromString("2019-10-20 15:36"));
+    REQUIRE(rec.date_from == TimePointFromString("2019-10-20 14:24:00"));
+    REQUIRE(rec.date_till == TimePointFromString("2019-10-20 15:36:00"));
     REQUIRE(rec.reminder == 1);
     REQUIRE(rec.repeat == 2);
     REQUIRE(rec.isValid());
@@ -80,8 +85,8 @@ TEST_CASE("Events Record tests")
         auto entry = eventsRecordInterface.GetByID(1);
         REQUIRE(entry.ID == 1);
         REQUIRE(entry.title == "Event1");
-        REQUIRE(entry.date_from == TimePointFromString("2019-10-20 14:24"));
-        REQUIRE(entry.date_till == TimePointFromString("2019-10-20 15:36"));
+        REQUIRE(entry.date_from == TimePointFromString("2019-10-20 14:24:00"));
+        REQUIRE(entry.date_till == TimePointFromString("2019-10-20 15:36:00"));
         REQUIRE(entry.reminder == 1);
         REQUIRE(entry.repeat == 2);
         REQUIRE(entry.isValid());
@@ -99,12 +104,16 @@ TEST_CASE("Events Record tests")
         REQUIRE_FALSE(entry.isValid());
     }
 
-    EventsTableRow tableRow2{
-        {.ID = 10}, "Event2", TimePointFromString("2025-10-20 14:24"), TimePointFromString("2025-10-20 15:36"), 1, 2};
+    EventsTableRow tableRow2{{.ID = 10},
+                             "Event2",
+                             TimePointFromString("2025-10-20 14:24:00"),
+                             TimePointFromString("2025-10-20 15:36:00"),
+                             1,
+                             2};
     auto rec2 = EventsRecord(tableRow2);
     REQUIRE(rec2.title == "Event2");
-    REQUIRE(rec2.date_from == TimePointFromString("2025-10-20 14:24"));
-    REQUIRE(rec2.date_till == TimePointFromString("2025-10-20 15:36"));
+    REQUIRE(rec2.date_from == TimePointFromString("2025-10-20 14:24:00"));
+    REQUIRE(rec2.date_till == TimePointFromString("2025-10-20 15:36:00"));
     REQUIRE(rec2.reminder == 1);
     REQUIRE(rec2.repeat == 2);
     REQUIRE(rec2.isValid());
@@ -143,8 +152,8 @@ TEST_CASE("Events Record tests")
 
         SECTION("Get table rows by SELECT invalid")
         {
-            auto retOffsetLimit = eventsRecordInterface.Select(TimePointFromString("2010-10-20 14:24"),
-                                                               TimePointFromString("2010-10-20 15:36"));
+            auto retOffsetLimit = eventsRecordInterface.Select(TimePointFromString("2010-10-20 14:24:00"),
+                                                               TimePointFromString("2010-10-20 15:36:00"));
             REQUIRE(retOffsetLimit->size() == 0);
         }
     }
@@ -153,8 +162,8 @@ TEST_CASE("Events Record tests")
     {
         auto entryPre      = eventsRecordInterface.GetByID(1);
         entryPre.title     = "newTitle";
-        entryPre.date_from = TimePointFromString("2019-12-31 23:59");
-        entryPre.date_till = TimePointFromString("2019-12-31 23:59");
+        entryPre.date_from = TimePointFromString("2019-12-31 23:59:00");
+        entryPre.date_till = TimePointFromString("2019-12-31 23:59:00");
         REQUIRE(eventsRecordInterface.Update(entryPre));
 
         auto entry = eventsRecordInterface.GetByID(1);
@@ -166,12 +175,31 @@ TEST_CASE("Events Record tests")
         REQUIRE(entry.repeat == entryPre.repeat);
     }
 
-    EventsTableRow tableRow3{
-        {.ID = 3}, "Event3", TimePointFromString("2021-10-20 14:24"), TimePointFromString("2021-10-20 15:36"), 1, 2};
+    REQUIRE(numberOfEvents == 8);
+
+    SECTION("Select first upcoming event")
+    {
+        TimePoint start_date = TimePointFromString("2025-10-27 14:24:00");
+        auto nextUpcoming    = eventsRecordInterface.SelectFirstUpcoming(start_date, start_date);
+        REQUIRE(nextUpcoming->size() == 1);
+        EventsRecord nextEventsRecord = nextUpcoming->at(0);
+        REQUIRE(nextEventsRecord.ID == 7);
+
+        start_date   = TimePointFromString("2025-11-10 14:24:00");
+        nextUpcoming = eventsRecordInterface.SelectFirstUpcoming(start_date, start_date);
+        REQUIRE(nextUpcoming->size() == 0);
+    }
+
+    EventsTableRow tableRow3{{.ID = 3},
+                             "Event3",
+                             TimePointFromString("2021-10-20 14:24:00"),
+                             TimePointFromString("2021-10-20 15:36:00"),
+                             1,
+                             2};
     auto rec3 = EventsRecord(tableRow3);
     REQUIRE(rec3.title == "Event3");
-    REQUIRE(rec3.date_from == TimePointFromString("2018-10-20 14:24"));
-    REQUIRE(rec3.date_till == TimePointFromString("2021-10-20 15:36"));
+    REQUIRE(rec3.date_from == TimePointFromString("2021-10-20 14:24:00"));
+    REQUIRE(rec3.date_till == TimePointFromString("2021-10-20 15:36:00"));
     REQUIRE(rec3.reminder == 1);
     REQUIRE(rec3.repeat == 2);
     REQUIRE(rec3.isValid());
@@ -257,25 +285,34 @@ TEST_CASE("Events Record tests")
         REQUIRE(recordGet.repeat == repeat);
     };
 
+    auto selectFirstUpcomingEvent = [&](TimePoint filter_from, TimePoint filter_till) {
+        auto query  = std::make_shared<db::query::events::SelectFirstUpcoming>(filter_from, filter_till);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto records = result->getResult();
+        return records;
+    };
+
     SECTION("Get via query")
     {
-        getQuery(3, "Event1", TimePointFromString("2021-10-20 14:24"), TimePointFromString("2021-10-20 15:36"));
+        getQuery(3, "Event1", TimePointFromString("2021-10-20 14:24:00"), TimePointFromString("2021-10-20 15:36:00"));
     }
 
     SECTION("GetFiltered via query")
     {
         getFiltered(1,
                     "Event1",
-                    TimePointFromString("2019-10-20 14:24"),
-                    TimePointFromString("2019-10-20 15:36"),
-                    TimePointFromString("2018-10-20 14:24"),
-                    TimePointFromString("2019-10-20 15:36"));
+                    TimePointFromString("2019-10-20 14:24:00"),
+                    TimePointFromString("2019-10-20 15:36:00"),
+                    TimePointFromString("2018-10-20 14:24:00"),
+                    TimePointFromString("2019-10-20 15:36:00"));
     }
 
     SECTION("Add via query")
     {
-        AddQuery(3, "Event3", TimePointFromString("2026-10-20 14:24"), TimePointFromString("2022-10-20 15:36"));
-        getQuery(4, "Event1", TimePointFromString("2026-10-20 14:24"), TimePointFromString("2022-10-20 15:36"));
+        AddQuery(3, "Event3", TimePointFromString("2026-10-20 14:24:00"), TimePointFromString("2022-10-20 15:36:00"));
+        getQuery(4, "Event1", TimePointFromString("2026-10-20 14:24:00"), TimePointFromString("2022-10-20 15:36:00"));
     }
 
     SECTION("Remove via query")
@@ -291,7 +328,8 @@ TEST_CASE("Events Record tests")
 
     SECTION("Update via query")
     {
-        EditQuery(2, "Event1", TimePointFromString("2021-10-20 14:24"), TimePointFromString("2021-10-20 15:36"), 1, 2);
+        EditQuery(
+            2, "Event1", TimePointFromString("2021-10-20 14:24:00"), TimePointFromString("2021-10-20 15:36:00"), 1, 2);
     }
 
     SECTION("Get All via query")
@@ -306,16 +344,31 @@ TEST_CASE("Events Record tests")
 
     SECTION("Get All Limited via query")
     {
-        AddQuery(3, "Event1", TimePointFromString("2026-10-20 14:24"), TimePointFromString("2022-10-20 15:36"));
-        AddQuery(3, "Event2", TimePointFromString("2020-10-20 14:24"), TimePointFromString("2022-10-20 15:36"));
-        AddQuery(3, "Event3", TimePointFromString("2025-10-20 14:24"), TimePointFromString("2022-10-20 15:36"));
-        AddQuery(3, "Event4", TimePointFromString("2019-10-20 14:24"), TimePointFromString("2022-10-20 15:36"));
+        AddQuery(3, "Event1", TimePointFromString("2026-10-20 14:24:00"), TimePointFromString("2022-10-20 15:36:00"));
+        AddQuery(3, "Event2", TimePointFromString("2020-10-20 14:24:00"), TimePointFromString("2022-10-20 15:36:00"));
+        AddQuery(3, "Event3", TimePointFromString("2025-10-20 14:24:00"), TimePointFromString("2022-10-20 15:36:00"));
+        AddQuery(3, "Event4", TimePointFromString("2019-10-20 14:24:00"), TimePointFromString("2022-10-20 15:36:00"));
         auto count1     = getAllLimited(0, 2);
         auto count2     = getAllLimited(2, 5);
         auto &eventsTbl = eventsDb.events;
         auto count3     = eventsTbl.count();
         REQUIRE(*count1 == *count2);
         REQUIRE(*count2 == count3);
+    }
+
+    SECTION("Select first upcoming via query")
+    {
+        auto date_from = TimePointFromString("2025-10-27 14:24:00");
+        auto date_till = TimePointFromString("2026-10-20 14:24:00");
+        auto records   = selectFirstUpcomingEvent(date_from, date_till);
+        REQUIRE(records->size() == 1);
+        auto firstEvent = records->at(0);
+        REQUIRE(firstEvent.ID == 7);
+
+        date_from = TimePointFromString("2025-11-10 14:24:00");
+        date_till = TimePointFromString("2026-10-20 14:24:00");
+        records   = selectFirstUpcomingEvent(date_from, date_till);
+        REQUIRE(records->size() == 0);
     }
 
     Database::deinitialize();

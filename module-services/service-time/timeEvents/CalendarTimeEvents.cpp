@@ -12,7 +12,7 @@
 
 namespace stm
 {
-    constexpr static const int eventTimerMinSkipInterval = 100;
+    constexpr static auto eventTimerMinSkipInterval = 100ms;
 
     CalendarTimeEvents::CalendarTimeEvents(sys::Service *service) : TimeEvents(service)
     {}
