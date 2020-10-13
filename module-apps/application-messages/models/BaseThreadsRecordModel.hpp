@@ -15,7 +15,7 @@ class BaseThreadsRecordModel : public app::DatabaseModel<ThreadRecord>, public g
     BaseThreadsRecordModel(app::Application *app);
 
     unsigned int requestRecordsCount() override;
-    bool updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records) override;
+    bool updateRecords(std::vector<ThreadRecord> records) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     app::Application *getApplication(void)

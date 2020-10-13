@@ -104,11 +104,7 @@ namespace gui
     bool SMSTemplatesWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto msg = dynamic_cast<DBSMSTemplateResponseMessage *>(msgl);
-        if (msg && smsTemplateModel->updateRecords(std::move(msg->records))) {
-            return true;
-        }
-
-        return false;
+        return msg && smsTemplateModel->updateRecords(*msg->records);
     }
 
 } /* namespace gui */

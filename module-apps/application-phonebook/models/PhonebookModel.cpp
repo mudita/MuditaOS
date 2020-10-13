@@ -85,7 +85,7 @@ auto PhonebookModel::requestLetterMap() -> ContactsMapData
     return contactMapData;
 }
 
-auto PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records) -> bool
+auto PhonebookModel::updateRecords(std::vector<ContactRecord> records) -> bool
 {
 
 #if DEBUG_DB_MODEL_DATA == 1
@@ -170,7 +170,7 @@ auto PhonebookModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     auto contactsResponse = dynamic_cast<db::query::ContactGetResult *>(queryResult);
     assert(contactsResponse != nullptr);
 
-    auto records = std::make_unique<std::vector<ContactRecord>>(contactsResponse->getRecords());
+    auto records = std::vector<ContactRecord>(contactsResponse->getRecords());
 
     return this->updateRecords(std::move(records));
 }

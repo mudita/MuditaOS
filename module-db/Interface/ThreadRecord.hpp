@@ -5,7 +5,6 @@
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
 #include "module-db/queries/messages/threads/QueryThreadsSearch.hpp"
-#include "module-db/queries/messages/threads/QueryThreadsGet.hpp"
 #include "module-db/queries/messages/threads/QueryThreadMarkAsRead.hpp"
 #include <PhoneNumber.hpp>
 

@@ -14,7 +14,7 @@ class AllEventsModel : public app::DatabaseModel<EventsRecord>, public gui::List
     virtual ~AllEventsModel() override = default;
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
-    bool updateRecords(std::unique_ptr<std::vector<EventsRecord>> records) override;
+    bool updateRecords(std::vector<EventsRecord> records) override;
 
     auto handleQueryResponse(db::QueryResult *) -> bool;
     // virtual methods for ListViewProvider
