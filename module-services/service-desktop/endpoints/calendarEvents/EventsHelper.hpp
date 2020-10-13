@@ -8,6 +8,7 @@
 #include <memory>
 #include <service-db/api/DBServiceAPI.hpp>
 #include "Endpoint.hpp"
+#include "ical/ParserICS.hpp"
 
 namespace parserFSM
 {
@@ -15,26 +16,20 @@ namespace parserFSM
     class EventsHelper final : public DBHelper
     {
       public:
-        EventsHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
+        EventsHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr)
+        {
+            parser = std::make_unique<ParserICS>();
+        };
 
-        auto createDBEntry(Context &context) -> sys::ReturnCodes override;
         auto requestDataFromDB(Context &context) -> sys::ReturnCodes override;
+        auto createDBEntry(Context &context) -> sys::ReturnCodes override;
         auto updateDBEntry(Context &context) -> sys::ReturnCodes override;
         auto deleteDBEntry(Context &context) -> sys::ReturnCodes override;
 
         // auto createSimpleResponse(Context &context) -> std::string override;
 
-        static auto reminderToICS(uint32_t reminder) -> list<Alarm> *;
-        static auto reminderFromICS(list<Alarm> *alarm) -> uint32_t;
-
-        static auto repeatOptionToICS(uint32_t repeat) -> Recurrence;
-        static auto repeatOptionFromICS(const Recurrence &frequency) -> uint32_t;
-
-        static auto eventRecordsToICS(std::unique_ptr<std::vector<EventsRecord>> records) -> const char *;
-        static auto eventRecordsFromICS(const char *icsFile) -> EventsRecord;
-
       private:
-        std::string receivedICS;
+        std::unique_ptr<ParserICS> parser;
     };
 
     namespace events

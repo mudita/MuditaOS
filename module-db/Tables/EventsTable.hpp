@@ -6,9 +6,11 @@
 #include <Common/Common.hpp>
 #include <utf8/UTF8.hpp>
 #include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <module-utils/icalendarlib/icalendar.h>
 
 struct EventsTableRow : public Record
 {
+    std::string UID;
     std::string title;
     TimePoint date_from = TIME_POINT_INVALID;
     TimePoint date_till = TIME_POINT_INVALID;
@@ -24,6 +26,8 @@ enum class EventsTableFields
 
 class EventsTable : public Table<EventsTableRow, EventsTableFields>
 {
+    std::unique_ptr<ICalendar> icsParser;
+
   public:
     EventsTable(Database *db);
     ~EventsTable() override = default;
@@ -37,6 +41,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     bool addYear(EventsTableRow entry);
     bool addCustom(EventsTableRow entry);
     bool removeById(uint32_t id) override final;
+    bool removeById(std::string UID);
     bool removeByField(EventsTableFields field, const char *str) override final;
     bool update(EventsTableRow entry) override final;
     EventsTableRow getById(uint32_t id) override final;
@@ -54,6 +59,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS events("
                                    "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                   "UID TEXT,"
                                    "title TEXT,"
                                    "date_from DATETIME,"
                                    "date_till DATETIME,"

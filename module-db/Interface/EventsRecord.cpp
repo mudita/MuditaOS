@@ -13,8 +13,8 @@
 #include <vector>
 
 EventsRecord::EventsRecord(const EventsTableRow &tableRow)
-    : Record{tableRow.ID}, title{tableRow.title}, date_from{tableRow.date_from}, date_till{tableRow.date_till},
-      reminder{tableRow.reminder}, repeat{tableRow.repeat}
+    : Record{tableRow.ID}, UID{tableRow.UID}, title{tableRow.title}, date_from{tableRow.date_from},
+      date_till{tableRow.date_till}, reminder{tableRow.reminder}, repeat{tableRow.repeat}
 {}
 
 EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(eventsDb)
@@ -23,6 +23,7 @@ EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(even
 bool EventsRecordInterface::Add(const EventsRecord &rec)
 {
     auto entry = EventsTableRow{{.ID = rec.ID},
+                                .UID       = rec.UID,
                                 .title     = rec.title,
                                 .date_from = rec.date_from,
                                 .date_till = rec.date_till,
@@ -120,6 +121,7 @@ bool EventsRecordInterface::Update(const EventsRecord &rec)
     }
 
     auto entry = EventsTableRow{{.ID = rec.ID},
+                                .UID       = rec.UID,
                                 .title     = rec.title,
                                 .date_from = rec.date_from,
                                 .date_till = rec.date_till,

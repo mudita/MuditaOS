@@ -91,7 +91,6 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
                     LOG_DEBUG("Result: %s", result->debugInfo().c_str());
                     if (result->hasListener()) {
                         LOG_DEBUG("Handling result...");
-                        /// TODO:
                         result->handle();
                     }
                 }

@@ -40,6 +40,7 @@ enum class RepeatOption
 
 struct EventsRecord : public Record
 {
+    std::string UID;
     std::string title;
     TimePoint date_from;
     TimePoint date_till;

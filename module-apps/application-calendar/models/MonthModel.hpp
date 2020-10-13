@@ -31,5 +31,4 @@ class MonthModel
     uint32_t getFirstWeekOffset();
     std::string getMonthYearText();
     std::string getMonthText();
-    std::vector<std::string> split(const std::string &s, char delim);
 };
