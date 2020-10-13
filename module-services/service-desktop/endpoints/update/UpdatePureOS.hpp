@@ -117,8 +117,6 @@ class UpdatePureOS : public updateos::UpdateStats
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
-    updateos::UpdateError resetNow();
-    updateos::UpdateError startResetTimer(int delay);
 
     void informError(const char *format, ...);
     void informDebug(const char *format, ...);
