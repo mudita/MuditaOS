@@ -23,7 +23,7 @@ namespace stm
 
       public:
         CalendarTimeEvents() = delete;
-        CalendarTimeEvents(sys::Service *service);
+        explicit CalendarTimeEvents(sys::Service *service);
         ~CalendarTimeEvents() = default;
     };
 

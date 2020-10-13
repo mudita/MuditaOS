@@ -16,8 +16,9 @@ namespace gui
         std::unique_ptr<sys::Timer> reminderTimer;
 
       protected:
-        std::shared_ptr<EventsRecord> eventRecord = nullptr;
+        std::shared_ptr<EventsRecord> eventRecord;
 
+        gui::VBox *body         = nullptr;
         Label *dateLabel        = nullptr;
         Label *timeLabel        = nullptr;
         Label *descriptionLabel = nullptr;

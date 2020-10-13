@@ -45,30 +45,46 @@ namespace gui
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
-        bottomBar->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        bottomBar->setBorderColor(ColorNoColor);
 
-        topImage = new gui::Image(this, 116, 59, 0, 0, "circle_top");
-        topImage->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        bottomImage = new gui::Image(this, 106, 240, 0, 0, "circle_bottom");
-        bottomImage->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
+        const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
+        const uint32_t h = this->getHeight() - bottomBar->getHeight();
+        body             = new gui::VBox(this, style::window::default_left_margin, topBar->getHeight(), w, h);
+        body->setBorderColor(gui::ColorNoColor);
 
-        dateLabel = new Label(this, 0, 120, 480, 80);
+        topImage = new gui::Image(body,
+                                  style::window::calendar::imageCircleTop::x,
+                                  style::window::calendar::imageCircleTop::y,
+                                  0,
+                                  0,
+                                  style::window::calendar::imageCircleTop::name);
+        topImage->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center));
+
+        dateLabel = new Label(body, 0, 0, w, style::window::label::default_h);
         dateLabel->setFont(style::window::font::smallbold);
         dateLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        dateLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        dateLabel->setBorderColor(ColorNoColor);
 
-        timeLabel = new Label(this, 0, 170, 480, 80);
+        timeLabel = new Label(body, 0, 0, w, style::window::label::default_h);
         timeLabel->setFont(style::window::font::largelight);
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        timeLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        timeLabel->setBorderColor(ColorNoColor);
 
-        descriptionLabel = new Label(this, 0, 350, 480, 80);
+        bottomImage = new gui::Image(body,
+                                     style::window::calendar::imageCircleBottom::x,
+                                     style::window::calendar::imageCircleBottom::y,
+                                     0,
+                                     0,
+                                     style::window::calendar::imageCircleBottom::name);
+        bottomImage->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center));
+
+        descriptionLabel = new Label(body, 0, 0, w, 2 * style::window::label::default_h);
         descriptionLabel->setFont(style::window::font::big);
         descriptionLabel->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        descriptionLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        descriptionLabel->setBorderColor(ColorNoColor);
 
-        setFocusItem(nullptr);
+        setFocusItem(body);
     }
 
     void EventReminderWindow::destroyInterface()
@@ -100,8 +116,8 @@ namespace gui
         }
 
         eventRecord    = item->getData();
-        dateLabel->setText(TimePointToDateString(eventRecord->date_from));
-        timeLabel->setText(TimePointToMinuteTimeString(eventRecord->date_from));
+        dateLabel->setText(TimePointToLocalizedDateString(eventRecord->date_from));
+        timeLabel->setText(TimePointToLocalizedTimeString(eventRecord->date_from));
         descriptionLabel->setText(eventRecord->title);
 
         startTimer();

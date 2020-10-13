@@ -5,6 +5,7 @@
 #include <time/time_conversion.hpp>
 
 using namespace std::chrono;
+using namespace std::chrono_literals;
 
 using Clock            = system_clock;
 using TimePoint        = time_point<Clock>;
@@ -139,21 +140,6 @@ inline TimePoint getFirstWeekDay(const TimePoint &tp)
     return finalDateTime;
 }
 
-inline std::string TimePointToDateString(const TimePoint &tp)
-{
-    return date::format("%F", time_point_cast<seconds>(tp));
-}
-
-inline std::string TimePointToTimeString(const TimePoint &tp)
-{
-    return date::format("%T", time_point_cast<seconds>(tp));
-}
-
-inline std::string TimePointToMinuteTimeString(const TimePoint &tp)
-{
-    return date::format("%H:%M", time_point_cast<seconds>(tp));
-}
-
 inline std::string TimePointToString(const TimePoint &tp, date::months months)
 {
     date::year_month_day yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};
@@ -191,7 +177,7 @@ inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std
     return timestamp.str(format);
 }
 
-inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format)
+inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format = "")
 {
     auto time = TimePointToTimeT(tp);
     utils::time::Time timestamp(time);

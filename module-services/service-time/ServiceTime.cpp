@@ -46,9 +46,7 @@ namespace stm
                 responseMsg = std::make_shared<TimeResponseMessage>(false);
                 break;
             }
-            if (msg->interface == db::Interface::Name::Events &&
-                (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update ||
-                 msg->type == db::Query::Type::Delete)) {
+            if (msg->interface == db::Interface::Name::Events && msg->dataModified()) {
 
                 calendarEvents.processNextEvent();
 

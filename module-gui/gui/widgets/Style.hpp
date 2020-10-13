@@ -164,6 +164,7 @@ namespace style
             const inline std::string November  = "common_november";
             const inline std::string December  = "common_december";
             const inline std::string Yesterday = "common_yesterday";
+            const inline std::string Today     = "common_today";
         } // namespace common
     }     // namespace strings
 
