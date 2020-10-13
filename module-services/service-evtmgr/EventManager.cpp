@@ -273,6 +273,8 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
     // torch driver queue
     sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
+    // vibration motor queue
+    sys::WorkerQueueInfo qVibrator = {"qVibrator", sizeof(bsp::vibrator::Vibration), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -284,6 +286,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qSIM);
     list.push_back(qMagnetometer);
     list.push_back(qTorch);
+    list.push_back(qVibrator);
 
     EventWorker->init(list);
     EventWorker->run();

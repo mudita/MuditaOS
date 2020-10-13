@@ -165,6 +165,10 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueVibrator)) {
+        // currently vibrator bsp can not request attention
+    }
+
     return true;
 }
 
