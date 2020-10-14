@@ -96,46 +96,42 @@ namespace gui
         return lhs;
     }
 
-    enum class RectangleEdgeFlags
+    enum class RectangleEdge
     {
-        GUI_RECT_EDGE_NO_EDGES = 0x00,
-        GUI_RECT_EDGE_TOP      = 0x01,
-        GUI_RECT_EDGE_BOTTOM   = 0x02,
-        GUI_RECT_EDGE_LEFT     = 0x04,
-        GUI_RECT_EDGE_RIGHT    = 0x08,
-        GUI_RECT_ALL_EDGES     = 0x0F
+        None   = 0x00,
+        Top    = 0x01,
+        Bottom = 0x02,
+        Left   = 0x04,
+        Right  = 0x08,
+        All    = 0x0F
     };
 
-    // bool operator&( const RectangleEdgeFlags& lhs, const RectangleEdgeFlags& rhs );
-    // RectangleEdgeFlags operator|( const RectangleEdgeFlags& lhs, const RectangleEdgeFlags& rhs );
-    // RectangleEdgeFlags operator|=( const RectangleEdgeFlags& lhs, const RectangleEdgeFlags& rhs );
-
-    enum class RectangleCornerFlags
+    enum class RectangleRoundedCorner
     {
-        GUI_RECT_CORNER_NO_CORNERS   = 0x00,
-        GUI_RECT_CORNER_TOP_LEFT     = 0x10,
-        GUI_RECT_CORNER_TOP_RIGHT    = 0x20,
-        GUI_RECT_CORNER_BOTTOM_LEFT  = 0x40,
-        GUI_RECT_CORNER_BOTTOM_RIGHT = 0x80,
-        GUI_RECT_ALL_CORNERS         = 0xF0,
+        None        = 0x00,
+        TopLeft     = 0x10,
+        TopRight    = 0x20,
+        BottomLeft  = 0x40,
+        BottomRight = 0x80,
+        All         = 0xF0,
     };
 
-    enum class RectangleFlatFlags
+    enum class RectangleFlatEdge
     {
-        GUI_RECT_FLAT_NO_FLAT      = 0x00,
-        GUI_RECT_FLAT_TOP_LEFT     = 0x01,
-        GUI_RECT_FLAT_TOP_RIGHT    = 0x02,
-        GUI_RECT_FLAT_BOTTOM_LEFT  = 0x04,
-        GUI_RECT_FLAT_BOTTOM_RIGHT = 0x08
+        None        = 0x00,
+        TopLeft     = 0x01,
+        TopRight    = 0x02,
+        BottomLeft  = 0x04,
+        BottomRight = 0x08
     };
 
-    enum class RectangleYapFlags
+    enum class RectangleYap
     {
-        GUI_RECT_YAP_NO_YAPS      = 0x00,
-        GUI_RECT_YAP_TOP_LEFT     = 0x10,
-        GUI_RECT_YAP_TOP_RIGHT    = 0x20,
-        GUI_RECT_YAP_BOTTOM_LEFT  = 0x40,
-        GUI_RECT_YAP_BOTTOM_RIGHT = 0x80,
+        None        = 0x00,
+        TopLeft     = 0x10,
+        TopRight    = 0x20,
+        BottomLeft  = 0x40,
+        BottomRight = 0x80,
     };
 
     typedef uint32_t (*timeSecondsFunctionPtr)();

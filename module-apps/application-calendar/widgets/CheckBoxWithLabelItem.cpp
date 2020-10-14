@@ -19,10 +19,10 @@ namespace gui
 
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::checkBox::height);
         setMargins(gui::Margins(style::margins::small, style::window::calendar::item::checkBox::margin_top, 0, 0));
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
 
         if (checkIsOnLeftBarSide) {
             checkBox = new gui::CheckBox(
@@ -58,7 +58,7 @@ namespace gui
         descriptionLabel->setMinimumSize(style::window::calendar::item::checkBox::description_label_w,
                                          style::window::calendar::item::checkBox::height);
         descriptionLabel->setMargins(gui::Margins(style::margins::very_big, 0, 0, 0));
-        descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;

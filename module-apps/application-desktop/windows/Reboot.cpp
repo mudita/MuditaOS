@@ -34,7 +34,7 @@ namespace gui
         text->setFilled(false);
         text->setBorderColor(gui::ColorFullBlack);
         text->setFont(style::header::font::title);
-        text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        text->setEdges(RectangleEdge::None);
         text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
     }
 

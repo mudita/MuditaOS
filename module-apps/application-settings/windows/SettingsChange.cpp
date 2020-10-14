@@ -45,7 +45,7 @@ namespace gui::option
             auto font_bold = FontManager::getInstance().getFont(style::window::font::mediumbold);
             auto settings  = app->getSettings();
 
-            rect->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            rect->setEdges(RectangleEdge::None);
             rect->setReverseOrder(true);
 
             auto text = new TextFixedSize(nullptr, style::option::text_left_padding, 0, 0, 0);
@@ -70,7 +70,7 @@ namespace gui::option
             pin_text->setPenWidth(0);
             pin_text->setInputMode(new InputMode(
                 {InputMode::digit}, [=](const UTF8 &text) {}, [=]() {}, [=]() {}));
-            pin_text->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+            pin_text->setEdges(RectangleEdge::All);
             auto lapp = app;
 
             pin_text->activatedCallback = [pin_text, lapp](gui::Item &item) {

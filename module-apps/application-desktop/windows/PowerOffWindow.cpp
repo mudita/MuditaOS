@@ -55,7 +55,7 @@ namespace gui
         titleLabel->setBorderColor(gui::ColorFullBlack);
         titleLabel->setFont(style::header::font::title);
         titleLabel->setText(utils::localize.get("app_desktop_poweroff_title"));
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
 
         // label with question for powering down
@@ -76,7 +76,7 @@ namespace gui
             label->setPenFocusWidth(2);
             label->setRadius(5);
             label->setFont(style::window::font::medium);
-            label->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+            label->setEdges(RectangleEdge::All);
             label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             selectionLabels.push_back(label);
             pinLabelX += 193;
@@ -95,7 +95,7 @@ namespace gui
         eventMgrLabel->setRadius(5);
         eventMgrLabel->setFont(style::window::font::bigbold);
         eventMgrLabel->setText("TURN PWR MGR OFF");
-        eventMgrLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        eventMgrLabel->setEdges(RectangleEdge::All);
         eventMgrLabel->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 

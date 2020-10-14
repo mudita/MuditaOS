@@ -15,7 +15,7 @@ namespace gui
     {
         setReverseOrder(true);
         setMinimumSize(phonebookStyle::informationWidget::w, phonebookStyle::numbersWithIconsWidget::h);
-        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(gui::RectangleEdge::None);
         setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
 
         smsImage                = new ImageBox(this,
@@ -55,7 +55,7 @@ namespace gui
         numberText->setMaximumSize(phonebookStyle::informationWidget::w,
                                    phonebookStyle::numbersWithIconsWidget::number_text_h);
         numberText->setFont(font);
-        numberText->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        numberText->setEdges(gui::RectangleEdge::None);
         numberText->setEditMode(EditMode::BROWSE);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         numberText->setText(number.getFormatted());
@@ -68,24 +68,24 @@ namespace gui
 
         phoneImage->focusChangedCallback = [&, app](Item &item) {
             if (phoneImage->focus) {
-                phoneImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+                phoneImage->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
                 app->getCurrentWindow()->bottomBarTemporaryMode(
                     utils::localize.get(style::strings::common::call), BottomBar::Side::CENTER, false);
             }
             else {
-                phoneImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+                phoneImage->setEdges(RectangleEdge::None);
             }
             return true;
         };
 
         smsImage->focusChangedCallback = [&, app](Item &item) {
             if (smsImage->focus) {
-                smsImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+                smsImage->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
                 app->getCurrentWindow()->bottomBarTemporaryMode(
                     utils::localize.get(style::strings::common::send), BottomBar::Side::CENTER, false);
             }
             else {
-                smsImage->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+                smsImage->setEdges(RectangleEdge::None);
             }
             return true;
         };

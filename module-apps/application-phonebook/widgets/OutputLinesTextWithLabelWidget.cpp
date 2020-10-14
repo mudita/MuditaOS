@@ -16,12 +16,12 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::huge, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(RectangleEdge::None);
 
         titleLabel = new Label(vBox);
         titleLabel->setMinimumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
                                    phonebookStyle::outputLinesTextWithLabelWidget::title_label_h);
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         titleLabel->setFont(style::window::font::verysmall);
         titleLabel->setLineMode(true);
@@ -31,7 +31,7 @@ namespace gui
         multilineText->setMaximumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
                                       phonebookStyle::outputLinesTextWithLabelWidget::input_text_h * 10);
         multilineText->setMargins(Margins(0, phonebookStyle::outputLinesTextWithLabelWidget::span_size, 0, 0));
-        multilineText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        multilineText->setEdges(RectangleEdge::None);
         multilineText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         multilineText->setFont(style::window::font::medium);
         multilineText->setEditMode(EditMode::BROWSE);
@@ -44,7 +44,7 @@ namespace gui
         };
 
         this->activeItem = false;
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setEdges(RectangleEdge::All);
     }
 
     auto OutputLinesTextWithLabelWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

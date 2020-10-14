@@ -14,17 +14,17 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::small, 0, 0));
 
         vBox = new gui::VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(gui::RectangleEdge::None);
         hBox = new gui::HBox(vBox, 0, 0, 0, 0);
         hBox->setMinimumSize(style::window::default_body_width, style::window::calendar::item::dayEvents::box_height);
         hBox->setMargins(gui::Margins(0, style::margins::small + style::margins::big, 0, 0));
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
 
         title = new gui::Label(hBox, 0, 0, 0, 0);
         title->setMinimumSize(style::window::calendar::item::dayEvents::title_w,
                               style::window::calendar::item::dayEvents::box_height);
         title->setMargins(gui::Margins(style::margins::small, 0, style::margins::small + style::margins::big, 0));
-        title->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        title->setEdges(gui::RectangleEdge::None);
         title->setFont(style::window::font::bigbold);
         title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
@@ -35,7 +35,7 @@ namespace gui
         description->setMinimumSize(style::window::default_body_width,
                                     style::window::calendar::item::dayEvents::box_height);
         description->setMargins(gui::Margins(style::margins::small, style::margins::big, 0, style::margins::very_big));
-        description->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        description->setEdges(gui::RectangleEdge::None);
         description->setFont(style::window::font::medium);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }

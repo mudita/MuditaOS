@@ -115,13 +115,13 @@ namespace gui
         uint16_t h;
         uint16_t radius;
         // flags that defines whether paint given border
-        RectangleEdgeFlags edges;
+        RectangleEdge edges;
         // flags that defines which edge should be flat. This will disable roundness on both sides of the edge.
-        RectangleFlatFlags flatEdges;
+        RectangleFlatEdge flatEdges;
         // flags that defines whether paint given corner (only for rounded corners)
-        RectangleCornerFlags corners;
+        RectangleRoundedCorner corners;
         // flags indicating yaps for speech bubbles, it takes precendece over other properties
-        RectangleYapFlags yaps;
+        RectangleYap yaps;
         // defines which of the edges and corners are painted
         unsigned short yapSize = 0;
         bool filled;
@@ -129,9 +129,8 @@ namespace gui
         Color fillColor;
         Color borderColor;
         CommandRectangle()
-            : x{0}, y{0}, w{0}, h{0}, radius{0}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-              flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
-              yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{0}, filled{false}, penWidth{1},
+            : x{0}, y{0}, w{0}, h{0}, radius{0}, edges{RectangleEdge::All}, flatEdges{RectangleFlatEdge::None},
+              corners{RectangleRoundedCorner::All}, yaps{RectangleYap::None}, yapSize{0}, filled{false}, penWidth{1},
               fillColor(ColorFullBlack), borderColor(ColorFullBlack)
         {
             id = DrawCommandID::GUI_DRAW_RECT;
