@@ -51,7 +51,7 @@ namespace app
         windowsFactory.attach(gui::name::window::all_songs_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MusicPlayerAllSongsWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::all_songs_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MusicPlayerEmptyWindow>(app);
         });
     }
