@@ -30,7 +30,7 @@ namespace gui
         std::unique_ptr<MonthModel> monthModel;
 
       public:
-        CalendarMainWindow(app::Application *app, std::string name);
+        CalendarMainWindow(app::Application *app, const std::string &name);
 
         ~CalendarMainWindow() override = default;
         void rebuild() override;

@@ -21,4 +21,5 @@ namespace bsp {
             va_end(args);
         }
     }
+
 };

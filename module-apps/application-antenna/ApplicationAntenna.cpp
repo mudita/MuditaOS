@@ -92,7 +92,7 @@ namespace app
         if (msgl->messageType == MessageType::CellularGetScanModeResult) {
             auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
             if (msg != nullptr) {
-                auto win = getWindow(gui::name::window::scan_window);
+                auto win = windowsStack.get(gui::name::window::scan_window);
 
                 if (win->getName() == gui::name::window::scan_window) {
                     auto window = dynamic_cast<gui::ScanModesWindow *>(win);
@@ -122,7 +122,7 @@ namespace app
             if (win->getName() == gui::name::window::algo_window) {
                 refresh = true;
             }
-            auto window     = getWindow(gui::name::window::algo_window);
+            auto window     = windowsStack.get(gui::name::window::algo_window);
             auto algoWindow = dynamic_cast<gui::AlgoParamsWindow *>(window);
             if (algoWindow != nullptr) {
                 algoWindow->handleAntennaChanged(antenna, refresh);
@@ -163,15 +163,16 @@ namespace app
 
     void ApplicationAntenna::createUserInterface()
     {
-
-        gui::AppWindow *win = new gui::AntennaMainWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::main_window, win));
-
-        win = new gui::ScanModesWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::scan_window, win));
-
-        win = new gui::AlgoParamsWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::algo_window, win));
+        using namespace gui::name::window;
+        windowsFactory.attach(main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AntennaMainWindow>(app);
+        });
+        windowsFactory.attach(scan_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ScanModesWindow>(app);
+        });
+        windowsFactory.attach(algo_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AlgoParamsWindow>(app);
+        });
     }
 
     void ApplicationAntenna::destroyUserInterface()
@@ -196,7 +197,7 @@ namespace app
             lastFreq   = bandFreq;
 
             bool refresh = false;
-            auto win     = getWindow(gui::name::window::algo_window);
+            auto win     = windowsStack.get(gui::name::window::algo_window);
             if (win == getCurrentWindow()) {
                 refresh = true;
             }

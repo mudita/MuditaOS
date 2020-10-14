@@ -1,0 +1,189 @@
+#include "AVRCP.hpp"
+
+namespace Bt
+{
+
+    AVRCP::PlaybackStatusInfo AVRCP::playInfo;
+    int AVRCP::currentTrackIndex;
+    MediaContext AVRCP::mediaTracker;
+    std::array<uint8_t, 200> AVRCP::sdpTargetServiceBuffer;
+    std::array<uint8_t, 200> AVRCP::sdpControllerServiceBuffer;
+
+    void AVRCP::packetHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    {
+        bd_addr_t event_addr;
+        uint16_t local_cid;
+        uint8_t status = ERROR_CODE_SUCCESS;
+
+        if (packetType != HCI_EVENT_PACKET) {
+            return;
+        }
+        if (hci_event_packet_get_type(packet) != HCI_EVENT_AVRCP_META) {
+            return;
+        }
+
+        switch (packet[2]) {
+        case AVRCP_SUBEVENT_CONNECTION_ESTABLISHED:
+            local_cid = avrcp_subevent_connection_established_get_avrcp_cid(packet);
+            status    = avrcp_subevent_connection_established_get_status(packet);
+            if (status != ERROR_CODE_SUCCESS) {
+                LOG_INFO("AVRCP: Connection failed, local cid 0x%02x, status 0x%02x\n", local_cid, status);
+                return;
+            }
+            AVRCP::mediaTracker.avrcp_cid = local_cid;
+            avrcp_subevent_connection_established_get_bd_addr(packet, event_addr);
+
+            avrcp_target_set_now_playing_info(
+                AVRCP::mediaTracker.avrcp_cid, NULL, sizeof(AVRCP::tracks) / sizeof(avrcp_track_t));
+            avrcp_target_set_unit_info(AVRCP::mediaTracker.avrcp_cid, AVRCP_SUBUNIT_TYPE_AUDIO, AVRCP::companyId);
+            avrcp_target_set_subunit_info(AVRCP::mediaTracker.avrcp_cid,
+                                          AVRCP_SUBUNIT_TYPE_AUDIO,
+                                          (uint8_t *)AVRCP::subunitInfo,
+                                          sizeof(AVRCP::subunitInfo));
+
+            avrcp_controller_get_supported_events(AVRCP::mediaTracker.avrcp_cid);
+
+            LOG_INFO("AVRCP: Channel successfully opened:  A2DP::mediaTracker.avrcp_cid 0x%02x\n",
+                     AVRCP::mediaTracker.avrcp_cid);
+            return;
+
+        case AVRCP_SUBEVENT_CONNECTION_RELEASED:
+            LOG_INFO("AVRCP Target: Disconnected, avrcp_cid 0x%02x\n",
+                     avrcp_subevent_connection_released_get_avrcp_cid(packet));
+            AVRCP::mediaTracker.avrcp_cid = 0;
+            return;
+        default:
+            break;
+        }
+
+        if (status != ERROR_CODE_SUCCESS) {
+            LOG_INFO("Responding to event 0x%02x failed with status 0x%02x\n", packet[2], status);
+        }
+    }
+
+    void AVRCP::targetPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    {
+        UNUSED(channel);
+        UNUSED(size);
+        uint8_t status = ERROR_CODE_SUCCESS;
+
+        if (packetType != HCI_EVENT_PACKET) {
+            return;
+        }
+        if (hci_event_packet_get_type(packet) != HCI_EVENT_AVRCP_META) {
+            return;
+        }
+
+        switch (packet[2]) {
+        case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED:
+            AVRCP::mediaTracker.volume = avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
+            LOG_INFO("AVRCP Target: Volume set to %d%% (%d)\n",
+                     AVRCP::mediaTracker.volume * 127 / 100,
+                     AVRCP::mediaTracker.volume);
+            break;
+        case AVRCP_SUBEVENT_EVENT_IDS_QUERY:
+            status = avrcp_target_supported_events(AVRCP::mediaTracker.avrcp_cid,
+                                                   AVRCP::eventsNum,
+                                                   const_cast<uint8_t *>(AVRCP::events),
+                                                   sizeof(AVRCP::events));
+            break;
+        case AVRCP_SUBEVENT_COMPANY_IDS_QUERY:
+            status = avrcp_target_supported_companies(AVRCP::mediaTracker.avrcp_cid,
+                                                      AVRCP::companiesNum,
+                                                      const_cast<uint8_t *>(AVRCP::companies),
+                                                      sizeof(AVRCP::companies));
+            break;
+        case AVRCP_SUBEVENT_PLAY_STATUS_QUERY:
+            status = avrcp_target_play_status(AVRCP::mediaTracker.avrcp_cid,
+                                              AVRCP::playInfo.song_length_ms,
+                                              AVRCP::playInfo.song_position_ms,
+                                              AVRCP::playInfo.status);
+            break;
+            // case AVRCP_SUBEVENT_NOW_PLAYING_INFO_QUERY:
+            //     status = avrcp_target_now_playing_info(avrcp_cid);
+            //     break;
+        case AVRCP_SUBEVENT_OPERATION: {
+            auto operation_id = (avrcp_operation_id_t)avrcp_subevent_operation_get_operation_id(packet);
+            switch (operation_id) {
+            case AVRCP_OPERATION_ID_PLAY:
+                LOG_INFO("AVRCP Target: PLAY\n");
+                status = a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
+                break;
+            case AVRCP_OPERATION_ID_PAUSE:
+                LOG_INFO("AVRCP Target: PAUSE\n");
+                status = a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
+                break;
+            case AVRCP_OPERATION_ID_STOP:
+                LOG_INFO("AVRCP Target: STOP\n");
+                status = a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
+                break;
+            default:
+                LOG_INFO("AVRCP Target: operation 0x%2x is not handled\n", operation_id);
+                return;
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
+
+        if (status != ERROR_CODE_SUCCESS) {
+            LOG_INFO("Responding to event 0x%02x failed with status 0x%02x\n", packet[2], status);
+        }
+    }
+
+    void AVRCP::controllerPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    {
+        UNUSED(channel);
+        UNUSED(size);
+        uint8_t status = 0xFF;
+
+        if (packetType != HCI_EVENT_PACKET) {
+            return;
+        }
+        if (hci_event_packet_get_type(packet) != HCI_EVENT_AVRCP_META) {
+            return;
+        }
+
+        status = packet[5];
+        if (AVRCP::mediaTracker.avrcp_cid == 0u) {
+            return;
+        }
+
+        // ignore INTERIM status
+        if (status == AVRCP_CTYPE_RESPONSE_INTERIM) {
+            return;
+        }
+
+        switch (packet[2]) {
+        case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED:
+            LOG_INFO("AVRCP Controller: notification absolute volume changed %d %%\n",
+                     avrcp_subevent_notification_volume_changed_get_absolute_volume(packet) * 100 / 127);
+            break;
+        case AVRCP_SUBEVENT_GET_CAPABILITY_EVENT_ID:
+            LOG_INFO("Remote supports EVENT_ID 0x%02x\n", avrcp_subevent_get_capability_event_id_get_event_id(packet));
+            break;
+        case AVRCP_SUBEVENT_GET_CAPABILITY_EVENT_ID_DONE:
+            LOG_INFO("automatically enable notifications\n");
+            avrcp_controller_enable_notification(AVRCP::mediaTracker.avrcp_cid,
+                                                 AVRCP_NOTIFICATION_EVENT_VOLUME_CHANGED);
+            break;
+        default:
+            break;
+        }
+    }
+    void AVRCP::init()
+    {
+        // Initialize AVRCP Service.
+        avrcp_init();
+        avrcp_register_packet_handler(&packetHandler);
+        // Initialize AVRCP Target.
+        avrcp_target_init();
+        avrcp_target_register_packet_handler(&targetPacketHandler);
+        // Initialize AVRCP Controller
+        avrcp_controller_init();
+        avrcp_controller_register_packet_handler(&controllerPacketHandler);
+    }
+
+} // namespace Bt

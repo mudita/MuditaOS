@@ -20,6 +20,7 @@ namespace gui
     AppWindow::~AppWindow()
     {
         LOG_INFO("deleting window: %s", name.c_str());
+        onClose();
     }
 
     void AppWindow::destroyInterface()
