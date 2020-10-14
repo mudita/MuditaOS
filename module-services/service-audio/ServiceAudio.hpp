@@ -98,6 +98,7 @@ class ServiceAudio : public sys::Service
         }
         return defaultValue;
     }
+    void updateDbValue(const std::string &path, const std::string &value);
 
     void setSetting(const audio::Setting &setting,
                     const std::string &value,
@@ -107,5 +108,5 @@ class ServiceAudio : public sys::Service
                                          const audio::Profile::Type &profileType,
                                          const audio::PlaybackType &playbackType);
 
-    void updateDbValue(const std::string &path, const std::string &value);
+    const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
 };
