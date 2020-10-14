@@ -9,15 +9,16 @@ namespace sdesktop
 {
     class UpdateOsMessage : public sys::DataMessage
     {
-    public:
+      public:
         UpdateOsMessage(const std::string updateFilePath, const uint32_t requestUUID)
-                : sys::DataMessage(MessageType::UpdateOS)
-                {
-                    updateStats.updateFile = updateFilePath;
-                    updateStats.uuid = requestUUID;
-                };
+            : sys::DataMessage(MessageType::UpdateOS)
+        {
+            updateStats.updateFile = updateFilePath;
+            updateStats.uuid       = requestUUID;
+        };
 
-        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS) {}
+        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
+        {}
 
         UpdateOsMessage(const updateos::UpdateMessageType updateMessageType)
             : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
@@ -33,7 +34,6 @@ namespace sdesktop
 
         updateos::UpdateStats updateStats       = {};
         updateos::UpdateMessageType messageType = updateos::UpdateMessageType::UpdateNow;
-        int rebootDelay                         = 0;
     };
 
     class BackupMessage : public sys::DataMessage

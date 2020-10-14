@@ -50,7 +50,7 @@ namespace gui
         titleLabel->setFilled(false);
         titleLabel->setBorderColor(gui::ColorFullBlack);
         titleLabel->setFont(style::header::font::title);
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         titleLabel->setText(utils::localize.get("app_desktop_update"));
 
@@ -59,7 +59,7 @@ namespace gui
         updateVersionInfo->setFilled(false);
         updateVersionInfo->setBorderColor(gui::ColorFullBlack);
         updateVersionInfo->setFont(style::window::font::smallbold);
-        updateVersionInfo->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        updateVersionInfo->setEdges(RectangleEdge::None);
         updateVersionInfo->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         updateVersionInfo->setText(utils::localize.get("app_desktop_update"));
@@ -69,7 +69,7 @@ namespace gui
         updateDetails->setFilled(false);
         updateDetails->setBorderColor(gui::ColorFullBlack);
         updateDetails->setFont(style::window::font::verysmall);
-        updateDetails->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        updateDetails->setEdges(RectangleEdge::None);
         updateDetails->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         updateDetails->setText(utils::localize.get("app_desktop_update"));
 
@@ -78,7 +78,7 @@ namespace gui
         currentVersionInfo->setFilled(false);
         currentVersionInfo->setBorderColor(gui::ColorFullBlack);
         currentVersionInfo->setFont(style::window::font::small);
-        currentVersionInfo->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        currentVersionInfo->setEdges(RectangleEdge::None);
         currentVersionInfo->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         currentVersionInfo->setText(utils::localize.get("app_desktop_update_current"));
@@ -103,7 +103,8 @@ namespace gui
         percentLabel->setFilled(false);
         percentLabel->setBorderColor(gui::ColorNoColor);
         percentLabel->setFont(style::window::font::largelight);
-        percentLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+        percentLabel->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         percentLabel->setVisible(false);
 
         uint32_t pinLabelX = 46;
@@ -116,7 +117,7 @@ namespace gui
             label->setPenFocusWidth(2);
             label->setRadius(5);
             label->setFont(style::window::font::medium);
-            label->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+            label->setEdges(RectangleEdge::All);
             label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             selectionLabels.push_back(label);
             pinLabelX += 193;
@@ -133,15 +134,15 @@ namespace gui
 
         // callbacks for getting focus
         selectionLabels[0]->focusChangedCallback = [=](gui::Item &item) {
-          if (item.focus)
-              this->state = State::Return;
-          return true;
+            if (item.focus)
+                this->state = State::Return;
+            return true;
         };
 
         selectionLabels[1]->focusChangedCallback = [=](gui::Item &item) {
-          if (item.focus)
-              this->state = State::UpdateNow;
-          return true;
+            if (item.focus)
+                this->state = State::UpdateNow;
+            return true;
         };
     }
     void UpdateWindow::destroyInterface()
@@ -153,7 +154,8 @@ namespace gui
     {
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
-        } else {
+        }
+        else {
             gui::UpdateSwitchData *item = dynamic_cast<gui::UpdateSwitchData *>(data);
             if (item != nullptr) {
                 std::stringstream currentVersion;
@@ -223,7 +225,7 @@ namespace gui
                 percentLabel->setVisible(true);
                 percentLabel->setText(utils::localize.get("app_desktop_update_start"));
                 auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateFile.c_str(), 0);
-                sys::Bus::SendUnicast (msgToSend, service::name::service_desktop, application);
+                sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, application);
 
                 return true;
             }
@@ -253,7 +255,8 @@ namespace gui
                 ssi << " %";
                 percentLabel->setText(ssi.str());
                 infoLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
-            } else if (item->getUpdateOsMessage().updateStats.messageText != "") {
+            }
+            else if (item->getUpdateOsMessage().updateStats.messageText != "") {
                 percentLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
             }
 

@@ -54,15 +54,14 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
-      sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+        sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
 
         if (updateOsMsg != nullptr &&
             updateOsMsg->messageType == updateos::UpdateMessageType::UpdateCheckForUpdateOnce) {
             fs::path file = UpdatePureOS::checkForUpdate();
 
-          if (file.has_filename()) {
-              /* send info to applicationDesktop that there is an update waiting */
-
+            if (file.has_filename()) {
+                /* send info to applicationDesktop that there is an update waiting */
                 auto msgToSend =
                     std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
                 msgToSend->updateStats.versioInformation = UpdatePureOS::getVersionInfoFromFile(file);
@@ -75,10 +74,10 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                       updateOsMsg->updateStats.updateFile.c_str(),
                       updateOsMsg->updateStats.uuid);
 
-          if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
-              updateOS->runUpdate(updateOsMsg->rebootDelay);
-      }
-      return std::make_shared<sys::ResponseMessage>();
+            if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
+                updateOS->runUpdate();
+        }
+        return std::make_shared<sys::ResponseMessage>();
     });
 
     vfs.updateTimestamp();
