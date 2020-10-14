@@ -272,7 +272,7 @@ namespace app
             return std::make_unique<gui::RebootWindow>(app);
         });
         windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
-          return std::make_unique<gui::UpdateWindow>(app);
+            return std::make_unique<gui::UpdateWindow>(app);
         });
     }
 
