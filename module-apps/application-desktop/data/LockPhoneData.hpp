@@ -48,7 +48,7 @@ namespace gui
         };
     };
 
-  class UpdateSwitchData : public gui::SwitchData
+    class UpdateSwitchData : public gui::SwitchData
     {
       public:
         UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
@@ -58,12 +58,13 @@ namespace gui
             return updateOsMessage;
         }
 
-      const sdesktop::UpdateOsMessage &getUpdateOsMessage()
-      {
-          return updateOsMessage;
-      }
+        const sdesktop::UpdateOsMessage &getUpdateOsMessage()
+        {
+            return updateOsMessage;
+        }
+
       private:
-      sdesktop::UpdateOsMessage updateOsMessage;
+        sdesktop::UpdateOsMessage updateOsMessage;
     };
 
 } // namespace gui
