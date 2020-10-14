@@ -97,26 +97,6 @@ namespace AudioServiceAPI
         return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    bool RoutingMute(sys::Service *serv, bool enable)
-    {
-        auto msg = std::make_shared<AudioEventRequest>(enable ? EventType::CallMute : EventType::CallUnmute);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
-    }
-
-    bool RoutingSpeakerPhone(sys::Service *serv, bool enable)
-    {
-        auto msg = std::make_shared<AudioEventRequest>(enable ? EventType::CallSpeakerphoneOn
-                                                              : EventType::CallSpeakerphoneOff);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
-    }
-
-    bool RoutingHeadset(sys::Service *serv, bool enable)
-    {
-        auto msg =
-            std::make_shared<AudioEventRequest>(enable ? EventType::HeadphonesPlugin : EventType::HeadphonesUnplug);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
-    }
-
     template <typename T>
     audio::RetCode GetSetting(sys::Service *serv,
                               const audio::Setting &setting,
