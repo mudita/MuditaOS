@@ -17,7 +17,7 @@ namespace gui
         item->setFont(format->getFont());
         item->setTextColor(format->getColor());
         item->setSize(item->getTextNeedSpace(), item->getTextHeight());
-        item->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        item->setEdges(RectangleEdge::None);
         return item;
     }
 
@@ -265,7 +265,7 @@ namespace gui
         if (drawUnderline) {
 
             underline = new Rect(nullptr, 0, 0, max_width, init_height);
-            underline->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+            underline->setEdges(RectangleEdge::Bottom);
 
             if (drawUnderlineMode == UnderlineDrawMode::WholeLine) {
                 height_used = std::max(height_used, (Length)init_height);

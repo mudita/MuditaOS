@@ -11,7 +11,7 @@ namespace style::window
         }
         el->setPenWidth(default_border_no_focus_w);
         el->setPenFocusWidth(default_border_focus_w);
-        el->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        el->setEdges(gui::RectangleEdge::Top | gui::RectangleEdge::Bottom);
         el->setFilled(false);
     }
 

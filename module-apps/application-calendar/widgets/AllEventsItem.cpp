@@ -15,13 +15,13 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::big, 0, 0));
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
 
         startTime = new gui::Label(hBox, 0, 0, 0, 0);
         startTime->setMinimumSize(style::window::calendar::item::allEvents::start_time_min_w,
                                   style::window::label::big_h);
         startTime->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
-        startTime->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        startTime->setEdges(gui::RectangleEdge::None);
         startTime->setFont(style::window::font::small);
         startTime->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         startTime->setMargins(gui::Margins(style::margins::small, 0, 0, 0));
@@ -29,7 +29,7 @@ namespace gui
         description = new gui::Label(hBox, 0, 0, 0, 0);
         description->setMinimumSize(style::window::calendar::item::allEvents::description_w,
                                     style::window::label::big_h);
-        description->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        description->setEdges(gui::RectangleEdge::None);
         description->setFont(style::window::font::bigbold);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
@@ -48,7 +48,7 @@ namespace gui
         description->setMinimumSize(0, 0);
         startTime->setLineMode(true);
         activeItem = false;
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
     }
 
     UTF8 AllEventsItem::getLabelMarker() const

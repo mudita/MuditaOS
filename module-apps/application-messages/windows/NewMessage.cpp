@@ -169,13 +169,13 @@ namespace gui
         auto recipientLabel = new Label(body, 0, 0, body->getWidth(), msgStyle::recipientLabel::h);
         recipientLabel->setText(utils::localize.get("sms_add_rec_num"));
         recipientLabel->activeItem = false;
-        recipientLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        recipientLabel->setEdges(gui::RectangleEdge::None);
         recipientLabel->setFont(style::window::font::small);
         recipientLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
         reciepientHbox->setAlignment(gui::Alignment::Vertical::Center);
-        reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        reciepientHbox->setEdges(gui::RectangleEdge::Bottom);
         reciepientHbox->setPenFocusWidth(style::window::default_border_focus_w);
         reciepientHbox->setPenWidth(style::window::default_border_rect_no_focus);
 
@@ -186,7 +186,7 @@ namespace gui
                                   msgStyle::text::h,
                                   "",
                                   ExpandMode::EXPAND_NONE);
-        recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        recipient->setEdges(gui::RectangleEdge::None);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
         recipient->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
@@ -208,13 +208,13 @@ namespace gui
         auto labelMessage = new Label(body, 0, 0, body->getWidth(), msgStyle::messageLabel::h);
         labelMessage->setText(utils::localize.get("app_messages_message"));
         labelMessage->activeItem = false;
-        labelMessage->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        labelMessage->setEdges(gui::RectangleEdge::None);
         labelMessage->setFont(style::window::font::small);
         labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::EXPAND_UP);
         message->setMaximumSize(body->getWidth(), body->getHeight());
-        message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
@@ -247,7 +247,7 @@ namespace gui
         body->addWidget(new Span(Axis::Y, body->getHeight()));
         message->setText(""); // to set actual size of Text
 
-        body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        body->setEdges(gui::RectangleEdge::None);
         body->setVisible(true);
         body->setNavigation();
         setFocusItem(body);

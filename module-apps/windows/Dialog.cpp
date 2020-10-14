@@ -58,7 +58,7 @@ Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(
     text->setRichText("lol");
     text->setTextType(TextType::MULTI_LINE);
     text->setEditMode(EditMode::BROWSE);
-    text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    text->setEdges(RectangleEdge::None);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 }
@@ -106,7 +106,7 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name) : Dialo
     no->setPenFocusWidth(3);
     no->setFilled(false);
     no->setBorderColor(ColorFullBlack);
-    no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    no->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
     no->setFont(style::window::font::big);
     no->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     no->activatedCallback = [=](Item &) -> bool {
@@ -124,7 +124,7 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name) : Dialo
     yes->setPenFocusWidth(3);
     yes->setFilled(false);
     yes->setBorderColor(ColorFullBlack);
-    yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    yes->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
     yes->setFont(style::window::font::big);
     yes->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     yes->activatedCallback = [=](Item &) -> bool { return false; };
@@ -155,7 +155,7 @@ DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string 
     iconText->setText("");
     iconText->setTextType(TextType::SINGLE_LINE);
     iconText->setEditMode(EditMode::BROWSE);
-    iconText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    iconText->setEdges(RectangleEdge::None);
     iconText->setFont(style::window::font::largelight);
     iconText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::None));
     setFocusItem(no);

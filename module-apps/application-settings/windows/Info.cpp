@@ -71,12 +71,12 @@ namespace gui
     void Info::addAlignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText)
     {
         auto lineBox = new gui::VBox(layout, 0, 0, style::window_width, style::window::label::small_h * 2);
-        lineBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        lineBox->setEdges(RectangleEdge::Bottom);
 
         auto label = new gui::Label(lineBox, 0, 0, 0, 0);
         label->setMinimumHeight(style::window::label::small_h);
         label->setMaximumWidth(style::window_width);
-        label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        label->setEdges(RectangleEdge::None);
         label->setMargins(gui::Margins(style::window::default_left_margin, 0, 0, 0));
         label->setText(labelText);
         label->setFont(style::window::font::smallbold);
@@ -84,7 +84,7 @@ namespace gui
         auto value = new gui::Label(lineBox, 0, 0, 0, 0);
         value->setMinimumHeight(style::window::label::small_h);
         value->setMaximumWidth(style::window_width);
-        value->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        value->setEdges(RectangleEdge::None);
         value->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
         value->setAlignment(gui::Alignment::Horizontal::Right);
         value->setText(valueText);

@@ -49,16 +49,16 @@ namespace gui
         penFocusWidth = width;
     }
 
-    void Rect::setEdges(RectangleEdgeFlags edges)
+    void Rect::setEdges(RectangleEdge edges)
     {
         this->edges = edges;
     }
-    void Rect::setCorners(RectangleCornerFlags corners)
+    void Rect::setCorners(RectangleRoundedCorner corners)
     {
         this->corners = corners;
     }
 
-    void Rect::setFlat(RectangleFlatFlags flats)
+    void Rect::setFlat(RectangleFlatEdge flats)
     {
         flatEdges = flats;
     }
@@ -68,16 +68,16 @@ namespace gui
         filled = val;
     }
 
-    void Rect::setYaps(RectangleYapFlags yaps)
+    void Rect::setYaps(RectangleYap yaps)
     {
         this->yaps = yaps;
-        if (yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT | RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT)) {
+        if (yaps & (RectangleYap::BottomLeft | RectangleYap::TopLeft)) {
             padding.left = yapSize;
         }
         else {
             padding.left = 0;
         }
-        if (yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT | RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT)) {
+        if (yaps & (RectangleYap::BottomRight | RectangleYap::TopRight)) {
             padding.right = yapSize;
         }
         else {

@@ -31,11 +31,11 @@ namespace gui
         const uint32_t pinLabelWidth = style::window_width - 2 * lock_style::pin_label_x_screen;
         LockWindow->pinLabel         = new gui::Label(
             LockWindow, lock_style::pin_label_x_screen, lock_style::pin_label_y, pinLabelWidth, lock_style::label_size);
-        LockWindow->pinLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        LockWindow->pinLabel->setEdges(RectangleEdge::None);
 
         LockWindow->buildPinLabels(LockWindow->pinLabel, pinSize, lock_style::label_size_screen);
         for (auto label : LockWindow->pinLabels) {
-            label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+            label->setEdges(RectangleEdge::Bottom);
         }
     }
     void ScreenLockBox::setVisibleStateEnterPin()

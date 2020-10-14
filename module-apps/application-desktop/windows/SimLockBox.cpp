@@ -33,11 +33,11 @@ namespace gui
         const uint32_t pinLabelWidth = style::window_width - 2 * lock_style::pin_label_x;
         LockWindow->pinLabel         = new gui::Label(
             LockWindow, lock_style::pin_label_x, lock_style::pin_label_y, pinLabelWidth, lock_style::label_size);
-        LockWindow->pinLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        LockWindow->pinLabel->setEdges(RectangleEdge::Bottom);
 
         LockWindow->buildPinLabels(LockWindow->pinLabel, pinSize, lock_style::label_size);
         for (auto label : LockWindow->pinLabels) {
-            label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            label->setEdges(RectangleEdge::None);
         }
     }
     void SimLockBox::setVisibleStateEnterPin()

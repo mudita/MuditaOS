@@ -52,7 +52,7 @@ namespace gui
                                    horizontalBox::inputField::h);
         inputField->setTextType(TextType::SINGLE_LINE);
         inputField->setEditMode(EditMode::EDIT);
-        inputField->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        inputField->setEdges(RectangleEdge::None);
         inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
         inputField->setFont(style::window::font::mediumbold);
 
@@ -66,10 +66,10 @@ namespace gui
                                            icon));
 
         horizontalBox->setPenWidth(horizontalBox::penWidth);
-        horizontalBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        horizontalBox->setEdges(RectangleEdge::Bottom);
 
-        const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES;
-        const Alignment alignment      = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
+        const RectangleEdge edges = RectangleEdge::None;
+        const Alignment alignment = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
         auto l = new Label(parent, searchHeader::x, searchHeader::y, searchHeader::w, searchHeader::h);
 
         l->setFont(style::window::font::small);

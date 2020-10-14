@@ -23,18 +23,18 @@ namespace gui
 
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::severalOptions::height);
 
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        setEdges(RectangleEdge::Bottom);
         setPenWidth(style::window::default_border_rect_no_focus);
         setMargins(gui::Margins(style::margins::small, style::margins::huge / 2, 0, style::margins::huge / 2));
 
         vBox = new gui::VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(gui::RectangleEdge::None);
         vBox->activeItem = false;
 
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
         descriptionLabel->setMinimumSize(style::window::default_body_width,
                                          style::window::calendar::item::severalOptions::label_h);
-        descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::small);
         descriptionLabel->activeItem = false;
@@ -44,7 +44,7 @@ namespace gui
         hBox->setMinimumSize(style::window::default_body_width,
                              style::window::calendar::item::severalOptions::height -
                                  style::window::calendar::item::severalOptions::label_h);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
         hBox->activeItem = false;
 
         leftArrow = new gui::Image(hBox, 0, 0, 0, 0);
@@ -59,7 +59,7 @@ namespace gui
                                         2 * style::window::calendar::item::severalOptions::arrow_w_h,
                                     style::window::calendar::item::severalOptions::height -
                                         style::window::calendar::item::severalOptions::label_h);
-        optionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        optionLabel->setEdges(gui::RectangleEdge::None);
         optionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         optionLabel->setFont(style::window::font::medium);
         optionLabel->activeItem = false;
