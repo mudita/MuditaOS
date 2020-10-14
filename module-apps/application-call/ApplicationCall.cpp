@@ -199,7 +199,8 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow("MainWindow");
+        setActiveWindow(gui::name::window::main_window);
+        pushWindow(app::window::name_call);
 
         return ret;
     }
