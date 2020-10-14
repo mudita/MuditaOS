@@ -34,7 +34,6 @@ namespace sdesktop
 
         updateos::UpdateStats updateStats       = {};
         updateos::UpdateMessageType messageType = updateos::UpdateMessageType::UpdateNow;
-        int rebootDelay                         = 0;
     };
 
     class BackupMessage : public sys::DataMessage

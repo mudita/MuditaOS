@@ -106,7 +106,7 @@ class UpdatePureOS : public updateos::UpdateStats
   public:
     UpdatePureOS(ServiceDesktop *ownerService);
 
-    updateos::UpdateError runUpdate(const int resetDelay);
+    updateos::UpdateError runUpdate();
     updateos::UpdateError prepareTempDirForUpdate();
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();

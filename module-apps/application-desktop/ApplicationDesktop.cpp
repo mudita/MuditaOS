@@ -239,7 +239,7 @@ namespace app
 
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
-        sys::Bus::SendBroadcast(msgToSend, this);
+        sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
 
         return sys::ReturnCodes::Success;
     }

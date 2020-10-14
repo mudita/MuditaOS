@@ -62,7 +62,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
             if (file.has_filename()) {
                 /* send info to applicationDesktop that there is an update waiting */
-
                 auto msgToSend =
                     std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
                 msgToSend->updateStats.versioInformation = UpdatePureOS::getVersionInfoFromFile(file);
@@ -76,7 +75,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                       updateOsMsg->updateStats.uuid);
 
             if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
-                updateOS->runUpdate(updateOsMsg->rebootDelay);
+                updateOS->runUpdate();
         }
         return std::make_shared<sys::ResponseMessage>();
     });

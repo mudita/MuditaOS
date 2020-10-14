@@ -51,7 +51,7 @@ updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
     return updateos::UpdateError::NoError;
 }
 
-updateos::UpdateError UpdatePureOS::runUpdate(const int resetDelay)
+updateos::UpdateError UpdatePureOS::runUpdate()
 {
     informDebug("Prepraring temp dir");
 
@@ -101,14 +101,12 @@ updateos::UpdateError UpdatePureOS::runUpdate(const int resetDelay)
         informError("Can't prepare root dir for reset");
     }
 
-    if ((err = cleanupAfterUpdate()) == updateos::UpdateError::NoError) {
-        if (resetDelay == -1)
-            return err;
-
-        if (resetDelay >= 0) { // no resetDelay implementation for now
-            sys::SystemManager::Reboot(owner);
-        }
+    if ((err = cleanupAfterUpdate()) != updateos::UpdateError::NoError) {
+        informError("runUpdate cleanupAfterUpdate failed, resetting anyway");
     }
+
+    // reboot always
+    sys::SystemManager::Reboot(owner);
 
     return err;
 }
