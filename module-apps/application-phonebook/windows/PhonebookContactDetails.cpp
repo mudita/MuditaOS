@@ -74,13 +74,13 @@ namespace gui
         contactFlagsWidget->setBlocked(contact->isOnBlocked());
         contactFlagsWidget->setFavourites(contact->isOnFavourites());
         if (contactFlagsWidget->visible) {
-            title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+            title->setEdges(RectangleEdge::None);
             bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsList::y);
             bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsList::w,
                               phonebookStyle::contactDetailsWindow::contactDetailsList::h);
         }
         else {
-            title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+            title->setEdges(RectangleEdge::Bottom);
             bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::y);
             bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::w,
                               phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::h);

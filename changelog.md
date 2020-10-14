@@ -27,6 +27,7 @@
 ### Changed
 
 * `[messages]` Split SMS thread for a specific contact into separate ones if multiple phone numbers are available.
+* `[gui][renderer]` Shape rendering refactored.
 
 ### Fixed
 

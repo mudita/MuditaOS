@@ -13,18 +13,19 @@ namespace gui
 
     static timeSecondsFunctionPtr timeSecondsFunction = nullptr;
 
-    bool operator&(const gui::RectangleEdgeFlags &lhs, const gui::RectangleEdgeFlags &rhs)
+    bool operator&(const gui::RectangleEdge &lhs, const gui::RectangleEdge &rhs)
     {
-        return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+        using T = std::underlying_type_t<RectangleEdge>;
+        return static_cast<bool>(static_cast<T>(lhs) & static_cast<T>(rhs));
     }
 
-    RectangleEdgeFlags operator|(const RectangleEdgeFlags &lhs, const RectangleEdgeFlags &rhs)
+    RectangleEdge operator|(const RectangleEdge &lhs, const RectangleEdge &rhs)
     {
-        using T = std::underlying_type_t<RectangleEdgeFlags>;
-        return static_cast<RectangleEdgeFlags>(static_cast<T>(lhs) | static_cast<T>(rhs));
+        using T = std::underlying_type_t<RectangleEdge>;
+        return static_cast<RectangleEdge>(static_cast<T>(lhs) | static_cast<T>(rhs));
     }
 
-    RectangleEdgeFlags operator|=(RectangleEdgeFlags &lhs, const RectangleEdgeFlags &rhs)
+    RectangleEdge operator|=(RectangleEdge &lhs, const RectangleEdge &rhs)
     {
         lhs = lhs | rhs;
         return lhs;

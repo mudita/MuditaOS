@@ -32,7 +32,7 @@ Icon::Icon(Item *parent,
            const UTF8 &str)
     : Rect(parent, x, y, w, h)
 {
-    setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    setEdges(RectangleEdge::None);
     setPenFocusWidth(style::window::default_border_no_focus_w);
     setPenWidth(style::window::default_border_no_focus_w);
 
@@ -40,7 +40,7 @@ Icon::Icon(Item *parent,
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
     text->setTextType(TextType::MULTI_LINE);
     text->setEditMode(EditMode::BROWSE);
-    text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    text->setEdges(RectangleEdge::None);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
     auto format = TextFormat(Font(27).raw(), Color(7, 0));

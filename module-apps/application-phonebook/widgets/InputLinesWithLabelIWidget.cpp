@@ -24,12 +24,12 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::huge, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(RectangleEdge::None);
 
         titleLabel = new Label(vBox);
         titleLabel->setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
                                    phonebookStyle::inputLinesWithLabelWidget::title_label_h);
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         titleLabel->setFont(style::window::font::verysmall);
         titleLabel->activeItem = false;
@@ -40,7 +40,7 @@ namespace gui
         inputText->setMargins(Margins(0, phonebookStyle::inputLinesWithLabelWidget::span_size, 0, 0));
         inputText->setUnderlinePadding(phonebookStyle::inputLinesWithLabelWidget::underline_padding);
 
-        inputText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        inputText->setEdges(RectangleEdge::None);
         inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
@@ -77,7 +77,7 @@ namespace gui
             }
             return result;
         };
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
     }
 
     auto InputLinesWithLabelIWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool

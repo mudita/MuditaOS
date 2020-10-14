@@ -10,28 +10,28 @@ namespace gui
     RepeatAndReminderItem::RepeatAndReminderItem(app::ApplicationCalendar *application) : app(application)
     {
         activeItem = false;
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::repeatAndReminder::height);
 
         hBox = new HBox(this, 0, 0, 0, 0);
-        hBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(RectangleEdge::None);
 
         repeatVBox = new VBox(hBox, 0, 0, 0, 0);
         repeatVBox->setMinimumSize(style::window::default_body_width / 2,
                                    style::window::calendar::item::repeatAndReminder::height);
-        repeatVBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        repeatVBox->setEdges(RectangleEdge::None);
 
         reminderVBox = new VBox(hBox, 0, 0, 0, 0);
         reminderVBox->setMinimumSize(style::window::default_body_width / 2,
                                      style::window::calendar::item::repeatAndReminder::height);
-        reminderVBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        reminderVBox->setEdges(RectangleEdge::None);
 
         repeatTitle = new gui::Label(repeatVBox, 0, 0, 0, 0);
         repeatTitle->setMinimumSize(style::window::calendar::item::repeatAndReminder::description_w,
                                     style::window::calendar::item::repeatAndReminder::title_label_h);
         repeatTitle->setMargins(
             gui::Margins(0, 0, 0, style::window::calendar::item::repeatAndReminder::title_label_margin));
-        repeatTitle->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        repeatTitle->setEdges(RectangleEdge::None);
         repeatTitle->setFont(style::window::font::small);
         repeatTitle->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         repeatTitle->setLineMode(true);
@@ -40,7 +40,7 @@ namespace gui
         repeat = new gui::Label(repeatVBox, 0, 0, 0, 0);
         repeat->setMinimumSize(style::window::calendar::item::repeatAndReminder::description_w,
                                style::window::calendar::item::repeatAndReminder::description_h);
-        repeat->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        repeat->setEdges(RectangleEdge::None);
         repeat->setFont(style::window::font::medium);
         repeat->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         repeat->activeItem = false;
@@ -50,7 +50,7 @@ namespace gui
                                       style::window::calendar::item::repeatAndReminder::title_label_h);
         reminderTitle->setMargins(
             gui::Margins(0, 0, 0, style::window::calendar::item::repeatAndReminder::title_label_margin));
-        reminderTitle->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        reminderTitle->setEdges(RectangleEdge::None);
         reminderTitle->setFont(style::window::font::small);
         reminderTitle->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         reminderTitle->setLineMode(true);
@@ -59,7 +59,7 @@ namespace gui
         reminder = new gui::Label(reminderVBox, 0, 0, 0, 0);
         reminder->setMinimumSize(style::window::default_body_width / 2,
                                  style::window::calendar::item::repeatAndReminder::description_h);
-        reminder->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        reminder->setEdges(RectangleEdge::None);
         reminder->setFont(style::window::font::medium);
         reminder->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         reminder->activeItem = false;

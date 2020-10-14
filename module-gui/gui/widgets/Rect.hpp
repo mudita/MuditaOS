@@ -23,13 +23,13 @@ namespace gui
         /// mark if rectangle should be filled with fill color.
         bool filled = false;
         /// mark how to draw borders
-        RectangleEdgeFlags edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES};
+        RectangleEdge edges{RectangleEdge::All};
         /// mark which edge should be flat. This will disable roundness on both sides of the edge.
-        RectangleFlatFlags flatEdges = {RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT};
+        RectangleFlatEdge flatEdges = {RectangleFlatEdge::None};
         /// mark if given corners should be painted (only for rounded corners)
-        RectangleCornerFlags corners = {RectangleCornerFlags::GUI_RECT_ALL_CORNERS};
+        RectangleRoundedCorner corners = {RectangleRoundedCorner::All};
         /// mark if we japs should be painted. small protrusions indicating a speech bubble
-        RectangleYapFlags yaps = {RectangleYapFlags::GUI_RECT_YAP_NO_YAPS};
+        RectangleYap yaps = {RectangleYap::None};
         /// yap size in horizontal width.
         unsigned short yapSize = style::window::default_rect_yaps;
 
@@ -41,10 +41,10 @@ namespace gui
         void setBorderColor(const Color &color);
         void setPenWidth(uint8_t width);
         void setPenFocusWidth(uint8_t width);
-        void setEdges(RectangleEdgeFlags edges);
-        void setCorners(RectangleCornerFlags corners);
-        void setFlat(RectangleFlatFlags flats);
-        virtual void setYaps(RectangleYapFlags yaps);
+        void setEdges(RectangleEdge edges);
+        void setCorners(RectangleRoundedCorner corners);
+        void setFlat(RectangleFlatEdge flats);
+        virtual void setYaps(RectangleYap yaps);
         virtual void setYapSize(unsigned short value);
         void setFilled(bool val);
         std::list<DrawCommand *> buildDrawList() override;
