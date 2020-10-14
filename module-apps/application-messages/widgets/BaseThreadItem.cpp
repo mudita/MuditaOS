@@ -16,7 +16,7 @@ namespace gui
         setMaximumSize(window::default_body_width, style::messages::threadItem::sms_thread_item_h);
 
         setRadius(0);
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
 
         setPenFocusWidth(window::default_border_focus_w);
         setPenWidth(window::default_border_no_focus_w);

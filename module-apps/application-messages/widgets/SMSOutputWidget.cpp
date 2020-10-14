@@ -15,10 +15,10 @@ namespace gui
     {
         setMinimumSize(style::window::default_body_width, style::messages::smsOutput::default_h);
         setMargins(Margins(0, style::messages::smsOutput::sms_vertical_spacer, 0, 0));
-        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(gui::RectangleEdge::None);
 
         body = new HBox(this, 0, 0, 0, 0);
-        body->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        body->setEdges(RectangleEdge::None);
         body->setMaximumSize(style::window::default_body_width, style::window::default_body_height);
 
         smsBubble = new TextBubble(nullptr, 0, 0, 0, 0);
@@ -37,20 +37,20 @@ namespace gui
             // Handle in the same way as case below. (pending sending display as already sent)
             [[fallthrough]];
         case SMSType::OUTBOX:
-            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            smsBubble->setYaps(RectangleYap::TopRight);
             body->setReverseOrder(true);
             body->addWidget(smsBubble);
             timeLabelBuild(record->date);
             break;
         case SMSType::INBOX:
             smsBubble->setPadding(style::messages::smsOutput::sms_left_bubble_padding);
-            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
+            smsBubble->setYaps(RectangleYap::TopLeft);
             body->setReverseOrder(false);
             body->addWidget(smsBubble);
             timeLabelBuild(record->date);
             break;
         case SMSType::FAILED:
-            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            smsBubble->setYaps(RectangleYap::TopRight);
             body->setReverseOrder(true);
             errorIconBuild();
             body->addWidget(smsBubble);
@@ -118,7 +118,7 @@ namespace gui
         timeLabel->setText(utils::time::Time(timestamp));
         timeLabel->setVisible(false);
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        timeLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        timeLabel->setEdges(RectangleEdge::None);
     }
 
     void SMSOutputWidget::errorIconBuild()

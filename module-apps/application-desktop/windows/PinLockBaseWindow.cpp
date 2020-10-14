@@ -34,7 +34,7 @@ namespace gui
         titleLabel->setBorderColor(gui::ColorFullBlack);
         titleLabel->setFont(style::header::font::title);
         titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
-        titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
     }
     void PinLockBaseWindow::buildInfoText(unsigned int h)

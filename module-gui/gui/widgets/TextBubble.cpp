@@ -6,10 +6,10 @@ namespace gui
     TextBubble::TextBubble(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
         setEditMode(EditMode::SCROLL);
-        setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        setEdges(RectangleEdge::All);
     }
 
-    void TextBubble::setYaps(RectangleYapFlags yaps)
+    void TextBubble::setYaps(RectangleYap yaps)
     {
         if (this->yaps != yaps) {
             this->yaps = yaps;

@@ -106,7 +106,7 @@ namespace gui
 
         text->setFont(style::window::font::verysmall);
         text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        text->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        text->setEdges(RectangleEdge::All);
         return text;
     }
 

@@ -17,7 +17,7 @@ namespace gui
         : application(app)
     {
         setMinimumSize(specialCharacterTableWidget::window_grid_w, specialCharacterTableWidget::window_grid_h);
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
 
         box = new GridLayout(0,
                              0,
@@ -87,7 +87,7 @@ namespace gui
     {
         auto rect = new Rect(
             nullptr, 0, 0, specialCharacterTableWidget::char_label_w, specialCharacterTableWidget::char_label_h);
-        rect->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        rect->setEdges(gui::RectangleEdge::Top | gui::RectangleEdge::Bottom);
         rect->setPenWidth(0);
         new gui::Image(rect,
                        specialCharacterTableWidget::char_newline_x,

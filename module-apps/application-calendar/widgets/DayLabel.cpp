@@ -16,14 +16,14 @@ namespace gui
                        bool isDayEmpty)
         : Rect(parent, 0, 0, width, height)
     {
-        this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        this->setEdges(RectangleEdge::None);
 
         this->vBox = new gui::VBox(this, 0, 0, 0, 0);
-        this->vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        this->vBox->setEdges(gui::RectangleEdge::None);
 
         this->dayNumber = new gui::Label(this->vBox, 0, 0, 0, 0);
         this->dayNumber->setMinimumSize(width, height - 22);
-        this->dayNumber->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        this->dayNumber->setEdges(RectangleEdge::None);
         this->dayNumber->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         this->dayNumber->setMargins(gui::Margins(0, 11, 0, 0));
@@ -78,7 +78,7 @@ namespace gui
             };
             this->setPenWidth(style::window::default_border_no_focus_w);
             this->setPenFocusWidth(style::window::default_border_focus_w);
-            this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_TOP | RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+            this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
         }
     }
 

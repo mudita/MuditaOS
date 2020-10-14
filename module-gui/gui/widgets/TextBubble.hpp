@@ -9,6 +9,6 @@ namespace gui
     {
       public:
         TextBubble(Item *parent, Position x, Position y, Length w, Length h);
-        void setYaps(RectangleYapFlags yaps) override;
+        void setYaps(RectangleYap yaps) override;
     };
 } // namespace gui
