@@ -260,7 +260,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     return {};
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::unique_ptr<Event> evt)
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
     auto input = audioMux.GetRoutingInput();
     input      = input ? input : audioMux.GetActiveInput();
@@ -269,7 +269,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::unique_
         return std::make_unique<AudioResponseMessage>(RetCode::OperationNotSet);
     }
 
-    auto retVal = input.value()->audio->SendEvent(std::move(evt));
+    auto retVal = input.value()->audio->SendEvent(evt);
     return std::make_unique<AudioEventResponse>(retVal);
 }
 
@@ -423,7 +423,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else if (msgType == typeid(AudioEventRequest)) {
         auto *msg   = static_cast<AudioEventRequest *>(msgl);
-        responseMsg = HandleSendEvent(msg->moveEvent());
+        responseMsg = HandleSendEvent(msg->getEvent());
     }
     else if (msgType == typeid(AudioKeyPressedRequest)) {
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);

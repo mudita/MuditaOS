@@ -223,30 +223,25 @@ class AudioGetFileTagsRequest : public AudioMessage
 class AudioEventRequest : public AudioMessage
 {
   public:
-    explicit AudioEventRequest(std::unique_ptr<audio::Event> evt) : evt(std::move(evt))
+    explicit AudioEventRequest(std::shared_ptr<audio::Event> evt) : evt(std::move(evt))
     {}
 
-    explicit AudioEventRequest(audio::EventType eType) : evt(std::make_unique<audio::Event>(eType))
+    explicit AudioEventRequest(audio::EventType eType) : evt(std::make_shared<audio::Event>(eType))
     {}
 
-    audio::Event *getEvent()
+    std::shared_ptr<audio::Event> getEvent()
     {
-        return evt.get();
-    }
-    std::unique_ptr<audio::Event> moveEvent()
-    {
-        return std::move(evt);
+        return evt;
     }
 
   private:
-    std::unique_ptr<audio::Event> evt;
+    std::shared_ptr<audio::Event> evt;
 };
 
 class AudioEventResponse : public AudioResponseMessage
 {
   public:
-    explicit AudioEventResponse(audio::RetCode retCode) : AudioResponseMessage(retCode)
-    {}
+    using AudioResponseMessage::AudioResponseMessage;
 };
 
 class AudioKeyPressedRequest : public AudioMessage

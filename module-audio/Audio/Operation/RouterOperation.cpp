@@ -197,7 +197,7 @@ namespace audio
         return RetCode::Success;
     }
 
-    audio::RetCode RouterOperation::SendEvent(std::unique_ptr<Event> evt)
+    audio::RetCode RouterOperation::SendEvent(std::shared_ptr<Event> evt)
     {
         switch (evt->getType()) {
         case EventType::HeadphonesPlugin:

@@ -32,7 +32,7 @@ namespace audio
         };
     }
 
-    audio::RetCode Audio::SendEvent(std::unique_ptr<Event> evt)
+    audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
     {
         switch (evt->getType()) {
         case EventType::HeadphonesPlugin:

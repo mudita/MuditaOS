@@ -87,23 +87,13 @@ namespace AudioServiceAPI
      */
     bool Resume(sys::Service *serv, const audio::Token &token);
     /**
-     * @brief Attempts to parse audio file for metatags.
-     *
-     * @param serv Requesting service.
-     * @param fileName Path to file to be parsed.
-     * @return audio::Tags on success, std::nullopt on failure
-     */
-    bool RoutingMute(sys::Service *serv, bool enable);
-    bool RoutingSpeakerPhone(sys::Service *serv, bool enable);
-    bool RoutingHeadset(sys::Service *serv, bool enable);
-    /**
      * @brief Sends audio event
      * @param serv Requesting service.
      * @param evt Event to be sent.
      * @return True is request has been sent successfully, false otherwise
      *   Response will come as message AudioSendEventResponse
      */
-    bool SendEvent(sys::Service *serv, std::unique_ptr<audio::Event> evt);
+    bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt);
     /**
      * @brief Sends audio event
      * @param serv Requesting service.
@@ -112,7 +102,13 @@ namespace AudioServiceAPI
      *   Response will come as message AudioSendEventResponse
      */
     bool SendEvent(sys::Service *serv, audio::EventType evt);
-
+    /**
+     * @brief Attempts to parse audio file for metatags.
+     *
+     * @param serv Requesting service.
+     * @param fileName Path to file to be parsed.
+     * @return audio::Tags on success, std::nullopt on failure
+     */
     std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
     /** @brief Gets settings. Current profile is taken by default.
      *

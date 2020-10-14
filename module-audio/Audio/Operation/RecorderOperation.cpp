@@ -143,7 +143,7 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    audio::RetCode RecorderOperation::SendEvent(std::unique_ptr<Event> evt)
+    audio::RetCode RecorderOperation::SendEvent(std::shared_ptr<Event> evt)
     {
         switch (evt->getType()) {
         case EventType::HeadphonesPlugin:

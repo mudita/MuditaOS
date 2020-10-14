@@ -143,7 +143,7 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
-    audio::RetCode PlaybackOperation::SendEvent(std::unique_ptr<Event> evt)
+    audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
 
         switch (evt->getType()) {

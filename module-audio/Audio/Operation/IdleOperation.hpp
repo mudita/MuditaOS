@@ -46,7 +46,7 @@ namespace audio
             return audio::RetCode::Success;
         }
 
-        audio::RetCode SendEvent(std::unique_ptr<Event> evt) override final
+        audio::RetCode SendEvent(std::shared_ptr<Event> evt) override final
         {
             return audio::RetCode::Success;
         }

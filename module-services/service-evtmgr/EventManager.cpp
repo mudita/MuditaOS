@@ -157,6 +157,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         handled = true;
     }
+    else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg && msgl->sender == this->GetName()) {
+        AudioServiceAPI::SendEvent(this, msg->getEvent());
+        handled = true;
+    }
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }

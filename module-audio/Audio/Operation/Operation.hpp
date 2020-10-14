@@ -65,7 +65,7 @@ namespace audio
 
         virtual audio::RetCode Resume() = 0;
 
-        virtual audio::RetCode SendEvent(std::unique_ptr<Event> evt) = 0;
+        virtual audio::RetCode SendEvent(std::shared_ptr<Event> evt) = 0;
 
         virtual audio::RetCode SetOutputVolume(float vol) = 0;
 
