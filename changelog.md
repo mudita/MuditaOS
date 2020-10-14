@@ -5,6 +5,8 @@
 ### Added
 
 * `[gui]` Dynamic Windows building and handling implemented
+* `[audio]` Added A2DP playback backend
+
 
 ### Fixed
 

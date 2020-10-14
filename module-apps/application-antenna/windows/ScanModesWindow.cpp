@@ -72,7 +72,7 @@ namespace gui
                 }
                 auto result = CellularServiceAPI::SetScanMode(this->application, mode);
                 if (result) {
-                    commandResult->setText("Succes!");
+                    commandResult->setText("Success!");
                 }
                 else {
                     commandResult->setText("Failure!");
