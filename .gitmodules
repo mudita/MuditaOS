@@ -53,3 +53,6 @@
 [submodule "module-utils/magic_enum"]
 	path = module-utils/magic_enum
 	url = git@github.com:Neargye/magic_enum.git
+[submodule "module-vfs/board/cross/freeRTOS_FAT"]
+	path = module-vfs/board/cross/freeRTOS_FAT
+	url = ../Lab-Project-FreeRTOS-FAT.git
