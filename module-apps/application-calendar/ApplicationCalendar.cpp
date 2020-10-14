@@ -59,7 +59,7 @@ namespace app
             LOG_DEBUG("Received notification");
             // window-specific actions
             if (msg->interface == db::Interface::Name::Events) {
-                for (auto &[name, window] : windows) {
+                for (auto &[name, window] : windowsStack.windows) {
                     window->onDatabaseMessage(msg);
                 }
             }
@@ -112,32 +112,36 @@ namespace app
 
     void ApplicationCalendar::createUserInterface()
     {
+        using namespace style::window::calendar::name;
 
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            gui::name::window::main_window, new gui::CalendarMainWindow(this, gui::name::window::main_window)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::day_events_window,
-            new gui::DayEventsWindow(this, style::window::calendar::name::day_events_window)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::no_events_window,
-            new gui::NoEvents(this, style::window::calendar::name::no_events_window, gui::NoEvents::Meta())));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(style::window::calendar::name::events_options,
-                                                                new gui::CalendarEventsOptions(this)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::dialog_yes_no,
-            new gui::DialogYesNo(this, style::window::calendar::name::dialog_yes_no)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::all_events_window,
-            new gui::AllEventsWindow(this, style::window::calendar::name::all_events_window)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::details_window,
-            new gui::EventDetailWindow(this, style::window::calendar::name::details_window)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::new_edit_event,
-            new gui::NewEditEventWindow(this, style::window::calendar::name::new_edit_event)));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(
-            style::window::calendar::name::custom_repeat_window,
-            new gui::CustomRepeatWindow(this, style::window::calendar::name::custom_repeat_window)));
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CalendarMainWindow>(app, name);
+        });
+        windowsFactory.attach(day_events_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DayEventsWindow>(app);
+        });
+        windowsFactory.attach(no_events_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NoEvents>(app, name, gui::NoEvents::Meta());
+        });
+        windowsFactory.attach(style::window::calendar::name::events_options,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::CalendarEventsOptions>(app);
+                              });
+        windowsFactory.attach(dialog_yes_no, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, dialog_yes_no);
+        });
+        windowsFactory.attach(all_events_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AllEventsWindow>(app, all_events_window);
+        });
+        windowsFactory.attach(details_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EventDetailWindow>(app, details_window);
+        });
+        windowsFactory.attach(new_edit_event, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NewEditEventWindow>(app, new_edit_event);
+        });
+        windowsFactory.attach(custom_repeat_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CustomRepeatWindow>(app, custom_repeat_window);
+        });
     }
 
     void ApplicationCalendar::destroyUserInterface()
@@ -146,7 +150,7 @@ namespace app
     void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const TimePoint &dateFilter)
     {
 
-        auto dialog = dynamic_cast<gui::NoEvents *>(getWindow(style::window::calendar::name::no_events_window));
+        auto dialog = dynamic_cast<gui::NoEvents *>(windowsStack.get(style::window::calendar::name::no_events_window));
         assert(dialog != nullptr);
         auto meta  = dialog->meta;
         meta.text  = "app_calendar_no_events_information";

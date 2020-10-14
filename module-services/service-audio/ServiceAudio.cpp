@@ -143,16 +143,10 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleGetFileTags(const std::string &fileName)
 {
-    if (auto input = audioMux.GetAvailableInput()) {
-        auto tag = (*input)->audio->GetFileTags(fileName.c_str());
-        if (tag) {
-            return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
-        }
-        else {
-            return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
-        }
+    if (auto tag = Audio::GetFileTags(fileName.c_str())) {
+        return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
     }
-    return {};
+    return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &token)
@@ -289,7 +283,8 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleRoutingControl(
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
-                                                               const Token &token)
+                                                               const Token &token,
+                                                               bool &muted)
 {
     std::vector<audio::RetCode> retCodes = {audio::RetCode::Success};
 
@@ -317,6 +312,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
         for (auto &input : audioMux.GetAllInputs()) {
             const auto &currentOperation = input.audio->GetCurrentOperation();
             if (std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
+                muted = true;
                 retCodes.emplace_back(stopInput(&input));
             }
         }
@@ -338,6 +334,13 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     return std::make_unique<AudioResponseMessage>(audio::RetCode::Success);
 }
 
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
+                                                               const Token &token)
+{
+    bool muted = false;
+    return HandleStop(stopTypes, token, muted);
+}
+
 void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type, const Token &token)
 {
     if (type == AudioNotificationMessage::Type::EndOfFile) {
@@ -357,9 +360,30 @@ void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type
     }
 }
 
+auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>
+{
+    const std::vector<audio::PlaybackType> typesToMute = {audio::PlaybackType::Notifications,
+                                                          audio::PlaybackType::CallRingtone,
+                                                          audio::PlaybackType::TextMessageRingtone};
+
+    // mute if 0 and return with parameter shouldn't popup
+    bool muted         = false;
+    const auto context = getCurrentContext();
+    if (step < 0) {
+        HandleStop(typesToMute, Token(), muted);
+        if (muted) {
+            return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, 0, muted, context);
+        }
+    }
+    const auto volume    = utils::getValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
+    const auto newVolume = std::clamp(volume + step, static_cast<int>(minVolume), static_cast<int>(maxVolume));
+    setSetting(Setting::Volume, std::to_string(newVolume), Profile::Type::Idle, PlaybackType::None);
+    return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, newVolume, muted, context);
+}
+
 sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-    std::shared_ptr<AudioResponseMessage> responseMsg;
+    sys::Message_t responseMsg;
 
     auto &msgType = typeid(*msgl);
     LOG_DEBUG("msgType %d", static_cast<int>(msgl->messageType));
@@ -409,6 +433,10 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgType == typeid(AudioRoutingControlRequest)) {
         auto *msg   = static_cast<AudioRoutingControlRequest *>(msgl);
         responseMsg = HandleRoutingControl(msg->controlType, msg->enable);
+    }
+    else if (msgType == typeid(AudioKeyPressedRequest)) {
+        auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
+        responseMsg = HandleKeyPressed(msg->step);
     }
     else {
         LOG_DEBUG("Unhandled message");
@@ -465,6 +493,7 @@ void ServiceAudio::setSetting(const audio::Setting &setting,
     else {
         if (profileType == Profile::Type::Idle) {
             setCurrentSetting(setting, value);
+            return;
         }
         const auto path = audio::str(setting, playbackType, profileType);
         updateDbValue(path, setting, value);
@@ -554,4 +583,21 @@ void ServiceAudio::setCurrentSetting(const audio::Setting &setting, const std::s
         updateDbValue(currentOperation, setting, valueToSet);
     }
     }
+}
+
+const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurrentContext()
+{
+    const auto activeInput = audioMux.GetActiveInput();
+    if (!activeInput.has_value()) {
+        const auto idleInput = audioMux.GetIdleInput();
+        if (idleInput.has_value()) {
+            return {(*idleInput)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
+                                                                 : Profile::Type::PlaybackLoudspeaker,
+                    audio::PlaybackType::CallRingtone};
+        }
+    }
+    auto &audio                  = (*activeInput)->audio;
+    const auto &currentOperation = audio->GetCurrentOperation();
+    const auto currentProfile    = currentOperation.GetProfile();
+    return {currentProfile->GetType(), currentOperation.GetPlaybackType()};
 }

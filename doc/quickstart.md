@@ -53,20 +53,21 @@ Running tests checks memory leaks too - this might be helpful in creation of new
 
 ## Building your own Docker image
 
-If for some reason you don't want to use [the existing Docker image](https://hub.docker.com/r/rwicik/pure_phone_build) you can build your own by following 
+If for some reason you don't want to use [the existing Docker image](docker push wearemudita/mudita_os_builder:latest) you can build your own by following 
 
-1. Download the necessery toolchain:
+1. Configure Docker file and download the necessary tool chain packages:
 
 ```bash
-./config/download_assets
+./config/build_docker_runner
 ```
+
 2. Build a new Docker image
 
 ```bash
-docker build docker/ -t rwicik/pure_phone_build:latest
+docker build docker -f docker/Dockerfile -t "wearemudita/mudita_os_builder:latest"
 ```
 
-Please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if Docker wouldn't be able to find it locally it will download it from Docker Hub.
+Please make sure that you add proper tag for image (`-t wearemudita/mudita_os_builder:latest`) as other scripts are using it for building, and if Docker wouldn't be able to find it locally it will download it from Docker Hub.
 
 ## Quickstart in your local environment
 

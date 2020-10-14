@@ -1,8 +1,9 @@
 #pragma once
-#include <string>
+#include <array>
 #include <cstring>
-#include <utility>
 #include <module-bluetooth/lib/btstack/src/bluetooth.h>
+#include <string>
+#include <utility>
 
 struct Device
 {
@@ -35,4 +36,18 @@ struct Devicei : public Device
     {
         memcpy(&address, addr, sizeof address);
     }
+};
+
+struct DeviceMetadata_t
+{
+    unsigned int sampleRate;
+    unsigned short channels;
+    unsigned int samplesPerFrame;
+};
+
+constexpr unsigned int DATA_BUFFER_SIZE = 256 * 2;
+
+struct AudioData_t
+{
+    std::array<int16_t, DATA_BUFFER_SIZE> data;
 };

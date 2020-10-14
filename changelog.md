@@ -1,5 +1,17 @@
 # MuditaOS changelog
 
+## current
+
+### Added
+
+* `[gui]` Dynamic Windows building and handling implemented
+* `[audio]` Added A2DP playback backend
+
+
+### Fixed
+
+* `[audio]` Fix parsing audio meta tags during playback
+
 ## [0.42.1 2020-10-12]
 
 ### Added
@@ -21,6 +33,7 @@
 * `[db]` Fixed database corruption issues on abrupt phone reset.
 * `[audio]` Fix audio looping.
 * `[phonebook]` Fix phone freezing when contacts database is empty.
+* `[phonebook]` Contacts list rebuilding in place not from start.
 
 ### Other
 
@@ -30,6 +43,7 @@
 * `[settings]` Improvements to API and logic.
 * `[gui]` Added timers.
 * `[doc]` Several updates to user and developer documentation.
+* `[audio]` Added volume popup logic.
 
 ## [0.40.1 2020-10-02]
 

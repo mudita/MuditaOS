@@ -169,4 +169,11 @@ namespace AudioServiceAPI
             return std::nullopt;
         }
     }
+
+    bool KeyPressed(sys::Service *serv, const int step)
+    {
+        auto msg = std::make_shared<AudioKeyPressedRequest>(step);
+        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+    }
+
 } // namespace AudioServiceAPI

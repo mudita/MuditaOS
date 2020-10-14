@@ -7,8 +7,8 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Window.hpp"
-#include <memory>
 #include <BoxLayout.hpp>
+#include <memory>
 #include <service-bluetooth/messages/BluetoothMessage.hpp>
 
 namespace gui
@@ -24,7 +24,7 @@ namespace gui
         VBox *box;
 
       public:
-        BtScanWindow(app::Application *app, std::vector<Devicei> devices);
+        BtScanWindow(app::Application *app, std::vector<Devicei> devices = {});
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;

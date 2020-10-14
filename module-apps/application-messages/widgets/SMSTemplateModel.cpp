@@ -23,7 +23,7 @@ void SMSTemplateModel::requestRecords(const uint32_t offset, const uint32_t limi
     DBServiceAPI::SMSTemplateGetLimitOffset(application, offset, limit);
 }
 
-bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateRecord>> records)
+bool SMSTemplateModel::updateRecords(std::vector<SMSTemplateRecord> records)
 {
     if (DatabaseModel::updateRecords(std::move(records))) {
         list->onProviderDataUpdate();

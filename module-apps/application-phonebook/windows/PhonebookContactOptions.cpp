@@ -1,8 +1,11 @@
 #include "PhonebookContactOptions.hpp"
+#include "DialogMetadata.hpp"
+#include "DialogMetadataMessage.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "Dialog.hpp"
 
+#include <memory>
 #include <service-db/api/DBServiceAPI.hpp>
 
 namespace gui
@@ -74,9 +77,7 @@ namespace gui
     auto PhonebookContactOptions::contactBlock(bool shouldBeBlocked) -> bool
     {
         LOG_DEBUG("Blocking contact: %" PRIu32, contact->ID);
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
-        assert(dialog != nullptr);
-        auto meta   = dialog->meta;
+        DialogMetadata meta;
         meta.action = [=]() -> bool {
             contact->addToBlocked(shouldBeBlocked);
             DBServiceAPI::ContactUpdate(this->application, *contact);
@@ -100,17 +101,14 @@ namespace gui
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
         meta.title      = cont.getFormattedName();
         meta.icon       = "phonebook_contact_delete_trashcan";
-        dialog->update(meta);
-        this->application->switchWindow(dialog->getName());
+        application->switchWindow(gui::window::name::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
         return true;
     }
 
     auto PhonebookContactOptions::contactRemove() -> bool
     {
         LOG_DEBUG("Removing contact: %" PRIu32, contact->ID);
-        auto dialog = dynamic_cast<gui::DialogYesNo *>(this->application->getWindow(gui::window::name::dialog_yes_no));
-        assert(dialog != nullptr);
-        auto meta   = dialog->meta;
+        DialogMetadata meta;
         meta.action = [=]() -> bool {
             if (!DBServiceAPI::ContactRemove(this->application, contact->ID)) {
                 LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
@@ -124,17 +122,13 @@ namespace gui
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
         meta.title      = cont.getFormattedName();
         meta.icon       = "phonebook_contact_delete_trashcan";
-        dialog->update(meta);
-        this->application->switchWindow(dialog->getName());
+        application->switchWindow(gui::window::name::dialog_yes_no, std::make_unique<DialogMetadataMessage>(meta));
         return true;
     }
 
     auto PhonebookContactOptions::showNotification(NotificationType notificationType) -> bool
     {
-        auto dialog =
-            dynamic_cast<gui::DialogConfirm *>(this->application->getWindow(gui::window::name::dialog_confirm));
-        assert(dialog != nullptr);
-        auto meta = dialog->meta;
+        DialogMetadata meta;
         meta.icon = "info_big_circle_W_G";
         switch (notificationType) {
         case NotificationType::Block:
@@ -152,8 +146,8 @@ namespace gui
             return true;
         };
         meta.title = contact->getFormattedName(ContactRecord::NameFormatType::Title);
-        dialog->update(meta);
-        this->application->switchWindow(dialog->getName());
+        application->switchWindow(gui::window::name::dialog_confirm,
+                                  std::make_unique<gui::DialogMetadataMessage>(meta));
         return true;
     }
 } // namespace gui

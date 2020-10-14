@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Tables/ThreadsTable.hpp>
 #include <Common/Query.hpp>
 #include <string>
 #include "Interface/SMSRecord.hpp"

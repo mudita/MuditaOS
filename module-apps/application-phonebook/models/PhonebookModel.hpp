@@ -31,7 +31,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
     ~PhonebookModel() override = default;
 
     // virtual methods from DatabaseModel
-    auto updateRecords(std::unique_ptr<std::vector<ContactRecord>> records) -> bool override;
+    auto updateRecords(std::vector<ContactRecord> records) -> bool override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
     auto requestLetterMap() -> ContactsMapData;
 

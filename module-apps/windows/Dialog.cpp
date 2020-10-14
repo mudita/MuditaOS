@@ -1,4 +1,5 @@
 #include "Dialog.hpp"
+#include "DialogMetadataMessage.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <i18/i18.hpp>
 
@@ -42,20 +43,19 @@ namespace style
 
 } // namespace style
 
-Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Meta &meta)
-    : gui::AppWindow(app, name), meta(meta)
+Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
 
     topBar->setActive(TopBar::Elements::TIME, true);
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-    setTitle(meta.title);
+    setTitle("");
 
-    icon = new Image(this, style::image::x, style::image::y, meta.icon);
+    icon = new Image(this, style::image::x, style::image::y, "");
 
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
-    text->setRichText(meta.text);
+    text->setRichText("lol");
     text->setTextType(TextType::MULTI_LINE);
     text->setEditMode(EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -63,17 +63,16 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 }
 
-void Dialog::update(const Meta &meta)
+void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    this->meta = meta;
-    setTitle(meta.title);
-    text->setRichText(meta.text);
-    icon->set(meta.icon);
-    // meta.action not used
+    if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
+        setTitle(metadata->get().title);
+        text->setRichText(metadata->get().text);
+        icon->set(metadata->get().icon);
+    }
 }
 
-DialogConfirm::DialogConfirm(app::Application *app, const std::string &name, const Dialog::Meta &meta)
-    : Dialog(app, name, meta)
+DialogConfirm::DialogConfirm(app::Application *app, const std::string &name) : Dialog(app, name)
 {
     topBar->setActive(TopBar::Elements::BATTERY, true);
     topBar->setActive(TopBar::Elements::SIGNAL, true);
@@ -87,18 +86,19 @@ DialogConfirm::DialogConfirm(app::Application *app, const std::string &name, con
         }
         return false;
     };
-    // Title not set
     setTitle("");
 }
 
-void DialogConfirm::update(const Meta &meta)
+void DialogConfirm::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    Dialog::update(meta);
-
-    icon->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+    if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
+        Dialog::onBeforeShow(mode, metadata);
+        auto foo                = metadata->get().action;
+        icon->activatedCallback = [foo](Item &) -> bool { return foo(); };
+    }
 }
 
-DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const Meta &meta) : Dialog(app, name, meta)
+DialogYesNo::DialogYesNo(app::Application *app, const std::string &name) : Dialog(app, name)
 {
     no = new Label(
         this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get(style::strings::common::no));
@@ -127,7 +127,7 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const M
     yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     yes->setFont(style::window::font::big);
     yes->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-    yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+    yes->activatedCallback = [=](Item &) -> bool { return false; };
 
     no->setNavigationItem(NavigationDirection::RIGHT, yes);
     yes->setNavigationItem(NavigationDirection::LEFT, no);
@@ -139,20 +139,20 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name, const M
     setFocusItem(no);
 }
 
-void DialogYesNo::update(const Meta &meta)
+void DialogYesNo::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    Dialog::update(meta);
-
-    yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
-
-    setFocusItem(no);
+    if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
+        Dialog::onBeforeShow(mode, metadata);
+        auto foo               = metadata->get().action;
+        yes->activatedCallback = [=](Item &) -> bool { return foo(); };
+        setFocusItem(no);
+    }
 }
 
-DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string &name, const Meta &meta)
-    : DialogYesNo(app, name, meta)
+DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string &name) : DialogYesNo(app, name)
 {
     iconText = new Text(this, style::icontext::x, style::icontext::y, style::icontext::w, style::icontext::h);
-    iconText->setText(textStr);
+    iconText->setText("");
     iconText->setTextType(TextType::SINGLE_LINE);
     iconText->setEditMode(EditMode::BROWSE);
     iconText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -161,16 +161,13 @@ DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string 
     setFocusItem(no);
 }
 
-void DialogYesNoIconTxt::update(const Meta &meta)
+void DialogYesNoIconTxt::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    DialogYesNo::update(meta);
-    iconText->setText(textStr);
-    topBar->setActive(TopBar::Elements::BATTERY, false);
-    topBar->setActive(TopBar::Elements::SIM, false);
-    setFocusItem(no);
-}
-
-void DialogYesNoIconTxt::SetIconText(const std::string &text)
-{
-    textStr = text;
+    if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
+        DialogYesNo::onBeforeShow(mode, metadata);
+        iconText->setText(metadata->get().iconText);
+        topBar->setActive(TopBar::Elements::BATTERY, false);
+        topBar->setActive(TopBar::Elements::SIM, false);
+        setFocusItem(no);
+    }
 }

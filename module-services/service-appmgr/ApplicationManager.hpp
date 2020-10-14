@@ -15,11 +15,17 @@
 #include <map>
 #include <string.h>
 #include "Application.hpp"
+#include "ApplicationLauncher.hpp"
 #include "SystemManager/SystemManager.hpp"
 #include "messages/APMMessage.hpp"
 #include "i18/i18.hpp"
 
 inline uint32_t default_application_locktime = 30000;
+
+namespace app
+{
+    class ApplicationLauncher;
+}
 
 namespace sapm
 {

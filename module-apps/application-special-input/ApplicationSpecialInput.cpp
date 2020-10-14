@@ -7,9 +7,11 @@ using namespace app;
 ApplicationSpecialInput::ApplicationSpecialInput(std::string name, std::string parent, bool startBackgound)
     : Application(name, parent, startBackgound)
 {
-    auto window = new gui::SpecialInputMainWindow(this);
-    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-    setActiveWindow(window->getName());
+    windowsFactory.attach(app::char_select, [](Application *app, const std::string &name) {
+        return std::make_unique<gui::SpecialInputMainWindow>(app);
+    });
+
+    setActiveWindow(app::char_select);
 }
 
 sys::Message_t ApplicationSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -35,8 +37,7 @@ sys::ReturnCodes ApplicationSpecialInput::InitHandler()
 
 void ApplicationSpecialInput::createUserInterface()
 {
-    auto window = new gui::SpecialInputMainWindow(this);
-    windows.insert({window->getName(), window});
+    windowsFactory.build(this, app::char_select);
 }
 
 void ApplicationSpecialInput::destroyUserInterface()
