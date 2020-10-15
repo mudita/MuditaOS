@@ -48,8 +48,7 @@ namespace gui
         auto el = new VBox();
         el->setPosition(0, 0);                   // setting position IN BOX if relative
         el->setSize(widgetArea.w, widgetArea.h); // set area to parent area
-        el->setPenWidth(0);
-        el->setRadius(0);
+        el->setEdges(RectangleEdge::None);
         // if new element fits && To avoid cyclic addWidget -> call parent addWidget
         BoxLayout::addWidget(el);
         if (el->visible) {
