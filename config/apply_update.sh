@@ -5,6 +5,26 @@ UPDATE_FILE=""
 PHONE_PARTITION_NAME="PUREOS"
 CLEAN_PHONE=0
 TMPDIR="flashmac"
+OS=`uname -s`
+PHONE_DEV=""
+LINUX_DEV_FILE="usb-NXP_SEMI_NXP_MASS_STORAGE_0123456789ABCDEF-0:0-part1"
+
+function get_phone_dev() {
+	if [ "$OS" == "Darwin" ]; then
+		diskutil list | grep $PHONE_PARTITION_NAME | awk '{print $6}'
+	else
+		readlink -f /dev/disk/by-id/$LINUX_DEV_FILE		
+	fi
+}
+
+function eject_phone() {
+	if [ "$OS" == "Darwin" ]; then
+		ex diskutil eject $PHONE_DEV
+	else
+		ex udisksctl unmount -b $PHONE_DEV
+		ex timeout --signal=SIGINT 1 udisksctl power-off -b $PHONE_DEV
+	fi
+}
 
 function ex() {
 	eval "$@"
@@ -42,16 +62,17 @@ if [ $OPTIND -eq 1 ]; then
 fi
 
 shift $((OPTIND-1))
-PHONE_DEV=`diskutil list | grep $PHONE_PARTITION_NAME | awk '{print $6}'`
+PHONE_DEV=$(get_phone_dev)
+
 if [ "$PHONE_DEV" == "" ]; then
 	echo "Can't find $PHONE_PARTITION_NAME device via diskutil, make sure that the phone is in USB-MSC mode"
 	exit 1
 fi
 
-PHONE_MOUNT=`df -h | grep $PHONE_DEV | awk '{print $9}'`
+PHONE_MOUNT=`df -P | grep $PHONE_DEV | awk '{print $6}'`
 
-if [ ! -d $PHONE_MOUNT ]; then
-	echo dev: $PHONE_DEV mount: $PHONE_MOUNT is not a directory
+if [ "$PHONE_MOUNT" == "" ]; then
+	echo dev: $PHONE_DEV not mounted, do that yorself and re-run
 	exit 1
 fi
 
@@ -71,11 +92,13 @@ if [ $CLEAN_PHONE == 1 ]; then
 	ex sync
 fi
 
+echo "Copyind data"
 ex cp $TMPDIR/boot.bin $PHONE_MOUNT/current/
 ex cp $TMPDIR/Luts.bin $PHONE_MOUNT/current/
 ex cp $TMPDIR/country-codes.db $PHONE_MOUNT/current/
 ex cp $TMPDIR/version.json $PHONE_MOUNT/current/
-
 ex cp -r $TMPDIR/assets $PHONE_MOUNT/current/
+
 echo "Ejecting phone from OS..."
-ex diskutil eject $PHONE_DEV
+eject_phone
+
