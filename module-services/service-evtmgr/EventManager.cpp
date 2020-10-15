@@ -220,22 +220,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
                 vibratorPlayer.start();
             }
         }
-        else {
-            auto msg2 = dynamic_cast<sevm::VibratorStateSequenceMessage *>(msgl);
-            if (msg2 != nullptr) {
-                // replace pattern with new one
-                static std::deque<vibrator::Vibration> vibratorSequence;
-                vibratorSequence = (msg2->vibrSeq);
-
-                //            if (vibratorSequence.size() > 0) {
-                //                auto currentVibration = vibratorSequence.front();
-                //
-                //                vibratorSequence.emplace_back(*dynamic_cast<vibrator::Vibration *>(msg));
-                //                vibratorSequence.pop_front();
-
-                // we have a sequence
-            }
-        }
     }
     else if (msgl->messageType == MessageType::EVMTorchStateMessage) {
         auto msg = dynamic_cast<sevm::TorchStateMessage *>(msgl);

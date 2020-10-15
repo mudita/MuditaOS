@@ -175,7 +175,6 @@ enum class MessageType
 
     // Vibration motor messages
     EVMVibratorStateMessage,
-    EVMVibratorStateSequenceMessage,
 
     // Torch messages
     EVMTorchStateMessage,

@@ -18,7 +18,7 @@ namespace bsp
         class Vibration
         {
           public:
-            /// default (null) duration means infinitely
+            /// default (null) duration means forever
             State state;
             std::optional<uint16_t> duration;
             Vibration(State state, std::optional<uint16_t> duration = std::nullopt)

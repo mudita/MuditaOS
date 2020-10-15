@@ -16,7 +16,6 @@ namespace bsp
             LOG_DEBUG("vibration ends  \t\U0001f6d1\U0001f4f3");
         }
         void deinit()
-        {
-        }
+        {}
     } // namespace vibrator
 } // namespace bsp
