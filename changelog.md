@@ -6,11 +6,13 @@
 
 * `[gui]` Dynamic Windows building and handling implemented
 * `[audio]` Added A2DP playback backend
-
+* `[audio]` Added SendEvent audio API
 
 ### Fixed
 
 * `[audio]` Fix parsing audio meta tags during playback
+* `[settings]` Removed the border around the settings menu.
+* `[simulator]` Fix crash on exit.
 
 ## [0.42.1 2020-10-12]
 

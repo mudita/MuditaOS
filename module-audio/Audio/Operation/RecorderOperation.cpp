@@ -52,11 +52,11 @@ namespace audio
         constexpr audio::Gain defaultRecordingHeadsetGain    = 100;
 
         const auto dbRecordingOnBoardMicGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
         const auto recordingOnBoardMicGain = dbCallback(dbRecordingOnBoardMicGainPath, defaultRecordingOnBoardMicGain);
 
         const auto dbRecordingHeadsetGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadset);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadset);
         const auto recordingHeadsetGain = dbCallback(dbRecordingHeadsetGainPath, defaultRecordingHeadsetGain);
 
         availableProfiles.push_back(
@@ -143,20 +143,20 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    audio::RetCode RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode RecorderOperation::SendEvent(std::shared_ptr<Event> evt)
     {
-        switch (evt) {
-        case Event::HeadphonesPlugin:
+        switch (evt->getType()) {
+        case EventType::HeadphonesPlugin:
             SwitchProfile(Profile::Type::RecordingHeadset);
             break;
-        case Event::HeadphonesUnplug:
+        case EventType::HeadphonesUnplug:
             // TODO: Switch to recording bt profile if present
             SwitchProfile(Profile::Type::RecordingBuiltInMic);
             break;
-        case Event::BTHeadsetOn:
+        case EventType::BTHeadsetOn:
             SwitchProfile(Profile::Type::RecordingBTHeadset);
             break;
-        case Event::BTHeadsetOff:
+        case EventType::BTHeadsetOff:
             // TODO: Switch to recording headphones profile if present
             SwitchProfile(Profile::Type::RecordingBuiltInMic);
             break;

@@ -220,22 +220,28 @@ class AudioGetFileTagsRequest : public AudioMessage
     const std::string fileName;
 };
 
-class AudioRoutingControlRequest : public AudioMessage
+class AudioEventRequest : public AudioMessage
 {
   public:
-    enum class ControlType
-    {
-        RecordCtrl,
-        Mute,
-        SwitchSpeakerphone,
-        SwitchHeadphones
-    };
-
-    AudioRoutingControlRequest(ControlType controlType, bool enable) : enable(enable), controlType(controlType)
+    explicit AudioEventRequest(std::shared_ptr<audio::Event> evt) : evt(std::move(evt))
     {}
 
-    const bool enable;
-    const ControlType controlType;
+    explicit AudioEventRequest(audio::EventType eType) : evt(std::make_shared<audio::Event>(eType))
+    {}
+
+    std::shared_ptr<audio::Event> getEvent()
+    {
+        return evt;
+    }
+
+  private:
+    std::shared_ptr<audio::Event> evt;
+};
+
+class AudioEventResponse : public AudioResponseMessage
+{
+  public:
+    using AudioResponseMessage::AudioResponseMessage;
 };
 
 class AudioKeyPressedRequest : public AudioMessage

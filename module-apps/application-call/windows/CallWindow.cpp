@@ -97,10 +97,10 @@ namespace gui
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {
-                AudioServiceAPI::RoutingSpeakerPhone(this->application, false);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOff);
             } break;
             case SpeakerIconState::SPEAKERON: {
-                AudioServiceAPI::RoutingSpeakerPhone(this->application, true);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOn);
             } break;
             // case SpeakerIconState::BLUETOOTH: {
             //     // TODO: need implementation
@@ -122,8 +122,9 @@ namespace gui
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             LOG_INFO("Mic activated activated %d", static_cast<int>(microphoneIcon->get()));
 
-            microphoneIcon->get() == MicrophoneIconState::MUTED ? AudioServiceAPI::RoutingMute(this->application, false)
-                                                                : AudioServiceAPI::RoutingMute(this->application, true);
+            microphoneIcon->get() == MicrophoneIconState::MUTED
+                ? AudioServiceAPI::SendEvent(this->application, audio::EventType::CallMute)
+                : AudioServiceAPI::SendEvent(this->application, audio::EventType::CallUnmute);
 
             return true;
         };

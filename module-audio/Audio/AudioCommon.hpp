@@ -25,6 +25,8 @@ namespace audio
 
     constexpr uint32_t audioOperationTimeout = 1000;
 
+    static const std::string audioDbPrefix = "audio/";
+
     enum class Setting
     {
         Volume,
@@ -57,15 +59,39 @@ namespace audio
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
 
-    [[nodiscard]] const std::string str(const Setting &setting,
-                                        const PlaybackType &playbackType,
-                                        const Profile::Type &profileType);
+    [[nodiscard]] const std::string dbPath(const Setting &setting,
+                                           const PlaybackType &playbackType,
+                                           const Profile::Type &profileType);
 
-    [[nodiscard]] const std::string str(const Setting &setting,
-                                        const PlaybackType &playbackType,
-                                        const bool headphonesInserted);
+    enum class EventType
+    {
+        HeadphonesPlugin,
+        HeadphonesUnplug,
+        BTHeadsetOn,
+        BTHeadsetOff,
+        BTA2DPOn,
+        BTA2DPOff,
+        CallMute,
+        CallUnmute,
+        CallSpeakerphoneOn,
+        CallSpeakerphoneOff,
+    };
 
-    [[nodiscard]] const std::string str(const Setting &setting, const PlaybackType &playbackType);
+    class Event
+    {
+      public:
+        explicit Event(EventType eType) : eventType(eType)
+        {}
+        virtual ~Event() = default;
+
+        EventType getType() const
+        {
+            return eventType;
+        }
+
+      private:
+        const EventType eventType;
+    };
 
     enum class RetCode
     {
