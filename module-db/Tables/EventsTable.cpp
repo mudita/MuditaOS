@@ -347,17 +347,15 @@ bool EventsTable::addCustom(EventsTableRow entry)
     for (uint32_t i = 1; i <= numberOfWeeks; i++) {
         for (auto option : weekDayOptions) {
             if (option) {
-                result =
-                    result &&
-                    db->execute("INSERT or IGNORE INTO events "
-                                "(title, date_from, date_till, reminder, repeat, reminder_fired) VALUES"
-                                "('%q', '%q','%q', %u, %u);",
-                                entry.title.c_str(),
-                                TimePointToString(dateFrom + date::days{incrementation}).c_str(),
-                                TimePointToString(dateTill + date::days{incrementation}).c_str(),
-                                entry.reminder,
-                                entry.repeat,
-                                TimePointToString(entry.reminder_fired).c_str());
+                result = result && db->execute("INSERT or IGNORE INTO events "
+                                               "(title, date_from, date_till, reminder, repeat, reminder_fired) VALUES"
+                                               "('%q', '%q','%q', %u, %u);",
+                                               entry.title.c_str(),
+                                               TimePointToString(dateFrom + date::days{incrementation}).c_str(),
+                                               TimePointToString(dateTill + date::days{incrementation}).c_str(),
+                                               entry.reminder,
+                                               entry.repeat,
+                                               TimePointToString(entry.reminder_fired).c_str());
             }
             ++incrementation;
         }
@@ -537,16 +535,15 @@ uint32_t EventsTable::countByFieldId(const char *field, uint32_t id)
 
 std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
 {
-    auto retQuery =
-        db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
-                  "FROM events "
-                  "WHERE calc_dt >= '%q' "
-                  "AND reminder_fired = '%q' "
-                  "AND reminder <> -1 "
-                  "ORDER BY calc_dt "
-                  "LIMIT 1 ",
-                  TimePointToString(filter_from).c_str(),
-                  TimePointToString(TIME_POINT_INVALID).c_str());
+    auto retQuery = db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
+                              "FROM events "
+                              "WHERE calc_dt >= '%q' "
+                              "AND reminder_fired = '%q' "
+                              "AND reminder <> -1 "
+                              "ORDER BY calc_dt "
+                              "LIMIT 1 ",
+                              TimePointToString(filter_from).c_str(),
+                              TimePointToString(TIME_POINT_INVALID).c_str());
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<EventsTableRow>();
