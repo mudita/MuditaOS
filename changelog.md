@@ -9,6 +9,7 @@
 * `[audio]` Added SendEvent audio API
 * `[calculator]` Add calculator application.
 * `[settings]` Create Messages window for apps and tools branch.
+* `[desktop]` Added DeveloperMode endpoint.
 
 
 ### Fixed
