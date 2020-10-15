@@ -115,7 +115,7 @@ namespace gui
             return false;
         }
 
-        eventRecord    = item->getData();
+        eventRecord = item->getData();
         dateLabel->setText(TimePointToLocalizedDateString(eventRecord->date_from));
         timeLabel->setText(TimePointToLocalizedTimeString(eventRecord->date_from));
         descriptionLabel->setText(eventRecord->title);

@@ -44,8 +44,8 @@ namespace stm
             return 0;
         }
 
-        eventRecord = records->at(0);
-        startTP     = eventRecord.date_from - minutes{eventRecord.reminder};
+        eventRecord   = records->at(0);
+        startTP       = eventRecord.date_from - minutes{eventRecord.reminder};
         auto duration = eventRecord.date_from - std::chrono::minutes{eventRecord.reminder} - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
