@@ -18,10 +18,11 @@ namespace parserFSM
         factory,
         contacts,
         messages,
-        calllog
+        calllog,
+        developerMode,
     };
 
-    constexpr int lastEndpoint = static_cast<int>(EndpointType::calllog);
+    constexpr int lastEndpoint = static_cast<int>(EndpointType::developerMode);
     // Message defs and utils
     namespace message
     {

@@ -10,6 +10,7 @@ target_include_directories(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/factoryReset"
 		"${CMAKE_CURRENT_LIST_DIR}/restore"
 		"${CMAKE_CURRENT_LIST_DIR}/update"
+		"${CMAKE_CURRENT_LIST_DIR}/developerMode"
 )
 target_include_directories(${CMAKE_PROJECT_NAME}
     PUBLIC
@@ -33,5 +34,7 @@ target_sources(${PROJECT_NAME}
 		"restore/RestoreEndpoint.cpp"
 		"update/UpdateEndpoint.cpp"
 		"update/UpdatePureOS.cpp"
+		"developerMode/DeveloperModeEndpoint.cpp"
+		"developerMode/DeveloperModeHelper.cpp"
 
 )

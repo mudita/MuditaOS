@@ -10,6 +10,7 @@
 #include "restore/RestoreEndpoint.hpp"
 #include "factoryReset/FactoryResetEndpoint.hpp"
 #include "calllog/CalllogEndpoint.hpp"
+#include "developerMode/DeveloperModeEndpoint.hpp"
 
 using namespace parserFSM;
 
@@ -36,6 +37,8 @@ class EndpointFactory
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
         case EndpointType::calllog:
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
+        case EndpointType::developerMode:
+            return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }
