@@ -330,22 +330,10 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    auto input = audioMux.GetRoutingInput();
-    input      = input ? input : audioMux.GetActiveInput();
-
-    if (!input) {
-        return std::make_unique<AudioResponseMessage>(RetCode::OperationNotSet);
+    for (auto &input : audioMux.GetAllInputs()) {
+        input.audio->SendEvent(evt);
     }
-
-    if (evt->getType() == EventType::HeadphonesPlugin) {
-        headphonesInserted = true;
-    }
-    else if (evt->getType() == EventType::HeadphonesUnplug) {
-        headphonesInserted = false;
-    }
-
-    auto retVal = input.value()->audio->SendEvent(evt);
-    return std::make_unique<AudioEventResponse>(retVal);
+    return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
@@ -546,7 +534,9 @@ std::string ServiceAudio::getSetting(const Setting &setting,
             targetPlayback = currentPlaybackType;
         }
         else if (setting == Setting::Volume) {
-            targetProfile = headphonesInserted ? Profile::Type::PlaybackHeadphones : Profile::Type::PlaybackLoudspeaker;
+            auto input    = audioMux.GetIdleInput();
+            targetProfile = ((*input)->audio->GetHeadphonesInserted()) ? Profile::Type::PlaybackHeadphones
+                                                                       : Profile::Type::PlaybackLoudspeaker;
             targetPlayback = PlaybackType::CallRingtone;
         }
         else {
@@ -581,8 +571,9 @@ void ServiceAudio::setSetting(const Setting &setting,
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
         else if (setting == audio::Setting::Volume) {
-            updatedProfile =
-                headphonesInserted ? Profile::Type::PlaybackHeadphones : Profile::Type::PlaybackLoudspeaker;
+            auto input     = audioMux.GetIdleInput();
+            updatedProfile = (*input)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
+                                                                      : Profile::Type::PlaybackLoudspeaker;
             updatedPlayback = PlaybackType::CallRingtone;
             valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
         }
