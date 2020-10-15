@@ -42,6 +42,8 @@ class ServiceAudio : public sys::Service
     audio::AudioMux audioMux;
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
 
+    bool headphonesInserted = false;
+
     auto IsVibrationMotorOn()
     {
         return vibrationMotorStatus == audio::AudioMux::VibrationStatus::On;
@@ -69,6 +71,8 @@ class ServiceAudio : public sys::Service
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
 
+    auto IsVibrationEnabled(const audio::PlaybackType &type) -> bool;
+    auto IsPlaybackEnabled(const audio::PlaybackType &type) -> bool;
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
 
@@ -94,9 +98,8 @@ class ServiceAudio : public sys::Service
         }
         return defaultValue;
     }
+    void updateDbValue(const std::string &path, const std::string &value);
 
-    void setCurrentSetting(const audio::Setting &setting, const std::string &value);
-    void setCurrentVolume(const uint32_t &value);
     void setSetting(const audio::Setting &setting,
                     const std::string &value,
                     const audio::Profile::Type &profileType,
@@ -104,9 +107,6 @@ class ServiceAudio : public sys::Service
     [[nodiscard]] std::string getSetting(const audio::Setting &setting,
                                          const audio::Profile::Type &profileType,
                                          const audio::PlaybackType &playbackType);
-    std::optional<std::string> getCurrentSetting(const audio::Setting &setting);
-    void updateDbValue(const std::string &path, const audio::Setting &setting, const std::string &value);
-    void updateDbValue(const audio::Operation &currentOperation, const audio::Setting &setting, const uint32_t &value);
-    void updateDbValue(const audio::Operation &currentOperation, const audio::Setting &setting, const bool &value);
-    [[nodiscard]] const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
+
+    const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
 };

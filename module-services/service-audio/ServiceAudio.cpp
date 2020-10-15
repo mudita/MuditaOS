@@ -23,8 +23,8 @@ ServiceAudio::ServiceAudio()
       audioMux([this](auto... params) { return this->AsyncCallback(params...); },
                [this](auto... params) { return this->DbCallback(params...); })
 {
-    busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
     LOG_INFO("[ServiceAudio] Initializing");
+    busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
 }
 
 ServiceAudio::~ServiceAudio()
@@ -34,6 +34,70 @@ ServiceAudio::~ServiceAudio()
 
 sys::ReturnCodes ServiceAudio::InitHandler()
 {
+    static const std::string defaultVolumeHigh = "10";
+    static const std::string defaultVolumeLow  = "2";
+    static const std::string defaultTrue       = "1";
+    static const std::string defaultFalse      = "0";
+
+    static const int IdxPath  = 0;
+    static const int IdxValue = 1;
+
+    const static std::vector<std::vector<std::string>> defaultSettings = {
+
+        // PLAYBACK
+        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
+
+        {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
+
+        {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
+
+        {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
+
+        {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackHeadphones),
+         defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackLoudspeaker),
+         defaultVolumeHigh},
+
+        // ROUTING
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBTHeadset), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingSpeakerphone), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadset), "50"},
+
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingBTHeadset), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingSpeakerphone), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadset), defaultVolumeHigh},
+
+        // MISC
+        {dbPath(Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle), defaultFalse},
+        {dbPath(Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle), defaultFalse},
+        {dbPath(Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
+
+        {dbPath(Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
+    };
+
+    for (const auto &defaultSet : defaultSettings) {
+        addOrIgnoreEntry(defaultSet[IdxPath], defaultSet[IdxValue]);
+    }
+
     return sys::ReturnCodes::Success;
 }
 
@@ -92,14 +156,18 @@ static void ExtVibrationStop()
 {
     LOG_ERROR("[Vibration] - Unimplemented - vibration stop");
 }
-// below static members will be replaced by accessors to DB entries
-static bool IsVibrationEnabled(const audio::PlaybackType &type)
+
+bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
 {
-    return true;
+    auto isEnabled = utils::getValue<audio::Vibrate>(
+        getSetting(Setting::EnableVibration, Profile::Type::Idle, PlaybackType::Multimedia));
+    return isEnabled;
 }
-static bool IsPlaybackEnabled(const audio::PlaybackType &type)
+bool ServiceAudio::IsPlaybackEnabled(const audio::PlaybackType &type)
 {
-    return true;
+    auto isEnabled = utils::getValue<audio::EnableSound>(
+        getSetting(Setting::EnableSound, Profile::Type::Idle, PlaybackType::Multimedia));
+    return isEnabled;
 }
 
 ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::PlaybackType &type)
@@ -269,6 +337,13 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
         return std::make_unique<AudioResponseMessage>(RetCode::OperationNotSet);
     }
 
+    if (evt->getType() == EventType::HeadphonesPlugin) {
+        headphonesInserted = true;
+    }
+    else if (evt->getType() == EventType::HeadphonesUnplug) {
+        headphonesInserted = false;
+    }
+
     auto retVal = input.value()->audio->SendEvent(evt);
     return std::make_unique<AudioEventResponse>(retVal);
 }
@@ -377,7 +452,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     sys::Message_t responseMsg;
 
     auto &msgType = typeid(*msgl);
-    LOG_DEBUG("msgType %d", static_cast<int>(msgl->messageType));
+    LOG_DEBUG("msgType %d %s", static_cast<int>(msgl->messageType), msgType.name());
 
     if (msgType == typeid(AudioNotificationMessage)) {
         auto *msg = static_cast<AudioNotificationMessage *>(msgl);
@@ -441,7 +516,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
 }
 
-void ServiceAudio::updateDbValue(const std::string &path, const audio::Setting &setting, const std::string &value)
+void ServiceAudio::updateDbValue(const std::string &path, const std::string &value)
 {
     if (path.empty()) {
         return;
@@ -453,126 +528,94 @@ void ServiceAudio::updateDbValue(const std::string &path, const audio::Setting &
     DBServiceAPI::GetQuery(this, db::Interface::Name::Settings_v2, std::move(query));
 }
 
-void ServiceAudio::updateDbValue(const audio::Operation &currentOperation,
-                                 const audio::Setting &setting,
-                                 const uint32_t &value)
+std::string ServiceAudio::getSetting(const Setting &setting,
+                                     const Profile::Type &profileType,
+                                     const PlaybackType &playbackType)
 {
-    const auto currentProfile = currentOperation.GetProfile();
+    const std::string defaultValue = {};
+    auto targetProfile             = profileType;
+    auto targetPlayback            = playbackType;
 
-    auto dbPath = audio::str(setting, currentOperation.GetPlaybackType(), currentProfile->GetType());
-    updateDbValue(dbPath, setting, std::to_string(value));
-}
+    if (profileType == Profile::Type::Idle && playbackType == PlaybackType::None) {
+        if (const auto activeInput = audioMux.GetActiveInput(); activeInput.has_value()) {
+            const auto &currentOperation    = (*activeInput)->audio->GetCurrentOperation();
+            const auto &currentProfile      = currentOperation.GetProfile()->GetType();
+            const auto &currentPlaybackType = (*activeInput)->audio->GetCurrentOperationPlaybackType();
 
-void ServiceAudio::updateDbValue(const audio::Operation &currentOperation,
-                                 const audio::Setting &setting,
-                                 const bool &value)
-{
-    auto dbPath = audio::str(setting, currentOperation.GetPlaybackType());
-    updateDbValue(dbPath, setting, std::to_string(value));
-}
-
-void ServiceAudio::setSetting(const audio::Setting &setting,
-                              const std::string &value,
-                              const audio::Profile::Type &profileType,
-                              const audio::PlaybackType &playbackType)
-{
-    if (setting == audio::Setting::EnableVibration || setting == audio::Setting::EnableSound) {
-        const auto path = audio::str(setting, playbackType);
-        addOrIgnoreEntry(path, value);
-        updateDbValue(path, setting, value);
-    }
-    else {
-        if (profileType == Profile::Type::Idle) {
-            setCurrentSetting(setting, value);
-            return;
+            targetProfile  = currentProfile;
+            targetPlayback = currentPlaybackType;
         }
-        const auto path = audio::str(setting, playbackType, profileType);
-        updateDbValue(path, setting, value);
-    }
-}
-
-std::string ServiceAudio::getSetting(const audio::Setting &setting,
-                                     const audio::Profile::Type &profileType,
-                                     const audio::PlaybackType &playbackType)
-{
-    const std::string defaultValue = "";
-    if (profileType == audio::Profile::Type::Idle) {
-        if (const auto optSetting = getCurrentSetting(setting); optSetting.has_value()) {
-            return optSetting.value();
+        else if (setting == Setting::Volume) {
+            targetProfile = headphonesInserted ? Profile::Type::PlaybackHeadphones : Profile::Type::PlaybackLoudspeaker;
+            targetPlayback = PlaybackType::CallRingtone;
         }
-        return defaultValue;
+        else {
+            return defaultValue;
+        }
     }
-    const auto path = audio::str(setting, playbackType, profileType);
+
+    if (setting == Setting::EnableVibration || setting == Setting::EnableSound) {
+        targetProfile = Profile::Type::Idle;
+    }
+
+    std::string path = dbPath(setting, targetPlayback, targetProfile);
     return fetchAudioSettingFromDb(path, defaultValue);
 }
 
-std::optional<std::string> ServiceAudio::getCurrentSetting(const audio::Setting &setting)
+void ServiceAudio::setSetting(const Setting &setting,
+                              const std::string &value,
+                              const Profile::Type &profileType,
+                              const PlaybackType &playbackType)
 {
-    const auto activeInput = audioMux.GetActiveInput();
+    std::string valueToSet, path;
+    auto retCode         = audio::RetCode::Success;
+    auto updatedProfile  = profileType;
+    auto updatedPlayback = playbackType;
 
-    if (!activeInput.has_value()) {
-        const auto idleInput = audioMux.GetIdleInput();
-        if (idleInput.has_value() && setting == audio::Setting::Volume) {
-            const auto path = audio::str(audio::Setting::Volume,
-                                         audio::PlaybackType::CallRingtone,
-                                         (*idleInput)->audio->GetHeadphonesInserted());
-            return fetchAudioSettingFromDb<std::string>(path, "");
+    std::optional<AudioMux::Input *> activeInput;
+
+    if (profileType == Profile::Type::Idle && playbackType == PlaybackType::None) {
+        if (activeInput = audioMux.GetActiveInput(); activeInput.has_value()) {
+            const auto &currentOperation = (*activeInput)->audio->GetCurrentOperation();
+            updatedProfile               = currentOperation.GetProfile()->GetType();
+            updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
-        return {};
-    }
-
-    const auto &currentOperation = (*activeInput)->audio->GetCurrentOperation();
-    const auto path             = [&setting, &currentOperation]() -> std::string {
-        if (setting == audio::Setting::EnableVibration || setting == audio::Setting::EnableSound) {
-            return audio::str(setting, currentOperation.GetPlaybackType());
+        else if (setting == audio::Setting::Volume) {
+            updatedProfile =
+                headphonesInserted ? Profile::Type::PlaybackHeadphones : Profile::Type::PlaybackLoudspeaker;
+            updatedPlayback = PlaybackType::CallRingtone;
+            valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
         }
         else {
-            return audio::str(setting, currentOperation.GetPlaybackType(), currentOperation.GetProfile()->GetType());
+            return;
         }
-    }();
-    return fetchAudioSettingFromDb<std::string>(path, "");
-}
-
-void ServiceAudio::setCurrentSetting(const audio::Setting &setting, const std::string &value)
-{
-    const auto activeInput = audioMux.GetActiveInput();
-
-    if (!activeInput.has_value()) {
-        const auto idleInput = audioMux.GetIdleInput();
-        if (idleInput.has_value() && setting == audio::Setting::Volume) {
-            const auto path = audio::str(audio::Setting::Volume,
-                                         audio::PlaybackType::CallRingtone,
-                                         (*idleInput)->audio->GetHeadphonesInserted());
-            addOrIgnoreEntry(path, std::to_string(audio::playbackDefaults::defaultLoudspeakerVolume));
-            const auto valueToSet = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
-            updateDbValue(path, Setting::Volume, std::to_string(valueToSet));
-        }
-        return;
     }
 
-    auto &audio                 = (*activeInput)->audio;
-    const auto &currentOperation = audio->GetCurrentOperation();
     switch (setting) {
-    case audio::Setting::Volume: {
-        const auto valueToSet = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
-        if (audio->SetOutputVolume(valueToSet) == audio::RetCode::Success) {
-            updateDbValue(currentOperation, setting, valueToSet);
+    case Setting::Volume: {
+        const auto clampedValue = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
+        valueToSet              = std::to_string(clampedValue);
+        if (activeInput) {
+            retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
         }
     } break;
-    case audio::Setting::Gain: {
-        const auto valueToSet = std::clamp(utils::getValue<audio::Gain>(value), minGain, maxGain);
-        if (audio->SetInputGain(valueToSet) == audio::RetCode::Success) {
-            updateDbValue(currentOperation, setting, valueToSet);
+    case Setting::Gain: {
+        const auto clampedValue = std::clamp(utils::getValue<audio::Gain>(value), minGain, maxGain);
+        valueToSet              = std::to_string(clampedValue);
+        if (activeInput) {
+            retCode = activeInput.value()->audio->SetInputGain(clampedValue);
         }
     } break;
-    case audio::Setting::EnableVibration: {
-        const auto valueToSet = utils::getValue<audio::Vibrate>(value);
-        updateDbValue(currentOperation, setting, valueToSet);
+    case Setting::EnableVibration:
+    case Setting::EnableSound: {
+        updatedProfile = audio::Profile::Type::Idle;
+        valueToSet     = value;
     } break;
-    case audio::Setting::EnableSound: {
-        const auto valueToSet = utils::getValue<audio::EnableSound>(value);
-        updateDbValue(currentOperation, setting, valueToSet);
     }
+
+    if (retCode == RetCode::Success) {
+        path = dbPath(setting, updatedPlayback, updatedProfile);
+        updateDbValue(path, valueToSet);
     }
 }
 

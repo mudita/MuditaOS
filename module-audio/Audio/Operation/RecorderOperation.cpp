@@ -52,11 +52,11 @@ namespace audio
         constexpr audio::Gain defaultRecordingHeadsetGain    = 100;
 
         const auto dbRecordingOnBoardMicGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
         const auto recordingOnBoardMicGain = dbCallback(dbRecordingOnBoardMicGainPath, defaultRecordingOnBoardMicGain);
 
         const auto dbRecordingHeadsetGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadset);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadset);
         const auto recordingHeadsetGain = dbCallback(dbRecordingHeadsetGainPath, defaultRecordingHeadsetGain);
 
         availableProfiles.push_back(
