@@ -12,8 +12,8 @@ struct EventsTableRow : public Record
     std::string title;
     TimePoint date_from = TIME_POINT_INVALID;
     TimePoint date_till = TIME_POINT_INVALID;
-    uint32_t reminder  = 0;
-    uint32_t repeat    = 0;
+    uint32_t reminder        = 0;
+    uint32_t repeat          = 0;
     TimePoint reminder_fired = TIME_POINT_INVALID;
 };
 
