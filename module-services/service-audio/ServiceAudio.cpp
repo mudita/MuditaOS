@@ -260,26 +260,17 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     return {};
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleRoutingControl(
-    const AudioRoutingControlRequest::ControlType &controlType, const bool enable)
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    std::optional<Operation::Event> evt;
+    auto input = audioMux.GetRoutingInput();
+    input      = input ? input : audioMux.GetActiveInput();
 
-    if (controlType == AudioRoutingControlRequest::ControlType::Mute) {
-        evt = enable ? Operation::Event::CallMute : Operation::Event::CallUnmute;
-    }
-    else if (controlType == AudioRoutingControlRequest::ControlType::SwitchSpeakerphone) {
-        evt = enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff;
-    }
-    else if (controlType == AudioRoutingControlRequest::ControlType::SwitchHeadphones) {
-        evt = enable ? Operation::Event::HeadphonesPlugin : Operation::Event::HeadphonesUnplug;
+    if (!input) {
+        return std::make_unique<AudioResponseMessage>(RetCode::OperationNotSet);
     }
 
-    if (auto input = audioMux.GetRoutingInput(); evt && input) {
-        return std::make_unique<AudioResponseMessage>((*input)->audio->SendEvent(evt.value()));
-    }
-
-    return {};
+    auto retVal = input.value()->audio->SendEvent(evt);
+    return std::make_unique<AudioEventResponse>(retVal);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
@@ -430,9 +421,9 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto *msg   = static_cast<AudioGetFileTagsRequest *>(msgl);
         responseMsg = HandleGetFileTags(msg->fileName);
     }
-    else if (msgType == typeid(AudioRoutingControlRequest)) {
-        auto *msg   = static_cast<AudioRoutingControlRequest *>(msgl);
-        responseMsg = HandleRoutingControl(msg->controlType, msg->enable);
+    else if (msgType == typeid(AudioEventRequest)) {
+        auto *msg   = static_cast<AudioEventRequest *>(msgl);
+        responseMsg = HandleSendEvent(msg->getEvent());
     }
     else if (msgType == typeid(AudioKeyPressedRequest)) {
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);

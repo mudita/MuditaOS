@@ -143,24 +143,16 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
-    audio::RetCode PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
 
-        switch (evt) {
-        case Event::HeadphonesPlugin:
+        switch (evt->getType()) {
+        case EventType::HeadphonesPlugin:
             SwitchProfile(Profile::Type::PlaybackHeadphones);
             break;
-        case Event::HeadphonesUnplug:
+        case EventType::HeadphonesUnplug:
             // TODO: Switch to playback headphones/bt profile if present
             SwitchProfile(Profile::Type::PlaybackLoudspeaker);
-            break;
-        case Event::BTA2DPOn:
-            break;
-        case Event::BTA2DPOff:
-            break;
-        case Event::BTHeadsetOn:
-            break;
-        case Event::BTHeadsetOff:
             break;
         default:
             return RetCode::UnsupportedEvent;
