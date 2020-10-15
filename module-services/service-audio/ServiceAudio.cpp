@@ -339,7 +339,8 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 
     if (evt->getType() == EventType::HeadphonesPlugin) {
         headphonesInserted = true;
-    } else if (evt->getType() == EventType::HeadphonesUnplug) {
+    }
+    else if (evt->getType() == EventType::HeadphonesUnplug) {
         headphonesInserted = false;
     }
 
