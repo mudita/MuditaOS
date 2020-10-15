@@ -190,7 +190,7 @@ usb_cdc_vcom_struct_t *composite_init()
         USB_DeviceClassInit(CONTROLLER_ID, &g_UsbDeviceCompositeConfigList, &composite.deviceHandle))
     {
         LOG_ERROR("[Composite] USB Device init failed");
-        return -1;
+        return NULL;
     }
     else
     {
@@ -211,6 +211,6 @@ usb_cdc_vcom_struct_t *composite_init()
     }
 
     LOG_DEBUG("[Composite] USB initialized");
-    return 0;
+    return composite.cdcVcom.cdcAcmHandle;
 
 }

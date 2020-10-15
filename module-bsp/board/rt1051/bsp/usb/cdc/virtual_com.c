@@ -21,11 +21,11 @@
 #error "VCOM stream size has to be greater than single USB packet length"
 #endif
 
-#define call_user_cb(handle, id) do { \
-    if (handle->userCb) \
-            handle->userCb(handle->userCbArg, id); \
+#define call_user_cb(handle, id)                                                                                       \
+    do {                                                                                                               \
+        if (handle->userCb)                                                                                            \
+            handle->userCb(handle->userCbArg, id);                                                                     \
     } while (0);
-
 
 /* Define the information relates to abstract control model */
 typedef struct _usb_cdc_acm_info
@@ -131,13 +131,9 @@ static usb_status_t OnRecvCompleted(usb_cdc_vcom_struct_t *cdcVcom,
     }
     else if (param->length == 0xFFFFFFFF) {
         PRINTF("[VCOM] Warning: bus error");
-<<<<<<< HEAD
+        call_user_cb(cdcVcom, VCOM_ERROR_MALFORMED_USB_PACKET);
     }
     else {
-=======
-        call_user_cb(cdcVcom, VCOM_ERROR_MALFORMED_USB_PACKET);
-    } else {
->>>>>>> 5f573b9b... Add VCOM event callback(s)
         PRINTF("[VCOM] Error: missed %lu received bytes", param->length);
         call_user_cb(cdcVcom, VCOM_ERROR_MISSED_INCOMING_DATA);
     }
@@ -160,23 +156,14 @@ usb_status_t VirtualComUSBCallback(uint32_t event, void *param, void *userArg)
     case kUSB_DeviceCdcEventSendResponse:
         error = OnSendCompleted(cdcVcom, epCbParam);
         break;
-<<<<<<< HEAD
+
     case kUSB_DeviceCdcEventRecvResponse: {
         if (cdcVcom->configured) {
             error = OnRecvCompleted(cdcVcom, epCbParam);
         }
         else {
             PRINTF("[VCOM] Warning: received frame (%lu bytes) if not configured", epCbParam->length);
-=======
-        case kUSB_DeviceCdcEventRecvResponse:
-        {
-            if (cdcVcom->configured) {
-                error = OnRecvCompleted(cdcVcom, epCbParam);
-            } else {
-                    PRINTF("[VCOM] Warning: received frame (%lu bytes) if not configured", epCbParam->length);
-                    call_user_cb(cdcVcom, VCOM_WARNING_NOT_CONFIGURED);
-            }
->>>>>>> 5f573b9b... Add VCOM event callback(s)
+            call_user_cb(cdcVcom, VCOM_WARNING_NOT_CONFIGURED);
         }
     } break;
     case kUSB_DeviceCdcEventSerialStateNotif:
@@ -359,11 +346,14 @@ usb_status_t VirtualComUSBSetConfiguration(usb_cdc_vcom_struct_t *cdcVcom, uint8
  *
  * @return A USB error code or kStatus_USB_Success.
  */
-usb_status_t VirtualComInit(usb_cdc_vcom_struct_t *cdcVcom, class_handle_t classHandle, userCbFunc callback, void *userArg)
+usb_status_t VirtualComInit(usb_cdc_vcom_struct_t *cdcVcom,
+                            class_handle_t classHandle,
+                            userCbFunc callback,
+                            void *userArg)
 {
     cdcVcom->cdcAcmHandle = classHandle;
-    cdcVcom->userCb = callback;
-    cdcVcom->userCbArg = userArg;
+    cdcVcom->userCb       = callback;
+    cdcVcom->userCbArg    = userArg;
 
     if ((cdcVcom->inputStream = xStreamBufferCreate(VCOM_INPUT_STREAM_SIZE, 0)) == NULL) {
         return kStatus_USB_AllocFail;
