@@ -234,6 +234,9 @@
     "app_settings_net" : "Network",
     "app_settings_disp_key" : "Display and keypad",
     "app_settings_display_display_light": "Display light",
+    "app_settings_display_light_main": "Frontlight",
+    "app_settings_display_light_auto": "Automatic",
+    "app_settings_display_light_brightness": "Brightness",
     "app_settings_display_font_size": "Font size",
     "app_settings_display_locked_screen": "Locked screen",
     "app_settings_display_keypad_light": "Keypad light",
@@ -269,6 +272,8 @@
     "app_settings_network_import_contacts_from_sim_card": "Import contacts from SIM card",
     "app_settings_network_sim1": "Sim1",
     "app_settings_network_sim2": "Sim2",
+    "app_settings_toggle_on": "On",
+    "app_settings_toggle_off": "Off",
 
     "app_phonebook_title_main": "Contacts",
     "app_phonebook_search_win_contacts": "Contacts",
