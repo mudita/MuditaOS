@@ -2,6 +2,7 @@
 
 #include <AppWindow.hpp>
 #include <Application.hpp>
+#include <module-apps/windows/OptionWindow.hpp>
 
 namespace gui
 {
