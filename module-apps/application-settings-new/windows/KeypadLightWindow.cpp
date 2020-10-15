@@ -1,7 +1,6 @@
 #include "KeypadLightWindow.hpp"
 
 #include <application-settings-new/ApplicationSettings.hpp>
-#include <gui/widgets/CheckBoxWithLabel.hpp>
 #include <i18/i18.hpp>
 
 namespace gui
@@ -23,7 +22,7 @@ namespace gui
                      title->offset_h() + style::margins::big,
                      this->getWidth(),
                      this->getHeight() - style::margins::big - this->title->offset_h() - bottomBar->getHeight());
-        body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        body->setEdges(gui::RectangleEdge::None);
 
         auto toggleBoxes = [this](CheckBoxWithLabel &active) {
             for (CheckBoxWithLabel *box : boxes) {

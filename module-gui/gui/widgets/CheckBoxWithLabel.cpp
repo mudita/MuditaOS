@@ -6,7 +6,7 @@ namespace gui
         Item *parent, int x, int y, UTF8 description, std::function<void(CheckBoxWithLabel &)> clickCallback)
     {
         auto body = new gui::HBox(nullptr, x, y, style::window::default_body_width, style::window::label::big_h);
-        body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        body->setEdges(gui::RectangleEdge::None);
 
         label =
             new gui::Label(nullptr, 0, 0, style::checkbox::description_width, style::window::label::big_h, description);
