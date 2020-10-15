@@ -95,6 +95,8 @@ namespace audio
 
         virtual audio::RetCode Mute();
 
+        virtual void SetData(std::shared_ptr<void> data);
+
       private:
         bool headphonesInserted = false;
         State currentState = State::Idle;

@@ -199,4 +199,9 @@ namespace audio
         Stop();
     }
 
+    void PlaybackOperation::SetData(std::shared_ptr<void> data)
+    {
+        // pass to AudioDevice
+    }
+
 } // namespace audio

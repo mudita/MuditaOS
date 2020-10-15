@@ -171,4 +171,9 @@ namespace audio
         return SetOutputVolume(0);
     }
 
+    void Audio::SetData(std::shared_ptr<void> data)
+    {
+        currentOperation->SetData(data);
+    }
+
 } // namespace audio

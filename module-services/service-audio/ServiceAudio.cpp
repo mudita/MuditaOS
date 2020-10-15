@@ -6,6 +6,9 @@
 #include "Audio/Operation/IdleOperation.hpp"
 #include "Audio/Operation/PlaybackOperation.hpp"
 
+#include "service-bluetooth/messages/BluetoothMessage.hpp"
+#include "service-bluetooth/ServiceBluetooth.hpp"
+
 #include <type_traits>
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
@@ -299,6 +302,11 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         }
     };
 
+    if (lineSinkAvailable || btSinkAvailable) {
+        auto req = std::make_shared<BluetoothRequestStreamMessage>();
+        sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
+    }
+
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
         AudioStart(input);
@@ -484,6 +492,12 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
         responseMsg = HandleKeyPressed(msg->step);
     }
+    else if (msgType == typeid(BluetoothRequestStreamResultMessage)) {
+        auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
+        if (auto input = audioMux.GetActiveInput()) {
+            input.value()->audio->SetData(msg->data);
+        }
+    }
     else {
         LOG_DEBUG("Unhandled message");
     }
@@ -565,6 +579,7 @@ void ServiceAudio::setSetting(const Setting &setting,
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
             updatedProfile = (*input)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
                                                                       : Profile::Type::PlaybackLoudspeaker;
+
             updatedPlayback = PlaybackType::CallRingtone;
             valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
         }

@@ -91,3 +91,20 @@ class BluetoothDeviceMetadataMessage : public sys::DataMessage
         : DataMessage(MessageType::BluetoothDeviceMetadata), metadata(std::move(metadata)){};
     ~BluetoothDeviceMetadataMessage() override = default;
 };
+
+class BluetoothRequestStreamMessage : public sys::DataMessage
+{
+  public:
+    BluetoothRequestStreamMessage() : DataMessage(MessageType::BluetoothRequestStream){};
+    ~BluetoothRequestStreamMessage() override = default;
+};
+
+class BluetoothRequestStreamResultMessage : public sys::DataMessage
+{
+  public:
+    BluetoothRequestStreamResultMessage(std::shared_ptr<void> data)
+        : DataMessage(MessageType::BluetoothRequestStream), data(std::move(data)){};
+    ~BluetoothRequestStreamResultMessage() override = default;
+
+    const std::shared_ptr<void> data;
+};

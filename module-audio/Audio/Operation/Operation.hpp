@@ -76,6 +76,9 @@ namespace audio
 
         virtual Position GetPosition() = 0;
 
+        virtual void SetData(std::shared_ptr<void> data)
+        {}
+
         Volume GetOutputVolume() const
         {
             return (currentProfile != nullptr) ? currentProfile->GetOutputVolume() : Volume{};

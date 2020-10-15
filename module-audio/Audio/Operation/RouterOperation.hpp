@@ -37,6 +37,7 @@ namespace audio
         audio::RetCode SetInputGain(float gain) override final;
 
         Position GetPosition() override final;
+        void SetData(std::shared_ptr<void> data) override final;
 
       private:
         bool Mute(bool enable);

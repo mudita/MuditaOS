@@ -206,4 +206,9 @@ namespace audio
     {
         return enc->getCurrentPosition();
     }
+
+    void RecorderOperation::SetData(std::shared_ptr<void> data)
+    {
+        // pass to AudioDevice
+    }
 } // namespace audio

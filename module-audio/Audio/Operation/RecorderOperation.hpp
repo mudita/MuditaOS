@@ -35,6 +35,8 @@ namespace audio
 
         Position GetPosition() override final;
 
+        void SetData(std::shared_ptr<void> data) override final;
+
         uint32_t GetSize()
         {
             return enc->GetFileSize();
