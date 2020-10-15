@@ -67,7 +67,7 @@ namespace style
 
         namespace smsOutput
         {
-            constexpr gui::Length sms_radius                   = 7;
+            constexpr gui::Length sms_radius                   = 8;
             constexpr gui::Length default_h                    = 30;
             constexpr gui::Length sms_max_width                = 320;
             constexpr gui::Length sms_h_padding                = 15;

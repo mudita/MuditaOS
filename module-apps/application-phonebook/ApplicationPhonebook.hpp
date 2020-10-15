@@ -33,7 +33,6 @@ namespace app
 
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
         auto InitHandler() -> sys::ReturnCodes override;
-        auto DeinitHandler() -> sys::ReturnCodes override;
 
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes final
         {

@@ -46,7 +46,7 @@ namespace gui
         void refresh();
         void resizeWithScroll();
         void recalculateStartIndex();
-        void checkFirstPage();
+        void fillFirstPage();
         void setStartIndex();
         void recalculateOnBoxRequestedResize();
         unsigned int calculateMaxItemsOnPage();

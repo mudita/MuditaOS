@@ -244,7 +244,6 @@ namespace gui
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
         resizeWithScroll();
-        checkFirstPage();
         pageLoaded = true;
 
         // Check if there were queued rebuild Requests - if so rebuild list again.
@@ -252,6 +251,8 @@ namespace gui
             rebuildList(rebuildRequests.back().first, rebuildRequests.back().second);
             rebuildRequests.pop_back();
         }
+
+        fillFirstPage();
     }
 
     void ListView::onProviderDataUpdate()
@@ -285,7 +286,7 @@ namespace gui
         }
     }
 
-    void ListView::checkFirstPage()
+    void ListView::fillFirstPage()
     {
         // Check if first page is filled with items. If not reload page to be filed with items. Check for both
         // Orientations.
@@ -396,7 +397,7 @@ namespace gui
                 startIndex = startIndex < diff ? 0 : startIndex - diff;
             }
 
-            checkFirstPage();
+            fillFirstPage();
         }
     }
 
