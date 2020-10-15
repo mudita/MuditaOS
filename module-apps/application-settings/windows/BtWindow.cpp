@@ -63,7 +63,7 @@ namespace gui
 
         LOG_INFO("Create box layout");
         box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
-        box->setPenWidth(style::window::default_border_no_focus_w);
+        box->setEdges(RectangleEdge::None);
 
         // TODO WIP: it's just for usability now
         // TODO scan should return async - handle that... (if in scan -> add to list and refresh if new on window)
