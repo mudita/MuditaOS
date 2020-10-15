@@ -28,7 +28,7 @@ namespace gui
         void stop();
         void reset(std::chrono::seconds _duration) noexcept;
         auto isStopped() const noexcept -> bool;
-        void setTimerVisible(bool) const noexcept;
+        void setTimerVisible(bool) noexcept;
         void registerTimeoutCallback(const std::function<void()> &);
 
       private:

@@ -5,6 +5,8 @@
 #include "Text.hpp"
 #include "Label.hpp"
 
+#include <chrono>
+
 namespace gui
 {
     class TimerSetter : public Rect
@@ -19,9 +21,9 @@ namespace gui
             int timeInMinutes        = minimalValue;
 
           public:
-            int getTimeInMinutes() const noexcept
+            std::chrono::minutes getTime() const noexcept
             {
-                return timeInMinutes;
+                return std::chrono::minutes{timeInMinutes};
             }
             void checkBounds() noexcept;
             void putNumericValue(int digit) noexcept;
@@ -45,7 +47,7 @@ namespace gui
 
         bool onFocus(bool isFocused) final;
         bool onInput(const InputEvent &inputEvent) final;
-        int getTimeInSeconds() noexcept;
+        [[nodiscard]] std::chrono::seconds getTime() noexcept;
     };
 
 } // namespace gui

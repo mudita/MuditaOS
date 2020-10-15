@@ -9,10 +9,10 @@ namespace gui
 
     class MeditationTimerWindow : public AppWindow
     {
-        MeditationTimer *timer      = nullptr;
-        Text *meditationInfo        = nullptr;
-        int meditationTimeInSeconds = 0;
-        bool finished               = false;
+        MeditationTimer *timer = nullptr;
+        Text *meditationInfo   = nullptr;
+        bool finished          = false;
+        std::chrono::seconds meditationTime{0};
 
         void setWidgetVisible(bool topBar, bool bottomBar, bool counter);
         void setVisibleRunning();

@@ -8,10 +8,8 @@
 namespace app
 {
     ApplicationMeditation::ApplicationMeditation(std::string name, std::string parent, bool startBackground)
-        : Application{name, parent, startBackground}
-    {
-        state = std::make_unique<gui::OptionsData>();
-    }
+        : Application{name, parent, startBackground}, state{std::make_unique<gui::OptionsData>()}
+    {}
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes
     {

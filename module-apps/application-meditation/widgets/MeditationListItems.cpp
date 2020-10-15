@@ -36,9 +36,9 @@ PrepTimeItem::PrepTimeItem(std::string text) : MeditationListItem(std::move(text
     imageSelectionTick->setAlignment(Alignment(Alignment::Horizontal::Right));
 }
 
-void PrepTimeItem::select(bool value)
+void PrepTimeItem::select(bool isSelected)
 {
-    imageSelectionTick->setVisible(value);
+    imageSelectionTick->setVisible(isSelected);
 }
 
 OptionItemMeditationCounter::OptionItemMeditationCounter(std::string text, bool isCounterOn)
@@ -61,10 +61,10 @@ OptionItemMeditationCounter::OptionItemMeditationCounter(std::string text, bool 
     imageOptionOff->setVisible(!isCounterOn);
 }
 
-void OptionItemMeditationCounter::select(bool value)
+void OptionItemMeditationCounter::select(bool isSelected)
 {
-    imageOptionOn->setVisible(value);
-    imageOptionOff->setVisible(!value);
+    imageOptionOn->setVisible(isSelected);
+    imageOptionOff->setVisible(!isSelected);
 }
 
 OptionItemPreparation::OptionItemPreparation(std::string text) : MeditationListItem(std::move(text))

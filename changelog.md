@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[meditation]` Added basic meditation functionalities and settings
 * `[gui]` Dynamic Windows building and handling implemented
 * `[audio]` Added A2DP playback backend
 * `[audio]` Added SendEvent audio API

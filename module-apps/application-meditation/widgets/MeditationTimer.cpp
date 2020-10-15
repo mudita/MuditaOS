@@ -106,7 +106,7 @@ namespace gui
 
     auto MeditationTimer::onTimerTimeout(Item &self, Timer &timerTask) -> bool
     {
-        if (isFinished() || isStopped()) {
+        if (isStopped() || isFinished()) {
             timerTask.stop();
             detachTimer(timerTask);
 
@@ -142,7 +142,7 @@ namespace gui
         isRunning = false;
     }
 
-    void MeditationTimer::setTimerVisible(bool isVisible) const noexcept
+    void MeditationTimer::setTimerVisible(bool isVisible) noexcept
     {
         timer->setVisible(isVisible);
     }

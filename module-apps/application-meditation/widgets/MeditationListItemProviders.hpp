@@ -22,8 +22,8 @@ namespace gui
         bool updateRecords(std::vector<MeditationListRecord> dbRecords) final;
 
         // virtual methods for ListViewProvider
-        unsigned int requestRecordsCount() final;
-        unsigned int getMinimalItemHeight() const final;
+        [[nodiscard]] unsigned int requestRecordsCount() final;
+        [[nodiscard]] unsigned int getMinimalItemHeight() const final;
         void requestRecords(const uint32_t offset, const uint32_t limit) override;
     };
 

@@ -55,10 +55,10 @@ void MeditationTimerWindow::destroyInterface()
 
 void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    auto timerData = reinterpret_cast<MeditationTimerData *>(data);
+    auto timerData = dynamic_cast<MeditationTimerData *>(data);
     assert(timerData);
     setVisiblePreparation();
-    meditationTimeInSeconds = timerData->getMeditationTimeInSeconds();
+    meditationTime = timerData->getMeditationTime();
 
     auto onPreparation = [&]() -> void {
         setVisibleRunning();
@@ -67,14 +67,14 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         };
         timer->registerTimeoutCallback(onMeditationEnd);
-        timer->reset(std::chrono::seconds(meditationTimeInSeconds));
+        timer->reset(meditationTime);
         timer->start();
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     };
 
     timer->registerTimeoutCallback(onPreparation);
-    timer->setTimerVisible(timerData->getShowCounter());
-    timer->reset(std::chrono::seconds(timerData->getPreparationTimeInSeconds()));
+    timer->setTimerVisible(timerData->isCounterEnabled());
+    timer->reset(timerData->getPreparationTime());
     timer->start();
 }
 

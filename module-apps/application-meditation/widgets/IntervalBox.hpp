@@ -5,6 +5,7 @@
 #include "Label.hpp"
 
 #include <list>
+#include <chrono>
 
 namespace gui
 {
@@ -12,8 +13,8 @@ namespace gui
     {
         class ChimeIntervalList
         {
-            std::list<int> intervals;
-            std::list<int>::const_iterator current;
+            std::vector<std::chrono::minutes> intervals;
+            std::vector<std::chrono::minutes>::const_iterator current;
 
           public:
             enum Direction
@@ -24,15 +25,15 @@ namespace gui
 
             ChimeIntervalList();
 
-            int get() const noexcept
+            std::chrono::minutes getCurrent() const noexcept
             {
                 return *current;
             }
 
-            bool moveToNext(Direction) noexcept;
-            bool hasNext(Direction) const noexcept;
+            bool moveToNext(Direction dir) noexcept;
+            [[nodiscard]] bool hasNext(Direction dir) const noexcept;
 
-            static std::string to_string(int);
+            [[nodiscard]] static std::string toPrintableInterval(std::chrono::minutes time);
         } chimeIntervals;
 
         Label *topLabel         = nullptr;
@@ -42,19 +43,19 @@ namespace gui
 
         bool showLeftArrowOnFocus  = true;
         bool showRightArrowOnFocus = true;
-        int intervalValue          = 0;
+        std::chrono::minutes intervalValue{0};
 
         void build();
-        void updateIntervals(ChimeIntervalList::Direction);
+        void updateIntervals(ChimeIntervalList::Direction dir);
 
       public:
         IntervalBox(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h);
 
-        bool onFocus(bool state) final;
+        bool onFocus(bool isFocused) final;
         bool onInput(const InputEvent &inputEvent) final;
-        int getIntervalValue() const noexcept
+        std::chrono::seconds getIntervalValue() const noexcept
         {
-            return intervalValue;
-        };
+            return std::chrono::seconds{intervalValue};
+        }
     };
 } // namespace gui

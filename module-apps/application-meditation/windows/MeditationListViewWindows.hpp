@@ -16,7 +16,7 @@ namespace gui
         gui::ListView *list                          = nullptr;
         std::shared_ptr<MeditationProvider> provider = nullptr;
 
-        virtual void invalidate() noexcept;
+        void invalidate() noexcept;
 
       public:
         MeditationListViewWindow(app::Application *, std::string windowName);
@@ -30,14 +30,14 @@ namespace gui
     class MeditationOptionsWindow : public MeditationListViewWindow
     {
       public:
-        MeditationOptionsWindow(app::Application *);
+        explicit MeditationOptionsWindow(app::Application *);
         void buildInterface() final;
     };
 
     class PreparationTimeWindow : public MeditationListViewWindow
     {
       public:
-        PreparationTimeWindow(app::Application *);
+        explicit PreparationTimeWindow(app::Application *);
         void buildInterface() final;
     };
 } // namespace gui

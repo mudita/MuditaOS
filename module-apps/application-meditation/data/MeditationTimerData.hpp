@@ -1,38 +1,41 @@
 #pragma once
 
 #include "gui/SwitchData.hpp"
-
+#include <chrono>
 namespace gui
 {
     class MeditationTimerData : public gui::SwitchData
     {
       public:
-        MeditationTimerData(int preparationInSec, int meditationInSec, int intervals, bool showCounter)
-            : preparationTimeInSeconds(preparationInSec), meditationTimeInSeconds(meditationInSec),
-              meditationIntervals(intervals), showCounter(showCounter)
+        MeditationTimerData(std::chrono::seconds preparation,
+                            std::chrono::seconds meditation,
+                            std::chrono::seconds intervals,
+                            bool showCounter)
+            : preparationTime(preparation), meditationTime(meditation), meditationIntervals(intervals),
+              showCounter(showCounter)
         {}
 
-        int getPreparationTimeInSeconds() const noexcept
+        [[nodiscard]] std::chrono::seconds getPreparationTime() const noexcept
         {
-            return preparationTimeInSeconds;
-        };
-        int getMeditationTimeInSeconds() const noexcept
+            return preparationTime;
+        }
+        [[nodiscard]] std::chrono::seconds getMeditationTime() const noexcept
         {
-            return meditationTimeInSeconds;
-        };
-        int getMeditationIntervals() const noexcept
+            return meditationTime;
+        }
+        [[nodiscard]] std::chrono::seconds getMeditationIntervals() const noexcept
         {
             return meditationIntervals;
-        };
-        bool getShowCounter() const noexcept
+        }
+        [[nodiscard]] bool isCounterEnabled() const noexcept
         {
             return showCounter;
         }
 
       private:
-        int preparationTimeInSeconds = 0;
-        int meditationTimeInSeconds  = 0;
-        int meditationIntervals      = 0;
-        bool showCounter             = true;
+        std::chrono::seconds preparationTime{};
+        std::chrono::seconds meditationTime{};
+        std::chrono::seconds meditationIntervals{};
+        bool showCounter = true;
     };
 }; // namespace gui

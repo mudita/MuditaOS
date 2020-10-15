@@ -36,8 +36,9 @@ unsigned int MeditationProvider::getMinimalItemHeight() const
 void MeditationProvider::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto dbRecordsCopy = std::vector<MeditationListRecord>();
-    for (uint32_t i = offset; i < std::min<uint32_t>(offset + limit, dbRecords.size()); i++) {
-        dbRecordsCopy.push_back(MeditationListRecord(dbRecords.at(i)));
+    auto upperBound    = std::min<uint32_t>(offset + limit, dbRecords.size());
+    for (uint32_t i = offset; i < upperBound; i++) {
+        dbRecordsCopy.emplace_back(MeditationListRecord(dbRecords[i]));
     }
     updateRecords(std::move(dbRecordsCopy));
 }
@@ -65,13 +66,12 @@ gui::ListItem *PrepTimeProvider::getItem(gui::Order order)
         return nullptr;
     }
 
-    auto app = reinterpret_cast<app::ApplicationMeditation *>(application);
-    assert(app);
+    auto app = static_cast<app::ApplicationMeditation *>(application);
 
     auto item = new PrepTimeItem(record->getText());
     // check if record was already selected by id or value in case on default initialization
     if (app->state->preparationRecordIndex == record->getId() ||
-        app->state->preparationTimeInSeconds == record->getValue()) {
+        app->state->preparationTime == std::chrono::seconds{record->getValue()}) {
         item->select(true);
         itemCurrentlySelected              = item;
         app->state->preparationRecordIndex = record->getId();
@@ -85,8 +85,8 @@ gui::ListItem *PrepTimeProvider::getItem(gui::Order order)
         item->select(true);
         itemCurrentlySelected = item;
 
-        app->state->preparationTimeInSeconds = record->getValue();
-        app->state->preparationRecordIndex   = record->getId();
+        app->state->preparationTime        = std::chrono::seconds{record->getValue()};
+        app->state->preparationRecordIndex = record->getId();
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         return true;
     };
@@ -114,8 +114,7 @@ gui::ListItem *MeditationOptionsProvider::getItem(gui::Order order)
     }
     MeditationListItem *item = nullptr;
     if (record->getType() == MeditationListRecord::Type::OptionMeditationCounter) {
-        auto app = reinterpret_cast<app::ApplicationMeditation *>(application);
-        assert(app);
+        auto app = static_cast<app::ApplicationMeditation *>(application);
 
         item                    = new OptionItemMeditationCounter(record->getText(), app->state->showCounter);
         item->activatedCallback = [this, app, item](gui::Item &) {

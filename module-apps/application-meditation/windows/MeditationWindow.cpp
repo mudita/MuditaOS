@@ -29,9 +29,6 @@ namespace gui
 
     void MeditationWindow::buildInterface()
     {
-        auto app = dynamic_cast<app::ApplicationMeditation *>(application);
-        assert(app != nullptr); // Pre-condition check.
-
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_meditation_title_main"));
 
@@ -77,11 +74,11 @@ namespace gui
                 return true;
             }
             else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-                auto app = reinterpret_cast<app::ApplicationMeditation *>(application);
+                auto app = dynamic_cast<app::ApplicationMeditation *>(application);
                 assert(app);
 
-                auto timerSwitchData = std::make_unique<MeditationTimerData>(app->state->preparationTimeInSeconds,
-                                                                             timeSetter->getTimeInSeconds(),
+                auto timerSwitchData = std::make_unique<MeditationTimerData>(app->state->preparationTime,
+                                                                             timeSetter->getTime(),
                                                                              intervalBox->getIntervalValue(),
                                                                              app->state->showCounter);
                 application->switchWindow(app::window::name::meditation_timer, std::move(timerSwitchData));

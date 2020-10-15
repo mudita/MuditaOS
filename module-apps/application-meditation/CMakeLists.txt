@@ -15,10 +15,13 @@ target_sources(${PROJECT_NAME}
     PUBLIC
         ApplicationMeditation.hpp
         data/Style.hpp
+        data/MeditationTimerData.hpp
+        data/OptionsData.hpp
         windows/Names.hpp
-        windows/MeditationListViewWindows.cpp
+        windows/MeditationListViewWindows.hpp
         windows/MeditationTimerWindow.hpp
         windows/MeditationWindow.hpp
+        widgets/MeditationListRecords.hpp
         widgets/MeditationTimer.hpp
         widgets/MeditationListItemProviders.hpp
         widgets/MeditationListItems.hpp

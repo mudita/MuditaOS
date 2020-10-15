@@ -14,7 +14,7 @@ namespace gui
       public:
         MeditationListItem() = delete;
         MeditationListItem(std::string text);
-        virtual void select(bool)
+        virtual void select(bool isSelected)
         {}
     };
 
@@ -24,7 +24,7 @@ namespace gui
 
       public:
         explicit PrepTimeItem(std::string text);
-        void select(bool value) final;
+        void select(bool isSelected) final;
     };
 
     class OptionItemMeditationCounter : public MeditationListItem

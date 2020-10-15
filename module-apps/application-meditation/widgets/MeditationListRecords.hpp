@@ -12,8 +12,7 @@ namespace gui
         {
             Preparation,
             OptionMeditationCounter,
-            OptionPreparation,
-            ChimeInterval
+            OptionPreparation
         };
 
         MeditationListRecord() = delete;
