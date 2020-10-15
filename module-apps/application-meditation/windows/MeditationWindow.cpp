@@ -8,6 +8,7 @@
 #include "application-meditation/ApplicationMeditation.hpp"
 
 #include "InputEvent.hpp"
+//#include "Rect.hpp"
 
 #include <cassert>
 
@@ -46,7 +47,7 @@ namespace gui
                                      style::meditation::timer::Y,
                                      style::meditation::timer::Width,
                                      style::meditation::timer::Height);
-        timeSetter->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        timeSetter->setEdges(RectangleEdge::None);
         setFocusItem(timeSetter);
 
         intervalBox = new IntervalBox(this,
@@ -54,7 +55,7 @@ namespace gui
                                       style::meditation::intervalBox::Y,
                                       style::meditation::intervalBox::Width,
                                       style::meditation::intervalBox::Height);
-        intervalBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        intervalBox->setEdges(RectangleEdge::None);
 
         intervalBox->setNavigationItem(NavigationDirection::UP, timeSetter);
         intervalBox->setNavigationItem(NavigationDirection::DOWN, timeSetter);

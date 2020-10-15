@@ -1,10 +1,12 @@
 #include "ThreadsModel.hpp"
 #include "InputEvent.hpp"
 #include "OptionWindow.hpp"
+#include "OptionsWindow.hpp"
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
+#include "log/log.hpp"
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 
@@ -45,9 +47,9 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
-            app->windowOptions->clearOptions();
-            app->windowOptions->addOptions(threadWindowOptions(app, item->getThreadItem().get()));
-            app->switchWindow(app->windowOptions->getName(), nullptr);
+            application->switchWindow(
+                utils::localize.get("app_phonebook_options_title"),
+                std::make_unique<gui::OptionsWindowOptions>(threadWindowOptions(app, item->getThreadItem().get())));
         }
         return false;
     };

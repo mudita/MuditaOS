@@ -68,7 +68,7 @@ namespace gui
 
         body = new VBox{this, 0, 0, w, h};
         body->setAlignment(Alignment::Vertical::Top);
-        body->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        body->setEdges(RectangleEdge::None);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {

@@ -58,23 +58,39 @@ namespace app
 
     void ApplicationSettingsNew::createUserInterface()
     {
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(
+                app, utils::localize.get("app_settings_title_main"), mainWindowOptionsNew(app));
+        });
 
-        gui::AppWindow *window = nullptr;
+        windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::BluetoothWindow>(app);
+        });
 
-        window = newOptionWindow(this, gui::name::window::main_window, mainWindowOptionsNew(this));
-        window->setTitle(utils::localize.get("app_settings_title_main_new"));
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        windows.insert({gui::window::name::bluetooth, new gui::BluetoothWindow(this)});
-
-        attachWindow(new gui::DisplayAndKeypadWindow(this));
-        attachWindow(new gui::InputLanguageWindow(this));
-        attachWindow(new gui::LockedScreenWindow(this));
-        attachWindow(new gui::KeypadLightWindow(this));
-        attachWindow(new gui::FontSizeWindow(this));
-        attachWindow(new gui::DisplayLightWindow(this));
-        attachWindow(new gui::AppsAndToolsWindow(this));
-        attachWindow(new gui::NetworkWindow(this));
+        windowsFactory.attach(gui::window::name::display_and_keypad, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DisplayAndKeypadWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::input_language, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::InputLanguageWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::locked_screen, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::LockedScreenWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::KeypadLightWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::font_size, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::FontSizeWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::display_light, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DisplayLightWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AppsAndToolsWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NetworkWindow>(app);
+        });
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

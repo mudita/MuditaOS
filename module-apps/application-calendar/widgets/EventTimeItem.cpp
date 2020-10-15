@@ -17,17 +17,17 @@ namespace gui
     {
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventTime::height);
 
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
         setMargins(gui::Margins(style::margins::small, style::window::calendar::item::eventTime::margin, 0, 0));
 
         vBox = new gui::VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(gui::RectangleEdge::None);
         vBox->activeItem = false;
 
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
         descriptionLabel->setMinimumSize(style::window::default_body_width,
                                          style::window::calendar::item::eventTime::separator);
-        descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::small);
         descriptionLabel->activeItem = false;
@@ -36,11 +36,11 @@ namespace gui
         hBox->setMinimumSize(style::window::default_body_width,
                              style::window::calendar::item::eventTime::height -
                                  style::window::calendar::item::eventTime::separator);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
         hBox->activeItem = false;
 
         hourInput = new gui::Text(hBox, 0, 0, 0, 0);
-        hourInput->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        hourInput->setEdges(gui::RectangleEdge::Bottom);
         hourInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         hourInput->setFont(style::window::font::largelight);
         hourInput->setInputMode(new InputMode({InputMode::digit}));
@@ -52,14 +52,14 @@ namespace gui
         colonLabel->setMinimumSize(style::window::calendar::item::eventTime::separator,
                                    style::window::calendar::item::eventTime::height -
                                        style::window::calendar::item::eventTime::separator);
-        colonLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        colonLabel->setEdges(gui::RectangleEdge::None);
         colonLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         colonLabel->setFont(style::window::font::medium);
         colonLabel->setText(":");
         colonLabel->activeItem = false;
 
         minuteInput = new gui::Text(hBox, 0, 0, 0, 0);
-        minuteInput->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        minuteInput->setEdges(gui::RectangleEdge::Bottom);
         minuteInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         minuteInput->setFont(style::window::font::largelight);
         minuteInput->setInputMode(new InputMode({InputMode::digit}));
@@ -216,7 +216,7 @@ namespace gui
     {
         if (!mode24H) {
             mode12hInput = new gui::Label(hBox, 0, 0, 0, 0);
-            mode12hInput->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+            mode12hInput->setEdges(gui::RectangleEdge::Bottom);
             mode12hInput->setAlignment(
                 gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             mode12hInput->setFont(style::window::font::largelight);

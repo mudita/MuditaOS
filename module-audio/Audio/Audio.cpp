@@ -32,20 +32,20 @@ namespace audio
         };
     }
 
-    audio::RetCode Audio::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
     {
-        switch (evt) {
-        case Operation::Event::HeadphonesPlugin:
+        switch (evt->getType()) {
+        case EventType::HeadphonesPlugin:
             headphonesInserted = true;
             break;
-        case Operation::Event::HeadphonesUnplug:
+        case EventType::HeadphonesUnplug:
             headphonesInserted = false;
             break;
         default:
             break;
         }
 
-        return currentOperation->SendEvent(evt, data);
+        return currentOperation->SendEvent(std::move(evt));
     }
 
     audio::RetCode Audio::SetOutputVolume(Volume vol)
@@ -98,7 +98,7 @@ namespace audio
             currentOperation = std::move(ret.value());
 
             if (headphonesInserted == true) {
-                currentOperation->SendEvent(audio::Operation::Event::HeadphonesPlugin);
+                currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
             }
         }
         else {

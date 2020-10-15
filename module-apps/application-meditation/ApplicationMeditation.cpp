@@ -37,10 +37,18 @@ namespace app
 
     void ApplicationMeditation::createUserInterface()
     {
-        windows.insert({app::window::name::meditation_main_window, new gui::MeditationWindow(this)});
-        windows.insert({app::window::name::meditation_timer, new gui::MeditationTimerWindow(this)});
-        windows.insert({app::window::name::meditation_options, new gui::MeditationOptionsWindow(this)});
-        windows.insert({app::window::name::meditation_preparation, new gui::PreparationTimeWindow(this)});
+        windowsFactory.attach(app::window::name::meditation_main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MeditationWindow>(app);
+        });
+        windowsFactory.attach(app::window::name::meditation_timer, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MeditationTimerWindow>(app);
+        });
+        windowsFactory.attach(app::window::name::meditation_options, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MeditationOptionsWindow>(app);
+        });
+        windowsFactory.attach(app::window::name::meditation_preparation, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PreparationTimeWindow>(app);
+        });
     }
 
     void ApplicationMeditation::destroyUserInterface()

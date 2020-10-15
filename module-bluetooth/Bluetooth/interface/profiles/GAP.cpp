@@ -1,11 +1,11 @@
-#include <Bluetooth/Device.hpp>
-#include <log/log.hpp>
-#include "Service/Bus.hpp"
-#include <vector>
-#include <Bluetooth/Error.hpp>
-#include <module-services/service-bluetooth/messages/BluetoothMessage.hpp>
 #include "BluetoothWorker.hpp"
 #include "Device.hpp"
+#include "Service/Bus.hpp"
+#include <Bluetooth/Device.hpp>
+#include <Bluetooth/Error.hpp>
+#include <log/log.hpp>
+#include <module-services/service-bluetooth/messages/BluetoothMessage.hpp>
+#include <vector>
 
 extern "C"
 {

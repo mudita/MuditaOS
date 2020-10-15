@@ -73,23 +73,23 @@ namespace audio
         constexpr audio::Volume defaultRoutingHeadsetVolume      = 10;
 
         const auto dbRoutingEarspeakerGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
         const auto routingEarspeakerGain = dbCallback(dbRoutingEarspeakerGainPath, defaultRoutingEarspeakerGain);
         const auto dbRoutingEarspeakerVolumePath =
-            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
         const auto routingEarspeakerVolume = dbCallback(dbRoutingEarspeakerVolumePath, defaultRoutingEarspeakerVolume);
         const auto dbRoutingSpeakerphoneGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
         const auto routingSpeakerphoneGain = dbCallback(dbRoutingSpeakerphoneGainPath, defaultRoutingSpeakerphoneGain);
         const auto dbRoutingSpeakerphoneVolumePath =
-            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
         const auto routingSpeakerphoneVolume =
             dbCallback(dbRoutingSpeakerphoneVolumePath, defaultRoutingSpeakerphoneVolume);
         const auto dbRoutingHeadsetGainPath =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
         const auto routingHeadsetGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadsetGain);
         const auto dbRoutingHeadsetVolumePath =
-            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
         const auto routingHeadsetVolume = dbCallback(dbRoutingHeadsetVolumePath, defaultRoutingHeadsetVolume);
 
         availableProfiles.push_back(
@@ -197,29 +197,25 @@ namespace audio
         return RetCode::Success;
     }
 
-    audio::RetCode RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data)
+    audio::RetCode RouterOperation::SendEvent(std::shared_ptr<Event> evt)
     {
-        switch (evt) {
-        case Event::HeadphonesPlugin:
+        switch (evt->getType()) {
+        case EventType::HeadphonesPlugin:
             SwitchProfile(Profile::Type::RoutingHeadset);
             break;
-        case Event::HeadphonesUnplug:
+        case EventType::HeadphonesUnplug:
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
-        case Event::BTHeadsetOn:
-            break;
-        case Event::BTHeadsetOff:
-            break;
-        case Event ::CallMute:
+        case EventType::CallMute:
             Mute(true);
             break;
-        case Event ::CallUnmute:
+        case EventType::CallUnmute:
             Mute(false);
             break;
-        case Event ::CallSpeakerphoneOn:
+        case EventType::CallSpeakerphoneOn:
             SwitchProfile(Profile::Type::RoutingSpeakerphone);
             break;
-        case Event ::CallSpeakerphoneOff:
+        case EventType::CallSpeakerphoneOff:
             SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         default:

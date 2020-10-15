@@ -18,7 +18,7 @@ namespace AudioServiceAPI
      * @param serv Requesting service.
      * @param playbackType Type of playback.
      * @param fileName Name of the file.
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioStartPlaybackResponse
      */
     bool PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName);
@@ -28,7 +28,7 @@ namespace AudioServiceAPI
      *
      * @param serv Requesting service.
      * @param fileName Path to file where recording is to be saved.
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioStartRecordingResponse
      */
     bool RecordingStart(sys::Service *serv, const std::string &fileName);
@@ -36,13 +36,10 @@ namespace AudioServiceAPI
      * @brief Starts routing. Asynchronous call.
      *
      * @param serv Requesting service.
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioStartRoutingResponse
      */
     bool RoutingStart(sys::Service *serv);
-    bool RoutingMute(sys::Service *serv, bool enable);
-    bool RoutingSpeakerPhone(sys::Service *serv, bool enable);
-    bool RoutingHeadset(sys::Service *serv, bool enable);
     /**
      * @brief Stops playback operations by type. Asynchronous call.
      *
@@ -50,7 +47,7 @@ namespace AudioServiceAPI
      * @param stopVec Playback types to be stopped.
      *  When stop vector is passed it stops current operation only if it's type is contained in the vector.
      *  Otherwise does not have effect.
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioStopResponse for all stopped inputs
      */
     bool Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec);
@@ -59,15 +56,15 @@ namespace AudioServiceAPI
      *
      * @param serv Requesting service
      * @param token Identifier of related operation
-     * @return audio::RetCode standard service-api return code
-     *  Response will come as message AudioStopResponse
+     * @return True if request has been sent successfully, false otherwise
+     *  Response will come as message AudioStopResponse for all stopped inputs
      */
     bool Stop(sys::Service *serv, const audio::Token &token);
     /**
      * @brief Stops all active playback operation. Stopped operations cannot be resumed. Asynchronous call.
      *
      * @param serv Requesting service
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioStopResponse for all stopped inputs
      */
     bool StopAll(sys::Service *serv);
@@ -76,7 +73,7 @@ namespace AudioServiceAPI
      *
      * @param serv Requesting service
      * @param token Identifier of related operation
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioPauseResponse
      */
     bool Pause(sys::Service *serv, const audio::Token &token);
@@ -85,10 +82,26 @@ namespace AudioServiceAPI
      *
      * @param serv Requesting service
      * @param token Identifier of related operation
-     * @return True is request has been sent successfully, false otherwise
+     * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioResumeResponse
      */
     bool Resume(sys::Service *serv, const audio::Token &token);
+    /**
+     * @brief Sends audio event
+     * @param serv Requesting service.
+     * @param evt Event to be sent.
+     * @return True is request has been sent successfully, false otherwise
+     *   Response will come as message AudioSendEventResponse
+     */
+    bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt);
+    /**
+     * @brief Sends audio event
+     * @param serv Requesting service.
+     * @param evt Event to be sent.
+     *  @return True is request has been sent successfully, false otherwise
+     *   Response will come as message AudioSendEventResponse
+     */
+    bool SendEvent(sys::Service *serv, audio::EventType evt);
     /**
      * @brief Attempts to parse audio file for metatags.
      *
@@ -127,5 +140,12 @@ namespace AudioServiceAPI
                               const T value,
                               const audio::PlaybackType &playbackType = audio::PlaybackType::None,
                               const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
-
+    /** @brief Key pressed handler.
+     *
+     * @param serv - requesting service.
+     * @param step - step that will be added to current volume.
+     * @return True if request has been sent successfully, false otherwise
+     *  Response will come as message AudioKeyPressedResponse
+     */
+    bool KeyPressed(sys::Service *serv, const int step);
 }; // namespace AudioServiceAPI

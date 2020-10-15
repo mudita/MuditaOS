@@ -10,7 +10,7 @@ MeditationListItem::MeditationListItem(std::string textValue)
     setMinimumSize(listStyle::text::Width, listStyle::text::Height);
     setMaximumSize(listStyle::text::Width, listStyle::text::Height);
 
-    setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
     setPenFocusWidth(style::window::default_border_focus_w);
     setPenWidth(style::window::default_border_no_focus_w);
 

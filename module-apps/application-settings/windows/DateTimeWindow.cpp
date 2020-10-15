@@ -110,7 +110,7 @@ namespace gui
             dateBody->addWidget(toAdd->second);
         }
 
-        dateBody->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        dateBody->setEdges(gui::RectangleEdge::None);
 
         // create time items
 
@@ -153,7 +153,7 @@ namespace gui
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
         timeBody->addWidget(item);
 
-        timeBody->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        timeBody->setEdges(gui::RectangleEdge::None);
 
         setFocusItem(timeBody);
         timeBody->setNavigationItem(NavigationDirection::UP, dateBody);
@@ -183,7 +183,7 @@ namespace gui
     {
         auto label = new gui::Label(
             nullptr, 0, 0, style::settings::date::date_time_spacer_width, style::settings::date::date_time_item_height);
-        label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        label->setEdges(gui::RectangleEdge::None);
         label->setText(text);
         label->setFont(style::window::font::largelight);
         label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
@@ -206,7 +206,7 @@ namespace gui
         label->setPenWidth(1);
         label->setFont(style::window::font::largelight);
         label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        label->setEdges(gui::RectangleEdge::Bottom);
         label->activatedCallback = [=](gui::Item &) {
             this->setRTC();
             return true;
@@ -219,7 +219,7 @@ namespace gui
                                       style::settings::date::date_time_item_width,
                                       style::settings::date::date_time_item_title_height);
         title->setText(itemTitle);
-        title->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        title->setEdges(gui::RectangleEdge::None);
         title->setFont(style::window::font::verysmall);
         return label;
     }

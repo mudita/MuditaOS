@@ -11,7 +11,8 @@ namespace gui
         : OptionWindow(app, gui::window::name::namecard_options)
     {
         buildInterface();
-        this->addOptions(namecardOptionsList());
+        options = namecardOptionsList();
+        addOptions(options);
     }
 
     auto PhonebookNamecardOptions::handleSwitchData(SwitchData *data) -> bool

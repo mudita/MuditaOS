@@ -54,7 +54,7 @@ namespace gui
         this->activatedCallback = activatedCallback;
         this->setPenWidth(style::window::default_border_no_focus_w);
         this->setPenFocusWidth(style::window::default_border_focus_w);
-        this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_TOP | RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
         addWidget(it);
     };
 

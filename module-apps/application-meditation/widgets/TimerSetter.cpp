@@ -29,7 +29,7 @@ void TimerSetter::build()
                           timerStyle::setterValueLabel::Y,
                           timerStyle::setterValueLabel::Width,
                           timerStyle::setterValueLabel::Height);
-    timeLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    timeLabel->setEdges(RectangleEdge::None);
     timeLabel->setFont(style::window::font::supersizemelight);
     timeLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeLabel->setPenWidth(timerStyle::PenWidth);
@@ -43,17 +43,17 @@ void TimerSetter::build()
     timeUnitLabel->setFont(style::window::font::verysmall);
     timeUnitLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeUnitLabel->setText("MINUTES");
-    timeUnitLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    timeUnitLabel->setEdges(RectangleEdge::None);
 }
 
 bool TimerSetter::onFocus(bool isFocused)
 {
     circle->setFocus(isFocused);
     if (isFocused) {
-        timeLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        timeLabel->setEdges(RectangleEdge::Bottom);
     }
     else {
-        timeLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        timeLabel->setEdges(RectangleEdge::None);
     }
     state.onFocus();
     return true;

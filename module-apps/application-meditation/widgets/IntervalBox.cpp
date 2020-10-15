@@ -25,7 +25,7 @@ void IntervalBox::build()
                          utils::localize.get("app_meditation_interval_chime"));
     topLabel->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
     topLabel->setFont(style::window::font::verysmall);
-    topLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    topLabel->setEdges(RectangleEdge::None);
 
     bottomLabel = new Label(this,
                             boxStyle::bottomLabel::X,
@@ -34,7 +34,7 @@ void IntervalBox::build()
                             boxStyle::bottomLabel::Height);
     bottomLabel->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
     bottomLabel->setFont(style::window::font::small);
-    bottomLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    bottomLabel->setEdges(RectangleEdge::Bottom);
 
     leftSwitchArrow  = new gui::Image(bottomLabel,
                                      boxStyle::arrow::LeftX,

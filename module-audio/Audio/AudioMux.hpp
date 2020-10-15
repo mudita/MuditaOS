@@ -78,7 +78,7 @@ namespace audio
          */
         auto GetIdleInput() -> std::optional<Input *>;
         /**
-         * Gets first Active input
+         * Gets input, if possible routing one, otherwise first playback
          * @return nullopt if input not found
          */
         auto GetActiveInput() -> std::optional<Input *>;

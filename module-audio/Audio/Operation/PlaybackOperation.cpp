@@ -45,11 +45,11 @@ namespace audio
         constexpr audio::Volume defaultHeadphonesVolume  = 2;
 
         const auto dbLoudspeakerVolumePath =
-            audio::str(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackLoudspeaker);
+            audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackLoudspeaker);
         const auto loudspeakerVolume = dbCallback(dbLoudspeakerVolumePath, defaultLoudspeakerVolume);
 
         const auto dbHeadphonesVolumePath =
-            audio::str(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackHeadphones);
+            audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackHeadphones);
         const auto headphonesVolume = dbCallback(dbHeadphonesVolumePath, defaultHeadphonesVolume);
 
         availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume));
@@ -143,24 +143,16 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
-    audio::RetCode PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data)
+    audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
 
-        switch (evt) {
-        case Event::HeadphonesPlugin:
+        switch (evt->getType()) {
+        case EventType::HeadphonesPlugin:
             SwitchProfile(Profile::Type::PlaybackHeadphones);
             break;
-        case Event::HeadphonesUnplug:
+        case EventType::HeadphonesUnplug:
             // TODO: Switch to playback headphones/bt profile if present
             SwitchProfile(Profile::Type::PlaybackLoudspeaker);
-            break;
-        case Event::BTA2DPOn:
-            break;
-        case Event::BTA2DPOff:
-            break;
-        case Event::BTHeadsetOn:
-            break;
-        case Event::BTHeadsetOff:
             break;
         default:
             return RetCode::UnsupportedEvent;

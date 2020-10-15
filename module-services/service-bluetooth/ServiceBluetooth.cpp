@@ -44,6 +44,7 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
             switch (lmsg->req) {
             case BluetoothMessage::Start:
                 worker->run();
+
                 break;
             case BluetoothMessage::Scan:
                 if (worker->scan()) {
@@ -73,6 +74,13 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
                 worker->set_visible();
                 break;
 
+            case BluetoothMessage::Play:
+                worker->play_audio();
+                break;
+            case BluetoothMessage::Stop:
+                worker->stop_audio();
+                break;
+
             default:
                 break;
             }
@@ -90,6 +98,7 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
         auto addrMsg = static_cast<BluetoothAddrMessage *>(msg);
         worker->set_addr(addrMsg->addr);
     }
+
     return std::make_shared<sys::ResponseMessage>();
 }
 

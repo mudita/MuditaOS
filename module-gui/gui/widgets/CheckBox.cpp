@@ -18,7 +18,7 @@ namespace gui
           bottomBarRestoreFromTemporaryMode(bottomBarRestoreFromTemporaryMode), textOnLeft(textOnLeft)
 
     {
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        setEdges(RectangleEdge::Bottom);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         image = new Image("small_tick_W_M");

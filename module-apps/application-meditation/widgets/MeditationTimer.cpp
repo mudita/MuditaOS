@@ -22,7 +22,7 @@ namespace gui
                                      Item *_parent)
         : HBox(_parent, x, y, width, height), application{app}
     {
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
         build();
     }
 
@@ -41,7 +41,7 @@ namespace gui
         progressBar = new CircularProgressBar(this, params);
 
         timer = new Text(progressBar, 0, 0, getWidth(), getHeight());
-        timer->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        timer->setEdges(RectangleEdge::None);
         timer->setFont(style::window::font::supersizemelight);
         timer->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         timer->setEditMode(EditMode::BROWSE);

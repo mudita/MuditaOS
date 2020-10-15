@@ -9,7 +9,8 @@ namespace gui
     DisplayAndKeypadWindow::DisplayAndKeypadWindow(app::Application *app)
         : OptionWindow(app, gui::window::name::display_and_keypad)
     {
-        addOptions(displayAndKeypadOptionsList());
+        options = displayAndKeypadOptionsList();
+        addOptions(options);
         setTitle(utils::localize.get("app_settings_disp_key"));
     }
 

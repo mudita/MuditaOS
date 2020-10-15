@@ -11,6 +11,7 @@
 #include <memory>
 #include <functional>
 
+#include "OptionsWindow.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "bsp/rtc/rtc.hpp"
@@ -103,7 +104,7 @@ namespace gui
         for (uint32_t i = 0; i < 2; ++i) {
             rects[i] = new gui::Rect(this, 0, 0, information::imgs::w, information::imgs::h);
             rects[i]->setFilled(false);
-            rects[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+            rects[i]->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
             rects[i]->setPenFocusWidth(style::window::default_border_focus_w);
             rects[i]->setPenWidth(style::window::default_border_no_focus_w);
         }
@@ -260,12 +261,8 @@ namespace gui
             (inputEvent.keyCode == KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCallLog *>(application);
             assert(app != nullptr);
-
-            if (app->windowOptions != nullptr) {
-                app->windowOptions->clearOptions();
-                app->windowOptions->addOptions(calllogWindowOptions(app, record));
-                app->switchWindow(app->windowOptions->getName(), nullptr);
-            }
+            app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                              std::make_unique<gui::OptionsWindowOptions>(calllogWindowOptions(app, record)));
 
             return true;
         }

@@ -3,6 +3,7 @@
 #include "AppWindow.hpp"
 #include <Text.hpp>
 #include <functional>
+#include <DialogMetadata.hpp>
 
 namespace gui
 {
@@ -16,20 +17,9 @@ namespace gui
         Image *icon = nullptr;
 
       public:
-        struct Meta
-        {
-            std::string title;
-            UTF8 icon                    = "";
-            UTF8 text                    = "No text";
-            std::function<bool()> action = []() -> bool { return false; };
+        Dialog(app::Application *app, const std::string &name);
 
-            Meta() = default;
-        } meta;
-
-        Dialog(app::Application *app, const std::string &name, const Meta &meta);
-        ~Dialog() override = default;
-
-        virtual void update(const Meta &meta);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
     /// @brief Confirm Dialog class
@@ -39,10 +29,9 @@ namespace gui
     class DialogConfirm : public Dialog
     {
       public:
-        DialogConfirm(app::Application *app, const std::string &name, const Dialog::Meta &meta = Dialog::Meta());
-        ~DialogConfirm() override = default;
+        DialogConfirm(app::Application *app, const std::string &name);
 
-        virtual void update(const Meta &meta) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
     /// @brief Yes/No Dialog class
@@ -54,10 +43,9 @@ namespace gui
         Label *yes = nullptr, *no = nullptr;
 
       public:
-        DialogYesNo(app::Application *app, const std::string &name, const Meta &meta = Dialog::Meta());
-        ~DialogYesNo() override = default;
+        DialogYesNo(app::Application *app, const std::string &name);
 
-        void update(const Meta &meta);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
     /// @brief Yes/No Icon Text  Dialog class
@@ -67,14 +55,11 @@ namespace gui
     {
       protected:
         Text *iconText = nullptr;
-        UTF8 textStr   = "";
 
       public:
-        DialogYesNoIconTxt(app::Application *app, const std::string &name, const Meta &meta = Dialog::Meta());
-        ~DialogYesNoIconTxt() override = default;
+        DialogYesNoIconTxt(app::Application *app, const std::string &name);
 
-        void SetIconText(const std::string &text);
-        void update(const Meta &meta);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
 }; // namespace gui

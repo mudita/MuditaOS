@@ -21,6 +21,7 @@ void MeditationListViewWindow::buildInterface()
     list = new gui::ListView(
         this, listViewWindow::X, listViewWindow::Y, listViewWindow::Width, listViewWindow::Height, provider);
     setFocusItem(list);
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 }
 
 void MeditationListViewWindow::destroyInterface()
@@ -42,7 +43,7 @@ void MeditationListViewWindow::invalidate() noexcept
 
 void MeditationListViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    list->rebuildList();
+    list->rebuildList(style::listview::RebuildType::InPlace);
     list->setVisible(true);
 }
 

@@ -1,6 +1,7 @@
 #include "BluetoothWorker.hpp"
-#include "log/log.hpp"
 #include "BtCommand.hpp"
+#include "log/log.hpp"
+#include "module-bluetooth/Bluetooth/interface/profiles/A2DP/A2DP.hpp"
 
 extern "C"
 {
@@ -24,7 +25,7 @@ const char *c_str(Bt::Error::Code code)
     return "";
 }
 
-BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service)
+BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service), currentProfile(std::make_shared<Bt::A2DP>())
 {
     init({
         {"qBtIO", sizeof(Bt::Message), 10},
@@ -34,7 +35,9 @@ BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service)
 
 BluetoothWorker::~BluetoothWorker()
 {
-    if (this->bt_worker_task != nullptr) {}
+    if (this->bt_worker_task != nullptr) {
+        vTaskDelete(this->bt_worker_task);
+    }
     LOG_INFO("Worker removed");
 }
 
@@ -182,8 +185,37 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
 
     return true;
 }
-void BluetoothWorker::set_addr(uint8_t *addr)
+
+void BluetoothWorker::initAudioBT()
+{}
+
+bool BluetoothWorker::play_audio()
+{
+    auto profile = dynamic_cast<Bt::A2DP *>(currentProfile.get());
+    if (profile == nullptr) {
+        return false;
+    }
+
+    profile->init();
+    profile->setOwnerService(service);
+    profile->start();
+    return true;
+}
+bool BluetoothWorker::stop_audio()
+{
+    auto profile = dynamic_cast<Bt::A2DP *>(currentProfile.get());
+    if (profile == nullptr) {
+        return false;
+    }
+
+    profile->stop();
+    return true;
+}
+void BluetoothWorker::set_addr(bd_addr_t addr)
 {
     Bt::GAP::do_pairing(addr);
-    LOG_INFO("ADDRESS %s SET!", bd_addr_to_str(addr));
+    auto profile = dynamic_cast<Bt::A2DP *>(currentProfile.get());
+    if (profile != nullptr) {
+        profile->setDeviceAddress(addr);
+    }
 }

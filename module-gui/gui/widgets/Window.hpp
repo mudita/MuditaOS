@@ -32,6 +32,7 @@ namespace gui
         std::string name;
 
       public:
+        Window() = delete;
         explicit Window(std::string name);
 
         /// run every time in Application prior to showing window, except for when we came back to first window with no

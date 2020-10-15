@@ -13,7 +13,7 @@
 namespace gui
 {
 
-    CalendarMainWindow::CalendarMainWindow(app::Application *app, std::string name) : AppWindow(app, name)
+    CalendarMainWindow::CalendarMainWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
     {
         auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(appCalendar != nullptr);

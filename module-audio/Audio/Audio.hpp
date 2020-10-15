@@ -27,7 +27,7 @@ namespace audio
         virtual ~Audio() = default;
 
         // Events
-        audio::RetCode SendEvent(const Operation::Event evt, const EventData *data = nullptr);
+        audio::RetCode SendEvent(std::shared_ptr<Event> evt);
 
         // utilities
         Position GetPosition();
@@ -37,7 +37,7 @@ namespace audio
             return currentState;
         }
 
-        std::optional<Tags> GetFileTags(const char *filename);
+        static std::optional<Tags> GetFileTags(const char *filename);
 
         // Range 0-1
         audio::RetCode SetOutputVolume(Volume vol);

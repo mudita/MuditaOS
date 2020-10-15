@@ -172,8 +172,8 @@ namespace gui
         separatorLower->setBorderColor(gui::ColorFullBlack);
         separatorUpper->setPenWidth(1);
         separatorLower->setPenWidth(1);
-        separatorUpper->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        separatorLower->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        separatorUpper->setEdges(RectangleEdge::Bottom);
+        separatorLower->setEdges(RectangleEdge::Top);
 
         separatorLayout->addWidget(separatorUpper);
         separatorLayout->addWidget(separatorLower);

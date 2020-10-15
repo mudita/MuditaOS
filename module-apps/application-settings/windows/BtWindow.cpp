@@ -62,8 +62,8 @@ namespace gui
         setTitle(utils::localize.get("app_settings_bt"));
 
         LOG_INFO("Create box layout");
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 5 * style::window::label::default_h);
-        box->setPenWidth(style::window::default_border_no_focus_w);
+        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
+        box->setEdges(RectangleEdge::None);
 
         // TODO WIP: it's just for usability now
         // TODO scan should return async - handle that... (if in scan -> add to list and refresh if new on window)
@@ -91,9 +91,21 @@ namespace gui
             return true;
         });
 
-        add_box_label(box, "  -> Visibility", [=](Item &) {
-            LOG_DEBUG("Callback visibility");
+        add_box_label(box, "  -> Set visible", [=](Item &) {
+            LOG_DEBUG("Callback set visibility");
             message_bt(application, BluetoothMessage::Request::Visible);
+            return true;
+        });
+
+        add_box_label(box, "  -> Play", [=](Item &) {
+            LOG_DEBUG("Start playback");
+            message_bt(application, BluetoothMessage::Request::Play);
+            return true;
+        });
+
+        add_box_label(box, "  -> Stop", [=](Item &) {
+            LOG_DEBUG("Stop playback");
+            message_bt(application, BluetoothMessage::Request::Stop);
             return true;
         });
 

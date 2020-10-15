@@ -22,9 +22,7 @@ namespace app
       protected:
       public:
         ApplicationCallLog(std::string name = CallLogAppStr, std::string parent = "", bool startBackgound = false);
-        virtual ~ApplicationCallLog();
-
-        gui::OptionWindow *windowOptions = nullptr;
+        ~ApplicationCallLog() override;
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
