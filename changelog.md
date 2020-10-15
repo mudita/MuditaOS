@@ -11,6 +11,9 @@
 
 ## Current release
 
+### Added
+* `[messages][db]` File Indexer db Agent
+
 ### Changed
 
 * `[calendar]` Rework to use database model instead of internal model in day events list.
