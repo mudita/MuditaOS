@@ -1,16 +1,10 @@
-/*
- * @file CallWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 12 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "CallWindow.hpp"
+#include <application-call/data/CallWindowData.hpp>
 
 #include "GuiTimer.hpp"
 #include "InputEvent.hpp"
 #include "application-call/widgets/Icons.hpp"
+#include "log/log.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "application-call/ApplicationCall.hpp"
@@ -25,6 +19,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "application-call/data/CallAppStyle.hpp"
+#include "time/time_conversion.hpp"
 
 #include <UiCommonActions.hpp>
 #include <application-messages/data/SMSdata.hpp>
@@ -36,11 +31,13 @@
 #include <iomanip>
 
 #include <cassert>
+#include <magic_enum.hpp>
 
 namespace gui
 {
     using namespace callAppStyle;
     using namespace callAppStyle::callWindow;
+    using namespace call;
 
     CallWindow::CallWindow(app::Application *app, std::string windowName) : AppWindow(app, windowName)
     {
@@ -159,11 +156,12 @@ namespace gui
 
     void CallWindow::setState(State state)
     {
+        LOG_INFO("==> Call state change: %s -> %s", c_str(this->state), c_str(state));
         this->state = state;
         setVisibleState();
     }
 
-    const CallWindow::State &CallWindow::getState()
+    const State &CallWindow::getState()
     {
         return state;
     }
@@ -173,6 +171,8 @@ namespace gui
         // show state of the window
         switch (state) {
         case State::INCOMING_CALL: {
+            runCallTimer();
+
             bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(strings::answer), true);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::reject), true);
@@ -184,6 +184,8 @@ namespace gui
             setFocusItem(sendSmsIcon);
         } break;
         case State::CALL_ENDED: {
+            stopCallTimer();
+
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
@@ -220,6 +222,8 @@ namespace gui
             setFocusItem(microphoneIcon);
         } break;
         case State::IDLE:
+            stopCallTimer();
+            [[fallthrough]];
         default:
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
@@ -236,7 +240,7 @@ namespace gui
     void CallWindow::setCallNumber(std::string)
     {}
 
-    void CallWindow::updateDuration(const utils::time::Duration &duration)
+    void CallWindow::updateDuration(const utils::time::Duration duration)
     {
         if (durationLabel != nullptr) {
             durationLabel->setText(duration.str());
@@ -273,7 +277,6 @@ namespace gui
             }
         }
         else {
-            LOG_ERROR("Unrecognized SwitchData");
             return false;
         }
 
@@ -299,7 +302,37 @@ namespace gui
     }
 
     void CallWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
+    {
+        auto app = static_cast<app::ApplicationCall *>(application);
+
+        if (dynamic_cast<app::IncomingCallData *>(data) != nullptr) {
+            if (getState() == call::State::INCOMING_CALL) {
+                LOG_INFO("ignoring call incoming");
+            }
+            app->startRinging();
+            setState(call::State::INCOMING_CALL);
+            return;
+        }
+
+        if (dynamic_cast<app::CallAbortData *>(data) != nullptr) {
+            app->stopAudio();
+            setState(State::CALL_ENDED);
+            return;
+        }
+
+        if (dynamic_cast<app::CallActiveData *>(data) != nullptr) {
+            app->startRouting();
+            runCallTimer();
+            return;
+        }
+
+        if (dynamic_cast<app::ExecuteCallData *>(data) != nullptr) {
+            AudioServiceAPI::RoutingStart(application);
+            runCallTimer();
+            setState(State::OUTGOING_CALL);
+            return;
+        }
+    }
 
     bool CallWindow::handleLeftButton()
     {
@@ -378,16 +411,40 @@ namespace gui
     {
         auto app = dynamic_cast<app::ApplicationCall *>(application);
         assert(app != nullptr);
+
         auto timer = std::make_unique<app::GuiTimer>(app);
         timer->setInterval(app->getDelayedStopTime());
-        timerCallback = [app, this](Item &, Timer &timer) {
-            app->stopCallTimer();
+
+        timerCallback = [this](Item &, Timer &timer) {
             setState(State::IDLE);
             detachTimer(timer);
-            sapm::ApplicationManager::messageSwitchPreviousApplication(app);
+            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
             return true;
         };
-        app->connect(std::move(timer), this);
+        application->connect(std::move(timer), this);
     }
 
+    void CallWindow::runCallTimer()
+    {
+        static const sys::ms one_second = 1000;
+        callStart                       = utils::time::Timestamp();
+        stop_timer                      = false;
+        auto timer    = std::make_unique<app::GuiTimer>("CallTime", application, one_second, Timer::Continous);
+        timerCallback = [&](Item &, Timer &timer) {
+            if (stop_timer) {
+                timer.stop();
+                detachTimer(timer);
+            }
+            updateDuration(utils::time::Duration(utils::time::Timestamp(), callStart));
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            return true;
+        };
+        timer->start();
+        application->connect(std::move(timer), this);
+    }
+
+    void CallWindow::stopCallTimer()
+    {
+        stop_timer = true;
+    }
 } /* namespace gui */
