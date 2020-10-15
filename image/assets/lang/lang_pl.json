@@ -46,6 +46,8 @@
     "locale_date_full" : "%d.%m.%y",
     "locale_date_short" : "%d.%m",
 
+    "app_calculator_decimal_separator": ",",
+
     "app_notes_title_main": "Notatki",
     "app_notes_new_note": "Nowa Notatka",
     "app_notes_save": "ZAPISZ",

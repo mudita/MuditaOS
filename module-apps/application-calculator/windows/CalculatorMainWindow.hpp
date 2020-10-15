@@ -1,0 +1,31 @@
+#pragma once
+
+#include "windows/AppWindow.hpp"
+#include "Application.hpp"
+#include "application-calculator/widgets/MathOperationsBox.hpp"
+#include <module-gui/gui/widgets/Text.hpp>
+#include <module-utils/tinyexpr/tinyexpr.h>
+
+namespace gui
+{
+
+    class CalculatorMainWindow : public gui::AppWindow
+    {
+        gui::Text *mathOperationInput   = nullptr;
+        gui::MathOperationsBox *mathBox = nullptr;
+
+        bool clearInput = false;
+        void writeEquation(bool lastCharIsSymbol, const UTF8 &symbol);
+        void applyInputCallback();
+        bool isPreviousNumberDecimal();
+        bool isSymbol(uint32_t character);
+
+      public:
+        CalculatorMainWindow(app::Application *app, std::string name);
+
+        ~CalculatorMainWindow() override = default;
+        void buildInterface() override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
+    };
+
+} // namespace gui
