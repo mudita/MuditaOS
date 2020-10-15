@@ -27,8 +27,7 @@ namespace gui
 
     void TextFixedSize::drawLines()
     {
-
-        lines.erase();
+        lines->erase();
 
         auto sizeMinusPadding = [&](Axis axis, Area val) {
             auto size = area(val).size(axis);
@@ -44,16 +43,18 @@ namespace gui
         uint32_t w           = sizeMinusPadding(Axis::X, Area::Normal);
         uint32_t h           = sizeMinusPadding(Axis::Y, Area::Normal);
         auto line_y_position = padding.top;
-        auto cursor          = 0;
+        auto &draw_cursor    = *cursor;
+
+        draw_cursor.setToStart();
 
         unsigned int currentLine = 0;
         unsigned int lineHeight  = format.getFont()->info.line_height + underlinePadding;
 
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(
-                document.get(), cursor, w, lineHeight, underline, UnderlineDrawMode::WholeLine, underlinePadding);
-            cursor += text_line.length();
+            auto text_line =
+                gui::TextLine(draw_cursor, w, lineHeight, underline, UnderlineDrawMode::WholeLine, underlinePadding);
+            draw_cursor += text_line.length();
 
             if (text_line.height() > 0 && lineHeight != text_line.height()) {
                 lineHeight = text_line.height();
@@ -67,8 +68,8 @@ namespace gui
                 break;
             }
 
-            lines.emplace(std::move(text_line));
-            auto &line = lines.last();
+            lines->emplace(std::move(text_line));
+            auto &line = lines->last();
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
 
@@ -78,7 +79,7 @@ namespace gui
 
         } while (true);
 
-        lines.linesHAlign(sizeMinusPadding(Axis::X, Area::Normal));
-        lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+        lines->linesHAlign(sizeMinusPadding(Axis::X, Area::Normal));
+        lines->linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
     }
 } // namespace gui

@@ -5,9 +5,12 @@
 #include "Label.hpp"
 #include "TextDocument.hpp"
 #include "BoxLayout.hpp"
+#include "TextLineCursor.hpp"
 
 namespace gui
 {
+    class TextCursor;
+
     enum class UnderlineDrawMode
     {
         WholeLine,
@@ -20,6 +23,7 @@ namespace gui
         unsigned int number_letters_shown = 0;
         Length width_used                 = 0;
         Length height_used                = 0;
+        Length max_width                  = 0;
         std::list<Label *> elements_to_show_in_line;
         Rect *underline                     = nullptr;
         bool drawUnderline                  = false;
@@ -29,23 +33,31 @@ namespace gui
         unsigned int block_nr               = text::npos;
         Position storedYOffset              = 0;
 
-        void createUnderline(unsigned int max_width, unsigned int max_height);
+        void createUnderline(unsigned int max_w, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
 
       public:
-        /// creates TextLine with data from text from start position in `TextDocument` filling max_width
-        /// @note might be better to have TextBlockIterator which could hop through TextBlock inside TextDocument
-        TextLine(TextDocument *, unsigned int start_position, unsigned int max_width);
-        TextLine(TextDocument *,
-                 unsigned int start_position,
+        /// creates TextLine with data from text based on TextCursor position filling max_width
+        TextLine(const BlockCursor &, unsigned int max_width);
+        TextLine(TextLine &) = delete;
+        TextLine(TextLine &&);
+
+        TextLine(TextCursor &cursor,
                  unsigned int max_width,
                  unsigned int init_height,
                  bool drawUnderline,
                  UnderlineDrawMode drawUnderlineMode,
-                 Position underlinePadding = 0);
+                 Position underlinePadding)
+            : TextLine(cursor, max_width)
+        {
+            this->drawUnderline     = drawUnderline;
+            this->drawUnderlineMode = drawUnderlineMode;
+            this->underlinePadding  = underlinePadding;
+
+            createUnderline(max_width, init_height);
+        }
+
         ~TextLine();
-        TextLine(TextLine &) = delete;
-        TextLine(TextLine &&);
 
         /// number of letters in Whole TextLines
         unsigned int length() const
@@ -106,5 +118,7 @@ namespace gui
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
         void alignH(Alignment align, Length parent_length) const;
         void alignV(Alignment align, Length parent_length, Length lines_height);
+        auto getText(unsigned int pos) const -> UTF8;
+        auto checkBounds(TextLineCursor &cursor, uint32_t utf_value, const TextFormat *format) -> InputBound;
     };
 } // namespace gui

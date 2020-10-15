@@ -1,8 +1,10 @@
 #pragma once
 
+#include "utf8/UTF8.hpp"
 #include "TextConstants.hpp"
 #include <cstdio>
 #include <stdint.h>
+#include <string>
 #include <list>
 
 namespace gui
@@ -23,14 +25,15 @@ namespace gui
     {
       protected:
         TextDocument *document = nullptr;
-        auto currentBlock();
-        auto blocksEnd();
-        auto blocksBegin();
+        auto currentBlock() const;
+        auto blocksEnd() const;
+        auto blocksBegin() const;
         RawFont *default_font = nullptr;
 
       private:
         unsigned int pos      = text::npos;
         unsigned int block_nr = text::npos;
+        bool block_jump       = false;
 
       protected:
         [[nodiscard]] auto checkNpos() const -> bool;
@@ -64,6 +67,8 @@ namespace gui
 
         [[nodiscard]] auto atEnd() const -> bool;
 
+        [[nodiscard]] auto atEol() const -> bool;
+
         operator bool() const
         {
             return !checkNpos();
@@ -73,11 +78,18 @@ namespace gui
         auto operator++() -> BlockCursor &;
         auto operator-=(unsigned int) -> BlockCursor &;
         auto operator--() -> BlockCursor &;
+
+        // return if handled ( this is not i.e. at begin/end)
+        auto removeChar() -> bool;
+        auto operator*() -> const TextBlock &;
+        auto operator->() -> const TextBlock *;
+
         void addChar(uint32_t utf_val);
         void addTextBlock(TextBlock &&);
-        // return if handled ( this is not i.e. at begin/end)
-        bool removeChar();
-        const TextBlock &operator*();
+
+        [[nodiscard]] auto getText() -> std::string;
+        auto getUTF8Text() -> UTF8;
+        void resetJumps();
 
         /// iterable
         /// {

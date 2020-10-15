@@ -17,12 +17,14 @@ namespace gui
         if (getEnd() != End::Newline && eol == End::Newline) {
             this->text.insertCode(text::newline);
         }
+        end = eol;
     }
 
     TextBlock::TextBlock(const TextBlock &p)
     {
         text   = p.text;
         format = std::make_unique<TextFormat>(*p.format);
+        end    = p.end;
     }
 
     const UTF8 &TextBlock::getText() const
@@ -83,6 +85,7 @@ namespace gui
         if (getEnd() != End::Newline) {
             text.insertCode(text::newline);
         }
+        this->end = end;
     }
 
     void TextBlock::addChar(uint32_t utf_val, unsigned int pos)

@@ -29,4 +29,25 @@ namespace gui
         SINGLE_LINE = 1,
         MULTI_LINE
     };
+
+    enum class InputBound
+    {
+        CANT_PROCESS = 0x100,
+        NO_DATA      = 0x101,
+        HIT_BOUND    = 0x110,
+
+        CAN_ADD    = 0x1000,
+        CAN_MOVE   = 0x10000,
+        CAN_REMOVE = 0x100000
+    };
+
+    enum class Scroll
+    {
+        DOWN  = -1,
+        UP    = 1,
+        LEFT  = -1,
+        RIGHT = 1,
+        NONE  = 0
+    };
+
 } // namespace gui

@@ -20,6 +20,7 @@
 #include <FontManager.hpp>
 #include <RawFont.hpp>
 #include <RichTextParser.hpp>
+#include "Lines.hpp"
 
 #if DEBUG_GUI_TEXT == 1
 #define debug_text(...) LOG_DEBUG(__VA_ARGS__)
@@ -39,6 +40,12 @@
 
 namespace gui
 {
+    /// changes integer value to ascii int value (with no additional checks)
+    char intToAscii(int val)
+    {
+        return val + '0';
+    }
+
     Text::Text(Item *parent,
                const uint32_t &x,
                const uint32_t &y,
@@ -47,9 +54,11 @@ namespace gui
                const UTF8 &text,
                ExpandMode expandMode,
                TextType textType)
-        : Rect(parent, x, y, w, h), lines(this), expandMode{expandMode}, textType{textType},
+        : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType},
           format(FontManager::getInstance().getFont(style::window::font::small))
     {
+        lines = std::make_unique<Lines>(this);
+
         alignment = style::text::defaultTextAlignment;
 
         setPenWidth(style::window::default_border_no_focus_w);
@@ -95,9 +104,9 @@ namespace gui
         setText(std::make_unique<TextDocument>(textToTextBlocks(text, format.getFont(), TextBlock::End::None)));
     }
 
-    void Text::setText(std::unique_ptr<TextDocument> &&document)
+    void Text::setText(std::unique_ptr<TextDocument> &&doc)
     {
-        buildDocument(std::move(document));
+        buildDocument(std::move(doc));
         onTextChanged();
     }
 
@@ -181,6 +190,12 @@ namespace gui
         buildCursor();
     }
 
+    std::tuple<Scroll, uint32_t> scrollView(const TextCursor &cursor)
+    {
+        uint32_t scrolledLines = 1;
+        return {Scroll::UP, scrolledLines};
+    }
+
     bool Text::onInput(const InputEvent &evt)
     {
         if (Rect::onInput(evt)) {
@@ -203,26 +218,16 @@ namespace gui
             debug_text("handleActivation");
             return true;
         }
-        if (handleNavigation(evt)) {
-            debug_text("handleNavigation");
-            return true;
-        }
-        if (handleBackspace(evt)) {
-            debug_text("handleBackspace");
-            return true;
-        }
-        if (handleAddChar(evt)) {
-            debug_text("handleAddChar");
-            return true;
-        }
-        if (handleDigitLongPress(evt)) {
-            debug_text("handleDigitLongPress");
-            return true;
+
+        auto bound = lines->checkBounds(*cursor, evt);
+        bound      = cursor->processBound(bound, evt);
+
+        if (bound == InputBound::HIT_BOUND) {
+            auto [scroll, factor] = scrollView(*cursor);
+            lines->updateBounds(scroll, factor);
         }
 
-        debug_text("not handled: %s", evt.str().c_str());
-
-        return false;
+        return bound != InputBound::CANT_PROCESS;
     }
 
     bool Text::onFocus(bool state)
@@ -276,8 +281,8 @@ namespace gui
         if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT))) {
             debug_text("Text in scroll mode ignores left/right navigation");
         }
-        auto ret = cursor->move_cursor(inputToNavigation(inputEvent));
-        debug_text("move_cursor: %s", c_str(ret));
+        auto ret = cursor->moveCursor(inputToNavigation(inputEvent));
+        debug_text("moveCursor: %s", c_str(ret));
         if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
             debug_text("scrolling needs implementing");
             return false;
@@ -312,7 +317,7 @@ namespace gui
 
     void Text::drawLines()
     {
-        lines.erase();
+        lines->erase();
 
         auto sizeMinusPadding = [&](Axis axis, Area val) {
             auto size = area(val).size(axis);
@@ -337,15 +342,16 @@ namespace gui
         Length h = sizeMinusPadding(Axis::Y, Area::Max);
 
         auto line_y_position = padding.top;
-        auto cursor          = 0;
+
+        BlockCursor draw_cursor = *cursor;
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
         auto end             = TextBlock::End::None;
         auto line_x_position = padding.left;
         do {
-            auto text_line = gui::TextLine(document.get(), cursor, w);
-            cursor += text_line.length();
+            auto text_line = gui::TextLine(draw_cursor, w);
+            draw_cursor += text_line.length();
 
             if (text_line.length() == 0 && end == TextBlock::End::None) {
                 debug_text("cant show more text from this document");
@@ -364,13 +370,14 @@ namespace gui
             // for each different text which fits in line, addWidget last - to not trigger callbacks to parent
             // on resizes while not needed, after detach there can be no `break` othervise there will be leak - hence
             // detach
-            lines.emplace(std::move(text_line));
-            auto &line = lines.last();
+            lines->emplace(std::move(text_line));
+            auto &line = lines->last();
 
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
+            line.alignH(getAlignment(Axis::X), w);
 
-            end = lines.last().getEnd();
+            end = lines->last().getEnd();
             line_y_position += line.height();
 
             debug_text_lines("debug text drawing: \n start cursor: %d line length: %d end cursor %d : document length "
@@ -394,9 +401,9 @@ namespace gui
         // should be done on each loop
         {
             uint16_t h_used = line_y_position + padding.bottom;
-            uint16_t w_used = lines.maxWidth() + padding.getSumInAxis(Axis::X);
+            uint16_t w_used = lines->maxWidth() + padding.getSumInAxis(Axis::X);
 
-            if (lines.size() == 0) {
+            if (lines->size() == 0) {
                 debug_text("No lines to show, try to at least fit in cursor");
                 if (format.getFont() != nullptr && line_y_position < format.getFont()->info.line_height) {
                     h_used = format.getFont()->info.line_height;
@@ -414,8 +421,8 @@ namespace gui
                 }
             }
 
-            lines.linesHAlign(sizeMinusPadding(Axis::X, Area::Normal));
-            lines.linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
+            lines->linesHAlign(sizeMinusPadding(Axis::X, Area::Normal));
+            lines->linesVAlign(sizeMinusPadding(Axis::Y, Area::Normal));
 
             debug_text("<- END\n");
         }
@@ -458,7 +465,7 @@ namespace gui
     void Text::buildCursor()
     {
         erase(cursor);
-        cursor = new TextCursor(this, document.get());
+        cursor = new TextLineCursor(this);
         cursor->setAlignment(this->getAlignment());
         cursor->setMargins(this->getPadding());
         showCursor(focus);
@@ -542,12 +549,6 @@ namespace gui
 
         debug_text("handleAdChar -> End(false)");
         return false;
-    }
-
-    /// changes integer value to ascii int value (with no additional checks)
-    char intToAscii(int val)
-    {
-        return val + '0';
     }
 
     bool Text::handleDigitLongPress(const InputEvent &inputEvent)

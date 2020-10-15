@@ -45,8 +45,6 @@ namespace gui
         HBOX
     };
 
-    NavigationDirection inputToNavigation(const InputEvent &evt);
-
     class Item
     {
       private:
@@ -224,7 +222,7 @@ namespace gui
         [[nodiscard]] Margins getMargins();
 
         virtual void setPadding(const Padding &value);
-        [[nodiscard]] Padding getPadding();
+        [[nodiscard]] Padding getPadding() const;
 
         virtual void setAlignment(const Alignment &value);
         [[nodiscard]] Alignment &getAlignment();
@@ -293,6 +291,7 @@ namespace gui
         virtual void clearNavigationItem(gui::NavigationDirection direction);
 
         Item();
+        Item(Item &) = delete;
         virtual ~Item();
 
         /// @defgroup inconsistent  inconsistent size/offset accessors and setters
@@ -352,5 +351,7 @@ namespace gui
         /// Pointer to navigation object. It is added when object is set for one of the directions
         gui::Navigation *navigationDirections = nullptr;
     };
+
+    NavigationDirection inputToNavigation(const InputEvent &evt);
 
 } /* namespace gui */
