@@ -14,6 +14,7 @@ class ContactDetailsModel : public app::InternalModel<gui::ContactListItem *>, p
   public:
     ContactDetailsModel(app::Application *app);
 
+    void clearData();
     void loadData(std::shared_ptr<ContactRecord> contactRecord);
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;

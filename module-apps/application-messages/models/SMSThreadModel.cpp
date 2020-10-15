@@ -78,7 +78,7 @@ auto SMSThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 
     resetInputWidget();
 
-    if (msgResponse->getDraft().isValid()) {
+    if (msgResponse->getDraft().isValid() && smsInput->inputText->isEmpty()) {
         smsInput->draft = msgResponse->getDraft().type == SMSType::DRAFT
                               ? std::optional<SMSRecord>{msgResponse->getDraft()}
                               : std::nullopt;

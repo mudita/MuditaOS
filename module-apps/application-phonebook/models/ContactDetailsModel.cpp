@@ -11,6 +11,12 @@
 ContactDetailsModel::ContactDetailsModel(app::Application *app) : application(app)
 {}
 
+void ContactDetailsModel::clearData()
+{
+    list->clear();
+    eraseInternalData();
+}
+
 auto ContactDetailsModel::requestRecordsCount() -> unsigned int
 {
     return internalData.size();
@@ -53,8 +59,7 @@ void ContactDetailsModel::createData(bool showInformationWidget, bool showAddres
 
 void ContactDetailsModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
 {
-    list->clear();
-    eraseInternalData();
+    clearData();
 
     auto isInformationDataExist = [&]() -> bool {
         return contactRecord->numbers.size() > 0 || contactRecord->mail.length() > 0;
