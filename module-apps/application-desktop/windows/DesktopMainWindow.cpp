@@ -102,16 +102,14 @@ namespace gui
             setFocusItem(nullptr);
             erase(notifications);
 
-            // TimeServiceAPI::messageTimersProcessingStop(application);
-            auto msg = std::make_shared<TimersProcessingStopMessage>();
-            sys::Bus::SendUnicast(msg, service::name::service_time, application);
+            sys::Bus::SendUnicast(
+                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
         }
         else if (app->lockHandler.lock.isLocked()) {
             application->switchWindow(app::window::name::desktop_pin_lock);
 
-            // TimeServiceAPI::messageTimersProcessingStop(application);
-            auto msg = std::make_shared<TimersProcessingStopMessage>();
-            sys::Bus::SendUnicast(msg, service::name::service_time, application);
+            sys::Bus::SendUnicast(
+                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
         }
         else {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
@@ -124,9 +122,8 @@ namespace gui
                     this->application, app::name_settings, app::sim_select, nullptr);
             }
 
-            // TimeServiceAPI::messageTimersProcessingStart(application);
-            auto msg = std::make_shared<TimersProcessingStartMessage>();
-            sys::Bus::SendUnicast(msg, service::name::service_time, application);
+            sys::Bus::SendUnicast(
+                std::make_shared<TimersProcessingStartMessage>(), service::name::service_time, application);
         }
     }
 
