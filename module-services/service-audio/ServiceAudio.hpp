@@ -42,8 +42,6 @@ class ServiceAudio : public sys::Service
     audio::AudioMux audioMux;
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
 
-    bool headphonesInserted = false;
-
     auto IsVibrationMotorOn()
     {
         return vibrationMotorStatus == audio::AudioMux::VibrationStatus::On;

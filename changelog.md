@@ -1,5 +1,10 @@
 # MuditaOS changelog
 
+## Current release
+
+### Fixed
+* `[audio]` Fix headphones autodetection.
+
 ## [0.42.2 2020-10-16]
 
 ### Added
