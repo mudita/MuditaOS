@@ -1,9 +1,44 @@
 cmake_minimum_required(VERSION 3.12)
+include(thirdparty)
 
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
 
-set(SOURCES "" vfs-utils.cpp)
+set(FREERTOS_FAT_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_crc.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_dir.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_error.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_fat.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_file.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_format.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_ioman.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_locking.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_memory.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_stdio.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_string.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_sys.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_time.c
+        )
+
+third_party_source_optimization(${FREERTOS_FAT_SOURCES})
+
+# Disable some warnings due to ugly embedded hacks
+# in the FREERTOS FAT implementation
+if(${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
+set_property(SOURCE ${FREERTOS_FAT_SOURCES} APPEND_STRING PROPERTY COMPILE_FLAGS
+" -Wno-overflow -Wno-type-limits -Wno-format -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast")
+endif()
+
+set(PROJECT_INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/free_rtos_custom/include
+        )
+
+set(SOURCES ""
+        ${FREERTOS_FAT_SOURCES}
+        vfs-utils.cpp
+        vfs.cpp
+)
 
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)

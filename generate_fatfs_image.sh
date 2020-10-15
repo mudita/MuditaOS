@@ -46,4 +46,6 @@ done
 cd -
 cd $SRC_DATA
 mcopy -s -i "$PART1" user ::
+mcopy -s -i "$PART1" .boot.json ::
+mcopy -s -i "$PART1" .boot.json.crc32 ::
 cd -

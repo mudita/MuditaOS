@@ -12,12 +12,11 @@
 #include <log/log.hpp>
 #include <json/json11.hpp>
 
-#ifdef TARGET_Linux
-#include <cstdio>
-#else
-#include "ff_stdio.h"
+#ifndef TARGET_Linux
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
+
+#include "ff_stdio.h"
 
 #define PATH_SYS      "/sys"
 #define PATH_USER     "user"
@@ -107,11 +106,7 @@ namespace purefs
 class vfs
 {
   public:
-#ifdef TARGET_Linux
-    using FILE = std::FILE;
-#else
     using FILE = FF_FILE;
-#endif
 
     enum class FileAttributes
     {
@@ -177,8 +172,9 @@ class vfs
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
-    FF_Disk_t *emmcFFDisk;
 #endif
+
+    FF_Disk_t *emmcFFDisk;
 
     static void computeCRC32(FILE *file, unsigned long *outCrc32);
     static bool verifyCRC(const std::string filePath, const unsigned long crc32);
