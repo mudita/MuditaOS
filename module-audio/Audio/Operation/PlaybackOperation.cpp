@@ -45,11 +45,11 @@ namespace audio
         constexpr audio::Volume defaultHeadphonesVolume  = 2;
 
         const auto dbLoudspeakerVolumePath =
-            audio::str(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackLoudspeaker);
+            audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackLoudspeaker);
         const auto loudspeakerVolume = dbCallback(dbLoudspeakerVolumePath, defaultLoudspeakerVolume);
 
         const auto dbHeadphonesVolumePath =
-            audio::str(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackHeadphones);
+            audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackHeadphones);
         const auto headphonesVolume = dbCallback(dbHeadphonesVolumePath, defaultHeadphonesVolume);
 
         availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume));

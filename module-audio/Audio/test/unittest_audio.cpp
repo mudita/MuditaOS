@@ -42,7 +42,7 @@ TEST_CASE("Audio settings string creation")
 {
     SECTION("Create volume string for playback loudspeaker, multimedia")
     {
-        const auto str = audio::str(
+        const auto str = audio::dbPath(
             audio::Setting::Volume, audio::PlaybackType::Multimedia, audio::Profile::Type::PlaybackLoudspeaker);
         REQUIRE_FALSE(str.empty());
         REQUIRE(str == "audio/PlaybackLoudspeaker/Multimedia/Volume");
@@ -51,7 +51,7 @@ TEST_CASE("Audio settings string creation")
     SECTION("Create volume string for routing speakerphone")
     {
         const auto str =
-            audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
         REQUIRE_FALSE(str.empty());
         REQUIRE(str == "audio/RoutingSpeakerphone/Volume");
     }
@@ -59,14 +59,14 @@ TEST_CASE("Audio settings string creation")
     SECTION("Create gain string for recording built-in microphone")
     {
         const auto str =
-            audio::str(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
         REQUIRE_FALSE(str.empty());
         REQUIRE(str == "audio/RecordingBuiltInMic/Gain");
     }
 
     SECTION("Create empty volume string when Idle")
     {
-        const auto str = audio::str(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::Idle);
+        const auto str = audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::Idle);
         REQUIRE(str.empty());
     }
 }
