@@ -1,7 +1,10 @@
 #include "KeypadLightWindow.hpp"
 
+#include "CheckBoxWithLabel.hpp"
+
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <i18/i18.hpp>
+#include <BoxLayout.hpp>
 
 namespace gui
 {
