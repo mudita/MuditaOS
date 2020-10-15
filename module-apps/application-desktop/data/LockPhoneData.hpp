@@ -58,11 +58,6 @@ namespace gui
             return updateOsMessage;
         }
 
-        const sdesktop::UpdateOsMessage &getUpdateOsMessage()
-        {
-            return updateOsMessage;
-        }
-
       private:
         sdesktop::UpdateOsMessage updateOsMessage;
     };
