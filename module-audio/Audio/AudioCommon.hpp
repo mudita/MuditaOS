@@ -67,6 +67,36 @@ namespace audio
 
     [[nodiscard]] const std::string str(const Setting &setting, const PlaybackType &playbackType);
 
+    enum class EventType
+    {
+        HeadphonesPlugin,
+        HeadphonesUnplug,
+        BTHeadsetOn,
+        BTHeadsetOff,
+        BTA2DPOn,
+        BTA2DPOff,
+        CallMute,
+        CallUnmute,
+        CallSpeakerphoneOn,
+        CallSpeakerphoneOff,
+    };
+
+    class Event
+    {
+      public:
+        explicit Event(EventType eType) : eventType(eType)
+        {}
+        virtual ~Event() = default;
+
+        EventType getType() const
+        {
+            return eventType;
+        }
+
+      private:
+        const EventType eventType;
+    };
+
     enum class RetCode
     {
         Success = 0,

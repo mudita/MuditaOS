@@ -71,8 +71,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         if (bsp::headset::Handler(notification) == true) {
             bool state = bsp::headset::IsInserted();
-            auto message = std::make_shared<AudioRoutingControlRequest>(
-                AudioRoutingControlRequest::ControlType::SwitchHeadphones, state);
+            auto message = std::make_shared<AudioEventRequest>(state ? audio::EventType::HeadphonesPlugin
+                                                                     : audio::EventType::CallSpeakerphoneOff);
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }
