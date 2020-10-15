@@ -400,14 +400,16 @@ namespace app
             // check if this is case where application is returning to the last visible window.
             if ((switchData != nullptr) && (msg->LastSeenWindow)) {}
             else {
-                getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
                 auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
                 if (ret != nullptr && switchData != nullptr) {
                     auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                     if (text != nullptr) {
                         text->addText(ret->getDescription());
+                        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                        return msgHandled();
                     }
                 }
+                getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
             }
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }

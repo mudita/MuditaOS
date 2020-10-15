@@ -96,11 +96,6 @@ namespace app
         return ret;
     }
 
-    auto ApplicationPhonebook::DeinitHandler() -> sys::ReturnCodes
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationPhonebook::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
