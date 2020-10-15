@@ -301,7 +301,7 @@ updateos::UpdateError UpdatePureOS::updateBootJSON()
         vfs::FILE *fpCRC = vfs.fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
             std::array<char, purefs::buffer::crc_char_size> crcBuf;
-            sprintf(crcBuf.data(), "%08lX", bootJSONAbsoulteCRC);
+            snprintf(crcBuf.data(), crcBuf.size(), "%lX", bootJSONAbsoulteCRC);
             vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
             vfs.fclose(fpCRC);
         }
