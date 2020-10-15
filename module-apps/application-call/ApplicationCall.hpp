@@ -32,11 +32,7 @@ namespace app
         void RingingHandler(const CellularCallMessage *const msg);
 
       protected:
-        std::unique_ptr<sys::Timer> timerCall;
-        utils::time::Timestamp callStartTime = 0;
-        utils::time::Duration callDuration;
         sys::ms callDelayedStopTime = 3000;
-        void timerCallCallback();
 
       public:
         ApplicationCall(std::string name = name_call, std::string parent = "", bool startBackgound = false);
@@ -53,10 +49,6 @@ namespace app
         void destroyUserInterface() override;
         void setDisplayedNumber(std::string num);
         const std::string &getDisplayedNumber();
-        // starts timer that upon triggering, if no user action was performed, will hide application to background and
-        // move to previous application
-        void runCallTimer();
-        void stopCallTimer();
 
         void handleCallEvent(const std::string &number);
         void handleAddContactEvent(const std::string &number);
@@ -67,5 +59,9 @@ namespace app
         {
             return callDelayedStopTime;
         }
+
+        void stopAudio();
+        void startRinging();
+        void startRouting();
     };
 } /* namespace app */

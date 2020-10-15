@@ -2,6 +2,7 @@
 
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"
+#include "application-call/data/CallWindowData.hpp"
 #include "data/CallSwitchData.hpp"
 #include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
@@ -14,6 +15,7 @@
 #include <UiCommonActions.hpp>
 #include <Dialog.hpp>
 #include <log/log.hpp>
+#include <memory>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <service-audio/api/AudioServiceAPI.hpp>
@@ -29,103 +31,39 @@ namespace app
     ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackground)
         : Application(name, parent, startBackground, app::call_stack_size)
     {
-        timerCall = std::make_unique<sys::Timer>("Call", this, 1000);
-        timerCall->connect([this](sys::Timer &) { timerCallCallback(); });
     }
 
     //  number of seconds after end call to switch back to previous application
     const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
 
-    void ApplicationCall::timerCallCallback()
+    void switchWindowOrApp(Application *app, std::unique_ptr<gui::SwitchData> &&data)
     {
-        callDuration = utils::time::Timestamp() - callStartTime;
-
-        if (getCurrentWindow() == windowsStack.get(window::name_call)) {
-            auto callWindow = dynamic_cast<gui::CallWindow *>(getCurrentWindow());
-
-            if (callWindow != nullptr && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS) {
-                callWindow->updateDuration(callDuration);
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
+        if (app->getState() == Application::State::ACTIVE_FORGROUND) {
+            app->switchWindow(window::name_call, std::move(data));
+        }
+        else {
+            sapm::ApplicationManager::messageSwitchApplication(app, name_call, window::name_call, std::move(data));
         }
     }
 
     void ApplicationCall::CallAbortHandler()
     {
-        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
-        assert(callWindow != nullptr);
-
-        LOG_INFO("---------------------------------CallAborted");
-        AudioServiceAPI::StopAll(this);
-
-        callWindow->setState(gui::CallWindow::State::CALL_ENDED);
-        if (getState() == State::ACTIVE_FORGROUND && getCurrentWindow() != callWindow) {
-            switchWindow(window::name_call);
-            return;
-        }
-        else if (getState() == State::ACTIVE_BACKGROUND) {
-            // it means we have switched to different application during call and the call was aborted
-            // hence we need to switch back to call application
-            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
-        }
-
-        refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        switchWindowOrApp(this, std::make_unique<app::CallAbortData>());
     }
 
     void ApplicationCall::CallActiveHandler()
     {
-        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
-        assert(callWindow != nullptr);
-
-        AudioServiceAPI::RoutingStart(this);
-        runCallTimer();
-
-        LOG_INFO("---------------------------------CallActive");
-        callWindow->setState(gui::CallWindow::State::CALL_IN_PROGRESS);
-        refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        switchWindowOrApp(this, std::make_unique<app::CallActiveData>());
     }
 
     void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
     {
-        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
-        assert(callWindow != nullptr);
-
-        LOG_INFO("---------------------------------IncomingCall");
-        if (callWindow->getState() == gui::CallWindow::State::INCOMING_CALL) {
-            LOG_INFO("ignoring call incoming");
-        }
-        else {
-            AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
-            runCallTimer();
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncomingCallData>(msg->number);
-            // send to itself message to switch (run) call application
-            callWindow->setState(gui::CallWindow::State::INCOMING_CALL);
-            if (getState() == State::ACTIVE_FORGROUND) {
-                LOG_INFO("++++++++++++WINDOW SWITCH");
-                switchWindow(window::name_call, std::move(data));
-            }
-            else {
-                LOG_INFO("++++++++++++APP SWITCH");
-
-                sapm::ApplicationManager::messageSwitchApplication(this, name_call, window::name_call, std::move(data));
-            }
-        }
+        switchWindowOrApp(this, std::make_unique<app::IncomingCallData>(msg->number));
     }
 
     void ApplicationCall::RingingHandler(const CellularCallMessage *const msg)
     {
-        auto callWindow = dynamic_cast<gui::CallWindow *>(windowsStack.get(window::name_call));
-        assert(callWindow != nullptr);
-
-        LOG_INFO("---------------------------------Ringing");
-        AudioServiceAPI::RoutingStart(this);
-        runCallTimer();
-
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->number);
-        callWindow->setState(gui::CallWindow::State::OUTGOING_CALL);
-        if (getState() == State::ACTIVE_FORGROUND) {
-            switchWindow(window::name_call, std::move(data));
-        }
+        switchWindowOrApp(this, std::make_unique<app::ExecuteCallData>(msg->number));
     }
 
     // Invoked upon receiving data message
@@ -238,20 +176,6 @@ namespace app
         return true;
     }
 
-    void ApplicationCall::runCallTimer()
-    {
-        callStartTime       = utils::time::Timestamp();
-        callDuration        = 0;
-        timerCall->reload();
-    }
-
-    void ApplicationCall::stopCallTimer()
-    {
-        callStartTime       = 0;
-        callDuration        = 0;
-        timerCall->stop();
-    }
-
     void ApplicationCall::destroyUserInterface()
     {}
 
@@ -285,4 +209,18 @@ namespace app
         }
     }
 
+    void ApplicationCall::stopAudio()
+    {
+        AudioServiceAPI::StopAll(this);
+    }
+
+    void ApplicationCall::startRinging()
+    {
+        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
+    }
+
+    void ApplicationCall::startRouting()
+    {
+        AudioServiceAPI::RoutingStart(this);
+    }
 } // namespace app
