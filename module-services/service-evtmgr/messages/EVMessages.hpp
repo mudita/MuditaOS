@@ -5,6 +5,7 @@
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
 #include <SwitchData.hpp>
+#include <utility>
 #include "Service/Service.hpp"
 #include "bsp/keyboard/key_codes.hpp"
 #include "bsp/common.hpp"
@@ -127,6 +128,15 @@ namespace sevm
         VibratorStateMessage(bsp::vibrator::State state, std::optional<uint16_t> duration = std::nullopt)
             : Message(MessageType::EVMVibratorStateMessage), Vibration(state, duration)
         {}
+    };
+
+    class VibratorStateSequenceMessage : public Message
+    {
+      public:
+        VibratorStateSequenceMessage(std::deque<bsp::vibrator::Vibration> vibrationSequence)
+            : Message(MessageType::EVMVibratorStateMessage), vibrSeq(std::move(vibrationSequence))
+        {}
+        std::deque<bsp::vibrator::Vibration> vibrSeq;
     };
 } /* namespace sevm*/
 

@@ -19,8 +19,8 @@ namespace bsp
         {
           public:
             /// default (null) duration means infinitely
-            const State state;
-            const std::optional<uint16_t> duration;
+            State state;
+            std::optional<uint16_t> duration;
             Vibration(State state, std::optional<uint16_t> duration = std::nullopt)
                 : state(state), duration(duration){};
         };
