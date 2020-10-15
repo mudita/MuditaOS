@@ -1,19 +1,13 @@
-/*
- * DrawCommand.hpp
- *
- *  Created on: 25 kwi 2019
- *      Author: robert
- */
-
-#ifndef GUI_CORE_DRAWCOMMAND_HPP_
-#define GUI_CORE_DRAWCOMMAND_HPP_
+#pragma once
 
 #include <string>
 #include <cstdint>
 
+#include <module-utils/math/Math.hpp>
+
 #include "utf8/UTF8.hpp"
 #include "Color.hpp"
-#include "../Common.hpp"
+#include "Common.hpp"
 
 namespace gui
 {
@@ -121,13 +115,13 @@ namespace gui
         uint16_t h;
         uint16_t radius;
         // flags that defines whether paint given border
-        RectangleEdgeFlags edges;
+        RectangleEdge edges;
         // flags that defines which edge should be flat. This will disable roundness on both sides of the edge.
-        RectangleFlatFlags flatEdges;
+        RectangleFlatEdge flatEdges;
         // flags that defines whether paint given corner (only for rounded corners)
-        RectangleCornerFlags corners;
+        RectangleRoundedCorner corners;
         // flags indicating yaps for speech bubbles, it takes precendece over other properties
-        RectangleYapFlags yaps;
+        RectangleYap yaps;
         // defines which of the edges and corners are painted
         unsigned short yapSize = 0;
         bool filled;
@@ -135,9 +129,8 @@ namespace gui
         Color fillColor;
         Color borderColor;
         CommandRectangle()
-            : x{0}, y{0}, w{0}, h{0}, radius{0}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-              flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
-              yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{0}, filled{false}, penWidth{1},
+            : x{0}, y{0}, w{0}, h{0}, radius{0}, edges{RectangleEdge::All}, flatEdges{RectangleFlatEdge::None},
+              corners{RectangleRoundedCorner::All}, yaps{RectangleYap::None}, yapSize{0}, filled{false}, penWidth{1},
               fillColor(ColorFullBlack), borderColor(ColorFullBlack)
         {
             id = DrawCommandID::GUI_DRAW_RECT;
@@ -147,8 +140,12 @@ namespace gui
     class CommandArc : public DrawCommand
     {
       public:
-        CommandArc(
-            Point _center, Length _radius, AngleDegrees _start, AngleDegrees _sweep, uint8_t _width, Color _color)
+        CommandArc(Point _center,
+                   Length _radius,
+                   trigonometry::Degrees _start,
+                   trigonometry::Degrees _sweep,
+                   uint8_t _width,
+                   Color _color)
             : center{_center}, radius{_radius}, start{_start}, sweep{_sweep}, width{_width}, borderColor{_color}
         {
             id = DrawCommandID::GUI_DRAW_ARC;
@@ -156,8 +153,8 @@ namespace gui
 
         const Point center;
         const Length radius;
-        const AngleDegrees start;
-        const AngleDegrees sweep;
+        const trigonometry::Degrees start;
+        const trigonometry::Degrees sweep;
         const uint8_t width;
         const Color borderColor;
     };
@@ -174,8 +171,8 @@ namespace gui
                       Color _borderColor,
                       bool _filled     = false,
                       Color _fillColor = {})
-            : CommandArc{_center, _radius, 0, FullAngle, _borderWidth, _borderColor}, filled{_filled}, fillColor{
-                                                                                                           _fillColor}
+            : CommandArc{_center, _radius, 0, trigonometry::FullAngle, _borderWidth, _borderColor}, filled{_filled},
+              fillColor{_fillColor}
         {
             id = DrawCommandID::GUI_DRAW_CIRCLE;
         }
@@ -235,5 +232,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* GUI_CORE_DRAWCOMMAND_HPP_ */

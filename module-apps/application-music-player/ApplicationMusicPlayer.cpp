@@ -48,13 +48,12 @@ namespace app
 
     void ApplicationMusicPlayer::createUserInterface()
     {
-        gui::AppWindow *window = nullptr;
-
-        window = new gui::MusicPlayerAllSongsWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::MusicPlayerEmptyWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        windowsFactory.attach(gui::name::window::all_songs_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MusicPlayerAllSongsWindow>(app);
+        });
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MusicPlayerEmptyWindow>(app);
+        });
     }
 
     void ApplicationMusicPlayer::destroyUserInterface()

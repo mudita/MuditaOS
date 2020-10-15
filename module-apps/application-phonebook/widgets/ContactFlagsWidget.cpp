@@ -18,7 +18,7 @@ namespace gui
     {
         favourites = speedDial = ice = true;
         blocked                      = false;
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        setEdges(RectangleEdge::Bottom);
         initGUIIcons();
         buildWidget();
         repositionIcons();
@@ -72,7 +72,7 @@ namespace gui
     {
         mainBox = new HBox(this, 0, 0, style::window_width, style::widget::ContactFlag::itemHeight);
         mainBox->setAlignment(Alignment(Alignment::Horizontal::Center));
-        mainBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        mainBox->setEdges(RectangleEdge::None);
         mainBox->addWidget(favouritesIcon);
         mainBox->addWidget(iceIcon);
         mainBox->addWidget(speedDialIcon);

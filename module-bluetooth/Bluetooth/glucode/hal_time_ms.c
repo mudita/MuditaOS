@@ -1,6 +1,7 @@
+#include "btstack_debug.h"
 #include <FreeRTOS.h>
-#include <task.h>
 #include <stdint.h>
+#include <task.h>
 
 uint32_t hal_time_ms(void)
 {

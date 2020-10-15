@@ -4,25 +4,24 @@
 #include "AppWindow.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
-#include "gui/widgets/Progress.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Progress.hpp"
+#include "gui/widgets/ProgressBar.hpp"
 
 namespace gui
 {
 
     class ClockMainWindow : public AppWindow
     {
-        uint32_t seconds      = 0;
-        uint32_t hour         = 0;
-        uint32_t minute       = 0;
-        Label *hourLabel      = nullptr;
-        Label *minuteLabel    = nullptr;
-        Progress *progressBar = nullptr;
+        uint32_t seconds         = 0;
+        uint32_t hour            = 0;
+        uint32_t minute          = 0;
+        Label *hourLabel         = nullptr;
+        Label *minuteLabel       = nullptr;
+        ProgressBar *progressBar = nullptr;
 
       public:
-        ClockMainWindow(app::Application *app);
+        ClockMainWindow(app::Application *app, const std::string &name);
 
         bool handleSwitchData(SwitchData *data) override;
 

@@ -85,10 +85,7 @@ namespace gui
     bool NotesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         DBNotesResponseMessage *msg = reinterpret_cast<DBNotesResponseMessage *>(msgl);
-        if (notesModel->updateRecords(std::move(msg->records)))
-            return true;
-
-        return false;
+        return notesModel->updateRecords(std::move(*msg->records));
     }
 
 } /* namespace gui */

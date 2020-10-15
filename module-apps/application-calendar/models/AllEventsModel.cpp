@@ -52,7 +52,7 @@ gui::ListItem *AllEventsModel::getItem(gui::Order order)
     return item;
 }
 
-bool AllEventsModel::updateRecords(std::unique_ptr<std::vector<EventsRecord>> records)
+bool AllEventsModel::updateRecords(std::vector<EventsRecord> records)
 {
     DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
@@ -64,14 +64,13 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     auto response = dynamic_cast<db::query::events::GetAllLimitedResult *>(queryResult);
     assert(response != nullptr);
 
-    auto records_data = response->getResult();
+    auto records = *response->getResult();
     list->setElementsCount(*response->getCountResult());
-    auto records = std::make_unique<std::vector<EventsRecord>>(records_data->begin(), records_data->end());
 
     auto app = dynamic_cast<app::ApplicationCalendar *>(application);
     assert(application != nullptr);
 
-    if (records->empty()) {
+    if (records.empty()) {
 
         if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
             app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"));
@@ -79,7 +78,7 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     }
     auto eventShift = app->getEventShift();
     if (eventShift) {
-        for (auto &record : *records) {
+        for (auto &record : records) {
             record.date_from += hours(eventShift);
             record.date_till += hours(eventShift);
         }

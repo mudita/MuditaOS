@@ -25,9 +25,11 @@ namespace style
             constexpr uint32_t leftMargin  = 10;
             constexpr uint32_t rightMargin = 10;
 
-            constexpr uint32_t timestampWidth    = 100;
-            constexpr uint32_t cotactWidthOffset = timestampWidth + leftMargin + rightMargin;
-            constexpr uint32_t notSentIconWidth  = 20;
+            constexpr uint32_t timestampWidth             = 100;
+            constexpr uint32_t numberImportanceWidth      = 80;
+            constexpr uint32_t numberImportanceLeftMargin = 10;
+            constexpr uint32_t cotactWidthOffset          = timestampWidth + leftMargin + rightMargin;
+            constexpr uint32_t notSentIconWidth           = 20;
 
             constexpr uint32_t previewWidthOffset = leftMargin + rightMargin + 10;
         } // namespace threadItem

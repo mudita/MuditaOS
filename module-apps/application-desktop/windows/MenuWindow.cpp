@@ -54,7 +54,7 @@ namespace gui
         this->activatedCallback = activatedCallback;
         this->setPenWidth(style::window::default_border_no_focus_w);
         this->setPenFocusWidth(style::window::default_border_focus_w);
-        this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_TOP | RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
         addWidget(it);
     };
 
@@ -166,8 +166,14 @@ namespace gui
                                       application, "ApplicationMusicPlayer", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
-                new gui::Tile{
-                    "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
+                new gui::Tile{"menu_meditation_W_G",
+                              "app_desktop_menu_meditation",
+                              [=](gui::Item &item) {
+                                  LOG_INFO("Meditation");
+                                  sapm::ApplicationManager::messageSwitchApplication(
+                                      application, "ApplicationMeditation", gui::name::window::main_window, nullptr);
+                                  return true;
+                              }},
                 new gui::Tile{"menu_settings_W_G",
                               "app_desktop_menu_settings_new",
                               [=](gui::Item &item) {

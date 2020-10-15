@@ -10,17 +10,17 @@ namespace gui
 
     EventDetailDescriptionItem::EventDetailDescriptionItem()
     {
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(RectangleEdge::None);
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventDetail::height_min);
         setMaximumSize(style::window::default_body_width, style::window::calendar::item::eventDetail::height_max);
         setMargins(gui::Margins(style::margins::small, style::window::calendar::item::eventDetail::margin_top, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        vBox->setEdges(RectangleEdge::None);
 
         title = new gui::Label(vBox, 0, 0, 0, 0);
         title->setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventDetail::title_h);
-        title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        title->setEdges(RectangleEdge::None);
         title->setFont(style::window::font::small);
         title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         title->setLineMode(true);
@@ -29,7 +29,7 @@ namespace gui
         eventTime = new gui::Label(vBox, 0, 0, 0, 0);
         eventTime->setMinimumSize(style::window::default_body_width,
                                   style::window::calendar::item::eventDetail::label_h);
-        eventTime->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        eventTime->setEdges(RectangleEdge::None);
         eventTime->setMargins(
             gui::Margins(0, style::window::calendar::item::eventDetail::event_time_margin, 0, style::margins::small));
         eventTime->setFont(style::window::font::bigbold);
@@ -39,7 +39,7 @@ namespace gui
         description = new gui::Text(vBox, 0, 0, 0, 0);
         description->setMinimumSize(style::window::default_body_width,
                                     style::window::calendar::item::eventDetail::label_h);
-        description->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        description->setEdges(RectangleEdge::None);
         description->setMaximumSize(style::window::default_body_width,
                                     2 * style::window::calendar::item::eventDetail::label_h);
         description->setFont(style::window::font::big);

@@ -3,6 +3,10 @@
 
 namespace gui
 {
+    namespace
+    {
+        constexpr auto NumberImportancePrefix = '#';
+    } // namespace
 
     BaseThreadItem::BaseThreadItem()
     {
@@ -12,7 +16,7 @@ namespace gui
         setMaximumSize(window::default_body_width, style::messages::threadItem::sms_thread_item_h);
 
         setRadius(0);
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
 
         setPenFocusWidth(window::default_border_focus_w);
         setPenWidth(window::default_border_no_focus_w);
@@ -23,6 +27,13 @@ namespace gui
         contact->setFont(style::window::font::big);
         contact->setEllipsis(Ellipsis::Right);
         contact->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+
+        numberImportance = new gui::Label(this, 0, 0, 0, 0);
+        numberImportance->setPenFocusWidth(window::default_border_no_focus_w);
+        numberImportance->setPenWidth(window::default_border_no_focus_w);
+        numberImportance->setFont(style::window::font::small);
+        numberImportance->setAlignment(
+            gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
         timestamp = new gui::Label(this, 0, 0, 0, 0);
         timestamp->setPenFocusWidth(window::default_border_no_focus_w);
@@ -46,6 +57,15 @@ namespace gui
         contact->setPosition(msgStyle::leftMargin, msgStyle::topMargin);
         contact->setSize(newDim.w - msgStyle::cotactWidthOffset, newDim.h / 2 - msgStyle::topMargin);
 
+        const auto isNumberImportanceSet = !numberImportance->getText().empty();
+        if (isNumberImportanceSet) {
+            contact->setSize(contact->getWidth() - msgStyle::numberImportanceWidth, Axis::X);
+            numberImportance->setPosition(msgStyle::leftMargin + contact->getTextWidth() +
+                                              msgStyle::numberImportanceLeftMargin,
+                                          msgStyle::topMargin);
+            numberImportance->setSize(msgStyle::numberImportanceWidth, newDim.h / 2 - msgStyle::topMargin);
+        }
+
         timestamp->setPosition(newDim.w - msgStyle::timestampWidth, msgStyle::topMargin);
         timestamp->setSize(msgStyle::timestampWidth, newDim.h / 2 - msgStyle::topMargin);
     }
@@ -64,5 +84,10 @@ namespace gui
         onDimensionChangedBottom(oldDim, newDim);
 
         return true;
+    }
+
+    void BaseThreadItem::displayNumberImportance(long int id)
+    {
+        numberImportance->setText(NumberImportancePrefix + std::to_string(id));
     }
 } // namespace gui

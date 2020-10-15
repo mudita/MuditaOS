@@ -22,7 +22,7 @@ namespace gui
         setMargins(gui::Margins(0, style::margins::big, 0, 0));
 
         hBox = new gui::HBox(this, 0, 0, phonebookStyle::inputBoxWithLabelAndIconIWidget::w, 0);
-        hBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        hBox->setEdges(gui::RectangleEdge::None);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
@@ -31,7 +31,7 @@ namespace gui
                                       phonebookStyle::inputBoxWithLabelAndIconIWidget::input_box_h);
         inputBoxLabel->setMargins(
             gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconIWidget::input_box_right_margin, 0));
-        inputBoxLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        inputBoxLabel->setEdges(gui::RectangleEdge::Bottom);
         inputBoxLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         inputBoxLabel->setFont(style::window::font::medium);
         inputBoxLabel->activeItem = false;
@@ -51,7 +51,7 @@ namespace gui
                                          phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_h);
         descriptionLabel->setMargins(
             gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_right_margin, 0));
-        descriptionLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
@@ -62,7 +62,7 @@ namespace gui
 
         applyItemNameSpecificSettings();
 
-        setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        setEdges(gui::RectangleEdge::None);
     }
 
     auto InputBoxWithLabelAndIconWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

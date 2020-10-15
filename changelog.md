@@ -1,32 +1,50 @@
 # MuditaOS changelog
 
-## [Current release]
+## current
 
 ### Added
 
-* `[sms]` Added network time synchronisation.
-* `[gui][desktop]` Added *how-to-unlock-screen-info* window.
-* `[gui]` Added GUI timers capability
-* `[fonts]` Added multiplication and division sign to the font files
-* `[bluetooth]` Added storing of BT link keys.
-* `[audio]` AudioMux tests
-* `[audio]` Added vibration logic (effect is visible in logs only)
-* `[settings]` Added DatabaseAgent base class and SettingsAgent.
-* `[audio]` Added vibration/enable sound database logic
-* `[settings]` Create main window for apps and tools 
+* `[gui]` Dynamic Windows building and handling implemented
+* `[audio]` Added A2DP playback backend
 
-
-### Changed
-
-* `[system]` Timer API - linked to timer, same for Services and Applications. Updated docs
-* `[system]` Removed `using std` and `using cpp_freertos` from commonly used headers
-* `[audio]` Made most audio api calls asynchronous
-* `[messages]` Refactored messages SMS thread window to use ListView. 
 
 ### Fixed
 
-* `[audio]` Fix audio looping so it did not log errors
-* `[system]` Timers race condition, Timers should be thread safe for Services/Applications
+* `[audio]` Fix parsing audio meta tags during playback
+
+## [0.42.1 2020-10-12]
+
+### Added
+
+* `[messages]` Added network time synchronization.
+* `[gui][desktop]` Added "How to unlock" screen info window.
+* `[fonts]` Added multiplication and division sign to the font files.
+* `[bluetooth]` Added storing of BT link keys.
+* `[audio]` Added vibration/enable sound database logic.
+* `[settings]` Added the main window for apps and tools.
+* `[meditation]` Added a meditation progress bar a with simple implementation of meditation application.
+
+### Changed
+
+* `[messages]` Split SMS thread for a specific contact into separate ones if multiple phone numbers are available.
+* `[gui][renderer]` Shape rendering refactored.
+
+### Fixed
+
+* `[db]` Fixed database corruption issues on abrupt phone reset.
+* `[audio]` Fix audio looping.
+* `[phonebook]` Fix phone freezing when contacts database is empty.
+* `[phonebook]` Contacts list rebuilding in place not from start.
+
+### Other
+
+* `[audio]` Added vibration logic (the effect is visible in logs only).
+* `[audio]` Improvements to API and logic.
+* `[messages]` Refactored messages SMS thread window to use list view. 
+* `[settings]` Improvements to API and logic.
+* `[gui]` Added timers.
+* `[doc]` Several updates to user and developer documentation.
+* `[audio]` Added volume popup logic.
 
 ## [0.40.1 2020-10-02]
 

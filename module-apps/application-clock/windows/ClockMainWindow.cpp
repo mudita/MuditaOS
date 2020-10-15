@@ -13,7 +13,7 @@
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
-#include "gui/widgets/Progress.hpp"
+#include "gui/widgets/ProgressBar.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 #include "gui/core/ImageManager.hpp"
 #include "../ClockData.hpp"
@@ -22,7 +22,7 @@
 namespace gui
 {
 
-    ClockMainWindow::ClockMainWindow(app::Application *app) : gui::AppWindow(app, "MainWindow")
+    ClockMainWindow::ClockMainWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
     {
         uint32_t xOffset = 0;
         uint32_t yOffset = 0;
@@ -45,9 +45,9 @@ namespace gui
         minuteLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         uint32_t x = 480 / 2 - 90 + xOffset, y = 300 - 6 + yOffset, w = 180, h = 12;
-        progressBar = new Progress(this, x, y, w, h);
-        progressBar->setTotalProgress(59);
-        progressBar->setCurrentProgress(0);
+        progressBar = new ProgressBar(this, x, y, w, h);
+        progressBar->setMaximum(59);
+        progressBar->setValue(0);
     }
 
     bool ClockMainWindow::handleSwitchData(SwitchData *data)
@@ -108,7 +108,7 @@ namespace gui
             seconds = 0;
             ret     = true;
         }
-        progressBar->setCurrentProgress(seconds);
+        progressBar->setValue(seconds);
 
         return ret;
     }

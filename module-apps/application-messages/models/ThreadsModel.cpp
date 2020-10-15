@@ -1,11 +1,14 @@
 #include "ThreadsModel.hpp"
 #include "InputEvent.hpp"
 #include "OptionWindow.hpp"
+#include "OptionsWindow.hpp"
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
+#include "log/log.hpp"
 #include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}
@@ -23,12 +26,13 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
         return nullptr;
     }
 
-    auto item = gui::ThreadItem::makeThreadItem(this, thread);
-    item->setThreadItem(thread);
-    item->activatedCallback = [=](gui::Item &item) {
+    auto item               = gui::ThreadItem::makeThreadItem(this, thread);
+    item->activatedCallback = [this, thread](gui::Item &item) {
         LOG_INFO("ThreadItem ActivatedCallback");
         if (application) {
-            application->switchWindow(gui::name::window::thread_view, std::make_unique<SMSThreadData>(thread));
+            const auto &threadItem = static_cast<gui::ThreadItem &>(item);
+            application->switchWindow(gui::name::window::thread_view,
+                                      std::make_unique<SMSThreadData>(thread, threadItem.getThreadName()));
         }
         else {
             LOG_ERROR("No application!");
@@ -43,9 +47,9 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
-            app->windowOptions->clearOptions();
-            app->windowOptions->addOptions(threadWindowOptions(app, item->getThreadItem().get()));
-            app->switchWindow(app->windowOptions->getName(), nullptr);
+            application->switchWindow(
+                utils::localize.get("app_phonebook_options_title"),
+                std::make_unique<gui::OptionsWindowOptions>(threadWindowOptions(app, item->getThreadItem().get())));
         }
         return false;
     };
@@ -66,6 +70,6 @@ auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     assert(msgResponse != nullptr);
 
     auto records_data = msgResponse->getResults();
-    auto records      = std::make_unique<std::vector<ThreadRecord>>(records_data.begin(), records_data.end());
+    auto records      = std::vector<ThreadRecord>(records_data.begin(), records_data.end());
     return this->updateRecords(std::move(records));
 }

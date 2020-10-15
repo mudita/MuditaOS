@@ -13,7 +13,7 @@ unsigned int BaseThreadsRecordModel::requestRecordsCount()
     return recordsCount;
 }
 
-bool BaseThreadsRecordModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records)
+bool BaseThreadsRecordModel::updateRecords(std::vector<ThreadRecord> records)
 {
     DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();

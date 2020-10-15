@@ -1,10 +1,10 @@
 #!/bin/bash
 
-CONTAINER_NAME=rwicik/pure_phone_build
-CONTAINER_TAG=v1.0
+CONTAINER_NAME="wearemudita/mudita_os_builder"
+CONTAINER_TAG="latest"
 CONTAINER=${CONTAINER_NAME}:${CONTAINER_TAG}
 PURE_HOME=`pwd`
-STANDARD_OPTIONS="-v `pwd`:${PURE_HOME} --user \"$(id -u):$(id -g)\" -t"
+STANDARD_OPTIONS="-v `pwd`:${PURE_HOME} --user \"$(id -u):$(id -g)\" --env HOME=${PURE_HOME} -t"
 
 RCFILE="/home/docker/.bashrc"
 
@@ -46,7 +46,8 @@ case ${TARGET} in
     "make")
         BUILD_DIR=$1
         shift
-        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint make ${CONTAINER} -j $@"
+        JOBS=$(nproc)
+        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint make ${CONTAINER} -j ${JOBS} $@"
         ;;
     *)
         help

@@ -6,7 +6,7 @@
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Text.hpp>
 #include <gui/widgets/BoxLayout.hpp>
-#include <gui/widgets/Progress.hpp>
+#include <gui/widgets/ProgressBar.hpp>
 
 #include <memory>
 #include <string>
@@ -44,12 +44,12 @@ namespace gui
       public:
         Label *addBoxLabel(BoxLayout *layout, const std::string &text);
 
-        Label *currentFirmwareLabel = nullptr;
-        Label *statusLabel          = nullptr;
-        Label *newFirmwareLabelText = nullptr;
-        Label *newFirmwareLabel     = nullptr;
-        Progress *downloadProgress  = nullptr;
-        VBox *mainBox               = nullptr;
+        Label *currentFirmwareLabel   = nullptr;
+        Label *statusLabel            = nullptr;
+        Label *newFirmwareLabelText   = nullptr;
+        Label *newFirmwareLabel       = nullptr;
+        ProgressBar *downloadProgress = nullptr;
+        VBox *mainBox                 = nullptr;
 
       private:
         void invalidate() noexcept;

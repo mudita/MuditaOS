@@ -60,9 +60,9 @@ namespace gui
 
         const unsigned char progressLow(0);
         const unsigned char progressMax(100);
-        downloadProgress = new Progress(mainBox, 0, 0, style::window_width, style::window::label::default_h);
-        downloadProgress->setTotalProgress(progressMax);
-        downloadProgress->setCurrentPercent(progressLow);
+        downloadProgress = new ProgressBar(mainBox, 0, 0, style::window_width, style::window::label::default_h);
+        downloadProgress->setMaximum(progressMax);
+        downloadProgress->setValue(progressLow);
 
         statusLabel->activatedCallback = [&](Item &) -> bool {
             if (bottomBar->isActive(gui::BottomBar::Side::CENTER)) {

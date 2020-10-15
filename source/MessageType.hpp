@@ -184,6 +184,8 @@ enum class MessageType
     BluetoothScanResult,
     BluetoothAddrResult,
     BluetoothPairResult,
+    BluetoothAudioRegister,
+    BluetoothDeviceMetadata,
 
     LwIP_request,
     EVM_GPIO,
@@ -214,7 +216,7 @@ enum class MessageType
     AntennaGetLockState,
     AntennaLockNotification,
 
-    Settings,
+    Settings
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

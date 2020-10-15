@@ -37,6 +37,24 @@ CREATE TABLE IF NOT EXISTS notifications_tab (
         UNIQUE(path, service)
     );
 
+CREATE TABLE IF NOT EXISTS settings_changed_tab(
+
+    id INTEGER PRIMARY KEY,
+    path TEXT NOT NULL,
+    value TEXT,
+    CONSTRAINT changed_unique
+        UNIQUE(path ) ON CONFLICT REPLACE
+);
+
+
+CREATE TRIGGER IF NOT EXISTS on_update UPDATE OF value ON settings_tab
+WHEN new.value <> old.value
+    BEGIN
+        INSERT OR REPLACE INTO  settings_changed_tab (path, value) VALUES  (new.path,new.value);
+    END;
+
+
+
 -- ----------- insert default values ----------------------
 INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
     ('system/phone_mode', 'online'),

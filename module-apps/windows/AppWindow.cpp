@@ -20,6 +20,7 @@ namespace gui
     AppWindow::~AppWindow()
     {
         LOG_INFO("deleting window: %s", name.c_str());
+        onClose();
     }
 
     void AppWindow::destroyInterface()
@@ -47,7 +48,7 @@ namespace gui
         title->setFont(font::title);
         title->clear();
         title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        title->setEdges(RectangleEdge::Bottom);
         title->setEllipsis(Ellipsis::Right);
         title->visible = false;
 

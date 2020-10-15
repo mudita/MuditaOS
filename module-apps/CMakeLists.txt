@@ -14,13 +14,16 @@ endif()
 set( SOURCES 
     "Application.cpp"
     "GuiTimer.cpp"
-    "UiCommonActions.cpp" 
+    "UiCommonActions.cpp"
+    "WindowsFactory.cpp"
     "windows/AppWindow.cpp" 
     "windows/OptionWindow.cpp"
     "windows/Options.cpp" 
-    "windows/Dialog.cpp" 
+    "windows/OptionsWindowOption.cpp"
+    "windows/Dialog.cpp"
     "windows/NoEvents.cpp"
     "widgets/SearchBox.cpp"
+    "windows/OptionSetting.cpp"
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
@@ -39,6 +42,7 @@ set(APPLICATIONS
     special-input
     antenna
     music-player
+    meditation
 )
 
 list(SORT APPLICATIONS)

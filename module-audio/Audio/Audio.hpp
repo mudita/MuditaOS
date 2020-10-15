@@ -37,7 +37,7 @@ namespace audio
             return currentState;
         }
 
-        std::optional<Tags> GetFileTags(const char *filename);
+        static std::optional<Tags> GetFileTags(const char *filename);
 
         // Range 0-1
         audio::RetCode SetOutputVolume(Volume vol);

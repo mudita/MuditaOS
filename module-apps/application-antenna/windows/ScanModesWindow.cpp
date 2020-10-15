@@ -57,7 +57,7 @@ namespace gui
         modesBox = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
         modesBox->setPenWidth(0);
         modesBox->setPenFocusWidth(0);
-        modesBox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        modesBox->setEdges(gui::RectangleEdge::None);
 
         for (auto el : modeButtonParams) {
             gui::Label *modeLabel = addMode(nullptr, el.second);
@@ -72,7 +72,7 @@ namespace gui
                 }
                 auto result = CellularServiceAPI::SetScanMode(this->application, mode);
                 if (result) {
-                    commandResult->setText("Succes!");
+                    commandResult->setText("Success!");
                 }
                 else {
                     commandResult->setText("Failure!");
@@ -134,7 +134,7 @@ namespace gui
                                            antenna::scan_mode_window::commonDefaultPos,
                                            antenna::scan_mode_window::buttonW,
                                            antenna::scan_mode_window::commonSpacerH);
-        label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        label->setEdges(gui::RectangleEdge::None);
         label->setFilled(false);
         label->activeItem = false;
         label->visible    = false;

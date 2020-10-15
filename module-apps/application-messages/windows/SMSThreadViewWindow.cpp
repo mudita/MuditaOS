@@ -5,7 +5,6 @@
 #include "application-messages/data/MessagesStyle.hpp"
 
 #include "OptionsMessages.hpp"
-#include <OptionWindow.hpp>
 #include "Service/Message.hpp"
 
 #include <TextBubble.hpp>
@@ -66,7 +65,7 @@ namespace gui
                 auto ret = DBServiceAPI::ContactGetByIDWithTemporary(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
-                setTitle(ret->front().getFormattedName());
+                setTitle(pdata->threadName.value_or(ret->front().getFormattedName()));
                 auto retNumber = DBServiceAPI::GetNumberById(application, pdata->thread->numberID, numberIdTimeout);
                 assert(retNumber != nullptr);
                 smsModel->number = std::move(retNumber);

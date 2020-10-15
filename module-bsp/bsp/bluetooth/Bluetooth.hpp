@@ -132,6 +132,7 @@ namespace bsp {
     };
 
     /// definitions needed by BT stack
+
     class BlueKitchen : public BluetoothCommon {
         public:
             BlueKitchen(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size);

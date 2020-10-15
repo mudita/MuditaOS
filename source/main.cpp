@@ -13,6 +13,7 @@
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
+#include <application-meditation/ApplicationMeditation.hpp>
 
 // services
 #include <service-appmgr/ApplicationManager.hpp>
@@ -29,6 +30,7 @@
 
 #include <bsp/bsp.hpp>
 #include <Application.hpp>
+#include <ApplicationLauncher.hpp>
 #include <log/log.hpp>
 #include <phonenumbers/phonenumberutil.h>
 #include <source/version.hpp>
@@ -124,6 +126,9 @@ int main()
 #endif
 #ifdef ENABLE_APP_MUSIC_PLAYER
         applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
+#endif
+#ifdef ENABLE_APP_MEDITATION
+        applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
 #endif
 
         // start application manager

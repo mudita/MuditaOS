@@ -21,12 +21,12 @@ target_sources( ${PROJECT_NAME}
         "messages/DBSMSTemplateMessage.cpp"
         "messages/DBThreadMessage.cpp"
         "messages/QueryMessage.cpp"
-
         "agents/DatabaseAgent.cpp"
         "agents/settings/SettingsAgent.cpp"
-
+        "agents/settings/Settings.cpp"
 )
 
 if (${ENABLE_TESTS})
     add_subdirectory(test)
 endif ()
+

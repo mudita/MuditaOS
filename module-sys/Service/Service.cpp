@@ -141,7 +141,7 @@ namespace sys
     {
         timers.stop();
         enableRunLoop = false;
-    };
+    }
 
     auto Service::TimerHandle(SystemMessage &message) -> ReturnCodes
     {
