@@ -1,5 +1,14 @@
 #!/bin/bash
 
+RED='\e[38;2;255;13;0m'
+YELLOW="\e[38;2;255;232;0m"
+GREEN="\e[38;2;0;222;27m"
+ORANGE="\e[38;2;255;100;0m"
+
+OK="${GREEN}OK!\e[0m"
+ERROR="${RED}Error!\e[0m"
+FIXED="${YELLOW}Fixed!\e[0m"
+
 function printVar(){
     echo "$1: '${!1}'"
 }
