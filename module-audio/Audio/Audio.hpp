@@ -76,9 +76,14 @@ namespace audio
             return GetCurrentOperation().GetState();
         }
 
-        [[nodiscard]] inline bool GetHeadphonesInserted() const
+        [[nodiscard]] inline bool GetLineSinkAvailable() const
         {
-            return headphonesInserted;
+            return lineSinkAvailable;
+        }
+
+        [[nodiscard]] inline bool GetBtSinkAvailable() const
+        {
+            return lineSinkAvailable;
         }
 
         // Operations
@@ -100,7 +105,8 @@ namespace audio
         virtual void SetBluetoothStreamData(BluetoothStreamData data);
 
       private:
-        bool headphonesInserted = false;
+        bool lineSinkAvailable = false;
+        bool btSinkAvailable   = false;
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 

@@ -193,7 +193,7 @@ namespace audio
 
         return audio::RetCode::Success;
     }
-    
+
     PlaybackOperation::~PlaybackOperation()
     {
         Stop();

@@ -27,14 +27,14 @@ namespace audio
             std::function<std::uint32_t(const std::string &path, const std::uint32_t &defaultValue)> dbCallback);
         ~RouterOperation() = default;
 
-        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) override final;
-        audio::RetCode Stop() override final;
-        audio::RetCode Pause() override final;
-        audio::RetCode Resume() override final;
-        audio::RetCode SendEvent(std::shared_ptr<Event> evt) override final;
-        audio::RetCode SwitchProfile(const Profile::Type type) override final;
-        audio::RetCode SetOutputVolume(float vol) override final;
-        audio::RetCode SetInputGain(float gain) override final;
+        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) final;
+        audio::RetCode Stop() final;
+        audio::RetCode Pause() final;
+        audio::RetCode Resume() final;
+        audio::RetCode SendEvent(std::shared_ptr<Event> evt) final;
+        audio::RetCode SwitchProfile(const Profile::Type type) final;
+        audio::RetCode SetOutputVolume(float vol) final;
+        audio::RetCode SetInputGain(float gain) final;
 
         Position GetPosition() override final;
         void SetBluetoothStreamData(BluetoothStreamData data) override final;

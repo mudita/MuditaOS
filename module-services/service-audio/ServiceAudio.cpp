@@ -287,6 +287,10 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     auto AudioStart = [&](auto &input) {
         if (input) {
+            if ((*input)->audio->GetBtSinkAvailable()) {
+                auto req = std::make_shared<BluetoothRequestStreamMessage>();
+                sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
+            }
             for (auto &audioInput : audioMux.GetAllInputs()) {
                 HandlePause(&audioInput);
             }
@@ -302,11 +306,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
             retCode = audio::RetCode::Success;
         }
     };
-
-    if (lineSinkAvailable || btSinkAvailable) {
-        auto req = std::make_shared<BluetoothRequestStreamMessage>();
-        sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
-    }
 
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
@@ -541,9 +540,14 @@ std::string ServiceAudio::getSetting(const Setting &setting,
             targetPlayback = currentPlaybackType;
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == Setting::Volume)) {
-
-            targetProfile = ((*input)->audio->GetHeadphonesInserted()) ? Profile::Type::PlaybackHeadphones
-                                                                       : Profile::Type::PlaybackLoudspeaker;
+            auto input    = audioMux.GetIdleInput();
+            targetProfile = Profile::Type::PlaybackLoudspeaker;
+            if ((*input)->audio->GetLineSinkAvailable()) {
+                targetProfile = Profile::Type::PlaybackHeadphones;
+            }
+            if ((*input)->audio->GetBtSinkAvailable()) {
+                targetProfile = Profile::Type::PlaybackBTA2DP;
+            }
 
             targetPlayback = PlaybackType::CallRingtone;
         }
@@ -579,8 +583,14 @@ void ServiceAudio::setSetting(const Setting &setting,
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
-            updatedProfile = (*input)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
-                                                                      : Profile::Type::PlaybackLoudspeaker;
+            auto input     = audioMux.GetIdleInput();
+            updatedProfile = Profile::Type::PlaybackLoudspeaker;
+            if ((*input)->audio->GetLineSinkAvailable()) {
+                updatedProfile = Profile::Type::PlaybackHeadphones;
+            }
+            if ((*input)->audio->GetBtSinkAvailable()) {
+                updatedProfile = Profile::Type::PlaybackBTA2DP;
+            }
 
             updatedPlayback = PlaybackType::CallRingtone;
             valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
@@ -624,8 +634,8 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
     if (!activeInput.has_value()) {
         const auto idleInput = audioMux.GetIdleInput();
         if (idleInput.has_value()) {
-            return {(*idleInput)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
-                                                                 : Profile::Type::PlaybackLoudspeaker,
+            return {(*idleInput)->audio->GetLineSinkAvailable() ? Profile::Type::PlaybackHeadphones
+                                                                : Profile::Type::PlaybackLoudspeaker,
                     audio::PlaybackType::CallRingtone};
         }
     }
