@@ -45,6 +45,7 @@ namespace audio
     std::unique_ptr<Tags> decoder::fetchTags()
     {
         if (fd) {
+            auto inPos = vfs.ftell(fd);
             vfs.rewind(fd);
             TagLib::FileStream fileStream(fd);
             TagLib::FileRef tagReader(&fileStream);
@@ -68,7 +69,7 @@ namespace audio
             }
             vfs.rewind(fd);
             fetchTagsSpecific();
-            vfs.rewind(fd);
+            vfs.fseek(fd, inPos, SEEK_SET);
         }
 
         tag->filePath.append(filePath);
