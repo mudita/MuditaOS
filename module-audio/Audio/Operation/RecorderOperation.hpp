@@ -1,12 +1,11 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_RECORDEROPERATION_HPP
-#define PUREPHONE_RECORDEROPERATION_HPP
+#pragma once
 
 #include "Operation.hpp"
 #include <Audio/encoder/Encoder.hpp>
-#include "bsp/audio/bsp_audio.hpp"
+#include <bsp/audio/bsp_audio.hpp>
 
 namespace audio
 {
@@ -40,5 +39,3 @@ namespace audio
     };
 
 } // namespace audio
-
-#endif // PUREPHONE_RECORDEROPERATION_HPP

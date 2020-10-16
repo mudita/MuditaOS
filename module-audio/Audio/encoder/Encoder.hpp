@@ -1,11 +1,10 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_ENCODER_HPP
-#define PUREPHONE_ENCODER_HPP
+#pragma once
 
 #include <memory>
-#include "vfs.hpp"
+#include <vfs.hpp>
 
 namespace audio
 {
@@ -50,4 +49,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // PUREPHONE_ENCODER_HPP

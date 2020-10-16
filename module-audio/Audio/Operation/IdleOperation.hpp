@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_IDLEOPERATION_HPP
-#define PUREPHONE_IDLEOPERATION_HPP
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -65,4 +64,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // PUREPHONE_IDLEOPERATION_HPP

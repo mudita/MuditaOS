@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef UNTITLED1_DECODERWAV_HPP
-#define UNTITLED1_DECODERWAV_HPP
+#pragma once
 
 #include "decoder.hpp"
 
@@ -48,4 +47,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // UNTITLED1_DECODERWAV_HPP

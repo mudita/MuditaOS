@@ -11,7 +11,7 @@
 #include <Audio/encoder/Encoder.hpp>
 #include <Audio/Profiles/Profile.hpp>
 
-#include "service-bluetooth/ServiceBluetoothCommon.hpp"
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 namespace audio
 {
