@@ -7,6 +7,8 @@
 #include <optional>
 #include <functional>
 
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+
 #include "AudioCommon.hpp"
 #include "Operation/Operation.hpp"
 #include "decoder/decoder.hpp"
@@ -95,7 +97,7 @@ namespace audio
 
         virtual audio::RetCode Mute();
 
-        virtual void SetData(std::shared_ptr<void> data);
+        virtual void SetBluetoothStreamData(BluetoothStreamData data);
 
       private:
         bool headphonesInserted = false;

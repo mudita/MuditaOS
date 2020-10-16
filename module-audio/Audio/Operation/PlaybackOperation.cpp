@@ -193,15 +193,15 @@ namespace audio
 
         return audio::RetCode::Success;
     }
-
+    
     PlaybackOperation::~PlaybackOperation()
     {
         Stop();
     }
 
-    void PlaybackOperation::SetData(std::shared_ptr<void> data)
+    void PlaybackOperation::SetBluetoothStreamData(BluetoothStreamData data)
     {
-        // pass to AudioDevice
+        LOG_ERROR("UNIMPLEMENTED");
     }
 
 } // namespace audio

@@ -207,8 +207,8 @@ namespace audio
         return enc->getCurrentPosition();
     }
 
-    void RecorderOperation::SetData(std::shared_ptr<void> data)
+    void RecorderOperation::SetBluetoothStreamData(BluetoothStreamData data)
     {
-        // pass to AudioDevice
+        LOG_ERROR("UNIMPLEMENTED");
     }
 } // namespace audio

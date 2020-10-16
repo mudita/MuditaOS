@@ -3,17 +3,16 @@
 
 #pragma once
 
-#include "Bluetooth/Device.hpp"
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
+#include <Bluetooth/Device.hpp>
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+#include <Service/Message.hpp>
+#include <MessageType.hpp>
 
 #include <utility>
-#include "MessageType.hpp"
-#include "Bluetooth/Device.hpp"
 
 extern "C"
 {
-#include "module-bluetooth/lib/btstack/src/btstack_util.h"
+#include <module-bluetooth/lib/btstack/src/btstack_util.h>
 };
 
 class BluetoothMessage : public sys::DataMessage
@@ -102,9 +101,9 @@ class BluetoothRequestStreamMessage : public sys::DataMessage
 class BluetoothRequestStreamResultMessage : public sys::DataMessage
 {
   public:
-    BluetoothRequestStreamResultMessage(std::shared_ptr<void> data)
-        : DataMessage(MessageType::BluetoothRequestStream), data(std::move(data)){};
+    BluetoothRequestStreamResultMessage(BluetoothStreamData data)
+        : DataMessage(MessageType::BluetoothRequestStream), data(data){};
     ~BluetoothRequestStreamResultMessage() override = default;
 
-    const std::shared_ptr<void> data;
+    const BluetoothStreamData data;
 };

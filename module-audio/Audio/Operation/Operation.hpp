@@ -7,10 +7,11 @@
 #include <optional>
 #include <functional>
 
-#include "Audio/AudioCommon.hpp"
+#include <Audio/AudioCommon.hpp>
+#include <Audio/encoder/Encoder.hpp>
+#include <Audio/Profiles/Profile.hpp>
 
-#include "Audio/encoder/Encoder.hpp"
-#include "Audio/Profiles/Profile.hpp"
+#include "service-bluetooth/ServiceBluetoothCommon.hpp"
 
 namespace audio
 {
@@ -76,7 +77,7 @@ namespace audio
 
         virtual Position GetPosition() = 0;
 
-        virtual void SetData(std::shared_ptr<void> data)
+        virtual void SetBluetoothStreamData(BluetoothStreamData data)
         {}
 
         Volume GetOutputVolume() const

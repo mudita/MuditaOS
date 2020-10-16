@@ -46,7 +46,7 @@ namespace audio
 
         Position GetPosition() override final;
 
-        void SetData(std::shared_ptr<void> data) override final;
+        void SetBluetoothStreamData(BluetoothStreamData data) override final;
 
       private:
         std::unique_ptr<decoder> dec;

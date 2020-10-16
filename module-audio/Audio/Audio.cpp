@@ -171,9 +171,9 @@ namespace audio
         return SetOutputVolume(0);
     }
 
-    void Audio::SetData(std::shared_ptr<void> data)
+    void Audio::SetBluetoothStreamData(BluetoothStreamData data)
     {
-        currentOperation->SetData(data);
+        currentOperation->SetBluetoothStreamData(data);
     }
 
 } // namespace audio

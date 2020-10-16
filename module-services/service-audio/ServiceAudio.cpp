@@ -1,15 +1,16 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <type_traits>
+
 #include "ServiceAudio.hpp"
 #include "messages/AudioMessage.hpp"
-#include "Audio/Operation/IdleOperation.hpp"
-#include "Audio/Operation/PlaybackOperation.hpp"
 
-#include "service-bluetooth/messages/BluetoothMessage.hpp"
-#include "service-bluetooth/ServiceBluetooth.hpp"
-
-#include <type_traits>
+#include <Audio/Operation/IdleOperation.hpp>
+#include <Audio/Operation/PlaybackOperation.hpp>
+#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/ServiceBluetooth.hpp>
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 
@@ -495,7 +496,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgType == typeid(BluetoothRequestStreamResultMessage)) {
         auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
         if (auto input = audioMux.GetActiveInput()) {
-            input.value()->audio->SetData(msg->data);
+            input.value()->audio->SetBluetoothStreamData(msg->data);
         }
     }
     else {
@@ -543,6 +544,7 @@ std::string ServiceAudio::getSetting(const Setting &setting,
 
             targetProfile = ((*input)->audio->GetHeadphonesInserted()) ? Profile::Type::PlaybackHeadphones
                                                                        : Profile::Type::PlaybackLoudspeaker;
+
             targetPlayback = PlaybackType::CallRingtone;
         }
         else {
