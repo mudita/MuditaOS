@@ -1,7 +1,9 @@
 #include "Audio.hpp"
 #include "Operation/Operation.hpp"
+
 #include <log/log.hpp>
 #include <Utils.hpp>
+#include <bsp/headset/headset.hpp>
 
 namespace audio
 {
@@ -14,6 +16,7 @@ namespace audio
         if (ret) {
             currentOperation = std::move(ret.value());
         }
+        headphonesInserted = bsp::headset::IsInserted();
     }
 
     Position Audio::GetPosition()
