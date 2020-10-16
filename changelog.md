@@ -1,28 +1,30 @@
 # MuditaOS changelog
 
-## current
+## [0.42.2 2020-10-16]
 
 ### Added
 
-* `[gui]` Dynamic Windows building and handling implemented
-* `[audio]` Added A2DP playback backend
-* `[audio]` Added SendEvent audio API
 * `[calculator]` Add calculator application.
-* `[settings]` Create Messages window for apps and tools branch.
-* `[desktop]` Added DeveloperMode endpoint.
+* `[calendar]` Add screen notifications for events.
+* `[settings]` Create window for messages settings.
+* `[settings]` Add window for keypad light settings.
+* `[doc]` Added open source license.
 
+### Changed
+
+* `[settings]` Removed the border around the settings menu.
+* `[messages]` SMS bubble edges smoothing.
+* `[cellular]` Temporarily removed SMS memory setting.
+* `[phonebook]` Contacts list rebuilding in place, not from the start.
 
 ### Fixed
 
-* `[audio]` Fix parsing audio meta tags during playback
-* `[settings]` Removed the border around the settings menu.
+* `[audio]` Fix parsing audio meta tags during playback.
 * `[simulator]` Fix crash on exit.
-* `[listview]` Looping rebuild fix.
-* `[messages]` Draft msg overwriting sms input text.
-* `[messages]` SMS bubble edges smoothing.
-* `[phonebook]` Crash on contact details application exit fix.
-* `[specialInput]` Special characters inserts no longer call onBeforeShow.
-* `[cellular]` Temporary removed SMS memory setting.
+* `[listview]` Fix looping rebuild.
+* `[messages]` Fix draft msg overwriting SMS input text.
+* `[phonebook]` Fix crash on contact details application exit.
+* `[gui]` Fix refresh on special character insert in a special input.
 
 ## [0.42.1 2020-10-12]
 
@@ -39,14 +41,12 @@
 ### Changed
 
 * `[messages]` Split SMS thread for a specific contact into separate ones if multiple phone numbers are available.
-* `[gui][renderer]` Shape rendering refactored.
 
 ### Fixed
 
 * `[db]` Fixed database corruption issues on abrupt phone reset.
 * `[audio]` Fix audio looping.
 * `[phonebook]` Fix phone freezing when contacts database is empty.
-* `[phonebook]` Contacts list rebuilding in place not from start.
 
 ### Other
 
@@ -56,7 +56,6 @@
 * `[settings]` Improvements to API and logic.
 * `[gui]` Added timers.
 * `[doc]` Several updates to user and developer documentation.
-* `[audio]` Added volume popup logic.
 
 ## [0.40.1 2020-10-02]
 
