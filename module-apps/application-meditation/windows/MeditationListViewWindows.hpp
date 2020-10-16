@@ -5,7 +5,7 @@
 namespace gui
 {
     class ListView;
-    class MeditationProvider;
+    class MeditationModel;
 } // namespace gui
 
 namespace gui
@@ -13,8 +13,8 @@ namespace gui
     class MeditationListViewWindow : public AppWindow
     {
       protected:
-        gui::ListView *list                          = nullptr;
-        std::shared_ptr<MeditationProvider> provider = nullptr;
+        gui::ListView *list                    = nullptr;
+        std::shared_ptr<MeditationModel> model = nullptr;
 
         void invalidate() noexcept;
 

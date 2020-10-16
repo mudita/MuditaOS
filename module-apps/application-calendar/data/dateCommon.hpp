@@ -5,6 +5,7 @@
 #include <time/time_conversion.hpp>
 
 using namespace std::chrono;
+using namespace std::chrono_literals;
 
 using Clock            = system_clock;
 using TimePoint        = time_point<Clock>;
@@ -38,7 +39,7 @@ enum class Repeat
     custom
 };
 
-constexpr TimePoint TIME_POINT_INVALID = TimePoint::min();
+constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
 
 inline std::tm CreateTmStruct(int year, int month, int day, int hour, int minutes, int seconds)
 {
@@ -167,6 +168,20 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
         }
     }
     return date::format("%F %T", time_point_cast<seconds>(timePoint));
+}
+
+inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Date timestamp(time);
+    return timestamp.str(format);
+}
+
+inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format = "")
+{
+    auto time = TimePointToTimeT(tp);
+    utils::time::Time timestamp(time);
+    return timestamp.str(format);
 }
 
 inline TimePoint TimePointFromString(const char *s1)

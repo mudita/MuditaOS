@@ -16,8 +16,8 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         windows/SettingsMainWindow.cpp
-        windows/BluetoothWindow.cpp
         windows/BaseSettingsWindow.cpp
+        windows/BluetoothWindow.cpp
         windows/FontSizeWindow.cpp
         windows/InputLanguageWindow.cpp
         windows/DisplayLightWindow.cpp
@@ -26,6 +26,9 @@ target_sources( ${PROJECT_NAME}
         windows/DisplayAndKeypadWindow.cpp
         windows/AppsAndToolsWindow.cpp
         windows/NetworkWindow.cpp
+        windows/MessagesWindow.cpp
+        widgets/UpDown.cpp
+        widgets/Toggle.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -38,6 +41,9 @@ target_sources( ${PROJECT_NAME}
         windows/LockedScreenWindow.hpp
         windows/DisplayAndKeypadWindow.hpp
         windows/AppsAndToolsWindow.hpp
+        windows/MessagesWindow.hpp
+        widgets/UpDown.hpp
+        widgets/Toggle.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

@@ -264,6 +264,9 @@ sys::ReturnCodes EventManager::InitHandler()
 sys::ReturnCodes EventManager::DeinitHandler()
 {
     EventWorker->close();
+    EventWorker.reset();
+    EventWorker = nullptr;
+
     return sys::ReturnCodes::Success;
 }
 

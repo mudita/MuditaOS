@@ -8,6 +8,18 @@ namespace style
     {
         namespace calendar
         {
+            namespace imageCircleTop
+            {
+                constexpr uint32_t x = 116;
+                constexpr uint32_t y = 59;
+                constexpr auto name  = "circle_top";
+            } // namespace imageCircleTop
+            namespace imageCircleBottom
+            {
+                constexpr uint32_t x = 106;
+                constexpr uint32_t y = 240;
+                constexpr auto name  = "circle_bottom";
+            } // namespace imageCircleBottom
 
             namespace name
             {
@@ -19,6 +31,7 @@ namespace style
                 const inline std::string details_window       = "DetailsWindow";
                 const inline std::string new_edit_event       = "NewEditEvent";
                 const inline std::string custom_repeat_window = "CustomRepeat";
+                const inline std::string event_reminder_window = "EventReminderWindow";
             } // namespace name
 
             const inline std::string new_event  = "New";

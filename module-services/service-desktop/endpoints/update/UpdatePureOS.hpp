@@ -29,6 +29,7 @@ namespace updateos
         CantCreateTempDir,
         CantCreateUpdatesDir,
         CantRemoveUniqueTmpDir,
+        CantRemoveUpdateFile,
         CantCreateUniqueTmpDir,
         CantCreateExtractedFile,
         CantOpenChecksumsFile,
@@ -53,6 +54,41 @@ namespace updateos
         CantLoadBootloaderFile
     };
 
+    enum class UpdateState
+    {
+        Initial,
+        UpdateFileSet,
+        CreatingDirectories,
+        ExtractingFiles,
+        UpdatingBootloader,
+        ChecksumVerification,
+        VersionVerificiation,
+        ReadyForReset
+    };
+
+    enum class UpdateMessageType
+    {
+        UpdateFoundOnBoot,
+        UpdateCheckForUpdateOnce,
+        UpdateNow,
+        UpdateError,
+        UpdateInform
+    };
+
+    struct UpdateStats
+    {
+        fs::path updateFile            = "";
+        fs::path fileExtracted         = "";
+        fs::path updateTempDirectory   = PATH_SYS "/" PATH_TMP;
+        uint32_t totalBytes            = 0;
+        uint32_t currentExtractedBytes = 0;
+        uint32_t fileExtractedSize     = 0;
+        uint32_t uuid                  = 0;
+        std::string messageText        = "";
+        updateos::UpdateState status;
+        json11::Json versioInformation;
+    };
+
 }; // namespace updateos
 
 struct FileInfo
@@ -65,7 +101,7 @@ struct FileInfo
     unsigned long fileCRC32;
 };
 
-class UpdatePureOS
+class UpdatePureOS : public updateos::UpdateStats
 {
   public:
     UpdatePureOS(ServiceDesktop *ownerService);
@@ -80,6 +116,11 @@ class UpdatePureOS
     updateos::UpdateError updateBootJSON();
     updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
+    updateos::UpdateError updateUserData();
+
+    void informError(const char *format, ...);
+    void informDebug(const char *format, ...);
+    void informUpdate(const char *format, ...);
 
     updateos::BootloaderUpdateError writeBootloader(fs::path bootloaderFile);
 
@@ -88,10 +129,12 @@ class UpdatePureOS
     bool unpackFileToTemp(mtar_header_t &header, unsigned long *crc32);
     const fs::path getUpdateTmpChild(const fs::path &childPath);
 
+    static const json11::Json getVersionInfoFromFile(const fs::path &updateFile);
+    static bool isUpgradeToCurrent(const std::string &versionToCompare);
+    static const fs::path checkForUpdate();
+
   private:
-    fs::path updateTempDirectory;
     std::vector<FileInfo> filesInUpdatePackage;
     mtar_t updateTar      = {};
     ServiceDesktop *owner = nullptr;
-    fs::path updateFile;
 };

@@ -18,7 +18,8 @@
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-
+#include "service-time/ServiceTime.hpp"
+#include "service-time/messages/TimeMessage.hpp"
 #include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
@@ -100,9 +101,15 @@ namespace gui
             inputCallback = nullptr;
             setFocusItem(nullptr);
             erase(notifications);
+
+            sys::Bus::SendUnicast(
+                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
         }
         else if (app->lockHandler.lock.isLocked()) {
             application->switchWindow(app::window::name::desktop_pin_lock);
+
+            sys::Bus::SendUnicast(
+                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
         }
         else {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
@@ -114,6 +121,9 @@ namespace gui
                 sapm::ApplicationManager::messageSwitchApplication(
                     this->application, app::name_settings, app::sim_select, nullptr);
             }
+
+            sys::Bus::SendUnicast(
+                std::make_shared<TimersProcessingStartMessage>(), service::name::service_time, application);
         }
     }
 

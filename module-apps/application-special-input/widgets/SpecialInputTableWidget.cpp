@@ -26,7 +26,6 @@ namespace gui
                              {specialCharacterTableWidget::char_grid_w, specialCharacterTableWidget::char_grid_h});
 
         for (auto &carrier : carrier) {
-            LOG_INFO("create carrier: %s", carrier.val.c_str());
             box->addWidget(carrier.item);
             decorateActionActivated(carrier.item, carrier.val);
         }

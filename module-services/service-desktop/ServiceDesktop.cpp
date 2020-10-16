@@ -1,4 +1,5 @@
 #include <messages/QueryMessage.hpp>
+#include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include "ServiceDesktop.hpp"
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
@@ -25,23 +26,10 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
          {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
     desktopWorker->run();
 
-    connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
-        sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
-        if (updateOsMsg != nullptr) {
-            LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
-                      updateOsMsg->updateFile.c_str(),
-                      updateOsMsg->uuid);
-
-            if (updateOS->setUpdateFile(updateOsMsg->updateFile) == updateos::UpdateError::NoError)
-                updateOS->runUpdate();
-        }
-        return std::make_shared<sys::ResponseMessage>();
-    });
-
     connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-            LOG_DEBUG("ServiceDesktop::DataReceivedHandler BackupMessage received");
+
             BackupRestore::BackupUserFiles(this);
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -50,7 +38,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::RestoreMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
-            LOG_DEBUG("ServiceDesktop: RestoreMessage received");
+
             BackupRestore::RestoreUserFiles(this);
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -61,6 +49,33 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         if (factoryMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: FactoryMessage received");
             FactoryReset::Run(this);
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+
+        if (updateOsMsg != nullptr &&
+            updateOsMsg->messageType == updateos::UpdateMessageType::UpdateCheckForUpdateOnce) {
+            fs::path file = UpdatePureOS::checkForUpdate();
+
+            if (file.has_filename()) {
+                /* send info to applicationDesktop that there is an update waiting */
+                auto msgToSend =
+                    std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
+                msgToSend->updateStats.versioInformation = UpdatePureOS::getVersionInfoFromFile(file);
+                sys::Bus::SendUnicast(msgToSend, app::name_desktop, this);
+            }
+        }
+
+        if (updateOsMsg != nullptr && updateOsMsg->messageType == updateos::UpdateMessageType::UpdateNow) {
+            LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
+                      updateOsMsg->updateStats.updateFile.c_str(),
+                      updateOsMsg->updateStats.uuid);
+
+            if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
+                updateOS->runUpdate();
         }
         return std::make_shared<sys::ResponseMessage>();
     });

@@ -8,7 +8,7 @@ target_sources(${PROJECT_NAME}
         windows/MeditationTimerWindow.cpp
         windows/MeditationWindow.cpp
         widgets/MeditationTimer.cpp
-        widgets/MeditationListItemProviders.cpp
+        widgets/MeditationModel.cpp
         widgets/MeditationListItems.cpp
         widgets/IntervalBox.cpp
         widgets/TimerSetter.cpp
@@ -21,9 +21,8 @@ target_sources(${PROJECT_NAME}
         windows/MeditationListViewWindows.hpp
         windows/MeditationTimerWindow.hpp
         windows/MeditationWindow.hpp
-        widgets/MeditationListRecords.hpp
         widgets/MeditationTimer.hpp
-        widgets/MeditationListItemProviders.hpp
+        widgets/MeditationModel.hpp
         widgets/MeditationListItems.hpp
         widgets/IntervalBox.hpp
         widgets/TimerSetter.hpp

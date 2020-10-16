@@ -38,6 +38,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/GridLayout.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/RichTextParser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextFormat.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/CheckBoxWithLabel.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Arc.hpp"
@@ -60,5 +61,6 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/Layout.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/TopBar.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Text.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/CheckBoxWithLabel.hpp"
 )
 

@@ -18,8 +18,9 @@ class vfs vfs;
 
 TEST_CASE("System Update Tests")
 {
+    ServiceDesktop serviceDesktop;
     vfs.Init();
-    UpdatePureOS updateOS(nullptr);
+    UpdatePureOS updateOS(&serviceDesktop);
 
     updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
     REQUIRE(err == updateos::UpdateError::NoError);

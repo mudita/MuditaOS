@@ -10,6 +10,9 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 
 #include "gui/SwitchData.hpp"
+#include <service-desktop/ServiceDesktop.hpp>
+#include "DesktopMessages.hpp"
+#include <filesystem>
 
 namespace gui
 {
@@ -43,6 +46,20 @@ namespace gui
         {
             return previousApplication;
         };
+    };
+
+    class UpdateSwitchData : public gui::SwitchData
+    {
+      public:
+        UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
+        {}
+        const sdesktop::UpdateOsMessage &getUpdateOsMessage()
+        {
+            return updateOsMessage;
+        }
+
+      private:
+        sdesktop::UpdateOsMessage updateOsMessage;
     };
 
 } // namespace gui

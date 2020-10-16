@@ -1,6 +1,6 @@
 #include "MeditationListViewWindows.hpp"
 
-#include "application-meditation/widgets/MeditationListItemProviders.hpp"
+#include "application-meditation/widgets/MeditationModel.hpp"
 #include "application-meditation/data/Style.hpp"
 #include "Names.hpp"
 
@@ -18,14 +18,16 @@ MeditationListViewWindow::MeditationListViewWindow(app::Application *app, std::s
 void MeditationListViewWindow::buildInterface()
 {
     AppWindow::buildInterface();
+    model->createData();
     list = new gui::ListView(
-        this, listViewWindow::X, listViewWindow::Y, listViewWindow::Width, listViewWindow::Height, provider);
+        this, listViewWindow::X, listViewWindow::Y, listViewWindow::Width, listViewWindow::Height, model);
     setFocusItem(list);
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 }
 
 void MeditationListViewWindow::destroyInterface()
 {
+    model->clearData();
     erase();
     invalidate();
 }
@@ -50,7 +52,7 @@ void MeditationListViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 MeditationOptionsWindow::MeditationOptionsWindow(app::Application *app)
     : MeditationListViewWindow(app, app::window::name::meditation_options)
 {
-    provider = std::make_shared<MeditationOptionsProvider>(app);
+    model = std::make_shared<MeditationOptionsModel>(app);
     buildInterface();
 }
 
@@ -65,7 +67,7 @@ void MeditationOptionsWindow::buildInterface()
 PreparationTimeWindow::PreparationTimeWindow(app::Application *app)
     : MeditationListViewWindow(app, app::window::name::meditation_preparation)
 {
-    provider = std::make_shared<PrepTimeProvider>(app);
+    model = std::make_shared<PreparationTimeModel>(app);
     buildInterface();
 }
 

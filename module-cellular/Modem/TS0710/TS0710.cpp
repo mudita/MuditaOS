@@ -240,24 +240,8 @@ TS0710::ConfState TS0710::ConfProcedure()
         }
     }
 
-    bool timed_out                = false;
-    constexpr uint32_t cpmsTmeout = 5;
-    const auto cpmsTmeoutTicks =
-        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(cpmsTmeout * utils::time::milisecondsInSecond);
-    while (!timed_out) {
-        if (parser->cmd(at::AT::SET_SMS_STORAGE)) {
-            break;
-        }
-        vTaskDelay(pdMS_TO_TICKS(utils::time::milisecondsInSecond));
-        timed_out = cpp_freertos::Ticks::GetTicks() > cpmsTmeoutTicks;
-        if (timed_out) {
-            return ConfState::Failure;
-        }
-    }
-
     LOG_WARN("TODO: determine while this retry loop is necessary");
-
-    timed_out                      = false;
+    bool timed_out                 = false;
     constexpr uint32_t qsclkTmeout = 30;
     const auto qsclkTmeoutTicks =
         cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(qsclkTmeout * utils::time::milisecondsInSecond);

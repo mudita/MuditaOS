@@ -1,5 +1,5 @@
 #include "ApplicationDesktop.hpp"
-
+#include "Dialog.hpp"
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
@@ -7,6 +7,9 @@
 #include "windows/PowerOffWindow.hpp"
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
+#include "windows/Update.hpp"
+#include "AppWindow.hpp"
+#include "data/LockPhoneData.hpp"
 
 #include <service-db/api/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
@@ -49,6 +52,10 @@ namespace app
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
+
+        else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
+            handled = handle(msg);
+        }
         else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
             handled = lockHandler.handle(msg);
         }
@@ -69,6 +76,18 @@ namespace app
         else {
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
+    }
+
+    auto ApplicationDesktop::handle(sdesktop::UpdateOsMessage *msg) -> bool
+    {
+        if (msg != nullptr && msg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
+
+            if (msg->updateStats.updateFile.has_filename()) {
+                LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
+            }
+        }
+
+        return true;
     }
 
     auto ApplicationDesktop::handle(db::query::notifications::GetAllResult *msg) -> bool
@@ -198,6 +217,30 @@ namespace app
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
 
+        connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+            auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
+
+                if (getWindow(app::window::name::desktop_update)) {
+                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
+
+                    switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                }
+            }
+
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateInform) {
+                if (getWindow(app::window::name::desktop_update)) {
+                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
+                    getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
+                }
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        });
+
+        auto msgToSend =
+            std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
+        sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
+
         return sys::ReturnCodes::Success;
     }
 
@@ -227,6 +270,9 @@ namespace app
         });
         windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
             return std::make_unique<gui::RebootWindow>(app);
+        });
+        windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::UpdateWindow>(app);
         });
     }
 

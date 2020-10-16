@@ -1,0 +1,48 @@
+#pragma once
+
+#include "Service/Message.hpp"
+#include "MessageType.hpp"
+
+class TimeMessage : public sys::DataMessage
+{
+  public:
+    explicit TimeMessage(MessageType messageType) : sys::DataMessage(messageType){};
+
+    virtual ~TimeMessage() = default;
+};
+
+class TimersProcessingStartMessage : public TimeMessage
+{
+  public:
+    TimersProcessingStartMessage() : TimeMessage(MessageType::TimersProcessingStart)
+    {}
+};
+
+class TimersProcessingStopMessage : public TimeMessage
+{
+  public:
+    TimersProcessingStopMessage() : TimeMessage(MessageType::TimersProcessingStop)
+    {}
+};
+
+class ReloadTimersMessage : public TimeMessage
+{
+  public:
+    ReloadTimersMessage() : TimeMessage(MessageType::ReloadTimers)
+    {}
+};
+
+class TimeResponseMessage : public sys::ResponseMessage
+{
+  public:
+    TimeResponseMessage(bool retCode,
+                        std::string retdata    = std::string(),
+                        MessageType responseTo = MessageType::MessageTypeUninitialized)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
+    TimeResponseMessage(bool retCode, MessageType responseTo)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+    virtual ~TimeResponseMessage() = default;
+
+    bool retCode;
+    std::string data;
+};

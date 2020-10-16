@@ -9,12 +9,11 @@ namespace gui
     {
       public:
         OptionsData() = default;
-        OptionsData(int preparationInSec, int preparationRecord, bool showCounter)
-            : preparationTime(preparationInSec), preparationRecordIndex(preparationRecord), showCounter(showCounter)
+        OptionsData(std::chrono::seconds preparation, bool showCounter)
+            : preparationTime(preparation), showCounter(showCounter)
         {}
 
         std::chrono::seconds preparationTime{5};
-        uint32_t preparationRecordIndex = 0;
-        bool showCounter                = true;
+        bool showCounter = true;
     };
 } // namespace gui

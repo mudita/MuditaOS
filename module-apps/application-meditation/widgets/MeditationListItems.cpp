@@ -1,6 +1,8 @@
 #include "MeditationListItems.hpp"
 #include "application-meditation/data/Style.hpp"
 
+#include <i18/i18.hpp>
+
 using namespace gui;
 namespace listStyle = style::meditation::itemList;
 
@@ -23,7 +25,8 @@ MeditationListItem::MeditationListItem(std::string textValue)
     text->setVisible(true);
 }
 
-PrepTimeItem::PrepTimeItem(std::string text) : MeditationListItem(std::move(text))
+PreparationTimeItem::PreparationTimeItem(std::chrono::seconds _duration)
+    : MeditationListItem(convertToPrintable(_duration)), duration(_duration)
 {
     MeditationListItem::text->setFont(style::window::font::big);
     imageSelectionTick = new gui::Image(this,
@@ -36,13 +39,21 @@ PrepTimeItem::PrepTimeItem(std::string text) : MeditationListItem(std::move(text
     imageSelectionTick->setAlignment(Alignment(Alignment::Horizontal::Right));
 }
 
-void PrepTimeItem::select(bool isSelected)
+void PreparationTimeItem::select(bool isSelected)
 {
     imageSelectionTick->setVisible(isSelected);
 }
 
-OptionItemMeditationCounter::OptionItemMeditationCounter(std::string text, bool isCounterOn)
-    : MeditationListItem(std::move(text))
+std::string PreparationTimeItem::convertToPrintable(std::chrono::seconds _duration)
+{
+    if (_duration.count() > 60) {
+        return std::to_string(_duration.count() / 60) + " m";
+    }
+    return std::to_string(_duration.count()) + " s";
+}
+
+OptionItemMeditationCounter::OptionItemMeditationCounter(bool isCounterOn)
+    : MeditationListItem(utils::localize.get("app_meditation_option_show_counter"))
 {
     imageOptionOn  = new gui::Image(this,
                                    listStyle::image::X,
@@ -67,7 +78,8 @@ void OptionItemMeditationCounter::select(bool isSelected)
     imageOptionOff->setVisible(!isSelected);
 }
 
-OptionItemPreparation::OptionItemPreparation(std::string text) : MeditationListItem(std::move(text))
+OptionItemPreparation::OptionItemPreparation()
+    : MeditationListItem(utils::localize.get("app_meditation_preparation_time"))
 {
     image = new gui::Image(this,
                            listStyle::image::X,

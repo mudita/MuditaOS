@@ -19,6 +19,7 @@ namespace gui
         auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto handleSwitchData(SwitchData *data) -> bool override;
+        void onClose() override;
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

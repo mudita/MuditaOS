@@ -16,7 +16,7 @@ namespace
 } // namespace
 
 IntervalBox::IntervalBox(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
-    : Rect(parent, x, y, w, h)
+    : BoxLayout(parent, x, y, w, h)
 {
     build();
 }
@@ -24,12 +24,13 @@ IntervalBox::IntervalBox(Item *parent, const uint32_t x, const uint32_t y, const
 void IntervalBox::build()
 {
     namespace boxStyle = style::meditation::intervalBox;
-    topLabel           = new Label(this,
-                         boxStyle::topLabel::X,
-                         boxStyle::topLabel::Y,
-                         boxStyle::topLabel::Width,
-                         boxStyle::topLabel::Height,
-                         utils::localize.get("app_meditation_interval_chime"));
+
+    Label *topLabel = new Label(this,
+                                boxStyle::topLabel::X,
+                                boxStyle::topLabel::Y,
+                                boxStyle::topLabel::Width,
+                                boxStyle::topLabel::Height,
+                                utils::localize.get("app_meditation_interval_chime"));
     topLabel->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
     topLabel->setFont(style::window::font::verysmall);
     topLabel->setEdges(RectangleEdge::None);
@@ -59,7 +60,7 @@ void IntervalBox::build()
     leftSwitchArrow->setVisible(false);
     rightSwitchArrow->setVisible(false);
 
-    updateIntervals(ChimeIntervalList::Next);
+    updateIntervals(ChimeIntervalList::Direction::Next);
 }
 
 bool IntervalBox::onFocus(bool state)

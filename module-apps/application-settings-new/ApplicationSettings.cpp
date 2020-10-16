@@ -11,6 +11,7 @@
 #include "windows/KeypadLightWindow.hpp"
 #include "windows/AppsAndToolsWindow.hpp"
 #include "windows/NetworkWindow.hpp"
+#include "windows/MessagesWindow.hpp"
 
 #include "ApplicationSettings.hpp"
 
@@ -90,6 +91,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MessagesWindow>(app);
         });
     }
 

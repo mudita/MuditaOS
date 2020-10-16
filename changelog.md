@@ -8,11 +8,22 @@
 * `[gui]` Dynamic Windows building and handling implemented
 * `[audio]` Added A2DP playback backend
 * `[audio]` Added SendEvent audio API
+* `[calculator]` Add calculator application.
+* `[settings]` Create Messages window for apps and tools branch.
+* `[desktop]` Added DeveloperMode endpoint.
+
 
 ### Fixed
 
 * `[audio]` Fix parsing audio meta tags during playback
 * `[settings]` Removed the border around the settings menu.
+* `[simulator]` Fix crash on exit.
+* `[listview]` Looping rebuild fix.
+* `[messages]` Draft msg overwriting sms input text.
+* `[messages]` SMS bubble edges smoothing.
+* `[phonebook]` Crash on contact details application exit fix.
+* `[specialInput]` Special characters inserts no longer call onBeforeShow.
+* `[cellular]` Temporary removed SMS memory setting.
 
 ## [0.42.1 2020-10-12]
 

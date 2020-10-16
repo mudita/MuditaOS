@@ -66,18 +66,22 @@ namespace purefs
 
     namespace json
     {
-        const inline std::string main       = "main";
-        const inline std::string os_type    = "ostype";
-        const inline std::string os_image   = "imagename";
-        const inline std::string os_version = "version";
-        const inline std::string timestamp  = "timestamp";
-
+        const inline std::string main            = "main";
+        const inline std::string os_type         = "ostype";
+        const inline std::string os_image        = "imagename";
+        const inline std::string os_version      = "version";
+        const inline std::string version_major   = "major";
+        const inline std::string version_inor    = "minor";
+        const inline std::string version_patch   = "patch";
+        const inline std::string version_string  = "string";
+        const inline std::string timestamp       = "timestamp";
+        const inline std::string misc            = "misc";
+        const inline std::string builddate       = "builddate";
         const inline std::string git_info        = "git";
         const inline std::string os_git_tag      = "git_tag";
         const inline std::string os_git_revision = "git_commit";
         const inline std::string os_git_branch   = "git_branch";
-
-        const inline std::string bootloader = "bootloader";
+        const inline std::string bootloader      = "bootloader";
     } // namespace json
 
     struct BootConfig
@@ -95,7 +99,7 @@ namespace purefs
         static int version_compare(const std::string &v1, const std::string &v2);
         [[nodiscard]] json11::Json to_json() const;
     };
-};    // namespace purefs
+}; // namespace purefs
 
 class vfs
 {

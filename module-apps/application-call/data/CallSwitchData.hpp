@@ -69,4 +69,15 @@ namespace app
 
     };
 
+    class CallAbortData : public gui::SwitchData
+    {
+      public:
+        CallAbortData() = default;
+    };
+
+    class CallActiveData : public gui::SwitchData
+    {
+      public:
+        CallActiveData() = default;
+    };
 } /* namespace app */

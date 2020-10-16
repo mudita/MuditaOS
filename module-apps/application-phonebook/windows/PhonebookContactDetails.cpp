@@ -43,6 +43,11 @@ namespace gui
         erase();
     }
 
+    void PhonebookContactDetails::onClose()
+    {
+        contactDetailsModel->clearData();
+    }
+
     PhonebookContactDetails::~PhonebookContactDetails()
     {
         destroyInterface();
@@ -128,5 +133,4 @@ namespace gui
 
         return false;
     }
-
 } // namespace gui

@@ -78,6 +78,8 @@ namespace gui
         void restore();
         void restore(Side side);
 
+        void setFont(Side side, const UTF8 &fontName);
+
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
     };

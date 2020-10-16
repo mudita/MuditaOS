@@ -14,6 +14,7 @@
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
+#include <application-calculator/ApplicationCalculator.hpp>
 
 // services
 #include <service-appmgr/ApplicationManager.hpp>
@@ -23,6 +24,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
+#include <service-time/ServiceTime.hpp>
 #if ENABLE_GSM == 1
 #include <service-fota/ServiceFota.hpp>
 #include <service-cellular/ServiceCellular.hpp>
@@ -89,6 +91,8 @@ int main()
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
 
+        ret &= sys::SystemManager::CreateService(std::make_shared<stm::ServiceTime>(), sysmgr.get());
+
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
 #ifdef ENABLE_APP_DESKTOP
@@ -129,6 +133,9 @@ int main()
 #endif
 #ifdef ENABLE_APP_MEDITATION
         applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
+#endif
+#ifdef ENABLE_APP_CALCULATOR
+        applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
 #endif
 
         // start application manager

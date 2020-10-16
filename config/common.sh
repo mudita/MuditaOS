@@ -11,7 +11,7 @@ PURE_OS_GIT_TAG=""
 PURE_US_GIT_REV=""
 PURE_OS_GIT_BRANCH=""
 
-IMAGE_FILES="assets country-codes.db Luts.bin user .boot.json .boot.json.crc32"
+IMAGE_FILES="data assets country-codes.db Luts.bin user .boot.json .boot.json.crc32"
 IMAGE_MOVE_TO_ROOT="user .boot.json .boot.json.crc32"
 check_any_arch() {
     local path="${1}"
@@ -33,6 +33,7 @@ PURE_OS_GIT_REV=`git log --pretty=format:'%h' -n 1`
 PURE_OS_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 version=( ${PURE_OS_GIT_TAG//./ } )
+PURE_OS_VERSION_STRING=$PURE_OS_GIT_TAG
 PURE_OS_VERSION_MAJOR=${version[0]}
 PURE_OS_VERSION_MINOR=${version[1]}
 PURE_OS_VERSION_PATCH=${version[2]}

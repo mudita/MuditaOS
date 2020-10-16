@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rect.hpp"
+#include "BoxLayout.hpp"
 #include "Image.hpp"
 #include "Label.hpp"
 
@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    class IntervalBox : public Rect
+    class IntervalBox : public BoxLayout
     {
         class ChimeIntervalList
         {
@@ -17,7 +17,7 @@ namespace gui
             std::vector<std::chrono::minutes>::const_iterator current;
 
           public:
-            enum Direction
+            enum class Direction
             {
                 Next,
                 Previous
@@ -36,7 +36,6 @@ namespace gui
             [[nodiscard]] static std::string toPrintableInterval(std::chrono::minutes time);
         } chimeIntervals;
 
-        Label *topLabel         = nullptr;
         Label *bottomLabel      = nullptr;
         Image *leftSwitchArrow  = nullptr;
         Image *rightSwitchArrow = nullptr;

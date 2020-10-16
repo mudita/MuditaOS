@@ -12,8 +12,9 @@ struct EventsTableRow : public Record
     std::string title;
     TimePoint date_from = TIME_POINT_INVALID;
     TimePoint date_till = TIME_POINT_INVALID;
-    uint32_t reminder   = 0;
-    uint32_t repeat     = 0;
+    uint32_t reminder        = 0;
+    uint32_t repeat          = 0;
+    TimePoint reminder_fired = TIME_POINT_INVALID;
 };
 
 enum class EventsTableFields
@@ -50,14 +51,16 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                                       const char *str) override final;
 
     std::vector<EventsTableRow> getLimitOffsetByDate(uint32_t offset, uint32_t limit);
+    std::vector<EventsTableRow> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
 
   private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS events("
-                                   "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                   "title TEXT,"
-                                   "date_from DATETIME,"
-                                   "date_till DATETIME,"
-                                   "reminder INTEGER,"
-                                   "repeat INTEGER,"
-                                   "UNIQUE (title, date_from, date_till));";
+    const std::string createTableQuery = "CREATE TABLE IF NOT EXISTS events("
+                                         "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                         "title TEXT,"
+                                         "date_from DATETIME,"
+                                         "date_till DATETIME,"
+                                         "reminder INTEGER,"
+                                         "repeat INTEGER,"
+                                         "reminder_fired DATETIME,"
+                                         "UNIQUE (title, date_from, date_till));";
 };

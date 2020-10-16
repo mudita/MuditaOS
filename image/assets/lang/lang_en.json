@@ -57,6 +57,7 @@
     "common_november": "November",
     "common_december": "December",
     "common_yesterday" : "Yesterday",
+    "common_today" : "Today",
     "common_results_prefix": "Results: ",
     "common_search": "SEARCH",
 
@@ -109,6 +110,11 @@
     "app_calendar_all_day": "All day",
     "app_calendar_new_edit_event_start": "Start",
     "app_calendar_new_edit_event_end": "End",
+
+    "app_calculator_title_main": "Calculator",
+    "app_calculator_equals": "EQUALS",
+    "app_calculator_decimal_separator": ".",
+    "app_calculator_error": "Error",
 
     "app_options_invalid_option": " <Invalid Option> ",
     "app_options_contact_details": "Contact details",
@@ -233,13 +239,21 @@
     "app_settings_net" : "Network",
     "app_settings_disp_key" : "Display and keypad",
     "app_settings_display_display_light": "Display light",
+    "app_settings_display_light_main": "Frontlight",
+    "app_settings_display_light_auto": "Automatic",
+    "app_settings_display_light_brightness": "Brightness",
     "app_settings_display_font_size": "Font size",
     "app_settings_display_locked_screen": "Locked screen",
     "app_settings_display_keypad_light": "Keypad light",
+    "app_settings_display_keypad_light_on": "On",
+    "app_settings_display_keypad_light_active": "When active",
+    "app_settings_display_keypad_light_off": "Off",
     "app_settings_display_input_language": "Input language",
     "app_settings_system" : "System",
     "app_settings_apps_tools" : "Apps and tools",
     "app_settings_apps_messages" : "Messages",
+    "app_settings_show_unread_first" : "Show unread first",
+    "app_settings_Templates" :  "Templates",
     "app_settings_apps_torch" : "Torch",
     "app_settings_date_and_time": "Date and Time",
 	"app_settings_title_day": "Day",
@@ -263,6 +277,8 @@
     "app_settings_network_import_contacts_from_sim_card": "Import contacts from SIM card",
     "app_settings_network_sim1": "Sim1",
     "app_settings_network_sim2": "Sim2",
+    "app_settings_toggle_on": "On",
+    "app_settings_toggle_off": "Off",
 
     "app_phonebook_title_main": "Contacts",
     "app_phonebook_search_win_contacts": "Contacts",
@@ -348,6 +364,14 @@
     "settings_lang_DE": "DE",
     "settings_lang_SP": "SP",
     "desktop_powerdown_info1": "Now It is truly...",
-    "desktop_powerdown_info2": "Disabled!!!"
-
+    "desktop_powerdown_info2": "Disabled!!!",
+    "app_desktop_update": "Update",
+    "app_desktop_update_to": "Update to",
+    "app_desktop_update_apply": "Do you want to apply this update?",
+    "app_desktop_update_current": "Current",
+    "app_desktop_update_apply": "Apply update?",
+    "app_desktop_update_start": "Update start",
+    "app_desktop_update_size": "size",
+    "app_desktop_update_bytes": "bytes",
+    "app_desktop_update_unpacking": "Unpacking"
 }

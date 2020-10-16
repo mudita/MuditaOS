@@ -4,6 +4,8 @@
 #include "Label.hpp"
 #include "Image.hpp"
 
+#include <chrono>
+
 namespace gui
 {
     class MeditationListItem : public ListItem
@@ -18,13 +20,19 @@ namespace gui
         {}
     };
 
-    class PrepTimeItem : public MeditationListItem
+    class PreparationTimeItem : public MeditationListItem
     {
         gui::Image *imageSelectionTick = nullptr;
+        std::chrono::seconds duration;
+        [[nodiscard]] static std::string convertToPrintable(std::chrono::seconds _duration);
 
       public:
-        explicit PrepTimeItem(std::string text);
+        explicit PreparationTimeItem(std::chrono::seconds _duration);
         void select(bool isSelected) final;
+        [[nodiscard]] std::chrono::seconds getDuration() const noexcept
+        {
+            return duration;
+        }
     };
 
     class OptionItemMeditationCounter : public MeditationListItem
@@ -33,7 +41,7 @@ namespace gui
         gui::Image *imageOptionOff = nullptr;
 
       public:
-        OptionItemMeditationCounter(std::string text, bool isCounterOn);
+        explicit OptionItemMeditationCounter(bool isCounterOn);
         void select(bool value) final;
     };
 
@@ -42,7 +50,7 @@ namespace gui
         gui::Image *image = nullptr;
 
       public:
-        explicit OptionItemPreparation(std::string text);
+        OptionItemPreparation();
     };
 
 } // namespace gui
