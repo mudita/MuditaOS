@@ -22,6 +22,7 @@
 * `[messages]` SMS bubble edges smoothing.
 * `[phonebook]` Crash on contact details application exit fix.
 * `[specialInput]` Special characters inserts no longer call onBeforeShow.
+* `[cellular]` Temporary removed SMS memory setting.
 
 ## [0.42.1 2020-10-12]
 
