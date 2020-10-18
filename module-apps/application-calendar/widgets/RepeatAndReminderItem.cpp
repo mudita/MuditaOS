@@ -103,7 +103,7 @@ namespace gui
         repeatTitle->setText(utils::localize.get("app_calendar_event_detail_repeat"));
         reminderTitle->setText(utils::localize.get("app_calendar_event_detail_reminder"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-            if (event->repeat >= app::ApplicationCalendar::repeatOptions.size()) {
+            if (event->repeat > app::ApplicationCalendar::repeatOptions.size()) {
                 repeat->setText("app_calendar_custom_repeat_title");
             }
             else {

@@ -44,11 +44,13 @@ TEST_CASE("Events Record tests")
     SECTION("Constructor from EventsTableRow")
     {
         EventsTableRow tableRow{{.ID = 10},
+                                "test",
                                 "Event3",
                                 TimePointFromString("2019-10-20 14:24:00"),
                                 TimePointFromString("2019-10-20 15:36:00"),
                                 1,
-                                2};
+                                2,
+                                TIME_POINT_INVALID};
         EventsRecord testRec(tableRow);
         REQUIRE(testRec.title == "Event3");
         REQUIRE(testRec.date_from == TimePointFromString("2019-10-20 14:24:00"));
@@ -65,11 +67,14 @@ TEST_CASE("Events Record tests")
     REQUIRE(numberOfEvents == 0);
 
     EventsTableRow tableRow{{.ID = 10},
+                            "test",
                             "Event1",
                             TimePointFromString("2019-10-20 14:24:00"),
                             TimePointFromString("2019-10-20 15:36:00"),
                             1,
-                            2};
+                            2,
+                            TIME_POINT_INVALID};
+
     auto rec = EventsRecord(tableRow);
     REQUIRE(rec.title == "Event1");
     REQUIRE(rec.date_from == TimePointFromString("2019-10-20 14:24:00"));
@@ -108,11 +113,14 @@ TEST_CASE("Events Record tests")
     }
 
     EventsTableRow tableRow2{{.ID = 10},
+                             "test",
                              "Event2",
                              TimePointFromString("2025-10-20 14:24:00"),
                              TimePointFromString("2025-10-20 15:36:00"),
                              1,
-                             2};
+                             2,
+                             TIME_POINT_INVALID};
+
     auto rec2 = EventsRecord(tableRow2);
     REQUIRE(rec2.title == "Event2");
     REQUIRE(rec2.date_from == TimePointFromString("2025-10-20 14:24:00"));
@@ -194,11 +202,13 @@ TEST_CASE("Events Record tests")
     }
 
     EventsTableRow tableRow3{{.ID = 3},
+                             "test",
                              "Event3",
                              TimePointFromString("2021-10-20 14:24:00"),
                              TimePointFromString("2021-10-20 15:36:00"),
                              1,
-                             2};
+                             2,
+                             TIME_POINT_INVALID};
     auto rec3 = EventsRecord(tableRow3);
     REQUIRE(rec3.title == "Event3");
     REQUIRE(rec3.date_from == TimePointFromString("2021-10-20 14:24:00"));
@@ -247,7 +257,7 @@ TEST_CASE("Events Record tests")
     };
 
     auto AddQuery = [&](uint32_t id, std::string title, TimePoint date_from, TimePoint date_till) {
-        EventsTableRow tableRow2{{.ID = id}, title, date_from, date_till, 1, 2};
+        EventsTableRow tableRow2{{.ID = id}, "test", title, date_from, date_till, 1, 2, TIME_POINT_INVALID};
         auto record = EventsRecord(tableRow2);
         auto query  = std::make_shared<db::query::events::Add>(record);
         auto ret    = eventsRecordInterface.runQuery(query);
@@ -270,7 +280,7 @@ TEST_CASE("Events Record tests")
                          TimePoint date_till,
                          uint32_t reminder,
                          uint32_t repeat) {
-        EventsTableRow tableRow2{{.ID = id}, title, date_from, date_till, reminder, repeat};
+        EventsTableRow tableRow2{{.ID = id}, "test", title, date_from, date_till, reminder, repeat, TIME_POINT_INVALID};
         auto record = EventsRecord(tableRow2);
         auto query  = std::make_shared<db::query::events::Edit>(record);
         auto ret    = eventsRecordInterface.runQuery(query);
