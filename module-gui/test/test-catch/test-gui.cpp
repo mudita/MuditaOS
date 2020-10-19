@@ -33,6 +33,14 @@ using namespace std;
 
 class vfs vfs;
 
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_init;
+
 TEST_CASE("Test BoundingBox intersect")
 {
     gui::BoundingBox result;
@@ -53,7 +61,6 @@ TEST_CASE("Test BoundingBox intersect")
 /// tbh - there should allways be fallback to some memory stored font in our FontManager
 TEST_CASE("Are fonts loaded")
 {
-    vfs.Init();
     auto &fontmanager = gui::FontManager::getInstance();
     // check getInstance - getting even default font will result in nullptr
     // this is because no fonts are loaded

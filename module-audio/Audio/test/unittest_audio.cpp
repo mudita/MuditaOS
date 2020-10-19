@@ -19,11 +19,18 @@
 
 class vfs vfs;
 
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_init;
+
 TEST_CASE("Test audio tags")
 {
     SECTION(" Encoder tests ")
     {
-        vfs.Init();
         std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
         for (auto ext : testExtensions) {
             auto dec = audio::decoder::Create(("testfiles/audio." + ext).c_str());

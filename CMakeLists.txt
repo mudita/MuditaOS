@@ -217,7 +217,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 		${FAT_IMAGE}-target ALL
 		DEPENDS ${FAT_IMAGE}
 	)
-
+	add_dependencies(check ${FAT_IMAGE}-target)
     install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION "./")
 endif()
 
