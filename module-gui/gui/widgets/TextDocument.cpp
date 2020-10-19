@@ -1,5 +1,4 @@
 #include "TextDocument.hpp"
-#include "log/log.hpp"
 #include <cassert>
 #include <utility>
 #include <TextFormat.hpp>
@@ -22,9 +21,9 @@ namespace gui
         blocks.clear();
     }
 
-    void TextDocument::append(std::list<TextBlock> &&blocks)
+    void TextDocument::append(std::list<TextBlock> &&block_list)
     {
-        for (auto &&el : blocks) {
+        for (auto &&el : block_list) {
             this->blocks.emplace_back(std::move(el));
         }
     }
@@ -41,7 +40,7 @@ namespace gui
         l_block.setEnd(eol);
     }
 
-    UTF8 TextDocument::getText() const
+    auto TextDocument::getText() const -> UTF8
     {
         UTF8 output;
         if (blocks.size() != 0) {
@@ -53,7 +52,7 @@ namespace gui
         return output;
     }
 
-    BlockCursor TextDocument::getBlockCursor(unsigned int position)
+    auto TextDocument::getBlockCursor(unsigned int position) -> BlockCursor
     {
         unsigned int block_no      = 0;
         unsigned int loop_position = 0;
@@ -77,21 +76,20 @@ namespace gui
         return BlockCursor();
     }
 
-    TextPart TextDocument::getTextPart(BlockCursor cursor)
+    auto TextDocument::getText(BlockCursor cursor) -> std::string
     {
         if (cursor) {
-            auto block = std::next(blocks.begin(), cursor.getBlockNr());
-            return TextPart(cursor, block->getText(cursor.getPosition()), block->getFormat()->getFont());
+            return cursor.getText();
         }
-        return TextPart();
+        return "";
     }
 
-    [[nodiscard]] const std::list<TextBlock> &TextDocument::getBlocks() const
+    [[nodiscard]] auto TextDocument::getBlocks() const -> const std::list<TextBlock> &
     {
         return blocks;
     }
 
-    [[nodiscard]] const TextBlock *TextDocument::getBlock(BlockCursor *cursor) const
+    [[nodiscard]] auto TextDocument::getBlock(BlockCursor *cursor) const -> const TextBlock *
     {
         if (cursor != nullptr && *cursor) {
             return &operator()(*cursor);
@@ -99,7 +97,7 @@ namespace gui
         return nullptr;
     }
 
-    const TextBlock &TextDocument::operator()(const BlockCursor &cursor) const
+    auto TextDocument::operator()(const BlockCursor &cursor) const -> const TextBlock &
     {
         assert(cursor.getBlockNr() < blocks.size());
         return *std::next(blocks.begin(), cursor.getBlockNr());

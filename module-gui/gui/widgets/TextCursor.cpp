@@ -15,18 +15,19 @@ namespace gui
 {
     const unsigned int TextCursor::default_width = 2;
 
-    TextCursor::TextCursor(gui::Text *parent, gui::TextDocument *document)
+    TextCursor::TextCursor(gui::Text *parent, unsigned int pos, unsigned int block)
         : Rect(parent, 0, 0, default_width, 1),
-          BlockCursor(
-              document, text::npos, text::npos, parent != nullptr ? parent->getTextFormat().getFont() : nullptr),
+          BlockCursor(parent != nullptr ? parent->document.get() : nullptr,
+                      pos,
+                      block,
+                      parent != nullptr ? parent->getTextFormat().getFont() : nullptr),
           text(parent)
     {
         setFilled(true);
         setVisible(false);
-        pos_on_screen = document->getText().length();
     }
 
-    TextCursor::Move TextCursor::move_cursor(NavigationDirection direction)
+    TextCursor::Move TextCursor::moveCursor(NavigationDirection direction)
     {
         debug_text_cursor("cursor: screen pos: %d block: %d pos: %d %s",
                           pos_on_screen,
@@ -55,6 +56,7 @@ namespace gui
                 auto block    = document->getBlock(this);
                 auto len      = block->getText().length();
                 pos_on_screen = len - 1;
+                return Move::Up;
             }
             return Move::InLine;
         }
@@ -63,6 +65,10 @@ namespace gui
             operator++();
             if (nr == getBlockNr() || nr == text::npos) {
                 ++pos_on_screen;
+            }
+            else {
+                pos_on_screen = 0;
+                return Move::Down;
             }
             return Move::InLine;
         }
@@ -89,6 +95,7 @@ namespace gui
 
             return Move::Down;
         }
+
         return Move::Error;
     }
 
@@ -103,7 +110,7 @@ namespace gui
 
         auto block = getBlockNr();
 
-        for (auto &line : text->lines.get()) {
+        for (auto &line : text->lines->get()) {
             if (line.getBlockNr() == block) {
                 if (offset_pos + line.length() >= pos_on_screen) {
                     auto column = pos_on_screen - offset_pos;
@@ -131,7 +138,7 @@ namespace gui
             x = getAxisAlignmentValue(Axis::X, w);
             y = getAxisAlignmentValue(Axis::Y, h);
         }
-        else if (text != nullptr || text->lines.size() > 0) {
+        else if (text != nullptr || text->lines->size() > 0) {
             auto [line, column, row] = getLine();
             if (line == nullptr || column == text::npos || row == text::npos) {
                 setArea({x, y, w, h});
@@ -150,10 +157,10 @@ namespace gui
     {
         BlockCursor::addChar(utf_val);
         if (utf_val == text::newline) {
-            move_cursor(NavigationDirection::DOWN);
+            moveCursor(NavigationDirection::DOWN);
         }
         else {
-            move_cursor(NavigationDirection::RIGHT);
+            moveCursor(NavigationDirection::RIGHT);
         }
     }
 
@@ -171,16 +178,42 @@ namespace gui
         BlockCursor::addTextBlock(std::move(textblock));
         // +1 is for block barier
         for (unsigned int i = 0; i < len + 1; ++i) {
-            move_cursor(NavigationDirection::RIGHT);
+            moveCursor(NavigationDirection::RIGHT);
         }
         return *this;
     }
 
     void TextCursor::removeChar()
     {
-        move_cursor(NavigationDirection::LEFT);
+        moveCursor(NavigationDirection::LEFT);
         BlockCursor::removeChar();
     }
+
+    InputBound TextCursor::processBound(InputBound bound, const InputEvent &event)
+    {
+        if (bound == InputBound::CAN_MOVE) {
+            moveCursor(inputToNavigation(event));
+        }
+
+        if (bound == InputBound::CAN_REMOVE) {
+            removeChar();
+        }
+
+        if (bound == InputBound::CAN_ADD) {
+            if (event.isLongPress()) {
+                auto val = toNumeric(event.keyCode);
+                if (val != InvalidNumericKeyCode) {
+                    addChar(intToAscii(val));
+                }
+            }
+            else {
+                text->handleAddChar(event);
+            }
+        }
+
+        return bound;
+    }
+
 } // namespace gui
 
 const char *c_str(enum gui::TextCursor::Move what)

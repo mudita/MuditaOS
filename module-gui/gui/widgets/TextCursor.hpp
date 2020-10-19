@@ -8,7 +8,6 @@
 
 namespace gui
 {
-
     class Text;
     class TextDocument;
 
@@ -34,7 +33,7 @@ namespace gui
             Error, /// error - now not implemented
         };
 
-        TextCursor(gui::Text *parent, gui::TextDocument *document);
+        TextCursor(gui::Text *parent, unsigned int pos = 0, unsigned int block = 0);
         TextCursor() = delete;
 
         /// Up Down - end of line movement like in vi
@@ -43,7 +42,7 @@ namespace gui
         /// - informs that we changed line when needed - TODO think about it better... ( and if it's needed...?)
         /// - with_update - updates position in parent ( if false not - means we handled it already with i.e. addChar or
         /// removeChar)
-        Move move_cursor(NavigationDirection direction);
+        virtual Move moveCursor(NavigationDirection direction);
         void reset();
 
         // TODO note to self - here should be too UTF8 char handling, not in document...
@@ -57,6 +56,13 @@ namespace gui
         TextCursor &operator<<(const UTF8 &);
         TextCursor &operator<<(TextBlock);
         void removeChar();
+
+        auto getPosOnScreen() const
+        {
+            return pos_on_screen;
+        }
+
+        auto processBound(InputBound bound, const InputEvent &event) -> InputBound;
     };
 } // namespace gui
 

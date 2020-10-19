@@ -13,13 +13,16 @@
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "Style.hpp"
+#include "Lines.hpp"
 #include "TextCursor.hpp"
 #include "TextDocument.hpp"
 #include "TextLine.hpp"
 #include "Translator.hpp"
+#include "TextLineCursor.hpp"
 
 namespace gui
 {
+    class Lines;
 
     ///  @brief Widget that holds multiple lines of text.
     ///
@@ -36,88 +39,15 @@ namespace gui
     class Text : public Rect
     {
         friend TextCursor;
+        friend Lines;
 
       protected:
         // holds list of labels for displaying currently visible text lines.
-        class Lines
-        {
-            Item *parent = nullptr;
-            std::list<TextLine> lines;
 
-          public:
-            void erase()
-            {
-                if (parent != nullptr) {
-                    for (auto &line : lines) {
-                        line.erase();
-                    }
-                }
-                lines.clear();
-            }
-
-            void emplace(TextLine &&line)
-            {
-                lines.emplace_back(std::move(line));
-            }
-
-            Lines(Item *parent)
-            {
-                this->parent = parent;
-            }
-
-            const auto &get()
-            {
-                return lines;
-            }
-
-            auto &last()
-            {
-                return lines.back();
-            }
-
-            auto size()
-            {
-                return lines.size();
-            }
-
-            auto maxWidth()
-            {
-                unsigned int w = 0;
-                // could be std::max_element
-                for (auto &el : lines) {
-                    w = el.width() > w ? el.width() : w;
-                }
-                return w;
-            }
-
-            auto linesHeight()
-            {
-                unsigned int h = 0;
-                for (auto &el : lines) {
-                    h += el.height();
-                }
-                return h;
-            }
-
-            auto linesVAlign(Length parentSize)
-            {
-                for (auto &line : lines) {
-                    line.alignV(parent->getAlignment(Axis::Y), parentSize, linesHeight());
-                }
-            }
-
-            auto linesHAlign(Length parentSize)
-            {
-                for (auto &line : lines) {
-                    line.alignH(parent->getAlignment(Axis::X), parentSize);
-                }
-            }
-
-        } lines;
-
-        TextCursor *cursor                     = nullptr;
+        TextLineCursor *cursor                 = nullptr;
         std::unique_ptr<TextDocument> document = std::make_unique<TextDocument>(std::list<TextBlock>());
         InputMode *mode                        = nullptr;
+        std::unique_ptr<Lines> lines           = nullptr;
 
         void buildDocument(const UTF8 &text);
         void buildDocument(std::unique_ptr<TextDocument> &&document);
@@ -125,15 +55,15 @@ namespace gui
         /// show cursor if cursor should be visible
         void showCursor(bool focus);
 
-        EditMode editMode = EditMode::EDIT;
+      public:
+        ExpandMode expandMode    = ExpandMode::EXPAND_NONE;
+        EditMode editMode        = EditMode::EDIT;
+        KeyCode key_signs_remove = KeyCode::KEY_PND;
+
         [[nodiscard]] bool isMode(EditMode edit) const
         {
             return editMode == edit;
         }
-        KeyCode key_signs_remove = KeyCode::KEY_PND;
-
-      public:
-        ExpandMode expandMode = ExpandMode::EXPAND_NONE;
 
       protected:
         TextType textType = TextType::MULTI_LINE;
@@ -141,11 +71,11 @@ namespace gui
         bool underline = false;
         TextFormat format;
 
-        bool moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document);
-        bool handleNavigation(const InputEvent &inputEvent);
-        bool handleEnter();
+        auto moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document) -> bool;
+        auto handleNavigation(const InputEvent &inputEvent) -> bool;
+        auto handleEnter() -> bool;
 
-        std::list<DrawCommand *> buildDrawList() override;
+        auto buildDrawList() -> std::list<DrawCommand *> override;
         /// redrawing lines
         /// it redraws visible lines on screen and if needed requests resize in parent
         virtual void drawLines();
@@ -215,6 +145,8 @@ namespace gui
 
       private:
         gui::KeyInputMappedTranslation translator;
+
+      public:
         TextChangedCallback textChangedCallback;
 
         bool handleRotateInputMode(const InputEvent &inputEvent);
@@ -222,12 +154,15 @@ namespace gui
         bool handleSelectSpecialChar(const InputEvent &inputEvent);
         bool handleActivation(const InputEvent &inputEvent);
         bool handleBackspace(const InputEvent &inputEvent);
-        bool handleAddChar(const InputEvent &inputEvent);
         bool handleDigitLongPress(const InputEvent &inputEvent);
+        bool handleAddChar(const InputEvent &inputEvent);
 
         bool addChar(uint32_t utf8);
         bool removeChar();
+        InputBound processBound(InputBound bound, const InputEvent &event);
         void onTextChanged();
     };
+
+    char intToAscii(int val);
 
 } /* namespace gui */
