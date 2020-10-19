@@ -37,14 +37,6 @@ namespace audio
         return std::nullopt;
     }
 
-    std::optional<AudioMux::Input *> AudioMux::GetRecordingInput()
-    {
-        if (auto input = GetInput({Audio::State::Recording, Audio::State::Routing})) {
-            return input;
-        }
-        return std::nullopt;
-    }
-
     std::optional<AudioMux::Input *> AudioMux::GetPlaybackInput(const audio::PlaybackType &playbackType)
     {
         // if routing or recording we cannot continue
