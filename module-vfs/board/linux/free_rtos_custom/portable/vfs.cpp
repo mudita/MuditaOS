@@ -19,7 +19,10 @@ vfs::~vfs()
 
 void vfs::Init()
 {
-
+    if (emmcFFDisk) {
+        LOG_WARN("Disk manager already initialized");
+        return;
+    }
     emmcFFDisk = freertos_fat::internals::diskInit(purefs::dir::eMMC_disk.c_str(), image_name);
 
     /* Print out information on the disk. */

@@ -6,6 +6,7 @@
 #include "mock/InitializedFontManager.hpp"
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
+#include <vfs.hpp>
 #include <memory>
 #include <functional>
 #include <iostream>
@@ -25,7 +26,6 @@
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
-#include <vfs.hpp>
 
 #include <mock/TestWindow.hpp>
 
@@ -53,6 +53,7 @@ TEST_CASE("Test BoundingBox intersect")
 /// tbh - there should allways be fallback to some memory stored font in our FontManager
 TEST_CASE("Are fonts loaded")
 {
+    vfs.Init();
     auto &fontmanager = gui::FontManager::getInstance();
     // check getInstance - getting even default font will result in nullptr
     // this is because no fonts are loaded

@@ -4,6 +4,25 @@
 #include <iostream>
 #include <time/time_conversion.hpp>
 #include <algorithm>
+#include <thread.hpp>
+
+namespace
+{
+    thread_local void *tls_pointers[configNUM_THREAD_LOCAL_STORAGE_POINTERS];
+}
+
+extern "C"
+{
+
+    void *ff_stdio_pvTaskGetThreadLocalStoragePointer(TaskHandle_t, BaseType_t xIndex)
+    {
+        return tls_pointers[xIndex];
+    }
+    void ff_stdio_vTaskSetThreadLocalStoragePointer(TaskHandle_t, BaseType_t xIndex, void *pvValue)
+    {
+        tls_pointers[xIndex] = pvValue;
+    }
+}
 
 /// crap null stream from internets
 /// (https://stackoverflow.com/questions/8243743/is-there-a-null-stdostream-implementation-in-c-or-libraries)
@@ -213,6 +232,7 @@ int main(int argc, char *argv[])
 {
     time_t time_today = 0;
 
+    vfs.Init();
     // get reference Today time
     if (bsp::rtc_GetCurrentTimestamp(&time_today)) {
         std::cerr << "Error on gettime" << std::endl;

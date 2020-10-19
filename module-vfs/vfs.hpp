@@ -174,7 +174,7 @@ class vfs
     bsp::eMMC emmc;
 #endif
 
-    FF_Disk_t *emmcFFDisk;
+    FF_Disk_t *emmcFFDisk{};
 
     static void computeCRC32(FILE *file, unsigned long *outCrc32);
     static bool verifyCRC(const std::string filePath, const unsigned long crc32);

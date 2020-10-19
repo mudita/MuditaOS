@@ -13,12 +13,21 @@
 
 #include <cstdint>
 
+#include <thread.hpp>
+
 class vfs vfs;
 
-TEST_CASE("Test case 1")
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_initializer;
+
+TEST_CASE("Test vfs case 1")
 {
 
-    vfs.Init();
 
     const size_t testBufferSize = 1024 * 1024;
 
@@ -44,8 +53,19 @@ TEST_CASE("Test case 1")
     // current directory is the build dir
     // vfs adds sys/ to the path we need to got outside sys (bad!)
     // and look for some files there
-    auto dirList = vfs.listdir("module-vfs/test_dir");
-    REQUIRE(dirList.size() == 3);
+    vfs.mkdir("module-vfs");
+    vfs.mkdir("module-vfs/test_dir2");
+
+    fd = vfs.fopen("module-vfs/test1.txt", "a");
+    REQUIRE(fd != nullptr);
+    REQUIRE(vfs.fclose(fd) == 0);
+
+    fd = vfs.fopen("module-vfs/test2.txt", "a");
+    REQUIRE(fd != nullptr);
+    REQUIRE(vfs.fclose(fd) == 0);
+
+    auto dirList = vfs.listdir("module-vfs");
+    REQUIRE(dirList.size() >= 4);
     for (auto &dir : dirList) {
         if (dir.fileName == "test_dir2") {
             REQUIRE(dir.attributes == vfs::FileAttributes::Directory);
@@ -59,7 +79,6 @@ TEST_CASE("Test case 1")
 #define RANDDOM_TESTS 4
 TEST_CASE("Random strings")
 {
-    vfs.Init();
     const std::string allowedChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::string randomIds8, randomIds16, randomIds32;
     randomIds8  = vfs.generateRandomId(8);
@@ -81,7 +100,6 @@ TEST_CASE("Random strings")
 
 TEST_CASE("CRC32 tests")
 {
-    vfs.Init();
     unsigned long crc32 = 0;
     char crcBuf[purefs::buffer::crc_char_size];
     std::string randomData = vfs.generateRandomId(128);
@@ -99,6 +117,7 @@ TEST_CASE("CRC32 tests")
     bytesWritten = vfs.fwrite(&crcBuf, 1, purefs::buffer::crc_char_size, fdCRC);
     REQUIRE(bytesWritten == purefs::buffer::crc_char_size);
     REQUIRE(vfs.fclose(fdCRC) == 0);
+    REQUIRE(vfs.fclose(fd) == 0);
 
     REQUIRE(vfs.verifyCRC("testFile.txt") == true);
     REQUIRE(vfs.remove("testFile.txt") == 0);
@@ -107,12 +126,17 @@ TEST_CASE("CRC32 tests")
 
 TEST_CASE("File loading and saving")
 {
-    vfs.Init();
-    std::string fileContents = vfs.loadFileAsString("module-vfs/test_dir/test1.txt");
-    REQUIRE(strcmp(fileContents.c_str(), "abcd") == 0);
-
-    vfs.replaceWithString("module-vfs/test_dir/testWrite.txt", "this is a test");
-    fileContents = vfs.loadFileAsString("module-vfs/test_dir/testWrite.txt");
+    static constexpr auto test_str = "abcd";
+    auto fd                        = vfs.fopen("test1.txt", "w");
+    REQUIRE(fd != nullptr);
+    const auto slen = std::strlen(test_str);
+    REQUIRE(vfs.fwrite(test_str, 1, slen, fd) == slen);
+    vfs.fclose(fd);
+    std::string fileContents = vfs.loadFileAsString("test1.txt");
+    REQUIRE(strcmp(fileContents.c_str(), test_str) == 0);
+    vfs.mkdir("module-vfs/test_dirx");
+    vfs.replaceWithString("module-vfs/test_dirx/testWrite.txt", "this is a test");
+    fileContents = vfs.loadFileAsString("module-vfs/test_dirx/testWrite.txt");
     REQUIRE(strcmp(fileContents.c_str(), "this is a test") == 0);
-    REQUIRE(vfs.remove("module-vfs/test_dir/testWrite.txt") == 0);
+    REQUIRE(vfs.remove("module-vfs/test_dirx/testWrite.txt") == 0);
 }

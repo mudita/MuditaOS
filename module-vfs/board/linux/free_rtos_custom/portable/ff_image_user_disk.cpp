@@ -346,14 +346,15 @@ namespace freertos_fat::internals
             if (pxDisk->pxIOManager != NULL) {
                 FF_DeleteIOManager(pxDisk->pxIOManager);
             }
-
-            vPortFree(pxDisk);
+            // TODO: Fixme in the laters stage
+            free(pxDisk);
         }
         return pdPASS;
     }
 
     BaseType_t diskShowPartition(FF_Disk_t *pxDisk)
     {
+
         FF_Error_t xError;
         uint64_t ullFreeSectors;
         uint32_t ulTotalSizeMB, ulFreeSizeMB;
@@ -399,6 +400,7 @@ namespace freertos_fat::internals
 
             /* It is better not to use the 64-bit format such as %Lu because it
             might not be implemented. */
+
             LOG_PRINTF("Type           %8u (%s)\r\n", pxIOManager->xPartition.ucType, pcTypeName);
             LOG_PRINTF("VolLabel       '%8s' \r\n", pxIOManager->xPartition.pcVolumeLabel);
             LOG_PRINTF("TotalSectors   %8u\r\n", pxIOManager->xPartition.ulTotalSectors);
