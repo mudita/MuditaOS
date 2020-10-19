@@ -85,25 +85,24 @@ fi
 vjson=update/tmp/version.json
 cp config/version.json.template $vjson
 
-sed -i 's/__GIT_BRANCH__/'$PURE_OS_GIT_BRANCH'/g' $vjson
-sed -i 's/__GIT_TAG__/'$PURE_OS_GIT_TAG'/g' $vjson
-sed -i 's/__GIT_REVISION__/'$PURE_OS_GIT_REV'/g' $vjson
+sed -i -e 's/__GIT_BRANCH__/'$PURE_OS_GIT_BRANCH'/g' $vjson
+sed -i -e 's/__GIT_TAG__/'$PURE_OS_GIT_TAG'/g' $vjson
+sed -i -e 's/__GIT_REVISION__/'$PURE_OS_GIT_REV'/g' $vjson
 
-sed -i 's/__VERSION_STRING__/'$PURE_OS_VERSION_STRING'/g' $vjson
-sed -i 's/__VERSION_MAJOR__/'$PURE_OS_VERSION_MAJOR'/g' $vjson
-sed -i 's/__VERSION_MINOR__/'$PURE_OS_VERSION_MINOR'/g' $vjson
-sed -i 's/__VERSION_PATCH__/'$PURE_OS_VERSION_PATCH'/g' $vjson
+sed -i -e 's/__VERSION_MAJOR__/'$PURE_OS_VERSION_MAJOR'/g' $vjson
+sed -i -e 's/__VERSION_MINOR__/'$PURE_OS_VERSION_MINOR'/g' $vjson
+sed -i -e 's/__VERSION_PATCH__/'$PURE_OS_VERSION_PATCH'/g' $vjson
 
 BUILD_HOST=`uname -r`
 BUILD_USER=`whoami`
 BUILD_DATE=`date +'%F-%T'`
 
-sed -i 's/__MISC_CODENAME__/'$VERSION_CODENAME'/g' $vjson
-sed -i 's/__MISC_KERNEL__/'$VERSION_KERNEL'/g' $vjson
+sed -i -e 's/__MISC_CODENAME__/'$VERSION_CODENAME'/g' $vjson
+sed -i -e 's/__MISC_KERNEL__/'$VERSION_KERNEL'/g' $vjson
 
-sed -i 's/__MISC_BUILD_HOST__/'$BUILD_HOST'/g' $vjson
-sed -i 's/__MISC_BUILD_DATE__/'$BUILD_DATE'/g' $vjson
-sed -i 's/__MISC_BUILD_USER__/'$BUILD_USER'/g' $vjson
+sed -i -e 's/__MISC_BUILD_HOST__/'$BUILD_HOST'/g' $vjson
+sed -i -e 's/__MISC_BUILD_DATE__/'$BUILD_DATE'/g' $vjson
+sed -i -e 's/__MISC_BUILD_USER__/'$BUILD_USER'/g' $vjson
 
 echo "-- copy $BUILD_PATH/boot.bin"
 
@@ -120,14 +119,14 @@ rm -f update/tmp/.boot.ini.crc32
 # check for bootloader update
 if [ -f "$BOOTLOADER_FILE" ]; then
 	echo "-- including bootloader update file: $BOOTLOADER_FILE"
-	sed -i 's/__BOOTLOADER_INCLUDED__/1/g' $vjson
-	sed -i 's/__BOOTLOADER_INCLUDED_VERSION__/'$BOOTLOADER_VERSION'/g' $vjson
-	sed -i 's/__BOOTLOADER_INCLUDED_FILENAME__/'$(basename $BOOTLOADER_FILE)'/g' $vjson
+	sed -i -e 's/__BOOTLOADER_INCLUDED__/1/g' $vjson
+	sed -i -e 's/__BOOTLOADER_INCLUDED_VERSION__/'$BOOTLOADER_VERSION'/g' $vjson
+	sed -i -e 's/__BOOTLOADER_INCLUDED_FILENAME__/'$(basename $BOOTLOADER_FILE)'/g' $vjson
 	cp $BOOTLOADER_FILE update/tmp/
 else
-	sed -i 's/__BOOTLOADER_INCLUDED__/0/g' $vjson
-	sed -i 's/__BOOTLOADER_INCLUDED_VERSION__//g' $vjson
-	sed -i 's/__BOOTLOADER_INCLUDED_FILENAME__//g' $vjson
+	sed -i -e 's/__BOOTLOADER_INCLUDED__/0/g' $vjson
+	sed -i -e 's/__BOOTLOADER_INCLUDED_VERSION__//g' $vjson
+	sed -i -e 's/__BOOTLOADER_INCLUDED_FILENAME__//g' $vjson
 fi
 
 rm -f update/*.tar
