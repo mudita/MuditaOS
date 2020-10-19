@@ -7,6 +7,7 @@
 #include <string>
 #include <ticks.hpp>
 #include <vector>
+#include <Utils.hpp>
 
 using namespace at;
 
@@ -15,6 +16,8 @@ const std::string Chanel::ERROR      = "ERROR";
 const std::string Chanel::NO_CARRIER = "NO CARRIER";
 const std::string Chanel::BUSY       = "BUSY";
 const std::string Chanel::NO_ANSWER  = "NO ANSWER";
+const std::string Chanel::CME_ERROR  = "+CME ERROR:";
+const std::string Chanel::CMS_ERROR  = "+CMS ERROR:";
 // const std::string Chanel::CONNECT = "CONNECT";
 // const std::string Chanel::RING = "RING";
 // const std::string Chanel::NO_DIALTONE = "NO DIALTONE";
@@ -33,6 +36,20 @@ Result::Code Chanel::at_check(const std::vector<std::string> &arr)
     }
     return Result::Code::NONE;
 }
+
+bool Chanel::at_check_cmx_error(const std::string &CMX, const std::vector<std::string> &arr, uint32_t &errcode)
+{
+    if (arr.size()) {
+        for (auto cmxerr : arr) {
+            if (cmxerr.compare(0, CMX.length(), CMX) == 0) {
+                auto serr = utils::trim(cmxerr.substr(CMX.length(), cmxerr.length() - CMX.length()));
+                return utils::toNumeric(serr, errcode);
+            }
+        }
+    }
+    return false;
+}
+
 
 void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 {
@@ -95,13 +112,47 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
 
             result.response.insert(std::end(result.response), std::begin(ret), std::end(ret));
 
-            result.code = at_check(ret);
-            if (result.code != Result::Code::NONE) {
+            uint32_t errcode = 0;
+            if (at_check_cmx_error(CME_ERROR,ret, errcode)) {
+                result.code =
+                    Result::Code::ERROR; // setup error but in this case error from +CME ERROR with valid errorCode
+                auto tmp_ec = magic_enum::enum_cast<EquipmentErrorCode>(errcode);
+                if (tmp_ec.has_value()) {
+                    LOG_ERROR("%s", utils::enumToString(tmp_ec.value()).c_str());
+                    result.errorCode = tmp_ec.value();
+                }
+                else {
+                    LOG_ERROR("Unknow CME error code %lu", errcode);
+                    result.errorCode = at::EquipmentErrorCode::Unknown;
+                }
+                break;
+            } else if (at_check_cmx_error(CMS_ERROR,ret, errcode)) {
+                result.code =
+                    Result::Code::ERROR; // setup error but in this case error from +CME ERROR with valid errorCode
+
+                auto atmp_ec = magic_enum::enum_cast<NetworkErrorCode>(errcode);
+
+                if (atmp_ec.has_value()) {
+                    LOG_ERROR("%s", utils::enumToString(atmp_ec.value()).c_str());
+                    result.errorCode = atmp_ec.value();
+                }
+                else {
+                    LOG_ERROR("Unknow CMS error code %lu", errcode);
+                    result.errorCode = at::NetworkErrorCode::Unknown;
+                }
                 break;
             }
-            if (rxCount != 0 && result.response.size() >= rxCount) {
-                result.code = Result::Code::TOKENS;
-                break;
+            else
+            {
+
+                result.code = at_check(ret);
+                if (result.code != Result::Code::NONE) {
+                    break;
+                }
+                if (rxCount != 0 && result.response.size() >= rxCount) {
+                    result.code = Result::Code::TOKENS;
+                    break;
+                }
             }
         }
     }
