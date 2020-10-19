@@ -117,6 +117,11 @@ namespace sapm
 
       public:
         std::list<std::string> appStack;
+
+        ApplicationDescription *getFocusedApp();
+        ApplicationDescription *getLaunchingApp();
+        ApplicationDescription *getPreviousApp();
+
         State getState()
         {
             return state;
@@ -137,19 +142,7 @@ namespace sapm
     {
 
         SettingsRecord settings;
-
         sys::SystemManager *systemManager;
-
-        //
-        std::unique_ptr<utils::i18> i18;
-
-        // application that currently has focus. This means that is has rights to display screens and receive keyboard
-        // events.
-        std::string focusApplicationName = "";
-        // after loosing focus application becomes previous application and this is its name
-        std::string previousApplicationName = "";
-        // name of the application scheduled for launching
-        std::string launchApplicationName = "";
         // timer to count time from last user's activity. If it reaches time defined in settings database application
         // manager is sending signal to power manager and changing window to the desktop window in the blocked state.
         std::unique_ptr<sys::Timer> blockingTimer;

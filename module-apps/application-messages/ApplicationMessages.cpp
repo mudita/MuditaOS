@@ -88,7 +88,7 @@ namespace app
             case MessageType::DBQuery:
                 if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
                     auto result = queryResponse->getResult();
-                    if (result->hasListener()) {
+                    if (result && result->hasListener()) {
                         if (result->handle()) {
                             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                         }

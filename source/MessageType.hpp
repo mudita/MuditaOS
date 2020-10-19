@@ -156,6 +156,7 @@ enum class MessageType
                 ///< by the user)
     AppClose,
     AppFocus,
+    AppFocusLost,
 
     EVMFocusApplication,
     EVMKeyboardProfile,

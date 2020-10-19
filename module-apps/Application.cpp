@@ -167,16 +167,15 @@ namespace app
 #endif
 
         // case to handle returning to previous application
-        if (windowName == "LastWindow") {
+        if (windowName.empty()) {
             window = getCurrentWindow()->getName();
             auto msg =
                 std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
             sys::Bus::SendUnicast(msg, this->GetName(), this);
         }
         else {
-            window   = windowName.empty() ? default_window : windowName;
             auto msg = std::make_shared<AppSwitchWindowMessage>(
-                window, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
+                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
             sys::Bus::SendUnicast(msg, this->GetName(), this);
         }
     }
@@ -236,6 +235,9 @@ namespace app
         }
         else if (msgl->messageType == MessageType::AppRefresh) {
             return handleAppRefresh(msgl);
+        }
+        else if (msgl->messageType == MessageType::AppFocusLost) {
+            return handleAppFocusLost(msgl);
         }
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             return handleSIMMessage(msgl);
@@ -352,25 +354,9 @@ namespace app
             }
         }
         else if (state == State::ACTIVE_FORGROUND) {
-            if (msg->getTargetApplicationName() == this->GetName()) {
-                // if window name and data are null pointers this is a message informing
-                // that application should go to background mode
-                if ((msg->getTargetWindowName() == "") && (msg->getData() == nullptr)) {
-                    setState(State::ACTIVE_BACKGROUND);
-                    if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
-                        handled = true;
-                    }
-                    else {
-                        // TODO send to itself message to close
-                        LOG_ERROR("Failed to communicate ");
-                    }
-                }
-                // if application is in front and receives message with defined window it should
-                // change to that window.
-                else {
-                    switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
-                    handled = true;
-                }
+            if (msg->getTargetApplicationName() == GetName()) {
+                switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
+                handled = true;
             }
             else {
                 LOG_ERROR("Received switch message outside of activation flow");
@@ -453,6 +439,15 @@ namespace app
         return msgHandled();
     }
 
+    sys::Message_t Application::handleAppFocusLost(sys::DataMessage *msgl)
+    {
+        if (state == State::ACTIVE_FORGROUND) {
+            setState(State::ACTIVE_BACKGROUND);
+            sapm::ApplicationManager::messageConfirmSwitch(this);
+        }
+        return msgHandled();
+    }
+
     sys::Message_t Application::handleSIMMessage(sys::DataMessage *msgl)
     {
         getCurrentWindow()->setSIM();
@@ -531,6 +526,12 @@ namespace app
     void Application::messageRebuildApplication(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppRebuildMessage>();
+        sys::Bus::SendUnicast(msg, application, sender);
+    }
+
+    void Application::messageApplicationLostFocus(sys::Service *sender, std::string application)
+    {
+        auto msg = std::make_shared<AppLostFocusMessage>();
         sys::Bus::SendUnicast(msg, application, sender);
     }
 

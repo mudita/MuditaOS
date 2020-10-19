@@ -126,6 +126,7 @@ namespace app
         sys::Message_t handleAppClose(sys::DataMessage *msgl);
         sys::Message_t handleAppRebuild(sys::DataMessage *msgl);
         sys::Message_t handleAppRefresh(sys::DataMessage *msgl);
+        sys::Message_t handleAppFocusLost(sys::DataMessage *msgl);
         sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
@@ -295,6 +296,7 @@ namespace app
                                               gui::SwitchData *data = nullptr);
         static void messageCloseApplication(sys::Service *sender, std::string application);
         static void messageRebuildApplication(sys::Service *sender, std::string application);
+        static void messageApplicationLostFocus(sys::Service *sender, std::string application);
         /// @}
 
       protected:
