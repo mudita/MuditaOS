@@ -328,8 +328,12 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
         sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
         return std::make_unique<AudioEventResponse>(RetCode::Success);
     }
+
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
+        if (evt->getType() == EventType::BTHeadsetOff) {
+            input.audio->SetBluetoothStreamData(BluetoothStreamData());
+        }
     }
     return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
