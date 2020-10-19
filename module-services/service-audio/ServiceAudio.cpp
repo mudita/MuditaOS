@@ -287,10 +287,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     auto AudioStart = [&](auto &input) {
         if (input) {
-            if ((*input)->audio->GetBtSinkAvailable()) {
-                auto req = std::make_shared<BluetoothRequestStreamMessage>();
-                sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
-            }
             for (auto &audioInput : audioMux.GetAllInputs()) {
                 HandlePause(&audioInput);
             }
@@ -327,6 +323,11 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
+    if (evt->getType() == EventType::BTHeadsetOn) {
+        auto req = std::make_shared<BluetoothRequestStreamMessage>();
+        sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
+        return std::make_unique<AudioEventResponse>(RetCode::Success);
+    }
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
     }
@@ -494,8 +495,9 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else if (msgType == typeid(BluetoothRequestStreamResultMessage)) {
         auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
-        if (auto input = audioMux.GetActiveInput()) {
-            input.value()->audio->SetBluetoothStreamData(msg->data);
+        for (auto &input : audioMux.GetAllInputs()) {
+            input.audio->SetBluetoothStreamData(msg->data);
+            input.audio->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
         }
     }
     else {

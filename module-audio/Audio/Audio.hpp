@@ -107,6 +107,8 @@ namespace audio
       private:
         bool lineSinkAvailable = false;
         bool btSinkAvailable   = false;
+        BluetoothStreamData btData;
+
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 
