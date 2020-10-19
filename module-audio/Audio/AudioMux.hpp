@@ -89,11 +89,6 @@ namespace audio
          */
         auto GetRoutingInput(bool force = false) -> std::optional<Input *>;
         /**
-         * Gets input for recording
-         * @return nullopt if input not found
-         */
-        auto GetRecordingInput() -> std::optional<Input *>;
-        /**
          * Gets input for playback
          * @param playbackType Playback type to compare
          * @return nullopt if input not found
