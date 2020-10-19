@@ -12,9 +12,12 @@ jobs:
         token: ${{ secrets.GitHub_PAT }}
         submodules: recursive
         fetch-depth: 0
+    - name: "Copyright notice check"
+      run: |
+        config/license_header_check.sh --ci --check-only
     - name: "Style checking"
       run: |
-        ./config/pre-commit.hook --last
+        ./config/style_check_hook.sh --last
     - name: "Unit Tests"
       run: |
         ./configure.sh linux Debug && \
