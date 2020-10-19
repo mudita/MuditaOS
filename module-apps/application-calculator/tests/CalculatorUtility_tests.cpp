@@ -9,6 +9,14 @@
 
 class vfs vfs;
 
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_initializer;
+
 TEST_CASE("Calculator utilities")
 {
     auto calculator = Calculator();
