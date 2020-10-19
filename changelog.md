@@ -8,7 +8,9 @@
 * `[cellular]` Handling incoming calls and sms in sleep mode
 
 ### Fixed
+
 * `[audio]` Fix headphones autodetection.
+* `[audio]` Cumulative set of minor fixes and improvements
 
 ## [0.42.2 2020-10-16]
 

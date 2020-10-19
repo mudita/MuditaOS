@@ -159,14 +159,12 @@ static void ExtVibrationStop()
 
 bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
 {
-    auto isEnabled = utils::getValue<audio::Vibrate>(
-        getSetting(Setting::EnableVibration, Profile::Type::Idle, PlaybackType::Multimedia));
+    auto isEnabled = utils::getValue<audio::Vibrate>(getSetting(Setting::EnableVibration, Profile::Type::Idle, type));
     return isEnabled;
 }
 bool ServiceAudio::IsPlaybackEnabled(const audio::PlaybackType &type)
 {
-    auto isEnabled = utils::getValue<audio::EnableSound>(
-        getSetting(Setting::EnableSound, Profile::Type::Idle, PlaybackType::Multimedia));
+    auto isEnabled = utils::getValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, type));
     return isEnabled;
 }
 
@@ -291,13 +289,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
             for (auto &audioInput : audioMux.GetAllInputs()) {
                 HandlePause(&audioInput);
             }
-            if (opType == Operation::Type::Recorder) {
-                // since recording works on the same audio as routing
-                retToken = input.value()->token;
-            }
-            else {
-                retToken = audioMux.ResetInput(input);
-            }
+            retToken = audioMux.ResetInput(input);
 
             if (IsPlaybackEnabled(playbackType)) {
                 retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
@@ -316,7 +308,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
     else if (opType == Operation::Type::Recorder) {
-        auto input = audioMux.GetRecordingInput();
+        auto input = audioMux.GetIdleInput();
         AudioStart(input);
         return std::make_unique<AudioStartRecorderResponse>(retCode, retToken);
     }
@@ -340,7 +332,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
                                                                const Token &token,
                                                                bool &muted)
 {
-    std::vector<audio::RetCode> retCodes = {audio::RetCode::Success};
+    std::vector<std::pair<Token, audio::RetCode>> retCodes;
 
     auto stopInput = [this](auto inp) {
         if (inp->audio->GetCurrentState() == Audio::State::Idle) {
@@ -356,10 +348,10 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
 
     // stop by token
     if (auto tokenInput = audioMux.GetInput(token); token.IsValid() && tokenInput) {
-        retCodes.emplace_back(stopInput(tokenInput.value()));
+        retCodes.emplace_back(std::make_pair(token, stopInput(tokenInput.value())));
     }
     else if (token.IsValid()) {
-        return std::make_unique<AudioPauseResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
+        return std::make_unique<AudioStopResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
     }
     // stop with vector of playback types
     else if (!stopTypes.empty()) {
@@ -367,25 +359,28 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
             const auto &currentOperation = input.audio->GetCurrentOperation();
             if (std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
                 muted = true;
-                retCodes.emplace_back(stopInput(&input));
+                auto t = input.token;
+                retCodes.emplace_back(t, stopInput(&input));
             }
         }
     }
     // stop all audio
     else if (token.IsUninitialized()) {
         for (auto &input : audioMux.GetAllInputs()) {
-            retCodes.emplace_back(stopInput(&input));
+            auto t = input.token;
+            retCodes.emplace_back(t, stopInput(&input));
         }
     }
 
     // on failure return first false code
-    auto it = std::find_if_not(retCodes.begin(), retCodes.end(), [](auto p) { return p == audio::RetCode::Success; });
+    auto it =
+        std::find_if_not(retCodes.begin(), retCodes.end(), [](auto p) { return p.second == audio::RetCode::Success; });
     if (it != retCodes.end()) {
-        return std::make_unique<AudioResponseMessage>(*it);
+        return std::make_unique<AudioStopResponse>(it->second, it->first);
     }
 
     VibrationUpdate();
-    return std::make_unique<AudioResponseMessage>(audio::RetCode::Success);
+    return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
@@ -533,8 +528,8 @@ std::string ServiceAudio::getSetting(const Setting &setting,
             targetProfile  = currentProfile;
             targetPlayback = currentPlaybackType;
         }
-        else if (setting == Setting::Volume) {
-            auto input    = audioMux.GetIdleInput();
+        else if (auto input = audioMux.GetIdleInput(); input && (setting == Setting::Volume)) {
+
             targetProfile = ((*input)->audio->GetHeadphonesInserted()) ? Profile::Type::PlaybackHeadphones
                                                                        : Profile::Type::PlaybackLoudspeaker;
             targetPlayback = PlaybackType::CallRingtone;
@@ -570,8 +565,7 @@ void ServiceAudio::setSetting(const Setting &setting,
             updatedProfile               = currentOperation.GetProfile()->GetType();
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
-        else if (setting == audio::Setting::Volume) {
-            auto input     = audioMux.GetIdleInput();
+        else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
             updatedProfile = (*input)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
                                                                       : Profile::Type::PlaybackLoudspeaker;
             updatedPlayback = PlaybackType::CallRingtone;
