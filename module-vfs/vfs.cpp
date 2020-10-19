@@ -19,17 +19,24 @@ disk. */
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
-    return ff_fopen(relativeToRoot(filename).c_str(), mode);
+    const auto handle = ff_fopen(relativeToRoot(filename).c_str(), mode);
+    chnNotifier.onFileOpen(filename, mode, handle);
+    return handle;
 }
 
 int vfs::fclose(FILE *stream)
 {
+    chnNotifier.onFileClose(stream);
     return ff_fclose(stream);
 }
 
 int vfs::remove(const char *name)
 {
-    return ff_remove(relativeToRoot(name).c_str());
+    const auto abs_name = relativeToRoot(name);
+    const auto ret      = ff_remove(abs_name.c_str());
+    if (!ret)
+        chnNotifier.onFileRemove(abs_name);
+    return ret;
 }
 
 size_t vfs::fread(void *ptr, size_t size, size_t count, FILE *stream)
@@ -259,7 +266,13 @@ bool vfs::fileExists(const char *path)
 int vfs::deltree(const char *path)
 {
     if (path != nullptr)
-        return ff_deltree(relativeToRoot(path).c_str());
+        return ff_deltree(
+            relativeToRoot(path).c_str(),
+            [](void *ctx, const char *path) {
+                auto _this = reinterpret_cast<vfs *>(ctx);
+                _this->chnNotifier.onFileRemove(path);
+            },
+            this);
     else
         return -1;
 }
@@ -274,8 +287,12 @@ int vfs::mkdir(const char *dir)
 
 int vfs::rename(const char *oldname, const char *newname)
 {
-    if (oldname != nullptr && newname != nullptr)
-        return ff_rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str(), true);
+    if (oldname != nullptr && newname != nullptr) {
+        const auto ret = ff_rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str(), true);
+        if (!ret)
+            chnNotifier.onFileRename(newname, oldname);
+        return ret;
+    }
     else
         return -1;
 }
@@ -311,4 +328,18 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
 
     ffconfigFREE(buffer);
     return count;
+}
+auto vfs::getAbsolutePath(std::string_view path) const -> std::string
+{
+    namespace fs = std::filesystem;
+    fs::path fs_path(path);
+    if (fs_path.is_relative()) {
+        char cwd_path[ffconfigMAX_FILENAME];
+        ff_getcwd(cwd_path, sizeof cwd_path);
+        fs::path fs_cwd(cwd_path);
+        return fs_cwd / fs_path;
+    }
+    else {
+        return std::string(path);
+    }
 }

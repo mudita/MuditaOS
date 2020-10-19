@@ -3,11 +3,7 @@
 //
 
 #pragma once
-#ifdef TARGET_Linux
-#include <cstdio>
-#else
 #include "ff_stdio.h"
-#endif
 #include <unordered_map>
 #include <mutex.hpp>
 #include <functional>
@@ -16,11 +12,7 @@ namespace vfsn::utility
 {
     class vfsNotifier
     {
-#ifdef TARGET_Linux
-        using FILE = std::FILE;
-#else
         using FILE = FF_FILE;
-#endif
       public:
         //! Event type notified for indexer
         enum class FsEvent
