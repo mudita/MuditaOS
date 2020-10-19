@@ -211,9 +211,10 @@ uint8_t g_UsbDeviceConfigurationDescriptor[] = {
     /* The number of contiguous interfaces associated with this function */
     0x02,
     /* The function belongs to the Communication Device/Interface Class  */
-    USB_CDC_VCOM_CIC_CLASS, 0x03,
+    USB_CDC_VCOM_CIC_CLASS,
+    USB_CDC_VCOM_CIC_SUBCLASS,
     /* The function uses the No class specific protocol required Protocol  */
-    0x00,
+    USB_CDC_VCOM_CIC_PROTOCOL,
     /* The Function string descriptor index */
     USB_STRING_CDC_ACM_CLASS,
 
