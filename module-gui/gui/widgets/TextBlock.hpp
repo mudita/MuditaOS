@@ -26,7 +26,7 @@ namespace gui
         };
 
       private:
-        End end = End::Newline;
+        End end = End::None;
 
       public:
         TextBlock(const UTF8 text, const RawFont *font, End eol = End::None);

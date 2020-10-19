@@ -3,9 +3,6 @@
 #include "TextDocument.hpp"
 #include "TextParse.hpp"
 #include "log/log.hpp"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
 
 static const int last_char_inclusive = 0; // if then -1 / else 0
 
@@ -14,20 +11,20 @@ static const int last_char_inclusive = 0; // if then -1 / else 0
 
 namespace gui
 {
-    auto BlockCursor::currentBlock()
+    auto BlockCursor::currentBlock() const
     {
         if (block_nr == text::npos) {
-            return std::end(document->blocks);
+            return document->blocks.end();
         }
         return std::next(document->blocks.begin(), block_nr);
     }
 
-    auto BlockCursor::blocksEnd()
+    auto BlockCursor::blocksEnd() const
     {
         return std::end(document->blocks);
     }
 
-    auto BlockCursor::blocksBegin()
+    auto BlockCursor::blocksBegin() const
     {
         return std::begin(document->blocks);
     }
@@ -73,10 +70,28 @@ namespace gui
         ;
     }
 
+    auto BlockCursor::atEol() const -> bool
+    {
+        if (!checkDocument() || checkNpos()) {
+            return false;
+        }
+
+        auto block = currentBlock();
+        // check if we have jumped to new block because of new line
+        if (pos == 0 && block != blocksBegin() && block_jump) {
+            return (--block)->getEnd() == TextBlock::End::Newline;
+        }
+
+        return pos == block->length() && block->getEnd() == TextBlock::End::Newline;
+    }
+
     auto BlockCursor::operator+=(unsigned int val) -> BlockCursor &
     {
         // just use operator ++
-        for (unsigned int i = 0; i < val; ++i, ++*this) {}
+        for (unsigned int i = 0; i < val; i++) {
+            ++*this;
+        }
+
         return *this;
     }
 
@@ -85,22 +100,22 @@ namespace gui
         if (!checkDocument()) {
             return *this;
         }
-        else {
-        }
 
         resetNpos();
 
         auto block = std::next(document->blocks.begin(), block_nr);
 
-        bool end_of_current_block_reached =
-            pos >= std::next(document->blocks.begin(), block_nr)->length() +
-                       (block->getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
-        ;
-        bool last_document_reached = block_nr + 1 == document->blocks.size();
+        size_t block_size = std::next(document->blocks.begin(), block_nr)->length();
+        block_size += (block->getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
+
+        bool end_of_current_block_reached = pos >= block_size;
+        bool last_document_reached        = block_nr + 1 == document->blocks.size();
 
         if (end_of_current_block_reached && last_document_reached) {
             return *this;
         }
+
+        block_jump = end_of_current_block_reached;
 
         if (end_of_current_block_reached) {
             block_nr += 1;
@@ -109,6 +124,7 @@ namespace gui
         }
 
         pos += 1;
+
         return *this;
     }
 
@@ -133,9 +149,8 @@ namespace gui
 
         if (pos == 0) {
             block_nr -= 1;
-            auto block = std::next(document->blocks.begin(), block_nr);
-            pos        = block->length() + last_char_inclusive;
-            if (block->getEnd() == TextBlock::End::Newline) {
+            pos = currentBlock()->length() + last_char_inclusive;
+            if (atEol()) {
                 pos -= 1;
             }
             return *this;
@@ -164,8 +179,7 @@ namespace gui
                 return;
             }
             document->append(TextBlock("", default_font, TextBlock::End::None));
-            block_nr = 0;
-            pos      = 0;
+            resetNpos();
         }
         auto block = currentBlock();
         if (block == blocksEnd()) {
@@ -185,8 +199,7 @@ namespace gui
             return;
         }
         if (document->isEmpty()) {
-            block_nr = 0;
-            pos      = 0;
+            resetNpos();
         }
         document->append(std::move(textblock));
     }
@@ -234,6 +247,32 @@ namespace gui
     const TextBlock &BlockCursor::operator*()
     {
         return *currentBlock();
+    }
+
+    auto BlockCursor::getText() -> std::string
+    {
+        if (currentBlock() == blocksEnd()) {
+            return "";
+        }
+        return currentBlock()->getText(getPosition());
+    }
+
+    auto BlockCursor::getUTF8Text() -> UTF8
+    {
+        if (currentBlock() == blocksEnd()) {
+            return "";
+        }
+        return currentBlock()->getText(getPosition());
+    }
+
+    const TextBlock *BlockCursor::operator->()
+    {
+        return &*currentBlock();
+    }
+
+    void BlockCursor::resetJumps()
+    {
+        block_jump = false;
     }
 
     auto BlockCursor::begin() -> std::list<TextBlock>::iterator

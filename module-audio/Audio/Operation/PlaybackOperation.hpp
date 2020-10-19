@@ -13,6 +13,7 @@ namespace audio::playbackDefaults
 namespace audio
 {
     class decoder;
+    class Tags;
 
     class PlaybackOperation : public Operation
     {
@@ -41,8 +42,9 @@ namespace audio
         Position GetPosition() override final;
 
       private:
-        std::unique_ptr<decoder> dec                  = nullptr;
-        std::unique_ptr<bsp::AudioDevice> audioDevice = nullptr;
+        std::unique_ptr<decoder> dec;
+        std::unique_ptr<bsp::AudioDevice> audioDevice;
+        std::unique_ptr<Tags> tags;
     };
 
 } // namespace audio

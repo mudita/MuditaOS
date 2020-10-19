@@ -96,18 +96,19 @@ TEST_CASE("TextDocument <-> BlockCursor fencing tests")
         REQUIRE(cursor.getPosition() != text::npos);
         auto block_text = std::string(blocks.front().getText()); // cant do so on our utf..
         auto test_text  = std::string(block_text.begin() + offset - 1, block_text.end());
-        auto part       = document.getTextPart(cursor);
-        REQUIRE(part.text == test_text);
-        REQUIRE(part.font == testfont);
+        auto text       = document.getText(cursor);
+        REQUIRE(text == test_text);
+        REQUIRE(cursor->getFormat()->getFont() == testfont);
     }
 
     SECTION("true fence hit - just next block")
     {
         auto cursor = document.getBlockCursor(offset);
         REQUIRE(cursor.getPosition() != text::npos);
-        auto part = document.getTextPart(cursor);
-        REQUIRE(part.text == std::next(blocks.begin())->getText());
-        REQUIRE(part.font == testfont);
+        auto text = document.getText(cursor);
+
+        REQUIRE(text == std::string(std::next(blocks.begin())->getText()));
+        REQUIRE(cursor->getFormat()->getFont() == testfont);
     }
 
     SECTION("1st block + 1 -> 2nd block - 1st char")
@@ -116,17 +117,16 @@ TEST_CASE("TextDocument <-> BlockCursor fencing tests")
         REQUIRE(cursor.getPosition() != text::npos);
         auto block_text = std::string(std::next(blocks.begin())->getText());
         auto test_text  = std::string(block_text.begin() + 1, block_text.end());
-        auto part       = document.getTextPart(cursor);
-        REQUIRE(part.text == test_text);
-        REQUIRE(part.font == testfont);
+        auto text       = document.getText(cursor);
+        REQUIRE(text == test_text);
+        REQUIRE(cursor->getFormat()->getFont() == testfont);
     }
     SECTION("fence fence hit - fence of textBlocks and block")
     {
         auto cursor = document.getBlockCursor(document.getText().length());
         REQUIRE(cursor.getPosition() == text::npos);
-        auto part = document.getTextPart(cursor);
-        REQUIRE(part.text == "");
-        REQUIRE(part.font == nullptr);
+        auto text = document.getText(cursor);
+        REQUIRE(text == "");
     }
 }
 
@@ -381,7 +381,7 @@ TEST_CASE("remove Char")
         auto block_count_start = doc.getBlocks().size();
         auto how_many          = std::next(doc.getBlocks().begin())->length();
         // move to end of second block +1 is for newline
-        cursor += doc.getBlocks().front().length() + how_many;
+        cursor += doc.getBlocks().front().length() + how_many - 1;
         for (unsigned int i = 0; i <= how_many + 1; ++i) {
             REQUIRE(cursor.removeChar());
             --cursor;
@@ -393,10 +393,10 @@ TEST_CASE("remove Char")
 
     SECTION("block with just newline - remove newline block")
     {
-        auto doc    = mockup::buildJustNewlineTestDocument();
-        auto cursor = BlockCursor(&doc, 0, 0, nullptr);
+        auto doc = mockup::buildJustNewlineTestDocument();
+        auto cur = BlockCursor(&doc, 0, 0, nullptr);
         REQUIRE(!doc.isEmpty());
-        cursor.removeChar();
+        cur.removeChar();
         REQUIRE(doc.isEmpty());
     }
 }
@@ -429,4 +429,39 @@ TEST_CASE("add newline at the end")
     REQUIRE(doc.getBlocks().size() == 2);
     REQUIRE(doc.getBlocks().front().getText() == "some long text.\n");
     REQUIRE(doc.getBlocks().back().getText() == "s");
+}
+
+TEST_CASE("atEOL()")
+{
+    using namespace gui;
+    std::string text = "some long text";
+    auto [doc, font] = mockup::buildOnelineTestDocument(text);
+    auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
+
+    REQUIRE(cursor.atEnd() == false);
+    cursor += text.length();
+    REQUIRE(cursor.atEnd() == true);
+    cursor += text.length();
+    REQUIRE(cursor.atEnd() == true);
+}
+
+TEST_CASE("operator-> for Text block with text")
+{
+    using namespace gui;
+    std::string text = "some long text";
+    auto [doc, font] = mockup::buildOnelineTestDocument(text);
+    auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
+
+    // one block text len will be same for len of whole doc
+    REQUIRE(cursor->length() == doc.getText().length());
+}
+
+TEST_CASE("operator* for TextBlock")
+{
+    using namespace gui;
+    std::string text = "some long text";
+    auto [doc, font] = mockup::buildOnelineTestDocument(text);
+    auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
+
+    REQUIRE((*cursor).length() == doc.getText().length());
 }

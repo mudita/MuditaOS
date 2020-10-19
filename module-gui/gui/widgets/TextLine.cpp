@@ -3,8 +3,10 @@
 #include "Label.hpp"
 #include "TextBlock.hpp"
 #include "TextDocument.hpp"
+#include "TextCursor.hpp"
 #include <cstdio>
 #include <RawFont.hpp>
+#include <numeric>
 
 namespace gui
 {
@@ -23,34 +25,39 @@ namespace gui
 
     /// Note - line breaking could be done here with different TextLines to return
     /// or via different block types (i.e. numeric block tyle could be not "breakable"
-    TextLine::TextLine(TextDocument *document, unsigned int start_position, unsigned int max_width)
+    TextLine::TextLine(const BlockCursor &cursor, unsigned int max_width) : max_width(max_width)
     {
-        if (document == nullptr) {
-            return;
-        }
-
-        auto cursor     = document->getBlockCursor(start_position);
-        auto old_cursor = cursor;
+        BlockCursor localCursor = cursor;
+        localCursor.resetJumps();
 
         do {
-            if (!cursor) { // cursor is faulty
-                break;
-            }
-            if (old_cursor.getBlockNr() != cursor.getBlockNr() &&
-                (*document)(old_cursor).getEnd() == TextBlock::End::Newline) {
-                end = TextBlock::End::Newline;
-                break;
+            if (!localCursor) { // cursor is faulty
+                return;
             }
 
-            // it would be better if cursor would know what to do when it jumps over blocks
+            if (localCursor.atEnd()) {
+                return;
+            }
 
-            // take Part of TextBlock we want to show
-            auto text_part   = document->getTextPart(cursor);
-            auto text_format = (*cursor).getFormat();
+            if (localCursor.atEol()) {
+                width_used = max_width;
+                return;
+            }
+
+            // take text we want to show
+            auto text = localCursor.getUTF8Text();
+
+            if (text.length() == 0) {
+                ++localCursor;
+                continue;
+            }
+
+            auto text_format = localCursor->getFormat();
             if (text_format->getFont() == nullptr) {
                 break;
             }
-            auto can_show = text_format->getFont()->getCharCountInSpace(text_part.text, max_width - width_used);
+
+            auto can_show = text_format->getFont()->getCharCountInSpace(text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
             if (can_show == 0) {
@@ -64,7 +71,7 @@ namespace gui
             }
 
             // create item for show and update Line data
-            auto item = buildUITextPart(text_part.text.substr(0, can_show), text_format);
+            auto item = buildUITextPart(text.substr(0, can_show), text_format);
             number_letters_shown += can_show;
             width_used += item->getTextNeedSpace();
             height_used = std::max(height_used, item->getTextHeight());
@@ -73,29 +80,12 @@ namespace gui
             block_nr = cursor.getBlockNr();
 
             // not whole text shown, try again for next line if you want
-            if (can_show < text_part.text.length()) {
+            if (can_show < text.length()) {
                 break;
             }
 
-            old_cursor = cursor;
-            cursor     = document->getBlockCursor(start_position + number_letters_shown);
+            localCursor += can_show;
         } while (true);
-    }
-
-    TextLine::TextLine(TextDocument *document,
-                       unsigned int start_position,
-                       unsigned int max_width,
-                       unsigned int init_height,
-                       bool drawUnderline,
-                       UnderlineDrawMode drawUnderlineMode,
-                       Position underlinePadding)
-        : TextLine(document, start_position, max_width)
-    {
-        this->drawUnderline     = drawUnderline;
-        this->drawUnderlineMode = drawUnderlineMode;
-        this->underlinePadding  = underlinePadding;
-
-        createUnderline(max_width, init_height);
     }
 
     TextLine::TextLine(TextLine &&from)
@@ -110,6 +100,7 @@ namespace gui
         underlinePadding         = from.underlinePadding;
         end                      = from.end;
         block_nr                 = from.block_nr;
+        max_width                = from.max_width;
     }
 
     TextLine::~TextLine()
@@ -205,6 +196,19 @@ namespace gui
         return width;
     }
 
+    UTF8 TextLine::getText(unsigned int pos) const
+    {
+        UTF8 text;
+        for (auto &label : elements_to_show_in_line) {
+            if (label->getFont() == nullptr) {
+                continue;
+            }
+            text += label->getText();
+        }
+
+        return text;
+    }
+
     void TextLine::erase()
     {
         for (auto &el : elements_to_show_in_line) {
@@ -260,7 +264,7 @@ namespace gui
         }
     }
 
-    void TextLine::createUnderline(unsigned int max_width, unsigned int init_height)
+    void TextLine::createUnderline(unsigned int width, unsigned int init_height)
     {
         if (drawUnderline) {
 
@@ -283,4 +287,16 @@ namespace gui
         }
     }
 
+    auto TextLine::checkBounds(TextLineCursor &cursor, uint32_t utf_value, const TextFormat *format) -> InputBound
+    {
+        auto font = format->getFont();
+        auto text = getText(0);
+        text.insertCode(utf_value);
+
+        if ((width_used + font->getPixelWidth(text)) <= max_width) {
+            return InputBound::CAN_ADD;
+        }
+
+        return InputBound::CANT_PROCESS;
+    }
 } // namespace gui

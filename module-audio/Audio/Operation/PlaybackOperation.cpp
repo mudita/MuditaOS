@@ -78,7 +78,10 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
-        auto tags = dec->fetchTags();
+
+        if (!tags) {
+            tags = dec->fetchTags();
+        }
 
         eventCallback = callback;
         state         = State::Active;
