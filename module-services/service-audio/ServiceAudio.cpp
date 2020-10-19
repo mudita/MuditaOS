@@ -275,7 +275,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleResume(const Token &to
         VibrationUpdate(input.value()->audio->GetCurrentOperationPlaybackType(), input);
         return std::make_unique<AudioResumeResponse>((*input)->audio->Resume(), token);
     }
-    return std::make_unique<AudioPauseResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
+    return std::make_unique<AudioResumeResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation::Type opType,
@@ -318,7 +318,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         AudioStart(input);
         return std::make_unique<AudioStartRoutingResponse>(retCode, retToken);
     }
-    return {};
+    return std::make_unique<AudioStartRoutingResponse>(RetCode::OperationNotSet, Token::MakeBadToken());
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
