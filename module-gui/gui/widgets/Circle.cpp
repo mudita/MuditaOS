@@ -22,6 +22,12 @@ namespace gui
         return *this;
     }
 
+    Circle::ShapeParams &Circle::ShapeParams::setFocusBorderColor(Color _color) noexcept
+    {
+        focusBorderColor = _color;
+        return *this;
+    }
+
     Circle::ShapeParams &Circle::ShapeParams::setPenWidth(std::uint8_t _width) noexcept
     {
         penWidth = _width;
@@ -46,6 +52,7 @@ namespace gui
                  params.center,
                  params.radius,
                  params.borderColor,
+                 params.focusBorderColor,
                  params.penWidth,
                  params.focusPenWidth,
                  params.isFilled,
@@ -56,12 +63,13 @@ namespace gui
                    Point _center,
                    Length _radius,
                    Color _borderColor,
+                   Color _focusBorderColor,
                    std::uint8_t _penWidth,
                    std::uint8_t _focusPenWidth,
                    bool _filled,
                    Color _fillColor)
         : Arc{parent, _center, _radius, 0, trigonometry::FullAngle, _borderColor, _penWidth, _focusPenWidth},
-          isFilled{_filled}, fillColor{_fillColor}
+          isFilled{_filled}, fillColor{_fillColor}, focusBorderColor{_focusBorderColor}
     {}
 
     std::list<DrawCommand *> Circle::buildDrawList()
@@ -70,7 +78,8 @@ namespace gui
             return {};
         }
 
-        auto circle   = new CommandCircle(center, radius, focus ? focusPenWidth : penWidth, color, isFilled, fillColor);
+        auto circle = new CommandCircle(
+            center, radius, focus ? focusPenWidth : penWidth, focus ? focusBorderColor : color, isFilled, fillColor);
         circle->areaX = widgetArea.x;
         circle->areaY = widgetArea.y;
         circle->areaW = widgetArea.w;

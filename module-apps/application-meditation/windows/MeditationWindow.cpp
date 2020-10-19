@@ -1,10 +1,18 @@
 #include "MeditationWindow.hpp"
 
+#include "application-meditation/windows/Names.hpp"
+#include "application-meditation/widgets/IntervalBox.hpp"
+#include "application-meditation/widgets/TimerSetter.hpp"
+#include "application-meditation/data/Style.hpp"
+#include "application-meditation/data/MeditationTimerData.hpp"
+#include "application-meditation/ApplicationMeditation.hpp"
+
+#include "InputEvent.hpp"
+//#include "Rect.hpp"
+
 #include <cassert>
 
 #include <i18/i18.hpp>
-
-#include <application-meditation/data/Style.hpp>
 
 namespace gui
 {
@@ -21,33 +29,68 @@ namespace gui
 
     void MeditationWindow::buildInterface()
     {
-        auto app = dynamic_cast<app::ApplicationMeditation *>(application);
-        assert(app != nullptr); // Pre-condition check.
-
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_meditation_title_main"));
 
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setActive(BottomBar::Side::LEFT, true);
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::start));
 
-        timer = new MeditationTimer(style::meditation::timer::X,
-                                    style::meditation::timer::Y,
-                                    style::meditation::timer::Width,
-                                    style::meditation::timer::Height,
-                                    app,
-                                    this);
+        timeSetter = new TimerSetter(this,
+                                     style::meditation::timer::X,
+                                     style::meditation::timer::Y,
+                                     style::meditation::timer::Width,
+                                     style::meditation::timer::Height);
+        timeSetter->setEdges(RectangleEdge::None);
+        setFocusItem(timeSetter);
 
-        setFocusItem(timer);
+        intervalBox = new IntervalBox(this,
+                                      style::meditation::intervalBox::X,
+                                      style::meditation::intervalBox::Y,
+                                      style::meditation::intervalBox::Width,
+                                      style::meditation::intervalBox::Height);
+        intervalBox->setEdges(RectangleEdge::None);
+
+        intervalBox->setNavigationItem(NavigationDirection::UP, timeSetter);
+        intervalBox->setNavigationItem(NavigationDirection::DOWN, timeSetter);
+        timeSetter->setNavigationItem(NavigationDirection::DOWN, intervalBox);
+        timeSetter->setNavigationItem(NavigationDirection::UP, intervalBox);
     }
 
     void MeditationWindow::destroyInterface()
     {
         erase();
-        timer = nullptr;
+        invalidate();
     }
 
     auto MeditationWindow::onInput(const InputEvent &inputEvent) -> bool
     {
+        if (inputEvent.isShortPress()) {
+            if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+                application->switchWindow(app::window::name::meditation_options);
+                return true;
+            }
+            else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
+                auto app = dynamic_cast<app::ApplicationMeditation *>(application);
+                assert(app);
+
+                auto timerSwitchData = std::make_unique<MeditationTimerData>(app->state->preparationTime,
+                                                                             timeSetter->getTime(),
+                                                                             intervalBox->getIntervalValue(),
+                                                                             app->state->showCounter);
+                application->switchWindow(app::window::name::meditation_timer, std::move(timerSwitchData));
+                return true;
+            }
+        }
         return AppWindow::onInput(inputEvent);
+    }
+
+    void MeditationWindow::invalidate() noexcept
+    {
+        timeSetter  = nullptr;
+        intervalBox = nullptr;
     }
 } // namespace gui
