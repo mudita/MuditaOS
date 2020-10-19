@@ -2,6 +2,10 @@
 
 ## Current release
 
+### Added
+
+* `[meditation]` Added basic meditation functionalities and settings
+
 ### Fixed
 * `[audio]` Fix headphones autodetection.
 

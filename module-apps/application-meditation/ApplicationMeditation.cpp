@@ -1,11 +1,14 @@
 #include "ApplicationMeditation.hpp"
 
 #include "windows/MeditationWindow.hpp"
+#include "windows/MeditationListViewWindows.hpp"
+#include "windows/MeditationTimerWindow.hpp"
+#include "windows/Names.hpp"
 
 namespace app
 {
     ApplicationMeditation::ApplicationMeditation(std::string name, std::string parent, bool startBackground)
-        : Application{name, parent, startBackground}
+        : Application{name, parent, startBackground}, state{std::make_unique<gui::OptionsData>()}
     {}
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes
@@ -32,8 +35,17 @@ namespace app
 
     void ApplicationMeditation::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(app::window::name::meditation_main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MeditationWindow>(app);
+        });
+        windowsFactory.attach(app::window::name::meditation_timer, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MeditationTimerWindow>(app);
+        });
+        windowsFactory.attach(app::window::name::meditation_options, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MeditationOptionsWindow>(app);
+        });
+        windowsFactory.attach(app::window::name::meditation_preparation, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PreparationTimeWindow>(app);
         });
     }
 
