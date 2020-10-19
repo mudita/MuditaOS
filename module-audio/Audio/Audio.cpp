@@ -111,7 +111,7 @@ namespace audio
             if (lineSinkAvailable == true) {
                 currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
             }
-            if (btSinkAvailable == true) {
+            if (btSinkAvailable == true && btData) {
                 currentOperation->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
                 currentOperation->SetBluetoothStreamData(btData);
             }
@@ -180,7 +180,7 @@ namespace audio
         return SetOutputVolume(0);
     }
 
-    void Audio::SetBluetoothStreamData(BluetoothStreamData data)
+    void Audio::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
     {
         btData = data;
     }

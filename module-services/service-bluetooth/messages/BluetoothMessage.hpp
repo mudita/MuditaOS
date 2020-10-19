@@ -101,9 +101,15 @@ class BluetoothRequestStreamMessage : public sys::DataMessage
 class BluetoothRequestStreamResultMessage : public sys::DataMessage
 {
   public:
-    BluetoothRequestStreamResultMessage(BluetoothStreamData data)
+    BluetoothRequestStreamResultMessage(std::shared_ptr<BluetoothStreamData> data)
         : DataMessage(MessageType::BluetoothRequestStream), data(data){};
     ~BluetoothRequestStreamResultMessage() override = default;
 
-    const BluetoothStreamData data;
+    std::shared_ptr<BluetoothStreamData> getData()
+    {
+        return data;
+    }
+
+  private:
+    std::shared_ptr<BluetoothStreamData> data;
 };

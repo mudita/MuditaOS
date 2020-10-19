@@ -70,7 +70,7 @@ namespace audio
         virtual audio::RetCode SetInputGain(float gain) = 0;
 
         virtual Position GetPosition() = 0;
-        virtual void SetBluetoothStreamData(BluetoothStreamData data) = 0;
+        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) = 0;
 
         Volume GetOutputVolume() const
         {

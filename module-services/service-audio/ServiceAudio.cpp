@@ -9,7 +9,7 @@
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <service-bluetooth/messages/BluetoothMessage.hpp>
-#include <service-bluetooth/ServiceBluetooth.hpp>
+#include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
@@ -325,14 +325,14 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 {
     if (evt->getType() == EventType::BTHeadsetOn) {
         auto req = std::make_shared<BluetoothRequestStreamMessage>();
-        sys::Bus::SendUnicast(req, ServiceBluetooth::serviceName, this);
+        sys::Bus::SendUnicast(req, service::name::bluetooth, this);
         return std::make_unique<AudioEventResponse>(RetCode::Success);
     }
 
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
         if (evt->getType() == EventType::BTHeadsetOff) {
-            input.audio->SetBluetoothStreamData(BluetoothStreamData());
+            input.audio->SetBluetoothStreamData(nullptr);
         }
     }
     return std::make_unique<AudioEventResponse>(RetCode::Success);
@@ -500,7 +500,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgType == typeid(BluetoothRequestStreamResultMessage)) {
         auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
         for (auto &input : audioMux.GetAllInputs()) {
-            input.audio->SetBluetoothStreamData(msg->data);
+            input.audio->SetBluetoothStreamData(msg->getData());
             input.audio->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
         }
     }
@@ -546,7 +546,6 @@ std::string ServiceAudio::getSetting(const Setting &setting,
             targetPlayback = currentPlaybackType;
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == Setting::Volume)) {
-            auto input    = audioMux.GetIdleInput();
             targetProfile = Profile::Type::PlaybackLoudspeaker;
             if ((*input)->audio->GetLineSinkAvailable()) {
                 targetProfile = Profile::Type::PlaybackHeadphones;
@@ -589,7 +588,6 @@ void ServiceAudio::setSetting(const Setting &setting,
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
-            auto input     = audioMux.GetIdleInput();
             updatedProfile = Profile::Type::PlaybackLoudspeaker;
             if ((*input)->audio->GetLineSinkAvailable()) {
                 updatedProfile = Profile::Type::PlaybackHeadphones;

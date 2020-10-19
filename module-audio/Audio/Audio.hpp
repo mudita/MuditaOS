@@ -102,12 +102,12 @@ namespace audio
 
         virtual audio::RetCode Mute();
 
-        virtual void SetBluetoothStreamData(BluetoothStreamData data);
+        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
 
       private:
         bool lineSinkAvailable = false;
         bool btSinkAvailable   = false;
-        BluetoothStreamData btData;
+        std::shared_ptr<BluetoothStreamData> btData;
 
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
