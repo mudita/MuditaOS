@@ -163,6 +163,11 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             LOG_DEBUG("SIM state change: %d", static_cast<int>(pinstate));
             bsp::cellular::sim::hotswap_trigger();
         }
+
+        if (notification == bsp::cellular::ringIndicatorPin) {
+            auto message = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMRingIndicator);
+            sys::Bus::SendUnicast(message, "EventManager", this->service);
+        }
     }
 
     return true;

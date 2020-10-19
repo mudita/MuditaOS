@@ -444,6 +444,9 @@ class TS0710
     bool IsModemActive(void);
     void TurnOnModem(void);
     void ResetModem(void);
+    void TurnOffModem(void);
+    void EnterSleepMode(void);
+    void ExitSleepMode(void);
 };
 
 #endif //_TS0710_H

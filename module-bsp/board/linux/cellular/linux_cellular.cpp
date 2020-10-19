@@ -271,5 +271,12 @@ namespace bsp
             void sim_sel()
             {}
         } // namespace sim
+        namespace ringIndicator
+        {
+            auto riIRQ_handler() -> BaseType_t
+            {
+                return BaseType_t();
+            }
+        } // namespace ringIndicator
     }     // namespace cellular
 } // namespace bsp
