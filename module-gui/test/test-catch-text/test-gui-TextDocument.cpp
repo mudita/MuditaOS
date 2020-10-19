@@ -49,9 +49,8 @@ TEST_CASE("TextDocument getBlockCursor")
         auto document = TextDocument({});
         auto cursor   = document.getBlockCursor(100);
         REQUIRE(cursor.getBlockNr() == text::npos);
-        auto part = document.getTextPart(cursor);
-        REQUIRE(part.text == "");
-        REQUIRE(part.font == nullptr);
+        auto text = document.getText(cursor);
+        REQUIRE(text == "");
     }
 
     auto [document, testfont] = mockup::buildTestDocument();
@@ -64,9 +63,7 @@ TEST_CASE("TextDocument getBlockCursor")
         auto cursor = document.getBlockCursor(pos);
         REQUIRE(cursor.getPosition() != text::npos);
         REQUIRE(cursor.getBlockNr() != text::npos);
-        auto part = document.getTextPart(cursor);
-        REQUIRE(!(part.text == ""));
-        REQUIRE(part.font != nullptr);
-        REQUIRE(part.font == testfont);
+        auto text = document.getText(cursor);
+        REQUIRE(!(text == ""));
     }
 }
