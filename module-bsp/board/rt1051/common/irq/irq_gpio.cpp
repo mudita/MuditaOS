@@ -127,7 +127,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_RI_PIN)) {
-                // TODO:M.P BSP_CellularUartRingIndicatorIrqHandler();
+                bsp::cellular::ringIndicator::riIRQ_handler();
             }
 
             // Clear all IRQs

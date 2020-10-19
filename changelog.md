@@ -5,6 +5,7 @@
 ### Added
 
 * `[meditation]` Added basic meditation functionalities and settings
+* `[cellular]` Handling incoming calls and sms in sleep mode
 
 ### Fixed
 * `[audio]` Fix headphones autodetection.
