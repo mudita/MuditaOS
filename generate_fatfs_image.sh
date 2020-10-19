@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 usage() {
 cat << ==usage
 Usage: $(basename $0) [image_dir] [assets_root_dir]
@@ -8,6 +8,8 @@ Usage: $(basename $0) [image_dir] [assets_root_dir]
 }
 
 ASSETS_DIR="assets country-codes.db Luts.bin"
+
+TEST_ITEMS="testfiles"
 
 if [ $# -ne 2 ]; then
 	echo "Error! Invalid argument count"
@@ -27,7 +29,6 @@ truncate -s 16G $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
 label: dos
 label-id: 0x09650eb4
-device: /dev/sda
 unit: sectors
 
 /dev/sda1 : start=        2048, size=    28522496, type=b, bootable
@@ -43,9 +44,14 @@ cd "$SRC_DATA"
 for i in $ASSETS_DIR; do
 	mcopy -s -i "$PART1" $i ::/current/
 done
-cd -
-cd $SRC_DATA
 mcopy -s -i "$PART1" user ::
 mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
+
+# Testing parts of files
+for i in $TEST_ITEMS; do
+	mcopy -s -i "$PART1" $i ::/current
+done
+mcopy -s -i "$PART1" sys/updates ::
+
 cd -
