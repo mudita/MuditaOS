@@ -23,6 +23,8 @@ namespace audio
             const audio::PlaybackType &playbackType,
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
+        virtual ~PlaybackOperation();
+
         audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) override final;
 
         audio::RetCode Stop() override final;

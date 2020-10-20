@@ -55,11 +55,18 @@ namespace bsp
       private:
         static const uint32_t CODEC_CHANNEL_PCM_BUFFER_SIZE = 1024;
 
-        /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
-        enum class irq_state_t
+        enum class State
         {
-            IRQStateHalfTransfer = 1 << 0,
-            IRQStateFullTransfer = 1 << 1
+            Running,
+            Stopped
+        };
+
+        /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
+        enum class TransferState
+        {
+            HalfTransfer = 1 << 0,
+            FullTransfer = 1 << 1,
+            Close        = 1 << 2,
         };
 
         struct SAIFormat
@@ -71,6 +78,7 @@ namespace bsp
             size_t dataSize;          /*!< Transfer size. */
         };
 
+        State state = State::Stopped;
         SAIFormat saiInFormat;
         SAIFormat saiOutFormat;
         uint32_t mclkSourceClockHz = 0;

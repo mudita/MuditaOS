@@ -1,19 +1,11 @@
-/*
- *  @file RT1051CellularAudio.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 03.08.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
 #include "RT1051CellularAudio.hpp"
 #include "board.h"
 #include "dma_config.h"
-
 #include "log/log.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
+
+#include <mutex.hpp>
 
 namespace bsp
 {
@@ -39,6 +31,12 @@ namespace bsp
 
     AudioDevice::RetCode RT1051CellularAudio::Start(const bsp::AudioDevice::Format &format)
     {
+        cpp_freertos::LockGuard lock(mutex);
+
+        if (state == State::Running) {
+            LOG_ERROR("Audio device already running");
+            return AudioDevice::RetCode::Failure;
+        }
 
         Init();
 
@@ -73,6 +71,8 @@ namespace bsp
         // Store format passed
         currentFormat = format;
 
+        state = State::Running;
+
         return AudioDevice::RetCode::Success;
     }
 
@@ -80,19 +80,26 @@ namespace bsp
     {
         cpp_freertos::LockGuard lock(mutex);
 
+        if (state == State::Stopped) {
+            return AudioDevice::RetCode::Failure;
+        }
+
         InStop();
         OutStop();
 
         if (outWorkerThread) {
-            vTaskDelete(outWorkerThread);
+            xTaskNotify(outWorkerThread, static_cast<std::uint32_t>(TransferState::Close), eSetBits);
             outWorkerThread = nullptr;
         }
+
         if (inWorkerThread) {
-            vTaskDelete(inWorkerThread);
+            xTaskNotify(inWorkerThread, static_cast<std::uint32_t>(TransferState::Close), eSetBits);
             inWorkerThread = nullptr;
         }
 
         currentFormat = {};
+        state         = State::Stopped;
+
         return AudioDevice::RetCode::Success;
     }
 
@@ -143,11 +150,11 @@ namespace bsp
         txDMAHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
         rxDMAHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
         dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL),
-                       BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE
+                       BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE);
         dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL),
-                       BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE
+                       BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE);
 
-        mclkSourceClockHz = GetPerphSourceClock(PerphClock_SAI1); // TODO:M.P fix PerphClock_SAI1
+        mclkSourceClockHz = GetPerphSourceClock(PerphClock_SAI1);
 
         // Initialize SAI Tx module
         SAI_TxGetDefaultConfig(&config);
@@ -281,43 +288,38 @@ namespace bsp
 
     void inCellularWorkerTask(void *pvp)
     {
-        uint32_t ulNotificationValue = 0;
+        std::uint32_t ulNotificationValue = 0;
+        RT1051CellularAudio *inst         = reinterpret_cast<RT1051CellularAudio *>(pvp);
 
-        RT1051CellularAudio *inst = reinterpret_cast<RT1051CellularAudio *>(pvp);
-
-        while (1) {
+        while (true) {
             xTaskNotifyWait(0x00,                 /* Don't clear any bits on entry. */
                             UINT32_MAX,           /* Clear all bits on exit. */
                             &ulNotificationValue, /* Receives the notification value. */
                             portMAX_DELAY);       /* Block indefinitely. */
             {
-                cpp_freertos::LockGuard lock(inst->mutex);
+                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051CellularAudio::TransferState::Close)) {
+                    LOG_DEBUG("Rx worker: received close event");
+                    break;
+                }
 
-                if (ulNotificationValue &
-                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer)) {
+                if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::TransferState::HalfTransfer)) {
                     auto framesFetched = inst->GetAudioCallback()(
                         inst->inBuffer, nullptr, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-                    if (framesFetched == 0) {
-                        break;
-                    }
-                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+
+                    if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->inBuffer[framesFetched],
                                0,
                                RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
                     }
                 }
 
-                if (ulNotificationValue &
-                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateFullTransfer)) {
+                if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::TransferState::FullTransfer)) {
                     auto framesFetched =
                         inst->GetAudioCallback()(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE],
                                                  nullptr,
                                                  RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
-                    if (framesFetched == 0) {
-                        break;
-                    }
-                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                    if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->inBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
                                0,
                                RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
@@ -326,52 +328,45 @@ namespace bsp
             }
         }
 
-        {
-            cpp_freertos::LockGuard lock(inst->mutex);
-            inst->InStop();
-            inst->inWorkerThread = nullptr;
-            vTaskDelete(NULL);
-        }
+        LOG_INFO("Killing Rx cellular audio codec worker thread");
+        vTaskDelete(nullptr);
     }
 
     void outCellularWorkerTask(void *pvp)
     {
-        uint32_t ulNotificationValue = 0;
+        std::uint32_t ulNotificationValue = 0;
 
         RT1051CellularAudio *inst = reinterpret_cast<RT1051CellularAudio *>(pvp);
 
-        while (1) {
+        while (true) {
             xTaskNotifyWait(0x00,                 /* Don't clear any bits on entry. */
                             UINT32_MAX,           /* Clear all bits on exit. */
                             &ulNotificationValue, /* Receives the notification value. */
                             portMAX_DELAY);       /* Block indefinitely. */
             {
-                cpp_freertos::LockGuard lock(inst->mutex);
-                if (ulNotificationValue &
-                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer)) {
+                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051CellularAudio::TransferState::Close)) {
+                    LOG_DEBUG("Tx worker: received close event");
+                    break;
+                }
+
+                if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::TransferState::HalfTransfer)) {
                     auto framesFetched = inst->GetAudioCallback()(
                         nullptr, inst->outBuffer, RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-                    if (framesFetched == 0) {
-                        break;
-                    }
-                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+
+                    if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->outBuffer[framesFetched],
                                0,
                                RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
                     }
                 }
 
-                if (ulNotificationValue &
-                    static_cast<uint32_t>(RT1051CellularAudio::irq_state_t::IRQStateFullTransfer)) {
+                if (ulNotificationValue & static_cast<uint32_t>(RT1051CellularAudio::TransferState::FullTransfer)) {
                     auto framesFetched =
                         inst->GetAudioCallback()(nullptr,
                                                  &inst->outBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE],
                                                  RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
-                    if (framesFetched == 0) {
-                        goto cleanup;
-                    }
-                    else if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                    if (framesFetched < RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                         memset(&inst->outBuffer[RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
                                0,
                                RT1051CellularAudio::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
@@ -380,33 +375,31 @@ namespace bsp
             }
         }
 
-    cleanup : {
-        cpp_freertos::LockGuard lock(inst->mutex);
-        inst->OutStop();
-        inst->outWorkerThread = nullptr;
-        vTaskDelete(NULL);
-    }
+        LOG_INFO("Killing Tx audio codec worker thread");
+        vTaskDelete(nullptr);
     }
 
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        static RT1051CellularAudio::irq_state_t state = RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer;
-        RT1051CellularAudio *inst                     = (RT1051CellularAudio *)userData;
-        sai_transfer_t xfer                           = {0};
-        BaseType_t xHigherPriorityTaskWoken           = pdFALSE;
+        static RT1051CellularAudio::TransferState state = RT1051CellularAudio::TransferState::HalfTransfer;
+        RT1051CellularAudio *inst                       = (RT1051CellularAudio *)userData;
+        sai_transfer_t xfer                             = {0};
+        BaseType_t xHigherPriorityTaskWoken             = pdFALSE;
 
-        if (state == RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer) {
+        if (inst->state == RT1051CellularAudio::State::Stopped) {
+            return;
+        }
+
+        if (state == RT1051CellularAudio::TransferState::HalfTransfer) {
 
             xfer.dataSize = inst->saiInFormat.dataSize;
             xfer.data     = inst->saiInFormat.data + (inst->saiInFormat.dataSize);
             SAI_TransferReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &inst->rxHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
-            if (inst->inWorkerThread) {
-                xTaskNotifyFromISR(
-                    inst->inWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-            }
-            state = RT1051CellularAudio::irq_state_t::IRQStateFullTransfer;
+            xTaskNotifyFromISR(
+                inst->inWorkerThread, static_cast<std::uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
+            state = RT1051CellularAudio::TransferState::FullTransfer;
         }
         else {
 
@@ -415,11 +408,9 @@ namespace bsp
             SAI_TransferReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &inst->rxHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
-            if (inst->inWorkerThread) {
-                xTaskNotifyFromISR(
-                    inst->inWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-            }
-            state = RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer;
+            xTaskNotifyFromISR(
+                inst->inWorkerThread, static_cast<std::uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
+            state = RT1051CellularAudio::TransferState::HalfTransfer;
         }
 
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -427,23 +418,25 @@ namespace bsp
 
     void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        static RT1051CellularAudio::irq_state_t state = RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer;
-        RT1051CellularAudio *inst                     = (RT1051CellularAudio *)userData;
-        sai_transfer_t xfer                           = {0};
-        BaseType_t xHigherPriorityTaskWoken           = pdFALSE;
+        static RT1051CellularAudio::TransferState state = RT1051CellularAudio::TransferState::HalfTransfer;
+        RT1051CellularAudio *inst                       = (RT1051CellularAudio *)userData;
+        sai_transfer_t xfer                             = {0};
+        BaseType_t xHigherPriorityTaskWoken             = pdFALSE;
 
-        if (state == RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer) {
+        if (inst->state == RT1051CellularAudio::State::Stopped) {
+            return;
+        }
+
+        if (state == RT1051CellularAudio::TransferState::HalfTransfer) {
 
             xfer.dataSize = inst->saiOutFormat.dataSize;
             xfer.data     = inst->saiOutFormat.data + (inst->saiOutFormat.dataSize);
             SAI_TransferSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &inst->txHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
-            if (inst->outWorkerThread) {
-                xTaskNotifyFromISR(
-                    inst->outWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-            }
-            state = RT1051CellularAudio::irq_state_t::IRQStateFullTransfer;
+            xTaskNotifyFromISR(
+                inst->outWorkerThread, static_cast<std::uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
+            state = RT1051CellularAudio::TransferState::FullTransfer;
         }
         else {
             xfer.dataSize = inst->saiOutFormat.dataSize;
@@ -451,11 +444,9 @@ namespace bsp
             SAI_TransferSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &inst->txHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
-            if (inst->outWorkerThread) {
-                xTaskNotifyFromISR(
-                    inst->outWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-            }
-            state = RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer;
+            xTaskNotifyFromISR(
+                inst->outWorkerThread, static_cast<std::uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
+            state = RT1051CellularAudio::TransferState::HalfTransfer;
         }
 
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);

@@ -117,6 +117,7 @@ namespace audio
 
     audio::RetCode Audio::Start()
     {
+        currentOperation->Stop();
         return Start(currentOperation->GetOperationType(),
                      currentOperation->GetToken(),
                      currentOperation->GetFilePath().c_str(),
