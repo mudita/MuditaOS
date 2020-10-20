@@ -8,6 +8,7 @@
 #include "Service/Service.hpp"
 #include "queue.h"
 #include <memory>
+#include <module-services/service-bluetooth/ServiceBluetoothCommon.hpp>
 namespace Bt
 {
     class A2DP : public Profile
@@ -24,6 +25,8 @@ namespace Bt
         auto init() -> Error override;
         void setDeviceAddress(uint8_t *addr) override;
         void setOwnerService(sys::Service *service);
+        auto getStreamData() -> std::shared_ptr<BluetoothStreamData> override;
+
         void start();
         void stop();
 

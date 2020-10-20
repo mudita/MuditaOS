@@ -39,4 +39,17 @@ namespace gui
         void invalidate() noexcept;
         std::vector<Devicei> devices;
     };
+
+    class DeviceData : public SwitchData
+    {
+        std::vector<Devicei> devices;
+
+      public:
+        DeviceData(std::vector<Devicei> devices) : SwitchData(), devices(std::move(devices))
+        {}
+        auto getDevices() -> const std::vector<Devicei> &
+        {
+            return devices;
+        }
+    };
 } // namespace gui

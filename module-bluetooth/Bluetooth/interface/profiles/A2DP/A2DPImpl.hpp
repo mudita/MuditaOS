@@ -56,6 +56,7 @@ namespace Bt
         static sys::Service *ownerService;
         static QueueHandle_t sourceQueue;
         static QueueHandle_t sinkQueue;
+        static DeviceMetadata_t metadata;
 
         static void startTimer(MediaContext *context);
         static void stopTimer(MediaContext *context);
@@ -71,5 +72,6 @@ namespace Bt
         void stop();
         void setDeviceAddress(bd_addr_t addr);
         void setOwnerService(sys::Service *service);
+        auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
     };
 } // namespace Bt
