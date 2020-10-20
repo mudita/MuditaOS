@@ -1,10 +1,3 @@
-/*
- *  @file bsp_audio.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 22.07.19
- *  @copyright Copyright (C) 2019 mudita.com
- */
-
 #include "bsp_audio.hpp"
 
 #if defined(TARGET_RT1051)

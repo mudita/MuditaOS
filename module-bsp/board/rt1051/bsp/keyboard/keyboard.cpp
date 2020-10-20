@@ -1,15 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- *  @file bsp_keyboard.c
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 25 oct 2018
- *  @brief Keyboard BSP implementation
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
-
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>

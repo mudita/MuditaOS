@@ -1,14 +1,3 @@
-/*
- *  @file bsp_lpm.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 04.09.19
- *  @brief  
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-
-
 #include "bsp_lpm.hpp"
 
 

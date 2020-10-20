@@ -2,13 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
-
- * @file sqlite3port.c
- * @author Lukasz Skrzypczak (lukasz.skrypczak@mudita.com)
- * @date 21 cze 2018
- * @brief Insert brief information about this file purpose.
- * @copyright Copyright (C) 2018 mudita.com. Based on https://www.sqlite.org/src/doc/trunk/src/test_demovfs.c
- * @details :
  **
  ** This file implements an example of a simple VFS implementation that
  ** omits complex features often not required or not possible on embedded
