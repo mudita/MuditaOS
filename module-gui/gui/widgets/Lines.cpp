@@ -72,7 +72,7 @@ namespace gui
 
         auto bound = textLine->checkBounds(cursor, code, format);
         if (bound == InputBound::CANT_PROCESS && line == scroll_position) {
-            return InputBound::CANT_PROCESS;
+            return InputBound::HIT_BOUND;
         }
 
         return InputBound::CAN_ADD;

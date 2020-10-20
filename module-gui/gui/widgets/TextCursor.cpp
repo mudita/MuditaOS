@@ -192,11 +192,15 @@ namespace gui
     InputBound TextCursor::processBound(InputBound bound, const InputEvent &event)
     {
         if (bound == InputBound::CAN_MOVE) {
-            moveCursor(inputToNavigation(event));
+            if (event.isShortPress()) {
+                moveCursor(inputToNavigation(event));
+            }
         }
 
         if (bound == InputBound::CAN_REMOVE) {
-            removeChar();
+            if (event.isShortPress()) {
+                text->handleBackspace(event);
+            }
         }
 
         if (bound == InputBound::CAN_ADD) {
