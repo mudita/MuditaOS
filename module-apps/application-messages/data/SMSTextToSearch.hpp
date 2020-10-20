@@ -12,7 +12,7 @@ class SMSTextToSearch : public gui::SwitchData
 
   public:
     SMSTextToSearch(const std::string text_to_search, const std::string title);
-    [[nodiscard]] auto getTextToSearch() const -> std::string ;
+    [[nodiscard]] auto getTextToSearch() const -> std::string;
     [[nodiscard]] auto getTitle() const -> std::string
     {
         return title;

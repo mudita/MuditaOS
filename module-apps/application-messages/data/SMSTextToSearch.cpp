@@ -3,7 +3,8 @@
 
 #include "SMSTextToSearch.hpp"
 
-SMSTextToSearch::SMSTextToSearch(const std::string text_to_search, const std::string title) : text_to_search(text_to_search), title(title)
+SMSTextToSearch::SMSTextToSearch(const std::string text_to_search, const std::string title)
+    : text_to_search(text_to_search), title(title)
 {}
 
 auto SMSTextToSearch::getTextToSearch() const -> std::string

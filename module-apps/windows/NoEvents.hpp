@@ -3,10 +3,8 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
-#include <gui/widgets/Icon.hpp>
-#include <Text.hpp>
 #include <functional>
+#include "Dialog.hpp"
 
 /// Provides information witch window is equivalent to empty window (DayEvents window and AllEvents window may be empty)
 enum class EquivalentWindow
@@ -18,34 +16,11 @@ enum class EquivalentWindow
 
 namespace gui
 {
-    /// @brief base NoEvents class
-    ///
-    /// Contain icon, text, Back action and switch to new/edit event window action
-    class NoEvents : public AppWindow
+    class NoEvents : public Dialog
     {
-      protected:
-        Image *leftArrowImage = nullptr;
-        Image *newEventImage  = nullptr;
-        Icon *emptyListIcon   = nullptr;
-
       public:
-        struct Meta
-        {
-            std::string title;
-            UTF8 text;
-            UTF8 icon;
-            std::function<bool()> action = []() -> bool { return false; };
-
-            Meta() = default;
-        } meta;
-
-        NoEvents(app::Application *app, const std::string &name, const Meta &meta);
-        ~NoEvents() override = default;
-
-        virtual void update(const Meta &meta);
-        bool onInput(const gui::InputEvent &inputEvent) override;
-        void rebuild() override;
-        void buildInterface() override;
+        NoEvents(app::Application *app, const std::string &name);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
 }; // namespace gui

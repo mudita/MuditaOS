@@ -78,7 +78,7 @@ namespace gui
     {
         // get old value of battery level, calcualte new level and comapre both
         // if they are different make a change and return true, otherwise return false;
-        if ( topBar != nullptr ) {
+        if (topBar != nullptr) {
             return topBar->setBatteryLevel(percentage);
         }
         return false;
