@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 /// beware time_t size might vary, as i.e. on linux it's long int (64b -> 8B != 4B)
 /// this calss uses strftime to convert timestamp to text, but for UTF8 elements (mon,day) it uses our locale

@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "EventsTable.hpp"
 #include "module-db/Interface/EventsRecord.hpp"
 //#include <module-apps/application-calendar/widgets/CalendarStyle.hpp>
