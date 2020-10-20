@@ -141,6 +141,6 @@ std::string IntervalBox::ChimeIntervalList::toPrintableInterval(std::chrono::min
     }
     const std::string toReplace = "%0";
     std::string temp            = utils::localize.get("app_meditation_interval_every_x_minutes");
-    temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(value.count()));
+    temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(static_cast<int>(value.count())));
     return temp;
 }
