@@ -227,7 +227,7 @@ namespace gui
             lines->updateScrollPosition(scroll, factor);
         }
 
-        if (bound != InputBound::CANT_PROCESS) {
+        if (!(bound & InputBound::CANT_PROCESS)) {
             return true;
         }
 
@@ -379,7 +379,6 @@ namespace gui
 
             line.setPosition(line_x_position, line_y_position);
             line.setParent(this);
-            line.alignH(getAlignment(Axis::X), w);
 
             end = lines->last().getEnd();
             line_y_position += line.height();
