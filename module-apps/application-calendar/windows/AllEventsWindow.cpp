@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "AllEventsWindow.hpp"
 #include "InputEvent.hpp"
 #include "module-apps/application-calendar/ApplicationCalendar.hpp"

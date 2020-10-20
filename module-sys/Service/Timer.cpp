@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "Timer.hpp"
 #include "Service.hpp"              // for Service, Service::Timers
 #include "Service/TimerMessage.hpp" // for TimerMessage

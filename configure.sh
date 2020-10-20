@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 if [[ $BASH_VERSINFO -lt 4 ]]; then
     echo "Please update your bash to at last version 4"

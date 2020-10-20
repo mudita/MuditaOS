@@ -1,4 +1,7 @@
 #!/bin/python3
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 # common elements for super simple test harness
 
 import serial
