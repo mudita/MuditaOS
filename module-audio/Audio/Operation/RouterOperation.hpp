@@ -9,6 +9,7 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <bsp/audio/bsp_audio.hpp>
+#include <mutex.hpp>
 
 #include <memory>
 #include <functional>
@@ -21,6 +22,10 @@ namespace audio
 {
     class RouterOperation : public Operation
     {
+        using AudioCallback =
+            std::function<std::int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>;
+        static const std::size_t INPUT_BUFFER_START_SIZE = 1024;
+
       public:
         RouterOperation(
             const char *file,
@@ -45,17 +50,21 @@ namespace audio
         bool muteEnable = false;
 
         std::unique_ptr<Encoder> enc;
+
         std::unique_ptr<bsp::AudioDevice> audioDevice;
         std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
-        std::function<std::int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
-            audioDeviceCallback = nullptr;
-        std::function<std::int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
-            audioDeviceCellularCallback = nullptr;
+
+        AudioCallback audioDeviceCallback         = nullptr;
+        AudioCallback audioDeviceCellularCallback = nullptr;
+
         std::vector<std::int16_t> audioDeviceBuffer;
         std::vector<std::int16_t> audioDeviceCellularBuffer;
-        std::vector<std::int16_t> channel1Buffer;
-        std::vector<std::int16_t> channel2Buffer;
-        std::vector<std::int16_t> mixBuffer;
+
+        cpp_freertos::MutexStandard audioMutex;
+        cpp_freertos::MutexStandard cellularMutex;
+
+        int receivedFramesDiffAudio    = 0;
+        int receivedFramesDiffCellular = 0;
     };
 
 } // namespace audio
