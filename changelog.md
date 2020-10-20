@@ -1,5 +1,11 @@
 # MuditaOS changelog
 
+## Current release
+
+### Changed
+
+* `[calendar]` Rework to use database model instead of internal model in day events list.
+
 ## [0.44.1 2020-10-30]
 
 ### Added

@@ -59,9 +59,12 @@ bool EventsRecordInterface::Add(const EventsRecord &rec)
     }
 }
 
-std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(TimePoint filter_from, TimePoint filter_till)
+std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(TimePoint filter_from,
+                                                                         TimePoint filter_till,
+                                                                         uint32_t offset,
+                                                                         uint32_t limit)
 {
-    auto rows = eventsDb->events.selectByDatePeriod(filter_from, filter_till);
+    auto rows = eventsDb->events.selectByDatePeriod(filter_from, filter_till, offset, limit);
 
     auto records = std::make_unique<std::vector<EventsRecord>>();
 
@@ -182,6 +185,11 @@ uint32_t EventsRecordInterface::GetCount()
     return eventsDb->events.count();
 }
 
+uint32_t EventsRecordInterface::GetCountFiltered(TimePoint from, TimePoint till)
+{
+    return eventsDb->events.countFromFilter(from, till);
+}
+
 std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::SelectFirstUpcoming(TimePoint filter_from,
                                                                                       TimePoint filter_till)
 {
@@ -264,8 +272,12 @@ std::unique_ptr<db::query::events::GetFilteredResult> EventsRecordInterface::run
 {
     auto getFilteredQuery = dynamic_cast<db::query::events::GetFiltered *>(query.get());
     assert(getFilteredQuery != nullptr);
-    auto records  = Select(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
-    auto response = std::make_unique<db::query::events::GetFilteredResult>(std::move(records));
+    auto records        = Select(getFilteredQuery->filter_from,
+                          getFilteredQuery->filter_till,
+                          getFilteredQuery->offset,
+                          getFilteredQuery->limit);
+    auto numberOfEvents = GetCountFiltered(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
+    auto response       = std::make_unique<db::query::events::GetFilteredResult>(std::move(records), numberOfEvents);
     response->setRequestQuery(query);
     return response;
 }

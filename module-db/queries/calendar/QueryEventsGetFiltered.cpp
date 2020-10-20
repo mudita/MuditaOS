@@ -5,8 +5,8 @@
 
 namespace db::query::events
 {
-    GetFiltered::GetFiltered(TimePoint filter_from, TimePoint filter_till)
-        : Query(Query::Type::Read), filter_from(filter_from), filter_till(filter_till)
+    GetFiltered::GetFiltered(TimePoint filter_from, TimePoint filter_till, uint32_t offset, uint32_t limit)
+        : Query(Query::Type::Read), filter_from(filter_from), filter_till(filter_till), offset(offset), limit(limit)
     {}
 
     auto GetFiltered::debugInfo() const -> std::string
@@ -14,13 +14,18 @@ namespace db::query::events
         return "GetFiltered";
     }
 
-    GetFilteredResult::GetFilteredResult(std::unique_ptr<std::vector<EventsRecord>> records)
-        : records(std::move(records))
+    GetFilteredResult::GetFilteredResult(std::unique_ptr<std::vector<EventsRecord>> records, uint32_t count)
+        : records(std::move(records)), recordsCount(count)
     {}
 
     auto GetFilteredResult::getResult() -> std::unique_ptr<std::vector<EventsRecord>>
     {
         return std::move(records);
+    }
+
+    auto GetFilteredResult::getCountResult() -> uint32_t
+    {
+        return recordsCount;
     }
 
     auto GetFilteredResult::debugInfo() const -> std::string

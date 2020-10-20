@@ -140,8 +140,8 @@ TEST_CASE("Events Table tests")
                                .reminder  = 0,
                                .repeat    = 3}));
 
-        auto entries = eventsTbl.selectByDatePeriod(TimePointFromString("2000-01-01 00:00:00"),
-                                                    TimePointFromString("2012-12-31 23:59:00"));
+        auto entries = eventsTbl.selectByDatePeriod(
+            TimePointFromString("2000-01-01 00:00:00"), TimePointFromString("2012-12-31 23:59:00"), 0, UINT32_MAX);
 
         REQUIRE(entries.size() == 0);
     }
