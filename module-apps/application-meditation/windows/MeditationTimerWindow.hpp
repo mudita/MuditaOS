@@ -13,6 +13,7 @@ namespace gui
         Text *meditationInfo   = nullptr;
         bool finished          = false;
         std::chrono::seconds meditationTime{0};
+        std::chrono::seconds meditationIntervalPeriod{0};
 
         void setWidgetVisible(bool topBar, bool bottomBar, bool counter);
         void setVisibleRunning();

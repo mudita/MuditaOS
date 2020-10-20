@@ -22,13 +22,14 @@ namespace gui
                         app::ApplicationMeditation *app,
                         Item *_parent = nullptr);
 
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        [[nodiscard]] auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
 
         void start();
         void stop();
-        void reset(std::chrono::seconds _duration) noexcept;
-        auto isStopped() const noexcept -> bool;
-        void setTimerVisible(bool) noexcept;
+        void reset(std::chrono::seconds _duration, std::chrono::seconds period = std::chrono::seconds::zero()) noexcept;
+        [[nodiscard]] auto isStopped() const noexcept -> bool;
+        void onInterval() const;
+        void setCounterVisible(bool isVisible) noexcept;
         void registerTimeoutCallback(const std::function<void()> &);
 
       private:
@@ -38,13 +39,16 @@ namespace gui
         void onReset();
 
         void startTimer();
-        auto onTimerTimeout(Item &self, Timer &timerTask) -> bool;
-        auto isFinished() const noexcept -> bool;
-        auto calculatePercentageValue() const noexcept -> unsigned int;
+        [[nodiscard]] auto onTimerTimeout(Item &self, Timer &timerTask) -> bool;
+        [[nodiscard]] auto isFinished() const noexcept -> bool;
+        [[nodiscard]] auto intervalReached() const noexcept -> bool;
+        [[nodiscard]] auto calculatePercentageValue() const noexcept -> unsigned int;
 
         std::atomic_bool isRunning{false};
         std::chrono::seconds duration{std::chrono::seconds::zero()};
         std::chrono::seconds elapsed{std::chrono::seconds::zero()};
+        std::chrono::seconds intervalPeriod{std::chrono::seconds::zero()};
+        bool hasInterval = false;
 
         app::ApplicationMeditation *application = nullptr;
         CircularProgressBar *progressBar        = nullptr;
