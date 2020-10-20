@@ -70,7 +70,7 @@ class ServiceAudio : public sys::Service
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
 
     auto IsVibrationEnabled(const audio::PlaybackType &type) -> bool;
-    auto IsPlaybackEnabled(const audio::PlaybackType &type) -> bool;
+    auto IsOperationEnabled(const audio::PlaybackType &plType, const audio::Operation::Type &opType) -> bool;
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
 
