@@ -20,6 +20,5 @@ class ServiceBluetooth : public sys::Service
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
   private:
-    static const char *serviceName;
     std::unique_ptr<BluetoothWorker> worker;
 };

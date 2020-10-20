@@ -1,12 +1,16 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <type_traits>
+
 #include "ServiceAudio.hpp"
 #include "messages/AudioMessage.hpp"
-#include "Audio/Operation/IdleOperation.hpp"
-#include "Audio/Operation/PlaybackOperation.hpp"
 
-#include <type_traits>
+#include <Audio/Operation/IdleOperation.hpp>
+#include <Audio/Operation/PlaybackOperation.hpp>
+#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 
@@ -319,8 +323,17 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
+    if (evt->getType() == EventType::BTHeadsetOn) {
+        auto req = std::make_shared<BluetoothRequestStreamMessage>();
+        sys::Bus::SendUnicast(req, service::name::bluetooth, this);
+        return std::make_unique<AudioEventResponse>(RetCode::Success);
+    }
+
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
+        if (evt->getType() == EventType::BTHeadsetOff) {
+            input.audio->SetBluetoothStreamData(nullptr);
+        }
     }
     return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
@@ -484,6 +497,13 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
         responseMsg = HandleKeyPressed(msg->step);
     }
+    else if (msgType == typeid(BluetoothRequestStreamResultMessage)) {
+        auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
+        for (auto &input : audioMux.GetAllInputs()) {
+            input.audio->SetBluetoothStreamData(msg->getData());
+            input.audio->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
+        }
+    }
     else {
         LOG_DEBUG("Unhandled message");
     }
@@ -526,9 +546,14 @@ std::string ServiceAudio::getSetting(const Setting &setting,
             targetPlayback = currentPlaybackType;
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == Setting::Volume)) {
+            targetProfile = Profile::Type::PlaybackLoudspeaker;
+            if ((*input)->audio->IsLineSinkAvailable()) {
+                targetProfile = Profile::Type::PlaybackHeadphones;
+            }
+            if ((*input)->audio->IsBtSinkAvailable()) {
+                targetProfile = Profile::Type::PlaybackBTA2DP;
+            }
 
-            targetProfile = ((*input)->audio->GetHeadphonesInserted()) ? Profile::Type::PlaybackHeadphones
-                                                                       : Profile::Type::PlaybackLoudspeaker;
             targetPlayback = PlaybackType::CallRingtone;
         }
         else {
@@ -563,8 +588,14 @@ void ServiceAudio::setSetting(const Setting &setting,
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
-            updatedProfile = (*input)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
-                                                                      : Profile::Type::PlaybackLoudspeaker;
+            updatedProfile = Profile::Type::PlaybackLoudspeaker;
+            if ((*input)->audio->IsLineSinkAvailable()) {
+                updatedProfile = Profile::Type::PlaybackHeadphones;
+            }
+            if ((*input)->audio->IsBtSinkAvailable()) {
+                updatedProfile = Profile::Type::PlaybackBTA2DP;
+            }
+
             updatedPlayback = PlaybackType::CallRingtone;
             valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
         }
@@ -607,8 +638,8 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
     if (!activeInput.has_value()) {
         const auto idleInput = audioMux.GetIdleInput();
         if (idleInput.has_value()) {
-            return {(*idleInput)->audio->GetHeadphonesInserted() ? Profile::Type::PlaybackHeadphones
-                                                                 : Profile::Type::PlaybackLoudspeaker,
+            return {(*idleInput)->audio->IsLineSinkAvailable() ? Profile::Type::PlaybackHeadphones
+                                                               : Profile::Type::PlaybackLoudspeaker,
                     audio::PlaybackType::CallRingtone};
         }
     }

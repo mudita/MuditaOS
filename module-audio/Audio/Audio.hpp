@@ -7,6 +7,8 @@
 #include <optional>
 #include <functional>
 
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+
 #include "AudioCommon.hpp"
 #include "Operation/Operation.hpp"
 #include "decoder/decoder.hpp"
@@ -74,9 +76,14 @@ namespace audio
             return GetCurrentOperation().GetState();
         }
 
-        [[nodiscard]] inline bool GetHeadphonesInserted() const
+        [[nodiscard]] inline bool IsLineSinkAvailable() const
         {
-            return headphonesInserted;
+            return lineSinkAvailable;
+        }
+
+        [[nodiscard]] inline bool IsBtSinkAvailable() const
+        {
+            return lineSinkAvailable;
         }
 
         // Operations
@@ -95,8 +102,13 @@ namespace audio
 
         virtual audio::RetCode Mute();
 
+        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
+
       private:
-        bool headphonesInserted = false;
+        bool lineSinkAvailable = false;
+        bool btSinkAvailable   = false;
+        std::shared_ptr<BluetoothStreamData> btData;
+
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 

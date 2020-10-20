@@ -1,9 +1,8 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <Utils.hpp>
 #include "decoder.hpp"
-#include "Utils.hpp"
-
 #include "decoderMP3.hpp"
 #include "decoderFLAC.hpp"
 #include "decoderWAV.hpp"

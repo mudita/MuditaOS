@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef UNTITLED1_DECODER_H
-#define UNTITLED1_DECODER_H
+#pragma once
 
 #include <stdint.h>
 #include <string>
@@ -10,7 +9,7 @@
 #include <optional>
 #include <cstring>
 
-#include "vfs.hpp"
+#include <vfs.hpp>
 
 namespace audio
 {
@@ -117,4 +116,3 @@ namespace audio
 
 } // namespace audio
 
-#endif // UNTITLED1_DECODER_H

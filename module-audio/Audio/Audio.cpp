@@ -5,7 +5,6 @@
 #include "Operation/Operation.hpp"
 
 #include <log/log.hpp>
-#include <Utils.hpp>
 #include <bsp/headset/headset.hpp>
 
 namespace audio
@@ -19,7 +18,7 @@ namespace audio
         if (ret) {
             currentOperation = std::move(ret.value());
         }
-        headphonesInserted = bsp::headset::IsInserted();
+        lineSinkAvailable = bsp::headset::IsInserted();
     }
 
     Position Audio::GetPosition()
@@ -42,10 +41,16 @@ namespace audio
     {
         switch (evt->getType()) {
         case EventType::HeadphonesPlugin:
-            headphonesInserted = true;
+            lineSinkAvailable = true;
             break;
         case EventType::HeadphonesUnplug:
-            headphonesInserted = false;
+            lineSinkAvailable = false;
+            break;
+        case EventType::BTHeadsetOn:
+            lineSinkAvailable = true;
+            break;
+        case EventType::BTHeadsetOff:
+            lineSinkAvailable = false;
             break;
         default:
             break;
@@ -103,8 +108,12 @@ namespace audio
             }
             currentOperation = std::move(ret.value());
 
-            if (headphonesInserted == true) {
+            if (lineSinkAvailable) {
                 currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
+            }
+            if (btSinkAvailable && btData) {
+                currentOperation->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
+                currentOperation->SetBluetoothStreamData(btData);
             }
         }
         else {
@@ -169,6 +178,11 @@ namespace audio
     audio::RetCode Audio::Mute()
     {
         return SetOutputVolume(0);
+    }
+
+    void Audio::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
+    {
+        btData = data;
     }
 
 } // namespace audio
