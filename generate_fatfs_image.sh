@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 usage() {
 cat << ==usage
 Usage: $(basename $0) [image_dir] [assets_root_dir]
