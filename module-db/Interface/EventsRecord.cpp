@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "EventsRecord.hpp"
 #include "module-db/queries/calendar/QueryEventsGet.hpp"
 #include "module-db/queries/calendar/QueryEventsGetAll.hpp"

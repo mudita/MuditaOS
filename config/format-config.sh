@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 # config file for pre-commit.hook clang-format
 # ignore file for clang-format autoformating
 

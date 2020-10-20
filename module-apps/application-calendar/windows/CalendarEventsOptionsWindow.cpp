@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "CalendarEventsOptionsWindow.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"

@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 PURE_PARTITION_PRIMARY="PUREOS"
 PURE_PARTITION_RECOVERY="RECOVER"
 PURE_OS_CURRENT="current"
