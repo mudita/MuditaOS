@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "Common.hpp"
+#include <module-gui/gui/Common.hpp>
 
 namespace gui
 {

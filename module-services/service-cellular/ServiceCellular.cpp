@@ -224,12 +224,11 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 
     switch (mode) {
     case sys::ServicePowerMode ::Active:
-        // muxdaemon->ExitSleepMode();
+        cmux->ExitSleepMode();
         break;
     case sys::ServicePowerMode ::SuspendToRAM:
     case sys::ServicePowerMode ::SuspendToNVM:
-        LOG_FATAL("TEMPORARY DISABLED!!!!! UNCOMMENT WHEN READY.");
-        //            muxdaemon->EnterSleepMode();
+        cmux->EnterSleepMode();
         break;
     }
 

@@ -539,3 +539,18 @@ void TS0710::ResetModem(void)
 {
     return pv_cellular->Restart();
 }
+
+void TS0710::TurnOffModem(void)
+{
+    return pv_cellular->PowerDown();
+}
+
+void TS0710::EnterSleepMode(void)
+{
+    return pv_cellular->EnterSleep();
+}
+
+void TS0710::ExitSleepMode(void)
+{
+    return pv_cellular->ExitSleep();
+}

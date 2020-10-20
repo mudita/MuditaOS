@@ -2,7 +2,7 @@
 
 #include "Alignment.hpp"        // for Alignment
 #include "Axes.hpp"             // for Axis
-#include "Common.hpp"           // for NavigationDirection, Size
+#include <module-gui/gui/Common.hpp>
 #include "Layout.hpp"           // for LayoutHorizontalPolicy, LayoutVertic...
 #include "Margins.hpp"          // for Padding, Margins
 #include "core/BoundingBox.hpp" // for BoundingBox, BoundingBox::(anonymous)

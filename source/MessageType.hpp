@@ -178,6 +178,7 @@ enum class MessageType
     // cellular messages
     EVMGetBoard,
     EVMModemStatus,
+    EVMRingIndicator,
 
     // bluetooth messages
     BluetoothRequest,
