@@ -1,14 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * @file NotesItem.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 12 sie 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #ifndef MODULE_APPS_APPLICATION_NOTES_WIDGETS_NOTESITEM_HPP_
 #define MODULE_APPS_APPLICATION_NOTES_WIDGETS_NOTESITEM_HPP_
 

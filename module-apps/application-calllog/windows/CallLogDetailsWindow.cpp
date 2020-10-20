@@ -1,15 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * @file CallLogDetailsWindow.cpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 05.10.2019
- * @brief Call Log Details Window
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "CallLogDetailsWindow.hpp"
 #include <memory>
 #include <functional>

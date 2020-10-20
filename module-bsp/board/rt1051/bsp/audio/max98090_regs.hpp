@@ -1,15 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- *  @file max98090.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 8 Oct 2018
- *  @brief MAX98090 device driver.
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
-
 #ifndef BSP_AUDIOCODEC_MAX98090_H_
 #define BSP_AUDIOCODEC_MAX98090_H_
 
