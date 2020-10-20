@@ -33,7 +33,7 @@ void TimerSetter::build()
     timeLabel->setFont(style::window::font::supersizemelight);
     timeLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeLabel->setPenWidth(timerStyle::PenWidth);
-    timeLabel->setText(std::to_string(state.getTime().count()));
+    timeLabel->setText(std::to_string(static_cast<int>(state.getTime().count())));
 
     timeUnitLabel = new Label(this,
                               timerStyle::setterUnitLabel::X,
@@ -78,7 +78,7 @@ bool TimerSetter::onInput(const InputEvent &inputEvent)
         else {
             state.onFocus();
         }
-        timeLabel->setText(std::to_string(state.getTime().count()));
+        timeLabel->setText(std::to_string(static_cast<int>(state.getTime().count())));
         if (handled) {
             return true;
         }
