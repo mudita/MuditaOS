@@ -1,6 +1,3 @@
-//
-// Created by lucck on 14.10.2020.
-//
 #include "vfs.hpp"
 #include "ff_eMMC_user_disk.hpp"
 

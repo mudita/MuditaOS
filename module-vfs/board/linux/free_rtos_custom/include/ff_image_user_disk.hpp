@@ -1,6 +1,3 @@
-//
-// Created by lucck on 14.10.2020.
-//
 #pragma once
 
 #include "vfs.hpp"

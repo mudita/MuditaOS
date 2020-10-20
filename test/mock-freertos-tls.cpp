@@ -1,19 +1,3 @@
-/*
- * =====================================================================================
- *
- *       Filename:  freertos-tls.cpp
- *
- *    Description: Free rtos thread local storage wrapper
- *
- *        Version:  1.0
- *        Created:  16.10.2020 09:48:51
- *       Revision:  none
- *       Compiler:  gcc
- *
- *
- * =====================================================================================
- */
-
 #include <thread.hpp>
 
 namespace
