@@ -293,7 +293,7 @@ namespace gui
         auto text = getText(0);
         text.insertCode(utf_value);
 
-        if ((width_used + font->getPixelWidth(text)) <= max_width) {
+        if ((font->getPixelWidth(text)) <= max_width) {
             return InputBound::CAN_ADD;
         }
 
