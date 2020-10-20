@@ -547,10 +547,10 @@ std::string ServiceAudio::getSetting(const Setting &setting,
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == Setting::Volume)) {
             targetProfile = Profile::Type::PlaybackLoudspeaker;
-            if ((*input)->audio->GetLineSinkAvailable()) {
+            if ((*input)->audio->IsLineSinkAvailable()) {
                 targetProfile = Profile::Type::PlaybackHeadphones;
             }
-            if ((*input)->audio->GetBtSinkAvailable()) {
+            if ((*input)->audio->IsBtSinkAvailable()) {
                 targetProfile = Profile::Type::PlaybackBTA2DP;
             }
 
@@ -589,10 +589,10 @@ void ServiceAudio::setSetting(const Setting &setting,
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
             updatedProfile = Profile::Type::PlaybackLoudspeaker;
-            if ((*input)->audio->GetLineSinkAvailable()) {
+            if ((*input)->audio->IsLineSinkAvailable()) {
                 updatedProfile = Profile::Type::PlaybackHeadphones;
             }
-            if ((*input)->audio->GetBtSinkAvailable()) {
+            if ((*input)->audio->IsBtSinkAvailable()) {
                 updatedProfile = Profile::Type::PlaybackBTA2DP;
             }
 
@@ -638,8 +638,8 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
     if (!activeInput.has_value()) {
         const auto idleInput = audioMux.GetIdleInput();
         if (idleInput.has_value()) {
-            return {(*idleInput)->audio->GetLineSinkAvailable() ? Profile::Type::PlaybackHeadphones
-                                                                : Profile::Type::PlaybackLoudspeaker,
+            return {(*idleInput)->audio->IsLineSinkAvailable() ? Profile::Type::PlaybackHeadphones
+                                                               : Profile::Type::PlaybackLoudspeaker,
                     audio::PlaybackType::CallRingtone};
         }
     }

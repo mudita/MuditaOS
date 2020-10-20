@@ -76,12 +76,12 @@ namespace audio
             return GetCurrentOperation().GetState();
         }
 
-        [[nodiscard]] inline bool GetLineSinkAvailable() const
+        [[nodiscard]] inline bool IsLineSinkAvailable() const
         {
             return lineSinkAvailable;
         }
 
-        [[nodiscard]] inline bool GetBtSinkAvailable() const
+        [[nodiscard]] inline bool IsBtSinkAvailable() const
         {
             return lineSinkAvailable;
         }

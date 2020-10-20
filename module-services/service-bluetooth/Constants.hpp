@@ -5,4 +5,4 @@
 namespace service::name
 {
     inline const std::string bluetooth = "ServiceBluetooth";
-};
+}

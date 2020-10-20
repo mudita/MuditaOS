@@ -108,10 +108,10 @@ namespace audio
             }
             currentOperation = std::move(ret.value());
 
-            if (lineSinkAvailable == true) {
+            if (lineSinkAvailable) {
                 currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
             }
-            if (btSinkAvailable == true && btData) {
+            if (btSinkAvailable && btData) {
                 currentOperation->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
                 currentOperation->SetBluetoothStreamData(btData);
             }

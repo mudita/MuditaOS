@@ -36,8 +36,8 @@ namespace audio
         audio::RetCode SetOutputVolume(float vol) final;
         audio::RetCode SetInputGain(float gain) final;
 
-        Position GetPosition() override final;
-        void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) override final;
+        Position GetPosition() final;
+        void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) final;
 
       private:
         bool Mute(bool enable);
