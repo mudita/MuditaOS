@@ -19,7 +19,7 @@
 #include "vfs.hpp"
 
 #include "bsp/battery-charger/battery_charger.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 #include "AudioServiceAPI.hpp"
@@ -98,7 +98,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::Bus::SendUnicast(message, targetApplication, this);
         }
         // notify application manager to prevent screen locking
-        sapm::ApplicationManager::messagePreventBlocking(this);
+        app::manager::Controller::preventBlockingDevice(this);
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMFocusApplication) {

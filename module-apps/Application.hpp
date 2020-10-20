@@ -73,7 +73,7 @@ namespace app
 
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
-    /// 2. Application lifetime is managed with sapm::ApplicationManager
+    /// 2. Application lifetime is managed with app::manager::ApplicationManager
     class Application : public sys::Service
     {
       public:
@@ -153,7 +153,7 @@ namespace app
         void blockEvents(bool isBlocked);
 
         /// Method sending switch command for another window. It will switch window within active application.
-        /// To switch windows between applications use sapm::ApplicationManager::messageSwitchApplication
+        /// To switch windows between applications use app::manager::Controller::switchApplication
         /// it will effectively trigger setActiveWindow and change on windows stack
         ///
         /// @param windowName name of window to show, only required parameter, our windows stack uses string names as

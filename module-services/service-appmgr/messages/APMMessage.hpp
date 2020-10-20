@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_
-#define MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_
+#pragma once
 
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
@@ -11,36 +10,27 @@
 
 #include "i18/i18.hpp"
 
-namespace sapm
+namespace app::manager
 {
-
-    /*
-     * @brief Template for all messages that go to application manager
-     */
+    /// A template for all messages to application manager.
     class APMMessage : public sys::DataMessage
     {
       protected:
-        // name of the application that is sending message to application manager.
+        /// name of the application that is sending message to application manager.
         std::string senderName;
 
       public:
-        APMMessage(MessageType messageType, const std::string &senderName)
-            : sys::DataMessage(messageType), senderName{senderName} {};
-        virtual ~APMMessage(){};
+        APMMessage(MessageType messageType, std::string senderName)
+            : sys::DataMessage(messageType), senderName{std::move(senderName)}
+        {}
 
-        std::string getSenderName()
+        [[nodiscard]] auto getSenderName() const noexcept -> std::string
         {
             return senderName;
         }
     };
 
-    //	APMSwitch, //request to switch to given application, optionally also to specified window
-    //  APMSwitchToNotification, //request to switch to given notification (application and specified window)
-    //	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
-    //	APMSwitchPrevApp, //Request to switch to previous application.
-    //	APMConfirmSwitch, //Used when application confirms that it is loosing focus and also when application confirms
-    // that is has gained focus 	APMConfirmClose, //Sent by application to confirm completion of the close procedure
-
+    /// Requests a switch to a given application. Optionally to a specified window, too.
     class APMSwitch : public APMMessage
     {
         std::string application;
@@ -49,26 +39,30 @@ namespace sapm
 
       public:
         APMSwitch(const std::string &senderName,
-                  const std::string &applicationName,
-                  const std::string &windowName,
+                  std::string applicationName,
+                  std::string windowName,
                   std::unique_ptr<gui::SwitchData> data)
             : APMMessage(MessageType::APMSwitch, senderName),
-              application{applicationName}, window{windowName}, data{std::move(data)}
+              application{std::move(applicationName)}, window{std::move(windowName)}, data{std::move(data)}
         {}
-        const std::string &getName() const
+
+        [[nodiscard]] auto getName() const noexcept -> const std::string &
         {
             return application;
-        };
-        const std::string &getWindow() const
+        }
+
+        [[nodiscard]] auto getWindow() const noexcept -> const std::string &
         {
             return window;
-        };
-        std::unique_ptr<gui::SwitchData> &getData()
+        }
+
+        [[nodiscard]] auto getData() noexcept -> std::unique_ptr<gui::SwitchData> &
         {
             return data;
-        };
+        }
     };
 
+    /// Requests a switch to a previous application.
     class APMSwitchPrevApp : public APMMessage
     {
         std::unique_ptr<gui::SwitchData> data;
@@ -77,12 +71,14 @@ namespace sapm
         APMSwitchPrevApp(const std::string &name, std::unique_ptr<gui::SwitchData> data = nullptr)
             : APMMessage(MessageType::APMSwitchPrevApp, name), data{std::move(data)}
         {}
-        std::unique_ptr<gui::SwitchData> &getData()
+
+        [[nodiscard]] auto getData() noexcept -> std::unique_ptr<gui::SwitchData> &
         {
             return data;
-        };
+        }
     };
 
+    /// Confirms that the applications lost/gained focus.
     class APMConfirmSwitch : public APMMessage
     {
       public:
@@ -90,6 +86,7 @@ namespace sapm
         {}
     };
 
+    /// Confirms that the application closed successfully.
     class APMConfirmClose : public APMMessage
     {
       public:
@@ -97,46 +94,47 @@ namespace sapm
         {}
     };
 
+    /// Confirms that the application registered successfully.
     class APMRegister : public APMMessage
     {
-      protected:
         bool status;
         bool startBackground;
 
       public:
-        APMRegister(const std::string &senderName, const bool &status, const bool &startBackground)
+        APMRegister(const std::string &senderName, bool status, bool startBackground)
             : APMMessage(MessageType::APMRegister, senderName), status{status}, startBackground{startBackground}
         {}
 
-        const bool &getStatus()
+        [[nodiscard]] auto getStatus() const noexcept -> bool
         {
             return status;
-        };
-        const bool &getStartBackground()
+        }
+
+        [[nodiscard]] auto getStartBackground() const noexcept -> bool
         {
             return startBackground;
-        };
+        }
     };
 
+    /// Requests the application to close.
     class APMDelayedClose : public APMMessage
     {
-      protected:
         std::string application;
 
       public:
         APMDelayedClose(const std::string &senderName, std::string application)
-            : APMMessage(MessageType::APMDeleydClose, senderName), application{application}
+            : APMMessage(MessageType::APMDelayedClose, senderName), application{std::move(application)}
         {}
 
-        const std::string &getApplication()
+        [[nodiscard]] auto getApplication() const noexcept -> const std::string &
         {
             return application;
-        };
+        }
     };
 
+    /// Requests to change the language.
     class APMChangeLanguage : public APMMessage
     {
-      protected:
         utils::Lang language;
 
       public:
@@ -144,12 +142,13 @@ namespace sapm
             : APMMessage(MessageType::APMChangeLanguage, senderName), language{language}
         {}
 
-        const utils::Lang &getLanguage()
+        [[nodiscard]] auto getLanguage() const noexcept -> utils::Lang
         {
             return language;
-        };
+        }
     };
 
+    /// Requests the application manager to close.
     class APMClose : public APMMessage
     {
       public:
@@ -157,6 +156,7 @@ namespace sapm
         {}
     };
 
+    /// Requests application manager to prevent device blocking.
     class APMPreventBlocking : public APMMessage
     {
       public:
@@ -164,6 +164,7 @@ namespace sapm
         {}
     };
 
+    /// Requests the application manager to enter power save mode.
     class APMInitPowerSaveMode : public APMMessage
     {
       public:
@@ -171,14 +172,17 @@ namespace sapm
         {}
     };
 
+    /// Requests the application manager to check the status of the application.
     class APMCheckApp : public APMMessage
     {
       public:
-        APMCheckApp(const std::string &senderName, const std::string &appNameToCheck)
-            : APMMessage(MessageType::APMCheckAppRunning, senderName), appNameToCheck(appNameToCheck)
+        APMCheckApp(const std::string &senderName, std::string applicationName)
+            : APMMessage(MessageType::APMCheckAppRunning, senderName),
+              checkAppName(std::move(applicationName)), isRunning{false}
         {}
-        const std::string appNameToCheck;
-        bool isRunning = false;
+
+        std::string checkAppName;
+        bool isRunning;
     };
 
     struct Action
@@ -203,6 +207,4 @@ namespace sapm
       private:
         Action action;
     };
-} /* namespace sapm */
-
-#endif /* MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_ */
+} // namespace app::manager

@@ -16,7 +16,7 @@
 #include "log/debug.hpp"                                 // for DEBUG_APPLI...
 #include "log/log.hpp"                                   // for LOG_INFO
 #include "messages/AppMessage.hpp"                       // for AppSwitchMe...
-#include "service-appmgr/ApplicationManager.hpp"         // for Application...
+#include "service-appmgr/Controller.hpp"                 // for Controller
 #include "service-cellular/messages/CellularMessage.hpp" // for CellularNot...
 #include "service-db/api/DBServiceAPI.hpp"               // for DBServiceAPI
 #include "service-evtmgr/messages/BatteryMessages.hpp"   // for BatteryLeve...
@@ -186,7 +186,7 @@ namespace app
         if (prevWindow == gui::name::window::no_window) {
             LOG_INFO("Back to previous application");
             cleanPrevWindw();
-            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+            app::manager::Controller::switchBack(this);
         }
         else {
             LOG_INFO("Back to previous window %s", prevWindow.c_str());
@@ -337,7 +337,7 @@ namespace app
 
             if (msg->getTargetApplicationName() == this->GetName()) {
                 setState(State::ACTIVE_FORGROUND);
-                if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
+                if (app::manager::Controller::confirmSwitch(this)) {
                     LOG_INFO("target Window: %s : target description: %s",
                              msg->getTargetWindowName().c_str(),
                              msg->getData() ? msg->getData()->getDescription().c_str() : "");
@@ -413,7 +413,7 @@ namespace app
     sys::Message_t Application::handleAppClose(sys::DataMessage *msgl)
     {
         setState(State::DEACTIVATING);
-        sapm::ApplicationManager::messageConfirmClose(this);
+        app::manager::Controller::confirmClose(this);
         return msgHandled();
     }
 
@@ -443,7 +443,7 @@ namespace app
     {
         if (state == State::ACTIVE_FORGROUND) {
             setState(State::ACTIVE_BACKGROUND);
-            sapm::ApplicationManager::messageConfirmSwitch(this);
+            app::manager::Controller::confirmSwitch(this);
         }
         return msgHandled();
     }
@@ -457,19 +457,16 @@ namespace app
 
     sys::ReturnCodes Application::InitHandler()
     {
-        bool initState = true;
-
         setState(State::INITIALIZING);
-        //	uint32_t start = xTaskGetTickCount();
         settings = DBServiceAPI::SettingsGet(this);
-        //	uint32_t stop = xTaskGetTickCount();
-        //	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
-        initState = (settings.dbID == 1);
 
-        // send response to application manager true if successful, false otherwise.
-        sapm::ApplicationManager::messageRegisterApplication(this, initState, startBackground);
-        sys::ReturnCodes retCode = (initState ? sys::ReturnCodes::Success : sys::ReturnCodes::Failure);
-        return retCode;
+        const bool initialised = settings.dbID == 1;
+        app::manager::Controller::registerApplication(this, initialised, startBackground);
+        if (!initialised) {
+            setState(State::DEACTIVATED);
+            return sys::ReturnCodes::Failure;
+        }
+        return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes Application::DeinitHandler()

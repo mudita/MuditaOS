@@ -125,19 +125,19 @@ enum class MessageType
     AudioMessage,
 
     // application manager
-    APMAction,               ///< Used to send an action request to application manager.
-    APMCheckAppRunning,      ///< check if application is running in application manager
-    APMSwitch,               ///< request to switch to given application, optionally also to specified window
-    APMSwitchToNotification, ///< request to switch to given notification (application and specified window)
-    APMSwitchPrevApp,        ///< Request to switch to previous application.
-    APMConfirmSwitch, ///< Used when application confirms that it is loosing focus and also when application confirms
-                      ///< that is has gained focus
-    APMConfirmClose,  ///< Sent by application to confirm completion of the close procedure
-    APMRegister,      ///< when application finishes initHandler it is sending this messag to inform whether init was
-                      ///< successful or not.
-    APMDeleydClose, ///< this message is sent internally from and to application manager to close specified application.
-    APMChangeLanguage, ///< this message is sent from any application to inform application manager that it should send
-                       ///< gui rebuild command to all applications in background and currently active application.
+    APMAction,          ///< Used to send an action request to application manager.
+    APMCheckAppRunning, ///< check if application is running in application manager
+    APMSwitch,          ///< request to switch to given application, optionally also to specified window
+    APMSwitchPrevApp,   ///< Request to switch to previous application.
+    APMConfirmSwitch,   ///< Used when application confirms that it is loosing focus and also when application confirms
+                        ///< that is has gained focus
+    APMConfirmClose,    ///< Sent by application to confirm completion of the close procedure
+    APMRegister,        ///< when application finishes initHandler it is sending this messag to inform whether init was
+                        ///< successful or not.
+    APMDelayedClose,    ///< this message is sent internally from and to application manager to close specified
+                        ///< application.
+    APMChangeLanguage,  ///< this message is sent from any application to inform application manager that it should send
+                        ///< gui rebuild command to all applications in background and currently active application.
     APMClose, ///< this message will trigger application manager to close itself, all running applications gui and eink
               ///< services.
     APMPreventBlocking,   ///< Prevents application manager from initializing device blocking.
