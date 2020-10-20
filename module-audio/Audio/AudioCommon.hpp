@@ -4,9 +4,9 @@
 #pragma once
 
 #include <map>
+#include <bsp_audio.hpp>
 
 #include "Profiles/Profile.hpp"
-#include "bsp_audio.hpp"
 
 namespace audio
 {

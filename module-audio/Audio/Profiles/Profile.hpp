@@ -7,7 +7,7 @@
 #include <functional>
 #include <string>
 
-#include "bsp/audio/bsp_audio.hpp"
+#include <bsp/audio/bsp_audio.hpp>
 
 namespace audio
 {

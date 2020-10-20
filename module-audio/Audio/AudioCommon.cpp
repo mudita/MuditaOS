@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AudioCommon.hpp"
-#include <cmath>
 #include <sstream>
 #include <Utils.hpp>
 #include "Profiles/Profile.hpp"

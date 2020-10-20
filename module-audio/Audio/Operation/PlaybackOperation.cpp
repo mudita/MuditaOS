@@ -199,4 +199,9 @@ namespace audio
         Stop();
     }
 
+    void PlaybackOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
+    {
+        LOG_ERROR("UNIMPLEMENTED");
+    }
+
 } // namespace audio

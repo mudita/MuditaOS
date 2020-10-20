@@ -182,6 +182,7 @@ enum class MessageType
     BluetoothPairResult,
     BluetoothAudioRegister,
     BluetoothDeviceMetadata,
+    BluetoothRequestStream,
 
     LwIP_request,
     EVM_GPIO,

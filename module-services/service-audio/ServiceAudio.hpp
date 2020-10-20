@@ -2,13 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
-#include "Service/Service.hpp"
 #include <functional>
-#include "Audio/Audio.hpp"
-#include "Audio/AudioMux.hpp"
-#include "MessageType.hpp"
+
 #include "messages/AudioMessage.hpp"
+
+#include <Service/Service.hpp>
+#include <Audio/Audio.hpp>
+#include <Audio/AudioMux.hpp>
+#include <MessageType.hpp>
 
 #include <service-db/api/DBServiceAPI.hpp>
 #include <queries/settings/QuerySettingsGet_v2.hpp>
