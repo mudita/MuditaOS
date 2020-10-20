@@ -1,14 +1,3 @@
-
-/*
- * @file bsp_cellular.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 14.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
-
 #ifndef PUREPHONE_BSP_CELLULAR_HPP
 #define PUREPHONE_BSP_CELLULAR_HPP
 

@@ -1,14 +1,7 @@
-/*
- *  @file IdleOperation.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 25.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_IDLEOPERATION_HPP
-#define PUREPHONE_IDLEOPERATION_HPP
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -26,46 +19,48 @@ namespace audio
 
         ~IdleOperation() = default;
 
-        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) override final
+        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) final
         {
             return audio::RetCode::Success;
         }
 
-        audio::RetCode Stop() override final
+        audio::RetCode Stop() final
         {
             return audio::RetCode::Success;
         }
 
-        audio::RetCode Pause() override final
+        audio::RetCode Pause() final
         {
             return audio::RetCode::Success;
         }
 
-        audio::RetCode Resume() override final
+        audio::RetCode Resume() final
         {
             return audio::RetCode::Success;
         }
 
-        audio::RetCode SendEvent(std::shared_ptr<Event> evt) override final
+        audio::RetCode SendEvent(std::shared_ptr<Event> evt) final
         {
             return audio::RetCode::Success;
         }
 
-        audio::RetCode SwitchProfile(const Profile::Type type) override final
+        audio::RetCode SwitchProfile(const Profile::Type type) final
         {
             return audio::RetCode::Success;
         }
 
-        audio::RetCode SetOutputVolume(float vol) override final;
+        audio::RetCode SetOutputVolume(float vol) final;
 
-        audio::RetCode SetInputGain(float gain) override final;
+        audio::RetCode SetInputGain(float gain) final;
 
-        Position GetPosition() override final
+        Position GetPosition() final
         {
             return 0.0;
         }
+
+        void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) final
+        {}
     };
 
 } // namespace audio
 
-#endif // PUREPHONE_IDLEOPERATION_HPP

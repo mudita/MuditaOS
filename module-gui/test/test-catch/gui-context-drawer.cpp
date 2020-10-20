@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 // This is minimalistic example how our GUI renderer works - this code won't compile right now
 // there shouldn't be much work to do to make it compile again, there is no target like that in need so it's not added
 // this could be potentially used instead running whole PurePhone simulator to test/create UI only code

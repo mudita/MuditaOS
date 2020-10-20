@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "PlaybackOperation.hpp"
 
 #include "Audio/decoder/decoder.hpp"
@@ -22,7 +25,6 @@ namespace audio
         std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
         : Operation(false, playbackType), dec(nullptr)
     {
-
         audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
 
 #if PERF_STATS_ON == 1
@@ -73,7 +75,6 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
     {
-
         if (state == State::Active || state == State::Paused) {
             return RetCode::InvokedInIncorrectState;
         }
@@ -98,9 +99,6 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Stop()
     {
-        if (state == State::Idle) {
-            return RetCode::InvokedInIncorrectState;
-        }
         state = State::Idle;
         return GetDeviceError(audioDevice->Stop());
     }
@@ -122,7 +120,7 @@ namespace audio
         if (state == State::Active || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
-        state = State::Active;
+        state    = State::Active;
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
         return GetDeviceError(ret);
     }
@@ -194,6 +192,16 @@ namespace audio
         }
 
         return audio::RetCode::Success;
+    }
+
+    PlaybackOperation::~PlaybackOperation()
+    {
+        Stop();
+    }
+
+    void PlaybackOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
+    {
+        LOG_ERROR("UNIMPLEMENTED");
     }
 
 } // namespace audio

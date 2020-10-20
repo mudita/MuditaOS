@@ -1,16 +1,18 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
-#include "Bluetooth/Device.hpp"
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
+#include <Bluetooth/Device.hpp>
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+#include <Service/Message.hpp>
+#include <MessageType.hpp>
 
 #include <utility>
-#include "MessageType.hpp"
-#include "Bluetooth/Device.hpp"
 
 extern "C"
 {
-#include "module-bluetooth/lib/btstack/src/btstack_util.h"
+#include <module-bluetooth/lib/btstack/src/btstack_util.h>
 };
 
 class BluetoothMessage : public sys::DataMessage
@@ -87,4 +89,27 @@ class BluetoothDeviceMetadataMessage : public sys::DataMessage
     BluetoothDeviceMetadataMessage(DeviceMetadata_t metadata)
         : DataMessage(MessageType::BluetoothDeviceMetadata), metadata(std::move(metadata)){};
     ~BluetoothDeviceMetadataMessage() override = default;
+};
+
+class BluetoothRequestStreamMessage : public sys::DataMessage
+{
+  public:
+    BluetoothRequestStreamMessage() : DataMessage(MessageType::BluetoothRequestStream){};
+    ~BluetoothRequestStreamMessage() override = default;
+};
+
+class BluetoothRequestStreamResultMessage : public sys::DataMessage
+{
+  public:
+    BluetoothRequestStreamResultMessage(std::shared_ptr<BluetoothStreamData> data)
+        : DataMessage(MessageType::BluetoothRequestStream), data(data){};
+    ~BluetoothRequestStreamResultMessage() override = default;
+
+    std::shared_ptr<BluetoothStreamData> getData()
+    {
+        return data;
+    }
+
+  private:
+    std::shared_ptr<BluetoothStreamData> data;
 };

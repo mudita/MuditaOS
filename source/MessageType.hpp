@@ -1,11 +1,6 @@
-/*
- * @file MessageType.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 3 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #ifndef SOURCE_MESSAGETYPE_HPP_
 #define SOURCE_MESSAGETYPE_HPP_
 
@@ -187,6 +182,7 @@ enum class MessageType
     BluetoothPairResult,
     BluetoothAudioRegister,
     BluetoothDeviceMetadata,
+    BluetoothRequestStream,
 
     LwIP_request,
     EVM_GPIO,

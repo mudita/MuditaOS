@@ -1,11 +1,5 @@
-/*
- *  @file RT1051CellularAudio.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 03.08.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051CELLULARAUDIO_HPP
 #define PUREPHONE_RT1051CELLULARAUDIO_HPP
@@ -55,11 +49,18 @@ namespace bsp
       private:
         static const uint32_t CODEC_CHANNEL_PCM_BUFFER_SIZE = 1024;
 
-        /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
-        enum class irq_state_t
+        enum class State
         {
-            IRQStateHalfTransfer = 1 << 0,
-            IRQStateFullTransfer = 1 << 1
+            Running,
+            Stopped
+        };
+
+        /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
+        enum class TransferState
+        {
+            HalfTransfer = 1 << 0,
+            FullTransfer = 1 << 1,
+            Close        = 1 << 2,
         };
 
         struct SAIFormat
@@ -71,6 +72,7 @@ namespace bsp
             size_t dataSize;          /*!< Transfer size. */
         };
 
+        State state = State::Stopped;
         SAIFormat saiInFormat;
         SAIFormat saiOutFormat;
         uint32_t mclkSourceClockHz = 0;

@@ -1,13 +1,4 @@
 
-/*
- * @file board.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 20.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "board.h"
 extern "C"
 {
@@ -21,6 +12,7 @@ extern "C"
 }
 #include "chip.hpp"
 #include "irq/irq_gpio.hpp"
+#include "audio/RT1051Audiocodec.hpp"
 
 #include <cstdint>
 
@@ -186,7 +178,8 @@ namespace bsp
         SCB_EnableICache();
     }
 
-    void BoardInit(){
+    void BoardInit()
+    {
         PINMUX_InitBootPins();
 
         BOARD_InitBootClocks();
@@ -198,6 +191,9 @@ namespace bsp
 
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);
+
+        // init audio
+        RT1051Audiocodec::Init();
 
         PrintSystemClocks();
         clearAndPrintBootReason();

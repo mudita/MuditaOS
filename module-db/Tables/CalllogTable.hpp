@@ -1,11 +1,6 @@
-/*
- * @file CalllogTable.hpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 23.09.2019
- * @brief Call Log DB Table
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 #include "Table.hpp"

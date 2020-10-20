@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 /// This file goal is to provide one place to store all at commands, with their respectable timeouts if these have

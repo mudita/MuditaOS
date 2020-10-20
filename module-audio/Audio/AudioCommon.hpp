@@ -1,9 +1,12 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 #include <map>
+#include <bsp_audio.hpp>
 
 #include "Profiles/Profile.hpp"
-#include "bsp_audio.hpp"
 
 namespace audio
 {

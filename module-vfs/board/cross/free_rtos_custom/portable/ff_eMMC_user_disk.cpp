@@ -1,11 +1,5 @@
-/*
- *  @file ff_eMMC_user_disk.c
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 01.03.2018
- *  @brief
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /* Standard includes. */
 #include "module-vfs/board/cross/free_rtos_custom/include/ff_eMMC_user_disk.hpp"

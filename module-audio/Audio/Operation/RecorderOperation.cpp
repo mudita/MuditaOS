@@ -1,11 +1,5 @@
-/*
- *  @file RecorderOperation.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 23.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RecorderOperation.hpp"
 #include "Audio/encoder/Encoder.hpp"
@@ -211,5 +205,10 @@ namespace audio
     Position RecorderOperation::GetPosition()
     {
         return enc->getCurrentPosition();
+    }
+
+    void RecorderOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
+    {
+        LOG_ERROR("UNIMPLEMENTED");
     }
 } // namespace audio

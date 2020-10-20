@@ -1,11 +1,5 @@
-/*
- *  @file i18.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 29 mar 2019
- *  @brief I18 implementation
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef UNTITLED_I18_HPP
 #define UNTITLED_I18_HPP

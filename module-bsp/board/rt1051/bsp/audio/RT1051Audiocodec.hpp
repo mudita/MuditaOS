@@ -1,14 +1,7 @@
-/*
- *  @file rt1051_audiocodec.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 29.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_RT1051AUDIOCODEC_HPP
-#define PUREPHONE_RT1051AUDIOCODEC_HPP
+#pragma once
 
 #include "bsp/audio/bsp_audio.hpp"
 #include "fsl_sai_edma.h"
@@ -36,6 +29,9 @@ namespace bsp
     {
 
       public:
+        static void Init();
+        static void Deinit();
+
         friend void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void inAudioCodecWorkerTask(void *pvp);
@@ -56,12 +52,20 @@ namespace bsp
 
       private:
         static const uint32_t CODEC_CHANNEL_PCM_BUFFER_SIZE = 1024;
+        const static TickType_t codecSettleTime             = 20 * portTICK_PERIOD_MS;
+
+        enum class State
+        {
+            Running,
+            Stopped
+        };
 
         /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
-        enum class irq_state_t
+        enum class TransferState
         {
-            IRQStateHalfTransfer = 1 << 0,
-            IRQStateFullTransfer = 1 << 1
+            HalfTransfer = 1 << 0,
+            FullTransfer = 1 << 1,
+            Close        = 1 << 2,
         };
 
         struct SAIFormat
@@ -73,21 +77,23 @@ namespace bsp
             size_t dataSize;          /*!< Transfer size. */
         };
 
+        static sai_config_t config;
+        static std::uint32_t mclkSourceClockHz;
+
+        State state = State::Stopped;
         SAIFormat saiInFormat;
         SAIFormat saiOutFormat;
-        uint32_t mclkSourceClockHz = 0;
-        sai_config_t config;
         TaskHandle_t inWorkerThread  = nullptr;
         TaskHandle_t outWorkerThread = nullptr;
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
 
         // M.P: It is important to destroy these drivers in specific order
-        std::shared_ptr<drivers::DriverPLL> pllAudio;
-        std::shared_ptr<drivers::DriverDMAMux> dmamux;
-        std::shared_ptr<drivers::DriverDMA> dma;
-        std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
-        std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
+        static std::shared_ptr<drivers::DriverPLL> pllAudio;
+        static std::shared_ptr<drivers::DriverDMAMux> dmamux;
+        static std::shared_ptr<drivers::DriverDMA> dma;
+        static std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
+        static std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);
@@ -98,13 +104,9 @@ namespace bsp
         // CODEC_CHANNEL_PCM_BUFFER_SIZE * 2 for double buffering
         static ALIGN_(4) int16_t outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2];
 
-        void Init();
-        void Deinit();
         void OutStart();
         void InStart();
         void OutStop();
         void InStop();
     };
 } // namespace bsp
-
-#endif // PUREPHONE_RT1051AUDIOCODEC_HPP

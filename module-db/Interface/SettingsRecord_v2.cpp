@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "SettingsRecord_v2.hpp"
 #include "module-db/queries/settings/QuerySettingsGet_v2.hpp"
 #include "module-db/queries/settings/QuerySettingsUpdate_v2.hpp"

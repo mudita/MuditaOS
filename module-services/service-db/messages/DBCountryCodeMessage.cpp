@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "DBCountryCodeMessage.hpp"
 
 DBCountryCodeMessage::DBCountryCodeMessage(MessageType messageType, const uint32_t _mcc, const uint32_t _country_code)

@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "RouterOperation.hpp"
 
 #include <Audio/AudioCommon.hpp>
@@ -263,6 +266,11 @@ namespace audio
     Position RouterOperation::GetPosition()
     {
         return 0.0;
+    }
+
+    void RouterOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
+    {
+        LOG_ERROR("UNIMPLEMENTED");
     }
 
 } // namespace audio

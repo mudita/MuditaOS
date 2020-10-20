@@ -1,11 +1,5 @@
-/*
- *  @file ff_eMMC_user_disk.h
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 01.03.2018
- *  @brief
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef FREERTOS_PLUS_FAT_PORTABLE_FF_EMMC_USER_DISK_H_
 #define FREERTOS_PLUS_FAT_PORTABLE_FF_EMMC_USER_DISK_H_

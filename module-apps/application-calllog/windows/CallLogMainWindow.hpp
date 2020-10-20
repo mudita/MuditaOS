@@ -1,11 +1,6 @@
-/*
- * @file CallLogMainWindow.hpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 19.09.2019
- * @brief Application Call Log Main Window
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 #include <string>

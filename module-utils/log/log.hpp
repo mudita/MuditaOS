@@ -1,8 +1,7 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
- *	@file log.h
- *	@author mateuszpiesta (mateusz.piesta@mudita.com)
- *	@date 5 cze 2018
- *  @brief Generic logging utilities.
  *  This module is wrapper over printf with additional thread safety provided and common logs levels.
  *
  *  USAGE:

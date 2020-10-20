@@ -7,8 +7,7 @@
  *  @details
  */
 
-#ifndef AUDIOPLAYER_CODECS_XING_HEADER_H_
-#define AUDIOPLAYER_CODECS_XING_HEADER_H_
+#pragma once
 
 #include <stdint.h>
 #include <stddef.h>
@@ -32,4 +31,3 @@ typedef struct
  */
 uint8_t parseXingHeader(uint8_t *data, size_t datasize, xing_info_t *info);
 
-#endif /* AUDIOPLAYER_CODECS_XING_HEADER_H_ */

@@ -1,4 +1,8 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "ServiceBluetooth.hpp"
+#include "Constants.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
@@ -6,9 +10,7 @@
 #include <log/log.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 
-const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
-
-ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName)
+ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
     LOG_INFO("[ServiceBluetooth] Initializing");
 }

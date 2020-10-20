@@ -1,11 +1,5 @@
-/*
- *  @file decoderMP3.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 08.04.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_SIMD

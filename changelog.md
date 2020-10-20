@@ -7,11 +7,17 @@
 * `[meditation]` Added gong sound on meditation intervals
 * `[meditation]` Added basic meditation functionalities and settings
 * `[cellular]` Handling incoming calls and sms in sleep mode
+* `[audio]` Added Bluetooth related APIs to AudioServiceAPI
 
 ### Fixed
 
+* `[meditation]` Fix time options display on rt1051
 * `[audio]` Fix headphones autodetection.
 * `[audio]` Cumulative set of minor fixes and improvements
+
+### Other
+
+* `[audio]` Improve synchronization when switching operations.
 
 ## [0.42.2 2020-10-16]
 

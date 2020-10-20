@@ -1,14 +1,8 @@
-/*
- *  @file decoderFLAC.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 06.04.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <Utils.hpp>
 #include "decoderFLAC.hpp"
-#include "Utils.hpp"
 
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO

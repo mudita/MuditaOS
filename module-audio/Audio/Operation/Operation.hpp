@@ -1,13 +1,17 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 #include <memory>
 #include <optional>
 #include <functional>
 
-#include "Audio/AudioCommon.hpp"
+#include <Audio/AudioCommon.hpp>
+#include <Audio/encoder/Encoder.hpp>
+#include <Audio/Profiles/Profile.hpp>
 
-#include "Audio/encoder/Encoder.hpp"
-#include "Audio/Profiles/Profile.hpp"
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 namespace audio
 {
@@ -58,20 +62,15 @@ namespace audio
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
         virtual audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) = 0;
-
         virtual audio::RetCode Stop() = 0;
-
         virtual audio::RetCode Pause() = 0;
-
         virtual audio::RetCode Resume() = 0;
-
         virtual audio::RetCode SendEvent(std::shared_ptr<Event> evt) = 0;
-
         virtual audio::RetCode SetOutputVolume(float vol) = 0;
-
         virtual audio::RetCode SetInputGain(float gain) = 0;
 
         virtual Position GetPosition() = 0;
+        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) = 0;
 
         Volume GetOutputVolume() const
         {

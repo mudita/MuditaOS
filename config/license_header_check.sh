@@ -32,11 +32,19 @@ declare -A FileTypes=(
         )
 declare -a paths_to_ignore
 
+function addEmptyLine() {
+    LINE=$1
+    CHECK_EMPTY=$(sed -n "${LINE}p" ${FILE})
+    if [[ -n ${CHECK_EMPTY} ]]; then
+        sed -i ${LINE}'s@^\(.*\)$@\n\1@' ${FILE}
+    fi
+}
+
 
 function cppChecker(){
     FILE=$1
-    LICENSE_LINE1="//${LICENSE1}"
-    LICENSE_LINE2="//${LICENSE2}"
+    LICENSE_LINE1="// ${LICENSE1}"
+    LICENSE_LINE2="// ${LICENSE2}"
 
     CHECK_LICENSE=$(head -n5 ${FILE} | grep "${LICENSE1}")
     if [[ -z ${CHECK_LICENSE} ]]; then
@@ -46,6 +54,7 @@ function cppChecker(){
         else 
             sed -i "1i${LICENSE_LINE1}" ${FILE}
             sed -i "2i${LICENSE_LINE2}" ${FILE}
+            addEmptyLine 3
             echo -e "${FIXED}"
         fi
     else 
@@ -64,9 +73,11 @@ function scriptChecker(){
             if [[ -n "${FIST_LINE}" ]]; then
                 sed -i "2i${LICENSE_LINE1}" ${FILE}
                 sed -i "3i${LICENSE_LINE2}" ${FILE}
+                addEmptyLine 4
             else 
                 sed -i "1i${LICENSE_LINE1}" ${FILE}
                 sed -i "2i${LICENSE_LINE2}" ${FILE}
+                addEmptyLine 3
             fi
             echo -e "${FIXED}"
         fi
@@ -77,8 +88,8 @@ function scriptChecker(){
 }
 function pythonChecker(){
     FILE=$1
-    LICENSE_LINE1="#${LICENSE1}"
-    LICENSE_LINE2="#${LICENSE2}"
+    LICENSE_LINE1="# ${LICENSE1}"
+    LICENSE_LINE2="# ${LICENSE2}"
     SHA_BANG_EXEC="python"
     scriptChecker
     
@@ -86,8 +97,8 @@ function pythonChecker(){
 
 function bashChecker(){
     FILE=$1
-    LICENSE_LINE1="#${LICENSE1}"
-    LICENSE_LINE2="#${LICENSE2}"
+    LICENSE_LINE1="# ${LICENSE1}"
+    LICENSE_LINE2="# ${LICENSE2}"
     SHA_BANG_EXEC="bash"
     scriptChecker
 }

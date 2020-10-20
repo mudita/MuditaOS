@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 declare -A OPTS=( ['continous']=' -singlerun ' ['verify']='  ' ['speed']=' -speed 25000 ')
 

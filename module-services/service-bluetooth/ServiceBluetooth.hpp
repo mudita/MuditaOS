@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 #include "Bluetooth/BluetoothWorker.hpp"
@@ -17,6 +20,5 @@ class ServiceBluetooth : public sys::Service
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
   private:
-    static const char *serviceName;
     std::unique_ptr<BluetoothWorker> worker;
 };

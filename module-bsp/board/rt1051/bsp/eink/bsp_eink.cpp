@@ -1,11 +1,5 @@
-/*
- *  @file bsp_eink.c
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 7 sie 2018
- *  @brief
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp_eink.h"
 #include "board.h"

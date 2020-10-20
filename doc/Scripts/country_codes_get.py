@@ -1,4 +1,7 @@
 #!/usr/bin/python2.7
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 # Get the Mobile Country Codes (MCC) and Mobile Network Codes (MNC) table
 # from mcc-mnc.com and output it in JSON format.
 
