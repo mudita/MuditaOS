@@ -18,7 +18,7 @@ namespace gui
             static constexpr int defaultIncrementValue = 15;
 
             bool resetValueOnNumeric = true;
-            int timeInMinutes        = minimalValue;
+            int timeInMinutes        = defaultIncrementValue;
 
           public:
             std::chrono::minutes getTime() const noexcept

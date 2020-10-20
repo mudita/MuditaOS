@@ -79,12 +79,14 @@ namespace gui
         return true;
     }
 
-    void MeditationTimer::reset(std::chrono::seconds _duration) noexcept
+    void MeditationTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _intervalPeriod) noexcept
     {
         assert(_duration != std::chrono::seconds::zero()); // Pre-condition check.
 
         duration = _duration;
         elapsed  = std::chrono::seconds::zero();
+        intervalPeriod = _intervalPeriod;
+        hasInterval    = _intervalPeriod != std::chrono::seconds::zero();
         onReset();
     }
 
@@ -113,11 +115,13 @@ namespace gui
             if (isFinished() && timeoutCallback != nullptr) {
                 timeoutCallback();
             }
-
             return true;
         }
 
         ++elapsed;
+        if (intervalReached() || isFinished()) {
+            onInterval();
+        }
         update();
         return true;
     }
@@ -131,6 +135,12 @@ namespace gui
     {
         return !isRunning;
     }
+
+    auto MeditationTimer::intervalReached() const noexcept -> bool
+    {
+        return hasInterval && (elapsed.count() % intervalPeriod.count()) == 0;
+    }
+
     auto MeditationTimer::calculatePercentageValue() const noexcept -> unsigned int
     {
         const auto percentage = static_cast<float>(elapsed.count()) / duration.count();
@@ -142,9 +152,19 @@ namespace gui
         isRunning = false;
     }
 
-    void MeditationTimer::setTimerVisible(bool isVisible) noexcept
+    void MeditationTimer::setCounterVisible(bool isVisible) noexcept
     {
         timer->setVisible(isVisible);
+    }
+
+    namespace
+    {
+        constexpr auto intervalSoundPath = "assets/audio/ringtone.wav";
+    }
+
+    void MeditationTimer::onInterval() const
+    {
+        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Multimedia, intervalSoundPath);
     }
 
     void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)

@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[meditation]` Added gong sound on meditation intervals
 * `[meditation]` Added basic meditation functionalities and settings
 * `[cellular]` Handling incoming calls and sms in sleep mode
 
