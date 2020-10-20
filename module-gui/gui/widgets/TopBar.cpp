@@ -1,15 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * @file TopBar.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 22 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include <ctime>
 #include <iomanip>
 #include "Label.hpp"

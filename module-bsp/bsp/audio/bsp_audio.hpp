@@ -1,10 +1,3 @@
-/*
- *  @file bsp_audio.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 22.07.19
- *  @copyright Copyright (C) 2019 mudita.com
- */
-
 #pragma once
 
 #include <optional>

@@ -1,15 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * @file ClockMainWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 6 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 // module-gui
 #include "application-clock/windows/ClockMainWindow.hpp"
 #include "gui/widgets/Window.hpp"

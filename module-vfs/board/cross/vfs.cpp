@@ -1,15 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- *  @file vfs.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 09.04.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
 #include "../../vfs.hpp"
 #include "ff_eMMC_user_disk.hpp"
 

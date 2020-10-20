@@ -1,14 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * @file CalllogItem.hpp
- * @author Aleksander Rudnik (aleksander.rudnik@mudita.com)
- * @date 23.09.2019
- * @brief Call Log Item
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
 #include "Label.hpp"
