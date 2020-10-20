@@ -78,7 +78,10 @@ namespace gui
     {
         // get old value of battery level, calcualte new level and comapre both
         // if they are different make a change and return true, otherwise return false;
-        return topBar->setBatteryLevel(percentage);
+        if ( topBar != nullptr ) {
+            return topBar->setBatteryLevel(percentage);
+        }
+        return false;
     }
     // updates battery level in the window
     bool AppWindow::updateSignalStrength()
