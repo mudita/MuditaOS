@@ -50,9 +50,9 @@ void PreparationTimeItem::select(bool isSelected)
 std::string PreparationTimeItem::convertToPrintable(std::chrono::seconds _duration)
 {
     if (_duration.count() > 60) {
-        return std::to_string(_duration.count() / 60) + " m";
+        return std::to_string(static_cast<int>((_duration.count()) / 60)) + " m";
     }
-    return std::to_string(_duration.count()) + " s";
+    return std::to_string(static_cast<int>(_duration.count())) + " s";
 }
 
 OptionItemMeditationCounter::OptionItemMeditationCounter(bool isCounterOn)

@@ -11,6 +11,7 @@
 
 ### Fixed
 
+* `[meditation]` Fix time options display on rt1051
 * `[audio]` Fix headphones autodetection.
 * `[audio]` Cumulative set of minor fixes and improvements
 
