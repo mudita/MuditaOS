@@ -162,9 +162,12 @@ bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
     auto isEnabled = utils::getValue<audio::Vibrate>(getSetting(Setting::EnableVibration, Profile::Type::Idle, type));
     return isEnabled;
 }
-bool ServiceAudio::IsPlaybackEnabled(const audio::PlaybackType &type)
+bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const Operation::Type &opType)
 {
-    auto isEnabled = utils::getValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, type));
+    if (opType == Operation::Type::Router || opType == Operation::Type::Recorder) {
+        return true;
+    }
+    auto isEnabled = utils::getValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, plType));
     return isEnabled;
 }
 
@@ -291,7 +294,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
             }
             retToken = audioMux.ResetInput(input);
 
-            if (IsPlaybackEnabled(playbackType)) {
+            if (IsOperationEnabled(playbackType, opType)) {
                 retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
             }
         }
