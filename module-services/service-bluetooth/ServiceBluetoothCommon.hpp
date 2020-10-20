@@ -10,5 +10,5 @@ class BluetoothStreamData
 {
   public:
     QueueHandle_t in    = nullptr;
-    1 QueueHandle_t out = nullptr;
+    QueueHandle_t out   = nullptr;
 };
