@@ -2,7 +2,7 @@
 
 MuditaOS is an open source project and we're more than happy to receive contributions from our community. There are many ways in which you can contribute to the project from reporting bugs, suggesting features to writing code and documentation.
 
-Before contributing please read and accept our [Code of Conduct](./CODE_OF_CODUCT.md).
+Before contributing please read and accept our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Reporting bugs
 

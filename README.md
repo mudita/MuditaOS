@@ -56,7 +56,7 @@ You can quickstart the project by going through one of the following guides:
 
 ## Contributing
 
-Pull requests are welcome. Please follow the guidelines in the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article. Before contributing or starting a discussion, please make sure that you read our [Code of Conduct](./CODE_OF_CODUCT.md).
+Pull requests are welcome. Please follow the guidelines in the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article. Before contributing or starting a discussion, please make sure that you read our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ### Discussions
 
