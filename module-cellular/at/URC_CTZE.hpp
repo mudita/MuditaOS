@@ -8,21 +8,23 @@
 
 namespace at::urc
 {
-    struct CTZE : public Any
+    class CTZE : public Any
     {
         const std::string urc_name = "+CTZE";
-
-        CTZE(const std::string &val);
-        ~CTZE() override = default;
-        auto what() -> std::string final;
-
-        enum class tokensDescription
+        enum Tokens
         {
-            GMTdiference,
-            daylightSavingsAdjustment,
-            date,
-            time
+            GMTDifference,
+            DaylightSavingsAdjustment,
+            Date,
+            Time
         };
-        struct tm getTimeInfo(void);
+
+      public:
+        explicit CTZE(const std::string &val);
+        ~CTZE() override = default;
+        [[nodiscard]] auto what() const noexcept -> std::string final;
+        [[nodiscard]] auto isValid() const noexcept -> bool;
+
+        [[nodiscard]] auto getTimeInfo(void) const noexcept -> tm;
     };
 }; // namespace at::urc

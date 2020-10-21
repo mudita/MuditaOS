@@ -120,7 +120,8 @@ namespace at
         ENABLE_TIME_ZONE_UPDATE,
         SET_TIME_ZONE_REPORTING,
         DISABLE_TIME_ZONE_UPDATE,
-        DISABLE_TIME_ZONE_REPORTING
+        DISABLE_TIME_ZONE_REPORTING,
+        ENABLE_NETWORK_REGISTRATION_URC
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -187,6 +188,7 @@ namespace at
             {AT::SET_TIME_ZONE_REPORTING, {"AT+CTZR=2"}},
             {AT::DISABLE_TIME_ZONE_UPDATE, {"AT+CTZU=0"}},
             {AT::DISABLE_TIME_ZONE_REPORTING, {"AT+CTZR=0"}},
+            {AT::ENABLE_NETWORK_REGISTRATION_URC, {"AT+CREG=2"}},
         };
         if (fact.count(at)) {
             return fact.at(at);

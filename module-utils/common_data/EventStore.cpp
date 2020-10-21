@@ -41,11 +41,24 @@ namespace Store
         this->signalStrength = signalStrength;
     }
 
-    SignalStrength GSM::getSignalStrength()
+    SignalStrength GSM::getSignalStrength() const
     {
         cpp_freertos::LockGuard lock(mutex);
 
         return signalStrength;
+    }
+
+    void GSM::setNetwork(const Network &network)
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        this->network = network;
+    }
+
+    Network GSM::getNetwork() const
+    {
+        cpp_freertos::LockGuard lock(mutex);
+
+        return network;
     }
 
     bool GSM::simCardInserted()
