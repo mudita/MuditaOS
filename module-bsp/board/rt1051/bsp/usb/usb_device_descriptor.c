@@ -15,29 +15,32 @@
 
 #include "usb_device_descriptor.h"
 
-usb_device_endpoint_struct_t g_UsbMtpEndpoints[USB_MTP_ENDPOINT_COUNT] =
-{
+usb_device_endpoint_struct_t g_UsbMtpEndpoints[USB_MTP_ENDPOINT_COUNT] = {
     {
-        USB_MTP_BULK_IN_ENDPOINT | (USB_IN << 7U), USB_ENDPOINT_BULK, HS_MTP_BULK_IN_PACKET_SIZE, 0U,
+        USB_MTP_BULK_IN_ENDPOINT | (USB_IN << 7U),
+        USB_ENDPOINT_BULK,
+        HS_MTP_BULK_IN_PACKET_SIZE,
+        0U,
     },
     {
-        USB_MTP_BULK_OUT_ENDPOINT | (USB_OUT << 7U), USB_ENDPOINT_BULK, HS_MTP_BULK_OUT_PACKET_SIZE, 0U,
+        USB_MTP_BULK_OUT_ENDPOINT | (USB_OUT << 7U),
+        USB_ENDPOINT_BULK,
+        HS_MTP_BULK_OUT_PACKET_SIZE,
+        0U,
     },
     {
-        USB_MTP_INTR_IN_ENDPOINT | (USB_IN << 7U), USB_ENDPOINT_INTERRUPT, HS_MTP_INTR_IN_PACKET_SIZE, 0U,
-    }
-};
+        USB_MTP_INTR_IN_ENDPOINT | (USB_IN << 7U),
+        USB_ENDPOINT_INTERRUPT,
+        HS_MTP_INTR_IN_PACKET_SIZE,
+        0U,
+    }};
 
-usb_device_interface_struct_t g_UsbDeviceMtpInterface[] =
-{
-    {
-        0,
-        {
-            USB_MTP_ENDPOINT_COUNT, g_UsbMtpEndpoints,
-        },
-        NULL
-    }
-};
+usb_device_interface_struct_t g_UsbDeviceMtpInterface[] = {{0,
+                                                            {
+                                                                USB_MTP_ENDPOINT_COUNT,
+                                                                g_UsbMtpEndpoints,
+                                                            },
+                                                            NULL}};
 
 usb_device_interfaces_struct_t g_UsbDeviceMtpInterfaces[USB_MTP_INTERFACE_COUNT] = {{
     USB_MTP_DEVICE_CLASS,
@@ -107,10 +110,18 @@ usb_device_interface_struct_t g_cdcVcomDicInterface[] = {{0,
 
 /* Define interfaces for virtual com */
 usb_device_interfaces_struct_t g_cdcVcomInterfaces[USB_CDC_VCOM_INTERFACE_COUNT] = {
-    {USB_CDC_VCOM_CIC_CLASS, USB_CDC_VCOM_CIC_SUBCLASS, USB_CDC_VCOM_CIC_PROTOCOL, USB_CDC_VCOM_CIC_INTERFACE_INDEX,
-     g_cdcVcomCicInterface, sizeof(g_cdcVcomCicInterface) / sizeof(usb_device_interface_struct_t)},
-    {USB_CDC_VCOM_DIC_CLASS, USB_CDC_VCOM_DIC_SUBCLASS, USB_CDC_VCOM_DIC_PROTOCOL, USB_CDC_VCOM_DIC_INTERFACE_INDEX,
-     g_cdcVcomDicInterface, sizeof(g_cdcVcomDicInterface) / sizeof(usb_device_interface_struct_t)},
+    {USB_CDC_VCOM_CIC_CLASS,
+     USB_CDC_VCOM_CIC_SUBCLASS,
+     USB_CDC_VCOM_CIC_PROTOCOL,
+     USB_CDC_VCOM_CIC_INTERFACE_INDEX,
+     g_cdcVcomCicInterface,
+     sizeof(g_cdcVcomCicInterface) / sizeof(usb_device_interface_struct_t)},
+    {USB_CDC_VCOM_DIC_CLASS,
+     USB_CDC_VCOM_DIC_SUBCLASS,
+     USB_CDC_VCOM_DIC_PROTOCOL,
+     USB_CDC_VCOM_DIC_INTERFACE_INDEX,
+     g_cdcVcomDicInterface,
+     sizeof(g_cdcVcomDicInterface) / sizeof(usb_device_interface_struct_t)},
 };
 
 /* Define configurations for virtual com */
@@ -172,20 +183,18 @@ uint8_t g_UsbDeviceConfigurationDescriptor[] = {
     USB_DESCRIPTOR_LENGTH_CONFIGURE,
     USB_DESCRIPTOR_TYPE_CONFIGURE,
     /* Total length of data returned for this configuration. */
-    USB_SHORT_GET_LOW(
-        USB_DESCRIPTOR_LENGTH_CONFIGURE +
-        USB_IAD_DESC_SIZE +
-        USB_DESCRIPTOR_LENGTH_INTERFACE + USB_DESCRIPTOR_LENGTH_CDC_HEADER_FUNC + USB_DESCRIPTOR_LENGTH_CDC_CALL_MANAG +
-        USB_DESCRIPTOR_LENGTH_CDC_ABSTRACT + USB_DESCRIPTOR_LENGTH_CDC_UNION_FUNC + USB_DESCRIPTOR_LENGTH_ENDPOINT +
-        USB_DESCRIPTOR_LENGTH_INTERFACE + USB_DESCRIPTOR_LENGTH_ENDPOINT + USB_DESCRIPTOR_LENGTH_ENDPOINT +
-        USB_DESCRIPTOR_LENGTH_INTERFACE + 3*USB_DESCRIPTOR_LENGTH_ENDPOINT), /* MTP */
-    USB_SHORT_GET_HIGH(
-        USB_DESCRIPTOR_LENGTH_CONFIGURE +
-        USB_IAD_DESC_SIZE +
-        USB_DESCRIPTOR_LENGTH_INTERFACE + USB_DESCRIPTOR_LENGTH_CDC_HEADER_FUNC + USB_DESCRIPTOR_LENGTH_CDC_CALL_MANAG +
-        USB_DESCRIPTOR_LENGTH_CDC_ABSTRACT + USB_DESCRIPTOR_LENGTH_CDC_UNION_FUNC + USB_DESCRIPTOR_LENGTH_ENDPOINT +
-        USB_DESCRIPTOR_LENGTH_INTERFACE + USB_DESCRIPTOR_LENGTH_ENDPOINT + USB_DESCRIPTOR_LENGTH_ENDPOINT +
-        USB_DESCRIPTOR_LENGTH_INTERFACE + 3*USB_DESCRIPTOR_LENGTH_ENDPOINT), /* MTP */
+    USB_SHORT_GET_LOW(USB_DESCRIPTOR_LENGTH_CONFIGURE + USB_IAD_DESC_SIZE + USB_DESCRIPTOR_LENGTH_INTERFACE +
+                      USB_DESCRIPTOR_LENGTH_CDC_HEADER_FUNC + USB_DESCRIPTOR_LENGTH_CDC_CALL_MANAG +
+                      USB_DESCRIPTOR_LENGTH_CDC_ABSTRACT + USB_DESCRIPTOR_LENGTH_CDC_UNION_FUNC +
+                      USB_DESCRIPTOR_LENGTH_ENDPOINT + USB_DESCRIPTOR_LENGTH_INTERFACE +
+                      USB_DESCRIPTOR_LENGTH_ENDPOINT + USB_DESCRIPTOR_LENGTH_ENDPOINT +
+                      USB_DESCRIPTOR_LENGTH_INTERFACE + 3 * USB_DESCRIPTOR_LENGTH_ENDPOINT), /* MTP */
+    USB_SHORT_GET_HIGH(USB_DESCRIPTOR_LENGTH_CONFIGURE + USB_IAD_DESC_SIZE + USB_DESCRIPTOR_LENGTH_INTERFACE +
+                       USB_DESCRIPTOR_LENGTH_CDC_HEADER_FUNC + USB_DESCRIPTOR_LENGTH_CDC_CALL_MANAG +
+                       USB_DESCRIPTOR_LENGTH_CDC_ABSTRACT + USB_DESCRIPTOR_LENGTH_CDC_UNION_FUNC +
+                       USB_DESCRIPTOR_LENGTH_ENDPOINT + USB_DESCRIPTOR_LENGTH_INTERFACE +
+                       USB_DESCRIPTOR_LENGTH_ENDPOINT + USB_DESCRIPTOR_LENGTH_ENDPOINT +
+                       USB_DESCRIPTOR_LENGTH_INTERFACE + 3 * USB_DESCRIPTOR_LENGTH_ENDPOINT), /* MTP */
     USB_INTERFACE_COUNT,
     /* Value to use as an argument to the SetConfiguration() request to select this configuration */
     USB_COMPOSITE_CONFIGURE_INDEX,
@@ -199,7 +208,6 @@ uint8_t g_UsbDeviceConfigurationDescriptor[] = {
     /* Maximum power consumption of the USB * device from the bus in this specific * configuration when the device is
        fully * operational. Expressed in 2 mA units *  (i.e., 50 = 100 mA).  */
     USB_DEVICE_MAX_POWER,
-
 
     /* Interface Association Descriptor (IAD) */
     /* Size of this descriptor in bytes */
@@ -277,22 +285,22 @@ uint8_t g_UsbDeviceConfigurationDescriptor[] = {
     USB_CDC_VCOM_DIC_PROTOCOL,
     USB_STRING_CDC_ACM_DIC,
     /* Endpoint Descriptors */
-        USB_DESCRIPTOR_LENGTH_ENDPOINT,
-        USB_DESCRIPTOR_TYPE_ENDPOINT,
-        USB_CDC_VCOM_DIC_BULK_IN_ENDPOINT | (USB_IN << 7U),
-        USB_ENDPOINT_BULK,
-        USB_SHORT_GET_LOW(FS_CDC_VCOM_BULK_IN_PACKET_SIZE),
-        USB_SHORT_GET_HIGH(FS_CDC_VCOM_BULK_IN_PACKET_SIZE),
-        0x00, /* The polling interval value is every 0 Frames */
+    USB_DESCRIPTOR_LENGTH_ENDPOINT,
+    USB_DESCRIPTOR_TYPE_ENDPOINT,
+    USB_CDC_VCOM_DIC_BULK_IN_ENDPOINT | (USB_IN << 7U),
+    USB_ENDPOINT_BULK,
+    USB_SHORT_GET_LOW(FS_CDC_VCOM_BULK_IN_PACKET_SIZE),
+    USB_SHORT_GET_HIGH(FS_CDC_VCOM_BULK_IN_PACKET_SIZE),
+    0x00, /* The polling interval value is every 0 Frames */
 
-        /*Bulk OUT Endpoint descriptor */
-        USB_DESCRIPTOR_LENGTH_ENDPOINT,
-        USB_DESCRIPTOR_TYPE_ENDPOINT,
-        USB_CDC_VCOM_DIC_BULK_OUT_ENDPOINT | (USB_OUT << 7U),
-        USB_ENDPOINT_BULK,
-        USB_SHORT_GET_LOW(FS_CDC_VCOM_BULK_OUT_PACKET_SIZE),
-        USB_SHORT_GET_HIGH(FS_CDC_VCOM_BULK_OUT_PACKET_SIZE),
-        0x00, /* The polling interval value is every 0 Frames */
+    /*Bulk OUT Endpoint descriptor */
+    USB_DESCRIPTOR_LENGTH_ENDPOINT,
+    USB_DESCRIPTOR_TYPE_ENDPOINT,
+    USB_CDC_VCOM_DIC_BULK_OUT_ENDPOINT | (USB_OUT << 7U),
+    USB_ENDPOINT_BULK,
+    USB_SHORT_GET_LOW(FS_CDC_VCOM_BULK_OUT_PACKET_SIZE),
+    USB_SHORT_GET_HIGH(FS_CDC_VCOM_BULK_OUT_PACKET_SIZE),
+    0x00, /* The polling interval value is every 0 Frames */
 
     /***** MTP Device Class *****/
     /* Interface Descriptors */
@@ -306,29 +314,29 @@ uint8_t g_UsbDeviceConfigurationDescriptor[] = {
     USB_MTP_DEVICE_PROTOCOL,
     USB_STRING_MTP_INTERFACE,
     /* Endpoint Descriptors */
-        USB_DESCRIPTOR_LENGTH_ENDPOINT,
-        USB_DESCRIPTOR_TYPE_ENDPOINT,
-        USB_MTP_BULK_IN_ENDPOINT  | (USB_IN << 7U),
-        USB_ENDPOINT_BULK,
-        USB_SHORT_GET_LOW(HS_MTP_BULK_IN_PACKET_SIZE),
-        USB_SHORT_GET_HIGH(HS_MTP_BULK_IN_PACKET_SIZE),
-        0x00,
+    USB_DESCRIPTOR_LENGTH_ENDPOINT,
+    USB_DESCRIPTOR_TYPE_ENDPOINT,
+    USB_MTP_BULK_IN_ENDPOINT | (USB_IN << 7U),
+    USB_ENDPOINT_BULK,
+    USB_SHORT_GET_LOW(HS_MTP_BULK_IN_PACKET_SIZE),
+    USB_SHORT_GET_HIGH(HS_MTP_BULK_IN_PACKET_SIZE),
+    0x00,
 
-        USB_DESCRIPTOR_LENGTH_ENDPOINT,
-        USB_DESCRIPTOR_TYPE_ENDPOINT,
-        USB_MTP_BULK_OUT_ENDPOINT  | (USB_OUT << 7U),
-        USB_ENDPOINT_BULK,
-        USB_SHORT_GET_LOW(HS_MTP_BULK_IN_PACKET_SIZE),
-        USB_SHORT_GET_HIGH(HS_MTP_BULK_IN_PACKET_SIZE),
-        0x00,
+    USB_DESCRIPTOR_LENGTH_ENDPOINT,
+    USB_DESCRIPTOR_TYPE_ENDPOINT,
+    USB_MTP_BULK_OUT_ENDPOINT | (USB_OUT << 7U),
+    USB_ENDPOINT_BULK,
+    USB_SHORT_GET_LOW(HS_MTP_BULK_IN_PACKET_SIZE),
+    USB_SHORT_GET_HIGH(HS_MTP_BULK_IN_PACKET_SIZE),
+    0x00,
 
-        USB_DESCRIPTOR_LENGTH_ENDPOINT,
-        USB_DESCRIPTOR_TYPE_ENDPOINT,
-        USB_MTP_INTR_IN_ENDPOINT  | (USB_IN << 7U),
-        USB_ENDPOINT_INTERRUPT,
-        USB_SHORT_GET_LOW(HS_MTP_INTR_IN_PACKET_SIZE),
-        USB_SHORT_GET_HIGH(HS_MTP_INTR_IN_PACKET_SIZE),
-        FS_MTP_INTR_IN_INTERVAL,
+    USB_DESCRIPTOR_LENGTH_ENDPOINT,
+    USB_DESCRIPTOR_TYPE_ENDPOINT,
+    USB_MTP_INTR_IN_ENDPOINT | (USB_IN << 7U),
+    USB_ENDPOINT_INTERRUPT,
+    USB_SHORT_GET_LOW(HS_MTP_INTR_IN_PACKET_SIZE),
+    USB_SHORT_GET_HIGH(HS_MTP_INTR_IN_PACKET_SIZE),
+    FS_MTP_INTR_IN_INTERVAL,
 };
 
 #if (defined(USB_DEVICE_CONFIG_CV_TEST) && (USB_DEVICE_CONFIG_CV_TEST > 0U))
@@ -390,8 +398,7 @@ usb_status_t USB_DeviceGetDeviceQualifierDescriptor(
 usb_status_t USB_DeviceGetConfigurationDescriptor(
     usb_device_handle handle, usb_device_get_configuration_descriptor_struct_t *configurationDescriptor)
 {
-    if (USB_COMPOSITE_CONFIGURE_INDEX > configurationDescriptor->configuration)
-    {
+    if (USB_COMPOSITE_CONFIGURE_INDEX > configurationDescriptor->configuration) {
         configurationDescriptor->buffer = g_UsbDeviceConfigurationDescriptor;
         configurationDescriptor->length = USB_DESCRIPTOR_LENGTH_CONFIGURATION_ALL;
         return kStatus_USB_Success;
@@ -417,7 +424,8 @@ usb_status_t USB_DeviceGetStringDescriptor(usb_device_handle handle,
         stringDescriptor->buffer = USB_StringDescriptorBuffer;
         stringDescriptor->length = length;
         return kStatus_USB_Success;
-    } else {
+    }
+    else {
         return kStatus_USB_Error;
     }
 }
@@ -447,17 +455,13 @@ usb_status_t USB_DeviceSetSpeed(usb_device_handle handle, uint8_t speed)
     ptr1 = (usb_descriptor_union_t *)(&g_UsbDeviceConfigurationDescriptor[0]);
     ptr2 = (usb_descriptor_union_t *)(&g_UsbDeviceConfigurationDescriptor[USB_DESCRIPTOR_LENGTH_CONFIGURATION_ALL - 1]);
 
-    while (ptr1 < ptr2)
-    {
-        if (ptr1->common.bDescriptorType == USB_DESCRIPTOR_TYPE_ENDPOINT)
-        {
-            if (USB_SPEED_HIGH == speed)
-            {
+    while (ptr1 < ptr2) {
+        if (ptr1->common.bDescriptorType == USB_DESCRIPTOR_TYPE_ENDPOINT) {
+            if (USB_SPEED_HIGH == speed) {
                 if ((USB_CDC_VCOM_CIC_INTERRUPT_IN_ENDPOINT ==
                      (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                     ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                     USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN))
-                {
+                     USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN)) {
                     ptr1->endpoint.bInterval = HS_CDC_VCOM_INTERRUPT_IN_INTERVAL;
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(HS_CDC_VCOM_INTERRUPT_IN_PACKET_SIZE,
                                                        ptr1->endpoint.wMaxPacketSize);
@@ -465,42 +469,33 @@ usb_status_t USB_DeviceSetSpeed(usb_device_handle handle, uint8_t speed)
                 else if ((USB_CDC_VCOM_DIC_BULK_IN_ENDPOINT ==
                           (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(HS_CDC_VCOM_BULK_IN_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
                 else if ((USB_CDC_VCOM_DIC_BULK_OUT_ENDPOINT ==
                           (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(HS_CDC_VCOM_BULK_OUT_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
-                else if ((USB_MTP_BULK_IN_ENDPOINT ==
-                          (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
+                else if ((USB_MTP_BULK_IN_ENDPOINT == (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(HS_MTP_BULK_IN_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
-                else if ((USB_MTP_BULK_OUT_ENDPOINT ==
-                          (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
+                else if ((USB_MTP_BULK_OUT_ENDPOINT == (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(HS_MTP_BULK_OUT_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
-                else
-                {
+                else {
                 }
             }
-            else
-            {
+            else {
                 if ((USB_CDC_VCOM_CIC_INTERRUPT_IN_ENDPOINT ==
                      (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                     ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                     USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN))
-                {
+                     USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN)) {
                     ptr1->endpoint.bInterval = FS_CDC_VCOM_INTERRUPT_IN_INTERVAL;
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(FS_CDC_VCOM_INTERRUPT_IN_PACKET_SIZE,
                                                        ptr1->endpoint.wMaxPacketSize);
@@ -508,100 +503,76 @@ usb_status_t USB_DeviceSetSpeed(usb_device_handle handle, uint8_t speed)
                 else if ((USB_CDC_VCOM_DIC_BULK_IN_ENDPOINT ==
                           (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(FS_CDC_VCOM_BULK_IN_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
                 else if ((USB_CDC_VCOM_DIC_BULK_OUT_ENDPOINT ==
                           (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(FS_CDC_VCOM_BULK_OUT_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
-                else if ((USB_MTP_BULK_IN_ENDPOINT ==
-                          (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
+                else if ((USB_MTP_BULK_IN_ENDPOINT == (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_IN)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(FS_MTP_BULK_IN_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
-                else if ((USB_MTP_BULK_OUT_ENDPOINT ==
-                          (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
+                else if ((USB_MTP_BULK_OUT_ENDPOINT == (ptr1->endpoint.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK)) &&
                          ((ptr1->endpoint.bEndpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) ==
-                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT))
-                {
+                          USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_OUT)) {
                     USB_SHORT_TO_LITTLE_ENDIAN_ADDRESS(FS_MTP_BULK_OUT_PACKET_SIZE, ptr1->endpoint.wMaxPacketSize);
                 }
-                else
-                {
+                else {
                 }
             }
         }
         ptr1 = (usb_descriptor_union_t *)((uint8_t *)ptr1 + ptr1->common.bLength);
     }
 
-    for (int i = 0; i < USB_CDC_VCOM_CIC_ENDPOINT_COUNT; i++)
-    {
-        if (USB_SPEED_HIGH == speed)
-        {
+    for (int i = 0; i < USB_CDC_VCOM_CIC_ENDPOINT_COUNT; i++) {
+        if (USB_SPEED_HIGH == speed) {
             g_cdcVcomCicEndpoints[i].maxPacketSize = HS_CDC_VCOM_INTERRUPT_IN_PACKET_SIZE;
             g_cdcVcomCicEndpoints[i].interval      = HS_CDC_VCOM_INTERRUPT_IN_INTERVAL;
         }
-        else
-        {
+        else {
             g_cdcVcomCicEndpoints[i].maxPacketSize = FS_CDC_VCOM_INTERRUPT_IN_PACKET_SIZE;
             g_cdcVcomCicEndpoints[i].interval      = FS_CDC_VCOM_INTERRUPT_IN_INTERVAL;
         }
     }
 
-    for (int i = 0; i < USB_CDC_VCOM_DIC_ENDPOINT_COUNT; i++)
-    {
-        if (USB_SPEED_HIGH == speed)
-        {
-            if (g_cdcVcomDicEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK)
-            {
+    for (int i = 0; i < USB_CDC_VCOM_DIC_ENDPOINT_COUNT; i++) {
+        if (USB_SPEED_HIGH == speed) {
+            if (g_cdcVcomDicEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) {
                 g_cdcVcomDicEndpoints[i].maxPacketSize = HS_CDC_VCOM_BULK_IN_PACKET_SIZE;
             }
-            else
-            {
+            else {
                 g_cdcVcomDicEndpoints[i].maxPacketSize = HS_CDC_VCOM_BULK_OUT_PACKET_SIZE;
             }
         }
-        else
-        {
-            if (g_cdcVcomDicEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK)
-            {
+        else {
+            if (g_cdcVcomDicEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) {
                 g_cdcVcomDicEndpoints[i].maxPacketSize = FS_CDC_VCOM_BULK_IN_PACKET_SIZE;
             }
-            else
-            {
+            else {
                 g_cdcVcomDicEndpoints[i].maxPacketSize = FS_CDC_VCOM_BULK_OUT_PACKET_SIZE;
             }
         }
     }
 
-    for (int i = 0; i < USB_MTP_ENDPOINT_COUNT; i++)
-    {
-        if (USB_SPEED_HIGH == speed)
-        {
-            if (g_UsbMtpEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK)
-            {
+    for (int i = 0; i < USB_MTP_ENDPOINT_COUNT; i++) {
+        if (USB_SPEED_HIGH == speed) {
+            if (g_UsbMtpEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) {
                 g_UsbMtpEndpoints[i].maxPacketSize = HS_MTP_BULK_IN_PACKET_SIZE;
             }
-            else
-            {
+            else {
                 g_UsbMtpEndpoints[i].maxPacketSize = HS_MTP_BULK_OUT_PACKET_SIZE;
             }
         }
-        else
-        {
-            if (g_UsbMtpEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK)
-            {
+        else {
+            if (g_UsbMtpEndpoints[i].endpointAddress & USB_DESCRIPTOR_ENDPOINT_ADDRESS_DIRECTION_MASK) {
                 g_UsbMtpEndpoints[i].maxPacketSize = FS_MTP_BULK_IN_PACKET_SIZE;
             }
-            else
-            {
+            else {
                 g_UsbMtpEndpoints[i].maxPacketSize = FS_MTP_BULK_OUT_PACKET_SIZE;
             }
         }

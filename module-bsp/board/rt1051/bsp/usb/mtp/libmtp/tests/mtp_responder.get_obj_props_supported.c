@@ -12,7 +12,7 @@ static mtp_responder_t *mtp = NULL;
 static uint16_t error;
 static uint8_t given_data[512];
 static size_t given_data_size;
-static const mtp_op_cntr_t *given = (mtp_op_cntr_t*)given_data;
+static const mtp_op_cntr_t *given = (mtp_op_cntr_t *)given_data;
 
 Describe(get_object_props_supported);
 
@@ -35,18 +35,30 @@ AfterEach(get_object_props_supported)
 Ensure(get_object_props_supported, returns_array_with_supproted_properties)
 {
     const uint8_t request[] = {
-        0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x98,
-        0x0F, 0x00, 0x00, 0xF0, 0x01, 0x30, 0x00, 0x00,
+        0x10,
+        0x00,
+        0x00,
+        0x00,
+        0x01,
+        0x00,
+        0x01,
+        0x98,
+        0x0F,
+        0x00,
+        0x00,
+        0xF0,
+        0x01,
+        0x30,
+        0x00,
+        0x00,
     };
 
     const uint32_t expected_length = 12 + 100;
 
-    expect(serialize_object_props_supported,
-            will_return(100));
-    expect(is_format_code_supported,
-            will_return(true));
+    expect(serialize_object_props_supported, will_return(100));
+    expect(is_format_code_supported, will_return(true));
 
-    error = mtp_responder_handle_request(mtp, request, sizeof(request));
+    error           = mtp_responder_handle_request(mtp, request, sizeof(request));
     given_data_size = mtp_responder_get_data(mtp);
 
     assert_that(error, is_equal_to(MTP_RESPONSE_OK));
@@ -55,7 +67,4 @@ Ensure(get_object_props_supported, returns_array_with_supproted_properties)
     assert_that(given->header.operation_code, is_equal_to(MTP_OPERATION_GET_OBJECT_PROPS_SUPPORTED));
     assert_that(given->header.transaction_id, is_equal_to(0xF000000F));
     assert_that(given->header.length, is_equal_to(expected_length));
-
 }
-
-

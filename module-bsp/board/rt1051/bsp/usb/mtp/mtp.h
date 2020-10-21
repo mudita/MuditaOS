@@ -5,7 +5,8 @@
 #include "mtp_fs.h"
 
 // refactor name to mtp_app_struct_t
-typedef struct {
+typedef struct
+{
     class_handle_t classHandle;
     mtp_responder_t *responder;
     struct mtp_fs *mtp_fs;

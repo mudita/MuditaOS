@@ -38,16 +38,16 @@
 #define millisecToTicks(millisec) (((millisec)*configTICK_RATE_HZ + 999U) / 1000U)
 
 #ifdef DEBUG_ASSERT
-#define OS_ASSERT(condition) \
-    if (!(condition))        \
-        while (1)            \
+#define OS_ASSERT(condition)                                                                                           \
+    if (!(condition))                                                                                                  \
+        while (1)                                                                                                      \
             ;
 #else
 #define OS_ASSERT(condition) (void)(condition);
 #endif
 
 /*! @brief Converts milliseconds to ticks*/
-#define MSEC_TO_TICK(msec) \
+#define MSEC_TO_TICK(msec)                                                                                             \
     (((uint32_t)(msec) + 500uL / (uint32_t)configTICK_RATE_HZ) * (uint32_t)configTICK_RATE_HZ / 1000uL)
 #define TICKS_TO_MSEC(tick) ((uint32_t)((uint64_t)(tick)*1000uL / (uint64_t)configTICK_RATE_HZ))
 /************************************************************************************
@@ -86,8 +86,7 @@ typedef struct _osa_state
 ********************************************************************************** */
 __WEAK_FUNC void main_task(void const *argument);
 __WEAK_FUNC void main_task(void const *argument)
-{
-}
+{}
 
 void startup_task(void *argument);
 
@@ -120,8 +119,7 @@ void *OSA_MemoryAllocate(uint32_t length)
 {
     void *p = (void *)pvPortMalloc(length);
 
-    if (NULL != p)
-    {
+    if (NULL != p) {
         memset(p, 0, length);
     }
 
@@ -149,8 +147,7 @@ void OSA_EnterCritical(uint32_t *sr)
     {
         *sr = portSET_INTERRUPT_MASK_FROM_ISR();
     }
-    else
-    {
+    else {
         portENTER_CRITICAL();
     }
 }
@@ -165,8 +162,7 @@ void OSA_ExitCritical(uint32_t sr)
     {
         portCLEAR_INTERRUPT_MASK_FROM_ISR(sr);
     }
-    else
-    {
+    else {
         portEXIT_CRITICAL();
     }
 }
@@ -195,11 +191,9 @@ osa_task_handle_t OSA_TaskGetCurrentHandle(void)
     osa_freertos_task_t *ptask;
 
     list_element = LIST_GetHead(&s_osaState.taskList);
-    while (NULL != list_element)
-    {
+    while (NULL != list_element) {
         ptask = (osa_freertos_task_t *)(void *)list_element;
-        if (ptask->taskHandle == xTaskGetCurrentTaskHandle())
-        {
+        if (ptask->taskHandle == xTaskGetCurrentTaskHandle()) {
             return (osa_task_handle_t)ptask;
         }
         list_element = LIST_GetNext(list_element);
@@ -277,8 +271,7 @@ osa_status_t OSA_TaskCreate(osa_task_handle_t taskHandle, osa_task_def_t *thread
                     (task_param_t)task_param,                    /* optional task startup argument */
                     PRIORITY_OSA_TO_RTOS(thread_def->tpriority), /* initial priority */
                     &pxCreatedTask                               /* optional task handle to create */
-                    ) == pdPASS)
-    {
+                    ) == pdPASS) {
         ptask->taskHandle = pxCreatedTask;
         OSA_InterruptDisable();
         (void)LIST_AddTail(&s_osaState.taskList, (list_element_handle_t) & (ptask->link));
@@ -341,12 +334,10 @@ uint32_t OSA_TimeGetMsec(void)
 {
     TickType_t ticks;
 
-    if (0U != __get_IPSR())
-    {
+    if (0U != __get_IPSR()) {
         ticks = xTaskGetTickCountFromISR();
     }
-    else
-    {
+    else {
         ticks = xTaskGetTickCount();
     }
 
@@ -371,8 +362,7 @@ osa_status_t OSA_SemaphoreCreate(osa_semaphore_handle_t semaphoreHandle, uint32_
     } xSemaHandle;
 
     xSemaHandle.sem = xSemaphoreCreateCounting(0xFF, initValue);
-    if (NULL != xSemaHandle.sem)
-    {
+    if (NULL != xSemaHandle.sem) {
         *(uint32_t *)semaphoreHandle = xSemaHandle.semhandle;
         return KOSA_StatusSuccess;
     }
@@ -415,21 +405,17 @@ osa_status_t OSA_SemaphoreWait(osa_semaphore_handle_t semaphoreHandle, uint32_t 
     QueueHandle_t sem = (QueueHandle_t)(void *)(uint32_t *)(*(uint32_t *)semaphoreHandle);
 
     /* Convert timeout from millisecond to tick. */
-    if (millisec == osaWaitForever_c)
-    {
+    if (millisec == osaWaitForever_c) {
         timeoutTicks = portMAX_DELAY;
     }
-    else
-    {
+    else {
         timeoutTicks = MSEC_TO_TICK(millisec);
     }
 
-    if (pdFALSE == xSemaphoreTake(sem, timeoutTicks))
-    {
+    if (pdFALSE == xSemaphoreTake(sem, timeoutTicks)) {
         return KOSA_StatusTimeout; /* timeout */
     }
-    else
-    {
+    else {
         return KOSA_StatusSuccess; /* semaphore taken */
     }
 }
@@ -449,28 +435,22 @@ osa_status_t OSA_SemaphorePost(osa_semaphore_handle_t semaphoreHandle)
     osa_status_t status = KOSA_StatusError;
     QueueHandle_t sem   = (QueueHandle_t)(void *)(uint32_t *)(*(uint32_t *)semaphoreHandle);
 
-    if (0U != __get_IPSR())
-    {
+    if (0U != __get_IPSR()) {
         portBASE_TYPE taskToWake = pdFALSE;
 
-        if (pdTRUE == xSemaphoreGiveFromISR(sem, &taskToWake))
-        {
+        if (pdTRUE == xSemaphoreGiveFromISR(sem, &taskToWake)) {
             portYIELD_FROM_ISR(taskToWake);
             status = KOSA_StatusSuccess;
         }
-        else
-        {
+        else {
             status = KOSA_StatusError;
         }
     }
-    else
-    {
-        if (pdTRUE == xSemaphoreGive(sem))
-        {
+    else {
+        if (pdTRUE == xSemaphoreGive(sem)) {
             status = KOSA_StatusSuccess; /* sync object given */
         }
-        else
-        {
+        else {
             status = KOSA_StatusError;
         }
     }
@@ -496,8 +476,7 @@ osa_status_t OSA_MutexCreate(osa_mutex_handle_t mutexHandle)
     } xMutexHandle;
 
     xMutexHandle.mutex = xSemaphoreCreateRecursiveMutex();
-    if (NULL != xMutexHandle.mutex)
-    {
+    if (NULL != xMutexHandle.mutex) {
         *(uint32_t *)mutexHandle = xMutexHandle.pmutexHandle;
         return KOSA_StatusSuccess;
     }
@@ -521,21 +500,17 @@ osa_status_t OSA_MutexLock(osa_mutex_handle_t mutexHandle, uint32_t millisec)
     QueueHandle_t mutex = (QueueHandle_t)(void *)(uint32_t *)(*(uint32_t *)mutexHandle);
 
     /* Convert timeout from millisecond to tick. */
-    if (millisec == osaWaitForever_c)
-    {
+    if (millisec == osaWaitForever_c) {
         timeoutTicks = portMAX_DELAY;
     }
-    else
-    {
+    else {
         timeoutTicks = MSEC_TO_TICK(millisec);
     }
 
-    if (pdFALSE == xSemaphoreTakeRecursive(mutex, timeoutTicks))
-    {
+    if (pdFALSE == xSemaphoreTakeRecursive(mutex, timeoutTicks)) {
         return KOSA_StatusTimeout; /* timeout */
     }
-    else
-    {
+    else {
         return KOSA_StatusSuccess; /* semaphore taken */
     }
 }
@@ -551,12 +526,10 @@ osa_status_t OSA_MutexUnlock(osa_mutex_handle_t mutexHandle)
     assert(mutexHandle);
     QueueHandle_t mutex = (QueueHandle_t)(void *)(uint32_t *)(*(uint32_t *)mutexHandle);
 
-    if (pdFALSE == xSemaphoreGiveRecursive(mutex))
-    {
+    if (pdFALSE == xSemaphoreGiveRecursive(mutex)) {
         return KOSA_StatusError;
     }
-    else
-    {
+    else {
         return KOSA_StatusSuccess;
     }
 }
@@ -590,12 +563,10 @@ osa_status_t OSA_EventCreate(osa_event_handle_t eventHandle, uint8_t autoClear)
     osa_event_struct_t *pEventStruct = (osa_event_struct_t *)eventHandle;
 
     pEventStruct->handle = xEventGroupCreate();
-    if (NULL != pEventStruct->handle)
-    {
+    if (NULL != pEventStruct->handle) {
         pEventStruct->autoClear = autoClear;
     }
-    else
-    {
+    else {
         return KOSA_StatusError;
     }
     return KOSA_StatusSuccess;
@@ -615,19 +586,16 @@ osa_status_t OSA_EventSet(osa_event_handle_t eventHandle, osa_event_flags_t flag
     assert(eventHandle);
     osa_event_struct_t *pEventStruct = (osa_event_struct_t *)eventHandle;
 
-    if (NULL == pEventStruct->handle)
-    {
+    if (NULL == pEventStruct->handle) {
         return KOSA_StatusError;
     }
-    if (0U != __get_IPSR())
-    {
+    if (0U != __get_IPSR()) {
         result = xEventGroupSetBitsFromISR(pEventStruct->handle, (event_flags_t)flagsToSet, &taskToWake);
         assert(pdPASS == result);
         (void)result;
         portYIELD_FROM_ISR(taskToWake);
     }
-    else
-    {
+    else {
         (void)xEventGroupSetBits(pEventStruct->handle, (event_flags_t)flagsToSet);
     }
 
@@ -647,17 +615,14 @@ osa_status_t OSA_EventClear(osa_event_handle_t eventHandle, osa_event_flags_t fl
     assert(eventHandle);
     osa_event_struct_t *pEventStruct = (osa_event_struct_t *)eventHandle;
 
-    if (NULL == pEventStruct->handle)
-    {
+    if (NULL == pEventStruct->handle) {
         return KOSA_StatusError;
     }
 
-    if (0U != __get_IPSR())
-    {
+    if (0U != __get_IPSR()) {
         (void)xEventGroupClearBitsFromISR(pEventStruct->handle, (event_flags_t)flagsToClear);
     }
-    else
-    {
+    else {
         (void)xEventGroupClearBits(pEventStruct->handle, (event_flags_t)flagsToClear);
     }
     return KOSA_StatusSuccess;
@@ -692,38 +657,32 @@ osa_status_t OSA_EventWait(osa_event_handle_t eventHandle,
 
     /* Clean FreeRTOS cotrol flags */
     flagsToWait = flagsToWait & 0x00FFFFFFU;
-    if (NULL == pEventStruct->handle)
-    {
+    if (NULL == pEventStruct->handle) {
         return KOSA_StatusError;
     }
 
     /* Convert timeout from millisecond to tick. */
-    if (millisec == osaWaitForever_c)
-    {
+    if (millisec == osaWaitForever_c) {
         timeoutTicks = portMAX_DELAY;
     }
-    else
-    {
+    else {
         timeoutTicks = millisec / portTICK_PERIOD_MS;
     }
 
     clearMode = (pEventStruct->autoClear != 0U) ? pdTRUE : pdFALSE;
 
-    flagsSave = xEventGroupWaitBits(pEventStruct->handle, (event_flags_t)flagsToWait, clearMode, (BaseType_t)waitAll,
-                                    timeoutTicks);
+    flagsSave = xEventGroupWaitBits(
+        pEventStruct->handle, (event_flags_t)flagsToWait, clearMode, (BaseType_t)waitAll, timeoutTicks);
 
     flagsSave &= (event_flags_t)flagsToWait;
-    if (NULL != pSetFlags)
-    {
+    if (NULL != pSetFlags) {
         *pSetFlags = (osa_event_flags_t)flagsSave;
     }
 
-    if (0U != flagsSave)
-    {
+    if (0U != flagsSave) {
         return KOSA_StatusSuccess;
     }
-    else
-    {
+    else {
         return KOSA_StatusTimeout;
     }
 }
@@ -741,8 +700,7 @@ osa_status_t OSA_EventDestroy(osa_event_handle_t eventHandle)
     assert(eventHandle);
     osa_event_struct_t *pEventStruct = (osa_event_struct_t *)eventHandle;
 
-    if (NULL == pEventStruct->handle)
-    {
+    if (NULL == pEventStruct->handle) {
         return KOSA_StatusError;
     }
     vEventGroupDelete(pEventStruct->handle);
@@ -770,8 +728,7 @@ osa_status_t OSA_MsgQCreate(osa_msgq_handle_t msgqHandle, uint32_t msgNo, uint32
 
     /* Create the message queue where the number and size is specified by msgNo and msgSize */
     xMsgqHandle.msgq = xQueueCreate(msgNo, msgSize);
-    if (NULL != xMsgqHandle.msgq)
-    {
+    if (NULL != xMsgqHandle.msgq) {
         *(uint32_t *)msgqHandle = xMsgqHandle.pmsgqHandle;
         return KOSA_StatusSuccess;
     }
@@ -792,20 +749,16 @@ osa_status_t OSA_MsgQPut(osa_msgq_handle_t msgqHandle, osa_msg_handle_t pMessage
     portBASE_TYPE taskToWake = pdFALSE;
     QueueHandle_t handler    = (QueueHandle_t)(void *)(uint32_t *)(*(uint32_t *)msgqHandle);
 
-    if (0U != __get_IPSR())
-    {
-        if (pdTRUE == xQueueSendToBackFromISR(handler, pMessage, &taskToWake))
-        {
+    if (0U != __get_IPSR()) {
+        if (pdTRUE == xQueueSendToBackFromISR(handler, pMessage, &taskToWake)) {
             portYIELD_FROM_ISR(taskToWake);
             osaStatus = KOSA_StatusSuccess;
         }
-        else
-        {
+        else {
             osaStatus = KOSA_StatusError;
         }
     }
-    else
-    {
+    else {
         osaStatus = (xQueueSendToBack(handler, pMessage, 0) == pdPASS) ? (KOSA_StatusSuccess) : (KOSA_StatusError);
     }
 
@@ -833,20 +786,16 @@ osa_status_t OSA_MsgQGet(osa_msgq_handle_t msgqHandle, osa_msg_handle_t pMessage
 
     uint32_t timeoutTicks;
 
-    if (millisec == osaWaitForever_c)
-    {
+    if (millisec == osaWaitForever_c) {
         timeoutTicks = portMAX_DELAY;
     }
-    else
-    {
+    else {
         timeoutTicks = MSEC_TO_TICK(millisec);
     }
-    if (pdPASS != xQueueReceive(handler, pMessage, timeoutTicks))
-    {
+    if (pdPASS != xQueueReceive(handler, pMessage, timeoutTicks)) {
         osaStatus = KOSA_StatusTimeout; /* not able to send it to the queue? */
     }
-    else
-    {
+    else {
         osaStatus = KOSA_StatusSuccess;
     }
     return osaStatus;
@@ -876,20 +825,16 @@ osa_status_t OSA_MsgQDestroy(osa_msgq_handle_t msgqHandle)
  *END**************************************************************************/
 void OSA_InterruptEnable(void)
 {
-    if (0U != __get_IPSR())
-    {
-        if (1 == s_osaState.basePriorityNesting)
-        {
+    if (0U != __get_IPSR()) {
+        if (1 == s_osaState.basePriorityNesting) {
             portCLEAR_INTERRUPT_MASK_FROM_ISR(s_osaState.basePriority);
         }
 
-        if (s_osaState.basePriorityNesting > 0)
-        {
+        if (s_osaState.basePriorityNesting > 0) {
             s_osaState.basePriorityNesting--;
         }
     }
-    else
-    {
+    else {
         portEXIT_CRITICAL();
     }
 }
@@ -902,16 +847,13 @@ void OSA_InterruptEnable(void)
  *END**************************************************************************/
 void OSA_InterruptDisable(void)
 {
-    if (0U != __get_IPSR())
-    {
-        if (0 == s_osaState.basePriorityNesting)
-        {
+    if (0U != __get_IPSR()) {
+        if (0 == s_osaState.basePriorityNesting) {
             s_osaState.basePriority = portSET_INTERRUPT_MASK_FROM_ISR();
         }
         s_osaState.basePriorityNesting++;
     }
-    else
-    {
+    else {
         portENTER_CRITICAL();
     }
 }
@@ -924,12 +866,10 @@ void OSA_InterruptDisable(void)
  *END**************************************************************************/
 void OSA_EnableIRQGlobal(void)
 {
-    if (s_osaState.interruptDisableCount > 0U)
-    {
+    if (s_osaState.interruptDisableCount > 0U) {
         s_osaState.interruptDisableCount--;
 
-        if (0U == s_osaState.interruptDisableCount)
-        {
+        if (0U == s_osaState.interruptDisableCount) {
             __enable_irq();
         }
         /* call core API to enable the global interrupt*/

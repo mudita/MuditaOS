@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include "defines.h"
 
-typedef struct {
+typedef struct
+{
     const char *manufacturer;
     const char *model;
     const char *version;
@@ -15,4 +16,3 @@ bool is_format_code_supported(uint16_t format_code);
 uint32_t serialize_device_info(const mtp_device_info_t *info, uint8_t *data);
 
 #endif /* _MTP_DATASET_H */
-

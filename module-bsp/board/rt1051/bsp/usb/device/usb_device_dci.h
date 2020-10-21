@@ -20,7 +20,8 @@
 
 /*! @brief Macro to define controller handle */
 #define usb_device_controller_handle usb_device_handle
-#define USB_DEVICE_MESSAGES_SIZE (sizeof(uint32_t)*(1U + (sizeof(usb_device_callback_message_struct_t) - 1U) / sizeof(uint32_t)))
+#define USB_DEVICE_MESSAGES_SIZE                                                                                       \
+    (sizeof(uint32_t) * (1U + (sizeof(usb_device_callback_message_struct_t) - 1U) / sizeof(uint32_t)))
 /*! @brief Available notify types for device notification */
 typedef enum _usb_device_notification
 {
@@ -33,7 +34,7 @@ typedef enum _usb_device_notification
     kUSB_DeviceNotifyDetach,           /*!< Device disconnected from a host */
     kUSB_DeviceNotifyAttach,           /*!< Device connected to a host */
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-    kUSB_DeviceNotifyDcdDetectFinished,               /*!< Device charger detection finished */
+    kUSB_DeviceNotifyDcdDetectFinished, /*!< Device charger detection finished */
 #endif
 } usb_device_notification_t;
 
@@ -70,8 +71,8 @@ typedef enum _usb_device_control_type
     kUSB_DeviceControlSetTestMode,       /*!< Drive xCHI into test mode */
     kUSB_DeviceControlGetRemoteWakeUp,   /*!< Get flag of LPM Remote Wake-up Enabled by USB host. */
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U))
-    kUSB_DeviceControlDcdDisable,       /*!< disable dcd module function. */
-    kUSB_DeviceControlDcdEnable,        /*!< enable dcd module function. */
+    kUSB_DeviceControlDcdDisable, /*!< disable dcd module function. */
+    kUSB_DeviceControlDcdEnable,  /*!< enable dcd module function. */
 #endif
     kUSB_DeviceControlPreSetDeviceAddress, /*!< Pre set device address */
     kUSB_DeviceControlUpdateHwTick,        /*!< update hardware tick */
@@ -120,15 +121,17 @@ typedef struct _usb_device_controller_interface_struct
 /*! @brief USB device status structure */
 typedef struct _usb_device_struct
 {
-#if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U))  || \
+#if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U)) ||                          \
     (defined(FSL_FEATURE_SOC_USB_ANALOG_COUNT) && (FSL_FEATURE_SOC_USB_ANALOG_COUNT > 0U))
     volatile uint64_t hwTick; /*!< Current hw tick(ms)*/
 #endif
     usb_device_controller_handle controllerHandle;                       /*!< Controller handle */
     const usb_device_controller_interface_struct_t *controllerInterface; /*!< Controller interface handle */
 #if USB_DEVICE_CONFIG_USE_TASK
-    MSGQ_HANDLE_BUFFER_DEFINE(notificationQueueBuffer, USB_DEVICE_CONFIG_MAX_MESSAGES, USB_DEVICE_MESSAGES_SIZE); /*!< Message queue buffer*/
-    osa_msgq_handle_t notificationQueue; /*!< Message queue*/
+    MSGQ_HANDLE_BUFFER_DEFINE(notificationQueueBuffer,
+                              USB_DEVICE_CONFIG_MAX_MESSAGES,
+                              USB_DEVICE_MESSAGES_SIZE); /*!< Message queue buffer*/
+    osa_msgq_handle_t notificationQueue;                 /*!< Message queue*/
 #endif
     usb_device_callback_t deviceCallback; /*!< Device callback function pointer */
     usb_device_endpoint_callback_struct_t

@@ -10,7 +10,7 @@
 #include "virtual_com.h"
 #include "mtp.h"
 
-#define CONTROLLER_ID kUSB_ControllerEhci0
+#define CONTROLLER_ID                 kUSB_ControllerEhci0
 #define USB_DEVICE_INTERRUPT_PRIORITY (3U)
 
 typedef struct _usb_device_composite_struct

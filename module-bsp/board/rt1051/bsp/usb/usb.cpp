@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
  * Copyright  Onplick <info@onplick.com> - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
@@ -29,14 +32,11 @@ namespace bsp
     }
 
     void usbCDCReceive(void *ptr)
-    {
-    }
+    {}
 
     int usbCDCSend(std::string *sendMsg)
     {
         return -1;
     }
 
-}
-
-
+} // namespace bsp

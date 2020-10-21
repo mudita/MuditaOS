@@ -4,25 +4,21 @@
 #include "mtp_container.h"
 
 static const uint8_t open_session_request[] = {
-    0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00
-};
+    0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 
-static const uint8_t open_session_response[] = {
-    0x0c, 0x00, 0x00, 0x00, 0x03, 0x00, 0x01, 0x20, 0x00, 0x00, 0x00, 0x00
-};
+static const uint8_t open_session_response[] = {0x0c, 0x00, 0x00, 0x00, 0x03, 0x00, 0x01, 0x20, 0x00, 0x00, 0x00, 0x00};
 
-static mtp_op_cntr_t* smap;
+static mtp_op_cntr_t *smap;
 
 Describe(mtp_container);
 
 BeforeEach(mtp_container)
 {
-    smap = (mtp_op_cntr_t*)open_session_request;
+    smap = (mtp_op_cntr_t *)open_session_request;
 }
 
 AfterEach(mtp_container)
-{
-}
+{}
 
 Ensure(mtp_container, length)
 {
@@ -52,8 +48,7 @@ Ensure(mtp_container, transaction_id)
 
 Ensure(mtp_container, get_param_count_is_ok)
 {
-    mtp_op_cntr_t *no_param_container = (mtp_op_cntr_t*)&open_session_response;
-    assert_that(mtp_container_get_param_count((mtp_op_cntr_t*)smap), is_equal_to(1));
-    assert_that(mtp_container_get_param_count((mtp_op_cntr_t*)no_param_container), is_equal_to(0));
+    mtp_op_cntr_t *no_param_container = (mtp_op_cntr_t *)&open_session_response;
+    assert_that(mtp_container_get_param_count((mtp_op_cntr_t *)smap), is_equal_to(1));
+    assert_that(mtp_container_get_param_count((mtp_op_cntr_t *)no_param_container), is_equal_to(0));
 }
-

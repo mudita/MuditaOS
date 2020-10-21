@@ -19,7 +19,6 @@
 #include "mtp_storage.h"
 #include "mtp_dataset.h"
 
-
 /** @brief Forward declaration. All data is prived
  *         and not exposed to application.
  */
@@ -31,7 +30,7 @@ typedef struct mtp_responder mtp_responder_t;
  *  @returns handle to mtp library
  *           NULL if fail to allocate memory
  */
-mtp_responder_t* mtp_responder_alloc(void);
+mtp_responder_t *mtp_responder_alloc(void);
 
 /** @brief Initialize library by setting default values
  *  @param mtp library handle
@@ -46,8 +45,7 @@ void mtp_responder_free(mtp_responder_t *mtp);
  *  @param info about device
  *  @return zero on success
  */
-int mtp_responder_set_device_info(mtp_responder_t *mtp,
-                                  const mtp_device_info_t *info);
+int mtp_responder_set_device_info(mtp_responder_t *mtp, const mtp_device_info_t *info);
 
 /** @brief Set storage to expose by MTP to host PC
  *  @param storage_id identifier composed by 16-bit disk identifier
@@ -57,17 +55,13 @@ int mtp_responder_set_device_info(mtp_responder_t *mtp,
  *                 api call
  *  @return zero on success
  */
-int mtp_responder_set_storage(mtp_responder_t *mtp,
-        uint32_t disk,
-        const struct mtp_storage_api *api,
-        void *api_arg);
+int mtp_responder_set_storage(mtp_responder_t *mtp, uint32_t disk, const struct mtp_storage_api *api, void *api_arg);
 
 /** @brief Setup space for store data coming from handled request
  *  @param buffer pinter to memory to store data
  *  @param size of buffer
  *  */
 void mtp_responder_set_data_buffer(mtp_responder_t *mtp, void *buffer, size_t size);
-
 
 void mtp_responder_handle_event(mtp_responder_t *mtp, void *event);
 
@@ -78,9 +72,7 @@ void mtp_responder_handle_event(mtp_responder_t *mtp, void *event);
  *  @param out_size send data frame priror to response frame if grater than zero
  *  @returns status/error code to be send in response
  *  */
-uint16_t mtp_responder_handle_request(mtp_responder_t *mtp,
-        const void *request,
-        const size_t req_size);
+uint16_t mtp_responder_handle_request(mtp_responder_t *mtp, const void *request, const size_t req_size);
 
 /** @brief Function returns amount of data in buffer. In case if data
  *         didn't fit into a buffer it fills it with next chunk of data
@@ -117,6 +109,4 @@ void mtp_responder_get_response(mtp_responder_t *mtp, uint16_t code, void *data_
 
 void mtp_responder_transaction_reset(mtp_responder_t *mtp);
 
-
 #endif /* _MTP_RESPONDER_H */
-

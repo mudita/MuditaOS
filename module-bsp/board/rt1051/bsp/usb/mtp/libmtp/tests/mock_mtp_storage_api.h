@@ -3,7 +3,7 @@
 
 extern const struct mtp_storage_api mock_api;
 
-const mtp_storage_properties_t* mock_get_properties(void* arg);
+const mtp_storage_properties_t *mock_get_properties(void *arg);
 uint32_t mock_find_first(void *arg, uint32_t parent);
 uint32_t mock_find_next(void *arg);
 uint64_t mock_free_space(void *arg);

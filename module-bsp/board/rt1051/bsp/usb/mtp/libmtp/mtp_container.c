@@ -1,7 +1,6 @@
 #include "mtp_container.h"
 
-static const char *c_type[] =
-{
+static const char *c_type[] = {
     "undefined",
     "command",
     "data",
@@ -27,11 +26,10 @@ const char *str_op_type(uint16_t opcode)
     return "unknown opcode";
 }
 
-int mtp_container_get_param_count(const mtp_op_cntr_t* c)
+int mtp_container_get_param_count(const mtp_op_cntr_t *c)
 {
     int count = (c->header.length - MTP_CONTAINER_HEADER_SIZE) / sizeof(uint32_t);
     if (count > 0 && count < 5)
         return count;
     return 0;
 }
-

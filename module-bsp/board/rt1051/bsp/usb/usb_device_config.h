@@ -10,8 +10,8 @@
 #define _USB_DEVICE_CONFIG_H_
 
 /*******************************************************************************
-* Definitions
-******************************************************************************/
+ * Definitions
+ ******************************************************************************/
 /*!
  * @addtogroup usb_device_configuration
  * @{
@@ -35,7 +35,7 @@
 #define USB_DEVICE_CONFIG_LPCIP3511HS (0U)
 
 /*! @brief Device instance count, the sum of KHCI and EHCI instance counts*/
-#define USB_DEVICE_CONFIG_NUM \
+#define USB_DEVICE_CONFIG_NUM                                                                                          \
     (USB_DEVICE_CONFIG_KHCI + USB_DEVICE_CONFIG_EHCI + USB_DEVICE_CONFIG_LPCIP3511FS + USB_DEVICE_CONFIG_LPCIP3511HS)
 
 /* @} */
@@ -156,11 +156,11 @@
 /* @} */
 
 #ifndef USB_DEVICE_VENDOR_ID
-#   define USB_DEVICE_VENDOR_ID (0x045E)
+#define USB_DEVICE_VENDOR_ID (0x045E)
 #endif
 
 #ifndef USB_DEVICE_PRODUCT_ID
-#   define USB_DEVICE_PRODUCT_ID (0x0622)
+#define USB_DEVICE_PRODUCT_ID (0x0622)
 #endif
 
 #endif /* _USB_DEVICE_CONFIG_H_ */

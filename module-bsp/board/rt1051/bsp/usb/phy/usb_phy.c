@@ -20,36 +20,28 @@ void *USB_EhciPhyGetBase(uint8_t controllerId)
     uint32_t usbphy_base_temp[] = USBPHY_BASE_ADDRS;
     uint32_t usbphy_base[]      = USBPHY_BASE_ADDRS;
 
-    if (controllerId < kUSB_ControllerEhci0)
-    {
+    if (controllerId < kUSB_ControllerEhci0) {
         return NULL;
     }
 
-    if ((controllerId == kUSB_ControllerEhci0) || (controllerId == kUSB_ControllerEhci1))
-    {
+    if ((controllerId == kUSB_ControllerEhci0) || (controllerId == kUSB_ControllerEhci1)) {
         controllerId = controllerId - kUSB_ControllerEhci0;
     }
-    else if ((controllerId == kUSB_ControllerLpcIp3511Hs0) || (controllerId == kUSB_ControllerLpcIp3511Hs1))
-    {
+    else if ((controllerId == kUSB_ControllerLpcIp3511Hs0) || (controllerId == kUSB_ControllerLpcIp3511Hs1)) {
         controllerId = controllerId - kUSB_ControllerLpcIp3511Hs0;
     }
-    else if ((controllerId == kUSB_ControllerIp3516Hs0) || (controllerId == kUSB_ControllerIp3516Hs1))
-    {
+    else if ((controllerId == kUSB_ControllerIp3516Hs0) || (controllerId == kUSB_ControllerIp3516Hs1)) {
         controllerId = controllerId - kUSB_ControllerIp3516Hs0;
     }
-    else
-    {
+    else {
     }
 
-    for (instance = 0; instance < (sizeof(usbphy_base_temp) / sizeof(usbphy_base_temp[0])); instance++)
-    {
-        if (usbphy_base_temp[instance])
-        {
+    for (instance = 0; instance < (sizeof(usbphy_base_temp) / sizeof(usbphy_base_temp[0])); instance++) {
+        if (usbphy_base_temp[instance]) {
             usbphy_base[newinstance++] = usbphy_base_temp[instance];
         }
     }
-    if (controllerId > newinstance)
-    {
+    if (controllerId > newinstance) {
         return NULL;
     }
 
@@ -76,8 +68,7 @@ uint32_t USB_EhciPhyInit(uint8_t controllerId, uint32_t freq, usb_phy_config_str
     USBPHY_Type *usbPhyBase;
 
     usbPhyBase = (USBPHY_Type *)USB_EhciPhyGetBase(controllerId);
-    if (NULL == usbPhyBase)
-    {
+    if (NULL == usbPhyBase) {
         return kStatus_USB_Error;
     }
 
@@ -104,13 +95,11 @@ uint32_t USB_EhciPhyInit(uint8_t controllerId, uint32_t freq, usb_phy_config_str
     /* PWD register provides overall control of the PHY power state */
     usbPhyBase->PWD = 0U;
     if ((kUSB_ControllerIp3516Hs0 == controllerId) || (kUSB_ControllerIp3516Hs1 == controllerId) ||
-        (kUSB_ControllerLpcIp3511Hs0 == controllerId) || (kUSB_ControllerLpcIp3511Hs0 == controllerId))
-    {
+        (kUSB_ControllerLpcIp3511Hs0 == controllerId) || (kUSB_ControllerLpcIp3511Hs0 == controllerId)) {
         usbPhyBase->CTRL_SET = USBPHY_CTRL_SET_ENAUTOCLR_CLKGATE_MASK;
         usbPhyBase->CTRL_SET = USBPHY_CTRL_SET_ENAUTOCLR_PHY_PWD_MASK;
     }
-    if (NULL != phyConfig)
-    {
+    if (NULL != phyConfig) {
         /* Decode to trim the nominal 17.78mA current source for the High Speed TX drivers on USB_DP and USB_DM. */
         usbPhyBase->TX =
             ((usbPhyBase->TX & (~(USBPHY_TX_D_CAL_MASK | USBPHY_TX_TXCAL45DM_MASK | USBPHY_TX_TXCAL45DP_MASK))) |
@@ -140,8 +129,7 @@ uint32_t USB_EhciLowPowerPhyInit(uint8_t controllerId, uint32_t freq, usb_phy_co
     USBPHY_Type *usbPhyBase;
 
     usbPhyBase = (USBPHY_Type *)USB_EhciPhyGetBase(controllerId);
-    if (NULL == usbPhyBase)
-    {
+    if (NULL == usbPhyBase) {
         return kStatus_USB_Error;
     }
 
@@ -169,12 +157,9 @@ uint32_t USB_EhciLowPowerPhyInit(uint8_t controllerId, uint32_t freq, usb_phy_co
 
     usbPhyBase->ANACTRL &= ~USBPHY_ANACTRL_DEV_PULLDOWN_MASK;
     usbPhyBase->ANACTRL &= ~USBPHY_ANACTRL_PFD_CLKGATE_MASK;
-    while (!(usbPhyBase->ANACTRL & USBPHY_ANACTRL_PFD_STABLE_MASK))
-    {
-    }
+    while (!(usbPhyBase->ANACTRL & USBPHY_ANACTRL_PFD_STABLE_MASK)) {}
 #endif
-    if (NULL != phyConfig)
-    {
+    if (NULL != phyConfig) {
         /* Decode to trim the nominal 17.78mA current source for the High Speed TX drivers on USB_DP and USB_DM. */
         usbPhyBase->TX =
             ((usbPhyBase->TX & (~(USBPHY_TX_D_CAL_MASK | USBPHY_TX_TXCAL45DM_MASK | USBPHY_TX_TXCAL45DP_MASK))) |
@@ -199,8 +184,7 @@ void USB_EhciPhyDeinit(uint8_t controllerId)
     USBPHY_Type *usbPhyBase;
 
     usbPhyBase = (USBPHY_Type *)USB_EhciPhyGetBase(controllerId);
-    if (NULL == usbPhyBase)
-    {
+    if (NULL == usbPhyBase) {
         return;
     }
 #if ((!(defined FSL_FEATURE_SOC_CCM_ANALOG_COUNT)) && (!(defined FSL_FEATURE_SOC_ANATOP_COUNT)))
@@ -227,17 +211,14 @@ void USB_EhcihostPhyDisconnectDetectCmd(uint8_t controllerId, uint8_t enable)
     USBPHY_Type *usbPhyBase;
 
     usbPhyBase = (USBPHY_Type *)USB_EhciPhyGetBase(controllerId);
-    if (NULL == usbPhyBase)
-    {
+    if (NULL == usbPhyBase) {
         return;
     }
 
-    if (enable)
-    {
+    if (enable) {
         usbPhyBase->CTRL |= USBPHY_CTRL_ENHOSTDISCONDETECT_MASK;
     }
-    else
-    {
+    else {
         usbPhyBase->CTRL &= (~USBPHY_CTRL_ENHOSTDISCONDETECT_MASK);
     }
 #endif
@@ -250,23 +231,19 @@ void USB_PhyDeviceForceEnterFSMode(uint8_t controllerId, uint8_t enable)
     USBPHY_Type *usbPhyBase;
 
     usbPhyBase = (USBPHY_Type *)USB_EhciPhyGetBase(controllerId);
-    if (NULL == usbPhyBase)
-    {
+    if (NULL == usbPhyBase) {
         return;
     }
 
-    if (enable)
-    {
+    if (enable) {
         uint32_t delay         = 1000000;
         usbPhyBase->DEBUG0_CLR = USBPHY_DEBUG0_CLKGATE_MASK;
-        while ((usbPhyBase->USB1_VBUS_DET_STAT & USBPHY_USB1_VBUS_DET_STAT_VBUS_VALID_3V_MASK) && (delay))
-        {
+        while ((usbPhyBase->USB1_VBUS_DET_STAT & USBPHY_USB1_VBUS_DET_STAT_VBUS_VALID_3V_MASK) && (delay)) {
             delay--;
         }
         usbPhyBase->USB1_LOOPBACK_SET = USBPHY_USB1_LOOPBACK_UTMI_TESTSTART_MASK;
     }
-    else
-    {
+    else {
         usbPhyBase->DEBUG0_CLR        = USBPHY_DEBUG0_CLKGATE_MASK;
         usbPhyBase->USB1_LOOPBACK_CLR = USBPHY_USB1_LOOPBACK_UTMI_TESTSTART_MASK;
     }

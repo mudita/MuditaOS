@@ -68,121 +68,122 @@ typedef struct list_element_tag
  ******************************************************************************/
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif /* _cplusplus */
-/*!
- * @brief Initialize the list.
- *
- * This function initialize the list.
- *
- * @param list - List handle to initialize.
- * @param max - Maximum number of elements in list. 0 for unlimited.
- */
-void LIST_Init(list_handle_t list, uint32_t max);
+    /*!
+     * @brief Initialize the list.
+     *
+     * This function initialize the list.
+     *
+     * @param list - List handle to initialize.
+     * @param max - Maximum number of elements in list. 0 for unlimited.
+     */
+    void LIST_Init(list_handle_t list, uint32_t max);
 
-/*!
- * @brief Gets the list that contains the given element.
- *
- *
- * @param element - Handle of the element.
- * @retval NULL if element is orphan, Handle of the list the element is inserted into.
- */
-list_handle_t LIST_GetList(list_element_handle_t element);
+    /*!
+     * @brief Gets the list that contains the given element.
+     *
+     *
+     * @param element - Handle of the element.
+     * @retval NULL if element is orphan, Handle of the list the element is inserted into.
+     */
+    list_handle_t LIST_GetList(list_element_handle_t element);
 
-/*!
- * @brief Links element to the head of the list.
- *
- * @param list - Handle of the list.
- * @param element - Handle of the element.
- * @retval kLIST_Full if list is full, kLIST_Ok if insertion was successful.
- */
-list_status_t LIST_AddHead(list_handle_t list, list_element_handle_t element);
+    /*!
+     * @brief Links element to the head of the list.
+     *
+     * @param list - Handle of the list.
+     * @param element - Handle of the element.
+     * @retval kLIST_Full if list is full, kLIST_Ok if insertion was successful.
+     */
+    list_status_t LIST_AddHead(list_handle_t list, list_element_handle_t element);
 
-/*!
- * @brief Links element to the tail of the list.
- *
- * @param list - Handle of the list.
- * @param element - Handle of the element.
- * @retval kLIST_Full if list is full, kLIST_Ok if insertion was successful.
- */
-list_status_t LIST_AddTail(list_handle_t list, list_element_handle_t element);
+    /*!
+     * @brief Links element to the tail of the list.
+     *
+     * @param list - Handle of the list.
+     * @param element - Handle of the element.
+     * @retval kLIST_Full if list is full, kLIST_Ok if insertion was successful.
+     */
+    list_status_t LIST_AddTail(list_handle_t list, list_element_handle_t element);
 
-/*!
- * @brief Unlinks element from the head of the list.
- *
- * @param list - Handle of the list.
- *
- * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
- */
-list_element_handle_t LIST_RemoveHead(list_handle_t list);
+    /*!
+     * @brief Unlinks element from the head of the list.
+     *
+     * @param list - Handle of the list.
+     *
+     * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
+     */
+    list_element_handle_t LIST_RemoveHead(list_handle_t list);
 
-/*!
- * @brief Gets head element handle.
- *
- * @param list - Handle of the list.
- *
- * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
- */
-list_element_handle_t LIST_GetHead(list_handle_t list);
+    /*!
+     * @brief Gets head element handle.
+     *
+     * @param list - Handle of the list.
+     *
+     * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
+     */
+    list_element_handle_t LIST_GetHead(list_handle_t list);
 
-/*!
- * @brief Gets next element handle for given element handle.
- *
- * @param element - Handle of the element.
- *
- * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
- */
-list_element_handle_t LIST_GetNext(list_element_handle_t element);
+    /*!
+     * @brief Gets next element handle for given element handle.
+     *
+     * @param element - Handle of the element.
+     *
+     * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
+     */
+    list_element_handle_t LIST_GetNext(list_element_handle_t element);
 
-/*!
- * @brief Gets previous element handle for given element handle.
- *
- * @param element - Handle of the element.
- *
- * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
- */
-list_element_handle_t LIST_GetPrev(list_element_handle_t element);
+    /*!
+     * @brief Gets previous element handle for given element handle.
+     *
+     * @param element - Handle of the element.
+     *
+     * @retval NULL if list is empty, handle of removed element(pointer) if removal was successful.
+     */
+    list_element_handle_t LIST_GetPrev(list_element_handle_t element);
 
-/*!
- * @brief Unlinks an element from its list.
- *
- * @param element - Handle of the element.
- *
- * @retval kLIST_OrphanElement if element is not part of any list.
- * @retval kLIST_Ok if removal was successful.
- */
-list_status_t LIST_RemoveElement(list_element_handle_t element);
+    /*!
+     * @brief Unlinks an element from its list.
+     *
+     * @param element - Handle of the element.
+     *
+     * @retval kLIST_OrphanElement if element is not part of any list.
+     * @retval kLIST_Ok if removal was successful.
+     */
+    list_status_t LIST_RemoveElement(list_element_handle_t element);
 
-/*!
- * @brief Links an element in the previous position relative to a given member of a list.
- *
- * @param element - Handle of the element.
- * @param newElement - New element to insert before the given member.
- *
- * @retval kLIST_OrphanElement if element is not part of any list.
- * @retval kLIST_Ok if removal was successful.
- */
-list_status_t LIST_AddPrevElement(list_element_handle_t element, list_element_handle_t newElement);
+    /*!
+     * @brief Links an element in the previous position relative to a given member of a list.
+     *
+     * @param element - Handle of the element.
+     * @param newElement - New element to insert before the given member.
+     *
+     * @retval kLIST_OrphanElement if element is not part of any list.
+     * @retval kLIST_Ok if removal was successful.
+     */
+    list_status_t LIST_AddPrevElement(list_element_handle_t element, list_element_handle_t newElement);
 
-/*!
- * @brief Gets the current size of a list.
- *
- * @param list - Handle of the list.
- *
- * @retval Current size of the list.
- */
-uint32_t LIST_GetSize(list_handle_t list);
+    /*!
+     * @brief Gets the current size of a list.
+     *
+     * @param list - Handle of the list.
+     *
+     * @retval Current size of the list.
+     */
+    uint32_t LIST_GetSize(list_handle_t list);
 
-/*!
- * @brief Gets the number of free places in the list.
- *
- * @param list - Handle of the list.
- *
- * @retval Available size of the list.
- */
-uint32_t LIST_GetAvailableSize(list_handle_t list);
+    /*!
+     * @brief Gets the number of free places in the list.
+     *
+     * @param list - Handle of the list.
+     *
+     * @retval Available size of the list.
+     */
+    uint32_t LIST_GetAvailableSize(list_handle_t list);
 
-/* @} */
+    /* @} */
 
 #if defined(__cplusplus)
 }

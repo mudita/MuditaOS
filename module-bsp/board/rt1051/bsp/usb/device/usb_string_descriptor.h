@@ -16,10 +16,11 @@
  * For enum, there is prefix added: USB_STRING_.
  */
 #include "usb_strings.h"
-#define ID(id, value) USB_STRING_##id
-#define VALUE(id,value) value
+#define ID(id, value)    USB_STRING_##id
+#define VALUE(id, value) value
 
-typedef enum {
+typedef enum
+{
     USB_STRING_EMPTY = 0,
     USB_STRINGS(ID),
     USB_STRING_MAX_ID
@@ -32,9 +33,8 @@ typedef enum {
  * @return length of descriptor's binary data or 0
  *         for non-existing string
  */
-uint16_t USB_StringDescriptor(void* buffer, uint8_t id);
+uint16_t USB_StringDescriptor(void *buffer, uint8_t id);
 
 /**/
 extern uint8_t USB_StringDescriptorBuffer[];
 #endif /*_USB_STRING_DESCRIPTOR_H */
-
