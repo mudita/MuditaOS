@@ -239,6 +239,10 @@ namespace sapm
             sapm::APMSwitch *msg = reinterpret_cast<sapm::APMSwitch *>(msgl);
             handleSwitchApplication(msg);
         } break;
+        case MessageType::APMSwitchToNotification: {
+            sapm::APMSwitchToNotification *msg = reinterpret_cast<sapm::APMSwitchToNotification *>(msgl);
+            handleSwitchToNotification(msg);
+        } break;
         case MessageType::APMSwitchPrevApp: {
             sapm::APMSwitchPrevApp *msg = reinterpret_cast<sapm::APMSwitchPrevApp *>(msgl);
             if (!handleSwitchPrevApplication(msg)) {
@@ -529,6 +533,27 @@ namespace sapm
         return true;
     }
 
+    // tries to switch to the notification
+    bool ApplicationManager::handleSwitchToNotification(APMSwitchToNotification *msg)
+    {
+        auto app = appGet(msg->getAppName());
+        if (!app) {
+            LOG_ERROR("Cant switch to app: %s , doesn't exist", msg->getAppName().c_str());
+            return false;
+        }
+
+        if (app->getState() == app::Application::State::ACTIVE_FORGROUND) {
+            app::Application::messageSwitchApplication(
+                this, msg->getAppName(), msg->getWindowName(), std::move(msg->getData()));
+            return true;
+        }
+        else {
+            APMSwitch apmSwitch(
+                msg->getSenderName(), msg->getAppName(), msg->getWindowName(), std::move(msg->getData()));
+            return handleSwitchApplication(&apmSwitch);
+        }
+    }
+
     // tries to switch the application
     bool ApplicationManager::handleSwitchPrevApplication(APMSwitchPrevApp *msg)
     {
@@ -771,6 +796,15 @@ namespace sapm
     }
 
     // Static methods
+    bool ApplicationManager::messageSwitchToNotification(sys::Service *sender,
+                                                         const std::string &applicationName,
+                                                         const std::string &windowName,
+                                                         std::unique_ptr<gui::SwitchData> &&data)
+    {
+        auto msg = std::make_shared<sapm::APMSwitchToNotification>(
+            sender->GetName(), applicationName, windowName, std::move(data));
+        return sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+    }
 
     bool ApplicationManager::messageSwitchApplication(sys::Service *sender,
                                                       const std::string &applicationName,

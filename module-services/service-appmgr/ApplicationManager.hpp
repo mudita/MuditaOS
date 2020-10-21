@@ -156,6 +156,8 @@ namespace sapm
 
         // tries to switch the application
         bool handleSwitchApplication(APMSwitch *msg);
+        // tries to switch to the notification
+        bool handleSwitchToNotification(APMSwitchToNotification *msg);
         //	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
         bool handleCloseConfirmation(APMConfirmClose *msg);
         bool handleSwitchConfirmation(APMConfirmSwitch *msg);
@@ -187,7 +189,6 @@ namespace sapm
         sys::ReturnCodes DeinitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-
         /**
          * @brief Sends request to application manager to switch from current application to specific window in
          * application with specified name .
@@ -196,6 +197,14 @@ namespace sapm
                                              const std::string &applicationName,
                                              const std::string &windowName,
                                              std::unique_ptr<gui::SwitchData> data = nullptr);
+        /**
+         * @brief Sends request to application manager to switch from current application to specific window in
+         * application with specified name (even if is the name of foreground application ) .
+         */
+        static bool messageSwitchToNotification(sys::Service *sender,
+                                                const std::string &applicationName,
+                                                const std::string &windowName,
+                                                std::unique_ptr<gui::SwitchData> &&data);
 
         static bool messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data);
         /**

@@ -125,9 +125,10 @@ enum class MessageType
     AudioMessage,
 
     // application manager
-    APMCheckAppRunning, // check if application is running in application manager
-    APMSwitch,          // request to switch to given application, optionally also to specified window
-    APMSwitchPrevApp,   // Request to switch to previous application.
+    APMCheckAppRunning,      // check if application is running in application manager
+    APMSwitch,               // request to switch to given application, optionally also to specified window
+    APMSwitchToNotification, // request to switch to given notification (application and specified window)
+    APMSwitchPrevApp,        // Request to switch to previous application.
     APMConfirmSwitch, // Used when application confirms that it is loosing focus and also when application confirms that
                       // is has gained focus
     APMConfirmClose,  // Sent by application to confirm completion of the close procedure
