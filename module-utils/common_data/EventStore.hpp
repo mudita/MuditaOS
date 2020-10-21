@@ -50,11 +50,37 @@ namespace Store
         RssiBar rssiBar = RssiBar::zero;
     };
 
+    struct Network
+    {
+        enum class Status
+        {
+            NotRegistered,
+            RegisteredHomeNetwork,
+            Searching,
+            RegistrationDenied,
+            Unknown,
+            RegisteredRoaming
+        } status = Status::NotRegistered;
+
+        enum class AccessTechnology
+        {
+            Gsm   = 0x00,
+            Utran = 0x02,
+            GsmWEgprs,
+            UtranWHsdpa,
+            UtranWHsupa,
+            UtranWHsdpaAndWHsupa,
+            EUtran,
+            Unknown = 0xFF
+        } accessTechnology = AccessTechnology::Unknown;
+    };
+
     struct GSM
     {
       private:
         GSM() = default;
         SignalStrength signalStrength;
+        Network network;
 
         static cpp_freertos::MutexStandard mutex;
 
@@ -91,7 +117,10 @@ namespace Store
         } modem = Modem::OFF;
 
         void setSignalStrength(const SignalStrength &signalStrength);
-        SignalStrength getSignalStrength();
+        SignalStrength getSignalStrength() const;
+
+        void setNetwork(const Network &signalStrength);
+        Network getNetwork() const;
 
         static GSM *get();
     };

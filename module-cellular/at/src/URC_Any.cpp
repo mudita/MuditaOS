@@ -13,7 +13,7 @@ namespace at::urc
 
     void Any::split(const std::string &str, char tokenDelimiter)
     {
-        const std::string delim = ": ";
+        const std::string delim = ":";
         auto pos                = str.find(delim);
         head                    = std::string(str, 0, pos);
         if (pos != std::string::npos) {
@@ -21,9 +21,14 @@ namespace at::urc
         } // else - everyting went to head
     }
 
-    auto Any::is() -> bool
+    auto Any::is() const -> bool
     {
         return head.find(what()) != std::string::npos;
+    }
+
+    auto Any::getTokens() const -> std::vector<std::string>
+    {
+        return tokens;
     }
 
 } // namespace at::urc
