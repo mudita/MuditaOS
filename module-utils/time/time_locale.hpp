@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -141,10 +141,6 @@ namespace utils
 
             static const std::string format(enum TimeFormat what)
             {
-                if (what >= num_formatters) {
-                    LOG_ERROR("Bad value: %d", what);
-                    return "⌚";
-                }
                 return localize.get(tlocale.time_formats[what]);
             }
 
