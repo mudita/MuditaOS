@@ -1,55 +1,64 @@
-# all devs are codeovners
+# Please mind that:
+# 1. in CODEOVNERS file there is no `/**` syntax but we end catalog without `/` which means whole catalog and subdirs
+#    example `dir     @owner` means whole dir and it's subdirectory
+# 2. in CODEOWNERS file ending catalog with `/` means "cutoff
+#    example `dir     @owner` means whole only dir **without subdirs**
+# 3. starting dir from `/` means `from root dir` whereas without means `all such catalogs` (like we would do with extglob `**/`
+#
+# CODEOWNERS for teams have some issues: https://github.community/t/codeowners-works-with-users-but-not-teams/733
+
+\.github @pholat @rwicik @alekrudnik
+
+# all devs are codeovners, but this doesn't work ( see issue linked above )
 * @mudita/os
 
 #docments
 *.md                                        @wojtekidd
-/doc/**                                     @wojtekidd
+/doc                                        @wojtekidd
 
 #modules
-/module-audio/**                            @hubert-chrzaniuk @jimmorrisson @alekrudnik
-/module-bluetooth/**                        @SP2FET
-/module-bsp/**                              @grzyw-o-mat @SzMrMdt
-/module-cellular/**                         @kkleczkowski @alekrudnik
-/module-db/**                               @mudita/os/embedded-abs @pholat @PrzeBrudny
-/module-gui/**                              @PrzeBrudny @pholat @mozdzyk
-/module-utils/**                            @alekrudnik @mpsm @piotr-tanski
+/module-audio                               @hubert-chrzaniuk @jimmorrisson @alekrudnik
+/module-bluetooth                           @SP2FET
+/module-bsp                                 @grzyw-o-mat @SzMrMdt
+/module-cellular                            @kkleczkowski @alekrudnik
+/module-db                                  @mudita/os/embedded-abs @pholat @PrzeBrudny
+/module-gui                                 @PrzeBrudny @pholat @mozdzyk
+/module-utils                               @alekrudnik @mpsm @piotr-tanski
 /module-utils/PhoneNumber.*                 @mpsm
-/module-vfs/**                              @lucckb @alekrudnik @rkubiak01 @SzMrMdt
-/module_services/**                         @alekrudnik
+/module-vfs                                 @lucckb @alekrudnik @rkubiak01 @SzMrMdt
+/module_services                            @alekrudnik
 
 #system
-/module-bsp/board/rt1051/bsp/audio/**       @mpsm @alekrudnik
-/module-os/**                               @mpsm
-/module-sys/**                              @mpsm @alekrudnik
-/module-sys/Service/**                      @pholat
+/module-bsp/board/rt1051/bsp/audio          @mpsm @alekrudnik
+/module-os                                  @mpsm
+/module-sys                                 @mpsm @alekrudnik
+/module-sys/Service                         @pholat
 
 #services
-/module_services/service-antenna/**         @kkleczkowski
-/module-services/service-appmgr/**          @pholat @piotr-tanski
-/module_services/service-audio/**           @hubert-chrzaniuk @jimmorrisson
-/module_services/service-cellular/**        @kkleczkowski
-/module-services/service-db/**              @mudita/os/embedded-abs @PrzeBrudny
-/module-services/service-desktop/**         @SP2FET @rkubiak01
-/module_services/service-file-indexer/**    @lucckb
+/module_services/service-antenna            @kkleczkowski
+/module-services/service-appmgr             @pholat @piotr-tanski
+/module_services/service-audio              @hubert-chrzaniuk @jimmorrisson
+/module_services/service-cellular           @kkleczkowski
+/module-services/service-db                 @mudita/os/embedded-abs @PrzeBrudny
+/module-services/service-desktop            @SP2FET @rkubiak01
+/module_services/service-file-indexer       @lucckb
 
 #apps
-/module-apps/**                             @piotr-tanski @pholat @PrzeBrudny
-/module-apps/application-calendar/**        @PrzeBrudny @pholat @alekrudnik
-/module-apps/application-call/**            @alekrudnik
-/module-apps/application-calllog/**         @mudita/os/embedded-abs
-/module-apps/application-messages/**        @PrzeBrudny
-/module-apps/application-music-player/**    @alekrudnik
-/module-apps/application-phonebook/**       @mudita/os/embedded-abs @PrzeBrudny
-/module-apps/application-settings-new/**    @mudita/os/embedded-abs
-/module-apps/application-settings/**        @mudita/os/embedded-abs
+/module-apps                                @piotr-tanski @pholat @PrzeBrudny
+/module-apps/application-calendar           @PrzeBrudny @pholat @alekrudnik
+/module-apps/application-call               @alekrudnik
+/module-apps/application-calllog            @mudita/os/embedded-abs
+/module-apps/application-messages           @PrzeBrudny
+/module-apps/application-music-player       @alekrudnik
+/module-apps/application-phonebook          @mudita/os/embedded-abs @PrzeBrudny
+/module-apps/application-settings-new       @mudita/os/embedded-abs
+/module-apps/application-settings           @mudita/os/embedded-abs
 
 #build system
 *.cmake                                     @rwicik @mpsm
 *.sh                                        @pholat @rwicik @lucckb
-.github/**                                  @rwicik
-.gitmodules                                 @mpsm @rwicik
-/board/rt1051/ldscripts/**                  @mpsm
-/config/**                                  @rwicik @rkubiak01
-/docker/**                                  @rwicik
+\.gitmodules                                 @mpsm @rwicik
+/board/rt1051/ldscripts                     @mpsm
+/config                                     @rwicik @rkubiak01
+/docker                                     @rwicik
 CMakeLists.txt                              @rwicik @mpsm
-
