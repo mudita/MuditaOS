@@ -7,6 +7,8 @@
 #
 # CODEOWNERS for teams have some issues: https://github.community/t/codeowners-works-with-users-but-not-teams/733
 
+.github @pholat @rwicik @alekrudnik
+
 # all devs are codeovners
 * @os
 
