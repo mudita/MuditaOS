@@ -60,16 +60,12 @@ void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 #endif
 }
 
-std::string Chanel::formatCommand(const std::string &cmd)
+std::string Chanel::formatCommand(const std::string &cmd) const
 {
     if (validTerm.end() != std::find(validTerm.begin(), validTerm.end(), cmd.back())) {
         return cmd;
     }
-    std::string cmdFixed;
-    cmdFixed.reserve(cmd.size() + 1);
-    cmdFixed.append(cmd);
-    cmdFixed.push_back(cmdSeparator);
-    return cmdFixed;
+    return cmd + cmdSeparator;
 }
 
 class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount)
