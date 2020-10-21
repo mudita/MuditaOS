@@ -2,11 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
-#include "Context.hpp"
-#include "EndpointFactory.hpp"
-#include "log/log.hpp"
-#include "ParserUtils.hpp"
-#include <memory>
+
+#include "Context.hpp"         // for Context
+#include "Endpoint.hpp"        // for Endpoint
+#include "EndpointFactory.hpp" // for EndpointFactory
+#include "FreeRTOS.h"          // for xQueueHandle
+
+#include <bits/exception.h> // for exception
+#include <inttypes.h>       // for PRIu32
+
+#include "log/log.hpp" // for LOG_ERROR, LOG_DEBUG
+#include <memory>      // for operator!=, unique_ptr
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace parserFSM;
 

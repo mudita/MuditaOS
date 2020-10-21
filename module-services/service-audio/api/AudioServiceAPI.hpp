@@ -4,11 +4,23 @@
 #pragma once
 
 #include "../messages/AudioMessage.hpp"
+#include "Audio/AudioCommon.hpp"      // for PlaybackType, PlaybackType::None
+#include "Audio/Profiles/Profile.hpp" // for Profile, Profile::Type, Profil...
 #include "Audio/decoder/decoder.hpp"
-
-#include <optional>
+#include <memory>   // for shared_ptr
+#include <optional> // for optional
+#include <string>   // for string
+#include <vector>   // for vector
 
 class Service;
+namespace audio
+{
+    struct Tags;
+} // namespace audio
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 /**
  * Audio service API.

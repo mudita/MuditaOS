@@ -4,20 +4,40 @@
 #ifndef PUREPHONE_SERVICECELLULAR_HPP
 #define PUREPHONE_SERVICECELLULAR_HPP
 
-#include "CellularCall.hpp"
-#include "USSD.hpp"
+#include "CellularCall.hpp" // for CellularCall
 #include "SMSRecord.hpp"
-#include <Modem/TS0710/DLC_channel.h>
-#include <Modem/TS0710/TS0710.h>
-#include <Service/Service.hpp>
-#include "messages/CellularMessage.hpp"
-#include <utf8/UTF8.hpp>
-#include "State.hpp"
-#include "bsp/common.hpp"
+#include "State.hpp" // for State
+#include "USSD.hpp"  // for State, State::none
 
-#include <optional>
+#include <Modem/TS0710/DLC_channel.h> // for DLC_channel::Callback_t, DLC...
+#include <Modem/TS0710/TS0710.h>      // for TS0710
+#include <Service/Service.hpp>        // for Service
+#include <utf8/UTF8.hpp>
+#include <stdint.h> // for uint32_t
+
+#include "Modem/TS0710/TS0710_types.h"  // for PS460800, PortSpeed_e
+#include "Service/Common.hpp"           // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp"          // for Message_t, DataMessage (ptr ...
+#include "bsp/common.hpp"               // for Board, Board::none
+#include "messages/CellularMessage.hpp" // for CellularUSSDMessage, Cellula...
+#include <memory>                       // for unique_ptr, allocator, make_...
+#include <optional>                     // for optional
+#include <string>                       // for string
+#include <vector>                       // for vector
 
 class MuxDaemon;
+namespace db
+{
+    namespace query
+    {
+        class SMSSearchByTypeResult;
+    } // namespace query
+} // namespace db
+namespace sys
+{
+    class Timer;
+} // namespace sys
+struct SMSRecord;
 
 class ServiceCellular : public sys::Service
 {

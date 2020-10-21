@@ -2,7 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AtResponse.hpp"
-#include <json/json11.hpp>
+
+#include <json/json11.hpp> // for Json, Json::object
+
+#include "service-evtmgr/harness/Events.hpp" // for Data, Type
+#include <map>                               // for map<>::mapped_type
 
 namespace harness
 {

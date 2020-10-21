@@ -2,15 +2,20 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularCall.hpp"
-#include <Modem/ATParser.hpp>
-#include <Utils.hpp>
-#include <log/log.hpp>
-#include <time/time_conversion.hpp>
-#include <bsp/rtc/rtc.hpp>
 
-#include <vector>
-#include <string>
-#include <sstream>
+#include "CalllogRecord.hpp" // for CalllogRecord
+#include "PhoneNumber.hpp"   // for PhoneNumber::View, PhoneNumber
+
+#include <log/log.hpp>              // for LOG_ERROR
+#include <time/time_conversion.hpp> // for Timestamp, operator-, Duration
+#include <Utils.hpp>                // for enum_cast, split
+#include <inttypes.h>               // for PRIu32
+
+#include <optional>  // for optional
+#include <sstream>   // for operator<<, basic_ostream, basic...
+#include <stdexcept> // for runtime_error
+#include <string>    // for allocator, stoul, operator+, string
+#include <vector>    // for vector
 
 namespace ModemCall
 {

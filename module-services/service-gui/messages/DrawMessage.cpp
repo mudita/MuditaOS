@@ -1,9 +1,12 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "GUIMessage.hpp"
 #include "DrawMessage.hpp"
-#include "MessageType.hpp"
+
+#include "Common.hpp"      // for RefreshModes
+#include "DrawCommand.hpp" // for DrawCommand
+#include "GUIMessage.hpp"  // for GUIMessage
+#include "MessageType.hpp" // for MessageType, MessageType::GUICommands
 
 namespace sgui
 {

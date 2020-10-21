@@ -5,7 +5,13 @@
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
-#include "bsp/common.hpp"
+
+#include "bsp/common.hpp" // for Board
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace EventManagerServiceAPI
 {

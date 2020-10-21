@@ -2,21 +2,34 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <functional>
+#include "BaseInterface.hpp" // for Interface, Inter...
 
-#include "messages/AudioMessage.hpp"
-
-#include <Service/Service.hpp>
 #include <Audio/Audio.hpp>
-#include <Audio/AudioMux.hpp>
-#include <MessageType.hpp>
-
-#include <service-db/api/DBServiceAPI.hpp>
-#include <queries/settings/QuerySettingsGet_v2.hpp>
+#include <Audio/AudioMux.hpp>  // for AudioMux, AudioM...
+#include <Service/Service.hpp> // for Service
 #include <queries/settings/QuerySettingsAddOrIgnore_v2.hpp>
+#include <queries/settings/QuerySettingsGet_v2.hpp> // for SettingsQuery
 #include <queries/settings/QuerySettingsUpdate_v2.hpp>
-#include <service-db/messages/QueryMessage.hpp>
+#include <MessageType.hpp>
 #include <Utils.hpp>
+#include <assert.h> // for assert
+#include <stdint.h> // for uint32_t, int32_t
+
+#include "Audio/AudioCommon.hpp"                // for PlaybackType
+#include "Audio/Operation/Operation.hpp"        // for Operation, Opera...
+#include "Audio/Profiles/Profile.hpp"           // for Profile, Profile...
+#include "Common/Query.hpp"                     // for Query, QueryResult
+#include "Service/Common.hpp"                   // for ReturnCodes, Ret...
+#include "Service/Message.hpp"                  // for Message_t, DataM...
+#include "messages/AudioMessage.hpp"            // for AudioNotificatio...
+#include <service-db/api/DBServiceAPI.hpp>      // for DBServiceAPI
+#include <service-db/messages/QueryMessage.hpp> // for QueryResponse
+#include <functional>
+#include <memory>   // for unique_ptr, shar...
+#include <optional> // for optional, nullopt
+#include <string>   // for string
+#include <utility>  // for pair, tuple_elem...
+#include <vector>   // for vector
 
 class ServiceAudio : public sys::Service
 {

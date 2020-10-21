@@ -1,9 +1,12 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-#include <module-db/Interface/ContactRecord.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <catch2/catch.hpp> // for Assertion...
+
+#include "utf8/UTF8.hpp"                                   // for UTF8
+#include <module-db/Interface/ContactRecord.hpp>           // for ContactRe...
+#include <module-services/service-db/api/DBServiceAPI.hpp> // for DBServiceAPI
+#include <memory>                                          // for allocator
 
 TEST_CASE("DB_API")
 {

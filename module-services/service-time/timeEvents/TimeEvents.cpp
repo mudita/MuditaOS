@@ -3,6 +3,15 @@
 
 #include "TimeEvents.hpp"
 
+#include "Common/Query.hpp"  // for QueryResult
+#include "Service/Timer.hpp" // for Timer, Timer::Type, Timer::Type::Single...
+#include <utility>           // for move
+
+namespace sys
+{
+    class Service;
+} // namespace sys
+
 namespace stm
 {
     constexpr static const int eventTimerInitInterval = 1000;

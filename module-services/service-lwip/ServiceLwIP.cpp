@@ -2,21 +2,28 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceLwIP.hpp"
-#include <log/log.hpp>
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
+
+#include "MessageType.hpp" // for MessageType, MessageType::LwIP_req...
+
+#include <bits/exception.h> // for exception
+#include <log/log.hpp>      // for LOG_ERROR, LOG_INFO
+#include <stddef.h>         // for NULL
+
+#include "Service/Message.hpp" // for ResponseMessage, DataMessage, Mess...
+#include "Service/Service.hpp" // for Service
 
 extern "C"
 {
-#include "dhcp-server/dhserver.h"
-#include "lwip/apps/httpd.h"
-#include "lwip/init.h"
-#include "lwip/opt.h"
-#include "lwip/tcpip.h"
+#include "dhcp-server/dhserver.h" // for dhserv_init, dhcp_config_t, dhcp_e...
+#include "lwip/apps/httpd.h"      // for httpd_init
+#include "lwip/tcpip.h"           // for tcpip_init
 };
 
-#include <Service/Bus.hpp>
+#include <Service/Bus.hpp> // for Bus
+
+#include <memory>  // for make_shared, allocator, shared_ptr
+#include <string>  // for string
+#include <utility> // for pair
 
 #define NUM_DHCP_ENTRY 3
 

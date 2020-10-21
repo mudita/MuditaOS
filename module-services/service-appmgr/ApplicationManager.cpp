@@ -1,38 +1,38 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
-
-#include "SystemManager/SystemManager.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-evtmgr/EventManager.hpp"
-#include "messages/APMMessage.hpp"
 #include "AppMessage.hpp"
-#include "application-call/data/CallSwitchData.hpp"
 
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-cellular/ServiceCellular.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include "MessageType.hpp" // for Mes...
 
-#include <memory>
-#include <utility>
-
+#include "Common/Common.hpp"                                     // for Set...
+#include "Service/Bus.hpp"                                       // for Bus
+#include "Service/Timer.hpp"                                     // for Timer
+#include "SystemManager/SystemManager.hpp"                       // for Sys...
+#include "application-call/ApplicationCall.hpp"                  // for nam...
+#include "application-desktop/ApplicationDesktop.hpp"            // for nam...
+#include "application-special-input/ApplicationSpecialInput.hpp" // for spe...
+#include "log/debug.hpp"                                         // for DEB...
+#include "messages/APMMessage.hpp"                               // for APM...
+#include "service-db/api/DBServiceAPI.hpp"                       // for DBS...
+#include <algorithm>                                             // for fin...
+#include <iterator>                                              // for next
+#include <limits>                                                // for num...
+#include <memory>                                                // for all...
+#include <utility>                                               // for move
 // services
-#include "service-eink/ServiceEink.hpp"
-#include "service-gui/ServiceGUI.hpp"
-
-#include "Service/Timer.hpp"
-#include "application-call/ApplicationCall.hpp"
-#include "application-desktop/ApplicationDesktop.hpp"
-#include "application-special-input/ApplicationSpecialInput.hpp"
+#include "service-eink/ServiceEink.hpp"    // for Ser...
+#include "service-evtmgr/EventManager.hpp" // for Eve...
+#include "service-gui/ServiceGUI.hpp"      // for Ser...
 
 /// Auto phone lock disabled for now till the times when it's debugged
 /// #define AUTO_PHONE_LOCK_ENABLED
 
+#include "i18/i18.hpp" // for Lang
+#include <cassert>     // for assert
 // module-utils
-#include "log/log.hpp"
-#include "i18/i18.hpp"
-#include <cassert>
+#include "log/log.hpp" // for LOG...
 
 namespace sapm
 {

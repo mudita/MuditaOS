@@ -11,17 +11,31 @@
 #ifndef MODULE_SERVICES_SERVICE_GUI_SERVICEGUI_HPP_
 #define MODULE_SERVICES_SERVICE_GUI_SERVICEGUI_HPP_
 
-#include <memory>
+#include "Common.hpp" // for RefreshModes, RefreshModes::GUI_REF...
+#include "WorkerGUI.hpp"
 
+#include <stdint.h> // for uint32_t
+
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only)
+#include "Service/Service.hpp" // for Service
+#include <memory>              // for allocator, unique_ptr
+#include <string>              // for string
+#include <vector>              // for vector
 // module-gui
+#include "queue.h"  // for QueueDefinition
+#include "semphr.h" // for SemaphoreHandle_t
+
 #include "gui/core/Context.hpp"
-#include "gui/core/Renderer.hpp"
+#include "gui/core/Renderer.hpp" // for Renderer
 #include "gui/input/Translator.hpp"
 #include "messages/DrawMessage.hpp"
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "WorkerGUI.hpp"
+namespace gui
+{
+    class Context;
+    class DrawCommand;
+} // namespace gui
 
 namespace sgui
 {

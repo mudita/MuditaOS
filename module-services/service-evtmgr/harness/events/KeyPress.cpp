@@ -2,8 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "KeyPress.hpp"
-#include "../../messages/EVMessages.hpp"
-#include "../Events.hpp"
+
+#include "../Events.hpp"                          // for Data, Type
+#include "bsp/keyboard/key_codes.hpp"             // for KeyCodes, KeyCodes...
+#include "common_data/RawKey.hpp"                 // for RawKey, RawKey::State
+#include "service-evtmgr/messages/KbdMessage.hpp" // for KbdMessage
+#include <map>                                    // for map<>::mapped_type
+#include <memory>                                 // for make_shared, share...
 
 namespace harness::events
 {

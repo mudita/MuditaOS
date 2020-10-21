@@ -12,8 +12,14 @@
 #define RENDERER_RAREA_HPP_
 
 #include <cairomm/context.h>
+#include <gtkmm/drawingarea.h> // for DrawingArea
 #include <gtkmm.h>
-#include <gtkmm/drawingarea.h>
+
+namespace Cairo
+{
+    class Context;
+    template <class T_CppObject> class RefPtr;
+} // namespace Cairo
 
 class RArea : public Gtk::DrawingArea
 {

@@ -1,14 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsAgent.hpp"
 
-#include <module-sys/Service/Bus.hpp>
-#include <module-vfs/vfs.hpp>
+#include "Database/Database.hpp"         // for Database
+#include "Service/Service.hpp"           // for Service
+#include "messages/SettingsMessages.hpp" // for SetVariable, GetVariable
 
-#include <log/log.hpp>
+#include <module-sys/Service/Bus.hpp> // for Bus
+#include <module-vfs/vfs.hpp>         // for USER_PATH
 
-#include <memory>
+#include <functional> // for _Bind_helper<>::type, _Plac...
+#include <memory>     // for make_shared, allocator, sha...
+#include <utility>    // for move
 
 SettingsAgent::SettingsAgent(sys::Service *parentService) : DatabaseAgent(parentService)
 {

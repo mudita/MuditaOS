@@ -3,8 +3,21 @@
 
 #pragma once
 
-#include "Endpoint.hpp"
+#include "Endpoint.hpp"    // for Endpoint
+#include "ParserUtils.hpp" // for parserFSM
+
+#include "Service/Common.hpp" // for ReturnCodes
 #include "Service/Service.hpp"
+#include <string> // for string
+
+namespace parserFSM
+{
+    class Context;
+} // namespace parserFSM
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace parserFSM;
 

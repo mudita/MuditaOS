@@ -2,11 +2,19 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ParserFSM.hpp"
-#include <service-desktop/ServiceDesktop.hpp>
-#include <log/log.hpp>
-#include <json/json11.hpp>
-#include <memory>
-#include <string>
+
+#include "MessageHandler.hpp" // for MessageHandler
+#include "ParserUtils.hpp"    // for eraseFront, calcPayloadLength, extract...
+
+#include <log/log.hpp> // for LOG_DEBUG, LOG_ERROR
+
+#include <memory> // for unique_ptr, make_unique
+#include <string> // for string
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace parserFSM;
 

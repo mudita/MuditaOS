@@ -2,13 +2,20 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Service/Service.hpp"
-#include <string>
-#include "json/json11.hpp"
 #include <log/log.hpp>
+
+#include "Service/Service.hpp"
+#include "json/json11.hpp" // for Json
+#include <string>          // for string
+
+namespace sys
+{
+    class Service;
+} // namespace sys
+
 extern "C"
 {
-#include <FreeRTOS.h>
+#include <FreeRTOS.h> // for xQueueHandle
 #include <queue.h>
 }
 

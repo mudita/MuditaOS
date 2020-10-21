@@ -3,7 +3,10 @@
 
 #pragma once
 
-#include "../Events.hpp"
+#include "../Events.hpp"   // for Event, Events, Events::GPIO
+#include "json/json11.hpp" // for Json
+#include <map>             // for map
+#include <string>          // for string, allocator
 
 namespace harness::events
 {

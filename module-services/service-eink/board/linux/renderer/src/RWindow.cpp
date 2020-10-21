@@ -1,19 +1,25 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <glib.h>
+#include <stddef.h>
+#include <unistd.h>
 /*
  * RWindow.cpp
  *
  *  Created on: 24 kwi 2019
  *      Author: robert
  */
-#include <map>
-#include <gtk/gtk.h>
-
 #include "RWindow.hpp"
 
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "glibmm/signalproxy.h"
 #include "module-bsp/bsp/common.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "module-services/service-eink/board/linux/renderer/src/RArea.hpp"
+#include "sigc++/functors/mem_fun.h"
+#include <map>
+#include <utility>
+
 static gboolean viewUpdate(gpointer data)
 {
     RWindow *win = reinterpret_cast<RWindow *>(data);

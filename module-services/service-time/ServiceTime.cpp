@@ -2,12 +2,20 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
-#include "messages/TimeMessage.hpp"
-#include <vector>
 
+#include "BaseInterface.hpp"
+#include "MessageType.hpp"
+
+#include "Common/Query.hpp"
+#include "log/log.hpp"
+#include "messages/TimeMessage.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 #include "service-db/messages/QueryMessage.hpp"
+#include "service-time/timeEvents/CalendarTimeEvents.hpp"
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace stm
 {

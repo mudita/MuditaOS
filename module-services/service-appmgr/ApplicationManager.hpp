@@ -4,16 +4,32 @@
 #ifndef MODULE_SERVICES_SERVICE_APPMGR_APPLICATIONMANAGER_HPP_
 #define MODULE_SERVICES_SERVICE_APPMGR_APPLICATIONMANAGER_HPP_
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <map>
+#include "Application.hpp"         // for Application, Application::State
+#include "ApplicationLauncher.hpp" // for ApplicationLauncher
+#include "SettingsRecord.hpp"      // for SettingsRecord
+#include "SwitchData.hpp"          // for SwitchData, SwitchSpecialChar (pt...
+
 #include <string.h>
-#include "Application.hpp"
-#include "ApplicationLauncher.hpp"
+
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only)
+#include "Service/Service.hpp" // for Service
 #include "SystemManager/SystemManager.hpp"
-#include "messages/APMMessage.hpp"
-#include "i18/i18.hpp"
+#include "i18/i18.hpp"             // for Lang, i18 (ptr only)
+#include "log/log.hpp"             // for LOG_ERROR
+#include "messages/APMMessage.hpp" // for APMSwitchPrevApp
+#include <cstdint>                 // for uint32_t
+#include <list>                    // for list
+#include <map>
+#include <memory> // for unique_ptr, operator==, allocator
+#include <string> // for string
+#include <vector> // for vector
+
+namespace sys
+{
+    class SystemManager;
+    class Timer;
+} // namespace sys
 
 inline uint32_t default_application_locktime = 30000;
 

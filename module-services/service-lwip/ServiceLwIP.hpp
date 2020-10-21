@@ -3,10 +3,12 @@
 
 #pragma once
 
+#include "MessageType.hpp" // for MessageType, MessageType::LwIP_request
+
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for DataMessage, Message_t, ResponseMessa...
+#include "Service/Service.hpp" // for Service
 #include <memory>
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
 
 class LwIP_message : public sys::DataMessage
 {

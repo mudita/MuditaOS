@@ -3,12 +3,17 @@
 
 #pragma once
 
-#include <Database/Database.hpp>
+#include <Database/Database.hpp> // for Database
 #include <Service/Service.hpp>
 
-#include <string>
+#include <memory> // for unique_ptr
+#include <string> // for string
 
 class Database;
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 class DatabaseAgent
 {

@@ -2,21 +2,25 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAntenna.hpp"
-#include "Service/Timer.hpp"
-#include "api/AntennaServiceAPI.hpp"
-#include "log/log.hpp"
-#include "messages/AntennaMessage.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include <at/response.hpp>
-#include <memory>
-#include <module-utils/state/ServiceState.hpp>
-#include <service-cellular/messages/CellularMessage.hpp>
 
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include "time/time_conversion.hpp"
-#include <ticks.hpp>
+#include "MessageType.hpp" // for MessageType
+#include "projdefs.h"      // for pdMS_TO_TICKS
 
-#include <cassert>
+#include <at/response.hpp> // for parseCSQ
+#include <ticks.hpp>       // for Ticks
+
+#include "Service/Timer.hpp"                             // for Timer
+#include "api/AntennaServiceAPI.hpp"                     // for LockRequest
+#include "log/log.hpp"                                   // for LOG_INFO
+#include "messages/AntennaMessage.hpp"                   // for AntennaLock...
+#include "service-cellular/State.hpp"                    // for State, Stat...
+#include "service-cellular/api/CellularServiceAPI.hpp"   // for GetCSQ, Get...
+#include <module-utils/state/ServiceState.hpp>           // for State
+#include <service-cellular/messages/CellularMessage.hpp> // for CellularNot...
+#include <algorithm>                                     // for max
+#include <memory>                                        // for make_shared
+#include <string>                                        // for string
+#include <vector>                                        // for vector
 
 const char *ServiceAntenna::serviceName = "ServiceAntenna";
 

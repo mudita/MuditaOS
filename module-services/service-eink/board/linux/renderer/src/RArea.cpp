@@ -1,16 +1,16 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * RArea.cpp
- *
- *  Created on: 24 kwi 2019
- *      Author: robert
- */
-#include <gtkmm.h>
-#include <cairomm/context.h>
-#include <gdkmm/pixbuf.h>
 #include "RArea.hpp"
+
+#include <cairomm/context.h> // for Context
+#include <gdkmm/pixbuf.h>    // for Pixbuf, COLORSPACE_RGB
+#include <glib.h>            // for guchar
+
+#include "cairomm/refptr.h" // for RefPtr
+#include "gdkmm/general.h"  // for set_source_pixbuf
+#include "glibmm/refptr.h"  // for RefPtr
+#include "gtkmm/widget.h"   // for Allocation
 
 RArea::RArea() : data{nullptr}
 {}

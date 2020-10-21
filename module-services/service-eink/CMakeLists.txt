@@ -1,4 +1,4 @@
-
+﻿
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set( EINK_BOARD_PATH "board/rt1051" )
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -11,21 +11,11 @@ endif()
 
 message( "EINK BOARD PATH: ${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}" )
 
-include_directories( ${CMAKE_PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		"${CMAKE_CURRENT_LIST_DIR}/messages"
-		"${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}"
-)
-
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		"${CMAKE_CURRENT_LIST_DIR}/messages"
-		"${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}"
-#		"${CMAKE_CURRENT_LIST_DIR}/../"
+include_directories(
+    ${module-bsp_INCLUDE_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/messages
+    ${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}
 )
 
 target_sources( ${PROJECT_NAME}

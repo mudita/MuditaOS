@@ -2,10 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DBContactMessage.hpp"
-#include "MessageType.hpp"
 
-#include <memory>
-#include <utility>
+#include "ContactRecord.hpp" // for ContactRecord
+#include "MessageType.hpp"   // for MessageType, MessageType::DBContac...
+#include "PhoneNumber.hpp"   // for PhoneNumber
+
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <memory>                 // for unique_ptr
+#include <utility>                // for move
 
 DBContactMessage ::DBContactMessage(MessageType messageType, const ContactRecord &rec, bool favourite)
     : DBMessage(messageType), record(rec), favourite{favourite}

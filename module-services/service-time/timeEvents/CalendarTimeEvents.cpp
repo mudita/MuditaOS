@@ -3,15 +3,29 @@
 
 #include "CalendarTimeEvents.hpp"
 
+#include "BaseInterface.hpp"
+
+#include "Common/Query.hpp"
+#include "application-calendar/widgets/CalendarStyle.hpp"
+#include "queries/calendar/QueryEventsEdit.hpp"
+#include "service-time/timeEvents/TimeEvents.hpp"
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
+#include <module-apps/application-calendar/data/CalendarData.hpp>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
+#include <module-gui/gui/SwitchData.hpp>
 #include <module-services/service-appmgr/ApplicationManager.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
-#include <module-services/service-db/messages/DBNotificationMessage.hpp>
-#include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
+#include <algorithm>
+#include <chrono>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
-#include <module-gui/gui/SwitchData.hpp>
-#include <module-apps/application-calendar/data/CalendarData.hpp>
-#include <module-apps/application-calendar/ApplicationCalendar.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace stm
 {

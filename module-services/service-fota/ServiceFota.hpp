@@ -3,17 +3,26 @@
 
 #pragma once
 
-#include "api/FotaServiceAPI.hpp"
-
-#include <service-cellular/ServiceCellular.hpp>
+#include "Result.hpp" // for Result
 
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
-#include <Service/Service.hpp>
-#include <Service/Message.hpp>
+#include <Service/Message.hpp> // for Message_t
+#include <Service/Service.hpp> // for Service
+#include <stdint.h>            // for uint32_t
 
-#include <memory>
+#include "Service/Common.hpp"     // for ReturnCodes, ReturnCodes::Success
+#include "api/FotaServiceAPI.hpp" // for ContextMap
+#include <service-cellular/ServiceCellular.hpp>
+#include <memory> // for unique_ptr
 #include <sstream>
+#include <string> // for string
+
+class DLC_channel;
+namespace sys
+{
+    class Timer;
+} // namespace sys
 
 namespace FotaService
 {

@@ -3,8 +3,14 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
-#include "Interface/SMSRecord.hpp"
+#include "DBMessage.hpp"   // for DBMessage, DBResponseMessage
+#include "MessageType.hpp" // for MessageType, MessageType::Message...
+
+#include <stdint.h> // for uint32_t
+
+#include "Interface/SMSRecord.hpp" // for SMSRecord
+#include <memory>                  // for unique_ptr
+#include <vector>                  // for vector
 
 class DBSMSMessage : public DBMessage
 {

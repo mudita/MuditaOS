@@ -3,17 +3,28 @@
 
 #pragma once
 
-#include "Common/Query.hpp"
-#include "SMSTemplateRecord.hpp"
-#include "Service/Service.hpp"
-#include "Service/Common.hpp"
-#include "DBHelper.hpp"
-#include <memory>
-#include <service-db/api/DBServiceAPI.hpp>
+#include "DBHelper.hpp" // for DBHelper
 #include "Endpoint.hpp"
+#include "SMSTemplateRecord.hpp" // for SMSTemplateRecord
+#include "ThreadRecord.hpp"      // for ThreadRecord
+
+#include "Common/Query.hpp"
+#include "Service/Common.hpp" // for ReturnCodes
+#include "Service/Service.hpp"
+#include "json/json11.hpp" // for Json
+#include <service-db/api/DBServiceAPI.hpp>
+#include <memory>
+#include <string> // for string, allocator
+
+namespace sys
+{
+    class Service;
+} // namespace sys
+struct SMSRecord;
 
 namespace parserFSM
 {
+    class Context;
 
     class MessageHelper final : public DBHelper
     {

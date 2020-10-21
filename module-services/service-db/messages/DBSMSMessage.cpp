@@ -3,6 +3,11 @@
 
 #include "DBSMSMessage.hpp"
 
+#include "SMSRecord.hpp" // for SMSRecord
+
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <utility>                // for move
+
 DBSMSMessage::DBSMSMessage(MessageType messageType, const SMSRecord &rec) : DBMessage(messageType), record(rec)
 {}
 

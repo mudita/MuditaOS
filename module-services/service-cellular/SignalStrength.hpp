@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "common_data/EventStore.hpp"
+#include "common_data/EventStore.hpp" // for SignalStrength, RssiBar
 #include <limits>
 
 class SignalStrength

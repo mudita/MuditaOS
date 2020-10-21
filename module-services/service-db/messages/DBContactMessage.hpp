@@ -3,16 +3,18 @@
 
 #pragma once
 
-#include "MessageType.hpp"
+#include "DBMessage.hpp"   // for DBMessage, DBResponseMessage
+#include "MessageType.hpp" // for MessageType, MessageType::Mes...
 
-#include "DBMessage.hpp"
-#include "Interface/ContactRecord.hpp"
-#include "Service/Message.hpp"
+#include <PhoneNumber.hpp> // for PhoneNumber, PhoneNumber::View
+#include <stdint.h>        // for uint32_t
 
-#include <PhoneNumber.hpp>
-
-#include <memory>
+#include "Interface/ContactRecord.hpp" // for ContactRecord
+#include "Service/Common.hpp"          // for ReturnCodes
+#include "Service/Message.hpp"         // for DataMessage, ResponseMessage
+#include <memory>                      // for unique_ptr
 #include <utility>
+#include <vector> // for vector
 
 class DBContactMessage : public DBMessage
 {

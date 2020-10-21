@@ -1,23 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * ServiceGUI.hpp
- *
- *  Created on: 22 maj 2019
- *      Author: robert
- */
+#pragma once
 
-#ifndef MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_
-#define MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_
+#include "EinkIncludes.hpp" // for EinkWaveFormSettings_t, EinkWaveforms_e
 
-//#include "board.h"
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only)
+#include "Service/Service.hpp" // for Service
+#include "Service/Timer.hpp"   // for Timer, ms
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-// eink bsp
-#include "EinkIncludes.hpp"
-#include "Service/Timer.hpp"
+#include <stdint.h> // for uint32_t, int32_t, int8_t, uint8_t
+
+#include <string> // for string, allocator
 
 class ServiceEink : public sys::Service
 {
@@ -70,5 +65,3 @@ class ServiceEink : public sys::Service
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 };
-
-#endif /* MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_ */

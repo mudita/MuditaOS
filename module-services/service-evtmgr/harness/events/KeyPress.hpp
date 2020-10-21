@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include "../Events.hpp"
+#include "../Events.hpp"   // for Event, Events, Events::KeyPress
+#include "json/json11.hpp" // for Json
+#include <string>          // for string
 
 namespace harness::events
 {

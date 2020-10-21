@@ -2,7 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerDesktop.hpp"
-#include "MessageHandler.hpp"
+
+#include "MessageHandler.hpp" // for MessageHandler, MessageHandler::s...
+#include "ParserFSM.hpp"      // for StateMachine
+#include "projdefs.h"         // for pdTRUE
+#include "queue.h"            // for xQueueReceive, QueueDefinition
+
+#include "bsp/usb_cdc/usb_cdc.hpp" // for usbCDCInit, usbCDCSend
+#include "log/log.hpp"             // for LOG_ERROR, LOG_INFO
+#include <map>                     // for map
+#include <vector>                  // for vector
 
 bool WorkerDesktop::handleMessage(uint32_t queueID)
 {

@@ -1,13 +1,25 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "CalllogHelper.hpp"
+
+#include "BaseInterface.hpp"
+#include "Context.hpp"
+#include "MessageHandler.hpp"
+#include "ParserUtils.hpp"
+#include "PhoneNumber.hpp"
+
+#include "Common/Query.hpp"
+#include "api/DBServiceAPI.hpp"
+#include "utf8/UTF8.hpp"
 #include <module-db/queries/calllog/QueryCalllogGet.hpp>
+#include <module-db/queries/calllog/QueryCalllogGetByContactID.hpp>
 #include <module-db/queries/calllog/QueryCalllogGetCount.hpp>
 #include <module-db/queries/calllog/QueryCalllogRemove.hpp>
-#include <module-db/queries/calllog/QueryCalllogGetByContactID.hpp>
-
-#include "CalllogEndpoint.hpp"
-#include "CalllogHelper.hpp"
+#include <memory>
+#include <ostream>
+#include <utility>
+#include <vector>
 
 using namespace parserFSM;
 

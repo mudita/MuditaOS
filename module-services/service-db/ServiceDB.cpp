@@ -3,27 +3,56 @@
 
 #include "ServiceDB.hpp"
 
-#include "messages/DBSMSMessage.hpp"
-#include "messages/DBThreadMessage.hpp"
-#include "messages/DBNotificationMessage.hpp"
-#include "messages/DBSettingsMessage.hpp"
-#include "messages/DBSMSTemplateMessage.hpp"
-#include "messages/DBContactMessage.hpp"
-#include "messages/DBAlarmMessage.hpp"
-#include "messages/DBNotesMessage.hpp"
-#include "messages/DBCalllogMessage.hpp"
-#include "messages/DBCountryCodeMessage.hpp"
-#include <messages/DBServiceMessage.hpp>
+#include "AlarmsRecord.hpp"        // for AlarmsRecordInterface
+#include "CalllogRecord.hpp"       // for CalllogRecordInterface
+#include "ContactRecord.hpp"       // for ContactRecord, Contact...
+#include "CountryCodeRecord.hpp"   // for CountryCodeRecordInter...
+#include "EventsRecord.hpp"        // for EventsRecordInterface
+#include "MessageType.hpp"         // for MessageType, MessageTy...
+#include "NotesRecord.hpp"         // for NotesRecordInterface
+#include "NotificationsRecord.hpp" // for NotificationsRecordInt...
+#include "SMSRecord.hpp"           // for SMSRecord, SMSRecordIn...
+#include "SMSTemplateRecord.hpp"   // for SMSTemplateRecordInter...
+#include "SettingsRecord.hpp"      // for SettingsRecordInterface
+#include "ThreadRecord.hpp"        // for ThreadRecord, ThreadRe...
 
-#include "Database/Database.hpp"
+#include <Service/Bus.hpp>               // for Bus
+#include <messages/DBServiceMessage.hpp> // for DBServiceResponseMessage
+#include <time/ScopedTime.hpp>           // for Scoped
+#include <inttypes.h>                    // for PRIu32
+#include <stdint.h>                      // for uint32_t
 
-#include "log/log.hpp"
-
-#include "includes/DBServiceName.hpp"
-#include "messages/QueryMessage.hpp"
-#include <Service/Bus.hpp>
-#include <cassert>
-#include <time/ScopedTime.hpp>
+#include "Database/Database.hpp"              // for Database
+#include "Databases/AlarmsDB.hpp"             // for AlarmsDB
+#include "Databases/CalllogDB.hpp"            // for CalllogDB
+#include "Databases/ContactsDB.hpp"           // for ContactsDB
+#include "Databases/CountryCodesDB.hpp"       // for CountryCodesDB
+#include "Databases/EventsDB.hpp"             // for EventsDB
+#include "Databases/NotesDB.hpp"              // for NotesDB
+#include "Databases/NotificationsDB.hpp"      // for NotificationsDB
+#include "Databases/SettingsDB.hpp"           // for SettingsDB
+#include "Databases/SmsDB.hpp"                // for SmsDB
+#include "SettingsRecord_v2.hpp"              // for SettingsRecordInterfac...
+#include "Tables/Record.hpp"                  // for DB_ID_NONE
+#include "agents/DatabaseAgent.hpp"           // for DatabaseAgent
+#include "agents/settings/SettingsAgent.hpp"  // for SettingsAgent
+#include "includes/DBServiceName.hpp"         // for db
+#include "log/log.hpp"                        // for LOG_INFO, LOG_DEBUG
+#include "messages/DBAlarmMessage.hpp"        // for DBAlarmResponseMessage
+#include "messages/DBCalllogMessage.hpp"      // for DBCalllogResponseMessage
+#include "messages/DBContactMessage.hpp"      // for DBContactMessage, DBCo...
+#include "messages/DBCountryCodeMessage.hpp"  // for DBCountryCodeResponseM...
+#include "messages/DBNotesMessage.hpp"        // for DBNotesResponseMessage
+#include "messages/DBNotificationMessage.hpp" // for NotificationMessage
+#include "messages/DBSMSMessage.hpp"          // for DBSMSResponseMessage
+#include "messages/DBSMSTemplateMessage.hpp"  // for DBSMSTemplateMessage
+#include "messages/DBSettingsMessage.hpp"     // for DBSettingsResponseMessage
+#include "messages/DBThreadMessage.hpp"       // for DBThreadResponseMessage
+#include "messages/QueryMessage.hpp"          // for QueryMessage, QueryRes...
+#include <cassert>                            // for assert
+#include <optional>                           // for optional
+#include <utility>                            // for move
+#include <vector>                             // for vector
 
 static const auto service_db_stack = 1024 * 24;
 

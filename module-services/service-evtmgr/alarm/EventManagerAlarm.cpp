@@ -8,18 +8,25 @@
  *      Author: kuba
  */
 
-#include "../EventManager.hpp"
+#include "AlarmsRecord.hpp" // for AlarmsRecord
+#include "MessageType.hpp"  // for MessageType, Messag...
+#include "SwitchData.hpp"   // for SwitchData
 
-#include "log/log.hpp"
+#include <sys/types.h> // for time_t
 
-#include "bsp/keyboard/keyboard.hpp"
-#include "../WorkerEvent.hpp"
-#include "../messages/EVMessages.hpp"
+#include "../EventManager.hpp"                   // for EventManager
+#include "../messages/EVMessages.hpp"            // for RtcMinuteAlarmMessage
+#include "Service/Bus.hpp"                       // for Bus
+#include "service-appmgr/ApplicationManager.hpp" // for ApplicationManager
+#include "service-db/api/DBServiceAPI.hpp"       // for DBServiceAPI
+#include <memory>                                // for allocator, make_shared
+#include <string>                                // for string
+#include <utility>                               // for move
 
-#include "vfs.hpp"
-
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+namespace sys
+{
+    class DataMessage;
+} // namespace sys
 
 void EventManager::HandleAlarmTrigger(sys::DataMessage *msgl)
 {

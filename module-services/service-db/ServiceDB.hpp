@@ -3,23 +3,53 @@
 
 #pragma once
 
+#include "BaseInterface.hpp" // for Interface, Interface::Name
+
+#include "Common/Query.hpp" // for Query, Query::Type
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "Interface/ContactRecord.hpp"
 #include "Interface/CountryCodeRecord.hpp"
-#include "Interface/NotesRecord.hpp"
-#include "Interface/SMSRecord.hpp"
-#include "Interface/SettingsRecord.hpp"
-#include "Interface/ThreadRecord.hpp"
-#include "Interface/SMSTemplateRecord.hpp"
-#include "Interface/NotificationsRecord.hpp"
 #include "Interface/EventsRecord.hpp"
+#include "Interface/NotesRecord.hpp"
+#include "Interface/NotificationsRecord.hpp"
+#include "Interface/SMSRecord.hpp"
+#include "Interface/SMSTemplateRecord.hpp"
+#include "Interface/SettingsRecord.hpp"
 #include "Interface/SettingsRecord_v2.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
-#include "messages/DBNotificationMessage.hpp"
+#include "Interface/ThreadRecord.hpp"
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only)
+#include "Service/Service.hpp" // for Service
 #include "agents/DatabaseAgent.hpp"
 #include "agents/settings/SettingsAgent.hpp"
+#include "messages/DBNotificationMessage.hpp"
+#include <memory> // for unique_ptr
+#include <set>    // for set
+#include <string> // for string
+
+class AlarmsDB;
+class AlarmsRecordInterface;
+class CalllogDB;
+class CalllogRecordInterface;
+class ContactRecordInterface;
+class ContactsDB;
+class CountryCodeRecordInterface;
+class CountryCodesDB;
+class DatabaseAgent;
+class EventsDB;
+class EventsRecordInterface;
+class NotesDB;
+class NotesRecordInterface;
+class NotificationsDB;
+class NotificationsRecordInterface;
+class SMSRecordInterface;
+class SMSTemplateRecordInterface;
+class SettingsDB;
+class SettingsRecordInterface;
+class SettingsRecordInterface_v2;
+class SmsDB;
+class ThreadRecordInterface;
 
 class ServiceDB : public sys::Service
 {

@@ -3,6 +3,11 @@
 
 #include "DBNotificationMessage.hpp"
 
+#include "BaseInterface.hpp" // for Interface, Interface::Name
+#include "MessageType.hpp"   // for MessageType, MessageType::DBServiceNoti...
+
+#include "Common/Query.hpp" // for Query, Query::Type, Query::Type::Create
+
 namespace db
 {
     NotificationMessage::NotificationMessage(db::Interface::Name interface, Query::Type type)

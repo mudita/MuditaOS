@@ -1,44 +1,43 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
-/*
- * WorkerEvent.cpp
- *
- *  Created on: May 31, 2019
- *      Author: kuba
- */
-
-#include <string.h>
 
 extern "C"
 {
-#include "FreeRTOS.h"
-#include "task.h"
+#include "FreeRTOS.h" // for xQueueHandle
+#include "projdefs.h" // for pdTRUE
+#include "queue.h"    // for xQueueReceive
+#include "task.h"     // for xTaskGetTickC...
 }
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "Service/Worker.hpp"
-#include "MessageType.hpp"
-
+#include "Audio/AudioCommon.hpp" // for EventType
+#include "Constants.hpp"         // for evt_manager
+#include "MessageType.hpp"       // for MessageType
+#include "Service/Worker.hpp"    // for WorkerQueueInfo
 #include "WorkerEvent.hpp"
-#include "EventManager.hpp"
-#include "service-evtmgr/messages/EVMessages.hpp"
-#include "AudioServiceAPI.hpp"
+#include "bsp/battery-charger/battery_charger.hpp"     // for battery_Clear...
+#include "bsp/cellular/bsp_cellular.hpp"               // for getStatus
+#include "bsp/harness/bsp_harness.hpp"                 // for Init, emit
+#include "bsp/keyboard/keyboard.hpp"                   // for keyboard_Deinit
+#include "bsp/magnetometer/magnetometer.hpp"           // for init
+#include "bsp/rtc/rtc.hpp"                             // for rtc_GetCurren...
+#include "bsp/torch/torch.hpp"                         // for deinit, init
+#include "bsp/vibrator/vibrator.hpp"                   // for init
+#include "common_data/EventStore.hpp"                  // for GSM, GSM::Tray
+#include "common_data/RawKey.hpp"                      // for RawKey, RawKe...
+#include "harness/Parser.hpp"                          // for c_str, parse
+#include "headset.hpp"                                 // for Deinit, Handler
+#include "log/log.hpp"                                 // for LOG_ERROR
+#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventReq...
+#include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelM...
+#include "service-evtmgr/messages/EVMessages.hpp"      // for StatusStateMe...
+#include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 
-#include "bsp/battery-charger/battery_charger.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "bsp/keyboard/keyboard.hpp"
-#include "headset.hpp"
-#include "bsp/rtc/rtc.hpp"
-#include "bsp/vibrator/vibrator.hpp"
-#include "bsp/magnetometer/magnetometer.hpp"
-#include "bsp/torch/torch.hpp"
+#include <Service/Bus.hpp> // for Bus
+#include <sys/types.h>     // for time_t
 
-#include "Constants.hpp"
-#include "bsp/harness/bsp_harness.hpp"
-#include "harness/Parser.hpp"
-#include <Service/Bus.hpp>
+#include <memory> // for make_shared
+#include <string> // for string
+#include <vector> // for vector
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -188,7 +187,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
     return true;
 }
 
-#include "harness/events/SysStart.hpp"
+#include "harness/events/SysStart.hpp" // for SysStart
 
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
 {

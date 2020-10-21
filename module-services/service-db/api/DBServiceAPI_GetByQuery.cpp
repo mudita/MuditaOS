@@ -1,13 +1,26 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBServiceAPI.hpp"
+#include "BaseInterface.hpp" // for Interface, Interface::Name
+#include "DBServiceAPI.hpp"  // for DBServiceAPI
 
-#include <includes/DBServiceName.hpp>
-#include <messages/QueryMessage.hpp>
-#include <Service/Message.hpp>
+#include <Service/Message.hpp>        // for MessageRet_t
+#include <includes/DBServiceName.hpp> // for db
+#include <messages/QueryMessage.hpp>  // for QueryMessage
+#include <stdint.h>                   // for uint32_t
 
-#include <utility>
+#include "Service/Bus.hpp" // for Bus
+#include <memory>          // for make_shared, allocator, unique...
+#include <utility>         // for move
+
+namespace db
+{
+    class Query;
+} // namespace db
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 bool DBServiceAPI::GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query)
 {

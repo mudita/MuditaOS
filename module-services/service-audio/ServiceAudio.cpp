@@ -1,16 +1,27 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <type_traits>
-
 #include "ServiceAudio.hpp"
-#include "messages/AudioMessage.hpp"
 
-#include <Audio/Operation/IdleOperation.hpp>
-#include <Audio/Operation/PlaybackOperation.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
-#include <service-bluetooth/Constants.hpp>
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+#include "Utils.hpp" // for getValue
+
+#include "Audio/Audio.hpp"                                  // for Audio
+#include "Audio/AudioMux.hpp"                               // for AudioMux...
+#include "Service/Bus.hpp"                                  // for Bus
+#include "Service/Service.hpp"                              // for Service
+#include "SettingsRecord_v2.hpp"                            // for Settings...
+#include "Tables/Record.hpp"                                // for DB_ID_NONE
+#include "Tables/SettingsTable_v2.hpp"                      // for Settings...
+#include "api/DBServiceAPI.hpp"                             // for DBServic...
+#include "log/log.hpp"                                      // for LOG_DEBUG
+#include "messages/AudioMessage.hpp"                        // for AudioRes...
+#include "messages/QueryMessage.hpp"                        // for QueryRes...
+#include "queries/settings/QuerySettingsAddOrIgnore_v2.hpp" // for AddOrIgn...
+#include "queries/settings/QuerySettingsUpdate_v2.hpp"      // for UpdateQuery
+#include <service-bluetooth/Constants.hpp>                  // for bluetooth
+#include <service-bluetooth/messages/BluetoothMessage.hpp>  // for Bluetoot...
+#include <algorithm>                                        // for clamp
+#include <typeinfo>                                         // for type_info
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 

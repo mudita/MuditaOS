@@ -4,7 +4,16 @@
 #pragma once
 
 #include "WorkerDesktop.hpp"
+
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only)
+#include "Service/Service.hpp" // for Service
 #include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
+#include <memory> // for allocator, unique_ptr
+#include <string> // for string
+
+class UpdatePureOS;
+class WorkerDesktop;
 
 namespace service::name
 {

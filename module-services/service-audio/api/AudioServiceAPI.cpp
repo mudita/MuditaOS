@@ -2,8 +2,19 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AudioServiceAPI.hpp"
-#include "Service/Bus.hpp"
-#include "../ServiceAudio.hpp"
+
+#include "../ServiceAudio.hpp"                     // for ServiceAudio, Ser...
+#include "Audio/decoder/decoder.hpp"               // for Tags
+#include "Service/Bus.hpp"                         // for Bus, defaultCmdTi...
+#include "Service/Common.hpp"                      // for ReturnCodes, Retu...
+#include "log/log.hpp"                             // for LOG_DEBUG, LOG_ERROR
+#include "service-audio/messages/AudioMessage.hpp" // for AudioStopRequest
+#include <utility>                                 // for move, pair
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace audio;
 namespace AudioServiceAPI

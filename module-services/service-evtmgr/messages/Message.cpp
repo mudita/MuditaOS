@@ -2,7 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Message.hpp"
-#include <Service/Service.hpp>
+
+#include "MessageType.hpp" // for MessageType
+
+#include "Service/Message.hpp" // for DataMessage
 
 namespace sevm
 {

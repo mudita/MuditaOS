@@ -1,38 +1,22 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * ServiceEink.cpp
- *
- *  Created on: 22 maj 2019
- *      Author: robert
- */
-
 // FreeRTOS
-extern "C"
-{
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "timers.h"
-#include "semphr.h"
-}
-// module-utils
-#include "log/log.hpp"
-// module-vfs
-#include "vfs.hpp"
-#include "EinkIncludes.hpp"
-
-// eink messages
-#include "messages/EinkMessage.hpp"
-#include "messages/ImageMessage.hpp"
-#include "service-gui/messages/GUIMessage.hpp"
-
-#include "SystemManager/SystemManager.hpp"
-
-#include "MessageType.hpp"
 
 #include "ServiceEink.hpp"
+#include "MessageType.hpp"                     // for MessageType, MessageT...
+#include "Service/Bus.hpp"                     // for Bus
+#include "log/log.hpp"                         // for LOG_FATAL, LOG_ERROR
+#include "messages/EinkMessage.hpp"            // for EinkMessage
+#include "messages/ImageMessage.hpp"           // for ImageMessage
+#include "service-gui/messages/GUIMessage.hpp" // for GUIMessage
+#include "vfs.hpp"                             // for vfs
+
+#include <stdint.h>
+#include <stdio.h>  // for SEEK_SET
+#include <string.h> // for memset, memcpy
+
+#include <memory> // for make_shared, allocator
 
 enum class EinkWorkerCommands
 {

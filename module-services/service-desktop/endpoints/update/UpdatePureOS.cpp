@@ -5,10 +5,23 @@
 #if defined(TARGET_RT1051)
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
-#include <service-desktop/ServiceDesktop.hpp>
-#include <service-gui/ServiceGUI.hpp>
-#include <math.h>
+#include "DesktopMessages.hpp"
+#include "vfs.hpp" // for vfs
+
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "Service/Bus.hpp" // for Bus
+#include "SystemManager/SystemManager.hpp"
+#include "crc32/crc32.h"
+#include "json/json11.hpp" // for Json
+#include "log/log.hpp"
+#include "microtar/src/microtar.hpp"
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <array> // for array
+#include <memory>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {

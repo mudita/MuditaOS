@@ -1,34 +1,37 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
-
-// module-os
-#include "FreeRTOS.h"
-#include "semphr.h"
-
-// module-gui
-#include "gui/core/Context.hpp"
-#include "gui/input/Translator.hpp"
-
-// gui service
-#include "messages/GUIMessage.hpp"
-#include "messages/DrawMessage.hpp"
-
-// service-eink
-#include "service-eink/messages/ImageMessage.hpp"
-
 #include "ServiceGUI.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
 
-#include "../gui/core/ImageManager.hpp"
-#include "log/log.hpp"
+#include "DrawCommand.hpp" // for DrawCommand
+#include "MessageType.hpp" // for MessageType, Messa...
+#include "WorkerGUI.hpp"   // for WorkerGUI, WorkerG...
 
-#include "memory/usermem.h"
+#include <FontManager.hpp> // for FontManager
+#include <stddef.h>        // for NULL
 
-#include "SystemManager/SystemManager.hpp"
-#include "WorkerGUI.hpp"
-#include <FontManager.hpp>
+#include "../gui/core/ImageManager.hpp"    // for ImageManager
+#include "Service/Bus.hpp"                 // for Bus
+#include "Service/Worker.hpp"              // for WorkerQueueInfo
+#include "SystemManager/SystemManager.hpp" // for SystemManager
+#include <list>                            // for list, operator!=
+#include <memory>                          // for unique_ptr, make_s...
+#include <utility>                         // for move, pair
+// module-gui
+#include "gui/core/Context.hpp"     // for Context
+#include "log/log.hpp"              // for LOG_WARN, LOG_DEBUG
+#include "messages/DrawMessage.hpp" // for DrawMessage, DrawM...
+#include "messages/EinkMessage.hpp" // for EinkMessage
+// gui service
+#include "projdefs.h" // for pdMS_TO_TICKS, pdTRUE
+#include "semphr.h"   // for xSemaphoreGive
+
+#include "messages/GUIMessage.hpp"               // for GUIMessage
+#include "service-appmgr/ApplicationManager.hpp" // for ApplicationManager
+// service-eink
+#include "task.h" // for xTaskGetTickCount
+
+#include "service-eink/messages/ImageMessage.hpp" // for ImageMessage
 
 namespace sgui
 {

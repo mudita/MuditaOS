@@ -3,14 +3,16 @@
 
 #include "FotaServiceAPI.hpp"
 
-#include <service-fota/ServiceFota.hpp>
-#include <service-fota/messages/FotaMessages.hpp>
-#include <service-cellular/messages/CellularMessage.hpp>
-#include <service-cellular/ServiceCellular.hpp>
-#include <Service/Bus.hpp>
+#include "MessageType.hpp" // for MessageType, Messa...
 
-#include <sstream>
-#include <string>
+#include <Service/Bus.hpp> // for Bus
+
+#include "log/log.hpp"                            // for LOG_DEBUG
+#include <service-fota/ServiceFota.hpp>           // for Service, Service::...
+#include <service-fota/messages/FotaMessages.hpp> // for HTTPRequestMessage
+#include <memory>                                 // for make_shared, share...
+#include <sstream>                                // for operator<<, basic_...
+#include <string>                                 // for allocator, string
 
 namespace FotaService
 {

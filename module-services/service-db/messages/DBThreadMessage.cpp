@@ -3,6 +3,11 @@
 
 #include "DBThreadMessage.hpp"
 
+#include "ThreadRecord.hpp" // for ThreadRecord
+
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <utility>                // for move
+
 DBThreadMessage::DBThreadMessage(MessageType messageType, const ThreadRecord &rec) : DBMessage(messageType), record(rec)
 {}
 

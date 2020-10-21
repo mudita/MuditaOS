@@ -1,11 +1,19 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-#include "agents/settings/Settings.hpp"
-#include "messages/SettingsMessages.hpp"
-#include <Service/Service.hpp>
-#include <functional>
+#include <Service/Service.hpp> // for Service
+#include <catch2/catch.hpp>    // for AssertionHandler, SourceLin...
+
+#include "Service/Common.hpp"            // for ReturnCodes, ReturnCodes::S...
+#include "Service/Mailbox.hpp"           // for Mailbox
+#include "Service/Message.hpp"           // for Message_t, ResponseMessage
+#include "agents/settings/Settings.hpp"  // for Settings
+#include "messages/SettingsMessages.hpp" // for SetVariable, VariableResponse
+#include <functional>                    // for _Bind_helper<>::type, _Plac...
+#include <map>                           // for operator!=, _Rb_tree_iterator
+#include <memory>                        // for shared_ptr, allocator, make...
+#include <optional>                      // for optional
+#include <string>                        // for string, operator==, basic_s...
 
 namespace Settings
 {

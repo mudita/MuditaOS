@@ -1,17 +1,27 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../ServiceCellular.hpp"
-
 #include "CellularServiceAPI.hpp"
 
-#include <PhoneNumber.hpp>
-#include <Service/Bus.hpp>
-#include <utf8/UTF8.hpp>
+#include "MessageType.hpp" // for MessageType
 
-#include <memory>
-#include <string>
-#include <utility>
+#include <Service/Bus.hpp> // for Bus
+#include <PhoneNumber.hpp> // for PhoneNumber
+
+#include "../ServiceCellular.hpp"                        // for ServiceCell...
+#include "Modem/TS0710/TS0710.h"                         // for TS0710, TS0...
+#include "Service/Common.hpp"                            // for ReturnCodes
+#include "bsp/cellular/bsp_cellular.hpp"                 // for antenna
+#include "log/log.hpp"                                   // for LOG_ERROR
+#include "service-cellular/messages/CellularMessage.hpp" // for CellularReq...
+#include <memory>                                        // for make_shared
+#include <string>                                        // for string
+#include <utility>                                       // for pair, move
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {

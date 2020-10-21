@@ -1,62 +1,73 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <algorithm>
-#include <cassert>
-#include <iostream>
-#include <iterator>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "ServiceCellular.hpp"
 
-#include <ctime>
-#include <functional>
-#include <iomanip>
+#include "AudioServiceAPI.hpp"
+#include "BaseInterface.hpp"
+#include "CalllogRecord.hpp"
+#include "Commands.hpp"
+#include "MessageType.hpp"
+#include "NotificationsRecord.hpp"
+#include "Result.hpp"
+#include "SMSRecord.hpp"
+#include "SignalStrength.hpp"
+#include "projdefs.h"
+#include "task.h"
 
+#include <at/URC_CTZE.hpp>
+#include <at/URC_CUSD.hpp>
+#include <at/URC_QIND.hpp>
+#include <at/response.hpp>
+#include <bits/exception.h>
+#include <common_data/EventStore.hpp>
+#include <log/log.hpp>
+#include <PhoneNumber.hpp>
+#include <Utils.hpp>
+#include <country.hpp>
+
+#include "Audio/AudioCommon.hpp"
+#include "Common/Common.hpp"
+#include "Common/Query.hpp"
+#include "Modem/ATCommon.hpp"
+#include "Modem/ATParser.hpp"
+#include "Modem/TS0710/DLC_channel.h"
+#include "Modem/TS0710/TS0710.h"
+#include "Modem/TS0710/TS0710_START.h"
+#include "Service/Bus.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Timer.hpp"
-#include "ServiceCellular.hpp"
-
-#include "MessageType.hpp"
-
-#include "messages/CellularMessage.hpp"
-
-#include "SignalStrength.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-appmgr/messages/APMMessage.hpp"
-#include "service-evtmgr/messages/EVMessages.hpp"
-#include "ucs2/UCS2.hpp"
-
+#include "Tables/CalllogTable.hpp"
+#include "Tables/Record.hpp"
 #include "api/CellularServiceAPI.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
+#include "messages/CellularMessage.hpp"
+#include "service-antenna/ServiceAntenna.hpp"
+#include "service-antenna/api/AntennaServiceAPI.hpp"
+#include "service-antenna/messages/AntennaMessage.hpp"
+#include "service-cellular/CellularCall.hpp"
+#include "service-cellular/State.hpp"
+#include "service-cellular/USSD.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 #include "service-db/messages/QueryMessage.hpp"
-
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp"
-#include "service-antenna/api/AntennaServiceAPI.hpp"
-#include "service-antenna/messages/AntennaMessage.hpp"
-
+#include "service-evtmgr/messages/EVMessages.hpp"
 #include "time/time_conversion.hpp"
-#include <Utils.hpp>
-#include <at/URC_QIND.hpp>
-#include <at/URC_CUSD.hpp>
-#include <at/URC_CTZE.hpp>
-#include <at/response.hpp>
-#include <common_data/EventStore.hpp>
-#include <service-evtmgr/Constants.hpp>
-#include <country.hpp>
-#include <PhoneNumber.hpp>
-#include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
+#include "ucs2/UCS2.hpp"
+#include "utf8/UTF8.hpp"
 #include <module-db/queries/messages/sms/QuerySMSSearchByType.hpp>
-
-#include <log/log.hpp>
-
-#include <vector>
-#include <utility>
+#include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+#include <map>
 #include <optional>
 #include <string>
-#include <ticks.hpp>
+#include <utility>
+#include <vector>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 

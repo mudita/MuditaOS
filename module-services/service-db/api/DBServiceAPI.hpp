@@ -3,23 +3,41 @@
 
 #pragma once
 
-#include "Interface/AlarmsRecord.hpp"
-#include "Interface/CalllogRecord.hpp"
-#include "Interface/ContactRecord.hpp"
-#include "Interface/NotesRecord.hpp"
-#include "Interface/SMSRecord.hpp"
-#include "Interface/SettingsRecord.hpp"
-#include "Interface/ThreadRecord.hpp"
-#include "Interface/SMSTemplateRecord.hpp"
-#include "Service/Bus.hpp"
-#include "Interface/SettingsRecord_v2.hpp"
+#include "BaseInterface.hpp" // for Interface, Interface::Name
 
 #include <Common/Query.hpp>
-#include <PhoneNumber.hpp>
+#include <Service/Message.hpp> // for MessageRet_t
+#include <sys/types.h>         // for time_t
+#include <PhoneNumber.hpp>     // for PhoneNumber
+#include <stdint.h>            // for uint32_t
 
-#include <Service/Message.hpp>
+#include "Common/Common.hpp"           // for EntryState, EntryState::ALL
+#include "Interface/AlarmsRecord.hpp"  // for AlarmsRecord
+#include "Interface/CalllogRecord.hpp" // for CalllogRecord
+#include "Interface/ContactRecord.hpp"
+#include "Interface/NotesRecord.hpp"
+#include "Interface/SMSRecord.hpp"         // for SMSRecord
+#include "Interface/SMSTemplateRecord.hpp" // for SMSTemplateRecord
+#include "Interface/SettingsRecord.hpp"    // for SettingsRecord
+#include "Interface/SettingsRecord_v2.hpp"
+#include "Interface/ThreadRecord.hpp" // for ThreadRecord
+#include "Service/Bus.hpp"
+#include "utf8/UTF8.hpp" // for UTF8
+#include <memory>        // for unique_ptr, shared_ptr
+#include <string>        // for string
+#include <vector>        // for vector
 
 class DBContactMessage;
+namespace db
+{
+    class Query;
+} // namespace db
+namespace sys
+{
+    class Service;
+} // namespace sys
+struct ContactRecord;
+struct NotesRecord;
 
 class DBServiceAPI
 {

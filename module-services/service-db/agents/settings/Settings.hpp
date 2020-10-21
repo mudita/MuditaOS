@@ -3,18 +3,21 @@
 
 #pragma once
 
-#include <list>
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
+#include <includes/DBServiceName.hpp> // for db
+#include <stdint.h>                   // for int16_t
 
-#include <includes/DBServiceName.hpp>
+#include <functional> // for function
+#include <list>       // for list
+#include <map>        // for map
+#include <memory>     // for shared_ptr, allocator
+#include <optional>   // for optional
+#include <string>     // for string
 
 namespace sys
 {
-    class Service;
     class Message;
+    class Service;
+
     using Message_t = std::shared_ptr<Message>;
 }; // namespace sys
 

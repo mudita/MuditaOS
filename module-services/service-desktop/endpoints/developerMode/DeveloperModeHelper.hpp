@@ -3,13 +3,21 @@
 
 #pragma once
 
-#include "Common/Query.hpp"
 #include "Context.hpp"
+
+#include "Common/Query.hpp"
+#include "Service/Common.hpp" // for ReturnCodes
 #include "Service/Service.hpp"
-#include "Service/Common.hpp"
+#include <string> // for allocator, string
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace parserFSM
 {
+    class Context;
 
     class DeveloperModeHelper
     {

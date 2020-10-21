@@ -1,18 +1,18 @@
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}"
 )
 
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
+include_directories(
+    ${module-bsp_INCLUDE_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
 target_include_directories(${PROJECT_NAME}
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/../service-audio/api"
+
 )
 
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )

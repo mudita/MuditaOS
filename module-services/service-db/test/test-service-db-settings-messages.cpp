@@ -1,14 +1,19 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-#include "messages/SettingsMessages.hpp"
+#include <Service/Message.hpp> // for Message_t, ResponseMessage
+#include <Service/Service.hpp> // for Service
+#include <catch2/catch.hpp>    // for Section, SourceLineInfo
 
-#include <Service/Service.hpp>
-#include <Service/Message.hpp>
-
-#include <functional>
-#include <module-sys/Service/Bus.hpp>
+#include "Service/Common.hpp"            // for ReturnCodes, ReturnCodes::S...
+#include "messages/SettingsMessages.hpp" // for SetVariable, ListProfiles
+#include <module-sys/Service/Bus.hpp>    // for Bus
+#include <functional>                    // for _Bind_helper<>::type, _Plac...
+#include <list>                          // for list
+#include <memory>                        // for make_shared, allocator, sha...
+#include <optional>                      // for optional
+#include <string>                        // for string
+#include <utility>                       // for move
 
 namespace Settings
 {

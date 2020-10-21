@@ -4,10 +4,11 @@
 #pragma once
 
 #include "DBMessage.hpp"
-#include "Service/Message.hpp"
+
+#include "Service/Message.hpp"                   // for DataMessage
+#include <module-db/Common/Query.hpp>            // for Query, Query::Type
+#include <module-db/Interface/BaseInterface.hpp> // for Interface, Interfac...
 #include <memory>
-#include <module-db/Interface/BaseInterface.hpp>
-#include <module-db/Common/Query.hpp>
 
 namespace db
 {

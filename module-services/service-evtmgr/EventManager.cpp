@@ -10,35 +10,37 @@
 
 #include "EventManager.hpp"
 
-#include "log/log.hpp"
+#include "AudioServiceAPI.hpp" // for SendEvent
+#include "BaseInterface.hpp"   // for Interface
+#include "MessageType.hpp"     // for MessageType
+#include "WorkerEvent.hpp"     // for WorkerEvent
 
-#include "bsp/keyboard/keyboard.hpp"
-#include "WorkerEvent.hpp"
-#include "messages/EVMessages.hpp"
-
-#include "vfs.hpp"
-
-#include "bsp/battery-charger/battery_charger.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-db/messages/DBNotificationMessage.hpp"
-#include "AudioServiceAPI.hpp"
-
-#include "bsp/harness/bsp_harness.hpp"
-#include "harness/Parser.hpp"
-#include "harness/events/AtResponse.hpp"
-#include "harness/events/FocusApp.hpp"
-#include <service-cellular/messages/CellularMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
-
-#include <cassert>
-
-#include "bsp/magnetometer/magnetometer.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "bsp/common.hpp"
-#include "bsp/rtc/rtc.hpp"
-
-#include <cassert>
+#include "Service/Bus.hpp"                               // for Bus
+#include "Service/Worker.hpp"                            // for WorkerQueue...
+#include "SystemManager/Constants.hpp"                   // for system_manager
+#include "SystemManager/SystemManager.hpp"               // for SystemManager
+#include "bsp/common.hpp"                                // for c_str
+#include "bsp/harness/bsp_harness.hpp"                   // for emit
+#include "bsp/keyboard/key_codes.hpp"                    // for KeyCodes
+#include "bsp/magnetometer/magnetometer.hpp"             // for GetBoard
+#include "bsp/rtc/rtc.hpp"                               // for rtc_SetDate...
+#include "bsp/torch/torch.hpp"                           // for State, Action
+#include "common_data/RawKey.hpp"                        // for RawKey, Raw...
+#include "harness/events/AtResponse.hpp"                 // for AtResponse
+#include "harness/events/FocusApp.hpp"                   // for FocusApp
+#include "log/log.hpp"                                   // for LOG_INFO
+#include "messages/EVMessages.hpp"                       // for TorchStateR...
+#include "service-appmgr/ApplicationManager.hpp"         // for Application...
+#include "service-audio/messages/AudioMessage.hpp"       // for AudioEventR...
+#include "service-db/messages/DBNotificationMessage.hpp" // for Notificatio...
+#include "service-evtmgr/messages/BatteryMessages.hpp"   // for BatteryLeve...
+#include "service-evtmgr/messages/KbdMessage.hpp"        // for KbdMessage
+#include <service-cellular/messages/CellularMessage.hpp> // for CellularTim...
+#include <service-evtmgr/Constants.hpp>                  // for evt_manager
+#include <cassert>                                       // for assert
+#include <list>                                          // for list
+#include <tuple>                                         // for tie, tuple
+#include <vector>                                        // for vector
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {

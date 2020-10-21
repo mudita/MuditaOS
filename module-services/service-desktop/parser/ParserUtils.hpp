@@ -2,10 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <stdint.h>
-#include <string>
+#include <bits/exception.h> // for exception
+#include <log/log.hpp>      // for LOG_ERROR
+#include <stddef.h>         // for size_t
+#include <stdint.h>         // for uint8_t
+
+#include <string> // for string, allocator, basic_string, stol
 #include <vector>
-#include <log/log.hpp>
 
 namespace parserFSM
 {

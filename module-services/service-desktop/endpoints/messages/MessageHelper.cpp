@@ -2,33 +2,39 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHelper.hpp"
-#include "Common/Query.hpp"
-#include "ParserUtils.hpp"
+
+#include "BaseInterface.hpp"
+#include "Context.hpp"
+#include "MessageHandler.hpp"
+#include "ParserUtils.hpp" // for Code
 #include "PhoneNumber.hpp"
 #include "SMSRecord.hpp"
 #include "SMSTemplateRecord.hpp"
-#include "Service/Common.hpp"
 #include "ThreadRecord.hpp"
+
+#include "Common/Query.hpp"
+#include "Service/Common.hpp"
 #include "api/DBServiceAPI.hpp"
+#include "json/json11.hpp" // for Json
 #include "queries/messages/sms/QuerySMSGet.hpp"
 #include "queries/messages/sms/QuerySMSGetByContactID.hpp"
-#include "queries/messages/sms/QuerySMSGetByThreadID.hpp"
 #include "queries/messages/sms/QuerySMSGetByID.hpp"
 #include "queries/messages/sms/QuerySMSGetByText.hpp"
+#include "queries/messages/sms/QuerySMSGetByThreadID.hpp"
 #include "queries/messages/sms/QuerySMSGetCount.hpp"
-#include "queries/messages/threads/QueryThreadsSearch.hpp"
 #include "queries/messages/sms/QuerySMSRemove.hpp"
-#include "queries/messages/templates/QuerySMSTemplateGet.hpp"
-#include "queries/messages/templates/QuerySMSTemplateRemove.hpp"
-#include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"
 #include "queries/messages/templates/QuerySMSTemplateAdd.hpp"
+#include "queries/messages/templates/QuerySMSTemplateGet.hpp"
 #include "queries/messages/templates/QuerySMSTemplateGetByID.hpp"
 #include "queries/messages/templates/QuerySMSTemplateGetCount.hpp"
+#include "queries/messages/templates/QuerySMSTemplateRemove.hpp"
+#include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"
 #include "queries/messages/threads/QueryThreadMarkAsRead.hpp"
-#include "utf8/UTF8.hpp"
-#include "json/json11.hpp"
+#include "utf8/UTF8.hpp" // for UTF8
 #include <memory>
 #include <string>
+#include <utility> // for move
+#include <vector>
 
 using namespace parserFSM;
 

@@ -1,31 +1,36 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Service/Timer.hpp"
-#include "api/FotaServiceAPI.hpp"
-
 #include "ServiceFota.hpp"
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
 
-#include <Service/Bus.hpp>
-#include <module-cellular/Modem/TS0710/TS0710.h>
-#include <module-cellular/at/Result.hpp>
-#include <module-cellular/at/URC_QIND.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
+#include "Commands.hpp"    // for AT, AT::QIG...
+#include "MessageType.hpp" // for MessageType
+#include "portmacro.h"     // for TickType_t
 
-#include "MessageType.hpp"
+#include <Service/Bus.hpp>  // for Bus
+#include <bits/exception.h> // for exception
 
-#include "messages/FotaMessages.hpp"
-
-#include <algorithm>
-#include <cctype>
-#include <functional>
-#include <iostream>
-#include <numeric>
-#include <sstream>
-#include <string>
-#include <sstream>
+#include "Modem/TS0710/DLC_channel.h"                    // for DLC_channel
+#include "Service/Message.hpp"                           // for Message_t
+#include "Service/Service.hpp"                           // for Service
+#include "Service/Timer.hpp"                             // for Timer
+#include "api/FotaServiceAPI.hpp"                        // for Config, Con...
+#include "log/log.hpp"                                   // for LOG_DEBUG
+#include "messages/FotaMessages.hpp"                     // for FotaRespons...
+#include "service-cellular/State.hpp"                    // for State, Stat...
+#include "service-cellular/messages/CellularMessage.hpp" // for CellularGet...
+#include <module-cellular/at/Result.hpp>                 // for Result, Res...
+#include <module-cellular/at/URC_QIND.hpp>               // for QIND
+#include <service-cellular/api/CellularServiceAPI.hpp>   // for GetDataChannel
+#include <algorithm>                                     // for find_if
+#include <cctype>                                        // for tolower
+#include <functional>                                    // for _Bind_helpe...
+#include <numeric>                                       // for accumulate
+#include <sstream>                                       // for operator<<
+#include <string>                                        // for string, bas...
+#include <unordered_map>                                 // for unordered_m...
+#include <utility>                                       // for move, pair
+#include <vector>                                        // for vector
 
 namespace FotaService
 {

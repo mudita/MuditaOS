@@ -3,8 +3,15 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
-#include "Interface/AlarmsRecord.hpp"
+#include "DBMessage.hpp"   // for DBMessage, DBResponseMessage
+#include "MessageType.hpp" // for MessageType, MessageType::Mess...
+
+#include <sys/types.h> // for time_t
+#include <stdint.h>    // for uint32_t
+
+#include "Interface/AlarmsRecord.hpp" // for AlarmsRecord
+#include <memory>                     // for unique_ptr
+#include <vector>                     // for vector
 
 class DBAlarmMessage : public DBMessage
 {

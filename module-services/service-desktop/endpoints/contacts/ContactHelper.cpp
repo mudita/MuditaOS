@@ -1,19 +1,32 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ContactRecord.hpp"
 #include "ContactHelper.hpp"
-#include "Common/Query.hpp"
-#include "ParserUtils.hpp"
-#include "Service/Common.hpp"
-#include "api/DBServiceAPI.hpp"
-#include "log/log.hpp"
-#include "queries/phonebook/QueryContactGetByID.hpp"
-#include "queries/phonebook/QueryContactUpdate.hpp"
-#include "json/json11.hpp"
-#include <queries/phonebook/QueryContactGet.hpp>
-#include <queries/phonebook/QueryContactAdd.hpp>
-#include <queries/phonebook/QueryContactRemove.hpp>
+
+#include "BaseInterface.hpp"  // for Interface, Inte...
+#include "ContactRecord.hpp"  // for ContactRecord
+#include "Context.hpp"        // for Context
+#include "MessageHandler.hpp" // for MessageHandler
+#include "ParserUtils.hpp"    // for Code, Code::Int...
+#include "PhoneNumber.hpp"    // for PhoneNumber
+
+#include <queries/phonebook/QueryContactAdd.hpp>    // for ContactAdd, Con...
+#include <queries/phonebook/QueryContactGet.hpp>    // for ContactGet, Con...
+#include <queries/phonebook/QueryContactRemove.hpp> // for ContactRemove
+
+#include "Common/Common.hpp"                         // for ContactNumberType
+#include "Common/Query.hpp"                          // for EndpointListener
+#include "Service/Common.hpp"                        // for ReturnCodes
+#include "api/DBServiceAPI.hpp"                      // for DBServiceAPI
+#include "json/json11.hpp"                           // for Json, Json::array
+#include "log/log.hpp"                               // for LOG_ERROR
+#include "queries/RecordQuery.hpp"                   // for RecordsSizeQuer...
+#include "queries/phonebook/QueryContactGetByID.hpp" // for ContactGetByID
+#include "queries/phonebook/QueryContactUpdate.hpp"  // for ContactUpdate
+#include "utf8/UTF8.hpp"                             // for UTF8
+#include <memory>                                    // for make_unique
+#include <utility>                                   // for move
+#include <vector>                                    // for vector
 
 using namespace parserFSM;
 

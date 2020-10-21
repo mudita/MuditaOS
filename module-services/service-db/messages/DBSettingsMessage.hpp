@@ -3,9 +3,14 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
-#include "Interface/SettingsRecord.hpp"
-#include "Interface/SettingsRecord_v2.hpp"
+#include "DBMessage.hpp"   // for DBMessage, DBResponseMessage
+#include "MessageType.hpp" // for MessageType, MessageType:...
+
+#include <stdint.h> // for uint32_t
+
+#include "Interface/SettingsRecord.hpp"    // for SettingsRecord
+#include "Interface/SettingsRecord_v2.hpp" // for SettingsRecord_v2
+#include <string>                          // for string
 
 class DBSettingsMessage : public DBMessage
 {

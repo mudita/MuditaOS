@@ -1,21 +1,32 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Common/Common.hpp"
 #include "ContactRecord.hpp"
-#include "ParserUtils.hpp"
-#include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
-#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
-#include "ParserFSM.hpp"
-#include "contacts/ContactHelper.hpp"
-#include "messages/MessageHelper.hpp"
-#include "queries/messages/sms/QuerySMSSearchByType.hpp"
+#include "Context.hpp"
+#include "Endpoint.hpp"
 #include "EndpointFactory.hpp"
+#include "ParserFSM.hpp"
+#include "ParserUtils.hpp"
+#include "PhoneNumber.hpp"
+#include "SMSRecord.hpp"
+#include "SMSTemplateRecord.hpp"
+#include "ServiceDesktop.hpp"
+
+#include <catch2/catch.hpp>
+#include <vfs.hpp>
+
+#include "Common/Common.hpp"
+#include "contacts/ContactHelper.hpp"
 #include "contacts/ContactsEndpoint.hpp"
 #include "json/json11.hpp"
+#include "messages/MessageHelper.hpp"
+#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
+#include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
+#include "utf8/UTF8.hpp"
+#include <filesystem>
 #include <memory>
-#include <vfs.hpp>
-#include <catch2/catch.hpp>
+#include <string>
+#include <vector>
 
 class vfs vfs;
 

@@ -1,9 +1,21 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Endpoint.hpp"
-#include "ParserUtils.hpp"
+#include "Endpoint.hpp"    // for Endpoint
+#include "ParserUtils.hpp" // for parserFSM
 #include "ServiceDesktop.hpp"
+
+#include "Service/Common.hpp" // for ReturnCodes
+#include <string>             // for string
+
+namespace parserFSM
+{
+    class Context;
+} // namespace parserFSM
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace parserFSM;
 

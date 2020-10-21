@@ -2,9 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
-#include "vfs.hpp"
-#include "service-db/includes/DBServiceName.hpp"
-#include "SystemManager/SystemManager.hpp"
+
+#include "vfs.hpp" // for vfs, vfs::Directory...
+
+#include <stdint.h> // for uint32_t
+
+#include "SystemManager/SystemManager.hpp"       // for SystemManager
+#include "log/log.hpp"                           // for LOG_ERROR, LOG_INFO
+#include "service-db/includes/DBServiceName.hpp" // for db
+#include <filesystem>                            // for path
+#include <memory>                                // for unique_ptr, allocator
+#include <vector>                                // for vector
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace FactoryReset
 {

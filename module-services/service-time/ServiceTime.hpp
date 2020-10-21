@@ -2,15 +2,19 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Service/Service.hpp"
-#include "ServiceTime.hpp"
-#include <functional>
 #include "MessageType.hpp"
-#include "timeEvents/CalendarTimeEvents.hpp"
+#include "ServiceTime.hpp"
 
-#include <module-db/queries/calendar/QueryEventsGet.hpp>
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePow...
+#include "Service/Message.hpp" // for Message_t, DataMessage ...
+#include "Service/Service.hpp" // for Service
+#include "service-time/ServiceTime.hpp"
+#include "timeEvents/CalendarTimeEvents.hpp" // for CalendarTimeEvents
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <module-db/queries/calendar/QueryEventsGet.hpp>
 #include <module-sys/Service/Timer.hpp>
+#include <functional>
+#include <string> // for allocator, string
 
 namespace service::name
 {

@@ -4,13 +4,18 @@
 #ifndef MODULE_SERVICES_SERVICE_GUI_DRAWMESSAGE_HPP_
 #define MODULE_SERVICES_SERVICE_GUI_DRAWMESSAGE_HPP_
 
-#include <list>
-#include <memory>
+#include "GUIMessage.hpp" // for GUIMessage
 
 #include "Service/Message.hpp"
 #include "core/DrawCommand.hpp"
-#include "GUIMessage.hpp"
-#include "gui/Common.hpp"
+#include "gui/Common.hpp" // for RefreshModes
+#include <list>           // for list
+#include <memory>         // for unique_ptr
+
+namespace gui
+{
+    class DrawCommand;
+} // namespace gui
 
 namespace sgui
 {

@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "../Events.hpp"
+#include "../Events.hpp" // for Event, Events, Events::SysStart
+#include <string>        // for string
 
 namespace harness
 {

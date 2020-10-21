@@ -3,6 +3,8 @@
 
 #include "CalllogEndpoint.hpp"
 
+#include "Context.hpp" // for Context
+
 using namespace parserFSM;
 
 auto CalllogEndpoint::handle(Context &context) -> void

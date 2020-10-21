@@ -2,11 +2,26 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BackupRestore.hpp"
-#include "vfs.hpp"
-#include "microtar/src/microtar.hpp"
-#include "api/DBServiceAPI.hpp"
-#include "service-db/includes/DBServiceName.hpp"
-#include "SystemManager/SystemManager.hpp"
+
+#include "vfs.hpp" // for vfs, vfs::Directory...
+
+#include <assert.h> // for assert
+#include <stdint.h> // for uint32_t
+
+#include "SystemManager/SystemManager.hpp"       // for SystemManager
+#include "api/DBServiceAPI.hpp"                  // for DBServiceAPI
+#include "log/log.hpp"                           // for LOG_INFO, LOG_ERROR
+#include "microtar/src/microtar.hpp"             // for mtar_close, mtar_he...
+#include "service-db/includes/DBServiceName.hpp" // for db
+#include <filesystem>                            // for path
+#include <memory>                                // for allocator, unique_ptr
+#include <string>                                // for string, operator+
+#include <vector>                                // for vector
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 static const long unsigned int empty_dirlist_size = 2;
 static const auto backup_file_name                = "backup.tar";

@@ -1,13 +1,27 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <messages/QueryMessage.hpp>
-#include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include "ServiceDesktop.hpp"
+
 #include "BackupRestore.hpp"
 #include "DesktopMessages.hpp"
-#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
+#include "MessageType.hpp"
+#include "UpdatePureOS.hpp"
+#include "WorkerDesktop.hpp"
+#include "vfs.hpp"
+
+#include <messages/QueryMessage.hpp>
+#include <inttypes.h>
+
+#include "Common/Query.hpp"
+#include "Service/Bus.hpp"
+#include "Service/Worker.hpp"
+#include "json/json11.hpp"
 #include "log/log.hpp"
+#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
+#include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <module-services/service-desktop/ServiceDesktop.hpp>
+#include <filesystem>
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
