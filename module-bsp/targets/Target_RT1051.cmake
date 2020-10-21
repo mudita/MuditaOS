@@ -109,7 +109,6 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
 	"${USB_SRC}"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/usb_cdc.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMAMux.cpp"
