@@ -9,8 +9,8 @@
 
 .github @pholat @rwicik @alekrudnik
 
-# all devs are codeovners
-* @os
+# all devs are codeovners, but this doesn't work ( see issue linked above )
+* @mudita/os
 
 #docments
 *.md                                        @wojtekidd
