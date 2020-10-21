@@ -1,4 +1,4 @@
-#ifndef PUREPHONE_BSP_LPM_HPP
+﻿#ifndef PUREPHONE_BSP_LPM_HPP
 #define PUREPHONE_BSP_LPM_HPP
 
 #include <optional>
@@ -6,16 +6,20 @@
 
 namespace bsp {
 
-    class LowPowerMode {
-    public:
-
-        enum class Mode{
+    class LowPowerMode
+    {
+      private:
+      public:
+        enum class Mode
+        {
             FullSpeed,
             LowPowerRun,
             LowPowerIdle,
             Suspend
 
         };
+        LowPowerMode()          = default;
+        virtual ~LowPowerMode() = default;
 
         static std::optional<std::unique_ptr<LowPowerMode>> Create();
 
@@ -27,11 +31,8 @@ namespace bsp {
 
 
     protected:
-        Mode currentMode = Mode::FullSpeed;
-
+      Mode currentMode = Mode::FullSpeed;
     };
-
-}
-
+} // namespace bsp
 
 #endif //PUREPHONE_BSP_LPM_HPP

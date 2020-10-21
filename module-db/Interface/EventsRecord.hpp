@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -72,7 +72,7 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     bool Add(const EventsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
     bool RemoveByField(EventsRecordField field, const char *str) override final;
-    bool Update(const EventsRecord &rec);
+    bool Update(const EventsRecord &rec) override final;
     EventsRecord GetByID(uint32_t id) override final;
     uint32_t GetCount() override final;
     std::unique_ptr<std::vector<EventsRecord>> Select(TimePoint filter_from, TimePoint filter_till);
