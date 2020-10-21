@@ -7,17 +7,15 @@
 
 namespace at::urc
 {
-    struct QIND : public Any
+    class QIND : public Any
     {
         const std::string urc_name = "+QIND";
-        const std::string type_csq = "csq";
+        const std::string type_csq = "\"csq\"";
 
-        static const auto invalid_rssi_modulo = 99;
-        static const auto invalid_ber         = 99;
+        static const auto invalid_rssi_low  = 99;
+        static const auto invalid_rssi_high = 199;
+        static const auto invalid_ber       = 99;
 
-        QIND(const std::string &val);
-        ~QIND() override = default;
-        auto what() -> std::string final;
         enum CSQ
         {
             CSQ,
@@ -25,8 +23,17 @@ namespace at::urc
             BER
         };
 
-        auto is_csq() -> bool;
         /// by docs invalid csq: RSSI: 99, 199, and ber: 99
-        auto validate(enum CSQ) -> bool;
+        [[nodiscard]] auto validate(enum CSQ) const noexcept -> bool;
+
+      public:
+        explicit QIND(const std::string &val);
+        ~QIND() override = default;
+        [[nodiscard]] auto what() const noexcept -> std::string final;
+
+        [[nodiscard]] auto isCsq() const noexcept -> bool;
+
+        [[nodiscard]] auto getRSSI() const noexcept -> std::optional<int>;
+        [[nodiscard]] auto getBER() const noexcept -> std::optional<int>;
     };
 }; // namespace at::urc

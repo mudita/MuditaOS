@@ -580,31 +580,32 @@ namespace FotaService
         if (qind.is()) {
             const unsigned char fotaPrefixTagPosition = 0;
             const unsigned char fotaStatusTagPosition = 1;
-            if (qind.tokens[fotaPrefixTagPosition].find("FOTA") != std::string::npos) {
-                if (qind.tokens[1].find("START") != std::string::npos) {
+            auto tokens                               = qind.getTokens();
+            if (tokens[fotaPrefixTagPosition].find("FOTA") != std::string::npos) {
+                if (tokens[1].find("START") != std::string::npos) {
                     LOG_DEBUG("FOTA UPDATING");
                 }
-                else if (qind.tokens[fotaStatusTagPosition].find("HTTPEND") != std::string::npos) {
-                    LOG_DEBUG("Downloading finished: %s", qind.tokens[2].c_str());
+                else if (tokens[fotaStatusTagPosition].find("HTTPEND") != std::string::npos) {
+                    LOG_DEBUG("Downloading finished: %s", tokens[2].c_str());
                 }
-                else if (qind.tokens[fotaStatusTagPosition].find("END") != std::string::npos) {
+                else if (tokens[fotaStatusTagPosition].find("END") != std::string::npos) {
                     LOG_DEBUG("FOTA FINISHED -> reboot (%s)", receiverServiceName.c_str());
                     sendFotaFinshed(receiverServiceName);
                 }
-                else if (qind.tokens[fotaStatusTagPosition].find("UPDATING") != std::string::npos) {
+                else if (tokens[fotaStatusTagPosition].find("UPDATING") != std::string::npos) {
                     auto token_val = 0;
                     try {
-                        token_val = std::stoi(qind.tokens[2]);
+                        token_val = std::stoi(tokens[2]);
                     }
                     catch (const std::exception &e) {
-                        LOG_ERROR("Conversion error of %s, taking default value %d", qind.tokens[2].c_str(), token_val);
+                        LOG_ERROR("Conversion error of %s, taking default value %d", tokens[2].c_str(), token_val);
                     }
 
                     unsigned char progress = static_cast<unsigned char>(token_val);
                     LOG_DEBUG("FOTA UPDATING: %d", progress);
                     sendProgress(progress, receiverServiceName);
                 }
-                else if (qind.tokens[fotaStatusTagPosition].find("HTTPSTART") != std::string::npos) {
+                else if (tokens[fotaStatusTagPosition].find("HTTPSTART") != std::string::npos) {
                     LOG_DEBUG("Start downloading DELTA");
                 }
             }
