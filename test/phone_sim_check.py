@@ -4,5 +4,5 @@
 
 from harness.uart import conn, log
 
-conn.gsm("AT+CPIN?\r");
+conn.gsm("AT+CPIN?");
 print(conn.read(10))

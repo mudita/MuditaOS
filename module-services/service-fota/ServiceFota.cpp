@@ -189,8 +189,8 @@ namespace FotaService
             LOG_DEBUG("HTTP Method: %s", (msg->method == HTTPMethod::GET ? "GET" : "POST"));
             // setup http context
             std::vector<std::string> httpGetCommands;
-            httpGetCommands.push_back("AT+QHTTPCFG=\"contextid\",1\r");
-            httpGetCommands.push_back("AT+QHTTPCFG=\"responseheader\",1\r");
+            httpGetCommands.push_back("AT+QHTTPCFG=\"contextid\",1");
+            httpGetCommands.push_back("AT+QHTTPCFG=\"responseheader\",1");
             /// left for debuging - DNS configuration
             // httpGetCommands.push_back("AT+QIDNSCFG=?\r");
             // httpGetCommands.push_back("AT+QIDNSCFG=1\r");
@@ -344,7 +344,7 @@ namespace FotaService
     void Service::getActiveCotext()
     {
         if (dataChannel) {
-            auto availableContext = sendAndLogError("AT+QIACT?\r");
+            auto availableContext = sendAndLogError("AT+QIACT?");
             if (availableContext) {
                 parseQIACT(availableContext);
             }
@@ -420,7 +420,7 @@ namespace FotaService
     std::string Service::prepareQIACT(unsigned char contextId)
     {
         std::ostringstream cmd;
-        cmd << "AT+QIACT=" << static_cast<int>(contextId) << "\r";
+        cmd << "AT+QIACT=" << static_cast<int>(contextId);
         return cmd.str();
     }
 
@@ -428,21 +428,21 @@ namespace FotaService
     {
         std::ostringstream cmd;
         cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId) << "," << static_cast<int>(apn.type) << ",\"" << apn.apn
-            << "\",\"" << apn.username << "\",\"" << apn.password << "\"," << static_cast<int>(apn.authMethod) << "\r";
+            << "\",\"" << apn.username << "\",\"" << apn.password << "\"," << static_cast<int>(apn.authMethod);
         return cmd.str();
     }
 
     std::string Service::prepareQICSGPquery(const APN::Config &apn)
     {
         std::ostringstream cmd;
-        cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId) << "\r";
+        cmd << "AT+QICSGP=" << static_cast<int>(apn.contextId);
         return cmd.str();
     }
 
     std::string Service::prepareQIDEACT(unsigned char contextId)
     {
         std::ostringstream cmd;
-        cmd << "AT+QIDEACT=" << static_cast<int>(contextId) << "\r";
+        cmd << "AT+QIDEACT=" << static_cast<int>(contextId);
         return cmd.str();
     }
 
@@ -450,38 +450,38 @@ namespace FotaService
     {
         std::string fotaCmd("AT+QFOTADL=\"");
         fotaCmd += url;
-        fotaCmd += "\"\r";
+        fotaCmd += "\"";
         return fotaCmd;
     }
 
     std::string Service::prepareQHTTPGET(unsigned int timeout)
     {
         std::ostringstream cmd;
-        cmd << "AT+QHTTPGET=" << timeout << "\r";
+        cmd << "AT+QHTTPGET=" << timeout;
         return cmd.str();
     }
 
     std::string Service::prepareQHTTPREAD(unsigned int timeout)
     {
         std::ostringstream cmd;
-        cmd << "AT+QHTTPREAD=" << timeout << "\r";
+        cmd << "AT+QHTTPREAD=" << timeout;
         return cmd.str();
     }
 
     std::string Service::prepareQHTTPURL(const std::string &url)
     {
         std::ostringstream cmd;
-        cmd << "AT+QHTTPURL=" << url.size() << "\r";
+        cmd << "AT+QHTTPURL=" << url.size();
         return cmd.str();
     }
 
     void Service::setupSSLContext()
     {
         std::vector<std::string> sslConfigCommands;
-        sslConfigCommands.push_back("AT+QHTTPCFG=\"sslctxid\",1\r");
-        sslConfigCommands.push_back("AT+QSSLCFG=\"sslversion\",1,5\r");
-        sslConfigCommands.push_back("AT+QSSLCFG=\"ciphersuite\",1,0xFFFF\r");
-        sslConfigCommands.push_back("AT+QSSLCFG=\"seclevel\",1,0\r");
+        sslConfigCommands.push_back("AT+QHTTPCFG=\"sslctxid\",1");
+        sslConfigCommands.push_back("AT+QSSLCFG=\"sslversion\",1,5");
+        sslConfigCommands.push_back("AT+QSSLCFG=\"ciphersuite\",1,0xFFFF");
+        sslConfigCommands.push_back("AT+QSSLCFG=\"seclevel\",1,0");
 
         for (auto &currCmd : sslConfigCommands) {
             sendAndLogError(currCmd);

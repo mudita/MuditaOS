@@ -140,8 +140,10 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t 
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     at::Result result;
+
     cmd_init();
-    cmd_send(cmd);
+    std::string cmdFixed = formatCommand(cmd);
+    cmd_send(cmdFixed);
 
     uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
@@ -179,7 +181,7 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t 
         }
     }
 
-    cmd_log(cmd, result, timeout);
+    cmd_log(cmdFixed, result, timeout);
     cmd_post();
     blockedTaskHandle = nullptr;
 

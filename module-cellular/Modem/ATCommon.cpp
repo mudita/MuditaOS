@@ -36,7 +36,6 @@ Result::Code Chanel::at_check(const std::vector<std::string> &arr)
 
 void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 {
-
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\r'), cmd.end());
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
     switch (result.code) {
@@ -61,13 +60,26 @@ void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 #endif
 }
 
+std::string Chanel::formatCommand(const std::string &cmd)
+{
+    if (validTerm.end() != std::find(validTerm.begin(), validTerm.end(), cmd.back())) {
+        return cmd;
+    }
+    std::string cmdFixed;
+    cmdFixed.reserve(cmd.size() + 1);
+    cmdFixed.append(cmd);
+    cmdFixed.push_back(cmdSeparator);
+    return cmdFixed;
+}
+
 class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount)
 {
     Result result;
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
 
     cmd_init();
-    cmd_send(cmd);
+    std::string cmdFixed = formatCommand(cmd);
+    cmd_send(cmdFixed);
 
     uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = ((timeout == UINT32_MAX) ? UINT32_MAX : currentTime + timeout);
@@ -99,7 +111,7 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
 
     blockedTaskHandle = nullptr;
     cmd_post();
-    cmd_log(cmd, result, timeout);
+    cmd_log(cmdFixed, result, timeout);
 
     return result;
 }

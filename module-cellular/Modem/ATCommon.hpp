@@ -17,6 +17,10 @@ namespace at
     class Chanel
     {
       protected:
+        const char cmdSeparator           = '\r';
+        const std::vector<char> validTerm = {cmdSeparator, ',', '='};
+        std::string formatCommand(const std::string &cmd);
+
         cpp_freertos::MutexStandard mutex;
         TaskHandle_t blockedTaskHandle = nullptr;
 
