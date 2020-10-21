@@ -108,16 +108,16 @@ namespace gui
         if (!mathOperationInput->getText().empty()) {
 
             if (lastCharIsSymbol && symbol != style::calculator::symbols::strings::minus) {
-                mathOperationInput->setText(
+                mathOperationInput->setRichText(
                     std::string(mathOperationInput->getText()).erase(mathOperationInput->getText().length() - 1) +
                     symbol.c_str());
             }
             else {
-                mathOperationInput->setText(mathOperationInput->getText() + symbol);
+                mathOperationInput->setRichText(mathOperationInput->getText() + symbol);
             }
         }
         else if (symbol == style::calculator::symbols::strings::minus) {
-            mathOperationInput->setText(mathOperationInput->getText() + symbol);
+            mathOperationInput->setRichText(mathOperationInput->getText() + symbol);
         }
     }
 
@@ -156,7 +156,7 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
             auto result = Calculator().calculate(std::string(mathOperationInput->getText()));
-            mathOperationInput->setText(result.value);
+            mathOperationInput->setRichText(result.value);
             clearInput = result.isError;
             return true;
         }
