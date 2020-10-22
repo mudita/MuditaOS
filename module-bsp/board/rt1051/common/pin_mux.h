@@ -217,6 +217,9 @@ extern "C"
 #define PINMUX_TORCH_EN_PIN IOMUXC_GPIO_AD_B1_05_GPIO1_IO21
     void PINMUX_InitTorch(void);
 
+#define PINMUX_MAGNETOMETER_IRQ_PIN IOMUXC_GPIO_AD_B1_04_GPIO1_IO20
+    void PINMUX_InitMagnetometer(void);
+
 #if defined(__cplusplus)
 }
 #endif

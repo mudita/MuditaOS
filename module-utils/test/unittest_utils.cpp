@@ -180,3 +180,31 @@ TEST_CASE("Get value from string")
         REQUIRE(testValue == target);
     }
 }
+
+TEST_CASE("Swap endianness")
+{
+    uint32_t as_long = 0x11223344;
+
+    SECTION("endiannes check")
+    {
+        uint8_t *as_array;
+        as_array = reinterpret_cast<uint8_t *>(&as_long);
+        if (as_array[0] == 0x11) {
+            REQUIRE(BYTE_ORDER == BIG_ENDIAN);
+        }
+        else if (as_array[0] == 0x44) {
+            REQUIRE(BYTE_ORDER == LITTLE_ENDIAN);
+        }
+        else {
+            FAIL("cannot determine endiannes");
+        }
+    }
+    SECTION("swap endiannes uint32")
+    {
+        uint32_t as_long_swapped = utils::swapBytes(as_long);
+        REQUIRE(((as_long >> 8 * 3) & 0xFF) == ((as_long_swapped >> 8 * 0) & 0xFF));
+        REQUIRE(((as_long >> 8 * 2) & 0xFF) == ((as_long_swapped >> 8 * 1) & 0xFF));
+        REQUIRE(((as_long >> 8 * 1) & 0xFF) == ((as_long_swapped >> 8 * 2) & 0xFF));
+        REQUIRE(((as_long >> 8 * 0) & 0xFF) == ((as_long_swapped >> 8 * 3) & 0xFF));
+    }
+}
