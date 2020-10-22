@@ -62,7 +62,8 @@ void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 
 std::string Chanel::formatCommand(const std::string &cmd) const
 {
-    if (validTerm.end() != std::find(validTerm.begin(), validTerm.end(), cmd.back())) {
+    bool isTerminatorValid = std::find(validTerm.begin(), validTerm.end(), cmd.back()) != validTerm.end();
+    if (isTerminatorValid) {
         return cmd;
     }
     return cmd + cmdSeparator;
