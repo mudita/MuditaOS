@@ -53,4 +53,5 @@ constexpr unsigned int DATA_BUFFER_SIZE = 256 * 2;
 struct AudioData_t
 {
     std::array<int16_t, DATA_BUFFER_SIZE> data;
+    uint16_t bytesSent;
 };

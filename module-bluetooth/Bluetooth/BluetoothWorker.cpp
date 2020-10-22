@@ -4,8 +4,8 @@
 #include "BluetoothWorker.hpp"
 #include "BtCommand.hpp"
 #include "log/log.hpp"
-#include "module-bluetooth/Bluetooth/interface/profiles/A2DP/A2DP.hpp"
-
+#include "interface/profiles/A2DP/A2DP.hpp"
+#include "interface/profiles/HSP/HSP.hpp"
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack_util.h"
@@ -28,7 +28,7 @@ const char *c_str(Bt::Error::Code code)
     return "";
 }
 
-BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service), currentProfile(std::make_shared<Bt::A2DP>())
+BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service), currentProfile(std::make_shared<Bt::HSP>())
 {
     init({
         {"qBtIO", sizeof(Bt::Message), 10},
@@ -86,18 +86,18 @@ bool BluetoothWorker::scan()
     }
 }
 
-void BluetoothWorker::stop_scan()
+void BluetoothWorker::stopScan()
 {
     Bt::GAP::stop_scan();
 }
 
-bool BluetoothWorker::set_visible()
+bool BluetoothWorker::toggleVisibility()
 {
     static bool visibility = true;
     Bt::GAP::set_visibility(visibility);
     visibility = !visibility;
 
-    return false;
+    return visibility;
 }
 
 bool BluetoothWorker::start_pan()
@@ -108,16 +108,6 @@ bool BluetoothWorker::start_pan()
         LOG_ERROR("PAN setup error: %s %" PRIu32, c_str(err.err), err.lib_code);
     }
     return false;
-}
-
-BluetoothWorker::Error BluetoothWorker::aud_init()
-{
-    LOG_INFO("%s", __PRETTY_FUNCTION__);
-    Error err = SuccessBt;
-    LOG_INFO("AUDIO - TODO");
-    // start GAVD
-    // &&  ASSIGN_CLASS_OF_DEVICE(ClassOfDevice, 0x28, 0x04, 0x10);
-    return err;
 }
 
 #include <sstream>
@@ -189,36 +179,22 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     return true;
 }
 
-void BluetoothWorker::initAudioBT()
-{}
-
-bool BluetoothWorker::play_audio()
+bool BluetoothWorker::establishAudioConnection()
 {
-    auto profile = dynamic_cast<Bt::A2DP *>(currentProfile.get());
-    if (profile == nullptr) {
+    currentProfile->setOwnerService(service);
+    if (currentProfile->init() != Bt::Error::Success) {
         return false;
     }
-
-    profile->init();
-    profile->setOwnerService(service);
-    profile->start();
+    currentProfile->connect();
     return true;
 }
-bool BluetoothWorker::stop_audio()
+bool BluetoothWorker::disconnectAudioConnection()
 {
-    auto profile = dynamic_cast<Bt::A2DP *>(currentProfile.get());
-    if (profile == nullptr) {
-        return false;
-    }
-
-    profile->stop();
+    currentProfile->disconnect();
     return true;
 }
-void BluetoothWorker::set_addr(bd_addr_t addr)
+void BluetoothWorker::setDeviceAddress(bd_addr_t addr)
 {
     Bt::GAP::do_pairing(addr);
-    auto profile = dynamic_cast<Bt::A2DP *>(currentProfile.get());
-    if (profile != nullptr) {
-        profile->setDeviceAddress(addr);
-    }
+    currentProfile->setDeviceAddress(addr);
 }

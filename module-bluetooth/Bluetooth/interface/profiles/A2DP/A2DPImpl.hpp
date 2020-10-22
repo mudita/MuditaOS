@@ -7,6 +7,8 @@
 #include <Bluetooth/Error.hpp>
 #include <BtCommand.hpp>
 #include <log/log.hpp>
+#include <Audio/AudioCommon.hpp>
+
 extern "C"
 {
 #include <btstack.h>
@@ -53,7 +55,7 @@ namespace Bt
         static bd_addr_t deviceAddr;
         static btstack_packet_callback_registration_t hciEventCallbackRegistration;
         static std::array<uint8_t, MEDIA_CAP_SIZE> mediaSbcCodecCapabilities;
-        static sys::Service *ownerService;
+        static const sys::Service *ownerService;
         static QueueHandle_t sourceQueue;
         static QueueHandle_t sinkQueue;
         static DeviceMetadata_t metadata;
@@ -65,13 +67,14 @@ namespace Bt
         static void hciPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void sendMediaPacket();
         static auto fillSbcAudioBuffer(MediaContext *context) -> int;
+        static void sendAudioEvent(audio::EventType event);
 
       public:
-        auto init() -> Error;
+        auto init() -> Error::Code;
         void start();
         void stop();
         void setDeviceAddress(bd_addr_t addr);
-        void setOwnerService(sys::Service *service);
+        void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
     };
 } // namespace Bt

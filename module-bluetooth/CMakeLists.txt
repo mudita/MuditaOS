@@ -11,6 +11,8 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/A2DP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVRCP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/HSP.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/SCO.cpp
     )
 
 message("Build with BlueKitchen")
@@ -60,5 +62,6 @@ target_link_libraries(
     module-utils
     module-vfs
     module-sys
+    module-audio
     ${BOARD_DIR_LIBRARIES}
     )
