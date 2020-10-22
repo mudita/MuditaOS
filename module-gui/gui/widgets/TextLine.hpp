@@ -33,7 +33,6 @@ namespace gui
         UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
         Position underlinePadding           = 0;
         TextBlock::End end                  = TextBlock::End::None;
-        unsigned int block_nr               = text::npos;
         Position storedYOffset              = 0;
 
         void createUnderline(unsigned int max_w, unsigned int max_height);
@@ -41,11 +40,11 @@ namespace gui
 
       public:
         /// creates TextLine with data from text based on TextCursor position filling max_width
-        TextLine(const BlockCursor &, unsigned int max_width);
+        TextLine(BlockCursor &, unsigned int max_width);
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&);
 
-        TextLine(const BlockCursor &cursor,
+        TextLine(BlockCursor &cursor,
                  unsigned int max_width,
                  unsigned int init_height,
                  bool drawUnderline,
@@ -93,7 +92,7 @@ namespace gui
         {
             unsigned int local_pos = 0;
             for (auto &el : elements_to_show_in_line) {
-                local_pos += el->getTextLength();
+                LOG_INFO("Wchodzisz tutaj w ogole?");
                 if (local_pos >= pos) {
                     return el;
                 }
@@ -104,11 +103,6 @@ namespace gui
         int32_t getX() const
         {
             return elements_to_show_in_line.front()->area().pos(Axis::X);
-        }
-
-        unsigned int getBlockNr() const
-        {
-            return block_nr;
         }
 
         void setPosition(const short &x, const short &y);

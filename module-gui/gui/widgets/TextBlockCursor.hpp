@@ -5,6 +5,7 @@
 
 #include "utf8/UTF8.hpp"
 #include "TextConstants.hpp"
+#include "TextBlock.hpp"
 #include <cstdio>
 #include <stdint.h>
 #include <string>
@@ -28,15 +29,16 @@ namespace gui
     {
       protected:
         TextDocument *document = nullptr;
-        auto currentBlock() const;
-        auto blocksEnd() const;
-        auto blocksBegin() const;
+        [[nodiscard]] auto currentBlock() const -> std::_List_iterator<TextBlock>;
+        [[nodiscard]] auto lastBlock() const -> std::_List_iterator<TextBlock>;
+        [[nodiscard]] auto blocksEnd() const -> std::_List_iterator<TextBlock>;
+        [[nodiscard]] auto blocksBegin() const -> std::_List_iterator<TextBlock>;
         RawFont *default_font = nullptr;
 
       private:
-        unsigned int pos      = text::npos;
-        unsigned int block_nr = text::npos;
-        bool block_jump       = false;
+        unsigned int pos            = text::npos;
+        unsigned int currentBlockNr = text::npos;
+        unsigned int lastBlockNr    = text::npos;
 
       protected:
         [[nodiscard]] auto checkNpos() const -> bool;
@@ -62,7 +64,37 @@ namespace gui
 
         [[nodiscard]] auto getBlockNr() const -> unsigned int
         {
-            return block_nr;
+            return currentBlockNr;
+        }
+
+        [[nodiscard]] auto getLastBlockNr() const -> unsigned int
+        {
+            return lastBlockNr;
+        }
+
+        [[nodiscard]] auto checkLastBlockNewLine() const -> bool
+        {
+            if (lastBlockNr != text::npos) {
+                return lastBlock()->getEnd() == TextBlock::End::Newline;
+            }
+            else {
+                return false;
+            }
+        }
+
+        [[nodiscard]] auto checkCurrentBlockNewLine() const -> bool
+        {
+            if (currentBlockNr != text::npos) {
+                return currentBlock()->getEnd() == TextBlock::End::Newline;
+            }
+            else {
+                return false;
+            }
+        }
+
+        auto clearLastBlockNr() -> void
+        {
+            lastBlockNr = text::npos;
         }
 
         [[nodiscard]] auto atBegin() const -> bool
@@ -70,12 +102,12 @@ namespace gui
             if (document == nullptr || checkNpos()) {
                 return false;
             }
-            return pos == 0 && block_nr == 0;
+            return pos == 0 && currentBlockNr == 0;
         }
 
         [[nodiscard]] auto atEnd() const -> bool;
 
-        [[nodiscard]] auto atEol() const -> bool;
+        [[nodiscard]] auto atEol() -> bool;
 
         operator bool() const
         {
@@ -97,7 +129,6 @@ namespace gui
 
         [[nodiscard]] auto getText() -> std::string;
         auto getUTF8Text() -> UTF8;
-        void resetJumps();
 
         /// iterable
         /// {

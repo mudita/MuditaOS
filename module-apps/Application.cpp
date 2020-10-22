@@ -113,7 +113,7 @@ namespace app
             return;
         }
 
-        LOG_DEBUG("Rendering %s", getCurrentWindow()->getName().c_str());
+        //        LOG_DEBUG("Rendering %s", getCurrentWindow()->getName().c_str());
 
         // send drawing commands only when if application is in active and visible.
         if (state == State::ACTIVE_FORGROUND) {

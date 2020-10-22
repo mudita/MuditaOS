@@ -7,19 +7,14 @@
 
 namespace gui
 {
-
     // LEFT/RIGHT/UP/DOWN
-    auto Lines::processNavigation(TextLineCursor &cursor, const InputEvent &event) -> gui::InputBound
+    auto Lines::checkNavigationBounds(TextLineCursor &cursor, InputEvent event) -> gui::InputBound
     {
         auto dir = inputToNavigation(event);
         if (dir == NavigationDirection::NONE) {
             return InputBound::UNDEFINED;
         }
-        return canMove(cursor, dir);
-    }
 
-    auto Lines::canMove(TextLineCursor &cursor, NavigationDirection dir) -> gui::InputBound
-    {
         auto screen_bound = scroll_position + max_lines_count - 1;
         auto lines_bound  = lines.size() - 1;
 
@@ -56,7 +51,7 @@ namespace gui
         return InputBound::CAN_MOVE;
     }
 
-    gui::InputBound Lines::processAdding(TextLineCursor &cursor, const InputEvent &event)
+    auto Lines::checkAdditionBounds(TextLineCursor &cursor, InputEvent event) -> gui::InputBound
     {
         auto keymap = parent->mode != nullptr ? parent->mode->get() : "";
         auto code   = gui::Profiles::get(keymap).get(event.key.key_code, 0);
@@ -75,13 +70,13 @@ namespace gui
 
         auto bound = textLine->checkBounds(cursor, code, format);
         if (bound == InputBound::CANT_PROCESS && line == scroll_position) {
-            return InputBound::HIT_BOUND;
+            return InputBound::CAN_ADD;
         }
 
         return InputBound::CAN_ADD;
     }
 
-    auto Lines::processRemoval(TextLineCursor &cursor) -> gui::InputBound
+    auto Lines::checkRemovalBounds(TextLineCursor &cursor, InputEvent event) -> gui::InputBound
     {
         if (lines.empty()) {
             return InputBound::CANT_PROCESS;
@@ -102,21 +97,7 @@ namespace gui
         return InputBound::CAN_REMOVE;
     }
 
-    auto Lines::processTextInput(TextLineCursor &cursor, const InputEvent &event) -> gui::InputBound
-    {
-        if (!parent->isMode(EditMode::EDIT)) {
-            return gui::InputBound::CANT_PROCESS;
-        }
-
-        if (event.isShortPress() && event.is(KeyCode::KEY_PND)) {
-            return processRemoval(cursor);
-        }
-        else {
-            return processAdding(cursor, event);
-        }
-    }
-
-    void Lines::updateScrollPosition(NavigationDirection dir, uint32_t lines_to_scroll)
+    void Lines::updateScrollPosition(NavigationDirection dir, unsigned int lines_to_scroll)
     {
         if (dir == NavigationDirection::UP) {
             scroll_position -= lines_to_scroll;
@@ -139,17 +120,6 @@ namespace gui
         for (auto &line : lines) {
             line.alignH(parent->getAlignment(Axis::X), parentSize);
         }
-    }
-
-    auto Lines::checkBounds(TextLineCursor &cursor, InputEvent event) -> InputBound
-    {
-        auto bound = processNavigation(cursor, event);
-
-        if (bound == InputBound::UNDEFINED) {
-            bound = processTextInput(cursor, event);
-        }
-
-        return bound;
     }
 
     void Lines::draw(TextCursor &cursor)
