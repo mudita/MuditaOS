@@ -8,6 +8,7 @@
 * `[meditation]` Added basic meditation functionalities and settings
 * `[cellular]` Handling incoming calls and sms in sleep mode
 * `[audio]` Added Bluetooth related APIs to AudioServiceAPI
+* `[settings]` Added sql script for file indexer DB schema
 
 ### Fixed
 
