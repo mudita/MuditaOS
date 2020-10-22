@@ -15,6 +15,14 @@
 class vfs vfs;
 utils::i18 localize;
 
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_intializer;
+
 TEST_CASE("Duration - creation")
 {
     utils::localize.Switch(utils::Lang::En);

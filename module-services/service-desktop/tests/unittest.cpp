@@ -19,11 +19,17 @@
 
 class vfs vfs;
 
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_initializer;
+
 TEST_CASE("System Update Tests")
 {
-    ServiceDesktop serviceDesktop;
-    vfs.Init();
-    UpdatePureOS updateOS(&serviceDesktop);
+    UpdatePureOS updateOS(nullptr);
 
     updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
     REQUIRE(err == updateos::UpdateError::NoError);
@@ -39,7 +45,6 @@ TEST_CASE("System Update Tests")
 
 TEST_CASE("Factory Reset Test")
 {
-    vfs.Init();
 
     std::string sysdir = purefs::dir::eMMC_disk;
     sysdir += "/factory-test/sys";

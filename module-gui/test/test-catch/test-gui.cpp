@@ -6,6 +6,7 @@
 #include "mock/InitializedFontManager.hpp"
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
+#include <vfs.hpp>
 #include <memory>
 #include <functional>
 #include <iostream>
@@ -25,13 +26,20 @@
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
-#include <vfs.hpp>
 
 #include <mock/TestWindow.hpp>
 
 using namespace std;
 
 class vfs vfs;
+
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_init;
 
 TEST_CASE("Test BoundingBox intersect")
 {

@@ -51,6 +51,7 @@ function(add_catch2_executable)
     # disable logs in unit tests
     if (NOT ${ENABLE_TEST_LOGS})
     	target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
+    	target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
     endif (NOT ${ENABLE_TEST_LOGS})
 
     target_link_libraries(${_TESTNAME} PRIVATE Catch2::Catch2)
