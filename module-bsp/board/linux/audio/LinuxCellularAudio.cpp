@@ -86,7 +86,7 @@ namespace bsp
 
         int32_t framesToFetch = framesPerBuffer;
 
-        if ((ptr->currentFormat.flags & static_cast<uint32_t>(Flags::OutPutStereo))) {
+        if ((ptr->currentFormat.flags & static_cast<uint32_t>(Flags::OutputStereo))) {
             framesToFetch = framesPerBuffer * 2;
         }
 
@@ -162,7 +162,7 @@ namespace bsp
             outChan++;
         }
 
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutPutStereo)) {
+        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) {
             outChan = 2;
         }
         /* Open an audio I/O stream. */

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <map>
-#include <bsp_audio.hpp>
+#include <bsp/audio/bsp_audio.hpp>
 
 #include "Profiles/Profile.hpp"
 

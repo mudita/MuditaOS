@@ -104,6 +104,10 @@ namespace gui
     }
 
     void BtScanWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
+    {
+        auto newData = static_cast<DeviceData *>(data);
+        devices      = newData->getDevices();
+        rebuild();
+    }
 
 } // namespace gui

@@ -9,6 +9,7 @@
 #include "messages/BluetoothMessage.hpp"
 #include <log/log.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
+#include <module-sys/Service/Bus.hpp>
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
@@ -88,6 +89,16 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
             }
             break;
         }
+        case MessageType::BluetoothAddrResult: {
+            auto addrMsg = static_cast<BluetoothAddrMessage *>(msg);
+            worker->set_addr(addrMsg->addr);
+        } break;
+        case MessageType::BluetoothRequestStream: {
+            auto result =
+                std::make_shared<BluetoothRequestStreamResultMessage>(worker->currentProfile->getStreamData());
+            sys::Bus::SendUnicast(std::move(result), "ServiceAudio", this);
+            LOG_INFO("Queues sent after a request!");
+        } break;
         default:
             LOG_INFO("BT not handled!");
             break;
@@ -95,10 +106,6 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
     }
     catch (std::exception &ex) {
         LOG_ERROR("Exception on BtService!: %s", ex.what());
-    }
-    if (dynamic_cast<BluetoothAddrMessage *>(msg) != nullptr) {
-        auto addrMsg = static_cast<BluetoothAddrMessage *>(msg);
-        worker->set_addr(addrMsg->addr);
     }
 
     return std::make_shared<sys::ResponseMessage>();

@@ -32,12 +32,13 @@ namespace bsp {
             HeadphonesMono,
             Earspeaker,
             Loudspeaker,
+            BluetoothA2DP,
             None
         };
 
         enum class Flags {
             OutputMono = 1 << 0,
-            OutPutStereo = 1 << 1,
+            OutputStereo = 1 << 1,
             InputLeft = 1 << 2,
             InputRight = 1 << 3,
             InputStereo = 1 << 4

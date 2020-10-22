@@ -4,6 +4,8 @@
 
 #include "board/rt1051/bsp/audio/RT1051Audiocodec.hpp"
 #include "board/rt1051/bsp/audio/RT1051CellularAudio.hpp"
+#include "board/rt1051/bsp/audio/RT1051BluetoothAudio.hpp"
+
 #elif defined(TARGET_Linux)
 #include "audio/linux_audiocodec.hpp"
 #include "audio/LinuxCellularAudio.hpp"
@@ -22,7 +24,7 @@ namespace bsp{
             case Type ::Audiocodec:
             {
 #if defined(TARGET_RT1051)
-                inst = std::make_unique<bsp::RT1051Audiocodec>(callback );
+                inst = std::make_unique<bsp::RT1051Audiocodec>(callback);
 #elif defined(TARGET_Linux)
                 inst = std::make_unique<bsp::LinuxAudiocodec>(callback );
 #else
@@ -36,6 +38,7 @@ namespace bsp{
             case Type ::Bluetooth:
             {
 #if defined(TARGET_RT1051)
+                inst = std::make_unique<bsp::RT1051BluetoothAudio>(callback);
 
 #elif defined(TARGET_Linux)
 
@@ -48,7 +51,7 @@ namespace bsp{
             case Type::Cellular:
             {
 #if defined(TARGET_RT1051)
-                inst = std::make_unique<bsp::RT1051CellularAudio>(callback );
+                inst = std::make_unique<bsp::RT1051CellularAudio>(callback);
 #elif defined(TARGET_Linux)
                 inst = std::make_unique<bsp::LinuxCellularAudio>(callback );
 #else

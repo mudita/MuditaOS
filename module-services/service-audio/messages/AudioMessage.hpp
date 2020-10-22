@@ -7,8 +7,8 @@
 #include <variant>
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
-#include "Audio/AudioCommon.hpp"
-#include "Audio/decoder/decoder.hpp"
+#include "module-audio/Audio/AudioCommon.hpp"
+#include "module-audio/Audio/decoder/decoder.hpp"
 
 class AudioMessage : public sys::DataMessage
 {

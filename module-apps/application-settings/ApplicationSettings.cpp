@@ -53,9 +53,9 @@ namespace app
         if (auto btmsg = dynamic_cast<BluetoothScanResultMessage *>(msgl); btmsg != nullptr) {
             auto devices = btmsg->devices;
             LOG_INFO("received BT Scan message!");
-
+            auto data = std::make_unique<gui::DeviceData>(devices);
             windowsFactory.build(this, gui::name::window::name_btscan);
-            setActiveWindow(gui::name::window::name_btscan);
+            switchWindow(gui::name::window::name_btscan, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 
             render(gui::RefreshModes::GUI_REFRESH_FAST);
         }
