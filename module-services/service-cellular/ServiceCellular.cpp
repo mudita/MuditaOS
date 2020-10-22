@@ -1074,18 +1074,18 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
     if (channel) {
-
+        channel->cmd(at::AT::SET_SMS_TEXT_MODE_UCS2);
         channel->cmd(at::AT::SMS_UCSC2);
         // if text fit in single message send
         if (textLen < singleMessageLen) {
 
             if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(
-                    (std::string(at::factory(at::AT::CMGS)) + UCS2(UTF8(record.number.getEntered())).modemStr() + "\"")
+                    (std::string(at::factory(at::AT::CMGS)) + UCS2(UTF8(record.number.getEntered())).str() + "\"")
                         .c_str(),
                     1,
                     commandTimeout))) {
 
-                if (channel->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
+                if (channel->cmd((UCS2(record.body).str() + "\032").c_str())) {
                     result = true;
                 }
                 else {
@@ -1116,12 +1116,12 @@ bool ServiceCellular::sendSMS(SMSRecord record)
                 }
                 UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
-                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).modemStr() +
+                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).str() +
                                     "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
                 if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
                     // prompt sign received, send data ended by "Ctrl+Z"
-                    if (channel->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), commandTimeout, 2)) {
+                    if (channel->cmd((UCS2(messagePart).str() + "\032").c_str(), commandTimeout, 2)) {
                         result = true;
                     }
                     else {
