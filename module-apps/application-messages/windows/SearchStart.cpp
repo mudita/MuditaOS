@@ -4,7 +4,7 @@
 #include "SearchStart.hpp"
 #include "../ApplicationMessages.hpp"
 #include <i18/i18.hpp>
-#include <widgets/SearchBox.hpp>
+#include <widgets/InputBox.hpp>
 #include <cassert>
 
 namespace gui
@@ -21,7 +21,7 @@ namespace gui
         body = new gui::Item();
         body->setBoundingBox(bodySize());
         addWidget(body);
-        auto text = searchBox(this, utils::localize.get("common_search_uc"), "search");
+        auto text = inputBox(this, utils::localize.get("common_search_uc"), "search");
 
         inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);

@@ -1,5 +1,15 @@
 # MuditaOS changelog
 
+## Current release
+
+### Added
+* `[settings][bluetooth]` Add "Phone name" window.
+
+
+### Fixed
+
+### Other
+
 ## [0.43.1 2020-10-23]
 
 ### Added
