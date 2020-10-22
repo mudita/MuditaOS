@@ -1,9 +1,10 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Application.hpp"
+#include "ApplicationSettings.hpp"
 
-#include "MessageType.hpp"
+#include "windows/AddDeviceWindow.hpp"
+#include "windows/AllDevicesWindow.hpp"
 #include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/DisplayAndKeypadWindow.hpp"
@@ -16,11 +17,10 @@
 #include "windows/NetworkWindow.hpp"
 #include "windows/MessagesWindow.hpp"
 
-#include "ApplicationSettings.hpp"
+#include "Dialog.hpp"
 
-#include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
-#include <module-apps/messages/AppMessage.hpp>
-
+#include <service-evtmgr/api/EventManagerServiceAPI.hpp>
+#include <service-bluetooth/messages/BluetoothMessage.hpp>
 #include <i18/i18.hpp>
 
 namespace app
@@ -38,6 +38,16 @@ namespace app
         auto rm = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
         if (nullptr != rm && sys::ReturnCodes::Success == rm->retCode) {
             return retMsg;
+        }
+
+        if (auto btMsg = dynamic_cast<BluetoothScanResultMessage *>(msgl); btMsg != nullptr) {
+            auto scannedBtDevices = btMsg->devices;
+            LOG_INFO("Received BT Scan message!");
+
+            auto data = std::make_unique<gui::DeviceData>(scannedBtDevices);
+            windowsFactory.build(this, gui::window::name::add_device);
+            switchWindow(gui::window::name::add_device, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            render(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -66,11 +76,18 @@ namespace app
             return std::make_unique<gui::OptionWindow>(
                 app, utils::localize.get("app_settings_title_main"), mainWindowOptionsNew(app));
         });
-
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
         });
-
+        windowsFactory.attach(gui::window::name::add_device, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AddDeviceWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::all_devices, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AllDevicesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::Dialog>(app, name);
+        });
         windowsFactory.attach(gui::window::name::display_and_keypad, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DisplayAndKeypadWindow>(app);
         });

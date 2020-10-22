@@ -126,6 +126,7 @@ namespace style
     {
         namespace common
         {
+            const inline std::string add            = "common_add";
             const inline std::string open           = "common_open";
             const inline std::string call           = "common_call";
             const inline std::string send           = "common_send";

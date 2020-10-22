@@ -10,6 +10,7 @@
 * `[audio]` Added Bluetooth related APIs to AudioServiceAPI
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
 * `[settings]` Added sql script for file indexer DB schema
+* `[settings][bluetooth]` Create "Add device" windows
 
 ### Fixed
 

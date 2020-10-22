@@ -16,6 +16,8 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         windows/SettingsMainWindow.cpp
+        windows/AddDeviceWindow.cpp
+        windows/AllDevicesWindow.cpp
         windows/BaseSettingsWindow.cpp
         windows/BluetoothWindow.cpp
         windows/FontSizeWindow.cpp
@@ -42,6 +44,7 @@ target_sources( ${PROJECT_NAME}
         windows/DisplayAndKeypadWindow.hpp
         windows/AppsAndToolsWindow.hpp
         windows/MessagesWindow.hpp
+        widgets/SettingsStyle.hpp
         widgets/UpDown.hpp
         widgets/Toggle.hpp
 )
