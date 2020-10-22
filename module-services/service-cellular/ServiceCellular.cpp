@@ -614,6 +614,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 for (auto const &el : respMsg->response) {
                     LOG_DEBUG("> %s", el.c_str());
                 }
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                break;
             }
             responseMsg = respMsg;
             break;
@@ -637,6 +639,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         }
     } break;
+
     case MessageType::CellularSimProcedure: {
         state.set(this, State::ST::SimSelect);
         break;
@@ -756,10 +759,15 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto *msg = dynamic_cast<CellularCallRequestMessage *>(msgl);
         assert(msg != nullptr);
         auto channel = cmux->get(TS0710::Channel::Commands);
-        if (channel) {
-            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->number.getEntered() + ";");
-            if (ret) {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
+        assert(channel != nullptr);
+
+        call_request::Factory factory(msg->number.getEntered());
+
+        auto req = factory.create();
+        auto ret = channel->cmd(req->process());
+        if (ret) {
+            if (req->callRequest) {
+
                 // activate call state timer
                 callStateTimer->reload();
                 // Propagate "Ringing" notification into system
@@ -769,7 +777,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                     this);
                 break;
             }
+            responseMsg = std::make_shared<CellularResponseMessage>(true);
         }
+
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     } break;
     case MessageType::DBServiceNotification: {
@@ -1000,12 +1010,38 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         return std::make_shared<sys::ResponseMessage>();
     }
 }
+namespace
+{
+    bool isAbortCallNotification(const std::string &str)
+    {
+        return ((str.find(at::Chanel::NO_CARRIER) != std::string::npos) ||
+                (str.find(at::Chanel::BUSY) != std::string::npos) ||
+                (str.find(at::Chanel::NO_ANSWER) != std::string::npos));
+    }
+    namespace powerdown
+    {
+        static const std::string powerDownNormal = "NORMAL POWER DOWN";
+        static const std::string poweredDown     = "POWERED DOWN";
+
+        bool isNormalPowerDown(const std::string str)
+        {
+            std::string stripped = utils::removeNewLines(str);
+            return stripped.find(powerDownNormal) == 0;
+        }
+        bool isPoweredDown(const std::string str)
+        {
+            std::string stripped = utils::removeNewLines(str);
+            return stripped.find(poweredDown) == 0;
+        }
+    } // namespace powerdown
+} // namespace
 
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
     CellularUrcHandler urcHandler(*this);
 
     std::string str(data.begin(), data.end());
+
     std::string logStr = utils::removeNewLines(str);
     LOG_DEBUG("Notification:: %s", logStr.c_str());
 
@@ -1466,6 +1502,7 @@ bool ServiceCellular::handle_sim_sanity_check()
 
 bool ServiceCellular::handle_select_sim()
 {
+
     bsp::cellular::sim::sim_sel();
     bsp::cellular::sim::hotswap_trigger();
 #if defined(TARGET_Linux)
