@@ -208,7 +208,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	set(FAT_IMAGE ${CMAKE_PROJECT_NAME}.img)
 	add_custom_command(
 		OUTPUT ${FAT_IMAGE}
-        DEPENDS assets
+		DEPENDS assets
 		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_fatfs_image.sh ${FAT_IMAGE} ${CMAKE_BINARY_DIR}
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 		COMMENT "Generate ${FAT_IMAGE}"
