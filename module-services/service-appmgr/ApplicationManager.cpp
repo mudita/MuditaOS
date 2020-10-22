@@ -7,6 +7,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
+#include "AppMessage.hpp"
 #include "application-call/data/CallSwitchData.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
@@ -162,6 +163,12 @@ namespace sapm
         blockingTimer = std::make_unique<sys::Timer>(
             "BlockTimer", this, std::numeric_limits<sys::ms>().max(), sys::Timer::Type::SingleShot);
         blockingTimer->connect([&](sys::Timer &) { phoneLockCB(); });
+
+        connect(typeid(APMAction), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto actionMsg = static_cast<APMAction *>(request);
+            handleAction(actionMsg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 
     ApplicationManager::~ApplicationManager()
@@ -238,10 +245,6 @@ namespace sapm
         case MessageType::APMSwitch: {
             sapm::APMSwitch *msg = reinterpret_cast<sapm::APMSwitch *>(msgl);
             handleSwitchApplication(msg);
-        } break;
-        case MessageType::APMSwitchToNotification: {
-            sapm::APMSwitchToNotification *msg = reinterpret_cast<sapm::APMSwitchToNotification *>(msgl);
-            handleSwitchToNotification(msg);
         } break;
         case MessageType::APMSwitchPrevApp: {
             sapm::APMSwitchPrevApp *msg = reinterpret_cast<sapm::APMSwitchPrevApp *>(msgl);
@@ -533,25 +536,24 @@ namespace sapm
         return true;
     }
 
-    // tries to switch to the notification
-    bool ApplicationManager::handleSwitchToNotification(APMSwitchToNotification *msg)
+    auto ApplicationManager::handleAction(APMAction *actionMsg) -> bool
     {
-        auto app = appGet(msg->getAppName());
-        if (!app) {
-            LOG_ERROR("Cant switch to app: %s , doesn't exist", msg->getAppName().c_str());
+        auto &action         = actionMsg->getAction();
+        const auto targetApp = appGet(action.targetApplication);
+        if (targetApp == nullptr) {
+            LOG_ERROR("Failed to switch to %s application: No such application.", action.targetApplication.c_str());
             return false;
         }
 
-        if (app->getState() == app::Application::State::ACTIVE_FORGROUND) {
-            app::Application::messageSwitchApplication(
-                this, msg->getAppName(), msg->getWindowName(), std::move(msg->getData()));
-            return true;
+        if (targetApp->getState() == app::Application::State::ACTIVE_FORGROUND) {
+            // If the app is already focused, then switch window.
+            auto msg = std::make_shared<app::AppSwitchWindowMessage>(
+                action.targetWindow, std::string{}, std::move(action.data), gui::ShowMode::GUI_SHOW_INIT);
+            return sys::Bus::SendUnicast(msg, targetApp->name(), this);
         }
-        else {
-            APMSwitch apmSwitch(
-                msg->getSenderName(), msg->getAppName(), msg->getWindowName(), std::move(msg->getData()));
-            return handleSwitchApplication(&apmSwitch);
-        }
+        APMSwitch switchRequest(
+            actionMsg->getSenderName(), targetApp->name(), action.targetWindow, std::move(action.data));
+        return handleSwitchApplication(&switchRequest);
     }
 
     // tries to switch the application
@@ -796,13 +798,9 @@ namespace sapm
     }
 
     // Static methods
-    bool ApplicationManager::messageSwitchToNotification(sys::Service *sender,
-                                                         const std::string &applicationName,
-                                                         const std::string &windowName,
-                                                         std::unique_ptr<gui::SwitchData> &&data)
+    auto ApplicationManager::sendAction(sys::Service *sender, Action &&action) -> bool
     {
-        auto msg = std::make_shared<sapm::APMSwitchToNotification>(
-            sender->GetName(), applicationName, windowName, std::move(data));
+        auto msg = std::make_shared<APMAction>(sender->GetName(), std::move(action));
         return sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
     }
 

@@ -34,38 +34,6 @@ namespace sapm
         }
     };
 
-    /*
-     * @brief Template for notification messages that go to application manager
-     */
-    class APMNotificationMessage : public APMMessage
-    {
-        std::string application;
-        std::string window;
-        std::unique_ptr<gui::SwitchData> data;
-
-      public:
-        APMNotificationMessage(const std::string &senderName,
-                               const std::string &applicationName,
-                               const std::string &windowName,
-                               std::unique_ptr<gui::SwitchData> data)
-            : APMMessage(MessageType::APMSwitchToNotification, senderName),
-              application{applicationName}, window{windowName}, data{std::move(data)}
-        {}
-
-        const std::string &getAppName() const
-        {
-            return application;
-        };
-        const std::string &getWindowName() const
-        {
-            return window;
-        };
-        std::unique_ptr<gui::SwitchData> &getData()
-        {
-            return data;
-        };
-    };
-
     //	APMSwitch, //request to switch to given application, optionally also to specified window
     //  APMSwitchToNotification, //request to switch to given notification (application and specified window)
     //	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
@@ -99,17 +67,6 @@ namespace sapm
         {
             return data;
         };
-    };
-
-    class APMSwitchToNotification : public APMNotificationMessage
-    {
-      public:
-        APMSwitchToNotification(const std::string &senderName,
-                                const std::string &applicationName,
-                                const std::string &windowName,
-                                std::unique_ptr<gui::SwitchData> data)
-            : APMNotificationMessage(senderName, applicationName, windowName, std::move(data))
-        {}
     };
 
     class APMSwitchPrevApp : public APMMessage
@@ -224,6 +181,28 @@ namespace sapm
         bool isRunning = false;
     };
 
+    struct Action
+    {
+        std::string targetApplication;
+        std::string targetWindow;
+        std::unique_ptr<gui::SwitchData> data;
+    };
+
+    class APMAction : public APMMessage
+    {
+      public:
+        APMAction(const std::string &senderName, Action &&_action)
+            : APMMessage{MessageType::APMAction, senderName}, action{std::move(_action)}
+        {}
+
+        auto getAction() noexcept -> Action &
+        {
+            return action;
+        }
+
+      private:
+        Action action;
+    };
 } /* namespace sapm */
 
 #endif /* MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_ */
