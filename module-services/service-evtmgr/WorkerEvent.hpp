@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -65,8 +65,8 @@ class WorkerEvent : public sys::Worker
      * This function is responsible for creating all queues provided in the constructor.
      * When all queues are created this method creates set of queues.
      */
-    virtual bool init(std::list<sys::WorkerQueueInfo> queues);
-    virtual bool deinit();
+    virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
+    virtual bool deinit() override;
 
     /**
      * This method is called from thread when new message arrives in queue.

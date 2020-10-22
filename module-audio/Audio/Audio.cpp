@@ -46,11 +46,11 @@ namespace audio
         case EventType::HeadphonesUnplug:
             lineSinkAvailable = false;
             break;
-        case EventType::BTHeadsetOn:
-            lineSinkAvailable = true;
+        case EventType::BTA2DPOn:
+            btSinkAvailable = true;
             break;
-        case EventType::BTHeadsetOff:
-            lineSinkAvailable = false;
+        case EventType::BTA2DPOff:
+            btSinkAvailable = false;
             break;
         default:
             break;
@@ -112,7 +112,7 @@ namespace audio
                 currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
             }
             if (btSinkAvailable && btData) {
-                currentOperation->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
+                currentOperation->SendEvent(std::make_unique<Event>(EventType::BTA2DPOn));
                 currentOperation->SetBluetoothStreamData(btData);
             }
         }

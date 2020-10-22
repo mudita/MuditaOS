@@ -66,7 +66,7 @@ namespace bsp
             saiOutFormat.stereo = kSAI_MonoLeft;
             OutStart();
         }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutPutStereo)) {
+        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) {
             saiOutFormat.stereo = kSAI_Stereo;
             OutStart();
         }

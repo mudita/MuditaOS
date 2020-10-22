@@ -4,7 +4,8 @@
 #pragma once
 
 #include "Error.hpp"
-
+#include <module-services/service-bluetooth/ServiceBluetoothCommon.hpp>
+#include <memory>
 namespace Bt
 {
     class Profile
@@ -13,6 +14,7 @@ namespace Bt
         virtual ~Profile()                           = default;
         virtual auto init() -> Error                 = 0;
         virtual void setDeviceAddress(uint8_t *addr) = 0;
+        virtual auto getStreamData() -> std::shared_ptr<BluetoothStreamData> = 0;
     };
 
 } // namespace Bt

@@ -7,6 +7,8 @@
 #include "Audio/Profiles/Profile.hpp"
 #include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
+#include "Audio/Profiles/ProfilePlaybackBluetoothA2DP.hpp"
+
 #include "Audio/AudioCommon.hpp"
 
 #include <bsp/audio/bsp_audio.hpp>
@@ -56,6 +58,7 @@ namespace audio
 
         availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume));
         availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume));
+        availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackBTA2DP, nullptr, loudspeakerVolume));
 
         currentProfile = availableProfiles[0];
 
@@ -88,7 +91,7 @@ namespace audio
         state         = State::Active;
 
         currentProfile->SetInOutFlags(tags->num_channel == 2
-                                          ? static_cast<uint32_t>(bsp::AudioDevice::Flags::OutPutStereo)
+                                          ? static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo)
                                           : static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
 
         currentProfile->SetSampleRate(tags->sample_rate);
@@ -155,6 +158,10 @@ namespace audio
             // TODO: Switch to playback headphones/bt profile if present
             SwitchProfile(Profile::Type::PlaybackLoudspeaker);
             break;
+        case EventType::BTA2DPOn:
+            // TODO: Switch to playback headphones/bt profile if present
+            SwitchProfile(Profile::Type::PlaybackBTA2DP);
+            break;
         default:
             return RetCode::UnsupportedEvent;
         }
@@ -201,7 +208,11 @@ namespace audio
 
     void PlaybackOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
     {
-        LOG_ERROR("UNIMPLEMENTED");
+        if (auto device = dynamic_cast<bsp::RT1051BluetoothAudio *>(audioDevice.get()); device != nullptr) {
+            device->sourceQueue = data->out;
+            device->metadata    = data->metadata;
+            LOG_INFO("Queue and metadata set!");
+        }
     }
 
 } // namespace audio
