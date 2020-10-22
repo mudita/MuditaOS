@@ -5,7 +5,7 @@
 
 #include "Application.hpp"
 
-#include "bsp/common.hpp"
+#include <bsp/common.hpp>
 
 namespace gui::window::name
 {
@@ -26,8 +26,8 @@ namespace gui::window::name
     inline const std::string input_language = "InputLanguage";
     inline const std::string locked_screen  = "LockedScreen";
 
-    inline const std::string messages = "Messages";
-    inline const std::string torch    = "Torch";
+    inline const std::string messages  = "Messages";
+    inline const std::string torch     = "Torch";
     inline const std::string templates = "Templates";
 
     inline const std::string display_and_keypad = "DisplayAndKeypad";
@@ -35,6 +35,7 @@ namespace gui::window::name
     inline const std::string change_settings = "ChangeSettings";
     inline const std::string all_operators   = "AllOperators";
     inline const std::string import_contacts = "ImportContacts";
+    inline const std::string dialog_settings = "DialogSettings";
 
 } // namespace gui::window::name
 
