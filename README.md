@@ -103,4 +103,4 @@ firefox build-<target>-<build_type>/doc/html/index.html
 The [MuditaOS changelog](./changelog.md) is regularly updated by the core development team.
 
 ## License
-MuditaOS is licensed on [GPL3](https://choosealicense.com/licenses/gpl-3.0/).
+MuditaOS is licensed on [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/).
