@@ -3,7 +3,8 @@
 	"common_kbd_upper": "lang_eng_upper",
     "common_kbd_numeric": "numeric",
     "common_kbd_phone": "phone",
-	
+
+    "common_add": "ADD",
     "common_open": "OPEN",
     "common_call": "CALL",
     "common_save": "SAVE",
@@ -204,7 +205,6 @@
     "app_call_is_calling": "is calling",
     "app_call_calling": "calling...",
     "app_call_call_ended": "call ended",
-    "app_call_add": "ADD",
     "app_call_contact": "CONTACT",
     "app_call_mute": "MUTE",
     "app_call_muted": "MUTED",
@@ -232,7 +232,9 @@
     "app_settings_title_main_new": "Settings New",
     "app_settings_bt" : "Bluetooth",
     "app_settings_bluetooth_add_device" : "Add device",
+    "app_settings_bluetooth_all_devices" : "All devices",
     "app_settings_bluetooth_all_devices_indent" : "  All devices",
+    "app_settings_bluetooth_searching_devices" : "Searching devices... \nIt may take a moment.",
     "app_settings_bluetooth_main" : "Bluetooth",
     "app_settings_bluetooth_phone_name_indent" : "  Phone name",
     "app_settings_bluetooth_phone_visibility" : "Phone visibility",

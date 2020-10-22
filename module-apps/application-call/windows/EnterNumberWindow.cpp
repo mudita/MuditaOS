@@ -52,7 +52,7 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_call_call"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_call_add"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_add"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
 
         topBar->setActive(TopBar::Elements::SIGNAL, true);
