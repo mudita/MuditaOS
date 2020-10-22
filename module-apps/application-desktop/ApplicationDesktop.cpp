@@ -97,13 +97,18 @@ namespace app
     {
         assert(msg);
         auto records = *msg->getResult();
+
+        bool rebuildMainWindow = false;
+
         for (auto record : records) {
             switch (record.key) {
             case NotificationsRecord::Key::Calls:
+                rebuildMainWindow |= record.value != notifications.notSeen.Calls;
                 notifications.notSeen.Calls = record.value;
                 break;
 
             case NotificationsRecord::Key::Sms:
+                rebuildMainWindow |= record.value != notifications.notSeen.SMS;
                 notifications.notSeen.SMS = record.value;
                 break;
 
@@ -114,9 +119,11 @@ namespace app
             }
         }
 
-        /// TODO if current window is this one or was on stack -> requild it
-        /// windowsFactory.build(this, app::window::name::desktop_menu);
-        /// windowsFactory.build(this, app::window::name::desktop_main_window);
+        auto ptr = getCurrentWindow();
+        if (rebuildMainWindow && ptr->getName() == app::window::name::desktop_main_window) {
+            ptr->rebuild();
+        }
+
         return true;
     }
 
@@ -175,7 +182,6 @@ namespace app
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
         notifications.notSeen.Calls = 0;
-        getCurrentWindow()->rebuild(); // triggers rebuild - shouldn't be needed, but is
         return true;
     }
 
@@ -186,7 +192,6 @@ namespace app
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
         notifications.notSeen.SMS = 0;
-        getCurrentWindow()->rebuild(); // triggers rebuild - shouldn't be needed, but is
         return true;
     }
 
