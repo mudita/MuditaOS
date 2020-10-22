@@ -323,7 +323,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    if (evt->getType() == EventType::BTHeadsetOn) {
+    if (evt->getType() == EventType::BTA2DPOn) {
         auto req = std::make_shared<BluetoothRequestStreamMessage>();
         sys::Bus::SendUnicast(req, service::name::bluetooth, this);
         return std::make_unique<AudioEventResponse>(RetCode::Success);
@@ -331,7 +331,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
-        if (evt->getType() == EventType::BTHeadsetOff) {
+        if (evt->getType() == EventType::BTA2DPOff) {
             input.audio->SetBluetoothStreamData(nullptr);
         }
     }
@@ -501,7 +501,8 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
         for (auto &input : audioMux.GetAllInputs()) {
             input.audio->SetBluetoothStreamData(msg->getData());
-            input.audio->SendEvent(std::make_unique<Event>(EventType::BTHeadsetOn));
+            input.audio->SendEvent(std::make_unique<Event>(EventType::BTA2DPOn));
+            LOG_INFO("Queues received!");
         }
     }
     else {

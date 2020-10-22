@@ -15,6 +15,8 @@
 #include "ProfileRoutingHeadset.hpp"
 #include "ProfileRoutingSpeakerphone.hpp"
 
+#include "ProfilePlaybackBluetoothA2DP.hpp"
+
 #include <Utils.hpp>
 
 namespace audio
@@ -30,6 +32,9 @@ namespace audio
             break;
         case Type::PlaybackLoudspeaker:
             inst = std::make_unique<ProfilePlaybackLoudspeaker>(callback, vol);
+            break;
+        case Type::PlaybackBTA2DP:
+            inst = std::make_unique<ProfilePlaybackBluetoothA2DP>(callback, vol);
             break;
         case Type::RecordingBuiltInMic:
             inst = std::make_unique<ProfileRecordingOnBoardMic>(callback, gain);

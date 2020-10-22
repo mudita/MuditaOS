@@ -14,6 +14,9 @@
 #include <log/log.hpp>
 #include <module-sys/Service/Bus.hpp>
 #include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <module-audio/Audio/AudioCommon.hpp>
+#include <module-services/service-audio/messages/AudioMessage.hpp>
+#include <module-services/service-evtmgr/Constants.hpp>
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"
@@ -72,11 +75,16 @@ namespace Bt
     {
         pimpl->setOwnerService(service);
     }
+    auto A2DP::getStreamData() -> std::shared_ptr<BluetoothStreamData>
+    {
+        return pimpl->getStreamData();
+    }
 
     sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;
     QueueHandle_t A2DP::A2DPImpl::sinkQueue   = nullptr;
     bd_addr_t A2DP::A2DPImpl::deviceAddr;
+    DeviceMetadata_t A2DP::A2DPImpl::metadata;
     btstack_packet_callback_registration_t A2DP::A2DPImpl::hciEventCallbackRegistration;
     std::array<uint8_t, 150> A2DP::A2DPImpl::sdpSourceServiceBuffer;
     std::array<uint8_t, 4> A2DP::A2DPImpl::mediaSbcCodecCapabilities = {
@@ -184,7 +192,6 @@ namespace Bt
             if (sourceQueue != nullptr) {
                 if (xQueueReceive(sourceQueue, &audioData, 10) != pdPASS) {
                     audioData.data.fill(0);
-                    LOG_ERROR("Failed to receive!");
                 }
             }
             else {
@@ -384,14 +391,11 @@ namespace Bt
                                      AVDTP::sbcConfig.maxBitpoolValue,
                                      AVDTP::sbcConfig.channelMode);
 
-            DeviceMetadata_t metadata{
+            metadata = DeviceMetadata_t{
                 .sampleRate      = static_cast<unsigned int>(AVDTP::sbcConfig.samplingFrequency),
                 .channels        = static_cast<unsigned short>(AVDTP::sbcConfig.numChannels),
                 .samplesPerFrame = static_cast<unsigned int>(btstack_sbc_encoder_num_audio_frames()),
             };
-
-            auto msg = std::make_shared<BluetoothDeviceMetadataMessage>(std::move(metadata));
-            sys::Bus::SendUnicast(std::move(msg), "ServiceBluetooth", ownerService);
 
             break;
         }
@@ -446,8 +450,9 @@ namespace Bt
             sourceQueue = xQueueCreate(5, sizeof(AudioData_t));
             sinkQueue   = nullptr;
             if (sourceQueue != nullptr) {
-                auto msg = std::make_shared<BluetoothAudioRegisterMessage>(sourceQueue, sinkQueue);
-                sys::Bus::SendUnicast(std::move(msg), "ServiceBluetooth", ownerService);
+                auto event = std::make_shared<audio::Event>(audio::EventType::BTA2DPOn);
+                auto msg   = std::make_shared<AudioEventRequest>(std::move(event));
+                sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, ownerService);
             }
             else {
                 LOG_ERROR("failed to create queue!");
@@ -529,7 +534,11 @@ namespace Bt
                 cid,
                 AVRCP::mediaTracker.local_seid,
                 local_seid);
-
+            {
+                auto event = std::make_shared<audio::Event>(audio::EventType::BTA2DPOff);
+                auto msg   = std::make_shared<AudioEventRequest>(std::move(event));
+                sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, ownerService);
+            }
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.stream_opened = 0;
                 LOG_INFO("A2DP Source: Stream released.\n");
@@ -575,6 +584,10 @@ namespace Bt
     void A2DP::A2DPImpl::setOwnerService(sys::Service *service)
     {
         ownerService = service;
+    }
+    auto A2DP::A2DPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
+    {
+        return std::make_shared<BluetoothStreamData>(sinkQueue, sourceQueue, metadata);
     }
 
 } // namespace Bt
