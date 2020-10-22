@@ -11,6 +11,7 @@
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
 * `[settings]` Added sql script for file indexer DB schema
 * `[settings][bluetooth]` Create "Add device" windows
+* `[hardware]` Slider driver (offline/online mode selection)
 
 ### Fixed
 
@@ -22,6 +23,7 @@
 ### Other
 
 * `[audio]` Improve synchronization when switching operations.
+* `[vfs]`  Use partition image file for Phone filesystem on Linux emulator
 
 ## [0.42.2 2020-10-16]
 

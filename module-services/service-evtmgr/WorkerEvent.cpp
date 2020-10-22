@@ -43,7 +43,7 @@ extern "C"
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
 
-    QueueHandle_t queue = queues[queueID];
+    xQueueHandle queue = queues[queueID];
 
     // service queue
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueService)) {
@@ -173,6 +173,18 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerIRQ)) {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
+            return false;
+        }
+
+        if (std::optional<bsp::KeyCodes> key = bsp::magnetometer::WorkerEventHandler()) {
+            LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
+            processKeyEvent(bsp::KeyEvents::Pressed, *key);
+        }
+    }
+
     return true;
 }
 
@@ -189,7 +201,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
-    bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometer)]);
+    bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
 
     time_t timestamp;

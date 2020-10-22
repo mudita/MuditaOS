@@ -257,22 +257,3 @@ void BluetoothCommon::set_irq(bool enable)
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
 }
-
-extern "C"
-{
-    void GPIO1_Combined_16_31_IRQHandler(void)
-    {
-        BaseType_t xHigherPriorityTaskWoken = 0;
-        uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
-
-        if (irq_mask & (1 << BSP_BLUETOOTH_UART_CTS_PIN)) {
-            LOG_DEBUG("CTS IRQ!\n");
-        }
-
-        // Clear all IRQs
-        GPIO_PortClearInterruptFlags(GPIO1, irq_mask);
-
-        // Switch context if necessary
-        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-    }
-};
