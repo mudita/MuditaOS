@@ -419,8 +419,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
 {
     auto audioRet = cmux->AudioConfProcedure();
     if (audioRet == TS0710::ConfState::Success) {
-        auto cmd =
-            at::factory(at::AT::IPR) + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
+        auto cmd = at::factory(at::AT::IPR) + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
         LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
         if (!cmux->getParser()->cmd(cmd)) {
             LOG_ERROR("Baudrate setup error");
@@ -657,7 +656,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         assert(msg != nullptr);
         auto channel = cmux->get(TS0710::Channel::Commands);
         if (channel) {
-            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->number.getEntered() + ";\r");
+            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->number.getEntered() + ";");
             if (ret) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
@@ -1060,12 +1059,11 @@ bool ServiceCellular::sendSMS(SMSRecord record)
         // if text fit in single message send
         if (textLen < singleMessageLen) {
 
-            if (cmux->CheckATCommandPrompt(
-                    channel->SendCommandPrompt((std::string(at::factory(at::AT::CMGS)) +
-                                                UCS2(UTF8(record.number.getEntered())).modemStr() + "\"\r")
-                                                   .c_str(),
-                                               1,
-                                               commandTimeout))) {
+            if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(
+                    (std::string(at::factory(at::AT::CMGS)) + UCS2(UTF8(record.number.getEntered())).modemStr() + "\"")
+                        .c_str(),
+                    1,
+                    commandTimeout))) {
 
                 if (channel->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                     result = true;
@@ -1099,7 +1097,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
                 UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
                 std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).modemStr() +
-                                    "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount) + "\r");
+                                    "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
                 if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
                     // prompt sign received, send data ended by "Ctrl+Z"
@@ -1142,7 +1140,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
     channel->cmd(at::AT::SMS_UCSC2);
 
     auto cmd = at::factory(at::AT::QCMGR);
-    auto ret = channel->cmd(cmd + messageNumber + "\r", cmd.timeout);
+    auto ret = channel->cmd(cmd + messageNumber, cmd.timeout);
 
     bool messageParsed = false;
 
@@ -1339,7 +1337,7 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
     auto channel = cmux->get(TS0710::Channel::Commands);
     std::vector<std::string> result;
     if (channel) {
-        auto resp = channel->cmd("AT+COPS=?\r", 180000, 2);
+        auto resp = channel->cmd("AT+COPS=?", 180000, 2);
         if (resp.code == at::Result::Code::OK) {
             std::string rawResponse = resp.response[0];
             std::string toErase("+COPS: ");
@@ -1497,7 +1495,7 @@ bool ServiceCellular::handle_select_sim()
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
         bool ready = false;
         while (!ready) {
-            auto response = channel->cmd("AT+CPIN?\r");
+            auto response = channel->cmd("AT+CPIN?");
             for (auto &line : response.response) {
                 if (line.find("+CPIN: READY") == std::string::npos) {
                     ready = true;
@@ -1513,7 +1511,7 @@ bool ServiceCellular::handle_select_sim()
 bool ServiceCellular::handle_modem_on()
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
-    channel->cmd("AT+CCLK?\r");
+    channel->cmd("AT+CCLK?");
     // inform host ap ready
     cmux->InformModemHostWakeup();
     state.set(this, State::ST::URCReady);
@@ -1579,7 +1577,7 @@ bool ServiceCellular::SetScanMode(std::string mode)
     if (channel) {
         auto command = at::factory(at::AT::SET_SCANMODE);
 
-        auto resp = channel->cmd(command.cmd + mode + ",1\r", 300, 1);
+        auto resp = channel->cmd(command.cmd + mode + ",1", 300, 1);
         if (resp.code == at::Result::Code::OK) {
             return true;
         }
@@ -1610,7 +1608,7 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
     at::Result resp;
     if (channel) {
         auto command           = at::factory(at::AT::QLDTMF);
-        std::string dtmfString = "\"" + std::string(1, digit) + "\"\r";
+        std::string dtmfString = "\"" + std::string(1, digit) + "\"";
         resp                   = channel->cmd(command.cmd + dtmfString);
         if (resp) {
             command = at::factory(at::AT::VTS);
@@ -1679,7 +1677,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
     if (channel != nullptr) {
         if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
             channel->cmd(at::AT::SMS_GSM);
-            std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15\r";
+            std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15";
             auto result         = channel->cmd(command, commandTimeout, commandExpectedTokens);
             if (result.code == at::Result::Code::OK) {
                 ussdState = ussd::State::pullRequestSent;

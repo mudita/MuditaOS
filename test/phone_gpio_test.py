@@ -4,10 +4,10 @@
 
 from harness.uart import conn, log
 
-# conn.gsm("AT+QSIMDET=?\r")
+# conn.gsm("AT+QSIMDET=?")
 # conn.read(1)
 # conn.sleep(3)
-# conn.gsm("AT+QSIMSTAT=?\r")
+# conn.gsm("AT+QSIMSTAT=?")
 # conn.read(1)
 # conn.sleep(3)
 
