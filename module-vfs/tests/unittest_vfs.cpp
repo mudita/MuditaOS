@@ -15,6 +15,10 @@
 
 #include <thread.hpp>
 
+#include <vector>
+
+#include <algorithm>
+
 class vfs vfs;
 
 struct vfs_initializer
@@ -139,4 +143,39 @@ TEST_CASE("File loading and saving")
     fileContents = vfs.loadFileAsString("module-vfs/test_dirx/testWrite.txt");
     REQUIRE(strcmp(fileContents.c_str(), "this is a test") == 0);
     REQUIRE(vfs.remove("module-vfs/test_dirx/testWrite.txt") == 0);
+}
+
+TEST_CASE("VFS lseek check")
+{
+    static constexpr auto seek_filename = "lseek_test.fil";
+    static constexpr auto buf_size      = 1024U;
+    static constexpr auto buf_items     = 1024U;
+    static constexpr auto buf_elems     = buf_size * buf_items;
+    auto fd                             = vfs.fopen(seek_filename, "w+");
+    REQUIRE(fd != nullptr);
+    std::vector<char> buffer(buf_size);
+    std::iota(std::begin(buffer), std::end(buffer), 0);
+    for (auto record = 0U; record < buf_items; ++record) {
+        REQUIRE(vfs.fwrite(buffer.data(), buffer.size(), 1, fd) == 1);
+    }
+    REQUIRE(vfs.fclose(fd) == 0);
+    fd = vfs.fopen(seek_filename, "r");
+    REQUIRE(fd != nullptr);
+    std::vector<char> buf_out(buf_size);
+    static constexpr auto offs_seek1 = 256;
+    REQUIRE(vfs.fseek(fd, offs_seek1, SEEK_SET) == 0);
+    REQUIRE(vfs.ftell(fd) == offs_seek1);
+    REQUIRE(vfs.fread(buf_out.data(), buf_out.size(), 1, fd) == 1);
+    REQUIRE(buffer == buf_out);
+
+    REQUIRE(vfs.fseek(fd, 0UL, SEEK_END) == 0);
+    REQUIRE(vfs.ftell(fd) == buf_elems);
+    REQUIRE(vfs.fseek(fd, buf_elems + 10, SEEK_SET) < 0);
+    REQUIRE(vfs.ftell(fd) == buf_elems);
+
+    REQUIRE(vfs.fseek(fd, 0UL, SEEK_SET) == 0);
+    REQUIRE(vfs.fread(buf_out.data(), buf_out.size(), 1, fd) == 1);
+    REQUIRE(buffer == buf_out);
+
+    REQUIRE(vfs.fclose(fd) == 0);
 }
