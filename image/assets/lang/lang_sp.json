@@ -2,7 +2,8 @@
 	"common_kbd_lower": "lang_sp_lower",
 	"common_kbd_upper": "lang_sp_upper",
 	"common_kbd_numeric": "numeric",
-	
+
+    "common_add": "ADD",
     "common_open": "ABIERTA",
     "common_call": "CALL",
     "common_save": "SAVE",
@@ -108,7 +109,6 @@
     "app_call_emergency": "Emergency call",
     "app_call_is_calling": "is calling",
     "app_call_call_ended": "call ended",
-    "app_call_add": "ADD",
     "app_call_contact": "CONTACT",
     
     "app_messages_title_main": "Messages",

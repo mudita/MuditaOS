@@ -218,6 +218,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
             devices.push_back(dev);
             auto msg = std::make_shared<BluetoothScanResultMessage>(devices);
             sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService);
+            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", Bt::GAP::ownerService);
 
         } break;
 
@@ -255,6 +256,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
             auto result = packet[2];
             auto msg    = std::make_shared<BluetoothPairResultMessage>(result == 0u);
             sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService);
+            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", Bt::GAP::ownerService);
         } break;
         default:
             break;
