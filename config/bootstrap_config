@@ -23,27 +23,28 @@ GH_RUNNER_PKG="${GH_RUNNER_LINK##*/}"
 GH_RUNNER_PATH_VAR=${GH_RUNNER_NAME//[-.]/_}
 
 INSTALL_PACKAGES=" 
-        ca-certificates \
-        curl \
-        gnupg2 \
-        binutils \
-        wget \
-        git \
-        make \
-        pkg-config \
-        gtkmm-3.0 \
-        gcc-9 \
-        g++-9 \
-        portaudio19-dev \
-        build-essential \
-        vim \
-        bash-completion \
-        clang-format-10 \
         apt-utils \
-        locales \
-        tzdata \
-        ninja-build \
-        graphviz \
+        bash-completion \
+        binutils \
+        build-essential \
+        ca-certificates \
+        ccache \
+        clang-format-10 \
+        curl \
         doxygen \
-        ccache 
+        g++-9 \
+        gcc-9 \
+        git \
+        gnupg2 \
+        graphviz \
+        gtkmm-3.0 \
+        locales \
+        make \
+        mtools \
+        ninja-build \
+        pkg-config \
+        portaudio19-dev \
+        tzdata \
+        vim \
+        wget
 "
