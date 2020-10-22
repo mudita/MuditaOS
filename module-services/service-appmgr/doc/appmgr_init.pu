@@ -1,0 +1,7 @@
+@startuml
+participant "Application Manager" as appmgr
+participant "Root Application" as root
+
+appmgr -> appmgr: Start system services
+appmgr -> root: Start
+@enduml
