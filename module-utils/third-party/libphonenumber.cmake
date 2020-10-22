@@ -23,10 +23,16 @@ set (LIBPHONENUMBER_SOURCES
         ${LIBPHONENUMBER}/utf/unicodetext.cc
         ${LIBPHONENUMBER}/utf/unilib.cc
 )
-target_sources(${PROJECT_NAME} PRIVATE ${LIBPHONENUMBER_SOURCES})
+
+# create static library for the third party
+set (LIBPHONENUMBER_TARGET phonenumber)
+add_library (${LIBPHONENUMBER_TARGET} STATIC ${LIBPHONENUMBER_SOURCES})
+
+# setup flags for the third party
+third_party_target_setup (${LIBPHONENUMBER_TARGET})
 
 # set compile definitions
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions (${LIBPHONENUMBER_TARGET}
         PRIVATE
                 I18N_PHONENUMBERS_ASCII_DECIMALS_ONLY
         PUBLIC
@@ -36,12 +42,28 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 # suppress warning for libphonenumber
-set_source_files_properties(${LIBPHONENUMBER}/asyoutypeformatter.cc
+set_source_files_properties (${LIBPHONENUMBER}/asyoutypeformatter.cc
         PROPERTIES COMPILE_FLAGS
         -Wno-implicit-fallthrough
 )
 
-# add include directory
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIBPHONENUMBER_SRCDIR})
+# add include directory path
+target_include_directories (${LIBPHONENUMBER_TARGET} PUBLIC ${LIBPHONENUMBER_SRCDIR})
 
-third_party_source_optimization(${LIBPHONENUMBER_SOURCES})
+# module-os dependency (locking support)
+target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC module-os)
+
+# RE2 dependency
+if (NOT RE2_TARGET)
+        message (FATAL_ERROR "RE2 is required for libphonenumber")
+endif ()
+target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC ${RE2_TARGET})
+
+# protobuf dependency
+if (NOT PROTOBUF_TARGET)
+        message (FATAL_ERROR "Protobuf is required for libphonenumber")
+endif()
+target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC ${PROTOBUF_TARGET})
+
+# turn on optimization in debug
+third_party_source_optimization (${LIBPHONENUMBER_SOURCES})

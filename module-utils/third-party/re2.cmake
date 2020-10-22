@@ -1,8 +1,8 @@
-include(thirdparty)
+include (thirdparty)
 
 # add re2 library sources
-set(RE2_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/re2)
-set(RE2_SOURCES
+set (RE2_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/re2)
+set (RE2_SOURCES
         ${RE2_SRCDIR}/re2/bitstate.cc
         ${RE2_SRCDIR}/re2/compile.cc
         ${RE2_SRCDIR}/re2/dfa.cc
@@ -26,19 +26,31 @@ set(RE2_SOURCES
         ${RE2_SRCDIR}/util/rune.cc
         ${RE2_SRCDIR}/util/strutil.cc
 )
-target_sources(${PROJECT_NAME} PRIVATE ${RE2_SOURCES})
+
+# create static library for the third party
+set (RE2_TARGET re2)
+add_library (${RE2_TARGET} STATIC ${RE2_SOURCES})
+
+# setup flags for the third party
+third_party_target_setup (${RE2_TARGET})
 
 # use FreeRTOS cpp wrapper to provide thread safety
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions (${RE2_TARGET}
 	PUBLIC
 	RE2_USE_RTOS_WRAPPER
 )
 
 # suppress warning for RE2 to avoid big changes in the original library
-set_source_files_properties(${RE2_SRCDIR}/re2/perl_groups.cc
+set_source_files_properties (${RE2_SRCDIR}/re2/perl_groups.cc
         PROPERTIES COMPILE_FLAGS
         -Wno-missing-field-initializers
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${RE2_SRCDIR})
+# add include directory path
+target_include_directories(${RE2_TARGET} PUBLIC ${RE2_SRCDIR})
+
+# module-os dependency (locking support)
+target_link_libraries (${RE2_TARGET} PUBLIC module-os)
+
+# optimize thirdy party sources in dbeug
 third_party_source_optimization(${RE2_SOURCES})
