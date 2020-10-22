@@ -37,7 +37,7 @@ enum class WorkerEventQueues
     queueRTC,
     queueHarness,
     queueCellular,
-    queueMagnetometer,
+    queueMagnetometerIRQ,
     queueTorch,
 };
 

@@ -3,10 +3,6 @@
 
 #include "bsp/magnetometer/magnetometer.hpp"
 
-#include "bsp/BoardDefinitions.hpp"
-
-using namespace drivers;
-
 static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp
@@ -31,5 +27,13 @@ namespace bsp
         {
             return bsp::Board::Linux;
         }
+
+        std::optional<bsp::KeyCodes> WorkerEventHandler()
+        {
+            return std::nullopt;
+        }
+
+        void enableIRQ()
+        {}
     } // namespace magnetometer
 } // namespace bsp

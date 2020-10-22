@@ -182,4 +182,15 @@ namespace utils
 
         return false;
     }
+
+    static inline uint32_t swapBytes(uint32_t toSwap)
+    {
+#ifdef __GNUC__
+        return __builtin_bswap32(toSwap);
+#else
+        return ((((toSwap)&0xff000000) >> 24) | (((toSwap)&0x00ff0000) >> 8) | (((toSwap)&0x0000ff00) << 8) |
+                (((toSwap)&0x000000ff) << 24));
+#endif
+    }
+
 } // namespace utils
