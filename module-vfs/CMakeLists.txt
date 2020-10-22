@@ -34,8 +34,14 @@ set(PROJECT_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/free_rtos_custom/include
         )
 
+set(FREERTOS_FAT_EXTSOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/ff_stdio_flush.c
+	${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/ff_file_flush.c
+)
+
 set(SOURCES ""
         ${FREERTOS_FAT_SOURCES}
+        ${FREERTOS_FAT_EXTSOURCES}
         vfs-utils.cpp
         vfs.cpp
 )
