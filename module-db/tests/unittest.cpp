@@ -18,6 +18,14 @@
 
 class vfs vfs;
 
+struct vfs_initializer
+{
+    vfs_initializer()
+    {
+        vfs.Init();
+    }
+} vfs_initializer;
+
 TEST_CASE("Create and destroy simple database")
 {
 
