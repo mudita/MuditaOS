@@ -16,9 +16,10 @@ extern "C"
 
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
-#include "Service/Worker.hpp"   // for Worker, WorkerQueueInfo (ptr only)
-#include "parser/ParserFSM.hpp" // for StateMachine
-#include "bsp/usb_cdc/usb_cdc.hpp"
+#include "Service/Worker.hpp"
+#include "parser/ParserFSM.hpp"
+
+#include "bsp/usb/usb.hpp"
 
 namespace sys
 {
