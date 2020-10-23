@@ -126,6 +126,7 @@ namespace app
             }
             currwin->setSIM();
             currwin->updateSignalStrength();
+            currwin->updateNetworkAccessTechnology();
 
             std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
 
@@ -203,8 +204,13 @@ namespace app
     sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-        if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
-            return handleSignalStrengthUpdate(msgl);
+        if (msg != nullptr) {
+            if (msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+                return handleSignalStrengthUpdate(msgl);
+            }
+            if (msg->type == CellularNotificationMessage::Type::NetworkStatusUpdate) {
+                return handleNetworkAccessTechnologyUpdate(msgl);
+            }
         }
         else if (msgl->messageType == MessageType::AppInputEvent) {
             return handleInputEvent(msgl);
@@ -254,6 +260,14 @@ namespace app
     sys::Message_t Application::handleSignalStrengthUpdate(sys::DataMessage *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleNetworkAccessTechnologyUpdate(sys::DataMessage *msgl)
+    {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
