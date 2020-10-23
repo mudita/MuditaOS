@@ -289,9 +289,7 @@ namespace app
 
     bool ApplicationMessages::showSearchResults(const UTF8 &title, const UTF8 &search_text)
     {
-        auto name = gui::name::window::search_results;
-        windowsStack.get(name)->setTitle(title);
-        switchWindow(name, std::make_unique<SMSTextToSearch>(search_text));
+        switchWindow(gui::name::window::search_results, std::make_unique<SMSTextToSearch>(search_text, title));
         return true;
     }
 
