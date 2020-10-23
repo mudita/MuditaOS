@@ -22,7 +22,7 @@ set( SOURCES
     "windows/OptionsWindowOption.cpp"
     "windows/Dialog.cpp"
     "windows/NoEvents.cpp"
-    "widgets/SearchBox.cpp"
+    "widgets/InputBox.cpp"
     "windows/OptionSetting.cpp"
     )
 

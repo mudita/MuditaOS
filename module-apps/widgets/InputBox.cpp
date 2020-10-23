@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SearchBox.hpp"
+#include "InputBox.hpp"
+
 #include <BoxLayout.hpp>
-#include "i18/i18.hpp"
 #include <Image.hpp>
 
 namespace gui
@@ -11,13 +11,13 @@ namespace gui
     constexpr uint32_t default_x = style::window::default_left_margin;
     constexpr uint32_t default_w =
         style::window_width - style::window::default_left_margin - style::window::default_right_margin;
-    namespace searchHeader
+    namespace inputHeader
     {
         constexpr uint32_t x = style::window::default_left_margin;
         constexpr uint32_t y = 127;
-        constexpr uint32_t w = 86;
+        constexpr uint32_t w = default_w;
         constexpr uint32_t h = 20;
-    } // namespace searchHeader
+    } // namespace inputHeader
 
     namespace horizontalBox
     {
@@ -46,7 +46,7 @@ namespace gui
 namespace gui
 {
 
-    gui::Text *searchBox(gui::Item *parent, const std::string &header, const std::string &icon)
+    auto inputBox(gui::Item *parent, const std::string &header, const std::string &icon) -> gui::Text *
     {
         auto inputField = new Text(nullptr,
                                    horizontalBox::inputField::x,
@@ -61,19 +61,21 @@ namespace gui
 
         auto horizontalBox = new HBox(parent, horizontalBox::x, horizontalBox::y, horizontalBox::w, horizontalBox::h);
         horizontalBox->addWidget(inputField);
-        horizontalBox->addWidget(new Image(nullptr,
-                                           horizontalBox::searchTop::x,
-                                           horizontalBox::searchTop::y,
-                                           horizontalBox::searchTop::w,
-                                           horizontalBox::searchTop::h,
-                                           icon));
+        if (!icon.empty()) {
+            horizontalBox->addWidget(new Image(nullptr,
+                                               horizontalBox::searchTop::x,
+                                               horizontalBox::searchTop::y,
+                                               horizontalBox::searchTop::w,
+                                               horizontalBox::searchTop::h,
+                                               icon));
+        }
 
         horizontalBox->setPenWidth(horizontalBox::penWidth);
         horizontalBox->setEdges(RectangleEdge::Bottom);
 
         const RectangleEdge edges = RectangleEdge::None;
         const Alignment alignment = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
-        auto l = new Label(parent, searchHeader::x, searchHeader::y, searchHeader::w, searchHeader::h);
+        auto l                    = new Label(parent, inputHeader::x, inputHeader::y, inputHeader::w, inputHeader::h);
 
         l->setFont(style::window::font::small);
         l->setEdges(edges);
