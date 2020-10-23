@@ -11,6 +11,7 @@
 #include <crc32/crc32.h>
 #include <log/log.hpp>
 #include <json/json11.hpp>
+#include "vfsNotifier.hpp"
 
 #ifndef TARGET_Linux
 #include "board/cross/eMMC/eMMC.hpp"
@@ -133,7 +134,6 @@ class vfs
         uint32_t freePercent;
         uint32_t totalMbytes;
     };
-
     vfs();
     ~vfs();
     void Init();
@@ -169,6 +169,11 @@ class vfs
     {
         return bootConfig;
     }
+    void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
+    {
+        chnNotifier.registerNotificationHandler(handler);
+    }
+    auto getAbsolutePath(std::string_view path) const -> std::string;
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
@@ -187,6 +192,7 @@ class vfs
     bool loadBootConfig(const fs::path &bootJsonPath);
     bool updateBootConfig(const fs::path &bootJsonPath);
     struct purefs::BootConfig bootConfig;
+    vfsn::utility::vfsNotifier chnNotifier;
 };
 
 extern vfs vfs;
