@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCalendar.hpp"
+#include "DialogMetadataMessage.hpp"
 #include "windows/CalendarMainWindow.hpp"
 #include "windows/DayEventsWindow.hpp"
 #include "windows/CalendarEventsOptionsWindow.hpp"
@@ -125,7 +126,7 @@ namespace app
             return std::make_unique<gui::DayEventsWindow>(app);
         });
         windowsFactory.attach(no_events_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NoEvents>(app, name, gui::NoEvents::Meta());
+            return std::make_unique<gui::NoEvents>(app, name);
         });
         windowsFactory.attach(style::window::calendar::name::events_options,
                               [](Application *app, const std::string &name) {
@@ -156,14 +157,15 @@ namespace app
 
     void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const TimePoint &dateFilter)
     {
+        if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
+            popToWindow(gui::name::window::main_window);
+            return;
+        }
 
-        auto dialog = dynamic_cast<gui::NoEvents *>(windowsStack.get(style::window::calendar::name::no_events_window));
-        assert(dialog != nullptr);
-        auto meta  = dialog->meta;
-        meta.text  = "app_calendar_no_events_information";
+        gui::DialogMetadata meta;
+        meta.text   = utils::localize.get("app_calendar_no_events_information");
         meta.title = title;
         meta.icon  = "phonebook_empty_grey_circle_W_G";
-
         meta.action = [=]() -> bool {
             LOG_DEBUG("Switch to new event window");
             std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
@@ -178,13 +180,9 @@ namespace app
             return true;
         };
 
-        if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
-            popToWindow(gui::name::window::main_window);
-        }
-
-        dialog->update(meta);
-        switchWindow(dialog->getName());
         LOG_DEBUG("Switch to no events window");
+        switchWindow(style::window::calendar::name::no_events_window,
+                     std::make_unique<gui::DialogMetadataMessage>(meta));
     }
 
 } /* namespace app */
