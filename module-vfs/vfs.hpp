@@ -108,7 +108,7 @@ class vfs
 {
   public:
     using FILE = FF_FILE;
-
+    using FsEvent = vfsn::utility::vfsNotifier::FsEvent;
     enum class FileAttributes
     {
         ReadOnly,
