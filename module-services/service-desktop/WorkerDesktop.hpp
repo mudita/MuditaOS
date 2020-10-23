@@ -16,7 +16,7 @@ extern "C"
 #include "Service/Worker.hpp"
 #include "parser/ParserFSM.hpp"
 
-#include "bsp/usb_cdc/usb_cdc.hpp"
+#include "bsp/usb/usb.hpp"
 
 class WorkerDesktop : public sys::Worker
 {
