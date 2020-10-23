@@ -7,6 +7,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
+#include "AppMessage.hpp"
 #include "application-call/data/CallSwitchData.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
@@ -162,6 +163,12 @@ namespace sapm
         blockingTimer = std::make_unique<sys::Timer>(
             "BlockTimer", this, std::numeric_limits<sys::ms>().max(), sys::Timer::Type::SingleShot);
         blockingTimer->connect([&](sys::Timer &) { phoneLockCB(); });
+
+        connect(typeid(APMAction), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto actionMsg = static_cast<APMAction *>(request);
+            handleAction(actionMsg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 
     ApplicationManager::~ApplicationManager()
@@ -529,6 +536,26 @@ namespace sapm
         return true;
     }
 
+    auto ApplicationManager::handleAction(APMAction *actionMsg) -> bool
+    {
+        auto &action         = actionMsg->getAction();
+        const auto targetApp = appGet(action.targetApplication);
+        if (targetApp == nullptr) {
+            LOG_ERROR("Failed to switch to %s application: No such application.", action.targetApplication.c_str());
+            return false;
+        }
+
+        if (targetApp->getState() == app::Application::State::ACTIVE_FORGROUND) {
+            // If the app is already focused, then switch window.
+            auto msg = std::make_shared<app::AppSwitchWindowMessage>(
+                action.targetWindow, std::string{}, std::move(action.data), gui::ShowMode::GUI_SHOW_INIT);
+            return sys::Bus::SendUnicast(msg, targetApp->name(), this);
+        }
+        APMSwitch switchRequest(
+            actionMsg->getSenderName(), targetApp->name(), action.targetWindow, std::move(action.data));
+        return handleSwitchApplication(&switchRequest);
+    }
+
     // tries to switch the application
     bool ApplicationManager::handleSwitchPrevApplication(APMSwitchPrevApp *msg)
     {
@@ -771,6 +798,11 @@ namespace sapm
     }
 
     // Static methods
+    auto ApplicationManager::sendAction(sys::Service *sender, Action &&action) -> bool
+    {
+        auto msg = std::make_shared<APMAction>(sender->GetName(), std::move(action));
+        return sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+    }
 
     bool ApplicationManager::messageSwitchApplication(sys::Service *sender,
                                                       const std::string &applicationName,

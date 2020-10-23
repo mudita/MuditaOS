@@ -156,6 +156,7 @@ namespace sapm
 
         // tries to switch the application
         bool handleSwitchApplication(APMSwitch *msg);
+        auto handleAction(APMAction *actionMsg) -> bool;
         //	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
         bool handleCloseConfirmation(APMConfirmClose *msg);
         bool handleSwitchConfirmation(APMConfirmSwitch *msg);
@@ -187,6 +188,14 @@ namespace sapm
         sys::ReturnCodes DeinitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+
+        /**
+         * @brief Sends the action request to application manager.
+         * @param sender    Sender service name.
+         * @param action    Action request
+         * @return true on success, false otherwise.
+         */
+        static auto sendAction(sys::Service *sender, Action &&action) -> bool;
 
         /**
          * @brief Sends request to application manager to switch from current application to specific window in

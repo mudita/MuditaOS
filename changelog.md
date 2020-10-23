@@ -10,6 +10,7 @@
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
 * `[settings][bluetooth]` Create "Add device" windows.
 * `[hardware]` Slider driver (offline/online mode selection)
+* `[appmgr]` Application manager actions introduced.
 
 ### Fixed
 

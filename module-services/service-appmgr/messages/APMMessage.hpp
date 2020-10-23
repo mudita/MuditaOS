@@ -35,10 +35,11 @@ namespace sapm
     };
 
     //	APMSwitch, //request to switch to given application, optionally also to specified window
+    //  APMSwitchToNotification, //request to switch to given notification (application and specified window)
     //	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
     //	APMSwitchPrevApp, //Request to switch to previous application.
     //	APMConfirmSwitch, //Used when application confirms that it is loosing focus and also when application confirms
-    //that is has gained focus 	APMConfirmClose, //Sent by application to confirm completion of the close procedure
+    // that is has gained focus 	APMConfirmClose, //Sent by application to confirm completion of the close procedure
 
     class APMSwitch : public APMMessage
     {
@@ -180,6 +181,28 @@ namespace sapm
         bool isRunning = false;
     };
 
+    struct Action
+    {
+        std::string targetApplication;
+        std::string targetWindow;
+        std::unique_ptr<gui::SwitchData> data;
+    };
+
+    class APMAction : public APMMessage
+    {
+      public:
+        APMAction(const std::string &senderName, Action &&_action)
+            : APMMessage{MessageType::APMAction, senderName}, action{std::move(_action)}
+        {}
+
+        auto getAction() noexcept -> Action &
+        {
+            return action;
+        }
+
+      private:
+        Action action;
+    };
 } /* namespace sapm */
 
 #endif /* MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_ */
