@@ -116,6 +116,7 @@ namespace app
         State state = State::DEACTIVATED;
 
         sys::Message_t handleSignalStrengthUpdate(sys::DataMessage *msgl);
+        sys::Message_t handleNetworkAccessTechnologyUpdate(sys::DataMessage *msgl);
         sys::Message_t handleInputEvent(sys::DataMessage *msgl);
         sys::Message_t handleKBDKeyEvent(sys::DataMessage *msgl);
         sys::Message_t handleBatteryLevel(sys::DataMessage *msgl);
