@@ -29,6 +29,7 @@ add_subdirectory( service-desktop )
 add_subdirectory( service-fota )
 add_subdirectory( service-antenna )
 add_subdirectory( service-time )
+add_subdirectory( service-fileindexer )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db module-cellular module-audio  ${TARGET_LIBRARIES} )
 
