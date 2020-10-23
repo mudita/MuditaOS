@@ -1,30 +1,28 @@
 # MuditaOS changelog
 
-## Current release
+## [0.43.1 2020-10-23]
 
 ### Added
 
-* `[meditation]` Added gong sound on meditation intervals
-* `[meditation]` Added basic meditation functionalities and settings
-* `[cellular]` Handling incoming calls and sms in sleep mode
-* `[audio]` Added Bluetooth related APIs to AudioServiceAPI
+* `[meditation]` Added gong sound on meditation intervals.
+* `[meditation]` Added basic meditation functionalities and settings.
+* `[cellular]` Handling incoming calls and sms in sleep mode.
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
-* `[settings]` Added sql script for file indexer DB schema
-* `[settings][bluetooth]` Create "Add device" windows
+* `[settings][bluetooth]` Create "Add device" windows.
 * `[hardware]` Slider driver (offline/online mode selection)
 
 ### Fixed
 
-* `[meditation]` Fix time options display on rt1051
+* `[meditation]` Fix time options display on RT1051.
 * `[audio]` Fix headphones autodetection.
-* `[audio]` Cumulative set of minor fixes and improvements
+* `[audio]` Cumulative set of minor fixes and improvements.
 * `[db][vfs]` Fixed database corruption issues on abrupt phone reset.
 * `[calendar]` add event crash
 
 ### Other
 
 * `[audio]` Improve synchronization when switching operations.
-* `[vfs]`  Use partition image file for Phone filesystem on Linux emulator
+* `[vfs]`  Use partition image file for Phone filesystem on Linux emulator.
 
 ## [0.42.2 2020-10-16]
 
