@@ -8,14 +8,14 @@
 namespace gui
 {
 
-    BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : AppWindow(app, name)
+    BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : OptionWindow(app, name)
     {
         buildInterface();
     }
 
     void BaseSettingsWindow::buildInterface()
     {
-        AppWindow::buildInterface();
+        OptionWindow::buildInterface();
 
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));

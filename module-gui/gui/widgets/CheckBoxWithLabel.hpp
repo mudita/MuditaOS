@@ -7,10 +7,10 @@
 
 namespace style::checkbox
 {
-    const inline int check_x           = 380;
-    const inline int check_y           = 12;
-    const inline int description_width = 340;
-    const inline int check_width       = 60;
+    const inline int check_x           = 400;
+    const inline int check_y           = 25;
+    const inline int description_width = 380;
+    const inline int check_width       = 40;
 } // namespace style::checkbox
 
 namespace gui

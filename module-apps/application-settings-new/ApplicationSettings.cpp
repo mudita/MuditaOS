@@ -17,6 +17,10 @@
 #include "windows/NetworkWindow.hpp"
 #include "windows/MessagesWindow.hpp"
 #include "windows/PhoneNameWindow.hpp"
+#include "windows/AutolockWindow.hpp"
+#include "windows/WallpaperWindow.hpp"
+#include "windows/QuotesMainWindow.hpp"
+#include "windows/QuotesAddWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -118,6 +122,18 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AutolockWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::WallpaperWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuotesMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuotesAddWindow>(app);
         });
     }
 

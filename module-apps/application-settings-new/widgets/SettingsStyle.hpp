@@ -11,25 +11,21 @@ namespace style
     {
         namespace window
         {
-            namespace allDevices
+            namespace leftArrowImage
             {
-                namespace leftArrowImage
-                {
-                    constexpr uint32_t x = style::window::default_left_margin;
-                    constexpr uint32_t y = 62;
-                    constexpr uint32_t w = 11;
-                    constexpr uint32_t h = 13;
-                } // namespace leftArrowImage
+                constexpr uint32_t x = style::window::default_left_margin;
+                constexpr uint32_t y = 62;
+                constexpr uint32_t w = 11;
+                constexpr uint32_t h = 13;
+            } // namespace leftArrowImage
 
-                namespace crossImage
-                {
-                    constexpr uint32_t x = style::window::default_left_margin + 20;
-                    constexpr uint32_t y = 55;
-                    constexpr uint32_t w = 24;
-                    constexpr uint32_t h = 24;
-                } // namespace crossImage
-            }     // namespace allDevices
-
-        }; // namespace window
-    }      // namespace settings
+            namespace crossImage
+            {
+                constexpr uint32_t x = style::window::default_left_margin + 20;
+                constexpr uint32_t y = 55;
+                constexpr uint32_t w = 24;
+                constexpr uint32_t h = 24;
+            } // namespace crossImage
+        }     // namespace window
+    };        // namespace settings
 } // namespace style

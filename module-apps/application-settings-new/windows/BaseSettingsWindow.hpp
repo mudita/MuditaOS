@@ -10,7 +10,7 @@
 namespace gui
 {
 
-    class BaseSettingsWindow : public AppWindow
+    class BaseSettingsWindow : public OptionWindow
     {
       public:
         BaseSettingsWindow(app::Application *app, std::string name);

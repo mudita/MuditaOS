@@ -7,12 +7,15 @@
 
 namespace gui
 {
-    class LockedScreenWindow : public BaseSettingsWindow
+    class CheckBoxWithLabel;
+
+    class QuotesAddWindow : public AppWindow
     {
       public:
-        LockedScreenWindow(app::Application *app);
+        QuotesAddWindow(app::Application *app);
         void buildInterface() override;
 
-        std::list<Option> lockedScreenOptions();
+      private:
+        std::vector<CheckBoxWithLabel *> boxes;
     };
 } // namespace gui

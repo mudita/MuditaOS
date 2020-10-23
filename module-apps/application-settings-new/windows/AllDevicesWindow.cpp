@@ -71,16 +71,16 @@ namespace gui
         topBar->setActive(TopBar::Elements::SIM, false);
 
         leftArrowImage = new gui::Image(this,
-                                        style::settings::window::allDevices::leftArrowImage::x,
-                                        style::settings::window::allDevices::leftArrowImage::y,
-                                        style::settings::window::allDevices::leftArrowImage::w,
-                                        style::settings::window::allDevices::leftArrowImage::h,
+                                        style::settings::window::leftArrowImage::x,
+                                        style::settings::window::leftArrowImage::y,
+                                        style::settings::window::leftArrowImage::w,
+                                        style::settings::window::leftArrowImage::h,
                                         "arrow_left");
         crossImage     = new gui::Image(this,
-                                    style::settings::window::allDevices::crossImage::x,
-                                    style::settings::window::allDevices::crossImage::y,
-                                    style::settings::window::allDevices::crossImage::w,
-                                    style::settings::window::allDevices::crossImage::h,
+                                    style::settings::window::crossImage::x,
+                                    style::settings::window::crossImage::y,
+                                    style::settings::window::crossImage::w,
+                                    style::settings::window::crossImage::h,
                                     "cross");
 
         return optionsList;
