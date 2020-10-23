@@ -117,6 +117,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <errno.h>
+#include <memory>
+#include <cstring>
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -165,21 +167,52 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
 )
 {
     size_t nWrite; /* Return value from write() */
-
-    auto fileSize = vfs.filelength(p->fd);
+    const auto fileSize = vfs.filelength(p->fd);
     // vfs_fseek doesn't like offset to be > file size
-    if (iOfst >= fileSize)
-        iOfst = fileSize;
+    if (iOfst < fileSize) {
+        if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
+            return SQLITE_IOERR_WRITE;
+        }
+    }
+    else {
+        if (vfs.fseek(p->fd, fileSize, SEEK_SET) != 0) {
+            return SQLITE_IOERR_WRITE;
+        }
+        // Zero fill if outside the buffer
+        auto bytesLeft                     = iOfst - fileSize;
+        static constexpr auto zerobuf_size = 512U;
+        auto zero_buf                      = std::make_unique<char[]>(zerobuf_size);
+        std::memset(zero_buf.get(), 0, zerobuf_size);
+        while (bytesLeft > 0) {
+            unsigned long bytesToWrite;
+            if ((fileSize % zerobuf_size) != 0) {
+                bytesToWrite = zerobuf_size - (fileSize % zerobuf_size);
+                if (bytesToWrite > bytesLeft) {
+                    bytesToWrite = bytesLeft;
+                }
+            }
+            else {
+                bytesToWrite = bytesLeft;
 
-    if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
-        return SQLITE_IOERR_WRITE;
+                if (bytesToWrite > zerobuf_size) {
+                    bytesToWrite = zerobuf_size;
+                }
+            }
+            auto ret = vfs.fwrite(zero_buf.get(), sizeof(char), bytesToWrite, p->fd);
+            if (ret != bytesToWrite) {
+                return SQLITE_IOERR_WRITE;
+            }
+            bytesLeft -= bytesToWrite;
+        }
     }
 
     nWrite = vfs.fwrite(zBuf, 1, iAmt, p->fd);
     if ((int)nWrite != iAmt) {
         return SQLITE_IOERR_WRITE;
     }
-
+    if (ff_fflush(p->fd) != 0) {
+        return SQLITE_IOERR_WRITE;
+    }
     return SQLITE_OK;
 }
 
@@ -232,12 +265,12 @@ static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 
         return rc;
     }
 
-    // vfs_fseek returns error if desired file position is > file size. To mimic lseek desired position need to be
-    // truncated
     auto fileSize = vfs.filelength(p->fd);
-    if (p->fd != NULL) {
-        if (iOfst >= fileSize)
+
+    if (p->fd != nullptr) {
+        if (iOfst >= fileSize) {
             iOfst = fileSize;
+        }
     }
 
     if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
@@ -316,7 +349,7 @@ static int ecophoneTruncate(sqlite3_file *pFile, sqlite_int64 size)
     UNUSED(pFile);
     UNUSED(size);
 #endif
-    return SQLITE_OK;
+    return SQLITE_IOERR_TRUNCATE;
 }
 
 /*
@@ -396,12 +429,7 @@ static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg)
 {
     UNUSED(pFile);
     UNUSED(pArg);
-    // LOG_DEBUG("OP Code: %d", op); left for future dbug
-    switch (op) {
-    case SQLITE_FCNTL_PRAGMA:
-        return SQLITE_NOTFOUND;
-    }
-    return SQLITE_OK;
+    return SQLITE_NOTFOUND;
 }
 
 /*
@@ -412,13 +440,14 @@ static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg)
 static int ecophoneSectorSize(sqlite3_file *pFile)
 {
     UNUSED(pFile);
-    return 0;
+    static constexpr auto SECTOR_SIZE = 512;
+    return SECTOR_SIZE;
 }
 
 static int ecophoneDeviceCharacteristics(sqlite3_file *pFile)
 {
     UNUSED(pFile);
-    return 0;
+    return SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN;
 }
 
 /*
@@ -519,7 +548,6 @@ static int ecophoneOpen(sqlite3_vfs *pVfs,   /* VFS */
         sqlite3_free(aBuf);
         return SQLITE_CANTOPEN;
     }
-
     p->aBuffer = aBuf;
 
     if (pOutFlags) {
@@ -607,7 +635,7 @@ static void *ecophoneDlOpen(sqlite3_vfs *pVfs, const char *zPath)
 {
     UNUSED(pVfs);
     UNUSED(zPath);
-    return 0;
+    return nullptr;
 }
 
 static void ecophoneDlError(sqlite3_vfs *pVfs, int nByte, char *zErrMsg)
@@ -622,14 +650,13 @@ static void (*ecophoneDlSym(sqlite3_vfs *pVfs, void *pH, const char *z))(void)
     UNUSED(pVfs);
     UNUSED(pH);
     UNUSED(z);
-    return 0;
+    return nullptr;
 }
 
 static void ecophoneDlClose(sqlite3_vfs *pVfs, void *pHandle)
 {
     UNUSED(pVfs);
     UNUSED(pHandle);
-    return;
 }
 
 /*
@@ -638,10 +665,7 @@ static void ecophoneDlClose(sqlite3_vfs *pVfs, void *pHandle)
  */
 static int ecophoneRandomness(sqlite3_vfs *pVfs, int nByte, char *zByte)
 {
-    UNUSED(pVfs);
-    UNUSED(nByte);
-    UNUSED(zByte);
-    return SQLITE_OK;
+    return SQLITE_PERM;
 }
 
 /*
