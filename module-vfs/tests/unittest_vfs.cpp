@@ -153,19 +153,20 @@ TEST_CASE("VFS lseek check")
     static constexpr auto buf_elems     = buf_size * buf_items;
     auto fd                             = vfs.fopen(seek_filename, "w+");
     REQUIRE(fd != nullptr);
-    std::vector<char> buffer(buf_size);
-    std::iota(std::begin(buffer), std::end(buffer), 0);
+    std::vector<int> buffer(buf_size);
     for (auto record = 0U; record < buf_items; ++record) {
+        std::iota(std::begin(buffer), std::end(buffer), record * buf_size);
         REQUIRE(vfs.fwrite(buffer.data(), buffer.size(), 1, fd) == 1);
     }
     REQUIRE(vfs.fclose(fd) == 0);
     fd = vfs.fopen(seek_filename, "r");
     REQUIRE(fd != nullptr);
-    std::vector<char> buf_out(buf_size);
+    std::vector<int> buf_out(buf_size);
     static constexpr auto offs_seek1 = 256;
     REQUIRE(vfs.fseek(fd, offs_seek1, SEEK_SET) == 0);
     REQUIRE(vfs.ftell(fd) == offs_seek1);
     REQUIRE(vfs.fread(buf_out.data(), buf_out.size(), 1, fd) == 1);
+    std::iota(std::begin(buffer), std::end(buffer), offs_seek1);
     REQUIRE(buffer == buf_out);
 
     REQUIRE(vfs.fseek(fd, 0UL, SEEK_END) == 0);
@@ -175,7 +176,7 @@ TEST_CASE("VFS lseek check")
 
     REQUIRE(vfs.fseek(fd, 0UL, SEEK_SET) == 0);
     REQUIRE(vfs.fread(buf_out.data(), buf_out.size(), 1, fd) == 1);
+    std::iota(std::begin(buffer), std::end(buffer), 0);
     REQUIRE(buffer == buf_out);
-
     REQUIRE(vfs.fclose(fd) == 0);
 }
