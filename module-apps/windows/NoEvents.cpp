@@ -5,12 +5,8 @@
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "log/log.hpp"
-#include <service-appmgr/ApplicationManager.hpp>
-#include <i18/i18.hpp>
-#include <module-services/service-db/messages/QueryMessage.hpp>
-#include <module-db/Interface/EventsRecord.hpp>
-#include <module-apps/application-calendar/ApplicationCalendar.hpp>
-#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+
+#include <service-appmgr/Controller.hpp>
 
 using namespace gui;
 

@@ -22,7 +22,7 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <service-audio/api/AudioServiceAPI.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
 
@@ -45,7 +45,7 @@ namespace app
             app->switchWindow(window::name_call, std::move(data));
         }
         else {
-            sapm::ApplicationManager::messageSwitchApplication(app, name_call, window::name_call, std::move(data));
+            app::manager::Controller::switchApplication(app, name_call, window::name_call, std::move(data));
         }
     }
 

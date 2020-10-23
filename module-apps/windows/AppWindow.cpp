@@ -4,10 +4,11 @@
 #include "AppWindow.hpp"
 #include "Application.hpp"
 #include "InputEvent.hpp"
+#include "UiCommonActions.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <i18/i18.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-audio/api/AudioServiceAPI.hpp>
 
 using namespace style::header;
@@ -131,7 +132,7 @@ namespace gui
 
         if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
             LOG_INFO("exit to main menu");
-            sapm::ApplicationManager::messageSwitchApplication(
+            app::manager::Controller::switchApplication(
                 application, app::name_desktop, gui::name::window::main_window, nullptr);
         }
         // process only if key is released
@@ -217,7 +218,7 @@ namespace gui
 
     bool AppWindow::selectSpecialCharacter()
     {
-        return sapm::ApplicationManager::messageSwitchSpecialInput(
+        return app::specialInput(
             application,
             std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
     }
