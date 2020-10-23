@@ -13,6 +13,8 @@
 
 ### Other
 
+* `[appmgr]` Application manager documentation added.
+
 ## [0.43.1 2020-10-23]
 
 ### Added
