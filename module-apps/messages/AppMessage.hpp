@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_APPS_MESSAGES_APPMESSAGE_HPP_
-#define MODULE_APPS_MESSAGES_APPMESSAGE_HPP_
+#pragma once
 
+#include "Common.hpp"
 #include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include "SwitchData.hpp"
@@ -21,7 +21,7 @@ namespace app
     {
       public:
         AppMessage(MessageType messageType) : sys::DataMessage(messageType){};
-        virtual ~AppMessage(){};
+        AppMessage() : sys::DataMessage(MessageType::AppMessage){};
     };
 
     // this message is used to notify application about switching event. Application will gain or lose focus upon
@@ -80,16 +80,21 @@ namespace app
     {
       protected:
         gui::RefreshModes mode;
+        std::string window_name;
 
       public:
-        //	AppRefreshMessage( const std::string& application, gui::RefreshModes mode ) :
-        AppRefreshMessage(gui::RefreshModes mode) : AppMessage(MessageType::AppRefresh), mode{mode} {};
-        virtual ~AppRefreshMessage(){};
+        AppRefreshMessage(gui::RefreshModes mode, std::string window_name)
+            : mode{mode}, window_name(std::move(window_name)){};
 
-        const gui::RefreshModes &getMode()
+        [[nodiscard]] const gui::RefreshModes &getMode()
         {
             return mode;
-        };
+        }
+
+        [[nodiscard]] const std::string &getWindowName()
+        {
+            return window_name;
+        }
     };
 
     class AppSwitchWindowMessage : public AppMessage
@@ -170,4 +175,3 @@ namespace app
         {}
     };
 };     // namespace app
-#endif /* MODULE_APPS_MESSAGES_APPMESSAGE_HPP_ */

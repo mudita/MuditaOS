@@ -198,6 +198,7 @@ namespace gui
             bottomBar->setText(BottomBar::Side::RIGHT, text);
             break;
         }
+        LOG_DEBUG("--> FROM HERE");
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
@@ -208,6 +209,7 @@ namespace gui
         }
 
         bottomBar->restore();
+        LOG_DEBUG("--> FROM HERE");
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 

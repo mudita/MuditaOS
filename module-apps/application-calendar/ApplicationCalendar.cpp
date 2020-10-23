@@ -84,6 +84,7 @@ namespace app
                     if (result->hasListener()) {
                         LOG_DEBUG("Has listener");
                         if (result->handle()) {
+                            LOG_DEBUG("--> FROM HERE");
                             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                         }
                     }

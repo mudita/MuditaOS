@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <cstdint>
 
@@ -35,6 +36,8 @@ namespace gui
         GUI_RENDER_DEEP,
         GUI_RENDER_REFRESH // sent to applications so they can repaint current window
     };
+
+    // using DrawCommand = std::unique_ptr<DrawCommandImpl>;
 
     class DrawCommand
     {

@@ -4,7 +4,6 @@
 #pragma once
 
 #include "GUIMessage.hpp"
-
 #include <core/DrawCommand.hpp>
 #include <gui/Common.hpp>
 #include <Service/Message.hpp>
@@ -20,9 +19,6 @@ namespace gui
 namespace sgui
 {
 
-    /*
-     *
-     */
     class DrawMessage : public GUIMessage
     {
       public:
@@ -36,16 +32,14 @@ namespace sgui
       public:
         gui::RefreshModes mode;
         std::list<std::unique_ptr<gui::DrawCommand>> commands;
-
-        /**
-         * flag that informs that this is last rendering before suspending system.
-         */
         DrawCommand command = DrawCommand::NORMAL;
 
-        DrawMessage(const std::list<gui::DrawCommand *> &commandsList,
-                    gui::RefreshModes mode,
-                    DrawCommand cmd = DrawCommand::NORMAL);
-        virtual ~DrawMessage();
+        DrawMessage(std::list<gui::DrawCommand *> commandsList, gui::RefreshModes mode);
+
+        void setCommandType(DrawCommand command)
+        {
+            this->command = command;
+        }
     };
 
-} /* namespace sgui */
+} // namespace sgui

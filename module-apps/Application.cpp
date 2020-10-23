@@ -74,6 +74,10 @@ namespace app
 
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
         longPressTimer->connect([&](sys::Timer &) { longPressTimerCallback(); });
+
+        connect(typeid(AppRefreshMessage), [this](sys::DataMessage *msg, sys::ResponseMessage *) -> sys::Message_t {
+            return handleAppRefresh(msg);
+        });
     }
 
     Application::~Application() = default;
@@ -113,8 +117,6 @@ namespace app
             return;
         }
 
-        LOG_DEBUG("Rendering %s", getCurrentWindow()->getName().c_str());
-
         // send drawing commands only when if application is in active and visible.
         if (state == State::ACTIVE_FORGROUND) {
             auto currwin = getCurrentWindow();
@@ -128,23 +130,14 @@ namespace app
             currwin->updateSignalStrength();
             currwin->updateNetworkAccessTechnology();
 
-            std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
-
+            auto message = std::make_shared<sgui::DrawMessage>(currwin->buildDrawList(), mode);
             if (shutdownInProgress) {
-                auto msg =
-                    std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::SHUTDOWN);
-                sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+                message->setCommandType(sgui::DrawMessage::DrawCommand::SHUTDOWN);
             }
             else if (suspendInProgress) {
-                auto msg =
-                    std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::SUSPEND);
-                sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+                message->setCommandType(sgui::DrawMessage::DrawCommand::SUSPEND);
             }
-            else {
-                auto msg =
-                    std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::NORMAL);
-                sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-            }
+            sys::Bus::SendUnicast(message, "ServiceGUI", this);
         }
 
         if (suspendInProgress)
@@ -197,8 +190,11 @@ namespace app
 
     void Application::refreshWindow(gui::RefreshModes mode)
     {
-        auto msg = std::make_shared<AppRefreshMessage>(mode);
-        sys::Bus::SendUnicast(msg, this->GetName(), this);
+        if (getCurrentWindow() != nullptr) {
+            LOG_DEBUG("[REFRESH] %s : %s", c_str(mode), getCurrentWindow()->getName().c_str());
+            auto msg = std::make_shared<AppRefreshMessage>(mode, getCurrentWindow()->getName());
+            sys::Bus::SendUnicast(msg, this->GetName(), this);
+        }
     }
 
     sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
@@ -239,9 +235,6 @@ namespace app
         else if (msgl->messageType == MessageType::AppRebuild) {
             return handleAppRebuild(msg);
         }
-        else if (msgl->messageType == MessageType::AppRefresh) {
-            return handleAppRefresh(msgl);
-        }
         else if (msgl->messageType == MessageType::AppFocusLost) {
             return handleAppFocusLost(msgl);
         }
@@ -260,6 +253,7 @@ namespace app
     sys::Message_t Application::handleSignalStrengthUpdate(sys::DataMessage *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -283,6 +277,7 @@ namespace app
             longPressTimer->stop();
         }
         if (getCurrentWindow() != nullptr && getCurrentWindow()->onInput(msg->getEvent())) {
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -307,6 +302,7 @@ namespace app
         LOG_INFO("Application battery level: %d", msg->levelPercents);
 
         if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents)) {
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -318,14 +314,17 @@ namespace app
         if (msg->plugged == true) {
             LOG_INFO("Application charger connected");
             getCurrentWindow()->batteryCharging(true);
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         else {
             LOG_INFO("Application charger disconnected");
             getCurrentWindow()->batteryCharging(false);
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
+        LOG_DEBUG("--> FROM HERE");
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return msgHandled();
     }
@@ -335,6 +334,7 @@ namespace app
         auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
         getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
         if (state == State::ACTIVE_FORGROUND) {
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -410,12 +410,14 @@ namespace app
                     auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                     if (text != nullptr) {
                         text->addText(ret->getDescription());
+                        LOG_DEBUG("--> FROM HERE");
                         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                         return msgHandled();
                     }
                 }
                 getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
             }
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
         else {
@@ -440,6 +442,7 @@ namespace app
         }
         LOG_INFO("Refresh app with focus!");
         if (state == State::ACTIVE_FORGROUND) {
+            LOG_DEBUG("--> FROM HERE");
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
         LOG_INFO("App rebuild done");
@@ -449,7 +452,13 @@ namespace app
     sys::Message_t Application::handleAppRefresh(sys::DataMessage *msgl)
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
+        if (!(getCurrentWindow() != nullptr && getCurrentWindow()->getName() == msg->getWindowName())) {
+            LOG_DEBUG("Ignore request for window %s we are on window %s",
+                      msg->getWindowName().c_str(),
+                      getCurrentWindow() == nullptr ? "none" : getCurrentWindow()->getName().c_str());
+        }
         render(msg->getMode());
+        LOG_DEBUG("%s : %s", c_str(msg->getMode()), getCurrentWindow()->getName().c_str());
         return msgHandled();
     }
 
@@ -465,6 +474,7 @@ namespace app
     sys::Message_t Application::handleSIMMessage(sys::DataMessage *msgl)
     {
         getCurrentWindow()->setSIM();
+        LOG_DEBUG("--> FROM HERE");
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return msgHandled();
     }
@@ -515,15 +525,6 @@ namespace app
                                                std::unique_ptr<gui::SwitchData> data)
     {
         auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data));
-        sys::Bus::SendUnicast(msg, application, sender);
-    }
-
-    void Application::messageRefreshApplication(sys::Service *sender,
-                                                std::string application,
-                                                std::string window,
-                                                gui::SwitchData *data)
-    {
-        auto msg = std::make_shared<AppMessage>(MessageType::AppRefresh);
         sys::Bus::SendUnicast(msg, application, sender);
     }
 
