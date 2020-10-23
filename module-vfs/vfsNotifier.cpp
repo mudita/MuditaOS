@@ -17,15 +17,13 @@ namespace vfsn::utility
     }
     auto vfsNotifier::onFileClose(const FILE *file) noexcept -> void
     {
-        std::string path;
-        {
-            cpp_freertos::LockGuard _lock(mMutex);
-            const auto item = mOpenedMap.find(file);
-            if (item != mOpenedMap.end()) {
-                path = item->second;
-            }
+        cpp_freertos::LockGuard _lock(mMutex);
+        const auto item = mOpenedMap.find(file);
+        if (item != mOpenedMap.end()) {
+            const auto path = item->second;
+            mOpenedMap.erase(item);
+            notify(path, FsEvent::modified);
         }
-        notify(path, FsEvent::modified);
     }
 
     auto vfsNotifier::onFileRemove(std::string_view filename) noexcept -> void
