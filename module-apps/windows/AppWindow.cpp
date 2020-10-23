@@ -90,6 +90,11 @@ namespace gui
         return topBar->updateSignalStrength();
     }
 
+    bool AppWindow::updateNetworkAccessTechnology()
+    {
+        return topBar->updateNetworkAccessTechnology();
+    }
+
     bool AppWindow::updateTime(const UTF8 &timeStr)
     {
         topBar->setTime(timeStr);

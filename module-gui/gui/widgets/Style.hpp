@@ -27,6 +27,7 @@ namespace style
         namespace font
         {
             const inline std::string time  = "gt_pressura_regular_24";
+            const inline std::string modes = "gt_pressura_regular_20";
             const inline std::string title = "gt_pressura_bold_32";
         }; // namespace font
     };     // namespace header
