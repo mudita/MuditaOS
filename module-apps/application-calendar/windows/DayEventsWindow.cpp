@@ -3,6 +3,7 @@
 
 #include "DayEventsWindow.hpp"
 #include "application-calendar/data/CalendarData.hpp"
+#include "log/log.hpp"
 #include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/Label.hpp>
@@ -32,11 +33,6 @@ namespace gui
     }
     void DayEventsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        auto filterTill = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode + 1);
-        auto query      = std::make_unique<db::query::events::GetFiltered>(filterFrom, filterTill);
-        query->setQueryListener(
-            db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-        DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
         setTitle(dayMonthTitle);
     }
 
@@ -44,6 +40,11 @@ namespace gui
     {
         if (data == nullptr) {
             return false;
+        }
+
+        auto message = dynamic_cast<DayEventsWindowMessage *>(data);
+        if (message != nullptr) {
+            dayEventsModel->loadData(std::move(message->records));
         }
 
         auto *item = dynamic_cast<DayMonthData *>(data);
@@ -114,20 +115,6 @@ namespace gui
 
     auto DayEventsWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
     {
-        if (const auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
-            std::unique_ptr<std::vector<EventsRecord>> records = response->getResult();
-            auto app                                           = dynamic_cast<app::ApplicationCalendar *>(application);
-            assert(application != nullptr);
-            app->setEquivalentToEmptyWindow(EquivalentWindow::DayEventsWindow);
-            if (records->empty()) {
-                auto name = dayMonthTitle;
-                app->switchToNoEventsWindow(name, filterFrom);
-                return true;
-            }
-            dayEventsModel->loadData(std::move(records));
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-            return true;
-        }
         LOG_DEBUG("Response False");
         return false;
     }

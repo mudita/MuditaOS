@@ -17,6 +17,7 @@
 * `[audio]` Fix headphones autodetection.
 * `[audio]` Cumulative set of minor fixes and improvements.
 * `[db][vfs]` Fixed database corruption issues on abrupt phone reset.
+* `[calendar]` add event crash
 
 ### Other
 

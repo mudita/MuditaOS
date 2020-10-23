@@ -38,6 +38,13 @@ class WeekDaysRepeatData : public gui::SwitchData
     virtual void setData(const uint32_t weekDay);
 };
 
+class DayEventsWindowMessage : public gui::SwitchData
+{
+  public:
+    std::unique_ptr<std::vector<EventsRecord>> records;
+    ~DayEventsWindowMessage() = default;
+};
+
 class DayMonthData : public gui::SwitchData
 {
   protected:
