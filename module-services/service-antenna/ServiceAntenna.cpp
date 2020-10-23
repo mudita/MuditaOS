@@ -57,6 +57,7 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
 
     timer = std::make_unique<sys::Timer>("Antena", this, 5000);
     timer->connect([&](sys::Timer &) {
+        LOG_INFO("																Timer tick!");
         timer->stop();
         auto stateToSet = state->get();
         if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {

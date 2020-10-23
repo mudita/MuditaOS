@@ -31,6 +31,7 @@
 #if ENABLE_GSM == 1
 #include <service-fota/ServiceFota.hpp>
 #include <service-cellular/ServiceCellular.hpp>
+#include <service-antenna/ServiceAntenna.hpp>
 #endif
 
 #include <bsp/bsp.hpp>
@@ -86,6 +87,7 @@ int main()
         LOG_INFO("ServiceCellular (GSM) - Disabled");
 #else
         LOG_INFO("ServiceCellular (GSM) - Enabling");
+        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceAntenna>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<FotaService::Service>(), sysmgr.get());
 #endif

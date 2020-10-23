@@ -60,6 +60,7 @@ namespace at
         {
             auto resp = response;
             auto pos  = resp.find(',');
+            LOG_INFO("%s", response.c_str());
             if (pos != std::string::npos) {
                 auto constexpr digitLength = 1;
                 resp                       = resp.substr(pos + digitLength, digitLength);
