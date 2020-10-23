@@ -7,7 +7,7 @@
 #include "application-messages/widgets/SMSTemplateItem.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
 
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-db/messages/DBSMSTemplateMessage.hpp>
 #include <i18/i18.hpp>
 #include <Style.hpp>
@@ -82,9 +82,9 @@ namespace gui
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
             LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.getFormatted().c_str());
             app->sendSms(phoneNumber, templ->text);
-            sapm::ApplicationManager::messageSwitchPreviousApplication(
-                app,
-                std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::make_unique<SMSTemplateSent>()));
+            app::manager::Controller::switchBack(app,
+                                                 std::make_unique<app::manager::APMSwitchPrevApp>(
+                                                     application->GetName(), std::make_unique<SMSTemplateSent>()));
             return true;
         };
     }

@@ -163,5 +163,11 @@ namespace app
         virtual ~AppRebuildMessage(){};
     };
 
+    class AppLostFocusMessage : public AppMessage
+    {
+      public:
+        AppLostFocusMessage() : AppMessage{MessageType::AppFocusLost}
+        {}
+    };
 };     // namespace app
 #endif /* MODULE_APPS_MESSAGES_APPMESSAGE_HPP_ */

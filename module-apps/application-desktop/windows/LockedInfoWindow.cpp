@@ -3,7 +3,7 @@
 
 #include "LockedInfoWindow.hpp"
 
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "RichTextParser.hpp"
@@ -44,8 +44,8 @@ bool LockedInfoWindow::onInput(const InputEvent &inputEvent)
 {
     if (inputEvent.isShortPress()) {
         if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            sapm::ApplicationManager::messageSwitchApplication(
-                application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
+            app::manager::Controller::switchApplication(
+                application, app::name_phonebook, gui::window::name::ice_contacts);
             return true;
         }
         else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {

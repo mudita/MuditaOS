@@ -73,7 +73,7 @@ namespace app
 
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
-    /// 2. Application lifetime is managed with sapm::ApplicationManager
+    /// 2. Application lifetime is managed with app::manager::ApplicationManager
     class Application : public sys::Service
     {
       public:
@@ -126,6 +126,7 @@ namespace app
         sys::Message_t handleAppClose(sys::DataMessage *msgl);
         sys::Message_t handleAppRebuild(sys::DataMessage *msgl);
         sys::Message_t handleAppRefresh(sys::DataMessage *msgl);
+        sys::Message_t handleAppFocusLost(sys::DataMessage *msgl);
         sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
@@ -152,7 +153,7 @@ namespace app
         void blockEvents(bool isBlocked);
 
         /// Method sending switch command for another window. It will switch window within active application.
-        /// To switch windows between applications use sapm::ApplicationManager::messageSwitchApplication
+        /// To switch windows between applications use app::manager::Controller::switchApplication
         /// it will effectively trigger setActiveWindow and change on windows stack
         ///
         /// @param windowName name of window to show, only required parameter, our windows stack uses string names as
@@ -295,6 +296,7 @@ namespace app
                                               gui::SwitchData *data = nullptr);
         static void messageCloseApplication(sys::Service *sender, std::string application);
         static void messageRebuildApplication(sys::Service *sender, std::string application);
+        static void messageApplicationLostFocus(sys::Service *sender, std::string application);
         /// @}
 
       protected:

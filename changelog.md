@@ -5,6 +5,9 @@
 ### Added
 * `[settings][bluetooth]` Add "Phone name" window.
 
+### Changed
+
+* `[appmgr]` Application manager refactored.
 
 ### Fixed
 
