@@ -88,13 +88,13 @@ fi
 vjson=update/tmp/version.json
 cp config/version.json.template $vjson
 
-sed -i -e 's/__GIT_BRANCH__/'$PURE_OS_GIT_BRANCH'/g' $vjson
-sed -i -e 's/__GIT_TAG__/'$PURE_OS_GIT_TAG'/g' $vjson
-sed -i -e 's/__GIT_REVISION__/'$PURE_OS_GIT_REV'/g' $vjson
+sed -i -e 's/__GIT_BRANCH__/'$MUDITAOS_GIT_BRANCH'/g' $vjson
+sed -i -e 's/__GIT_TAG__/'$MUDITAOS_GIT_TAG'/g' $vjson
+sed -i -e 's/__GIT_REVISION__/'$MUDITAOS_GIT_REV'/g' $vjson
 
-sed -i -e 's/__VERSION_MAJOR__/'$PURE_OS_VERSION_MAJOR'/g' $vjson
-sed -i -e 's/__VERSION_MINOR__/'$PURE_OS_VERSION_MINOR'/g' $vjson
-sed -i -e 's/__VERSION_PATCH__/'$PURE_OS_VERSION_PATCH'/g' $vjson
+sed -i -e 's/__VERSION_MAJOR__/'$MUDITAOS_VERSION_MAJOR'/g' $vjson
+sed -i -e 's/__VERSION_MINOR__/'$MUDITAOS_VERSION_MINOR'/g' $vjson
+sed -i -e 's/__VERSION_PATCH__/'$MUDITAOS_VERSION_PATCH'/g' $vjson
 
 BUILD_HOST=`uname -r`
 BUILD_USER=`whoami`
@@ -134,11 +134,11 @@ fi
 
 rm -f update/*.tar
 curpwd=`pwd`
-vstr=$PURE_OS_VERSION_MAJOR.$PURE_OS_VERSION_MINOR.$PURE_OS_VERSION_PATCH-$PURE_OS_GIT_REV
+vstr=$MUDITAOS_VERSION_MAJOR.$MUDITAOS_VERSION_MINOR.$MUDITAOS_VERSION_PATCH-$MUDITAOS_GIT_REV
 echo -ne "-- "
 cd update/tmp && rhash -ru checksums.txt .
 cd $curpwd
-echo "-- create tar update/pureos-$vstr.tar"
-cd update/tmp && tar -cf ../pureos-$vstr.tar .
+echo "-- create tar update/muditaos-$vstr.tar"
+cd update/tmp && tar -cf ../muditaos-$vstr.tar .
 cd $curpwd
-ls -alh update/pureos-$vstr.tar
+ls -alh update/muditaos-$vstr.tar

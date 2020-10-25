@@ -11,7 +11,7 @@
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <service-db/messages/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <service-desktop/endpoints/update/UpdatePureOS.hpp>
+#include <service-desktop/endpoints/update/UpdateMuditaOS.hpp>
 #include <module-services/service-desktop/ServiceDesktop.hpp>
 #include "DesktopMessages.hpp"
 
