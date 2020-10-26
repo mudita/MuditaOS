@@ -6,14 +6,14 @@
 
 #
 # It works when the phone is in USB-MSC mode, it will apply the .tar
-# file provided as the -f parameter to the script, as the "current
+# file provided as the -u parameter to the script, as the "current
 # version on the Pure phone.
 #
 # Works on Linux and MacOS
 #
 
 UPDATE_FILE=""
-PHONE_PARTITION_NAME="PUREOS"
+PHONE_PARTITION_NAME="MUDITAOS"
 CLEAN_PHONE=0
 TMPDIR="flashmac"
 OS=`uname -s`
@@ -24,7 +24,7 @@ function get_phone_dev() {
 	if [ "$OS" == "Darwin" ]; then
 		diskutil list | grep $PHONE_PARTITION_NAME | awk '{print $6}'
 	else
-		readlink -f /dev/disk/by-id/$LINUX_DEV_FILE		
+		readlink -u /dev/disk/by-id/$LINUX_DEV_FILE		
 	fi
 }
 
@@ -45,18 +45,18 @@ function ex() {
 print_help() {
 	echo "Usage: $0 [OPTION]"
 	echo "  -h print help"
-	echo "  -f update file"
+	echo "  -u update file"
 	echo "  -c clean before update"
 	echo
 	exit 1
 }
 
-while getopts ":hf:c" arg; do
+while getopts ":hu:c" arg; do
 	case "${arg}" in
 		h)
 			print_help
 			;;
-		f)
+		u)
 			UPDATE_FILE=$OPTARG
 			;;
 		c)
