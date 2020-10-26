@@ -983,8 +983,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     std::string str(data.begin(), data.end());
 
     std::string logStr = utils::removeNewLines(str);
-    LOG_ERROR("================= NOTIFICATION %s", data.c_str());
-
     if (auto ret = str.find("+CPIN: ") != std::string::npos) {
         /// TODO handle different sim statuses - i.e. no sim, sim error, sim puk, sim pin etc.
         if (str.find("NOT READY", ret) == std::string::npos) {
