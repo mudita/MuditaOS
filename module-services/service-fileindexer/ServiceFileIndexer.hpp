@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Service/Service.hpp>
+#include "startupIndexer.hpp"
 
 namespace service
 {
@@ -19,6 +20,9 @@ namespace service
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
+
+      private:
+        detail::startupIndexer mStartupIndexer;
     };
 
 }; // namespace service
