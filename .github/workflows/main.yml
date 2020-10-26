@@ -10,7 +10,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         token: ${{ secrets.GitHub_PAT }}
-        submodules: recursive
+        submodules: false
         fetch-depth: 0
     - name: "Copyright notice check"
       run: |
