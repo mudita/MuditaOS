@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "SMSTemplateModel.hpp"
-
+#include <Interface/SMSTemplateRecord.hpp>
 #include <Label.hpp>
 #include <Image.hpp>
 #include <ListItem.hpp>

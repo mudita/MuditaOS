@@ -199,23 +199,20 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
     auto ret       = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
     auto count_ret = db->query("SELECT COUNT (*) from sms WHERE sms.body like \'%%%q%%\'", text.c_str());
     ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].getUInt32();
+
     if (ret.first != 0) {
         auto retQuery =
             db->query("SELECT * from sms WHERE sms.body like \'%%%q%%\' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
                       text.c_str(),
                       limit,
                       offset);
-        do {
-            ret.second.push_back(ThreadsTableRow{
-                {.ID = (*retQuery)[0].getUInt32()},
-                .date           = (*retQuery)[3].getUInt32(),
-                .msgCount       = 0,
-                .unreadMsgCount = 0,
-                .contactID      = (*retQuery)[2].getUInt32(),
-                .snippet        = (*retQuery)[6].getString(),
-                .type           = static_cast<SMSType>((*retQuery)[7].getUInt32()),
-            });
-        } while (retQuery->nextRow());
+
+        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+            ret.second = {};
+        }
+        else {
+            fillRetQuery(ret.second, retQuery);
+        }
     }
     else {
         ret.second = {};

@@ -51,7 +51,7 @@ unsigned int SMSThreadModel::requestRecordsCount()
 
 void SMSThreadModel::requestRecords(uint32_t offset, uint32_t limit)
 {
-    auto query = std::make_unique<db::query::SMSGetForList>(smsThreadID, offset, limit);
+    auto query = std::make_unique<db::query::SMSGetForList>(smsThreadID, offset, limit, numberID);
     query->setQueryListener(
         db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(application, db::Interface::Name::SMS, std::move(query));
@@ -87,6 +87,8 @@ auto SMSThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
                               : std::nullopt;
         smsInput->displayDraftMessage();
     }
+
+    number = std::make_unique<utils::PhoneNumber::View>(msgResponse->getNumber());
 
     return this->updateRecords(std::move(records_data));
 }
