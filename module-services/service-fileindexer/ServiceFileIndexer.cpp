@@ -3,9 +3,8 @@
 
 #include <log/log.hpp>
 #include <vfs.hpp>
-#include <filesystem>
 #include "ServiceFileIndexer.hpp"
-#include "FileChangeMessage.hpp"
+#include "messages/FileChangeMessage.hpp"
 #include "Constants.hpp"
 #include <Service/Bus.hpp>
 
@@ -39,14 +38,10 @@ namespace service
             [_this = shared_from_this()](std::string_view new_path, vfs::FsEvent event, std::string_view old_path) {
                 namespace fs       = std::filesystem;
                 const auto new_ext = fs::path(new_path).extension().string();
-                if (new_ext != ".db" && new_ext != ".db-journal" && new_ext != ".wall") {
-                    auto msg = std::make_shared<msg::FileChangeMessage>(new_path, event, old_path);
-                    sys::Bus::SendUnicast(msg, std::string(service::name::file_indexer), _this.get());
-                }
-                else {
-                    LOG_DEBUG("Ignore db file %s", std::string(new_path).c_str());
-                }
+                auto msg           = std::make_shared<msg::FileChangeMessage>(new_path, event, old_path);
+                sys::Bus::SendUnicast(msg, std::string(service::name::file_indexer), _this.get());
             });
+        mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
         return sys::ReturnCodes::Success;
     }
 
