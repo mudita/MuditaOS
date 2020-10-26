@@ -11,13 +11,15 @@
 
 #include "Application.hpp"         // for Application, Application::State
 #include "ApplicationLauncher.hpp" // for ApplicationLauncher
-#include "messages/APMMessage.hpp"
+#include "messages/Message.hpp"
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
 #include "Service/Timer.hpp"   // for Timer
 #include "SettingsRecord.hpp"  // for SettingsRecord
 #include "SwitchData.hpp"      // for SwitchData
+
+#include "Types.hpp"
 
 namespace app
 {
@@ -42,7 +44,6 @@ namespace app::manager
         static inline constexpr std::string_view InvalidAppName{"NONE"};
 
         using State = app::Application::State;
-        using Name  = std::string;
 
         explicit ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher);
 
@@ -50,7 +51,7 @@ namespace app::manager
         void run(sys::Service *caller);
         void runInBackground(sys::Service *caller);
 
-        auto name() const -> Name;
+        auto name() const -> ApplicationName;
         auto state() const noexcept -> State;
         auto preventsBlocking() const noexcept -> bool;
         auto closeable() const noexcept -> bool;
@@ -70,7 +71,6 @@ namespace app::manager
     {
       public:
         using ApplicationsContainer = std::vector<std::unique_ptr<ApplicationHandle>>;
-        using ApplicationsStack     = std::deque<ApplicationHandle::Name>;
         enum class State
         {
             Running,
@@ -82,14 +82,14 @@ namespace app::manager
         explicit ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers);
         virtual ~ApplicationManagerBase() = default;
 
-        void pushApplication(const ApplicationHandle::Name &name);
+        void pushApplication(const ApplicationName &name);
         void popApplication();
         void clearStack();
 
         auto getFocusedApplication() const noexcept -> ApplicationHandle *;
         auto getLaunchingApplication() const noexcept -> ApplicationHandle *;
         auto getPreviousApplication() const noexcept -> ApplicationHandle *;
-        auto getApplication(const ApplicationHandle::Name &name) const noexcept -> ApplicationHandle *;
+        auto getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *;
         auto getApplications() const noexcept -> const ApplicationsContainer &
         {
             return applications;
@@ -102,6 +102,8 @@ namespace app::manager
         }
 
       private:
+        using ApplicationsStack = std::deque<ApplicationName>;
+
         State state = State::Running;
         ApplicationsContainer applications;
         ApplicationsStack stack;
@@ -112,9 +114,9 @@ namespace app::manager
       public:
         static inline const std::string ServiceName = "ApplicationManager";
 
-        ApplicationManager(const std::string &serviceName,
+        ApplicationManager(const ApplicationName &serviceName,
                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
-                           const ApplicationHandle::Name &_rootApplicationName);
+                           const ApplicationName &_rootApplicationName);
 
         auto InitHandler() -> sys::ReturnCodes override;
         auto DeinitHandler() -> sys::ReturnCodes override;
@@ -133,13 +135,13 @@ namespace app::manager
 
         // Message handlers
         void registerMessageHandlers();
-        auto handleAction(APMAction *actionMsg) -> bool;
-        auto handleSwitchApplication(APMSwitch *msg) -> bool;
-        auto handleCloseConfirmation(APMConfirmClose *msg) -> bool;
-        auto handleSwitchConfirmation(APMConfirmSwitch *msg) -> bool;
-        auto handleSwitchBack(APMSwitchPrevApp *msg) -> bool;
-        auto handleRegisterApplication(APMRegister *msg) -> bool;
-        auto handleLanguageChange(APMChangeLanguage *msg) -> bool;
+        auto handleAction(ActionRequest *actionMsg) -> bool;
+        auto handleSwitchApplication(SwitchRequest *msg) -> bool;
+        auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
+        auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
+        auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
+        auto handleRegisterApplication(ApplicationRegistration *msg) -> bool;
+        auto handleLanguageChange(LanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
@@ -149,13 +151,13 @@ namespace app::manager
         void onApplicationSwitchToPrev(ApplicationHandle &previousApp,
                                        std::unique_ptr<gui::SwitchData> &&data,
                                        std::string targetWindow = {});
-        void onApplicationRegistered(ApplicationHandle &app, bool startInBackground);
+        void onApplicationRegistered(ApplicationHandle &app, const ApplicationManifest &manifest);
         void onApplicationRegistrationFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
         void onPhoneLocked();
 
-        ApplicationHandle::Name rootApplicationName;
+        ApplicationName rootApplicationName;
         SettingsRecord settings;
         std::unique_ptr<sys::Timer> blockingTimer; //< timer to count time from last user's activity. If it reaches time
                                                    // defined in settings database application

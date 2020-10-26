@@ -17,6 +17,7 @@
 #include "gui/Common.hpp"                               // for ShowMode
 #include "projdefs.h"                                   // for pdMS_TO_TICKS
 #include "service-evtmgr/messages/EVMessages.hpp"       // for TorchStateMe...
+#include "service-appmgr/data/ApplicationManifest.hpp"
 #include <list>                                         // for list
 #include <map>                                          // for allocator, map
 #include <memory>                                       // for make_shared
@@ -342,8 +343,8 @@ namespace app
         /// 1. long press transformation (right now we support long press only via top application keyTralator handling)
         /// 2. simple translation of keys 1 to 1 with keyboard
         std::unique_ptr<gui::KeyInputSimpleTranslation> keyTranslator;
-        /// Flag defines how application will behave after registration. It can go forground or background
-        bool startBackground = false;
+        /// Manifest describing the application
+        app::manager::ApplicationManifest manifest;
         /// Flag which defines whether application initialized suspend mode, this will influence how render message will
         /// sent to gui service. If suspend is true, application manager will receive information from both eink and gui
         /// services if last rendering mesage will be processed.

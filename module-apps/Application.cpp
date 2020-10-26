@@ -65,7 +65,7 @@ namespace app
     Application::Application(
         std::string name, std::string parent, bool startBackground, uint32_t stackDepth, sys::ServicePriority priority)
         : Service(name, parent, stackDepth, priority), default_window(gui::name::window::main_window),
-          windowsStack(this), windowsFactory(), startBackground{startBackground}
+          windowsStack(this), windowsFactory(), manifest{name, StartInBackground{startBackground}, {}}
     {
         keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
@@ -472,9 +472,9 @@ namespace app
         setState(State::INITIALIZING);
         settings = DBServiceAPI::SettingsGet(this);
 
-        const bool initialised = settings.dbID == 1;
-        app::manager::Controller::registerApplication(this, initialised, startBackground);
-        if (!initialised) {
+        const auto status = (settings.dbID == 1) ? StartupStatus::Success : StartupStatus::Failure;
+        app::manager::Controller::registerApplication(this, status, manifest);
+        if (status == StartupStatus::Failure) {
             setState(State::DEACTIVATED);
             return sys::ReturnCodes::Failure;
         }

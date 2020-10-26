@@ -162,7 +162,7 @@ namespace app
                     data->result                                 = item->contact;
                     data->setDescription("PhonebookSearchRequest");
                     return app::manager::Controller::switchBack(
-                        this, std::make_unique<app::manager::APMSwitchPrevApp>(GetName(), std::move(data)));
+                        this, std::make_unique<app::manager::SwitchBackRequest>(GetName(), std::move(data)));
                 };
             }
             LOG_DEBUG("Switching to search results window.");

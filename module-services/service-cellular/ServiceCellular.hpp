@@ -15,7 +15,7 @@
 #include <vector>   // for vector
 
 #include "CellularCall.hpp" // for CellularCall
-#include <service-appmgr/messages/APMMessage.hpp>
+#include <service-appmgr/messages/Message.hpp>
 #include "USSD.hpp"                     // for State, State::none
 #include "SMSRecord.hpp"                // for SMSRecord
 #include "messages/CellularMessage.hpp" // for CellularUSSDMessage, CellularUSSDMessage::RequestType

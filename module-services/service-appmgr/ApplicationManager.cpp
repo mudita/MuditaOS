@@ -25,7 +25,7 @@
 #include "Service/Bus.hpp"   // for Bus
 #include "SystemManager/SystemManager.hpp"        // for SystemManager
 #include "i18/i18.hpp"                            // for Lang, Lang::En, Lang::De, Lang::Pl, Lang::Sp, i18, localize
-#include "service-appmgr/messages/APMMessage.hpp" // for APMCheckApp, APMSwitch, APMRegister, APMConfirmClose, APMConfirmSwitch, Action, APMAction, APMChangeLanguage, APMSwitchPrevApp, APMDelayedClose, APMClose, APMInitPowerSaveMode, APMPreventBlocking
+#include "service-appmgr/messages/Message.hpp" // for APMCheckApp, APMSwitch, APMRegister, APMConfirmClose, APMConfirmSwitch, Action, APMAction, APMChangeLanguage, APMSwitchPrevApp, APMDelayedClose, APMClose, APMInitPowerSaveMode, APMPreventBlocking
 
 // Auto phone lock disabled for now till the times when it's debugged
 // #define AUTO_PHONE_LOCK_ENABLED
@@ -73,7 +73,7 @@ namespace app::manager
         : launcher{std::move(_launcher)}
     {}
 
-    auto ApplicationHandle::name() const -> Name
+    auto ApplicationHandle::name() const -> ApplicationName
     {
         return launcher ? launcher->getName() : InvalidAppName.data();
     }
@@ -134,7 +134,7 @@ namespace app::manager
         state = _state;
     }
 
-    void ApplicationManagerBase::pushApplication(const ApplicationHandle::Name &name)
+    void ApplicationManagerBase::pushApplication(const ApplicationName &name)
     {
         stack.push_front(name);
     }
@@ -179,8 +179,7 @@ namespace app::manager
         return getApplication(stack[1]);
     }
 
-    auto ApplicationManagerBase::getApplication(const ApplicationHandle::Name &name) const noexcept
-        -> ApplicationHandle *
+    auto ApplicationManagerBase::getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *
     {
         auto it = std::find_if(
             applications.begin(), applications.end(), [&name](const auto &app) { return app->name() == name; });
@@ -190,9 +189,9 @@ namespace app::manager
         return it->get();
     }
 
-    ApplicationManager::ApplicationManager(const std::string &serviceName,
+    ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
-                                           const ApplicationHandle::Name &_rootApplicationName)
+                                           const ApplicationName &_rootApplicationName)
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           blockingTimer{std::make_unique<sys::Timer>(
               "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)}
@@ -238,7 +237,7 @@ namespace app::manager
 
     void ApplicationManager::startBackgroundApplications()
     {
-        for (const auto &name : std::vector<ApplicationHandle::Name>{app::name_call, app::special_input}) {
+        for (const auto &name : std::vector<ApplicationName>{app::name_call, app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
                 app->runInBackground(this);
             }
@@ -260,62 +259,62 @@ namespace app::manager
 
     void ApplicationManager::registerMessageHandlers()
     {
-        connect(typeid(APMCheckApp), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg       = static_cast<APMCheckApp *>(request);
-            auto ret       = std::make_shared<APMCheckApp>(GetName(), msg->checkAppName);
+        connect(typeid(ApplicationStatusRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg       = static_cast<ApplicationStatusRequest *>(request);
+            auto ret       = std::make_shared<ApplicationStatusRequest>(GetName(), msg->checkAppName);
             ret->isRunning = getApplication(msg->checkAppName) != nullptr;
             return ret;
         });
-        connect(typeid(APMInitPowerSaveMode), [this](sys::DataMessage *, sys::ResponseMessage *) {
+        connect(typeid(PowerSaveModeInitRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
             handlePowerSavingModeInit();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMPreventBlocking), [this](sys::DataMessage *, sys::ResponseMessage *) {
+        connect(typeid(PreventBlockingRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
             blockingTimer->reload();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMSwitch), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMSwitch *>(request);
+        connect(typeid(SwitchRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<SwitchRequest *>(request);
             handleSwitchApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMSwitchPrevApp), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMSwitchPrevApp *>(request);
+        connect(typeid(SwitchBackRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<SwitchBackRequest *>(request);
             handleSwitchBack(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMConfirmSwitch), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMConfirmSwitch *>(request);
+        connect(typeid(SwitchConfirmation), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<SwitchConfirmation *>(request);
             handleSwitchConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMConfirmClose), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMConfirmClose *>(request);
+        connect(typeid(CloseConfirmation), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<CloseConfirmation *>(request);
             handleCloseConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMDelayedClose), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMDelayedClose *>(request);
+        connect(typeid(ApplicationCloseRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<ApplicationCloseRequest *>(request);
             closeService(msg->getApplication());
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMRegister), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMRegister *>(request);
+        connect(typeid(ApplicationRegistration), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<ApplicationRegistration *>(request);
             handleRegisterApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMChangeLanguage), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<APMChangeLanguage *>(request);
+        connect(typeid(LanguageChangeRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<LanguageChangeRequest *>(request);
             handleLanguageChange(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMClose), [this](sys::DataMessage *, sys::ResponseMessage *) {
+        connect(typeid(ShutdownRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
             closeApplications();
             closeServices();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(APMAction), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto actionMsg = static_cast<APMAction *>(request);
+        connect(typeid(ActionRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto actionMsg = static_cast<ActionRequest *>(request);
             handleAction(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
         });
@@ -391,7 +390,7 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::handleSwitchApplication(APMSwitch *msg) -> bool
+    auto ApplicationManager::handleSwitchApplication(SwitchRequest *msg) -> bool
     {
         auto app = getApplication(msg->getName());
         if (app == nullptr) {
@@ -445,7 +444,7 @@ namespace app::manager
         }
     }
 
-    auto ApplicationManager::handleAction(APMAction *actionMsg) -> bool
+    auto ApplicationManager::handleAction(ActionRequest *actionMsg) -> bool
     {
         auto &action         = actionMsg->getAction();
         const auto targetApp = getApplication(action.targetApplication);
@@ -460,12 +459,12 @@ namespace app::manager
                 action.targetWindow, std::string{}, std::move(action.data), gui::ShowMode::GUI_SHOW_INIT);
             return sys::Bus::SendUnicast(msg, targetApp->name(), this);
         }
-        APMSwitch switchRequest(
+        SwitchRequest switchRequest(
             actionMsg->getSenderName(), targetApp->name(), action.targetWindow, std::move(action.data));
         return handleSwitchApplication(&switchRequest);
     }
 
-    auto ApplicationManager::handleSwitchBack(APMSwitchPrevApp *msg) -> bool
+    auto ApplicationManager::handleSwitchBack(SwitchBackRequest *msg) -> bool
     {
         auto previousApp = getPreviousApplication();
         if (previousApp == nullptr) {
@@ -506,7 +505,7 @@ namespace app::manager
         previousApp.switchWindow = std::move(targetWindow);
     }
 
-    auto ApplicationManager::handleRegisterApplication(APMRegister *msg) -> bool
+    auto ApplicationManager::handleRegisterApplication(ApplicationRegistration *msg) -> bool
     {
         auto app = getApplication(msg->getSenderName());
         if (app == nullptr) {
@@ -514,19 +513,19 @@ namespace app::manager
             return false;
         }
 
-        if (msg->getStatus()) {
-            onApplicationRegistered(*app, msg->getStartBackground());
+        if (msg->getStatus() == StartupStatus::Success) {
+            onApplicationRegistered(*app, msg->getApplicationManifest());
         }
         else {
             onApplicationRegistrationFailure(*app);
         }
 
-        auto notification = std::make_shared<APMCheckApp>(GetName(), app->name());
+        auto notification = std::make_shared<ApplicationStatusRequest>(GetName(), app->name());
         sys::Bus::SendMulticast(notification, sys::BusChannels::AppManagerNotifications, this);
         return true;
     }
 
-    void ApplicationManager::onApplicationRegistered(ApplicationHandle &app, bool startInBackground)
+    void ApplicationManager::onApplicationRegistered(ApplicationHandle &app, const ApplicationManifest &manifest)
     {
         LOG_DEBUG("Application %s registered successfully.", app.name().c_str());
 
@@ -536,7 +535,7 @@ namespace app::manager
             return;
         }
 
-        if (startInBackground) {
+        if (manifest.startInBackground) {
             setState(State::Running);
             app.setState(ApplicationHandle::State::ACTIVE_BACKGROUND);
         }
@@ -554,7 +553,7 @@ namespace app::manager
         Controller::switchBack(this);
     }
 
-    auto ApplicationManager::handleLanguageChange(app::manager::APMChangeLanguage *msg) -> bool
+    auto ApplicationManager::handleLanguageChange(app::manager::LanguageChangeRequest *msg) -> bool
     {
         const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
         if (requestedLanguage == settings.language) {
@@ -583,7 +582,7 @@ namespace app::manager
         }
     }
 
-    auto ApplicationManager::handleSwitchConfirmation(APMConfirmSwitch *msg) -> bool
+    auto ApplicationManager::handleSwitchConfirmation(SwitchConfirmation *msg) -> bool
     {
         auto senderApp = getApplication(msg->getSenderName());
         if (senderApp == nullptr) {
@@ -618,7 +617,7 @@ namespace app::manager
         return false;
     }
 
-    auto ApplicationManager::handleCloseConfirmation(APMConfirmClose *msg) -> bool
+    auto ApplicationManager::handleCloseConfirmation(CloseConfirmation *msg) -> bool
     {
         auto senderApp = getApplication(msg->getSenderName());
         if (senderApp == nullptr) {

@@ -18,5 +18,7 @@ target_sources(${PROJECT_NAME}
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationManager.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Controller.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/ApplicationManifest.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Types.hpp"
 )
 

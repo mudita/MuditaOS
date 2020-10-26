@@ -12,7 +12,7 @@
 #include "application-special-input/ApplicationSpecialInput.hpp"
 
 #include "service-appmgr/Controller.hpp"
-#include "service-appmgr/messages/APMMessage.hpp"
+#include "service-appmgr/messages/Message.hpp"
 
 #include <i18/i18.hpp>
 #include <log/log.hpp>
@@ -169,6 +169,6 @@ namespace app
                 app, app::special_input, app::char_select, std::move(switchData));
         }
         return app::manager::Controller::switchBack(
-            app, std::make_unique<app::manager::APMSwitchPrevApp>(switchData->requester, std::move(switchData)));
+            app, std::make_unique<app::manager::SwitchBackRequest>(switchData->requester, std::move(switchData)));
     }
 } // namespace app
