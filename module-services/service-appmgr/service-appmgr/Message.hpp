@@ -141,11 +141,28 @@ namespace app::manager
         ApplicationName application;
     };
 
-    /// Requests to change the language.
-    class LanguageChangeRequest : public Message
+    /// Requests to change the display language.
+    class DisplayLanguageChangeRequest : public Message
     {
       public:
-        LanguageChangeRequest(const ApplicationName &senderName, utils::Lang language)
+        DisplayLanguageChangeRequest(const ApplicationName &senderName, utils::Lang language)
+            : Message(MessageType::APMChangeLanguage, senderName), language{language}
+        {}
+
+        [[nodiscard]] auto getLanguage() const noexcept -> utils::Lang
+        {
+            return language;
+        }
+
+      private:
+        utils::Lang language;
+    };
+
+    /// Requests to change the input language.
+    class InputLanguageChangeRequest : public Message
+    {
+      public:
+        InputLanguageChangeRequest(const ApplicationName &senderName, utils::Lang language)
             : Message(MessageType::APMChangeLanguage, senderName), language{language}
         {}
 

@@ -116,7 +116,8 @@ namespace app::manager
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
         auto handleInitApplication(ApplicationInitialisation *msg) -> bool;
-        auto handleLanguageChange(LanguageChangeRequest *msg) -> bool;
+        auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
+        auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
