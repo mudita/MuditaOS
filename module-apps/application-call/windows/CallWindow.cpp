@@ -174,8 +174,6 @@ namespace gui
         // show state of the window
         switch (state) {
         case State::INCOMING_CALL: {
-            runCallTimer();
-
             bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(strings::answer), true);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::reject), true);
@@ -430,7 +428,6 @@ namespace gui
     void CallWindow::runCallTimer()
     {
         static const sys::ms one_second = 1000;
-        callStart                       = utils::time::Timestamp();
         stop_timer                      = false;
         auto timer    = std::make_unique<app::GuiTimer>("CallTime", application, one_second, Timer::Continous);
         timerCallback = [&](Item &, Timer &timer) {
@@ -438,7 +435,8 @@ namespace gui
                 timer.stop();
                 detachTimer(timer);
             }
-            updateDuration(utils::time::Duration(utils::time::Timestamp(), callStart));
+            updateDuration(utils::time::Duration(callDuration, 0));
+            callDuration++;
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         };
@@ -448,6 +446,7 @@ namespace gui
 
     void CallWindow::stopCallTimer()
     {
+        callDuration = 0;
         stop_timer = true;
     }
 } /* namespace gui */

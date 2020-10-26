@@ -18,7 +18,7 @@ namespace gui
     {
       private:
         gui::KeyInputMappedTranslation translator;
-        utils::time::Timestamp callStart;
+        time_t callDuration = 0;
         bool stop_timer = false;
 
       protected:
