@@ -75,11 +75,13 @@ set(SOURCES
         queries/messages/templates/QuerySMSTemplateAdd.cpp
         queries/messages/templates/QuerySMSTemplateGetByID.cpp
         queries/messages/templates/QuerySMSTemplateGet.cpp
+        queries/messages/templates/QuerySMSTemplateGetForList.cpp
         queries/messages/templates/QuerySMSTemplateGetCount.cpp
         queries/messages/templates/QuerySMSTemplateRemove.cpp
         queries/messages/templates/QuerySMSTemplateUpdate.cpp
-        queries/messages/threads/QueryThreadsSearch.cpp
+        queries/messages/threads/QueryThreadsSearchForList.cpp
         queries/messages/threads/QueryThreadsGet.cpp
+        queries/messages/threads/QueryThreadsGetForList.cpp
         queries/messages/threads/QueryThreadGetByID.cpp
         queries/messages/threads/QueryThreadGetByNumber.cpp
         queries/messages/threads/QueryThreadGetByContactID.cpp

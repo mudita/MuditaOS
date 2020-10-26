@@ -8,7 +8,7 @@
 #include "module-apps/application-messages/data/MessagesStyle.hpp"
 #include "messages/DBThreadMessage.hpp"
 #include "messages/QueryMessage.hpp"
-#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
 #include "service-db/messages/DBMessage.hpp"
 #include <i18/i18.hpp>
 

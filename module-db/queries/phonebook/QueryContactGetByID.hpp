@@ -16,15 +16,20 @@ namespace db::query
     class ContactGetByID : public Query
     {
       public:
-        ContactGetByID(unsigned int id);
+        ContactGetByID(unsigned int id, bool withTemporary = false);
         [[nodiscard]] auto debugInfo() const -> std::string override;
         auto getID() -> unsigned int
         {
             return id;
         }
+        auto getWithTemporary() -> bool
+        {
+            return withTemporary;
+        }
 
       private:
         unsigned int id;
+        bool withTemporary = false;
     };
 
     class ContactGetByIDResult : public QueryResult

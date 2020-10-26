@@ -3,7 +3,7 @@
 
 #include "QueryThreadMarkAsRead.hpp"
 
-namespace db::query::smsthread
+namespace db::query
 {
     MarkAsRead::MarkAsRead(uint32_t id, Read read) : Query(Query::Type::Update), read(read), id(id)
     {}
@@ -25,4 +25,4 @@ namespace db::query::smsthread
     {
         return "MarkAsReadResult";
     }
-} // namespace db::query::smsthread
+} // namespace db::query

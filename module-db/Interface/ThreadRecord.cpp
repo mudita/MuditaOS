@@ -10,6 +10,8 @@
 #include <queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <queries/messages/threads/QueryThreadRemove.hpp>
 #include <queries/messages/threads/QueryThreadsGet.hpp>
+#include <queries/messages/threads/QueryThreadsGetForList.hpp>
+#include <queries/messages/threads/QueryThreadsSearchForList.hpp>
 
 #include <cassert>
 #include <log/log.hpp>
@@ -164,71 +166,141 @@ ThreadRecord ThreadRecordInterface::GetByNumber(const utils::PhoneNumber::View &
 
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
-    if (const auto localQuery = dynamic_cast<const db::query::ThreadsSearch *>(query.get())) {
-        auto dbResult = smsDB->threads.getBySMSQuery(localQuery->text, localQuery->startingPosition, localQuery->depth);
-
-        auto response = std::make_unique<db::query::ThreadsSearchResult>(dbResult.first, dbResult.second);
-        response->setRequestQuery(query);
-        return response;
+    if (typeid(*query) == typeid(db::query::ThreadsSearchForList)) {
+        return threadSearchForListQuery(query);
     }
-
-    if (const auto localQuery = dynamic_cast<const db::query::ThreadsGet *>(query.get())) {
-        auto dbResult = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
-
-        auto response = std::make_unique<db::query::ThreadsGetResults>(dbResult);
-        response->setRequestQuery(query);
-        return response;
+    else if (typeid(*query) == typeid(db::query::MarkAsRead)) {
+        return markAsReadQuery(query);
     }
-
-    if (const auto local_query = dynamic_cast<const db::query::smsthread::MarkAsRead *>(query.get())) {
-        auto response = runQueryImpl(local_query);
-        response->setRequestQuery(query);
-        return response;
+    else if (typeid(*query) == typeid(db::query::ThreadsGet)) {
+        return threadsGetQuery(query);
     }
-
-    if (const auto local_query = dynamic_cast<const db::query::ThreadGetByID *>(query.get())) {
-        const auto ret = GetByID(local_query->id);
-        auto response  = std::make_unique<db::query::ThreadGetByIDResult>(
-            ret.isValid() ? std::optional<ThreadRecord>{ret} : std::nullopt);
-        response->setRequestQuery(query);
-        return response;
+    else if (typeid(*query) == typeid(db::query::ThreadsGetForList)) {
+        return threadsGetForListQuery(query);
     }
-
-    if (const auto local_query = dynamic_cast<const db::query::ThreadGetByNumber *>(query.get())) {
-        auto response = std::make_unique<db::query::ThreadGetByNumberResult>(GetByNumber(local_query->getNumber()));
-        response->setRequestQuery(query);
-        return response;
+    else if (typeid(*query) == typeid(db::query::ThreadGetByID)) {
+        return threadGetByIDQuery(query);
     }
-
-    if (const auto local_query = dynamic_cast<const db::query::ThreadGetByContactID *>(query.get())) {
-        const auto thread = GetByContact(local_query->id);
-        auto response     = std::make_unique<db::query::ThreadGetByContactIDResult>(
-            thread.isValid() ? std::optional<ThreadRecord>(thread) : std::nullopt);
-        response->setRequestQuery(query);
-        return response;
+    else if (typeid(*query) == typeid(db::query::ThreadGetByNumber)) {
+        return threadGetByNumberQuery(query);
     }
-
-    if (const auto local_query = dynamic_cast<const db::query::ThreadRemove *>(query.get())) {
-        const auto ret = RemoveByID(local_query->id);
-        auto response  = std::make_unique<db::query::ThreadRemoveResult>(ret);
-        response->setRequestQuery(query);
-        return response;
+    else if (typeid(*query) == typeid(db::query::ThreadGetByContactID)) {
+        return threadGetByContactIDQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::ThreadRemove)) {
+        return threadRemoveQuery(query);
     }
 
     return nullptr;
 }
 
-std::unique_ptr<db::query::smsthread::MarkAsReadResult> ThreadRecordInterface::runQueryImpl(
-    const db::query::smsthread::MarkAsRead *query)
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadSearchForListQuery(
+    const std::shared_ptr<db::Query> &query)
 {
-    using namespace db::query::smsthread;
-    auto ret = false;
+    const auto localQuery = static_cast<const db::query::ThreadsSearchForList *>(query.get());
+    auto dbResult = smsDB->threads.getBySMSQuery(localQuery->textToSearch, localQuery->offset, localQuery->limit);
 
-    auto record = GetByID(query->id);
+    auto records = std::vector<ThreadRecord>(dbResult.second.begin(), dbResult.second.end());
+    auto count   = dbResult.first;
+
+    std::vector<ContactRecord> contacts;
+
+    for (const auto &record : records) {
+        contacts.push_back(ContactRecordInterface(contactsDB).GetByIdWithTemporary(record.contactID));
+    }
+
+    auto response = std::make_unique<db::query::ThreadsSearchResultForList>(records, contacts, count);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::MarkAsRead *>(query.get());
+    auto record           = GetByID(localQuery->id);
+    auto ret              = false;
+
     if (record.isValid()) {
-        LOG_FATAL("query-read %d", static_cast<int>(query->read));
-        record.unreadMsgCount = query->read == MarkAsRead::Read::True ? 0 : 1;
+        LOG_FATAL("query-read %d", static_cast<int>(localQuery->read));
+        record.unreadMsgCount = localQuery->read == db::query::MarkAsRead::Read::True ? 0 : 1;
         ret                   = Update(record);
     }
-    return std::make_unique<MarkAsReadResult>(ret);
+
+    return std::make_unique<db::query::MarkAsReadResult>(ret);
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadsGet *>(query.get());
+
+    auto dbResult = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
+    auto records  = std::vector<ThreadRecord>(dbResult.begin(), dbResult.end());
+
+    auto response = std::make_unique<db::query::ThreadsGetResults>(records);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetForListQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadsGetForList *>(query.get());
+
+    auto dbResult = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
+    auto records  = std::vector<ThreadRecord>(dbResult.begin(), dbResult.end());
+
+    std::vector<ContactRecord> contacts;
+    std::vector<utils::PhoneNumber::View> numbers;
+
+    for (const auto &record : records) {
+        contacts.push_back(ContactRecordInterface(contactsDB).GetByIdWithTemporary(record.contactID));
+        numbers.push_back(ContactRecordInterface(contactsDB).GetNumberById(record.numberID));
+    }
+
+    auto count = smsDB->threads.count();
+
+    auto response = std::make_unique<db::query::ThreadsGetForListResults>(records, contacts, numbers, count);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByIDQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadGetByID *>(query.get());
+
+    const auto ret = GetByID(localQuery->id);
+    auto response  = std::make_unique<db::query::ThreadGetByIDResult>(ret.isValid() ? std::optional<ThreadRecord>{ret}
+                                                                                   : std::nullopt);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByNumberQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadGetByNumber *>(query.get());
+
+    auto response = std::make_unique<db::query::ThreadGetByNumberResult>(GetByNumber(localQuery->getNumber()));
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByContactIDQuery(
+    const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadGetByContactID *>(query.get());
+
+    const auto thread = GetByContact(localQuery->id);
+    auto response     = std::make_unique<db::query::ThreadGetByContactIDResult>(
+        thread.isValid() ? std::optional<ThreadRecord>(thread) : std::nullopt);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadRemoveQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadRemove *>(query.get());
+
+    const auto ret = RemoveByID(localQuery->id);
+    auto response  = std::make_unique<db::query::ThreadRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
 }

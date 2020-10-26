@@ -9,7 +9,7 @@
 #include "Databases/SmsDB.hpp"
 #include "SMSRecord.hpp"
 #include "ThreadRecord.hpp"
-#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
 #include "queries/messages/sms/QuerySMSAdd.hpp"
 #include "queries/messages/sms/QuerySMSRemove.hpp"
 #include "queries/messages/sms/QuerySMSUpdate.hpp"
@@ -51,7 +51,7 @@ TEST_CASE("Query interface")
         REQUIRE(smsInterface->runQuery(std::make_shared<db::TestQuery>()) == nullptr);
     }
 
-    auto query = std::make_shared<db::query::ThreadsSearch>("a", 0, 10);
+    auto query = std::make_shared<db::query::ThreadsSearchForList>("a", 0, 10);
 
     SECTION("known query, wrong interface")
     {
@@ -62,7 +62,7 @@ TEST_CASE("Query interface")
     SECTION("proper result returned")
     {
         auto result = threadInterface->runQuery(query);
-        REQUIRE(dynamic_cast<db::query::ThreadsSearchResult *>(result.get()));
+        REQUIRE(dynamic_cast<db::query::ThreadsSearchResultForList *>(result.get()));
     }
 
     SECTION("Endpoint callback test")
