@@ -215,53 +215,32 @@ namespace gui
         calculateDisplayText();
     }
 
-    std::list<DrawCommand *> Label::buildDrawList()
+    void Label::buildDrawListImplementation(std::list<Command> &commands)
     {
-
-        std::list<DrawCommand *> commands;
-
-        // check if widget is visible
-        if (visible == false) {
-            return commands;
-        }
-
-        // get children draw commands
-        std::list<DrawCommand *> commandsChildren;
-        commandsChildren = Item::buildDrawList();
-
-        // base class draw commands
-        std::list<DrawCommand *> commandsBase;
-        commandsBase = gui::Rect::buildDrawList();
-
-        commands.splice(commands.end(), commandsBase);
-        // set local draw commands - text command
         if (font != nullptr) {
-            CommandText *textCmd = new CommandText();
-            textCmd->str         = textDisplayed;
-            textCmd->fontID      = font->id;
-            textCmd->color       = textColor;
+            auto cmd    = std::make_unique<CommandText>();
+            cmd->str    = textDisplayed;
+            cmd->fontID = font->id;
+            cmd->color  = textColor;
 
-            textCmd->x          = drawArea.x;
-            textCmd->y          = drawArea.y;
-            textCmd->w          = drawArea.w;
-            textCmd->h          = drawArea.h;
-            textCmd->tx         = textArea.x;
-            textCmd->ty         = textArea.y;
-            textCmd->tw         = textArea.w;
-            textCmd->th         = textArea.h;
-            textCmd->charsWidth = stringPixelWidth;
+            cmd->x          = drawArea.x;
+            cmd->y          = drawArea.y;
+            cmd->w          = drawArea.w;
+            cmd->h          = drawArea.h;
+            cmd->tx         = textArea.x;
+            cmd->ty         = textArea.y;
+            cmd->tw         = textArea.w;
+            cmd->th         = textArea.h;
+            cmd->charsWidth = stringPixelWidth;
 
-            textCmd->areaX = widgetArea.x;
-            textCmd->areaY = widgetArea.y;
-            textCmd->areaW = widgetArea.w;
-            textCmd->areaH = widgetArea.h;
-            commands.push_back(textCmd);
+            cmd->areaX = widgetArea.x;
+            cmd->areaY = widgetArea.y;
+            cmd->areaW = widgetArea.w;
+            cmd->areaH = widgetArea.h;
+
+            commands.emplace_back(std::move(cmd));
         }
-        if (not commandsChildren.empty()) {
-            commands.splice(commands.end(), commandsChildren);
-        }
-
-        return commands;
+        Rect::buildDrawListImplementation(commands);
     }
 
     bool Label::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

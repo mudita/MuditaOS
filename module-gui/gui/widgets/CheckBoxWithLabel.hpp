@@ -29,6 +29,9 @@ namespace gui
         void setChecked(bool state);
         auto isChecked() const -> bool;
 
+        void buildDrawListImplementation(std::list<Command> &commands) override
+        {}
+
       private:
         gui::CheckBox *check = nullptr;
         gui::Label *label    = nullptr;

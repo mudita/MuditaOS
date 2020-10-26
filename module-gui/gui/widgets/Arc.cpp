@@ -104,23 +104,14 @@ namespace gui
         return start;
     }
 
-    std::list<DrawCommand *> Arc::buildDrawList()
+    void Arc::buildDrawListImplementation(std::list<Command> &commands)
     {
-        if (!visible) {
-            return {};
-        }
-
-        auto arc   = new CommandArc(center, radius, start, sweep, focus ? focusPenWidth : penWidth, color);
+        auto arc = std::make_unique<CommandArc>(center, radius, start, sweep, focus ? focusPenWidth : penWidth, color);
         arc->areaX = widgetArea.x;
         arc->areaY = widgetArea.y;
         arc->areaW = widgetArea.w;
         arc->areaH = widgetArea.h;
 
-        std::list<DrawCommand *> commands;
-        commands.push_back(arc);
-
-        auto childrenCommands = Item::buildChildrenDrawList();
-        commands.splice(commands.end(), childrenCommands);
-        return commands;
+        commands.emplace_back(std::move(arc));
     }
 } // namespace gui

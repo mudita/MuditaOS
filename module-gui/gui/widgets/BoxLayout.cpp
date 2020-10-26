@@ -100,12 +100,6 @@ namespace gui
         Item::erase();
     }
 
-    std::list<DrawCommand *> BoxLayout::buildDrawList()
-    {
-        auto el = Rect::buildDrawList();
-        return el;
-    }
-
     void BoxLayout::setVisible(bool value, bool previous)
     {
         visible = value; // maybe use parent setVisible(...)? would be better but which one?

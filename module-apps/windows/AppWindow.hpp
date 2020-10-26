@@ -77,7 +77,6 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
-        std::list<DrawCommand *> buildDrawList() override;
         /// Setting bottom bar temporary text
         /// @param text - bottomBar text
         /// @param overwriteOthers - set or not other bottomBar texts to "" (default true)

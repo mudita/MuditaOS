@@ -357,16 +357,6 @@ namespace gui
         }
     };
 
-    std::list<DrawCommand *> ListView::buildDrawList()
-    {
-        // check if widget is visible
-        if (visible == false) {
-            return std::list<DrawCommand *>();
-        }
-
-        return gui::Rect::buildDrawList();
-    }
-
     bool ListView::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);

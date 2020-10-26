@@ -106,7 +106,6 @@ namespace app
         std::unique_ptr<gui::SwitchData> data;
 
       public:
-        bool LastSeenWindow      = false;
         AppSwitchWindowMessage() = delete;
 
         AppSwitchWindowMessage(const std::string &window,

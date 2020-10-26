@@ -78,7 +78,7 @@ namespace gui
         void onProviderDataUpdate();
 
         // virtual methods from Item
-        std::list<DrawCommand *> buildDrawList() override;
+        void buildDrawListImplementation(std::list<Command> &commands) override{};
         bool onInput(const InputEvent &inputEvent) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;

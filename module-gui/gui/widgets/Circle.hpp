@@ -5,7 +5,6 @@
 
 #include <list>
 #include <cstdint>
-
 #include "Arc.hpp"
 #include "Common.hpp"
 #include "Style.hpp"
@@ -41,7 +40,7 @@ namespace gui
 
         Circle(Item *parent, const Circle::ShapeParams &params);
 
-        std::list<DrawCommand *> buildDrawList() override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
 
       private:
         Circle(Item *parent,

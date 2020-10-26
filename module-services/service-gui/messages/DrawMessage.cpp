@@ -9,15 +9,8 @@
 namespace sgui
 {
 
-    DrawMessage::DrawMessage(std::list<gui::DrawCommand *> commandsList, gui::RefreshModes mode)
-        : GUIMessage(MessageType::GUICommands)
+    DrawMessage::DrawMessage(std::list<gui::Command> commands, gui::RefreshModes mode)
+        : GUIMessage(MessageType::GUICommands), mode(mode), commands(std::move(commands))
     {
-
-        this->mode = mode;
-        [[maybe_unused]] auto ret = std::remove_if(
-            commandsList.begin(), commandsList.end(), [](gui::DrawCommand *cmd) { return cmd == nullptr; });
-        for (auto cmd : commandsList) {
-            commands.push_back(std::unique_ptr<gui::DrawCommand>(cmd));
-        }
     }
 } /* namespace sgui */

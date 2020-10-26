@@ -39,22 +39,11 @@ namespace gui
         return false;
     }
 
-    std::list<DrawCommand *> Window::buildDrawList()
+    void Window::buildDrawListImplementation(std::list<Command> &commands)
     {
-
-        std::list<DrawCommand *> commands;
-        std::list<DrawCommand *> childrenCommands = Item::buildDrawList();
-
-        DrawCommand *clearCommand = new DrawCommand();
+        auto clearCommand         = std::make_unique<DrawCommand>();
         clearCommand->id          = DrawCommandID::GUI_DRAW_CLEAR;
-
-        commands.push_back(clearCommand);
-
-        if (!childrenCommands.empty()) {
-            commands.splice(commands.end(), childrenCommands);
-        }
-
-        return commands;
+        commands.emplace_back(std::move(clearCommand));
     }
 
     bool Window::onInput(const InputEvent &inputEvent)

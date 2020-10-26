@@ -14,10 +14,8 @@
 #include <list>                 // for list
 #include <memory>               // for unique_ptr
 #include <utility>              // for move
-namespace gui
-{
-    class DrawCommand;
-}
+#include <core/DrawCommandForward.hpp>
+
 namespace gui
 {
     class InputEvent;
@@ -277,11 +275,17 @@ namespace gui
         /// calls onDimensionChanged & updateDrwArea
         /// @attention should be bind to area
         virtual void setBoundingBox(const BoundingBox &new_box);
-        /// list of commands for renderer to draw elements on screen
-        /// all elements consist od lines, arcs, rectangles, text and images
-        /// for full list of elements please see renderer code
+        /// entry function to create commands to execute in renderer to draw on screen
         /// @note we should consider lazy evaluation prior to drawing on screen, rather than on each resize of elements
-        virtual std::list<DrawCommand *> buildDrawList();
+        /// @return list of commands for renderer to draw elements on screen
+        virtual std::list<Command> buildDrawList() final;
+        /// Implementation of DrawList per Item to be drawn on screen
+        /// This is called from buildDrawList before children elements are added
+        /// should be = 0;
+        virtual void buildDrawListImplementation(std::list<Command> &commands)
+        {}
+        std::function<void(std::list<Command> &)> preBuildDrawListHook         = nullptr;
+        std::function<void(std::list<Command> &)> postBuildDrawListHook        = nullptr;
         /// sets radius of Item box
         /// @note this should be moved to Rect
         virtual void setRadius(int value);
@@ -350,7 +354,7 @@ namespace gui
         /// On change of position or size this method will recalculate visible part of the widget
         /// considering widgets hierarchy and calculate absolute position of drawing primitives.
         virtual void updateDrawArea();
-        std::list<DrawCommand *> buildChildrenDrawList();
+        virtual void buildChildrenDrawList(std::list<Command> &commands) final;
         /// Pointer to navigation object. It is added when object is set for one of the directions
         gui::Navigation *navigationDirections = nullptr;
     };

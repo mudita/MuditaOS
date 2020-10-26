@@ -93,21 +93,9 @@ namespace gui
         yapSize = value;
     }
 
-    std::list<DrawCommand *> Rect::buildDrawList()
+    void Rect::buildDrawListImplementation(std::list<Command> &commands)
     {
-
-        std::list<DrawCommand *> commands;
-
-        // check if widget is visible
-        if (visible == false) {
-            return commands;
-        }
-
-        // get children draw commands
-        std::list<DrawCommand *> childrenCommands = Item::buildDrawList();
-
-        // set local draw commands
-        CommandRectangle *rect = new CommandRectangle();
+        auto rect = std::make_unique<CommandRectangle>();
 
         rect->x         = drawArea.x;
         rect->y         = drawArea.y;
@@ -123,21 +111,18 @@ namespace gui
         rect->yaps      = yaps;
         rect->yapSize   = yapSize;
         rect->radius    = radius;
-        if (focus)
+        if (focus) {
             rect->penWidth = penFocusWidth;
-        else
+        }
+        else {
             rect->penWidth = penWidth;
+        }
 
         rect->filled      = filled;
         rect->borderColor = borderColor;
         rect->fillColor   = fillColor;
 
-        commands.push_back(rect);
-
-        if (!childrenCommands.empty())
-            commands.insert(commands.end(), childrenCommands.begin(), childrenCommands.end());
-
-        return commands;
+        commands.emplace_back(std::move(rect));
     }
 
 } /* namespace gui */

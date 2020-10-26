@@ -11,10 +11,10 @@
 #include <list>
 #include <memory>
 
-namespace gui
-{
-    class DrawCommand;
-} // namespace gui
+#include "Service/Message.hpp"
+#include "core/DrawCommandForward.hpp"
+#include "GUIMessage.hpp"
+#include "gui/Common.hpp"
 
 namespace sgui
 {
@@ -22,7 +22,7 @@ namespace sgui
     class DrawMessage : public GUIMessage
     {
       public:
-        enum class DrawCommand
+        enum class Type
         {
             NORMAL,
             SUSPEND,
@@ -31,14 +31,14 @@ namespace sgui
 
       public:
         gui::RefreshModes mode;
-        std::list<std::unique_ptr<gui::DrawCommand>> commands;
-        DrawCommand command = DrawCommand::NORMAL;
+        std::list<gui::Command> commands;
+        Type type = Type::NORMAL;
 
-        DrawMessage(std::list<gui::DrawCommand *> commandsList, gui::RefreshModes mode);
+        DrawMessage(std::list<gui::Command> commandsList, gui::RefreshModes mode);
 
-        void setCommandType(DrawCommand command)
+        void setCommandType(Type type)
         {
-            this->command = command;
+            this->type = type;
         }
     };
 

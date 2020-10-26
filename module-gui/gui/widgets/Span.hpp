@@ -21,9 +21,11 @@ namespace gui
 
         Span(Item *parent, Axis axis, unsigned int size) : Span(axis, size)
         {
-            if (parent) {
+            if (parent != nullptr) {
                 parent->addWidget(this);
             }
         }
+
+        void buildDrawListImplementation(std::list<Command> &commands) override{};
     };
 }; // namespace gui

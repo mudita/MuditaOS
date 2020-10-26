@@ -83,8 +83,9 @@ namespace gui
 
         void setFont(Side side, const UTF8 &fontName);
 
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        void buildDrawListImplementation(std::list<Command> &commands) override
+        {}
     };
 
 } /* namespace gui */

@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <cstdint>
 
@@ -16,9 +15,6 @@
 namespace gui
 {
 
-    /**
-     * @brief IDs of the drawing commands
-     */
     enum class DrawCommandID
     {
         GUI_DRAW_UNDEFINED = 0,
@@ -37,8 +33,6 @@ namespace gui
         GUI_RENDER_REFRESH // sent to applications so they can repaint current window
     };
 
-    // using DrawCommand = std::unique_ptr<DrawCommandImpl>;
-
     class DrawCommand
     {
       public:
@@ -53,9 +47,6 @@ namespace gui
         virtual ~DrawCommand(){};
     };
 
-    /**
-     * @brief Draw command for rendering.
-     */
     class CommandRender : public DrawCommand
     {
       public:
@@ -66,9 +57,6 @@ namespace gui
         };
     };
 
-    /**
-     * @brief Draw command for line.
-     */
     class CommandLine : public DrawCommand
     {
       public:

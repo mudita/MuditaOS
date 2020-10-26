@@ -30,7 +30,7 @@ namespace gui
         void setValue(unsigned int value) noexcept override;
         void setPercentageValue(unsigned int value) noexcept override;
 
-        std::list<DrawCommand *> buildDrawList() override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       private:
@@ -50,7 +50,7 @@ namespace gui
         void setValue(unsigned int value) noexcept override;
         void setPercentageValue(unsigned int value) noexcept override;
 
-        auto buildDrawList() -> std::list<DrawCommand *> override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
 
       private:

@@ -50,7 +50,7 @@ namespace gui
         virtual void setYaps(RectangleYap yaps);
         virtual void setYapSize(unsigned short value);
         void setFilled(bool val);
-        std::list<DrawCommand *> buildDrawList() override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
     };
 
 } /* namespace gui */
