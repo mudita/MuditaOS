@@ -435,7 +435,8 @@ namespace gui
                 timer.stop();
                 detachTimer(timer);
             }
-            updateDuration(utils::time::Duration(callDuration, 0));
+            std::chrono::time_point<std::chrono::system_clock> systemUnitDuration(callDuration);
+            updateDuration(std::chrono::system_clock::to_time_t(systemUnitDuration));
             callDuration++;
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
@@ -446,7 +447,7 @@ namespace gui
 
     void CallWindow::stopCallTimer()
     {
-        callDuration = 0;
+        callDuration = std::chrono::seconds().zero();
         stop_timer = true;
     }
 } /* namespace gui */

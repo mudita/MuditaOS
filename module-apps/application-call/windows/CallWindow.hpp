@@ -18,7 +18,8 @@ namespace gui
     {
       private:
         gui::KeyInputMappedTranslation translator;
-        time_t callDuration = 0;
+        // call duration in seconds
+        std::chrono::seconds callDuration = std::chrono::seconds().zero();
         bool stop_timer = false;
 
       protected:
