@@ -187,6 +187,12 @@ ServiceCellular::~ServiceCellular()
     LOG_INFO("[ServiceCellular] Cleaning resources");
 }
 
+// this static function will be replaced by Settings API
+static bool isSettingsAutomaticTimeSyncEnabled()
+{
+    return true;
+}
+
 void ServiceCellular::CallStateTimerHandler()
 {
     std::shared_ptr<CellularRequestMessage> msg =
@@ -977,7 +983,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     std::string str(data.begin(), data.end());
 
     std::string logStr = utils::removeNewLines(str);
-    LOG_DEBUG("Notification:: %s", logStr.c_str());
 
     if (auto ret = str.find("+CPIN: ") != std::string::npos) {
         /// TODO handle different sim statuses - i.e. no sim, sim error, sim puk, sim pin etc.
@@ -1075,8 +1080,9 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
                                                              *message);
     }
     auto ctze = at::urc::CTZE(str);
-    if (ctze.is()) {
-        auto msg = std::make_shared<CellularTimeNotificationMessage>(ctze.getTimeInfo());
+    if (ctze.is() && isSettingsAutomaticTimeSyncEnabled()) {
+        auto msg = std::make_shared<CellularTimeNotificationMessage>(
+            ctze.getGMTTime(), ctze.getTimeZoneOffset(), ctze.getTimeZoneString());
         sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
         return std::nullopt;
     }
@@ -1594,8 +1600,10 @@ bool ServiceCellular::handle_modem_on()
 bool ServiceCellular::handle_URCReady()
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
-    channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
-    channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
+    if (isSettingsAutomaticTimeSyncEnabled()) {
+        channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
+        channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
+    }
     channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
     LOG_DEBUG("%s", state.c_str());
     return true;

@@ -57,6 +57,18 @@ EventManager::~EventManager()
     }
 }
 
+// those static functions and variables will be replaced by Settings API
+static std::string tzSet = {};
+static void setSettingsTimeZone(const std::string &timeZone)
+{
+    tzSet = timeZone;
+    return;
+}
+const std::string getSettingsTimeZone()
+{
+    return tzSet;
+}
+
 // Invoked upon receiving data message
 sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
@@ -211,9 +223,14 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgl->messageType == MessageType::CellularTimeUpdated) {
         auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
         if (msg != nullptr) {
-            auto time = msg->getTime();
-            bsp::rtc_SetDateTime(&time);
-            LOG_INFO("RTC set by network time.");
+            if (auto time = msg->getTime(); time) {
+                LOG_INFO("RTC set by network time.");
+                bsp::rtc_SetDateTime(&time.value());
+            }
+            if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
+                setSettingsTimeZone(msg->getTimeZoneString().value());
+                utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
+            }
             auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
             sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
         }

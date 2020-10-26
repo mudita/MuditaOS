@@ -83,16 +83,39 @@ class CellularNotificationMessage : public CellularMessage
 class CellularTimeNotificationMessage : public CellularMessage
 {
   private:
-    struct tm time;
+    std::optional<struct tm> time;
+    std::optional<int> timeZoneGmtOff;
+    std::optional<std::string> timeZoneString;
 
   public:
     CellularTimeNotificationMessage() = delete;
+    explicit CellularTimeNotificationMessage(struct tm time, long int timeZoneGmtOff, std::string timeZoneString)
+        : CellularMessage(MessageType::CellularTimeUpdated), time(time), timeZoneGmtOff(timeZoneGmtOff),
+          timeZoneString(timeZoneString)
+    {}
+
+    explicit CellularTimeNotificationMessage(long int timeZoneGmtOff, std::string timeZoneString)
+        : CellularMessage(MessageType::CellularTimeUpdated), timeZoneGmtOff(timeZoneGmtOff),
+          timeZoneString(timeZoneString)
+    {}
+
     explicit CellularTimeNotificationMessage(struct tm time)
         : CellularMessage(MessageType::CellularTimeUpdated), time(time)
     {}
-    struct tm getTime(void)
+
+    std::optional<struct tm> getTime(void)
     {
         return time;
+    }
+
+    std::optional<long int> getTimeZoneOffset(void)
+    {
+        return timeZoneGmtOff;
+    }
+
+    std::optional<const std::string> getTimeZoneString(void)
+    {
+        return timeZoneString;
     }
 };
 class CellularUSSDMessage : public CellularMessage

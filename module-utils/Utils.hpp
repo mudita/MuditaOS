@@ -169,18 +169,16 @@ namespace utils
         findAndReplaceAll(data, {{toSearch, replaceStr}});
     }
 
-    static inline bool toNumeric(const std::string &text, uint32_t &value)
+    static inline bool toNumeric(const std::string &text, int &value)
     {
         try {
             value = std::stoi(text);
-            return true;
         }
         catch (const std::exception &e) {
             LOG_ERROR("toNumeric exception %s", e.what());
             return false;
         }
-
-        return false;
+        return true;
     }
 
     static inline uint32_t swapBytes(uint32_t toSwap)

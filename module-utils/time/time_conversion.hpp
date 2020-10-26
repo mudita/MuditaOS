@@ -16,9 +16,10 @@ namespace utils
 {
     namespace time
     {
-        constexpr auto secondsInMinute = 60;
-        constexpr auto minutesInHour   = 60;
-        constexpr auto hoursInday      = 24;
+        constexpr auto secondsInMinute        = 60;
+        constexpr auto minutesInHour          = 60;
+        constexpr auto hoursInday             = 24;
+        constexpr auto minutesInQuarterOfHour = 15;
         constexpr auto secondsInHour   = minutesInHour * secondsInMinute;
         constexpr auto secondsInDay    = hoursInday * secondsInHour;
         constexpr auto milisecondsInSecond = 1000;
@@ -70,14 +71,7 @@ namespace utils
             }
 
           public:
-            Timestamp()
-            {
-                auto err = bsp::rtc_GetCurrentTimestamp(&time);
-                if (err) {
-                    LOG_ERROR("rtc_GetCurrentTimestamp failure!");
-                }
-                timeinfo = *localtime(&time);
-            }
+            Timestamp();
             Timestamp(time_t newtime) : time(newtime)
             {
                 timeinfo = *localtime(&time);
@@ -195,6 +189,11 @@ namespace utils
           public:
             Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
             virtual UTF8 str(std::string format = "") final;
+
+            /// set time zone offset including adjustment for daylight saving
+            static void setTimeZoneOffset(int tzOffset);
+            // get time zone offset including adjustment for daylight saving
+            static int getTimeZoneOffset();
         };
 
         class Duration
