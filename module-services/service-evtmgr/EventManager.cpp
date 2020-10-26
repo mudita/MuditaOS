@@ -58,13 +58,12 @@ EventManager::~EventManager()
 }
 
 // those static functions and variables will be replaced by Settings API
-static std::string tzSet = {};
+static std::string tzSet;
 static void setSettingsTimeZone(const std::string &timeZone)
 {
     tzSet = timeZone;
-    return;
 }
-const std::string getSettingsTimeZone()
+std::string getSettingsTimeZone()
 {
     return tzSet;
 }

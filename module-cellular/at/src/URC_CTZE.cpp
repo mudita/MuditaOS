@@ -32,10 +32,9 @@ auto CTZE::isValid() const noexcept -> bool
 int CTZE::getTimeZoneOffset() const
 {
     const std::string &tzOffsetToken = tokens[static_cast<uint32_t>(Tokens::GMTDifference)];
-    bool failed                      = false;
 
     int offsetInQuartersOfHour = 0;
-    failed                     = !utils::toNumeric(tzOffsetToken, offsetInQuartersOfHour);
+    bool failed                = !utils::toNumeric(tzOffsetToken, offsetInQuartersOfHour);
 
     if (offsetInQuartersOfHour != std::clamp(offsetInQuartersOfHour, minTimezoneOffset, maxTimezoneOffset)) {
         offsetInQuartersOfHour = 0;
@@ -46,13 +45,12 @@ int CTZE::getTimeZoneOffset() const
         LOG_ERROR("Failed to parse CTZE time zone offset: %s", tzOffsetToken.c_str());
     }
 
-    long int offsetInSeconds =
-        offsetInQuartersOfHour * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
+    int offsetInSeconds = offsetInQuartersOfHour * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
 
     return offsetInSeconds;
 }
 
-const std::string CTZE::getTimeZoneString() const
+std::string CTZE::getTimeZoneString() const
 {
     return tokens[static_cast<uint32_t>(Tokens::GMTDifference)] + "," +
            tokens[static_cast<uint32_t>(Tokens::DaylightSavingsAdjustment)];

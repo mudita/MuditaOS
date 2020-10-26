@@ -31,7 +31,7 @@ namespace at::urc
         [[nodiscard]] auto getTimeInfo(void) const noexcept -> tm;
 
         auto getTimeZoneOffset() const -> int;
-        auto getTimeZoneString() const -> const std::string;
+        auto getTimeZoneString() const -> std::string;
         auto getGMTTime(void) const -> const struct tm;
     };
 }; // namespace at::urc
