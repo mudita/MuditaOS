@@ -7,10 +7,13 @@
 #include "application-special-input/data/SpecialCharactersTableStyle.hpp"
 #include <cassert>
 #include <module-apps/application-special-input/ApplicationSpecialInput.hpp>
-#include <module-services/service-appmgr/ApplicationManager.hpp>
+#include <module-services/service-appmgr/Controller.hpp>
 
 #include "Style.hpp"
 #include "messages/AppMessage.hpp"
+
+#include "UiCommonActions.hpp"
+
 namespace gui
 {
 
@@ -78,7 +81,7 @@ namespace gui
         it->activatedCallback = [=](Item &it) {
             setFocusItem(nullptr);
             LOG_INFO("handled special char for %s", application->getCurrentWindow()->getName().c_str());
-            sapm::ApplicationManager::messageSwitchSpecialInput(
+            app::specialInput(
                 application,
                 std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response, app->requester, str));
             return true;

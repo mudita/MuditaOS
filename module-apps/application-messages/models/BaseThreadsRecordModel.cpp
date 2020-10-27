@@ -12,11 +12,10 @@ BaseThreadsRecordModel::BaseThreadsRecordModel(app::Application *app) : Database
 
 unsigned int BaseThreadsRecordModel::requestRecordsCount()
 {
-    recordsCount = DBServiceAPI::ThreadGetCount(application);
     return recordsCount;
 }
 
-bool BaseThreadsRecordModel::updateRecords(std::vector<ThreadRecord> records)
+bool BaseThreadsRecordModel::updateRecords(std::vector<ThreadListStruct> records)
 {
     DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();

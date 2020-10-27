@@ -7,7 +7,8 @@
 
 using namespace db::query;
 
-ContactGetByID::ContactGetByID(unsigned int id) : Query(Query::Type::Read), id(id)
+ContactGetByID::ContactGetByID(unsigned int id, bool withTemporary)
+    : Query(Query::Type::Read), id(id), withTemporary(withTemporary)
 {}
 
 ContactGetByIDResult::ContactGetByIDResult(const ContactRecord &record) : record(std::move(record))

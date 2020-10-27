@@ -12,28 +12,26 @@ namespace gui
 
     class ThreadItem : public BaseThreadItem
     {
-        ThreadsModel *model = nullptr;
-        std::shared_ptr<ThreadRecord> thread;
+        std::shared_ptr<ThreadListStruct> threadStruct;
 
-        auto getContactRecord() -> ContactRecord;
-        auto getNumberImportance(const ContactRecord &contact) -> std::optional<long int>;
+        auto getNumberImportance() -> std::optional<long int>;
 
         void setPreview();
-        void setContactName(const ContactRecord &contactInfo, std::optional<long int> numberImportance = std::nullopt);
+        void setContactName(std::optional<long int> numberImportance = std::nullopt);
 
       public:
-        explicit ThreadItem(ThreadsModel *model);
+        ThreadItem() = default;
 
-        void setThreadItem(std::shared_ptr<ThreadRecord> _thread);
+        void setThreadItem(std::shared_ptr<ThreadListStruct> _threadStruct);
 
-        auto getThreadName() const -> UTF8;
+        [[nodiscard]] auto getThreadName() const -> UTF8;
 
         std::shared_ptr<ThreadRecord> getThreadItem()
         {
-            return thread;
+            return threadStruct->thread;
         }
 
-        static ThreadItem *makeThreadItem(ThreadsModel *model, std::shared_ptr<ThreadRecord> thread);
+        static ThreadItem *makeThreadItem(const std::shared_ptr<ThreadListStruct> &threadStruct);
     };
 
     class ThreadItemWithIndicator : public ThreadItem
@@ -43,7 +41,7 @@ namespace gui
         void onDimensionChangedBottom(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       public:
-        ThreadItemWithIndicator(ThreadsModel *model, const UTF8 &indicatorName);
+        ThreadItemWithIndicator(const UTF8 &indicatorName);
     };
 
     class ThreadItemNotRead : public ThreadItemWithIndicator
@@ -51,7 +49,7 @@ namespace gui
         static const inline UTF8 indicatorName = "dot_12px_hard_alpha_W_M";
 
       public:
-        ThreadItemNotRead(ThreadsModel *model);
+        ThreadItemNotRead();
     };
 
 } /*namespace gui*/

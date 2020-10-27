@@ -13,6 +13,8 @@
 #include <TextBubble.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <service-db/messages/DBNotificationMessage.hpp>
+#include <module-db/queries/phonebook/QueryContactGetByID.hpp>
+
 #include <log/log.hpp>
 #include <Style.hpp>
 
@@ -64,15 +66,8 @@ namespace gui
         {
             auto pdata = dynamic_cast<SMSThreadData *>(data);
             if (pdata) {
-                LOG_INFO("We have it! %" PRIu32, pdata->thread->ID);
-                auto ret = DBServiceAPI::ContactGetByIDWithTemporary(application, pdata->thread->contactID);
-                contact  = std::make_shared<ContactRecord>(ret->front());
-                // should be name number for now - easier to handle
-                setTitle(pdata->threadName.value_or(ret->front().getFormattedName()));
-                auto retNumber = DBServiceAPI::GetNumberById(application, pdata->thread->numberID, numberIdTimeout);
-                assert(retNumber != nullptr);
-                smsModel->number = std::move(retNumber);
-                LOG_INFO("Phonenumber for thread: %s", smsModel->number->getFormatted().c_str());
+                LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
+                requestContactName(pdata->thread->contactID);
 
                 // Mark thread as Read
                 if (pdata->thread->isUnread()) {
@@ -82,7 +77,7 @@ namespace gui
                         app->markSmsThreadAsRead(pdata->thread->ID);
                     }
                 }
-
+                smsModel->numberID    = pdata->thread->numberID;
                 smsModel->smsThreadID = pdata->thread->ID;
                 smsList->rebuildList();
             }
@@ -126,4 +121,21 @@ namespace gui
         return false;
     }
 
+    auto SMSThreadViewWindow::requestContactName(unsigned int contactID) -> void
+    {
+        auto query = std::make_unique<db::query::ContactGetByID>(contactID, true);
+        query->setQueryListener(db::QueryCallback::fromFunction(
+            [this](auto response) { return handleContactNameQueryResponse(response); }));
+        DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
+    }
+
+    auto SMSThreadViewWindow::handleContactNameQueryResponse(db::QueryResult *queryResult) -> bool
+    {
+        auto msgResponse = dynamic_cast<db::query::ContactGetByIDResult *>(queryResult);
+        assert(msgResponse != nullptr);
+
+        setTitle(msgResponse->getResult().getFormattedName());
+
+        return false;
+    }
 } /* namespace gui */

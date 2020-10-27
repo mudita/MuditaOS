@@ -6,7 +6,7 @@
 #include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 
 namespace gui
 {
@@ -156,8 +156,7 @@ namespace gui
         LOG_DEBUG("Switch to previous window");
         destroyTimer();
 
-        sapm::ApplicationManager::messageSwitchApplication(
-            application, "ApplicationDesktop", gui::name::window::main_window, nullptr);
+        app::manager::Controller::switchApplication(application, "ApplicationDesktop", gui::name::window::main_window);
     }
 
 } /* namespace gui */

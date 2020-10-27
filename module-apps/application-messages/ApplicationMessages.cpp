@@ -88,7 +88,7 @@ namespace app
             case MessageType::DBQuery:
                 if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
                     auto result = queryResponse->getResult();
-                    if (result->hasListener()) {
+                    if (result && result->hasListener()) {
                         if (result->handle()) {
                             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                         }
@@ -158,7 +158,7 @@ namespace app
 
     bool ApplicationMessages::markSmsThreadAsRead(const uint32_t id)
     {
-        using namespace db::query::smsthread;
+        using namespace db::query;
         LOG_DEBUG("markSmsThreadAsRead");
         DBServiceAPI::GetQuery(
             this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::True));
@@ -167,8 +167,8 @@ namespace app
 
     bool ApplicationMessages::markSmsThreadAsUnread(const uint32_t id)
     {
-        using namespace db::query::smsthread;
-        LOG_DEBUG("markSmsThreadAsRead");
+        using namespace db::query;
+        LOG_DEBUG("markSmsThreadAsUnRead");
         DBServiceAPI::GetQuery(
             this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::False));
         return true;
@@ -289,9 +289,7 @@ namespace app
 
     bool ApplicationMessages::showSearchResults(const UTF8 &title, const UTF8 &search_text)
     {
-        auto name = gui::name::window::search_results;
-        windowsStack.get(name)->setTitle(title);
-        switchWindow(name, std::make_unique<SMSTextToSearch>(search_text));
+        switchWindow(gui::name::window::search_results, std::make_unique<SMSTextToSearch>(search_text, title));
         return true;
     }
 

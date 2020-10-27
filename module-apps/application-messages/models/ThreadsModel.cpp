@@ -5,6 +5,7 @@
 #include "InputEvent.hpp"
 #include "OptionWindow.hpp"
 #include "OptionsWindow.hpp"
+#include "ListView.hpp"
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/widgets/ThreadItem.hpp"
@@ -12,6 +13,7 @@
 #include "log/log.hpp"
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
+#include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}
@@ -23,19 +25,21 @@ auto ThreadsModel::getMinimalItemHeight() const -> unsigned int
 
 auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
 {
-    std::shared_ptr<ThreadRecord> thread = getRecord(order);
+    std::shared_ptr<ThreadListStruct> threadStruct = getRecord(order);
 
-    if (thread.get() == nullptr) {
+    if (!threadStruct) {
         return nullptr;
     }
 
-    auto item               = gui::ThreadItem::makeThreadItem(this, thread);
-    item->activatedCallback = [this, thread](gui::Item &item) {
+    auto item = gui::ThreadItem::makeThreadItem(threadStruct);
+
+    item->activatedCallback = [this, threadStruct](gui::Item &item) {
         LOG_INFO("ThreadItem ActivatedCallback");
         if (application) {
             const auto &threadItem = static_cast<gui::ThreadItem &>(item);
-            application->switchWindow(gui::name::window::thread_view,
-                                      std::make_unique<SMSThreadData>(thread, threadItem.getThreadName()));
+            application->switchWindow(
+                gui::name::window::thread_view,
+                std::make_unique<SMSThreadData>(threadStruct->thread, threadItem.getThreadName()));
         }
         else {
             LOG_ERROR("No application!");
@@ -61,7 +65,7 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
 
 void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 {
-    auto query = std::make_unique<db::query::ThreadsGet>(offset, limit);
+    auto query = std::make_unique<db::query::ThreadsGetForList>(offset, limit);
     query->setQueryListener(
         db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
@@ -69,10 +73,29 @@ void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 
 auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
-    auto msgResponse = dynamic_cast<db::query::ThreadsGetResults *>(queryResult);
+    auto msgResponse = dynamic_cast<db::query::ThreadsGetForListResults *>(queryResult);
     assert(msgResponse != nullptr);
 
-    auto records_data = msgResponse->getResults();
-    auto records      = std::vector<ThreadRecord>(records_data.begin(), records_data.end());
+    // If list record count has changed we need to rebuild list.
+    if (recordsCount != (msgResponse->getCount())) {
+        recordsCount = msgResponse->getCount();
+        list->rebuildList(style::listview::RebuildType::Full, 0, true);
+        return false;
+    }
+
+    auto threads  = msgResponse->getResults();
+    auto contacts = msgResponse->getContacts();
+    auto numbers  = msgResponse->getNumbers();
+
+    std::vector<ThreadListStruct> records;
+
+    assert(threads.size() == contacts.size() && threads.size() == numbers.size());
+
+    for (unsigned int i = 0; i < threads.size(); i++) {
+        records.emplace_back(std::make_shared<ThreadRecord>(threads[i]),
+                             std::make_shared<ContactRecord>(contacts[i]),
+                             std::make_shared<utils::PhoneNumber::View>(numbers[i]));
+    }
+
     return this->updateRecords(std::move(records));
 }

@@ -11,7 +11,7 @@ namespace gui::model
 
     class ThreadsSearchResultsModel : public BaseThreadsRecordModel
     {
-        UTF8 search_value;
+        UTF8 textToSearch;
 
       public:
         ThreadsSearchResultsModel(app::Application *app);

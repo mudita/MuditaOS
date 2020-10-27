@@ -19,7 +19,7 @@
 #include "vfs.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 
 void EventManager::HandleAlarmTrigger(sys::DataMessage *msgl)
 {
@@ -55,7 +55,7 @@ void EventManager::HandleAlarmTrigger(sys::DataMessage *msgl)
             alarmIsValid = false;
             // run bell application
             std::unique_ptr<gui::SwitchData> switchMessage = std::make_unique<sevm::EVMAlarmSwitchData>(alarmID);
-            sapm::ApplicationManager::messageSwitchApplication(this, "bell", "main", std::move(switchMessage));
+            app::manager::Controller::switchApplication(this, "bell", "main", std::move(switchMessage));
         }
         // check if alarm is not obsolete
         else if ((alarmTimestamp < (currentTime % 86400)) && ((currentTime + 60) % 86400) > (currentTime % 86400)) {

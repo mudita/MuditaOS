@@ -16,6 +16,7 @@
 #include "windows/AppsAndToolsWindow.hpp"
 #include "windows/NetworkWindow.hpp"
 #include "windows/MessagesWindow.hpp"
+#include "windows/PhoneNameWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -114,6 +115,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PhoneNameWindow>(app);
         });
     }
 

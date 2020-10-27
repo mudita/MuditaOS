@@ -6,7 +6,7 @@
 
 #include <i18/i18.hpp>
 #include <log/log.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 
 std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
 {
@@ -32,7 +32,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                            return false;
                                        }
                                        LOG_INFO("switching to %s page", window.c_str());
-                                       sapm::ApplicationManager::messageSwitchApplication(
+                                       app::manager::Controller::switchApplication(
                                            app, "ApplicationSettings", gui::name::window::main_window, nullptr);
                                        app->switchWindow(window, nullptr);
                                        return true;

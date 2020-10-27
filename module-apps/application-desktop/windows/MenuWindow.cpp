@@ -6,7 +6,7 @@
 #include "InputEvent.hpp"
 #include "Item.hpp"
 #include "Navigation.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include <tools/Common.hpp>
 #include <Style.hpp>
@@ -129,7 +129,7 @@ namespace gui
                 new gui::Tile("menu_calendar_W_G",
                               "app_desktop_menu_calendar",
                               [=](gui::Item &item) {
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationCalendar", gui::name::window::main_window, nullptr);
                                   return true;
                               }),
@@ -138,7 +138,7 @@ namespace gui
                               "app_desktop_menu_phone",
                               [=](gui::Item &item) {
                                   LOG_INFO("Call Log");
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationCallLog", gui::name::window::main_window, nullptr);
                                   return true;
                               },
@@ -147,7 +147,7 @@ namespace gui
                               "app_desktop_menu_contacts",
                               [=](gui::Item &item) {
                                   LOG_INFO("Phonebook");
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationPhonebook", gui::name::window::main_window, nullptr);
                                   return true;
                               }),
@@ -156,7 +156,7 @@ namespace gui
                               "app_desktop_menu_messages",
                               [=](gui::Item &item) {
                                   LOG_INFO("Messages");
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationMessages", gui::name::window::main_window, nullptr);
                                   return true;
                               },
@@ -165,7 +165,7 @@ namespace gui
                               "app_desktop_menu_music",
                               [=](gui::Item &item) {
                                   LOG_INFO("Music Player");
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationMusicPlayer", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
@@ -173,7 +173,7 @@ namespace gui
                               "app_desktop_menu_meditation",
                               [=](gui::Item &item) {
                                   LOG_INFO("Meditation");
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationMeditation", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
@@ -181,7 +181,7 @@ namespace gui
                               "app_desktop_menu_settings_new",
                               [=](gui::Item &item) {
                                   LOG_INFO("page 1 settings");
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, APP_SETTINGS_NEW, gui::name::window::main_window, nullptr);
                                   return true;
                               }},
@@ -194,21 +194,21 @@ namespace gui
                 new gui::Tile{"menu_tools_notes_W_G",
                               "app_desktop_tools_notes",
                               [=](gui::Item &item) {
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationNotes", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
                 new gui::Tile{"menu_tools_calculator_W_G",
                               "app_desktop_tools_calculator",
                               [=](gui::Item &item) {
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationCalculator", gui::name::window::main_window, nullptr);
                                   return true;
                               }},
                 new gui::Tile{"menu_tools_recorder_W_G",
                               "app_desktop_tools_antenna",
                               [=](gui::Item &item) {
-                                  sapm::ApplicationManager::messageSwitchApplication(
+                                  app::manager::Controller::switchApplication(
                                       application, "ApplicationAntenna", gui::name::window::main_window, nullptr);
                                   return true;
                               }},

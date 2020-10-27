@@ -47,4 +47,5 @@ void vfs::Init()
     else {
         LOG_INFO("vfs::Init looks like %s exists", purefs::dir::user_disk.c_str());
     }
+    chnNotifier.onFileSystemInitialized();
 }

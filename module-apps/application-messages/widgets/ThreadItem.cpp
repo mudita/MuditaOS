@@ -11,16 +11,11 @@
 
 namespace gui
 {
-    ThreadItem *ThreadItem::makeThreadItem(ThreadsModel *model, std::shared_ptr<ThreadRecord> thread)
+    ThreadItem *ThreadItem::makeThreadItem(const std::shared_ptr<ThreadListStruct> &threadStruct)
     {
-        ThreadItem *threadItem = thread->isUnread() ? new ThreadItemNotRead(model) : new ThreadItem(model);
-        threadItem->setThreadItem(thread);
+        ThreadItem *threadItem = threadStruct->thread->isUnread() ? new ThreadItemNotRead() : new ThreadItem();
+        threadItem->setThreadItem(threadStruct);
         return threadItem;
-    }
-
-    ThreadItem::ThreadItem(ThreadsModel *model)
-    {
-        this->model = model;
     }
 
     auto ThreadItem::getThreadName() const -> UTF8
@@ -36,7 +31,7 @@ namespace gui
     void ThreadItem::setPreview()
     {
         UTF8 prefix;
-        switch (thread->type) {
+        switch (threadStruct->thread->type) {
         case SMSType::DRAFT:
             prefix = utils::localize.get("app_messages_thread_draft");
             break;
@@ -50,36 +45,27 @@ namespace gui
         default:
             break;
         }
-        preview->setText(prefix + thread->snippet);
+        preview->setText(prefix + threadStruct->thread->snippet);
     }
 
-    void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> _thread)
+    void ThreadItem::setThreadItem(std::shared_ptr<ThreadListStruct> _threadStruct)
     {
-        thread = std::move(_thread);
-        if (model != nullptr) {
-            const auto &contact = getContactRecord();
-            setContactName(contact, getNumberImportance(contact));
-        }
+        threadStruct = std::move(_threadStruct);
 
-        timestamp->setText(utils::time::DateTime(thread->date));
+        setContactName(getNumberImportance());
+        timestamp->setText(utils::time::DateTime(threadStruct->thread->date));
         setPreview();
     }
 
-    auto ThreadItem::getContactRecord() -> ContactRecord
+    auto ThreadItem::getNumberImportance() -> std::optional<long>
     {
-        auto contactRec = DBServiceAPI::ContactGetByIDWithTemporary(model->getApplication(), thread->contactID);
-        return contactRec->front();
-    }
-
-    auto ThreadItem::getNumberImportance(const ContactRecord &contact) -> std::optional<long>
-    {
-        if (contact.numbers.size() < 2) {
+        if (threadStruct->contact->numbers.size() < 2) {
             // At least two phone numbers are needed to indicate a number importance.
             return std::nullopt;
         }
 
-        const auto numberRec     = DBServiceAPI::GetNumberById(model->getApplication(), thread->numberID);
-        const auto &phoneNumbers = contact.numbers;
+        const auto numberRec     = threadStruct->number;
+        const auto &phoneNumbers = threadStruct->contact->numbers;
 
         const auto it = std::find_if(phoneNumbers.begin(), phoneNumbers.end(), [&numberRec](const auto &phoneNumber) {
             return phoneNumber.number == *numberRec;
@@ -91,15 +77,15 @@ namespace gui
         return std::distance(phoneNumbers.begin(), it) + 1;
     }
 
-    void ThreadItem::setContactName(const ContactRecord &contactInfo, std::optional<long int> numberImportance)
+    void ThreadItem::setContactName(std::optional<long int> numberImportance)
     {
-        contact->setText(contactInfo.getFormattedName());
+        contact->setText(threadStruct->contact->getFormattedName());
         if (numberImportance.has_value()) {
             displayNumberImportance(numberImportance.value());
         }
     }
 
-    ThreadItemWithIndicator::ThreadItemWithIndicator(ThreadsModel *model, const UTF8 &indicatorName) : ThreadItem(model)
+    ThreadItemWithIndicator::ThreadItemWithIndicator(const UTF8 &indicatorName) : ThreadItem()
     {
         indicator = new gui::Image(this, 0, 0, indicatorName);
     }
@@ -118,7 +104,6 @@ namespace gui
                                    indicator->getSize(gui::Axis::Y) / 2); // align with text
     }
 
-    ThreadItemNotRead::ThreadItemNotRead(ThreadsModel *model)
-        : ThreadItemWithIndicator(model, ThreadItemNotRead::indicatorName)
+    ThreadItemNotRead::ThreadItemNotRead() : ThreadItemWithIndicator(ThreadItemNotRead::indicatorName)
     {}
 } /*namespace gui*/

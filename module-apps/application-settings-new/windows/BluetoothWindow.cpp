@@ -13,7 +13,10 @@ namespace gui
 {
 
     BluetoothWindow::BluetoothWindow(app::Application *app) : OptionWindow(app, gui::window::name::bluetooth)
-    {}
+    {
+        topBar->setActive(TopBar::Elements::BATTERY, false);
+        topBar->setActive(TopBar::Elements::SIM, false);
+    }
 
     void BluetoothWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {

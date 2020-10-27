@@ -20,11 +20,11 @@ This article includes details on how MuditaOS widgets are rendered and how the G
 
 ### How does it work on the application side
 
-Please see `app::Application`, `sapm::ApplicationManager` for detailed information on how messages are handled between both. This is just general documentation.
+Please see `app::Application`, `app::manager::ApplicationManager` for detailed information on how messages are handled between both. This is just general documentation.
 
 ![Simplified app start diagram](how_app_start_work.svg "Simplified hi level app start")
 
-These actions are done on a chained bus request between: `app::Application`, `sapm::ApplicationManager` and `sapm::EventWorker`
+These actions are done on a chained bus request between: `app::Application`, `app::manager::ApplicationManager` and `sapm::EventWorker`
 
 All of these are asynchronous and there is little state machine maintenance.
 
