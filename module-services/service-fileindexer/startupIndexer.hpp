@@ -14,10 +14,11 @@ namespace service::detail
 {
     class startupIndexer
     {
-        static constexpr auto timer_indexing_time = 20U;
+        static constexpr auto timer_indexing_time = 100U;
 
       public:
-        startupIndexer()                       = default;
+        startupIndexer();
+        ~startupIndexer();
         startupIndexer(const startupIndexer &) = delete;
         startupIndexer &operator=(startupIndexer) = delete;
         auto start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
@@ -34,6 +35,8 @@ namespace service::detail
         auto setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void;
 
       private:
-        std::list<std::shared_ptr<msg::FileChangeMessage>> m_msgs;
+        std::list<std::shared_ptr<msg::FileChangeMessage>> mMsgs;
+        decltype(mMsgs)::iterator mIdxIterator;
+        std::unique_ptr<sys::Timer> mIdxTimer;
     };
 } // namespace service::detail

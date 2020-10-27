@@ -9,9 +9,8 @@ namespace service::msg
 {
     class FileChangeMessage final : public sys::DataMessage
     {
-        using evt_t = vfsn::utility::vfsNotifier::FsEvent;
-
       public:
+        using evt_t = vfsn::utility::vfsNotifier::FsEvent;
         FileChangeMessage(std::string_view new_path, evt_t ev, std::string_view old_path);
         virtual ~FileChangeMessage()
         {}
