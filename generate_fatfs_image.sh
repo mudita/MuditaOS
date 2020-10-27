@@ -27,6 +27,28 @@ if [ ! -d "$SRC_DATA" ]; then
 	usage
 	exit -1
 fi
+_REQ_CMDS="sfdisk mtools awk truncate"
+for cmd in $_REQ_CMDS; do
+	if [ ! $(command -v $cmd) ]; then
+		echo "Error! $cmd is not installed, please use 'sudo apt install' for install required tool"
+		exit -1
+	fi
+done
+#mtools version
+_AWK_SCRIPT='
+/[0-9]/ { 
+	split($4,vers,"."); 
+	if(vers[1]>=4 && vers[2]>=0 && vers[3] >= 24) { 
+		print "true"; 
+	}
+	exit 0; 
+}'
+MTOOLS_OK=$(mtools --version | awk "${_AWK_SCRIPT}")
+
+if [ ! $MTOOLS_OK ]; then
+	echo "Invalid mtools version, please upgrade mtools to >= 4.0.24"
+	exit -1
+fi
 
 truncate -s 16G $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
@@ -50,11 +72,12 @@ done
 mcopy -s -i "$PART1" user ::
 mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
+mmd -i "$PART1" ::/current/sys
+mcopy -s -i "$PART1" data ::/current/sys
 
 # Testing parts of files
 for i in $TEST_ITEMS; do
 	mcopy -s -i "$PART1" $i ::/current
 done
 mcopy -s -i "$PART1" sys/updates ::
-
 cd -
