@@ -219,11 +219,20 @@ auto ContactRecordInterface::getLetterMapQuery(std::shared_ptr<db::Query> query)
 auto ContactRecordInterface::getByIDQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
 {
     auto readQuery = static_cast<db::query::ContactGetByID *>(query.get());
-    auto record    = ContactRecordInterface::GetByID(readQuery->getID());
-    auto response  = std::make_unique<db::query::ContactGetByIDResult>(record);
+    ContactRecord record;
+
+    if (readQuery->getWithTemporary()) {
+        record = ContactRecordInterface::GetByIdWithTemporary(readQuery->getID());
+    }
+    else {
+        record = ContactRecordInterface::GetByID(readQuery->getID());
+    }
+
+    auto response = std::make_unique<db::query::ContactGetByIDResult>(record);
     response->setRequestQuery(query);
     return response;
 }
+
 auto ContactRecordInterface::getSizeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
 {
     auto textFilter = dynamic_cast<const db::query::TextFilter *>(query.get());
@@ -277,6 +286,11 @@ auto ContactRecordInterface::getSizeQuery(std::shared_ptr<db::Query> query) -> s
     auto response = std::make_unique<db::query::RecordsSizeQueryResult>(count);
     response->setRequestQuery(query);
     return response;
+}
+
+auto ContactRecordInterface::getForListQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+{
+    return nullptr;
 }
 
 auto ContactRecordInterface::addQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>

@@ -3,7 +3,7 @@
 
 #include "CalendarTimeEvents.hpp"
 
-#include <module-services/service-appmgr/ApplicationManager.hpp>
+#include <module-services/service-appmgr/Controller.hpp>
 #include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
@@ -71,7 +71,7 @@ namespace stm
         auto event = std::make_shared<EventsRecord>(eventRecord);
         eventData->setData(event);
 
-        sapm::ApplicationManager::messageSwitchApplication(
+        app::manager::Controller::switchApplication(
             service(), app::name_calendar, style::window::calendar::name::event_reminder_window, std::move(eventData));
     }
 } // namespace stm

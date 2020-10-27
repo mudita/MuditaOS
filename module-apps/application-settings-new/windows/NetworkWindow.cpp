@@ -2,11 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NetworkWindow.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
+
+#include "OptionSetting.hpp"
 
 #include <i18/i18.hpp>
-#include "OptionsStyle.hpp"
-#include "OptionSetting.hpp"
-#include <application-settings-new/ApplicationSettings.hpp>
 
 namespace gui
 {
@@ -33,16 +33,13 @@ namespace gui
                 return true;
             },
             [=](gui::Item &item) {
-                auto nlb = dynamic_cast<gui::Label *>(&item);
-                if (nullptr != nlb) {
-                    if (item.focus) {
-                        this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
-                                               BottomBar::Side::CENTER);
-                    }
-                    else {
-                        this->setBottomBarText(utils::localize.get(style::strings::common::select),
-                                               BottomBar::Side::CENTER);
-                    }
+                if (item.focus) {
+                    this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
+                                           BottomBar::Side::CENTER);
+                }
+                else {
+                    this->setBottomBarText(utils::localize.get(style::strings::common::select),
+                                           BottomBar::Side::CENTER);
                 }
                 return true;
             },

@@ -16,20 +16,21 @@ namespace at::urc
     /// +QIND: "csq",15,99
     /// '+QIND' - head
     /// '"csq", 15, 99' are three tokens
-    struct Any
+    class Any
     {
+      public:
         Any(const std::string &str, char tokenDelimiter = ',');
         virtual ~Any()                     = default;
-        virtual auto what() -> std::string = 0;
-        /// split urc into: head and tokenized data (as in class descripiton)
-        virtual void split(const std::string &str, char tokenDelimiter = ',') final;
+        virtual auto what() const noexcept -> std::string = 0;
         /// check if urc parsed is of proper type - i.e. QIND
-        virtual auto is() -> bool final;
+        virtual auto is() const -> bool final;
 
+        auto getTokens() const -> std::vector<std::string>;
+
+      protected:
         std::string head;
         std::vector<std::string> tokens;
-
-      private:
-        Any() = default;
+        /// split urc into: head and tokenized data (as in class descripiton)
+        virtual void split(const std::string &str, char tokenDelimiter = ',') final;
     };
 }; // namespace at::urc

@@ -13,7 +13,13 @@
 
 namespace gui
 {
-
+    namespace networkTechnology
+    {
+        constexpr uint32_t x = 80;
+        constexpr uint32_t y = 21;
+        constexpr uint32_t w = 130;
+        constexpr uint32_t h = 20;
+    } // namespace networkTechnology
     const uint32_t TopBar::signalOffset    = 35;
     const uint32_t TopBar::batteryOffset   = 413;
     gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
@@ -101,6 +107,15 @@ namespace gui
         timeLabel->setFont(style::header::font::time);
         timeLabel->setText("00:00");
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+
+        networkAccessTechnologyLabel =
+            new Label(this, networkTechnology::x, networkTechnology::y, networkTechnology::w, networkTechnology::h);
+        networkAccessTechnologyLabel->setFilled(false);
+        networkAccessTechnologyLabel->setBorderColor(gui::ColorNoColor);
+        networkAccessTechnologyLabel->setFont(style::header::font::modes);
+        networkAccessTechnologyLabel->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        updateNetworkAccessTechnology();
     }
 
     void TopBar::setActive(std::list<std::pair<TopBar::Elements, bool>> elements)
@@ -147,6 +162,10 @@ namespace gui
         case Elements::SIM:
             elements.sim = active;
             simSet();
+            break;
+        case Elements::NETWORK_ACCESS_TECHNOLOGY:
+            elements.networkAccessTechnology = active;
+            updateNetworkAccessTechnology();
             break;
         };
     }
@@ -213,6 +232,37 @@ namespace gui
                 return true;
             }
             return false;
+        }
+        return true;
+    }
+
+    bool TopBar::updateNetworkAccessTechnology()
+    {
+        if (elements.networkAccessTechnology) {
+            auto accessTechnology = Store::GSM::get()->getNetwork().accessTechnology;
+
+            constexpr auto text2g  = "2g";
+            constexpr auto text3g  = "3g";
+            constexpr auto textLte = "lte";
+
+            switch (accessTechnology) {
+            case Store::Network::AccessTechnology::Gsm:
+            case Store::Network::AccessTechnology::GsmWEgprs:
+                networkAccessTechnologyLabel->setText(text2g);
+                break;
+            case Store::Network::AccessTechnology::Utran:
+            case Store::Network::AccessTechnology::UtranWHsdpa:
+            case Store::Network::AccessTechnology::UtranWHsupa:
+            case Store::Network::AccessTechnology::UtranWHsdpaAndWHsupa:
+                networkAccessTechnologyLabel->setText(text3g);
+                break;
+            case Store::Network::AccessTechnology::EUtran:
+                networkAccessTechnologyLabel->setText(textLte);
+                break;
+            case Store::Network::AccessTechnology::Unknown:
+                networkAccessTechnologyLabel->setText("");
+                break;
+            }
         }
         return true;
     }

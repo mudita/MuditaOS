@@ -29,6 +29,7 @@ target_sources( ${PROJECT_NAME}
         windows/AppsAndToolsWindow.cpp
         windows/NetworkWindow.cpp
         windows/MessagesWindow.cpp
+        windows/PhoneNameWindow.cpp
         widgets/UpDown.cpp
         widgets/Toggle.cpp
 

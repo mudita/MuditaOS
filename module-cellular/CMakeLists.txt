@@ -26,7 +26,8 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_Any.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp       
-	    ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CTZE.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CTZE.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CREG.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )
@@ -70,3 +71,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} module-bsp module-utils module-vfs  module-sys module-db )
+
+if (${ENABLE_TESTS})
+    add_subdirectory( test )
+endif()

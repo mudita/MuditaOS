@@ -13,11 +13,12 @@ namespace db::query
     class SMSGetForList : public Query
     {
       public:
-        unsigned int threadId = DB_ID_NONE;
-        unsigned int offset   = 0;
-        unsigned int limit    = 0;
+        unsigned int threadId  = DB_ID_NONE;
+        unsigned int offset    = 0;
+        unsigned int limit     = 0;
+        unsigned int contactID = 0;
 
-        SMSGetForList(unsigned int id, unsigned int offset = 0, unsigned int limit = 0);
+        SMSGetForList(unsigned int id, unsigned int offset = 0, unsigned int limit = 0, unsigned int contactID = 0);
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
@@ -26,12 +27,17 @@ namespace db::query
         std::vector<SMSRecord> result;
         unsigned int count = 0;
         SMSRecord draft;
+        utils::PhoneNumber::View number;
 
       public:
-        SMSGetForListResult(std::vector<SMSRecord> result, unsigned int count, SMSRecord draft);
+        SMSGetForListResult(std::vector<SMSRecord> result,
+                            unsigned int count,
+                            SMSRecord draft,
+                            const utils::PhoneNumber::View &number);
         [[nodiscard]] auto getResults() const -> std::vector<SMSRecord>;
         [[nodiscard]] auto getCount() const -> unsigned int;
         [[nodiscard]] auto getDraft() const -> SMSRecord;
+        [[nodiscard]] auto getNumber() const -> utils::PhoneNumber::View;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

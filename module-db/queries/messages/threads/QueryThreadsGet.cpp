@@ -16,10 +16,10 @@ namespace db::query
         return "SMSThreadsGet";
     }
 
-    ThreadsGetResults::ThreadsGetResults(std::vector<ThreadsTableRow> result_rows) : results(std::move(result_rows))
+    ThreadsGetResults::ThreadsGetResults(std::vector<ThreadRecord> result_rows) : results(std::move(result_rows))
     {}
 
-    auto ThreadsGetResults::getResults() const -> std::vector<ThreadsTableRow>
+    auto ThreadsGetResults::getResults() const -> std::vector<ThreadRecord>
     {
         return results;
     }

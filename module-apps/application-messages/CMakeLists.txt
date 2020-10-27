@@ -15,7 +15,7 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         "ApplicationMessages.cpp"
         "widgets/ThreadItem.cpp"
-        "widgets/SMSTemplateModel.cpp"
+        "models/SMSTemplateModel.cpp"
         "widgets/SMSTemplateItem.cpp"
         "widgets/SMSInputWidget.cpp"
         "widgets/SMSOutputWidget.cpp"

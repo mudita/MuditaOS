@@ -8,7 +8,7 @@
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
 #include <gui/widgets/Window.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include <module-services/service-db/messages/QueryMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
@@ -66,7 +66,7 @@ namespace gui
         if (inputEvent.keyCode == gui::KeyCode::KEY_RF &&
             inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
             LOG_DEBUG("Switch to desktop");
-            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+            app::manager::Controller::switchBack(application);
         }
 
         if (AppWindow::onInput(inputEvent)) {

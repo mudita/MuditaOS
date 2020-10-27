@@ -8,7 +8,7 @@
 #include "InputEvent.hpp"
 #include "application-call/widgets/Icons.hpp"
 #include "log/log.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
@@ -421,7 +421,7 @@ namespace gui
         timerCallback = [this](Item &, Timer &timer) {
             setState(State::IDLE);
             detachTimer(timer);
-            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+            app::manager::Controller::switchBack(application);
             return true;
         };
         application->connect(std::move(timer), this);

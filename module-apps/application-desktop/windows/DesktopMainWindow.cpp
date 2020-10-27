@@ -12,7 +12,7 @@
 #include "application-desktop/data/LockPhoneData.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 #include "service-time/ServiceTime.hpp"
 #include "service-time/messages/TimeMessage.hpp"
 #include <UiCommonActions.hpp>
@@ -113,7 +113,7 @@ namespace gui
                 LOG_ERROR("Couldn't fit in all notifications");
             }
             if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
-                sapm::ApplicationManager::messageSwitchApplication(
+                app::manager::Controller::switchApplication(
                     this->application, app::name_settings, app::sim_select, nullptr);
             }
 
@@ -373,7 +373,7 @@ namespace gui
                 utils::localize.get("app_desktop_unread_messages"),
                 std::to_string(app->notifications.notSeen.SMS),
                 [this]() -> bool {
-                    return sapm::ApplicationManager::messageSwitchApplication(
+                    return app::manager::Controller::switchApplication(
                         application, app::name_messages, gui::name::window::main_window, nullptr);
                 },
                 [app]() -> bool { return app->clearMessagesNotification(); });

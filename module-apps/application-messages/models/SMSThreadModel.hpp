@@ -15,6 +15,7 @@ class SMSThreadModel : public app::DatabaseModel<SMSRecord>, public gui::ListIte
     unsigned int smsThreadID      = 0;
     gui::SMSInputWidget *smsInput = nullptr;
     std::unique_ptr<utils::PhoneNumber::View> number;
+    unsigned int numberID = DB_ID_NONE;
 
     SMSThreadModel(app::Application *app);
     ~SMSThreadModel() override;
