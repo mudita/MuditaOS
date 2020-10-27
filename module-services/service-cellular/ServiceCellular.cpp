@@ -648,7 +648,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg = respMsg;
             break;
         } break;
-        case CellularNotificationMessage::Type::SIM:
+        case CellularNotificationMessage::Type::SIM_READY:
             if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
                 state.set(this, cellular::State::ST::SimInit);
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
@@ -660,7 +660,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg = std::make_shared<CellularResponseMessage>(resp);
         } break;
         case CellularNotificationMessage::Type::SignalStrengthUpdate:
-        case CellularNotificationMessage::Type::NetworkStatusUpdate: {
+        case CellularNotificationMessage::Type::NetworkStatusUpdate:
+        case CellularNotificationMessage::Type::SIM_NOT_READY: {
             // skipped
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
@@ -1168,14 +1169,19 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
+        settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(Store::GSM::get()->selected));
         // SIM causes SIM INIT, only on ready
-        response = std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM));
+        response =
+            std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_READY));
         sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
         sendSimUnlocked();
         break;
     case at::SimState::NotReady:
         LOG_DEBUG("Not ready");
         Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+        response =
+            std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_NOT_READY));
+        sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
         break;
     case at::SimState::SimPin: {
         SimCard simCard(*this);
@@ -1230,7 +1236,6 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
         break;
     }
-
     auto simMessage = std::make_shared<sevm::SIMMessage>();
     sys::Bus::SendUnicast(simMessage, service::name::evt_manager, this);
 

@@ -29,6 +29,9 @@
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <module-utils/i18n/i18n.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-db/Settings.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -36,7 +39,12 @@ namespace app
                                                    std::string parent,
                                                    StartInBackground startInBackground)
         : Application(name, parent, startInBackground)
-    {}
+    {
+        if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
+            Store::GSM::get()->sim == selectedSim) {
+            selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
+        }
+    }
 
     // Invoked upon receiving data message
     auto ApplicationSettingsNew::DataReceivedHandler(sys::DataMessage *msgl,
@@ -57,6 +65,19 @@ namespace app
             windowsFactory.build(this, gui::window::name::add_device);
             switchWindow(gui::window::name::add_device, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             render(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        else if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
+            selectedSim = Store::GSM::get()->selected;
+            if (CellularNotificationMessage::Type::SIM_READY == phoneMsg->type) {
+                selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
+            }
+            else if (CellularNotificationMessage::Type::SIM_NOT_READY == phoneMsg->type) {
+                selectedSimNumber = {};
+            }
+            auto currentWindow = getCurrentWindow();
+            if (gui::window::name::network == currentWindow->getName()) {
+                currentWindow->rebuild();
+            }
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -122,7 +143,7 @@ namespace app
             return std::make_unique<gui::NightshiftWindow>(app);
         });
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NetworkWindow>(app);
+            return std::make_unique<gui::NetworkWindow>(app, dynamic_cast<SimParams *>(app));
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
@@ -149,4 +170,20 @@ namespace app
 
     void ApplicationSettingsNew::destroyUserInterface()
     {}
+
+    std::string ApplicationSettingsNew::getNumber()
+    {
+        return selectedSimNumber;
+    }
+
+    void ApplicationSettingsNew::setSim(Store::GSM::SIM sim)
+    {
+        CellularServiceAPI::SetSimCard(this, sim);
+    }
+
+    Store::GSM::SIM ApplicationSettingsNew::getSim()
+    {
+        return selectedSim;
+    }
+
 } /* namespace app */
