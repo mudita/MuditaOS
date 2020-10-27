@@ -21,6 +21,18 @@ add_catch2_executable(
         module-utils
 )
 
+# UCS2 tests
+add_catch2_executable(
+    NAME
+        utils-ucs2
+    SRCS
+        unittest_ucs2.cpp
+        ../ucs2/UCS2.cpp
+        ../ucs2/UCS2.hpp
+    LIBS
+        module-utils
+)
+
 # UTF8 tests
 add_catch2_executable(
     NAME

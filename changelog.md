@@ -10,6 +10,7 @@
 * `[appmgr]` Application manager refactored.
 
 ### Fixed
+* `[cellular]` Fixed 32 bit UCS2 codes handling.
 
 ### Other
 

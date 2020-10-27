@@ -1,13 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * UCS2.cpp
- *
- *  Created on: 24 wrz 2019
- *      Author: kuba
- */
-
 #include "UCS2.hpp"
 #include <cstring>
 #include <cstdint>
@@ -16,110 +9,87 @@
 #include <iomanip>
 #include "log/log.hpp"
 #include <iterator>
+#include <locale>
+#include <codecvt>
 
-const uint32_t UCS2::ucs2bufferExt = 16;
-
-UCS2::UCS2(void)
+namespace ucs2
 {
-    sizeUsed      = 0;
-    sizeAllocated = ucs2bufferExt;
-    buffer        = new uint16_t[ucs2bufferExt];
-    length        = 0;
-}
+    constexpr uint32_t bufferExt = 32;
+} // namespace ucs2
 
-UCS2::~UCS2()
+UCS2::UCS2() : sizeAllocated{ucs2::bufferExt}, buffer{std::make_unique<uint32_t[]>(ucs2::bufferExt)}
 {
-
-    delete[] buffer;
 }
 
 UCS2::UCS2(const UTF8 &string)
 {
-    this->clear();
+    clear();
 
-    for (uint32_t i = 0; i < string.length(); i++) {
-        uint32_t utfChar = string[i];
-
-        //		LOG_INFO("decoded uft %x", ucs2char);
-        if (0xffff0000 & utfChar) {
-            sizeUsed = 0;
-            length   = 0;
-            LOG_ERROR("UCS2::UCS2(const UTF8& string) failed, provided char is out of range");
-            break;
-        }
-
-        append(static_cast<uint16_t>(utfChar));
+    for (std::size_t i = 0; i < string.length(); i++) {
+        uint32_t utfChar = convertFromUtf(string[i]);
+        append(utfChar);
     }
 }
 
 UCS2::UCS2(const std::string &string)
+    : sizeAllocated{ucs2::bufferExt}, buffer{std::make_unique<uint32_t[]>(ucs2::bufferExt)}
 {
-    sizeUsed      = 0;
-    sizeAllocated = ucs2bufferExt;
-    buffer        = new uint16_t[ucs2bufferExt];
-    length        = 0;
-
-    for (unsigned int i = 0; i < string.size() / 4; i++) {
-        uint16_t ucs2char = 0;
-        try {
-            ucs2char = std::stoi(string.substr(i * 4, 4), 0, 16);
-        }
-        catch (std::invalid_argument &e) {
-            LOG_ERROR("UCS2::UCS2(const std::string& string) failed.");
-            this->clear();
-        }
-        catch (std::out_of_range &e) {
-            this->clear();
-            LOG_ERROR("UCS2::UCS2(const std::string& string) failed.");
-        }
+    constexpr uint8_t chunkSize16Bit = 4;
+    for (std::size_t i = 0; i < string.length() / chunkSize16Bit; i++) {
+        const auto ucs2char = getUcs2Char(string, i);
+        // handle 32 bit
         if (0xffff0000 & ucs2char) {
-            this->clear();
-            LOG_ERROR("UCS2::UCS2(const UTF8& string) failed, provided char is out of range");
-            // break;
+            ++i;
+            append(ucs2char);
+            continue;
         }
-        append(static_cast<uint16_t>(ucs2char));
+        // handle 16 bit
+        append(ucs2char);
     }
 
     // terminate ucs2 string by 0
     append(0);
 }
 UCS2::UCS2(UCS2 &ucs)
+    : length{ucs.getLength()}, sizeUsed{ucs.getSizeUsed()},
+      sizeAllocated{ucs.getSizeAlocated()}, buffer{std::make_unique<uint32_t[]>(sizeAllocated)}
 {
-    sizeUsed      = 0;
-    sizeAllocated = ucs2bufferExt;
-    buffer        = new uint16_t[ucs2bufferExt];
-    length        = 0;
-
-    this->sizeUsed      = ucs.getSizeUsed();
-    this->sizeAllocated = ucs.getSizeAlocated();
-    this->length        = ucs.getLength();
-    this->buffer        = new uint16_t[sizeAllocated];
-    memset(buffer, 0, sizeAllocated);
-    memcpy(buffer, ucs.getData(), sizeUsed);
+    memcpy(buffer.get(), ucs.buffer.get(), sizeUsed);
 }
 
-UTF8 UCS2::toUTF8(void)
+UTF8 UCS2::toUTF8() const noexcept
 {
-    if (this->length == 0)
+    if (length == 0)
         return UTF8();
 
     // create buffer for worst case scenario which is that every char will take 3 bytes in utf8 string
     // + 1 for null terminator
 
-    uint8_t *buffer = new uint8_t[3 * this->length + 1];
-    memset(buffer, 0, 3 * this->length + 1);
+    const auto bufferSize = 3 * length + 1;
+    auto buffer           = std::make_unique<uint8_t[]>(bufferSize);
 
     uint32_t offset = 0;
-    for (uint32_t i = 0; i < this->length; i++) {
+    std::string s{};
+    for (uint32_t i = 0; i < length; i++) {
         uint32_t c = this->buffer[i];
 
-        // check if character must occupy 3 bytes
-        if (c > 0x07ff) {
+        if (c > 0xffff) {
+            // 32 bit conversion
+            // U' = yyyyyyyyyyxxxxxxxxxx  // U - 0x10000
+            // W1 = 110110yyyyyyyyyy      // 0xD800 + yyyyyyyyyy
+            // W2 = 110111xxxxxxxxxx      // 0xDC00 + xxxxxxxxxx
+            const uint16_t y       = (c & 0x03FF0000) >> 16;
+            const uint16_t x       = c & 0x03FF;
+            const uint32_t decoded = 0x10000 + (y << 10) + x;
+            std::u32string u32s    = {decoded};
+
+            s.append(convertToUtf8String(u32s));
+        }
+        else if (c > 0x07ff) {
             buffer[offset++] = (0x00E0 | ((c & 0xF000) >> 12));
             buffer[offset++] = (0x0080 | ((c & 0x0FC0) >> 6));
             buffer[offset++] = (0x0080 | (c & 0x003F));
         }
-        // check if character must occupy 2 bytes
         else if (c > 0x07f) {
             buffer[offset++] = (0x00C0 | ((c & 0x07C0) >> 6));
             buffer[offset++] = (0x0080 | (c & 0x003F));
@@ -128,29 +98,26 @@ UTF8 UCS2::toUTF8(void)
             buffer[offset++] = c;
         }
     }
-    UTF8 retString(reinterpret_cast<const char *>(buffer));
-    delete[] buffer;
-    return retString;
+    return (!s.empty()) ? UTF8(s + reinterpret_cast<const char *>(buffer.get()))
+                        : UTF8(reinterpret_cast<const char *>(buffer.get()));
 }
 
-void UCS2::append(const uint16_t &ucs2char)
+void UCS2::append(const uint32_t &ucs2char)
 {
     // check if buffer needs to be expanded
     if (sizeUsed == sizeAllocated) {
-        uint16_t *newBuffer = new uint16_t[sizeAllocated + ucs2bufferExt];
-        memset(newBuffer, 0, sizeAllocated + ucs2bufferExt);
-        memcpy(newBuffer, buffer, sizeAllocated);
-        delete[] buffer;
-        buffer        = newBuffer;
-        sizeAllocated = sizeAllocated + ucs2bufferExt;
+        auto newBuffer = std::make_unique<uint32_t[]>(sizeAllocated + ucs2::bufferExt);
+        memcpy(newBuffer.get(), buffer.get(), sizeAllocated);
+        buffer        = std::move(newBuffer);
+        sizeAllocated = sizeAllocated + ucs2::bufferExt;
     }
     // write character to the end of buffer, increment size and add 2 to used bytes ( usc2 character is two byte )
     buffer[length] = ucs2char;
     length++;
-    sizeUsed += 2;
+    sizeUsed += sizeof(ucs2char);
 }
 
-std::string UCS2::modemStr(void)
+std::string UCS2::str() const noexcept
 {
     std::stringstream ss;
 
@@ -162,13 +129,66 @@ std::string UCS2::modemStr(void)
     return ss.str();
 }
 
-void UCS2::clear(void)
+void UCS2::clear()
 {
     sizeUsed      = 0;
-    sizeAllocated = ucs2bufferExt;
+    sizeAllocated = ucs2::bufferExt;
 
-    delete[] buffer;
-
-    buffer = new uint16_t[ucs2bufferExt];
+    buffer = std::make_unique<uint32_t[]>(ucs2::bufferExt);
     length = 0;
+}
+
+uint32_t UCS2::convertFromUtf(uint32_t utfChar) const noexcept
+{
+    if (0xffff0000 & utfChar) {
+        // 32 bit conversion
+        // U' = yyyyyyyyyyxxxxxxxxxx  // U - 0x10000
+        // W1 = 110110yyyyyyyyyy      // 0xD800 + yyyyyyyyyy
+        // W2 = 110111xxxxxxxxxx      // 0xDC00 + xxxxxxxxxx
+        const uint16_t x    = utfChar & 0x3FF;
+        const uint16_t y    = utfChar & 0xF400;
+        const uint16_t low  = 0xDC00 + x;
+        const uint16_t high = 0xD800 + (y >> 10);
+        return (high << 16) + low;
+    }
+    return utfChar;
+}
+
+std::string inline UCS2::convertToUtf8String(const std::u32string &s) const
+{
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+    return conv.to_bytes(s);
+}
+
+uint32_t UCS2::getUcs2Char(const std::string &string, const std::size_t &i)
+{
+    constexpr uint8_t chunkSize16Bit = 4;
+    constexpr uint8_t chunkSize32Bit = 8;
+    constexpr uint8_t indexPosition  = 4;
+    constexpr int base               = 16;
+
+    uint32_t ucs2char     = 0;
+    uint16_t nextUcs2char = 0;
+    try {
+        ucs2char = std::stoi(string.substr(i * indexPosition, chunkSize16Bit), 0, base);
+        // check next character
+        if (i < (string.length() / chunkSize16Bit) - 1) {
+            nextUcs2char = std::stoi(string.substr((i + 1) * indexPosition, chunkSize16Bit), 0, base);
+            // 32 bit
+            if (ucs2char & 0xD800 && nextUcs2char & 0xDC00) {
+                std::istringstream buf{string.substr(i * indexPosition, chunkSize32Bit)};
+                buf >> std::hex >> ucs2char;
+            }
+        }
+    }
+    catch (const std::invalid_argument &e) {
+        clear();
+        LOG_ERROR("UCS2::UCS2(const std::string& string) failed. Invalid argument.");
+    }
+    catch (const std::out_of_range &e) {
+        clear();
+        LOG_ERROR("UCS2::UCS2(const std::string& string) failed. Out of range.");
+    }
+
+    return ucs2char;
 }
