@@ -4,6 +4,8 @@
 #pragma once
 
 #include <Service/Service.hpp>
+#include <Service/Timer.hpp>
+
 #include <list>
 
 namespace service::msg
@@ -17,8 +19,8 @@ namespace service::detail
         static constexpr auto timer_indexing_time = 100U;
 
       public:
-        startupIndexer();
-        ~startupIndexer();
+        startupIndexer()                       = default;
+        ~startupIndexer()                      = default;
         startupIndexer(const startupIndexer &) = delete;
         startupIndexer &operator=(startupIndexer) = delete;
         auto start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
