@@ -2,17 +2,18 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-PURE_PARTITION_PRIMARY="PUREOS"
-PURE_PARTITION_RECOVERY="RECOVER"
-PURE_OS_CURRENT="current"
-PURE_OS_PREVIOUS="previous"
-PURE_OS_FACTORY="factory"
-PURE_OS_VERSION_MAJOR=""
-PURE_OS_VERSION_MINOR=""
-PURE_OS_VERSION_PATCH=""
-PURE_OS_GIT_TAG=""
-PURE_US_GIT_REV=""
-PURE_OS_GIT_BRANCH=""
+MUDITAOS_PARTITION_PRIMARY="MUDITAOS"
+MUDITAOS_PARTITION_RECOVERY="RECOVER"
+MUDITAOS_CURRENT="current"
+MUDITAOS_PREVIOUS="previous"
+MUDITAOS_FACTORY="factory"
+MUDITAOS_UPDATES="updates"
+MUDITAOS_VERSION_MAJOR=""
+MUDITAOS_VERSION_MINOR=""
+MUDITAOS_VERSION_PATCH=""
+MUDITAOS_GIT_TAG=""
+MUDITAUS_GIT_REV=""
+MUDITAOS_GIT_BRANCH=""
 
 IMAGE_FILES="data assets country-codes.db Luts.bin user .boot.json .boot.json.crc32"
 IMAGE_MOVE_TO_ROOT="user .boot.json .boot.json.crc32"
@@ -31,12 +32,12 @@ check_target_linux() {
     check_any_arch "${@}" '(GNU/Linux)'
 }
 
-PURE_OS_GIT_TAG=`git describe --tags | awk -F'-' '{print $2}'`
-PURE_OS_GIT_REV=`git log --pretty=format:'%h' -n 1`
-PURE_OS_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+MUDITAOS_GIT_TAG=`git describe --tags | awk -F'-' '{print $2}'`
+MUDITAOS_GIT_REV=`git log --pretty=format:'%h' -n 1`
+MUDITAOS_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
-version=( ${PURE_OS_GIT_TAG//./ } )
-PURE_OS_VERSION_STRING=$PURE_OS_GIT_TAG
-PURE_OS_VERSION_MAJOR=${version[0]}
-PURE_OS_VERSION_MINOR=${version[1]}
-PURE_OS_VERSION_PATCH=${version[2]}
+version=( ${MUDITAOS_GIT_TAG//./ } )
+MUDITAOS_VERSION_STRING=$MUDITAOS_GIT_TAG
+MUDITAOS_VERSION_MAJOR=${version[0]}
+MUDITAOS_VERSION_MINOR=${version[1]}
+MUDITAOS_VERSION_PATCH=${version[2]}

@@ -1,4 +1,4 @@
-file (COPY "${CMAKE_CURRENT_LIST_DIR}/pureos-unittest.tar" DESTINATION "${CMAKE_BINARY_DIR}/sys/updates")
+file (COPY "${CMAKE_CURRENT_LIST_DIR}/muditaos-unittest.tar" DESTINATION "${CMAKE_BINARY_DIR}/sys/updates")
 file (COPY "${CMAKE_CURRENT_LIST_DIR}/factory-test" DESTINATION "${CMAKE_BINARY_DIR}/sys")
 
 add_catch2_executable(
@@ -7,7 +7,7 @@ add_catch2_executable(
 	SRCS
 		"${CMAKE_CURRENT_LIST_DIR}/unittest.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/tests-main.cpp"
-		"../endpoints/update/UpdatePureOS.cpp"
+		"../endpoints/update/UpdateMuditaOS.cpp"
 		"../endpoints/factoryReset/FactoryReset.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/../parser/MessageHandler.cpp"
 
