@@ -42,6 +42,7 @@
 #include <at/URC_QIND.hpp>
 #include <at/URC_CUSD.hpp>
 #include <at/URC_CTZE.hpp>
+#include <at/URC_CREG.hpp>
 #include <at/response.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -570,8 +571,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             break;
-        default: {
-            LOG_INFO("Skipped CellularNotificationMessage::Type %d", static_cast<int>(msg->type));
+        case CellularNotificationMessage::Type::SignalStrengthUpdate:
+        case CellularNotificationMessage::Type::NetworkStatusUpdate:
+        case CellularNotificationMessage::Type::NewIncomingUSSD: {
+            // skipped
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
         }
@@ -977,30 +980,21 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
     // Received signal strength change
     auto qind = at::urc::QIND(str);
-    if (qind.is() && qind.is_csq()) {
+    if (qind.is() && qind.isCsq()) {
         AntennaServiceAPI::CSQChange(this);
-        if (!qind.validate(at::urc::QIND::RSSI)) {
+        auto rssi = qind.getRSSI();
+        if (!rssi) {
             LOG_INFO("Invalid csq - ignore");
         }
         else {
-            auto token_val = 0;
-            try {
-                token_val = std::stoi(qind.tokens[at::urc::QIND::RSSI]);
-            }
-            catch (const std::exception &e) {
-                LOG_ERROR("Conversion error of %s, taking default value %d",
-                          qind.tokens[at::urc::QIND::RSSI].c_str(),
-                          token_val);
-            }
+            SignalStrength signalStrength(*rssi);
 
-            SignalStrength signalStrength(token_val);
-            if (signalStrength.isValid()) {
-                Store::GSM::get()->setSignalStrength(signalStrength.data);
-                return std::make_shared<CellularNotificationMessage>(
-                    CellularNotificationMessage::Type::SignalStrengthUpdate, str);
+            Store::GSM::get()->setSignalStrength(signalStrength.data);
+            return std::make_shared<CellularNotificationMessage>(
+                CellularNotificationMessage::Type::SignalStrengthUpdate, str);
             }
-        }
     }
+
     if (str.find("\"FOTA\",\"HTTPEND\",0") != std::string::npos) {
         LOG_DEBUG("Fota UPDATE, switching to AT mode");
         cmux->setMode(TS0710::Mode::AT);
@@ -1008,7 +1002,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
     auto cusd = at::urc::CUSD(str);
     if (cusd.is()) {
-
         if (cusd.isActionNeeded()) {
             if (ussdState == ussd::State::pullRequestSent) {
                 ussdState = ussd::State::pullResponseReceived;
@@ -1021,13 +1014,40 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             setUSSDTimer();
         }
 
+        auto message = cusd.getMessage();
+        if (!message) {
+            return std::nullopt;
+        }
+
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
-                                                             cusd.message());
+                                                             *message);
     }
     auto ctze = at::urc::CTZE(str);
     if (ctze.is()) {
         auto msg = std::make_shared<CellularTimeNotificationMessage>(ctze.getTimeInfo());
         sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
+        return std::nullopt;
+    }
+
+    auto creg = at::urc::CREG(str);
+    if (creg.is()) {
+        if (creg.isValid()) {
+            auto accessTechnology = creg.getAccessTechnology();
+            auto status           = creg.getStatus();
+
+            LOG_INFO("Network status - %s, access technology %s",
+                     utils::enumToString(status).c_str(),
+                     utils::enumToString(accessTechnology).c_str());
+
+            Store::Network network{status, accessTechnology};
+
+            Store::GSM::get()->setNetwork(network);
+            return std::make_shared<CellularNotificationMessage>(
+                CellularNotificationMessage::Type::NetworkStatusUpdate);
+        }
+
+        LOG_WARN("Network status - not valid");
+
         return std::nullopt;
     }
 
@@ -1524,6 +1544,7 @@ bool ServiceCellular::handle_URCReady()
     auto channel = cmux->get(TS0710::Channel::Commands);
     channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
     channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
+    channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
     LOG_DEBUG("%s", state.c_str());
     return true;
 }

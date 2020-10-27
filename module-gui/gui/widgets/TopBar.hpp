@@ -41,6 +41,7 @@ namespace gui
             BATTERY,
             TIME,
             SIM,
+            NETWORK_ACCESS_TECHNOLOGY
         };
         enum class TimeMode
         {
@@ -50,7 +51,8 @@ namespace gui
         static uint32_t time;
 
       protected:
-        Label *timeLabel;
+        Label *timeLabel                    = nullptr;
+        Label *networkAccessTechnologyLabel = nullptr;
         Image *signal[static_cast<size_t>(Store::RssiBar::noOfSupprtedBars)];
         Image *lock;
         std::array<Image *, batteryLevelCount> battery = {nullptr};
@@ -70,7 +72,8 @@ namespace gui
             bool battery : 1;
             bool time : 1;
             bool sim : 1;
-        } elements = {false, false, false, false, true};
+            bool networkAccessTechnology : 1;
+        } elements = {false, false, false, false, true, true};
 
       public:
         TopBar();
@@ -101,6 +104,8 @@ namespace gui
          * @brief updates signal strength. This will cause appropriate image to be displayed.
          */
         bool updateSignalStrength();
+
+        bool updateNetworkAccessTechnology();
 
         void simSet();
         void setTime(const UTF8 &time);
