@@ -104,10 +104,10 @@ struct FileInfo
     unsigned long fileCRC32;
 };
 
-class UpdatePureOS : public updateos::UpdateStats
+class UpdateMuditaOS : public updateos::UpdateStats
 {
   public:
-    UpdatePureOS(ServiceDesktop *ownerService);
+    UpdateMuditaOS(ServiceDesktop *ownerService);
 
     updateos::UpdateError runUpdate();
     updateos::UpdateError prepareTempDirForUpdate();

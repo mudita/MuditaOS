@@ -5,7 +5,7 @@
 
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
-#include "UpdatePureOS.hpp"
+#include "UpdateMuditaOS.hpp"
 #include <vfs.hpp>
 
 namespace sdesktop

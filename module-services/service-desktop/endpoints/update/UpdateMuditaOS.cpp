@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "UpdatePureOS.hpp"
+#include "UpdateMuditaOS.hpp"
 #if defined(TARGET_RT1051)
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
@@ -27,26 +27,26 @@ json11::Json FileInfo::to_json() const
         {"name", fileName}, {"size", std::to_string(fileSize)}, {"crc32", std::to_string(fileCRC32)}};
 }
 
-UpdatePureOS::UpdatePureOS(ServiceDesktop *ownerService) : owner(ownerService)
+UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerService)
 {
     status = updateos::UpdateState::Initial;
 }
 
-updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
+updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
 {
     updateFile = purefs::dir::os_updates / updateFileToUse;
     if (vfs.fileExists(updateFile.c_str())) {
-        versioInformation = UpdatePureOS::getVersionInfoFromFile(updateFile);
+        versioInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
             totalBytes = vfs.filelength(updateTar.stream);
         }
         else {
-            informError("UpdatePureOS::setUpdateFile can't open TAR file %s", updateFile.c_str());
+            informError("UpdateMuditaOS::setUpdateFile can't open TAR file %s", updateFile.c_str());
             return updateos::UpdateError::CantOpenUpdateFile;
         }
     }
     else {
-        informError("UpdatePureOS::setUpdateFile %s does not exist", updateFile.c_str());
+        informError("UpdateMuditaOS::setUpdateFile %s does not exist", updateFile.c_str());
         return updateos::UpdateError::CantOpenUpdateFile;
     }
 
@@ -54,7 +54,7 @@ updateos::UpdateError UpdatePureOS::setUpdateFile(fs::path updateFileToUse)
     return updateos::UpdateError::NoError;
 }
 
-updateos::UpdateError UpdatePureOS::runUpdate()
+updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
     informDebug("Prepraring temp dir");
 
@@ -114,7 +114,7 @@ updateos::UpdateError UpdatePureOS::runUpdate()
     return err;
 }
 
-updateos::UpdateError UpdatePureOS::unpackUpdate()
+updateos::UpdateError UpdateMuditaOS::unpackUpdate()
 {
     mtar_header_t tarHeader;
     filesInUpdatePackage.clear();
@@ -144,7 +144,7 @@ updateos::UpdateError UpdatePureOS::unpackUpdate()
     return updateos::UpdateError::NoError;
 }
 
-updateos::UpdateError UpdatePureOS::verifyChecksums()
+updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
     status = updateos::UpdateState::ChecksumVerification;
 
@@ -178,7 +178,7 @@ updateos::UpdateError UpdatePureOS::verifyChecksums()
     return updateos::UpdateError::NoError;
 }
 
-updateos::UpdateError UpdatePureOS::verifyVersion()
+updateos::UpdateError UpdateMuditaOS::verifyVersion()
 {
     status = updateos::UpdateState::VersionVerificiation;
 
@@ -199,13 +199,13 @@ updateos::UpdateError UpdatePureOS::verifyVersion()
     return updateos::UpdateError::NoError;
 }
 
-updateos::UpdateError UpdatePureOS::updateBootloader()
+updateos::UpdateError UpdateMuditaOS::updateBootloader()
 {
     informDebug("updateBootloader noError");
     return updateos::UpdateError::NoError;
 }
 
-unsigned long UpdatePureOS::getExtractedFileCRC32(const std::string &filePath)
+unsigned long UpdateMuditaOS::getExtractedFileCRC32(const std::string &filePath)
 {
     for (auto file : filesInUpdatePackage) {
         if (file.fileName == filePath) {
@@ -215,7 +215,7 @@ unsigned long UpdatePureOS::getExtractedFileCRC32(const std::string &filePath)
     return 0;
 }
 
-void UpdatePureOS::getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long)
+void UpdateMuditaOS::getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long)
 {
     std::size_t lastSpacePos = infoLine.find_last_of(' ');
     if (lastSpacePos > 0) {
@@ -232,7 +232,7 @@ void UpdatePureOS::getChecksumInfo(const std::string &infoLine, std::string &fil
     }
 }
 
-updateos::UpdateError UpdatePureOS::prepareRoot()
+updateos::UpdateError UpdateMuditaOS::prepareRoot()
 {
     informDebug("prepareRoot()");
     int ret;
@@ -289,7 +289,7 @@ updateos::UpdateError UpdatePureOS::prepareRoot()
     return updateBootJSON();
 }
 
-updateos::UpdateError UpdatePureOS::updateBootJSON()
+updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 {
     unsigned long bootJSONAbsoulteCRC = 0;
     fs::path bootJSONAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_json;
@@ -322,7 +322,7 @@ updateos::UpdateError UpdatePureOS::updateBootJSON()
     return updateos::UpdateError::NoError;
 }
 
-bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
+bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 {
     std::unique_ptr<unsigned char[]> readBuf(new unsigned char[purefs::buffer::tar_buf]);
     const fs::path fullPath = getUpdateTmpChild(h.name);
@@ -380,7 +380,7 @@ bool UpdatePureOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     return true;
 }
 
-updateos::UpdateError UpdatePureOS::cleanupAfterUpdate()
+updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 {
     if (vfs.isDir(updateTempDirectory.c_str()) && vfs.deltree(updateTempDirectory.c_str())) {
         informError("ff_deltree failed on %s", updateTempDirectory.c_str());
@@ -395,12 +395,12 @@ updateos::UpdateError UpdatePureOS::cleanupAfterUpdate()
     return updateos::UpdateError::NoError;
 }
 
-const fs::path UpdatePureOS::getUpdateTmpChild(const fs::path &childPath)
+const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
 {
     return updateTempDirectory / childPath;
 }
 
-updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
+updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 {
     status = updateos::UpdateState::CreatingDirectories;
 
@@ -457,7 +457,7 @@ updateos::UpdateError UpdatePureOS::prepareTempDirForUpdate()
     return updateos::UpdateError::NoError;
 }
 
-updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloaderFile)
+updateos::BootloaderUpdateError UpdateMuditaOS::writeBootloader(fs::path bootloaderFile)
 {
     status = updateos::UpdateState::UpdatingBootloader;
 
@@ -503,21 +503,21 @@ updateos::BootloaderUpdateError UpdatePureOS::writeBootloader(fs::path bootloade
 #endif
 }
 
-const json11::Json UpdatePureOS::getVersionInfoFromFile(const fs::path &updateFile)
+const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &updateFile)
 {
     if (vfs.fileExists(updateFile.c_str())) {
         mtar_t tar;
         mtar_header_t h;
 
         if (mtar_open(&tar, updateFile.c_str(), "r") == MTAR_EOPENFAIL) {
-            LOG_INFO("UpdatePureOS::getVersionInfoFromFile %s can't open", updateFile.c_str());
+            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile %s can't open", updateFile.c_str());
             return json11::Json();
         }
 
         std::unique_ptr<char[]> versionFilename(new char[purefs::buffer::crc_buf]);
         sprintf(versionFilename.get(), "./%s", updateos::file::version.c_str());
         if (mtar_find(&tar, versionFilename.get(), &h) == MTAR_ENOTFOUND) {
-            LOG_INFO("UpdatePureOS::getVersionInfoFromFile can't find %s in %s",
+            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't find %s in %s",
                      updateos::file::version.c_str(),
                      updateFile.c_str());
 
@@ -528,7 +528,7 @@ const json11::Json UpdatePureOS::getVersionInfoFromFile(const fs::path &updateFi
         /* this file should never be larger then purefs::buffer::tar_buf */
         std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
         if (mtar_read_data(&tar, readBuf.get(), h.size) != MTAR_ESUCCESS) {
-            LOG_INFO("UpdatePureOS::getVersionInfoFromFile can't read %s in %s",
+            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't read %s in %s",
                      updateos::file::version.c_str(),
                      updateFile.c_str());
 
@@ -542,7 +542,7 @@ const json11::Json UpdatePureOS::getVersionInfoFromFile(const fs::path &updateFi
         std::string dataPackage  = std::string(static_cast<char *>(readBuf.get()), h.size);
         json11::Json versionInfo = json11::Json::parse(dataPackage, parserError);
         if (parserError != "") {
-            LOG_INFO("UpdatePureOS::getVersionInfoFromFile can't parse %s as JSON error: \"%s\"",
+            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't parse %s as JSON error: \"%s\"",
                      updateos::file::version.c_str(),
                      parserError.c_str());
             return json11::Json();
@@ -551,29 +551,29 @@ const json11::Json UpdatePureOS::getVersionInfoFromFile(const fs::path &updateFi
         return versionInfo;
     }
     else {
-        LOG_INFO("UpdatePureOS::getVersionInfoFromFile %s does not exist", updateFile.c_str());
+        LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile %s does not exist", updateFile.c_str());
     }
 
     return json11::Json();
 }
 
-bool UpdatePureOS::isUpgradeToCurrent(const std::string &versionToCompare)
+bool UpdateMuditaOS::isUpgradeToCurrent(const std::string &versionToCompare)
 {
     return true;
 }
 
-const fs::path UpdatePureOS::checkForUpdate()
+const fs::path UpdateMuditaOS::checkForUpdate()
 {
     std::vector<vfs::DirectoryEntry> fileList =
         vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
     for (auto &file : fileList) {
 
-        json11::Json versionInfo = UpdatePureOS::getVersionInfoFromFile(purefs::dir::os_updates / file.fileName);
+        json11::Json versionInfo = UpdateMuditaOS::getVersionInfoFromFile(purefs::dir::os_updates / file.fileName);
         if (versionInfo.is_null())
             continue;
 
         if (versionInfo[purefs::json::os_version][purefs::json::version_string].is_string()) {
-            if (UpdatePureOS::isUpgradeToCurrent(
+            if (UpdateMuditaOS::isUpgradeToCurrent(
                     versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
                 return purefs::dir::os_updates / file.fileName;
             }
@@ -583,12 +583,12 @@ const fs::path UpdatePureOS::checkForUpdate()
     return fs::path();
 }
 
-updateos::UpdateError UpdatePureOS::updateUserData()
+updateos::UpdateError UpdateMuditaOS::updateUserData()
 {
     return updateos::UpdateError::NoError;
 }
 
-void UpdatePureOS::informError(const char *format, ...)
+void UpdateMuditaOS::informError(const char *format, ...)
 {
     va_list argptr;
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
@@ -604,7 +604,7 @@ void UpdatePureOS::informError(const char *format, ...)
     sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 }
 
-void UpdatePureOS::informDebug(const char *format, ...)
+void UpdateMuditaOS::informDebug(const char *format, ...)
 {
     va_list argptr;
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
@@ -615,7 +615,7 @@ void UpdatePureOS::informDebug(const char *format, ...)
     LOG_DEBUG("UPDATE_DEBUG %s", readBuf.get());
 }
 
-void UpdatePureOS::informUpdate(const char *format, ...)
+void UpdateMuditaOS::informUpdate(const char *format, ...)
 {
     va_list argptr;
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);

@@ -13,7 +13,7 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 
-    updateOS = std::make_unique<UpdatePureOS>(this);
+    updateOS = std::make_unique<UpdateMuditaOS>(this);
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -61,13 +61,13 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
         if (updateOsMsg != nullptr &&
             updateOsMsg->messageType == updateos::UpdateMessageType::UpdateCheckForUpdateOnce) {
-            fs::path file = UpdatePureOS::checkForUpdate();
+            fs::path file = UpdateMuditaOS::checkForUpdate();
 
             if (file.has_filename()) {
                 /* send info to applicationDesktop that there is an update waiting */
                 auto msgToSend =
                     std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
-                msgToSend->updateStats.versioInformation = UpdatePureOS::getVersionInfoFromFile(file);
+                msgToSend->updateStats.versioInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
                 sys::Bus::SendUnicast(msgToSend, app::name_desktop, this);
             }
         }

@@ -62,7 +62,7 @@ unit: sectors
 
 PART1="$IMAGE_NAME@@1048576"
 PART2="$IMAGE_NAME@@14604566528"
-mformat -i "$PART1" -F -T 28522496 -v PUREOS
+mformat -i "$PART1" -F -T 28522496 -v MUDITAOS
 mformat -i "$PART2" -F -T 2097152 -v RECOVER
 mmd -i "$PART1" ::/current
 cd "$SRC_DATA"
