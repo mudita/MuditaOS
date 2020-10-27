@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <ff_stdio_listdir_recursive.h>
 #include <vfs.hpp>
-#include <Service/Timer.hpp>
 #include <Service/Bus.hpp>
 #include "Constants.hpp"
 
@@ -24,11 +23,6 @@ namespace service::detail
             ".flac",
         };
     } // namespace
-
-    startupIndexer::~startupIndexer()
-    {}
-    startupIndexer::startupIndexer()
-    {}
 
     auto startupIndexer::fileShouldBeIndexed(std::string_view path) -> bool
     {
@@ -64,7 +58,7 @@ namespace service::detail
     auto startupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
         if (!mIdxTimer) {
-            mIdxTimer    = std::make_unique<sys::Timer>("file_indexing", svc.get(), timer_indexing_time);
+            mIdxTimer = std::make_unique<sys::Timer>("file_indexing", svc.get(), timer_indexing_time);
             mIdxTimer->connect([this, svc](sys::Timer &) {
                 if (!mMsgs.empty()) {
                     sys::Bus::SendUnicast(mMsgs.front(), std::string(service::name::file_indexer), svc.get());
