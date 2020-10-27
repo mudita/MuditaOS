@@ -42,6 +42,7 @@ namespace app
     sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
+        std::cout << "ApplicationDesktop::DataReceivedHandler" << std::endl;
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
@@ -60,6 +61,7 @@ namespace app
             handled = handle(msg);
         }
         else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
+            std::cout << "ApplicationDesktop::DataReceivedHandler CellularSimResponseMessage" << std::endl;
             handled = lockHandler.handle(msg);
         }
 
@@ -243,6 +245,17 @@ namespace app
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
+
+        //
+        //        const utils::PhoneNumber number("501501510");
+        //
+        //        auto msgToSelf = std::make_shared<CellularSimResponseMessage>(CellularSimMessage::SimCard::SIM1,
+        //                                                                      CellularSimResponseMessage::SimState::PUKRequired,
+        //                                                                      number.getView(),
+        //                                                                      4,
+        //                                                                      4);
+        //
+        //        sys::Bus::SendUnicast(msgToSelf, name_desktop, this);
 
         return sys::ReturnCodes::Success;
     }

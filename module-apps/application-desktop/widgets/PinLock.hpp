@@ -39,12 +39,12 @@ namespace gui
         }
         [[nodiscard]] unsigned int getPinSize() const noexcept
         {
-            return pinValue.size();
+            return maxPinSize;
         }
         /// returns current position of a PIN character to be inserted
         [[nodiscard]] unsigned int getCharCount() const noexcept
         {
-            return charCount;
+            return pinValue.size();
         }
         [[nodiscard]] unsigned int getRemainingAttempts() const noexcept
         {
@@ -54,10 +54,14 @@ namespace gui
         {
             return getCharCount() != getPinSize();
         }
-        void putNextChar(unsigned int c) noexcept;
-        void verifyPin() noexcept;
+        [[nodiscard]] bool canSend() const noexcept
+        {
+            return getCharCount() >= minPinSize;
+        }
+        void putNextChar(unsigned int c);
+        void verifyPin();
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
-        void popChar() noexcept;
+        void popChar();
         /// clear all characters passed to the Lock
         void clearAttempt() noexcept;
         /// if Lock is in the State::InvalidPin state, changes it's state to the State::EnterPin
@@ -83,11 +87,15 @@ namespace gui
         unsigned int remainingAttempts = 0;
         /// code of the entered character on specified position
         std::vector<unsigned int> pinValue;
-        /// flag defines number of entered pin characters
-        unsigned int charCount = 0;
+        unsigned int maxPinSize = 0;
+        unsigned int minPinSize = 0;
         std::map<InfoName, std::string> additionalLockInfo;
 
-        void reset(LockType, State, unsigned int remainingAttempts, unsigned int pinSize) noexcept;
+        void reset(LockType _type,
+                   State _state,
+                   unsigned int _remainingAttempts,
+                   unsigned int _maxPinSize,
+                   unsigned int _minPinSize = 4) noexcept;
 
         friend class gui::PinLockHandler;
     };

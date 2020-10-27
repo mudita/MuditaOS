@@ -31,5 +31,6 @@ namespace gui
 
         void buildLockBox(unsigned int pinSize) override final;
         void buildPinLabels(unsigned int pinSize);
+        void rebuildPinLabels(unsigned int pinSize);
     };
 } // namespace gui
