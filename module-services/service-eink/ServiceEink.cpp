@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceEink.hpp"
+#include "messages/EinkModeMessage.hpp"
+#include <time/ScopedTime.hpp>
 
 #include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
@@ -26,7 +28,7 @@ enum class EinkWorkerCommands
 };
 
 ServiceEink::ServiceEink(const std::string &name, std::string parent)
-    : sys::Service(name, parent, 4096 + 1024), timerID{0}, selfRefereshTriggerCount{0},
+    : sys::Service(name, parent, 4096 + 1024), selfRefereshTriggerCount{0},
       temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0},
       powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
 {
@@ -34,6 +36,15 @@ ServiceEink::ServiceEink(const std::string &name, std::string parent)
     memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
     waveformSettings.mode        = EinkWaveformGC16;
     waveformSettings.temperature = -1000;
+
+    connect(typeid(seink::EinkModeMessage),
+            [this](sys::DataMessage *message, sys::ResponseMessage *) -> sys::Message_t {
+                auto msg          = static_cast<seink::EinkModeMessage *>(message);
+                this->displayMode = msg->getMode() == seink::EinkModeMessage::Mode::Normal
+                                        ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
+                                        : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
+                return sys::Message_t();
+            });
 }
 
 ServiceEink::~ServiceEink()
@@ -73,9 +84,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::Res
         sys::Bus::SendUnicast(msg, this->GetName(), this);
     } break;
     case MessageType::EinkDMATransfer: {
-
-        //			LOG_INFO("[%s] EinkDMATransfer", GetName().c_str());
-        //			uint32_t start_tick = xTaskGetTickCount();
+        utils::time::Scoped scopedtimming("EinkDMATransfer");
 
         if (suspended) {
             if (suspendInProgress) {
@@ -101,7 +110,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::Res
                 changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
             }
 
-            ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard);
+            ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
             if (ret != EinkOK)
                 LOG_FATAL("Failed to update frame");
 
@@ -116,7 +125,6 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::Res
 
             if (ret != EinkOK)
                 LOG_FATAL("Failed to refresh frame");
-            //			uint32_t end_tick = xTaskGetTickCount();
 
             powerOffTimer.reload();
 
@@ -359,7 +367,7 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
 
     EinkStatus_e ret;
     memset(einkRenderBuffer, 15, 480 * 600);
-    ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard);
+    ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
     if (ret != EinkOK)
         LOG_FATAL("Failed to update frame");
     ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
@@ -368,7 +376,7 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
 
     for (uint32_t i = 0; i < 2; i++) {
         memset(einkRenderBuffer, 0, 480 * 600);
-        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard);
+        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to update frame");
         ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
@@ -376,7 +384,7 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
             LOG_FATAL("Failed to refresh frame");
 
         memset(einkRenderBuffer, 15, 480 * 600);
-        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard);
+        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to update frame");
         ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);

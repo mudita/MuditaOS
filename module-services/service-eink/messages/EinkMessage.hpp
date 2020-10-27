@@ -9,14 +9,10 @@
 namespace seink
 {
 
-    /*
-     * @brief Template for all messages that go to gui service
-     */
     class EinkMessage : public sys::DataMessage
     {
       public:
         EinkMessage(MessageType messageType) : sys::DataMessage(messageType){};
-        virtual ~EinkMessage(){};
     };
 
 } /* namespace seink */

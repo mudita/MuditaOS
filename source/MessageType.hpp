@@ -9,6 +9,7 @@ enum class MessageType
 
     MessageTypeUninitialized = 0,
     // eink messages
+    EinkMessage,
     EinkStateRequest,      ///< message is used to pull status of the eink. If eink is ready to display image
     EinkImageData,         ///< message with pointer to the image data for displaying
     EinkDMATransfer,       ///< this message is internally sent from wink service to eink service. This will trigger DMA
