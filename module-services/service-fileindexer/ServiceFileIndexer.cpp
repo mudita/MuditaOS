@@ -16,10 +16,6 @@ namespace service
     {
         LOG_DEBUG("[%s] Initializing", std::string(name).c_str());
     }
-    // File indexer service destructor
-    ServiceFileIndexer::~ServiceFileIndexer()
-    {}
-
     // When receive notification handler
     sys::Message_t ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
     {

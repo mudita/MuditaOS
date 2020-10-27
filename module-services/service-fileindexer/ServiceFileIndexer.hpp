@@ -13,7 +13,7 @@ namespace service
     {
       public:
         ServiceFileIndexer(const std::string_view name);
-        virtual ~ServiceFileIndexer();
+        virtual ~ServiceFileIndexer()                  = default;
         ServiceFileIndexer(const ServiceFileIndexer &) = delete;
         ServiceFileIndexer &operator=(const ServiceFileIndexer &) = delete;
         sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
