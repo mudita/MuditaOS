@@ -28,9 +28,8 @@ enum class EinkWorkerCommands
 };
 
 ServiceEink::ServiceEink(const std::string &name, std::string parent)
-    : sys::Service(name, parent, 4096 + 1024), selfRefereshTriggerCount{0},
-      temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0},
-      powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
+    : sys::Service(name, parent, 4096 + 1024), selfRefereshTriggerCount{0}, temperatureMeasurementTriggerCount{0},
+      powerOffTriggerCount{0}, powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
 {
     // initialize initial eink parameters
     memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));

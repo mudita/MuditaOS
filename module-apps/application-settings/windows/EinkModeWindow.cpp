@@ -30,18 +30,18 @@ namespace gui
         topBar->setActive(TopBar::Elements::BATTERY, true);
 
         setTitle("Change eink mode");
-        auto label = new Label(this, 100,200,300,50,"Change mode on click");
+        auto label               = new Label(this, 100, 200, 300, 50, "Change mode on click");
         label->activatedCallback = [this](Item &) -> bool {
             static auto last_mode = seink::EinkModeMessage::Mode::Normal;
-            if ( last_mode == seink::EinkModeMessage::Mode::Normal) 
-            {
+            if (last_mode == seink::EinkModeMessage::Mode::Normal) {
                 last_mode = seink::EinkModeMessage::Mode::Invert;
-            } else 
-            {
+            }
+            else {
                 last_mode = seink::EinkModeMessage::Mode::Normal;
             }
 
-            sys::Bus::SendUnicast(std::make_shared<seink::EinkModeMessage>(last_mode),"ServiceEink",this->application, 5000);
+            sys::Bus::SendUnicast(
+                std::make_shared<seink::EinkModeMessage>(last_mode), "ServiceEink", this->application, 5000);
             return true;
         };
         setFocusItem(label);

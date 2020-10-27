@@ -9,21 +9,21 @@ namespace seink
 {
     class EinkModeMessage : public EinkMessage
     {
-        public:
-            enum Mode 
-            {
-                Normal,
-                Invert
-            };
-          EinkModeMessage(Mode mode) : EinkMessage(MessageType::EinkMessage), mode(mode)
-          {}
+      public:
+        enum Mode
+        {
+            Normal,
+            Invert
+        };
+        EinkModeMessage(Mode mode) : EinkMessage(MessageType::EinkMessage), mode(mode)
+        {}
 
-          [[nodiscard]] auto getMode() noexcept
-          {
-              return mode;
-          }
+        [[nodiscard]] auto getMode() noexcept
+        {
+            return mode;
+        }
 
-        private:
-          Mode mode = Normal;
+      private:
+        Mode mode = Normal;
     };
-}
+} // namespace seink

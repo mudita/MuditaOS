@@ -17,7 +17,7 @@ namespace gui
     namespace window::name
     {
         inline const std::string eink = "EinkModeWindow";
-    } // namespace name
+    } // namespace window::name
 
     class EinkModeWindow : public AppWindow
     {
