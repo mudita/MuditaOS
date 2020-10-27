@@ -121,7 +121,8 @@ namespace at
         SET_TIME_ZONE_REPORTING,
         DISABLE_TIME_ZONE_UPDATE,
         DISABLE_TIME_ZONE_REPORTING,
-        ENABLE_NETWORK_REGISTRATION_URC
+        ENABLE_NETWORK_REGISTRATION_URC,
+        SET_SMS_TEXT_MODE_UCS2
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -189,7 +190,7 @@ namespace at
             {AT::DISABLE_TIME_ZONE_UPDATE, {"AT+CTZU=0"}},
             {AT::DISABLE_TIME_ZONE_REPORTING, {"AT+CTZR=0"}},
             {AT::ENABLE_NETWORK_REGISTRATION_URC, {"AT+CREG=2"}},
-        };
+            {AT::SET_SMS_TEXT_MODE_UCS2, {"AT+CSMP=17,167,0,8"}}};
         if (fact.count(at)) {
             return fact.at(at);
         }
