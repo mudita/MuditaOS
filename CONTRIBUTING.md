@@ -34,3 +34,5 @@ If you have an idea for a feature that could possibly land in MuditaOS please le
 If you would like to contribute a new feature or a bug fix to MuditaOS, please discuss your idea first in Github issues. If there is no Github issue for your idea, please open one. It may be that somebody from Mudita core team is already working on it, or that there are particular complexities that you should know about before starting the implementation.
 
 Please refer to the [Development workflow article](#./doc/development_workflow.md) to learn how to submit code and documentation changes to the MuditaOS repository.
+
+If you want to start localizing MuditaOS interface please start from [the "Internationalization" article](./doc/i18n.md).
