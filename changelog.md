@@ -4,6 +4,7 @@
 
 ### Added
 * `[settings][bluetooth]` Add "Phone name" window.
+* `[gui]` Add "ButtonOnOff" widget.
 
 ### Changed
 
