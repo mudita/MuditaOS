@@ -23,7 +23,7 @@ namespace service::detail
             ".mp3",
             ".flac",
         };
-    }
+    } // namespace
 
     startupIndexer::~startupIndexer()
     {}
@@ -64,12 +64,11 @@ namespace service::detail
     auto startupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
         if (!mIdxTimer) {
-            mIdxIterator = mMsgs.begin();
             mIdxTimer    = std::make_unique<sys::Timer>("file_indexing", svc.get(), timer_indexing_time);
             mIdxTimer->connect([this, svc](sys::Timer &) {
-                if (mIdxIterator != mMsgs.end()) {
-                    sys::Bus::SendUnicast(*mIdxIterator, std::string(service::name::file_indexer), svc.get());
-                    mIdxIterator++;
+                if (!mMsgs.empty()) {
+                    sys::Bus::SendUnicast(mMsgs.front(), std::string(service::name::file_indexer), svc.get());
+                    mMsgs.pop_front();
                 }
                 else {
                     mIdxTimer->stop();

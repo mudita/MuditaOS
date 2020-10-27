@@ -36,7 +36,6 @@ namespace service::detail
 
       private:
         std::list<std::shared_ptr<msg::FileChangeMessage>> mMsgs;
-        decltype(mMsgs)::iterator mIdxIterator;
         std::unique_ptr<sys::Timer> mIdxTimer;
     };
 } // namespace service::detail
