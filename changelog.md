@@ -12,6 +12,7 @@
 
 ### Fixed
 
+* `[desktop][gui]` Fixed SIM passcodes to accepts variable length
 * `[desktop][messages]` Fixed notifications display and navigation
 * `[cellular]` Fixed 32 bit UCS2 codes handling.
 

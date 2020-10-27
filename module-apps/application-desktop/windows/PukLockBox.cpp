@@ -15,37 +15,44 @@ namespace lock_style = style::window::pin_lock;
 
 namespace gui
 {
-    void PukLockBox::popChar(uint32_t charNum)
+    void PukLockBox::popChar(unsigned int charNum)
     {
-        LockWindow->pinLabels[charNum]->clear();
+        rebuildPinLabels(charNum);
     }
-    void PukLockBox::putChar(uint32_t charNum)
+    void PukLockBox::putChar(unsigned int charNum)
     {
-        LockWindow->pinLabels[charNum]->setText("*");
+        rebuildPinLabels(++charNum);
     }
     void PukLockBox::buildLockBox(unsigned int pinSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
         LockWindow->buildInfoText(lock_style::info_text_h_puk);
-        buildPinLabels(pinSize);
+        buildPinLabels(0);
     }
     void PukLockBox::buildPinLabels(unsigned int pinSize)
     {
-        // labels with stars for displaying entered digits
-        const uint32_t pinLabelWidth = style::window_width - 2 * lock_style::pin_label_x;
-        LockWindow->pinLabel         = new gui::Label(
-            LockWindow, lock_style::pin_label_x, lock_style::pin_label_y, pinLabelWidth, lock_style::label_size);
-        LockWindow->pinLabel->setEdges(RectangleEdge::Bottom);
+        auto itemBuilder = []() -> Rect * {
+            auto label = new gui::Image("dot_12px_hard_alpha_W_G");
+            return label;
+        };
 
-        LockWindow->buildPinLabels(LockWindow->pinLabel, pinSize, lock_style::label_size);
-        for (auto label : LockWindow->pinLabels) {
-            label->setEdges(RectangleEdge::None);
-        }
+        LockWindow->buildPinLabels(itemBuilder,
+                                   pinSize,
+                                   lock_style::pin_label_x,
+                                   lock_style::pin_label_y,
+                                   style::window_width - 2 * lock_style::pin_label_x);
+        LockWindow->pinLabelsBox->setEdges(RectangleEdge::Bottom);
     }
+
+    void PukLockBox::rebuildPinLabels(unsigned int pinSize)
+    {
+        LockWindow->pinLabelsBox->erase();
+        buildPinLabels(pinSize);
+    }
+
     void PukLockBox::setVisibleStateEnterPin()
     {
-        LockWindow->clearPinLabels();
-        LockWindow->pinLabel->setVisible(true);
+        LockWindow->pinLabelsBox->setVisible(true);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked"));
@@ -58,14 +65,12 @@ namespace gui
     }
     void PukLockBox::setVisibleStateVerifiedPin()
     {
-        LockWindow->clearPinLabels();
-        LockWindow->pinLabel->setVisible(false);
+        LockWindow->pinLabelsBox->setVisible(false);
         LockWindow->infoText->setVisible(false);
     }
     void PukLockBox::setVisibleStateInvalidPin()
     {
-        LockWindow->clearPinLabels();
-        LockWindow->pinLabel->setVisible(false);
+        LockWindow->pinLabelsBox->setVisible(false);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_wrong_puk"));
@@ -94,7 +99,7 @@ namespace gui
     }
     void PukLockBox::setVisibleStateBlocked()
     {
-        LockWindow->pinLabel->setVisible(false);
+        LockWindow->pinLabelsBox->setVisible(false);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked_info1"));

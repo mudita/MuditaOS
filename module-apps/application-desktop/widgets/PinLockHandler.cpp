@@ -8,8 +8,10 @@
 
 namespace gui
 {
-    constexpr unsigned int default_screen_pin_size = 4;
-    constexpr unsigned int default_screen_attempts = 4;
+    constexpr unsigned int defaultScreenPinSize  = 4;
+    constexpr unsigned int defaultScreenAttempts = 4;
+    constexpr unsigned int maxSimPasscodesSize   = 10;
+    constexpr unsigned int minSimPasscodesSize   = 4;
 
     PinLockHandler::PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings)
         : app(app), appSettings(settings), lock(this)
@@ -20,13 +22,15 @@ namespace gui
     auto PinLockHandler::handle(CellularSimResponseMessage *msg) -> bool
     {
         assert(msg);
-
         parseSimCard(msg);
         parseSimState(msg);
         parseAttemptsAndPinSize(msg);
         lock.additionalLockInfo[gui::PinLock::InfoName::PhoneNum] = msg->getPhoneNumber().getFormatted();
 
-        app->getWindow(app::window::name::desktop_pin_lock)->rebuild();
+        auto currentWindow = app->getWindow(app::window::name::desktop_pin_lock);
+        if (currentWindow != nullptr && currentWindow->getName() == gui::name::window::main_window) {
+            currentWindow->rebuild();
+        }
         app->switchWindow(gui::name::window::main_window);
         return true;
     }
@@ -91,7 +95,9 @@ namespace gui
             reloadScreenLock();
         }
         else {
-            lock.pinValue          = std::vector<unsigned int>(msg->getPinSize(), 0);
+            lock.pinValue          = std::vector<unsigned int>();
+            lock.maxPinSize        = maxSimPasscodesSize;
+            lock.minPinSize        = minSimPasscodesSize;
             lock.remainingAttempts = msg->getAttemptsLeft();
         }
     }
@@ -103,7 +109,7 @@ namespace gui
             uint32_t hash = hashEngine(pin);
             lock.remainingAttempts--;
             if (hash == appSettings.lockPassHash) {
-                lock.remainingAttempts = default_screen_attempts;
+                lock.remainingAttempts = defaultScreenAttempts;
                 lock.state             = gui::PinLock::State::VerifiedPin;
             }
             else if (lock.remainingAttempts > 0) {
@@ -126,12 +132,10 @@ namespace gui
 
     void PinLockHandler::reloadScreenLock()
     {
-        lock.type  = gui::PinLock::LockType::Screen;
-        lock.state = gui::PinLock::State::EnterPin;
-
-        unsigned int pinSize   = appSettings.lockPassHash == 0 ? 0 : default_screen_pin_size;
-        lock.pinValue          = std::vector<unsigned int>(pinSize, 0);
-        lock.remainingAttempts = default_screen_attempts;
+        auto type            = gui::PinLock::LockType::Screen;
+        auto state           = gui::PinLock::State::EnterPin;
+        unsigned int pinSize = appSettings.lockPassHash == 0 ? 0 : defaultScreenPinSize;
+        lock.reset(type, state, defaultScreenAttempts, pinSize, pinSize);
     }
 
 } // namespace gui
