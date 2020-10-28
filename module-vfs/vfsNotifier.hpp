@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <mutex.hpp>
 #include <functional>
+#include <string>
 
 namespace vfsn::utility
 {
