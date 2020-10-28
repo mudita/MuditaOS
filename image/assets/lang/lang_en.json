@@ -170,8 +170,8 @@
     "app_desktop_sim_blocked_info1": "Sorry, SIM card permanently blocked.",
     "app_desktop_sim_blocked_info2": "Please contact your service provider",
 
-    "app_desktop_unread_messages": "Unread messages",
-    "app_desktop_missed_calls": "Missed calls",
+    "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
+    "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",
     "app_desktop_menu_phone": "PHONE",
     "app_desktop_menu_contacts": "CONTACTS",
     "app_desktop_menu_messages": "MESSAGES",
@@ -194,6 +194,7 @@
     "app_desktop_show": "SHOW",
     "app_desktop_calls": "CALLS",
     "app_desktop_clear": "CLEAR",
+    "app_desktop_clear_all": "CLEAR ALL",
     
     "app_call_call": "CALL",
     "app_call_clear": "CLEAR",

@@ -11,6 +11,8 @@
 * `[appmgr]` Application manager refactored.
 
 ### Fixed
+
+* `[desktop][messages]` Fixed notifications display and navigation
 * `[cellular]` Fixed 32 bit UCS2 codes handling.
 
 ### Other

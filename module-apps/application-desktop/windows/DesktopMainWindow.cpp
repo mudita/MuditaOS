@@ -10,6 +10,8 @@
 #include "GuiTimer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/data/LockPhoneData.hpp"
+#include "application-desktop/data/Style.hpp"
+#include "application-desktop/widgets/NotificationsBox.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/Controller.hpp"
@@ -19,25 +21,11 @@
 
 #include "i18/i18.hpp"
 #include "log/log.hpp"
-#include <Span.hpp>
-#include <Style.hpp>
+
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
 #include <time/time_conversion.hpp>
-
-namespace style
-{
-    const auto design_time_offset          = 106;
-    const auto design_time_h               = 96;
-    const auto design_day_offset           = 204;
-    const auto design_day_h                = 51;
-    const auto design_border_offset        = 20;
-    const auto design_option_span          = 8;
-    const auto design_notifications_offset = 284;
-    const auto digit_normal_size              = 13;
-    const auto notification_icon_unified_size = 35;
-}; // namespace style
 
 namespace gui
 {
@@ -50,19 +38,26 @@ namespace gui
         topBar->setActive(
             {{TopBar::Elements::SIGNAL, true}, {TopBar::Elements::LOCK, true}, {TopBar::Elements::BATTERY, true}});
 
-        time = new gui::Label(this, 0, style::design_time_offset, style::window_width, style::design_time_h);
+        using namespace style::desktop;
+
+        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Hight);
         time->setFilled(false);
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizemelight);
         time->setText(ttime);
         time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
-        dayText = new gui::Label(this, 0, style::design_day_offset, style::window_width, style::design_day_h);
+        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Hight);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
         dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
         dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+
+        activatedCallback = [this](Item &) {
+            application->switchWindow(app::window::name::desktop_menu);
+            return true;
+        };
 
         setVisibleState();
     }
@@ -90,12 +85,12 @@ namespace gui
         auto app = getAppDesktop();
 
         if (app->lockHandler.lock.isLocked() && app->lockHandler.lock.getLockType() == PinLock::LockType::Screen) {
-            bottomBar->restore();
+
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             topBar->setActive(TopBar::Elements::LOCK, true);
             inputCallback = nullptr;
             setFocusItem(nullptr);
-            erase(notifications);
+            buildNotifications(app);
 
             sys::Bus::SendUnicast(
                 std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
@@ -107,11 +102,13 @@ namespace gui
                 std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
         }
         else {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
             topBar->setActive(TopBar::Elements::LOCK, false);
-            if (!fillNotifications(app)) {
+
+            if (!buildNotifications(app)) {
                 LOG_ERROR("Couldn't fit in all notifications");
             }
+            setActiveState(app);
+
             if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
                 app::manager::Controller::switchApplication(
                     this->application, app::name_settings, app::sim_select, nullptr);
@@ -120,6 +117,7 @@ namespace gui
             sys::Bus::SendUnicast(
                 std::make_shared<TimersProcessingStartMessage>(), service::name::service_time, application);
         }
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -145,19 +143,19 @@ namespace gui
     {
         auto *app = getAppDesktop();
 
-        if ((inputEvent.keyCode == KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
+        if (inputEvent.is(KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
             app->lockHandler.lock.lock();
             setVisibleState();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             application->setSuspendFlag(true);
             return true;
         }
-        else if (inputEvent.keyCode == KeyCode::KEY_RF) {
+        else if (inputEvent.is(KeyCode::KEY_RF)) {
             application->switchWindow("PowerOffWindow");
             return true;
         }
         // long press of '0' key is translated to '+'
-        else if (inputEvent.keyCode == KeyCode::KEY_0) {
+        else if (inputEvent.is(KeyCode::KEY_0)) {
             return app::prepareCall(application, "+");
         }
         // check if any of the lower inheritance onInput methods catch the event
@@ -167,13 +165,18 @@ namespace gui
     bool DesktopMainWindow::processShortPressEventOnUnlocked(const InputEvent &inputEvent)
     {
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
-        if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-            application->switchWindow(app::window::name::desktop_menu);
+        // if numeric key was pressed record that key and send it to call application
+        if (code != 0) {
+            return app::prepareCall(application, std::string(1, static_cast<char>(code)));
+        }
+        else if (inputEvent.is(KeyCode::KEY_UP) && focusItem == nullptr) {
+            setFocusItem(notifications);
+            notifications->navigateToBottom();
             return true;
         }
-        // if numeric key was pressed record that key and send it to call application
-        else if (code != 0) {
-            return app::prepareCall(application, std::string(1, static_cast<char>(code)));
+        else if (inputEvent.is(KeyCode::KEY_DOWN) && focusItem == nullptr) {
+            setFocusItem(notifications);
+            return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
@@ -252,123 +255,38 @@ namespace gui
         return gui::AppWindow::buildDrawList();
     }
 
-    auto add_image_inactive(UTF8 img)
+    auto DesktopMainWindow::buildNotifications(app::ApplicationDesktop *app) -> bool
     {
-        auto thumbnail        = new gui::Image(img);
-        thumbnail->activeItem = false;
-        return thumbnail;
-    }
-
-    auto add_box_icon(UTF8 icon)
-    {
-        auto thumbnail = add_image_inactive(icon);
-        thumbnail->setMinimumWidth(style::notification_icon_unified_size);
-        thumbnail->setMargins(
-            gui::Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
-        return thumbnail;
-    }
-
-    /// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of
-    /// notifications]<span>$`
-    auto add_notification(BoxLayout *layout,
-                          UTF8 icon,
-                          UTF8 name,
-                          UTF8 indicator,
-                          std::function<bool()> showCallback,
-                          std::function<bool()> clearCallback) -> bool
-    {
-        // 1. create hbox for all elements
-        auto el = new gui::HBox(nullptr, 0, 0, style::window::default_body_width, style::window::label::default_h);
-        el->setAlignment(Alignment(gui::Alignment::Vertical::Center));
-
-        auto text = new gui::Label();
-        text->setMaximumSize(el->area().w, Axis::X);
-        text->setText(name);
-        text->setFont(style::window::font::medium);
-        text->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        text->setPenWidth(style::window::default_border_no_focus_w);
-        text->activeItem = false;
-
-        auto number = new gui::Text();
-        if (indicator.length() > 2) {
-            const UTF8 max_notification_value = "99+";
-            number->setText(max_notification_value);
-            number->setMinimumWidth(max_notification_value.length() * style::digit_normal_size);
-        }
-        else {
-            number->setText(indicator);
-            number->setMinimumWidth(indicator.length() * style::digit_normal_size);
-        }
-        number->setFont(style::window::font::mediumbold);
-        number->setPenWidth(style::window::default_border_no_focus_w);
-        number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
-        number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        number->activeItem = false;
-
-        // 2. Add all elements to hbox layout
-        el->addWidget(add_box_icon(icon));
-        el->addWidget(text);
-        el->addWidget(add_image_inactive("dot_12px_hard_alpha_W_G"));
-        el->addWidget(number);
-
-        // 3. Set hbox layout properties
-        el->setPenWidth(style::window::default_border_no_focus_w);
-        el->setPenFocusWidth(style::window::default_border_focus_w);
-        el->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
-        el->inputCallback = [showCallback, clearCallback](Item &, const InputEvent &event) -> bool {
-            if (event.state != InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (event.keyCode == KeyCode::KEY_LF && showCallback) {
-                return showCallback();
-            }
-            if (event.keyCode == KeyCode::KEY_RF && clearCallback) {
-                return clearCallback();
-            }
-            return false;
-        };
-
-        layout->addWidget(el);
-        if (el->visible) {
-            // space between next notifications to show
-            layout->addWidget(new gui::Span(Axis::Y, style::design_option_span));
-        }
-
-        return el->visible;
-    }
-
-    auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
-    {
-        bottomBar->restore();
         erase(notifications);
-        // 1. create notifications box
-        notifications = new gui::VBox(nullptr,
-                                      0,
-                                      style::design_notifications_offset,
-                                      style::window_width,
-                                      bottomBar->widgetArea.pos(Axis::Y) - style::design_notifications_offset);
-        notifications->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        notifications->setPenWidth(style::window::default_border_no_focus_w);
-        notifications->setPenFocusWidth(style::window::default_border_no_focus_w);
-        this->addWidget(notifications);
+        using namespace style::desktop;
+        notifications = new NotificationsBox(this,
+                                             notifications::X,
+                                             notifications::Y,
+                                             notifications::Width,
+                                             bottomBar->widgetArea.pos(Axis::Y) - notifications::Y);
+
+        addWidget(notifications);
         if (!notifications->visible) {
             LOG_ERROR("Can't fit notifications box!");
             return false;
         }
 
-        // 2. actually fill it in
+        auto onNotificationFocus = [this](bool isFocused) -> void {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_show"), isFocused);
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"), isFocused);
+        };
+
         if (app->notifications.notSeen.Calls > 0) {
-            add_notification(
-                notifications,
+            notifications->addNotification(
                 "phone",
                 utils::localize.get("app_desktop_missed_calls"),
                 std::to_string(app->notifications.notSeen.Calls),
                 [app]() -> bool { return app->showCalls(); },
-                [app]() -> bool { return app->clearCallsNotification(); });
+                [app]() -> bool { return app->clearCallsNotification(); },
+                onNotificationFocus);
         }
         if (app->notifications.notSeen.SMS > 0) {
-            add_notification(
-                notifications,
+            notifications->addNotification(
                 "mail",
                 utils::localize.get("app_desktop_unread_messages"),
                 std::to_string(app->notifications.notSeen.SMS),
@@ -376,19 +294,42 @@ namespace gui
                     return app::manager::Controller::switchApplication(
                         application, app::name_messages, gui::name::window::main_window, nullptr);
                 },
-                [app]() -> bool { return app->clearMessagesNotification(); });
+                [app, this]() -> bool { return app->clearMessagesNotification(); },
+                onNotificationFocus);
         }
-        bottomBar->store();
+
+        notifications->focusChangedCallback = [this, app](Item &) -> bool {
+            if (notifications->focus == false) {
+                LOG_DEBUG("All notifications removed, notification box lost focus");
+                bottomBar->setActive(BottomBar::Side::RIGHT, false);
+                setFocusItem(nullptr);
+                setActiveState(app);
+                return true;
+            }
+            return false;
+        };
+
+        return true;
+    }
+    auto DesktopMainWindow::setActiveState(app::ApplicationDesktop *app) -> bool
+    {
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
         if (app->notifications.notSeen.areEmpty() != true) {
-            setFocusItem(notifications);
-            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_show"));
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear_all"));
+            inputCallback = [this, app](Item &, const InputEvent &inputEvent) -> bool {
+                if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_RF) && getFocusItem() == nullptr) {
+                    LOG_DEBUG("KEY_RF pressed to clear all notifications");
+                    setFocusItem(notifications);
+                    return notifications->clearAll(inputEvent);
+                }
+                return false;
+            };
         }
         else {
             bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_calls"));
             inputCallback = [app](Item &, const InputEvent &inputEvent) -> bool {
-                if (inputEvent.state == InputEvent::State::keyReleasedShort &&
-                    inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+                if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LF)) {
+                    LOG_DEBUG("KEY_LF pressed to navigate to calls");
                     return app->showCalls();
                 }
                 return false;
