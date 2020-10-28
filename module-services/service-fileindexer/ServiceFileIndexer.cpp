@@ -7,6 +7,8 @@
 #include "messages/FileChangeMessage.hpp"
 #include "Constants.hpp"
 #include <Service/Bus.hpp>
+#include <fileref.h>
+#include <tag.h>
 
 namespace service
 {
@@ -90,6 +92,26 @@ namespace service
     auto ServiceFileIndexer::onAudioContentChanged(std::string_view path) -> void
     {
         LOG_DEBUG("Audio content index %s", std::string(path).c_str());
+        TagLib::FileRef fref(std::string(path).c_str());
+        if (!fref.isNull() && fref.tag()) {
+            const auto tag = fref.tag();
+            LOG_DEBUG("title %s", tag->title().toCString());
+            LOG_DEBUG("artist %s", tag->artist().toCString());
+            LOG_DEBUG("album %s", tag->album().toCString());
+            LOG_DEBUG("year %i", tag->year());
+            LOG_DEBUG("comment %s", tag->comment().toCString());
+            LOG_DEBUG("track %u", tag->track());
+            LOG_DEBUG("genre %s", tag->genre().toCString());
+        }
+        if (!fref.isNull() && fref.audioProperties()) {
+            const auto prop = fref.audioProperties();
+            int seconds     = prop->length() % 60;
+            int minutes     = (prop->length() - seconds) / 60;
+            LOG_DEBUG("bitrate %i", prop->bitrate());
+            LOG_DEBUG("samplerate %i", prop->sampleRate());
+            LOG_DEBUG("channels %i", prop->channels());
+            LOG_DEBUG("length %02i:%02i", minutes, seconds);
+        }
     }
     // On text file content change
     auto ServiceFileIndexer::onTextContentChanged(std::string_view path) -> void
