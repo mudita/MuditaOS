@@ -19,7 +19,7 @@
 #include "service-eink/messages/ImageMessage.hpp"
 
 #include "ServiceGUI.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include "../gui/core/ImageManager.hpp"
 #include "log/log.hpp"
@@ -198,7 +198,7 @@ namespace sgui
                 suspendInProgress = false;
                 LOG_DEBUG("last rendering before suspend is finished.");
 
-                sapm::ApplicationManager::messageInitPowerSaveMode(this);
+                app::manager::Controller::changePowerSaveMode(this);
             }
             // mode = gui::RefreshModes::GUI_REFRESH_FAST;
             // check if something new was rendered. If so render counter has greater value than

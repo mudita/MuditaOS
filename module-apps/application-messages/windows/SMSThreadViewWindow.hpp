@@ -18,27 +18,22 @@ namespace gui
     class SMSThreadViewWindow : public AppWindow
     {
       private:
-        std::shared_ptr<SMSThreadModel> smsModel = nullptr;
-        gui::ListView *smsList                   = nullptr;
+        std::shared_ptr<SMSThreadModel> smsModel;
+        gui::ListView *smsList = nullptr;
 
-        std::shared_ptr<ContactRecord> contact;
-
-        inline static const std::uint32_t numberIdTimeout = 1000;
+        auto requestContactName(unsigned int ContactID) -> void;
+        auto handleContactNameQueryResponse(db::QueryResult *) -> bool;
 
       public:
-        SMSThreadViewWindow(app::Application *app);
+        explicit SMSThreadViewWindow(app::Application *app);
+        ~SMSThreadViewWindow() override;
 
-        virtual ~SMSThreadViewWindow();
-        // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
-
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void onClose() override;
-
         bool onDatabaseMessage(sys::Message *msgl) override;
         void rebuild() override;
         void buildInterface() override;
-
         void destroyInterface() override;
     };
 

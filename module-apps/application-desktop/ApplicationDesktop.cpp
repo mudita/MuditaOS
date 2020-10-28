@@ -17,7 +17,7 @@
 #include <service-db/api/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <messages/QueryMessage.hpp>
@@ -146,7 +146,7 @@ namespace app
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
             if (need_sim_select && !lockHandler.lock.isLocked()) {
-                sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
+                app::manager::Controller::switchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
             }
             else if (need_sim_select == false) {
@@ -164,7 +164,7 @@ namespace app
     bool ApplicationDesktop::showCalls()
     {
         LOG_DEBUG("show calls!");
-        return sapm::ApplicationManager::messageSwitchApplication(
+        return app::manager::Controller::switchApplication(
             this, app::CallLogAppStr, gui::name::window::main_window, nullptr);
     }
 

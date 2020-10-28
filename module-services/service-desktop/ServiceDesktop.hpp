@@ -4,7 +4,7 @@
 #pragma once
 
 #include "WorkerDesktop.hpp"
-#include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
+#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp"
 
 namespace service::name
 {
@@ -28,6 +28,6 @@ class ServiceDesktop : public sys::Service
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
     sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
-    std::unique_ptr<UpdatePureOS> updateOS;
+    std::unique_ptr<UpdateMuditaOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
 };

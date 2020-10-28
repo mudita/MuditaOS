@@ -6,7 +6,7 @@
 #include <Common/Query.hpp>
 #include <string>
 
-namespace db::query::smsthread
+namespace db::query
 {
     class MarkAsRead : public Query
     {
@@ -34,4 +34,4 @@ namespace db::query::smsthread
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-} // namespace db::query::smsthread
+} // namespace db::query

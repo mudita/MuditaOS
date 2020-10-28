@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application-messages/widgets/SMSTemplateModel.hpp"
+#include "application-messages/models/SMSTemplateModel.hpp"
 #include "application-messages/data/SMSdata.hpp"
 
 #include <AppWindow.hpp>

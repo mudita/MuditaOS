@@ -10,15 +10,29 @@
 #include "Interface/ThreadRecord.hpp"
 
 #include <vector>
+#include <module-db/Interface/ContactRecord.hpp>
 
-class BaseThreadsRecordModel : public app::DatabaseModel<ThreadRecord>, public gui::ListItemProvider
+struct ThreadListStruct
+{
+    std::shared_ptr<ThreadRecord> thread;
+    std::shared_ptr<ContactRecord> contact;
+    std::shared_ptr<utils::PhoneNumber::View> number;
+
+    ThreadListStruct(std::shared_ptr<ThreadRecord> thread,
+                     std::shared_ptr<ContactRecord> contact,
+                     std::shared_ptr<utils::PhoneNumber::View> number)
+        : thread(thread), contact(contact), number(number)
+    {}
+};
+
+class BaseThreadsRecordModel : public app::DatabaseModel<ThreadListStruct>, public gui::ListItemProvider
 {
   public:
     BaseThreadsRecordModel() = delete;
     BaseThreadsRecordModel(app::Application *app);
 
     unsigned int requestRecordsCount() override;
-    bool updateRecords(std::vector<ThreadRecord> records) override;
+    bool updateRecords(std::vector<ThreadListStruct> records) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     app::Application *getApplication(void)

@@ -33,7 +33,7 @@ target_sources(${PROJECT_NAME}
 		"factoryReset/FactoryReset.cpp"
 		"restore/RestoreEndpoint.cpp"
 		"update/UpdateEndpoint.cpp"
-		"update/UpdatePureOS.cpp"
+		"update/UpdateMuditaOS.cpp"
 		"developerMode/DeveloperModeEndpoint.cpp"
 		"developerMode/DeveloperModeHelper.cpp"
 

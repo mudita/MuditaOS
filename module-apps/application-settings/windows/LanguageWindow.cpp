@@ -4,7 +4,7 @@
 #include <memory>
 #include <functional>
 
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include "../ApplicationSettings.hpp"
 
@@ -53,27 +53,27 @@ namespace gui
         // add option connectivity option
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_english"), [=](gui::Item &item) {
             LOG_INFO("selected language: english");
-            sapm::ApplicationManager::messageChangeLanguage(application, utils::Lang::En);
+            app::manager::Controller::changeLanguage(application, utils::Lang::En);
             return true;
         }));
 
         // add option date and time option
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_polish"), [=](gui::Item &) {
             LOG_INFO("selected language: polish");
-            sapm::ApplicationManager::messageChangeLanguage(application, utils::Lang::Pl);
+            app::manager::Controller::changeLanguage(application, utils::Lang::Pl);
             return true;
         }));
 
         // add option display option
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_german"), [=](gui::Item &) {
             LOG_INFO("selected language: german");
-            sapm::ApplicationManager::messageChangeLanguage(application, utils::Lang::De);
+            app::manager::Controller::changeLanguage(application, utils::Lang::De);
             return true;
         }));
 
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_spanish"), [=](gui::Item &) {
             LOG_INFO("selected language: spanish");
-            sapm::ApplicationManager::messageChangeLanguage(application, utils::Lang::Sp);
+            app::manager::Controller::changeLanguage(application, utils::Lang::Sp);
             return true;
         }));
 

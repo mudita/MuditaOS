@@ -16,7 +16,7 @@
 #include "log/debug.hpp"                                 // for DEBUG_APPLI...
 #include "log/log.hpp"                                   // for LOG_INFO
 #include "messages/AppMessage.hpp"                       // for AppSwitchMe...
-#include "service-appmgr/ApplicationManager.hpp"         // for Application...
+#include "service-appmgr/Controller.hpp"                 // for Controller
 #include "service-cellular/messages/CellularMessage.hpp" // for CellularNot...
 #include "service-db/api/DBServiceAPI.hpp"               // for DBServiceAPI
 #include "service-evtmgr/messages/BatteryMessages.hpp"   // for BatteryLeve...
@@ -126,6 +126,7 @@ namespace app
             }
             currwin->setSIM();
             currwin->updateSignalStrength();
+            currwin->updateNetworkAccessTechnology();
 
             std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
 
@@ -167,16 +168,15 @@ namespace app
 #endif
 
         // case to handle returning to previous application
-        if (windowName == "LastWindow") {
+        if (windowName.empty()) {
             window = getCurrentWindow()->getName();
             auto msg =
                 std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
             sys::Bus::SendUnicast(msg, this->GetName(), this);
         }
         else {
-            window   = windowName.empty() ? default_window : windowName;
             auto msg = std::make_shared<AppSwitchWindowMessage>(
-                window, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
+                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
             sys::Bus::SendUnicast(msg, this->GetName(), this);
         }
     }
@@ -187,7 +187,7 @@ namespace app
         if (prevWindow == gui::name::window::no_window) {
             LOG_INFO("Back to previous application");
             cleanPrevWindw();
-            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+            app::manager::Controller::switchBack(this);
         }
         else {
             LOG_INFO("Back to previous window %s", prevWindow.c_str());
@@ -204,8 +204,13 @@ namespace app
     sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-        if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
-            return handleSignalStrengthUpdate(msgl);
+        if (msg != nullptr) {
+            if (msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+                return handleSignalStrengthUpdate(msgl);
+            }
+            if (msg->type == CellularNotificationMessage::Type::NetworkStatusUpdate) {
+                return handleNetworkAccessTechnologyUpdate(msgl);
+            }
         }
         else if (msgl->messageType == MessageType::AppInputEvent) {
             return handleInputEvent(msgl);
@@ -237,6 +242,9 @@ namespace app
         else if (msgl->messageType == MessageType::AppRefresh) {
             return handleAppRefresh(msgl);
         }
+        else if (msgl->messageType == MessageType::AppFocusLost) {
+            return handleAppFocusLost(msgl);
+        }
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             return handleSIMMessage(msgl);
         }
@@ -252,6 +260,14 @@ namespace app
     sys::Message_t Application::handleSignalStrengthUpdate(sys::DataMessage *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleNetworkAccessTechnologyUpdate(sys::DataMessage *msgl)
+    {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -335,7 +351,7 @@ namespace app
 
             if (msg->getTargetApplicationName() == this->GetName()) {
                 setState(State::ACTIVE_FORGROUND);
-                if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
+                if (app::manager::Controller::confirmSwitch(this)) {
                     LOG_INFO("target Window: %s : target description: %s",
                              msg->getTargetWindowName().c_str(),
                              msg->getData() ? msg->getData()->getDescription().c_str() : "");
@@ -352,25 +368,9 @@ namespace app
             }
         }
         else if (state == State::ACTIVE_FORGROUND) {
-            if (msg->getTargetApplicationName() == this->GetName()) {
-                // if window name and data are null pointers this is a message informing
-                // that application should go to background mode
-                if ((msg->getTargetWindowName() == "") && (msg->getData() == nullptr)) {
-                    setState(State::ACTIVE_BACKGROUND);
-                    if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
-                        handled = true;
-                    }
-                    else {
-                        // TODO send to itself message to close
-                        LOG_ERROR("Failed to communicate ");
-                    }
-                }
-                // if application is in front and receives message with defined window it should
-                // change to that window.
-                else {
-                    switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
-                    handled = true;
-                }
+            if (msg->getTargetApplicationName() == GetName()) {
+                switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
+                handled = true;
             }
             else {
                 LOG_ERROR("Received switch message outside of activation flow");
@@ -427,7 +427,7 @@ namespace app
     sys::Message_t Application::handleAppClose(sys::DataMessage *msgl)
     {
         setState(State::DEACTIVATING);
-        sapm::ApplicationManager::messageConfirmClose(this);
+        app::manager::Controller::confirmClose(this);
         return msgHandled();
     }
 
@@ -453,6 +453,15 @@ namespace app
         return msgHandled();
     }
 
+    sys::Message_t Application::handleAppFocusLost(sys::DataMessage *msgl)
+    {
+        if (state == State::ACTIVE_FORGROUND) {
+            setState(State::ACTIVE_BACKGROUND);
+            app::manager::Controller::confirmSwitch(this);
+        }
+        return msgHandled();
+    }
+
     sys::Message_t Application::handleSIMMessage(sys::DataMessage *msgl)
     {
         getCurrentWindow()->setSIM();
@@ -462,19 +471,16 @@ namespace app
 
     sys::ReturnCodes Application::InitHandler()
     {
-        bool initState = true;
-
         setState(State::INITIALIZING);
-        //	uint32_t start = xTaskGetTickCount();
         settings = DBServiceAPI::SettingsGet(this);
-        //	uint32_t stop = xTaskGetTickCount();
-        //	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
-        initState = (settings.dbID == 1);
 
-        // send response to application manager true if successful, false otherwise.
-        sapm::ApplicationManager::messageRegisterApplication(this, initState, startBackground);
-        sys::ReturnCodes retCode = (initState ? sys::ReturnCodes::Success : sys::ReturnCodes::Failure);
-        return retCode;
+        const bool initialised = settings.dbID == 1;
+        app::manager::Controller::registerApplication(this, initialised, startBackground);
+        if (!initialised) {
+            setState(State::DEACTIVATED);
+            return sys::ReturnCodes::Failure;
+        }
+        return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes Application::DeinitHandler()
@@ -531,6 +537,12 @@ namespace app
     void Application::messageRebuildApplication(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppRebuildMessage>();
+        sys::Bus::SendUnicast(msg, application, sender);
+    }
+
+    void Application::messageApplicationLostFocus(sys::Service *sender, std::string application)
+    {
+        auto msg = std::make_shared<AppLostFocusMessage>();
         sys::Bus::SendUnicast(msg, application, sender);
     }
 

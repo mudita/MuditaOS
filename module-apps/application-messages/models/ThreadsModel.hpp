@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <module-db/Interface/ContactRecord.hpp>
 #include "BaseThreadsRecordModel.hpp"
 
 class ThreadsModel : public BaseThreadsRecordModel

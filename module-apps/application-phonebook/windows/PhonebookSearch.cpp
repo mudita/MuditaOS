@@ -3,7 +3,7 @@
 
 #include "PhonebookSearch.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "widgets/SearchBox.hpp"
+#include "widgets/InputBox.hpp"
 
 #include <Utils.hpp>
 
@@ -21,7 +21,7 @@ namespace gui
 
         setTitle(utils::localize.get("app_phonebook_title_main"));
 
-        inputField = searchBox(this, utils::localize.get("common_search_uc"), "search");
+        inputField = inputBox(this, utils::localize.get("common_search_uc"), "search");
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);

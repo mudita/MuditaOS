@@ -53,6 +53,7 @@ namespace gui
                                  msgThreadStyle::listHeight,
                                  threadsModel);
         list->setScrollTopMargin(style::margins::small);
+        list->rebuildList();
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -129,7 +130,6 @@ namespace gui
         }
         else {
             emptyListIcon->setVisible(false);
-            list->rebuildList(style::listview::RebuildType::InPlace);
         }
 
         DBServiceAPI::GetQuery(application,

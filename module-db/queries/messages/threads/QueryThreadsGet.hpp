@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Tables/ThreadsTable.hpp>
+#include "Interface/ThreadRecord.hpp"
 #include <Common/Query.hpp>
 #include <string>
 
@@ -22,11 +23,11 @@ namespace db::query
 
     class ThreadsGetResults : public QueryResult
     {
-        std::vector<ThreadsTableRow> results;
+        std::vector<ThreadRecord> results;
 
       public:
-        ThreadsGetResults(std::vector<ThreadsTableRow> result_rows);
-        [[nodiscard]] auto getResults() const -> std::vector<ThreadsTableRow>;
+        ThreadsGetResults(std::vector<ThreadRecord> result_rows);
+        [[nodiscard]] auto getResults() const -> std::vector<ThreadRecord>;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

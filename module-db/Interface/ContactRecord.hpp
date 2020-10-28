@@ -234,6 +234,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     const std::uint32_t favouritesGroupId;
     auto getQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto getForListQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto getLetterMapQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 
     auto getByIDQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;

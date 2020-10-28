@@ -11,7 +11,7 @@
 #include <country.hpp>
 #include <i18/i18.hpp>
 #include <InputMode.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <UiCommonActions.hpp>
 
@@ -108,7 +108,7 @@ namespace gui
                 // if there isn't any char in phone number field return to previous application
                 if (enteredNumber.empty()) {
                     formatter->Clear();
-                    sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+                    app::manager::Controller::switchBack(application);
                 }
                 // if there is the last char just clear input
                 else if (enteredNumber.size() == 1) {
@@ -134,7 +134,7 @@ namespace gui
             if (inputEvent.keyCode == KeyCode::KEY_RF) {
                 // if there isn't any char in phone number field return to previous application
                 if (enteredNumber.empty()) {
-                    sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+                    app::manager::Controller::switchBack(application);
                     return true;
                 }
 

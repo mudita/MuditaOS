@@ -58,6 +58,7 @@ class CellularNotificationMessage : public CellularMessage
         CallActive,  // call is in progress both if call was initialized by user and when user received incoming call.
         NewIncomingSMS,           // device received new sms from network. (what about sms delivery reports?).
         SignalStrengthUpdate,     // update of the strength of the network's signal.
+        NetworkStatusUpdate,      // update of the status of the network
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
         SIM,                      // change on SIM from URC

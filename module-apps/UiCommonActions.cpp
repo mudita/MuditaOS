@@ -9,7 +9,10 @@
 #include "application-messages/windows/SMSThreadViewWindow.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "application-special-input/ApplicationSpecialInput.hpp"
+
+#include "service-appmgr/Controller.hpp"
+#include "service-appmgr/messages/APMMessage.hpp"
 
 #include <i18/i18.hpp>
 #include <log/log.hpp>
@@ -37,10 +40,10 @@ namespace app
     auto call(Application *app, const utils::PhoneNumber::View &phoneNumber) -> bool
     {
         assert(app != nullptr);
-        auto data = std::make_unique<ExecuteCallData>(phoneNumber);
+        auto data             = std::make_unique<ExecuteCallData>(phoneNumber);
+        data->disableAppClose = true;
 
-        return sapm::ApplicationManager::messageSwitchApplication(
-            app, name_call, window::name_enterNumber, std::move(data));
+        return app::manager::Controller::switchApplication(app, name_call, window::name_enterNumber, std::move(data));
     }
 
     auto prepareCall(Application *app, const std::string &number) -> bool
@@ -48,8 +51,7 @@ namespace app
         assert(app != nullptr);
         auto data = std::make_unique<EnterNumberData>(number);
 
-        return sapm::ApplicationManager::messageSwitchApplication(
-            app, name_call, window::name_enterNumber, std::move(data));
+        return app::manager::Controller::switchApplication(app, name_call, window::name_enterNumber, std::move(data));
     }
 
     auto sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number, const UTF8 textData)
@@ -60,12 +62,13 @@ namespace app
         switch (smsOperation) {
         case SmsOperation::New: {
             auto data                        = std::make_unique<SMSSendRequest>(number, textData);
+            data->disableAppClose            = true;
             data->ignoreCurrentWindowOnStack = true;
-            return sapm::ApplicationManager::messageSwitchApplication(
+            return app::manager::Controller::switchApplication(
                 app, name_messages, gui::name::window::new_sms, std::move(data));
         }
         case SmsOperation::Template: {
-            return sapm::ApplicationManager::messageSwitchApplication(
+            return app::manager::Controller::switchApplication(
                 app, name_messages, gui::name::window::sms_templates, std::make_unique<SMSSendTemplateRequest>(number));
         }
         default: {
@@ -83,15 +86,15 @@ namespace app
         switch (contactOperation) {
         case ContactOperation::Add: {
             data->ignoreCurrentWindowOnStack = true;
-            return sapm::ApplicationManager::messageSwitchApplication(
+            return app::manager::Controller::switchApplication(
                 app, name_phonebook, gui::window::name::new_contact, std::move(data));
         }
         case ContactOperation::Details: {
-            return sapm::ApplicationManager::messageSwitchApplication(
+            return app::manager::Controller::switchApplication(
                 app, name_phonebook, gui::window::name::contact, std::move(data));
         }
         case ContactOperation::Edit: {
-            return sapm::ApplicationManager::messageSwitchApplication(
+            return app::manager::Controller::switchApplication(
                 app,
                 name_phonebook,
                 gui::window::name::new_contact, // TODO: need to be fixed when contact edition is working
@@ -119,7 +122,7 @@ namespace app
                      contactRec.alternativeName.c_str());
 
             if (contactOperation == ContactOperation::Add) {
-                return sapm::ApplicationManager::messageSwitchApplication(
+                return app::manager::Controller::switchApplication(
                     app,
                     name_phonebook,
                     gui::window::name::new_contact,
@@ -156,4 +159,16 @@ namespace app
         return false;
     }
 
+    auto specialInput(Application *app, std::unique_ptr<gui::SwitchSpecialChar> &&switchData) -> bool
+    {
+        assert(app != nullptr);
+
+        switchData->disableAppClose = true;
+        if (gui::SwitchSpecialChar::Type::Request == switchData->type) {
+            return app::manager::Controller::switchApplication(
+                app, app::special_input, app::char_select, std::move(switchData));
+        }
+        return app::manager::Controller::switchBack(
+            app, std::make_unique<app::manager::APMSwitchPrevApp>(switchData->requester, std::move(switchData)));
+    }
 } // namespace app

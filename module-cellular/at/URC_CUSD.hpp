@@ -5,26 +5,41 @@
 
 #include "URC_Any.hpp"
 
+#include <optional>
+
 namespace at::urc
 {
 
-    struct CUSD : public Any
+    class CUSD : public Any
     {
 
         const std::string urc_name = "+CUSD";
-
-        CUSD(const std::string &val);
-        ~CUSD() override = default;
-
-        enum class Tokens
+        enum Tokens
         {
             Status,
             Response,
             DCS
         };
 
-        auto what() -> std::string final;
-        bool isActionNeeded(void);
-        std::string message(void);
+      public:
+        enum class StatusType
+        {
+            NoFurtherUserActionRequired,
+            FurtherUserActionRequired,
+            UssdTerminatedByNetwork,
+            AnotherLocalClientHasResponded,
+            OperationNotSupported,
+            NetworkTimeOut
+        };
+
+        explicit CUSD(const std::string &val);
+        ~CUSD() override = default;
+
+        [[nodiscard]] auto what() const noexcept -> std::string final;
+        [[nodiscard]] auto isValid() const noexcept -> bool;
+        [[nodiscard]] auto isActionNeeded() const noexcept -> bool;
+        [[nodiscard]] auto getMessage() const noexcept -> std::optional<std::string>;
+        [[nodiscard]] auto getStatus() const noexcept -> std::optional<StatusType>;
+        [[nodiscard]] auto getDCS() const noexcept -> std::optional<int>;
     };
 } // namespace at::urc

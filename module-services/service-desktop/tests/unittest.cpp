@@ -4,7 +4,7 @@
 #include "Common/Common.hpp"
 #include "ContactRecord.hpp"
 #include "ParserUtils.hpp"
-#include "module-services/service-desktop/endpoints/update/UpdatePureOS.hpp"
+#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp"
 #include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
 #include "ParserFSM.hpp"
 #include "contacts/ContactHelper.hpp"
@@ -29,12 +29,12 @@ struct vfs_initializer
 
 TEST_CASE("System Update Tests")
 {
-    UpdatePureOS updateOS(nullptr);
+    UpdateMuditaOS updateOS(nullptr);
 
     updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
     REQUIRE(err == updateos::UpdateError::NoError);
 
-    updateOS.setUpdateFile("pureos-unittest.tar");
+    updateOS.setUpdateFile("muditaos-unittest.tar");
 
     err = updateOS.unpackUpdate();
     REQUIRE(err == updateos::UpdateError::NoError);
