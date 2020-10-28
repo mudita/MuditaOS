@@ -16,7 +16,7 @@
 #include "queries/messages/sms/QuerySMSGetByID.hpp"
 #include "queries/messages/sms/QuerySMSGetByText.hpp"
 #include "queries/messages/sms/QuerySMSGetCount.hpp"
-#include "queries/messages/threads/QueryThreadsSearch.hpp"
+#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
 #include "queries/messages/sms/QuerySMSRemove.hpp"
 #include "queries/messages/templates/QuerySMSTemplateGet.hpp"
 #include "queries/messages/templates/QuerySMSTemplateRemove.hpp"
@@ -434,15 +434,15 @@ auto MessageHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
 
 auto MessageHelper::updateSMS(Context &context) -> sys::ReturnCodes
 {
-    using namespace db::query::smsthread;
+    using namespace db::query;
 
-    auto query = std::make_unique<db::query::smsthread::MarkAsRead>(
+    auto query = std::make_unique<db::query::MarkAsRead>(
         context.getBody()[json::messages::threadID].int_value(),
         (context.getBody()[json::messages::isUnread].bool_value() ? MarkAsRead::Read::False : MarkAsRead::Read::True));
 
     auto listener = std::make_unique<db::EndpointListener>(
         [=](db::QueryResult *result, Context context) {
-            if (auto SMSResult = dynamic_cast<db::query::smsthread::MarkAsReadResult *>(result)) {
+            if (auto SMSResult = dynamic_cast<db::query::MarkAsReadResult *>(result)) {
 
                 context.setResponseStatus(SMSResult->getResult() ? http::Code::OK : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());

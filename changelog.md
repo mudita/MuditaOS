@@ -1,5 +1,22 @@
 # MuditaOS changelog
 
+## Current release
+
+### Added
+* `[settings][bluetooth]` Add "Phone name" window.
+* `[gui]` Add "ButtonOnOff" widget.
+
+### Changed
+
+* `[appmgr]` Application manager refactored.
+
+### Fixed
+* `[cellular]` Fixed 32 bit UCS2 codes handling.
+
+### Other
+
+* `[appmgr]` Application manager documentation added.
+
 ## [0.43.1 2020-10-23]
 
 ### Added
@@ -10,6 +27,7 @@
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
 * `[settings][bluetooth]` Create "Add device" windows.
 * `[hardware]` Slider driver (offline/online mode selection)
+* `[appmgr]` Application manager actions introduced.
 
 ### Fixed
 

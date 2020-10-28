@@ -7,7 +7,6 @@
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
-#include "module-db/queries/messages/threads/QueryThreadsSearch.hpp"
 #include "module-db/queries/messages/threads/QueryThreadMarkAsRead.hpp"
 #include <PhoneNumber.hpp>
 
@@ -26,11 +25,9 @@ struct ThreadRecord : Record
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
-        : date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount), snippet(rec.snippet),
-          type(rec.type), contactID(rec.contactID), numberID(rec.numberID)
-    {
-        ID = rec.ID;
-    }
+        : Record(rec.ID), date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount),
+          snippet(rec.snippet), type(rec.type), contactID(rec.contactID), numberID(rec.numberID)
+    {}
 
     bool isUnread() const
     {
@@ -76,5 +73,12 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     /// for now implementation between Interface <-> Database
     /// it would only make sense to pass Query from Inteface to multiple databases to get all data we are interested in
     /// or better split it to smaller entities... this could be done with any db high level interface -  left as it is
-    std::unique_ptr<db::query::smsthread::MarkAsReadResult> runQueryImpl(const db::query::smsthread::MarkAsRead *query);
+    std::unique_ptr<db::QueryResult> threadSearchForListQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> markAsReadQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadsGetQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadsGetForListQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadGetByIDQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadGetByNumberQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadGetByContactIDQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadRemoveQuery(const std::shared_ptr<db::Query> &query);
 };

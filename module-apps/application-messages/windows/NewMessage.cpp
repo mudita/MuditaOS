@@ -9,7 +9,7 @@
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <i18/i18.hpp>
 #include <BoxLayout.hpp>
@@ -80,7 +80,7 @@ namespace gui
         if (recipient->getText().empty()) {
             auto data             = std::make_unique<PhonebookSearchReuqest>();
             data->disableAppClose = true;
-            return sapm::ApplicationManager::messageSwitchApplication(
+            return app::manager::Controller::switchApplication(
                 application, app::name_phonebook, name::window::main_window, std::move(data));
         }
         return true;

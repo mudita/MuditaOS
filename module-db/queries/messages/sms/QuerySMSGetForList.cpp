@@ -7,8 +7,8 @@
 
 namespace db::query
 {
-    SMSGetForList::SMSGetForList(unsigned int threadId, unsigned int offset, unsigned int limit)
-        : Query(Query::Type::Read), threadId(threadId), offset(offset), limit(limit)
+    SMSGetForList::SMSGetForList(unsigned int threadId, unsigned int offset, unsigned int limit, unsigned int contactID)
+        : Query(Query::Type::Read), threadId(threadId), offset(offset), limit(limit), contactID(contactID)
     {}
 
     auto SMSGetForList::debugInfo() const -> std::string
@@ -16,8 +16,11 @@ namespace db::query
         return "SMSGetForList";
     }
 
-    SMSGetForListResult::SMSGetForListResult(std::vector<SMSRecord> result, unsigned int count, SMSRecord draft)
-        : result(std::move(result)), count(count), draft(std::move(draft))
+    SMSGetForListResult::SMSGetForListResult(std::vector<SMSRecord> result,
+                                             unsigned int count,
+                                             SMSRecord draft,
+                                             const utils::PhoneNumber::View &number)
+        : result(std::move(result)), count(count), draft(std::move(draft)), number(number)
     {}
     auto SMSGetForListResult::getResults() const -> std::vector<SMSRecord>
     {
@@ -30,6 +33,10 @@ namespace db::query
     auto SMSGetForListResult::getDraft() const -> SMSRecord
     {
         return draft;
+    }
+    auto SMSGetForListResult::getNumber() const -> utils::PhoneNumber::View
+    {
+        return number;
     }
     auto SMSGetForListResult::debugInfo() const -> std::string
     {

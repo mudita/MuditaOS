@@ -7,5 +7,5 @@
 
 namespace gui
 {
-    gui::Text *searchBox(gui::Item *parent, const std::string &header, const std::string &icon);
+    auto inputBox(gui::Item *parent, const std::string &header, const std::string &icon = std::string()) -> gui::Text *;
 }; // namespace gui

@@ -102,4 +102,10 @@ namespace app
     ///
     /// @return true if succeed
     auto contact(Application *app, ContactOperation contactOperation, uint32_t contactId) -> bool;
+
+    /// @brief requests display special input window.
+    /// @param app          Requesting application
+    /// @param switchData   Application switch data.
+    /// @return true if succeed.
+    auto specialInput(Application *app, std::unique_ptr<gui::SwitchSpecialChar> &&switchData) -> bool;
 } // namespace app

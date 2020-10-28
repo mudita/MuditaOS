@@ -15,7 +15,7 @@
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
 #include "windows/PhonebookIceContacts.hpp"
-#include <service-appmgr/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace app
 {
@@ -161,8 +161,8 @@ namespace app
                     std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
                     data->result                                 = item->contact;
                     data->setDescription("PhonebookSearchRequest");
-                    return sapm::ApplicationManager::messageSwitchPreviousApplication(
-                        this, std::make_unique<sapm::APMSwitchPrevApp>(GetName(), std::move(data)));
+                    return app::manager::Controller::switchBack(
+                        this, std::make_unique<app::manager::APMSwitchPrevApp>(GetName(), std::move(data)));
                 };
             }
             LOG_DEBUG("Switching to search results window.");

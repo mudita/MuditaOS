@@ -22,4 +22,6 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gu
 
     unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
+
+    auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
 };
