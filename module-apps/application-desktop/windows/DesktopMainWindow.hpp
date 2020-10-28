@@ -4,12 +4,10 @@
 #pragma once
 
 #include "AppWindow.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
-#include "gui/widgets/Text.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
+
+#include "Translator.hpp"
 
 namespace app
 {
@@ -18,13 +16,14 @@ namespace app
 
 namespace gui
 {
+    class NotificationsBox;
 
     class DesktopMainWindow : public AppWindow
     {
       protected:
         gui::Label *time          = nullptr;
         gui::Label *dayText       = nullptr;
-        gui::VBox *notifications  = nullptr;
+        gui::NotificationsBox *notifications = nullptr;
 
         /// Timed enter value cache, could be templated to any value really
         class EnterCache
@@ -59,13 +58,14 @@ namespace gui
             }
         } enter_cache;
         /**
-         * Name of the appliction that was on top when lock timeout occured
+         * Name of the application that was on top when lock timeout occurred
          */
         std::string lockTimeoutApplilcation = "";
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
-        auto fillNotifications(app::ApplicationDesktop *app) -> bool;
+        auto buildNotifications(app::ApplicationDesktop *app) -> bool;
+        auto setActiveState(app::ApplicationDesktop *app) -> bool;
         bool processLongPressEvent(const InputEvent &inputEvent);
         bool processShortPressEventOnUnlocked(const InputEvent &inputEvent);
         bool processShortPressEventOnLocked(const InputEvent &inputEvent);

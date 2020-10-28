@@ -1,5 +1,5 @@
-Bluetooth interface layer
-=========================
+# Bluetooth interface layer
+
 
 Right now it properly uses API from bsp/bsp-bluetooth and BlueKitchen stack.  
 It's meant to provide interface layer for service-bluetooth like that:
@@ -7,9 +7,14 @@ It's meant to provide interface layer for service-bluetooth like that:
 >>>                                                     <=> bsp/bluetooth
 
 ## Layout
-* Bluetooth
+* `Bluetooth`
     * `interface` code - for other modules to use
+        * `profiles` - implementation of Bluetooth profiles
     * `glucode` code needed for libraries to work
-    * `profiles` bluetooth library function wrappers
-* lib
+* `lib`
     Libraries used with as little modifications as possible
+
+## Events flowchart
+![Flowchart](./flowchart.svg)
+<img src="./flowchart.svg">
+
