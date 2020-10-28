@@ -1,22 +1,28 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <string.h>
-
 extern "C"
 {
-#include "FreeRTOS.h"
-#include "task.h"
 }
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "Service/Worker.hpp"
-#include "MessageType.hpp"
+#include <Service/Bus.hpp> // for Bus
+#include <memory>          // for unique_ptr, make_shared
+#include <utility>         // for move
+#include <vector>          // for vector
+
+#include "Service/Service.hpp" // for Service
+#include "Service/Message.hpp" // for DataMessage
+#include "Service/Worker.hpp"  // for Worker, WorkerCommand
+#include "MessageType.hpp"     // for MessageType, MessageType::GUIRenderingFinished
 #include "WorkerGUI.hpp"
 // module-utils
-#include "log/log.hpp"
-#include <Service/Bus.hpp>
+#include "log/log.hpp"                // for LOG_ERROR
+#include "DrawCommand.hpp"            // for DrawCommand
+#include "Renderer.hpp"               // for Renderer
+#include "projdefs.h"                 // for pdMS_TO_TICKS, pdTRUE
+#include "queue.h"                    // for xQueueReceive, QueueDefinition, QueueHandle_t
+#include "semphr.h"                   // for xSemaphoreGive, xSemaphoreTake
+#include "service-gui/ServiceGUI.hpp" // for ServiceGUI
 
 namespace sgui
 {

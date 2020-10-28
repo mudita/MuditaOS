@@ -3,12 +3,17 @@
 
 #pragma once
 
-#include <PhoneNumber.hpp>
-#include <Interface/CalllogRecord.hpp>
-#include <time/time_conversion.hpp>
+#include <PhoneNumber.hpp>             // for PhoneNumber::View, PhoneNumber
+#include <Interface/CalllogRecord.hpp> // for CalllogRecord
+#include <time/time_conversion.hpp>    // for Timestamp
+#include <stdint.h>                    // for uint8_t, int8_t
+#include <sys/types.h>                 // for time_t
+#include <functional>                  // for function
+#include <string>                      // for string
+#include <iosfwd>                      // for ostream
 
-#include <functional>
-#include <string>
+#include "Tables/CalllogTable.hpp" // for CallType, CallType::CT_NONE
+#include "utf8/UTF8.hpp"           // for UTF8
 
 namespace ModemCall
 {

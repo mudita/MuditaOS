@@ -3,6 +3,11 @@
 
 #include "DBCalllogMessage.hpp"
 
+#include <utility> // for move
+
+#include "CalllogRecord.hpp"      // for CalllogRecord
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
 DBCalllogMessage::DBCalllogMessage(MessageType messageType, const CalllogRecord &rec)
     : DBMessage(messageType), record(rec)
 {}

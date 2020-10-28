@@ -2,14 +2,23 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Parser.hpp"
-#include "Events.hpp"
-#include "actions/CellularCMD.hpp"
-#include "events/GPIO.hpp"
-#include "events/KeyPress.hpp"
-#include <Service/Bus.hpp>
-#include <json/json11.hpp>
-#include <log/log.hpp>
-#include <service-evtmgr/Constants.hpp>
+
+#include <Service/Bus.hpp>              // for Bus
+#include <json/json11.hpp>              // for Json, json11
+#include <log/log.hpp>                  // for LOG_DEBUG, LOG_ERROR
+#include <service-evtmgr/Constants.hpp> // for evt_manager
+#include <memory>                       // for shared_ptr
+
+#include "Events.hpp"              // for Events, Type, Data, Events::GPIO, Events::GSMCmd, Events::KeyPress
+#include "actions/CellularCMD.hpp" // for gsm_send
+#include "events/GPIO.hpp"         // for GPIO
+#include "events/KeyPress.hpp"     // for KeyPress
+
+namespace sys
+{
+    class DataMessage;
+    class Service;
+} // namespace sys
 
 namespace harness
 {

@@ -2,12 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventManagerServiceAPI.hpp"
-#include <Service/Service.hpp>
-#include "../EventManager.hpp"
-#include "../messages/EVMessages.hpp"
 
-#include "../Constants.hpp"
-#include <Service/Bus.hpp>
+#include <Service/Bus.hpp> // for Bus
+#include <stdint.h>        // for uint32_t
+#include <memory>          // for make_shared, shared_ptr, __shared_ptr<>::element_type
+#include <utility>         // for pair
+
+#include "../messages/EVMessages.hpp" // for EVMBoardResponseMessage
+#include "../Constants.hpp"           // for evt_manager
+#include "MessageType.hpp"            // for MessageType, MessageType::EVMGetBoard
+#include "Service/Common.hpp"         // for ReturnCodes, ReturnCodes::Success
+#include "Service/Message.hpp"        // for DataMessage
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
 {

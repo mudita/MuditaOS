@@ -3,7 +3,11 @@
 
 #include "Controller.hpp"
 
-#include "module-sys/Service/Bus.hpp"
+#include <utility> // for move
+
+#include "module-sys/Service/Bus.hpp" // for Bus
+#include "Service/Service.hpp"        // for Service
+#include "service-appmgr/ApplicationManager.hpp" // for ApplicationManager, ApplicationManager::ServiceName, ApplicationHandle, ApplicationHandle::Name
 
 namespace app::manager
 {

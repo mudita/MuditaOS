@@ -1,9 +1,12 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-#include <module-db/Interface/ContactRecord.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <catch2/catch.hpp> // for AssertionHandler, operator""_catch_sr, SourceLineInfo, StringRef, REQUIRE, Section, SECTION, SectionInfo, TEST_CASE
+#include <module-db/Interface/ContactRecord.hpp> // for ContactRecord
+#include <module-services/service-db/api/DBServiceAPI.hpp> // for DBServiceAPI, DBServiceAPI::noError, DBServiceAPI::ContactVerificationError, DBServiceAPI::emptyContactError
+#include <memory> // for allocator
+
+#include "utf8/UTF8.hpp" // for UTF8
 
 TEST_CASE("DB_API")
 {

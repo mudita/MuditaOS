@@ -3,6 +3,8 @@
 
 #include "DBCountryCodeMessage.hpp"
 
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
 DBCountryCodeMessage::DBCountryCodeMessage(MessageType messageType, const uint32_t _mcc, const uint32_t _country_code)
     : DBMessage(messageType), mcc(_mcc), country_code(_country_code)
 {}

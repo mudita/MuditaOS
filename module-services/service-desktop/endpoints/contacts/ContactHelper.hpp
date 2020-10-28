@@ -3,17 +3,26 @@
 
 #pragma once
 
+#include <application-phonebook/models/PhonebookModel.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <string> // for string, allocator
+
 #include "Common/Query.hpp"
 #include "Context.hpp"
 #include "Service/Service.hpp"
-#include "Service/Common.hpp"
-#include "DBHelper.hpp"
-#include <application-phonebook/models/PhonebookModel.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
-#include "ContactRecord.hpp"
+#include "Service/Common.hpp" // for ReturnCodes
+#include "DBHelper.hpp"       // for DBHelper
+#include "ContactRecord.hpp"  // for ContactRecord
+#include "json/json11.hpp"    // for Json
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace parserFSM
 {
+    class Context;
 
     class ContactHelper : public DBHelper
     {

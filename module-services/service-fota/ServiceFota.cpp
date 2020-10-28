@@ -1,31 +1,34 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Service/Timer.hpp"
-#include "api/FotaServiceAPI.hpp"
+#include <Service/Bus.hpp>                             // for Bus
+#include <module-cellular/at/Result.hpp>               // for Result, Result::Code, Result::Code::OK
+#include <module-cellular/at/URC_QIND.hpp>             // for QIND
+#include <service-cellular/api/CellularServiceAPI.hpp> // for GetDataChannel
+#include <bits/exception.h>                            // for exception
+#include <algorithm>                                   // for find_if, remove, transform
+#include <cctype>                                      // for tolower
+#include <functional>                                  // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
+#include <numeric>                                     // for accumulate
+#include <sstream> // for operator<<, basic_ostream, ostringstream, basic_ostream::operator<<, char_traits, basic_istream, istringstream, basic_ostream<>::__ostream_type
+#include <string>  // for string, basic_string, stoi, getline, operator<<, operator==, operator+, operator!=
+#include <unordered_map> // for unordered_map<>::iterator, _Node_iterator, operator==, _Map_base<>::mapped_type, _Node_iterator_base, unordered_map<>::mapped_type
+#include <utility>       // for move, pair
+#include <vector>        // for vector
 
+#include "Service/Timer.hpp"      // for Timer
+#include "api/FotaServiceAPI.hpp" // for Config, ContextMap, ContextType, HTTPMethod, ContextPair, HTTPMethod::GET, AuthMethod, HTTPErrors, HTTPErrors::OK, HTTPMethod::POST
 #include "ServiceFota.hpp"
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-
-#include <Service/Bus.hpp>
-#include <module-cellular/Modem/TS0710/TS0710.h>
-#include <module-cellular/at/Result.hpp>
-#include <module-cellular/at/URC_QIND.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-
-#include "MessageType.hpp"
-
-#include "messages/FotaMessages.hpp"
-
-#include <algorithm>
-#include <cctype>
-#include <functional>
-#include <iostream>
-#include <numeric>
-#include <sstream>
-#include <string>
-#include <sstream>
+#include "Service/Service.hpp"       // for Service
+#include "Service/Message.hpp"       // for Message_t, DataMessage, ResponseMessage
+#include "MessageType.hpp"           // for MessageType, MessageType::CellularListCurrentCalls
+#include "messages/FotaMessages.hpp" // for FotaResponseMessage, HTTPRequestMessage, ConfigureAPNMessage, HTTPResponseMessage, NotificationMessage, FOTAStart, FOTAProgres, FOTAFinished, FOTARawProgress, InternetRequestMessage, NotificationMessage::Type, ConnectMessage, NotificationMessage::Type::Configured, NotificationMessage::Type::Connected
+#include "Commands.hpp"              // for AT, AT::QIGETERROR
+#include "Modem/TS0710/DLC_channel.h"                    // for DLC_channel
+#include "log/log.hpp"                                   // for LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR
+#include "portmacro.h"                                   // for TickType_t
+#include "service-cellular/State.hpp"                    // for State, State::ST, State::ST::Ready
+#include "service-cellular/messages/CellularMessage.hpp" // for CellularGetChannelResponseMessage, StateChange
 
 namespace FotaService
 {

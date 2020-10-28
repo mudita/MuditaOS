@@ -11,28 +11,22 @@
 // FreeRTOS
 extern "C"
 {
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "timers.h"
-#include "semphr.h"
 }
+#include <stdio.h>  // for SEEK_SET
+#include <string.h> // for memset, memcpy
+#include <memory>   // for make_shared, allocator
+
 // module-utils
-#include "log/log.hpp"
+#include "log/log.hpp" // for LOG_FATAL, LOG_ERROR, LOG_DEBUG, LOG_INFO
 // module-vfs
-#include "vfs.hpp"
-#include "EinkIncludes.hpp"
-
+#include "vfs.hpp" // for vfs
 // eink messages
-#include "messages/EinkMessage.hpp"
-#include "messages/ImageMessage.hpp"
-#include "service-gui/messages/GUIMessage.hpp"
-
-#include "SystemManager/SystemManager.hpp"
-
-#include "MessageType.hpp"
-
+#include "messages/EinkMessage.hpp"            // for EinkMessage
+#include "messages/ImageMessage.hpp"           // for ImageMessage
+#include "service-gui/messages/GUIMessage.hpp" // for GUIMessage
+#include "MessageType.hpp" // for MessageType, MessageType::GUIDisplayReady, MessageType::EinkDMATransfer, MessageType::EinkImageData, MessageType::EinkStateRequest, MessageType::EinkTemperatureUpdate
 #include "ServiceEink.hpp"
+#include "Service/Bus.hpp" // for Bus
 
 enum class EinkWorkerCommands
 {

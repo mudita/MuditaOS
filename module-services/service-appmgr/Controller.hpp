@@ -3,9 +3,19 @@
 
 #pragma once
 
-#include "ApplicationManager.hpp"
+#include <memory> // for unique_ptr
+#include <string> // for string
 
+#include "ApplicationManager.hpp" // for ApplicationHandle, ApplicationHandle::Name
 #include "module-sys/Service/Service.hpp"
+#include "SwitchData.hpp"                         // for SwitchData
+#include "i18/i18.hpp"                            // for Lang
+#include "service-appmgr/messages/APMMessage.hpp" // for APMSwitchPrevApp, Action (ptr only)
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace app::manager
 {

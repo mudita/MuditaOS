@@ -13,7 +13,13 @@
 
 #include <cairomm/context.h>
 #include <gtkmm.h>
-#include <gtkmm/drawingarea.h>
+#include <gtkmm/drawingarea.h> // for DrawingArea
+
+namespace Cairo
+{
+    class Context;
+    template <class T_CppObject> class RefPtr;
+} // namespace Cairo
 
 class RArea : public Gtk::DrawingArea
 {

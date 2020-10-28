@@ -2,7 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AntennaServiceAPI.hpp"
-#include "../messages/AntennaMessage.hpp"
+
+#include <memory>  // for make_shared, allocator, shared_ptr, __shared_ptr<>::element_type
+#include <utility> // for pair
+
+#include "../messages/AntennaMessage.hpp" // for AntennaLockRequestMessage, AntennaLockRequestResponse
+#include "MessageType.hpp" // for MessageType, MessageType::AntennaCSQChange, MessageType::AntennaGetLockState, MessageType::AntennaLockService
+#include "Service/Bus.hpp"     // for Bus
+#include "Service/Common.hpp"  // for ReturnCodes, ReturnCodes::Success, BusChannels, BusChannels::AntennaNotifications
+#include "Service/Message.hpp" // for DataMessage
+#include "service-antenna/ServiceAntenna.hpp" // for ServiceAntenna, ServiceAntenna::serviceName, lockState
+
+namespace sys
+{
+    class Service;
+} // namespace sys
+
 namespace AntennaServiceAPI
 {
 

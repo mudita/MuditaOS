@@ -3,28 +3,46 @@
 
 #include "DBServiceAPI.hpp"
 
-#include <messages/DBThreadMessage.hpp>
-#include <messages/DBSettingsMessage.hpp>
-#include <messages/DBSMSMessage.hpp>
-#include <messages/DBSMSTemplateMessage.hpp>
-#include <messages/DBContactMessage.hpp>
-#include <messages/DBAlarmMessage.hpp>
-#include <messages/DBNotesMessage.hpp>
-#include <messages/DBCalllogMessage.hpp>
-#include <messages/DBCountryCodeMessage.hpp>
-#include <messages/DBServiceMessage.hpp>
-#include <messages/QueryMessage.hpp>
+#include <messages/DBThreadMessage.hpp> // for DBThreadMessage, DBThreadResponseMessage, DBThreadGetCountMessage, DBThreadMessageGet
+#include <messages/DBSettingsMessage.hpp> // for DBSettingsMessage, DBSettingsResponseMessage
+#include <messages/DBSMSMessage.hpp>      // for DBSMSMessage, DBSMSResponseMessage, DBSMSGetCount
+#include <messages/DBSMSTemplateMessage.hpp> // for DBSMSTemplateMessage, DBSMSTemplateResponseMessage, DBSMSTemplateGetCount
+#include <messages/DBContactMessage.hpp> // for DBContactMessage, DBContactResponseMessage, DBContactBlock, DBContactNumberMessage, DBContactSearchMessage, DBContactNumberResponseMessage
+#include <messages/DBAlarmMessage.hpp>   // for DBAlarmMessage, DBAlarmResponseMessage
+#include <messages/DBNotesMessage.hpp>   // for DBNotesMessage, DBNotesResponseMessage
+#include <messages/DBCalllogMessage.hpp> // for DBCalllogMessage, DBCalllogResponseMessage, DBCalllogGetCount
+#include <messages/DBCountryCodeMessage.hpp>                   // for DBCountryCodeMessage, DBCountryCodeResponseMessage
+#include <messages/DBServiceMessage.hpp>                       // for DBServiceMessageBackup
+#include <messages/QueryMessage.hpp>                           // for QueryResponse
+#include <Common/Query.hpp>                                    // for Query, QueryResult
+#include <queries/phonebook/QueryNumberGetByID.hpp>            // for NumberGetByID, NumberGetByIDResult
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp> // for ThreadGetByNumber, ThreadGetByNumberResult
+#include <includes/DBServiceName.hpp>                          // for db
+#include <Utils.hpp>                                           // for to_string
+#include <ext/alloc_traits.h>                                  // for __alloc_traits<>::value_type
+#include <cassert>                                             // for assert
+#include <utility>                                             // for pair, move, tuple_element<>::type
 
-#include <Common/Query.hpp>
-#include <queries/phonebook/QueryNumberGetByID.hpp>
-#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include "AlarmsRecord.hpp"  // for AlarmsRecord
+#include "CalllogRecord.hpp" // for CalllogRecord, operator<<
+#include "ContactRecord.hpp" // for ContactRecord, ContactRecord::Number
+#include "MessageType.hpp" // for MessageType, MessageType::DBContactGetByID, MessageType::DBAlarmAdd, MessageType::DBAlarmGetCount, MessageType::DBAlarmGetLimitOffset, MessageType::DBAlarmGetNext, MessageType::DBAlarmRemove, MessageType::DBAlarmUpdate, MessageType::DBCalllogAdd, MessageType::DBCalllogGetLimitOffset, MessageType::DBCalllogRemove, MessageType::DBCalllogUpdate, MessageType::DBContactAdd, MessageType::DBContactBlock, MessageType::DBContactGetByName, MessageType::DBContactGetByNumber, MessageType::DBContactGetBySpeedDial, MessageType::DBContactGetCount, MessageType::DBContactGetLimitOffset, MessageType::DBContactRemove, MessageType::DBContactSearch, MessageType::DBContactUpdate, MessageType::DBCountryCode, MessageType::DBNotesAdd, MessageType::DBNotesGetCount, MessageType::DBNotesGetLimitOffset, MessageType::DBNotesRemove, MessageType::DBNotesUpdate, MessageType::DBSMSAdd, MessageType::DBSMSGetLastRecord, MessageType::DBSMSGetSMSLimitOffset, MessageType::DBSMSGetSMSLimitOffsetByThreadID, MessageType::DBSMSRemove, MessageType::DBSMSTemplateAdd, MessageType::DBSMSTemplateGetLimitOffset, MessageType::DBSMSTemplateRemove, MessageType::DBSMSTemplateUpdate, MessageType::DBSMSUpdate, MessageType::DBServiceBackup, MessageType::DBSettingsGet, MessageType::DBSettingsUpdate, MessageType::DBThreadGet, MessageType::DBThreadGetForContact, MessageType::DBThreadGetLimitOffset, MessageType::DBThreadRemove, MessageType::DBThreadUpdate
+#include "PhoneNumber.hpp" // for PhoneNumber::View, PhoneNumber
+#include "SMSRecord.hpp"   // for SMSRecord
+#include "SMSTemplateRecord.hpp"        // for SMSTemplateRecord
+#include "Service/Bus.hpp"              // for Bus
+#include "Service/Common.hpp"           // for ReturnCodes, ReturnCodes::Success, c_str
+#include "SettingsRecord.hpp"           // for SettingsRecord
+#include "Tables/CountryCodesTable.hpp" // for CodesTableRow
+#include "Tables/Record.hpp"            // for DB_ID_NONE
+#include "ThreadRecord.hpp"             // for ThreadRecord
+#include "log/log.hpp"                  // for LOG_DEBUG, LOG_ERROR, LOG_INFO
 
-#include <ServiceDB.hpp>
-#include <includes/DBServiceName.hpp>
-
-#include <Utils.hpp>
-
-#include <cassert>
+namespace sys
+{
+    class Service;
+} // namespace sys
+struct NotesRecord;
 
 SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
 {

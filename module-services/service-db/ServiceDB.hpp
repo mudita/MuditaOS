@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <memory> // for unique_ptr
+#include <set>    // for set
+#include <string> // for string
+
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "Interface/ContactRecord.hpp"
@@ -15,11 +19,37 @@
 #include "Interface/NotificationsRecord.hpp"
 #include "Interface/EventsRecord.hpp"
 #include "Interface/SettingsRecord_v2.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+#include "Service/Service.hpp" // for Service
 #include "messages/DBNotificationMessage.hpp"
 #include "agents/DatabaseAgent.hpp"
 #include "agents/settings/SettingsAgent.hpp"
+#include "BaseInterface.hpp"  // for Interface, Interface::Name
+#include "Common/Query.hpp"   // for Query, Query::Type
+#include "Service/Common.hpp" // for ReturnCodes, ServicePowerMode
+
+class AlarmsDB;
+class AlarmsRecordInterface;
+class CalllogDB;
+class CalllogRecordInterface;
+class ContactRecordInterface;
+class ContactsDB;
+class CountryCodeRecordInterface;
+class CountryCodesDB;
+class DatabaseAgent;
+class EventsDB;
+class EventsRecordInterface;
+class NotesDB;
+class NotesRecordInterface;
+class NotificationsDB;
+class NotificationsRecordInterface;
+class SMSRecordInterface;
+class SMSTemplateRecordInterface;
+class SettingsDB;
+class SettingsRecordInterface;
+class SettingsRecordInterface_v2;
+class SmsDB;
+class ThreadRecordInterface;
 
 class ServiceDB : public sys::Service
 {

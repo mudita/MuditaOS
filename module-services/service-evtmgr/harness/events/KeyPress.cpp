@@ -2,8 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "KeyPress.hpp"
-#include "../../messages/EVMessages.hpp"
-#include "../Events.hpp"
+
+#include <map>    // for map<>::mapped_type
+#include <memory> // for make_shared, shared_ptr, __shared_ptr_access
+
+#include "../Events.hpp"              // for Data, Type
+#include "bsp/keyboard/key_codes.hpp" // for KeyCodes, KeyCodes::FnLeft, KeyCodes::FnRight, KeyCodes::JoystickDown, KeyCodes::JoystickEnter, KeyCodes::JoystickLeft, KeyCodes::JoystickRight, KeyCodes::JoystickUp, KeyCodes::NumericKey0, KeyCodes::NumericKey1, KeyCodes::NumericKey2, KeyCodes::NumericKey3, KeyCodes::NumericKey4, KeyCodes::NumericKey5, KeyCodes::NumericKey6, KeyCodes::NumericKey7, KeyCodes::NumericKey8, KeyCodes::NumericKey9, KeyCodes::NumericKeyAst, KeyCodes::NumericKeyPnd, KeyCodes::SSwitchDown, KeyCodes::SSwitchMid, KeyCodes::SSwitchUp, KeyCodes::Torch, KeyCodes::Undefined, KeyCodes::VolDown, KeyCodes::VolUp
+#include "common_data/RawKey.hpp"     // for RawKey, RawKey::State, RawKey::State::Released
+#include "service-evtmgr/messages/KbdMessage.hpp" // for KbdMessage
 
 namespace harness::events
 {

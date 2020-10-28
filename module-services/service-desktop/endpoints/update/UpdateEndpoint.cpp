@@ -2,9 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UpdateEndpoint.hpp"
-#include "DesktopMessages.hpp"
-#include "ServiceDesktop.hpp"
-#include <Service/Bus.hpp>
+
+#include <Service/Bus.hpp> // for Bus
+#include <filesystem>      // for operator/, path
+#include <memory>          // for allocator, make_shared
+
+#include "DesktopMessages.hpp" // for UpdateOsMessage
+#include "ServiceDesktop.hpp"  // for service_desktop
+#include "Context.hpp"         // for Context
+#include "MessageHandler.hpp"  // for MessageHandler
+#include "UpdateMuditaOS.hpp"  // for update
+#include "json/json11.hpp"     // for Json, Json::object
+#include "vfs.hpp"             // for vfs, os_updates
 
 auto UpdateEndpoint::handle(Context &context) -> void
 {

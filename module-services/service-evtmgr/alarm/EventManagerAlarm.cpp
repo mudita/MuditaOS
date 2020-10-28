@@ -8,18 +8,24 @@
  *      Author: kuba
  */
 
-#include "../EventManager.hpp"
+#include <sys/types.h> // for time_t
+#include <memory>      // for allocator, make_shared, make_unique, __shared_ptr_access, shared_ptr, unique_ptr
+#include <string>      // for string
+#include <utility>     // for move
 
-#include "log/log.hpp"
+#include "../EventManager.hpp"             // for EventManager
+#include "../messages/EVMessages.hpp"      // for RtcMinuteAlarmMessage, EVMAlarmSwitchData
+#include "service-db/api/DBServiceAPI.hpp" // for DBServiceAPI
+#include "service-appmgr/Controller.hpp"   // for Controller
+#include "AlarmsRecord.hpp"                // for AlarmsRecord
+#include "MessageType.hpp"                 // for MessageType, MessageType::EVMMinuteUpdated
+#include "Service/Bus.hpp"                 // for Bus
+#include "SwitchData.hpp"                  // for SwitchData
 
-#include "bsp/keyboard/keyboard.hpp"
-#include "../WorkerEvent.hpp"
-#include "../messages/EVMessages.hpp"
-
-#include "vfs.hpp"
-
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-appmgr/Controller.hpp"
+namespace sys
+{
+    class DataMessage;
+} // namespace sys
 
 void EventManager::HandleAlarmTrigger(sys::DataMessage *msgl)
 {

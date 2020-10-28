@@ -10,35 +10,37 @@
 
 #include "EventManager.hpp"
 
-#include "log/log.hpp"
+#include <service-cellular/messages/CellularMessage.hpp> // for CellularTimeNotificationMessage, RawCommandResp
+#include <service-evtmgr/Constants.hpp>                  // for evt_manager
+#include <cassert>                                       // for assert
+#include <list>                                          // for list
+#include <tuple>                                         // for tie, tuple
+#include <vector>                                        // for vector
 
-#include "bsp/keyboard/keyboard.hpp"
-#include "WorkerEvent.hpp"
-#include "messages/EVMessages.hpp"
-
-#include "vfs.hpp"
-
-#include "bsp/battery-charger/battery_charger.hpp"
-#include "service-appmgr/Controller.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-db/messages/DBNotificationMessage.hpp"
-#include "AudioServiceAPI.hpp"
-
-#include "bsp/harness/bsp_harness.hpp"
-#include "harness/Parser.hpp"
-#include "harness/events/AtResponse.hpp"
-#include "harness/events/FocusApp.hpp"
-#include <service-cellular/messages/CellularMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
-
-#include <cassert>
-
-#include "bsp/magnetometer/magnetometer.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "bsp/common.hpp"
-#include "bsp/rtc/rtc.hpp"
-
-#include <cassert>
+#include "log/log.hpp"             // for LOG_INFO, LOG_DEBUG, LOG_FATAL
+#include "WorkerEvent.hpp"         // for WorkerEvent
+#include "messages/EVMessages.hpp" // for TorchStateResultMessage, EVMFocusApplication, StatusStateMessage, EVMBoardResponseMessage, SIMMessage, TorchStateMessage
+#include "service-appmgr/Controller.hpp"                 // for Controller
+#include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
+#include "AudioServiceAPI.hpp"                           // for SendEvent
+#include "bsp/harness/bsp_harness.hpp"                   // for emit
+#include "harness/events/AtResponse.hpp"                 // for AtResponse
+#include "harness/events/FocusApp.hpp"                   // for FocusApp
+#include "bsp/magnetometer/magnetometer.hpp"             // for GetBoard
+#include "bsp/common.hpp"                                // for c_str
+#include "bsp/rtc/rtc.hpp"                               // for rtc_SetDateTime
+#include "BaseInterface.hpp"                             // for Interface, Interface::Name, Interface::Name::Alarms
+#include "MessageType.hpp" // for MessageType, MessageType::EVMModemStatus, MessageType::CellularTimeUpdated, MessageType::DBServiceNotification, MessageType::EVMBatteryLevel, MessageType::EVMChargerPlugged, MessageType::EVMFocusApplication, MessageType::EVMGetBoard, MessageType::EVMMinuteUpdated, MessageType::EVMRingIndicator, MessageType::EVMTimeUpdated, MessageType::EVMTorchStateMessage, MessageType::EVM_GPIO, MessageType::KBDKeyEvent
+#include "Service/Bus.hpp" // for Bus
+#include "Service/Worker.hpp"              // for WorkerQueueInfo
+#include "SystemManager/Constants.hpp"     // for system_manager
+#include "SystemManager/SystemManager.hpp" // for SystemManager
+#include "bsp/keyboard/key_codes.hpp"      // for KeyCodes, KeyCodes::FnRight, bsp
+#include "bsp/torch/torch.hpp" // for State, Action, getColorTemp, getState, toggle, turn, Action::getState, Action::setState, Action::toggle
+#include "common_data/RawKey.hpp"                      // for RawKey, RawKey::State, RawKey::State::Pressed
+#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
+#include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
+#include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {

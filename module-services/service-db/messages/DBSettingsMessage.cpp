@@ -3,6 +3,11 @@
 
 #include "DBSettingsMessage.hpp"
 
+#include "SettingsRecord_v2.hpp"  // for SettingsRecord_v2
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
+struct SettingsRecord;
+
 DBSettingsMessage::DBSettingsMessage(MessageType messageType, const SettingsRecord &rec)
     : DBMessage(messageType), record(rec)
 {}

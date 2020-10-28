@@ -2,12 +2,17 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeviceInfoEndpoint.hpp"
-#include <source/version.hpp>
-#include <vfs.hpp>
-#include <common_data/EventStore.hpp>
-#include <time/time_conversion.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
-#include <string>
+
+#include <source/version.hpp>         // for GIT_BRANCH, GIT_REV, GIT_TAG
+#include <vfs.hpp>                    // for vfs::FilesystemStats, vfs
+#include <common_data/EventStore.hpp> // for GSM, Battery, SignalStrength
+#include <time/time_conversion.hpp>   // for Time
+#include <stdint.h>                   // for uint32_t
+#include <string>                     // for to_string, allocator, string
+
+#include "Context.hpp"        // for Context
+#include "MessageHandler.hpp" // for MessageHandler
+#include "json/json11.hpp"    // for Json, Json::object
 
 auto DeviceInfoEndpoint::handle(Context &context) -> void
 {

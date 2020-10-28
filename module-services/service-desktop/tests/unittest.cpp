@@ -1,21 +1,30 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Common/Common.hpp"
-#include "ContactRecord.hpp"
-#include "ParserUtils.hpp"
-#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp"
-#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp"
-#include "ParserFSM.hpp"
-#include "contacts/ContactHelper.hpp"
-#include "messages/MessageHelper.hpp"
-#include "queries/messages/sms/QuerySMSSearchByType.hpp"
-#include "EndpointFactory.hpp"
-#include "contacts/ContactsEndpoint.hpp"
-#include "json/json11.hpp"
-#include <memory>
-#include <vfs.hpp>
-#include <catch2/catch.hpp>
+#include <vfs.hpp>          // for vfs, eMMC_disk
+#include <catch2/catch.hpp> // for AssertionHandler, operator""_catch_sr, SourceLineInfo, StringRef, REQUIRE, Section, SECTION, SectionInfo, TEST_CASE
+#include <memory>           // for allocator, unique_ptr, make_unique, operator==, allocator_traits<>::value_type
+#include <filesystem>       // for path
+#include <string>           // for string, operator==, basic_string, operator+, char_traits
+#include <vector>           // for vector
+
+#include "Common/Common.hpp" // for ContactNumberType, ContactNumberType::PAGER, SMSType, SMSType::DRAFT
+#include "ContactRecord.hpp" // for ContactRecord, ContactRecord::Number
+#include "ParserUtils.hpp" // for EndpointType, Method, Method::get, id, EndpointType::contacts, EndpointType::invalid, contactID, date, dateSent, messageBody, templateText, threadID, parserFSM
+#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp" // for UpdateError, UpdateError::NoError, UpdateMuditaOS
+#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp" // for CopyDirContent, DeleteDirContent
+#include "ParserFSM.hpp" // for State, StateMachine, State::NoMsg, State::ReceivedPayload, State::ReceivedPartialPayload, State::ReceivedPartialHeader
+#include "contacts/ContactHelper.hpp" // for ContactHelper, address, alternativeName, isBlocked, isFavourite, numbers, primaryName
+#include "messages/MessageHelper.hpp"    // for MessageHelper
+#include "EndpointFactory.hpp"           // for EndpointFactory
+#include "contacts/ContactsEndpoint.hpp" // for ContactsEndpoint
+#include "json/json11.hpp"               // for Json
+#include "Context.hpp"                   // for Context, invalidUuid
+#include "Endpoint.hpp"                  // for Endpoint
+#include "PhoneNumber.hpp"               // for PhoneNumber, PhoneNumber::View
+#include "SMSRecord.hpp"                 // for SMSRecord
+#include "SMSTemplateRecord.hpp"         // for SMSTemplateRecord
+#include "utf8/UTF8.hpp"                 // for UTF8, operator<<
 
 class vfs vfs;
 

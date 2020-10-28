@@ -2,9 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Service/Service.hpp"
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <module-sys/Service/Timer.hpp>
+#include <module-sys/Service/Timer.hpp> // for Timer
+#include <stdint.h>                     // for uint32_t
+#include <memory>                       // for unique_ptr
+#include <string>                       // for string
+
+#include "Service/Service.hpp"
+
+namespace db
+{
+    class QueryResult;
+} // namespace db
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace stm
 {

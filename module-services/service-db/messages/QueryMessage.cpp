@@ -3,8 +3,14 @@
 
 #include "QueryMessage.hpp"
 
-#include <memory>
-#include <stdexcept>
+#include <memory>    // for unique_ptr, operator==
+#include <stdexcept> // for runtime_error
+#include <utility>   // for move
+
+#include "BaseInterface.hpp"      // for Interface, Interface::Name
+#include "Common/Query.hpp"       // for Query, QueryResult
+#include "MessageType.hpp"        // for MessageType, MessageType::DBQuery
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
 
 namespace db
 {

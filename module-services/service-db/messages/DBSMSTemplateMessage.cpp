@@ -3,6 +3,11 @@
 
 #include "DBSMSTemplateMessage.hpp"
 
+#include <utility> // for move
+
+#include "SMSTemplateRecord.hpp"  // for SMSTemplateRecord
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
 DBSMSTemplateMessage::DBSMSTemplateMessage(MessageType messageType, const SMSTemplateRecord &rec)
     : DBMessage(messageType), record(rec)
 {}
