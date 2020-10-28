@@ -1,13 +1,9 @@
+#!/usr/bin/env python
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-from harness.uart import conn, log
-# it would be much better to wait for ok in script, but resend doesn't work now...
-# due to Service Cellular arch
+from harness.uart import connection
 
-conn.gsm("at+qsimdet=1,0")
-conn.sleep(10)
-conn.gsm("AT+QSIMSTAT=1")
-conn.sleep(10)
-conn.gsm("at&w")
-conn.sleep(10)
+connection.gsm("at+qsimdet=1,0", 10)
+connection.gsm("AT+QSIMSTAT=1", 10)
+connection.gsm("at&w", 10)
