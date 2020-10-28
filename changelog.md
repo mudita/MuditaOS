@@ -16,6 +16,7 @@
 ### Other
 
 * `[appmgr]` Application manager documentation added.
+* `[audio]` Improve synchronization during calls.
 
 ## [0.43.1 2020-10-23]
 

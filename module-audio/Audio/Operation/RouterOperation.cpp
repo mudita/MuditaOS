@@ -8,9 +8,15 @@
 
 #include <bsp_audio.hpp>
 #include <log/log.hpp>
+#include <mutex.hpp>
 
+#include <algorithm>
 #include <optional>
-#include <cstring>
+#include <vector>
+
+// enforced optimization is needed for std::vector::insert and std::fill to be
+// as quick as memcpy and memset respectively
+#pragma GCC optimize("O3")
 
 namespace audio
 {
@@ -23,19 +29,32 @@ namespace audio
         audioDeviceCallback =
             [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> std::int32_t {
             if (inputBuffer != nullptr) {
+                cpp_freertos::LockGuard lock(audioMutex);
+                receivedFramesDiffAudio++;
+
                 if (framesPerBuffer > audioDeviceBuffer.size()) {
                     audioDeviceBuffer.resize(framesPerBuffer, 0);
                 }
 
                 if (muteEnable) {
-                    memset(&audioDeviceBuffer[0], 0, framesPerBuffer * sizeof(std::int16_t));
+                    std::fill(std::begin(audioDeviceBuffer), std::end(audioDeviceBuffer), 0);
                 }
                 else {
-                    memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(std::int16_t));
+                    auto rangeStart = static_cast<const std::uint16_t *>(inputBuffer);
+                    auto rangeEnd   = rangeStart + framesPerBuffer;
+                    std::copy(rangeStart, rangeEnd, std::begin(audioDeviceBuffer));
                 }
             }
 
             if (outputBuffer != nullptr) {
+                cpp_freertos::LockGuard lock(cellularMutex);
+                receivedFramesDiffCellular--;
+
+                if (receivedFramesDiffCellular != 0) {
+                    LOG_FATAL("Audio router synchronization fail, diff = %d", receivedFramesDiffCellular);
+                    receivedFramesDiffCellular = 0;
+                }
+
                 if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
                     audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
                 }
@@ -48,14 +67,27 @@ namespace audio
         audioDeviceCellularCallback =
             [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> std::int32_t {
             if (inputBuffer != nullptr) {
+                cpp_freertos::LockGuard lock(cellularMutex);
+                receivedFramesDiffCellular++;
+
                 if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
                     audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
                 }
 
-                memcpy(&audioDeviceCellularBuffer[0], inputBuffer, framesPerBuffer * sizeof(std::int16_t));
+                auto rangeStart = static_cast<const std::uint16_t *>(inputBuffer);
+                auto rangeEnd   = rangeStart + framesPerBuffer;
+                std::copy(rangeStart, rangeEnd, std::begin(audioDeviceCellularBuffer));
             }
 
             if (outputBuffer != nullptr) {
+                cpp_freertos::LockGuard lock(audioMutex);
+                receivedFramesDiffAudio--;
+
+                if (receivedFramesDiffAudio != 0) {
+                    LOG_FATAL("Audio router synchronization fail, diff = %d", receivedFramesDiffAudio);
+                    receivedFramesDiffAudio = 0;
+                }
+
                 if (framesPerBuffer > audioDeviceBuffer.size()) {
                     audioDeviceBuffer.resize(framesPerBuffer, 0);
                 }
@@ -65,8 +97,8 @@ namespace audio
             return framesPerBuffer;
         };
 
-        audioDeviceBuffer.resize(1024, 0);
-        audioDeviceCellularBuffer.resize(1024, 0);
+        audioDeviceBuffer.resize(INPUT_BUFFER_START_SIZE, 0);
+        audioDeviceCellularBuffer.resize(INPUT_BUFFER_START_SIZE, 0);
 
         constexpr audio::Gain defaultRoutingEarspeakerGain       = 20;
         constexpr audio::Volume defaultRoutingEarspeakerVolume   = 10;
