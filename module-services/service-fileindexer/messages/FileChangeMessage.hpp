@@ -15,22 +15,22 @@ namespace service::msg
         virtual ~FileChangeMessage()           = default;
         FileChangeMessage(FileChangeMessage &) = delete;
         FileChangeMessage &operator=(FileChangeMessage &) = delete;
-        auto newPath() const noexcept
+        [[nodiscard]] auto newPath() const noexcept
         {
             return mNewPath;
         }
-        auto oldPath() const noexcept
+        [[nodiscard]] auto oldPath() const noexcept
         {
             return mOldPath;
         }
-        auto event() const noexcept
+        [[nodiscard]] auto event() const noexcept
         {
             return mEvent;
         }
 
       private:
-        std::string mNewPath;
-        evt_t mEvent;
-        std::string mOldPath;
+        const std::string mNewPath;
+        const evt_t mEvent;
+        const std::string mOldPath;
     };
 } // namespace service::msg
