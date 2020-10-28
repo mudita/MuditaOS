@@ -47,26 +47,31 @@ namespace gui
         infoText->setVisible(true);
         infoText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     }
-    void PinLockBaseWindow::buildPinLabels(gui::Label *labelsBox, unsigned int pinSize, unsigned int singleLabelWidth)
+    void PinLockBaseWindow::buildPinLabels(std::function<Rect *()> itemBuilder,
+                                           unsigned int pinSize,
+                                           unsigned int offsetX,
+                                           unsigned int offsetY,
+                                           unsigned int boxWidth)
     {
-        if (pinSize * singleLabelWidth > labelsBox->getWidth()) {
-            singleLabelWidth = labelsBox->getWidth() / pinSize;
-        }
-        const uint32_t pinLabelSpacing = (labelsBox->getWidth() - pinSize * singleLabelWidth) / (pinSize - 1);
+        pinLabelsBox = new gui::HBox(this, offsetX, offsetY, boxWidth, lock_style::label_size);
+        pinLabelsBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        uint32_t pinLabelX = 0;
+        if (pinSize == 0) {
+            return;
+        }
+
         for (uint32_t i = 0; i < pinSize; i++) {
-            gui::Label *label = new gui::Label(labelsBox, pinLabelX, 0, singleLabelWidth, lock_style::label_size);
+            auto label = itemBuilder();
             label->setFilled(false);
             label->setBorderColor(gui::ColorFullBlack);
             label->setPenWidth(2);
-            label->setFont(style::window::font::largelight);
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             label->setVisible(true);
-            this->pinLabels.push_back(label);
-            pinLabelX += singleLabelWidth + pinLabelSpacing;
+            label->activeItem = false;
+            pinLabelsBox->addWidget(label);
         }
     }
+
     void PinLockBaseWindow::buildImages(const std::string &lockImg, const std::string &infoImg)
     {
         lockImage = new gui::Image(this, lock_style::image_x, lock_style::image_y, 0, 0, lockImg);
@@ -88,10 +93,5 @@ namespace gui
     {
         bottomBar->setText(side, txt, false);
     }
-    void PinLockBaseWindow::clearPinLabels()
-    {
-        for (auto label : pinLabels) {
-            label->clear();
-        }
-    }
+
 } // namespace gui

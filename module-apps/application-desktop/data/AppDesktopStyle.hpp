@@ -7,17 +7,17 @@
 
 namespace style::window::pin_lock
 {
-    const inline uint32_t image_x            = 177;
-    const inline uint32_t image_y            = 132;
-    const inline uint32_t title_label_y      = 60;
-    const inline uint32_t title_label_h      = 40;
-    const inline uint32_t label_size         = 30;
-    const inline uint32_t label_size_screen  = 60;
-    const inline uint32_t pin_label_x        = 85;
-    const inline uint32_t pin_label_x_screen = 100;
-    const inline uint32_t pin_label_y        = 450;
-    const inline uint32_t info_text_y        = 294;
-    const inline uint32_t info_text_h_screen = 60;
-    const inline uint32_t info_text_h_sim    = 150;
-    const inline uint32_t info_text_h_puk    = 180;
+    constexpr auto image_x            = 177;
+    constexpr auto image_y            = 132;
+    constexpr auto title_label_y      = 60;
+    constexpr auto title_label_h      = 40;
+    constexpr auto label_size         = 60;
+    constexpr auto label_margins      = 10;
+    constexpr auto pin_label_x        = 85;
+    constexpr auto pin_label_y        = 450;
+    constexpr auto pin_label_y_screen = 400;
+    constexpr auto info_text_y        = 294;
+    constexpr auto info_text_h_screen = 60;
+    constexpr auto info_text_h_sim    = 150;
+    constexpr auto info_text_h_puk    = 180;
 } // namespace style::window::pin_lock
