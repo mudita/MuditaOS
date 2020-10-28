@@ -10,8 +10,8 @@ namespace gui
     class PinLockBox
     {
       public:
-        virtual void popChar(uint32_t charNum) = 0;
-        virtual void putChar(uint32_t charNum) = 0;
+        virtual void popChar(unsigned int charNum) = 0;
+        virtual void putChar(unsigned int charNum) = 0;
 
         virtual void setVisibleStateEnterPin()    = 0;
         virtual void setVisibleStateVerifiedPin() = 0;

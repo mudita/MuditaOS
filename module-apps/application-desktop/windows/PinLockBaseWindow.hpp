@@ -5,6 +5,7 @@
 
 #include "AppWindow.hpp"
 #include "Text.hpp"
+#include "BoxLayout.hpp"
 
 namespace gui
 {
@@ -20,19 +21,21 @@ namespace gui
         {}
         void build();
         void buildInfoText(unsigned int textHight);
-        void buildPinLabels(gui::Label *labelBox, unsigned int pinSize, unsigned int singleLabelWidth);
+        void buildPinLabels(std::function<Rect *()> itemBuilder,
+                            unsigned int pinSize,
+                            unsigned int offsetX,
+                            unsigned int offsetY,
+                            unsigned int boxWidth);
         void buildImages(const std::string &lockImg, const std::string &infoImg);
         void setBottomBarWidgetsActive(bool left, bool center, bool right);
         void setImagesVisible(bool lockImg, bool infoImg);
         void setBottomBarWidgetText(BottomBar::Side side, const UTF8 &txt);
-        void clearPinLabels();
 
         gui::Label *titleLabel = nullptr;
         gui::Text *infoText    = nullptr;
-        gui::Label *pinLabel   = nullptr;
-        std::vector<gui::Label *> pinLabels;
         gui::Image *lockImage = nullptr;
         gui::Image *infoImage = nullptr;
+        gui::HBox *pinLabelsBox = nullptr;
 
         PinLock &lock;
 
