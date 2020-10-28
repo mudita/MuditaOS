@@ -32,11 +32,13 @@ endif()
 set(PROJECT_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/include
         ${CMAKE_CURRENT_SOURCE_DIR}/board/free_rtos_custom/include
-        )
+        ${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/include
+)
 
 set(FREERTOS_FAT_EXTSOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/ff_stdio_flush.c
-	${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/ff_file_flush.c
+	${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/src/ff_stdio_flush.c
+	${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/src/ff_file_flush.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/freertos-fat-custom/src/ff_stdio_listdir_recursive.c
 )
 
 set(SOURCES ""
