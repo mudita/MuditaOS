@@ -5,6 +5,7 @@
 #include "notesIndexer.hpp"
 #include <vfs.hpp>
 #include <cwctype>
+#include <utf8/UTF8.hpp>
 
 namespace service::detail
 {
