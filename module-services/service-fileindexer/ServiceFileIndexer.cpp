@@ -119,7 +119,7 @@ namespace service
     {
         LOG_DEBUG("Text content index %s", std::string(path).c_str());
         detail::notesIndexer noteInfo(path);
-        LOG_DEBUG("Words %lu Lines %lu Chars %lu Size %lu",
+        LOG_DEBUG("Words %zu Lines %zu Chars %zu Size %zu",
                   noteInfo.getWords(),
                   noteInfo.getLines(),
                   noteInfo.getChars(),
