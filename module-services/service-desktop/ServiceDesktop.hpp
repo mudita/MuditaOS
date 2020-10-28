@@ -11,14 +11,11 @@
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
+#include "Constants.hpp"
 
 class UpdateMuditaOS;
 class WorkerDesktop;
 
-namespace service::name
-{
-    const inline std::string service_desktop = "ServiceDesktop";
-};
 
 namespace sdesktop
 {

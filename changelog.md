@@ -1,21 +1,17 @@
 # MuditaOS changelog
 
 
-### Added
-
-* `[cellular]` Set pin functionality with Action mockup
-### Changed
-
-* `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
-
 
 ## Current release
 
 ### Added
-* `[messages][db]` File Indexer db Agent
 
+* `[messages][db]` File Indexer db Agent
+* `[testing]` Added key release simulation through service-desktop developerMode
+* `[cellular]` Set pin functionality with Action mockup
 ### Changed
 
+* `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
 * `[calendar]` Rework to use database model instead of internal model in day events list.
 
 ## [0.44.1 2020-10-30]
@@ -568,5 +564,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-
 

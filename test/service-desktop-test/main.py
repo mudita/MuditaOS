@@ -1,6 +1,8 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+import interface.CDCSerial
+
 from tests.messages import *
 from tests.templates import *
 from tests.contacts import *
@@ -12,15 +14,13 @@ from tests.calllog import *
 from termcolor import colored
 
 
-def main(port_name='/dev/ttyACM1'):
-    phone.port = port_name
-    phone.timeout = 10
-    phone.open()
-    phone.flushInput()
+def main(port_name='/dev/ttyACM2'):
+
+    serial = interface.CDCSerial.CDCSerial(port_name)
     final_result = True
     failed_tests = []
-    for test_instance in (DeviceInfoTest(), UpdateTest(), BackupTest(), MessageTest(),
-                          MessageTemplateTest(), ContactTest(), CalllogTest(), FactoryResetTest()):
+    for test_instance in (DeviceInfoTest(serial), UpdateTest(serial), BackupTest(serial), MessageTest(serial),
+                          MessageTemplateTest(serial), ContactTest(serial), CalllogTest(serial), FactoryResetTest(serial)):
         test_name = type(test_instance).__name__
         result = test_instance.run()
         if result == False:

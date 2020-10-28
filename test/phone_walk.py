@@ -4,16 +4,12 @@
 
 # script walking on desktop
 
-from harness.common import Serial
-import logging
-import json
+from interface.CDCSerial import CDCSerial
 
-log = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-conn = Serial()
+new_conn = CDCSerial()
 
 for lol in range(1, 60 * 30):
-    conn.key(ord('d'))
-    conn.key(ord('s'))
-    conn.key(ord('s'))
-    conn.key(ord('d'))
+    new_conn.send_key(ord('d'))
+    new_conn.send_key(ord('s'))
+    new_conn.send_key(ord('s'))
+    new_conn.send_key(ord('d'))

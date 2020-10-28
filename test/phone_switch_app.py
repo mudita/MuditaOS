@@ -3,14 +3,8 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # script walking on desktop
-from harness.common import Serial
-import logging
+from harness.uart import conn, new_conn, log
 import json
-
-log = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-conn = Serial()
-
 
 def cmd_json(data):
     ret = {}
@@ -26,13 +20,13 @@ for el in range(1, 100):
     log.info("TEST ex: {}".format(el))
     # back
     # move left , enter, read for entry
-    conn.key(ord('d'))
-    conn.key(ord('d'))
-    conn.key(ord('\n'))
+    new_conn.send_key(ord('d'))
+    new_conn.send_key(ord('d'))
+    new_conn.send_key(ord('\n'))
     data = cmd_json(conn.read(4))
     log.debug(data)
     conn.sleep(1)
-    conn.key(12)
+    new_conn.send_key(12)
     conn.sleep(1)
     data = cmd_json(conn.read(4))
     log.debug(data)
