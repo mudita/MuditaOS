@@ -14,10 +14,21 @@ namespace service::msg
 }
 namespace service::detail
 {
+    // RFC6838 IANA MIME types
+    enum class mimeType
+    {
+        _none_,
+        application,
+        audio,
+        example,
+        font,
+        image,
+        text,
+        video
+    };
     class startupIndexer
     {
         static constexpr auto timer_indexing_time = 100U;
-
       public:
         startupIndexer()                       = default;
         ~startupIndexer()                      = default;
@@ -28,7 +39,7 @@ namespace service::detail
             collectStartupFiles();
             setupTimers(svc, svc_name);
         }
-        static auto fileShouldBeIndexed(std::string_view path) -> bool;
+        static auto getFileType(std::string_view path) -> mimeType;
 
       private:
         // Collect startup files when service starts

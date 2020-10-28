@@ -20,8 +20,11 @@ namespace service
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
-
       private:
+        auto onDeleteFile(std::string_view path) -> void;
+        auto onRenameFile(std::string_view oldPath, std::string_view newPath) -> void;
+        auto onAudioContentChanged(std::string_view path) -> void;
+        auto onTextContentChanged(std::string_view path) -> void;
         detail::startupIndexer mStartupIndexer;
     };
 

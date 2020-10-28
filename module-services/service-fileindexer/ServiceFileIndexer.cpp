@@ -21,7 +21,30 @@ namespace service
     {
         auto fcm = dynamic_cast<msg::FileChangeMessage *>(msg);
         if (fcm) {
-            LOG_DEBUG("File notification handler received %s", fcm->newPath().c_str());
+            switch (fcm->event()) {
+            case msg::FileChangeMessage::evt_t::modified: {
+                switch (detail::startupIndexer::getFileType(fcm->newPath())) {
+                case detail::mimeType::audio:
+                    onAudioContentChanged(fcm->newPath());
+                    break;
+                case detail::mimeType::text:
+                    onTextContentChanged(fcm->newPath());
+                    break;
+                default:
+                    LOG_INFO("Skip indexing file %s", fcm->newPath().c_str());
+                    break;
+                }
+            } break;
+            case msg::FileChangeMessage::evt_t::renamed:
+                onRenameFile(fcm->oldPath(), fcm->newPath());
+                break;
+            case msg::FileChangeMessage::evt_t::deleted:
+                onDeleteFile(fcm->newPath());
+                break;
+            default:
+                LOG_INFO("Unsupported notification");
+                break;
+            }
             return std::make_shared<sys::ResponseMessage>();
         }
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
@@ -53,5 +76,26 @@ namespace service
     {
         LOG_DEBUG("Switch to power Mode %s", c_str(mode));
         return sys::ReturnCodes::Success;
+    }
+
+    // When file is changed update db only
+    auto ServiceFileIndexer::onDeleteFile(std::string_view path) -> void
+    {
+        LOG_DEBUG("File deleted %s", std::string(path).c_str());
+    }
+    // When file is renamed
+    auto ServiceFileIndexer::onRenameFile(std::string_view oldPath, std::string_view newPath) -> void
+    {
+        LOG_DEBUG("File renamed old: %s, new: %s", std::string(oldPath).c_str(), std::string(newPath).c_str());
+    }
+    // On audio file content change
+    auto ServiceFileIndexer::onAudioContentChanged(std::string_view path) -> void
+    {
+        LOG_DEBUG("Audio content index %s", std::string(path).c_str());
+    }
+    // On text file content change
+    auto ServiceFileIndexer::onTextContentChanged(std::string_view path) -> void
+    {
+        LOG_DEBUG("Text content index %s", std::string(path).c_str());
     }
 } // namespace service

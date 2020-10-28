@@ -16,22 +16,18 @@ namespace service::detail
     namespace
     {
         // File extensions indexing allow list
-        const std::vector<std::string_view> allowed_exts{
-            ".txt",
-            ".wav",
-            ".mp3",
-            ".flac",
-        };
+        const std::vector<std::pair<std::string_view, mimeType>> allowed_exts{
+            {".txt", mimeType::text}, {".wav", mimeType::audio}, {".mp3", mimeType::audio}, {".flac", mimeType::audio}};
     } // namespace
 
-    auto startupIndexer::fileShouldBeIndexed(std::string_view path) -> bool
+    auto startupIndexer::getFileType(std::string_view path) -> mimeType
     {
         for (const auto &ext : allowed_exts) {
-            if (fs::path(path).extension() == ext) {
-                return true;
+            if (fs::path(path).extension() == ext.first) {
+                return ext.second;
             }
         }
-        return false;
+        return mimeType::_none_;
     }
 
     // Collect startup files when service starts
@@ -42,7 +38,7 @@ namespace service::detail
             auto _this = reinterpret_cast<startupIndexer *>(ctx);
             if (!isDir) {
                 for (const auto &ext : allowed_exts) {
-                    if (fs::path(path).extension() == ext) {
+                    if (fs::path(path).extension() == ext.first) {
                         _this->mMsgs.emplace_back(std::make_shared<msg::FileChangeMessage>(
                             path, msg::FileChangeMessage::evt_t::modified, ""s));
                         LOG_DEBUG("Initial indexing file added %s", path);
