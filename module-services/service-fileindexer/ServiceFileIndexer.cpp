@@ -4,6 +4,7 @@
 #include <log/log.hpp>
 #include <vfs.hpp>
 #include "ServiceFileIndexer.hpp"
+#include "notesIndexer.hpp"
 #include "messages/FileChangeMessage.hpp"
 #include "Constants.hpp"
 #include <Service/Bus.hpp>
@@ -117,5 +118,11 @@ namespace service
     auto ServiceFileIndexer::onTextContentChanged(std::string_view path) -> void
     {
         LOG_DEBUG("Text content index %s", std::string(path).c_str());
+        detail::notesIndexer noteInfo(path);
+        LOG_DEBUG("Words %lu Lines %lu Chars %lu Size %lu",
+                  noteInfo.getWords(),
+                  noteInfo.getLines(),
+                  noteInfo.getChars(),
+                  noteInfo.getFileSize());
     }
 } // namespace service

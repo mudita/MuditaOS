@@ -12,4 +12,5 @@ target_sources( ${PROJECT_NAME}
 	"ServiceFileIndexer.cpp"
 	"messages/FileChangeMessage.cpp"
 	"startupIndexer.cpp"
+	"notesIndexer.cpp"
 )
