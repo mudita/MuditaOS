@@ -7,6 +7,7 @@
 #include <mutex.hpp>
 #include <functional>
 #include <string>
+#include <thread.hpp>
 
 namespace vfsn::utility
 {
@@ -69,6 +70,7 @@ namespace vfsn::utility
         auto registerNotificationHandler(NotifyHandler hwnd) -> void
         {
             notificationCallback = hwnd;
+            threadHandle         = hwnd ? cpp_freertos::Thread::GetCurrentThreadHandle() : nullptr;
         }
 
       private:
@@ -80,7 +82,7 @@ namespace vfsn::utility
          */
         auto notify(std::string_view file, FsEvent event, std::string_view old_file = "") -> void
         {
-            if (notificationCallback)
+            if (threadHandle != cpp_freertos::Thread::GetCurrentThreadHandle() && notificationCallback)
                 notificationCallback(file, event, old_file);
         }
 
@@ -91,5 +93,6 @@ namespace vfsn::utility
         cpp_freertos::MutexStandard mMutex;
         //! Notification handler callback
         NotifyHandler notificationCallback;
+        TaskHandle_t threadHandle;
     };
 } // namespace vfsn::utility
