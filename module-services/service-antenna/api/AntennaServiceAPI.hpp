@@ -6,7 +6,12 @@
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 
-#include "../ServiceAntenna.hpp"
+#include "../ServiceAntenna.hpp" // for lockState
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace AntennaServiceAPI
 {

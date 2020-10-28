@@ -2,10 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RestoreEndpoint.hpp"
-#include "DesktopMessages.hpp"
-#include "ParserUtils.hpp"
-#include "ServiceDesktop.hpp"
-#include <Service/Bus.hpp>
+
+#include <Service/Bus.hpp> // for Bus
+#include <memory>          // for make_shared
+
+#include "DesktopMessages.hpp" // for RestoreMessage
+#include "ParserUtils.hpp"     // for restoreRequest, Method, Method::post
+#include "ServiceDesktop.hpp"  // for service_desktop
+#include "Context.hpp"         // for Context
+#include "MessageHandler.hpp"  // for MessageHandler
+#include "json/json11.hpp"     // for Json, Json::object
 
 auto RestoreEndpoint::handle(Context &context) -> void
 {

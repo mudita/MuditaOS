@@ -3,9 +3,22 @@
 
 #pragma once
 
-#include "Endpoint.hpp"
+#include <memory> // for make_unique, unique_ptr
+#include <string> // for string
+
+#include "Endpoint.hpp" // for Endpoint
 #include "Service/Service.hpp"
-#include "ContactHelper.hpp"
+#include "ContactHelper.hpp" // for ContactHelper
+#include "ParserUtils.hpp"   // for parserFSM
+
+namespace parserFSM
+{
+    class Context;
+} // namespace parserFSM
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace parserFSM;
 

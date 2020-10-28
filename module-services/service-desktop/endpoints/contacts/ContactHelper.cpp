@@ -1,19 +1,30 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ContactRecord.hpp"
+#include <queries/phonebook/QueryContactGet.hpp>    // for ContactGet, ContactGetSize, ContactGetResult
+#include <queries/phonebook/QueryContactAdd.hpp>    // for ContactAdd, ContactAddResult
+#include <queries/phonebook/QueryContactRemove.hpp> // for ContactRemove, ContactRemoveResult
+#include <memory>                                   // for make_unique, unique_ptr
+#include <utility>                                  // for move
+#include <vector>                                   // for vector
+
+#include "ContactRecord.hpp" // for ContactRecord, ContactRecord::Number
 #include "ContactHelper.hpp"
-#include "Common/Query.hpp"
-#include "ParserUtils.hpp"
-#include "Service/Common.hpp"
-#include "api/DBServiceAPI.hpp"
-#include "log/log.hpp"
-#include "queries/phonebook/QueryContactGetByID.hpp"
-#include "queries/phonebook/QueryContactUpdate.hpp"
-#include "json/json11.hpp"
-#include <queries/phonebook/QueryContactGet.hpp>
-#include <queries/phonebook/QueryContactAdd.hpp>
-#include <queries/phonebook/QueryContactRemove.hpp>
+#include "Common/Query.hpp"                          // for EndpointListener, Query, QueryListener, QueryResult
+#include "ParserUtils.hpp"                           // for Code, Code::InternalServerError, Code::OK, parserFSM
+#include "Service/Common.hpp"                        // for ReturnCodes, ReturnCodes::Success, ReturnCodes::Failure
+#include "api/DBServiceAPI.hpp"                      // for DBServiceAPI
+#include "log/log.hpp"                               // for LOG_ERROR
+#include "queries/phonebook/QueryContactGetByID.hpp" // for ContactGetByID, ContactGetByIDResult
+#include "queries/phonebook/QueryContactUpdate.hpp"  // for ContactUpdate, ContactUpdateResult
+#include "json/json11.hpp"                           // for Json, Json::array, Json::object
+#include "BaseInterface.hpp"                         // for Interface, Interface::Name, Interface::Name::Contact
+#include "Common/Common.hpp"                         // for ContactNumberType, ContactNumberType::CELL
+#include "Context.hpp"                               // for Context
+#include "MessageHandler.hpp"                        // for MessageHandler
+#include "PhoneNumber.hpp"                           // for PhoneNumber, PhoneNumber::View
+#include "queries/RecordQuery.hpp"                   // for RecordsSizeQueryResult
+#include "utf8/UTF8.hpp"                             // for UTF8
 
 using namespace parserFSM;
 

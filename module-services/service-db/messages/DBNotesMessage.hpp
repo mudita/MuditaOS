@@ -3,8 +3,13 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
-#include "Interface/NotesRecord.hpp"
+#include <stdint.h> // for uint32_t
+#include <memory>   // for unique_ptr
+#include <vector>   // for vector
+
+#include "DBMessage.hpp"             // for DBMessage, DBResponseMessage
+#include "Interface/NotesRecord.hpp" // for NotesRecord
+#include "MessageType.hpp"           // for MessageType, MessageType::MessageTypeUninitialized
 
 class DBNotesMessage : public DBMessage
 {

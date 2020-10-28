@@ -3,6 +3,12 @@
 
 #pragma once
 #include <Service/Service.hpp>
+#include <string> // for string
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace harness
 {

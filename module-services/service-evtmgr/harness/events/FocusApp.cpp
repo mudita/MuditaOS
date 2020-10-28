@@ -2,7 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FocusApp.hpp"
-#include <json/json11.hpp>
+
+#include <json/json11.hpp> // for Json, Json::object, json11
+#include <map>             // for map<>::mapped_type
+#include <vector>          // for vector
 
 namespace harness
 {

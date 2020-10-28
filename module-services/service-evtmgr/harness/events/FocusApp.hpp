@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include "../Events.hpp"
+#include <string> // for string
+
+#include "../Events.hpp" // for Event, Events, Events::FocusApp
 
 namespace harness
 {

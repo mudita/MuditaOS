@@ -3,17 +3,30 @@
 
 #pragma once
 
+#include <module-utils/state/ServiceState.hpp>
+#include <stdint.h> // for uint32_t
 #include <algorithm>
 #include <cassert>
+#include <memory> // for unique_ptr
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
+#include "Service/Service.hpp" // for Service
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Worker.hpp"
 #include "MessageType.hpp"
+#include "bsp/cellular/bsp_cellular.hpp" // for antenna
+#include "Service/Common.hpp"            // for ReturnCodes, ServicePowerMode
 
-#include <module-utils/state/ServiceState.hpp>
-
-#include "bsp/cellular/bsp_cellular.hpp"
+namespace sys
+{
+    class Timer;
+} // namespace sys
+namespace utils
+{
+    namespace state
+    {
+        template <typename T> class State;
+    } // namespace state
+} // namespace utils
 
 namespace antenna
 {

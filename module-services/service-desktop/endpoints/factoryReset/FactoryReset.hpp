@@ -3,7 +3,14 @@
 
 #pragma once
 
+#include <string> // for string
+
 #include "Service/Service.hpp"
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace FactoryReset
 {

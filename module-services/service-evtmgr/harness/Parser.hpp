@@ -3,10 +3,16 @@
 
 #pragma once
 
-#include "Events.hpp"
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <string>
+#include <string> // for string
+
+#include "Events.hpp"
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace harness
 {

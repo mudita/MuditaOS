@@ -2,8 +2,23 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "TimeEvents.hpp"
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <stdint.h> // for uint32_t
+#include <memory>   // for allocator, unique_ptr
+#include <string>   // for string
+
+#include "TimeEvents.hpp"                           // for TimeEvents
+#include "EventsRecord.hpp"                         // for EventsRecord
+#include "application-calendar/data/dateCommon.hpp" // for TIME_POINT_INVALID, TimePoint
+
+namespace db
+{
+    class QueryResult;
+} // namespace db
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace stm
 {

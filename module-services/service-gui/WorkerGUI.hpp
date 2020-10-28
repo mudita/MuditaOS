@@ -4,12 +4,14 @@
 #ifndef MODULE_SERVICES_SERVICE_GUI_WORKERGUI_HPP_
 #define MODULE_SERVICES_SERVICE_GUI_WORKERGUI_HPP_
 
+#include <stdint.h> // for uint32_t
+
 #include "core/DrawCommand.hpp"
 #include "core/Context.hpp"
 #include "messages/GUIMessage.hpp"
 #include "ServiceGUI.hpp"
-#include "Service/Worker.hpp"
-#include "gui/core/Renderer.hpp"
+#include "Service/Worker.hpp"    // for Worker
+#include "gui/core/Renderer.hpp" // for Renderer
 
 namespace sgui
 {

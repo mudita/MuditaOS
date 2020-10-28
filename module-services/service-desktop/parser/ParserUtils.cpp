@@ -3,6 +3,8 @@
 
 #include "ParserUtils.hpp"
 
+#include "log/log.hpp" // for LOG_ERROR
+
 using namespace parserFSM;
 
 bool http::isMethodValid(uint8_t method)

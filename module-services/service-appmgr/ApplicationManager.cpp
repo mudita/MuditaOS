@@ -2,24 +2,28 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-appmgr/Controller.hpp"
 
-#include <utility>
-#include <module-apps/application-desktop/data/LockPhoneData.hpp>
+#include <utility>   // for move
+#include <algorithm> // for find_if
+#include <limits>    // for numeric_limits
 
-#include "application-call/ApplicationCall.hpp"
-#include "application-special-input/ApplicationSpecialInput.hpp"
-
-#include "Service/Message.hpp"
-#include "AppMessage.hpp"
-
-#include "Service/Timer.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-evtmgr/EventManager.hpp"
-#include "service-eink/ServiceEink.hpp"
-#include "service-gui/ServiceGUI.hpp"
-
-#include "log/log.hpp"
+#include "service-appmgr/Controller.hpp"                         // for Controller
+#include "application-call/ApplicationCall.hpp"                  // for name_call
+#include "application-special-input/ApplicationSpecialInput.hpp" // for special_input
+#include "Service/Message.hpp"             // for ResponseMessage, DataMessage (ptr only), Message_t
+#include "AppMessage.hpp"                  // for AppSwitchWindowMessage
+#include "Service/Timer.hpp"               // for Timer, Timer::Type, Timer::Type::SingleShot, ms
+#include "service-db/api/DBServiceAPI.hpp" // for DBServiceAPI
+#include "service-evtmgr/EventManager.hpp" // for EventManager
+#include "service-eink/ServiceEink.hpp"    // for ServiceEink
+#include "service-gui/ServiceGUI.hpp"      // for ServiceGUI
+#include "log/log.hpp"                     // for LOG_INFO, LOG_ERROR, LOG_WARN, LOG_DEBUG, LOG_FATAL
+#include "Common.hpp"                      // for ShowMode, ShowMode::GUI_SHOW_INIT
+#include "Common/Common.hpp" // for SettingsLanguage, SettingsLanguage::ENGLISH, SettingsLanguage::GERMAN, SettingsLanguage::POLISH, SettingsLanguage::SPANISH
+#include "Service/Bus.hpp"   // for Bus
+#include "SystemManager/SystemManager.hpp"        // for SystemManager
+#include "i18/i18.hpp"                            // for Lang, Lang::En, Lang::De, Lang::Pl, Lang::Sp, i18, localize
+#include "service-appmgr/messages/APMMessage.hpp" // for APMCheckApp, APMSwitch, APMRegister, APMConfirmClose, APMConfirmSwitch, Action, APMAction, APMChangeLanguage, APMSwitchPrevApp, APMDelayedClose, APMClose, APMInitPowerSaveMode, APMPreventBlocking
 
 // Auto phone lock disabled for now till the times when it's debugged
 // #define AUTO_PHONE_LOCK_ENABLED

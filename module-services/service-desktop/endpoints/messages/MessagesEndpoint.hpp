@@ -3,9 +3,22 @@
 
 #pragma once
 
-#include "Endpoint.hpp"
+#include <memory> // for make_shared, shared_ptr
+#include <string> // for string
+
+#include "Endpoint.hpp" // for Endpoint
 #include "Service/Service.hpp"
-#include "MessageHelper.hpp"
+#include "MessageHelper.hpp" // for MessageHelper
+#include "ParserUtils.hpp"   // for parserFSM
+
+namespace parserFSM
+{
+    class Context;
+} // namespace parserFSM
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 using namespace parserFSM;
 

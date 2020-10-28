@@ -4,6 +4,9 @@
 #pragma once
 
 #include <string.h>
+#include <stdint.h> // for uint32_t
+#include <list>     // for list
+#include <string>   // for allocator, string
 
 extern "C"
 {
@@ -13,10 +16,14 @@ extern "C"
 
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
-#include "Service/Worker.hpp"
-#include "parser/ParserFSM.hpp"
-
+#include "Service/Worker.hpp"   // for Worker, WorkerQueueInfo (ptr only)
+#include "parser/ParserFSM.hpp" // for StateMachine
 #include "bsp/usb_cdc/usb_cdc.hpp"
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 class WorkerDesktop : public sys::Worker
 {

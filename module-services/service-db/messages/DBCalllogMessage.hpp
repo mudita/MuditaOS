@@ -3,8 +3,14 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
-#include "Interface/CalllogRecord.hpp"
+#include <stdint.h> // for uint32_t
+#include <memory>   // for unique_ptr
+#include <vector>   // for vector
+
+#include "DBMessage.hpp"               // for DBMessage, DBResponseMessage
+#include "Interface/CalllogRecord.hpp" // for CalllogRecord
+#include "Common/Common.hpp"           // for EntryState
+#include "MessageType.hpp"             // for MessageType, MessageType::MessageTypeUninitialized
 
 class DBCalllogMessage : public DBMessage
 {

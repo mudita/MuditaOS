@@ -2,10 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BackupEndpoint.hpp"
-#include "DesktopMessages.hpp"
-#include "ParserUtils.hpp"
-#include "ServiceDesktop.hpp"
-#include <Service/Bus.hpp>
+
+#include <Service/Bus.hpp> // for Bus
+#include <filesystem>      // for path
+#include <memory>          // for make_shared
+
+#include "DesktopMessages.hpp" // for BackupMessage
+#include "ParserUtils.hpp" // for Method, backupReady, backupRequest, backupUpload, Code, Code::BadRequest, Method::del, Method::get, Method::post, Method::put
+#include "ServiceDesktop.hpp" // for service_desktop
+#include "Context.hpp"        // for Context
+#include "MessageHandler.hpp" // for MessageHandler
+#include "json/json11.hpp"    // for Json, Json::object
+#include "vfs.hpp"            // for vfs, os_backup
 
 static bool backupReady = false;
 

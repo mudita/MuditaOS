@@ -9,20 +9,20 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cstring>
-#include <sys/types.h>
+#include <sys/mman.h>          // for mmap, shm_open, MAP_FAILED, MAP_SHARED, PROT_READ, PROT_WRITE
+#include <sys/stat.h>          // for mkfifo
+#include <fcntl.h>             // for open, O_WRONLY, O_NONBLOCK, O_CREAT, O_RDWR
+#include <unistd.h>            // for ftruncate
+#include <gtkmm/application.h> // for Application
+#include <errno.h>             // for errno
+#include <stdint.h>            // for uint32_t, uint8_t
+#include <iostream>            // for operator<<, basic_ostream, endl, char_traits, ostream, cerr, cout, std
+#include <cstring>             // for strerror, NULL
+#include <string>              // for string, allocator
 
-#include <gtkmm.h>
-#include <gtkmm/application.h>
+#include "RWindow.hpp"     // for RWindow
+#include "glibmm/refptr.h" // for RefPtr
 
-#include "RWindow.hpp"
 using namespace std;
 
 static const int FrameBufferWidth  = 480;
