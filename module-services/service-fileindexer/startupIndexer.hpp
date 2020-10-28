@@ -29,6 +29,7 @@ namespace service::detail
     class startupIndexer
     {
         static constexpr auto timer_indexing_time = 100U;
+
       public:
         startupIndexer()                       = default;
         ~startupIndexer()                      = default;

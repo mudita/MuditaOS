@@ -7,4 +7,4 @@
 namespace service::name
 {
     inline constexpr std::string_view file_indexer = "FileIndexer";
-}
+} // namespace service::name

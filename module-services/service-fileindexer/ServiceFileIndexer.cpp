@@ -11,11 +11,11 @@
 namespace service
 {
 
-    // File indexer service constructor
     ServiceFileIndexer::ServiceFileIndexer(const std::string_view name) : sys::Service(std::string(name))
     {
         LOG_DEBUG("[%s] Initializing", std::string(name).c_str());
     }
+
     // When receive notification handler
     sys::Message_t ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
     {
@@ -64,14 +64,12 @@ namespace service
         return sys::ReturnCodes::Success;
     }
 
-    // Deinitialization handler
     sys::ReturnCodes ServiceFileIndexer::DeinitHandler()
     {
         vfs.registerNotificationHandler(nullptr);
         return sys::ReturnCodes::Success;
     }
 
-    // Power mode switch handler
     sys::ReturnCodes ServiceFileIndexer::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         LOG_DEBUG("Switch to power Mode %s", c_str(mode));
