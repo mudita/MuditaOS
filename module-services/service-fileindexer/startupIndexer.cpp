@@ -15,9 +15,13 @@ namespace service::detail
     namespace fs = std::filesystem;
     namespace
     {
+        using namespace std::string_literals;
         // File extensions indexing allow list
         const std::vector<std::pair<std::string_view, mimeType>> allowed_exts{
             {".txt", mimeType::text}, {".wav", mimeType::audio}, {".mp3", mimeType::audio}, {".flac", mimeType::audio}};
+
+        // List of initial dirs for scan
+        const std::vector<std::string> start_dirs{purefs::dir::user_disk, purefs::dir::os_current};
     } // namespace
 
     auto startupIndexer::getFileType(std::string_view path) -> mimeType
@@ -46,9 +50,9 @@ namespace service::detail
                 }
             }
         };
-
-        ff_stdio_listdir_recursive(purefs::dir::user_disk.c_str(), searcher_cb, this);
-        ff_stdio_listdir_recursive(purefs::dir::os_current.c_str(), searcher_cb, this);
+        for (const auto &path : start_dirs) {
+            ff_stdio_listdir_recursive(path.c_str(), searcher_cb, this);
+        }
     }
     // Setup timers for notification
     auto startupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
