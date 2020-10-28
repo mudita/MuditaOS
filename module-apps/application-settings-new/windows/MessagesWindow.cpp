@@ -44,7 +44,7 @@ namespace gui
                     return true;
                 },
                 nullptr,
-                showUnreadMessagesFirst ? RightIcon::On : RightIcon::Off));
+                showUnreadMessagesFirst ? RightItem::On : RightItem::Off));
         };
 
         auto addMenu = [&](UTF8 name, std::string window) {
@@ -60,7 +60,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightIcon::Border));
+                RightItem::ArrowWhite));
         };
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));

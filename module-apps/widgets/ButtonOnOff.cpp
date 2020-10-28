@@ -6,18 +6,9 @@
 #include <Style.hpp>
 #include <i18/i18.hpp>
 
-namespace style
-{
-    namespace buttonOnOff
-    {
-        constexpr uint32_t w = 56;
-        constexpr uint32_t h = 32;
-    } // namespace buttonOnOff
-} // namespace style
-
 namespace gui
 {
-    ButtonOnOff::ButtonOnOff(Item *parent, ButtonType buttonType) : Label{parent}
+    ButtonOnOff::ButtonOnOff(Item *parent, const ButtonState buttonState) : Label{parent}
     {
         setMinimumSize(style::buttonOnOff::w, style::buttonOnOff::h);
 
@@ -27,16 +18,27 @@ namespace gui
         setPenWidth(2);
         setFilled(true);
         setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        if (buttonType == ButtonType::On) {
+        setFont(style::window::font::small);
+        switchState(buttonState);
+    }
+
+    void ButtonOnOff::switchState(const ButtonState newButtonState)
+    {
+        currentState = newButtonState;
+        if (currentState == ButtonState::On) {
             setFillColor(ColorFullBlack);
             setText(utils::translateI18("app_settings_toggle_on"));
             setTextColor(ColorFullWhite);
         }
-        else if (buttonType == ButtonType::Off) {
+        else if (currentState == ButtonState::Off) {
             setFillColor(ColorFullWhite);
             setText(utils::translateI18("app_settings_toggle_off"));
             setTextColor(ColorFullBlack);
         }
+    }
+    void ButtonOnOff::toggleState()
+    {
+        switchState(static_cast<ButtonState>(!static_cast<bool>(currentState)));
     }
 
 } /* namespace gui */

@@ -35,12 +35,14 @@ namespace gui
             },
             [=](gui::Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
+                    this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
                                            BottomBar::Side::CENTER);
                 }
                 return true;
             },
-            this));
+            this,
+            isBluetoothSwitchOn ? RightItem::On : RightItem::Off));
+
         if (isBluetoothSwitchOn) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_bluetooth_all_devices_indent"),
@@ -50,13 +52,13 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::localize.get(style::strings::common::select),
+                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
                 },
                 nullptr,
-                RightIcon::Border));
+                RightItem::ArrowWhite));
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_bluetooth_phone_visibility"),
                 [=](gui::Item &item) {
@@ -65,12 +67,13 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
+                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
                 },
-                this));
+                this,
+                isPhoneVisibilitySwitchOn ? RightItem::On : RightItem::Off));
             if (isPhoneVisibilitySwitchOn) {
                 optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                     utils::translateI18("app_settings_bluetooth_phone_name_indent"),
@@ -80,13 +83,13 @@ namespace gui
                     },
                     [=](gui::Item &item) {
                         if (item.focus) {
-                            this->setBottomBarText(utils::localize.get(style::strings::common::select),
+                            this->setBottomBarText(utils::translateI18(style::strings::common::select),
                                                    BottomBar::Side::CENTER);
                         }
                         return true;
                     },
                     nullptr,
-                    RightIcon::Border));
+                    RightItem::ArrowWhite));
             }
         }
 
