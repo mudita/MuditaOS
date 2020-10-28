@@ -3,11 +3,17 @@
 
 #pragma once
 
-#include <module-utils/microtar/src/microtar.hpp>
-#include <vfs.hpp>
-#include <json/json11.hpp>
+#include <module-utils/microtar/src/microtar.hpp> // for mtar_header_t, mtar_t
+#include <vfs.hpp>                                // for PATH_SYS, PATH_TMP
+#include <json/json11.hpp>                        // for Json
+#include <stdint.h>                               // for uint32_t
+#include <filesystem>                             // for path, filesystem
+#include <iosfwd>                                 // for size_t
+#include <string>                                 // for string, allocator
+#include <vector>                                 // for vector
 
 class ServiceDesktop;
+
 namespace fs = std::filesystem;
 namespace updateos
 {

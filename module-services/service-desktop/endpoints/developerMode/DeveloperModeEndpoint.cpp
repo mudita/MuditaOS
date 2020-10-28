@@ -3,6 +3,8 @@
 
 #include "DeveloperModeEndpoint.hpp"
 
+#include "Context.hpp" // for Context
+
 using namespace parserFSM;
 
 auto DeveloperModeEndpoint::handle(Context &context) -> void

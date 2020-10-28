@@ -2,9 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+#include <string> // for string
+
 #include "ParserUtils.hpp"
 #include "json/json11.hpp"
 #include "MessageHandler.hpp"
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace parserFSM
 {

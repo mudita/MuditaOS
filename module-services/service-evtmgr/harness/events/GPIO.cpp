@@ -2,11 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "GPIO.hpp"
-#include "../../messages/EVMessages.hpp"
-#include <log/log.hpp>
-#include <map>
 
-#include "bsp/harness/bsp_harness.hpp"
+#include <log/log.hpp> // for LOG_DEBUG, LOG_ERROR
+#include <map>         // for map, map<>::mapped_type
+#include <memory>      // for shared_ptr, __shared_ptr_access, make_shared
+#include <utility>     // for pair
+
+#include "../../messages/EVMessages.hpp"     // for GPIO
+#include "bsp/harness/bsp_harness.hpp"       // for to, read, write
+#include "bsp/harness/bsp_pinmap.hpp"        // for harness
+#include "service-evtmgr/harness/Events.hpp" // for Data, Type
 
 namespace harness::events
 {

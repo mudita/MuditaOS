@@ -3,7 +3,11 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
+#include <stdint.h> // for uint32_t
+#include <string>   // for string
+
+#include "DBMessage.hpp"   // for DBMessage, DBResponseMessage
+#include "MessageType.hpp" // for MessageType, MessageType::MessageTypeUninitialized
 
 class DBServiceMessageBackup : public DBMessage
 {

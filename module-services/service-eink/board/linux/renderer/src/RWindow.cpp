@@ -1,19 +1,25 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <glib.h>   // for g_timeout_add, gboolean, gpointer
+#include <stddef.h> // for size_t
+#include <unistd.h> // for write, ssize_t
 /*
  * RWindow.cpp
  *
  *  Created on: 24 kwi 2019
  *      Author: robert
  */
-#include <map>
-#include <gtk/gtk.h>
+#include <map>     // for map, operator!=, _Rb_tree_iterator<>::_Self, map<>::iterator, operator==, _Rb_tree_iterator
+#include <utility> // for pair
 
 #include "RWindow.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp" // for KeyCodes, KeyCodes::FnLeft, KeyCodes::FnRight, KeyCodes::JoystickDown, KeyCodes::JoystickEnter, KeyCodes::JoystickLeft, KeyCodes::JoystickRight, KeyCodes::JoystickUp, KeyCodes::NumericKey0, KeyCodes::NumericKey1, KeyCodes::NumericKey2, KeyCodes::NumericKey3, KeyCodes::NumericKey4, KeyCodes::NumericKey5, KeyCodes::NumericKey6, KeyCodes::NumericKey7, KeyCodes::NumericKey8, KeyCodes::NumericKey9, KeyCodes::NumericKeyAst, KeyCodes::NumericKeyPnd, KeyCodes::SSwitchDown, KeyCodes::SSwitchMid, KeyCodes::SSwitchUp, KeyCodes::Torch, KeyCodes::VolDown, KeyCodes::VolUp
+#include "module-bsp/bsp/common.hpp"             // for KeyEvents, KeyEvents::Pressed, KeyEvents::Released
+#include "glibmm/signalproxy.h"                  // for SignalProxy
+#include "module-services/service-eink/board/linux/renderer/src/RArea.hpp" // for RArea
+#include "sigc++/functors/mem_fun.h"                                       // for bound_mem_functor1, mem_fun
 
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
-#include "module-bsp/bsp/common.hpp"
 static gboolean viewUpdate(gpointer data)
 {
     RWindow *win = reinterpret_cast<RWindow *>(data);

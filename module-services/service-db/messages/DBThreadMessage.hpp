@@ -3,8 +3,14 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
-#include "Interface/ThreadRecord.hpp"
+#include <stdint.h> // for uint32_t
+#include <memory>   // for unique_ptr
+#include <vector>   // for vector
+
+#include "DBMessage.hpp"              // for DBMessage, DBResponseMessage
+#include "Interface/ThreadRecord.hpp" // for ThreadRecord
+#include "Common/Common.hpp"          // for EntryState, EntryState::ALL
+#include "MessageType.hpp"            // for MessageType, MessageType::MessageTypeUninitialized
 
 class DBThreadMessage : public DBMessage
 {

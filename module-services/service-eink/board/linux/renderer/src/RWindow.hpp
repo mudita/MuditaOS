@@ -11,14 +11,16 @@
 #ifndef RENDERER_RWINDOW_HPP_
 #define RENDERER_RWINDOW_HPP_
 
-#include <map>
-#include <cstdint>
 #include <gtkmm.h>
 #include <gtkmm/drawingarea.h>
+#include <gdk/gdk.h> // for GdkEventKey
+#include <map>       // for map
+#include <cstdint>   // for uint32_t, int8_t
 
-#include "RArea.hpp"
-
+#include "RArea.hpp" // for RArea
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "gtkmm/window.h" // for Window
+
 class RWindow : public Gtk::Window
 {
   protected:

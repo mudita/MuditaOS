@@ -2,9 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularCMD.hpp"
-#include <Service/Bus.hpp>
-#include <service-cellular/ServiceCellular.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
+
+#include <Service/Bus.hpp>                      // for Bus
+#include <service-cellular/ServiceCellular.hpp> // for ServiceCellular, ServiceCellular::serviceName
+#include <memory>                               // for allocator, make_shared, __shared_ptr_access, shared_ptr
+
+#include "log/log.hpp"                                   // for LOG_ERROR
+#include "service-cellular/messages/CellularMessage.hpp" // for RawCommand
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace harness
 {

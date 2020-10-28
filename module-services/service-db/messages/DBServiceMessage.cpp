@@ -3,6 +3,8 @@
 
 #include "DBServiceMessage.hpp"
 
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
 DBServiceMessageBackup::DBServiceMessageBackup(MessageType messageType, std::string backupPath)
     : DBMessage(messageType), backupPath(backupPath)
 {}

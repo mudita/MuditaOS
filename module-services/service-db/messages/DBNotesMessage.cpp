@@ -3,6 +3,11 @@
 
 #include "DBNotesMessage.hpp"
 
+#include <utility> // for move
+
+#include "NotesRecord.hpp"        // for NotesRecord
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
 DBNotesMessage::DBNotesMessage(MessageType messageType, const NotesRecord &rec) : DBMessage(messageType), record(rec)
 {}
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -8,37 +8,45 @@
  *      Author: kuba
  */
 
-#include <string.h>
-
 extern "C"
 {
-#include "FreeRTOS.h"
-#include "task.h"
+#include "FreeRTOS.h" // for xQueueHandle
+#include "projdefs.h" // for pdTRUE
+#include "queue.h"    // for xQueueReceive, QueueDefinition, QueueHandle_t
+#include "task.h"     // for xTaskGetTickCount
 }
+#include "Audio/AudioCommon.hpp"      // for EventType, EventType::HeadphonesPlugin, EventType::HeadphonesUnplug
+#include "common_data/EventStore.hpp" // for GSM, GSM::Tray
+#include "common_data/RawKey.hpp"     // for RawKey, RawKey::State, RawKey::State::Pressed, RawKey::State::Released
+//#include "harness/harness.hpp"                          // for ETX, STX
+#include "log/log.hpp"                                 // for LOG_DEBUG, LOG_ERROR
+#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
+#include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
+#include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "Service/Worker.hpp"
-#include "MessageType.hpp"
+#include <Service/Bus.hpp> // for Bus
+//#include <bits/types/struct_tm.h>                       // for tm
+#include <sys/types.h> // for time_t
+#include <memory>      // for make_shared, __shared_ptr_access, shared_ptr, allocator
+#include <optional>    // for optional
+#include <string>      // for string
+#include <vector>      // for vector
 
+#include "Service/Worker.hpp" // for WorkerQueueInfo, Worker, WorkerCommand
+#include "MessageType.hpp" // for MessageType, MessageType::EVMMinuteUpdated, MessageType::EVMModemStatus, MessageType::EVMRingIndicator
 #include "WorkerEvent.hpp"
-#include "EventManager.hpp"
-#include "service-evtmgr/messages/EVMessages.hpp"
-#include "AudioServiceAPI.hpp"
-
-#include "bsp/battery-charger/battery_charger.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "bsp/keyboard/keyboard.hpp"
-#include "headset.hpp"
-#include "bsp/rtc/rtc.hpp"
-#include "bsp/vibrator/vibrator.hpp"
-#include "bsp/magnetometer/magnetometer.hpp"
-#include "bsp/torch/torch.hpp"
-
-#include "Constants.hpp"
-#include "bsp/harness/bsp_harness.hpp"
-#include "harness/Parser.hpp"
-#include <Service/Bus.hpp>
+#include "service-evtmgr/messages/EVMessages.hpp"  // for StatusStateMessage, RtcMinuteAlarmMessage
+#include "bsp/battery-charger/battery_charger.hpp" // for battery_ClearAllIRQs, battery_Deinit, battery_Init, battery_getBatteryLevel, battery_getChargeStatus, batteryIRQSource, batteryIRQSource::INOKB, batteryIRQSource::INTB
+#include "bsp/cellular/bsp_cellular.hpp" // for getStatus, getTray, hotswap_trigger, init, ringIndicatorPin, statusPin, trayPin, value, value::ACTIVE
+#include "bsp/keyboard/keyboard.hpp" // for keyboard_Deinit, keyboard_Init, keyboard_get_data
+#include "headset.hpp"               // for Deinit, Handler, Init, IsInserted
+#include "bsp/rtc/rtc.hpp" // for rtc_GetCurrentTimestamp, rtc_SetMinuteAlarm, rtc_GetCurrentDateTime, rtc_Init
+#include "bsp/vibrator/vibrator.hpp"         // for init
+#include "bsp/magnetometer/magnetometer.hpp" // for WorkerEventHandler, init
+#include "bsp/torch/torch.hpp"               // for deinit, init
+#include "Constants.hpp"                     // for evt_manager
+#include "bsp/harness/bsp_harness.hpp"       // for Init, emit, flush, read
+#include "harness/Parser.hpp"                // for c_str, parse, Error, Error::Success
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -188,7 +196,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
     return true;
 }
 
-#include "harness/events/SysStart.hpp"
+#include "harness/events/SysStart.hpp" // for SysStart
 
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
 {

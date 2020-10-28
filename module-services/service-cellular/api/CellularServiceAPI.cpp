@@ -1,17 +1,25 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../ServiceCellular.hpp"
+#include <PhoneNumber.hpp> // for PhoneNumber
+#include <Service/Bus.hpp> // for Bus
+#include <memory> // for make_shared, shared_ptr, allocator, dynamic_pointer_cast, operator!=, __shared_ptr_access, __shared_ptr<>::element_type
+#include <string> // for string
+#include <utility> // for pair, move
 
+#include "../ServiceCellular.hpp" // for ServiceCellular, ServiceCellular::serviceName
 #include "CellularServiceAPI.hpp"
+#include "MessageType.hpp" // for MessageType, MessageType::CellularAnswerIncomingCall, MessageType::CellularGetAntenna, MessageType::CellularGetCREG, MessageType::CellularGetCSQ, MessageType::CellularGetFirmwareVersion, MessageType::CellularGetIMSI, MessageType::CellularGetNWINFO, MessageType::CellularGetNetworkInfo, MessageType::CellularGetOwnNumber, MessageType::CellularGetScanMode, MessageType::CellularHangupCall, MessageType::CellularSelectAntenna, MessageType::CellularSetScanMode, MessageType::CellularStartOperatorsScan
+#include "Modem/TS0710/TS0710.h"                         // for TS0710, TS0710::Channel, TS0710::Channel::Data
+#include "Service/Common.hpp"                            // for ReturnCodes, ReturnCodes::Success
+#include "bsp/cellular/bsp_cellular.hpp"                 // for antenna
+#include "log/log.hpp"                                   // for LOG_ERROR, LOG_DEBUG
+#include "service-cellular/messages/CellularMessage.hpp" // for CellularRequestMessage, CellularResponseMessage, CellularAntennaRequestMessage, CellularUSSDMessage, CellularCallRequestMessage, CellularDtmfRequestMessage, CellularGetChannelMessage, CellularAntennaResponseMessage, CellularUSSDMessage::RequestType
 
-#include <PhoneNumber.hpp>
-#include <Service/Bus.hpp>
-#include <utf8/UTF8.hpp>
-
-#include <memory>
-#include <string>
-#include <utility>
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {

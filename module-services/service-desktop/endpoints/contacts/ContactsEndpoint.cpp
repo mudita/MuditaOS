@@ -2,9 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsEndpoint.hpp"
-#include "queries/phonebook/QueryContactGet.hpp"
-#include <memory>
-#include <string>
+
+#include <memory> // for unique_ptr
+
+#include "Context.hpp"                // for Context
+#include "contacts/ContactHelper.hpp" // for ContactHelper
 
 using namespace parserFSM;
 

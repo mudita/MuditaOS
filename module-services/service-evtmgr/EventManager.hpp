@@ -11,13 +11,18 @@
 #ifndef MODULE_SERVICES_SERVICE_KBD_EVENTMANAGER_HPP_
 #define MODULE_SERVICES_SERVICE_KBD_EVENTMANAGER_HPP_
 
+#include <stdint.h>    // for uint32_t
+#include <sys/types.h> // for time_t
+#include <memory>      // for unique_ptr
+#include <string>      // for string
+
 #include "bsp/keyboard/key_codes.hpp"
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
+#include "Service/Service.hpp" // for Service
+#include "Service/Message.hpp" // for DataMessage (ptr only), Message_t, ResponseMessage (ptr only)
 #include "Service/Worker.hpp"
 #include "MessageType.hpp"
-
 #include "bsp/common.hpp"
+#include "Service/Common.hpp" // for ReturnCodes, ServicePowerMode
 
 class WorkerEvent;
 

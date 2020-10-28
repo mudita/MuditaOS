@@ -1,14 +1,19 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-#include "messages/SettingsMessages.hpp"
+#include <catch2/catch.hpp>           // for Section, SourceLineInfo, SECTION, SectionInfo, StringRef, TEST_CASE
+#include <Service/Service.hpp>        // for Service
+#include <Service/Message.hpp>        // for Message_t, ResponseMessage, DataMessage
+#include <module-sys/Service/Bus.hpp> // for Bus
+#include <functional>                 // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
+#include <list>                       // for list
+#include <memory>                     // for make_shared, allocator, shared_ptr
+#include <optional>                   // for optional
+#include <string>                     // for string
+#include <utility>                    // for move
 
-#include <Service/Service.hpp>
-#include <Service/Message.hpp>
-
-#include <functional>
-#include <module-sys/Service/Bus.hpp>
+#include "messages/SettingsMessages.hpp" // for SetVariable, ListProfiles, GetVariable, AddMode, AddProfile, CurrentModeChanged, CurrentProfileChanged, EntryPath, GetCurrentMode, GetCurrentProfile, ListModes, ModeListResponse, ProfileListResponse, RegisterOnVariableChange, UnregisterOnVariableChange, VariableChanged, VariableResponse
+#include "Service/Common.hpp"            // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
 
 namespace Settings
 {

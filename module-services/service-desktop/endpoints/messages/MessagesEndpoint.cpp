@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessagesEndpoint.hpp"
-#include "module-db/queries/messages/templates/QuerySMSTemplateGetByID.hpp"
+
+#include "Context.hpp" // for Context
 
 using namespace parserFSM;
 

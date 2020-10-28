@@ -3,6 +3,11 @@
 
 #include "DBAlarmMessage.hpp"
 
+#include <utility> // for move
+
+#include "AlarmsRecord.hpp"       // for AlarmsRecord
+#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+
 DBAlarmMessage ::DBAlarmMessage(MessageType messageType, const AlarmsRecord &rec) : DBMessage(messageType), record(rec)
 {}
 

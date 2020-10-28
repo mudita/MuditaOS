@@ -3,8 +3,21 @@
 
 #pragma once
 
+#include <optional> // for optional
+#include <string>   // for string
+
 #include "messages/SettingsMessages.hpp"
-#include "agents/DatabaseAgent.hpp"
+#include "agents/DatabaseAgent.hpp" // for DatabaseAgent
+#include "Service/Message.hpp"      // for DataMessage (ptr only), Message_t, ResponseMessage (ptr only)
+
+namespace Settings
+{
+    struct EntryPath;
+} // namespace Settings
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 class SettingsAgent : public DatabaseAgent
 {

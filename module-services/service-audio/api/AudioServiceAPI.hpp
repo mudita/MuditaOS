@@ -3,12 +3,25 @@
 
 #pragma once
 
+#include <optional> // for optional
+#include <memory>   // for shared_ptr
+#include <string>   // for string
+#include <vector>   // for vector
+
 #include "../messages/AudioMessage.hpp"
 #include "Audio/decoder/decoder.hpp"
-
-#include <optional>
+#include "Audio/AudioCommon.hpp" // for PlaybackType, PlaybackType::None, Token (ptr only), RetCode, Setting, Event (ptr only), EventType
+#include "Audio/Profiles/Profile.hpp" // for Profile, Profile::Type, Profile::Type::Idle
 
 class Service;
+namespace audio
+{
+    struct Tags;
+} // namespace audio
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 /**
  * Audio service API.

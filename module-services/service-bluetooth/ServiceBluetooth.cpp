@@ -2,14 +2,19 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceBluetooth.hpp"
-#include "Constants.hpp"
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
-#include "messages/BluetoothMessage.hpp"
-#include <log/log.hpp>
-#include <service-lwip/ServiceLwIP.hpp>
-#include <module-sys/Service/Bus.hpp>
+
+#include <log/log.hpp>                // for LOG_INFO, LOG_ERROR
+#include <module-sys/Service/Bus.hpp> // for Bus
+#include <bits/exception.h>           // for exception
+#include <utility>                    // for move
+
+#include "Constants.hpp"       // for bluetooth
+#include "Service/Service.hpp" // for Service
+#include "Service/Message.hpp" // for ResponseMessage, Message_t, DataMessage
+#include "MessageType.hpp" // for MessageType, MessageType::BluetoothAddrResult, MessageType::BluetoothRequest, MessageType::BluetoothRequestStream
+#include "messages/BluetoothMessage.hpp" // for BluetoothMessage, BluetoothRequestStreamResultMessage, BluetoothAddrMessage, BluetoothMessage::PAN, BluetoothMessage::Play, BluetoothMessage::Scan, BluetoothMessage::Start, BluetoothMessage::Stop, BluetoothMessage::StopScan, BluetoothMessage::Visible
+#include "BluetoothWorker.hpp"           // for BluetoothWorker
+#include "interface/profiles/Profile.hpp" // for Profile
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {

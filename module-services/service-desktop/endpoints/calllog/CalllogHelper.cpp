@@ -1,13 +1,24 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-db/queries/calllog/QueryCalllogGet.hpp>
-#include <module-db/queries/calllog/QueryCalllogGetCount.hpp>
-#include <module-db/queries/calllog/QueryCalllogRemove.hpp>
-#include <module-db/queries/calllog/QueryCalllogGetByContactID.hpp>
+#include <module-db/queries/calllog/QueryCalllogGet.hpp>            // for CalllogGet, CalllogGetResult
+#include <module-db/queries/calllog/QueryCalllogGetCount.hpp>       // for CalllogGetCount, CalllogGetCountResult
+#include <module-db/queries/calllog/QueryCalllogRemove.hpp>         // for CalllogRemove, CalllogRemoveResult
+#include <module-db/queries/calllog/QueryCalllogGetByContactID.hpp> // for CalllogGetByContactID, CalllogGetByContactIDResult
+#include <memory>                                                   // for make_unique, unique_ptr
+#include <ostream>                                                  // for stringstream, basic_ostream, basic_ios::clear
+#include <utility>                                                  // for move
+#include <vector>                                                   // for vector
 
-#include "CalllogEndpoint.hpp"
 #include "CalllogHelper.hpp"
+#include "BaseInterface.hpp"    // for Interface, Interface::Name, Interface::Name::Calllog
+#include "Common/Query.hpp"     // for EndpointListener, Query, QueryListener, QueryResult
+#include "Context.hpp"          // for Context
+#include "MessageHandler.hpp"   // for MessageHandler
+#include "ParserUtils.hpp"      // for Code, Code::InternalServerError, Code::OK, parserFSM
+#include "PhoneNumber.hpp"      // for PhoneNumber::View
+#include "api/DBServiceAPI.hpp" // for DBServiceAPI
+#include "utf8/UTF8.hpp"        // for UTF8
 
 using namespace parserFSM;
 

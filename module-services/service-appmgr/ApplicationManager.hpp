@@ -3,16 +3,35 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
+#include <memory>      // for unique_ptr, allocator
+#include <string>      // for string
+#include <deque>       // for deque
+#include <string_view> // for string_view
+#include <vector>      // for vector
 
-#include "Application.hpp"
-#include "ApplicationLauncher.hpp"
+#include "Application.hpp"         // for Application, Application::State
+#include "ApplicationLauncher.hpp" // for ApplicationLauncher
 #include "messages/APMMessage.hpp"
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+#include "Service/Service.hpp" // for Service
+#include "Service/Timer.hpp"   // for Timer
+#include "SettingsRecord.hpp"  // for SettingsRecord
+#include "SwitchData.hpp"      // for SwitchData
 
 namespace app
 {
     class ApplicationLauncher;
+    namespace manager
+    {
+        class APMAction;
+        class APMChangeLanguage;
+        class APMConfirmClose;
+        class APMConfirmSwitch;
+        class APMRegister;
+        class APMSwitch;
+        class APMSwitchPrevApp;
+    } // namespace manager
 }
 
 namespace app::manager

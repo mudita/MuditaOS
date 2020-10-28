@@ -3,9 +3,14 @@
 
 #pragma once
 
+#include <memory> // for unique_ptr
+
 #include "Bluetooth/BluetoothWorker.hpp"
-#include "Service/Service.hpp"
-#include <memory>
+#include "Service/Service.hpp" // for Service
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
+#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+
+class BluetoothWorker;
 
 class ServiceBluetooth : public sys::Service
 {

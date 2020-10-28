@@ -4,9 +4,11 @@
 #pragma once
 
 #include <memory>
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
+
+#include "MessageType.hpp"     // for MessageType, MessageType::LwIP_request
+#include "Service/Message.hpp" // for DataMessage, Message_t, ResponseMessage (ptr only)
+#include "Service/Service.hpp" // for Service
+#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 
 class LwIP_message : public sys::DataMessage
 {

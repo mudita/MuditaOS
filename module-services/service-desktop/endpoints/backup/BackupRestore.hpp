@@ -5,6 +5,11 @@
 
 #include "Service/Service.hpp"
 
+namespace sys
+{
+    class Service;
+} // namespace sys
+
 class BackupRestore
 {
   public:

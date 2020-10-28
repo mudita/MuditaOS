@@ -3,5 +3,10 @@
 
 #include "DatabaseAgent.hpp"
 
+namespace sys
+{
+    class Service;
+} // namespace sys
+
 DatabaseAgent::DatabaseAgent(sys::Service *parentService) : parentService(parentService)
 {}

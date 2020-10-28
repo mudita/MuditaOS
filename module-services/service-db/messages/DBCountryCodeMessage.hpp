@@ -3,8 +3,12 @@
 
 #pragma once
 
-#include "DBMessage.hpp"
+#include <stdint.h> // for uint32_t
+
+#include "DBMessage.hpp" // for DBMessage, DBResponseMessage
 #include "Interface/CountryCodeRecord.hpp"
+#include "MessageType.hpp"              // for MessageType, MessageType::MessageTypeUninitialized
+#include "Tables/CountryCodesTable.hpp" // for CodesTableRow
 
 class DBCountryCodeMessage : public DBMessage
 {

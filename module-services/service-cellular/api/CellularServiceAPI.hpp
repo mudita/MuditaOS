@@ -2,13 +2,20 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "../messages/CellularMessage.hpp"
-#include "utf8/UTF8.hpp"
-#include <Modem/TS0710/TS0710.h>
+#include <Modem/TS0710/TS0710.h> // for TS0710, TS0710::Channel
+#include <PhoneNumber.hpp>       // for PhoneNumber
+#include <stdint.h>              // for uint32_t
+#include <string>                // for string, allocator
 
-#include <PhoneNumber.hpp>
-#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
+#include "../messages/CellularMessage.hpp" // for CellularUSSDMessage, CellularUSSDMessage::RequestType
+#include "utf8/UTF8.hpp"
+#include "module-bsp/bsp/cellular/bsp_cellular.hpp" // for antenna
+
 class Service;
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 namespace CellularServiceAPI
 {
