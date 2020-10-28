@@ -337,10 +337,10 @@ namespace gui
             break;
         case gui::Alignment::Vertical::Center:
             if (reverseOrder) {
-                return calcPos + el->getMargins().getSumInAxis(axis) - offset / 2;
+                return calcPos - ((offset - el->getMargins().getSumInAxis(axis)) / 2);
             }
             else {
-                return calcPos - el->getMargins().getSumInAxis(axis) + offset / 2;
+                return calcPos + ((offset - el->getMargins().getSumInAxis(axis)) / 2);
             }
             break;
         case gui::Alignment::Vertical::Bottom:
@@ -360,10 +360,10 @@ namespace gui
             break;
         case gui::Alignment::Horizontal::Center:
             if (reverseOrder) {
-                return calcPos + el->getMargins().getSumInAxis(axis) - offset / 2;
+                return calcPos - ((offset - el->getMargins().getSumInAxis(axis)) / 2);
             }
             else {
-                return calcPos - el->getMargins().getSumInAxis(axis) + offset / 2;
+                return calcPos + ((offset - el->getMargins().getSumInAxis(axis)) / 2);
             }
             break;
         case gui::Alignment::Horizontal::Right:
