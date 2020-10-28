@@ -96,6 +96,7 @@ namespace at
         ATD,  /// setup call
         IPR,  /// set baudrate
         CMUX, /// setup cmux params
+        CFUN, /// set phone functionality
         CMGS, /// sms
         QCMGS,
         CREG,       /// network registration status
@@ -122,7 +123,8 @@ namespace at
         DISABLE_TIME_ZONE_UPDATE,
         DISABLE_TIME_ZONE_REPORTING,
         ENABLE_NETWORK_REGISTRATION_URC,
-        SET_SMS_TEXT_MODE_UCS2
+        SET_SMS_TEXT_MODE_UCS2,
+        CFUN_RESET,
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -164,6 +166,8 @@ namespace at
             {AT::ATD, {"ATD"}},
             {AT::IPR, {"AT+IPR="}},
             {AT::CMUX, {"AT+CMUX="}},
+            {AT::CFUN, {"AT+CFUN="}},
+            {AT::CFUN_RESET, {"AT+CFUN=1,1", 15000}},
             {AT::CMGS, {"AT+CMGS=\""}},
             {AT::QCMGS, {"AT+QCMGS=\""}},
             {AT::CREG, {"AT+CREG?", default_doc_timeout}},
