@@ -11,7 +11,7 @@
 
 #include "Application.hpp"         // for Application, Application::State
 #include "ApplicationLauncher.hpp" // for ApplicationLauncher
-#include "messages/Message.hpp"
+#include "module-services/service-appmgr/messages/Message.hpp"
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
@@ -19,7 +19,8 @@
 #include "SettingsRecord.hpp"  // for SettingsRecord
 #include "SwitchData.hpp"      // for SwitchData
 
-#include "Types.hpp"
+#include "ApplicationHandle.hpp"
+#include "ApplicationsRegistry.hpp"
 
 namespace app
 {
@@ -34,43 +35,13 @@ namespace app
         class APMSwitch;
         class APMSwitchPrevApp;
     } // namespace manager
-}
+} // namespace app
 
 namespace app::manager
 {
-    class ApplicationHandle
-    {
-      public:
-        static inline constexpr std::string_view InvalidAppName{"NONE"};
-
-        using State = app::Application::State;
-
-        explicit ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher);
-
-        void setState(State state) noexcept;
-        void run(sys::Service *caller);
-        void runInBackground(sys::Service *caller);
-
-        auto name() const -> ApplicationName;
-        auto state() const noexcept -> State;
-        auto preventsBlocking() const noexcept -> bool;
-        auto closeable() const noexcept -> bool;
-        auto started() const noexcept -> bool;
-
-        std::unique_ptr<app::ApplicationLauncher> launcher; // Handle to the application's start function.
-        std::unique_ptr<gui::SwitchData> switchData;
-        std::string switchWindow;
-        bool blockClosing =
-            false; //< Informs the application manager that this application mustn't be closed temporarily.
-                   // This flag is used to prevent application closing when application is closeable and there is
-                   // incoming call. This flag is also used when closeable application is on front and there is a
-                   // timeout to block the application.
-    };
-
     class ApplicationManagerBase
     {
       public:
-        using ApplicationsContainer = std::vector<std::unique_ptr<ApplicationHandle>>;
         enum class State
         {
             Running,
@@ -92,7 +63,7 @@ namespace app::manager
         auto getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *;
         auto getApplications() const noexcept -> const ApplicationsContainer &
         {
-            return applications;
+            return applications.getAll();
         }
 
         void setState(State _state) noexcept;
@@ -101,11 +72,13 @@ namespace app::manager
             return state;
         }
 
+      protected:
+        ApplicationsRegistry applications;
+
       private:
         using ApplicationsStack = std::deque<ApplicationName>;
 
         State state = State::Running;
-        ApplicationsContainer applications;
         ApplicationsStack stack;
     };
 
@@ -136,11 +109,12 @@ namespace app::manager
         // Message handlers
         void registerMessageHandlers();
         auto handleAction(ActionRequest *actionMsg) -> bool;
+        auto handleLaunchAction(ApplicationLaunchData *launchParams) -> bool;
         auto handleSwitchApplication(SwitchRequest *msg) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
-        auto handleRegisterApplication(ApplicationRegistration *msg) -> bool;
+        auto handleInitApplication(ApplicationInitialisation *msg) -> bool;
         auto handleLanguageChange(LanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
 
@@ -151,8 +125,8 @@ namespace app::manager
         void onApplicationSwitchToPrev(ApplicationHandle &previousApp,
                                        std::unique_ptr<gui::SwitchData> &&data,
                                        std::string targetWindow = {});
-        void onApplicationRegistered(ApplicationHandle &app, const ApplicationManifest &manifest);
-        void onApplicationRegistrationFailure(ApplicationHandle &app);
+        void onApplicationInitialised(ApplicationHandle &app, StartInBackground startInBackground);
+        void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
         void onPhoneLocked();
@@ -163,5 +137,8 @@ namespace app::manager
                                                    // defined in settings database application
                                                    // manager is sending signal to power manager and changing window to
                                                    // the desktop window in the blocked state.
+
+        // Temporary solution - to be replaced with ActionsMiddleware.
+        std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
     };
 } // namespace app::manager

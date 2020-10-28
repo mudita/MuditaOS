@@ -15,9 +15,9 @@ namespace app
     class ApplicationMeditation : public Application
     {
       public:
-        explicit ApplicationMeditation(std::string name     = name_meditation,
-                                       std::string parent   = {},
-                                       bool startBackground = false);
+        explicit ApplicationMeditation(std::string name                    = name_meditation,
+                                       std::string parent                  = {},
+                                       StartInBackground startInBackground = {false});
 
         auto InitHandler() -> sys::ReturnCodes override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
@@ -26,5 +26,13 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
         std::unique_ptr<gui::OptionsData> state;
+    };
+
+    template <> struct ManifestTraits<ApplicationMeditation>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
     };
 } // namespace app

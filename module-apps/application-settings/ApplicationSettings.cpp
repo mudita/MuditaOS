@@ -32,9 +32,8 @@
 
 namespace app
 {
-
-    ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound)
+    ApplicationSettings::ApplicationSettings(std::string name, std::string parent, StartInBackground startInBackground)
+        : Application(name, parent, startInBackground)
     {
         busChannels.push_back(sys::BusChannels::AntennaNotifications);
     }

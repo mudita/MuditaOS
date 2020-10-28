@@ -4,7 +4,7 @@
 #include <memory>
 #include <functional>
 
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 
 #include "bsp/rtc/rtc.hpp"
 

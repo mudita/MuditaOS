@@ -62,16 +62,16 @@ namespace app
         }
     }
 
-    Application::Application(
-        std::string name, std::string parent, bool startBackground, uint32_t stackDepth, sys::ServicePriority priority)
+    Application::Application(std::string name,
+                             std::string parent,
+                             StartInBackground startInBackground,
+                             uint32_t stackDepth,
+                             sys::ServicePriority priority)
         : Service(name, parent, stackDepth, priority), default_window(gui::name::window::main_window),
-          windowsStack(this), windowsFactory(), manifest{name, StartInBackground{startBackground}, {}}
+          windowsStack(this), startInBackground{startInBackground}
     {
         keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-        if (startBackground) {
-            setState(State::ACTIVE_BACKGROUND);
-        }
 
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
         longPressTimer->connect([&](sys::Timer &) { longPressTimerCallback(); });
@@ -223,6 +223,9 @@ namespace app
         else if (msgl->messageType == MessageType::EVMMinuteUpdated) {
             return handleMinuteUpdated(msgl);
         }
+        else if (msgl->messageType == MessageType::AppAction) {
+            return handleAction(msgl);
+        }
         else if (msgl->messageType == MessageType::AppSwitch) {
             return handleApplicationSwitch(msgl);
         }
@@ -329,6 +332,21 @@ namespace app
         getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleAction(sys::DataMessage *msgl)
+    {
+        auto *msg         = static_cast<AppActionRequest *>(msgl);
+        const auto action = msg->getAction();
+        try {
+            const auto &actionHandler = receivers.at(action);
+            auto &data                = msg->getData();
+            actionHandler(std::move(data));
+        }
+        catch (const std::out_of_range &) {
+            LOG_ERROR("Application %s is not able to handle action #%d", GetName().c_str(), action);
         }
         return msgHandled();
     }
@@ -473,10 +491,14 @@ namespace app
         settings = DBServiceAPI::SettingsGet(this);
 
         const auto status = (settings.dbID == 1) ? StartupStatus::Success : StartupStatus::Failure;
-        app::manager::Controller::registerApplication(this, status, manifest);
+        app::manager::Controller::applicationInitialised(this, status, startInBackground);
         if (status == StartupStatus::Failure) {
             setState(State::DEACTIVATED);
             return sys::ReturnCodes::Failure;
+        }
+
+        if (startInBackground) {
+            setState(State::ACTIVE_BACKGROUND);
         }
         return sys::ReturnCodes::Success;
     }
@@ -505,6 +527,15 @@ namespace app
     bool Application::adjustCurrentVolume(const int step)
     {
         return AudioServiceAPI::KeyPressed(this, step);
+    }
+
+    void Application::requestAction(sys::Service *sender,
+                                    const ApplicationName &applicationName,
+                                    manager::actions::ActionId actionId,
+                                    manager::actions::ActionParamsPtr &&data)
+    {
+        auto msg = std::make_shared<AppActionRequest>(actionId, std::move(data));
+        sys::Bus::SendUnicast(msg, applicationName, sender);
     }
 
     void Application::messageSwitchApplication(sys::Service *sender,
@@ -615,5 +646,10 @@ namespace app
     {
         timer->sysapi.connect(item);
         item->attachTimer(std::move(timer));
+    }
+
+    void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)
+    {
+        receivers.insert_or_assign(actionId, std::move(callback));
     }
 } /* namespace app */

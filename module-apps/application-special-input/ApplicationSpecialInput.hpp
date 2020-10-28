@@ -19,7 +19,9 @@ namespace app
       public:
         std::string requester = "";
 
-        ApplicationSpecialInput(std::string name = special_input, std::string parent = "", bool startBackgound = true);
+        ApplicationSpecialInput(std::string name                    = special_input,
+                                std::string parent                  = {},
+                                StartInBackground startInBackground = {true});
         virtual ~ApplicationSpecialInput() = default;
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -33,4 +35,11 @@ namespace app
         void destroyUserInterface() override;
     };
 
+    template <> struct ManifestTraits<ApplicationSpecialInput>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 }; // namespace app

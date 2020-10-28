@@ -11,7 +11,7 @@
 #include <functional>
 #include <memory>
 
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 
 #include "../ApplicationSettings.hpp"
 #include "DateTimeWindow.hpp"

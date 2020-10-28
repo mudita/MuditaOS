@@ -40,10 +40,8 @@ namespace app
     auto call(Application *app, const utils::PhoneNumber::View &phoneNumber) -> bool
     {
         assert(app != nullptr);
-        auto data             = std::make_unique<ExecuteCallData>(phoneNumber);
-        data->disableAppClose = true;
-
-        return app::manager::Controller::switchApplication(app, name_call, window::name_enterNumber, std::move(data));
+        auto data = std::make_unique<ExecuteCallData>(phoneNumber);
+        return app::manager::Controller::sendAction(app, manager::actions::Call, std::move(data));
     }
 
     auto prepareCall(Application *app, const std::string &number) -> bool

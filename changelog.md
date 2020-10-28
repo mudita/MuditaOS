@@ -15,6 +15,7 @@
 
 * `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
 * `[calendar]` Rework to use database model instead of internal model in day events list.
+* `[appmgr]` Application manager actions introduced.
 
 ### Fixed
 

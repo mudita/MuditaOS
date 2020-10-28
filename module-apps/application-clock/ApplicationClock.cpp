@@ -11,7 +11,7 @@
 // module-services
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 // MessageType
 #include "MessageType.hpp"
 // this module
@@ -20,12 +20,12 @@
 
 namespace app
 {
-
     ApplicationClock::ApplicationClock(std::string name,
                                        std::string parent,
+                                       StartInBackground startInBackground,
                                        uint32_t stackDepth,
                                        sys::ServicePriority priority)
-        : Application(name, parent, false, stackDepth, priority)
+        : Application(name, parent, startInBackground, stackDepth, priority)
     {
         timerClock = std::make_unique<sys::Timer>("Clock", this, 1000);
         timerClock->connect([&](sys::Timer &) { timerClockCallback(); });

@@ -7,10 +7,10 @@
 #include "MessageType.hpp"
 #include "i18/i18.hpp"
 
+#include <module-apps/Application.hpp>
 #include <module-gui/gui/SwitchData.hpp>
-
-#include <service-appmgr/Types.hpp>
-#include <service-appmgr/data/ApplicationManifest.hpp>
+#include <module-services/service-appmgr/Actions.hpp>
+#include <module-services/service-appmgr/ApplicationManifest.hpp>
 
 namespace app::manager
 {
@@ -98,12 +98,14 @@ namespace app::manager
         {}
     };
 
-    /// Confirms that the application registered successfully.
-    class ApplicationRegistration : public Message
+    ///
+    class ApplicationInitialisation : public Message
     {
       public:
-        ApplicationRegistration(const ApplicationName &senderName, StartupStatus _status, ApplicationManifest _manifest)
-            : Message(MessageType::APMRegister, senderName), status{_status}, manifest{std::move(_manifest)}
+        ApplicationInitialisation(const ApplicationName &senderName,
+                                  StartupStatus _status,
+                                  StartInBackground _startInBackground)
+            : Message(MessageType::APMInit, senderName), status{_status}, startInBackground{_startInBackground}
         {}
 
         [[nodiscard]] auto getStatus() const noexcept -> StartupStatus
@@ -111,14 +113,14 @@ namespace app::manager
             return status;
         }
 
-        [[nodiscard]] auto getApplicationManifest() const noexcept -> const ApplicationManifest &
+        [[nodiscard]] auto isBackgroundApplication() const noexcept -> bool
         {
-            return manifest;
+            return startInBackground.value;
         }
 
       private:
         StartupStatus status;
-        ApplicationManifest manifest;
+        StartInBackground startInBackground;
     };
 
     /// Requests the application to close.
@@ -193,26 +195,25 @@ namespace app::manager
         bool isRunning;
     };
 
-    struct Action
-    {
-        ApplicationName targetApplication;
-        std::string targetWindow;
-        std::unique_ptr<gui::SwitchData> data;
-    };
-
     class ActionRequest : public Message
     {
       public:
-        ActionRequest(const ApplicationName &senderName, Action &&_action)
-            : Message{MessageType::APMAction, senderName}, action{std::move(_action)}
+        ActionRequest(const ApplicationName &senderName, actions::ActionId _actionId, actions::ActionParamsPtr &&_data)
+            : Message{MessageType::APMAction, senderName}, actionId{_actionId}, data{std::move(_data)}
         {}
 
-        auto getAction() noexcept -> Action &
+        [[nodiscard]] auto getAction() const noexcept -> actions::ActionId
         {
-            return action;
+            return actionId;
+        }
+
+        [[nodiscard]] auto getData() noexcept -> actions::ActionParamsPtr &
+        {
+            return data;
         }
 
       private:
-        Action action;
+        actions::ActionId actionId;
+        actions::ActionParamsPtr data;
     };
 } // namespace app::manager

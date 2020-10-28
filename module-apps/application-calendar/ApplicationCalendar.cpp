@@ -44,9 +44,10 @@ namespace app
 
     ApplicationCalendar::ApplicationCalendar(std::string name,
                                              std::string parent,
+                                             StartInBackground startInBackground,
                                              uint32_t stackDepth,
                                              sys::ServicePriority priority)
-        : Application(name, parent, false, stackDepth, priority)
+        : Application(name, parent, startInBackground, stackDepth, priority)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }

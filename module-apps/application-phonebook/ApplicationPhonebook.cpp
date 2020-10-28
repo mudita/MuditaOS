@@ -19,9 +19,10 @@
 
 namespace app
 {
-
-    ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, phonebook_stack_size)
+    ApplicationPhonebook::ApplicationPhonebook(std::string name,
+                                               std::string parent,
+                                               StartInBackground startInBackground)
+        : Application(name, parent, startInBackground, phonebook_stack_size)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }

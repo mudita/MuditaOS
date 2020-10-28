@@ -27,9 +27,9 @@ namespace app
     {
 
       public:
-        ApplicationMusicPlayer(std::string name    = name_music_player,
-                               std::string parent  = "",
-                               bool startBackgound = false);
+        ApplicationMusicPlayer(std::string name                    = name_music_player,
+                               std::string parent                  = {},
+                               StartInBackground startInBackground = {false});
         virtual ~ApplicationMusicPlayer();
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -52,4 +52,11 @@ namespace app
         std::optional<audio::Tags> getFileTags(const std::string &filePath);
     };
 
+    template <> struct ManifestTraits<ApplicationMusicPlayer>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */

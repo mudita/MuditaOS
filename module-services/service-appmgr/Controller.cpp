@@ -7,21 +7,23 @@
 
 #include "module-sys/Service/Bus.hpp" // for Bus
 #include "Service/Service.hpp"        // for Service
-#include "service-appmgr/ApplicationManager.hpp" // for ApplicationManager, ApplicationManager::ServiceName, ApplicationHandle, ApplicationHandle::Name
+#include "service-appmgr/model/ApplicationManager.hpp" // for ApplicationManager, ApplicationManager::ServiceName, ApplicationHandle, ApplicationHandle::Name
 
 namespace app::manager
 {
-    auto Controller::registerApplication(sys::Service *sender,
-                                         StartupStatus status,
-                                         const ApplicationManifest &manifest) -> bool
+    auto Controller::sendAction(sys::Service *sender, actions::ActionId actionId, actions::ActionParamsPtr &&data)
+        -> bool
     {
-        auto msg = std::make_shared<app::manager::ApplicationRegistration>(sender->GetName(), status, manifest);
+        auto msg = std::make_shared<app::manager::ActionRequest>(sender->GetName(), actionId, std::move(data));
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 
-    auto Controller::sendAction(sys::Service *sender, Action &&action) -> bool
+    auto Controller::applicationInitialised(sys::Service *sender,
+                                            StartupStatus status,
+                                            StartInBackground startInBackground) -> bool
     {
-        auto msg = std::make_shared<app::manager::ActionRequest>(sender->GetName(), std::move(action));
+        auto msg =
+            std::make_shared<app::manager::ApplicationInitialisation>(sender->GetName(), status, startInBackground);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 

@@ -6,8 +6,8 @@
 #include <memory> // for unique_ptr
 #include <string> // for string
 
-#include "Types.hpp"
-#include "ApplicationManager.hpp" // for ApplicationHandle, ApplicationHandle::Name
+#include "Actions.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 #include "module-sys/Service/Service.hpp"
 #include "SwitchData.hpp"                         // for SwitchData
 #include "i18/i18.hpp"                            // for Lang
@@ -25,9 +25,11 @@ namespace app::manager
       public:
         Controller() = delete;
 
-        static auto sendAction(sys::Service *sender, Action &&action) -> bool;
-        static auto registerApplication(sys::Service *sender, StartupStatus status, const ApplicationManifest &manifest)
+        static auto sendAction(sys::Service *sender, actions::ActionId actionId, actions::ActionParamsPtr &&data)
             -> bool;
+        static auto applicationInitialised(sys::Service *sender,
+                                           StartupStatus status,
+                                           StartInBackground startInBackground) -> bool;
         static auto switchApplication(sys::Service *sender,
                                       const ApplicationName &applicationName,
                                       const std::string &windowName,

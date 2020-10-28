@@ -7,9 +7,10 @@
 
 namespace app
 {
-
-    ApplicationCalculator::ApplicationCalculator(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, stack_size)
+    ApplicationCalculator::ApplicationCalculator(std::string name,
+                                                 std::string parent,
+                                                 StartInBackground startInBackground)
+        : Application(name, parent, startInBackground, stack_size)
     {}
 
     sys::Message_t ApplicationCalculator::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

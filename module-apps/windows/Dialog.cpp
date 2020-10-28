@@ -3,7 +3,7 @@
 
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 #include <i18/i18.hpp>
 
 using namespace gui;

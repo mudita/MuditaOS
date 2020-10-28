@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-appmgr/ApplicationManager.hpp"
+#include "ApplicationManager.hpp"
 
 #include <utility>   // for move
 #include <algorithm> // for find_if
@@ -18,13 +18,13 @@
 #include <service-eink/ServiceEink.hpp>    // for ServiceEink
 #include <service-eink/Common.hpp>
 #include <service-gui/Common.hpp>
-#include "service-gui/ServiceGUI.hpp"      // for ServiceGUI
-#include "log/log.hpp"                     // for LOG_INFO, LOG_ERROR, LOG_WARN, LOG_DEBUG, LOG_FATAL
-#include "Common.hpp"                      // for ShowMode, ShowMode::GUI_SHOW_INIT
+#include "service-gui/ServiceGUI.hpp" // for ServiceGUI
+#include "log/log.hpp"                // for LOG_INFO, LOG_ERROR, LOG_WARN, LOG_DEBUG, LOG_FATAL
+#include "Common.hpp"                 // for ShowMode, ShowMode::GUI_SHOW_INIT
 #include "Common/Common.hpp" // for SettingsLanguage, SettingsLanguage::ENGLISH, SettingsLanguage::GERMAN, SettingsLanguage::POLISH, SettingsLanguage::SPANISH
 #include "Service/Bus.hpp"   // for Bus
-#include "SystemManager/SystemManager.hpp"        // for SystemManager
-#include "i18/i18.hpp"                            // for Lang, Lang::En, Lang::De, Lang::Pl, Lang::Sp, i18, localize
+#include "SystemManager/SystemManager.hpp"     // for SystemManager
+#include "i18/i18.hpp"                         // for Lang, Lang::En, Lang::De, Lang::Pl, Lang::Sp, i18, localize
 #include "service-appmgr/messages/Message.hpp" // for APMCheckApp, APMSwitch, APMRegister, APMConfirmClose, APMConfirmSwitch, Action, APMAction, APMChangeLanguage, APMSwitchPrevApp, APMDelayedClose, APMClose, APMInitPowerSaveMode, APMPreventBlocking
 
 // Auto phone lock disabled for now till the times when it's debugged
@@ -47,9 +47,8 @@ namespace app::manager
                 return utils::Lang::De;
             case SettingsLanguage::SPANISH:
                 return utils::Lang::Sp;
-            default:
-                return utils::Lang::En;
             }
+            return utils::Lang::En;
         }
 
         SettingsLanguage toSettingsLanguage(utils::Lang language)
@@ -63,71 +62,14 @@ namespace app::manager
                 return SettingsLanguage::GERMAN;
             case utils::Lang::Sp:
                 return SettingsLanguage::SPANISH;
-            default:
-                return SettingsLanguage::ENGLISH;
             }
+            return SettingsLanguage::ENGLISH;
         }
     } // namespace
 
-    ApplicationHandle::ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher)
-        : launcher{std::move(_launcher)}
-    {}
-
-    auto ApplicationHandle::name() const -> ApplicationName
-    {
-        return launcher ? launcher->getName() : InvalidAppName.data();
-    }
-
-    auto ApplicationHandle::state() const noexcept -> State
-    {
-        return launcher && launcher->handle ? launcher->handle->getState() : State::NONE;
-    }
-
-    void ApplicationHandle::setState(State state) noexcept
-    {
-        if (launcher && launcher->handle) {
-            launcher->handle->setState(state);
-        }
-    }
-
-    auto ApplicationHandle::preventsBlocking() const noexcept -> bool
-    {
-        return launcher ? launcher->isBlocking() : false;
-    }
-
-    auto ApplicationHandle::closeable() const noexcept -> bool
-    {
-        return launcher ? launcher->isCloseable() : false;
-    }
-
-    auto ApplicationHandle::started() const noexcept -> bool
-    {
-        const auto appState = state();
-        return appState == State::ACTIVE_FORGROUND || appState == State::ACTIVE_BACKGROUND ||
-               appState == State::ACTIVATING;
-    }
-
-    void ApplicationHandle::run(sys::Service *caller)
-    {
-        if (launcher) {
-            launcher->run(caller);
-        }
-    }
-
-    void ApplicationHandle::runInBackground(sys::Service *caller)
-    {
-        if (launcher) {
-            launcher->runBackground(caller);
-        }
-    }
-
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
-    {
-        std::vector<std::unique_ptr<app::ApplicationLauncher>> container = std::move(launchers);
-        for (auto &&launcher : container) {
-            applications.push_back(std::make_unique<ApplicationHandle>(std::move(launcher)));
-        }
-    }
+        : applications{std::move(launchers)}
+    {}
 
     void ApplicationManagerBase::setState(State _state) noexcept
     {
@@ -181,12 +123,7 @@ namespace app::manager
 
     auto ApplicationManagerBase::getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *
     {
-        auto it = std::find_if(
-            applications.begin(), applications.end(), [&name](const auto &app) { return app->name() == name; });
-        if (it == applications.end()) {
-            return nullptr;
-        }
-        return it->get();
+        return applications.findByName(name);
     }
 
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
@@ -298,9 +235,9 @@ namespace app::manager
             closeService(msg->getApplication());
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(ApplicationRegistration), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<ApplicationRegistration *>(request);
-            handleRegisterApplication(msg);
+        connect(typeid(ApplicationInitialisation), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<ApplicationInitialisation *>(request);
+            handleInitApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(LanguageChangeRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
@@ -446,21 +383,47 @@ namespace app::manager
 
     auto ApplicationManager::handleAction(ActionRequest *actionMsg) -> bool
     {
-        auto &action         = actionMsg->getAction();
-        const auto targetApp = getApplication(action.targetApplication);
-        if (targetApp == nullptr) {
-            LOG_ERROR("Failed to switch to %s application: No such application.", action.targetApplication.c_str());
+        auto action = actionMsg->getAction();
+        if (action == actions::Launch) {
+            auto params = static_cast<ApplicationLaunchData *>(actionMsg->getData().get());
+            return handleLaunchAction(params);
+        }
+
+        const auto actionHandlers = applications.findByAction(action);
+        if (actionHandlers.empty()) {
+            LOG_ERROR("No applications handling action #%d.", action);
+            return false;
+        }
+        if (actionHandlers.size() > 1) {
+            LOG_FATAL("Choosing amongst multiple action handler applications is not yet implemented.");
             return false;
         }
 
-        if (targetApp->state() == app::Application::State::ACTIVE_FORGROUND) {
-            // If the app is already focused, then switch window.
-            auto msg = std::make_shared<app::AppSwitchWindowMessage>(
-                action.targetWindow, std::string{}, std::move(action.data), gui::ShowMode::GUI_SHOW_INIT);
-            return sys::Bus::SendUnicast(msg, targetApp->name(), this);
+        auto &actionData     = actionMsg->getData();
+        const auto targetApp = actionHandlers.front();
+        if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
+            pendingAction = std::make_tuple(targetApp->name(), action, std::move(actionData));
+
+            SwitchRequest switchRequest(actionMsg->getSenderName(),
+                                        targetApp->name(),
+                                        targetApp->switchWindow,
+                                        std::move(targetApp->switchData));
+            return handleSwitchApplication(&switchRequest);
         }
+
+        app::Application::requestAction(this, targetApp->name(), action, std::move(actionData));
+        return true;
+    }
+
+    auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool
+    {
+        auto targetApp = getApplication(launchParams->getTargetApplicationName());
+        if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
+            return false;
+        }
+
         SwitchRequest switchRequest(
-            actionMsg->getSenderName(), targetApp->name(), action.targetWindow, std::move(action.data));
+            ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
         return handleSwitchApplication(&switchRequest);
     }
 
@@ -505,7 +468,7 @@ namespace app::manager
         previousApp.switchWindow = std::move(targetWindow);
     }
 
-    auto ApplicationManager::handleRegisterApplication(ApplicationRegistration *msg) -> bool
+    auto ApplicationManager::handleInitApplication(ApplicationInitialisation *msg) -> bool
     {
         auto app = getApplication(msg->getSenderName());
         if (app == nullptr) {
@@ -514,10 +477,10 @@ namespace app::manager
         }
 
         if (msg->getStatus() == StartupStatus::Success) {
-            onApplicationRegistered(*app, msg->getApplicationManifest());
+            onApplicationInitialised(*app, msg->isBackgroundApplication());
         }
         else {
-            onApplicationRegistrationFailure(*app);
+            onApplicationInitFailure(*app);
         }
 
         auto notification = std::make_shared<ApplicationStatusRequest>(GetName(), app->name());
@@ -525,9 +488,9 @@ namespace app::manager
         return true;
     }
 
-    void ApplicationManager::onApplicationRegistered(ApplicationHandle &app, const ApplicationManifest &manifest)
+    void ApplicationManager::onApplicationInitialised(ApplicationHandle &app, StartInBackground startInBackground)
     {
-        LOG_DEBUG("Application %s registered successfully.", app.name().c_str());
+        LOG_DEBUG("Application %s initialised successfully.", app.name().c_str());
 
         auto launchingApp = getLaunchingApplication();
         if (launchingApp == nullptr || launchingApp->name() != app.name()) {
@@ -535,7 +498,7 @@ namespace app::manager
             return;
         }
 
-        if (manifest.startInBackground) {
+        if (startInBackground) {
             setState(State::Running);
             app.setState(ApplicationHandle::State::ACTIVE_BACKGROUND);
         }
@@ -547,9 +510,9 @@ namespace app::manager
         }
     }
 
-    void ApplicationManager::onApplicationRegistrationFailure(ApplicationHandle &app)
+    void ApplicationManager::onApplicationInitFailure(ApplicationHandle &app)
     {
-        LOG_ERROR("Failed to register %s: Application initialisation error.", app.name().c_str());
+        LOG_ERROR("Failed to initialise %s: Application internal error.", app.name().c_str());
         Controller::switchBack(this);
     }
 
@@ -601,6 +564,12 @@ namespace app::manager
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
             EventManager::messageSetApplication(this, app.name());
+
+            auto &[appName, action, data] = pendingAction;
+            if (appName == app.name()) {
+                app::Application::requestAction(this, appName, action, std::move(data));
+                pendingAction = std::make_tuple(ApplicationName{}, 0, nullptr);
+            }
             return true;
         }
         if (getState() == State::AwaitingLostFocusConfirmation) {
