@@ -192,9 +192,8 @@ class CellularSimResponseMessage : public CellularSimMessage
     CellularSimResponseMessage(SimCard sim,
                                SimState state,
                                const utils::PhoneNumber::View &number,
-                               unsigned int pinSize,
                                unsigned int attemptsLeft = defaultAttemptsLeft)
-        : CellularSimMessage(sim), state(state), number(number), pinSize(pinSize), attemptsLeft(attemptsLeft)
+        : CellularSimMessage(sim), state(state), number(number), attemptsLeft(attemptsLeft)
     {}
 
     SimState getSimState() const noexcept
@@ -205,10 +204,6 @@ class CellularSimResponseMessage : public CellularSimMessage
     {
         return number;
     }
-    unsigned int getPinSize() const noexcept
-    {
-        return pinSize;
-    }
     unsigned int getAttemptsLeft() const noexcept
     {
         return attemptsLeft;
@@ -217,11 +212,9 @@ class CellularSimResponseMessage : public CellularSimMessage
   private:
     SimState state = defaultSimState;
     utils::PhoneNumber::View number;
-    unsigned int pinSize = defaultPinSize;
     /// ignored if state is not one of { PINInvalidRetryPossible, PUKInvalidRetryPossible }
     unsigned int attemptsLeft = defaultAttemptsLeft;
 
-    static const unsigned int defaultPinSize      = 4;
     static const unsigned int defaultAttemptsLeft = 4;
     static const SimState defaultSimState         = SimState::SIMUnlocked;
 };

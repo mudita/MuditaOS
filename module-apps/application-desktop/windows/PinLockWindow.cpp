@@ -18,7 +18,6 @@
 
 namespace gui
 {
-
     PinLockWindow::PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock)
         : PinLockBaseWindow(app, window_name, lock), this_window_name(window_name)
     {
@@ -39,7 +38,7 @@ namespace gui
         AppWindow::buildInterface();
         PinLockBaseWindow::build();
         buildPinLockBox();
-        LockBox->buildLockBox(lock.getPinSize());
+        LockBox->buildLockBox(lock.getMaxPinSize());
     }
 
     void PinLockWindow::destroyInterface()
@@ -54,8 +53,7 @@ namespace gui
         lockImage  = nullptr;
         infoImage  = nullptr;
         infoText   = nullptr;
-        pinLabel   = nullptr;
-        pinLabels.clear();
+        pinLabelsBox = nullptr;
     }
 
     void PinLockWindow::setVisibleState(const PinLock::State state)
@@ -94,15 +92,14 @@ namespace gui
             return AppWindow::onInput(inputEvent);
         }
         // accept only LF, enter, RF, #, and numeric values;
-        if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
+        if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
             app::manager::Controller::switchApplication(
                 application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
             return true;
         }
-        else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             if (state == PinLock::State::EnterPin) {
                 lock.clearAttempt();
-                clearPinLabels();
             }
             else if (state == PinLock::State::InvalidPin) {
                 LockBox->setVisibleStateInvalidPin();
@@ -111,10 +108,13 @@ namespace gui
             application->switchWindow(gui::name::window::main_window);
             return true;
         }
-        else if (inputEvent.keyCode == KeyCode::KEY_PND) {
+        else if (inputEvent.is(KeyCode::KEY_PND)) {
             if (state == PinLock::State::EnterPin) {
                 lock.popChar();
                 LockBox->popChar(lock.getCharCount());
+                if (!lock.canVerify()) {
+                    bottomBar->setActive(BottomBar::Side::CENTER, false);
+                }
                 return true;
             }
         }
@@ -122,16 +122,16 @@ namespace gui
             if (state == PinLock::State::EnterPin && lock.canPut()) {
                 LockBox->putChar(lock.getCharCount());
                 lock.putNextChar(gui::toNumeric(inputEvent.keyCode));
-                if (lock.getLockType() == PinLock::LockType::Screen) {
+                if (!lock.canPut() && lock.getLockType() == PinLock::LockType::Screen) {
                     lock.verifyPin();
                 }
-                else if (!lock.canPut()) {
+                else if (lock.canVerify()) {
                     bottomBar->setActive(BottomBar::Side::CENTER, true);
                 }
                 return true;
             }
         }
-        else if (inputEvent.keyCode == KeyCode::KEY_ENTER && bottomBar->isActive(BottomBar::Side::CENTER)) {
+        else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
             if (state == PinLock::State::InvalidPin) {
                 lock.consumeInvalidPinState();
                 application->switchWindow(this_window_name);

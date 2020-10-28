@@ -4,7 +4,6 @@
 #pragma once
 
 #include "PinLockBox.hpp"
-#include "Label.hpp"
 
 namespace gui
 {
@@ -21,8 +20,8 @@ namespace gui
 
       private:
         PinLockBaseWindow *LockWindow;
-        void popChar(uint32_t charNum) override final;
-        void putChar(uint32_t charNum) override final;
+        void popChar(unsigned int charNum) override final;
+        void putChar(unsigned int charNum) override final;
 
         void setVisibleStateEnterPin() override final;
         void setVisibleStateVerifiedPin() override final;
@@ -31,5 +30,6 @@ namespace gui
 
         void buildLockBox(unsigned int pinSize) override final;
         void buildPinLabels(unsigned int pinSize);
+        void rebuildPinLabels(unsigned int pinSize);
     };
 } // namespace gui
