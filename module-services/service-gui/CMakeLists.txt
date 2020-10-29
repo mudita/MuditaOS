@@ -1,30 +1,29 @@
-include_directories( ${CMAKE_PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		"${CMAKE_CURRENT_LIST_DIR}/messages"
-)
-
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		"${CMAKE_CURRENT_LIST_DIR}/.."
-		"${CMAKE_CURRENT_LIST_DIR}/messages"
-)
-
+﻿project(service-gui)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
-target_sources( ${PROJECT_NAME}
+set(SOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/WorkerGUI.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.cpp"
+)
 
-	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/WorkerGUI.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.cpp"
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/WorkerGUI.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/messages/GUIMessage.hpp"
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+
+#include_directories(module-gui)
+
+target_link_libraries(${PROJECT_NAME}
+    module-gui
+    service-eink
+    module-apps
+    )
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        module-gui
+        service-eink
+    PUBLIC
+        "${CMAKE_CURRENT_LIST_DIR}"
+        "${CMAKE_CURRENT_LIST_DIR}/messages"
 )
 

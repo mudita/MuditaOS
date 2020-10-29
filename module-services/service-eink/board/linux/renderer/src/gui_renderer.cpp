@@ -1,27 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-//============================================================================
-// Name        : pure-gui.cpp
-// Author      :
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
+#include "RWindow.hpp"
 
-#include <sys/mman.h>          // for mmap, shm_open, MAP_FAILED, MAP_SHARED, PROT_READ, PROT_WRITE
-#include <sys/stat.h>          // for mkfifo
-#include <fcntl.h>             // for open, O_WRONLY, O_NONBLOCK, O_CREAT, O_RDWR
-#include <unistd.h>            // for ftruncate
-#include <gtkmm/application.h> // for Application
-#include <errno.h>             // for errno
-#include <stdint.h>            // for uint32_t, uint8_t
-#include <iostream>            // for operator<<, basic_ostream, endl, char_traits, ostream, cerr, cout, std
-#include <cstring>             // for strerror, NULL
-#include <string>              // for string, allocator
+#include <glibmm/refptr.h>
+#include <fcntl.h>
+#include <gtkmm/application.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
-#include "RWindow.hpp"     // for RWindow
-#include "glibmm/refptr.h" // for RefPtr
+#include <unistd.h>
+
+#include <cstdint>
+#include <cstring>
+#include <errno.h>
+#include <iostream>
+#include <string>
 
 using namespace std;
 

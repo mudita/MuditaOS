@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_SERVICES_SERVICE_EINK_EINKMESSAGE_HPP_
-#define MODULE_SERVICES_SERVICE_EINK_EINKMESSAGE_HPP_
+#pragma once
 
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
+#include <MessageType.hpp>
+#include <Service/Message.hpp>
 
 namespace seink
 {
@@ -21,5 +20,3 @@ namespace seink
     };
 
 } /* namespace seink */
-
-#endif /* MODULE_SERVICES_SERVICE_EINK_EINKMESSAGE_HPP_ */
