@@ -439,14 +439,13 @@ namespace app
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
         assert(msg);
-        if (!(getCurrentWindow() != nullptr && getCurrentWindow()->getName() == msg->getWindowName())) {
+        if (getCurrentWindow() == nullptr || (getCurrentWindow()->getName() != msg->getWindowName())) {
             LOG_DEBUG("Ignore request for window %s we are on window %s",
                       msg->getWindowName().c_str(),
                       getCurrentWindow() == nullptr ? "none" : getCurrentWindow()->getName().c_str());
             return msgNotHandled();
         }
         render(msg->getMode());
-        LOG_DEBUG("%s : %s", c_str(msg->getMode()), getCurrentWindow()->getName().c_str());
         return msgHandled();
     }
 

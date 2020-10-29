@@ -25,7 +25,5 @@ namespace gui
                 parent->addWidget(this);
             }
         }
-
-        void buildDrawListImplementation(std::list<Command> &commands) override{};
     };
 }; // namespace gui

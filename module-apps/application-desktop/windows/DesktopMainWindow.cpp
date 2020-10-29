@@ -152,7 +152,6 @@ namespace gui
         if (inputEvent.is(KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
             app->lockHandler.lock.lock();
             setVisibleState();
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             application->setSuspendFlag(true);
             return true;
         }
@@ -255,92 +254,7 @@ namespace gui
         return ret;
     }
 
-    auto add_image_inactive(UTF8 img)
-    {
-        auto thumbnail        = new gui::Image(img);
-        thumbnail->activeItem = false;
-        return thumbnail;
-    }
-
-    auto add_box_icon(UTF8 icon)
-    {
-        auto thumbnail = add_image_inactive(icon);
-        thumbnail->setMinimumWidth(style::notification_icon_unified_size);
-        thumbnail->setMargins(
-            gui::Margins(style::window::default_left_margin, 0, style::window::default_right_margin, 0));
-        return thumbnail;
-    }
-
-    /// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of
-    /// notifications]<span>$`
-    auto add_notification(BoxLayout *layout,
-                          UTF8 icon,
-                          UTF8 name,
-                          UTF8 indicator,
-                          std::function<bool()> showCallback,
-                          std::function<bool()> clearCallback) -> bool
-    {
-        // 1. create hbox for all elements
-        auto el = new gui::HBox(nullptr, 0, 0, style::window::default_body_width, style::window::label::default_h);
-        el->setAlignment(Alignment(gui::Alignment::Vertical::Center));
-
-        auto text = new gui::Label();
-        text->setMaximumSize(el->area().w, Axis::X);
-        text->setText(name);
-        text->setFont(style::window::font::medium);
-        text->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        text->setPenWidth(style::window::default_border_no_focus_w);
-        text->activeItem = false;
-
-        auto number = new gui::Text();
-        if (indicator.length() > 2) {
-            const UTF8 max_notification_value = "99+";
-            number->setText(max_notification_value);
-            number->setMinimumWidth(max_notification_value.length() * style::digit_normal_size);
-        }
-        else {
-            number->setText(indicator);
-            number->setMinimumWidth(indicator.length() * style::digit_normal_size);
-        }
-        number->setFont(style::window::font::mediumbold);
-        number->setPenWidth(style::window::default_border_no_focus_w);
-        number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
-        number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        number->activeItem = false;
-
-        // 2. Add all elements to hbox layout
-        el->addWidget(add_box_icon(icon));
-        el->addWidget(text);
-        el->addWidget(add_image_inactive("dot_12px_hard_alpha_W_G"));
-        el->addWidget(number);
-
-        // 3. Set hbox layout properties
-        el->setPenWidth(style::window::default_border_no_focus_w);
-        el->setPenFocusWidth(style::window::default_border_focus_w);
-        el->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
-        el->inputCallback = [showCallback, clearCallback](Item &, const InputEvent &event) -> bool {
-            if (event.state != InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (event.keyCode == KeyCode::KEY_LF && showCallback) {
-                return showCallback();
-            }
-            if (event.keyCode == KeyCode::KEY_RF && clearCallback) {
-                return clearCallback();
-            }
-            return false;
-        };
-
-        layout->addWidget(el);
-        if (el->visible) {
-            // space between next notifications to show
-            layout->addWidget(new gui::Span(Axis::Y, style::design_option_span));
-        }
-
-        return el->visible;
-    }
-
-    auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
+    auto DesktopMainWindow::buildNotifications(app::ApplicationDesktop *app) -> bool
     {
         erase(notifications);
         using namespace style::desktop;
