@@ -237,7 +237,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         else {
             // single vibration pulse
         }
-        vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.duration.count());
+        vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.pulse.count());
         vibratorTimerOneshot->connect([&](sys::Timer &) { vibrator::set(vibrator::State::Off); });
         vibratorTimerOneshot->start();
     }

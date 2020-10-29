@@ -24,7 +24,12 @@ namespace bsp
         {}
         void set(State state)
         {
-            state == State::On ? enable() : disable();
+            if (state == State::On) {
+                enable();
+            }
+            else {
+                disable();
+            }
         }
     } // namespace vibrator
 } // namespace bsp

@@ -45,14 +45,26 @@ void EventManagerServiceAPI::TurnVibration(sys::Service *serv, bsp::vibrator::St
 }
 
 void EventManagerServiceAPI::PulseVibration(sys::Service *serv,
-                                            std::chrono::milliseconds durationOn,
-                                            std::chrono::milliseconds durationOff,
-                                            bool forever)
+                                            std::chrono::milliseconds pulseDuration,
+                                            std::chrono::milliseconds repeatEvery)
 {
-    constexpr uint32_t timeout = 1000;
+    // sanity check
+    if (pulseDuration == std::chrono::milliseconds::zero()) {
+        LOG_ERROR("malformed vibration pulse. Duration must be > 0!");
+    }
+    else {
+        if (repeatEvery > std::chrono::milliseconds::zero() && pulseDuration >= repeatEvery) {
+            // malformed reccuring pulse. assume single shot
+            LOG_ERROR("malformed vibration pulse. Repeat period must be > than pulse duration!");
+            PulseVibration(serv, pulseDuration);
+        }
+        else {
+            constexpr uint32_t timeout = 1000;
 
-    sys::Bus::SendUnicast(std::make_shared<sevm::VibratorPulseMessage>(durationOn, durationOff, forever),
-                          service::name::evt_manager,
-                          serv,
-                          pdMS_TO_TICKS(timeout));
+            sys::Bus::SendUnicast(std::make_shared<sevm::VibratorPulseMessage>(pulseDuration, repeatEvery),
+                                  service::name::evt_manager,
+                                  serv,
+                                  pdMS_TO_TICKS(timeout));
+        }
+    }
 }

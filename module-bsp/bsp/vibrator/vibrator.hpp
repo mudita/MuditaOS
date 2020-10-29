@@ -15,10 +15,13 @@ namespace bsp
             Off,
         };
 
-        struct Vibration
+        /// A pulse of vibration
+        struct VibrationPulse
         {
-            std::chrono::milliseconds duration    = std::chrono::milliseconds::zero();
-            std::chrono::milliseconds period      = std::chrono::milliseconds::zero();
+            /// for how long the vibration will be on
+            std::chrono::milliseconds pulse;
+            /// optional recurrence of pulse
+            std::chrono::milliseconds period = std::chrono::milliseconds::zero();
         };
 
         void enable();

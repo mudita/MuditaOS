@@ -24,9 +24,13 @@ namespace EventManagerServiceAPI
      */
     bsp::Board GetBoard(sys::Service *serv);
 
+    /// @brief Set a steady vibration or a lack thereof
     void TurnVibration(sys::Service *serv, bsp::vibrator::State state);
+
+    /// @brief Vibrate a pulse of vibration
+    /// @param pulseDuration duration of the vibration pulse
+    /// @param repeatEvery optional periodic repetition od the pulse
     void PulseVibration(sys::Service *serv,
-                        std::chrono::milliseconds durationOn,
-                        std::chrono::milliseconds durationOff = std::chrono::milliseconds::zero(),
-                        bool forever                          = false);
+                        std::chrono::milliseconds pulseDuration,
+                        std::chrono::milliseconds repeatEvery = std::chrono::milliseconds::zero());
 } // namespace EventManagerServiceAPI
