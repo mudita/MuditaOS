@@ -63,7 +63,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightIcon::Bt));
+                RightItem::Bt));
         }
 
         topBar->setActive(TopBar::Elements::SIGNAL, false);
