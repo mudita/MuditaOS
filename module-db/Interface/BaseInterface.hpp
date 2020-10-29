@@ -18,7 +18,6 @@ namespace db
 
         enum class Name
         {
-            Settings,
             SMS,
             SMSThread,
             SMSTemplate,
@@ -37,8 +36,6 @@ namespace db
 constexpr const char *c_str(enum db::Interface::Name db)
 {
     switch (db) {
-    case db::Interface::Name::Settings:
-        return "Settings";
     case db::Interface::Name::SMS:
         return "SMS";
     case db::Interface::Name::SMSThread:

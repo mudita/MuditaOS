@@ -9,6 +9,9 @@
 #include <widgets/TextFixedSize.hpp>
 #include <FontManager.hpp>
 #include <service-db/DBServiceAPI.hpp>
+#include <module-services/service-db/agents/settings/Settings.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-utils/Utils.hpp>
 
 namespace style::option
 {
@@ -32,10 +35,26 @@ namespace gui::option
     {
       private:
         app::Application *app = nullptr;
+        unsigned int lockPassHash;
 
       public:
         ChangePin(app::Application *app) : app(app)
-        {}
+        {
+            app->settings->registerValueChange(
+                ::Settings::SystemProperties::lockPassHash,
+                [this](const std::string &name, std::optional<std::string> value) { settingsChanged(name, value); });
+        }
+        void settingsChanged(const std::string &name, std::optional<std::string> value)
+        {
+            if (::Settings::SystemProperties::lockPassHash == name) {
+                if (value.has_value()) {
+                    lockPassHash = utils::getValue<unsigned int>(value.value());
+                }
+            }
+            else {
+                LOG_ERROR("Application not registered value changed received: %s", name.c_str());
+            }
+        }
 
         [[nodiscard]] auto build() const -> Item * override
         {
@@ -46,7 +65,6 @@ namespace gui::option
                                        style::window::label::big_h);
             auto font      = FontManager::getInstance().getFont(style::window::font::medium);
             auto font_bold = FontManager::getInstance().getFont(style::window::font::mediumbold);
-            auto settings  = app->getSettings();
 
             rect->setEdges(RectangleEdge::None);
             rect->setReverseOrder(true);
@@ -69,20 +87,17 @@ namespace gui::option
             pin_text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
             pin_text->setEditMode(EditMode::EDIT);
             pin_text->setFont(font);
-            pin_text->setText(std::to_string(settings.lockPassHash));
+            pin_text->setText(std::to_string(lockPassHash));
             pin_text->setPenWidth(0);
             pin_text->setInputMode(new InputMode(
                 {InputMode::digit}, [=](const UTF8 &text) {}, [=]() {}, [=]() {}));
             pin_text->setEdges(RectangleEdge::All);
-            auto lapp = app;
 
-            pin_text->activatedCallback = [pin_text, lapp](gui::Item &item) {
-                auto settings = lapp->getSettings();
+            pin_text->activatedCallback = [pin_text, this](gui::Item &item) {
                 auto text     = pin_text->getText();
                 if (text.length() == 0) {
                     LOG_DEBUG("remove pin");
-                    settings.lockPassHash = 0;
-                    DBServiceAPI::SettingsUpdate(lapp, settings);
+                    app->settings->setValue(::Settings::SystemProperties::lockPassHash, "");
                 }
                 else if (text.length() != 4) {
                     pin_text->setText("bad value - needs 4 digits");
@@ -90,8 +105,7 @@ namespace gui::option
                 else {
                     auto value = std::stoi(text);
                     LOG_DEBUG("setting pin to: %d", value);
-                    settings.lockPassHash = value;
-                    DBServiceAPI::SettingsUpdate(lapp, settings);
+                    app->settings->setValue(::Settings::SystemProperties::lockPassHash, std::to_string(value));
                 }
                 return true;
             };

@@ -13,6 +13,7 @@
 #include "LanguageWindow.hpp"
 #include <Style.hpp>
 #include <module-apps/application-settings-new/widgets/SettingsStyle.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace gui
 {
@@ -52,25 +53,25 @@ namespace gui
 
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_english"), [=](gui::Item &item) {
             LOG_INFO("selected display language: english");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::En);
+            getApplication()->settings->setValue(::Settings::SystemProperties::displayLanguage, "En");
             return true;
         }));
 
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_polish"), [=](gui::Item &) {
             LOG_INFO("selected display language: polish");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::Pl);
+            getApplication()->settings->setValue(::Settings::SystemProperties::displayLanguage, "Pl");
             return true;
         }));
 
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_german"), [=](gui::Item &) {
             LOG_INFO("selected display language: german");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::De);
+            getApplication()->settings->setValue(::Settings::SystemProperties::displayLanguage, "De");
             return true;
         }));
 
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_spanish"), [=](gui::Item &) {
-            LOG_INFO("selected display language: spanish");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::Sp);
+            LOG_INFO("selected language: spanish");
+            getApplication()->settings->setValue(::Settings::SystemProperties::displayLanguage, "Sp");
             return true;
         }));
 

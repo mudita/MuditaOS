@@ -27,6 +27,8 @@
 #include <limits>
 #include <utility>
 
+#include <module-utils/Utils.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 // Auto phone lock disabled for now till the times when it's debugged
 // #define AUTO_PHONE_LOCK_ENABLED
 
@@ -36,36 +38,20 @@ namespace app::manager
     {
         constexpr auto default_application_locktime_ms = 30000;
 
-        utils::Lang toUtilsLanguage(SettingsLanguage language)
+        utils::Lang toUtilsLanguage(const std::string &language)
         {
-            switch (language) {
-            case SettingsLanguage::ENGLISH:
+            if ("En" == language)
                 return utils::Lang::En;
-            case SettingsLanguage::POLISH:
+            if ("Pl" == language)
                 return utils::Lang::Pl;
-            case SettingsLanguage::GERMAN:
+            if ("De" == language)
                 return utils::Lang::De;
-            case SettingsLanguage::SPANISH:
+            if ("Sp" == language)
                 return utils::Lang::Sp;
-            }
             return utils::Lang::En;
         }
 
-        SettingsLanguage toSettingsLanguage(utils::Lang language)
-        {
-            switch (language) {
-            case utils::Lang::En:
-                return SettingsLanguage::ENGLISH;
-            case utils::Lang::Pl:
-                return SettingsLanguage::POLISH;
-            case utils::Lang::De:
-                return SettingsLanguage::GERMAN;
-            case utils::Lang::Sp:
-                return SettingsLanguage::SPANISH;
-            }
-            return SettingsLanguage::ENGLISH;
-        }
-    } // namespace
+    }; // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
         : applications{std::move(launchers)}
@@ -131,18 +117,27 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           blockingTimer{std::make_unique<sys::Timer>(
-              "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)}
+              "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
+          settings(std::make_unique<::Settings::Settings>(this))
     {
         registerMessageHandlers();
         blockingTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
+        settings->registerValueChange(
+            ::Settings::SystemProperties::displayLanguage,
+            [this](const std::string &name, std::optional<std::string> value) { displayLanguageChanged(name, value); });
+        settings->registerValueChange(
+            ::Settings::SystemProperties::inputLanguage,
+            [this](const std::string &name, std::optional<std::string> value) { inputLanguageChanged(name, value); });
+        settings->registerValueChange(
+            ::Settings::SystemProperties::lockTime,
+            [this](const std::string &name, std::optional<std::string> value) { lockTimeChanged(name, value); });
     }
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        settings = DBServiceAPI::SettingsGet(this);
-        blockingTimer->setInterval(settings.lockTime != 0 ? settings.lockTime : default_application_locktime_ms);
-        utils::localize.SetDisplayLanguage(toUtilsLanguage(settings.displayLanguage));
-        utils::localize.setInputLanguage(toUtilsLanguage(settings.inputLanguage));
+        utils::localize.SetDisplayLanguage(toUtilsLanguage(displayLanguage));
+        utils::localize.setInputLanguage(toUtilsLanguage(inputLanguage));
+        blockingTimer->setInterval(default_application_locktime_ms);
 
         startSystemServices();
         startBackgroundApplications();
@@ -238,16 +233,6 @@ namespace app::manager
         connect(typeid(ApplicationInitialised), [this](sys::Message *request) {
             auto msg = static_cast<ApplicationInitialised *>(request);
             handleInitApplication(msg);
-            return std::make_shared<sys::ResponseMessage>();
-        });
-        connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
-            auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
-            handleDisplayLanguageChange(msg);
-            return std::make_shared<sys::ResponseMessage>();
-        });
-        connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
-            auto msg = static_cast<InputLanguageChangeRequest *>(request);
-            handleInputLanguageChange(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
@@ -531,37 +516,6 @@ namespace app::manager
         Controller::switchBack(this);
     }
 
-    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
-    {
-        const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
-        settings                     = DBServiceAPI::SettingsGet(this);
-
-        if (requestedLanguage == settings.displayLanguage) {
-            LOG_WARN("The selected language is already set. Ignore.");
-            return true;
-        }
-        settings.displayLanguage = requestedLanguage;
-        utils::localize.SetDisplayLanguage(msg->getLanguage());
-        rebuildActiveApplications();
-        DBServiceAPI::SettingsUpdate(this, settings);
-        return true;
-    }
-
-    auto ApplicationManager::handleInputLanguageChange(app::manager::InputLanguageChangeRequest *msg) -> bool
-    {
-        const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
-        settings                     = DBServiceAPI::SettingsGet(this);
-
-        if (requestedLanguage == settings.inputLanguage) {
-            LOG_WARN("The selected language is already set. Ignore.");
-            return true;
-        }
-        settings.inputLanguage = requestedLanguage;
-        utils::localize.setInputLanguage(msg->getLanguage());
-        DBServiceAPI::SettingsUpdate(this, settings);
-        return true;
-    }
-
     void ApplicationManager::rebuildActiveApplications()
     {
         for (const auto &app : getApplications()) {
@@ -670,5 +624,31 @@ namespace app::manager
             Controller::switchApplication(this, rootApplicationName, gui::name::window::main_window, std::move(data));
         }
 #endif
+    }
+    void ApplicationManager::displayLanguageChanged(const std::string &name, std::optional<std::string> value)
+    {
+        if (value.has_value()) {
+            if (displayLanguage != value.value()) {
+                displayLanguage = value.value();
+                utils::localize.SetDisplayLanguage(toUtilsLanguage(displayLanguage));
+                rebuildActiveApplications();
+            }
+            else {
+                LOG_WARN("The selected language is already set. Ignore.");
+            }
+        }
+    }
+    void ApplicationManager::lockTimeChanged(const std::string &name, std::optional<std::string> value)
+    {
+        if (value.has_value() && !value.value().empty()) {
+            blockingTimer->setInterval(utils::getValue<unsigned int>(value.value()));
+            //?any additional action needed here?
+        }
+    }
+    void ApplicationManager::inputLanguageChanged(const std::string &name, std::optional<std::string> value)
+    {
+        if (value.has_value()) {
+            inputLanguage = value.value();
+        }
     }
 } // namespace app::manager
