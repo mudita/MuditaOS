@@ -12,6 +12,11 @@ namespace gui
     {
       public:
         InputLanguageWindow(app::Application *app);
-        void buildInterface() override;
+
+      protected:
+        auto buildOptionsList() -> std::list<gui::Option> override;
+
+      private:
+        std::string selectedLang;
     };
 } // namespace gui

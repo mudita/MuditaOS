@@ -15,13 +15,13 @@ namespace gui
         style::window::decorate(optionBodyHBox);
 
         auto optionNameLabel = new Label(optionBodyHBox, 0, 0, 0, 0, text);
-        optionNameLabel->setMinimumSize(style::window::default_body_width - style::buttonOnOff::w,
-                                        style::window::label::big_h);
         optionNameLabel->setEdges(RectangleEdge::None);
         optionNameLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         optionNameLabel->setFont(style::window::font::big);
 
         std::string imageName;
+        int optionRightItemWidth = 0;
+
         switch (rightItem) {
         case RightItem::ArrowBlack:
             imageName = "right_label_arrow";
@@ -31,23 +31,29 @@ namespace gui
             break;
         case RightItem::On:
             new ButtonOnOff(optionBodyHBox, ButtonState::On);
+            optionRightItemWidth = style::buttonOnOff::w;
             break;
         case RightItem::Off:
             new ButtonOnOff(optionBodyHBox, ButtonState::Off);
+            optionRightItemWidth = style::buttonOnOff::w;
             break;
         case RightItem::Bt:
             imageName = "bt";
+            break;
+        case RightItem::Checked:
+            imageName = "small_tick_W_M";
             break;
         default:
             break;
         }
 
         if (!imageName.empty()) {
-            auto image = new gui::Image(optionBodyHBox, 0, 0, 0, 0, imageName);
-            optionNameLabel->setMinimumSize(style::window::default_body_width - image->getWidth(),
-                                            style::window::label::big_h);
+            auto image           = new gui::Image(optionBodyHBox, 0, 0, 0, 0, imageName);
+            optionRightItemWidth = image->getWidth();
         }
 
+        optionNameLabel->setMinimumSize(style::window::default_body_width - optionRightItemWidth,
+                                        style::window::label::big_h);
         return optionBodyHBox;
     }
 } // namespace gui

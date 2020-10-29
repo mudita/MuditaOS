@@ -34,8 +34,6 @@ target_sources( ${PROJECT_NAME}
         windows/WallpaperWindow.cpp
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
-        widgets/UpDown.cpp
-        widgets/Toggle.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -52,8 +50,6 @@ target_sources( ${PROJECT_NAME}
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
         windows/WallpaperWindow.hpp
-        widgets/UpDown.hpp
-        widgets/Toggle.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

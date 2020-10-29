@@ -13,14 +13,16 @@ namespace gui
     {
       public:
         QuotesMainWindow(app::Application *app);
-        void buildInterface() override;
 
-        bool onInput(const InputEvent &inputEvent) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+
+      protected:
+        auto buildOptionsList() -> std::list<Option> override;
 
       private:
-        void buildQuotesList(std::list<std::string> quotes);
+        void readQuotes(fs::path fn);
+        void switchHandler(bool &optionSwitch);
 
-        std::vector<CheckBoxWithLabel *> boxes;
-        std::list<std::string> readQuotes(fs::path fn);
+        std::list<std::pair<std::string, bool>> quotes;
     };
 } // namespace gui

@@ -5,9 +5,9 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
+#include "windows/OptionSetting.hpp"
 
 #include <InputEvent.hpp>
-#include <CheckBoxWithLabel.hpp>
 #include <i18/i18.hpp>
 #include <json/json11.hpp>
 #include <vfs.hpp>
@@ -21,53 +21,11 @@ namespace gui
 
     QuotesMainWindow::QuotesMainWindow(app::Application *app) : BaseSettingsWindow(app, gui::window::name::quotes)
     {
-        buildInterface();
-    }
-
-    void QuotesMainWindow::buildInterface()
-    {
-        BaseSettingsWindow::buildInterface();
         setTitle(utils::localize.get("app_settings_display_locked_screen_quotes"));
-        buildQuotesList(readQuotes(quotes::path));
-
-        auto leftArrowImage = new gui::Image(this,
-                                             style::settings::window::leftArrowImage::x,
-                                             style::settings::window::leftArrowImage::y,
-                                             style::settings::window::leftArrowImage::w,
-                                             style::settings::window::leftArrowImage::h,
-                                             "arrow_left");
-        auto newQuoteImage  = new gui::Image(this,
-                                            style::settings::window::crossImage::x,
-                                            style::settings::window::crossImage::y,
-                                            style::settings::window::crossImage::w,
-                                            style::settings::window::crossImage::h,
-                                            "cross");
-
-        addWidget(leftArrowImage);
-        addWidget(newQuoteImage);
+        readQuotes(quotes::path);
     }
 
-    void QuotesMainWindow::buildQuotesList(std::list<std::string> quotes)
-    {
-        auto body =
-            new VBox(nullptr,
-                     0,
-                     title->offset_h() + style::margins::big,
-                     this->getWidth(),
-                     this->getHeight() - style::margins::big - this->title->offset_h() - bottomBar->getHeight());
-        body->setEdges(gui::RectangleEdge::None);
-
-        auto toggleBoxes = [this](CheckBoxWithLabel &active) {};
-
-        for (auto quote : quotes) {
-            boxes.push_back(new CheckBoxWithLabel(body, 0, 0, quote, toggleBoxes));
-        }
-
-        addWidget(body);
-        setFocusItem(body);
-    }
-
-    bool QuotesMainWindow::onInput(const InputEvent &inputEvent)
+    auto QuotesMainWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
@@ -85,9 +43,8 @@ namespace gui
         return false;
     }
 
-    std::list<std::string> QuotesMainWindow::readQuotes(fs::path fn)
+    void QuotesMainWindow::readQuotes(fs::path fn)
     {
-        std::list<std::string> quotes;
         std::string err;
 
         std::string fileContents = vfs.loadFileAsString(fn);
@@ -98,10 +55,39 @@ namespace gui
             LOG_ERROR("Error while parsing quotes: %s", err.c_str());
         }
 
-        std::transform(
-            obj.begin(), obj.end(), std::back_inserter(quotes), [](auto item) { return item["quote"].string_value(); });
+        std::transform(obj.begin(), obj.end(), std::back_inserter(quotes), [](auto item) {
+            return std::pair{item["quote"].string_value(), false};
+        });
+    }
 
-        return quotes;
+    auto QuotesMainWindow::buildOptionsList() -> std::list<gui::Option>
+    {
+        std::list<gui::Option> optionsList;
 
-    } // namespace gui
+        for (auto &quote : quotes) {
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                utils::translateI18(quote.first),
+                [&quote, this](gui::Item &item) {
+                    switchHandler(quote.second);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                quote.second ? RightItem::Checked : RightItem::Disabled));
+        }
+
+        return optionsList;
+    }
+
+    void QuotesMainWindow::switchHandler(bool &optionSwitch)
+    {
+        optionSwitch = !optionSwitch;
+        rebuildOptionList();
+    }
 } // namespace gui

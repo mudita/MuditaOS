@@ -7,15 +7,15 @@
 
 namespace gui
 {
-    class CheckBoxWithLabel;
 
     class AutolockWindow : public BaseSettingsWindow
     {
       public:
         AutolockWindow(app::Application *app);
-        void buildInterface() override;
 
       private:
-        std::vector<CheckBoxWithLabel *> boxes;
+        auto buildOptionsList() -> std::list<Option> override;
+
+        std::string selectedTime;
     };
 } // namespace gui

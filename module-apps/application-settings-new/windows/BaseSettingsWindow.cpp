@@ -9,9 +9,7 @@ namespace gui
 {
 
     BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : OptionWindow(app, name)
-    {
-        buildInterface();
-    }
+    {}
 
     void BaseSettingsWindow::buildInterface()
     {
@@ -32,6 +30,17 @@ namespace gui
     {
         destroyInterface();
         buildInterface();
+    }
+
+    void BaseSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        rebuildOptionList();
+    }
+
+    void BaseSettingsWindow::rebuildOptionList()
+    {
+        clearOptions();
+        addOptions(buildOptionsList());
     }
 
 } // namespace gui

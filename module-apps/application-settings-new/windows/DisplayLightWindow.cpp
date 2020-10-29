@@ -3,101 +3,67 @@
 
 #include "DisplayLightWindow.hpp"
 
-#include <application-settings-new/ApplicationSettings.hpp>
+#include "application-settings-new/ApplicationSettings.hpp"
+#include "windows/OptionSetting.hpp"
+
 #include <i18/i18.hpp>
-#include <Common.hpp>
-#include <InputEvent.hpp>
 
 namespace gui
 {
     DisplayLightWindow::DisplayLightWindow(app::Application *app) : BaseSettingsWindow(app, window::name::display_light)
     {
-        buildInterface();
-    }
-
-    void DisplayLightWindow::buildInterface()
-    {
-        BaseSettingsWindow::buildInterface();
         setTitle(utils::localize.get("app_settings_display_display_light"));
+    }
 
-        int32_t offset_h = 8;
+    void DisplayLightWindow::switchHandler(bool &onOffSwitch)
+    {
+        onOffSwitch = !onOffSwitch;
+        rebuildOptionList();
+    }
 
-        body = new VBox(this,
-                        0,
-                        title->offset_h() + offset_h,
-                        this->getWidth(),
-                        this->getHeight() - offset_h - this->title->offset_h() - bottomBar->getHeight());
-        body->setEdges(gui::RectangleEdge::None);
+    auto DisplayLightWindow::buildOptionsList() -> std::list<gui::Option>
+    {
+        std::list<gui::Option> optionsList;
 
-        displayLight = new Toggle(nullptr,
-                                  0,
-                                  0,
-                                  body->getWidth(),
-                                  style::window::label::big_h,
-                                  utils::localize.get("app_settings_display_light_main"),
-                                  false);
-
-        autoLight = new Toggle(nullptr,
-                               0,
-                               0,
-                               body->getWidth(),
-                               style::window::label::big_h,
-                               utils::localize.get("app_settings_display_light_auto"),
-                               true);
-
-        brightness = new UpDown(nullptr,
-                                0,
-                                0,
-                                body->getWidth(),
-                                style::window::label::big_h,
-                                utils::localize.get("app_settings_display_light_brightness"),
-                                default_brightness,
-                                max_brightness);
-
-        displayLight->activatedCallback = [this](Item &) {
-            displayLightSwitchHandler();
-            return true;
+        auto addOnOffOoption = [&](UTF8 text, bool &toggle) {
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                text,
+                [&](gui::Item &item) mutable {
+                    switchHandler(toggle);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                toggle ? RightItem::On : RightItem::Off));
         };
 
-        autoLight->activatedCallback = [this](Item &) {
-            autoLightSwitchHandler();
-            return true;
-        };
-
-        body->addWidget(displayLight);
-
-        setFocusItem(body);
-
-    } // namespace gui
-
-    void DisplayLightWindow::displayLightSwitchHandler()
-    {
-        body->removeWidget(autoLight);
-
-        if (displayLight->getState()) {
-            body->addWidget(autoLight);
-            setFocusItem(body);
-            setFocusItem(autoLight);
+        addOnOffOoption(utils::translateI18("app_settings_display_light_main"), isDisplayLightSwitchOn);
+        if (isDisplayLightSwitchOn) {
+            addOnOffOoption(utils::translateI18("app_settings_display_light_auto"), isAutoLightSwitchOn);
         }
-    }
 
-    void DisplayLightWindow::autoLightSwitchHandler()
-    {
-        body->removeWidget(brightness);
-        if (!autoLight->getState()) {
-            body->addWidget(brightness);
-            setFocusItem(body);
-            setFocusItem(brightness);
+        if (isDisplayLightSwitchOn && !isAutoLightSwitchOn) {
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                utils::translateI18("app_settings_display_light_brightness"),
+                [=](gui::Item &item) { return true; },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::set),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                RightItem::ArrowWhite));
         }
+
+        return optionsList;
     }
 
-    void DisplayLightWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
-
-    void DisplayLightWindow::invalidate() noexcept
-    {
-        displayLight = nullptr;
-        autoLight    = nullptr;
-        brightness   = nullptr;
-    }
 } // namespace gui

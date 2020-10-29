@@ -2,51 +2,44 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AutolockWindow.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
+#include "windows/OptionSetting.hpp"
 
-#include <CheckBoxWithLabel.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
 #include <i18/i18.hpp>
-#include <BoxLayout.hpp>
 
 namespace gui
 {
 
     AutolockWindow::AutolockWindow(app::Application *app) : BaseSettingsWindow(app, window::name::autolock)
     {
-        buildInterface();
+        setTitle(utils::localize.get("app_settings_display_locked_screen_autolock"));
     }
 
-    void AutolockWindow::buildInterface()
+    auto AutolockWindow::buildOptionsList() -> std::list<gui::Option>
     {
-        BaseSettingsWindow::buildInterface();
-        setTitle(utils::localize.get("app_settings_display_locked_screen_autolock"));
-
-        auto body =
-            new VBox(nullptr,
-                     0,
-                     title->offset_h() + style::margins::big,
-                     this->getWidth(),
-                     this->getHeight() - style::margins::big - this->title->offset_h() - bottomBar->getHeight());
-        body->setEdges(gui::RectangleEdge::None);
-
-        auto toggleBoxes = [this](CheckBoxWithLabel &active) {
-            for (CheckBoxWithLabel *box : boxes) {
-                box->setChecked(false);
-                if (&active == box) {
-                    box->setChecked(!box->isChecked());
-                    // setAutoLockTime
-                }
-            }
-        };
-
+        std::list<gui::Option> optionsList;
         std::vector<std::string> autoLockTimes = {"15s", "30s", "1m", "2m", "5m", "10m", "20m"};
 
         for (auto time : autoLockTimes) {
-            boxes.push_back(new CheckBoxWithLabel(body, 0, 0, time, toggleBoxes));
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                time,
+                [=](gui::Item &item) {
+                    selectedTime = time;
+                    rebuildOptionList();
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                selectedTime == time ? RightItem::Checked : RightItem::Disabled));
         }
 
-        addWidget(body);
-        setFocusItem(body);
-    } // namespace gui
+        return optionsList;
+    }
 
 } // namespace gui

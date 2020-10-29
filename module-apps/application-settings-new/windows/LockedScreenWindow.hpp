@@ -11,8 +11,6 @@ namespace gui
     {
       public:
         LockedScreenWindow(app::Application *app);
-        void buildInterface() override;
-
-        std::list<Option> lockedScreenOptions();
+        auto buildOptionsList() -> std::list<Option> override;
     };
 } // namespace gui

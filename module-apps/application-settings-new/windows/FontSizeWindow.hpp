@@ -12,6 +12,6 @@ namespace gui
     {
       public:
         FontSizeWindow(app::Application *app);
-        void buildInterface() override;
+        auto buildOptionsList() -> std::list<gui::Option> override;
     };
 } // namespace gui

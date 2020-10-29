@@ -3,51 +3,56 @@
 
 #include "KeypadLightWindow.hpp"
 
-#include "CheckBoxWithLabel.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
+#include "windows/OptionSetting.hpp"
 
-#include <application-settings-new/ApplicationSettings.hpp>
 #include <i18/i18.hpp>
-#include <BoxLayout.hpp>
 
 namespace gui
 {
 
     KeypadLightWindow::KeypadLightWindow(app::Application *app) : BaseSettingsWindow(app, window::name::keypad_light)
     {
-        buildInterface();
+        setTitle(utils::localize.get("app_settings_display_keypad_light"));
     }
 
-    void KeypadLightWindow::buildInterface()
+    void KeypadLightWindow::switchHandler(bool &toggleSwitch)
     {
-        BaseSettingsWindow::buildInterface();
-        setTitle(utils::localize.get("app_settings_display_keypad_light"));
+        isActiveSwitchOn   = false;
+        isOffSwitchOn      = false;
+        isAlwaysOnSwitchOn = false;
 
-        auto body =
-            new VBox(nullptr,
-                     0,
-                     title->offset_h() + style::margins::big,
-                     this->getWidth(),
-                     this->getHeight() - style::margins::big - this->title->offset_h() - bottomBar->getHeight());
-        body->setEdges(gui::RectangleEdge::None);
+        toggleSwitch = !toggleSwitch;
+        rebuildOptionList();
+    }
 
-        auto toggleBoxes = [this](CheckBoxWithLabel &active) {
-            for (CheckBoxWithLabel *box : boxes) {
-                box->setChecked(false);
-                if (&active == box) {
-                    box->setChecked(!box->isChecked());
-                }
-            }
+    auto KeypadLightWindow::buildOptionsList() -> std::list<gui::Option>
+    {
+        std::list<gui::Option> optionsList;
+
+        auto addCheckOption = [&](UTF8 text, bool &Switch) {
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                text,
+                [&](gui::Item &item) mutable {
+                    switchHandler(Switch);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                Switch ? RightItem::Checked : RightItem::Disabled));
         };
 
-        boxes.push_back(new CheckBoxWithLabel(
-            body, 0, 0, utils::localize.get("app_settings_display_keypad_light_on"), toggleBoxes));
-        boxes.push_back(new CheckBoxWithLabel(
-            body, 0, 0, utils::localize.get("app_settings_display_keypad_light_active"), toggleBoxes));
-        boxes.push_back(new CheckBoxWithLabel(
-            body, 0, 0, utils::localize.get("app_settings_display_keypad_light_off"), toggleBoxes));
+        addCheckOption(utils::translateI18("app_settings_display_keypad_light_on"), isAlwaysOnSwitchOn);
+        addCheckOption(utils::translateI18("app_settings_display_keypad_light_off"), isOffSwitchOn);
+        addCheckOption(utils::translateI18("app_settings_display_keypad_light_active"), isActiveSwitchOn);
 
-        addWidget(body);
-        setFocusItem(body);
-    }
+        return optionsList;
+    } // namespace gui
 
 } // namespace gui

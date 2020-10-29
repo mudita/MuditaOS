@@ -13,15 +13,15 @@ namespace gui
     {
       public:
         WallpaperWindow(app::Application *app);
-        void buildInterface() override;
 
       private:
-        std::vector<CheckBoxWithLabel *> boxes;
+        void switchHandler(bool &onOffSwitch);
+        auto buildOptionsList() -> std::list<Option> override;
+
+        bool isWallpaperLogoSwitchOn   = false;
+        bool isWallpaperClockSwitchOn  = false;
+        bool isWallpaperQuotesSwitchOn = false;
 
         Item *quotes;
-
-        CheckBoxWithLabel *logoBox   = nullptr;
-        CheckBoxWithLabel *clockBox  = nullptr;
-        CheckBoxWithLabel *quotesBox = nullptr;
     };
 } // namespace gui

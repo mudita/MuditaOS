@@ -12,14 +12,11 @@ namespace gui
 {
     QuotesAddWindow::QuotesAddWindow(app::Application *app) : AppWindow(app, gui::window::name::quotes)
     {
-        buildInterface();
+        setTitle(utils::localize.get("app_settings_display_locked_screen_new_quote"));
     }
 
     void QuotesAddWindow::buildInterface()
     {
-        AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_settings_display_locked_screen_new_quote"));
-
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 

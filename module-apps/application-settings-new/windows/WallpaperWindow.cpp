@@ -3,64 +3,73 @@
 
 #include "WallpaperWindow.hpp"
 
-#include "CheckBoxWithLabel.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
+#include "windows/OptionSetting.hpp"
 
-#include <application-settings-new/ApplicationSettings.hpp>
 #include <i18/i18.hpp>
-#include <BoxLayout.hpp>
 
 namespace gui
 {
     WallpaperWindow::WallpaperWindow(app::Application *app) : BaseSettingsWindow(app, window::name::wallpaper)
     {
-        buildInterface();
+        setTitle(utils::localize.get("app_settings_display_locked_screen_wallpaper"));
     }
 
-    void WallpaperWindow::buildInterface()
+    auto WallpaperWindow::buildOptionsList() -> std::list<gui::Option>
     {
-        setTitle(utils::localize.get("app_settings_display_locked_screen_wallpaper"));
-        BaseSettingsWindow::buildInterface();
+        std::list<gui::Option> optionsList;
 
-        auto body =
-            new VBox(nullptr,
-                     0,
-                     title->offset_h() + style::margins::big,
-                     this->getWidth(),
-                     this->getHeight() - style::margins::big - this->title->offset_h() - bottomBar->getHeight());
-        body->setEdges(gui::RectangleEdge::None);
-
-        quotes = Option(
-                     utils::localize.get("app_settings_display_wallpaper_select_quotes"),
-                     [=](gui::Item &item) {
-                         this->application->switchWindow(gui::window::name::quotes, gui::ShowMode::GUI_SHOW_INIT);
-                         return true;
-                     },
-                     Arrow::Enabled)
-                     .build();
-
-        auto toggleBoxes = [this](CheckBoxWithLabel &active) {
-            for (CheckBoxWithLabel *box : {logoBox, clockBox, quotesBox}) {
-                box->setChecked(false);
-                if (&active == box) {
-                    box->setChecked(!box->isChecked());
-                }
-            }
-
-            quotes->setVisible(quotesBox->isChecked());
+        auto addCheckOption = [&](UTF8 text, bool &Switch) {
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                text,
+                [&](gui::Item &item) mutable {
+                    switchHandler(Switch);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                Switch ? RightItem::Checked : RightItem::Disabled));
         };
 
-        logoBox =
-            new CheckBoxWithLabel(body, 0, 0, utils::localize.get("app_settings_display_wallpaper_logo"), toggleBoxes);
-        clockBox =
-            new CheckBoxWithLabel(body, 0, 0, utils::localize.get("app_settings_display_wallpaper_clock"), toggleBoxes);
-        quotesBox = new CheckBoxWithLabel(
-            body, 0, 0, utils::localize.get("app_settings_display_wallpaper_quotes"), toggleBoxes);
+        addCheckOption(utils::translateI18("app_settings_display_wallpaper_logo"), isWallpaperLogoSwitchOn);
+        addCheckOption(utils::translateI18("app_settings_display_wallpaper_clock"), isWallpaperClockSwitchOn);
+        addCheckOption(utils::translateI18("app_settings_display_wallpaper_quotes"), isWallpaperQuotesSwitchOn);
 
-        addWidget(body);
-        body->addWidget(quotes);
-        setFocusItem(body);
+        if (isWallpaperQuotesSwitchOn) {
+            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+                utils::translateI18("app_settings_display_wallpaper_select_quotes"),
+                [=](gui::Item &item) {
+                    application->switchWindow(gui::window::name::quotes, nullptr);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                RightItem::ArrowWhite));
+        }
 
-        quotes->setVisible(false);
-    } // namespace gui
+        return optionsList;
+    }
+
+    void WallpaperWindow::switchHandler(bool &optionSwitch)
+    {
+        isWallpaperQuotesSwitchOn = false;
+        isWallpaperClockSwitchOn  = false;
+        isWallpaperLogoSwitchOn   = false;
+
+        optionSwitch = !optionSwitch;
+        rebuildOptionList();
+    }
 
 } // namespace gui
