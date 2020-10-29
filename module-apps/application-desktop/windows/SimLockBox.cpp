@@ -15,45 +15,37 @@ namespace lock_style = style::window::pin_lock;
 namespace gui
 {
 
-    void SimLockBox::popChar(unsigned int charNum)
+    void SimLockBox::popChar(uint32_t charNum)
     {
-        rebuildPinLabels(charNum);
+        LockWindow->pinLabels[charNum]->clear();
     }
-    void SimLockBox::putChar(unsigned int charNum)
+    void SimLockBox::putChar(uint32_t charNum)
     {
-        rebuildPinLabels(++charNum);
+        LockWindow->pinLabels[charNum]->setText("*");
     }
 
     void SimLockBox::buildLockBox(unsigned int pinSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
         LockWindow->buildInfoText(lock_style::info_text_h_sim);
-        buildPinLabels(0);
+        buildPinLabels(pinSize);
     }
     void SimLockBox::buildPinLabels(unsigned int pinSize)
     {
-        auto itemBuilder = []() -> Rect * {
-            auto label = new gui::Image("dot_12px_hard_alpha_W_G");
-            return label;
-        };
+        // labels with stars for displaying entered digits
+        const uint32_t pinLabelWidth = style::window_width - 2 * lock_style::pin_label_x;
+        LockWindow->pinLabel         = new gui::Label(
+            LockWindow, lock_style::pin_label_x, lock_style::pin_label_y, pinLabelWidth, lock_style::label_size);
+        LockWindow->pinLabel->setEdges(RectangleEdge::Bottom);
 
-        LockWindow->buildPinLabels(itemBuilder,
-                                   pinSize,
-                                   lock_style::pin_label_x,
-                                   lock_style::pin_label_y,
-                                   style::window_width - 2 * lock_style::pin_label_x);
-        LockWindow->pinLabelsBox->setEdges(RectangleEdge::Bottom);
+        LockWindow->buildPinLabels(LockWindow->pinLabel, pinSize, lock_style::label_size);
+        for (auto label : LockWindow->pinLabels) {
+            label->setEdges(RectangleEdge::None);
+        }
     }
-
-    void SimLockBox::rebuildPinLabels(unsigned int pinSize)
-    {
-        LockWindow->pinLabelsBox->erase();
-        buildPinLabels(pinSize);
-    }
-
     void SimLockBox::setVisibleStateEnterPin()
     {
-        LockWindow->pinLabelsBox->setVisible(true);
+        LockWindow->pinLabel->setVisible(true);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_to_unlock"));
@@ -74,13 +66,15 @@ namespace gui
     }
     void SimLockBox::setVisibleStateVerifiedPin()
     {
+        LockWindow->clearPinLabels();
         LockWindow->infoText->clear();
         LockWindow->infoText->setVisible(false);
-        LockWindow->pinLabelsBox->setVisible(false);
+        LockWindow->pinLabel->setVisible(false);
     }
     void SimLockBox::setVisibleStateInvalidPin()
     {
-        LockWindow->pinLabelsBox->setVisible(false);
+        LockWindow->clearPinLabels();
+        LockWindow->pinLabel->setVisible(false);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_wrong_pin")));
@@ -102,7 +96,7 @@ namespace gui
     }
     void SimLockBox::setVisibleStateBlocked()
     {
-        LockWindow->pinLabelsBox->setVisible(false);
+        LockWindow->pinLabel->setVisible(false);
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_puk_lock1")));
         LockWindow->infoText->setVisible(true);
