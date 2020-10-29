@@ -2,6 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAntenna.hpp"
+#include "Service/Timer.hpp"
+#include "api/AntennaServiceAPI.hpp"
+#include "log/log.hpp"
+#include "messages/AntennaMessage.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
+#include <at/response.hpp>
+#include <memory>
+#include <module-utils/state/ServiceState.hpp>
+#include <service-cellular/messages/CellularMessage.hpp>
+#include <common_data/EventStore.hpp>
 
 #include <at/response.hpp> // for parseCSQ, isRegistered, parseCREG, parseNetworkFrequency, parseQNWINFO
 #include <module-utils/state/ServiceState.hpp>           // for State
@@ -55,9 +65,8 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
 {
     LOG_INFO("[%s] Initializing", serviceName);
 
-    timer = std::make_unique<sys::Timer>("Antena", this, 5000);
-    timer->connect([&](sys::Timer &) {
-        LOG_INFO("																Timer tick!");
+    timer = std::make_unique<sys::Timer>("Antena", this, 5000, sys::Timer::Type::Periodic);
+    timer->connect([&](sys::Timer &) {																Timer tick!");
         timer->stop();
         auto stateToSet = state->get();
         if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
@@ -247,6 +256,7 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     if (!ret) {
         LOG_WARN("State [ %s ] not handled. Reloading timer.", c_str(state));
         timer->reload();
+        timer->start();
     }
     return ret;
 }
@@ -273,16 +283,15 @@ bool ServiceAntenna::noneStateHandler(void)
 
 bool ServiceAntenna::connectionStatusStateHandler(void)
 {
-    std::string cellularResponse;
-    CellularServiceAPI::GetCREG(this, cellularResponse);
-    uint32_t cregValue;
-    at::response::parseCREG(cellularResponse, cregValue);
-    if (at::response::creg::isRegistered(cregValue)) {
+    auto status = Store::GSM::get()->getNetwork().status;
+    if (status == Store::Network::Status::RegisteredHomeNetwork ||
+        status == Store::Network::Status::RegisteredRoaming) {
         LOG_INFO("Modem connected.");
         state->disableTimeout();
         state->set(antenna::State::bandCheck);
         return true;
     }
+    LOG_INFO("Modem not connected.");
     return false;
 }
 
