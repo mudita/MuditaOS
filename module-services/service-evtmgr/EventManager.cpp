@@ -223,23 +223,22 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         vibratorTimerPeriodic->stop();
         vibratorTimerOneshot->stop();
 
-        if (msgVibraPulse->forever == false) {
-            vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.durationOn.count());
-            vibratorTimerOneshot->connect([&](sys::Timer &timer) { vibrator::set(vibrator::State::Off); });
-        }
-        else {
-            vibratorTimerPeriodic->setInterval(msgVibraPulse->vibration.durationOn.count() +
-                                               msgVibraPulse->vibration.durationOff.count());
+        vibrator::set(vibrator::State::On);
+
+        if (msgVibraPulse->vibration.period > std::chrono::milliseconds::zero()) {
+            // periodic vibration pulses
+            vibratorTimerPeriodic->setInterval(msgVibraPulse->vibration.period.count());
             vibratorTimerPeriodic->connect([&](sys::Timer &timer) {
                 vibrator::set(vibrator::State::On);
                 vibratorTimerOneshot->reload();
             });
-
-            vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.durationOn.count());
-            vibratorTimerOneshot->connect([&](sys::Timer &) { vibrator::set(vibrator::State::Off); });
             vibratorTimerPeriodic->start();
         }
-        vibrator::set(vibrator::State::On);
+        else {
+            // single vibration pulse
+        }
+        vibratorTimerOneshot->setInterval(msgVibraPulse->vibration.duration.count());
+        vibratorTimerOneshot->connect([&](sys::Timer &) { vibrator::set(vibrator::State::Off); });
         vibratorTimerOneshot->start();
     }
 

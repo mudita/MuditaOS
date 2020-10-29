@@ -129,11 +129,11 @@ namespace sevm
       public:
         bsp::vibrator::Vibration vibration;
         bool forever;
-        VibratorPulseMessage(std::chrono::milliseconds durationOn,
-                             std::chrono::milliseconds durationOff = std::chrono::milliseconds::zero(),
+        VibratorPulseMessage(std::chrono::milliseconds duration,
+                             std::chrono::milliseconds repeatEvery = std::chrono::milliseconds::zero(),
                              bool forever                          = false)
-            : Message(MessageType::EVMVibratorPulseMessage), vibration{.durationOn  = durationOn,
-                                                                       .durationOff = durationOff},
+            : Message(MessageType::EVMVibratorPulseMessage), vibration{.duration = duration,
+                                                                       .period = repeatEvery},
               forever(forever)
         {}
     };

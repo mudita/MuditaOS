@@ -17,8 +17,8 @@ namespace bsp
 
         struct Vibration
         {
-            std::chrono::milliseconds durationOn  = std::chrono::milliseconds::zero();
-            std::chrono::milliseconds durationOff = std::chrono::milliseconds::zero();
+            std::chrono::milliseconds duration    = std::chrono::milliseconds::zero();
+            std::chrono::milliseconds period      = std::chrono::milliseconds::zero();
         };
 
         void enable();
