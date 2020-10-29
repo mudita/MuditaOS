@@ -8,6 +8,7 @@
 * `[gui]` Add "ButtonOnOff" widget.
 * `[cellular]` Add support for modem reset
 * `[cellular]` Obtain time zone through network
+* `[audio]` Add state notifications
 
 ### Changed
 
