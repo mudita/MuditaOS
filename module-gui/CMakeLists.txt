@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 
 project(module-gui VERSION 1.0
@@ -35,10 +35,9 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
 target_include_directories(${PROJECT_NAME}
-
-        PUBLIC
-
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/core
 )
 
 

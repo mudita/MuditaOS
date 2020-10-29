@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_SERVICES_SERVICE_GUI_DRAWMESSAGE_HPP_
-#define MODULE_SERVICES_SERVICE_GUI_DRAWMESSAGE_HPP_
+#pragma once
 
-#include <list>   // for list
-#include <memory> // for unique_ptr
+#include "GUIMessage.hpp"
 
-#include "Service/Message.hpp"
-#include "core/DrawCommand.hpp"
-#include "GUIMessage.hpp" // for GUIMessage
-#include "gui/Common.hpp" // for RefreshModes
+#include <core/DrawCommand.hpp>
+#include <gui/Common.hpp>
+#include <Service/Message.hpp>
+
+#include <list>
+#include <memory>
 
 namespace gui
 {
@@ -49,5 +49,3 @@ namespace sgui
     };
 
 } /* namespace sgui */
-
-#endif /* MODULE_SERVICES_SERVICE_GUI_DRAWMESSAGE_HPP_ */
