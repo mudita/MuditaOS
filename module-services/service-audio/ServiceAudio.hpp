@@ -77,6 +77,7 @@ class ServiceAudio : public sys::Service
     auto IsOperationEnabled(const audio::PlaybackType &plType, const audio::Operation::Type &opType) -> bool;
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
+    auto IsBusy() -> bool;
 
     void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
 

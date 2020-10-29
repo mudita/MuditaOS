@@ -440,9 +440,20 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
     return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, newVolume, muted, context);
 }
 
+bool ServiceAudio::IsBusy()
+{
+    for (auto &input : audioMux.GetAllInputs()) {
+        if (input.audio->GetCurrentState() != Audio::State::Idle) {
+            return true;
+        }
+    }
+    return false;
+}
+
 sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     sys::Message_t responseMsg;
+    bool isBusy = IsBusy();
 
     auto &msgType = typeid(*msgl);
     LOG_DEBUG("msgType %d %s", static_cast<int>(msgl->messageType), msgType.name());
@@ -507,6 +518,13 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else {
         LOG_DEBUG("Unhandled message");
+    }
+
+    auto curIsBusy = IsBusy();
+    if (isBusy != curIsBusy) {
+        auto broadMsg = std::make_shared<AudioNotificationMessage>(
+            curIsBusy ? AudioNotificationMessage::Type::ServiceWakeUp : AudioNotificationMessage::Type::ServiceSleep);
+        sys::Bus::SendMulticast(broadMsg, sys::BusChannels::ServiceAudioNotifications, this);
     }
 
     if (responseMsg) {
