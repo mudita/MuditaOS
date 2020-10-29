@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <cairomm/context.h> // for Context
-#include <gdkmm/pixbuf.h>    // for Pixbuf, COLORSPACE_RGB
-#include <glib.h>            // for guchar
-
 #include "RArea.hpp"
-#include "cairomm/refptr.h" // for RefPtr
-#include "gdkmm/general.h"  // for set_source_pixbuf
-#include "glibmm/refptr.h"  // for RefPtr
-#include "gtkmm/widget.h"   // for Allocation
+
+#include <cairomm/context.h>
+#include <cairomm/refptr.h>
+#include <gdkmm/general.h>
+#include <gdkmm/pixbuf.h>
+#include <gtkmm/widget.h>
+#include <glibmm/refptr.h>
+#include <glib.h>
 
 RArea::RArea() : data{nullptr}
 {}

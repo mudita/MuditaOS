@@ -1,25 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * RWindow.hpp
- *
- *  Created on: 24 kwi 2019
- *      Author: robert
- */
+#pragma once
 
-#ifndef RENDERER_RWINDOW_HPP_
-#define RENDERER_RWINDOW_HPP_
+#include "RArea.hpp"
 
+#include <module-bsp/bsp/keyboard/key_codes.hpp>
+
+#include <gdk/gdk.h>
 #include <gtkmm.h>
 #include <gtkmm/drawingarea.h>
-#include <gdk/gdk.h> // for GdkEventKey
-#include <map>       // for map
-#include <cstdint>   // for uint32_t, int8_t
+#include <gtkmm/window.h>
 
-#include "RArea.hpp" // for RArea
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
-#include "gtkmm/window.h" // for Window
+#include <cstdint>
+#include <map>
 
 class RWindow : public Gtk::Window
 {
@@ -52,5 +46,3 @@ class RWindow : public Gtk::Window
 
     void updateDrawBuffer();
 };
-
-#endif /* RENDERER_RWINDOW_HPP_ */

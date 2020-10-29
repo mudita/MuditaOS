@@ -1,19 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * RArea.hpp
- *
- *  Created on: 24 kwi 2019
- *      Author: robert
- */
-
-#ifndef RENDERER_RAREA_HPP_
-#define RENDERER_RAREA_HPP_
+#pragma once
 
 #include <cairomm/context.h>
 #include <gtkmm.h>
-#include <gtkmm/drawingarea.h> // for DrawingArea
+#include <gtkmm/drawingarea.h>
 
 namespace Cairo
 {
@@ -36,5 +28,3 @@ class RArea : public Gtk::DrawingArea
     char *data;
     bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
 };
-
-#endif /* RENDERER_RAREA_HPP_ */

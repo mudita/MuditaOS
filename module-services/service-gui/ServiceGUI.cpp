@@ -1,37 +1,38 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <FontManager.hpp> // for FontManager
-#include <stddef.h>        // for NULL
-#include <memory>          // for unique_ptr, make_shared, allocator
-#include <list>            // for list, operator!=, _List_iterator, _List_iterator<>::_Self
-#include <utility>         // for move, pair
+#include "ServiceGUI.hpp"
+#include "WorkerGUI.hpp"
+
+#include "messages/GUIMessage.hpp"
+#include "messages/DrawMessage.hpp"
+
+#include <DrawCommand.hpp>
+#include <FontManager.hpp>
+#include <MessageType.hpp>
+#include <gui/core/Context.hpp>
+#include <gui/core/ImageManager.hpp>
+#include <log/log.hpp>
+#include <messages/EinkMessage.hpp>
+#include <projdefs.h>
+#include <service-appmgr/Controller.hpp>
+#include <service-eink/messages/ImageMessage.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Worker.hpp>
+#include <SystemManager/SystemManager.hpp>
+
+#include <task.h>
 
 extern "C"
 {
 #include <FreeRTOS.h>
-#include <semphr.h> // for xSemaphoreGive, vSemaphoreDelete, xSemaphoreCreateBinary, xSemaphoreTake
+#include <semphr.h>
 }
-// module-gui
-#include "gui/core/Context.hpp" // for Context
-// gui service
-#include "messages/GUIMessage.hpp" // for GUIMessage
-#include "messages/DrawMessage.hpp" // for DrawMessage, DrawMessage::DrawCommand, DrawMessage::DrawCommand::SHUTDOWN, DrawMessage::DrawCommand::SUSPEND
-// service-eink
-#include "service-eink/messages/ImageMessage.hpp" // for ImageMessage
-#include "ServiceGUI.hpp"
-#include "service-appmgr/Controller.hpp"   // for Controller
-#include "../gui/core/ImageManager.hpp"    // for ImageManager
-#include "log/log.hpp"                     // for LOG_WARN, LOG_DEBUG, LOG_FATAL, LOG_INFO, LOG_ERROR
-#include "SystemManager/SystemManager.hpp" // for SystemManager
-#include "WorkerGUI.hpp"                   // for WorkerGUI, WorkerGUICommands, WorkerGUICommands::Render
-#include "DrawCommand.hpp"                 // for DrawCommand
-#include "MessageType.hpp" // for MessageType, MessageType::EinkStateRequest, MessageType::GUICommands, MessageType::GUIDisplayReady, MessageType::GUIFocusInfo, MessageType::GUIRenderingFinished, MessageType::MessageTypeUninitialized
-#include "Service/Bus.hpp" // for Bus
-#include "Service/Worker.hpp"       // for WorkerQueueInfo
-#include "messages/EinkMessage.hpp" // for EinkMessage
-#include "projdefs.h"               // for pdMS_TO_TICKS, pdTRUE
-#include "task.h"                   // for xTaskGetTickCount
+
+#include <cstddef>
+#include <list>
+#include <memory>
+#include <utility>
 
 namespace sgui
 {

@@ -1,17 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_SERVICES_SERVICE_GUI_WORKERGUI_HPP_
-#define MODULE_SERVICES_SERVICE_GUI_WORKERGUI_HPP_
+#pragma once
 
-#include <stdint.h> // for uint32_t
-
-#include "core/DrawCommand.hpp"
-#include "core/Context.hpp"
-#include "messages/GUIMessage.hpp"
 #include "ServiceGUI.hpp"
-#include "Service/Worker.hpp"    // for Worker
-#include "gui/core/Renderer.hpp" // for Renderer
+
+#include <core/Context.hpp>
+#include <core/DrawCommand.hpp>
+#include <gui/core/Renderer.hpp>
+#include <messages/GUIMessage.hpp>
+#include <Service/Worker.hpp>
+
+#include <cstdint>
 
 namespace sgui
 {
@@ -43,5 +43,3 @@ namespace sgui
     };
 
 } /* namespace sgui */
-
-#endif /* MODULE_SERVICES_SERVICE_GUI_WORKERGUI_HPP_ */
