@@ -70,7 +70,6 @@ const struct tm CTZE::getGMTTime(void) const
     return timeinfo;
 }
 
-
 auto CTZE::getTimeInfo() const noexcept -> tm
 {
     using namespace std::chrono;
@@ -78,18 +77,17 @@ auto CTZE::getTimeInfo() const noexcept -> tm
     std::tm timeinfo{};
     if (isValid()) {
         std::string dateTimeStr(tokens[Tokens::Date] + "," + tokens[Tokens::Time]);
-        //utils::findAndReplaceAll(dateTimeStr, "\"", "");
 
         std::stringstream stream(dateTimeStr);
         date::sys_seconds tp;
         stream >> date::parse("%Y/%m/%d,%H:%M:%S", tp);
 
         auto gmtDifferenceStr = tokens[Tokens::GMTDifference];
-        //utils::findAndReplaceAll(gmtDifferenceStr, "\"", "");
 
-        int gmtDifference                      = utils::getValue<int>(gmtDifferenceStr);
-        auto time = system_clock::to_time_t(tp) + gmtDifference * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
-        timeinfo  = *gmtime(&time);
+        int gmtDifference = utils::getValue<int>(gmtDifferenceStr);
+        auto time         = system_clock::to_time_t(tp) +
+                    gmtDifference * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
+        timeinfo = *gmtime(&time);
     }
     return timeinfo;
 }
