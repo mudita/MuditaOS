@@ -284,8 +284,8 @@ namespace gui
         /// should be = 0;
         virtual void buildDrawListImplementation(std::list<Command> &commands)
         {}
-        std::function<void(std::list<Command> &)> preBuildDrawListHook         = nullptr;
-        std::function<void(std::list<Command> &)> postBuildDrawListHook        = nullptr;
+        std::function<void(std::list<Command> &)> preBuildDrawListHook  = nullptr;
+        std::function<void(std::list<Command> &)> postBuildDrawListHook = nullptr;
         /// sets radius of Item box
         /// @note this should be moved to Rect
         virtual void setRadius(int value);
