@@ -10,6 +10,7 @@
 * `[cellular]` Obtain time zone through network
 * `[audio]` Add state notifications
 * `[antenna]` Service-antenna enabled.
+* `[audio]` Added 1st mudita audio assets
 
 ### Changed
 
@@ -552,4 +553,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-
