@@ -25,7 +25,6 @@ namespace at
         }
         bool parseCSQ(std::string cellularResponse, uint32_t &result)
         {
-            LOG_INFO("%s", cellularResponse.c_str());
             std::string CSQstring;
             if (parseCSQ(cellularResponse, CSQstring)) {
                 auto pos = CSQstring.find(',');
