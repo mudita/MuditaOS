@@ -245,26 +245,27 @@ void ServiceCellular::registerMessageHandlers()
 
 bool ServiceCellular::resetCellularModule(ResetType type)
 {
-    LOG_ERROR("Cellular modem reset. Type %d", static_cast<int>(type));
-    if (type == ResetType::SoftReset) {
-        auto channel = cmux->get(TS0710::Channel::Commands);
-        if (!channel) {
-            LOG_ERROR("Bad channel");
-            return false;
-        }
-        auto response = channel->cmd(at::AT::CFUN_RESET);
-        if (response.code == at::Result::Code::OK) {
+    LOG_DEBUG("Cellular modem reset. Type %d", static_cast<int>(type));
+
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (!channel) {
+        LOG_ERROR("Bad channel");
+        return false;
+    }
+
+    switch (type) {
+    case ResetType::SoftReset:
+        if (auto response = channel->cmd(at::AT::CFUN_RESET); response.code == at::Result::Code::OK) {
             return true;
         }
         LOG_ERROR("Cellular modem reset failed.");
-    }
-    else if (type == ResetType::PowerCycle) {
+        return false;
+    case ResetType::PowerCycle:
         cmux->TurnOffModem();
         cmux->TurnOnModem();
         isAfterForceReboot = true;
         return true;
-    }
-    else if (type == ResetType::HardReset) {
+    case ResetType::HardReset:
         cmux->ResetModem();
         isAfterForceReboot = true;
         return true;

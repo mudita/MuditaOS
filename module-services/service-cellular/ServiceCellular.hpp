@@ -100,9 +100,9 @@ class ServiceCellular : public sys::Service
 
     enum class ResetType
     {
-        SoftReset,  //! AT CFUN reset
-        PowerCycle, //! PWRKEY pin toggle
-        HardReset   //! RESET_N pin
+        SoftReset,  //<! AT CFUN reset
+        PowerCycle, //<! PWRKEY pin toggle
+        HardReset   //<! RESET_N pin
     };
     bool resetCellularModule(ResetType type);
     bool isAfterForceReboot = false;
