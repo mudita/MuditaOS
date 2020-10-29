@@ -8,7 +8,7 @@
 #include <phonenumbers/phonenumberutil.h>
 
 #include <exception>
-#include <string>
+#include <module-utils/utf8/UTF8.hpp>
 
 namespace utils
 {
@@ -346,6 +346,15 @@ namespace utils
          * @return View - phone number representation
          */
         static View parse(const std::string &inputNumber);
+
+        /**
+         * @brief Get lightweight representation of a PhoneNumber (see View class).
+         *
+         * @param received number - utf8 representation of received number
+         * @return View - instance of View object which represents state of
+         * PhoneNumber instance.
+         */
+        static const View getReceivedNumberView(const UTF8 &receivedNumber);
 
       private:
         View makeView(const std::string &input) const;

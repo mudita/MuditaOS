@@ -339,3 +339,41 @@ TEST_CASE("UTF8: insert whole string which doesn't work")
     REQUIRE(lol == fin);
     REQUIRE(lol.length() == len);
 }
+
+TEST_CASE("UTF8: Convert to ascii if is ascii combination")
+{
+    UTF8 combination = "778568738465";
+    REQUIRE(combination.isASCIICombination());
+    REQUIRE(combination.toASCII() == std::string("MUDITA"));
+}
+
+TEST_CASE("UTF8: Not ASCII combination")
+{
+    SECTION("Pl number - 9 digits")
+    {
+        UTF8 combination = "600123456";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("Pl e164 number")
+    {
+        UTF8 combination = "+48600123456";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("Pl formatted number")
+    {
+        UTF8 combination = "600 123 456";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("Pl formatted int number")
+    {
+        UTF8 combination = "+48 600 123 456";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+}
