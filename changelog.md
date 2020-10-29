@@ -7,6 +7,7 @@
 * `[settings][bluetooth]` Add "Phone name" window.
 * `[gui]` Add "ButtonOnOff" widget.
 * `[cellular]` Add support for modem reset
+* `[cellular]` Obtain time zone through network
 
 ### Changed
 

@@ -21,10 +21,17 @@ namespace at::urc
 
       public:
         explicit CTZE(const std::string &val);
+
+        constexpr static int maxTimezoneOffset = 56;
+        constexpr static int minTimezoneOffset = -48;
+
         ~CTZE() override = default;
         [[nodiscard]] auto what() const noexcept -> std::string final;
         [[nodiscard]] auto isValid() const noexcept -> bool;
-
         [[nodiscard]] auto getTimeInfo(void) const noexcept -> tm;
+
+        auto getTimeZoneOffset() const -> int;
+        auto getTimeZoneString() const -> std::string;
+        auto getGMTTime(void) const -> const struct tm;
     };
 }; // namespace at::urc

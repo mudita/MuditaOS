@@ -71,7 +71,7 @@ TEST_CASE("Split tests")
 TEST_CASE("toNumeric tests")
 {
     std::string inputStr1 = "2";
-    uint32_t value;
+    int value;
 
     auto ret = utils::toNumeric(inputStr1, value);
     REQUIRE(ret == true);
