@@ -33,7 +33,7 @@ namespace gui
         bool set(int id);
         void set(const UTF8 &name);
 
-        virtual void buildDrawListImplementation(std::list<Command> &commands) override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
     };
 
 } /* namespace gui */

@@ -438,6 +438,7 @@ namespace app
     sys::Message_t Application::handleAppRefresh(sys::DataMessage *msgl)
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
+        assert(msg);
         if (!(getCurrentWindow() != nullptr && getCurrentWindow()->getName() == msg->getWindowName())) {
             LOG_DEBUG("Ignore request for window %s we are on window %s",
                       msg->getWindowName().c_str(),

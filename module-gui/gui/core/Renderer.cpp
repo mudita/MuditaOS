@@ -290,7 +290,13 @@ namespace gui
 
     void Renderer::render(Context *ctx, std::list<Command> &commands)
     {
+        if (ctx == nullptr) {
+            return;
+        }
         for (auto &cmd : commands) {
+            if (cmd == nullptr) {
+                continue;
+            }
             switch (cmd->id) {
             case DrawCommandID::GUI_DRAW_CLEAR:
                 ctx->fill(15);

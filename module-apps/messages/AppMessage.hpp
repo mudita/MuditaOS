@@ -86,12 +86,12 @@ namespace app
         AppRefreshMessage(gui::RefreshModes mode, std::string window_name)
             : mode{mode}, window_name(std::move(window_name)){};
 
-        [[nodiscard]] const gui::RefreshModes &getMode()
+        [[nodiscard]] const gui::RefreshModes &getMode() const
         {
             return mode;
         }
 
-        [[nodiscard]] const std::string &getWindowName()
+        [[nodiscard]] const std::string &getWindowName() const
         {
             return window_name;
         }
