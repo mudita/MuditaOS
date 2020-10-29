@@ -14,33 +14,13 @@ namespace lock_style = style::window::pin_lock;
 
 namespace gui
 {
-
-    ScreenLockBox::PinLabel::PinLabel(Item *parent, const uint32_t &w, const uint32_t &h) : HBox(parent, 0, 0, w, h)
-    {}
-    void ScreenLockBox::PinLabel::setVisibleState(bool isImageVisible)
+    void ScreenLockBox::popChar(uint32_t charNum)
     {
-        if (isImageVisible) {
-            image = new gui::Image("dot_12px_hard_alpha_W_G");
-            image->setVisible(true);
-            image->activeItem = false;
-            addWidget(image);
-        }
-        else {
-            image->erase();
-        }
+        LockWindow->pinLabels[charNum]->clear();
     }
-
-    void ScreenLockBox::popChar(unsigned int charNum)
+    void ScreenLockBox::putChar(uint32_t charNum)
     {
-        if (charNum < pinLabels.size()) {
-            pinLabels[charNum]->setVisibleState(false);
-        }
-    }
-    void ScreenLockBox::putChar(unsigned int charNum)
-    {
-        if (charNum < pinLabels.size()) {
-            pinLabels[charNum]->setVisibleState(true);
-        }
+        LockWindow->pinLabels[charNum]->setText("*");
     }
     void ScreenLockBox::buildLockBox(unsigned int pinSize)
     {
@@ -50,32 +30,20 @@ namespace gui
     }
     void ScreenLockBox::buildPinLabels(unsigned int pinSize)
     {
-        unsigned int singleLabelWidth = lock_style::label_size;
-        constexpr auto pinLabelWidth  = style::window::default_body_width;
-        pinLabels.clear();
+        // labels with stars for displaying entered digits
+        const uint32_t pinLabelWidth = style::window_width - 2 * lock_style::pin_label_x_screen;
+        LockWindow->pinLabel         = new gui::Label(
+            LockWindow, lock_style::pin_label_x_screen, lock_style::pin_label_y, pinLabelWidth, lock_style::label_size);
+        LockWindow->pinLabel->setEdges(RectangleEdge::None);
 
-        if (pinSize == 0) {
-            return;
-        }
-        if (pinSize * singleLabelWidth > pinLabelWidth - pinSize * 2 * lock_style::label_margins) {
-            singleLabelWidth = pinLabelWidth / pinSize - 2 * lock_style::label_margins;
-        }
-
-        auto itemBuilder = [this, singleLabelWidth]() -> Rect * {
-            auto label = new PinLabel(nullptr, singleLabelWidth, lock_style::label_size);
+        LockWindow->buildPinLabels(LockWindow->pinLabel, pinSize, lock_style::label_size_screen);
+        for (auto label : LockWindow->pinLabels) {
             label->setEdges(RectangleEdge::Bottom);
-            label->setMargins(Margins(lock_style::label_margins, 0, lock_style::label_margins, 0));
-            pinLabels.push_back(label);
-            return label;
-        };
-
-        LockWindow->buildPinLabels(
-            itemBuilder, pinSize, style::window::default_left_margin, lock_style::pin_label_y_screen, pinLabelWidth);
-        LockWindow->pinLabelsBox->setEdges(RectangleEdge::None);
+        }
     }
     void ScreenLockBox::setVisibleStateEnterPin()
     {
-        LockWindow->pinLabelsBox->setVisible(true);
+        LockWindow->pinLabel->setVisible(true);
 
         LockWindow->infoText->clear();
         LockWindow->infoText->addText(utils::localize.get("app_desktop_screen_enter_passcode"));
@@ -86,14 +54,14 @@ namespace gui
     }
     void ScreenLockBox::setVisibleStateVerifiedPin()
     {
-        clearPinLabels();
-        LockWindow->pinLabelsBox->setVisible(false);
+        LockWindow->clearPinLabels();
+        LockWindow->pinLabel->setVisible(false);
         LockWindow->titleLabel->setVisible(false);
     }
     void ScreenLockBox::setVisibleStateInvalidPin()
     {
-        clearPinLabels();
-        LockWindow->pinLabelsBox->setVisible(false);
+        LockWindow->clearPinLabels();
+        LockWindow->pinLabel->setVisible(false);
 
         LockWindow->titleLabel->setVisible(true);
         LockWindow->titleLabel->setText(utils::localize.get("app_desktop_screen_wrong_pin"));
@@ -109,7 +77,7 @@ namespace gui
     }
     void ScreenLockBox::setVisibleStateBlocked()
     {
-        LockWindow->pinLabelsBox->setVisible(false);
+        LockWindow->pinLabel->setVisible(false);
         LockWindow->titleLabel->setVisible(false);
 
         LockWindow->infoText->clear();
@@ -118,12 +86,5 @@ namespace gui
 
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(false, true, false);
-    }
-
-    void ScreenLockBox::clearPinLabels()
-    {
-        for (unsigned i = 0; i < pinLabels.size(); i++) {
-            popChar(i);
-        }
     }
 } // namespace gui
