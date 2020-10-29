@@ -38,6 +38,7 @@ set(SOURCES
         Tables/ContactsGroups.cpp
         Tables/SettingsTable.cpp
         Tables/AlarmsTable.cpp
+        Tables/AlarmsStatusTable.cpp
         Tables/NotesTable.cpp
         Tables/CalllogTable.cpp
         Tables/CountryCodesTable.cpp
@@ -116,6 +117,12 @@ set(SOURCES
         queries/settings/QuerySettingsGet_v2.cpp
         queries/settings/QuerySettingsUpdate_v2.cpp
         queries/settings/QuerySettingsAddOrIgnore_v2.cpp
+        queries/alarms/QueryAlarmsAdd.cpp
+        queries/alarms/QueryAlarmsRemove.cpp
+        queries/alarms/QueryAlarmsEdit.cpp
+        queries/alarms/QueryAlarmsGet.cpp
+        queries/alarms/QueryAlarmsGetLimited.cpp
+        queries/alarms/QueryAlarmsTurnOffAll.cpp
 )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
