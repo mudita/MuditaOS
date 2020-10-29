@@ -3,8 +3,10 @@
 ## Current release
 
 ### Added
+
 * `[settings][bluetooth]` Add "Phone name" window.
 * `[gui]` Add "ButtonOnOff" widget.
+* `[cellular]` Add support for modem reset
 
 ### Changed
 

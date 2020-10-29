@@ -243,6 +243,36 @@ void ServiceCellular::registerMessageHandlers()
     handle_CellularGetChannelMessage();
 }
 
+bool ServiceCellular::resetCellularModule(ResetType type)
+{
+    LOG_DEBUG("Cellular modem reset. Type %d", static_cast<int>(type));
+
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (!channel) {
+        LOG_ERROR("Bad channel");
+        return false;
+    }
+
+    switch (type) {
+    case ResetType::SoftReset:
+        if (auto response = channel->cmd(at::AT::CFUN_RESET); response.code == at::Result::Code::OK) {
+            return true;
+        }
+        LOG_ERROR("Cellular modem reset failed.");
+        return false;
+    case ResetType::PowerCycle:
+        cmux->TurnOffModem();
+        cmux->TurnOnModem();
+        isAfterForceReboot = true;
+        return true;
+    case ResetType::HardReset:
+        cmux->ResetModem();
+        isAfterForceReboot = true;
+        return true;
+    }
+    return false;
+}
+
 void ServiceCellular::change_state(cellular::StateChange *msg)
 {
     assert(msg);
@@ -367,6 +397,11 @@ bool ServiceCellular::handle_power_up_procedure()
 
 bool ServiceCellular::handle_power_up_in_progress_procedure(void)
 {
+    if (isAfterForceReboot) {
+        constexpr auto msModemUartInitTime = 12000;
+        vTaskDelay(pdMS_TO_TICKS(msModemUartInitTime));
+        isAfterForceReboot = false;
+    }
     auto ret = cmux->BaudDetectProcedure();
     if (ret == TS0710::ConfState::Success) {
         state.set(this, cellular::State::ST::CellularConfProcedure);
@@ -406,6 +441,7 @@ bool ServiceCellular::handle_power_down_waiting()
 bool ServiceCellular::handle_power_down()
 {
     LOG_DEBUG("Powered Down");
+    isAfterForceReboot = true;
     cmux.reset();
     cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
     InitHandler();
@@ -801,11 +837,19 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         if (msg != nullptr) {
             if (board == bsp::Board::T4) {
                 auto status_pin = msg->state;
-                if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure) {
-                    state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+                if (status_pin == value::ACTIVE) {
+                    if (state.get() == State::ST::PowerUpProcedure) {
+                        state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+                    }
+                    else {
+                        // asynchronous power toggle should fall back to PowerDown regardless the state
+                        state.set(this, State::ST::PowerDown);
+                    }
                 }
-                else if (status_pin == value::INACTIVE && state.get() == State::ST::PowerDownWaiting) {
-                    state.set(this, State::ST::PowerDown);
+                else if (status_pin == value::INACTIVE) {
+                    if (isAfterForceReboot == true || state.get() == State::ST::PowerDownWaiting) {
+                        state.set(this, State::ST::PowerDown);
+                    }
                 }
             }
         }

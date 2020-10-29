@@ -96,6 +96,7 @@ namespace at
         ATD,  /// setup call
         IPR,  /// set baudrate
         CMUX, /// setup cmux params
+        CFUN, /// set phone functionality
         CMGS, /// sms
         QCMGS,
         CREG,       /// network registration status
@@ -122,9 +123,14 @@ namespace at
         DISABLE_TIME_ZONE_UPDATE,
         DISABLE_TIME_ZONE_REPORTING,
         ENABLE_NETWORK_REGISTRATION_URC,
-        SET_SMS_TEXT_MODE_UCS2
+        SET_SMS_TEXT_MODE_UCS2,
+        CFUN_RESET,
+        CFUN_MIN_FUNCTIONALITY,    /// Set minimum functionality
+        CFUN_FULL_FUNCTIONALITY,   /// Full functionality
+        CFUN_DISABLE_TRANSMITTING, /// Disable the ME from both transmitting and receiving RF signals
     };
 
+    // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
     inline auto factory(AT at) -> const Cmd &
     {
         static const std::map<AT, const Cmd> fact{
@@ -164,6 +170,11 @@ namespace at
             {AT::ATD, {"ATD"}},
             {AT::IPR, {"AT+IPR="}},
             {AT::CMUX, {"AT+CMUX="}},
+            {AT::CFUN, {"AT+CFUN=", 15000}},
+            {AT::CFUN_RESET, {"AT+CFUN=1,1", 15000}},
+            {AT::CFUN_MIN_FUNCTIONALITY, {"AT+CFUN=0", 15000}},
+            {AT::CFUN_FULL_FUNCTIONALITY, {"AT+CFUN=1", 15000}},
+            {AT::CFUN_DISABLE_TRANSMITTING, {"AT+CFUN=4", 15000}},
             {AT::CMGS, {"AT+CMGS=\""}},
             {AT::QCMGS, {"AT+QCMGS=\""}},
             {AT::CREG, {"AT+CREG?", default_doc_timeout}},
