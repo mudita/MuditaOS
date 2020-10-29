@@ -324,6 +324,7 @@ namespace app
         /// @ingrup AppWindowStack
         void cleanPrevWindw();
         /// getter for current wisible window in application
+        /// if there is none - returns default window
         /// @ingrup AppWindowStack
         gui::AppWindow *getCurrentWindow();
 

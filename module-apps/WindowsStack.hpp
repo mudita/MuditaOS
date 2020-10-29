@@ -51,5 +51,10 @@ namespace app
             auto ret = windows.find(name);
             return ret == std::end(windows) ? nullptr : ret->second.get();
         }
+
+        [[nodiscard]] auto isEmpty() const noexcept
+        {
+            return stack.size() == 0;
+        }
     };
 } // namespace app

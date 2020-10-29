@@ -112,7 +112,7 @@ namespace app
 
     void Application::render(gui::RefreshModes mode)
     {
-        if (getCurrentWindow() == nullptr) {
+        if (windowsStack.isEmpty()) {
             LOG_ERROR("Current window is not defined");
             return;
         }
@@ -190,8 +190,7 @@ namespace app
 
     void Application::refreshWindow(gui::RefreshModes mode)
     {
-        if (getCurrentWindow() != nullptr) {
-            LOG_DEBUG("[REFRESH] %s : %s", c_str(mode), getCurrentWindow()->getName().c_str());
+        if (not windowsStack.isEmpty()) {
             auto msg = std::make_shared<AppRefreshMessage>(mode, getCurrentWindow()->getName());
             sys::Bus::SendUnicast(msg, this->GetName(), this);
         }
@@ -275,7 +274,7 @@ namespace app
         else if (msg->getEvent().state == gui::InputEvent::State::keyReleasedShort) {
             longPressTimer->stop();
         }
-        if (getCurrentWindow() != nullptr && getCurrentWindow()->onInput(msg->getEvent())) {
+        if (not windowsStack.isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -390,7 +389,9 @@ namespace app
             if (switchData && switchData->ignoreCurrentWindowOnStack) {
                 popToWindow(getPrevWindow());
             }
-            getCurrentWindow()->onClose();
+            if (not windowsStack.isEmpty()) {
+                getCurrentWindow()->onClose();
+            }
             setActiveWindow(msg->getWindowName());
             LOG_DEBUG("Current window: %s vs %s", getCurrentWindow()->getName().c_str(), msg->getWindowName().c_str());
             getCurrentWindow()->handleSwitchData(switchData.get());
@@ -439,10 +440,10 @@ namespace app
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
         assert(msg);
-        if (getCurrentWindow() == nullptr || (getCurrentWindow()->getName() != msg->getWindowName())) {
+        if (windowsStack.isEmpty() || (getCurrentWindow()->getName() != msg->getWindowName())) {
             LOG_DEBUG("Ignore request for window %s we are on window %s",
                       msg->getWindowName().c_str(),
-                      getCurrentWindow() == nullptr ? "none" : getCurrentWindow()->getName().c_str());
+                      windowsStack.isEmpty() ? "none" : getCurrentWindow()->getName().c_str());
             return msgNotHandled();
         }
         render(msg->getMode());
