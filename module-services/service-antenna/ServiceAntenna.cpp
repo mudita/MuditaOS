@@ -2,11 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAntenna.hpp"
-#include "Service/Timer.hpp"
-#include "api/AntennaServiceAPI.hpp"
-#include "log/log.hpp"
+#include <Service/Timer.hpp>
 #include "messages/AntennaMessage.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include <service-appmgr/ApplicationManager.hpp>
 #include <at/response.hpp>
 #include <memory>
 #include <module-utils/state/ServiceState.hpp>
@@ -22,14 +20,14 @@
 #include <string>                                        // for string
 #include <vector>                                        // for vector
 
-#include "Service/Timer.hpp"                           // for Timer
+#include <Service/Timer.hpp>                           // for Timer
 #include "api/AntennaServiceAPI.hpp"                   // for LockRequest
-#include "log/log.hpp"                                 // for LOG_INFO, LOG_WARN, LOG_FATAL
+#include <log/log.hpp>                                 // for LOG_INFO, LOG_WARN, LOG_FATAL
 #include "messages/AntennaMessage.hpp"                 // for AntennaLockRequestResponse, AntennaLockRequestMessage
-#include "service-cellular/api/CellularServiceAPI.hpp" // for GetCSQ, GetAntenna, SelectAntenna, GetCREG, GetQNWINFO
-#include "MessageType.hpp" // for MessageType, MessageType::AntennaCSQChange, MessageType::AntennaChanged, MessageType::AntennaGetLockState, MessageType::AntennaLockService, MessageType::CellularCall, MessageType::CellularNotification, MessageType::CellularStateRequest, MessageType::StateChange
-#include "projdefs.h"      // for pdMS_TO_TICKS
-#include "service-cellular/State.hpp" // for State, State::ST, State::ST::Ready
+#include <service-cellular/api/CellularServiceAPI.hpp> // for GetCSQ, GetAntenna, SelectAntenna, GetCREG, GetQNWINFO
+#include <MessageType.hpp> // for MessageType, MessageType::AntennaCSQChange, MessageType::AntennaChanged, MessageType::AntennaGetLockState, MessageType::AntennaLockService, MessageType::CellularCall, MessageType::CellularNotification, MessageType::CellularStateRequest, MessageType::StateChange
+#include <projdefs.h>      // for pdMS_TO_TICKS
+#include <service-cellular/State.hpp> // for State, State::ST, State::ST::Ready
 
 const char *ServiceAntenna::serviceName = "ServiceAntenna";
 
