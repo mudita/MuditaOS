@@ -66,7 +66,7 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
     LOG_INFO("[%s] Initializing", serviceName);
 
     timer = std::make_unique<sys::Timer>("Antena", this, 5000, sys::Timer::Type::Periodic);
-    timer->connect([&](sys::Timer &) {																Timer tick!");
+    timer->connect([&](sys::Timer &) {
         timer->stop();
         auto stateToSet = state->get();
         if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
