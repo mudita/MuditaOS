@@ -47,6 +47,14 @@ include(third-party/tinyexpr.cmake)
 
 add_subdirectory(pugixml)
 
+add_subdirectory(taglib)
+set( TAGLIB_INCLUDE_DIRS 
+	 "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib/toolkit"
+	 "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib"
+	 "${CMAKE_CURRENT_BINARY_DIR}/taglib"
+	 PARENT_SCOPE
+)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs pugixml)
 
 # Board specific compilation definitions,options,include directories and features
