@@ -16,34 +16,40 @@ namespace gui
         }
     }
 
-    void PinLock::putNextChar(unsigned int c)
+    void PinLock::putNextChar(unsigned int c) noexcept
     {
-        if (state == State::EnterPin && maxPinSize > pinValue.size()) {
-            pinValue.push_back(c);
+        if (state == State::EnterPin && charCount < pinValue.size()) {
+            pinValue[charCount++] = c;
         }
     }
 
-    void PinLock::verifyPin()
+    void PinLock::verifyPin() noexcept
     {
-        handler->handle(pinValue);
-        clearAttempt();
+        if (charCount == pinValue.size()) {
+            handler->handle(pinValue);
+            clearAttempt();
+        }
     }
 
-    void PinLock::popChar()
+    void PinLock::popChar() noexcept
     {
-        if (state == State::EnterPin && pinValue.size() > 0) {
-            pinValue.pop_back();
+        if (state == State::EnterPin && charCount > 0) {
+            charCount--;
+            pinValue[charCount] = 0;
         }
     }
 
     void PinLock::clearAttempt() noexcept
     {
-        pinValue.clear();
+        for (auto &c : pinValue) {
+            c = 0;
+        }
+        charCount = 0;
     }
 
     bool PinLock::unlock() noexcept
     {
-        if (state == State::VerifiedPin || maxPinSize == 0) {
+        if (state == State::VerifiedPin || pinValue.size() == 0) {
             state = State::Unlocked;
             return true;
         }
@@ -72,17 +78,11 @@ namespace gui
         }
     }
 
-    void PinLock::reset(LockType _type,
-                        State _state,
-                        unsigned int _remainingAttempts,
-                        unsigned int _maxPinSize,
-                        unsigned int _minPinSize) noexcept
+    void PinLock::reset(LockType newType, State newState, unsigned int attempts, unsigned int size) noexcept
     {
-        type              = _type;
-        state             = _state;
-        remainingAttempts = _remainingAttempts;
-        pinValue          = std::vector<unsigned int>();
-        maxPinSize        = _maxPinSize;
-        minPinSize        = _minPinSize;
+        type              = newType;
+        state             = newState;
+        remainingAttempts = attempts;
+        pinValue          = std::vector<unsigned int>(size, 0);
     }
 } // namespace gui
