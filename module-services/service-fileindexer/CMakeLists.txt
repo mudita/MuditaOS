@@ -1,11 +1,21 @@
-message("${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
+cmake_minimum_required(VERSION 3.12)
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		${CMAKE_CURRENT_BINARY_DIR}/../../module-audio/Audio/decoder/taglib
-		${CMAKE_CURRENT_SOURCE_DIR}/../../module-audio/Audio/decoder/taglib/taglib
-		${CMAKE_CURRENT_SOURCE_DIR}/../../module-audio/Audio/decoder/taglib/taglib/toolkit
-)
+project(service-fileindexer VERSION 1.0
+	DESCRIPTION "File indexer service ")
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+
+target_include_directories( ${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS} )
+
+# Board specific compilation definitions,options,include directories and features
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
+target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
+
 
 target_sources( ${PROJECT_NAME}
 	PRIVATE
@@ -14,3 +24,6 @@ target_sources( ${PROJECT_NAME}
 	"startupIndexer.cpp"
 	"notesIndexer.cpp"
 )
+
+
+target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs module-sys tag )

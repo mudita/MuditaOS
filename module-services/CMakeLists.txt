@@ -1,4 +1,6 @@
-﻿project(module-services VERSION 1.0
+cmake_minimum_required(VERSION 3.14)
+
+project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
 include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
@@ -12,12 +14,10 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-include_directories(${CMAKE_CURRENT_LIST_DIR})
-
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-add_subdirectory( service-eink )
 add_subdirectory( service-gui )
+add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 add_subdirectory( service-db )
@@ -43,6 +43,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     module-db
     module-cellular
     module-audio
+    service-fileindexer
     ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
