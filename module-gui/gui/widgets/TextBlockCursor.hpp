@@ -106,8 +106,7 @@ namespace gui
         }
 
         [[nodiscard]] auto atEnd() const -> bool;
-
-        [[nodiscard]] auto atEol() -> bool;
+        [[nodiscard]] auto atEndDraw() const -> bool;
 
         operator bool() const
         {

@@ -33,10 +33,13 @@ namespace gui
 
         do {
             if (!localCursor) { // cursor is faulty
+                linesEnd = true;
                 return;
             }
 
-            if (localCursor.atEnd()) {
+            if (localCursor.atEndDraw()) {
+                LOG_ERROR("WYLICZYŁ MI SIĘ END!!!!!");
+                linesEnd = true;
                 return;
             }
 
@@ -54,7 +57,7 @@ namespace gui
             LOG_INFO("Jaki mamy tekst i ile jest bloków %s, %d", text.c_str(), localCursor.getBlockNr());
             LOG_INFO("Ile znaczkow z bloku wzjętych %d", text.length());
 
-            if (text.length() == 0) {
+            if (text.length() == 0 && !localCursor.checkLastBlockNewLine()) {
                 ++localCursor;
                 continue;
             }
@@ -70,11 +73,17 @@ namespace gui
 
             // we can show nothing - this is the end of this line
             if (can_show == 0) {
+
                 auto item = buildUITextPart("", text_format);
                 width_used += item->getTextNeedSpace();
                 height_used = std::max(height_used, item->getTextHeight());
 
                 elements_to_show_in_line.emplace_back(item);
+                end = localCursor->getEnd();
+                ++localCursor;
+
+                LOG_INFO("Zbudowala mi się ta pusta linia");
+
                 break;
             }
 
@@ -84,14 +93,13 @@ namespace gui
             width_used += item->getTextNeedSpace();
             height_used = std::max(height_used, item->getTextHeight());
             elements_to_show_in_line.emplace_back(item);
+            end = localCursor->getEnd();
 
             localCursor += can_show;
 
             if (localCursor.getLastBlockNr() != localCursor.getBlockNr() && localCursor.checkLastBlockNewLine()) {
 
-                end = TextBlock::End::Newline;
-
-                localCursor.clearLastBlockNr();
+                //                localCursor.clearLastBlockNr();
                 break;
             }
 
@@ -113,6 +121,7 @@ namespace gui
         drawUnderline            = from.drawUnderline;
         drawUnderlineMode        = from.drawUnderlineMode;
         underlinePadding         = from.underlinePadding;
+        linesEnd                 = from.linesEnd;
         end                      = from.end;
         max_width                = from.max_width;
     }

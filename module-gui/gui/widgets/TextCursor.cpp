@@ -108,13 +108,13 @@ namespace gui
 
         if (direction == NavigationDirection::DOWN) {
 
-            if (document->isEmpty()) {
-                return Move::Error;
-            }
-
-            operator++();
             //            operator++();
-            pos_on_screen++;
+            //            operator++();
+            //
+            //
+            //            pos_on_screen ++;
+
+            //            operator++();
 
             //                    auto block = document->getBlock(this);
             //
@@ -193,12 +193,12 @@ namespace gui
     void TextCursor::addChar(uint32_t utf_val)
     {
         BlockCursor::addChar(utf_val);
-        if (utf_val == text::newline) {
-            moveCursor(NavigationDirection::DOWN);
-        }
-        else {
-            moveCursor(NavigationDirection::RIGHT);
-        }
+        //        if (utf_val == text::newline) {
+        //            moveCursor(NavigationDirection::DOWN);
+        //        }
+        //        else {
+        moveCursor(NavigationDirection::RIGHT);
+        //        }
     }
 
     TextCursor &TextCursor::operator<<(const UTF8 &text)

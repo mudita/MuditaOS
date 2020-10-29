@@ -101,7 +101,7 @@ namespace gui
 
     bool TextBlock::isEmpty() const
     {
-        return text.length() == 0 && getEnd() == End::None;
+        return text.length() == 0;
     }
 
 } // namespace gui

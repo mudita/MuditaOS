@@ -6,6 +6,7 @@
 #include "TextDocument.hpp"
 #include "TextParse.hpp"
 #include "log/log.hpp"
+#include <cassert>
 
 static const int last_char_inclusive = 0; // if then -1 / else 0
 
@@ -77,36 +78,33 @@ namespace gui
         }
         auto lastBlock = document->blocks.back();
 
-        //        LOG_INFO("Co mam jak patrze tego enda: %d, %lu, %d, %d, %d,",
-        //                 currentBlockNr,
-        //                 document->blocks.size() - 1,
-        //                 pos,
-        //                 lastBlock.length(),
-        //                 (lastBlock.getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1));
-
-        if (currentBlockNr == document->blocks.size() - 1 &&
-            pos >= lastBlock.length() + (lastBlock.getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1)) {
-
-            LOG_ERROR("WYLICZYŁ MI SIĘ END!!!!!");
-        }
-
         return currentBlockNr == document->blocks.size() - 1 &&
                pos >= lastBlock.length() + (lastBlock.getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
     }
 
-    auto BlockCursor::atEol() -> bool
+    auto BlockCursor::atEndDraw() const -> bool
     {
         if (!checkDocument() || checkNpos()) {
             return false;
         }
+        auto lastBlock = document->blocks.back();
 
-        //        auto block = currentBlock();
-        //        // check if we have jumped to new block because of new line
-        //        if (pos == 0 && block != blocksBegin() && block_jump) {
-        //            return (--block)->getEnd() == TextBlock::End::Newline;
-        //        }
+        LOG_INFO("Co mam jak patrze tego enda: %d, %lu, %d, %d, %d, %d, %d",
+                 currentBlockNr,
+                 document->blocks.size() - 1,
+                 pos,
+                 lastBlock.length(),
+                 (lastBlock.getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1),
+                 (int)checkLastBlockNewLine(),
+                 currentBlock()->length());
 
-        return false;
+        auto check = checkLastBlockNewLine() &&
+                     currentBlock()->length() +
+                             (currentBlock()->getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1) ==
+                         0;
+
+        return currentBlockNr == document->blocks.size() - 1 && !check &&
+               pos >= lastBlock.length() + (lastBlock.getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
     }
 
     auto BlockCursor::operator+=(unsigned int val) -> BlockCursor &
@@ -135,7 +133,6 @@ namespace gui
 
         // Skip newline at end
         if (currentBlock()->getEnd() == TextBlock::End::Newline && (pos + 1) == blockSize) {
-            //            pos += 1;
             endOfCurrentBlockReached = true;
         }
 
@@ -150,6 +147,7 @@ namespace gui
         bool lastBlockReached = currentBlockNr + 1 == document->blocks.size();
 
         if (endOfCurrentBlockReached && lastBlockReached) {
+            clearLastBlockNr();
             return *this;
         }
 
@@ -157,6 +155,8 @@ namespace gui
             lastBlockNr = currentBlockNr;
             currentBlockNr += 1;
             pos = 0;
+
+            assert(currentBlockNr <= document->getBlocks().size());
 
             LOG_DEBUG("Dodawanie: Zmieniłem block %d, %d", pos, currentBlockNr);
 
@@ -232,7 +232,12 @@ namespace gui
         }
         if (utf_val == text::newline) {
             document->addNewline(*this, TextBlock::End::Newline);
-            document->append(TextBlock(" ", default_font, TextBlock::End::None));
+            //            document->append(TextBlock("", default_font, TextBlock::End::None));
+
+            //            pos         = 0;
+            //            lastBlockNr = currentBlockNr;
+            //            currentBlockNr++;
+
             return;
         }
         block->addChar(utf_val, pos);
@@ -240,13 +245,14 @@ namespace gui
 
     void BlockCursor::addTextBlock(TextBlock &&textblock)
     {
-        if (textblock.length() == 0) {
+        if (textblock.length() == 0 && lastBlock()->getEnd() != TextBlock::End::Newline) {
             return;
         }
         if (document->isEmpty()) {
             resetNpos();
         }
         document->append(std::move(textblock));
+        LOG_ERROR("ILE KURWA JEST TYCH BLOKOW %lu", document->getBlocks().size());
     }
 
     bool BlockCursor::removeChar()
@@ -274,15 +280,16 @@ namespace gui
 
         if (nextBlock != blocksEnd() && nextBlock->isEmpty() && block->getEnd() == TextBlock::End::Newline) {
             document->removeBlock(nextBlock);
-            block->removeChar(pos);
             return true;
         }
 
         debug_cursor("From block: [%d], remove pos: [%d] block length [%d]", getBlockNr(), pos, block->length());
         block->removeChar(pos);
 
+        LOG_ERROR("Ile jest niby w tym blocku jeszcze %d, %s", block->getText().length(), block->getText().c_str());
+
         if (block->isEmpty() && block != blocksEnd() && prevBlock->getEnd() != TextBlock::End::Newline) {
-            debug_cursor("empty block removed");
+            LOG_ERROR("empty block removed");
             document->removeBlock(block);
         }
 

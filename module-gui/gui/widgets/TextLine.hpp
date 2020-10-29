@@ -92,7 +92,8 @@ namespace gui
         {
             unsigned int local_pos = 0;
             for (auto &el : elements_to_show_in_line) {
-                LOG_INFO("Wchodzisz tutaj w ogole?");
+                //                LOG_INFO("Wchodzisz tutaj w ogole? %lu", elements_to_show_in_line.size());
+                local_pos += el->getTextLength();
                 if (local_pos >= pos) {
                     return el;
                 }
@@ -117,5 +118,6 @@ namespace gui
         void alignV(Alignment align, Length parent_length, Length lines_height);
         auto getText(unsigned int pos) const -> UTF8;
         auto checkBounds(TextLineCursor &cursor, uint32_t utf_value, const TextFormat *format) -> InputBound;
+        bool linesEnd = false;
     };
 } // namespace gui

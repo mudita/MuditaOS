@@ -46,6 +46,7 @@ namespace gui
         //                      TextBlock::End::None));
         text->addText(TextBlock("Przemek", Font(27).raw(), TextBlock::End::Newline));
         text->addText(TextBlock("A po tym nowa linia", Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock("P", Font(27).raw(), TextBlock::End::Newline));
         //        text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
         //        text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));
         //        text->addText(TextBlock("Add text,", Font(27).raw(), TextBlock::End::None));

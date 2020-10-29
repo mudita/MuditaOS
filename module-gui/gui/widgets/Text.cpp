@@ -360,20 +360,19 @@ namespace gui
 
         auto lineYPosition = padding.top;
 
-        BlockCursor drawCursor(cursor->getDocument(), 0, 0, cursor->getFont());
+        BlockCursor drawCursor(cursor->getDocument(), 0, 0, getTextFormat().getFont());
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
         LOG_ERROR("ZACZYNAM RYSOWANIE LINI!!!!");
 
-        auto end           = TextBlock::End::None;
         auto lineXPosition = padding.left;
         do {
             auto textLine = gui::TextLine(drawCursor, w);
 
-            LOG_DEBUG("dlaczego ta druga ma 0 długość %d", textLine.length());
+            LOG_DEBUG("Jaka ma długość %d", textLine.length());
 
-            if (textLine.length() == 0 && end == TextBlock::End::None) {
+            if (textLine.length() == 0 && textLine.linesEnd) {
                 debug_text("cant show more text from this document");
                 break;
             }
@@ -396,7 +395,6 @@ namespace gui
             line.setPosition(lineXPosition, lineYPosition);
             line.setParent(this);
 
-            end = lines->last().getEnd();
             lineYPosition += line.height();
 
             LOG_DEBUG("ROBIE NOWA LINIE !!!!!!! A mamy ich %lu", lines->size());
@@ -532,15 +530,15 @@ namespace gui
         if (!isMode(EditMode::EDIT)) {
             return false;
         }
-        if (lines->checkRemovalBounds(*cursor, inputEvent) == InputBound::CAN_REMOVE) {
-            if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
-                if (!document->isEmpty() && removeChar()) {
-                    onTextChanged();
-                    drawLines();
-                }
-                return true;
+        //        if (lines->checkRemovalBounds(*cursor, inputEvent) == InputBound::CAN_REMOVE) {
+        if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+            if (!document->isEmpty() && removeChar()) {
+                onTextChanged();
+                drawLines();
             }
+            return true;
         }
+        //        }
         return false;
     }
 
