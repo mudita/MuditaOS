@@ -53,7 +53,7 @@ namespace gui
             },
             nullptr,
             nullptr,
-            operatorsOn ? RightIcon::On : RightIcon::Off));
+            operatorsOn ? RightItem::On : RightItem::Off));
         if (operatorsOn) {
             optList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_network_all_operators"),
@@ -63,7 +63,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightIcon::Border));
+                RightItem::ArrowWhite));
         }
         optList.emplace_back(gui::Option{
             utils::translateI18("app_settings_network_import_contacts_from_sim_card"), [=](gui::Item &item) {

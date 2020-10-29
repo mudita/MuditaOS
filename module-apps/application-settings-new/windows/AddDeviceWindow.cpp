@@ -41,7 +41,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightIcon::Bt));
+                RightItem::Bt));
         }
 
         sys::Bus::SendUnicast(

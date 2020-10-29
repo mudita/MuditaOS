@@ -8,11 +8,11 @@
 
 namespace gui
 {
-    enum class RightIcon : uint8_t
+    enum class RightItem
     {
         Disabled,
-        Enabled,
-        Border,
+        ArrowBlack,
+        ArrowWhite,
         On,
         Off,
         Bt
@@ -25,15 +25,15 @@ namespace gui
         std::function<bool(Item &)> activatedCallback = nullptr;
         std::function<bool(Item &)> focusCb           = nullptr;
         AppWindow *app                                = nullptr;
-        RightIcon rIcon                               = RightIcon::Disabled;
+        RightItem rightItem                           = RightItem::Disabled;
 
       public:
         OptionSettings(const UTF8 text,
                        std::function<bool(Item &)> cb,
                        std::function<bool(Item &)> cbFocus,
                        AppWindow *app,
-                       RightIcon rIcon = RightIcon::Disabled)
-            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app), rIcon(rIcon)
+                       RightItem rightItem = RightItem::Disabled)
+            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app), rightItem(rightItem)
         {}
         [[nodiscard]] auto build() const -> Item * override;
     };

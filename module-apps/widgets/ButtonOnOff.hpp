@@ -5,18 +5,32 @@
 
 #include "Label.hpp"
 
+namespace style
+{
+    namespace buttonOnOff
+    {
+        constexpr uint32_t w = 56;
+        constexpr uint32_t h = 32;
+    } // namespace buttonOnOff
+} // namespace style
+
 namespace gui
 {
-    enum class ButtonType
+    enum class ButtonState : bool
     {
-        On,
-        Off
+        Off,
+        On
     };
 
     class ButtonOnOff : public Label
     {
       public:
-        ButtonOnOff(Item *parent, ButtonType buttonType);
+        ButtonOnOff(Item *parent, const ButtonState buttonState);
+        void switchState(const ButtonState);
+        void toggleState();
+
+      private:
+        ButtonState currentState;
     };
 
 } /* namespace gui */
