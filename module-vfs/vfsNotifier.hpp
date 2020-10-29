@@ -38,7 +38,7 @@ namespace vfsn::utility
          * @param[in] Handle to opened file
          * @return None
          */
-        auto onFileOpen(const char *filename, const char *mode, const FILE *file) noexcept -> void;
+        auto onFileOpen(std::string_view filename, const char *mode, const FILE *file) noexcept -> void;
         /** This method is called by the vfs layer when vfs close file
          * @param[in] filee Closed file handle
          * @return None

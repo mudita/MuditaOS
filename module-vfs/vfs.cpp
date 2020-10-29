@@ -19,15 +19,17 @@ disk. */
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
-    const auto handle = ff_fopen(relativeToRoot(filename).c_str(), mode);
-    chnNotifier.onFileOpen(filename, mode, handle);
+    const auto filename_rel = relativeToRoot(filename);
+    const auto handle       = ff_fopen(filename_rel.c_str(), mode);
+    chnNotifier.onFileOpen(filename_rel, mode, handle);
     return handle;
 }
 
 int vfs::fclose(FILE *stream)
 {
+    const auto ret = ff_fclose(stream);
     chnNotifier.onFileClose(stream);
-    return ff_fclose(stream);
+    return ret;
 }
 
 int vfs::remove(const char *name)
@@ -288,9 +290,11 @@ int vfs::mkdir(const char *dir)
 int vfs::rename(const char *oldname, const char *newname)
 {
     if (oldname != nullptr && newname != nullptr) {
-        const auto ret = ff_rename(relativeToRoot(oldname).c_str(), relativeToRoot(newname).c_str(), true);
+        const auto old_rel = relativeToRoot(oldname);
+        const auto new_rel = relativeToRoot(newname);
+        const auto ret     = ff_rename(old_rel.c_str(), new_rel.c_str(), true);
         if (!ret)
-            chnNotifier.onFileRename(newname, oldname);
+            chnNotifier.onFileRename(new_rel, old_rel);
         return ret;
     }
     else

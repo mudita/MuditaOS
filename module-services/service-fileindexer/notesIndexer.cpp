@@ -14,7 +14,9 @@ namespace service::detail
     {
         auto file = vfs.fopen(std::string(path).c_str(), "r");
         if (!file) {
-            LOG_INFO("Unable to open file %s. Ignore...", std::string().c_str());
+            LOG_INFO("Unable to open file [%s] errr: [%s] . Ignore...",
+                     std::string(path).c_str(),
+                     vfs.lastErrnoToStr().c_str());
             return;
         }
         if (!vfs.eof(file)) {

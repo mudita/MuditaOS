@@ -8,7 +8,7 @@
 namespace vfsn::utility
 {
 
-    auto vfsNotifier::onFileOpen(const char *filename, const char *mode, const FILE *file) noexcept -> void
+    auto vfsNotifier::onFileOpen(std::string_view filename, const char *mode, const FILE *file) noexcept -> void
     {
         if (file && std::strpbrk(mode, "+wa")) {
             cpp_freertos::LockGuard _lock(mMutex);
