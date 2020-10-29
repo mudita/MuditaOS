@@ -98,6 +98,15 @@ class ServiceCellular : public sys::Service
 
     ussd::State ussdState = ussd::State::none;
 
+    enum class ResetType
+    {
+        SoftReset,  //<! AT CFUN reset
+        PowerCycle, //<! PWRKEY pin toggle
+        HardReset   //<! RESET_N pin
+    };
+    bool resetCellularModule(ResetType type);
+    bool isAfterForceReboot = false;
+
     /// one point of state change handling
     void change_state(cellular::StateChange *msg);
 
