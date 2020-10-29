@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_SERVICES_SERVICE_EINK_MESSAGES_IMAGEMESSAGE_HPP_
-#define MODULE_SERVICES_SERVICE_EINK_MESSAGES_IMAGEMESSAGE_HPP_
+#pragma once
+
+#include "EinkMessage.hpp"
 
 #include <cstdint>
-#include "EinkMessage.hpp"
 
 namespace seink
 {
@@ -56,5 +56,3 @@ namespace seink
     };
 
 } /* namespace seink */
-
-#endif /* MODULE_SERVICES_SERVICE_EINK_MESSAGES_IMAGEMESSAGE_HPP_ */
