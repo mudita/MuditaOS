@@ -46,10 +46,12 @@ class AudioNotificationMessage : public AudioMessage
     enum class Type
     {
         EndOfFile,
-        Stop
+        Stop,
+        ServiceWakeUp,
+        ServiceSleep,
     };
 
-    explicit AudioNotificationMessage(Type type, audio::Token token) : type(type), token(token)
+    explicit AudioNotificationMessage(Type type, audio::Token token = audio::Token()) : type(type), token(token)
     {}
 
     const Type type;
