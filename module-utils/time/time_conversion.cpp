@@ -25,7 +25,7 @@ namespace utils
     {
 
         Locale tlocale;
-        static int timeGmtOff;
+        static int msTimeGmtOff = 4 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
 
         UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
         {
@@ -238,12 +238,12 @@ namespace utils
 
         void Time::setTimeZoneOffset(int tzOffset)
         {
-            timeGmtOff = tzOffset;
+            msTimeGmtOff = tzOffset;
         }
 
         int Time::getTimeZoneOffset()
         {
-            return timeGmtOff;
+            return msTimeGmtOff;
         };
 
         Duration::Duration(time_t duration) : duration(duration)

@@ -52,8 +52,10 @@ int CTZE::getTimeZoneOffset() const
 
 std::string CTZE::getTimeZoneString() const
 {
-    return tokens[static_cast<uint32_t>(Tokens::GMTDifference)] + "," +
-           tokens[static_cast<uint32_t>(Tokens::DaylightSavingsAdjustment)];
+    std::string timeZoneStr = tokens[static_cast<uint32_t>(Tokens::GMTDifference)] + "," +
+                              tokens[static_cast<uint32_t>(Tokens::DaylightSavingsAdjustment)];
+    timeZoneStr.erase(remove_if(timeZoneStr.begin(), timeZoneStr.end(), isspace), timeZoneStr.end());
+    return timeZoneStr;
 }
 
 const struct tm CTZE::getGMTTime(void) const

@@ -41,6 +41,7 @@
 #include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
 #include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
 #include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
+#include "module-utils/time/time_conversion.hpp"       // for Time Zone handling
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {

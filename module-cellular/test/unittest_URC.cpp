@@ -8,6 +8,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
+#include <module-utils/time/time_conversion.hpp>
 
 #include "URC_QIND.hpp"
 #include "URC_CUSD.hpp"
@@ -197,6 +198,13 @@ TEST_CASE("+CTZE")
         std::stringstream ss;
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,15:49:57");
+
+        REQUIRE(ctze.getTimeZoneOffset() == 8 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute);
+        REQUIRE(ctze.getTimeZoneString() == "+08,1");
+        ss.str(std::string());
+        timeInfo = ctze.getGMTTime();
+        ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
+        REQUIRE(ss.str() == "2020/10/21,13:49:57");
     }
 
     SECTION("ctze -08")
@@ -208,6 +216,31 @@ TEST_CASE("+CTZE")
         std::ostringstream ss;
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,11:49:57");
+
+        REQUIRE(ctze.getTimeZoneOffset() == -8 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute);
+        REQUIRE(ctze.getTimeZoneString() == "-08,1");
+        ss.str(std::string());
+        timeInfo = ctze.getGMTTime();
+        ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
+        REQUIRE(ss.str() == "2020/10/21,13:49:57");
+    }
+
+    SECTION("ctze -00")
+    {
+        auto ctze = at::urc::CTZE("+CTZE: \"-00\",0,\"2020/10/21,13:49:57\"");
+        REQUIRE(ctze.is());
+        REQUIRE(ctze.isValid());
+        auto timeInfo = ctze.getTimeInfo();
+        std::ostringstream ss;
+        ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
+        REQUIRE(ss.str() == "2020/10/21,13:49:57");
+
+        REQUIRE(ctze.getTimeZoneOffset() == 0);
+        REQUIRE(ctze.getTimeZoneString() == "-00,0");
+        ss.str(std::string());
+        timeInfo = ctze.getGMTTime();
+        ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
+        REQUIRE(ss.str() == "2020/10/21,13:49:57");
     }
 
     SECTION("too short")
