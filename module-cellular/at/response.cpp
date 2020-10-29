@@ -32,7 +32,11 @@ namespace at
                 if (pos != std::string::npos) {
                     LOG_INFO("%s", CSQstring.c_str());
                     CSQstring = CSQstring.substr(0, pos);
-                    return utils::toNumeric(CSQstring, result);
+                    int parsedVal = 0;
+                    if (utils::toNumeric(CSQstring, parsedVal) && parsedVal >= 0) {
+                        result = parsedVal;
+                        return true;
+                    }
                 }
             }
             return false;
@@ -59,7 +63,11 @@ namespace at
             if (pos != std::string::npos) {
                 auto constexpr digitLength = 1;
                 resp                       = resp.substr(pos + digitLength, digitLength);
-                return utils::toNumeric(resp, result);
+                int parsedVal              = 0;
+                if (utils::toNumeric(resp, parsedVal) && parsedVal >= 0) {
+                    result = parsedVal;
+                    return true;
+                }
             }
             return false;
         }
@@ -127,7 +135,7 @@ namespace at
                 utils::findAndReplaceAll(string, " ", "");
                 utils::findAndReplaceAll(string, "\"", "");
 
-                uint32_t freq = 0;
+                int freq = 0;
                 utils::toNumeric(string, freq);
                 return freq;
             }
@@ -158,8 +166,10 @@ namespace at
                 utils::findAndReplaceAll(string, "\"", emptyString);
                 utils::findAndReplaceAll(string, toRemove, emptyString);
 
-                uint32_t band;
-                utils::toNumeric(string, band);
+                int band = 0;
+                if (utils::toNumeric(string, band) && band < 0) {
+                    return 0;
+                }
 
                 auto freq = lteFreqs.find(band);
                 if (freq != lteFreqs.end()) {

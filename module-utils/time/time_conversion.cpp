@@ -25,6 +25,7 @@ namespace utils
     {
 
         Locale tlocale;
+        static int msTimeGmtOff = 4 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
 
         UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
         {
@@ -46,6 +47,16 @@ namespace utils
                 break;
             }
             return retval;
+        }
+
+        Timestamp::Timestamp()
+        {
+            auto err     = bsp::rtc_GetCurrentTimestamp(&time);
+            auto curTime = time + utils::time::Time::getTimeZoneOffset();
+            if (err) {
+                LOG_ERROR("rtc_GetCurrentTimestamp failure!");
+            }
+            timeinfo = *localtime(&curTime);
         }
 
         void Timestamp::set_time(time_t newtime)
@@ -224,6 +235,16 @@ namespace utils
                     Locale::format(Locale::FormatTime12H)); // @TODO: M.G. FormatLocaleTime which actually works
             }
         }
+
+        void Time::setTimeZoneOffset(int tzOffset)
+        {
+            msTimeGmtOff = tzOffset;
+        }
+
+        int Time::getTimeZoneOffset()
+        {
+            return msTimeGmtOff;
+        };
 
         Duration::Duration(time_t duration) : duration(duration)
         {

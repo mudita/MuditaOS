@@ -9,4 +9,5 @@ add_catch2_executable(
                 test-service-db-settings-api.cpp
         LIBS
                 module-services
+                module-utils
 )
