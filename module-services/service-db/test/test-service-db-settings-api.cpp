@@ -1,113 +1,137 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp> // for AssertionHandler, SourceLineInfo, operator""_catch_sr, Section, StringRef, REQUIRE, SECTION, SectionInfo, TEST_CASE
-#include <Service/Service.hpp> // for Service
-#include <functional>          // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
-#include <map>                 // for operator!=, _Rb_tree_iterator, map<>::iterator, map<>::mapped_type, map
-#include <memory>              // for shared_ptr, allocator, make_shared, operator==, __shared_ptr_access
-#include <optional>            // for optional
-#include <string>              // for string, operator==, basic_string
+#include <catch2/catch.hpp>
+#include "agents/settings/Settings.hpp"
+#include "messages/SettingsMessages.hpp"
+#include <Service/Service.hpp>
+#include <functional>
+#include <thread> // for Message_t, ResponseMessage, DataMessage, Message
 
-#include "agents/settings/Settings.hpp"  // for Settings
-#include "messages/SettingsMessages.hpp" // for SetVariable, VariableResponse, GetVariable, EntryPath, VariableChanged
-#include "Service/Common.hpp"            // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
-#include "Service/Mailbox.hpp"           // for Mailbox
-#include "Service/Message.hpp"           // for Message_t, ResponseMessage, DataMessage, Message
+#include <module-services/service-db/ServiceDB.hpp>
+#include <module-sys/SystemManager/SystemManager.hpp>
 
-namespace Settings
+#include <module-services/service-evtmgr/EventManager.hpp>
+#include <module-services/service-evtmgr/Constants.hpp>
+
+#include <module-services/service-fota/api/FotaServiceAPI.cpp>
+
+#include "test-service-db-settings-testmsgs.hpp"
+#include "test-service-db-settings-testservices.hpp"
+#include "test-service-db-settings-testapps.hpp"
+
+struct vfs_initializer
 {
-    class MyService : public sys::Service
+    vfs_initializer()
     {
-      public:
-        MyService(const std::string &name) : sys::Service(name)
-        {}
-        using MapStr = std::map<std::string, std::string>;
-        MapStr vars;
-        sys::Message_t handGetVar(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
-        {
-            if (auto msg = dynamic_cast<::Settings::Messages::GetVariable *>(req)) {
+        vfs.Init();
+    }
+} vfs_init;
 
-                auto path = msg->getPath();
-                if (vars.end() != vars.find(path.variable)) {
-                    return std::make_shared<::Settings::Messages::VariableResponse>(path, vars[path.variable]);
-                }
-
-                return std::make_shared<::Settings::Messages::VariableResponse>(path, "");
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        };
-
-        sys::Message_t handSetVar(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
-        {
-            if (auto msg = dynamic_cast<::Settings::Messages::SetVariable *>(req)) {
-
-                auto path      = msg->getPath();
-                auto value     = msg->getValue().value_or("");
-                auto old_value = setVal(path, msg->getValue().value_or(""));
-
-                auto update_msg = std::make_shared<::Settings::Messages::VariableChanged>(path, value, old_value);
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        };
-        std::string setVal(::Settings::EntryPath path, std::string value)
-        {
-            // insert into ...
-            vars[path.variable] = value;
-            return value;
-        }
-
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
-        {
-            return sys::Message_t();
-        }
-        sys::ReturnCodes InitHandler()
-        {
-            using std::placeholders::_1;
-            using std::placeholders::_2;
-
-            connect(::Settings::Messages::GetVariable(), std::bind(&MyService::handGetVar, this, _1, _2));
-            connect(::Settings::Messages::SetVariable(), std::bind(&MyService::handSetVar, this, _1, _2));
-            return sys::ReturnCodes::Success;
-        }
-        sys::ReturnCodes DeinitHandler()
-        {
-            return sys::ReturnCodes::Success;
-        }
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode)
-        {
-            return sys::ReturnCodes::Success;
-        }
-        void ProcessMsgs()
-        {
-            isReady = true;
-            while (1) {
-                auto msg = mailbox.pop(0);
-                if (msg == nullptr) {
-                    break;
-                }
-                auto ret = msg->Execute(this);
-            }
-        }
-    };
-}; // namespace Settings
 TEST_CASE("SettingsApi")
 {
-    SECTION("Create APP")
+    SECTION("variable/profile/mode register/set/get/unregister")
     {
-        Settings::MyService theApp("theApp");
-        Settings::Settings setapi(&theApp);
-    }
+        std::shared_ptr<sys::SystemManager> manager = std::make_shared<sys::SystemManager>(5000);
+        std::shared_ptr<Settings::MyService> varWritter;
+        std::shared_ptr<Settings::MyService> varReader;
+        std::shared_ptr<Settings::AppTest> testVar;
+        std::shared_ptr<Settings::ServiceProfile> profWritter;
+        std::shared_ptr<Settings::ServiceProfile> profReader;
+        std::shared_ptr<Settings::AppTestProfileMode> testProf;
+        std::shared_ptr<std::mutex> testStart;
+        std::shared_ptr<Settings::ServiceMode> modeWritter;
+        std::shared_ptr<Settings::ServiceMode> modeReader;
+        std::shared_ptr<Settings::AppTestProfileMode> testMode;
 
-    SECTION("set variable")
-    {
-        Settings::MyService theApp("theApp");
-        theApp.InitHandler();
-        Settings::Settings setapi(&theApp, "theApp");
-        setapi.setValue("glosnosc", "5");
-        theApp.ProcessMsgs();
-        REQUIRE(1 == theApp.vars.size());
-        REQUIRE(theApp.vars.end() != theApp.vars.find("glosnosc"));
-        REQUIRE("5" == theApp.vars["glosnosc"]);
+        manager->StartSystem([manager,
+                              &varWritter,
+                              &varReader,
+                              &testVar,
+                              &profWritter,
+                              &profReader,
+                              &testProf,
+                              &modeWritter,
+                              &modeReader,
+                              &testMode,
+                              &testStart]() {
+            // preliminary
+            testStart = std::make_shared<std::mutex>();
+            testStart->lock();
+            std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
+            auto ret = sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager),
+                                                         manager.get());
+            ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), manager.get());
+
+            varWritter = std::make_shared<Settings::MyService>("writterVar");
+            varReader  = std::make_shared<Settings::MyService>("readerVar");
+
+            ret &= sys::SystemManager::CreateService(varWritter, manager.get());
+            ret &= sys::SystemManager::CreateService(varReader, manager.get());
+
+            testVar = std::make_shared<Settings::AppTest>("appTest", varWritter, varReader, testStart);
+            ret &= sys::SystemManager::CreateService(testVar, manager.get());
+
+            profWritter = std::make_shared<Settings::ServiceProfile>("writterProf");
+            profReader  = std::make_shared<Settings::ServiceProfile>("readerProf");
+
+            ret &= sys::SystemManager::CreateService(profWritter, manager.get());
+            ret &= sys::SystemManager::CreateService(profReader, manager.get());
+
+            testProf =
+                std::make_shared<Settings::AppTestProfileMode>("appTestProfile", profWritter, profReader, testStart);
+            ret &= sys::SystemManager::CreateService(testProf, manager.get());
+
+            modeWritter = std::make_shared<Settings::ServiceMode>("writterMode");
+            modeReader  = std::make_shared<Settings::ServiceMode>("readerMode");
+
+            ret &= sys::SystemManager::CreateService(modeWritter, manager.get());
+            ret &= sys::SystemManager::CreateService(modeReader, manager.get());
+
+            testMode =
+                std::make_shared<Settings::AppTestProfileMode>("appTestMode", modeWritter, modeReader, testStart);
+            ret &= sys::SystemManager::CreateService(testMode, manager.get());
+
+            std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
+            testStart->unlock();
+            auto msgStart = std::make_shared<Settings::UTMsg::UTMsgStart>();
+            sys::Bus::SendUnicast(std::move(msgStart), "appTest", manager.get());
+
+            msgStart = std::make_shared<Settings::UTMsg::UTMsgStart>();
+            sys::Bus::SendUnicast(std::move(msgStart), "appTestProfile", manager.get());
+
+            msgStart = std::make_shared<Settings::UTMsg::UTMsgStart>();
+            sys::Bus::SendUnicast(std::move(msgStart), "appTestMode", manager.get());
+
+            return ret;
+        });
+
+        // start application
+        cpp_freertos::Thread::StartScheduler();
+
+        // check the results
+        std::cout << "testVar values:" << std::endl << std::flush;
+        for (auto s : testVar->v)
+            std::cout << s << std::endl << std::flush;
+        REQUIRE(testVar->v.size() == 3);
+        REQUIRE(testVar->v[1] == testVar->v[0] + "1");
+        REQUIRE(testVar->v[2] == testVar->v[1] + "2");
+
+        // check the result
+        std::cout << "testProf values:" << std::endl << std::flush;
+        for (auto s : testProf->v)
+            std::cout << s << std::endl << std::flush;
+        REQUIRE(testProf->v[1] == testProf->v[0] + "1");
+        REQUIRE(testProf->v[2] == testProf->v[0] + "12");
+        REQUIRE(testProf->v[3] == "other");
+        REQUIRE(testProf->v[4] == "other");
+
+        std::cout << "testMode values:" << std::endl << std::flush;
+        for (auto s : testMode->v)
+            std::cout << s << std::endl << std::flush;
+        REQUIRE(testMode->v[1] == testMode->v[0] + "1");
+        REQUIRE(testMode->v[2] == testMode->v[0] + "12");
+        REQUIRE(testMode->v[3] == "other");
+        REQUIRE(testMode->v[4] == "other");
     }
 }
