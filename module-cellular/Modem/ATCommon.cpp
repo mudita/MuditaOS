@@ -50,7 +50,6 @@ bool Chanel::at_check_cmx_error(const std::string &CMX, const std::vector<std::s
     return false;
 }
 
-
 void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 {
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\r'), cmd.end());
@@ -113,7 +112,7 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
             result.response.insert(std::end(result.response), std::begin(ret), std::end(ret));
 
             uint32_t errcode = 0;
-            if (at_check_cmx_error(CME_ERROR,ret, errcode)) {
+            if (at_check_cmx_error(CME_ERROR, ret, errcode)) {
                 result.code =
                     Result::Code::ERROR; // setup error but in this case error from +CME ERROR with valid errorCode
                 auto tmp_ec = magic_enum::enum_cast<EquipmentErrorCode>(errcode);
@@ -126,7 +125,8 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                     result.errorCode = at::EquipmentErrorCode::Unknown;
                 }
                 break;
-            } else if (at_check_cmx_error(CMS_ERROR,ret, errcode)) {
+            }
+            else if (at_check_cmx_error(CMS_ERROR, ret, errcode)) {
                 result.code =
                     Result::Code::ERROR; // setup error but in this case error from +CME ERROR with valid errorCode
 
@@ -142,8 +142,7 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                 }
                 break;
             }
-            else
-            {
+            else {
 
                 result.code = at_check(ret);
                 if (result.code != Result::Code::NONE) {

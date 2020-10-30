@@ -23,7 +23,6 @@ namespace at
             NONE,    // no code
         } code = Code::NONE;
 
-
         //! Information about Equipment or Network error as variant type
         /*!
          * Example of checking for specific error type
@@ -33,10 +32,7 @@ namespace at
         */
         std::variant<at::EquipmentErrorCode, at::NetworkErrorCode> errorCode = at::EquipmentErrorCode::NoInformation;
 
-
         std::vector<std::string> response;
-
-
 
         explicit operator bool() const
         {
