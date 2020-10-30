@@ -1,5 +1,14 @@
 # MuditaOS changelog
 
+
+### Added
+
+* `[cellular]` Set pin functionality with Action mockup
+### Changed
+
+* `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
+
+
 ## Current release
 
 ### Changed
@@ -556,4 +565,5 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+
 
