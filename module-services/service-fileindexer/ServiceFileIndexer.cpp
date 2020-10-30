@@ -26,7 +26,7 @@ namespace service
         if (fcm) {
             switch (fcm->event()) {
             case msg::FileChangeMessage::evt_t::modified: {
-                switch (detail::startupIndexer::getFileType(fcm->newPath())) {
+                switch (detail::StartupIndexer::getFileType(fcm->newPath())) {
                 case detail::mimeType::audio:
                     onAudioContentChanged(fcm->newPath());
                     break;
@@ -44,8 +44,7 @@ namespace service
             case msg::FileChangeMessage::evt_t::deleted:
                 onDeleteFile(fcm->newPath());
                 break;
-            default:
-                LOG_INFO("Unsupported notification");
+            case msg::FileChangeMessage::evt_t::initialized:
                 break;
             }
             return std::make_shared<sys::ResponseMessage>();

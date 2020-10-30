@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "startupIndexer.hpp"
+#include "StartupIndexer.hpp"
 #include "messages/FileChangeMessage.hpp"
 #include <filesystem>
 #include <ff_stdio_listdir_recursive.h>
@@ -24,7 +24,7 @@ namespace service::detail
         const std::vector<std::string> start_dirs{purefs::dir::user_disk, purefs::dir::os_current};
     } // namespace
 
-    auto startupIndexer::getFileType(std::string_view path) -> mimeType
+    auto StartupIndexer::getFileType(std::string_view path) -> mimeType
     {
         for (const auto &ext : allowed_exts) {
             if (fs::path(path).extension() == ext.first) {
@@ -35,11 +35,11 @@ namespace service::detail
     }
 
     // Collect startup files when service starts
-    auto startupIndexer::collectStartupFiles() -> void
+    auto StartupIndexer::collectStartupFiles() -> void
     {
         using namespace std::string_literals;
         auto searcher_cb = [](void *ctx, const char *path, bool isDir) {
-            auto _this = reinterpret_cast<startupIndexer *>(ctx);
+            auto _this = reinterpret_cast<StartupIndexer *>(ctx);
             if (!isDir) {
                 for (const auto &ext : allowed_exts) {
                     if (fs::path(path).extension() == ext.first) {
@@ -55,7 +55,7 @@ namespace service::detail
         }
     }
     // Setup timers for notification
-    auto startupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
+    auto StartupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
         if (!mIdxTimer) {
             mIdxTimer = std::make_unique<sys::Timer>("file_indexing", svc.get(), timer_indexing_time);

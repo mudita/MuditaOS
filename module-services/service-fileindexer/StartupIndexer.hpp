@@ -26,15 +26,15 @@ namespace service::detail
         text,
         video
     };
-    class startupIndexer
+    class StartupIndexer
     {
         static constexpr auto timer_indexing_time = 100U;
 
       public:
-        startupIndexer()                       = default;
-        ~startupIndexer()                      = default;
-        startupIndexer(const startupIndexer &) = delete;
-        startupIndexer &operator=(startupIndexer) = delete;
+        StartupIndexer()                       = default;
+        ~StartupIndexer()                      = default;
+        StartupIndexer(const StartupIndexer &) = delete;
+        StartupIndexer &operator=(StartupIndexer) = delete;
         auto start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
         {
             collectStartupFiles();
