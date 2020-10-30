@@ -288,30 +288,36 @@ namespace gui
         delete drawCtx;
     }
 
-    void Renderer::render(Context *ctx, std::vector<DrawCommand *> &commands)
+    void Renderer::render(Context *ctx, std::list<Command> &commands)
     {
-        for (auto cmd : commands) {
+        if (ctx == nullptr) {
+            return;
+        }
+        for (auto &cmd : commands) {
+            if (cmd == nullptr) {
+                continue;
+            }
             switch (cmd->id) {
             case DrawCommandID::GUI_DRAW_CLEAR:
                 ctx->fill(15);
                 break;
             case DrawCommandID::GUI_DRAW_LINE:
-                drawLine(ctx, static_cast<CommandLine *>(cmd));
+                drawLine(ctx, static_cast<CommandLine *>(cmd.get()));
                 break;
             case DrawCommandID::GUI_DRAW_RECT:
-                drawRectangle(ctx, static_cast<CommandRectangle *>(cmd));
+                drawRectangle(ctx, static_cast<CommandRectangle *>(cmd.get()));
                 break;
             case DrawCommandID::GUI_DRAW_ARC:
-                drawArc(ctx, static_cast<CommandArc *>(cmd));
+                drawArc(ctx, static_cast<CommandArc *>(cmd.get()));
                 break;
             case DrawCommandID::GUI_DRAW_CIRCLE:
-                drawCircle(ctx, static_cast<CommandCircle *>(cmd));
+                drawCircle(ctx, static_cast<CommandCircle *>(cmd.get()));
                 break;
             case DrawCommandID::GUI_DRAW_TEXT:
-                drawText(ctx, static_cast<CommandText *>(cmd));
+                drawText(ctx, static_cast<CommandText *>(cmd.get()));
                 break;
             case DrawCommandID::GUI_DRAW_IMAGE:
-                drawImage(ctx, static_cast<CommandImage *>(cmd));
+                drawImage(ctx, static_cast<CommandImage *>(cmd.get()));
                 break;
             default:
                 break;

@@ -50,29 +50,14 @@ namespace gui
         }
     }
 
-    std::list<DrawCommand *> Image::buildDrawList()
+    void Image::buildDrawListImplementation(std::list<Command> &commands)
     {
-
-        std::list<DrawCommand *> commands;
-
-        // check if widget is visible
-        if (visible == false)
-            return commands;
-
-        // get children draw commands
-        std::list<DrawCommand *> childrenCommands = Item::buildDrawList();
-        if (!childrenCommands.empty())
-            commands.merge(childrenCommands);
-
-        // set local draw commands
-        CommandImage *img = new CommandImage{};
-
+        auto img = std::make_unique<CommandImage>();
         // image
         img->x = drawArea.x;
         img->y = drawArea.y;
         img->w = drawArea.w;
         img->h = drawArea.h;
-
         // cmd part
         img->areaX = img->x;
         img->areaY = img->y;
@@ -81,9 +66,7 @@ namespace gui
 
         img->imageID = this->imageMap->getID();
 
-        commands.push_back(img);
-
-        return commands;
+        commands.emplace_back(std::move(img));
     }
 
 } /* namespace gui */

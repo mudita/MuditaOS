@@ -25,16 +25,6 @@ namespace gui
     gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
     uint32_t TopBar::time                  = 0;
 
-    TopBar::TopBar()
-    {
-
-        prepareWidget();
-
-        setFillColor(ColorFullWhite);
-        setBorderColor(ColorNoColor);
-        setFilled(true);
-        setSize(480, 50);
-    }
     TopBar::TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
     {
 
@@ -45,9 +35,11 @@ namespace gui
         setFilled(true);
         setSize(480, 50);
         updateDrawArea();
+
+        preBuildDrawListHook = [this](std::list<Command> &) {
+            setTime(time, (timeMode == TimeMode::TIME_24H) ? true : false);
+        };
     }
-    TopBar::~TopBar()
-    {}
 
     void TopBar::batteryShowBars(uint32_t val)
     {
@@ -285,14 +277,6 @@ namespace gui
         return timeLabel->getText();
     }
 
-    std::list<DrawCommand *> TopBar::buildDrawList()
-    {
-
-        // make sure that time text is updated.
-        setTime(time, (timeMode == TimeMode::TIME_24H) ? true : false);
-
-        return Rect::buildDrawList();
-    }
 
     void TopBar::simSet()
     {

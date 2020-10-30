@@ -15,9 +15,6 @@
 namespace gui
 {
 
-    /**
-     * @brief IDs of the drawing commands
-     */
     enum class DrawCommandID
     {
         GUI_DRAW_UNDEFINED = 0,
@@ -50,9 +47,6 @@ namespace gui
         virtual ~DrawCommand(){};
     };
 
-    /**
-     * @brief Draw command for rendering.
-     */
     class CommandRender : public DrawCommand
     {
       public:
@@ -63,9 +57,6 @@ namespace gui
         };
     };
 
-    /**
-     * @brief Draw command for line.
-     */
     class CommandLine : public DrawCommand
     {
       public:

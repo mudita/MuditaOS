@@ -47,24 +47,12 @@ namespace gui
         setValue(absoluteValue);
     }
 
-    std::list<DrawCommand *> ProgressBar::buildDrawList()
+    void ProgressBar::buildDrawListImplementation(std::list<Command> &commands)
     {
-        if (!visible) {
-            return {};
-        }
-
-        std::list<DrawCommand *> baseCommands = gui::Rect::buildDrawList();
-        auto it                               = baseCommands.begin();
-        it++;
-        CommandRectangle *fill = static_cast<CommandRectangle *>(*it);
-
         uint32_t progressSize = maxValue == 0U ? 0 : (currentValue * widgetArea.w) / maxValue;
-        fill->w               = progressSize;
+        drawArea.w            = progressSize;
 
-        std::list<DrawCommand *> commands;
-        commands.splice(commands.end(), baseCommands, it);
-        commands.splice(commands.end(), baseCommands);
-        return commands;
+        gui::Rect::buildDrawListImplementation(commands);
     }
 
     bool ProgressBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -137,17 +125,14 @@ namespace gui
         return static_cast<float>(currentValue) / maxValue;
     }
 
-    std::list<DrawCommand *> CircularProgressBar::buildDrawList()
+    void CircularProgressBar::buildDrawListImplementation(std::list<Command> &commands)
     {
         using namespace trigonometry;
 
-        if (!visible) {
-            return {};
-        }
-
         progressArc->setSweepAngle(getPercentageValue() * FullAngle);
         progressIndicator->setCenter(calculateProgressIndicatorCenter());
-        return Circle::buildDrawList();
+
+        Circle::buildDrawListImplementation(commands);
     }
 
     bool CircularProgressBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

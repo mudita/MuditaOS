@@ -97,7 +97,6 @@ namespace gui
         bool removeWidget(Item *item) override;
         bool erase(Item *item) override;
         void erase() override;
-        std::list<DrawCommand *> buildDrawList() override;
         /// add item if it will fit in box, return true on success
         /// axis sets direction to define space left in container
         template <Axis axis> void addWidget(Item *item);

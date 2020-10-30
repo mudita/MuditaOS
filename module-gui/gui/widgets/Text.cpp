@@ -24,6 +24,7 @@
 #include <RawFont.hpp>
 #include <RichTextParser.hpp>
 #include "Lines.hpp"
+#include <DrawCommand.hpp>
 
 #if DEBUG_GUI_TEXT == 1
 #define debug_text(...) LOG_DEBUG(__VA_ARGS__)
@@ -70,6 +71,8 @@ namespace gui
 
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdge::All);
+
+        preBuildDrawListHook = [this](std::list<Command> &commands) { preBuildDrawListHookImplementation(commands); };
     }
 
     Text::Text() : Text(nullptr, 0, 0, 0, 0)
@@ -434,7 +437,7 @@ namespace gui
         }
     }
 
-    std::list<DrawCommand *> Text::buildDrawList()
+    void Text::preBuildDrawListHookImplementation(std::list<Command> &commands)
     {
         // we can't build elements to show just before showing.
         // why? because we need to know if these elements fit in
@@ -452,7 +455,6 @@ namespace gui
                        return str.c_str();
                    }()
                                 .c_str());
-        return Rect::buildDrawList();
     }
 
     void Text::buildDocument(const UTF8 &text)

@@ -10,11 +10,7 @@
 #include <algorithm> // for find
 #include <list>      // for list<>::iterator, list, operator!=, _List...
 #include <memory>
-
-namespace gui
-{
-    class DrawCommand;
-}
+#include <DrawCommand.hpp>
 
 namespace gui
 {
@@ -107,21 +103,31 @@ namespace gui
         visible = value;
     }
 
-    std::list<DrawCommand *> Item::buildDrawList()
+    std::list<Command> Item::buildDrawList()
     {
-        return buildChildrenDrawList();
+        if (not visible) {
+            return {};
+        }
+        auto commands = std::list<Command>();
+        if (preBuildDrawListHook != nullptr) {
+            preBuildDrawListHook(commands);
+        }
+        buildDrawListImplementation(commands);
+        buildChildrenDrawList(commands);
+        if (postBuildDrawListHook != nullptr) {
+            postBuildDrawListHook(commands);
+        }
+        return commands;
     }
 
-    std::list<DrawCommand *> Item::buildChildrenDrawList()
+    void Item::buildChildrenDrawList(std::list<Command> &commands)
     {
-        std::list<DrawCommand *> commands;
         for (auto widget : children) {
             auto drawCommands = widget->buildDrawList();
             if (!drawCommands.empty()) {
                 commands.splice(commands.end(), drawCommands);
             }
         }
-        return commands;
     }
 
     void Item::setArea(BoundingBox area)

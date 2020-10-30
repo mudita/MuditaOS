@@ -12,7 +12,6 @@
 #include "utf8/UTF8.hpp"     // for UTF8
 #include <cstring>           // for memcpy
 #include <utility>           // for pair
-#include <vector>            // for vector
 
 namespace gui
 {
@@ -307,7 +306,8 @@ namespace gui
         commandRect->penWidth = unsupported->xoffset;
 
         auto renderCtx                           = std::make_unique<Context>(unsupported->width, unsupported->height);
-        std::vector<gui::DrawCommand *> commands = {commandRect.get()};
+        std::list<Command> commands;
+        commands.emplace_back(std::move(commandRect));
         Renderer().render(renderCtx.get(), commands);
 
         auto size         = unsupported->width * unsupported->height;
@@ -317,7 +317,8 @@ namespace gui
 
     void RawFont::setFallbackFont(RawFont *fallback)
     {
-        if (fallback != this)
+        if (fallback != this) {
             fallback_font = fallback;
+        }
     }
 } /* namespace gui */

@@ -2,28 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DrawMessage.hpp"
-
 #include "GUIMessage.hpp"
-
 #include <Common.hpp>
 #include <DrawCommand.hpp>
-#include <MessageType.hpp>
 
 namespace sgui
 {
 
-    DrawMessage::DrawMessage(const std::list<gui::DrawCommand *> &commandsList, gui::RefreshModes mode, DrawCommand cmd)
-        : GUIMessage(MessageType::GUICommands), command{cmd}
+    DrawMessage::DrawMessage(std::list<gui::Command> commands, gui::RefreshModes mode)
+        : GUIMessage(MessageType::GUICommands), mode(mode), commands(std::move(commands))
     {
-
-        this->mode = mode;
-        for (auto cmd : commandsList) {
-            if (cmd)
-                commands.push_back(std::unique_ptr<gui::DrawCommand>(cmd));
-        }
     }
-
-    DrawMessage::~DrawMessage()
-    {}
-
 } /* namespace sgui */

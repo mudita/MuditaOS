@@ -75,24 +75,15 @@ namespace gui
           isFilled{_filled}, fillColor{_fillColor}, focusBorderColor{_focusBorderColor}
     {}
 
-    std::list<DrawCommand *> Circle::buildDrawList()
+    void Circle::buildDrawListImplementation(std::list<Command> &commands)
     {
-        if (!visible) {
-            return {};
-        }
-
-        auto circle = new CommandCircle(
+        auto circle = std::make_unique<CommandCircle>(
             center, radius, focus ? focusPenWidth : penWidth, focus ? focusBorderColor : color, isFilled, fillColor);
         circle->areaX = widgetArea.x;
         circle->areaY = widgetArea.y;
         circle->areaW = widgetArea.w;
         circle->areaH = widgetArea.h;
 
-        std::list<DrawCommand *> commands;
-        commands.push_back(circle);
-
-        auto childrenCommands = Item::buildChildrenDrawList();
-        commands.splice(commands.end(), childrenCommands);
-        return commands;
+        commands.emplace_back(std::move(circle));
     }
 } // namespace gui

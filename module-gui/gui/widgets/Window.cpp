@@ -17,7 +17,7 @@
 
 namespace gui
 {
-    Window::Window(std::string name) : Item(), refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
+    Window::Window(std::string name) : Item(), name{name}
     {}
 
     void Window::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -26,36 +26,24 @@ namespace gui
     void Window::onClose()
     {}
 
-    void Window::getRefreshArea(RefreshModes &mode, uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)
+    void Window::getRefreshArea(uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)
     {
         x    = widgetArea.x;
         y    = widgetArea.y;
         w    = widgetArea.w;
         h    = widgetArea.h;
-        mode = refreshMode;
     }
 
     bool Window::handleSwitchData(SwitchData *data)
     {
-        return true;
+        return false;
     }
 
-    std::list<DrawCommand *> Window::buildDrawList()
+    void Window::buildDrawListImplementation(std::list<Command> &commands)
     {
-
-        std::list<DrawCommand *> commands;
-        std::list<DrawCommand *> childrenCommands = Item::buildDrawList();
-
-        DrawCommand *clearCommand = new DrawCommand();
+        auto clearCommand         = std::make_unique<DrawCommand>();
         clearCommand->id          = DrawCommandID::GUI_DRAW_CLEAR;
-
-        commands.push_back(clearCommand);
-
-        if (!childrenCommands.empty()) {
-            commands.splice(commands.end(), childrenCommands);
-        }
-
-        return commands;
+        commands.emplace_back(std::move(clearCommand));
     }
 
     bool Window::onInput(const InputEvent &inputEvent)

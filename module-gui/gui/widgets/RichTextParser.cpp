@@ -15,9 +15,11 @@
 #include <module-utils/pugixml/src/pugixml.hpp>
 #include <utility>
 
-#ifndef DEBUG_RTP
+#ifdef DEBUG_RTP
 const std::string node_types[] = {"null", "document", "element", "pcdata ", "cdata", "comment", "pi", "declaration"};
 #define log_parser(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define log_parser(...)
 #endif
 
 namespace text
@@ -426,7 +428,7 @@ namespace gui::text
 
     auto RichTextParser::parse(const UTF8 &text, TextFormat *base_style) -> std::unique_ptr<TextDocument>
     {
-        LOG_DEBUG("parsing: %s", text.c_str());
+        log_parser("parsing: %s", text.c_str());
         if (text.empty() || base_style == nullptr) {
             LOG_ERROR("no: %s", text.empty() ? "text" : "base style");
             return std::unique_ptr<TextDocument>();

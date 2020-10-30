@@ -118,13 +118,13 @@ namespace sgui
                 // if suspend flag is set ignore any new message
                 if (!suspendInProgress) {
 
-                    if (dmsg->command == sgui::DrawMessage::DrawCommand::SHUTDOWN) {
+                    if (dmsg->type == sgui::DrawMessage::Type::SHUTDOWN) {
                         LOG_WARN("Shutdown - received shutdown draw commands");
                         shutdownInProgress = true;
                     }
 
                     // if message carries suspend flag set flag in service and proceed
-                    if (dmsg->command == sgui::DrawMessage::DrawCommand::SUSPEND) {
+                    if (dmsg->type == sgui::DrawMessage::Type::SUSPEND) {
                         LOG_WARN("Suspended - received suspend draw commands");
                         suspendInProgress = true;
                     }
@@ -134,13 +134,11 @@ namespace sgui
                         mode = dmsg->mode;
                     }
 
-                    //				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+                    // LOG_DEBUG("Received %d draw commands", dmsg->commands.size());
 
                     // lock access to commands vector, clear it and then copy commands from message to vector
                     if (xSemaphoreTake(semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                        commands.clear();
-                        for (auto it = dmsg->commands.begin(); it != dmsg->commands.end(); it++)
-                            commands.push_back(std::move(*it));
+                        commands = std::move(dmsg->commands);
                         xSemaphoreGive(semCommands);
                     }
                     else {

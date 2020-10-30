@@ -40,29 +40,21 @@ namespace sgui
             xQueueReceive(queue, &received, 0);
 
             // take all unique pointers
-            std::vector<std::unique_ptr<gui::DrawCommand>> uniqueCommands;
+            std::list<std::unique_ptr<gui::DrawCommand>> uniqueCommands;
 
             if (xSemaphoreTake(serviceGUI->semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                for (auto it = serviceGUI->commands.begin(); it != serviceGUI->commands.end(); it++)
-                    uniqueCommands.push_back(std::move(*it));
-                serviceGUI->commands.clear();
+                uniqueCommands = std::move(serviceGUI->commands);
                 xSemaphoreGive(serviceGUI->semCommands);
             }
             else {
                 LOG_ERROR("Failed to acquire semaphore");
             }
 
-            // create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
-            std::vector<gui::DrawCommand *> commands;
-            for (auto it = uniqueCommands.begin(); it != uniqueCommands.end(); it++)
-                commands.push_back((*it).get());
-
             //		uint32_t start_tick = xTaskGetTickCount();
-            serviceGUI->renderer.render(serviceGUI->renderContext, commands);
+            serviceGUI->renderer.render(serviceGUI->renderContext, uniqueCommands);
             //		uint32_t end_tick = xTaskGetTickCount();
             //		LOG_INFO("[WorkerGUI] RenderingTime: %d", end_tick - start_tick);
 
-            //			delete received;
 
             // notify gui service that rendering is complete
             auto message = std::make_shared<sys::DataMessage>(MessageType::GUIRenderingFinished);

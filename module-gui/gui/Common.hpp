@@ -143,3 +143,14 @@ namespace gui
     void setTimeFunction(timeSecondsFunctionPtr fptr);
 
 } // namespace gui
+
+inline const char *c_str(gui::RefreshModes refresh)
+{
+    switch (refresh) {
+    case gui::RefreshModes::GUI_REFRESH_FAST:
+        return "GUI_REFRESH_FAST";
+    case gui::RefreshModes::GUI_REFRESH_DEEP:
+        return "GUI_REFRESH_DEEP";
+    }
+    return "";
+}

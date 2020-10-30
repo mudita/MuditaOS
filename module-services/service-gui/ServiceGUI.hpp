@@ -58,7 +58,7 @@ namespace sgui
         volatile bool rendering   = false;
         // set of commands recently received. If this vector is not empty and new set of commands is received
         // previous commands are removed.
-        std::vector<std::unique_ptr<gui::DrawCommand>> commands;
+        std::list<std::unique_ptr<gui::DrawCommand>> commands;
         //	uint32_t timer_id= 0;
         gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_DEEP;
 

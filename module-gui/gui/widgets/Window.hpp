@@ -30,7 +30,6 @@ namespace gui
     class Window : public Item
     {
       protected:
-        RefreshModes refreshMode;
         /// name of window used for windows switching
         std::string name;
 
@@ -43,7 +42,7 @@ namespace gui
         /// @note this is most likely being duplicated by handleSwitchData
         virtual void onBeforeShow(ShowMode mode, SwitchData *data);
         virtual void onClose();
-        virtual void getRefreshArea(RefreshModes &mode, uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h);
+        virtual void getRefreshArea(uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h);
 
         /// run prior to onBeforeShow
         /// @note this is most likely duplicate of onBeforeShow
@@ -58,7 +57,9 @@ namespace gui
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
-        std::list<DrawCommand *> buildDrawList() override;
+
+        void buildDrawListImplementation(std::list<Command> &commands) override;
+
         std::string getName()
         {
             return name;
