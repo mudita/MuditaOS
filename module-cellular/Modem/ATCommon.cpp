@@ -148,7 +148,6 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                 break;
             }
 
-
             result.code = at_check(ret);
             if (result.code != Result::Code::NONE) {
                 break;

@@ -1,5 +1,9 @@
 # MuditaOS changelog
 
+### Added
+
+* `[cellular]` Support for CMS and CME errors
+
 ## Current release
 
 ### Added
