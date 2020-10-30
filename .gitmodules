@@ -41,7 +41,7 @@
 	url = ../minimp3.git
     branch = RT1051
 [submodule "module-audio/Audio/decoder/taglib"]
-	path = module-audio/Audio/decoder/taglib
+	path = module-utils/taglib
 	url = ../taglib.git
 	branch = rt1051
 [submodule "module-bluetooth/lib/btstack"]
