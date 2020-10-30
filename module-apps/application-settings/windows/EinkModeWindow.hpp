@@ -22,6 +22,6 @@ namespace gui
     class EinkModeWindow : public AppWindow
     {
       public:
-        EinkModeWindow(app::Application *app);
+        explicit EinkModeWindow(app::Application *app);
     };
 } /* namespace gui */

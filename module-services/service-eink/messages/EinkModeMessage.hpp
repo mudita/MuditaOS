@@ -10,7 +10,7 @@ namespace seink
     class EinkModeMessage : public EinkMessage
     {
       public:
-        enum Mode
+        enum class Mode
         {
             Normal,
             Invert
@@ -18,12 +18,12 @@ namespace seink
         EinkModeMessage(Mode mode) : EinkMessage(MessageType::EinkMessage), mode(mode)
         {}
 
-        [[nodiscard]] auto getMode() noexcept
+        [[nodiscard]] auto getMode() const noexcept
         {
             return mode;
         }
 
       private:
-        Mode mode = Normal;
+        Mode mode = Mode::Normal;
     };
 } // namespace seink

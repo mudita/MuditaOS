@@ -19,7 +19,7 @@
 namespace gui
 {
 
-    EinkModeWindow::EinkModeWindow(app::Application *app) : AppWindow(app, "EinkModeWindow")
+    EinkModeWindow::EinkModeWindow(app::Application *app) : AppWindow(app, window::name::eink)
     {
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
