@@ -125,7 +125,7 @@ namespace gui
         void setFont(RawFont *font);
         RawFont *getFont() const noexcept;
         // virtual methods
-        std::list<DrawCommand *> buildDrawList() override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
         uint32_t getTextNeedSpace() const noexcept;
         /// line: height
         uint32_t getTextHeight() const noexcept;

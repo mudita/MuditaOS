@@ -291,10 +291,6 @@ namespace app
                                              std::string application,
                                              std::string window,
                                              std::unique_ptr<gui::SwitchData> data);
-        static void messageRefreshApplication(sys::Service *sender,
-                                              std::string application,
-                                              std::string window,
-                                              gui::SwitchData *data = nullptr);
         static void messageCloseApplication(sys::Service *sender, std::string application);
         static void messageRebuildApplication(sys::Service *sender, std::string application);
         static void messageApplicationLostFocus(sys::Service *sender, std::string application);
@@ -328,6 +324,7 @@ namespace app
         /// @ingrup AppWindowStack
         void cleanPrevWindw();
         /// getter for current wisible window in application
+        /// if there is none - returns default window
         /// @ingrup AppWindowStack
         gui::AppWindow *getCurrentWindow();
 

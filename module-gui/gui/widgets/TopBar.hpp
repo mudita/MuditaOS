@@ -76,14 +76,7 @@ namespace gui
         } elements = {false, false, false, false, true, true};
 
       public:
-        TopBar();
         TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-        virtual ~TopBar();
-
-        /**
-         * @brief Sets mode of time displaying according to TimeMode enum
-         * @note Variable is common for all instances of TopBar
-         */
 
         /**
          * @brief Hides or shows images.
@@ -115,9 +108,6 @@ namespace gui
         {
             return time;
         };
-
-        // virtual methods from Item
-        std::list<DrawCommand *> buildDrawList() override;
     };
 
 } /* namespace gui */

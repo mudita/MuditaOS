@@ -26,7 +26,6 @@ namespace gui
         {}
         GridLayout() : GridLayout(0, 0, 0, 0, {0, 0})
         {}
-        ~GridLayout() override = default;
         /// when reached top -> start from bottom. When reached left, start from right.
         bool navigationRotate = true;
         void resizeItems() override;

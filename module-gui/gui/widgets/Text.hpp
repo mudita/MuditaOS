@@ -78,7 +78,7 @@ namespace gui
         auto handleNavigation(const InputEvent &inputEvent) -> bool;
         auto handleEnter() -> bool;
 
-        auto buildDrawList() -> std::list<DrawCommand *> override;
+        void preBuildDrawListHookImplementation(std::list<Command> &commands);
         /// redrawing lines
         /// it redraws visible lines on screen and if needed requests resize in parent
         virtual void drawLines();

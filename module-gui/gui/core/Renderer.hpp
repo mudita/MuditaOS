@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include <vector>
+#include <list>
 
 #include <module-utils/math/Math.hpp>
 
 #include "DrawCommand.hpp"
 #include "Context.hpp"
+#include "DrawCommandForward.hpp"
 
 namespace gui
 {
@@ -49,7 +50,7 @@ namespace gui
       public:
         virtual ~Renderer() = default;
 
-        void render(Context *ctx, std::vector<DrawCommand *> &commands);
+        void render(Context *ctx, std::list<Command> &commands);
     };
 
 } /* namespace gui */

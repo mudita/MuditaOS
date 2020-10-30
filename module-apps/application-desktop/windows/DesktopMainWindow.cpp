@@ -78,6 +78,12 @@ namespace gui
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
         buildInterface();
+
+        preBuildDrawListHook = [this](std::list<Command> &cmd) {
+            if (time != nullptr) {
+                time->setText(topBar->getTimeString());
+            }
+        };
     }
 
     void DesktopMainWindow::setVisibleState()
@@ -146,7 +152,6 @@ namespace gui
         if (inputEvent.is(KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
             app->lockHandler.lock.lock();
             setVisibleState();
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             application->setSuspendFlag(true);
             return true;
         }
@@ -247,12 +252,6 @@ namespace gui
         auto ret = AppWindow::updateTime(timestamp, mode24H);
         time->setText(topBar->getTimeString());
         return ret;
-    }
-
-    std::list<DrawCommand *> DesktopMainWindow::buildDrawList()
-    {
-        time->setText(topBar->getTimeString());
-        return gui::AppWindow::buildDrawList();
     }
 
     auto DesktopMainWindow::buildNotifications(app::ApplicationDesktop *app) -> bool

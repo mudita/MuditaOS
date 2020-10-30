@@ -97,15 +97,9 @@ TEST_CASE("Draw window with labels")
 
     // vector with draw commands
     // context for drawing commands
-    std::list<gui::DrawCommand *> commandsList = win->buildDrawList();
-    std::vector<gui::DrawCommand *> commands{commandsList.begin(), commandsList.end()};
+    auto commandsList = win->buildDrawList();
 
     delete win;
-
-    // cleanup
-    for (auto cmd : commands) {
-        delete cmd;
-    }
 }
 
 TEST_CASE("Draw window with box layouts")

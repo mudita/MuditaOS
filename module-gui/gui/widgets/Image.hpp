@@ -29,14 +29,11 @@ namespace gui
         Image(Item *parent, uint32_t x, uint32_t y, const UTF8 imgName = UTF8{""})
             : Image(parent, x, y, 0u, 0u, imgName)
         {}
-        virtual ~Image() = default;
-        /// set image with id
+
         bool set(int id);
-        /// set image with string name
         void set(const UTF8 &name);
 
-        // virtual methods from Item
-        std::list<DrawCommand *> buildDrawList();
+        void buildDrawListImplementation(std::list<Command> &commands) override;
     };
 
 } /* namespace gui */

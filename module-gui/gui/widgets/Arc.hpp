@@ -47,7 +47,7 @@ namespace gui
         trigonometry::Degrees getSweepAngle() const noexcept;
         trigonometry::Degrees getStartAngle() const noexcept;
 
-        std::list<DrawCommand *> buildDrawList() override;
+        void buildDrawListImplementation(std::list<Command> &commands) override;
 
       protected:
         Arc(Item *parent,

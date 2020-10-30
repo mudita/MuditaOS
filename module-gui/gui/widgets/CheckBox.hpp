@@ -26,7 +26,6 @@ namespace gui
                  std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                  std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
                  bool textOnLeft                                              = true);
-        virtual ~CheckBox() override = default;
 
         void setImageVisible(bool state);
         bool isChecked();
