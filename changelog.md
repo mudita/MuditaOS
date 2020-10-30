@@ -1,33 +1,30 @@
 # MuditaOS changelog
 
-## Current release
+## [0.44.1 2020-10-30]
 
 ### Added
 
 * `[settings][bluetooth]` Add "Phone name" window.
-* `[gui]` Add "ButtonOnOff" widget.
-* `[cellular]` Add support for modem reset
-* `[cellular]` Obtain time zone through network
-* `[audio]` Add state notifications
-* `[antenna]` Service-antenna enabled.
-* `[audio]` Added 1st mudita audio assets
-
-### Changed
-
-* `[appmgr]` Application manager refactored.
-* `[GUI]` added dark mode switch
+* `[cellular]` Add support for modem reset.
+* `[cellular]` Obtain time zone through network.
+* `[audio]` Add state notifications.
+* `[antenna]` Enable antenna service.
+* `[audio]` Added Mudita audio assets.
+* `[gui]` Add dark mode switch.
 
 ### Fixed
 
 * `[desktop][messages]` Fixed notifications display and navigation
 * `[cellular]` Fixed 32 bit UCS2 codes handling.
-* `[call]` Fixed incorrect start of call duration timer
-* `[GUI]` minor refresh race fixed
+* `[call]` Fixed incorrect start of call duration timer.
+* `[GUI]` Minor refresh race fixed.
+* `[calendar]` Fixed crash on event addition.
 
 ### Other
 
-* `[appmgr]` Application manager documentation added.
+* `[doc]` Application manager documentation added.
 * `[audio]` Improve synchronization during calls.
+* `[system]` Application manager refactoring and improvements.
 
 ## [0.43.1 2020-10-23]
 
@@ -39,7 +36,6 @@
 * `[audio][bluetooth]` Added Bluetooth A2DP playback
 * `[settings][bluetooth]` Create "Add device" windows.
 * `[hardware]` Slider driver (offline/online mode selection)
-* `[appmgr]` Application manager actions introduced.
 
 ### Fixed
 
@@ -47,7 +43,6 @@
 * `[audio]` Fix headphones autodetection.
 * `[audio]` Cumulative set of minor fixes and improvements.
 * `[db][vfs]` Fixed database corruption issues on abrupt phone reset.
-* `[calendar]` add event crash
 
 ### Other
 
@@ -555,3 +550,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+
