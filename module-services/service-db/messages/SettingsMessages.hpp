@@ -301,12 +301,11 @@ namespace Settings
             {}
         };
 
-        class ListResponse : public sys::ResponseMessage
+        class ListResponse : public SettingsMessage
         {
           public:
             ListResponse() = default;
-            explicit ListResponse(std::list<std::string> value, sys::ReturnCodes code = sys::ReturnCodes::Success)
-                : sys::ResponseMessage(code), value(std::move(value))
+            explicit ListResponse(std::list<std::string> value) : SettingsMessage(), value(std::move(value))
             {}
 
             [[nodiscard]] auto getValue() const -> std::list<std::string>
