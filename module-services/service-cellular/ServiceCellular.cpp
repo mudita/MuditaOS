@@ -1304,7 +1304,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                             this,
                             db::Interface::Name::Notifications,
                             std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
-                        const std::string ringtone_path = "assets/audio/sms_transformer.wav";
+                        const std::string ringtone_path = "assets/audio/SMS-drum2.mp3";
                         AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
                     }
                     else {
