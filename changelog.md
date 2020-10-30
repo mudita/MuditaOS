@@ -20,6 +20,7 @@
 * `[desktop][messages]` Fixed notifications display and navigation
 * `[cellular]` Fixed 32 bit UCS2 codes handling.
 * `[call]` Fixed incorrect start of call duration timer
+* `[GUI]` minor refresh race fixed
 
 ### Other
 
