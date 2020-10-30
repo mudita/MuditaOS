@@ -15,9 +15,6 @@
 class ServiceEink : public sys::Service
 {
   protected:
-    // this is timer that triggers 3 handlers - self refresh, temperature measurement and power off
-    uint32_t timerID = 0;
-
     // counts timer triggers from last self refresh
     uint32_t selfRefereshTriggerCount;
     // counts timer events from last temperature measurement
@@ -34,6 +31,8 @@ class ServiceEink : public sys::Service
 
     // structure with recently loaded waveformdata
     EinkWaveFormSettings_t waveformSettings;
+
+    EinkDisplayColorMode_e displayMode = EinkDisplayColorMode_e::EinkDisplayColorModeStandard;
 
     bool suspended = false;
 

@@ -28,7 +28,8 @@ target_sources( ${PROJECT_NAME}
         windows/FotaWindow.cpp
         windows/Fota.cpp
         windows/SettingsChange.cpp
-		windows/USSDWindow.cpp
+        windows/USSDWindow.cpp
+        windows/EinkModeWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp

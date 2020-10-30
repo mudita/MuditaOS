@@ -15,6 +15,7 @@
 ### Changed
 
 * `[appmgr]` Application manager refactored.
+* `[GUI]` added dark mode switch
 
 ### Fixed
 
