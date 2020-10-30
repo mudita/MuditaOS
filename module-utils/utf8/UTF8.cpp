@@ -113,12 +113,9 @@ void U8char::set(char *val, unsigned int size)
 }
 
 UTF8::UTF8()
-    : data{new char[stringExpansion]}, sizeAllocated{stringExpansion}, sizeUsed{1}, strLength{0}, lastIndex{0},
-      lastIndexData{data}
+    : data{std::make_unique<char[]>(stringExpansion)},
+      sizeAllocated{stringExpansion}, sizeUsed{1}, strLength{0}, lastIndex{0}, lastIndexData{data.get()}
 {
-    if (data != nullptr) {
-        memset(data, 0, sizeAllocated);
-    }
 }
 
 UTF8::UTF8(const char *str)
@@ -126,13 +123,12 @@ UTF8::UTF8(const char *str)
     // bufferSize increased by 1 to ensure ending 0 in new string
     sizeUsed      = strlen(str) + 1;
     sizeAllocated = getDataBufferSize(sizeUsed);
-    data          = new char[sizeAllocated];
+    data          = std::make_unique<char[]>(sizeAllocated);
     if (data != nullptr) {
-        memset(data, 0, sizeAllocated);
-        memcpy(data, str, sizeUsed);
-        lastIndexData = data;
+        memcpy(data.get(), str, sizeUsed);
+        lastIndexData = data.get();
     }
-    strLength = getCharactersCount(data);
+    strLength = getCharactersCount(data.get());
     lastIndex = 0;
 }
 
@@ -141,13 +137,12 @@ UTF8::UTF8(const std::string &str)
     // bufferSize increased by 1 to ensure ending 0 in new string
     sizeUsed      = str.length() + 1;
     sizeAllocated = getDataBufferSize(sizeUsed);
-    data          = new char[sizeAllocated];
+    data          = std::make_unique<char[]>(sizeAllocated);
     if (data != nullptr) {
-        memset(data, 0, sizeAllocated);
-        memcpy(data, str.c_str(), sizeUsed);
-        lastIndexData = data;
+        memcpy(data.get(), str.c_str(), sizeUsed);
+        lastIndexData = data.get();
     }
-    strLength = getCharactersCount(data);
+    strLength = getCharactersCount(data.get());
     lastIndex = 0;
 }
 
@@ -159,67 +154,58 @@ UTF8::UTF8(const UTF8 &utf)
 
     // if there is any data used in the string allocate memory and copy usedSize bytes
     if (strLength != 0) {
-        data = new char[sizeAllocated];
+        data = std::make_unique<char[]>(sizeAllocated);
         if (data == nullptr) {
             // LOG_FATAL("No memory for copy constructor.");
             sizeAllocated = 0;
             sizeUsed      = 0;
             return;
         }
-        memcpy(data, utf.data, sizeAllocated);
+        memcpy(data.get(), utf.data.get(), sizeAllocated);
     }
     else {
         sizeAllocated = stringExpansion;
-        data          = new char[sizeAllocated];
-        memset(data, 0, sizeAllocated);
+        data          = std::make_unique<char[]>(sizeAllocated);
         sizeUsed = 1;
     }
     lastIndex     = 0;
-    lastIndexData = data;
+    lastIndexData = data.get();
 }
 
 UTF8::UTF8(UTF8 &&utf)
-    : data{utf.data}, sizeAllocated{utf.sizeAllocated}, sizeUsed{utf.sizeUsed}, strLength{utf.strLength}, lastIndex{0},
-      lastIndexData{data}
+    : data{std::move(utf.data)}, sizeAllocated{utf.sizeAllocated}, sizeUsed{utf.sizeUsed}, strLength{utf.strLength},
+      lastIndex{0}, lastIndexData{data.get()}
 {
-    utf.data = nullptr;
 }
 
 UTF8::UTF8(const char *data, const uint32_t allocated, const uint32_t used, const uint32_t len)
     : sizeAllocated{allocated}, sizeUsed{used}, strLength{len}, lastIndex{0}
 {
-    this->data = new char[allocated];
+    this->data = std::make_unique<char[]>(allocated);
     if (this->data == nullptr) {
         sizeAllocated = 0;
         sizeUsed      = 0;
         strLength     = 0;
         return;
     }
-    memcpy(this->data, data, allocated);
-    lastIndexData = this->data;
-}
-
-UTF8::~UTF8()
-{
-    delete[] data;
+    memcpy(this->data.get(), data, allocated);
+    lastIndexData = this->data.get();
 }
 
 bool UTF8::expand(uint32_t size)
 {
 
     uint32_t newSizeAllocated = getDataBufferSize(sizeAllocated + size);
-    auto *newData             = new char[newSizeAllocated];
+    auto newData              = std::make_unique<char[]>(newSizeAllocated);
 
     if (newData != nullptr) {
 
-        memcpy(newData, data, sizeUsed);
-        memset(newData + sizeUsed, 0, newSizeAllocated - sizeUsed);
+        memcpy(newData.get(), data.get(), sizeUsed);
 
-        delete[] data;
-        data          = newData;
+        data          = std::move(newData);
         sizeAllocated = newSizeAllocated;
         lastIndex     = 0;
-        lastIndexData = data;
+        lastIndexData = data.get();
         return true;
     }
     return false;
@@ -264,13 +250,11 @@ UTF8 &UTF8::operator=(const UTF8 &utf)
     sizeUsed      = utf.sizeUsed;
     strLength     = utf.strLength;
 
-    delete[] data;
-
-    data = new char[sizeAllocated];
-    memcpy(data, utf.data, sizeAllocated);
+    data = std::make_unique<char[]>(sizeAllocated);
+    memcpy(data.get(), utf.data.get(), sizeAllocated);
 
     lastIndex     = 0;
-    lastIndexData = data;
+    lastIndexData = data.get();
 
     return *this;
 }
@@ -279,9 +263,7 @@ UTF8 &UTF8::operator=(UTF8 &&utf) noexcept
 {
     // prevent moving if object is moved to itself
     if (this != &utf) {
-        delete[] data;
-        data          = utf.data;
-        utf.data      = nullptr;
+        data          = std::move(utf.data);
         sizeAllocated = utf.sizeAllocated;
         sizeUsed      = utf.sizeUsed;
         strLength     = utf.strLength;
@@ -304,7 +286,7 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
         charCnt = lastIndex;
     }
     else {
-        dataPtr = data;
+        dataPtr = data.get();
         charCnt = 0;
     }
     assert(dataPtr);
@@ -322,7 +304,7 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
 
 U8char UTF8::getChar(unsigned int pos)
 {
-    auto ptr    = data;
+    auto ptr    = data.get();
     long int to = pos;
 
     U8char u;
@@ -348,20 +330,19 @@ UTF8 &UTF8::operator+=(const UTF8 &utf)
     }
 
     uint32_t newSizeAllocated = getDataBufferSize(sizeUsed + utf.sizeUsed);
-    auto *newData             = new char[newSizeAllocated];
+    auto newData              = std::make_unique<char[]>(newSizeAllocated);
     if (newData != nullptr) {
 
-        memcpy(newData, data, sizeUsed);
+        memcpy(newData.get(), data.get(), sizeUsed);
         //-1 comes from the fact that null terminator is counted as a used byte in string's buffer.
-        memcpy(newData + sizeUsed - 1, utf.data, utf.sizeUsed);
-        delete[] data;
-        data          = newData;
+        memcpy(newData.get() + sizeUsed - 1, utf.data.get(), utf.sizeUsed);
+        data          = std::move(newData);
         sizeAllocated = newSizeAllocated;
         strLength += utf.strLength;
         //-1 is to ignore double null terminator as it is counted in sizeUsed
         sizeUsed += utf.sizeUsed - 1;
         lastIndex     = 0;
-        lastIndexData = data;
+        lastIndexData = data.get();
     }
     return *this;
 }
@@ -371,25 +352,24 @@ bool UTF8::operator==(const UTF8 &utf) const
     uint32_t len  = strLength - utf.strLength;
     uint32_t used = sizeUsed - utf.sizeUsed;
     if ((len | used) == 0) {
-        return memcmp(data, utf.data, sizeUsed) == 0;
+        return memcmp(data.get(), utf.data.get(), sizeUsed) == 0;
     }
     return false;
 }
 
 const char *UTF8::c_str() const
 {
-    return data;
+    return data.get();
 }
 
 void UTF8::clear()
 {
-    delete[] data;
-    data          = new char[stringExpansion];
+    data          = std::make_unique<char[]>(stringExpansion);
     sizeAllocated = stringExpansion;
     sizeUsed      = 1;
     strLength     = 0;
     lastIndex     = 0;
-    lastIndexData = data;
+    lastIndexData = data.get();
 }
 
 UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
@@ -399,7 +379,7 @@ UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
         return UTF8();
     }
 
-    char *beginPtr = this->data;
+    char *beginPtr = this->data.get();
     char *endPtr   = nullptr;
 
     uint32_t bufferSize = 0;
@@ -419,12 +399,10 @@ UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
     }
     // copy data to buffer
     // bufferSize increased by 1 to ensure ending 0 in new string
-    auto *buffer = new char[bufferSize + 1];
-    memset(buffer, 0, bufferSize + 1);
-    memcpy(buffer, beginPtr, bufferSize);
+    auto buffer = std::make_unique<char[]>(bufferSize + 1);
+    memcpy(buffer.get(), beginPtr, bufferSize);
 
-    UTF8 retString = UTF8(buffer);
-    delete[] buffer;
+    UTF8 retString = UTF8(buffer.get());
 
     return retString;
 }
@@ -446,7 +424,7 @@ uint32_t UTF8::find(const char *s, uint32_t pos)
     }
 
     uint32_t position = 0;
-    auto *dataPtr     = this->data;
+    auto *dataPtr     = this->data.get();
 
     for (position = 0; position < pos; position++) {
         dataPtr += charLength(dataPtr);
@@ -483,7 +461,7 @@ uint32_t UTF8::findLast(const char *s, uint32_t pos)
     }
 
     uint32_t position          = 0;
-    auto *dataPtr              = this->data;
+    auto *dataPtr              = this->data.get();
     uint32_t lastFoundPosition = npos;
 
     // calculate position of last string to compare
@@ -505,7 +483,7 @@ UTF8 UTF8::split(const uint32_t &idx)
         return UTF8();
     }
 
-    auto *dataPtr = this->data;
+    auto *dataPtr = this->data.get();
 
     // move data pointer to split index
     for (uint32_t i = 0; i < idx; i++) {
@@ -516,12 +494,11 @@ UTF8 UTF8::split(const uint32_t &idx)
 
     // re-create source string
     // create temp copy of string
-    uint32_t tempStringSize       = dataPtr - this->data;
+    uint32_t tempStringSize       = dataPtr - this->data.get();
     uint32_t tempStringBufferSize = getDataBufferSize(tempStringSize);
-    auto *tempString              = new char[tempStringBufferSize];
+    auto tempString               = std::make_unique<char[]>(tempStringBufferSize);
 
-    memset(tempString, 0, tempStringBufferSize);
-    memcpy(tempString, this->data, tempStringSize);
+    memcpy(tempString.get(), this->data.get(), tempStringSize);
 
     // add 1 to ensure string terminating zero
     this->sizeUsed      = tempStringSize + 1;
@@ -529,13 +506,10 @@ UTF8 UTF8::split(const uint32_t &idx)
     this->strLength     = idx;
 
     // clear used memory
-    memset(this->data, 0, this->sizeAllocated);
-    delete[] this->data;
-
-    this->data = tempString;
+    this->data = std::move(tempString);
 
     this->lastIndex     = 0;
-    this->lastIndexData = this->data;
+    this->lastIndexData = this->data.get();
 
     return retString;
 }
@@ -563,7 +537,7 @@ bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
     }
 
     // get pointer to begin of string to remove
-    auto *beginPtr = this->data;
+    auto *beginPtr = this->data.get();
     for (uint32_t i = 0; i < pos; i++) {
         beginPtr += charLength(beginPtr);
     }
@@ -578,27 +552,22 @@ bool UTF8::removeChar(const uint32_t &pos, const uint32_t &count)
     uint32_t newStringSize = this->sizeUsed - bytesToRemove;
 
     uint32_t tempStringBufferSize = getDataBufferSize(newStringSize);
-    auto *tempString              = new char[tempStringBufferSize];
+    auto tempString               = std::make_unique<char[]>(tempStringBufferSize);
     if (tempString == nullptr) {
         return false;
     }
 
     // create new data buffer
-    uint32_t copyOffset = beginPtr - this->data;
-    memset(tempString, 0, tempStringBufferSize);
-    memcpy(tempString, this->data, beginPtr - this->data);
-    memcpy(tempString + copyOffset, endPtr, this->sizeUsed - bytesToRemove - copyOffset);
+    uint32_t copyOffset = beginPtr - this->data.get();
+    memcpy(tempString.get(), this->data.get(), beginPtr - this->data.get());
+    memcpy(tempString.get() + copyOffset, endPtr, this->sizeUsed - bytesToRemove - copyOffset);
 
     this->sizeAllocated = tempStringBufferSize;
     this->strLength -= count;
     this->sizeUsed -= bytesToRemove;
 
-    // delete old data buffer
-    memset(this->data, 0, this->sizeAllocated);
-    delete[] this->data;
-
     // assign new data buffer
-    this->data = tempString;
+    this->data = std::move(tempString);
 
     return true;
 }
@@ -686,17 +655,17 @@ bool UTF8::insert(const char *ch, const uint32_t &index)
     }
 
     // find pointer where new character should be copied
-    auto *pos = data;
+    auto *pos = data.get();
     for (unsigned int i = 0; i < insertIndex; i++) {
         pos += charLength(pos);
     }
 
-    if ((pos - data) >= static_cast<int64_t>(sizeUsed)) {
+    if ((pos - data.get()) >= static_cast<int64_t>(sizeUsed)) {
         debug_utf("decode/encode error %d - ( %d ) < 0 && allocated: %d\n", sizeUsed, pos - data, sizeAllocated);
         return false;
     }
     if (insertIndex != length()) {
-        memmove(pos + ch_len, pos, sizeUsed - (pos - data)); // move data when insert is in text, not at the end
+        memmove(pos + ch_len, pos, sizeUsed - (pos - data.get())); // move data when insert is in text, not at the end
     }
     memcpy(pos, ch, ch_len); // copy UTF8 char value
 
@@ -734,14 +703,14 @@ bool UTF8::insertString(const UTF8 &str, const uint32_t &index)
     uint32_t totalSize = sizeUsed + str.sizeUsed - 1; //-1 because there are 2 end terminators
     expand(getDataBufferSize(totalSize));
 
-    auto *beginPtr = this->data;
+    auto *beginPtr = this->data.get();
     for (uint32_t i = 0; i < insertIndex; i++) {
         beginPtr += charLength(beginPtr);
     }
 
     //-1 to ignore end terminator from str
-    memmove(beginPtr + str.sizeUsed - 1, beginPtr, sizeUsed - (beginPtr - data));
-    memcpy(beginPtr, str.data, str.sizeUsed - 1);
+    memmove(beginPtr + str.sizeUsed - 1, beginPtr, sizeUsed - (beginPtr - data.get()));
+    memcpy(beginPtr, str.data.get(), str.sizeUsed - 1);
 
     return false;
 }

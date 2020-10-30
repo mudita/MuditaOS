@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdint>
 #include <iosfwd> // for forward declaration for ostream
+#include <memory>
 
 /// single utf8 character representation struct
 struct U8char
@@ -37,7 +38,7 @@ class UTF8
     UTF8(const char *data, const uint32_t allocated, const uint32_t used, const uint32_t len);
 
     /// pointer to buffer
-    char *data;
+    std::unique_ptr<char[]> data;
     /// total size of buffer in bytes
     uint32_t sizeAllocated;
     /// number of bytes used in buffer
@@ -69,7 +70,7 @@ class UTF8
     UTF8(UTF8 &&utf);
     static const uint32_t npos;
 
-    virtual ~UTF8();
+    virtual ~UTF8() = default;
 
     /**
      * OPERATORS
@@ -227,9 +228,9 @@ class UTF8
     static uint32_t getCharactersCount(const char *stream);
     /**
      * @brief Calculates number of bytes and character IDs in the provided stream;
-     * @param size Variable where number of bytes in the stream will be saved( till null terminator );
+     * @param size Variable where number of bytes in the stream will be saved (till null terminator).
      * @param count Variable where number of characters in the stream will be saved.
-     * @return true if there was no error, false otherwise;
+     * @return true if there was no error, false otherwise.
      */
     static bool getStreamLength(const char *stream, uint32_t &size, uint32_t &count);
 };
