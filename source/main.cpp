@@ -28,6 +28,9 @@
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
+#include <service-fileindexer/Constants.hpp>
+#include <service-fileindexer/ServiceFileIndexer.hpp>
+
 #if ENABLE_GSM == 1
 #include <service-fota/ServiceFota.hpp>
 #include <service-cellular/ServiceCellular.hpp>
@@ -80,6 +83,8 @@ int main()
 
         ret &=
             sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
+        ret &= sys::SystemManager::CreateService(
+            std::make_shared<service::ServiceFileIndexer>(service::name::file_indexer), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
 
 #if ENABLE_GSM == 0
