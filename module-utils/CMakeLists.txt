@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 if(NOT WIN32)
     include(Colours)
@@ -47,7 +47,7 @@ include(third-party/tinyexpr.cmake)
 
 add_subdirectory(pugixml)
 
-add_subdirectory(taglib)
+add_subdirectory(taglib EXCLUDE_FROM_ALL)
 set( TAGLIB_INCLUDE_DIRS
 	 "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib/toolkit"
 	 "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib"
