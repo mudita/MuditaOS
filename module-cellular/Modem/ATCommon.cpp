@@ -42,18 +42,16 @@ bool Chanel::at_check_cmx_error(const std::string &CMX, const std::vector<std::s
     if (arr.size()) {
         for (auto cmxerr : arr) {
             if (cmxerr.compare(0, CMX.length(), CMX) == 0) {
-                auto serr = utils::trim(cmxerr.substr(CMX.length(), cmxerr.length() - CMX.length()));
+                auto serr     = utils::trim(cmxerr.substr(CMX.length(), cmxerr.length() - CMX.length()));
                 int parsedVal = 0;
-                auto ret = utils::toNumeric(serr, parsedVal);
-                errcode = parsedVal;
+                auto ret      = utils::toNumeric(serr, parsedVal);
+                errcode       = parsedVal;
                 return ret;
             }
         }
     }
     return false;
 }
-
-
 
 void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 {
