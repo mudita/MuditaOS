@@ -66,10 +66,8 @@
 #include "service-cellular/USSD.hpp" // for State, State::pullRequestSent, State::sesionAborted, State::pullResponseReceived, State::pushSesion, noTimeout, State::none, pullResponseTimeout, pullSesionTimeout
 #include <service-appmgr/Controller.hpp>
 
-
-
-#include "task.h"                    // for vTaskDelay
-#include "utf8/UTF8.hpp"             // for UTF8
+#include "task.h"        // for vTaskDelay
+#include "utf8/UTF8.hpp" // for UTF8
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -137,7 +135,6 @@ State::ST State::get() const
     return this->state;
 }
 
-
 ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle)
 {
 
@@ -197,8 +194,6 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 {
     return true;
 }
-
-
 
 void ServiceCellular::CallStateTimerHandler()
 {
@@ -1103,7 +1098,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             Store::GSM::get()->setSignalStrength(signalStrength.data);
             return std::make_shared<CellularNotificationMessage>(
                 CellularNotificationMessage::Type::SignalStrengthUpdate, str);
-            }
+        }
     }
 
     if (str.find("\"FOTA\",\"HTTPEND\",0") != std::string::npos) {
