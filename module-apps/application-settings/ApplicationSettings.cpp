@@ -4,6 +4,7 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
+#include "application-settings/windows/EinkModeWindow.hpp"
 #include "windows/BtScanWindow.hpp"
 #include "windows/BtWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
@@ -146,6 +147,10 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::fota_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FotaWindow>(app);
+        });
+
+        windowsFactory.attach(gui::window::name::eink, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EinkModeWindow>(app);
         });
 
         if (board == bsp::Board::T4) {
