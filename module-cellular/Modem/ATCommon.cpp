@@ -7,6 +7,7 @@
 #include <string>
 #include <ticks.hpp>
 #include <vector>
+#include <inttypes.h> // for PRIu32
 #include <Utils.hpp>
 
 using namespace at;
@@ -124,7 +125,7 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                     result.errorCode = tmp_ec.value();
                 }
                 else {
-                    LOG_ERROR("Unknow CME error code %lu", errcode);
+                    LOG_ERROR("Unknow CME error code %" PRIu32, errcode);
                     result.errorCode = at::EquipmentErrorCode::Unknown;
                 }
                 break;
@@ -140,7 +141,7 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                     result.errorCode = atmp_ec.value();
                 }
                 else {
-                    LOG_ERROR("Unknow CMS error code %lu", errcode);
+                    LOG_ERROR("Unknow CMS error code %" PRIu32, errcode);
                     result.errorCode = at::NetworkErrorCode::Unknown;
                 }
                 break;
