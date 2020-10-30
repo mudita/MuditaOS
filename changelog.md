@@ -18,11 +18,12 @@
 
 ### Fixed
 
+* `[GUI][messages]` Fixed not showing number on deleting temporary contact
 * `[GUI]` Fixed filling Label with color
 
 ## [0.44.1 2020-10-30]
 
-### Added
+### Addedgit 
 
 * `[settings][bluetooth]` Add "Phone name" window.
 * `[cellular]` Add support for modem reset.

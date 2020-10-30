@@ -185,16 +185,16 @@ namespace app
         }
         LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
 
-        auto query = std::make_unique<ContactGetByID>(record->contactID);
+        auto query = std::make_unique<ContactGetByID>(record->contactID, true);
         query->setQueryListener(db::QueryCallback::fromFunction([this, record](auto response) {
             auto result = dynamic_cast<ContactGetByIDResult *>(response);
             if (result != nullptr) {
                 const auto &contact = result->getResult();
                 gui::DialogMetadata meta;
-                meta.action         = [this, record]() { return onRemoveSmsThreadConfirmed(*record); };
-                meta.text           = utils::localize.get("app_messages_thread_delete_confirmation");
-                meta.title          = contact.getFormattedName();
-                meta.icon           = "phonebook_contact_delete_trashcan";
+                meta.action = [this, record]() { return onRemoveSmsThreadConfirmed(*record); };
+                meta.text   = utils::localize.get("app_messages_thread_delete_confirmation");
+                meta.title  = contact.getFormattedName();
+                meta.icon   = "phonebook_contact_delete_trashcan";
                 switchWindow(gui::name::window::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
                 return true;
             }
