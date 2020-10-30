@@ -101,7 +101,7 @@ Code of <err> Meaning
         NoConnection                  = 1,
         PhoneAdaptorLinkReserved      = 2,
         OperationNotAllowed           = 3,
-        OperationNotAllowed1          = 4, // not sure about meaning, different msg from modem
+        OperationNotAllowed1          = 4, /*!<  not sure about meaning, different msg from modem */
         PH_SIM_PINRequired            = 5,
         PH_FSIM_PINRequired           = 6,
         PH_FSIM_PUKRequired           = 7,
@@ -124,7 +124,7 @@ Code of <err> Meaning
         InvalidCharactersInDialString = 27,
         NoNetworkService              = 30,
         NetworkTimeout                = 31,
-        NetworkNotAllowed_EC          = 32, // - emergency calls only
+        NetworkNotAllowed_EC          = 32, /*!< emergency calls only */
         NetworkPersPINRequired        = 40,
         NetworkPersPUKRequired        = 41,
         NetworkSubsetPersPINRequired  = 42,
@@ -138,8 +138,8 @@ Code of <err> Meaning
         AudioOperationNotSupported    = 903,
         AudioDeviceBusy               = 904,
 
-        Unknown       = MAX_AT_ERROR_VALUE + 1, // for error number out of the list
-        NoInformation = MAX_AT_ERROR_VALUE + 2  // in case of ERROR (not+CME), could be call AT+CEER
+        Unknown       = MAX_AT_ERROR_VALUE + 1, /*!< for error number out of the list */
+        NoInformation = MAX_AT_ERROR_VALUE + 2  /*!< in case of ERROR (not+CME), could be call AT+CEER */
     };
 
     /** @enum at::NetworkErrorCode
@@ -170,7 +170,7 @@ Code of <err> Meaning
         SMSCAddressUnknown          = 330,
         NoNetwork                   = 331,
         NetworkTimeout              = 332,
-        ModemUnknown                = 500, // this one i other then "Unknown" this Unknown id defined by quectel
+        ModemUnknown                = 500, /*!< this one i other then "Unknown" this Unknown id defined by quectel */
         SIMNotReady                 = 512,
         MessageLengthExceeds        = 513,
         InvalidRequestParameters    = 514,
@@ -181,8 +181,8 @@ Code of <err> Meaning
         GPRSIsSuspended             = 530,
         MEStorageFull               = 531,
 
-        Unknown       = MAX_AT_ERROR_VALUE + 1, // for error number out of the list
-        NoInformation = MAX_AT_ERROR_VALUE + 2  // in case of ERROR (not+CMS)
+        Unknown       = MAX_AT_ERROR_VALUE + 1, /*!< for error number out of the list */
+        NoInformation = MAX_AT_ERROR_VALUE + 2  /*!< in case of ERROR (not+CMS) */
     };
 
 } // namespace at

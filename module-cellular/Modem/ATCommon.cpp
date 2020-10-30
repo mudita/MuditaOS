@@ -130,7 +130,8 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                 }
                 break;
             }
-            else if (at_check_cmx_error(CMS_ERROR, ret, errcode)) {
+
+            if (at_check_cmx_error(CMS_ERROR, ret, errcode)) {
                 result.code =
                     Result::Code::ERROR; // setup error but in this case error from +CME ERROR with valid errorCode
 
@@ -146,16 +147,15 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
                 }
                 break;
             }
-            else {
 
-                result.code = at_check(ret);
-                if (result.code != Result::Code::NONE) {
-                    break;
-                }
-                if (rxCount != 0 && result.response.size() >= rxCount) {
-                    result.code = Result::Code::TOKENS;
-                    break;
-                }
+
+            result.code = at_check(ret);
+            if (result.code != Result::Code::NONE) {
+                break;
+            }
+            if (rxCount != 0 && result.response.size() >= rxCount) {
+                result.code = Result::Code::TOKENS;
+                break;
             }
         }
     }
