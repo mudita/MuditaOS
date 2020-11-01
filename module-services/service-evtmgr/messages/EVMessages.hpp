@@ -131,7 +131,7 @@ namespace sevm
 
         VibratorPulseMessage(std::chrono::milliseconds pulseDuration,
                              std::chrono::milliseconds repeatEvery = std::chrono::milliseconds::zero())
-            : Message(MessageType::EVMVibratorPulseMessage), vibration{.pulse = pulseDuration, .period = repeatEvery}
+            : Message(MessageType::EVMVibratorPulseMessage), vibration(pulseDuration, repeatEvery)
         {}
     };
 

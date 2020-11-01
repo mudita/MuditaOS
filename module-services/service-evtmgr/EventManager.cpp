@@ -45,9 +45,9 @@
 
 EventManager::EventManager(const std::string &name)
     : sys::Service(name), vibratorTimerPeriodic(std::make_unique<sys::Timer>(
-                              "VibrationPulse", this, sys::Timer::timeout_infinite, sys::Timer::Type::Periodic)),
+                              "VibratorTimerPeriodic", this, sys::Timer::timeout_infinite, sys::Timer::Type::Periodic)),
       vibratorTimerOneshot(std::make_unique<sys::Timer>(
-          "VibrationSubPulse", this, sys::Timer::timeout_infinite, sys::Timer::Type::SingleShot))
+          "VibratorTimerOneshot", this, sys::Timer::timeout_infinite, sys::Timer::Type::SingleShot))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;

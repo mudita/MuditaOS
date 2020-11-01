@@ -22,6 +22,12 @@ namespace bsp
             std::chrono::milliseconds pulse;
             /// optional recurrence of pulse
             std::chrono::milliseconds period = std::chrono::milliseconds::zero();
+
+            VibrationPulse(std::chrono::milliseconds pulse,
+                           std::chrono::milliseconds period = std::chrono::milliseconds::zero())
+                : pulse(pulse), period(period)
+            {}
+
         };
 
         void enable();
