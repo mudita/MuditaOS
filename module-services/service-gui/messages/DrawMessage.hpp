@@ -27,18 +27,22 @@ namespace sgui
             NORMAL,
             SUSPEND,
             SHUTDOWN
-        };
+        } type;
 
       public:
         gui::RefreshModes mode;
         std::list<gui::Command> commands;
-        Type type = Type::NORMAL;
 
         DrawMessage(std::list<gui::Command> commandsList, gui::RefreshModes mode);
 
-        void setCommandType(Type type)
+        void setCommandType(Type type) noexcept
         {
             this->type = type;
+        }
+
+        bool isType(Type type) const noexcept
+        {
+            return this->type == type;
         }
     };
 

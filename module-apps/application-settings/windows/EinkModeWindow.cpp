@@ -32,16 +32,16 @@ namespace gui
         setTitle("Change eink mode");
         auto label               = new Label(this, 100, 200, 300, 50, "Change mode on click");
         label->activatedCallback = [this](Item &) -> bool {
-            static auto last_mode = seink::EinkModeMessage::Mode::Normal;
-            if (last_mode == seink::EinkModeMessage::Mode::Normal) {
-                last_mode = seink::EinkModeMessage::Mode::Invert;
+            static auto last_mode = service::eink::EinkModeMessage::Mode::Normal;
+            if (last_mode == service::eink::EinkModeMessage::Mode::Normal) {
+                last_mode = service::eink::EinkModeMessage::Mode::Invert;
             }
             else {
-                last_mode = seink::EinkModeMessage::Mode::Normal;
+                last_mode = service::eink::EinkModeMessage::Mode::Normal;
             }
 
             sys::Bus::SendUnicast(
-                std::make_shared<seink::EinkModeMessage>(last_mode), "ServiceEink", this->application, 5000);
+                std::make_shared<service::eink::EinkModeMessage>(last_mode), "ServiceEink", this->application, 5000);
             return true;
         };
         setFocusItem(label);

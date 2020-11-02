@@ -10,26 +10,10 @@
 namespace sgui
 {
 
-    /*
-     * @brief Template for all messages that go to gui service
-     */
     class GUIMessage : public sys::DataMessage
     {
-        bool suspend  = false;
-        bool shutdown = false;
-
       public:
-        GUIMessage(MessageType messageType, bool suspend = false, bool shutdown = false)
-            : sys::DataMessage(messageType), suspend{suspend}, shutdown{shutdown} {};
-        virtual ~GUIMessage(){};
-        bool getSuspend()
-        {
-            return suspend;
-        };
-        bool getShutdown()
-        {
-            return shutdown;
-        };
+        GUIMessage() : sys::DataMessage(MessageType::GUIMessage){};
     };
 
 } /* namespace sgui */

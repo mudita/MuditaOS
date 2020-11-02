@@ -30,6 +30,7 @@
 #include <iterator>                                      // for distance, next
 #include <type_traits>                                   // for add_const<>...
 #include <WindowsFactory.hpp>
+#include <service-gui/Common.hpp>
 
 namespace gui
 {
@@ -137,7 +138,7 @@ namespace app
             else if (suspendInProgress) {
                 message->setCommandType(sgui::DrawMessage::Type::SUSPEND);
             }
-            sys::Bus::SendUnicast(message, "ServiceGUI", this);
+            sys::Bus::SendUnicast(message, service::name::gui, this);
         }
 
         if (suspendInProgress)

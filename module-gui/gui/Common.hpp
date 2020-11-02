@@ -137,11 +137,6 @@ namespace gui
         BottomRight = 0x80,
     };
 
-    typedef uint32_t (*timeSecondsFunctionPtr)();
-
-    uint32_t getTime();
-    void setTimeFunction(timeSecondsFunctionPtr fptr);
-
 } // namespace gui
 
 inline const char *c_str(gui::RefreshModes refresh)

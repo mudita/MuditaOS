@@ -16,6 +16,7 @@
 #include "service-db/api/DBServiceAPI.hpp" // for DBServiceAPI
 #include "service-evtmgr/EventManager.hpp" // for EventManager
 #include "service-eink/ServiceEink.hpp"    // for ServiceEink
+#include <service-gui/Common.hpp>
 #include "service-gui/ServiceGUI.hpp"      // for ServiceGUI
 #include "log/log.hpp"                     // for LOG_INFO, LOG_ERROR, LOG_WARN, LOG_DEBUG, LOG_FATAL
 #include "Common.hpp"                      // for ShowMode, ShowMode::GUI_SHOW_INIT
@@ -32,7 +33,6 @@ namespace app::manager
 {
     namespace
     {
-        constexpr char GUIServiceName[]                = "ServiceGUI";
         constexpr char EInkServiceName[]               = "ServiceEink";
         constexpr auto default_application_locktime_ms = 30000;
 
@@ -219,7 +219,7 @@ namespace app::manager
     void ApplicationManager::startSystemServices()
     {
         if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<sgui::ServiceGUI>(GUIServiceName, GetName(), 480, 600), this);
+                std::make_shared<sgui::ServiceGUI>(service::name::gui, GetName(), 480, 600), this);
             !ret) {
             LOG_ERROR("Failed to initialize GUI service");
         }
@@ -232,7 +232,7 @@ namespace app::manager
 
     void ApplicationManager::suspendSystemServices()
     {
-        sys::SystemManager::SuspendService(GUIServiceName, this);
+        sys::SystemManager::SuspendService(service::name::gui, this);
         sys::SystemManager::SuspendService(EInkServiceName, this);
     }
 
@@ -328,7 +328,7 @@ namespace app::manager
         switch (mode) {
         case sys::ServicePowerMode ::Active:
             sys::SystemManager::ResumeService(EInkServiceName, this);
-            sys::SystemManager::ResumeService(GUIServiceName, this);
+            sys::SystemManager::ResumeService(service::name::gui, this);
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
             [[fallthrough]];
@@ -355,7 +355,7 @@ namespace app::manager
 
     auto ApplicationManager::closeServices() -> bool
     {
-        closeService(GUIServiceName);
+        closeService(service::name::gui);
         closeService(EInkServiceName);
         return true;
     }

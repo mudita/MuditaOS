@@ -10,8 +10,6 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-#include_directories(module-gui)
-
 target_link_libraries(${PROJECT_NAME}
     module-gui
     service-eink
@@ -21,7 +19,6 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         module-gui
-        service-eink
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}"
         "${CMAKE_CURRENT_LIST_DIR}/messages"

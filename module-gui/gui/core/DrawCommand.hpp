@@ -5,12 +5,11 @@
 
 #include <string>
 #include <cstdint>
-
 #include <module-utils/math/Math.hpp>
+#include <utf8/UTF8.hpp>
+#include <gui/Common.hpp>
 
-#include "utf8/UTF8.hpp"
 #include "Color.hpp"
-#include "Common.hpp"
 
 namespace gui
 {

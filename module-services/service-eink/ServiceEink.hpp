@@ -51,14 +51,16 @@ class ServiceEink : public sys::Service
 
   public:
     ServiceEink(const std::string &name, std::string parent = "");
-    ~ServiceEink();
+    ~ServiceEink() override;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-
-    // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
-
     sys::ReturnCodes DeinitHandler() override;
-
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+
+  private:
+    sys::Message_t handleEinkDMATransfer(sys::Message *message);
+    sys::Message_t handleImageMessage(sys::Message *message);
+    sys::Message_t handleStateRequest(sys::Message *messge);
+    sys::Message_t handleTemperatureUpdate(sys::Message *);
 };

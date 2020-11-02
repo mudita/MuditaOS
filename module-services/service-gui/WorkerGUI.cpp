@@ -19,6 +19,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "messages/RenderingFinished.hpp"
 
 namespace sgui
 {
@@ -30,18 +31,13 @@ namespace sgui
     {
         QueueHandle_t queue = queues[queueID];
 
-        sgui::ServiceGUI *serviceGUI = reinterpret_cast<sgui::ServiceGUI *>(service);
+        auto serviceGUI = reinterpret_cast<sgui::ServiceGUI *>(service);
 
-        // queue for receiving rendering commands
         if (queueID == 0) {
-            //		LOG_INFO("Received rendering commands");
-
             sys::WorkerCommand received;
             xQueueReceive(queue, &received, 0);
 
-            // take all unique pointers
             std::list<std::unique_ptr<gui::DrawCommand>> uniqueCommands;
-
             if (xSemaphoreTake(serviceGUI->semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
                 uniqueCommands = std::move(serviceGUI->commands);
                 xSemaphoreGive(serviceGUI->semCommands);
@@ -50,15 +46,9 @@ namespace sgui
                 LOG_ERROR("Failed to acquire semaphore");
             }
 
-            //		uint32_t start_tick = xTaskGetTickCount();
             serviceGUI->renderer.render(serviceGUI->renderContext, uniqueCommands);
-            //		uint32_t end_tick = xTaskGetTickCount();
-            //		LOG_INFO("[WorkerGUI] RenderingTime: %d", end_tick - start_tick);
 
-
-            // notify gui service that rendering is complete
-            auto message = std::make_shared<sys::DataMessage>(MessageType::GUIRenderingFinished);
-            sys::Bus::SendUnicast(message, this->service->GetName(), this->service);
+            sys::Bus::SendUnicast(std::make_shared<service::gui::RenderingFinished>(), service->GetName(), service);
         }
         return true;
     }

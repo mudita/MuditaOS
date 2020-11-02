@@ -21,15 +21,26 @@
 #include <iosfwd>              // for std
 #include <typeinfo>            // for type_info
 
+#if (DEBUG_SERVICE_MESSAGES > 0)
+#include <cxxabi.h>
+#endif
+
 // this could use Scoped() class from utils to print execution time too
 void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
+
+    int status;
+    char *realname;
+    realname = abi::__cxa_demangle(typeid(*ptr).name(), 0, 0, &status);
+
     LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
               ptr->sender.c_str(),
               srvc->GetName().c_str(),
-              typeid(*ptr).name(),
+              realname,
               std::string(*ptr).c_str());
+
+    free(realname);
 #else
 #endif
 }
@@ -110,6 +121,9 @@ namespace sys
         debug_msg(this, message);
         if (handler != message_handlers.end()) {
             ret = message_handlers[idx](message, response);
+            if (ret != nullptr) {
+                ret->type = sys::Message::Type::Response;
+            }
         }
         else {
             ret = DataReceivedHandler(message, response);

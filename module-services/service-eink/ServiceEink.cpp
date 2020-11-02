@@ -3,6 +3,10 @@
 
 #include "ServiceEink.hpp"
 #include "messages/EinkModeMessage.hpp"
+#include "messages/EinkDMATransfer.hpp"
+#include "messages/StateRequest.hpp"
+#include "messages/TemperatureUpdate.hpp"
+#include <service-gui/messages/GUIDisplayReady.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <log/log.hpp>
@@ -31,128 +35,54 @@ ServiceEink::ServiceEink(const std::string &name, std::string parent)
     : sys::Service(name, parent, 4096 + 1024), selfRefereshTriggerCount{0}, temperatureMeasurementTriggerCount{0},
       powerOffTriggerCount{0}, powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
 {
-    // initialize initial eink parameters
     memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
     waveformSettings.mode        = EinkWaveformGC16;
     waveformSettings.temperature = -1000;
 
-    connect(typeid(seink::EinkModeMessage),
+    connect(typeid(service::eink::EinkModeMessage),
             [this](sys::DataMessage *message, sys::ResponseMessage *) -> sys::Message_t {
-                auto msg          = static_cast<seink::EinkModeMessage *>(message);
-                this->displayMode = msg->getMode() == seink::EinkModeMessage::Mode::Normal
+                auto msg          = static_cast<service::eink::EinkModeMessage *>(message);
+                this->displayMode = msg->getMode() == service::eink::EinkModeMessage::Mode::Normal
                                         ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
                                         : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
                 return sys::Message_t();
+            });
+
+    connect(typeid(service::eink::EinkDMATransfer),
+            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+                return handleEinkDMATransfer(request);
+            });
+
+    connect(typeid(service::eink::ImageMessage),
+            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+                return handleImageMessage(request);
+            });
+
+    connect(typeid(service::eink::StateRequest),
+            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+                return handleStateRequest(request);
+            });
+
+    connect(typeid(service::eink::TemperatureUpdate),
+            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+                return handleTemperatureUpdate(request);
             });
 }
 
 ServiceEink::~ServiceEink()
 {
-    //	LOG_INFO("[ServiceEink] Cleaning resources");
-    // release data from settings
     if (waveformSettings.LUTCData != nullptr)
         delete[] waveformSettings.LUTCData;
     if (waveformSettings.LUTDData != nullptr)
         delete[] waveformSettings.LUTDData;
-    // set sure that any new temperature will cause to load data from file.
     waveformSettings.temperature = -1000;
 }
 
-// Invoked upon receiving data message
 sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-    seink::EinkMessage *msg = static_cast<seink::EinkMessage *>(msgl);
-
-    switch (msg->messageType) {
-
-    case MessageType::EinkImageData: {
-        powerOffTimer.stop();
-        auto dmsg = static_cast<seink::ImageMessage *>(msgl);
-        //			LOG_INFO("[%s] EinkImageData", GetName().c_str());
-        memcpy(einkRenderBuffer, dmsg->getData(), dmsg->getSize());
-        deepRefresh = dmsg->getDeepRefresh();
-
-        shutdownInProgress = dmsg->getShutdown();
-        if (shutdownInProgress)
-            LOG_DEBUG("Shutdown In Progress");
-
-        suspendInProgress = dmsg->getSuspend();
-        if (suspendInProgress)
-            LOG_DEBUG("Suspend In Progress");
-        auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer);
-        sys::Bus::SendUnicast(msg, this->GetName(), this);
-    } break;
-    case MessageType::EinkDMATransfer: {
-        utils::time::Scoped scopedtimming("EinkDMATransfer");
-
-        if (suspended) {
-            if (suspendInProgress) {
-                LOG_ERROR("drawing before suspend failed");
-                suspendInProgress = false;
-            }
-
-            LOG_INFO("[ServiceEink] Received image while suspended, ignoring");
-        }
-
-        else {
-            EinkPowerOn();
-
-            int32_t temperature = EinkGetTemperatureInternal();
-            //			LOG_INFO("temperature: %d", temperature );
-
-            EinkStatus_e ret;
-            if (deepRefresh) {
-                changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
-                EinkDitherDisplay();
-            }
-            else {
-                changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
-            }
-
-            ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
-            if (ret != EinkOK)
-                LOG_FATAL("Failed to update frame");
-
-            if (deepRefresh) {
-                //				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
-                ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode);
-            }
-            else {
-                //				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
-                ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
-            }
-
-            if (ret != EinkOK)
-                LOG_FATAL("Failed to refresh frame");
-
-            powerOffTimer.reload();
-
-            auto msg =
-                std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress, shutdownInProgress);
-            suspendInProgress  = false;
-            shutdownInProgress = false;
-            sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-        }
-    } break;
-
-    case MessageType::EinkTemperatureUpdate: {
-        //			LOG_INFO("[%s] EinkTemperatureUpdate", GetName().c_str());
-    } break;
-
-    case MessageType::EinkStateRequest: {
-        //			LOG_INFO("[%s] EinkStateRequest", GetName().c_str());
-        auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady);
-        sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-    } break;
-
-    default:
-        break;
-    };
-
     return std::make_shared<sys::ResponseMessage>();
 }
 
-// Invoked during initialization
 sys::ReturnCodes ServiceEink::InitHandler()
 {
 
@@ -164,28 +94,9 @@ sys::ReturnCodes ServiceEink::InitHandler()
         LOG_FATAL("Error: Could not initialize Eink display!\n");
     }
 
-    // TODO remove screen clearing code below.
     EinkPowerOn();
 
-    //	uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
-    //	LOG_INFO("EInk measured temperature: %d\u00B0C", s_einkAmbientTemperature);
-    //
-    //	// Make the saturation to the lower limit
-    //	if (s_einkAmbientTemperature < 0)
-    //		s_einkAmbientTemperature = 0;
-    //
-    //	// Make the saturation to the higher limit
-    //	if (s_einkAmbientTemperature > 49)
-    //		s_einkAmbientTemperature = 49;
-    //
-    //	// Clear the temperature timer count
-    //	deepClearScreen( s_einkAmbientTemperature );
-    //	EinkPowerOff();
-    //
-    //	//TODO remove and add timer or turning off eink
-    //	EinkPowerOn();
-
-    auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady);
+    auto msg = std::make_shared<service::gui::GUIDisplayReady>();
     sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 
     return sys::ReturnCodes::Success;
@@ -210,30 +121,8 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
             LOG_FATAL("Error: Could not initialize Eink display!\n");
         }
 
-        // TODO remove screen clearing code below.
         EinkPowerOn();
-
-        //            int32_t temperature = EinkGetTemperatureInternal();
-        //            	//			LOG_INFO("temperature: %d", temperature );
-        //
-        //			changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
-        //			EinkDitherDisplay();
-        //
-        //            EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
-
         EinkPowerOff();
-        //
-        //            uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
-        //            // Make the saturation to the lower limit
-        //            if (s_einkAmbientTemperature < 0)
-        //                s_einkAmbientTemperature = 0;
-        //
-        //            // Make the saturation to the higher limit
-        //            if (s_einkAmbientTemperature > 49)
-        //                s_einkAmbientTemperature = 49;
-        //
-        //            // Clear the temperature timer count
-        //            deepClearScreen( s_einkAmbientTemperature );
     } break;
     case sys::ServicePowerMode ::SuspendToRAM:
     case sys::ServicePowerMode ::SuspendToNVM:
@@ -249,7 +138,6 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
 bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature)
 {
 
-    // If neither the temperature nor the waveform has changed - do nothing
     if ((temperature == waveformSettings.temperature) && (mode == waveformSettings.mode)) {
         return EinkOK;
     }
@@ -302,13 +190,12 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
         break;
     }
 
-    // Open file
     auto file = vfs.fopen("Luts.bin", "rb");
     if (file == nullptr) {
         LOG_FATAL("Could not find the LUTS.bin file. Returning");
         return false;
     }
-    // Allocate memory for the LUTD data. +1 for the EinkLUTD command for SPI transfer
+
     if (waveformSettings.LUTDData != nullptr)
         delete[] waveformSettings.LUTDData;
 
@@ -321,7 +208,6 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
         return false;
     }
 
-    // Allocate memory for the LUTC data. +1 for the EinkLUTC command for SPI transfer
     if (waveformSettings.LUTCData != nullptr)
         delete[] waveformSettings.LUTCData;
 
@@ -336,7 +222,6 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
     waveformSettings.LUTDData[0] = EinkLUTD;
     waveformSettings.LUTCData[0] = EinkLUTC;
 
-    /// LUTD
     vfs.fseek(file, offset, SEEK_SET);
     vfs.fread(&waveformSettings.LUTDData[1], 1, LUTD_SIZE, file);
 
@@ -345,7 +230,6 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
         frameCount * 64 + 1 +
         1; // (frameCount * 64) - size of actual LUT; (+1) - the byte containing frameCount; (+1) - EinkLUTD command
 
-    // LUTC
     offset += LUTD_SIZE;
     vfs.fseek(file, offset, SEEK_SET);
     vfs.fread(&waveformSettings.LUTCData[1], 1, LUTC_SIZE, file);
@@ -396,4 +280,83 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
     EinkPowerOff();
 
     return true;
+}
+
+sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
+{
+    utils::time::Scoped scopedtimming("EinkDMATransfer");
+
+    if (suspended) {
+        if (suspendInProgress) {
+            LOG_ERROR("drawing before suspend failed");
+            suspendInProgress = false;
+        }
+
+        LOG_INFO("[ServiceEink] Received image while suspended, ignoring");
+    }
+    else {
+        EinkPowerOn();
+
+        int32_t temperature = EinkGetTemperatureInternal();
+
+        EinkStatus_e ret;
+        if (deepRefresh) {
+            changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+            EinkDitherDisplay();
+        }
+        else {
+            changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+        }
+
+        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
+        if (ret != EinkOK)
+            LOG_FATAL("Failed to update frame");
+
+        if (deepRefresh) {
+            ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode);
+        }
+        else {
+            ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
+        }
+
+        if (ret != EinkOK)
+            LOG_FATAL("Failed to refresh frame");
+
+        powerOffTimer.reload();
+
+        auto msg           = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+        suspendInProgress  = false;
+        shutdownInProgress = false;
+        sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+    }
+    return nullptr;
+}
+
+sys::Message_t ServiceEink::handleImageMessage(sys::Message *message)
+{
+    auto dmsg = static_cast<service::eink::ImageMessage *>(message);
+
+    powerOffTimer.stop();
+    memcpy(einkRenderBuffer, dmsg->getData(), dmsg->getSize());
+    deepRefresh = dmsg->getDeepRefresh();
+
+    shutdownInProgress = dmsg->getShutdown();
+    if (shutdownInProgress)
+        LOG_DEBUG("Shutdown In Progress");
+
+    suspendInProgress = dmsg->getSuspend();
+    if (suspendInProgress)
+        LOG_DEBUG("Suspend In Progress");
+    sys::Bus::SendUnicast(std::make_shared<service::eink::EinkDMATransfer>(), this->GetName(), this);
+    return nullptr;
+}
+
+sys::Message_t ServiceEink::handleStateRequest(sys::Message *)
+{
+    return std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+}
+
+sys::Message_t ServiceEink::handleTemperatureUpdate(sys::Message *)
+{
+    return nullptr;
 }

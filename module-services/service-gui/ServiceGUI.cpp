@@ -6,6 +6,8 @@
 
 #include "messages/GUIMessage.hpp"
 #include "messages/DrawMessage.hpp"
+#include "messages/RenderingFinished.hpp"
+#include "messages/GUIDisplayReady.hpp"
 
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
@@ -13,10 +15,11 @@
 #include <gui/core/Context.hpp>
 #include <gui/core/ImageManager.hpp>
 #include <log/log.hpp>
-#include <messages/EinkMessage.hpp>
 #include <projdefs.h>
 #include <service-appmgr/Controller.hpp>
 #include <service-eink/messages/ImageMessage.hpp>
+#include <service-eink/messages/EinkMessage.hpp>
+#include <service-eink/messages/StateRequest.hpp>
 #include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <SystemManager/SystemManager.hpp>
@@ -36,12 +39,6 @@ extern "C"
 
 namespace sgui
 {
-
-    static uint32_t getTimeFunction()
-    {
-        return xTaskGetTickCount();
-    }
-
     ServiceGUI::ServiceGUI(const std::string &name, std::string parent, uint32_t screenWidth, uint32_t screenHeight)
         : sys::Service(name, parent, 4096, sys::ServicePriority::Idle), renderContext{nullptr},
           transferContext{nullptr}, renderFrameCounter{1}, transferedFrameCounter{0}, screenWidth{screenWidth},
@@ -50,17 +47,28 @@ namespace sgui
 
         LOG_INFO("[ServiceGUI] Initializing");
 
-        // allocate buffers for rendering and transferring data to eink
         renderContext   = new gui::Context(screenWidth, screenHeight);
         transferContext = new gui::Context(screenWidth, screenHeight);
 
-        // load fonts
         gui::FontManager &fontManager = gui::FontManager::getInstance();
         fontManager.init("assets");
 
-        // load images
         gui::ImageManager &imageManager = gui::ImageManager::getInstance();
         imageManager.init("assets");
+
+        connect(typeid(sgui::DrawMessage), [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+            return handleDrawMessage(request);
+        });
+
+        connect(typeid(service::gui::RenderingFinished),
+                [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+                    return handleGUIRenderingFinished(request);
+                });
+
+        connect(typeid(service::gui::GUIDisplayReady),
+                [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+                    return handleGUIDisplayReady(request);
+                });
     }
 
     ServiceGUI::~ServiceGUI()
@@ -74,23 +82,22 @@ namespace sgui
 
     void ServiceGUI::sendBuffer()
     {
-        // copy data from render context to transfer context
         transferContext->insert(0, 0, renderContext);
 
-        auto msg  = std::make_shared<seink::ImageMessage>(0,
-                                                         0,
-                                                         transferContext->getW(),
-                                                         transferContext->getH(),
-                                                         (mode == gui::RefreshModes::GUI_REFRESH_DEEP ? true : false),
-                                                         transferContext->getData(),
-                                                         suspendInProgress,
-                                                         shutdownInProgress);
+        auto msg =
+            std::make_shared<service::eink::ImageMessage>(0,
+                                                          0,
+                                                          transferContext->getW(),
+                                                          transferContext->getH(),
+                                                          (mode == gui::RefreshModes::GUI_REFRESH_DEEP ? true : false),
+                                                          transferContext->getData(),
+                                                          suspendInProgress,
+                                                          shutdownInProgress);
         einkReady = false;
         auto ret  = sys::Bus::SendUnicast(msg, "ServiceEink", this, 2000);
         if (ret.first == sys::ReturnCodes::Success) {
             transferedFrameCounter = renderFrameCounter;
         }
-        // set default refreshing mode.
         mode = gui::RefreshModes::GUI_REFRESH_FAST;
     }
 
@@ -100,139 +107,13 @@ namespace sgui
         worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
     }
 
-    // Invoked upon receiving data message
     sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-
-        sgui::GUIMessage *msg = static_cast<sgui::GUIMessage *>(msgl);
-
-        switch (msg->messageType) {
-        case MessageType::MessageTypeUninitialized: {
-            //			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
-        } break;
-        case MessageType::GUICommands: {
-            //			LOG_INFO("[%s] GUICommands", GetName().c_str());
-            auto dmsg = static_cast<sgui::DrawMessage *>(msgl);
-            if (!dmsg->commands.empty()) {
-
-                // if suspend flag is set ignore any new message
-                if (!suspendInProgress) {
-
-                    if (dmsg->type == sgui::DrawMessage::Type::SHUTDOWN) {
-                        LOG_WARN("Shutdown - received shutdown draw commands");
-                        shutdownInProgress = true;
-                    }
-
-                    // if message carries suspend flag set flag in service and proceed
-                    if (dmsg->type == sgui::DrawMessage::Type::SUSPEND) {
-                        LOG_WARN("Suspended - received suspend draw commands");
-                        suspendInProgress = true;
-                    }
-
-                    // update mode
-                    if (dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP) {
-                        mode = dmsg->mode;
-                    }
-
-                    // LOG_DEBUG("Received %d draw commands", dmsg->commands.size());
-
-                    // lock access to commands vector, clear it and then copy commands from message to vector
-                    if (xSemaphoreTake(semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                        commands = std::move(dmsg->commands);
-                        xSemaphoreGive(semCommands);
-                    }
-                    else {
-                        LOG_ERROR("Failed to acquire semaphore");
-                    }
-
-                    // if worker is not rendering send him new set of commands
-                    if (!rendering) {
-                        sendToRender();
-                    }
-                    else {
-                        //						LOG_ERROR("Already rendering");
-                    }
-
-                    //				uint32_t mem = usermemGetFreeHeapSize();
-                    //				LOG_WARN( "Heap Memory: %d", mem );
-                }
-                else {
-                    LOG_WARN("Suspended - ignoring draw commands");
-                }
-            }
-        } break;
-        case MessageType::GUIRenderingFinished: {
-            //			LOG_INFO("[%s] GUIRenderingFinished", GetName().c_str());
-            // increment counter holding number of drawn frames
-            rendering = false;
-            renderFrameCounter++;
-            // copy render buffer to transfer buffer using semaphore to protect data
-            // gui service is locking semaphore, makes a copy and then sends message to eink
-
-            if (einkReady) {
-                sendBuffer();
-            }
-            else if (!requestSent) {
-                requestSent = true;
-                // request eink state
-                auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
-                sys::Bus::SendUnicast(msg, "ServiceEink", this);
-            }
-        } break;
-        case MessageType::GUIFocusInfo: {
-            //			LOG_INFO("[%s] GUIFocusInfo", GetName().c_str());
-        } break;
-        case MessageType::GUIDisplayReady: {
-            //			LOG_INFO("[%s] GUIDisplayReady", GetName().c_str());
-            einkReady   = true;
-            requestSent = false;
-
-            if (msg->getShutdown()) {
-                einkReady         = false;
-                suspendInProgress = false;
-                LOG_DEBUG("last rendering before shutdown finished.");
-
-                sys::SystemManager::CloseSystem(this);
-            }
-
-            if (msg->getSuspend()) {
-                einkReady         = false;
-                suspendInProgress = false;
-                LOG_DEBUG("last rendering before suspend is finished.");
-
-                app::manager::Controller::changePowerSaveMode(this);
-            }
-            // mode = gui::RefreshModes::GUI_REFRESH_FAST;
-            // check if something new was rendered. If so render counter has greater value than
-            // transfer counter.
-            if ((renderFrameCounter != transferedFrameCounter) && (!rendering)) {
-                //				LOG_INFO("[ServiceGUI]Sending buffer");
-                sendBuffer();
-            }
-            else {
-                //				LOG_INFO(" NO new buffer to send");
-            }
-
-            // check if there are pending commands to render.
-            if (commands.empty() == false) {
-                //				LOG_INFO("Rendering pending %d commands", commands.size());
-                sendToRender();
-            }
-        } break;
-        default:
-            break;
-        };
-
         return std::make_shared<sys::ResponseMessage>();
     }
 
     sys::ReturnCodes ServiceGUI::InitHandler()
     {
-
-        // set function for acquiring time in seconds from the system
-        gui::setTimeFunction(getTimeFunction);
-
-        // create semaphore to protect vector with commands waiting for rendering
         semCommands = xSemaphoreCreateBinary();
         if (semCommands == NULL) {
             LOG_FATAL("Failed to create commands semaphore.");
@@ -240,7 +121,6 @@ namespace sgui
         }
         xSemaphoreGive(semCommands);
 
-        // initialize gui worker
         worker = new WorkerGUI(this);
         std::list<sys::WorkerQueueInfo> list;
         worker->init(list);
@@ -248,8 +128,7 @@ namespace sgui
 
         if (einkReady == false) {
             requestSent = true;
-            auto msg    = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
-            sys::Bus::SendUnicast(msg, "ServiceEink", this);
+            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), "ServiceEink", this);
         }
         return sys::ReturnCodes::Success;
     }
@@ -281,6 +160,92 @@ namespace sgui
         }
 
         return sys::ReturnCodes::Success;
+    }
+
+    sys::Message_t ServiceGUI::handleDrawMessage(sys::Message *message)
+    {
+        auto dmsg = static_cast<sgui::DrawMessage *>(message);
+        if (!dmsg->commands.empty()) {
+
+            if (!suspendInProgress) {
+
+                if (dmsg->isType(sgui::DrawMessage::Type::SHUTDOWN)) {
+                    LOG_WARN("Shutdown - received shutdown draw commands");
+                    shutdownInProgress = true;
+                }
+
+                if (dmsg->isType(sgui::DrawMessage::Type::SUSPEND)) {
+                    LOG_WARN("Suspended - received suspend draw commands");
+                    suspendInProgress = true;
+                }
+
+                if (dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP) {
+                    mode = dmsg->mode;
+                }
+
+                if (xSemaphoreTake(semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
+                    commands = std::move(dmsg->commands);
+                    xSemaphoreGive(semCommands);
+                }
+                else {
+                    LOG_ERROR("Failed to acquire semaphore");
+                }
+
+                if (!rendering) {
+                    sendToRender();
+                }
+            }
+            else {
+                LOG_WARN("Suspended - ignoring draw commands");
+            }
+        }
+        return nullptr;
+    }
+
+    sys::Message_t ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
+    {
+        rendering = false;
+        renderFrameCounter++;
+
+        if (einkReady) {
+            sendBuffer();
+        }
+        else if (!requestSent) {
+            requestSent = true;
+            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), "ServiceEink", this);
+        }
+        return nullptr;
+    }
+
+    sys::Message_t ServiceGUI::handleGUIDisplayReady(sys::Message *message)
+    {
+        auto msg    = static_cast<service::gui::GUIDisplayReady *>(message);
+        einkReady   = true;
+        requestSent = false;
+
+        if (msg->getShutdownInProgress()) {
+            einkReady         = false;
+            suspendInProgress = false;
+            LOG_DEBUG("last rendering before shutdown finished.");
+
+            sys::SystemManager::CloseSystem(this);
+        }
+
+        if (msg->getSuspendInProgress()) {
+            einkReady         = false;
+            suspendInProgress = false;
+            LOG_DEBUG("last rendering before suspend is finished.");
+
+            app::manager::Controller::changePowerSaveMode(this);
+        }
+        if ((renderFrameCounter != transferedFrameCounter) && (!rendering)) {
+            sendBuffer();
+        }
+
+        if (commands.empty() == false) {
+            sendToRender();
+        }
+        return nullptr;
     }
 
 } /* namespace sgui */
