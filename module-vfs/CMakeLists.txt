@@ -47,6 +47,7 @@ set(SOURCES ""
         vfs-utils.cpp
         vfs.cpp
 		vfsNotifier.cpp
+        vfs_io_syscalls.cpp
 )
 
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")

@@ -70,30 +70,30 @@ set(TARGET_COMPILE_FEATURES
 set(TARGET_SOURCES
 
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/_exit.c
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/io_syscalls.cpp
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/memwrap.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_flexspi_nor_config.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_sdram_ini_dcd.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/fsl_flexspi_nor_boot.c
-
         CACHE INTERNAL ""
         )
 
 set(TARGET_DIR_INCLUDES
 
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051
-
         CACHE INTERNAL "" )
 
-set(TARGET_LIBRARIES
+set(BOARD_DIR_INCLUDES
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/include
+)
 
-        CACHE INTERNAL ""
-        )
+set(TARGET_LIBRARIES
+    CACHE INTERNAL ""
+)
 
 set(TARGET_LINK_OPTIONS
-
-        CACHE INTERNAL ""
-        )
-
+    CACHE INTERNAL ""
+)
 
 # where is the target environment
 SET(CMAKE_FIND_ROOT_PATH  ${TOOLCHAIN_PATH}/${TOOLCHAIN_PREFIX})
