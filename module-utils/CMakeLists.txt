@@ -44,8 +44,10 @@ include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
 include(third-party/tinyexpr.cmake)
+include(third-party/pugixml.cmake)
 
-add_subdirectory(pugixml)
+# link against libphonenumber
+target_link_libraries (${PROJECT_NAME} PUBLIC ${LIBPHONENUMBER_TARGET})
 
 add_subdirectory(taglib EXCLUDE_FROM_ALL)
 set( TAGLIB_INCLUDE_DIRS
@@ -55,7 +57,13 @@ set( TAGLIB_INCLUDE_DIRS
 	 PARENT_SCOPE
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs pugixml)
+# link against tinyexpr
+target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})
+
+# link against pugixml
+target_link_libraries (${PROJECT_NAME} PUBLIC ${PUGIXML_TARGET})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

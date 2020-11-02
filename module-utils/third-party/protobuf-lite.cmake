@@ -1,9 +1,9 @@
 include (thirdparty)
 
 # add sources
-set(PROTOBUF_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/protobuf/src)
-set(PROTOBUF ${PROTOBUF_SRCDIR}/google/protobuf)
-set(PROTOBUF_SOURCES
+set (PROTOBUF_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/protobuf/src)
+set (PROTOBUF ${PROTOBUF_SRCDIR}/google/protobuf)
+set (PROTOBUF_SOURCES
         ${PROTOBUF}/any_lite.cc
         ${PROTOBUF}/arena.cc
         ${PROTOBUF}/extension_set.cc
@@ -32,13 +32,19 @@ set(PROTOBUF_SOURCES
         ${PROTOBUF}/stubs/time.cc
         ${PROTOBUF}/wire_format_lite.cc
 )
-target_sources(${PROJECT_NAME} PRIVATE ${PROTOBUF_SOURCES})
+
+# create static library for the third party
+set (PROTOBUF_TARGET protobuf)
+add_library (${PROTOBUF_TARGET} STATIC ${PROTOBUF_SOURCES})
+
+# setup flags for the third party
+third_party_target_setup (${PROTOBUF_TARGET})
 
 # set compile definitions for third party libraries
-target_compile_definitions(${PROJECT_NAME} PUBLIC GOOGLE_PROTOBUF_NO_THREADS)
+target_compile_definitions (${PROTOBUF_TARGET} PUBLIC GOOGLE_PROTOBUF_NO_THREADS)
 
-# supress warning for protobuf
-set_source_files_properties(${PROTOBUF_SOURCES}
+# supress warnings for protobuf
+set_source_files_properties (${PROTOBUF_SOURCES}
         PROPERTIES COMPILE_FLAGS
 	"-Wno-stringop-truncation \
         -Wno-stringop-overflow \
@@ -49,6 +55,10 @@ set_source_files_properties(${PROTOBUF_SOURCES}
 )
 
 # add include dir
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOBUF_SRCDIR})
+target_include_directories (${PROTOBUF_TARGET} PUBLIC ${PROTOBUF_SRCDIR})
 
-third_party_source_optimization(${PROTOBUF_SOURCES})
+# module-os dependency (locking support)
+target_link_libraries (${RE2_TARGET} PUBLIC module-os)
+
+# turn on optimization in debug
+third_party_source_optimization (${PROTOBUF_SOURCES})
