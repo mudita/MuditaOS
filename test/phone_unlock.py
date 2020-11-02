@@ -3,17 +3,15 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # unlock Desktop
-from harness.common import Serial
-import logging
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-log = logging.getLogger(__name__)
+from interface.CDCSerial import CDCSerial
+from interface.defs import key_codes
 
-conn = Serial()
-
+new_conn = CDCSerial()
 # write pin
-conn.key(ord('\n'))
-conn.key(ord('#'))
-conn.key(3)
-conn.key(3)
-conn.key(3)
-conn.key(3)
+new_conn.send_key(key_codes["enter"])
+new_conn.send_key(key_codes["#"])
+new_conn.send_key(3)
+new_conn.send_key(3)
+new_conn.send_key(3)
+new_conn.send_key(3)
+

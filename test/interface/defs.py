@@ -9,7 +9,8 @@ endpoint = {
     "factory": 5,
     "contacts": 6,
     "messages": 7,
-    "calllog": 8
+    "calllog": 8,
+    "developerMode": 9
 }
 
 method = {
@@ -23,4 +24,22 @@ status = {
     "OK": 200,
     "BadRequest": 400,
     "InternalServerError": 500
+}
+
+key_codes = {
+    "left": ord('a'),
+    "right": ord('d'),
+    "up": ord('w'),
+    "down": ord('s'),
+    "enter": ord('\n'),
+    "fnLeft": 11,
+    "fnRight": 12,
+    "volUp": 13,
+    "volDown": 14,
+    "torch": 15,
+    "sliderUp": 16,
+    "sliderMid": 18,
+    "sliderDown": 17,
+    "#": ord('#')
+
 }

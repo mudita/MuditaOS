@@ -12,6 +12,7 @@
 
 #include <service-cellular/messages/CellularMessage.hpp> // for CellularTimeNotificationMessage, RawCommandResp
 #include <service-evtmgr/Constants.hpp>                  // for evt_manager
+#include <service-desktop/Constants.hpp>                 // for ServiceDesktop
 #include <cassert>                                       // for assert
 #include <list>                                          // for list
 #include <tuple>                                         // for tie, tuple
@@ -91,7 +92,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgl->messageType == MessageType::EVM_GPIO) {
         LOG_DEBUG("EVM_GPIO msg");
     }
-    else if (msgl->messageType == MessageType::KBDKeyEvent && msgl->sender == this->GetName()) {
+    else if (msgl->messageType == MessageType::KBDKeyEvent &&
+             (msgl->sender == this->GetName() || msgl->sender == service::name::service_desktop)) {
 
         auto *msg = dynamic_cast<sevm::KbdMessage *>(msgl);
         assert(msg);
