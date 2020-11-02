@@ -1,24 +1,23 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-import serial
+
 import json
 import random
 
-phone = serial.Serial()
-
 
 class Test:
-    def __init__(self, payload, expected_result):
+    def __init__(self, serial, payload, expected_result):
         self.result = ""
+        self.serial = serial
         self.message = build_message(payload)
         self.expected_result = expected_result
 
     def execute(self):
-        phone.write(self.message.encode())
-        header = phone.read(10).decode()
+        self.serial.write(self.message.encode())
+        header = self.serial.read(10).decode()
         payload_length = int(header[1:])
-        result = phone.read(payload_length).decode()
+        result = self.serial.read(payload_length).decode()
         # print("result full:" + result)
         self.result = json.loads(result)
         return self.result == self.expected_result, self.result["body"]

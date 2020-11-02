@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <string> // for allocator, string
-
+#include <module-bsp/bsp/keyboard/key_codes.hpp>
+#include <module-services/service-evtmgr/messages/KbdMessage.hpp>
 #include "Common/Query.hpp"
 #include "Context.hpp"
 #include "Service/Service.hpp"
@@ -17,15 +17,16 @@ namespace sys
 
 namespace parserFSM
 {
-    class Context;
 
     class DeveloperModeHelper
     {
         sys::Service *ownerServicePtr = nullptr;
+        static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
+        void sendKeypress(bsp::KeyCodes keyCode);
 
       public:
         DeveloperModeHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
-        auto processGetRequest(Context &context) -> sys::ReturnCodes;
+        auto processPutRequest(Context &context) -> sys::ReturnCodes;
     };
 
     namespace json::developerMode

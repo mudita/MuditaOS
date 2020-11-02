@@ -11,16 +11,13 @@ auto DeveloperModeEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
     case http::Method::get:
-        helper->processGetRequest(context);
         break;
     case http::Method::post:
-
         break;
     case http::Method::put:
-
+        helper->processPutRequest(context);
         break;
     case http::Method::del:
-
         break;
     }
 }

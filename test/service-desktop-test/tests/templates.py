@@ -1,16 +1,19 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-from defs import *
+from interface.defs import *
 from test import *
 
 
 class MessageTemplateTest:
+    def __init__(self, serial):
+        self.serial = serial.get_serial()
+
     def run(self):
         # get templates count
         msg, result_msg = prepare_message(endpoint["messages"], method["get"], status["OK"],
                                           {"template": True, "count": True})
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         count = result['count']
         if count == 0:
@@ -20,7 +23,7 @@ class MessageTemplateTest:
         # get all templates
         msg, result_msg = prepare_message(endpoint["messages"], method["get"], status["OK"],
                                           {"template": True, "count": count})
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         records_length = len(result)
         if records_length != count:
@@ -30,7 +33,7 @@ class MessageTemplateTest:
         # add template
         msg, result_msg = prepare_message(endpoint["messages"], method["put"], status["OK"],
                                           {"template": True, "text": "test template"}, None)
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         if ret == False:
             return False
@@ -38,7 +41,7 @@ class MessageTemplateTest:
         # again check templates count
         msg, result_msg = prepare_message(endpoint["messages"], method["get"], status["OK"],
                                           {"template": True, "count": True})
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         if result["count"] != count + 1:
             print("record count unchanged after add!")
@@ -47,7 +50,7 @@ class MessageTemplateTest:
         # get template to remove
         msg, result_msg = prepare_message(endpoint["messages"], method["get"], status["OK"],
                                           {"template": True, "count": count + 1})
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         for template in result:
             if template["text"] == "test template":
@@ -57,7 +60,7 @@ class MessageTemplateTest:
         # remove template
         msg, result_msg = prepare_message(endpoint["messages"], method["del"], status["OK"],
                                           {"template": True, "id": id}, None)
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         if ret == False:
             return False
@@ -65,7 +68,7 @@ class MessageTemplateTest:
         # again check templates count
         msg, result_msg = prepare_message(endpoint["messages"], method["get"], status["OK"],
                                           {"template": True, "count": True})
-        test = Test(msg, result_msg)
+        test = Test(self.serial, msg, result_msg)
         ret, result = test.execute()
         if result["count"] != count:
             print("record count unchanged after remove!")
