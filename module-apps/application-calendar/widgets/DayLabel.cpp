@@ -7,8 +7,6 @@
 #include "application-calendar/widgets/MonthBox.hpp"
 #include "application-calendar/data/CalendarData.hpp"
 #include <time/time_conversion.hpp>
-#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 
 namespace gui
 {
@@ -78,32 +76,10 @@ namespace gui
                 auto filter = TimePointFromYearMonthDay(dateFilter);
                 data->setData(number + " " + month, filter);
                 LOG_DEBUG("Switch to DayEventsWindow");
-
-                /////
-                auto filterTill = filter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode + 1);
-                auto query      = std::make_unique<db::query::events::GetFiltered>(filter, filterTill);
-                query->setQueryListener(
-                    db::QueryCallback::fromFunction([app, filter, number, month](db::QueryResult *result) {
-                        if (const auto response = dynamic_cast<db::query::events::GetFilteredResult *>(result)) {
-                            std::unique_ptr<std::vector<EventsRecord>> records = response->getResult();
-                            auto application = dynamic_cast<app::ApplicationCalendar *>(app);
-                            assert(application != nullptr);
-                            if (records->empty()) {
-                                auto name = number + " " + month;
-                                application->switchToNoEventsWindow(name, filter);
-                                return true;
-                            }
-                            /// aaaand here switch to DauEventsWindow!
-                            auto message     = std::make_unique<DayEventsWindowMessage>();
-                            message->records = std::move(records);
-                            app->switchWindow(style::window::calendar::name::day_events_window, std::move(message));
-                            return true;
-                        }
-                        return false;
-                    }));
-                DBServiceAPI::GetQuery(app, db::Interface::Name::Events, std::move(query));
-                /////
-
+                if (auto calendarApp = dynamic_cast<app::ApplicationCalendar *>(app); calendarApp != nullptr) {
+                    calendarApp->setEquivalentToEmptyWindow(EquivalentWindow::DayEventsWindow);
+                }
+                app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
                 return true;
             };
             this->setPenWidth(style::window::default_border_no_focus_w);
