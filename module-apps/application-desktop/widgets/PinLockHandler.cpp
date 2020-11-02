@@ -24,7 +24,6 @@ namespace gui
         parseSimCard(msg);
         parseSimState(msg);
         parseAttemptsAndPinSize(msg);
-        lock.additionalLockInfo[gui::PinLock::InfoName::PhoneNum] = msg->getPhoneNumber().getFormatted();
 
         app->getWindow(app::window::name::desktop_pin_lock)->rebuild();
         app->switchWindow(gui::name::window::main_window);
@@ -76,11 +75,14 @@ namespace gui
     {
         assert(msg);
         switch (msg->getSimCard()) {
-        case CellularSimMessage::SimCard::SIM1:
+        case Store::GSM::SIM::SIM1:
             lock.additionalLockInfo[gui::PinLock::InfoName::LockName] = "SIM1";
             break;
-        case CellularSimMessage::SimCard::SIM2:
+        case Store::GSM::SIM::SIM2:
             lock.additionalLockInfo[gui::PinLock::InfoName::LockName] = "SIM2";
+            break;
+        default:
+            LOG_ERROR("Unknown SIM");
             break;
         }
     }
@@ -119,7 +121,7 @@ namespace gui
 
     void PinLockHandler::handleSimPinOrPuk(const std::vector<unsigned int> &pin)
     {
-        auto sim = CellularSimMessage::SimCard::SIM1;
+        auto sim = Store::GSM::SIM::SIM1;
         sys::Bus::SendUnicast(
             std::make_shared<CellularSimVerifyPinRequestMessage>(sim, pin), ServiceCellular::serviceName, app);
     }
