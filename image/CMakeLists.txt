@@ -1,4 +1,4 @@
-set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+﻿set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ASSETS_DEST_DIR "${CMAKE_BINARY_DIR}")
 
 file (GLOB_RECURSE ASSETS_LIST
@@ -24,6 +24,7 @@ foreach(ASSET ${ASSETS_LIST})
 
     set(outfile "${destdir}/${filename}")
     string(REPLACE "/" "-" target_name ${ASSET})
+    string(REPLACE " " "_" target_name ${target_name})
     if(${target_name} STREQUAL ${ASSET})
         set(target_name "file-${target_name}")
     endif()
