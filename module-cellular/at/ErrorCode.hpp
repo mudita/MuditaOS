@@ -8,7 +8,6 @@
 namespace at
 {
 
-
     static const int MAX_AT_ERROR_VALUE = 1000; // use for magic_enum limitations, see end of this file
 
     /** @enum at::EquipmentErrorCode
@@ -110,10 +109,10 @@ namespace at
 } // namespace at
 
 /** This part of code is extension for magic_enum class due to documentation,
-* below we extended AT error enum class, based on const MAX_AT_ERROR_VALUE
-* which should have value higher then maximum AT error value but lower then
-* magic num library limitations which is INT16_MAX-2 (-2 for Unknown and NoInformation)
-*/
+ * below we extended AT error enum class, based on const MAX_AT_ERROR_VALUE
+ * which should have value higher then maximum AT error value but lower then
+ * magic num library limitations which is INT16_MAX-2 (-2 for Unknown and NoInformation)
+ */
 namespace magic_enum
 {
     template <> struct enum_range<at::NetworkErrorCode>
