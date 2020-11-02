@@ -8,14 +8,12 @@
 namespace gui
 {
 
-    BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : AppWindow(app, name)
-    {
-        buildInterface();
-    }
+    BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : OptionWindow(app, name)
+    {}
 
     void BaseSettingsWindow::buildInterface()
     {
-        AppWindow::buildInterface();
+        OptionWindow::buildInterface();
 
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
@@ -32,6 +30,17 @@ namespace gui
     {
         destroyInterface();
         buildInterface();
+    }
+
+    void BaseSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        rebuildOptionList();
+    }
+
+    void BaseSettingsWindow::rebuildOptionList()
+    {
+        clearOptions();
+        addOptions(buildOptionsList());
     }
 
 } // namespace gui

@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <AppWindow.hpp>
-#include <Application.hpp>
-#include <module-apps/windows/OptionWindow.hpp>
+#include "Application.hpp"
+#include "windows/AppWindow.hpp"
+#include "windows/OptionWindow.hpp"
 
 namespace gui
 {
 
-    class BaseSettingsWindow : public AppWindow
+    class BaseSettingsWindow : public OptionWindow
     {
       public:
         BaseSettingsWindow(app::Application *app, std::string name);
@@ -19,7 +19,11 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
 
+        void rebuildOptionList();
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
       protected:
         virtual void invalidate() noexcept {};
+        virtual auto buildOptionsList() -> std::list<gui::Option> = 0;
     };
 } // namespace gui

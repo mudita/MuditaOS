@@ -15,7 +15,8 @@ namespace gui
         ArrowWhite,
         On,
         Off,
-        Bt
+        Bt,
+        Checked,
     };
 
     class OptionSettings : public option::Base

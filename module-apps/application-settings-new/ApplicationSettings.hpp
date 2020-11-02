@@ -30,6 +30,11 @@ namespace gui::window::name
     inline const std::string torch     = "Torch";
     inline const std::string templates = "Templates";
 
+    inline const std::string autolock  = "Autolock";
+    inline const std::string wallpaper = "Wallpaper";
+    inline const std::string quotes    = "Quotes";
+    inline const std::string new_quote = "NewQuote";
+
     inline const std::string display_and_keypad = "DisplayAndKeypad";
 
     inline const std::string change_settings = "ChangeSettings";

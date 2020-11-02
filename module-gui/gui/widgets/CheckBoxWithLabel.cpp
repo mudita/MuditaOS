@@ -17,7 +17,8 @@ namespace gui
                                   style::checkbox::check_x,
                                   style::checkbox::check_y,
                                   style::checkbox::check_width,
-                                  style::window::label::big_h);
+                                  style::window::label::small_h);
+        check->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         label->activatedCallback = [=](Item &item) {
             setChecked(!check->isChecked());
@@ -35,7 +36,7 @@ namespace gui
          */
         parent->addWidget(body);
         body->addWidget(label);
-        label->addWidget(check);
+        body->addWidget(check);
     }
 
     bool CheckBoxWithLabel::isChecked() const

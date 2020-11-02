@@ -3,9 +3,11 @@
 
 #include "DisplayAndKeypadWindow.hpp"
 
-#include <application-settings-new/ApplicationSettings.hpp>
+#include "application-settings-new/ApplicationSettings.hpp"
+#include "windows/OptionWindow.hpp"
+#include "windows/OptionSetting.hpp"
+
 #include <i18/i18.hpp>
-#include <OptionWindow.hpp>
 
 namespace gui
 {
@@ -19,28 +21,36 @@ namespace gui
 
     std::list<Option> DisplayAndKeypadWindow::displayAndKeypadOptionsList()
     {
-        std::list<gui::Option> l;
+        std::list<gui::Option> optionList;
 
-        auto i18     = [](std::string text) { return utils::localize.get(text); };
-        auto addMenu = [&](UTF8 name, std::string window = "") {
-            l.emplace_back(gui::Option{name,
-                                       [=](gui::Item &item) {
-                                           if (window == "") {
-                                               return false;
-                                           }
-                                           LOG_INFO("switching to %s page", window.c_str());
-                                           application->switchWindow(window, nullptr);
-                                           return true;
-                                       },
-                                       gui::Arrow::Enabled});
+        auto addMenu = [&](UTF8 name, std::string window) {
+            optionList.emplace_back(std::make_unique<gui::OptionSettings>(
+                name,
+                [=](gui::Item &item) {
+                    if (window.empty()) {
+                        return false;
+                    }
+                    LOG_INFO("switching to %s page", window.c_str());
+                    application->switchWindow(window, nullptr);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                RightItem::ArrowWhite));
         };
 
-        addMenu(i18("app_settings_display_display_light"), gui::window::name::display_light);
-        addMenu(i18("app_settings_display_font_size"), gui::window::name::font_size);
-        addMenu(i18("app_settings_display_locked_screen"), gui::window::name::locked_screen);
-        addMenu(i18("app_settings_display_keypad_light"), gui::window::name::keypad_light);
-        addMenu(i18("app_settings_display_input_language"), gui::window::name::input_language);
+        addMenu(utils::translateI18("app_settings_display_display_light"), gui::window::name::display_light);
+        addMenu(utils::translateI18("app_settings_display_font_size"), gui::window::name::font_size);
+        addMenu(utils::translateI18("app_settings_display_locked_screen"), gui::window::name::locked_screen);
+        addMenu(utils::translateI18("app_settings_display_keypad_light"), gui::window::name::keypad_light);
+        addMenu(utils::translateI18("app_settings_display_input_language"), gui::window::name::input_language);
 
-        return l;
+        return optionList;
     }
 } // namespace gui

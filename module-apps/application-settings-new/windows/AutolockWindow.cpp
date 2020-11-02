@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "InputLanguageWindow.hpp"
-
+#include "AutolockWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "windows/OptionSetting.hpp"
 
@@ -10,22 +9,22 @@
 
 namespace gui
 {
-    InputLanguageWindow::InputLanguageWindow(app::Application *app)
-        : BaseSettingsWindow(app, window::name::input_language)
+
+    AutolockWindow::AutolockWindow(app::Application *app) : BaseSettingsWindow(app, window::name::autolock)
     {
-        setTitle(utils::localize.get("app_settings_display_input_language"));
+        setTitle(utils::localize.get("app_settings_display_locked_screen_autolock"));
     }
 
-    auto InputLanguageWindow::buildOptionsList() -> std::list<gui::Option>
+    auto AutolockWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        std::vector<std::string> availableLanguages = {"English", "Detush", "Polski", "Español", "Français"};
+        std::vector<std::string> autoLockTimes = {"15s", "30s", "1m", "2m", "5m", "10m", "20m"};
 
-        for (auto lang : availableLanguages) {
+        for (auto time : autoLockTimes) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
-                lang,
+                time,
                 [=](gui::Item &item) {
-                    selectedLang = lang;
+                    selectedTime = time;
                     rebuildOptionList();
                     return true;
                 },
@@ -37,9 +36,10 @@ namespace gui
                     return true;
                 },
                 this,
-                selectedLang == lang ? RightItem::Checked : RightItem::Disabled));
+                selectedTime == time ? RightItem::Checked : RightItem::Disabled));
         }
 
         return optionsList;
     }
+
 } // namespace gui
