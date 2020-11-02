@@ -40,7 +40,7 @@
 	path = module-audio/Audio/decoder/minimp3
 	url = ../minimp3.git
     branch = RT1051
-[submodule "module-audio/Audio/decoder/taglib"]
+[submodule "module-utils/taglib"]
 	path = module-utils/taglib
 	url = ../taglib.git
 	branch = rt1051
