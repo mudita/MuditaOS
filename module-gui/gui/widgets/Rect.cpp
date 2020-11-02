@@ -37,6 +37,7 @@ namespace gui
     void Rect::setFillColor(const Color &color)
     {
         fillColor = color;
+        setFilled(true);
     }
 
     void Rect::setBorderColor(const Color &color)

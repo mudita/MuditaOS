@@ -14,6 +14,10 @@
 * `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
 * `[calendar]` Rework to use database model instead of internal model in day events list.
 
+### Fixed
+
+* `[GUI]` Fixed filling Label with color
+
 ## [0.44.1 2020-10-30]
 
 ### Added
