@@ -24,6 +24,7 @@ target_sources( ${PROJECT_NAME}
         "agents/DatabaseAgent.cpp"
         "agents/settings/SettingsAgent.cpp"
         "agents/settings/Settings.cpp"
+        "agents/file_indexer/FileIndexerAgent.cpp"
 )
 
 if (${ENABLE_TESTS})

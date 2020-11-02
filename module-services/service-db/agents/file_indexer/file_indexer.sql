@@ -1,68 +1,46 @@
--- Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
--- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-/*
- * Create File indexer  tables
-*/
+R"dbInitStr(
 
+/* Create File indexer  tables */
 BEGIN TRANSACTION;
 
---
--- File type table,
---
-CREATE TABLE IF NOT EXISTS file_type_tab (
-    file_type_id INTEGER NOT NULL,
-    mime_type TEXT NOT NULL,
-    PRIMARY KEY (file_type_id)
-);
 
-
---
 -- Main file table
---
 CREATE TABLE IF NOT EXISTS file_tab (
     file_id INTEGER NOT NULL,
     path TEXT NOT NULL UNIQUE,
-    size TEXT,
-    file_type_id INTEGER,
-    PRIMARY KEY (file_id),
-    FOREIGN KEY( file_type_id) REFERENCES file_type_tab(file_type_id)
+    size INTEGER,
+    mime_type INTEGER,
+    mtime INTEGER,
+    directory TEXT,
+    file_type INTEGER,
+    PRIMARY KEY (file_id)
     );
 
---
 -- Table contains information
 -- about file metadata.
---
 CREATE TABLE IF NOT EXISTS metadata_tab (
     file_id INTEGER NOT NULL,
     property TEXT NOT NULL,
     value TEXT NOT NULL,
-    PRIMARY KEY (file_id, property)
+    PRIMARY KEY (file_id, property),
+    FOREIGN KEY (file_id) REFERENCES file_tab(file_id)
     );
-
 
 -- Table contains information who to inform
 -- about changes in values.
---
 CREATE TABLE IF NOT EXISTS notifications_tab (
     id INTEGER PRIMARY KEY,
     path TEXT NOT NULL,
     service TEXT,
     CONSTRAINT notification_unique
-     UNIQUE(path, service)
+        UNIQUE(path, service)
 );
 
-
 -- ----------- insert default values ----------------------
-INSERT OR REPLACE INTO file_tab (path, size) VALUES
-    ('audio/track1.mp3', '4567'),
-    ('audio/track2.mp3', '345354');
+INSERT OR REPLACE INTO file_tab (path, size, mime_type, mtime, directory, file_type) VALUES
+    ('mp3/track1.mp3', 456666, 1, 1603929600, 'music',12297),
+    ('mp3/track2.mp3', 345354 ,1, 1603929604, 'my_songs',12297);
 
-INSERT OR REPLACE INTO file_type_tab (mime_type) VALUES
-    ('audio/mpeg'),
-    ('audio/x-wav'),
-    ('audio/basic'),
-    ('audio/midi'),
-    ('audio/x-aiff');
 
 INSERT OR REPLACE INTO metadata_tab (file_id, property, value) VALUES
     (1,'artist','Sting'),
@@ -72,6 +50,6 @@ INSERT OR REPLACE INTO metadata_tab (file_id, property, value) VALUES
     (2,'genre','Soul'),
     (2,'album','Album2');
 
-
 COMMIT;
 
+)dbInitStr"
