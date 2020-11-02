@@ -6,17 +6,9 @@
 
 using namespace at::urc;
 
-CREG::CREG(const std::string &val) : Any(val)
-{}
-
-auto CREG::what() const noexcept -> std::string
-{
-    return urc_name;
-}
-
 auto CREG::isValid() const noexcept -> bool
 {
-    return is() && (isExtended() || isShort());
+    return isExtended() || isShort();
 }
 
 auto CREG::isExtended() const noexcept -> bool

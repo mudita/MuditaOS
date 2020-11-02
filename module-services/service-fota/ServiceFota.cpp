@@ -579,11 +579,11 @@ namespace FotaService
 
     void Service::parseQIND(const std::string &message)
     {
-        auto qind = at::urc::QIND(message);
-        if (qind.is()) {
+        auto urc = at::urc::URC::Create(message);
+        if (auto qind = at::urc::getURC<at::urc::QIND>(urc)) {
             const unsigned char fotaPrefixTagPosition = 0;
             const unsigned char fotaStatusTagPosition = 1;
-            auto tokens                               = qind.getTokens();
+            auto tokens                               = qind->getTokens();
             if (tokens[fotaPrefixTagPosition].find("FOTA") != std::string::npos) {
                 if (tokens[1].find("START") != std::string::npos) {
                     LOG_DEBUG("FOTA UPDATING");

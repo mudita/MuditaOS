@@ -6,14 +6,6 @@
 
 using namespace at::urc;
 
-QIND::QIND(const std::string &val) : Any(val)
-{}
-
-auto QIND::what() const noexcept -> std::string
-{
-    return urc_name;
-}
-
 auto QIND::isCsq() const noexcept -> bool
 {
     if (tokens.size() == magic_enum::enum_count<enum CSQ>()) {

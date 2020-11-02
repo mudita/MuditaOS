@@ -6,6 +6,8 @@
 #include <at/URC_CUSD.hpp> // for CUSD
 #include <at/URC_CTZE.hpp> // for CTZE
 #include <at/URC_CREG.hpp> // for CREG
+#include <at/URC_CMTI.hpp> // for CMTI
+#include <at/URC_CLIP.hpp> // for CLIP
 #include <at/response.hpp> // for parseQNWINFO
 #include <common_data/EventStore.hpp> // for GSM, GSM::SIM, GSM::SIM::SIM1, GSM::SIM::SIM_FAIL, GSM::SIM::SIM2, GSM::Tray, GSM::Tray::IN, Network
 #include <service-evtmgr/Constants.hpp>                                    // for evt_manager
@@ -1023,6 +1025,7 @@ namespace
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
     std::string str(data.begin(), data.end());
+    auto urc = at::urc::URC::Create(str);
 
     std::string logStr = utils::removeNewLines(str);
     LOG_DEBUG("Notification:: %s", logStr.c_str());
@@ -1056,14 +1059,11 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     }
 
     // Incoming call
-    if (auto ret = str.find("+CLIP: ") != std::string::npos) {
+    if (auto clip = at::urc::getURC<at::urc::CLIP>(urc)) {
         LOG_TRACE("incoming call...");
-
-        auto beg     = str.find("\"", ret);
-        auto end     = str.find("\"", ret + beg + 1);
-        auto message = str.substr(beg + 1, end - beg - 1);
-
-        return std::make_shared<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, message);
+        if (clip->isValid()) {
+            return std::make_shared<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, clip->getNumber());
+        }
     }
 
     // Call aborted/failed
@@ -1073,26 +1073,24 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     }
 
     // Received new SMS
-    if (str.find("+CMTI: ") != std::string::npos) {
+    if (auto cmti = at::urc::getURC<at::urc::CMTI>(urc)) {
         LOG_TRACE("received new SMS notification");
-        // find message number
-        auto tokens = utils::split(str, ',');
-        if (tokens.size() == 2) {
+        if (cmti->isValid()) {
             return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingSMS,
-                                                                 tokens[1]);
+                                                                 cmti->getIndex());
         }
     }
 
-    // Received signal strength change
-    auto qind = at::urc::QIND(str);
-    if (qind.is() && qind.isCsq()) {
-        AntennaServiceAPI::CSQChange(this);
-        auto rssi = qind.getRSSI();
-        if (!rssi) {
-            LOG_INFO("Invalid csq - ignore");
-        }
-        else {
-            SignalStrength signalStrength(*rssi);
+    if (auto qind = at::urc::getURC<at::urc::QIND>(urc)) {
+        if (qind->isCsq()) {
+            // Received signal strength change
+            AntennaServiceAPI::CSQChange(this);
+            auto rssi = qind->getRSSI();
+            if (!rssi) {
+                LOG_INFO("Invalid csq - ignore");
+            }
+            else {
+                SignalStrength signalStrength(*rssi);
 
             Store::GSM::get()->setSignalStrength(signalStrength.data);
             return std::make_shared<CellularNotificationMessage>(
@@ -1105,9 +1103,8 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         cmux->setMode(TS0710::Mode::AT);
     }
 
-    auto cusd = at::urc::CUSD(str);
-    if (cusd.is()) {
-        if (cusd.isActionNeeded()) {
+    if (auto cusd = at::urc::getURC<at::urc::CUSD>(urc)) {
+        if (cusd->isActionNeeded()) {
             if (ussdState == ussd::State::pullRequestSent) {
                 ussdState = ussd::State::pullResponseReceived;
                 setUSSDTimer();
@@ -1119,7 +1116,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             setUSSDTimer();
         }
 
-        auto message = cusd.getMessage();
+        auto message = cusd->getMessage();
         if (!message) {
             return std::nullopt;
         }
@@ -1127,19 +1124,20 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
                                                              *message);
     }
-    auto ctze = at::urc::CTZE(str);
-    if (ctze.is() && isSettingsAutomaticTimeSyncEnabled()) {
-        auto msg = std::make_shared<CellularTimeNotificationMessage>(
-            ctze.getGMTTime(), ctze.getTimeZoneOffset(), ctze.getTimeZoneString());
-        sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
-        return std::nullopt;
+
+    if (auto ctze = at::urc::getURC<at::urc::CTZE>(urc)) {
+        if (isSettingsAutomaticTimeSyncEnabled() && ctze->isValid()) {
+            auto msg = std::make_shared<CellularTimeNotificationMessage>(
+                ctze->getGMTTime(), ctze->getTimeZoneOffset(), ctze->getTimeZoneString());
+            sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
+            return std::nullopt;
+        }
     }
 
-    auto creg = at::urc::CREG(str);
-    if (creg.is()) {
-        if (creg.isValid()) {
-            auto accessTechnology = creg.getAccessTechnology();
-            auto status           = creg.getStatus();
+    if (auto creg = at::urc::getURC<at::urc::CREG>(urc)) {
+        if (creg->isValid()) {
+            auto accessTechnology = creg->getAccessTechnology();
+            auto status           = creg->getStatus();
 
             LOG_INFO("Network status - %s, access technology %s",
                      utils::enumToString(status).c_str(),
@@ -1151,7 +1149,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
             return std::make_shared<CellularNotificationMessage>(
                 CellularNotificationMessage::Type::NetworkStatusUpdate);
         }
-
         LOG_WARN("Network status - not valid");
 
         return std::nullopt;

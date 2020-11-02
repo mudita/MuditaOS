@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "URC_Any.hpp"
+#include "URC.hpp"
 
 namespace at::urc
 {
-    class QIND : public Any
+    class QIND : public URC
     {
-        const std::string urc_name = "+QIND";
-        const std::string type_csq = "\"csq\"";
+
+        const std::string type_csq = "csq";
 
         static const auto invalid_rssi_low  = 99;
         static const auto invalid_rssi_high = 199;
@@ -27,12 +27,12 @@ namespace at::urc
         [[nodiscard]] auto validate(enum CSQ) const noexcept -> bool;
 
       public:
-        explicit QIND(const std::string &val);
+        inline static const std::string head = "+QIND";
+        using URC::URC;
+
         ~QIND() override = default;
-        [[nodiscard]] auto what() const noexcept -> std::string final;
 
         [[nodiscard]] auto isCsq() const noexcept -> bool;
-
         [[nodiscard]] auto getRSSI() const noexcept -> std::optional<int>;
         [[nodiscard]] auto getBER() const noexcept -> std::optional<int>;
     };

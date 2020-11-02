@@ -23,11 +23,13 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_START.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_TEST.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_WAKEUP.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_Any.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp       
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CTZE.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CREG.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CMTI.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CLIP.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )

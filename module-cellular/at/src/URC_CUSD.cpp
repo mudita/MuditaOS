@@ -7,17 +7,9 @@
 
 using namespace at::urc;
 
-CUSD::CUSD(const std::string &val) : Any(val)
-{}
-
-auto CUSD::what() const noexcept -> std::string
-{
-    return urc_name;
-}
-
 auto CUSD::isValid() const noexcept -> bool
 {
-    return is() && tokens.size() == magic_enum::enum_count<Tokens>();
+    return tokens.size() == magic_enum::enum_count<Tokens>();
 }
 
 auto CUSD::isActionNeeded() const noexcept -> bool

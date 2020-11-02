@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "URC_Any.hpp"
+#include "URC.hpp"
 
 #include <common_data/EventStore.hpp>
 
@@ -11,9 +11,8 @@ namespace at::urc
 {
     /// +CREG: <stat> - Indicate network registration status of the ME
     /// +CREG: <stat>[,<lac>,<ci>[,<Act>]] - Indicate network registration and location information of the ME
-    class CREG : public Any
+    class CREG : public URC
     {
-        const std::string urc_name = "+CREG";
         enum Tokens
         {
             Stat,
@@ -24,12 +23,12 @@ namespace at::urc
         };
 
       public:
-        explicit CREG(const std::string &val);
+        inline static const std::string head = "+CREG";
+        using URC::URC;
+
         ~CREG() override = default;
 
-        [[nodiscard]] auto what() const noexcept -> std::string final;
-
-        [[nodiscard]] auto isValid() const noexcept -> bool;
+        [[nodiscard]] bool isValid() const noexcept override;
         [[nodiscard]] auto isExtended() const noexcept -> bool;
         [[nodiscard]] auto isShort() const noexcept -> bool;
 

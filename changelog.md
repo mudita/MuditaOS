@@ -49,6 +49,7 @@
 * `[doc]` Application manager documentation added.
 * `[audio]` Improve synchronization during calls.
 * `[system]` Application manager refactoring and improvements.
+* `[cellular]` URC handling refactor.
 
 ## [0.43.1 2020-10-23]
 

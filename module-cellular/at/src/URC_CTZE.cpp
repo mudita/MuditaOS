@@ -9,21 +9,6 @@
 
 using namespace at::urc;
 
-CTZE::CTZE(const std::string &val) : Any(val)
-{
-    if (!is()) {
-        return;
-    }
-    for (auto &t : tokens) {
-        utils::findAndReplaceAll(t, "\"", "");
-    }
-}
-
-auto CTZE::what() const noexcept -> std::string
-{
-    return urc_name;
-}
-
 auto CTZE::isValid() const noexcept -> bool
 {
     return tokens.size() == magic_enum::enum_count<Tokens>();
