@@ -12,16 +12,16 @@
 
 namespace at::urc
 {
-    std::shared_ptr<URC> URC::Create(const std::string &urcBody)
+    std::shared_ptr<URC> URC::Create(const std::string &urcMessage)
     {
-        if (urcBody.empty()) {
+        if (urcMessage.empty()) {
             return std::make_unique<URC>(std::string());
         }
 
         const char headDelimiter = ':';
-        auto it          = std::find(urcBody.begin(), urcBody.end(), headDelimiter);
-        std::string head = std::string(urcBody.begin(), it);
-        std::string body = std::string(it == urcBody.end() ? it : it + 1, urcBody.end());
+        auto it                  = std::find(urcMessage.begin(), urcMessage.end(), headDelimiter);
+        std::string head         = std::string(urcMessage.begin(), it);
+        std::string body         = std::string(it == urcMessage.end() ? it : it + 1, urcMessage.end());
 
         if (head.find(CTZE::head) != std::string::npos) {
             return std::make_unique<CTZE>(body);
@@ -45,14 +45,14 @@ namespace at::urc
         return std::make_unique<URC>(std::string());
     }
 
-    URC::URC(const std::string &str, char tokenDelimiter) : body(str)
+    URC::URC(const std::string &urcBody, char tokenDelimiter)
     {
-        split(str, tokenDelimiter);
+        split(urcBody, tokenDelimiter);
     }
 
     void URC::split(const std::string &str, char tokenDelimiter)
     {
-        tokens = utils::split(str, tokenDelimiter);
+        tokens                            = utils::split(str, tokenDelimiter);
         constexpr auto urcStringDelimiter = "\"";
         for (auto &t : tokens) {
             utils::findAndReplaceAll(t, urcStringDelimiter, "");
