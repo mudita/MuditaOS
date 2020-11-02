@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application-calendar/models/DayEventsInternalModel.hpp"
+#include "application-calendar/models/DayEventsModel.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
@@ -12,7 +12,7 @@
 #include <ListView.hpp>
 #include <gui/widgets/Item.hpp>
 #include <gui/widgets/Label.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <application-calendar/data/dateCommon.hpp>
 
 namespace gui
 {
@@ -23,7 +23,7 @@ namespace gui
         gui::Image *leftArrowImage                               = nullptr;
         gui::Image *newDayEventImage                             = nullptr;
         gui::ListView *dayEventsList                             = nullptr;
-        std::shared_ptr<DayEventsInternalModel> dayEventsModel   = nullptr;
+        std::shared_ptr<DayEventsModel> dayEventsModel           = nullptr;
 
       public:
         DayEventsWindow(app::Application *app);
@@ -33,7 +33,6 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
     };
 
 } /* namespace app */

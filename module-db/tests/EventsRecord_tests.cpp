@@ -155,8 +155,8 @@ TEST_CASE("Events Record tests")
 
         SECTION("Get table rows by SELECT invalid")
         {
-            auto retOffsetLimit = eventsRecordInterface.Select(TimePointFromString("2010-10-20 14:24:00"),
-                                                               TimePointFromString("2010-10-20 15:36:00"));
+            auto retOffsetLimit = eventsRecordInterface.Select(
+                TimePointFromString("2010-10-20 14:24:00"), TimePointFromString("2010-10-20 15:36:00"), 0, UINT32_MAX);
             REQUIRE(retOffsetLimit->size() == 0);
         }
     }

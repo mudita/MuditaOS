@@ -159,9 +159,10 @@ namespace app
     {
         if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
             popToWindow(gui::name::window::main_window);
-            return;
         }
-
+        if (equivalentWindow == EquivalentWindow::AllEventsWindow) {
+            popToWindow(gui::name::window::main_window);
+        }
         gui::DialogMetadata meta;
         meta.text   = utils::localize.get("app_calendar_no_events_information");
         meta.title = title;

@@ -3,8 +3,7 @@
 
 #include "DayEventsWindow.hpp"
 #include "application-calendar/data/CalendarData.hpp"
-#include "log/log.hpp"
-#include "module-apps/application-calendar/ApplicationCalendar.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Item.hpp>
@@ -14,7 +13,6 @@
 #include <time/time_conversion.hpp>
 #include <module-services/service-db/messages/QueryMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
@@ -22,7 +20,7 @@ namespace gui
 
     DayEventsWindow::DayEventsWindow(app::Application *app)
         : AppWindow(app, style::window::calendar::name::day_events_window),
-          dayEventsModel{std::make_shared<DayEventsInternalModel>(this->application)}
+          dayEventsModel{std::make_shared<DayEventsModel>(this->application)}
     {
         buildInterface();
     }
@@ -33,7 +31,9 @@ namespace gui
     }
     void DayEventsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        setTitle(dayMonthTitle);
+        if (mode == gui::ShowMode::GUI_SHOW_INIT) {
+            dayEventsList->rebuildList();
+        }
     }
 
     auto DayEventsWindow::handleSwitchData(SwitchData *data) -> bool
@@ -42,18 +42,15 @@ namespace gui
             return false;
         }
 
-        auto message = dynamic_cast<DayEventsWindowMessage *>(data);
-        if (message != nullptr) {
-            dayEventsModel->loadData(std::move(message->records));
-        }
-
         auto *item = dynamic_cast<DayMonthData *>(data);
         if (item == nullptr) {
             return false;
         }
 
         dayMonthTitle = item->getDayMonthText();
-        filterFrom    = item->getDateFilter();
+        filterFrom      = item->getDateFilter();
+        auto filterTill = filterFrom + date::days{1};
+        dayEventsModel->setFilters(filterFrom, filterTill, dayMonthTitle);
         LOG_DEBUG("FILTER 1: %s", TimePointToString(filterFrom).c_str());
         setTitle(dayMonthTitle);
         if (dayMonthTitle == "") {
@@ -113,11 +110,6 @@ namespace gui
         return false;
     }
 
-    auto DayEventsWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool
-    {
-        LOG_DEBUG("Response False");
-        return false;
-    }
     bool DayEventsWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);

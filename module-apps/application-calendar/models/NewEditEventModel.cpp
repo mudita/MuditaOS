@@ -203,11 +203,11 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
                 assert(app != nullptr);
                 if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
                     app->popToWindow(gui::name::window::main_window);
-                    app->switchWindow(style::window::calendar::name::day_events_window);
+                    app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
                 }
                 else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
                     app->popToWindow(gui::name::window::main_window);
-                    app->switchWindow(style::window::calendar::name::all_events_window);
+                    app->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
                 }
             }
             else {

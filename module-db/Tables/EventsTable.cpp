@@ -425,12 +425,17 @@ EventsTableRow EventsTable::getById(uint32_t id)
     };
 }
 
-std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint date_filter, TimePoint filter_till)
+std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint date_filter,
+                                                            TimePoint filter_till,
+                                                            uint32_t offset,
+                                                            uint32_t limit)
 {
-    auto retQuery =
-        db->query("SELECT * FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of day');",
-                  TimePointToString(date_filter).c_str(),
-                  TimePointToString(filter_till).c_str());
+    auto retQuery = db->query("SELECT * FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of "
+                              "day') ORDER BY datetime(date_from) LIMIT %u OFFSET %u;",
+                              TimePointToString(date_filter).c_str(),
+                              TimePointToString(filter_till).c_str(),
+                              limit,
+                              offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<EventsTableRow>();
@@ -521,6 +526,20 @@ std::vector<EventsTableRow> EventsTable::getLimitOffsetByField(uint32_t offset,
 uint32_t EventsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM events;");
+
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
+        return 0;
+    }
+
+    return (*queryRet)[0].getUInt32();
+}
+
+uint32_t EventsTable::countFromFilter(TimePoint from, TimePoint till)
+{
+    auto queryRet = db->query(
+        "SELECT COUNT(*) FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of day');",
+        TimePointToString(from).c_str(),
+        TimePointToString(till).c_str());
 
     if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;

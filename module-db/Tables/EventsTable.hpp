@@ -44,8 +44,12 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     bool removeByField(EventsTableFields field, const char *str) override final;
     bool update(EventsTableRow entry) override final;
     EventsTableRow getById(uint32_t id) override final;
-    std::vector<EventsTableRow> selectByDatePeriod(TimePoint filter_from, TimePoint filter_till);
+    std::vector<EventsTableRow> selectByDatePeriod(TimePoint filter_from,
+                                                   TimePoint filter_till,
+                                                   uint32_t offset,
+                                                   uint32_t limit);
     uint32_t count() override final;
+    uint32_t countFromFilter(TimePoint from, TimePoint till);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     std::vector<EventsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
     std::vector<EventsTableRow> getLimitOffsetByField(uint32_t offset,
