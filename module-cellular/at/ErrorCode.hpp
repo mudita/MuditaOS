@@ -4,88 +4,10 @@
 
 #include <limits>
 #include <Utils.hpp> //for magic_enum
-//#include <magic_enum.hpp>
 
 namespace at
 {
-    /*
-     *
-     * Base on Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
-Code of <err> Meaning
-0 Phone failure
-1 No connection to phone
-2 Phone-adaptor link reserved
-3 Operation not allowed
-4 Operation not supported
-5 PH-SIM PIN required
-6 PH-FSIM PIN required
-7 PH-FSIM PUK required
-10 SIM not inserted
-11 SIM PIN required
-12 SIM PUK required
-13 SIM failure
-14 SIM busy
-15 SIM wrong
-16 Incorrect password
-17 SIM PIN2 required
-18 SIM PUK2 required
-20 Memory full
-21 Invalid index
-22 Not found
-23 Memory failure
-24 Text string too long
-25 Invalid characters in text string
-26 Dial string too long
-27 Invalid characters in dial string
-30 No network service
-31 Network timeout
-32 Network not allowed - emergency calls only
-40 Network personalization PIN required
-41 Network personalization PUK required
-42 Network subset personalization PIN required
-43 Network subset personalization PUK required
-44 Service provider personalization PIN required
-45 Service provider personalization PUK required
-46 Corporate personalization PIN required
-47 Corporate personalization PUK required
-901 Audio unknown error
-902 Audio invalid parameters
-903 Audio operation not supported
-904 Audio device busy
 
-//----------------------- second list CMS
-300 ME failure
-301 SMS ME reserved
-302 Operation not allowed
-303 Operation not supported
-304 Invalid PDU mode
-305 Invalid text mode
-310 SIM not inserted
-311 SIM pin necessary
-312 PH SIM pin necessary
-313 SIM failure
-314 SIM busy
-315 SIM wrong
-316 SIM PUK required
-317 SIM PIN2 required
-318 SIM PUK2 required
-320 Memory failure
-321 Invalid memory index
-322 Memory full
-330 SMSC address unknown
-331 No network
-332 Network timeout
-500 Unknown
-512 SIM not ready
-513 Message length exceeds
-514 Invalid request parameters
-515 ME storage failure
-517 Invalid service mode
-528 More message to send state error
-529 MO SMS is not allow
-530 GPRS is suspended
-531 ME storage full
-     */
 
     static const int MAX_AT_ERROR_VALUE = 1000; // use for magic_enum limitations, see end of this file
 
@@ -187,12 +109,11 @@ Code of <err> Meaning
 
 } // namespace at
 
-/*This part of code is extension for magic_enum class due to documentation,
- * below we extended AT error enum class, based on const MAX_AT_ERROR_VALUE
- * which should have value higher then maximum AT error value but lower then
- * magic num library limitations which is INT16_MAX-2 (-2 for Unknown and NoInformation)
- */
-
+/** This part of code is extension for magic_enum class due to documentation,
+* below we extended AT error enum class, based on const MAX_AT_ERROR_VALUE
+* which should have value higher then maximum AT error value but lower then
+* magic num library limitations which is INT16_MAX-2 (-2 for Unknown and NoInformation)
+*/
 namespace magic_enum
 {
     template <> struct enum_range<at::NetworkErrorCode>
