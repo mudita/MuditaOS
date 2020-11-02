@@ -135,8 +135,10 @@ enum class MessageType
     APMClose, ///< this message will trigger application manager to close itself, all running applications gui and eink
               ///< services.
     APMPreventBlocking,   ///< Prevents application manager from initializing device blocking.
-    APMInitPowerSaveMode, ///< This message is sent to application manager from desktop when locking timeout has
-                          ///< triggered or user explicitly locked the phone.
+    APMLockScreen,      ///< This message is sent to application manager from desktop when locking timeout has
+                        ///< triggered or user explicitly locked the phone.
+    APMUnlockScreen,    ///< This message is sent to application manager from PinLockWindow to block
+                        ///< switching Low Power Mode
 
     // keyboard messages
     KBDKeyEvent,

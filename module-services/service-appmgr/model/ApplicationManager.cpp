@@ -203,10 +203,6 @@ namespace app::manager
             ret->isRunning = getApplication(msg->checkAppName) != nullptr;
             return ret;
         });
-        connect(typeid(PowerSaveModeInitRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
-            handlePowerSavingModeInit();
-            return std::make_shared<sys::ResponseMessage>();
-        });
         connect(typeid(PreventBlockingRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
             blockingTimer->reload();
             return std::make_shared<sys::ResponseMessage>();
@@ -273,7 +269,8 @@ namespace app::manager
             sys::SystemManager::ResumeService(service::name::gui, this);
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
-            [[fallthrough]];
+            suspendSystemServices();
+            break;
         case sys::ServicePowerMode ::SuspendToNVM:
             suspendSystemServices();
             break;
@@ -323,14 +320,6 @@ namespace app::manager
         else {
             LOG_FATAL("Service/Application %s is still running", name.c_str());
         }
-    }
-
-    auto ApplicationManager::handlePowerSavingModeInit() -> bool
-    {
-        LOG_INFO("Going to suspend mode");
-        suspendSystemServices();
-        sys::SystemManager::SuspendSystem(this);
-        return true;
     }
 
     auto ApplicationManager::handleSwitchApplication(SwitchRequest *msg) -> bool

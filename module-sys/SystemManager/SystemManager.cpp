@@ -107,6 +107,10 @@ namespace sys
         // M.P: Ping/pong mechanism is turned off. It doesn't bring any value to the system.
         // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
         // ReloadTimer(pingPongTimerID);
+
+        lowPowerEnryTimer =
+            std::make_unique<sys::Timer>("LowPowerEnryTimer", this, LongWait, sys::Timer::Type::SingleShot);
+        lowPowerEnryTimer->connect([&](sys::Timer &) { LowPowerEntryHandler(); });
     }
 
     bool SystemManager::CloseSystem(Service *s)
@@ -121,11 +125,81 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::SuspendSystem(Service *caller)
+    bool SystemManager::FocusOnApplication(Service *caller, bool enabled)
     {
+        isFocusOnApplicationActive = enabled;
+        if (enabled)
+            return ExitLowPowerMode(caller);
+        else
+            lowPowerEnryTimer->reload(ShortWait);
+        return true;
+    }
 
+    bool SystemManager::UpdateChargerState(Service *caller, bool plugged)
+    {
+        isChargerPlugged = plugged;
+        if (plugged)
+            return ExitLowPowerMode(caller);
+        else
+            lowPowerEnryTimer->reload(ShortWait);
+        return true;
+    }
+
+    bool SystemManager::UpdateCellularState(Service *caller, bool ready)
+    {
+        isCellularReady = ready;
+        if (ready) {
+            lowPowerEnryTimer->reload(ShortWait);
+        }
+        else {
+            return ExitLowPowerMode(caller);
+        }
+        return true;
+    }
+
+    bool SystemManager::UpdateAudioState(Service *caller, bool active)
+    {
+        isAudioActive = active;
+        if (active) {
+            return ExitLowPowerMode(caller);
+        }
+        else {
+            lowPowerEnryTimer->reload(ShortWait);
+        }
+        return true;
+    }
+
+    void SystemManager::RtcUpdate()
+    {
+        isRtcUpdate = true;
+        lowPowerEnryTimer->reload(ShortWait);
+    }
+
+    void SystemManager::PrepareSystemToHandleCellular(Service *caller)
+    {
+        lowPowerEnryTimer->reload(LongWait);
+        ExitLowPowerMode(caller);
+    }
+
+    void SystemManager::CheckLowPowerMode(Service *caller)
+    {
+        lowPowerEnryTimer->reload(ShortWait);
+        ExitLowPowerMode(caller);
+    }
+
+    bool SystemManager::LowPowerPermission()
+    {
+        return (isScreenLock && !isAudioActive && !isFocusOnApplicationActive && isRtcUpdate && isCellularReady &&
+                !isChargerPlugged);
+    }
+
+    bool SystemManager::EnterLowPowerMode(Service *caller)
+    {
         if (powerManager->GetCurrentMode() != PowerManager::Mode::FullSpeed) {
-            LOG_WARN("System is already suspended.");
+            return false;
+        }
+
+        if (!LowPowerPermission()) {
             return false;
         }
 
@@ -144,23 +218,24 @@ namespace sys
             }
         }
 
+        CriticalSection::Enter();
         powerManager->Switch(PowerManager::Mode::LowPowerIdle);
+        CriticalSection::Exit();
 
         return true;
     }
 
-    bool SystemManager::ResumeSystem(Service *caller)
+    bool SystemManager::ExitLowPowerMode(Service *caller)
     {
-
         if (powerManager->GetCurrentMode() == PowerManager::Mode::FullSpeed) {
-            LOG_WARN("System is already resumed.");
             return false;
         }
 
+        CriticalSection::Enter();
         powerManager->Switch(PowerManager::Mode::FullSpeed);
+        CriticalSection::Exit();
 
         for (const auto &w : servicesList) {
-
             if (w->parent == "" && w->GetName() != caller->GetName()) {
                 auto ret = Bus::SendUnicast(
                     std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active),
@@ -174,6 +249,7 @@ namespace sys
                 }
             }
         }
+
         return true;
     }
 
@@ -306,9 +382,27 @@ namespace sys
         return ReturnCodes::Success;
     }
 
-    Message_t SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
+    Message_t SystemManager::DataReceivedHandler(DataMessage *msgl, ResponseMessage *resp)
     {
-        return std::make_shared<ResponseMessage>();
+        bool handled = false;
+
+        switch (msgl->messageType) {
+
+        case MessageType::APMLockScreen: {
+            isScreenLock = true;
+            lowPowerEnryTimer->reload(ShortWait);
+        } break;
+        case MessageType::APMUnlockScreen: {
+            isScreenLock = false;
+        } break;
+        default:
+            break;
+        }
+
+        if (handled)
+            return std::make_shared<sys::ResponseMessage>();
+        else
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
     void SystemManager::CloseSystemHandler()
@@ -349,6 +443,20 @@ namespace sys
         set(State::Reboot);
     }
 
+    void SystemManager::LowPowerEntryHandler()
+    {
+#if (LOW_POWER_MODE_ENABLED)
+        EnterLowPowerMode(this);
+#endif
+    }
+
+    bool SystemManager::isScreenLock{true};
+    bool SystemManager::isAudioActive{false};
+    bool SystemManager::isFocusOnApplicationActive{false};
+    bool SystemManager::isRtcUpdate{false};
+    bool SystemManager::isCellularReady{false};
+    bool SystemManager::isChargerPlugged{false};
+    std::unique_ptr<sys::Timer> SystemManager::lowPowerEnryTimer;
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
     std::unique_ptr<PowerManager> SystemManager::powerManager;

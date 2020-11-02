@@ -40,10 +40,11 @@ namespace app::manager
         static auto closeApplication(sys::Service *sender, const ApplicationName &name) -> bool;
         static auto changeDisplayLanguage(sys::Service *sender, utils::Lang language) -> bool;
         static auto changeInputLanguage(sys::Service *sender, utils::Lang language) -> bool;
-        static auto changePowerSaveMode(sys::Service *sender) -> bool;
         static auto stopApplicationManager(sys::Service *sender) -> bool;
         static auto preventBlockingDevice(sys::Service *sender) -> bool;
         static auto confirmSwitch(sys::Service *sender) -> bool;
         static auto confirmClose(sys::Service *sender) -> bool;
+        static auto lockScreen(sys::Service *sender) -> bool;
+        static auto unlockScreen(sys::Service *sender) -> bool;
     };
 } // namespace app::manager

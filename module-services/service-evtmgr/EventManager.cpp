@@ -48,6 +48,8 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
     alarmTimestamp = 0;
     alarmID        = 0;
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
 }
 
 EventManager::~EventManager()
@@ -102,9 +104,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
-        if (suspended && (message->key.state == RawKey::State::Pressed)) {
-            suspended = false;
-            sys::SystemManager::ResumeSystem(this);
+        if (message->key.state == RawKey::State::Pressed) {
+            // exit from low power mode if active
+            sys::SystemManager::CheckLowPowerMode(this);
         }
         if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
             // and state == ShutDown
@@ -125,15 +127,15 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             targetApplication = msg->getApplication();
             handled           = true;
             LOG_INFO("Switching focus to %s", targetApplication.c_str());
+
+            sys::SystemManager::FocusOnApplication(this, targetApplication == "ApplicationDesktop" ? false : true);
         }
     }
     else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
         auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
 
-        if (suspended) {
-            suspended = false;
-            sys::SystemManager::ResumeSystem(this);
-        }
+        // exit from low power mode if active
+        sys::SystemManager::CheckLowPowerMode(this);
 
         auto message           = std::make_shared<sevm::BatteryLevelMessage>();
         message->levelPercents = msg->levelPercents;
@@ -148,10 +150,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName()) {
         auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
 
-        if (suspended) {
-            suspended = false;
-            sys::SystemManager::ResumeSystem(this);
-        }
+        sys::SystemManager::UpdateChargerState(this, msg->plugged);
 
         auto message     = std::make_shared<sevm::BatteryPlugMessage>();
         message->plugged = msg->plugged;
@@ -229,6 +228,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             if (auto time = msg->getTime(); time) {
                 LOG_INFO("RTC set by network time.");
                 bsp::rtc_SetDateTime(&time.value());
+                sys::SystemManager::RtcUpdate();
             }
             if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
                 setSettingsTimeZone(msg->getTimeZoneString().value());
@@ -239,7 +239,24 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
-        sys::SystemManager::ResumeSystem(this);
+        sys::SystemManager::PrepareSystemToHandleCellular(this);
+    }
+    else if (msgl->messageType == MessageType::CellularStateRequest) {
+        auto msg = dynamic_cast<cellular::StateChange *>(msgl);
+        if (msg != nullptr) {
+            sys::SystemManager::UpdateCellularState(this, msg->request == cellular::State::ST::Ready ? true : false);
+        }
+    }
+    else if (msgl->messageType == MessageType::AudioMessage) {
+        auto msg = dynamic_cast<AudioNotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            if (msg->type == AudioNotificationMessage::Type::ServiceWakeUp) {
+                sys::SystemManager::UpdateAudioState(this, true);
+            }
+            else if (msg->type == AudioNotificationMessage::Type::ServiceSleep) {
+                sys::SystemManager::UpdateAudioState(this, false);
+            }
+        }
     }
 
     if (handled) {

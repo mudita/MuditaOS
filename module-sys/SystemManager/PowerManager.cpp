@@ -25,7 +25,11 @@ namespace sys
             ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::FullSpeed);
             break;
         case Mode::LowPowerIdle:
+            ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+            break;
         case Mode::LowPowerRun:
+            ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerRun);
+            break;
         case Mode::Suspend:
             LOG_FATAL("LowPowerIdle temporary disabled!");
             // Low power is temporary disabled it was breaking i.e. GSM

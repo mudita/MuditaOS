@@ -237,7 +237,7 @@ namespace sgui
             suspendInProgress = false;
             LOG_DEBUG("last rendering before suspend is finished.");
 
-            app::manager::Controller::changePowerSaveMode(this);
+            app::manager::Controller::lockScreen(this);
         }
         if ((renderFrameCounter != transferedFrameCounter) && (!rendering)) {
             sendBuffer();

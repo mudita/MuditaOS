@@ -149,13 +149,13 @@ namespace gui
             static bool state = false;
             if (state == false) {
                 // sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
-                sys::SystemManager::SuspendSystem(application);
-                LOG_INFO("SUSPEND SYSTEM");
+                sys::SystemManager::EnterLowPowerMode(application);
+                LOG_INFO("LOW POWER MODE SYSTEM");
                 state = true;
             }
             else {
-                sys::SystemManager::ResumeSystem(application);
-                LOG_INFO("RESUME SYSTEM");
+                sys::SystemManager::ExitLowPowerMode(application);
+                LOG_INFO("FULL SPEED SYSTEM");
                 state = false;
             }
             return true;

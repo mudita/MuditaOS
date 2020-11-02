@@ -88,9 +88,15 @@ namespace app::manager
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 
-    auto Controller::changePowerSaveMode(sys::Service *sender) -> bool
+    auto Controller::lockScreen(sys::Service *sender) -> bool
     {
-        auto msg = std::make_shared<app::manager::PowerSaveModeInitRequest>(sender->GetName());
-        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
+        auto msg = std::make_shared<app::manager::APMLockScreen>(sender->GetName());
+        return sys::Bus::SendUnicast(msg, service::name::system_manager, sender);
+    }
+
+    auto Controller::unlockScreen(sys::Service *sender) -> bool
+    {
+        auto msg = std::make_shared<app::manager::APMUnlockScreen>(sender->GetName());
+        return sys::Bus::SendUnicast(msg, service::name::system_manager, sender);
     }
 } // namespace app::manager

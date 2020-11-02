@@ -118,7 +118,6 @@ namespace app::manager
         auto handleInitApplication(ApplicationInitialisation *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
-        auto handlePowerSavingModeInit() -> bool;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,

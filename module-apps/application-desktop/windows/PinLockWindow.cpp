@@ -81,6 +81,7 @@ namespace gui
             lockTimeoutApplication = lockData->getPreviousApplication();
         }
         if (lock.unlock()) {
+            app::manager::Controller::unlockScreen(application);
             setVisibleState(PinLock::State::VerifiedPin);
             application->switchWindow(gui::name::window::main_window);
         }

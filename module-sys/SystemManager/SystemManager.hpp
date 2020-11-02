@@ -19,11 +19,17 @@
 #include "Service/Bus.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
+#include "Service/Timer.hpp"
 #include "PowerManager.hpp"
 #include "Constants.hpp"
 
+#define LOW_POWER_MODE_ENABLED 1
+
 namespace sys
 {
+    constexpr sys::ms LongWait{20000};
+    constexpr sys::ms ShortWait{5000};
+
     enum class Code
     {
         CloseSystem,
@@ -65,9 +71,9 @@ namespace sys
 
         static bool Reboot(Service *s);
 
-        static bool SuspendSystem(Service *caller);
+        static bool EnterLowPowerMode(Service *caller);
 
-        static bool ResumeSystem(Service *caller);
+        static bool ExitLowPowerMode(Service *caller);
 
         static bool SuspendService(const std::string &name, Service *caller);
 
@@ -90,9 +96,19 @@ namespace sys
         /// instead
         void kill(std::shared_ptr<Service> const &toKill);
 
-      private:
+        /// exit from low power mode if active
+        static void CheckLowPowerMode(Service *caller);
+        /// exit from low power mode if active
+        static void PrepareSystemToHandleCellular(Service *caller);
 
-        Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
+        static bool FocusOnApplication(Service *caller, bool enabled);
+        static bool UpdateChargerState(Service *caller, bool plugged);
+        static bool UpdateCellularState(Service *caller, bool ready);
+        static bool UpdateAudioState(Service *caller, bool active);
+        static void RtcUpdate();
+
+      private:
+        Message_t DataReceivedHandler(DataMessage *msgl, ResponseMessage *resp) override;
 
         ReturnCodes InitHandler() override;
 
@@ -125,10 +141,23 @@ namespace sys
         /// red key won't work to power it on. For more information follow up with schematics
         bool PreShutdownLoop();
 
+        /// timer counting down the time to enter low power mode
+        void LowPowerEntryHandler();
+        /// check if we can go to low power mode
+        static bool LowPowerPermission();
+
         TickType_t pingInterval;
         uint32_t pingPongTimerID;
 
         InitFunction userInit;
+
+        static bool isScreenLock;
+        static bool isAudioActive;
+        static bool isFocusOnApplicationActive;
+        static bool isRtcUpdate;
+        static bool isCellularReady;
+        static bool isChargerPlugged;
+        static std::unique_ptr<sys::Timer> lowPowerEnryTimer;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
         static cpp_freertos::MutexStandard destroyMutex;
