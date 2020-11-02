@@ -632,6 +632,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     settingsRecordInterface_v2   = std::make_unique<SettingsRecordInterface_v2>(settingsDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
+    databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();

@@ -24,6 +24,7 @@
 #include "messages/DBNotificationMessage.hpp"
 #include "agents/DatabaseAgent.hpp"
 #include "agents/settings/SettingsAgent.hpp"
+#include "agents/file_indexer/FileIndexerAgent.hpp"
 #include "BaseInterface.hpp"  // for Interface, Interface::Name
 #include "Common/Query.hpp"   // for Query, Query::Type
 #include "Service/Common.hpp" // for ReturnCodes, ServicePowerMode
