@@ -8,10 +8,14 @@
 namespace gui
 {
 
-    class FontSizeWindow : public BaseSettingsWindow
+    class AutolockWindow : public BaseSettingsWindow
     {
       public:
-        FontSizeWindow(app::Application *app);
-        auto buildOptionsList() -> std::list<gui::Option> override;
+        AutolockWindow(app::Application *app);
+
+      private:
+        auto buildOptionsList() -> std::list<Option> override;
+
+        std::string selectedTime;
     };
 } // namespace gui

@@ -7,17 +7,21 @@
 
 namespace gui
 {
+    class CheckBoxWithLabel;
 
-    class DisplayLightWindow : public BaseSettingsWindow
+    class WallpaperWindow : public BaseSettingsWindow
     {
       public:
-        DisplayLightWindow(app::Application *app);
+        WallpaperWindow(app::Application *app);
 
       private:
         void switchHandler(bool &onOffSwitch);
         auto buildOptionsList() -> std::list<Option> override;
 
-        bool isDisplayLightSwitchOn = false;
-        bool isAutoLightSwitchOn    = false;
+        bool isWallpaperLogoSwitchOn   = false;
+        bool isWallpaperClockSwitchOn  = false;
+        bool isWallpaperQuotesSwitchOn = false;
+
+        Item *quotes;
     };
 } // namespace gui

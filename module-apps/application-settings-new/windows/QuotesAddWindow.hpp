@@ -7,11 +7,15 @@
 
 namespace gui
 {
+    class CheckBoxWithLabel;
 
-    class FontSizeWindow : public BaseSettingsWindow
+    class QuotesAddWindow : public AppWindow
     {
       public:
-        FontSizeWindow(app::Application *app);
-        auto buildOptionsList() -> std::list<gui::Option> override;
+        QuotesAddWindow(app::Application *app);
+        void buildInterface() override;
+
+      private:
+        std::vector<CheckBoxWithLabel *> boxes;
     };
 } // namespace gui

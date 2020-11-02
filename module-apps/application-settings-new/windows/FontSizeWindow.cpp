@@ -3,7 +3,8 @@
 
 #include "FontSizeWindow.hpp"
 
-#include <application-settings-new/ApplicationSettings.hpp>
+#include "application-settings-new/ApplicationSettings.hpp"
+
 #include <i18/i18.hpp>
 
 namespace gui
@@ -11,13 +12,12 @@ namespace gui
 
     FontSizeWindow::FontSizeWindow(app::Application *app) : BaseSettingsWindow(app, gui::window::name::font_size)
     {
-        buildInterface();
+        setTitle(utils::localize.get("app_settings_display_font_size"));
     }
 
-    void FontSizeWindow::buildInterface()
+    auto FontSizeWindow::buildOptionsList() -> std::list<gui::Option>
     {
-        BaseSettingsWindow::buildInterface();
-        setTitle(utils::localize.get("app_settings_display_font_size"));
+        return std::list<gui::Option>();
     }
 
 } // namespace gui

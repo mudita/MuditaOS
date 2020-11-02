@@ -30,8 +30,10 @@ target_sources( ${PROJECT_NAME}
         windows/NetworkWindow.cpp
         windows/MessagesWindow.cpp
         windows/PhoneNameWindow.cpp
-        widgets/UpDown.cpp
-        widgets/Toggle.cpp
+        windows/AutolockWindow.cpp
+        windows/WallpaperWindow.cpp
+        windows/QuotesMainWindow.cpp
+        windows/QuotesAddWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -46,8 +48,8 @@ target_sources( ${PROJECT_NAME}
         windows/AppsAndToolsWindow.hpp
         windows/MessagesWindow.hpp
         widgets/SettingsStyle.hpp
-        widgets/UpDown.hpp
-        widgets/Toggle.hpp
+        windows/AutolockWindow.hpp
+        windows/WallpaperWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
