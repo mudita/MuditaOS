@@ -32,6 +32,7 @@ namespace drivers
             edma_config_t dmaConfig = {0};
 
             EDMA_GetDefaultConfig(&dmaConfig);
+            dmaConfig.enableRoundRobinArbitration = true;
             EDMA_Init(base, &dmaConfig);
             LOG_DEBUG("Init: DMA_0");
         } break;
@@ -40,8 +41,11 @@ namespace drivers
 
     RT1051DriverDMA::~RT1051DriverDMA()
     {
-        EDMA_Deinit(base);
-        LOG_DEBUG("Deinit: DMA_0");
+        switch (instance) {
+        case DMAInstances::DMA_0:
+            EDMA_Deinit(base);
+            LOG_DEBUG("Deinit: DMA_0");
+        }
     }
 
     std::unique_ptr<DriverDMAHandle> RT1051DriverDMA::CreateHandle(const uint32_t channel,

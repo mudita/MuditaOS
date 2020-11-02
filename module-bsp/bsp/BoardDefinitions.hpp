@@ -20,8 +20,8 @@ enum class BoardDefinitions
     AUDIOCODEC_I2C            = static_cast<int>(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX         = static_cast<int>(drivers::DMAMuxInstances ::DMAMUX0),
     AUDIOCODEC_DMA            = static_cast<int>(drivers::DMAInstances ::DMA_0),
-    AUDIOCODEC_TX_DMA_CHANNEL = 6,
-    AUDIOCODEC_RX_DMA_CHANNEL = 7,
+    AUDIOCODEC_TX_DMA_CHANNEL = 5,
+    AUDIOCODEC_RX_DMA_CHANNEL = 6,
     AUDIOCODEC_IRQ            = 31, // GPIO_B1_15  requires pull-up 10kΩ
     AUDIOCODEC_IRQ_GPIO       = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
 
@@ -30,8 +30,8 @@ enum class BoardDefinitions
 
     CELLULAR_AUDIO_DMAMUX         = AUDIOCODEC_DMAMUX,
     CELLULAR_AUDIO_DMA            = AUDIOCODEC_DMA,
-    CELLULAR_AUDIO_TX_DMA_CHANNEL = 3,
-    CELLULAR_AUDIO_RX_DMA_CHANNEL = 4,
+    CELLULAR_AUDIO_TX_DMA_CHANNEL = 2,
+    CELLULAR_AUDIO_RX_DMA_CHANNEL = 3,
 
     KEYBOARD_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     KEYBOARD_I2C          = AUDIOCODEC_I2C,
@@ -54,7 +54,7 @@ enum class BoardDefinitions
 
     CELLULAR_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     CELLULAR_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
-    CELLULAR_TX_DMA_CHANNEL = 5,
+    CELLULAR_TX_DMA_CHANNEL = 4,
     CELLULAR_GPIO_1 = static_cast<int >(drivers::GPIOInstances ::GPIO_1),
     CELLULAR_GPIO_2 = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
     CELLULAR_GPIO_3 = static_cast<int >(drivers::GPIOInstances ::GPIO_3),
@@ -83,6 +83,11 @@ enum class BoardDefinitions
     EINK_RESET_PIN=16,
     EINK_BUSY_PIN=17,
     EINK_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+
+    BLUETOOTH_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
+    BLUETOOTH_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
+    BLUETOOTH_TX_DMA_CHANNEL = 7,
+    BLUETOOTH_RX_DMA_CHANNEL = 8,
 
     EMMC_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
 

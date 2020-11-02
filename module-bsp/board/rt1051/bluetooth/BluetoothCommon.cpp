@@ -1,6 +1,8 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <module-bsp/drivers/dmamux/DriverDMAMux.hpp>
+#include <module-bsp/bsp/BoardDefinitions.hpp>
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include "log/log.hpp"
 #include "FreeRTOS.h"
@@ -8,6 +10,8 @@
 #include "board.h"
 
 using namespace bsp;
+
+lpuart_edma_handle_t BluetoothCommon::uartDmaHandle      = {};
 
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
@@ -51,6 +55,7 @@ BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, in
 {
     configure_uart_io();
     configure_lpuart();
+    configure_lpuart_edma();
     configure_cts_irq();
     LOG_INFO("Bluetooth HW init done!");
 }
@@ -228,6 +233,30 @@ void BluetoothCommon::configure_lpuart()
     NVIC_EnableIRQ(LPUART2_IRQn);
 }
 
+void BluetoothCommon::DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
+{
+
+    BaseType_t higherPriorTaskWoken = 0;
+    vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
+
+    portEND_SWITCHING_ISR(higherPriorTaskWoken);
+}
+
+void BluetoothCommon::configure_lpuart_edma()
+{
+    dmamux = drivers::DriverDMAMux::Create(static_cast<drivers::DMAMuxInstances>(BoardDefinitions ::BLUETOOTH_DMAMUX),
+                                           drivers::DriverDMAMuxParams{});
+    dma    = drivers::DriverDMA::Create(static_cast<drivers::DMAInstances>(BoardDefinitions ::BLUETOOTH_DMA),
+                                     drivers::DriverDMAParams{});
+
+    LPUART_TransferCreateHandleEDMA(BSP_BLUETOOTH_UART_BASE,
+                                    &uartDmaHandle,
+                                    DMATxCompletedCb,
+                                    NULL,
+                                    reinterpret_cast<edma_handle_t *>(txDMAHandle->GetHandle()),
+                                    NULL);
+}
+
 void BluetoothCommon::configure_cts_irq()
 {
     DisableIRQ(GPIO1_Combined_16_31_IRQn);
@@ -236,13 +265,14 @@ void BluetoothCommon::configure_cts_irq()
     EnableIRQ(GPIO1_Combined_16_31_IRQn);
     NVIC_SetPriority(GPIO1_Combined_16_31_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
 }
-
 void BluetoothCommon::set_irq(bool enable)
 {
     // printf("%s\n", __FUNCTION__);
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
+    auto n = LPUART_GetEnabledInterrupts(BSP_BLUETOOTH_UART_BASE);
+    n += 0;
     if (enable) {
         LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
                                 kLPUART_RxDataRegFullInterruptEnable | kLPUART_IdleLineInterruptEnable);

@@ -7,6 +7,12 @@
 #include <thread.hpp>
 #include <board.h>
 
+// edma
+#include <module-bsp/board/rt1051/common/fsl_drivers/fsl_lpuart_edma.h>
+#include "drivers/dmamux/DriverDMAMux.hpp"
+#include "drivers/dma/DriverDMA.hpp"
+// /edma
+
 /// c++ low level driver overlay
 
 namespace bsp {
@@ -125,10 +131,18 @@ namespace bsp {
             // Part to override
             virtual ssize_t read(void *buf, size_t nbytes) override = 0;
 
-        private:
+          private:
             void configure_uart_io();
             void configure_lpuart();
             void configure_cts_irq();
+            void configure_lpuart_edma();
+            // edma
+            std::shared_ptr<drivers::DriverDMAMux> dmamux;
+            std::shared_ptr<drivers::DriverDMA> dma;
+            std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
+            static lpuart_edma_handle_t uartDmaHandle;
+            static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
+            // /edma
     };
 
     /// definitions needed by BT stack
