@@ -24,25 +24,25 @@ namespace FileIndexer::Statements
                         )sql";
 
     constexpr auto getFileInfoByPath = R"sql(
-                        SELECT file_id, path, size, mime_type, time_stamp, directory ,file_type  FROM  file_tab AS FT
+                        SELECT file_id, path, size, mime_type, mtime, directory ,file_type  FROM  file_tab AS FT
                         WHERE FT.path = '%q'
                         COLLATE NOCASE;
                         )sql";
 
     constexpr auto getFileInfoById = R"sql(
-                        SELECT file_id, path, size, mime_type, time stamp, directory, file_type   FROM  file_tab AS FT
+                        SELECT file_id, path, size, mime_type, mtime, directory, file_type   FROM  file_tab AS FT
                         WHERE FT.file_id = '%lu'
                         COLLATE NOCASE;
                         )sql";
 
     constexpr auto getFilesByDir = R"sql(
-                        SELECT file_id, path, size, mime_type, time stamp, directory, file_type   FROM  file_tab AS FT
+                        SELECT file_id, path, size, mime_type, mtime, directory, file_type   FROM  file_tab AS FT
                         WHERE FT.directory = '%lu'
                         COLLATE NOCASE;
                         )sql";
 
     constexpr auto insertFileInfo = R"sql(
-                        INSERT OR REPLACE INTO file_tab (path, size, file_type, time_stamp, directory, file_type) VALUES
+                        INSERT OR REPLACE INTO file_tab (path, size, file_type, mtime, directory, file_type) VALUES
                         ( '%q', '%lu', '%lu' , '%lu', '%q', '%lu') ;
                         )sql";
 
