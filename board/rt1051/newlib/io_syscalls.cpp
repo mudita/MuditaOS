@@ -10,7 +10,7 @@
 #include <vfs_io_syscalls.hpp>
 extern "C"
 {
-    using namespace vfs::io;
+    using namespace vfs::internal;
 
     /* File related functions */
     int _fstat_r(struct _reent *r, int fd, struct stat *st)
@@ -106,6 +106,9 @@ extern "C"
     int fchmod(int fd, mode_t mode)
     {
         return syscalls::fchmod(_REENT->_errno, fd, mode);
+    }
+    int fsync( int fd ) {
+        return syscalls::fsync(_REENT->_errno, fd);
     }
 }
 

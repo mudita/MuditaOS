@@ -8,7 +8,7 @@
 #include <dirent.h>
 #include <stdint.h>
 
-namespace vfs::io::syscalls
+namespace vfs::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode);
     long close(int &_errno_, int fd);
@@ -33,4 +33,5 @@ namespace vfs::io::syscalls
     long int telldir(int &_errno_, DIR *dirp);
     int chmod(int &_errno_, const char *path, mode_t mode);
     int fchmod(int &_errno_, int fd, mode_t mode);
+    int fsync(int &_errno_, int fd);
 } // namespace vfs::io::syscalls

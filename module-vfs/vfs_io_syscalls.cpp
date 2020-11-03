@@ -5,7 +5,7 @@
 #include <log/log.hpp>
 
 struct stat;
-namespace vfs::io::syscalls
+namespace vfs::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode)
     {
@@ -139,6 +139,12 @@ namespace vfs::io::syscalls
         return -1;
     }
     int fchmod(int &_errno_, int fd, mode_t mode)
+    {
+        _errno_ = ENOTSUP;
+        LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
+        return -1;
+    }
+    int fsync(int &_errno_, int fd)
     {
         _errno_ = ENOTSUP;
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
