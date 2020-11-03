@@ -11,8 +11,8 @@ Where not otherwise indicated, all MuditaOS content is authored by Mudita engine
 
 The following proprietary code is included in MuditaOS:
 
-- [E Ink luts.bin](https://github.com/mudita/MuditaOS/blob/master/image/Luts.bin) 
-- [BlueKitchen's BTstack](https://github.com/bluekitchen/btstack) - "BTstack is free for non-commercial use. However, for commercial use, [tell us](mailto:contact@bluekitchen-gmbh.com) a bit about your project to get a quote."
+- [E Ink luts.bin](https://github.com/mudita/MuditaOS/blob/master/image/Luts.bin) - LUT is a small program the E Ink display executes each time you refresh it.
+- [BlueKitchen's BTstack](https://github.com/bluekitchen/btstack) -  "BTstack is BlueKitchen's implementation of the official Bluetooth stack. It is well suited for small, resource-constraint devices such as 8 or 16 bit embedded systems as it is highly configurable and comes with an ultra small memory footprint. (...) BTstack is free for non-commercial use. However, for commercial use, [tell us](mailto:contact@bluekitchen-gmbh.com) a bit about your project to get a quote."
 
 ## The GNU General Public License v3.0
 
