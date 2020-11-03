@@ -30,6 +30,9 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CREG.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CMTI.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CLIP.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_POWERED_DOWN.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_RESPONSE.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URCFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )

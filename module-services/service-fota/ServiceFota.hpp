@@ -18,6 +18,8 @@
 #include "Service/Common.hpp"     // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
 
 class DLC_channel;
+class FotaURCHandler;
+
 namespace sys
 {
     class Timer;
@@ -113,6 +115,8 @@ namespace FotaService
         std::string file;
         std::string receiverServiceName;
         unsigned char currentApnContext = 0;
+
+        friend FotaURCHandler;
     };
 
 } // namespace FotaService

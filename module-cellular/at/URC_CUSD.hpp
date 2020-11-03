@@ -32,9 +32,12 @@ namespace at::urc
         };
 
         inline static const std::string head = "+CUSD";
+        static bool isURC(const std::string uHead)
+        {
+            return uHead.find(CUSD::head) != std::string::npos;
+        }
 
         using URC::URC;
-        ~CUSD() override = default;
 
         [[nodiscard]] bool isValid() const noexcept override;
 
@@ -42,5 +45,10 @@ namespace at::urc
         [[nodiscard]] auto getMessage() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getStatus() const noexcept -> std::optional<StatusType>;
         [[nodiscard]] auto getDCS() const noexcept -> std::optional<int>;
+
+        void Handle(URCHandler &h) final
+        {
+            h.Handle(*this);
+        }
     };
 } // namespace at::urc

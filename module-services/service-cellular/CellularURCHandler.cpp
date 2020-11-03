@@ -1,0 +1,160 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#include "CellularURCHandler.hpp"
+
+#include "messages/CellularMessage.hpp"
+#include "api/CellularServiceAPI.hpp"
+
+#include <service-evtmgr/Constants.hpp>                              // for evt_manager service name
+#include <module-sys/Service/Bus.hpp>                                // for sys::Bus
+#include <module-services/service-antenna/api/AntennaServiceAPI.hpp> // for AntennaServiceAPI
+
+// this static function will be replaced by Settings API
+static bool isSettingsAutomaticTimeSyncEnabled()
+{
+    return true;
+}
+
+void CellularURCHandler::Handle(CLIP &urc)
+{
+    LOG_TRACE("incoming call...");
+    std::string phoneNumber;
+    if (urc.isValid()) {
+        phoneNumber = urc.getNumber();
+    }
+    // continue without number
+    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, phoneNumber);
+    urc.setHandled(true);
+}
+
+void CellularURCHandler::Handle(CREG &urc)
+{
+    if (urc.isValid()) {
+        auto accessTechnology = urc.getAccessTechnology();
+        auto status           = urc.getStatus();
+
+        LOG_INFO("Network status - %s, access technology %s",
+                 utils::enumToString(status).c_str(),
+                 utils::enumToString(accessTechnology).c_str());
+
+        Store::Network network{status, accessTechnology};
+
+        Store::GSM::get()->setNetwork(network);
+        response =
+            std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::NetworkStatusUpdate);
+        urc.setHandled(true);
+    }
+    else {
+        LOG_WARN("Network status - not valid");
+    }
+}
+
+void CellularURCHandler::Handle(CMTI &urc)
+{
+    LOG_TRACE("received new SMS notification");
+    if (urc.isValid()) {
+        response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingSMS,
+                                                                 urc.getIndex());
+        urc.setHandled(true);
+    }
+    else {
+        LOG_ERROR("Could not parse CMTI message");
+    }
+}
+
+void CellularURCHandler::Handle(CUSD &urc)
+{
+    if (urc.isActionNeeded()) {
+        if (cellularService.ussdState == ussd::State::pullRequestSent) {
+            cellularService.ussdState = ussd::State::pullResponseReceived;
+            cellularService.setUSSDTimer();
+        }
+    }
+    else {
+        CellularServiceAPI::USSDRequest(&cellularService, CellularUSSDMessage::RequestType::abortSesion);
+        cellularService.ussdState = ussd::State::sesionAborted;
+        cellularService.setUSSDTimer();
+    }
+
+    auto message = urc.getMessage();
+    if (!message) {
+        response = std::nullopt;
+        return;
+    }
+
+    response =
+        std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD, *message);
+    urc.setHandled(true);
+}
+
+void CellularURCHandler::Handle(CTZE &urc)
+{
+    if (!urc.isValid()) {
+        return;
+    }
+
+    if (isSettingsAutomaticTimeSyncEnabled()) {
+        auto msg = std::make_shared<CellularTimeNotificationMessage>(
+            urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
+        sys::Bus::SendUnicast(msg, service::name::evt_manager, &cellularService);
+    }
+    else {
+        LOG_DEBUG("Timezone sync disabled.");
+    }
+    urc.setHandled(true);
+}
+
+void CellularURCHandler::Handle(QIND &urc)
+{
+    if (urc.isCsq()) {
+        // Received signal strength change
+        AntennaServiceAPI::CSQChange(&cellularService);
+        auto rssi = urc.getRSSI();
+        if (!rssi) {
+            LOG_INFO("Invalid csq - ignore");
+        }
+        else {
+            SignalStrength signalStrength(*rssi);
+
+            Store::GSM::get()->setSignalStrength(signalStrength.data);
+            response = std::make_unique<CellularNotificationMessage>(
+                CellularNotificationMessage::Type::SignalStrengthUpdate, urc.getUrcBody());
+        }
+        urc.setHandled(true);
+    }
+    else if (urc.isFota()) {
+        std::string httpSuccess = "0";
+        if (urc.getFotaStage() == QIND::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
+            LOG_DEBUG("Fota UPDATE, switching to AT mode");
+            cellularService.cmux->setMode(TS0710::Mode::AT);
+            urc.setHandled(true);
+        }
+    }
+}
+
+void CellularURCHandler::Handle(POWERED_DOWN &urc)
+{
+    if (urc.isValid()) {
+        response =
+            std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistering);
+        urc.setHandled(true);
+    }
+}
+
+void CellularURCHandler::Handle(URC_RESPONSE &urc)
+{
+    std::vector<URC_RESPONSE::URCResponseType> typesToHandle = {
+        URC_RESPONSE::URCResponseType::NO_CARRIER,
+        URC_RESPONSE::URCResponseType::BUSY,
+        URC_RESPONSE::URCResponseType::NO_ANSWER,
+    };
+
+    for (auto &t : typesToHandle) {
+        if (t == urc.getURCResponseType()) {
+            LOG_TRACE("call aborted");
+            response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted);
+            urc.setHandled(true);
+        }
+    }
+}

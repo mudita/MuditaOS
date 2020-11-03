@@ -20,9 +20,12 @@ namespace at::urc
 
       public:
         inline static const std::string head = "+CTZE";
+        static bool isURC(const std::string uHead)
+        {
+            return uHead.find(CTZE::head) != std::string::npos;
+        }
 
         using URC::URC;
-        ~CTZE() override = default;
 
         constexpr static int maxTimezoneOffset = 56;
         constexpr static int minTimezoneOffset = -48;
@@ -33,5 +36,10 @@ namespace at::urc
         [[nodiscard]] auto getTimeZoneOffset() const -> int;
         [[nodiscard]] auto getTimeZoneString() const -> std::string;
         [[nodiscard]] auto getGMTTime() const -> const struct tm;
+
+        void Handle(URCHandler &h) final
+        {
+            h.Handle(*this);
+        }
     };
-}; // namespace at::urc
+} // namespace at::urc

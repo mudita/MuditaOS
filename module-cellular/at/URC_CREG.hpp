@@ -24,9 +24,12 @@ namespace at::urc
 
       public:
         inline static const std::string head = "+CREG";
-        using URC::URC;
+        static bool isURC(const std::string uHead)
+        {
+            return uHead.find(CREG::head) != std::string::npos;
+        }
 
-        ~CREG() override = default;
+        using URC::URC;
 
         [[nodiscard]] bool isValid() const noexcept override;
         [[nodiscard]] auto isExtended() const noexcept -> bool;
@@ -36,5 +39,10 @@ namespace at::urc
         [[nodiscard]] auto getLocation() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getCellId() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getAccessTechnology() const noexcept -> Store::Network::AccessTechnology;
+
+        void Handle(URCHandler &h) final
+        {
+            h.Handle(*this);
+        }
     };
-}; // namespace at::urc
+} // namespace at::urc

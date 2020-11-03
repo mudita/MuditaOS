@@ -5,6 +5,7 @@
 #include <module-cellular/at/Result.hpp>               // for Result, Result::Code, Result::Code::OK
 #include <module-cellular/at/URC_QIND.hpp>             // for QIND
 #include <service-cellular/api/CellularServiceAPI.hpp> // for GetDataChannel
+#include <module-cellular/at/URCFactory.hpp>           // for URCFactory
 #include <bits/exception.h>                            // for exception
 #include <algorithm>                                   // for find_if, remove, transform
 #include <cctype>                                      // for tolower
@@ -19,6 +20,7 @@
 #include "Service/Timer.hpp"      // for Timer
 #include "api/FotaServiceAPI.hpp" // for Config, ContextMap, ContextType, HTTPMethod, ContextPair, HTTPMethod::GET, AuthMethod, HTTPErrors, HTTPErrors::OK, HTTPMethod::POST
 #include "ServiceFota.hpp"
+#include "FotaURCHandler.hpp"        // FotaURCHandler
 #include "Service/Service.hpp"       // for Service
 #include "Service/Message.hpp"       // for Message_t, DataMessage, ResponseMessage
 #include "MessageType.hpp"           // for MessageType, MessageType::CellularListCurrentCalls
@@ -579,40 +581,9 @@ namespace FotaService
 
     void Service::parseQIND(const std::string &message)
     {
-        auto urc = at::urc::URC::Create(message);
-        if (auto qind = at::urc::getURC<at::urc::QIND>(urc)) {
-            const unsigned char fotaPrefixTagPosition = 0;
-            const unsigned char fotaStatusTagPosition = 1;
-            auto tokens                               = qind->getTokens();
-            if (tokens[fotaPrefixTagPosition].find("FOTA") != std::string::npos) {
-                if (tokens[1].find("START") != std::string::npos) {
-                    LOG_DEBUG("FOTA UPDATING");
-                }
-                else if (tokens[fotaStatusTagPosition].find("HTTPEND") != std::string::npos) {
-                    LOG_DEBUG("Downloading finished: %s", tokens[2].c_str());
-                }
-                else if (tokens[fotaStatusTagPosition].find("END") != std::string::npos) {
-                    LOG_DEBUG("FOTA FINISHED -> reboot (%s)", receiverServiceName.c_str());
-                    sendFotaFinshed(receiverServiceName);
-                }
-                else if (tokens[fotaStatusTagPosition].find("UPDATING") != std::string::npos) {
-                    auto token_val = 0;
-                    try {
-                        token_val = std::stoi(tokens[2]);
-                    }
-                    catch (const std::exception &e) {
-                        LOG_ERROR("Conversion error of %s, taking default value %d", tokens[2].c_str(), token_val);
-                    }
-
-                    unsigned char progress = static_cast<unsigned char>(token_val);
-                    LOG_DEBUG("FOTA UPDATING: %d", progress);
-                    sendProgress(progress, receiverServiceName);
-                }
-                else if (tokens[fotaStatusTagPosition].find("HTTPSTART") != std::string::npos) {
-                    LOG_DEBUG("Start downloading DELTA");
-                }
-            }
-        }
+        auto urc        = at::urc::URCFactory::Create(message);
+        auto urcHandler = FotaURCHandler(*this);
+        urc->Handle(urcHandler);
     }
 
     void Service::sendProgress(unsigned int progress, const std::string &receiver)

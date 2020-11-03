@@ -11,6 +11,7 @@ namespace at::urc
     {
 
         const std::string type_csq = "csq";
+        const std::string type_fota = "FOTA";
 
         static const auto invalid_rssi_low  = 99;
         static const auto invalid_rssi_high = 199;
@@ -23,17 +24,49 @@ namespace at::urc
             BER
         };
 
+        enum FOTA
+        {
+            FOTA,
+            STAGE,
+            PARAM
+        };
+
+        const size_t fotaMinTokenSize = 2;
+
         /// by docs invalid csq: RSSI: 99, 199, and ber: 99
         [[nodiscard]] auto validate(enum CSQ) const noexcept -> bool;
 
       public:
-        inline static const std::string head = "+QIND";
-        using URC::URC;
+        enum class FotaStage
+        {
+            HTTPSTART,
+            HTTPEND,
+            START,
+            UPDATING,
+            END,
+            UNDEFINED
+        };
 
-        ~QIND() override = default;
+        inline static const std::string head = "+QIND";
+        static bool isURC(const std::string uHead)
+        {
+            return uHead.find(QIND::head) != std::string::npos;
+        }
+
+        using URC::URC;
 
         [[nodiscard]] auto isCsq() const noexcept -> bool;
         [[nodiscard]] auto getRSSI() const noexcept -> std::optional<int>;
         [[nodiscard]] auto getBER() const noexcept -> std::optional<int>;
+
+        [[nodiscard]] auto isFota() const noexcept -> bool;
+        [[nodiscard]] auto isFotaValid() const noexcept -> bool;
+        [[nodiscard]] auto getFotaStage() const noexcept -> FotaStage;
+        [[nodiscard]] auto getFotaParameter() const noexcept -> std::string;
+
+        void Handle(URCHandler &h) final
+        {
+            h.Handle(*this);
+        }
     };
-}; // namespace at::urc
+} // namespace at::urc

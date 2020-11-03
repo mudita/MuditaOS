@@ -171,6 +171,8 @@ class ServiceCellular : public sys::Service
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
     bool handleUSSDURC(void);
     void handleUSSDTimer(void);
+
+    friend class CellularURCHandler;
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP

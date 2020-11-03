@@ -14,6 +14,36 @@ auto QIND::isCsq() const noexcept -> bool
     return false;
 }
 
+auto QIND::isFota() const noexcept -> bool
+{
+    return tokens.size() && tokens[FOTA] == type_fota;
+}
+
+auto QIND::isFotaValid() const noexcept -> bool
+{
+    return isFota() && tokens.size() >= fotaMinTokenSize;
+}
+
+auto QIND::getFotaStage() const noexcept -> FotaStage
+{
+    if (isFotaValid()) {
+        for (auto &stage : magic_enum::enum_values<FotaStage>()) {
+            if (tokens[STAGE] == magic_enum::enum_name(stage)) {
+                return stage;
+            }
+        }
+    }
+    return FotaStage::UNDEFINED;
+}
+
+auto QIND::getFotaParameter() const noexcept -> std::string
+{
+    if (isFotaValid() && tokens.size() >= fotaMinTokenSize) {
+        return tokens[PARAM];
+    }
+    return std::string();
+}
+
 auto QIND::validate(enum CSQ check) const noexcept -> bool
 {
     try {
