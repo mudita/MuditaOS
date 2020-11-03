@@ -31,7 +31,7 @@ namespace sgui
     {
         QueueHandle_t queue = queues[queueID];
 
-        auto serviceGUI = reinterpret_cast<sgui::ServiceGUI *>(service);
+        auto serviceGUI = static_cast<sgui::ServiceGUI *>(service);
 
         if (queueID == 0) {
             sys::WorkerCommand received;

@@ -5,5 +5,5 @@
 
 namespace service::name
 {
-    constexpr char gui[] = "ServiceGUI";
+    constexpr char eink[] = "ServiceEink";
 };

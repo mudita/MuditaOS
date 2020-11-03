@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <gui/Common.hpp>
 #include <EinkIncludes.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
@@ -14,6 +15,10 @@
 
 class ServiceEink : public sys::Service
 {
+    gui::Size screen        = {480, 600};
+    gui::Point pointTopLeft = {0, 0};
+    std::unique_ptr<uint8_t[]> einkRenderBuffer;
+
   protected:
     // counts timer triggers from last self refresh
     uint32_t selfRefereshTriggerCount;
@@ -43,7 +48,6 @@ class ServiceEink : public sys::Service
 
     bool deepClearScreen(int8_t temperature);
 
-    uint8_t einkRenderBuffer[600 * 480];
     bool deepRefresh         = false;
 
     sys::ms powerOffTime = 3000;

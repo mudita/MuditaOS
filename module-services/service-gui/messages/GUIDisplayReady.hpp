@@ -14,19 +14,16 @@ namespace service::gui
         bool shutdownInProgress = false;
 
       public:
-        GUIDisplayReady()
-        {}
-
         GUIDisplayReady(bool suspendInProgress, bool shutdownInProgress)
             : suspendInProgress(suspendInProgress), shutdownInProgress(shutdownInProgress)
         {}
 
-        [[nodiscard]] const auto &getSuspendInProgress() const noexcept
+        [[nodiscard]] auto getSuspendInProgress() const noexcept
         {
             return suspendInProgress;
         }
 
-        [[nodiscard]] const auto &getShutdownInProgress() const noexcept
+        [[nodiscard]] auto getShutdownInProgress() const noexcept
         {
             return shutdownInProgress;
         }

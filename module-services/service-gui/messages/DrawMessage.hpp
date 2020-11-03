@@ -27,7 +27,7 @@ namespace sgui
             NORMAL,
             SUSPEND,
             SHUTDOWN
-        } type;
+        } type = Type::NORMAL;
 
       public:
         gui::RefreshModes mode;

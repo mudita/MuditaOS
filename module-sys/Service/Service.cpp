@@ -30,8 +30,8 @@ void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
 
-    int status;
-    char *realname;
+    int status     = -1;
+    char *realname = nullptr;
     realname = abi::__cxa_demangle(typeid(*ptr).name(), 0, 0, &status);
 
     LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
@@ -97,7 +97,6 @@ namespace sys
             /// this is the only place that uses Reponse messages (service manager doesnt...)
             auto ret = msg->Execute(this);
             if (ret == nullptr) {
-                LOG_FATAL("NO MESSAGE from: %s msg type: %d", msg->sender.c_str(), static_cast<int>(msg->type));
                 ret = std::make_shared<DataMessage>(MessageType::MessageTypeUninitialized);
             }
 

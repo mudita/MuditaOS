@@ -6,6 +6,7 @@
 #include "messages/EinkDMATransfer.hpp"
 #include "messages/StateRequest.hpp"
 #include "messages/TemperatureUpdate.hpp"
+#include <service-gui/Common.hpp>
 #include <service-gui/messages/GUIDisplayReady.hpp>
 #include <time/ScopedTime.hpp>
 
@@ -32,8 +33,10 @@ enum class EinkWorkerCommands
 };
 
 ServiceEink::ServiceEink(const std::string &name, std::string parent)
-    : sys::Service(name, parent, 4096 + 1024), selfRefereshTriggerCount{0}, temperatureMeasurementTriggerCount{0},
-      powerOffTriggerCount{0}, powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
+    : sys::Service(name, parent, 4096 + 1024),
+      einkRenderBuffer(std::make_unique<uint8_t[]>(screen.height * screen.width)), selfRefereshTriggerCount{0},
+      temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0},
+      powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
 {
     memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
     waveformSettings.mode        = EinkWaveformGC16;
@@ -96,8 +99,8 @@ sys::ReturnCodes ServiceEink::InitHandler()
 
     EinkPowerOn();
 
-    auto msg = std::make_shared<service::gui::GUIDisplayReady>();
-    sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+    auto msg = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+    sys::Bus::SendUnicast(msg, service::name::gui, this);
 
     return sys::ReturnCodes::Success;
 }
@@ -249,28 +252,34 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
     changeWaveform(EinkWaveforms_e::EinkWaveformA2, temperature);
 
     EinkStatus_e ret;
-    memset(einkRenderBuffer, 15, 480 * 600);
-    ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
+    memset(einkRenderBuffer.get(), 15, screen.width * screen.height);
+    ret = EinkUpdateFrame(
+        pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, einkRenderBuffer.get(), Eink4Bpp, displayMode);
     if (ret != EinkOK)
         LOG_FATAL("Failed to update frame");
-    ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
+    ret = EinkRefreshImage(
+        pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, EinkDisplayTimingsFastRefreshMode);
     if (ret != EinkOK)
         LOG_FATAL("Failed to refresh frame");
 
     for (uint32_t i = 0; i < 2; i++) {
-        memset(einkRenderBuffer, 0, 480 * 600);
-        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
+        memset(einkRenderBuffer.get(), 0, screen.width * screen.height);
+        ret = EinkUpdateFrame(
+            pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, einkRenderBuffer.get(), Eink4Bpp, displayMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to update frame");
-        ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
+        ret = EinkRefreshImage(
+            pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, EinkDisplayTimingsFastRefreshMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to refresh frame");
 
-        memset(einkRenderBuffer, 15, 480 * 600);
-        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
+        memset(einkRenderBuffer.get(), 15, screen.width * screen.height);
+        ret = EinkUpdateFrame(
+            pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, einkRenderBuffer.get(), Eink4Bpp, displayMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to update frame");
-        ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
+        ret = EinkRefreshImage(
+            pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, EinkDisplayTimingsFastRefreshMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to refresh frame");
     }
@@ -308,15 +317,18 @@ sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
             changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
         }
 
-        ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, displayMode);
+        ret = EinkUpdateFrame(
+            pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, einkRenderBuffer.get(), Eink4Bpp, displayMode);
         if (ret != EinkOK)
             LOG_FATAL("Failed to update frame");
 
         if (deepRefresh) {
-            ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode);
+            ret = EinkRefreshImage(
+                pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, EinkDisplayTimingsDeepCleanMode);
         }
         else {
-            ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
+            ret = EinkRefreshImage(
+                pointTopLeft.x, pointTopLeft.y, screen.width, screen.height, EinkDisplayTimingsFastRefreshMode);
         }
 
         if (ret != EinkOK)
@@ -327,27 +339,27 @@ sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
         auto msg           = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
         suspendInProgress  = false;
         shutdownInProgress = false;
-        sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+        sys::Bus::SendUnicast(msg, service::name::gui, this);
     }
     return nullptr;
 }
 
-sys::Message_t ServiceEink::handleImageMessage(sys::Message *message)
+sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
 {
-    auto dmsg = static_cast<service::eink::ImageMessage *>(message);
+    auto message = static_cast<service::eink::ImageMessage *>(request);
 
     powerOffTimer.stop();
-    memcpy(einkRenderBuffer, dmsg->getData(), dmsg->getSize());
-    deepRefresh = dmsg->getDeepRefresh();
+    memcpy(einkRenderBuffer.get(), message->getData(), message->getSize());
+    deepRefresh = message->getDeepRefresh();
 
-    shutdownInProgress = dmsg->getShutdown();
+    shutdownInProgress = message->getShutdown();
     if (shutdownInProgress)
         LOG_DEBUG("Shutdown In Progress");
 
-    suspendInProgress = dmsg->getSuspend();
+    suspendInProgress = message->getSuspend();
     if (suspendInProgress)
         LOG_DEBUG("Suspend In Progress");
-    sys::Bus::SendUnicast(std::make_shared<service::eink::EinkDMATransfer>(), this->GetName(), this);
+    sys::Bus::SendUnicast(std::make_shared<service::eink::EinkDMATransfer>(), GetName(), this);
     return nullptr;
 }
 

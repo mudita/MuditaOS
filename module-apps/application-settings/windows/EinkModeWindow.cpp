@@ -4,6 +4,7 @@
 #include <memory>
 #include <functional>
 
+#include "Common.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "service-appmgr/Controller.hpp"
 
@@ -40,8 +41,10 @@ namespace gui
                 last_mode = service::eink::EinkModeMessage::Mode::Normal;
             }
 
-            sys::Bus::SendUnicast(
-                std::make_shared<service::eink::EinkModeMessage>(last_mode), "ServiceEink", this->application, 5000);
+            sys::Bus::SendUnicast(std::make_shared<service::eink::EinkModeMessage>(last_mode),
+                                  service::name::eink,
+                                  this->application,
+                                  5000);
             return true;
         };
         setFocusItem(label);

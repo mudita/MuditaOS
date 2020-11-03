@@ -23,6 +23,7 @@
 #include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <SystemManager/SystemManager.hpp>
+#include <service-eink/Common.hpp>
 
 #include <task.h>
 
@@ -94,7 +95,7 @@ namespace sgui
                                                           suspendInProgress,
                                                           shutdownInProgress);
         einkReady = false;
-        auto ret  = sys::Bus::SendUnicast(msg, "ServiceEink", this, 2000);
+        auto ret  = sys::Bus::SendUnicast(msg, service::name::eink, this, 2000);
         if (ret.first == sys::ReturnCodes::Success) {
             transferedFrameCounter = renderFrameCounter;
         }
@@ -128,7 +129,7 @@ namespace sgui
 
         if (einkReady == false) {
             requestSent = true;
-            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), "ServiceEink", this);
+            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
         }
         return sys::ReturnCodes::Success;
     }
@@ -212,7 +213,7 @@ namespace sgui
         }
         else if (!requestSent) {
             requestSent = true;
-            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), "ServiceEink", this);
+            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
         }
         return nullptr;
     }
