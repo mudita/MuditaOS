@@ -12,11 +12,11 @@
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <log/log.hpp>
-#include <module-sys/Service/Bus.hpp>
+#include <Service/Bus.hpp>
 #include <service-bluetooth/messages/BluetoothMessage.hpp>
-#include <module-audio/Audio/AudioCommon.hpp>
-#include <module-services/service-audio/messages/AudioMessage.hpp>
-#include <module-services/service-evtmgr/Constants.hpp>
+#include <Audio/AudioCommon.hpp>
+#include <service-audio/messages/AudioMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"
@@ -55,32 +55,37 @@ namespace Bt
         return *this;
     }
 
-    auto A2DP::init() -> Error
+    auto A2DP::init() -> Error::Code
     {
         return pimpl->init();
     }
-    void A2DP::start()
-    {
-        pimpl->start();
-    }
-    void A2DP::stop()
-    {
-        pimpl->stop();
-    }
+
     void A2DP::setDeviceAddress(uint8_t *addr)
     {
         pimpl->setDeviceAddress(addr);
     }
-    void A2DP::setOwnerService(sys::Service *service)
+
+    void A2DP::setOwnerService(const sys::Service *service)
     {
         pimpl->setOwnerService(service);
     }
+
     auto A2DP::getStreamData() -> std::shared_ptr<BluetoothStreamData>
     {
         return pimpl->getStreamData();
     }
 
-    sys::Service *A2DP::A2DPImpl::ownerService;
+    void A2DP::connect()
+    {
+        pimpl->start();
+    }
+
+    void A2DP::disconnect()
+    {
+        pimpl->stop();
+    }
+
+    const sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;
     QueueHandle_t A2DP::A2DPImpl::sinkQueue   = nullptr;
     bd_addr_t A2DP::A2DPImpl::deviceAddr;
@@ -95,7 +100,7 @@ namespace Bt
 
     /* LISTING_START(MainConfiguration): Setup Audio Source and AVRCP Target services */
 
-    auto A2DP::A2DPImpl::init() -> Error
+    auto A2DP::A2DPImpl::init() -> Error::Code
     {
         // request role change on reconnecting headset to always use them in slave mode
         hci_set_master_slave_policy(0);
@@ -115,7 +120,7 @@ namespace Bt
                                                AVDTP::sbcCodecConfiguration.size());
         if (local_stream_endpoint == nullptr) {
             LOG_INFO("A2DP Source: not enough memory to create local stream endpoint\n");
-            return Error(Bt::Error::SystemError);
+            return Bt::Error::SystemError;
         }
         AVRCP::mediaTracker.local_seid = avdtp_local_seid(local_stream_endpoint);
         avdtp_source_register_delay_reporting_category(AVRCP::mediaTracker.local_seid);
@@ -160,7 +165,7 @@ namespace Bt
 
         LOG_INFO("Init done!");
 
-        return Error();
+        return Bt::Error::Success;
     }
 
     void A2DP::A2DPImpl::sendMediaPacket()
@@ -450,9 +455,7 @@ namespace Bt
             sourceQueue = xQueueCreate(5, sizeof(AudioData_t));
             sinkQueue   = nullptr;
             if (sourceQueue != nullptr) {
-                auto event = std::make_shared<audio::Event>(audio::EventType::BTA2DPOn);
-                auto msg   = std::make_shared<AudioEventRequest>(std::move(event));
-                sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, ownerService);
+                sendAudioEvent(audio::EventType::BTA2DPOn);
             }
             else {
                 LOG_ERROR("failed to create queue!");
@@ -534,11 +537,7 @@ namespace Bt
                 cid,
                 AVRCP::mediaTracker.local_seid,
                 local_seid);
-            {
-                auto event = std::make_shared<audio::Event>(audio::EventType::BTA2DPOff);
-                auto msg   = std::make_shared<AudioEventRequest>(std::move(event));
-                sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, ownerService);
-            }
+            sendAudioEvent(audio::EventType::BTA2DPOff);
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.stream_opened = 0;
                 LOG_INFO("A2DP Source: Stream released.\n");
@@ -581,13 +580,22 @@ namespace Bt
         bd_addr_copy(deviceAddr, addr);
         LOG_INFO("Address set!");
     }
-    void A2DP::A2DPImpl::setOwnerService(sys::Service *service)
+
+    void A2DP::A2DPImpl::setOwnerService(const sys::Service *service)
     {
         ownerService = service;
     }
+
     auto A2DP::A2DPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
     {
         return std::make_shared<BluetoothStreamData>(sinkQueue, sourceQueue, metadata);
+    }
+
+    void A2DP::A2DPImpl::sendAudioEvent(audio::EventType event)
+    {
+        auto evt = std::make_shared<audio::Event>(event);
+        auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
+        sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
     }
 
 } // namespace Bt

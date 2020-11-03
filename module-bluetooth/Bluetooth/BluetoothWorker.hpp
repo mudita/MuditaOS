@@ -92,19 +92,19 @@ class BluetoothWorker : private sys::Worker
 
     bool scan();
 
-    bool set_visible();
+    bool toggleVisibility();
 
     bool start_pan();
 
-    bool play_audio();
+    bool establishAudioConnection();
 
-    bool stop_audio();
+    bool disconnectAudioConnection();
 
     Error aud_init();
     /// bluetooth stack id in use
     unsigned long active_features;
-    void stop_scan();
-    void set_addr(bd_addr_t addr);
+    void stopScan();
+    void setDeviceAddress(bd_addr_t addr);
     void initAudioBT();
 
     std::shared_ptr<Bt::Profile> currentProfile;
