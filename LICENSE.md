@@ -1,6 +1,22 @@
+# Software License Agreement
+
 MuditaOS – https://github.com/mudita/MuditaOS
 Copyright (c) 2017-2020, Mudita Sp. z o.o. All rights reserved.
 
+## Sources of Intellectual Property Included in MuditaOS
+
+Where not otherwise indicated, all MuditaOS content is authored by Mudita engineers and consists of Mudita-owned intellectual property. In some specific instances, MuditaOS will incorporate work done by developers outside of Mudita with their expressed permission.
+
+## Proprietary code
+
+The following proprietary code is included in MuditaOS:
+
+- [E Ink luts.bin](https://github.com/mudita/MuditaOS/blob/master/image/Luts.bin) 
+- [BlueKitchen's BTstack](https://github.com/bluekitchen/btstack) - "BTstack is free for non-commercial use. However, for commercial use, [tell us](mailto:contact@bluekitchen-gmbh.com) a bit about your project to get a quote."
+
+## The GNU General Public License v3.0
+
+``` 
 Licensed under the terms of GNU General Public License Version 3 or later.
 
    GNU GENERAL PUBLIC LICENSE
@@ -677,3 +693,5 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+```
+
