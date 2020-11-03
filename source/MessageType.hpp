@@ -10,20 +10,9 @@ enum class MessageType
     MessageTypeUninitialized = 0,
     // eink messages
     EinkMessage,
-    EinkStateRequest,      ///< message is used to pull status of the eink. If eink is ready to display image
-    EinkImageData,         ///< message with pointer to the image data for displaying
-    EinkDMATransfer,       ///< this message is internally sent from wink service to eink service. This will trigger DMA
-                           ///< transfer to Eink's controller. After tranfer gui service wil lbewill be notified
-    EinkTemperatureUpdate, ///< message sent from timer handler. Message forces service to update temperature measured
-                           ///< by the eink.
-
     // gui messages
-    GUICommands,          ///< list of rendering commands
-    GUIFocusInfo,         ///< information about application that gained focus
-    GUIDisplayReady,      ///< message that informs gui service that service controlling display device is ready for new
-                          ///< buffer data.
-    GUIRenderingFinished, ///< Message is sent from the worker when all rendering is finished.
-
+    GUIMessage,
+    GUIFocusInfo, ///< information about application that gained focus
     // DB messages
     DBServiceEvents,
 

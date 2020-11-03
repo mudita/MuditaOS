@@ -6,13 +6,13 @@
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 
-namespace seink
+namespace service::eink
 {
 
     class EinkMessage : public sys::DataMessage
     {
       public:
-        EinkMessage(MessageType messageType) : sys::DataMessage(messageType){};
+        EinkMessage() : sys::DataMessage(MessageType::EinkMessage){};
     };
 
 } /* namespace seink */

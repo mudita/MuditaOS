@@ -5,7 +5,7 @@
 
 #include "EinkMessage.hpp"
 
-namespace seink
+namespace service::eink
 {
     class EinkModeMessage : public EinkMessage
     {
@@ -15,7 +15,8 @@ namespace seink
             Normal,
             Invert
         };
-        EinkModeMessage(Mode mode) : EinkMessage(MessageType::EinkMessage), mode(mode)
+
+        EinkModeMessage(Mode mode) : EinkMessage(), mode(mode)
         {}
 
         [[nodiscard]] auto getMode() const noexcept

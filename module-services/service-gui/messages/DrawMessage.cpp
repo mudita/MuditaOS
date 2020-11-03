@@ -10,7 +10,7 @@ namespace sgui
 {
 
     DrawMessage::DrawMessage(std::list<gui::Command> commands, gui::RefreshModes mode)
-        : GUIMessage(MessageType::GUICommands), mode(mode), commands(std::move(commands))
+        : GUIMessage(), mode(mode), commands(std::move(commands))
     {
     }
 } /* namespace sgui */

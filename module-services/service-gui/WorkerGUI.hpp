@@ -8,7 +8,6 @@
 #include <core/Context.hpp>
 #include <core/DrawCommand.hpp>
 #include <gui/core/Renderer.hpp>
-#include <messages/GUIMessage.hpp>
 #include <Service/Worker.hpp>
 
 #include <cstdint>
