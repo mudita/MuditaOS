@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <array>
 #include <atomic>
-namespace vfs::internal::stdlib
+namespace vfsn::internal::stdlib
 {
     // Generic handle manager standard syscalls
     namespace impl

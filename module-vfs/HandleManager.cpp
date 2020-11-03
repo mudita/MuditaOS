@@ -3,7 +3,7 @@
 
 #include "HandleManager.hpp"
 
-namespace vfs::internal::stdlib::impl
+namespace vfsn::internal::stdlib::impl
 {
     auto HandleManager::clearHandle(int hwnd) noexcept -> void *
     {

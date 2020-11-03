@@ -10,7 +10,7 @@
 #include <vfs_io_syscalls.hpp>
 extern "C"
 {
-    using namespace vfs::internal;
+    using namespace vfsn::internal;
 
     /* File related functions */
     int _fstat_r(struct _reent *r, int fd, struct stat *st)

@@ -8,7 +8,7 @@
 #include <dirent.h>
 #include <stdint.h>
 
-namespace vfs::internal::syscalls
+namespace vfsn::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode);
     long close(int &_errno_, int fd);
