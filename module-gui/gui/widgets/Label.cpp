@@ -217,6 +217,7 @@ namespace gui
 
     void Label::buildDrawListImplementation(std::list<Command> &commands)
     {
+        Rect::buildDrawListImplementation(commands);
         if (font != nullptr) {
             auto cmd    = std::make_unique<CommandText>();
             cmd->str    = textDisplayed;
@@ -240,7 +241,6 @@ namespace gui
 
             commands.emplace_back(std::move(cmd));
         }
-        Rect::buildDrawListImplementation(commands);
     }
 
     bool Label::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
