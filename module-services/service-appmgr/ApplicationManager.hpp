@@ -1,23 +1,24 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory>      // for unique_ptr, allocator
-#include <string>      // for string
-#include <deque>       // for deque
-#include <string_view> // for string_view
-#include <vector>      // for vector
-
-#include "Application.hpp"         // for Application, Application::State
-#include "ApplicationLauncher.hpp" // for ApplicationLauncher
 #include "messages/APMMessage.hpp"
-#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
-#include "Service/Service.hpp" // for Service
-#include "Service/Timer.hpp"   // for Timer
-#include "SettingsRecord.hpp"  // for SettingsRecord
-#include "SwitchData.hpp"      // for SwitchData
+
+#include <Application.hpp>
+#include <ApplicationLauncher.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Timer.hpp>
+#include <SettingsRecord.hpp>
+#include <SwitchData.hpp>
+
+#include <deque>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace app
 {

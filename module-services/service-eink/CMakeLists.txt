@@ -1,5 +1,6 @@
 ﻿project(service-eink)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
+
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set( EINK_BOARD_PATH "board/rt1051" )
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -11,7 +12,12 @@ endif()
 
 message( "EINK BOARD PATH: ${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}" )
 
-add_library(${PROJECT_NAME} STATIC)
+set(SOURCES
+    ServiceEink.cpp
+    messages/ImageMessage.cpp
+    )
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries( ${PROJECT_NAME}
     module-utils
@@ -25,9 +31,4 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}"
 )
 
-target_sources( ${PROJECT_NAME}
-    PRIVATE
-        ServiceEink.cpp
-        messages/ImageMessage.cpp
-)
 

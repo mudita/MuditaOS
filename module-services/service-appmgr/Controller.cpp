@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Controller.hpp"
 
-#include <utility> // for move
+#include <module-sys/Service/Bus.hpp>
+#include <Service/Service.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
 
-#include "module-sys/Service/Bus.hpp" // for Bus
-#include "Service/Service.hpp"        // for Service
-#include "service-appmgr/ApplicationManager.hpp" // for ApplicationManager, ApplicationManager::ServiceName, ApplicationHandle, ApplicationHandle::Name
+#include <utility> // for move
 
 namespace app::manager
 {

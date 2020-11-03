@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
-
-project(module-services VERSION 1.0
+﻿project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
 include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
@@ -32,8 +30,9 @@ add_subdirectory( service-time )
 add_subdirectory( service-fileindexer )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    service-eink
     service-gui
+    service-eink
+    service-appmgr
     module-bsp
     module-os
     module-sys

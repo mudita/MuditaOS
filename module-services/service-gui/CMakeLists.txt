@@ -12,8 +12,8 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
     module-gui
-    service-eink
     module-apps
+    service-eink
     )
 
 target_include_directories(${PROJECT_NAME}

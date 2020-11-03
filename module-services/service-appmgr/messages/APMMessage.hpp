@@ -1,14 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
-
-#include "module-gui/gui/SwitchData.hpp"
-
-#include "i18/i18.hpp"
+#include <i18/i18.hpp>
+#include <MessageType.hpp>
+#include <module-gui/gui/SwitchData.hpp>
+#include <Service/Message.hpp>
 
 namespace app::manager
 {
