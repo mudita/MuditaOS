@@ -139,9 +139,12 @@ namespace bsp {
             // edma
             std::shared_ptr<drivers::DriverDMAMux> dmamux;
             std::shared_ptr<drivers::DriverDMA> dma;
-            std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
+            std::unique_ptr<drivers::DriverDMAHandle> uartRxDmaHandle;
+            std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
             static lpuart_edma_handle_t uartDmaHandle;
-            static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
+            static void uartCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
+            static volatile bool rxFinished;
+            static volatile bool txFinished;
             // /edma
     };
 

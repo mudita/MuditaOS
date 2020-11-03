@@ -11,7 +11,9 @@
 
 using namespace bsp;
 
-lpuart_edma_handle_t BluetoothCommon::uartDmaHandle      = {};
+lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
+volatile bool BluetoothCommon::rxFinished = false;
+volatile bool BluetoothCommon::txFinished = false;
 
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
@@ -55,7 +57,6 @@ BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, in
 {
     configure_uart_io();
     configure_lpuart();
-    configure_lpuart_edma();
     configure_cts_irq();
     LOG_INFO("Bluetooth HW init done!");
 }
@@ -231,30 +232,69 @@ void BluetoothCommon::configure_lpuart()
     NVIC_ClearPendingIRQ(LPUART2_IRQn);
     NVIC_SetPriority(LPUART2_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
     NVIC_EnableIRQ(LPUART2_IRQn);
-}
 
-void BluetoothCommon::DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
-{
-
-    BaseType_t higherPriorTaskWoken = 0;
-    vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
-
-    portEND_SWITCHING_ISR(higherPriorTaskWoken);
-}
-
-void BluetoothCommon::configure_lpuart_edma()
-{
     dmamux = drivers::DriverDMAMux::Create(static_cast<drivers::DMAMuxInstances>(BoardDefinitions ::BLUETOOTH_DMAMUX),
                                            drivers::DriverDMAMuxParams{});
     dma    = drivers::DriverDMA::Create(static_cast<drivers::DMAInstances>(BoardDefinitions ::BLUETOOTH_DMA),
                                      drivers::DriverDMAParams{});
 
+    uartTxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL));
+    uartRxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL));
+
+    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL), kDmaRequestMuxLPUART2Tx);
+    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL), kDmaRequestMuxLPUART2Rx);
+
     LPUART_TransferCreateHandleEDMA(BSP_BLUETOOTH_UART_BASE,
                                     &uartDmaHandle,
-                                    DMATxCompletedCb,
-                                    NULL,
-                                    reinterpret_cast<edma_handle_t *>(txDMAHandle->GetHandle()),
-                                    NULL);
+                                    uartCallback,
+                                    nullptr,
+                                    reinterpret_cast<edma_handle_t *>(uartTxDmaHandle->GetHandle()),
+                                    reinterpret_cast<edma_handle_t *>(uartRxDmaHandle->GetHandle()));
+
+    // Prepares to send.
+    lpuart_transfer_t sendXfer;
+    lpuart_transfer_t receiveXfer;
+
+    uint8_t sendData[] = {'H', 'e', 'l', 'l', 'o'};
+    uint8_t receiveData[32];
+
+    sendXfer.data     = sendData;
+    sendXfer.dataSize = sizeof(sendData) / sizeof(sendData[0]);
+    txFinished        = false;
+    // Sends out.
+    LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
+    // Send finished.
+    while (!txFinished) {}
+    // Prepares to receive
+    receiveXfer.data     = receiveData;
+    receiveXfer.dataSize = sizeof(receiveData) / sizeof(receiveData[0]);
+    rxFinished           = false;
+    // Receives.
+    LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
+    // Receive finished.
+    while (!rxFinished) {}
+    LOG_DEBUG("finally");
+}
+
+void BluetoothCommon::uartCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
+{
+    switch(status){
+    case kStatus_LPUART_TxIdle:
+        txFinished = true;
+        break;
+    case kStatus_LPUART_RxIdle:
+        rxFinished = true;
+        break;
+    default:
+        break;
+    }
+
+    return;
+
+    BaseType_t higherPriorTaskWoken = 0;
+    vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
+
+    portEND_SWITCHING_ISR(higherPriorTaskWoken);
 }
 
 void BluetoothCommon::configure_cts_irq()
