@@ -7,12 +7,9 @@
 
 #include <cstdint>
 
-namespace seink
+namespace service::eink
 {
 
-    /*
-     *
-     */
     class ImageMessage : public EinkMessage
     {
       protected:
@@ -31,7 +28,6 @@ namespace seink
                      uint8_t *data,
                      bool suspend,
                      bool shutdown);
-        virtual ~ImageMessage();
 
         uint8_t *getData()
         {
