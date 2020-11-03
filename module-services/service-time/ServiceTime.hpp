@@ -18,7 +18,7 @@
 
 namespace service::name
 {
-    const inline std::string service_time = "ServiceTime";
+    inline constexpr auto service_time = "ServiceTime";
 };
 
 namespace stm

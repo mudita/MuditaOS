@@ -30,11 +30,16 @@ namespace gui
         Horizontal horizontal = Alignment::Horizontal::Left;
         Vertical vertical     = Alignment::Vertical::Top;
 
-        Alignment()                  = default;
-        Alignment(const Alignment &) = default;
-        Alignment(Horizontal valH, Vertical valV);
-        Alignment(Horizontal valH);
-        Alignment(Vertical valV);
+        constexpr Alignment() = default;
+
+        constexpr Alignment(Horizontal valH, Vertical valV) : horizontal(valH), vertical(valV)
+        {}
+
+        constexpr Alignment(Horizontal valH) : horizontal(valH)
+        {}
+
+        constexpr Alignment(Vertical valV) : vertical(valV)
+        {}
 
         [[nodiscard]] Position calculateHAlignment(Length parentSize, Length childSize) const;
         [[nodiscard]] Position calculateVAlignment(Length parentSize, Length childSize) const;

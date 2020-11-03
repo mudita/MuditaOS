@@ -15,18 +15,18 @@ namespace gui
     {
         namespace cellular_passthrough
         {
-            inline const std::string window_name = "CellularPassthroughWindow";
+            inline constexpr auto window_name = "CellularPassthroughWindow";
 
-            inline const UTF8 passNormalDescription = "Regular passthrough";
-            inline const UTF8 passNormalLabel       = "ON";
+            inline constexpr auto passNormalDescription = "Regular passthrough";
+            inline constexpr auto passNormalLabel       = "ON";
 
-            inline const UTF8 passDFUDescription = "Firmware Upgrade";
-            inline const UTF8 passDFULabel       = "ON (upgrade)";
-            inline const UTF8 passDFUNote        = "Reset modem with 2*PWR_KEY";
+            inline constexpr auto passDFUDescription = "Firmware Upgrade";
+            inline constexpr auto passDFULabel       = "ON (upgrade)";
+            inline constexpr auto passDFUNote        = "Reset modem with 2*PWR_KEY";
 
-            inline const UTF8 noPassDescription = "Disable passthrough";
-            inline const UTF8 noPassLabel       = "OFF";
-            inline const UTF8 noPassNote        = "Reset modem hard. (battery out)";
+            inline constexpr auto noPassDescription = "Disable passthrough";
+            inline constexpr auto noPassLabel       = "OFF";
+            inline constexpr auto noPassNote        = "Reset modem hard. (battery out)";
         } // namespace cellular_passthrough
     }     // namespace window
 

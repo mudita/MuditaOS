@@ -18,7 +18,7 @@
 namespace app
 {
 
-    inline const std::string name_antenna = "ApplicationAntenna";
+    inline constexpr auto name_antenna = "ApplicationAntenna";
     namespace antenna
     {
         class StoreParams

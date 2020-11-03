@@ -14,7 +14,7 @@ namespace gui
     {
         namespace window
         {
-            const std::string algo_window("AlgoParamsWindow");
+            inline constexpr auto algo_window = "AlgoParamsWindow";
         }
     } // namespace name
     class AlgoParamsWindow : public AppWindow

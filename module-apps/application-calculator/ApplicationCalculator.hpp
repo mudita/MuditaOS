@@ -7,8 +7,8 @@
 
 namespace app
 {
-    const inline std::string name_calculator = "ApplicationCalculator";
-    constexpr std::uint16_t stack_size       = 4096;
+    inline constexpr auto name_calculator     = "ApplicationCalculator";
+    inline constexpr std::uint16_t stack_size = 4096;
 
     class ApplicationCalculator : public Application
     {

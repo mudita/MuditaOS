@@ -22,7 +22,7 @@ namespace gui
     {
         namespace name
         {
-            inline const std::string fota_window = "fota_window";
+            inline constexpr auto fota_window = "fota_window";
         } // namespace name
     }     // namespace window
     /** @brief Window managing modem firmware update

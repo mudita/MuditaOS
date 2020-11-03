@@ -10,7 +10,7 @@
 namespace app
 {
 
-    const inline std::string CallLogAppStr = "ApplicationCallLog";
+    inline constexpr auto CallLogAppStr = "ApplicationCallLog";
 
     class ApplicationCallLog : public Application
     {

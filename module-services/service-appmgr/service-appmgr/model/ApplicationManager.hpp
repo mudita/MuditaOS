@@ -86,7 +86,7 @@ namespace app::manager
     class ApplicationManager : public sys::Service, private ApplicationManagerBase
     {
       public:
-        static inline const std::string ServiceName = "ApplicationManager";
+        static constexpr auto ServiceName = "ApplicationManager";
 
         ApplicationManager(const ApplicationName &serviceName,
                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
