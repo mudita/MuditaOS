@@ -32,7 +32,7 @@ void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
 
     int status     = -1;
     char *realname = nullptr;
-    realname = abi::__cxa_demangle(typeid(*ptr).name(), 0, 0, &status);
+    realname       = abi::__cxa_demangle(typeid(*ptr).name(), 0, 0, &status);
 
     LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
               ptr->sender.c_str(),
