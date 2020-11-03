@@ -9,6 +9,8 @@
 * `[messages][db]` File Indexer db Agent
 * `[testing]` Added key release simulation through service-desktop developerMode
 * `[cellular]` Set pin functionality with Action mockup
+* `[bluetooth]` Added HSP playback and recording
+
 ### Changed
 
 * `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup

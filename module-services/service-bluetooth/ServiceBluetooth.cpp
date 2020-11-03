@@ -62,7 +62,7 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
                     return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
                 }
             case BluetoothMessage::StopScan:
-                worker->stop_scan();
+                worker->stopScan();
                 break;
             case BluetoothMessage::PAN: {
                 /// TODO request lwip first...
@@ -79,14 +79,14 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
                 //                    }
             } break;
             case BluetoothMessage::Visible:
-                worker->set_visible();
+                worker->toggleVisibility();
                 break;
 
             case BluetoothMessage::Play:
-                worker->play_audio();
+                worker->establishAudioConnection();
                 break;
             case BluetoothMessage::Stop:
-                worker->stop_audio();
+                worker->disconnectAudioConnection();
                 break;
 
             default:
@@ -96,7 +96,7 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys:
         }
         case MessageType::BluetoothAddrResult: {
             auto addrMsg = static_cast<BluetoothAddrMessage *>(msg);
-            worker->set_addr(addrMsg->addr);
+            worker->setDeviceAddress(addrMsg->addr);
         } break;
         case MessageType::BluetoothRequestStream: {
             auto result =

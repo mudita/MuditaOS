@@ -46,13 +46,18 @@ namespace bsp
     {
         return true;
     }
-
     void outBluetoothAudioWorkerTask(void *pvp)
     {
         auto *inst    = static_cast<RT1051BluetoothAudio *>(pvp);
         auto dataSize = inst->metadata.samplesPerFrame;
+        auto fatalError = false;
 
-        while (true) {
+        if (inst->sourceQueue == nullptr) {
+            LOG_FATAL("sourceQueue nullptr");
+            fatalError = true;
+        }
+
+        while (!fatalError) {
             auto framesFetched = inst->GetAudioCallback()(nullptr, inst->audioData.data.data(), dataSize);
             if (framesFetched == 0) {
                 break;
