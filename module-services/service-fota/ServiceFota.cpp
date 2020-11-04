@@ -3,9 +3,8 @@
 
 #include <Service/Bus.hpp>                             // for Bus
 #include <module-cellular/at/Result.hpp>               // for Result, Result::Code, Result::Code::OK
-#include <module-cellular/at/URC_QIND.hpp>             // for QIND
 #include <service-cellular/api/CellularServiceAPI.hpp> // for GetDataChannel
-#include <module-cellular/at/URCFactory.hpp>           // for URCFactory
+#include <module-cellular/at/UrcFactory.hpp>           // for UrcFactory
 #include <bits/exception.h>                            // for exception
 #include <algorithm>                                   // for find_if, remove, transform
 #include <cctype>                                      // for tolower
@@ -20,7 +19,7 @@
 #include "Service/Timer.hpp"      // for Timer
 #include "api/FotaServiceAPI.hpp" // for Config, ContextMap, ContextType, HTTPMethod, ContextPair, HTTPMethod::GET, AuthMethod, HTTPErrors, HTTPErrors::OK, HTTPMethod::POST
 #include "ServiceFota.hpp"
-#include "FotaURCHandler.hpp"        // FotaURCHandler
+#include "FotaUrcHandler.hpp"        // FotaUrcHandler
 #include "Service/Service.hpp"       // for Service
 #include "Service/Message.hpp"       // for Message_t, DataMessage, ResponseMessage
 #include "MessageType.hpp"           // for MessageType, MessageType::CellularListCurrentCalls
@@ -581,8 +580,8 @@ namespace FotaService
 
     void Service::parseQIND(const std::string &message)
     {
-        auto urc        = at::urc::URCFactory::Create(message);
-        auto urcHandler = FotaURCHandler(*this);
+        auto urc        = at::urc::UrcFactory::Create(message);
+        auto urcHandler = FotaUrcHandler(*this);
         urc->Handle(urcHandler);
     }
 

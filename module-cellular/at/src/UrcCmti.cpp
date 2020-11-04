@@ -1,16 +1,16 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "URC_CMTI.hpp"
+#include "UrcCmti.hpp"
 
 using namespace at::urc;
 
-auto CMTI::isValid() const noexcept -> bool
+auto Cmti::isValid() const noexcept -> bool
 {
     return tokens.size() == magic_enum::enum_count<Tokens>();
 }
 
-std::string CMTI::getMemory() const
+std::string Cmti::getMemory() const
 {
     if (!isValid()) {
         return std::string();
@@ -18,7 +18,7 @@ std::string CMTI::getMemory() const
     return tokens[Tokens::Mem];
 }
 
-std::string CMTI::getIndex() const
+std::string Cmti::getIndex() const
 {
     if (!isValid()) {
         return std::string();

@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "URC.hpp"
+#include "Urc.hpp"
 #include <ctime>
 
 namespace at::urc
 {
-    class CTZE : public URC
+    class Ctze : public Urc
     {
         enum Tokens
         {
@@ -20,24 +20,24 @@ namespace at::urc
 
       public:
         static constexpr std::string_view head = "+CTZE";
-        static bool isURC(const std::string uHead)
+        static auto isURC(const std::string uHead) -> bool
         {
-            return uHead.find(CTZE::head) != std::string::npos;
+            return uHead.find(Ctze::head) != std::string::npos;
         }
 
-        using URC::URC;
+        using Urc::Urc;
 
         constexpr static int maxTimezoneOffset = 56;
         constexpr static int minTimezoneOffset = -48;
 
-        [[nodiscard]] bool isValid() const noexcept override;
+        [[nodiscard]] auto isValid() const noexcept -> bool override;
         [[nodiscard]] auto getTimeInfo() const noexcept -> tm;
 
         [[nodiscard]] auto getTimeZoneOffset() const -> int;
         [[nodiscard]] auto getTimeZoneString() const -> std::string;
         [[nodiscard]] auto getGMTTime() const -> const struct tm;
 
-        void Handle(URCHandler &h) final
+        void Handle(UrcHandler &h) final
         {
             h.Handle(*this);
         }

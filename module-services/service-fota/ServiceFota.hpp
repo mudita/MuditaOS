@@ -18,7 +18,7 @@
 #include "Service/Common.hpp"     // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
 
 class DLC_channel;
-class FotaURCHandler;
+class FotaUrcHandler;
 
 namespace sys
 {
@@ -116,7 +116,7 @@ namespace FotaService
         std::string receiverServiceName;
         unsigned char currentApnContext = 0;
 
-        friend FotaURCHandler;
+        friend FotaUrcHandler;
     };
 
 } // namespace FotaService

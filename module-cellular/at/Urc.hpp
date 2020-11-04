@@ -4,26 +4,26 @@
 #pragma once
 
 #include <module-utils/Utils.hpp>
-#include "URCHandler.hpp"
+#include "UrcHandler.hpp"
 
 namespace at::urc
 
 {
-    class URC
+    class Urc
     {
       public:
         /**
-         * Parses URC body and constructs an instance.
-         * @param urcBody - URC message body without the header
-         * @param urcHead - URC message head
-         * @param tokenDelimiter - sign that separates parameters in URC message
+         * Parses Urc body and constructs an instance.
+         * @param urcBody - Urc message body without the header
+         * @param urcHead - Urc message head
+         * @param tokenDelimiter - sign that separates parameters in Urc message
          */
-        URC(const std::string &urcBody, const std::string &urcHead = std::string(), char tokenDelimiter = ',');
+        Urc(const std::string &urcBody, const std::string &urcHead = std::string(), char tokenDelimiter = ',');
 
-        virtual ~URC() = default;
+        virtual ~Urc() = default;
 
         /**
-         * Checks weather URC message is valid. Should be overridden in derived class of concrete URC.
+         * Checks weather Urc message is valid. Should be overridden in derived class of concrete Urc.
          * @return true if valid, false otherwise
          */
         virtual auto isValid() const noexcept -> bool
@@ -32,14 +32,14 @@ namespace at::urc
         }
 
         /**
-         * Gets vector of strings that represent URC parameters.
+         * Gets vector of strings that represent Urc parameters.
          * @return vector or parameters in order of appearance in message
          */
         auto getTokens() const -> std::vector<std::string>;
 
         /**
-         * Gets URC body stripped of urc header.
-         * @return URC body string
+         * Gets Urc body stripped of urc header.
+         * @return Urc body string
          */
         auto getUrcBody() const -> std::string
         {
@@ -47,14 +47,14 @@ namespace at::urc
         }
 
         /**
-         * Call for dispatching handling to URCHandler
-         * @param h - implementation of URCHandler
+         * Call for dispatching handling to UrcHandler
+         * @param h - implementation of UrcHandler
          */
-        virtual void Handle(URCHandler &h)
+        virtual void Handle(UrcHandler &h)
         {}
 
         /**
-         * Flag URC handled/unhandled
+         * Flag Urc handled/unhandled
          * @param state - true for handled, false for unhandled
          */
         void setHandled(bool state)
@@ -63,7 +63,7 @@ namespace at::urc
         }
 
         /**
-         * @return true if URC has been flagged as handled, false otherwise
+         * @return true if Urc has been flagged as handled, false otherwise
          */
         bool isHandled()
         {
@@ -78,9 +78,9 @@ namespace at::urc
         bool isUrcHandled = false;
 
         /**
-         * Splits URC into head and tokenized data, cleans tokens from whitespaces and quotes
+         * Splits Urc into head and tokenized data, cleans tokens from whitespaces and quotes
          * @param str - string to be split
-         * @param tokenDelimiter - sign that separates parameters in URC message
+         * @param tokenDelimiter - sign that separates parameters in Urc message
          */
         void split(const std::string &str, char tokenDelimiter = ',');
     };

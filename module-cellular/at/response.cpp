@@ -45,7 +45,7 @@ namespace at
             bool isRegistered(uint32_t commandData)
             {
 
-                // CREG command returns 1 when registered in home network, 5 when registered in roaming
+                // Creg command returns 1 when registered in home network, 5 when registered in roaming
                 constexpr uint32_t registeredHome    = 1;
                 constexpr uint32_t registeredRoaming = 5;
 

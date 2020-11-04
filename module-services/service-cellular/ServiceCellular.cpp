@@ -2,12 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>       // for removeNewLines, enumToString, split, to_string
-#include <at/URC_QIND.hpp> // for QIND
-#include <at/URC_CUSD.hpp> // for CUSD
-#include <at/URC_CTZE.hpp> // for CTZE
-#include <at/URC_CREG.hpp> // for CREG
-#include <at/URC_CMTI.hpp> // for CMTI
-#include <at/URC_CLIP.hpp> // for CLIP
+#include <at/UrcQind.hpp>  // for Qind
+#include <at/UrcCusd.hpp>  // for Cusd
+#include <at/UrcCtze.hpp>  // for Ctze
+#include <at/UrcCreg.hpp>  // for Creg
+#include <at/UrcCmti.hpp>  // for Cmti
+#include <at/UrcClip.hpp>  // for CLIP
 #include <at/response.hpp> // for parseQNWINFO
 #include <common_data/EventStore.hpp> // for GSM, GSM::SIM, GSM::SIM::SIM1, GSM::SIM::SIM_FAIL, GSM::SIM::SIM2, GSM::Tray, GSM::Tray::IN, Network
 #include <service-evtmgr/Constants.hpp>                                    // for evt_manager
@@ -15,7 +15,7 @@
 #include <PhoneNumber.hpp>                                                 // for PhoneNumber::View, PhoneNumber
 #include <module-db/queries/notifications/QueryNotificationsIncrement.hpp> // for Increment
 #include <module-db/queries/messages/sms/QuerySMSSearchByType.hpp>         // for SMSSearchByType, SMSSearchByTypeResult
-#include <module-cellular/at/URCFactory.hpp>                               // for URCFactory
+#include <module-cellular/at/UrcFactory.hpp>                               // for UrcFactory
 #include <log/log.hpp>      // for LOG_DEBUG, LOG_ERROR, LOG_INFO, LOG_FATAL, LOG_WARN, LOG_TRACE
 #include <bits/exception.h> // for exception
 #include <algorithm>        // for remove, max
@@ -31,7 +31,7 @@
 #include "Service/Service.hpp" // for Service
 #include "Service/Timer.hpp"   // for Timer
 #include "ServiceCellular.hpp"
-#include "CellularURCHandler.hpp" // for CellularURCHandler
+#include "CellularUrcHandler.hpp" // for CellularUrcHandler
 #include "MessageType.hpp" // for MessageType, MessageType::CellularGetAntenna, MessageType::CellularListCurrentCalls, MessageType::CellularAnswerIncomingCall, MessageType::CellularCall, MessageType::CellularCallRequest, MessageType::CellularGetCREG, MessageType::CellularGetCSQ, MessageType::CellularGetFirmwareVersion, MessageType::CellularGetIMSI, MessageType::CellularGetNWINFO, MessageType::CellularGetNetworkInfo, MessageType::CellularGetOwnNumber, MessageType::CellularGetScanMode, MessageType::CellularGetScanModeResult, MessageType::CellularHangupCall, MessageType::CellularNetworkInfoResult, MessageType::CellularNotification, MessageType::CellularOperatorsScanResult, MessageType::CellularSelectAntenna, MessageType::CellularSetScanMode, MessageType::CellularSimProcedure, MessageType::CellularStartOperatorsScan, MessageType::CellularStateRequest, MessageType::CellularTransmitDtmfTones, MessageType::CellularUSSDRequest, MessageType::DBServiceNotification, MessageType::EVMModemStatus, MessageType::EVMTimeUpdated
 #include "messages/CellularMessage.hpp" // for CellularResponseMessage, CellularNotificationMessage, CellularNotificationMessage::Type, CellularCallMessage, CellularUSSDMessage, RawCommandRespAsync, RawCommandResp, CellularUSSDMessage::RequestType, CellularRequestMessage, StateChange, CellularGetChannelMessage, CellularGetChannelResponseMessage, CellularAntennaResponseMessage, CellularCallMessage::Type, CellularTimeNotificationMessage, CellularUSSDMessage::RequestType::abortSesion, CellularAntennaRequestMessage, CellularCallRequestMessage, CellularNotificationMessage::Type::CallActive, RawCommand, CellularCallMessage::Type::IncomingCall, CellularCallMessage::Type::Ringing, CellularDtmfRequestMessage, CellularNotificationMessage::Type::CallAborted, CellularNotificationMessage::Type::NetworkStatusUpdate, CellularNotificationMessage::Type::NewIncomingSMS, CellularNotificationMessage::Type::NewIncomingUSSD, CellularNotificationMessage::Type::PowerDownDeregistered, CellularNotificationMessage::Type::PowerDownDeregistering, CellularNotificationMessage::Type::SIM, CellularNotificationMessage::Type::SignalStrengthUpdate, CellularUSSDMessage::RequestType::pushSesionRequest, CellularNotificationMessage::Type::PowerUpProcedureComplete, CellularNotificationMessage::Type::RawCommand, CellularUSSDMessage::RequestType::pullSesionRequest
 #include "SignalStrength.hpp"           // for SignalStrength
@@ -1001,13 +1001,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
-    CellularURCHandler urcHandler(*this);
+    CellularUrcHandler urcHandler(*this);
 
     std::string str(data.begin(), data.end());
     std::string logStr = utils::removeNewLines(str);
     LOG_DEBUG("Notification:: %s", logStr.c_str());
 
-    auto urc = at::urc::URCFactory::Create(str);
+    auto urc = at::urc::UrcFactory::Create(str);
     urc->Handle(urcHandler);
 
     if (auto ret = str.find("+CPIN: ") != std::string::npos) {

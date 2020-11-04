@@ -1,12 +1,12 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <URC_QIND.hpp>
+#include <UrcQind.hpp>
 #include <log/debug.hpp>
 
 using namespace at::urc;
 
-auto QIND::isCsq() const noexcept -> bool
+auto Qind::isCsq() const noexcept -> bool
 {
     if (tokens.size() == magic_enum::enum_count<enum CSQ>()) {
         return tokens[CSQ].find(type_csq) != std::string::npos;
@@ -14,37 +14,37 @@ auto QIND::isCsq() const noexcept -> bool
     return false;
 }
 
-auto QIND::isFota() const noexcept -> bool
+auto Qind::isFota() const noexcept -> bool
 {
-    return tokens.size() && tokens[FOTA] == type_fota;
+    return tokens.size() > 0 && tokens[Fota] == type_fota;
 }
 
-auto QIND::isFotaValid() const noexcept -> bool
+auto Qind::isFotaValid() const noexcept -> bool
 {
     return isFota() && tokens.size() >= fotaMinTokenSize;
 }
 
-auto QIND::getFotaStage() const noexcept -> FotaStage
+auto Qind::getFotaStage() const noexcept -> std::optional<FotaStage>
 {
     if (isFotaValid()) {
         for (auto &stage : magic_enum::enum_values<FotaStage>()) {
-            if (tokens[STAGE] == magic_enum::enum_name(stage)) {
+            if (tokens[Stage] == magic_enum::enum_name(stage)) {
                 return stage;
             }
         }
     }
-    return FotaStage::UNDEFINED;
+    return std::nullopt;
 }
 
-auto QIND::getFotaParameter() const noexcept -> std::string
+auto Qind::getFotaParameter() const noexcept -> std::string
 {
     if (isFotaValid() && tokens.size() >= fotaMinTokenSize) {
-        return tokens[PARAM];
+        return tokens[Param];
     }
     return std::string();
 }
 
-auto QIND::validate(enum CSQ check) const noexcept -> bool
+auto Qind::validate(enum CSQ check) const noexcept -> bool
 {
     try {
         if (isCsq()) {
@@ -67,7 +67,7 @@ auto QIND::validate(enum CSQ check) const noexcept -> bool
     return false;
 }
 
-auto QIND::getRSSI() const noexcept -> std::optional<int>
+auto Qind::getRSSI() const noexcept -> std::optional<int>
 {
     if (isCsq()) {
         int rssi;
@@ -86,7 +86,7 @@ auto QIND::getRSSI() const noexcept -> std::optional<int>
     return std::nullopt;
 }
 
-auto QIND::getBER() const noexcept -> std::optional<int>
+auto Qind::getBER() const noexcept -> std::optional<int>
 {
     if (isCsq()) {
         int ber;

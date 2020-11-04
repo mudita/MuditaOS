@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "URC.hpp"
+#include "Urc.hpp"
 
 namespace at::urc
 {
-    class QIND : public URC
+    class Qind : public Urc
     {
 
         const std::string type_csq  = "csq";
@@ -26,9 +26,9 @@ namespace at::urc
 
         enum FOTA
         {
-            FOTA,
-            STAGE,
-            PARAM
+            Fota,
+            Stage,
+            Param
         };
 
         const size_t fotaMinTokenSize = 2;
@@ -44,16 +44,15 @@ namespace at::urc
             START,
             UPDATING,
             END,
-            UNDEFINED
         };
 
         static constexpr std::string_view head = "+QIND";
-        static bool isURC(const std::string uHead)
+        static auto isURC(const std::string uHead) -> bool
         {
-            return uHead.find(QIND::head) != std::string::npos;
+            return uHead.find(Qind::head) != std::string::npos;
         }
 
-        using URC::URC;
+        using Urc::Urc;
 
         [[nodiscard]] auto isCsq() const noexcept -> bool;
         [[nodiscard]] auto getRSSI() const noexcept -> std::optional<int>;
@@ -61,10 +60,10 @@ namespace at::urc
 
         [[nodiscard]] auto isFota() const noexcept -> bool;
         [[nodiscard]] auto isFotaValid() const noexcept -> bool;
-        [[nodiscard]] auto getFotaStage() const noexcept -> FotaStage;
+        [[nodiscard]] auto getFotaStage() const noexcept -> std::optional<FotaStage>;
         [[nodiscard]] auto getFotaParameter() const noexcept -> std::string;
 
-        void Handle(URCHandler &h) final
+        void Handle(UrcHandler &h) final
         {
             h.Handle(*this);
         }

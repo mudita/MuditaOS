@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "CellularURCHandler.hpp"
+#include "CellularUrcHandler.hpp"
 
 #include "messages/CellularMessage.hpp"
 #include "api/CellularServiceAPI.hpp"
@@ -16,7 +16,7 @@ static bool isSettingsAutomaticTimeSyncEnabled()
     return true;
 }
 
-void CellularURCHandler::Handle(CLIP &urc)
+void CellularUrcHandler::Handle(Clip &urc)
 {
     LOG_TRACE("incoming call...");
     std::string phoneNumber;
@@ -28,7 +28,7 @@ void CellularURCHandler::Handle(CLIP &urc)
     urc.setHandled(true);
 }
 
-void CellularURCHandler::Handle(CREG &urc)
+void CellularUrcHandler::Handle(Creg &urc)
 {
     if (urc.isValid()) {
         auto accessTechnology = urc.getAccessTechnology();
@@ -50,7 +50,7 @@ void CellularURCHandler::Handle(CREG &urc)
     }
 }
 
-void CellularURCHandler::Handle(CMTI &urc)
+void CellularUrcHandler::Handle(Cmti &urc)
 {
     LOG_TRACE("received new SMS notification");
     if (urc.isValid()) {
@@ -59,11 +59,11 @@ void CellularURCHandler::Handle(CMTI &urc)
         urc.setHandled(true);
     }
     else {
-        LOG_ERROR("Could not parse CMTI message");
+        LOG_ERROR("Could not parse Cmti message");
     }
 }
 
-void CellularURCHandler::Handle(CUSD &urc)
+void CellularUrcHandler::Handle(Cusd &urc)
 {
     if (urc.isActionNeeded()) {
         if (cellularService.ussdState == ussd::State::pullRequestSent) {
@@ -88,7 +88,7 @@ void CellularURCHandler::Handle(CUSD &urc)
     urc.setHandled(true);
 }
 
-void CellularURCHandler::Handle(CTZE &urc)
+void CellularUrcHandler::Handle(Ctze &urc)
 {
     if (!urc.isValid()) {
         return;
@@ -105,7 +105,7 @@ void CellularURCHandler::Handle(CTZE &urc)
     urc.setHandled(true);
 }
 
-void CellularURCHandler::Handle(QIND &urc)
+void CellularUrcHandler::Handle(Qind &urc)
 {
     if (urc.isCsq()) {
         // Received signal strength change
@@ -125,7 +125,7 @@ void CellularURCHandler::Handle(QIND &urc)
     }
     else if (urc.isFota()) {
         std::string httpSuccess = "0";
-        if (urc.getFotaStage() == QIND::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
+        if (urc.getFotaStage() == Qind::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
             LOG_DEBUG("Fota UPDATE, switching to AT mode");
             cellularService.cmux->setMode(TS0710::Mode::AT);
             urc.setHandled(true);
@@ -133,7 +133,7 @@ void CellularURCHandler::Handle(QIND &urc)
     }
 }
 
-void CellularURCHandler::Handle(POWERED_DOWN &urc)
+void CellularUrcHandler::Handle(PoweredDown &urc)
 {
     if (urc.isValid()) {
         response =
@@ -142,12 +142,12 @@ void CellularURCHandler::Handle(POWERED_DOWN &urc)
     }
 }
 
-void CellularURCHandler::Handle(URC_RESPONSE &urc)
+void CellularUrcHandler::Handle(UrcResponse &urc)
 {
-    std::vector<URC_RESPONSE::URCResponseType> typesToHandle = {
-        URC_RESPONSE::URCResponseType::NO_CARRIER,
-        URC_RESPONSE::URCResponseType::BUSY,
-        URC_RESPONSE::URCResponseType::NO_ANSWER,
+    std::vector<UrcResponse::URCResponseType> typesToHandle = {
+        UrcResponse::URCResponseType::NoCarrier,
+        UrcResponse::URCResponseType::Busy,
+        UrcResponse::URCResponseType::NoAnswer,
     };
 
     for (auto &t : typesToHandle) {

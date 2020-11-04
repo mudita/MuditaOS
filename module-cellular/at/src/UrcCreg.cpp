@@ -1,27 +1,27 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <URC_CREG.hpp>
+#include <UrcCreg.hpp>
 #include <magic_enum.hpp>
 
 using namespace at::urc;
 
-auto CREG::isValid() const noexcept -> bool
+auto Creg::isValid() const noexcept -> bool
 {
     return isExtended() || isShort();
 }
 
-auto CREG::isExtended() const noexcept -> bool
+auto Creg::isExtended() const noexcept -> bool
 {
     return tokens.size() == magic_enum::enum_count<Tokens>();
 }
 
-auto CREG::isShort() const noexcept -> bool
+auto Creg::isShort() const noexcept -> bool
 {
     return tokens.size() == NumOfShortTokens;
 }
 
-auto CREG::getStatus() const noexcept -> Store::Network::Status
+auto Creg::getStatus() const noexcept -> Store::Network::Status
 {
     if (isValid()) {
         int statusInt;
@@ -40,7 +40,7 @@ auto CREG::getStatus() const noexcept -> Store::Network::Status
     return Store::Network::Status::Unknown;
 }
 
-auto CREG::getLocation() const noexcept -> std::optional<std::string>
+auto Creg::getLocation() const noexcept -> std::optional<std::string>
 {
     if (isValid() && isExtended()) {
         auto location = tokens[Tokens::Lac];
@@ -51,7 +51,7 @@ auto CREG::getLocation() const noexcept -> std::optional<std::string>
     return std::nullopt;
 }
 
-auto CREG::getCellId() const noexcept -> std::optional<std::string>
+auto Creg::getCellId() const noexcept -> std::optional<std::string>
 {
     if (isValid() && isExtended()) {
         auto cellId = tokens[Tokens::Ci];
@@ -62,7 +62,7 @@ auto CREG::getCellId() const noexcept -> std::optional<std::string>
     return std::nullopt;
 }
 
-auto CREG::getAccessTechnology() const noexcept -> Store::Network::AccessTechnology
+auto Creg::getAccessTechnology() const noexcept -> Store::Network::AccessTechnology
 {
     if (isValid() && isExtended()) {
         int accessTechnologyInt;

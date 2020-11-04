@@ -1,22 +1,22 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FotaURCHandler.hpp"
+#include "FotaUrcHandler.hpp"
 
-void FotaURCHandler::Handle(QIND &urc)
+void FotaUrcHandler::Handle(Qind &urc)
 {
     if (urc.isFotaValid()) {
-        if (urc.getFotaStage() == QIND::FotaStage::START) {
+        if (urc.getFotaStage() == Qind::FotaStage::START) {
             LOG_DEBUG("FOTA UPDATING");
         }
-        else if (urc.getFotaStage() == QIND::FotaStage::HTTPEND) {
+        else if (urc.getFotaStage() == Qind::FotaStage::HTTPEND) {
             LOG_DEBUG("Downloading finished: %s", urc.getFotaParameter().c_str());
         }
-        else if (urc.getFotaStage() == QIND::FotaStage::END) {
+        else if (urc.getFotaStage() == Qind::FotaStage::END) {
             LOG_DEBUG("FOTA FINISHED -> reboot (%s)", fotaService.receiverServiceName.c_str());
             fotaService.sendFotaFinshed(fotaService.receiverServiceName);
         }
-        else if (urc.getFotaStage() == QIND::FotaStage::UPDATING) {
+        else if (urc.getFotaStage() == Qind::FotaStage::UPDATING) {
             auto token_val = 0;
             try {
                 token_val = std::stoi(urc.getFotaParameter());
@@ -29,7 +29,7 @@ void FotaURCHandler::Handle(QIND &urc)
             LOG_DEBUG("FOTA UPDATING: %d", progress);
             fotaService.sendProgress(progress, fotaService.receiverServiceName);
         }
-        else if (urc.getFotaStage() == QIND::FotaStage::HTTPSTART) {
+        else if (urc.getFotaStage() == Qind::FotaStage::HTTPSTART) {
             LOG_DEBUG("Start downloading DELTA");
         }
     }

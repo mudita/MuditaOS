@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "URC.hpp"
+#include "Urc.hpp"
 
 #include <common_data/EventStore.hpp>
 
@@ -11,7 +11,7 @@ namespace at::urc
 {
     /// +CREG: <stat> - Indicate network registration status of the ME
     /// +CREG: <stat>[,<lac>,<ci>[,<Act>]] - Indicate network registration and location information of the ME
-    class CREG : public URC
+    class Creg : public Urc
     {
         enum Tokens
         {
@@ -26,12 +26,12 @@ namespace at::urc
         static constexpr std::string_view head = "+CREG";
         static bool isURC(const std::string uHead)
         {
-            return uHead.find(CREG::head) != std::string::npos;
+            return uHead.find(Creg::head) != std::string::npos;
         }
 
-        using URC::URC;
+        using Urc::Urc;
 
-        [[nodiscard]] bool isValid() const noexcept override;
+        [[nodiscard]] auto isValid() const noexcept -> bool override;
         [[nodiscard]] auto isExtended() const noexcept -> bool;
         [[nodiscard]] auto isShort() const noexcept -> bool;
 
@@ -40,7 +40,7 @@ namespace at::urc
         [[nodiscard]] auto getCellId() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getAccessTechnology() const noexcept -> Store::Network::AccessTechnology;
 
-        void Handle(URCHandler &h) final
+        void Handle(UrcHandler &h) final
         {
             h.Handle(*this);
         }

@@ -172,7 +172,7 @@ class ServiceCellular : public sys::Service
     bool handleUSSDURC(void);
     void handleUSSDTimer(void);
 
-    friend class CellularURCHandler;
+    friend class CellularUrcHandler;
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP

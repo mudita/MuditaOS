@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "URC.hpp"
+#include "Urc.hpp"
 
 #include <optional>
 
 namespace at::urc
 {
 
-    class CUSD : public URC
+    class Cusd : public Urc
     {
 
         enum Tokens
@@ -32,21 +32,21 @@ namespace at::urc
         };
 
         static constexpr std::string_view head = "+CUSD";
-        static bool isURC(const std::string uHead)
+        static auto isURC(const std::string uHead) -> bool
         {
-            return uHead.find(CUSD::head) != std::string::npos;
+            return uHead.find(Cusd::head) != std::string::npos;
         }
 
-        using URC::URC;
+        using Urc::Urc;
 
-        [[nodiscard]] bool isValid() const noexcept override;
+        [[nodiscard]] auto isValid() const noexcept -> bool override;
 
         [[nodiscard]] auto isActionNeeded() const noexcept -> bool;
         [[nodiscard]] auto getMessage() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getStatus() const noexcept -> std::optional<StatusType>;
         [[nodiscard]] auto getDCS() const noexcept -> std::optional<int>;
 
-        void Handle(URCHandler &h) final
+        void Handle(UrcHandler &h) final
         {
             h.Handle(*this);
         }

@@ -23,16 +23,16 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_START.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_TEST.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_WAKEUP.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp       
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CTZE.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CREG.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CMTI.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CLIP.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_POWERED_DOWN.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_RESPONSE.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URCFactory.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Urc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcQind.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCusd.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCtze.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCreg.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCmti.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcClip.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcPoweredDown.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcResponse.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )

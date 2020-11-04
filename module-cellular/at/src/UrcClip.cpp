@@ -1,16 +1,16 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "URC_CLIP.hpp"
+#include "UrcClip.hpp"
 
 using namespace at::urc;
 
-auto CLIP::isValid() const noexcept -> bool
+auto Clip::isValid() const noexcept -> bool
 {
-    return tokens.size() >= MinParametersCount;
+    return tokens.size() >= minParametersCount;
 }
 
-std::string CLIP::getNumber() const
+std::string Clip::getNumber() const
 {
     if (!isValid()) {
         return std::string();
@@ -18,7 +18,7 @@ std::string CLIP::getNumber() const
     return tokens[magic_enum::enum_integer(Tokens::Number)];
 };
 
-std::optional<CLIP::AddressType> CLIP::getType() const
+std::optional<Clip::AddressType> Clip::getType() const
 {
     if (!isValid()) {
         return std::nullopt;
@@ -29,7 +29,7 @@ std::optional<CLIP::AddressType> CLIP::getType() const
         return std::nullopt;
     }
 
-    constexpr auto addressTypes = magic_enum::enum_values<CLIP::AddressType>();
+    constexpr auto addressTypes = magic_enum::enum_values<Clip::AddressType>();
     for (const auto &type : addressTypes) {
         if (magic_enum::enum_integer(type) == addressType) {
             return type;
@@ -39,7 +39,7 @@ std::optional<CLIP::AddressType> CLIP::getType() const
     return std::nullopt;
 };
 
-std::optional<std::string> CLIP::getSubaddr() const
+std::optional<std::string> Clip::getSubaddr() const
 {
     size_t minNumOfParams = magic_enum::enum_integer(Tokens::Subaddr) + 1;
     if (tokens.size() < minNumOfParams) {
@@ -51,7 +51,7 @@ std::optional<std::string> CLIP::getSubaddr() const
     return tokens[magic_enum::enum_integer(Tokens::Subaddr)];
 };
 
-std::optional<std::string> CLIP::getSatype() const
+std::optional<std::string> Clip::getSatype() const
 {
     size_t minNumOfParams = magic_enum::enum_integer(Tokens::Satype) + 1;
     if (tokens.size() < minNumOfParams) {
@@ -63,7 +63,7 @@ std::optional<std::string> CLIP::getSatype() const
     return tokens[magic_enum::enum_integer(Tokens::Satype)];
 };
 
-std::optional<std::string> CLIP::getAlpha() const
+std::optional<std::string> Clip::getAlpha() const
 {
     size_t minNumOfParams = magic_enum::enum_integer(Tokens::Alpha) + 1;
     if (tokens.size() < minNumOfParams) {
@@ -75,7 +75,7 @@ std::optional<std::string> CLIP::getAlpha() const
     return tokens[magic_enum::enum_integer(Tokens::Alpha)];
 };
 
-std::optional<std::string> CLIP::getCLIValidity() const
+std::optional<std::string> Clip::getCLIValidity() const
 {
     size_t minNumOfParams = magic_enum::enum_integer(Tokens::CLIValidity) + 1;
     if (tokens.size() < minNumOfParams) {
