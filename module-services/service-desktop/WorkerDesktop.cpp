@@ -8,7 +8,7 @@
 
 #include "MessageHandler.hpp"      // for MessageHandler, MessageHandler::sendQueue
 #include "ParserFSM.hpp"           // for StateMachine
-#include "bsp/usb_cdc/usb_cdc.hpp" // for usbCDCInit, usbCDCSend
+#include "bsp/usb/usb.hpp"         // for usbCDCInit, usbCDCSend
 #include "log/log.hpp"             // for LOG_ERROR, LOG_INFO
 #include "projdefs.h"              // for pdTRUE
 #include "queue.h"                 // for xQueueReceive, QueueDefinition, QueueHandle_t
@@ -50,7 +50,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
 
-    if ((bsp::usbCDCInit(Worker::getQueueByName(WorkerDesktop::RECEIVE_QUEUE_BUFFER_NAME)) < 0)) {
+    if ((bsp::usbInit(Worker::getQueueByName(WorkerDesktop::RECEIVE_QUEUE_BUFFER_NAME)) != nullptr)) {
         LOG_ERROR("won't start desktop service without serial port");
         return false;
     }
