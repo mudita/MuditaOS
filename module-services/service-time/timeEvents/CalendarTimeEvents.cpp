@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarTimeEvents.hpp"
 
-#include <module-services/service-appmgr/Controller.hpp>                 // for Controller
+#include <service-appmgr/Controller.hpp>                                 // for Controller
 #include <module-services/service-db/api/DBServiceAPI.hpp>               // for DBServiceAPI
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp> // for SelectFirstUpcoming, SelectFirstUpcomingResult
 #include <module-gui/gui/SwitchData.hpp>                                 // for SwitchData
