@@ -10,7 +10,7 @@ std::unique_ptr<URC_RESPONSE> URC_RESPONSE::Create(const std::string body)
 {
     std::string trimmeBody = utils::trim(body);
     int idx                = 0;
-    for (std::string respBody : responseBodies) {
+    for (std::string_view respBody : responseBodies) {
         if (respBody == trimmeBody) {
             return std::make_unique<URC_RESPONSE>(magic_enum::enum_value<URCResponseType>(idx));
         }

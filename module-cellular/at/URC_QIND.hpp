@@ -10,7 +10,7 @@ namespace at::urc
     class QIND : public URC
     {
 
-        const std::string type_csq = "csq";
+        const std::string type_csq  = "csq";
         const std::string type_fota = "FOTA";
 
         static const auto invalid_rssi_low  = 99;
@@ -47,7 +47,7 @@ namespace at::urc
             UNDEFINED
         };
 
-        inline static const std::string head = "+QIND";
+        static constexpr std::string_view head = "+QIND";
         static bool isURC(const std::string uHead)
         {
             return uHead.find(QIND::head) != std::string::npos;

@@ -31,7 +31,7 @@ namespace at::urc
             NetworkTimeOut
         };
 
-        inline static const std::string head = "+CUSD";
+        static constexpr std::string_view head = "+CUSD";
         static bool isURC(const std::string uHead)
         {
             return uHead.find(CUSD::head) != std::string::npos;

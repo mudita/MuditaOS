@@ -1044,7 +1044,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     }
 
     return urcHandler.getResponse();
-
 }
 
 bool ServiceCellular::sendSMS(SMSRecord record)

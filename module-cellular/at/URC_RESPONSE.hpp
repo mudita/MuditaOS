@@ -10,7 +10,7 @@ namespace at::urc
     class URC_RESPONSE : public URC
     {
         // this enum has to be aligned with URCResponseType
-        static constexpr const char *responseBodies[] = {
+        static constexpr std::string_view responseBodies[] = {
             "OK", "CONNECT", "RING", "NO CARRIER", "ERROR", "NO DIALTONE", "BUSY", "NO ANSWER"};
 
       public:

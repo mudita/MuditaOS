@@ -23,7 +23,7 @@ namespace at::urc
         };
 
       public:
-        inline static const std::string head = "+CREG";
+        static constexpr std::string_view head = "+CREG";
         static bool isURC(const std::string uHead)
         {
             return uHead.find(CREG::head) != std::string::npos;

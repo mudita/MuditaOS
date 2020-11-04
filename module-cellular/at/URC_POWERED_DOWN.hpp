@@ -10,8 +10,8 @@ namespace at::urc
     class POWERED_DOWN : public URC
     {
       public:
-        inline static const std::string head_immediate = "POWERED DOWN";
-        inline static const std::string head_normal    = "NORMAL POWER DOWN";
+        static constexpr std::string_view head_immediate = "POWERED DOWN";
+        static constexpr std::string_view head_normal    = "NORMAL POWER DOWN";
         static bool isURC(const std::string uHead)
         {
             auto isImmediatePowerDown = uHead.find(POWERED_DOWN::head_immediate) != std::string::npos;

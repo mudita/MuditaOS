@@ -30,7 +30,7 @@ namespace at::urc
             NationalNumber      = 161,
         };
 
-        inline static const std::string head = "+CLIP";
+        static constexpr std::string_view head = "+CLIP";
         static bool isURC(const std::string uHead)
         {
             return uHead.find(CLIP::head) != std::string::npos;
