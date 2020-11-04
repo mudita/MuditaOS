@@ -11,7 +11,7 @@ namespace gui
 
     namespace window
     {
-        inline const std::string network_window = "Network";
+        inline constexpr auto network_window = "Network";
     };
 
     class NetworkWindow : public OptionWindow

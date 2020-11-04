@@ -10,8 +10,8 @@
 namespace app
 {
 
-    inline const std::string special_input = "ApplicationSpecialInput";
-    inline const std::string char_select   = gui::name::window::main_window;
+    inline constexpr auto special_input = "ApplicationSpecialInput";
+    inline constexpr auto char_select   = gui::name::window::main_window;
 
     // app just to provide input selection on UI
     class ApplicationSpecialInput : public app::Application

@@ -3,12 +3,10 @@
 
 #pragma once
 
+#include <gui/core/Color.hpp>
+#include <gui/Common.hpp>
 #include <Alignment.hpp>
 #include <Margins.hpp>
-#include <gui/core/Color.hpp>
-#include <inttypes.h>
-#include <string>
-#include <gui/Common.hpp>
 
 namespace gui
 {
@@ -19,64 +17,64 @@ namespace gui
 /// one place to gather all common magical numbers from design
 namespace style
 {
-    const inline uint32_t window_height = 600;
-    const inline uint32_t window_width  = 480;
+    inline constexpr auto window_height = 600U;
+    inline constexpr auto window_width  = 480U;
     namespace header
     {
-        const inline uint32_t height = 105;
+        inline constexpr auto height = 105U;
         namespace font
         {
-            const inline std::string time  = "gt_pressura_regular_24";
-            const inline std::string modes = "gt_pressura_regular_20";
-            const inline std::string title = "gt_pressura_bold_32";
+            inline constexpr auto time  = "gt_pressura_regular_24";
+            inline constexpr auto modes = "gt_pressura_regular_20";
+            inline constexpr auto title = "gt_pressura_bold_32";
         }; // namespace font
     };     // namespace header
 
     namespace footer
     {
-        const inline uint32_t height = 54;
+        inline constexpr auto height = 54U;
         namespace font
         {
-            const inline std::string bold   = "gt_pressura_bold_24";
-            const inline std::string medium = "gt_pressura_regular_24";
+            inline constexpr auto bold   = "gt_pressura_bold_24";
+            inline constexpr auto medium = "gt_pressura_regular_24";
         }; // namespace font
     };     // namespace footer
 
     namespace window
     {
-        const inline uint32_t default_left_margin  = 20;
-        const inline uint32_t default_right_margin = 20;
-        const inline uint32_t default_body_width =
+        inline constexpr auto default_left_margin  = 20U;
+        inline constexpr auto default_right_margin = 20U;
+        inline constexpr auto default_body_width =
             style::window_width - style::window::default_right_margin - style::window::default_left_margin;
-        const inline uint32_t default_body_height =
+        inline constexpr auto default_body_height =
             style::window_height - style::header::height - style::footer::height;
-        const inline uint32_t default_border_focus_w       = 2;
-        const inline uint32_t default_border_rect_no_focus = 1;
-        const inline uint32_t default_border_no_focus_w    = 0;
-        const inline uint32_t default_rect_yaps            = 10;
+        inline constexpr auto default_border_focus_w       = 2U;
+        inline constexpr auto default_border_rect_no_focus = 1U;
+        inline constexpr auto default_border_no_focus_w    = 0U;
+        inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
-            const inline std::string supersizemelight = "gt_pressura_light_90";
-            const inline std::string largelight       = "gt_pressura_light_46";
-            const inline std::string verybigbold      = "gt_pressura_bold_32";
-            const inline std::string bigbold          = "gt_pressura_bold_30";
-            const inline std::string big              = "gt_pressura_regular_30";
-            const inline std::string biglight         = "gt_pressura_light_30";
-            const inline std::string mediumbold       = "gt_pressura_bold_27";
-            const inline std::string medium           = "gt_pressura_regular_27";
-            const inline std::string mediumlight      = "gt_pressura_light_27";
-            const inline std::string smallbold        = "gt_pressura_bold_24";
-            const inline std::string small            = "gt_pressura_regular_24";
-            const inline std::string verysmallbold    = "gt_pressura_bold_20";
-            const inline std::string verysmall        = "gt_pressura_regular_20";
+            inline constexpr auto supersizemelight = "gt_pressura_light_90";
+            inline constexpr auto largelight       = "gt_pressura_light_46";
+            inline constexpr auto verybigbold      = "gt_pressura_bold_32";
+            inline constexpr auto bigbold          = "gt_pressura_bold_30";
+            inline constexpr auto big              = "gt_pressura_regular_30";
+            inline constexpr auto biglight         = "gt_pressura_light_30";
+            inline constexpr auto mediumbold       = "gt_pressura_bold_27";
+            inline constexpr auto medium           = "gt_pressura_regular_27";
+            inline constexpr auto mediumlight      = "gt_pressura_light_27";
+            inline constexpr auto smallbold        = "gt_pressura_bold_24";
+            inline constexpr auto small            = "gt_pressura_regular_24";
+            inline constexpr auto verysmallbold    = "gt_pressura_bold_20";
+            inline constexpr auto verysmall        = "gt_pressura_regular_20";
         }; // namespace font
 
-        const inline uint32_t list_offset_default = 12;
+        inline constexpr auto list_offset_default = 12U;
         namespace label
         {
-            const inline uint32_t small_h   = 33;
-            const inline uint32_t default_h = 50;
-            const inline uint32_t big_h     = 55;
+            inline constexpr auto small_h   = 33U;
+            inline constexpr auto default_h = 50U;
+            inline constexpr auto big_h     = 55U;
         }; // namespace label
 
         /// minimal label decoration - edges, focus & alignment
@@ -91,89 +89,89 @@ namespace style
     {
         namespace date
         {
-            const inline uint32_t date_time_item_height       = 107;
-            const inline uint32_t date_time_item_width        = 120;
-            const inline uint32_t date_time_item_title_height = 30;
-            const inline uint32_t date_time_spacer_width      = 20;
-            const inline uint32_t date_time_x_offset          = 30;
+            inline constexpr auto date_time_item_height       = 107U;
+            inline constexpr auto date_time_item_width        = 120U;
+            inline constexpr auto date_time_item_title_height = 30U;
+            inline constexpr auto date_time_spacer_width      = 20U;
+            inline constexpr auto date_time_x_offset          = 30U;
 
-            const inline uint32_t date_time_box_h = 107;
-            const inline uint32_t date_box_y_pos  = 123;
-            const inline uint32_t time_box_y_pos  = 285;
+            inline constexpr auto date_time_box_h = 107U;
+            inline constexpr auto date_box_y_pos  = 123U;
+            inline constexpr auto time_box_y_pos  = 285U;
 
         } // namespace date
         namespace ussd
         {
-            constexpr uint32_t commonXPos = 40;
-            constexpr uint32_t commonYPos = 110;
+            inline constexpr auto commonXPos = 40U;
+            inline constexpr auto commonYPos = 110U;
 
-            constexpr uint32_t commonW      = 420;
-            constexpr uint32_t commonLabelH = 33;
-            constexpr uint32_t commonTextH  = 99;
+            inline constexpr auto commonW      = 420U;
+            inline constexpr auto commonLabelH = 33U;
+            inline constexpr auto commonTextH  = 99U;
         } // namespace ussd
     }     // namespace settings
     namespace color
     {
-        const inline gui::Color lightgrey = gui::Color(3, 0);
+        inline constexpr auto lightgrey = gui::Color(3, 0);
     }; //  namespace color
     namespace text
     {
-        const inline gui::Alignment defaultTextAlignment =
+        inline constexpr auto defaultTextAlignment =
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
-        const inline unsigned int maxTextLines = 10;
+        inline constexpr auto maxTextLines = 10;
     }; // namespace text
 
     namespace strings
     {
         namespace common
         {
-            const inline std::string add            = "common_add";
-            const inline std::string open           = "common_open";
-            const inline std::string call           = "common_call";
-            const inline std::string send           = "common_send";
-            const inline std::string save           = "common_save";
-            const inline std::string confirm        = "common_confirm";
-            const inline std::string select         = "common_select";
-            const inline std::string use            = "common_use";
-            const inline std::string ok             = "common_ok";
-            const inline std::string back           = "common_back";
-            const inline std::string set            = "common_set";
-            const inline std::string yes            = "common_yes";
-            const inline std::string no             = "common_no";
-            const inline std::string Switch         = "common_switch";
-            const inline std::string options        = "common_options";
-            const inline std::string information    = "common_information";
-            const inline std::string search         = "common_search";
-            const inline std::string search_results = "common_search_results";
-            const inline std::string emoji          = "common_emoji";
-            const inline std::string special_chars  = "common_special_characters";
-            const inline std::string start          = "common_start";
-            const inline std::string stop           = "common_stop";
-            const inline std::string resume         = "common_resume";
-            const inline std::string pause          = "common_pause";
+            inline constexpr auto add            = "common_add";
+            inline constexpr auto open           = "common_open";
+            inline constexpr auto call           = "common_call";
+            inline constexpr auto send           = "common_send";
+            inline constexpr auto save           = "common_save";
+            inline constexpr auto confirm        = "common_confirm";
+            inline constexpr auto select         = "common_select";
+            inline constexpr auto use            = "common_use";
+            inline constexpr auto ok             = "common_ok";
+            inline constexpr auto back           = "common_back";
+            inline constexpr auto set            = "common_set";
+            inline constexpr auto yes            = "common_yes";
+            inline constexpr auto no             = "common_no";
+            inline constexpr auto Switch         = "common_switch";
+            inline constexpr auto options        = "common_options";
+            inline constexpr auto information    = "common_information";
+            inline constexpr auto search         = "common_search";
+            inline constexpr auto search_results = "common_search_results";
+            inline constexpr auto emoji          = "common_emoji";
+            inline constexpr auto special_chars  = "common_special_characters";
+            inline constexpr auto start          = "common_start";
+            inline constexpr auto stop           = "common_stop";
+            inline constexpr auto resume         = "common_resume";
+            inline constexpr auto pause          = "common_pause";
             // days
-            const inline std::string Monday    = "common_monday";
-            const inline std::string Tuesday   = "common_tuesday";
-            const inline std::string Wednesday = "common_wednesday";
-            const inline std::string Thursday  = "common_thursday";
-            const inline std::string Friday    = "common_friday";
-            const inline std::string Saturday  = "common_saturday";
-            const inline std::string Sunday    = "common_sunday";
+            inline constexpr auto Monday    = "common_monday";
+            inline constexpr auto Tuesday   = "common_tuesday";
+            inline constexpr auto Wednesday = "common_wednesday";
+            inline constexpr auto Thursday  = "common_thursday";
+            inline constexpr auto Friday    = "common_friday";
+            inline constexpr auto Saturday  = "common_saturday";
+            inline constexpr auto Sunday    = "common_sunday";
             // months
-            const inline std::string January   = "common_january";
-            const inline std::string February  = "common_february";
-            const inline std::string March     = "common_march";
-            const inline std::string April     = "common_april";
-            const inline std::string May       = "common_may";
-            const inline std::string June      = "common_june";
-            const inline std::string July      = "common_july";
-            const inline std::string August    = "common_august";
-            const inline std::string September = "common_september";
-            const inline std::string October   = "common_october";
-            const inline std::string November  = "common_november";
-            const inline std::string December  = "common_december";
-            const inline std::string Yesterday = "common_yesterday";
-            const inline std::string Today     = "common_today";
+            inline constexpr auto January   = "common_january";
+            inline constexpr auto February  = "common_february";
+            inline constexpr auto March     = "common_march";
+            inline constexpr auto April     = "common_april";
+            inline constexpr auto May       = "common_may";
+            inline constexpr auto June      = "common_june";
+            inline constexpr auto July      = "common_july";
+            inline constexpr auto August    = "common_august";
+            inline constexpr auto September = "common_september";
+            inline constexpr auto October   = "common_october";
+            inline constexpr auto November  = "common_november";
+            inline constexpr auto December  = "common_december";
+            inline constexpr auto Yesterday = "common_yesterday";
+            inline constexpr auto Today     = "common_today";
         } // namespace common
     }     // namespace strings
 
@@ -212,41 +210,41 @@ namespace style
 
         namespace scroll
         {
-            const inline uint32_t x           = 0;
-            const inline uint32_t y           = 0;
-            const inline uint32_t w           = 5;
-            const inline uint32_t h           = 0;
-            const inline uint32_t radius      = 2;
-            const inline gui::Color color     = gui::Color{0, 0};
-            const inline uint32_t margin      = 5;
-            const inline uint32_t min_space   = 10;
-            const inline uint32_t item_margin = 10;
+            inline constexpr auto x           = 0U;
+            inline constexpr auto y           = 0U;
+            inline constexpr auto w           = 5U;
+            inline constexpr auto h           = 0U;
+            inline constexpr auto radius      = 2U;
+            inline constexpr auto color       = gui::Color{0, 0};
+            inline constexpr auto margin      = 5U;
+            inline constexpr auto min_space   = 10U;
+            inline constexpr auto item_margin = 10U;
         } // namespace scroll
 
-        const inline uint32_t item_width_with_scroll =
+        inline constexpr auto item_width_with_scroll =
             style::window::default_body_width - style::listview::scroll::item_margin;
-        const inline uint32_t body_width_with_scroll =
+        inline constexpr auto body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
-        const inline uint32_t right_margin        = 15;
-        const inline uint32_t top_margin_small    = 5;
-        const inline uint32_t top_margin_big      = 8;
-        const inline uint32_t top_margin_very_big = 12;
-        const inline uint32_t item_span_small     = 8;
-        const inline uint32_t item_span_big       = 12;
+        inline constexpr auto right_margin        = 15U;
+        inline constexpr auto top_margin_small    = 5U;
+        inline constexpr auto top_margin_big      = 8U;
+        inline constexpr auto top_margin_very_big = 12U;
+        inline constexpr auto item_span_small     = 8U;
+        inline constexpr auto item_span_big       = 12U;
 
     } // namespace listview
 
     namespace margins
     {
-        const inline uint32_t small    = 6;
-        const inline uint32_t big      = 8;
-        const inline uint32_t very_big = 12;
-        const inline uint32_t huge     = 24;
+        inline constexpr auto small    = 6U;
+        inline constexpr auto big      = 8U;
+        inline constexpr auto very_big = 12U;
+        inline constexpr auto huge     = 24U;
     } // namespace margins
 
     namespace padding
     {
-        const inline uint32_t default_left_text_padding = 10;
+        inline constexpr auto default_left_text_padding = 10U;
     } // namespace padding
 
 }; // namespace style

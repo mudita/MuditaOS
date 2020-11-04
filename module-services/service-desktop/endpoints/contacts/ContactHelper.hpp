@@ -42,14 +42,14 @@ namespace parserFSM
 
     namespace json::contacts
     {
-        const inline std::string count           = "count";
-        const inline std::string primaryName     = "priName";
-        const inline std::string alternativeName = "altName";
-        const inline std::string address         = "address";
-        const inline std::string id              = "id";
-        const inline std::string numbers         = "numbers";
-        const inline std::string isBlocked       = "blocked";
-        const inline std::string isFavourite     = "favourite";
+        inline constexpr auto count           = "count";
+        inline constexpr auto primaryName     = "priName";
+        inline constexpr auto alternativeName = "altName";
+        inline constexpr auto address         = "address";
+        inline constexpr auto id              = "id";
+        inline constexpr auto numbers         = "numbers";
+        inline constexpr auto isBlocked       = "blocked";
+        inline constexpr auto isFavourite     = "favourite";
 
     } // namespace json::contacts
 } // namespace parserFSM

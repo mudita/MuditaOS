@@ -17,7 +17,7 @@
 
 namespace app
 {
-    inline const std::string name_desktop = "ApplicationDesktop";
+    inline constexpr auto name_desktop = "ApplicationDesktop";
 
     class ApplicationDesktop : public Application
     {

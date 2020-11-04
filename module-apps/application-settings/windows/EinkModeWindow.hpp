@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
-#include <string>
 #include <functional>
 
 #include "AppWindow.hpp"
@@ -16,7 +15,7 @@ namespace gui
 {
     namespace window::name
     {
-        inline const std::string eink = "EinkModeWindow";
+        inline constexpr auto eink = "EinkModeWindow";
     } // namespace window::name
 
     class EinkModeWindow : public AppWindow

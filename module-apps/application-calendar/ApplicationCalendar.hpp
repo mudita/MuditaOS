@@ -14,11 +14,11 @@
 namespace app
 {
 
-    inline const std::string name_calendar = "ApplicationCalendar";
+    inline constexpr auto name_calendar = "ApplicationCalendar";
 
     class ApplicationCalendar : public Application
     {
-        time_t applicationStartTime = 0;
+        time_t applicationStartTime       = 0;
         int eventShift                    = 0;
         EquivalentWindow equivalentWindow = EquivalentWindow::EmptyWindow;
 

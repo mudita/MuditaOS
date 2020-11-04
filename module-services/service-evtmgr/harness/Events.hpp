@@ -9,8 +9,8 @@
 
 namespace harness
 {
-    inline const std::string Type = "t";
-    inline const std::string Data = "d";
+    inline constexpr auto Type = "t";
+    inline constexpr auto Data = "d";
     enum class Events;
 
     /// basic event structure:

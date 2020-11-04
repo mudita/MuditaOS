@@ -18,9 +18,12 @@ namespace gui
       public:
         short left, top, right, bottom;
 
-        Margins();
-        Margins(const short left, const short top, const short right, const short bottom);
-        virtual ~Margins();
+        constexpr Margins() : left{0}, top{0}, right{0}, bottom{0}
+        {}
+
+        constexpr Margins(const short left, const short top, const short right, const short bottom)
+            : left{left}, top{top}, right{right}, bottom{bottom}
+        {}
 
         [[nodiscard]] short getSumInAxis(Axis axis) const;
         [[nodiscard]] short getMarginInAxis(Axis axis, MarginInAxis pos) const;
@@ -31,4 +34,3 @@ namespace gui
     using Padding = Margins;
 
 } /* namespace gui */
-

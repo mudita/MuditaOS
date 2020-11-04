@@ -527,10 +527,10 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
         }
 
         std::unique_ptr<char[]> versionFilename(new char[purefs::buffer::crc_buf]);
-        sprintf(versionFilename.get(), "./%s", updateos::file::version.c_str());
+        sprintf(versionFilename.get(), "./%s", updateos::file::version);
         if (mtar_find(&tar, versionFilename.get(), &h) == MTAR_ENOTFOUND) {
             LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't find %s in %s",
-                     updateos::file::version.c_str(),
+                     updateos::file::version,
                      updateFile.c_str());
 
             mtar_close(&tar);
@@ -541,7 +541,7 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
         std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
         if (mtar_read_data(&tar, readBuf.get(), h.size) != MTAR_ESUCCESS) {
             LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't read %s in %s",
-                     updateos::file::version.c_str(),
+                     updateos::file::version,
                      updateFile.c_str());
 
             mtar_close(&tar);
@@ -555,7 +555,7 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
         json11::Json versionInfo = json11::Json::parse(dataPackage, parserError);
         if (parserError != "") {
             LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't parse %s as JSON error: \"%s\"",
-                     updateos::file::version.c_str(),
+                     updateos::file::version,
                      parserError.c_str());
             return json11::Json();
         }

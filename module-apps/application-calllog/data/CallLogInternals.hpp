@@ -34,9 +34,9 @@ namespace calllog
     namespace settings
     {
         // Windows
-        const inline std::string MainWindowStr       = gui::name::window::main_window;
-        const inline std::string DetailsWindowStr    = "DetailsWindow";
-        const inline std::string DialogYesNoStr      = "DialogYesNo";
+        inline constexpr auto MainWindowStr    = gui::name::window::main_window;
+        inline constexpr auto DetailsWindowStr = "DetailsWindow";
+        inline constexpr auto DialogYesNoStr   = "DialogYesNo";
 
     } // namespace settings
 } // namespace calllog

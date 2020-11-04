@@ -323,7 +323,7 @@ namespace sys
         for (bool retry{};; retry = false) {
             for (auto &service : servicesList) {
                 if (service->GetName() == service::name::evt_manager) {
-                    LOG_DEBUG("Delay closing %s", service::name::evt_manager.c_str());
+                    LOG_DEBUG("Delay closing %s", service::name::evt_manager);
                     continue;
                 }
                 if (service->parent == "") {
