@@ -232,7 +232,7 @@ namespace app::manager
         });
         connect(typeid(ApplicationCloseRequest), [this](sys::Message *request) {
             auto msg = static_cast<ApplicationCloseRequest *>(request);
-            closeService(msg->getApplication());
+            closeApplication(applications.findByName(msg->getApplication()));
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(ApplicationInitialisation), [this](sys::Message *request) {
@@ -306,7 +306,7 @@ namespace app::manager
         for (const auto &app : getApplications()) {
             if (app->started()) {
                 LOG_INFO("Closing application %s", app->name().c_str());
-                closeService(app->name());
+                closeApplication(app.get());
                 app->setState(ApplicationHandle::State::DEACTIVATED);
             }
         }
@@ -322,6 +322,16 @@ namespace app::manager
         else {
             LOG_FATAL("Service/Application %s is still running", name.c_str());
         }
+    }
+
+    void ApplicationManager::closeApplication(ApplicationHandle *application)
+    {
+        if (application == nullptr) {
+            return;
+        }
+
+        closeService(application->name());
+        application->close();
     }
 
     auto ApplicationManager::handlePowerSavingModeInit() -> bool

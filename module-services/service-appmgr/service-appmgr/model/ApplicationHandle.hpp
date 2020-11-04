@@ -29,6 +29,7 @@ namespace app::manager
         void setState(State state) noexcept;
         void run(sys::Service *caller);
         void runInBackground(sys::Service *caller);
+        void close() noexcept;
 
         auto name() const -> ApplicationName;
         auto manifest() const -> const ApplicationManifest &;
