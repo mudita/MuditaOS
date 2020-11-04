@@ -270,7 +270,7 @@ namespace sys
     {
         isReady = true;
 
-        connect(SystemManagerCmd(), [&](DataMessage *msg, ResponseMessage * /*resp*/) {
+        connect(typeid(SystemManagerCmd), [&](DataMessage *msg, ResponseMessage * /*resp*/) {
             if (msg->channel == BusChannels::SystemManagerRequests) {
                 auto *data = static_cast<SystemManagerCmd *>(msg);
 

@@ -79,10 +79,7 @@ namespace sys
         uint64_t id;
         uint64_t uniID;
 
-        virtual operator std::string() const
-        {
-            return "{}";
-        }
+        virtual operator std::string() const;
 
 #ifdef UNIT_TESTS
         static uint32_t unitestsMsgInstancesCount;

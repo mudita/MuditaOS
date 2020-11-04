@@ -25,6 +25,7 @@ set( SOURCES
     "windows/OptionSetting.cpp"
     "widgets/ButtonOnOff.cpp"
     "widgets/InputBox.cpp"
+    "messages/AppRefreshMessage.cpp"
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})

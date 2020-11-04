@@ -6,6 +6,8 @@
 #include "Bus.hpp"
 #include "Channel.hpp"
 #include "ticks.hpp"
+#include <magic_enum.hpp>
+#include <json/json11.hpp>
 
 #include <string.h>
 
@@ -16,6 +18,13 @@ namespace sys
     {
         return std::make_pair(retCode, msg);
     };
+
+    Message::operator std::string() const
+    {
+        json11::Json::object vals;
+        vals["Type"] = std::string(magic_enum::enum_name(type));
+        return json11::Json(vals).dump();
+    }
 
     Message_t DataMessage::Execute(Service *service)
     {

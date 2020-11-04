@@ -13,10 +13,6 @@
 
 namespace app
 {
-
-    /*
-     * @brief Template for all messages that go to application manager
-     */
     class AppMessage : public sys::DataMessage
     {
       public:
@@ -74,27 +70,6 @@ namespace app
         {
             return returnApplication;
         };
-    };
-
-    class AppRefreshMessage : public AppMessage
-    {
-      protected:
-        gui::RefreshModes mode;
-        std::string window_name;
-
-      public:
-        AppRefreshMessage(gui::RefreshModes mode, std::string window_name)
-            : mode{mode}, window_name(std::move(window_name)){};
-
-        [[nodiscard]] const gui::RefreshModes &getMode() const
-        {
-            return mode;
-        }
-
-        [[nodiscard]] const std::string &getWindowName() const
-        {
-            return window_name;
-        }
     };
 
     class AppSwitchWindowMessage : public AppMessage

@@ -12,6 +12,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Timer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/PowerManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/messages/SystemManagerCmd.cpp
 
         )
 
