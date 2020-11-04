@@ -63,6 +63,7 @@ namespace vfsn::internal::syscalls
             _errno_ = EINVAL;
             return -1;
         }
+        LOG_DEBUG("Trying to open file %s", file);
         auto fil = ff_fopen(file, fflags);
         if (!fil) {
             _errno_ = stdioGET_ERRNO();
@@ -71,24 +72,26 @@ namespace vfsn::internal::syscalls
         int hwnd = gFileHandles.setHandle(fil);
         if (hwnd < 0) {
             ff_fclose(fil);
-            _errno_ = hwnd;
-            LOG_ERROR("Unable to find handle");
+            _errno_ = EMFILE;
+            LOG_ERROR("Unable to find handle %i", hwnd);
             return -1;
         }
         else {
             _errno_ = 0;
+            LOG_DEBUG("Assigned handle %i fileptr %p", hwnd, fil);
             return hwnd;
         }
     }
 
     long close(int &_errno_, int fd)
     {
-        auto fil = gFileHandles[fd];
+        auto fil = gFileHandles.clearHandle(fd);
         if (!fil) {
-            LOG_ERROR("Unable to find handle");
+            LOG_ERROR("Unable to find handle %i", fd);
             _errno_ = EBADF;
             return -1;
         }
+        LOG_DEBUG("Closing handle %i fileptr %p", fd, fil);
         auto ret = ff_fclose(fil);
         _errno_  = stdioGET_ERRNO();
         return ret;
@@ -98,7 +101,7 @@ namespace vfsn::internal::syscalls
     {
         auto fil = gFileHandles[fd];
         if (!fil) {
-            LOG_ERROR("Unable to find handle");
+            LOG_ERROR("Unable to find handle %i", fd);
             _errno_ = EBADF;
             return -1;
         }
@@ -111,7 +114,7 @@ namespace vfsn::internal::syscalls
     {
         auto fil = gFileHandles[fd];
         if (!fil) {
-            LOG_ERROR("Unable to find handle");
+            LOG_ERROR("Unable to find handle %i", fd);
             _errno_ = EBADF;
             return -1;
         }
@@ -124,7 +127,7 @@ namespace vfsn::internal::syscalls
     {
         auto fil = gFileHandles[fd];
         if (!fil) {
-            LOG_ERROR("Unable to find handle");
+            LOG_ERROR("Unable to find handle %i", fd);
             _errno_ = EBADF;
             return -1;
         }
@@ -132,11 +135,21 @@ namespace vfsn::internal::syscalls
         _errno_  = stdioGET_ERRNO();
         return ret;
     }
-    int fstat(int &_errno_, int fd, struct stat *st)
+    int fstat(int &_errno_, int fd, struct stat *pstat)
     {
-        _errno_ = ENOTSUP;
-        LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
-        return -1;
+        auto fil = gFileHandles[fd];
+        if (!fil) {
+            LOG_ERROR("Unable to find handle %i", fd);
+            _errno_ = EBADF;
+            return -1;
+        }
+        std::memset(pstat, 0, sizeof(*pstat));
+        pstat->st_ino  = fil->ulObjectCluster;
+        pstat->st_size = fil->ulFileSize;
+        pstat->st_dev  = 0;
+        pstat->st_mode = fil->ucMode;
+        _errno_        = 0;
+        return 0;
     }
     int link(int &_errno_, const char *existing, const char *newLink)
     {
@@ -321,7 +334,7 @@ namespace vfsn::internal::syscalls
     {
         auto fil = gFileHandles[fd];
         if (!fil) {
-            LOG_ERROR("Unable to find handle");
+            LOG_ERROR("Unable to find handle %i", fd);
             _errno_ = EBADF;
             return -1;
         }

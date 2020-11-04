@@ -20,9 +20,9 @@ namespace vfsn::internal::stdlib::impl
         for (h = 0; h < MAX_HANDLES; ++h) {
             void *tst_val = nullptr;
             if (mHandles[h].compare_exchange_strong(tst_val, hwnd)) {
-                return 0;
+                return h + FIRST_HANDLE;
             }
         }
-        return EMFILE;
+        return -1;
     }
 } // namespace vfs::internal::stdlib::impl
