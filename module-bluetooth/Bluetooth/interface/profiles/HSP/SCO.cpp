@@ -6,7 +6,7 @@
 #include <Audio/AudioCommon.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/messages/AudioMessage.hpp>
-
+#include <cassert>
 extern "C"
 {
 #include "btstack_audio.h"
