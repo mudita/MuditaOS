@@ -50,7 +50,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
 
-    if ((bsp::usbCDCInit(Worker::getQueueByName(WorkerDesktop::RECEIVE_QUEUE_BUFFER_NAME)) < 0)) {
+    if ((bsp::usbInit(Worker::getQueueByName(WorkerDesktop::RECEIVE_QUEUE_BUFFER_NAME)) != nullptr)) {
         LOG_ERROR("won't start desktop service without serial port");
         return false;
     }

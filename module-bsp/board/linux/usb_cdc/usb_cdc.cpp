@@ -51,14 +51,14 @@ namespace bsp
         }
     }
 
-    int usbCDCInit(xQueueHandle receiveQueue)
+    void *usbInit(xQueueHandle receiveQueue)
     {
 
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
 
         if (fd == -1) {
-            return (-1);
+            return (nullptr);
         }
 
         grantpt(fd);
@@ -94,6 +94,6 @@ namespace bsp
             LOG_ERROR("[ServiceDesktop:BSP_Driver] Failed to start freertos USB_Linux_Receive");
         }
 
-        return (fd);
+        return (&fd);
     }
 } // namespace bsp
