@@ -14,9 +14,10 @@ namespace app
 
     class ApplicationCallLog : public Application
     {
-      protected:
       public:
-        ApplicationCallLog(std::string name = CallLogAppStr, std::string parent = "", bool startBackgound = false);
+        ApplicationCallLog(std::string name                    = CallLogAppStr,
+                           std::string parent                  = {},
+                           StartInBackground startInBackground = {false});
         ~ApplicationCallLog() override;
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -36,4 +37,11 @@ namespace app
         bool setAllEntriesRead();
     };
 
+    template <> struct ManifestTraits<ApplicationCallLog>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */

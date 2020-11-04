@@ -662,8 +662,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     }
                     else {
                         responseMsg = std::make_shared<CellularResponseMessage>(false);
-
-                        app::manager::Controller::sendAction(this, simUnlockError(resp));
+                        // TODO: Sim unlock error.
                     }
                 }
                 else {
@@ -671,7 +670,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     responseMsg = std::make_shared<CellularResponseMessage>(false);
                     at::Result fatalError;
                     fatalError.code = at::Result::Code::ERROR;
-                    app::manager::Controller::sendAction(this, simUnlockError(fatalError));
+                    // TODO: Sim unlock error.
                 }
             }
         }
@@ -1033,10 +1032,10 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
             Store::GSM::get()->sim = Store::GSM::get()->selected;
             if (str.find("SIM PIN", ret) != std::string::npos) {
-                app::manager::Controller::sendAction(this, requestPin(3));
+                // TODO: Request pin.
             }
             else if (str.find("READY", ret) != std::string::npos) {
-                app::manager::Controller::sendAction(this, simUnlocked());
+                // TODO: Sim unlocked.
             }
             else {
                 LOG_WARN("Not supported: %s", logStr.c_str());

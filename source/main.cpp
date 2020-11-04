@@ -20,7 +20,7 @@
 #include <application-calculator/ApplicationCalculator.hpp>
 
 // services
-#include <service-appmgr/ApplicationManager.hpp>
+#include <module-services/service-appmgr/model/ApplicationManager.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>

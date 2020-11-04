@@ -26,9 +26,8 @@
 #include <cassert>
 namespace app
 {
-
-    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent), lockHandler(this, settings)
+    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
+        : Application(name, parent, startInBackground), lockHandler(this, settings)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }

@@ -19,9 +19,10 @@
 
 namespace app
 {
-
-    ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, phonebook_stack_size)
+    ApplicationPhonebook::ApplicationPhonebook(std::string name,
+                                               std::string parent,
+                                               StartInBackground startInBackground)
+        : Application(name, parent, startInBackground, phonebook_stack_size)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
@@ -162,7 +163,7 @@ namespace app
                     data->result                                 = item->contact;
                     data->setDescription("PhonebookSearchRequest");
                     return app::manager::Controller::switchBack(
-                        this, std::make_unique<app::manager::APMSwitchPrevApp>(GetName(), std::move(data)));
+                        this, std::make_unique<app::manager::SwitchBackRequest>(GetName(), std::move(data)));
                 };
             }
             LOG_DEBUG("Switching to search results window.");

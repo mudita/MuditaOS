@@ -83,7 +83,7 @@ namespace gui
             LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.getFormatted().c_str());
             app->sendSms(phoneNumber, templ->text);
             app::manager::Controller::switchBack(app,
-                                                 std::make_unique<app::manager::APMSwitchPrevApp>(
+                                                 std::make_unique<app::manager::SwitchBackRequest>(
                                                      application->GetName(), std::make_unique<SMSTemplateSent>()));
             return true;
         };

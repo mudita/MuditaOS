@@ -31,7 +31,9 @@ namespace app
     class ApplicationPhonebook : public app::Application
     {
       public:
-        ApplicationPhonebook(std::string name = name_phonebook, std::string parent = "", bool startBackgound = false);
+        ApplicationPhonebook(std::string name                    = name_phonebook,
+                             std::string parent                  = {},
+                             StartInBackground startInBackground = {false});
         ~ApplicationPhonebook() override = default;
 
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
@@ -49,4 +51,11 @@ namespace app
         bool searchEmpty(const std::string &query);
     };
 
+    template <> struct ManifestTraits<ApplicationPhonebook>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } // namespace app

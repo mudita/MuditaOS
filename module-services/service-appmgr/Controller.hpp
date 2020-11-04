@@ -6,11 +6,12 @@
 #include <memory> // for unique_ptr
 #include <string> // for string
 
-#include "ApplicationManager.hpp" // for ApplicationHandle, ApplicationHandle::Name
+#include "Actions.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 #include "module-sys/Service/Service.hpp"
 #include "SwitchData.hpp"                         // for SwitchData
 #include "i18/i18.hpp"                            // for Lang
-#include "service-appmgr/messages/APMMessage.hpp" // for APMSwitchPrevApp, Action (ptr only)
+#include "service-appmgr/messages/Message.hpp"    // for APMSwitchPrevApp, Action (ptr only)
 
 namespace sys
 {
@@ -24,14 +25,17 @@ namespace app::manager
       public:
         Controller() = delete;
 
-        static auto sendAction(sys::Service *sender, Action &&action) -> bool;
-        static auto registerApplication(sys::Service *sender, bool status, bool startBackground) -> bool;
+        static auto sendAction(sys::Service *sender, actions::ActionId actionId, actions::ActionParamsPtr &&data)
+            -> bool;
+        static auto applicationInitialised(sys::Service *sender,
+                                           StartupStatus status,
+                                           StartInBackground startInBackground) -> bool;
         static auto switchApplication(sys::Service *sender,
-                                      const ApplicationHandle::Name &applicationName,
+                                      const ApplicationName &applicationName,
                                       const std::string &windowName,
                                       std::unique_ptr<gui::SwitchData> data = nullptr) -> bool;
-        static auto switchBack(sys::Service *sender, std::unique_ptr<APMSwitchPrevApp> msg = nullptr) -> bool;
-        static auto closeApplication(sys::Service *sender, const ApplicationHandle::Name &name) -> bool;
+        static auto switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg = nullptr) -> bool;
+        static auto closeApplication(sys::Service *sender, const ApplicationName &name) -> bool;
         static auto changeLanguage(sys::Service *sender, utils::Lang language) -> bool;
         static auto changePowerSaveMode(sys::Service *sender) -> bool;
         static auto stopApplicationManager(sys::Service *sender) -> bool;

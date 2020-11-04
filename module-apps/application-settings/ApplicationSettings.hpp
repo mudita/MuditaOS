@@ -18,7 +18,9 @@ namespace app
     class ApplicationSettings : public app::Application
     {
       public:
-        ApplicationSettings(std::string name = name_settings, std::string parent = "", bool startBackgound = false);
+        ApplicationSettings(std::string name                    = name_settings,
+                            std::string parent                  = {},
+                            StartInBackground startInBackground = {false});
         virtual ~ApplicationSettings();
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -34,6 +36,13 @@ namespace app
         bsp::Board board = bsp::Board::none;
     };
 
+    template <> struct ManifestTraits<ApplicationSettings>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_SETTINGS_APPLICATIONSETTINGS_HPP_ */

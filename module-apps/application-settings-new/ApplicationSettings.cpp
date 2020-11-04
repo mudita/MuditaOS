@@ -30,8 +30,10 @@
 
 namespace app
 {
-    ApplicationSettingsNew::ApplicationSettingsNew(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound)
+    ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
+                                                   std::string parent,
+                                                   StartInBackground startInBackground)
+        : Application(name, parent, startInBackground)
     {}
 
     // Invoked upon receiving data message

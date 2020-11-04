@@ -12,7 +12,7 @@
 #include "application-special-input/ApplicationSpecialInput.hpp"
 
 #include "service-appmgr/Controller.hpp"
-#include "service-appmgr/messages/APMMessage.hpp"
+#include "service-appmgr/messages/Message.hpp"
 
 #include <i18/i18.hpp>
 #include <log/log.hpp>
@@ -40,10 +40,8 @@ namespace app
     auto call(Application *app, const utils::PhoneNumber::View &phoneNumber) -> bool
     {
         assert(app != nullptr);
-        auto data             = std::make_unique<ExecuteCallData>(phoneNumber);
-        data->disableAppClose = true;
-
-        return app::manager::Controller::switchApplication(app, name_call, window::name_enterNumber, std::move(data));
+        auto data = std::make_unique<ExecuteCallData>(phoneNumber);
+        return app::manager::Controller::sendAction(app, manager::actions::Call, std::move(data));
     }
 
     auto prepareCall(Application *app, const std::string &number) -> bool
@@ -169,6 +167,6 @@ namespace app
                 app, app::special_input, app::char_select, std::move(switchData));
         }
         return app::manager::Controller::switchBack(
-            app, std::make_unique<app::manager::APMSwitchPrevApp>(switchData->requester, std::move(switchData)));
+            app, std::make_unique<app::manager::SwitchBackRequest>(switchData->requester, std::move(switchData)));
     }
 } // namespace app

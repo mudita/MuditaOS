@@ -10,9 +10,8 @@
 
 namespace app
 {
-
-    ApplicationNotes::ApplicationNotes(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, 4096)
+    ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
+        : Application(name, parent, startInBackground, 4096)
     {}
 
     ApplicationNotes::~ApplicationNotes()

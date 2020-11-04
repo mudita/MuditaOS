@@ -9,14 +9,14 @@
 
 namespace app
 {
-
     inline const std::string name_notes = "ApplicationNotes";
 
     class ApplicationNotes : public Application
     {
-      protected:
       public:
-        ApplicationNotes(std::string name = name_notes, std::string parent = "", bool startBackgound = false);
+        ApplicationNotes(std::string name                    = name_notes,
+                         std::string parent                  = {},
+                         StartInBackground startInBackground = {false});
         virtual ~ApplicationNotes();
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -31,6 +31,13 @@ namespace app
         void destroyUserInterface() override;
     };
 
+    template <> struct ManifestTraits<ApplicationNotes>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_NOTES_APPLICATIONNOTES_HPP_ */

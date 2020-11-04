@@ -30,6 +30,7 @@ namespace app
         };
         constexpr uint32_t paramsMaxSize = 9;
     } // namespace antenna
+
     class ApplicationAntenna : public app::Application
     {
       protected:
@@ -44,7 +45,9 @@ namespace app
         uint32_t lastFreq = 0;
 
       public:
-        ApplicationAntenna(std::string name = name_antenna, std::string parent = "", bool startBackgound = false);
+        ApplicationAntenna(std::string name                    = name_antenna,
+                           std::string parent                  = {},
+                           StartInBackground startInBackground = {false});
         virtual ~ApplicationAntenna();
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -73,6 +76,13 @@ namespace app
         std::vector<app::antenna::StoreParams> highBandParams;
     };
 
+    template <> struct ManifestTraits<ApplicationAntenna>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_ANTENNA_APPLICATIONANTENNA_HPP_ */

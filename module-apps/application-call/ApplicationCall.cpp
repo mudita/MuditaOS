@@ -30,10 +30,11 @@
 
 namespace app
 {
-
-    ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackground)
-        : Application(name, parent, startBackground, app::call_stack_size)
+    ApplicationCall::ApplicationCall(std::string name, std::string parent, StartInBackground startInBackground)
+        : Application(name, parent, startInBackground, app::call_stack_size)
     {
+        addActionReceiver(manager::actions::Call,
+                          [this](auto data) { switchWindow(window::name_enterNumber, std::move(data)); });
     }
 
     //  number of seconds after end call to switch back to previous application

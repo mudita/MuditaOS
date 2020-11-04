@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "InputEvent.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 
 #include "../ApplicationNotes.hpp"
 
