@@ -15,14 +15,18 @@ namespace call_request
     {
 
         LOG_INFO("IMEIRequest::process");
-        return std::string(at::factory(at::AT::AT));
+        return std::string(at::factory(at::AT::GET_IMEI));
     }
 
+    std::unique_ptr<IMEIRequest> IMEIRequest::create(const std::string &data)
+    {
+        return std::make_unique<IMEIRequest>(data);
+    }
     std::string USSDRequest::process(void)
     {
 
         LOG_INFO("USSDRequest::process");
-        return std::string(at::factory(at::AT::AT));
+        return std::string(at::factory(at::AT::CUSD_SEND) + requestData + ",15\r");
     }
 
     std::string CallRequest::process(void)
@@ -32,20 +36,29 @@ namespace call_request
         return std::string(at::factory(at::AT::ATD) + request + ";\r");
     }
 
-    IRequest *Factory::create(void)
+    void Factory::registerRequest(std::string regex,
+                                  std::function<std::unique_ptr<IRequest>(const std::string &)> callback)
     {
+        requestMap.insert(
+            std::pair<std::string, std::function<std::unique_ptr<IRequest>(const std::string &)>>(regex, callback));
+    }
+    std::unique_ptr<IRequest> Factory::create(void)
+    {
+
         re2::StringPiece input(request);
-        re2::RE2 re("(\\*#06#)");
 
         if (isCallRequest()) {
-            return new CallRequest(request);
+            return std::make_unique<CallRequest>(request);
         }
-        else {
-            if (re2::RE2::FullMatch(input, re)) {
-                return new IMEIRequest(request);
+
+        for (auto element : requestMap) {
+            re2::RE2 reg(element.first);
+            if (re2::RE2::FullMatch(input, reg)) {
+                return element.second(request);
             }
         }
-        return new USSDRequest(request);
+
+        return std::make_unique<USSDRequest>(request);
     }
     bool Factory::isCallRequest(void)
     {
@@ -53,7 +66,6 @@ namespace call_request
         re2::StringPiece input(request);
         LOG_INFO("%s", request.c_str());
         re2::RE2 re("^[*].*[#]$");
-        //	re2::RE2 re("[\\*.#]");
 
         if (re2::RE2::PartialMatch(input, re)) {
             LOG_INFO("MMI Request");

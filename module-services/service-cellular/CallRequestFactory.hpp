@@ -4,6 +4,9 @@
 #pragma once
 
 #include <string>
+#include <memory>
+#include <map>
+#include <functional>
 
 namespace call_request
 {
@@ -17,6 +20,8 @@ namespace call_request
         virtual std::string process(void) = 0;
     };
 
+    constexpr auto IMEIRegex = "(\\*#06#)";
+
     class IMEIRequest : public IRequest
     {
       public:
@@ -24,18 +29,24 @@ namespace call_request
         IMEIRequest(const std::string &data){};
         ~IMEIRequest(){};
         std::string process(void) override final;
+        static std::unique_ptr<IMEIRequest> create(const std::string &data);
     };
 
     class USSDRequest : public IRequest
     {
+      private:
+        std::string requestData;
+
       public:
         USSDRequest() = delete;
-        USSDRequest(const std::string &data)
+        USSDRequest(const std::string &data) : requestData(data)
         {
             ussdRequest = true;
         };
         ~USSDRequest(){};
         std::string process(void) override final;
+
+        static std::unique_ptr<USSDRequest> create(const std::string &data);
     };
 
     class CallRequest : public IRequest
@@ -51,17 +62,24 @@ namespace call_request
         };
         ~CallRequest(){};
         std::string process(void) override final;
+
+        static std::unique_ptr<CallRequest> create(const std::string &data);
     };
 
     class Factory
     {
       private:
         std::string request;
+        std::map<std::string, std::function<std::unique_ptr<IRequest>(const std::string &)>> requestMap;
+        void registerRequest(std::string regex, std::function<std::unique_ptr<IRequest>(const std::string &)>);
 
       public:
         Factory() = delete;
-        Factory(const std::string &data) : request(data){};
-        IRequest *create(void);
+        Factory(const std::string &data) : request(data)
+        {
+            registerRequest(IMEIRegex, IMEIRequest::create);
+        };
+        std::unique_ptr<IRequest> create(void);
 
         bool isCallRequest(void);
     };

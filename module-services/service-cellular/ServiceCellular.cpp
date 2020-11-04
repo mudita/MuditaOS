@@ -777,6 +777,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                     this);
                 break;
             }
+            if (req->ussdRequest) {
+                ussdState = ussd::State::pullRequestSent;
+                setUSSDTimer();
+            }
             responseMsg = std::make_shared<CellularResponseMessage>(true);
         }
 

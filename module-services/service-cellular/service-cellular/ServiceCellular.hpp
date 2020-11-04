@@ -167,13 +167,13 @@ class ServiceCellular : public sys::Service
     void startStateTimer(uint32_t timeout);
     void stopStateTimer(void);
     void handleStateTimer(void);
-    void setUSSDTimer(void);
 
     // db response handlers
     auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
 
     // ussd handlers
     uint32_t ussdTimeout = 0;
+    void setUSSDTimer(void);
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
     bool handleUSSDURC(void);
     void handleUSSDTimer(void);
