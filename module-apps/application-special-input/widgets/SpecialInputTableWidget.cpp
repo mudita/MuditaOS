@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <locale>
@@ -7,7 +7,7 @@
 #include "application-special-input/data/SpecialCharactersTableStyle.hpp"
 #include <cassert>
 #include <module-apps/application-special-input/ApplicationSpecialInput.hpp>
-#include <module-services/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include "Style.hpp"
 #include "messages/AppMessage.hpp"

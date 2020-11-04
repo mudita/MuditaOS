@@ -1,14 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Controller.hpp"
+#include "service-appmgr/Controller.hpp"
+
+#include "service-appmgr/model/ApplicationManager.hpp"
+
+#include <module-sys/Service/Bus.hpp>
+#include <Service/Service.hpp>
 
 #include <utility> // for move
-
-#include "module-sys/Service/Bus.hpp" // for Bus
-#include "Service/Service.hpp"        // for Service
-#include "service-appmgr/model/ApplicationManager.hpp" // for ApplicationManager, ApplicationManager::ServiceName, ApplicationHandle, ApplicationHandle::Name
-
 namespace app::manager
 {
     auto Controller::sendAction(sys::Service *sender, actions::ActionId actionId, actions::ActionParamsPtr &&data)

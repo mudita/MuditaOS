@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <string>
-#include <memory>
+#include <module-apps/Application.hpp>
+#include <module-apps/ApplicationLauncher.hpp>
 
-#include "Application.hpp"
-#include "ApplicationLauncher.hpp"
+#include <memory>
+#include <string>
 
 namespace app
 {
