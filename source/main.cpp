@@ -83,8 +83,10 @@ int main()
 
         ret &=
             sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
+#if ENABLE_FILEINDEXER_SERVICE
         ret &= sys::SystemManager::CreateService(
             std::make_shared<service::ServiceFileIndexer>(service::name::file_indexer), sysmgr.get());
+#endif
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
 
 #if ENABLE_GSM == 0
