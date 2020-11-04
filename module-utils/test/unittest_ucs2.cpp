@@ -14,6 +14,21 @@ TEST_CASE("UCS2 to UTF8 conversion")
     REQUIRE((uint32_t)('e') == decodedMessage[1]);
     REQUIRE((uint32_t)('s') == decodedMessage[2]);
     REQUIRE((uint32_t)('t') == decodedMessage[3]);
+
+    SECTION("UTF8 IS ASCII combination")
+    {
+        auto utf8 = UCS2(std::string("00380034003800370037003300380034003800340036003900380032")).toUTF8();
+        REQUIRE(utf8.isASCIICombination());
+        auto ascii = utf8.toASCII();
+        REQUIRE(ascii == std::string("TWITTER"));
+    }
+
+    SECTION("UTF8 IS NOT ASCII combination")
+    {
+        auto utf8 = UCS2(std::string("003200390031")).toUTF8();
+        REQUIRE_FALSE(utf8.isASCIICombination());
+        REQUIRE_FALSE(utf8.toASCII().has_value());
+    }
 }
 
 TEST_CASE("UCS2 from UTF8 emoji 😁")
