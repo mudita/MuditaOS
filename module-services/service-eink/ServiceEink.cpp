@@ -34,9 +34,7 @@ enum class EinkWorkerCommands
 
 ServiceEink::ServiceEink(const std::string &name, std::string parent)
     : sys::Service(name, parent, 4096 + 1024),
-      einkRenderBuffer(std::make_unique<uint8_t[]>(screen.height * screen.width)), selfRefereshTriggerCount{0},
-      temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0},
-      powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
+      einkRenderBuffer(std::make_unique<uint8_t[]>(screen.height * screen.width))
 {
     memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
     waveformSettings.mode        = EinkWaveformGC16;
@@ -130,7 +128,6 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
     case sys::ServicePowerMode ::SuspendToRAM:
     case sys::ServicePowerMode ::SuspendToNVM:
         suspended = true;
-        powerOffTimer.stop();
         EinkPowerDown();
         break;
     }
@@ -334,8 +331,6 @@ sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
         if (ret != EinkOK)
             LOG_FATAL("Failed to refresh frame");
 
-        powerOffTimer.reload();
-
         auto msg           = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
         suspendInProgress  = false;
         shutdownInProgress = false;
@@ -348,7 +343,6 @@ sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
 {
     auto message = static_cast<service::eink::ImageMessage *>(request);
 
-    powerOffTimer.stop();
     memcpy(einkRenderBuffer.get(), message->getData(), message->getSize());
     deepRefresh = message->getDeepRefresh();
 

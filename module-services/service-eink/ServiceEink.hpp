@@ -20,13 +20,6 @@ class ServiceEink : public sys::Service
     std::unique_ptr<uint8_t[]> einkRenderBuffer;
 
   protected:
-    // counts timer triggers from last self refresh
-    uint32_t selfRefereshTriggerCount;
-    // counts timer events from last temperature measurement
-    uint32_t temperatureMeasurementTriggerCount;
-    // counts trigger counts from last action that required eink to be powered on
-    uint32_t powerOffTriggerCount;
-
     // number of timer triggers required to execute self refresh handler
     const uint32_t selfRefereshTriggerValue = 60;
     // number of timer triggers required to execute temperature measurement handler
@@ -49,9 +42,6 @@ class ServiceEink : public sys::Service
     bool deepClearScreen(int8_t temperature);
 
     bool deepRefresh         = false;
-
-    sys::ms powerOffTime = 3000;
-    sys::Timer powerOffTimer;
 
   public:
     ServiceEink(const std::string &name, std::string parent = "");
