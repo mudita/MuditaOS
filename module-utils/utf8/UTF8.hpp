@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iosfwd> // for forward declaration for ostream
 #include <memory>
+#include <optional>
 
 /// single utf8 character representation struct
 struct U8char
@@ -233,4 +234,16 @@ class UTF8
      * @return true if there was no error, false otherwise.
      */
     static bool getStreamLength(const char *stream, uint32_t &size, uint32_t &count);
+    /**
+     * @brief Checks if numbers contained in the UTF8 creates ASCII character combination
+     * eg. 778568738465 returns true
+     * @return true if is acii combination, false otherwise
+     */
+    [[nodiscard]] bool isASCIICombination() const noexcept;
+    /**
+     * @brief Converts UTF8 to ASCII character combination
+     * eg. 778568738465 returns "MUDITA"
+     * @return ASCII converted string
+     */
+    [[nodiscard]] std::optional<std::string> toASCII() const noexcept;
 };
