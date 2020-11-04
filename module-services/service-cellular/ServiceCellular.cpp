@@ -1344,7 +1344,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 
                     SMSRecord record;
                     record.body   = decodedMessage;
-                    record.number = utils::PhoneNumber(receivedNumber, utils::country::Id::UNKNOWN).getView();
+                    record.number = utils::PhoneNumber::getReceivedNumberView(receivedNumber);
                     record.type   = SMSType::INBOX;
                     record.date   = messageDate;
 

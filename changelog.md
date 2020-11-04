@@ -22,6 +22,7 @@
 * `[GUI][messages]` Fixed not showing number on deleting temporary contact
 * `[GUI]` Fixed filling Label with color
 * `[calculator]` Fix phone hanging when pressing '='.
+* `[messages][cellular]` Fixed special SMS handling -> ASCII instead of number.
 
 ## [0.44.1 2020-10-30]
 
