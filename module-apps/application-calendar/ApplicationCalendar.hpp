@@ -25,8 +25,9 @@ namespace app
       public:
         ApplicationCalendar(std::string name,
                             std::string parent,
-                            uint32_t stackDepth           = 4096,
-                            sys::ServicePriority priority = sys::ServicePriority::Idle);
+                            StartInBackground startInBackground = {false},
+                            uint32_t stackDepth                 = 4096,
+                            sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -58,5 +59,13 @@ namespace app
 
         static const std::map<Reminder, const char *> reminderOptions;
         static const std::map<Repeat, const char *> repeatOptions;
+    };
+
+    template <> struct ManifestTraits<ApplicationCalendar>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
     };
 } /* namespace app */

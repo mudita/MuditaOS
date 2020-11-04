@@ -34,8 +34,8 @@ namespace app
         }
     }
 
-    ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, 4096 * 2)
+    ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, StartInBackground startInBackground)
+        : Application(name, parent, startInBackground, 4096 * 2)
     {
         busChannels.push_back(sys::BusChannels::AntennaNotifications);
         busChannels.push_back(sys::BusChannels::AntennaNotifications);

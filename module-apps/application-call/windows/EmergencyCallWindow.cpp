@@ -3,7 +3,7 @@
 
 #include "../data/CallSwitchData.hpp"
 #include "../ApplicationCall.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 
 #include "i18/i18.hpp"
 #include "EmergencyCallWindow.hpp"

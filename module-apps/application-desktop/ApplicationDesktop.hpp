@@ -46,7 +46,9 @@ namespace app
 
         gui::PinLockHandler lockHandler;
 
-        ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
+        ApplicationDesktop(std::string name                    = name_desktop,
+                           std::string parent                  = {},
+                           StartInBackground startInBackground = {false});
         virtual ~ApplicationDesktop();
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -75,7 +77,14 @@ namespace app
         bool clearMessagesNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
+    };
 
+    template <> struct ManifestTraits<ApplicationDesktop>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
     };
 
 } /* namespace app */

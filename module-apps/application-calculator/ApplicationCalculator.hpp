@@ -12,9 +12,10 @@ namespace app
 
     class ApplicationCalculator : public Application
     {
-
       public:
-        ApplicationCalculator(std::string name = name_calculator, std::string parent = "", bool startBackgound = false);
+        ApplicationCalculator(std::string name                    = name_calculator,
+                              std::string parent                  = {},
+                              StartInBackground startInBackground = {false});
         ~ApplicationCalculator() override = default;
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -30,4 +31,11 @@ namespace app
         void destroyUserInterface() final;
     };
 
+    template <> struct ManifestTraits<ApplicationCalculator>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */

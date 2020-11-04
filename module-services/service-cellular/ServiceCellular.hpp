@@ -15,7 +15,6 @@
 #include <vector>   // for vector
 
 #include "CellularCall.hpp" // for CellularCall
-#include <service-appmgr/messages/APMMessage.hpp>
 #include "USSD.hpp"                     // for State, State::none
 #include "SMSRecord.hpp"                // for SMSRecord
 #include "messages/CellularMessage.hpp" // for CellularUSSDMessage, CellularUSSDMessage::RequestType
@@ -52,25 +51,6 @@ class ServiceCellular : public sys::Service
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-
-    app::manager::Action simUnlockError(at::Result result)
-    {
-        return {"MainWindow", "PinLockWindow", nullptr};
-    }
-    app::manager::Action requestPuk(unsigned int attemptsLeft)
-    {
-        return {"MainWindow", "PinLockWindow", nullptr};
-    }
-
-    app::manager::Action requestPin(unsigned int attemptsLeft)
-    {
-        return {"MainWindow", "PinLockWindow", nullptr};
-    }
-
-    app::manager::Action simUnlocked()
-    {
-        return {"MainWindow", "PinLockWindow", nullptr};
-    }
 
     /** Register message handlers.
      */

@@ -9,7 +9,7 @@
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/SearchStart.hpp"
 
-#include <service-appmgr/ApplicationManager.hpp>
+#include <module-services/service-appmgr/model/ApplicationManager.hpp>
 #include <i18/i18.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>

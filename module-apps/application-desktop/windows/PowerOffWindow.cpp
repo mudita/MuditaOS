@@ -13,7 +13,7 @@
 #include "../ApplicationDesktop.hpp"
 
 // services
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 
 #include "service-cellular/ServiceCellular.hpp"
 #include <Style.hpp>

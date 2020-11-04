@@ -7,7 +7,7 @@
 #include "Margins.hpp"
 #include "i18/i18.hpp"
 #include "messages/AppMessage.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 #include <GridLayout.hpp>
 #include <Style.hpp>
 #include <functional>

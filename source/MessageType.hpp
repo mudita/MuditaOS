@@ -127,6 +127,7 @@ enum class MessageType
     APMConfirmClose,    ///< Sent by application to confirm completion of the close procedure
     APMRegister,        ///< when application finishes initHandler it is sending this messag to inform whether init was
                         ///< successful or not.
+    APMInit,            ///< Send by application to confirm completion its initialisation process
     APMDelayedClose,    ///< this message is sent internally from and to application manager to close specified
                         ///< application.
     APMChangeLanguage,  ///< this message is sent from any application to inform application manager that it should send
@@ -140,7 +141,8 @@ enum class MessageType
     // keyboard messages
     KBDKeyEvent,
 
-    AppMessage, //< generic application message
+    AppMessage, ///< generic application message
+    AppAction,  ///< application action request.
     AppSwitch,  ///< application receives this message from application manager. It a signal to gain or loose focus.
     AppSwitchWindow, ///< This is internal message transmitted within application to change window. Additional command
                      ///< and data are transmitted with it.

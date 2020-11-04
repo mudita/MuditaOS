@@ -38,7 +38,9 @@ namespace app
     class ApplicationMessages : public app::Application
     {
       public:
-        ApplicationMessages(std::string name = name_messages, std::string parent = "", bool startBackgound = false);
+        ApplicationMessages(std::string name                    = name_messages,
+                            std::string parent                  = {},
+                            StartInBackground startInBackground = {false});
         virtual ~ApplicationMessages();
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -74,5 +76,13 @@ namespace app
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;
+    };
+
+    template <> struct ManifestTraits<ApplicationMessages>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
     };
 } /* namespace app */

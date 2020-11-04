@@ -108,7 +108,7 @@ namespace gui
                 data->setDescription("PhonebookSearchRequest");
                 return app::manager::Controller::switchBack(
                     application,
-                    std::make_unique<app::manager::APMSwitchPrevApp>(application->GetName(), std::move(data)));
+                    std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
             };
 
             leftArrowImage->setVisible(false);

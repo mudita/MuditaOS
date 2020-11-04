@@ -38,7 +38,9 @@ namespace app
         sys::ms callDelayedStopTime = 3000;
 
       public:
-        ApplicationCall(std::string name = name_call, std::string parent = "", bool startBackgound = false);
+        ApplicationCall(std::string name                    = name_call,
+                        std::string parent                  = {},
+                        StartInBackground startInBackground = {false});
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -66,5 +68,13 @@ namespace app
         void stopAudio();
         void startRinging();
         void startRouting();
+    };
+
+    template <> struct ManifestTraits<ApplicationCall>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch, manager::actions::Call}};
+        }
     };
 } /* namespace app */

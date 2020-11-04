@@ -24,6 +24,28 @@ namespace app
         AppMessage() : sys::DataMessage(MessageType::AppMessage){};
     };
 
+    class AppActionRequest : public AppMessage
+    {
+      public:
+        AppActionRequest(manager::actions::ActionId _actionId, manager::actions::ActionParamsPtr _data)
+            : AppMessage(MessageType::AppAction), actionId{_actionId}, data{std::move(_data)}
+        {}
+
+        manager::actions::ActionId getAction() const noexcept
+        {
+            return actionId;
+        }
+
+        manager::actions::ActionParamsPtr &getData() noexcept
+        {
+            return data;
+        }
+
+      private:
+        manager::actions::ActionId actionId;
+        manager::actions::ActionParamsPtr data;
+    };
+
     // this message is used to notify application about switching event. Application will gain or lose focus upon
     // receiving this message. Application gains focus when it was in init or active background state. Application loose
     // focus when it was in active foreground state. if no window is specified it is assumed that MainWindow is the

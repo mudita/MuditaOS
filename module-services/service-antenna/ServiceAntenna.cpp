@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAntenna.hpp"
-#include <service-appmgr/ApplicationManager.hpp>
+#include "module-services/service-appmgr/model/ApplicationManager.hpp"
 #include <common_data/EventStore.hpp>
 
 #include <at/response.hpp> // for parseCSQ, isRegistered, parseCREG, parseNetworkFrequency, parseQNWINFO

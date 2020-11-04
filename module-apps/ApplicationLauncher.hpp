@@ -7,6 +7,7 @@
 
 namespace app
 {
+    using ApplicationManifest = app::manager::ApplicationManifest;
 
     /// used in ApplicationManager to start applications
     class ApplicationLauncher
@@ -16,6 +17,8 @@ namespace app
         std::string name;
         /// name of the application's owner
         std::string parent;
+        /// Application's manifest
+        ApplicationManifest manifest;
         /// defines whether application can be closed when it looses focus
         bool closeable = true;
         /// defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
@@ -24,13 +27,21 @@ namespace app
         bool preventBlocking = false;
 
       public:
-        ApplicationLauncher(std::string name, bool isCloseable, bool preventBlocking = false)
-            : name{name}, closeable{isCloseable}, preventBlocking{preventBlocking} {};
+        ApplicationLauncher(std::string name,
+                            ApplicationManifest &&manifest,
+                            bool isCloseable,
+                            bool preventBlocking = false)
+            : name{name}, manifest{std::move(manifest)}, closeable{isCloseable}, preventBlocking{preventBlocking} {};
         virtual ~ApplicationLauncher() = default;
 
         [[nodiscard]] std::string getName() const noexcept
         {
             return name;
+        }
+
+        [[nodiscard]] const ApplicationManifest &getManifest() const noexcept
+        {
+            return manifest;
         }
 
         [[nodiscard]] bool isCloseable() const noexcept
@@ -60,7 +71,8 @@ namespace app
     template <class T> class ApplicationLauncherT : public ApplicationLauncher
     {
       public:
-        ApplicationLauncherT(std::string name, bool isCloseable = true) : ApplicationLauncher(name, isCloseable)
+        ApplicationLauncherT(std::string name, ApplicationManifest &&manifest, bool isCloseable = true)
+            : ApplicationLauncher(name, std::move(manifest), isCloseable)
         {}
 
         bool run(sys::Service *caller) override
@@ -82,6 +94,7 @@ namespace app
     template <class T>
     std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(std::string name, bool isCloseable = true)
     {
-        return std::unique_ptr<ApplicationLauncherT<T>>(new ApplicationLauncherT<T>(name, isCloseable));
+        return std::unique_ptr<ApplicationLauncherT<T>>(
+            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable));
     }
 } // namespace app

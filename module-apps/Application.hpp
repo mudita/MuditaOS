@@ -17,6 +17,7 @@
 #include "gui/Common.hpp"                               // for ShowMode
 #include "projdefs.h"                                   // for pdMS_TO_TICKS
 #include "service-evtmgr/messages/EVMessages.hpp"       // for TorchStateMe...
+#include "module-services/service-appmgr/ApplicationManifest.hpp"
 #include <list>                                         // for list
 #include <map>                                          // for allocator, map
 #include <memory>                                       // for make_shared
@@ -57,7 +58,6 @@ namespace sys
 
 namespace app
 {
-
     class Application;
     class GuiTimer;
 
@@ -69,6 +69,49 @@ namespace app
     inline auto msgNotHandled() -> sys::Message_t
     {
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
+
+    using ApplicationName = std::string;
+
+    enum class StartupStatus
+    {
+        Success,
+        Failure
+    };
+
+    struct StartInBackground
+    {
+        StartInBackground(bool _value) : value{_value}
+        {}
+
+        explicit operator bool() const noexcept
+        {
+            return value;
+        }
+
+        bool value;
+    };
+
+    /// Type traits pattern used to enforce user-defined types to implement "GetManifest" function.
+    template <class T> struct ManifestTraits;
+
+    template <class, class = void> struct HasManifest : std::false_type
+    {};
+
+    /// Checks whether T implements "GetManifest" static method.
+    /// Provides the member constant "value" that is equal to true if T implements "GetManifest" static method.
+    /// Otherwise, "value" is equal to false.
+    template <class T>
+    struct HasManifest<T, std::void_t<decltype(&ManifestTraits<T>::GetManifest)>>
+        : std::is_same<app::manager::ApplicationManifest, decltype(ManifestTraits<T>::GetManifest())>
+    {};
+
+    /// Retrieves the manifest of T, if T implements ManifestTraits.
+    /// Otherwise, reports an error during compile time.
+    template <class T, std::enable_if_t<HasManifest<T>::value, int> = 0>
+    auto ManifestOf() -> manager::ApplicationManifest
+    {
+        return ManifestTraits<T>::GetManifest();
     }
 
     /// This is template for creating new applications. Main difference between Application and service is that:
@@ -111,6 +154,8 @@ namespace app
         /// c_str() function for Application::State
         static const char *stateStr(State st);
 
+        using OnActionReceived = std::function<void(manager::actions::ActionParamsPtr &&)>;
+
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
@@ -122,6 +167,7 @@ namespace app
         sys::Message_t handleBatteryLevel(sys::DataMessage *msgl);
         sys::Message_t handleChargerPlugged(sys::DataMessage *msgl);
         sys::Message_t handleMinuteUpdated(sys::DataMessage *msgl);
+        sys::Message_t handleAction(sys::DataMessage *msgl);
         sys::Message_t handleApplicationSwitch(sys::DataMessage *msgl);
         sys::Message_t handleSwitchWindow(sys::DataMessage *msgl);
         sys::Message_t handleAppClose(sys::DataMessage *msgl);
@@ -131,14 +177,15 @@ namespace app
         sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
+        std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
 
       public:
         std::unique_ptr<sys::Timer> longPressTimer;
         Application(std::string name,
-                    std::string parent            = "",
-                    bool startBackground          = false,
-                    uint32_t stackDepth           = 4096,
-                    sys::ServicePriority priority = sys::ServicePriority::Idle);
+                    std::string parent                  = "",
+                    StartInBackground startInBackground = {false},
+                    uint32_t stackDepth                 = 4096,
+                    sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         virtual ~Application();
 
@@ -287,6 +334,10 @@ namespace app
         /// @note consider moving these as private elements of ApplicationManager i.e. under names
         /// message::switchApplication etc.
         /// @{
+        static void requestAction(sys::Service *sender,
+                                  const ApplicationName &applicationName,
+                                  manager::actions::ActionId actionId,
+                                  manager::actions::ActionParamsPtr &&data);
         static void messageSwitchApplication(sys::Service *sender,
                                              std::string application,
                                              std::string window,
@@ -343,7 +394,7 @@ namespace app
         /// 2. simple translation of keys 1 to 1 with keyboard
         std::unique_ptr<gui::KeyInputSimpleTranslation> keyTranslator;
         /// Flag defines how application will behave after registration. It can go forground or background
-        bool startBackground = false;
+        StartInBackground startInBackground{false};
         /// Flag which defines whether application initialized suspend mode, this will influence how render message will
         /// sent to gui service. If suspend is true, application manager will receive information from both eink and gui
         /// services if last rendering mesage will be processed.
@@ -358,6 +409,24 @@ namespace app
         static void messageInputEventApplication(sys::Service *sender,
                                                  std::string application,
                                                  const gui::InputEvent &event);
+
+        void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
     };
 
+    /// Parameter pack used by application launch action.
+    class ApplicationLaunchData : public manager::actions::ActionParams
+    {
+      public:
+        ApplicationLaunchData(const app::ApplicationName &appName)
+            : manager::actions::ActionParams{"Application launch parameters"}, targetAppName{appName}
+        {}
+
+        [[nodiscard]] auto getTargetApplicationName() const noexcept
+        {
+            return targetAppName;
+        }
+
+      private:
+        ApplicationName targetAppName;
+    };
 } /* namespace app */

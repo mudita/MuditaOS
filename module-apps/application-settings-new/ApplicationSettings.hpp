@@ -51,9 +51,9 @@ namespace app
     class ApplicationSettingsNew : public app::Application
     {
       public:
-        ApplicationSettingsNew(std::string name    = name_settings_new,
-                               std::string parent  = "",
-                               bool startBackgound = false);
+        ApplicationSettingsNew(std::string name                    = name_settings_new,
+                               std::string parent                  = {},
+                               StartInBackground startInBackground = {false});
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
         auto InitHandler() -> sys::ReturnCodes override;
 
@@ -67,4 +67,11 @@ namespace app
         bsp::Board board = bsp::Board::none;
     };
 
+    template <> struct ManifestTraits<ApplicationSettingsNew>
+    {
+        static auto GetManifest() -> manager::ApplicationManifest
+        {
+            return {{manager::actions::Launch}};
+        }
+    };
 } /* namespace app */
