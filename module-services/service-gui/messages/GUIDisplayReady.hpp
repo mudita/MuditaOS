@@ -27,5 +27,7 @@ namespace service::gui
         {
             return shutdownInProgress;
         }
+
+        operator std::string() const override;
     };
 } // namespace service::gui

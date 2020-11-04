@@ -44,6 +44,8 @@ namespace sgui
         {
             return this->type == type;
         }
+
+        operator std::string() const override;
     };
 
 } // namespace sgui

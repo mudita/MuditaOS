@@ -4,7 +4,6 @@
 #include <memory>
 #include <functional>
 
-#include "Common.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "service-appmgr/Controller.hpp"
 
@@ -16,6 +15,7 @@
 #include "Margins.hpp"
 #include "EinkModeWindow.hpp"
 #include <Style.hpp>
+#include <service-eink/Common.hpp>
 
 namespace gui
 {

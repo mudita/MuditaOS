@@ -353,6 +353,7 @@ sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
     suspendInProgress = message->getSuspend();
     if (suspendInProgress)
         LOG_DEBUG("Suspend In Progress");
+
     sys::Bus::SendUnicast(std::make_shared<service::eink::EinkDMATransfer>(), GetName(), this);
     return nullptr;
 }

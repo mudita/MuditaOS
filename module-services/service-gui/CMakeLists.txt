@@ -5,6 +5,7 @@ set(SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/WorkerGUI.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/messages/GUIDisplayReady.cpp"
 )
 
 
