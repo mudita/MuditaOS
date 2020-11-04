@@ -12,8 +12,8 @@
 using namespace bsp;
 
 lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
-volatile bool BluetoothCommon::rxFinished = false;
 volatile bool BluetoothCommon::txFinished = false;
+volatile bool BluetoothCommon::rxFinished = false;
 
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
@@ -220,8 +220,8 @@ void BluetoothCommon::configure_lpuart()
     bt_c.isMsb         = false;
     bt_c.rxIdleType    = kLPUART_IdleTypeStartBit;
     bt_c.rxIdleConfig  = kLPUART_IdleCharacter1;
-    bt_c.enableTx      = false;
-    bt_c.enableRx      = false;
+    bt_c.enableTx      = true;
+    bt_c.enableRx      = true;
 
     if (LPUART_Init(BSP_BLUETOOTH_UART_BASE, &bt_c, UartGetPeripheralClock()) != kStatus_Success) {
         LOG_ERROR("BT: UART config error Could not initialize the uart!");
@@ -262,9 +262,14 @@ void BluetoothCommon::configure_lpuart()
     sendXfer.dataSize = sizeof(sendData) / sizeof(sendData[0]);
     txFinished        = false;
     // Sends out.
-    LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
+    uint32_t ret = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
+    LOG_DEBUG("send: %ld", ret);
     // Send finished.
-    while (!txFinished) {}
+    uint32_t b = 0;
+    ret = LPUART_TransferGetSendCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
+    while (!txFinished) {
+    }
+    ret = LPUART_TransferGetSendCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
     // Prepares to receive
     receiveXfer.data     = receiveData;
     receiveXfer.dataSize = sizeof(receiveData) / sizeof(receiveData[0]);
@@ -272,7 +277,9 @@ void BluetoothCommon::configure_lpuart()
     // Receives.
     LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
     // Receive finished.
+    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
     while (!rxFinished) {}
+    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
     LOG_DEBUG("finally");
 }
 

@@ -143,8 +143,8 @@ namespace bsp {
             std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
             static lpuart_edma_handle_t uartDmaHandle;
             static void uartCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
-            static volatile bool rxFinished;
             static volatile bool txFinished;
+            static volatile bool rxFinished;
             // /edma
     };
 
