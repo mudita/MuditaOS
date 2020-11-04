@@ -34,6 +34,7 @@ extern "C" {
 
     struct DIR_ITER {
         void *dir_state;
+        char name_state[NAME_MAX+1];
     };
 
 	typedef struct {

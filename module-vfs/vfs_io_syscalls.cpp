@@ -7,6 +7,7 @@
 #include <log/log.hpp>
 #include <fcntl.h>
 #include <cstring>
+#include "vfs_internal_dirent.hpp"
 #include "HandleManager.hpp"
 
 /** NOTE: This is generic wrapper for newlib syscalls
@@ -50,13 +51,7 @@ namespace vfsn::internal
             }
         }
     } // namespace
-    struct internal_dir_state
-    {
-        internal_dir_state() : ff_data(std::make_unique<FF_FindData_t>())
-        {}
-        std::string base_name;
-        std::unique_ptr<FF_FindData_t> ff_data;
-    };
+
 } // namespace vfsn::internal
 
 namespace vfsn::internal::syscalls
@@ -205,31 +200,26 @@ namespace vfsn::internal::syscalls
     DIR *opendir(int &_errno_, const char *dirname)
     {
         auto dir                 = new DIR;
-        dir->dir_data            = new DIR_ITER;
-        dir->position            = 0;
-        auto ff_find             = new internal_dir_state();
-        dir->dir_data->dir_state = ff_find;
-        ff_find->base_name       = dirname;
-        auto ret                 = ff_findfirst(dirname, ff_find->ff_data.get());
-        if (ret < 0) {
-            delete reinterpret_cast<internal_dir_state *>(dir->dir_data->dir_state);
-            delete dir->dir_data;
+        dir->dir_data            = dirent::diropen(_errno_, dirname);
+        if (!dir->dir_data) {
             delete dir;
+            return nullptr;
         }
-        _errno_ = stdioGET_ERRNO();
+        dir->position            = 0;
+        dir->file_data.d_ino     = -1;
+        dir->file_data.d_name[0] = '\0';
         return dir;
     }
+
     int closedir(int &_errno_, DIR *dirp)
     {
         if (!dirp) {
             _errno_ = EBADF;
             return -1;
         }
-        delete reinterpret_cast<internal_dir_state *>(dirp->dir_data->dir_state);
-        delete dirp->dir_data;
+        auto res = dirent::dirclose(_errno_, dirp->dir_data);
         delete dirp;
-        _errno_ = 0;
-        return 0;
+        return res;
     }
 
     struct dirent *readdir(int &_errno_, DIR *dirp)
@@ -238,49 +228,83 @@ namespace vfsn::internal::syscalls
             _errno_ = EBADF;
             return nullptr;
         }
-        auto ret     = &dirp->file_data;
-        auto ff_find = reinterpret_cast<internal_dir_state *>(dirp->dir_data->dir_state)->ff_data.get();
-        ret->d_ino   = ff_find->xDirectoryEntry.ulObjectCluster;
-        ret->d_type  = (ff_find->ucAttributes & FF_FAT_ATTR_DIR) ? DT_DIR : DT_REG;
-        std::strncpy(ret->d_name, ff_find->pcFileName, sizeof(ret->d_name));
-        _errno_ = 0;
-        return ret;
+        auto olderrno{_errno_};
+        auto res = dirent::dirnext(_errno_, dirp->dir_data);
+        auto fff = reinterpret_cast<FF_FindData_t *>(dirp->dir_data->dir_state);
+        if (res < 0) {
+            if (_errno_ == ENOENT) {
+                _errno_ = olderrno;
+            }
+            return nullptr;
+        }
+        dirp->position += 1;
+        if (strnlen(fff->pcFileName, NAME_MAX) >= sizeof(dirp->file_data.d_name)) {
+            _errno_ = EOVERFLOW;
+            return nullptr;
+        }
+        dirp->file_data.d_ino  = fff->xDirectoryEntry.ulObjectCluster;
+        dirp->file_data.d_type = (fff->ucAttributes & FF_FAT_ATTR_DIR) ? DT_DIR : DT_REG;
+        std::strncpy(dirp->file_data.d_name, fff->pcFileName, sizeof(dirp->file_data.d_name));
+        return &dirp->file_data;
     }
+
     int readdir_r(int &_errno_, DIR *dirp, struct dirent *entry, struct dirent **result)
     {
         if (!dirp) {
-            _errno_ = EBADF;
-            return -1;
+            return EBADF;
         }
-        *result      = new dirent;
-        auto ret     = *result;
-        auto ff_find = reinterpret_cast<internal_dir_state *>(dirp->dir_data->dir_state)->ff_data.get();
-        ret->d_ino   = ff_find->xDirectoryEntry.ulObjectCluster;
-        ret->d_type  = (ff_find->ucAttributes & FF_FAT_ATTR_DIR) ? DT_DIR : DT_REG;
-        std::strncpy(ret->d_name, ff_find->pcFileName, sizeof(ret->d_name));
-        _errno_ = 0;
+        auto olderrno{_errno_};
+        auto res = dirent::dirnext(_errno_, dirp->dir_data);
+        auto fff = reinterpret_cast<FF_FindData_t *>(dirp->dir_data->dir_state);
+        if (res < 0) {
+            res = _errno_;
+            if (_errno_ == ENOENT) {
+                res = 0;
+            }
+            _errno_ = olderrno;
+            return res;
+        }
+        dirp->position += 1;
+        if (strnlen(fff->pcFileName, NAME_MAX) >= sizeof(entry->d_name)) {
+            return EOVERFLOW;
+        }
+        entry->d_ino  = fff->xDirectoryEntry.ulObjectCluster;
+        entry->d_type = (fff->ucAttributes & FF_FAT_ATTR_DIR) ? DT_DIR : DT_REG;
+        std::strncpy(entry->d_name, fff->pcFileName, sizeof(entry->d_name));
+        *result = entry;
         return 0;
     }
 
     void rewinddir(int &_errno_, DIR *dirp)
     {
+        if (!dirp) {
+            return;
+        }
+        dirent::dirreset(_errno_, dirp->dir_data);
         dirp->position = 0;
-        auto int_state = reinterpret_cast<internal_dir_state *>(dirp->dir_data->dir_state);
-        ff_findfirst(int_state->base_name.c_str(), int_state->ff_data.get());
-        _errno_ = stdioGET_ERRNO();
     }
 
     void seekdir(int &_errno_, DIR *dirp, long int loc)
     {
-        _errno_ = ENOTSUP;
-        LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
+        if (!dirp || loc < 0) {
+            return;
+        }
+        if (dirp->position > loc) {
+            dirent::dirreset(_errno_, dirp->dir_data);
+            dirp->position = 0;
+        }
+        while ((dirp->position < loc) && (dirent::dirnext(_errno_, dirp->dir_data) >= 0)) {
+            dirp->position += 1;
+        }
     }
     long int telldir(int &_errno_, DIR *dirp)
     {
-        _errno_ = ENOTSUP;
-        LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
-        return -1;
+        if (!dirp) {
+            return -1;
+        }
+        return dirp->position;
     }
+
     int chmod(int &_errno_, const char *path, mode_t mode)
     {
         _errno_ = ENOTSUP;
