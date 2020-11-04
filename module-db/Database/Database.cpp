@@ -71,7 +71,6 @@ Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isIn
     assert(rc == SQLITE_OK);
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
-    pragmaQuery("PRAGMA journal_mode=WAL");
 }
 
 Database::~Database()
