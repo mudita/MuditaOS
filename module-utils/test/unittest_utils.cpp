@@ -208,3 +208,64 @@ TEST_CASE("Swap endianness")
         REQUIRE(((as_long >> 8 * 0) & 0xFF) == ((as_long_swapped >> 8 * 3) & 0xFF));
     }
 }
+
+TEST_CASE("Floating point to string")
+{
+    SECTION("Double")
+    {
+        double test = 15.0965432456321;
+        REQUIRE(utils::to_string(test) == "15.096543");
+    }
+
+    SECTION("Negative double")
+    {
+        double test = -15.0965432456321;
+        REQUIRE(utils::to_string(test) == "-15.096543");
+    }
+
+    SECTION("Double between 0 and 1")
+    {
+        double test = 0.08654328765876;
+        REQUIRE(utils::to_string(test) == "0.086543");
+    }
+
+    SECTION("Double between -1 and 0")
+    {
+        double test = -0.08654328765876;
+        REQUIRE(utils::to_string(test) == "-0.086543");
+    }
+
+    SECTION("Float")
+    {
+        float test = 15.0543212;
+        REQUIRE(utils::to_string(test) == "15.054321");
+    }
+
+    SECTION("Negative float")
+    {
+        float test = -15.0543212;
+        REQUIRE(utils::to_string(test) == "-15.054321");
+    }
+
+    SECTION("Float between 0 and 1")
+    {
+        float test = 0.0453212;
+        REQUIRE(utils::to_string(test) == "0.045321");
+    }
+
+    SECTION("Float between -1 and 0")
+    {
+        float test = -0.0453212;
+        REQUIRE(utils::to_string(test) == "-0.045321");
+    }
+}
+
+TEST_CASE("Fill leading digit in string")
+{
+    std::string test = "45";
+    REQUIRE(utils::addLeadingZeros(test) == "45");
+    REQUIRE(utils::addLeadingZeros(test, 1) == "45");
+    REQUIRE(utils::addLeadingZeros(test, 2) == "45");
+    REQUIRE(utils::addLeadingZeros(test, 3) == "045");
+    REQUIRE(utils::addLeadingZeros(test, 4) == "0045");
+}

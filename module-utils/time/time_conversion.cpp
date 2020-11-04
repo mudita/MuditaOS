@@ -264,10 +264,14 @@ namespace utils
             utils::findAndReplaceAll(format, "%M", utils::to_string(minutes));
             utils::findAndReplaceAll(format, "%N", utils::to_string(hmminutes));
             utils::findAndReplaceAll(format, "%S", utils::to_string(seconds));
-            utils::findAndReplaceAll(format, "%0H", utils::to_string(hours, numberOfLeadingDigits));
-            utils::findAndReplaceAll(format, "%0M", utils::to_string(minutes, numberOfLeadingDigits));
-            utils::findAndReplaceAll(format, "%0N", utils::to_string(hmminutes, numberOfLeadingDigits));
-            utils::findAndReplaceAll(format, "%0S", utils::to_string(seconds, numberOfLeadingDigits));
+            utils::findAndReplaceAll(
+                format, "%0H", utils::addLeadingZeros(utils::to_string(hours), numberOfLeadingDigits));
+            utils::findAndReplaceAll(
+                format, "%0M", utils::addLeadingZeros(utils::to_string(minutes), numberOfLeadingDigits));
+            utils::findAndReplaceAll(
+                format, "%0N", utils::addLeadingZeros(utils::to_string(hmminutes), numberOfLeadingDigits));
+            utils::findAndReplaceAll(
+                format, "%0S", utils::addLeadingZeros(utils::to_string(seconds), numberOfLeadingDigits));
         }
 
         void Duration::calculate()
