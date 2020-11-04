@@ -12,8 +12,6 @@
 using namespace bsp;
 
 lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
-volatile bool BluetoothCommon::txFinished = false;
-volatile bool BluetoothCommon::rxFinished = false;
 
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
@@ -116,11 +114,12 @@ BTdev::Error BluetoothCommon::flush()
     return err;
 }
 
+/*
 ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 {
-    // LOG_INFO( "write -> [%.*s]",nbytes, buf);
+    LOG_INFO("write -> [%.*s]", nbytes, buf);
     ssize_t i = 0;
-    // if CTS set -> ignore return 0, can use threshold_guard here too
+    //     if CTS set -> ignore return 0, can use threshold_guard here too
     for (i = 0; i < nbytes; ++i) {
         if (out.push(*(buf + i)) != 0) {
             LOG_ERROR("Cant push!");
@@ -128,6 +127,39 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
         }
     }
     return i;
+}
+*/
+
+ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
+{
+    lpuart_transfer_t sendXfer;
+
+    LOG_INFO("write -> [%.*s]", nbytes, buf);
+
+    sendXfer.data     = reinterpret_cast<uint8_t *>(buf);
+    sendXfer.dataSize = nbytes;
+
+    // Sends out.
+    LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
+
+    ssize_t ret = 0;
+
+    auto sent = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
+    switch (sent) {
+    case kStatus_Success:
+        //    CTS
+        ret = nbytes;
+        break;
+    case kStatus_LPUART_TxBusy:
+        LOG_ERROR("Previous DMA xfer is still pending");
+        //        could've checked beforehand with uartDmaHandle.txState == kLPUART_TxIdle
+        ret = -1;
+        break;
+    case kStatus_InvalidArgument:
+        ret = -1;
+        break;
+    }
+    return ret;
 }
 
 ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
@@ -220,8 +252,8 @@ void BluetoothCommon::configure_lpuart()
     bt_c.isMsb         = false;
     bt_c.rxIdleType    = kLPUART_IdleTypeStartBit;
     bt_c.rxIdleConfig  = kLPUART_IdleCharacter1;
-    bt_c.enableTx      = true;
-    bt_c.enableRx      = true;
+    bt_c.enableTx      = false;
+    bt_c.enableRx      = false;
 
     if (LPUART_Init(BSP_BLUETOOTH_UART_BASE, &bt_c, UartGetPeripheralClock()) != kStatus_Success) {
         LOG_ERROR("BT: UART config error Could not initialize the uart!");
@@ -239,59 +271,40 @@ void BluetoothCommon::configure_lpuart()
                                      drivers::DriverDMAParams{});
 
     uartTxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL));
-    uartRxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL));
+    //    uartRxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL));
 
     dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL), kDmaRequestMuxLPUART2Tx);
-    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL), kDmaRequestMuxLPUART2Rx);
+    //    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL), kDmaRequestMuxLPUART2Rx);
 
     LPUART_TransferCreateHandleEDMA(BSP_BLUETOOTH_UART_BASE,
                                     &uartDmaHandle,
                                     uartCallback,
                                     nullptr,
                                     reinterpret_cast<edma_handle_t *>(uartTxDmaHandle->GetHandle()),
-                                    reinterpret_cast<edma_handle_t *>(uartRxDmaHandle->GetHandle()));
+                                    nullptr); // reinterpret_cast<edma_handle_t *>(uartRxDmaHandle->GetHandle()));
 
-    // Prepares to send.
-    lpuart_transfer_t sendXfer;
-    lpuart_transfer_t receiveXfer;
-
-    uint8_t sendData[] = {'H', 'e', 'l', 'l', 'o'};
-    uint8_t receiveData[32];
-
-    sendXfer.data     = sendData;
-    sendXfer.dataSize = sizeof(sendData) / sizeof(sendData[0]);
-    txFinished        = false;
-    // Sends out.
-    uint32_t ret = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
-    LOG_DEBUG("send: %ld", ret);
-    // Send finished.
-    uint32_t b = 0;
-    ret = LPUART_TransferGetSendCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
-    while (!txFinished) {
-    }
-    ret = LPUART_TransferGetSendCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
-    // Prepares to receive
-    receiveXfer.data     = receiveData;
-    receiveXfer.dataSize = sizeof(receiveData) / sizeof(receiveData[0]);
-    rxFinished           = false;
-    // Receives.
-    LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
-    // Receive finished.
-    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
-    while (!rxFinished) {}
-    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
-    LOG_DEBUG("finally");
+    //    // Prepares to receive
+    //    receiveXfer.data     = receiveData;
+    //    receiveXfer.dataSize = sizeof(receiveData) / sizeof(receiveData[0]);
+    //    rxFinished           = false;
+    //    // Receives.
+    //    LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
+    //    LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
+    //    // Receive finished.
+    //    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
+    //    while (!rxFinished) {}
+    //    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
+    //    LOG_DEBUG("finally");
 }
 
 void BluetoothCommon::uartCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
 {
-    switch(status){
+    switch (status) {
     case kStatus_LPUART_TxIdle:
-        txFinished = true;
+        LOG_DEBUG("tx done");
         break;
-    case kStatus_LPUART_RxIdle:
-        rxFinished = true;
-        break;
+        //    case kStatus_LPUART_RxIdle:
+        //        break;
     default:
         break;
     }
