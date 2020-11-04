@@ -1,17 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory> // for unique_ptr
-#include <string> // for string
-
 #include "Actions.hpp"
-#include "module-services/service-appmgr/model/ApplicationManager.hpp"
-#include "module-sys/Service/Service.hpp"
-#include "SwitchData.hpp"                         // for SwitchData
-#include "i18/i18.hpp"                            // for Lang
-#include "service-appmgr/messages/Message.hpp"    // for APMSwitchPrevApp, Action (ptr only)
+#include "Message.hpp"
+#include "model/ApplicationManager.hpp"
+
+#include <module-sys/Service/Service.hpp>
+#include <SwitchData.hpp>
+
+#include <i18/i18.hpp>
+
+#include <memory>
+#include <string>
 
 namespace sys
 {

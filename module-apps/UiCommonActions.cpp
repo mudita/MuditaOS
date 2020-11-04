@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UiCommonActions.hpp"
@@ -11,8 +11,8 @@
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-special-input/ApplicationSpecialInput.hpp"
 
-#include "service-appmgr/Controller.hpp"
-#include "service-appmgr/messages/Message.hpp"
+#include <service-appmgr/Controller.hpp>
+#include <service-appmgr/Message.hpp>
 
 #include <i18/i18.hpp>
 #include <log/log.hpp>

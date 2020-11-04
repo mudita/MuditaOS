@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+﻿cmake_minimum_required(VERSION 3.14)
 
 project(module-apps VERSION 1.0
         DESCRIPTION "Library with all applications.")
@@ -87,7 +87,19 @@ include_directories( ../module-os )
 include_directories( ../module-bsp )
 include_directories( ../module-db )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-services module-db ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-appmgr
+    PUBLIC
+        module-bsp
+        module-os
+        module-sys
+        module-utils
+        module-gui
+        module-services
+        module-db
+        ${TARGET_LIBRARIES}
+)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,7 @@
 #include "gui/Common.hpp"                               // for ShowMode
 #include "projdefs.h"                                   // for pdMS_TO_TICKS
 #include "service-evtmgr/messages/EVMessages.hpp"       // for TorchStateMe...
-#include "module-services/service-appmgr/ApplicationManifest.hpp"
+#include <service-appmgr/ApplicationManifest.hpp>
 #include <list>                                         // for list
 #include <map>                                          // for allocator, map
 #include <memory>                                       // for make_shared

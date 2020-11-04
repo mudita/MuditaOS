@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAntenna.hpp"
-#include "module-services/service-appmgr/model/ApplicationManager.hpp"
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <common_data/EventStore.hpp>
 
 #include <at/response.hpp> // for parseCSQ, isRegistered, parseCREG, parseNetworkFrequency, parseQNWINFO

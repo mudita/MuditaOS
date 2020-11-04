@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputEvent.hpp"
@@ -13,7 +13,7 @@
 #include "../ApplicationDesktop.hpp"
 
 // services
-#include "module-services/service-appmgr/model/ApplicationManager.hpp"
+#include <service-appmgr/model/ApplicationManager.hpp>
 
 #include "service-cellular/ServiceCellular.hpp"
 #include <Style.hpp>
