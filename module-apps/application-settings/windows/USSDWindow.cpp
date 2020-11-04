@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "USSDWindow.hpp"
@@ -7,7 +7,7 @@
 #include "Margins.hpp"
 #include "i18/i18.hpp"
 #include "messages/AppMessage.hpp"
-#include "module-services/service-appmgr/model/ApplicationManager.hpp"
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <GridLayout.hpp>
 #include <Style.hpp>
 #include <functional>
