@@ -20,8 +20,8 @@ namespace gui
 
         using StateMap = std::map<const State, const std::string>;
 
-        static const inline std::string play  = "play";
-        static const inline std::string pause = "pause";
+        static constexpr auto play            = "play";
+        static constexpr auto pause           = "pause";
         static const inline StateMap stateMap = {{State::Play, play}, {State::Pause, pause}};
 
         void setState(State state);

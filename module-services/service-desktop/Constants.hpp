@@ -7,5 +7,5 @@
 
 namespace service::name
 {
-    inline const std::string service_desktop = "ServiceDesktop";
+    inline constexpr auto service_desktop = "ServiceDesktop";
 };

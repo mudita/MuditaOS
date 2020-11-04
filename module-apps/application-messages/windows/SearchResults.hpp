@@ -12,7 +12,7 @@ namespace gui
 {
     namespace name::window
     {
-        inline std::string search_results = "SearchResults";
+        inline constexpr auto search_results = "SearchResults";
     }
 
     class SearchResults : public AppWindow

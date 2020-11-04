@@ -15,7 +15,7 @@ using TimePoint        = time_point<Clock>;
 using YearMonthDay     = date::year_month_day;
 using YearMonthDayLast = date::year_month_day_last;
 
-const inline int max_month_day = 48;
+inline constexpr auto max_month_day = 48;
 
 enum class Reminder
 {
@@ -42,7 +42,7 @@ enum class Repeat
     custom
 };
 
-constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
+inline constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
 
 inline std::tm CreateTmStruct(int year, int month, int day, int hour, int minutes, int seconds)
 {

@@ -13,7 +13,7 @@ namespace gui
     {
         namespace window
         {
-            const std::string scan_window("AntennaScanWindow");
+            inline constexpr auto scan_window = "AntennaScanWindow";
         }
     } // namespace name
     class ScanModesWindow : public AppWindow

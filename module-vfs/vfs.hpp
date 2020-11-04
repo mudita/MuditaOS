@@ -55,36 +55,36 @@ namespace purefs
 
     namespace extension
     {
-        const inline std::string crc32 = ".crc32";
+        inline constexpr auto crc32 = ".crc32";
     }
 
     namespace buffer
     {
-        const inline int crc_buf       = 1024;
-        const inline int crc_char_size = 9;
-        const inline int crc_radix     = 16;
-        const inline int tar_buf       = 8192 * 4;
-        const inline int copy_buf      = 8192 * 4;
+        inline constexpr auto crc_buf       = 1024;
+        inline constexpr auto crc_char_size = 9;
+        inline constexpr auto crc_radix     = 16;
+        inline constexpr auto tar_buf       = 8192 * 4;
+        inline constexpr auto copy_buf      = 8192 * 4;
     } // namespace buffer
 
     namespace json
     {
-        const inline std::string main            = "main";
-        const inline std::string os_type         = "ostype";
-        const inline std::string os_image        = "imagename";
-        const inline std::string os_version      = "version";
-        const inline std::string version_major   = "major";
-        const inline std::string version_inor    = "minor";
-        const inline std::string version_patch   = "patch";
-        const inline std::string version_string  = "string";
-        const inline std::string timestamp       = "timestamp";
-        const inline std::string misc            = "misc";
-        const inline std::string builddate       = "builddate";
-        const inline std::string git_info        = "git";
-        const inline std::string os_git_tag      = "git_tag";
-        const inline std::string os_git_revision = "git_commit";
-        const inline std::string os_git_branch   = "git_branch";
-        const inline std::string bootloader      = "bootloader";
+        inline constexpr auto main            = "main";
+        inline constexpr auto os_type         = "ostype";
+        inline constexpr auto os_image        = "imagename";
+        inline constexpr auto os_version      = "version";
+        inline constexpr auto version_major   = "major";
+        inline constexpr auto version_inor    = "minor";
+        inline constexpr auto version_patch   = "patch";
+        inline constexpr auto version_string  = "string";
+        inline constexpr auto timestamp       = "timestamp";
+        inline constexpr auto misc            = "misc";
+        inline constexpr auto builddate       = "builddate";
+        inline constexpr auto git_info        = "git";
+        inline constexpr auto os_git_tag      = "git_tag";
+        inline constexpr auto os_git_revision = "git_commit";
+        inline constexpr auto os_git_branch   = "git_branch";
+        inline constexpr auto bootloader      = "bootloader";
     } // namespace json
 
     struct BootConfig

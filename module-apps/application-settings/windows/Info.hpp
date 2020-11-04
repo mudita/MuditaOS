@@ -18,7 +18,7 @@ namespace gui
 
     namespace window
     {
-        inline const std::string hw_info = "hw_info";
+        inline constexpr auto hw_info = "hw_info";
     };
 
     class Info : public AppWindow

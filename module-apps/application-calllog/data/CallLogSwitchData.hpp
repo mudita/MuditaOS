@@ -9,7 +9,7 @@
 namespace calllog
 {
 
-    const inline std::string CALLLOG_SWITCH_DATA_STR = "CallLogSwitchData";
+    inline constexpr auto CALLLOG_SWITCH_DATA_STR = "CallLogSwitchData";
 
     class CallLogSwitchData : public gui::SwitchData
     {

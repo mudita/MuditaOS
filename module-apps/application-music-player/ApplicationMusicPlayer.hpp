@@ -12,16 +12,16 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string all_songs_window = "All Songs";
-            inline const std::string player_window    = "Player";
-            inline const std::string empty_window     = "Empty";
+            inline constexpr auto all_songs_window = "All Songs";
+            inline constexpr auto player_window    = "Player";
+            inline constexpr auto empty_window     = "Empty";
         }; // namespace window
     };     // namespace name
 };         // namespace gui
 
 namespace app
 {
-    const inline std::string name_music_player = "ApplicationMusicPlayer";
+    inline constexpr auto name_music_player = "ApplicationMusicPlayer";
 
     class ApplicationMusicPlayer : public Application
     {
