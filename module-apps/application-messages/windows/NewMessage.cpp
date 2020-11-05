@@ -30,6 +30,12 @@ namespace gui
 
     bool NewMessageWindow::onInput(const InputEvent &inputEvent)
     {
+        // draft is saved only on KeyCode::KEY_RF,
+        if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_RF)) {
+            if (!message->getText().empty()) {
+                handleMessageText();
+            }
+        }
         return AppWindow::onInput(inputEvent);
     }
 
@@ -254,18 +260,6 @@ namespace gui
         body->setVisible(true);
         body->setNavigation();
         setFocusItem(body);
-    }
-
-    void NewMessageWindow::onClose()
-    {
-        if (message->getText().empty()) {
-            // Nothing to do if text is empty.
-            return;
-        }
-
-        if (const auto handled = handleMessageText(); !handled) {
-            message->clear();
-        }
     }
 
     auto NewMessageWindow::handleMessageText() -> bool
