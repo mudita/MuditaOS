@@ -30,7 +30,7 @@ extern "C"
 #include "parser/ParserFSM.hpp"
 #include "bsp/usb/usb.hpp"
 #include "vfs.hpp"
-#include "timer.hpp"
+#include <module-os/RTOSWrapper/include/timer.hpp>
 
 class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp::USBDeviceListener
 {
