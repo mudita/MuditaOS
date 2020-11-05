@@ -2,12 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
 #include <log/log.hpp>
 
 #include <bits/exception.h>
 #include <cstddef>
 #include <cstdint>
+#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -20,6 +20,7 @@ namespace parserFSM
         invalid = 0,
         deviceInfo,
         update,
+        filesystemUpload,
         backup,
         restore,
         factory,
@@ -29,15 +30,15 @@ namespace parserFSM
         developerMode,
     };
 
-    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
+    constexpr int lastEndpoint = static_cast<int>(EndpointType::developerMode);
     // Message defs and utils
     namespace message
     {
-        inline constexpr auto size_length = 9U;
-        inline constexpr auto size_header = size_length + 1;
+        constexpr size_t size_length = 9;
+        constexpr size_t size_header = size_length + 1;
 
-        inline constexpr auto endpointChar = '#';
-        inline constexpr auto rawDataChar  = '$';
+        constexpr char endpointChar = '#';
+        constexpr char rawDataChar  = '$';
 
         inline void removeHeader(std::string &msg)
         {
@@ -80,8 +81,10 @@ namespace parserFSM
         enum class Code
         {
             OK                  = 200,
+            Accepted            = 202,
             BadRequest          = 400,
-            InternalServerError = 500
+            NotAcceptable       = 406,
+            InternalServerError = 500,
         };
 
         /*! Enum class for the HTTP methods.
@@ -120,6 +123,25 @@ namespace parserFSM
         inline constexpr auto factoryRequest = "factoryRequest";
         inline constexpr auto networkStatus    = "networkStatus";
         inline constexpr auto accessTechnology = "accessTechnology";
+        inline constexpr auto fileName         = "fileName";
+        inline constexpr auto fileSize         = "fileSize";
+
+        inline constexpr auto update      = "update";
+        inline constexpr auto updateInfo  = "updateInfo";
+        inline constexpr auto updateError = "updateError";
+        inline constexpr auto errorCode   = "errorCode";
+        inline constexpr auto statusCode  = "statusCode";
+
+        namespace filesystem
+        {
+            inline constexpr auto command = "command";
+            namespace commands
+            {
+                inline constexpr auto upload   = "upload";
+                inline constexpr auto rm       = "rm";
+                inline constexpr auto download = "download";
+            } // namespace commands
+        }     // namespace filesystem
 
         namespace messages
         {

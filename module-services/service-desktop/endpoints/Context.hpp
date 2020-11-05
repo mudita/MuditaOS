@@ -11,11 +11,11 @@ namespace parserFSM
 
     namespace json
     {
-        inline constexpr auto method   = "method";
-        inline constexpr auto endpoint = "endpoint";
-        inline constexpr auto uuid     = "uuid";
-        inline constexpr auto status   = "status";
-        inline constexpr auto body     = "body";
+        const inline std::string method   = "method";
+        const inline std::string endpoint = "endpoint";
+        const inline std::string uuid     = "uuid";
+        const inline std::string status   = "status";
+        const inline std::string body     = "body";
     } // namespace json
 
     struct endpointResponseContext
@@ -74,7 +74,7 @@ namespace parserFSM
                     uuid = invalidUuid;
                 }
             }
-            method = static_cast<http::Method>(js[json::method].int_value());
+            method   = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
         Context()
@@ -97,6 +97,10 @@ namespace parserFSM
         {
             responseContext.status = status;
         }
+        auto setEndpoint(EndpointType endpointTypeToSet)
+        {
+            endpoint = endpointTypeToSet;
+        }
         auto setResponseBody(json11::Json respBody)
         {
             responseContext.body = respBody;
@@ -108,10 +112,6 @@ namespace parserFSM
         auto getEndpoint() -> EndpointType
         {
             return endpoint;
-        }
-        void setEndpoint(EndpointType newEndpoint)
-        {
-            endpoint = newEndpoint;
         }
         auto getUuid() -> uint32_t
         {

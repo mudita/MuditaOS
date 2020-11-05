@@ -14,15 +14,19 @@ extern "C"
 #include <string.h>
 #include <unistd.h>
 
-#define SERIAL_TRANSMISSION_START 0x02
-#define SERIAL_TRANSMISSION_END 0x03
-#define SERIAL_SHELL_START 0x33
-#define SERIAL_BAUDRATE 115200
 #define SERIAL_BUFFER_LEN 512 // this matches the buffer length in rt1051 cdc implementaion
-
+#define SERIAL_BAUDRATE 115200
 namespace bsp
 {
-    void *usbInit(xQueueHandle);
-    void usbCDCReceive(void *ptr);
+    class USBDeviceListener {
+      public:
+        virtual bool getRawMode() {
+            return false;
+        }
+        virtual void rawDataReceived(void *dataPtr, uint32_t dataLen) = 0;
+    };
+
+    int usbInit(xQueueHandle, USBDeviceListener *deviceListener = nullptr);
+    int usbCDCReceive(void *ptr);
     int usbCDCSend(std::string *sendMsg);
 } // namespace bsp
