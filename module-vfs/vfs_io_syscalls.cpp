@@ -1,7 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <vfs.hpp>
-#include "vfs_io_syscalls.hpp"
 #include <errno.h>
 #include <dirent.h>
 #include <log/log.hpp>
@@ -10,6 +9,7 @@
 #include <unistd.h>
 #include "vfs_internal_dirent.hpp"
 #include "HandleManager.hpp"
+#include "vfs_io_syscalls.hpp"
 
 /** NOTE: This is generic wrapper for newlib syscalls
  * using current VFS implementation. This implementation
@@ -158,7 +158,7 @@ namespace vfsn::internal::syscalls
     }
     int link(int &_errno_, const char *existing, const char *newLink)
     {
-        _errno_ = ENOTSUP;
+        _errno_ = ENOSYS;
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
         return -1;
     }
@@ -173,7 +173,7 @@ namespace vfsn::internal::syscalls
 
     int fcntl(int &_errno_, int fd, int cmd, int arg)
     {
-        _errno_ = ENOTSUP;
+        _errno_ = ENOSYS;
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
         return -1;
     }
@@ -286,7 +286,7 @@ namespace vfsn::internal::syscalls
         auto fff = reinterpret_cast<FF_FindData_t *>(dirp->dir_data->dir_state);
         if (res < 0) {
             res = _errno_;
-            if (_errno_ == ENOENT) {
+            if (_errno_ == pdFREERTOS_ERRNO_ENMFILE) {
                 res = 0;
             }
             _errno_ = olderrno;
@@ -335,13 +335,13 @@ namespace vfsn::internal::syscalls
 
     int chmod(int &_errno_, const char *path, mode_t mode)
     {
-        _errno_ = ENOTSUP;
+        _errno_ = ENOSYS;
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
         return -1;
     }
     int fchmod(int &_errno_, int fd, mode_t mode)
     {
-        _errno_ = ENOTSUP;
+        _errno_ = ENOSYS;
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
         return -1;
     }
