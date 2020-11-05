@@ -1,0 +1,95 @@
+@startuml
+
+participant "Service Cellular" as srvclr
+participant "Application Manager" as appmgr
+participant "ApplicaionDesktop" as appdsktp
+participant "PinLockWindow" as pinwin
+actor User
+
+    == Pre-Interaction state ==
+!pragma teoz true
+note left of srvclr
+    Desktop side data:
+    None
+end note
+/ note left of pinwin
+    Desktop side data:
+    None
+end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Locked
+end note
+
+
+    == Pin required: Interaction Init ==
+note over srvclr, appdsktp #FFAAAA
+    what kind of data is actually presented tu user:
+    - removed from miro: phone number
+    - SIM1/SIM2 presented in Title
+    Needs to be confirmed
+end note
+
+note left of srvclr
+    Cellular side data:
+    State: PIN required
+    SIM: SIM1
+    phone: +48500500500
+    attempts: 4
+end note
+/ note left of pinwin
+    Desktop side data:
+    None
+end note
+
+[o->srvclr : need PIN
+
+srvclr -> appmgr : requestPIN(attempts, SIM1)
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        appdsktp -> appdsktp : queue action
+
+
+    == Pin required: Interaction - User unlocks screen ==
+note over appdsktp #FFAAAA
+    Miro: it does not looks like this flow
+    could be screen lock/unlock dependent.
+    This is only on ONBOARDING, on new SIM adaptation?
+    What happens in the Hot-swap?
+end note
+
+        appdsktp <- User : Unlock screen
+note left of pinwin
+    Desktop side data:
+    State: PIN required
+    SIM: SIM1
+    attempts: 4
+end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Unlocked
+end note
+        appdsktp -> pinwin ** : swtichWindow(SIM1, requiredPIN, attempts)
+            activate pinwin
+            pinwin -> pinwin : setVisablePinRequired
+            pinwin <- User : Enters PIN (good)
+            pinwin <- User : Confirm
+        appdsktp <- pinwin : handlePasscode(pinValue)
+srvclr <- appdsktp : verifyPIN(pinValue) via sys::bus message
+srvclr -> srvclr : verification passed
+note left of srvclr
+    Cellular side data:
+    State: PIN unlocked
+    SIM: SIM1
+    phone: +48500500500
+    attempts: 4
+end note
+srvclr -> appdsktp : verificationStatus(success) via sys::bus response
+        appdsktp -> appdsktp : handle(response)
+        appdsktp -> pinwin !! : delete
+note left of pinwin
+    Desktop side data:
+    None
+end note
+
+@enduml
