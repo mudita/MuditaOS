@@ -6,6 +6,7 @@
 #include "EinkMessage.hpp"
 
 #include <cstdint>
+#include <service-eink/ImageData.hpp>
 
 namespace service::eink
 {
@@ -13,42 +14,34 @@ namespace service::eink
     class ImageMessage : public EinkMessage
     {
       protected:
-        uint32_t x, y, w, h;
-        bool deepRefresh;
-        uint8_t *data;
+        ImageData imageData;
         bool suspend  = false;
         bool shutdown = false;
 
       public:
-        ImageMessage(uint32_t x,
-                     uint32_t y,
-                     uint32_t w,
-                     uint32_t h,
-                     bool deepRefresh,
-                     uint8_t *data,
-                     bool suspend,
-                     bool shutdown);
+        ImageMessage(ImageData &&imageData, bool suspend, bool shutdown)
+            : imageData(std::move(imageData)), suspend(suspend), shutdown(shutdown)
+        {}
 
-        uint8_t *getData()
+        [[nodiscard]] gui::Context &getContext()
         {
-            return data;
-        };
-        uint32_t getSize()
-        {
-            return w * h;
-        };
+            return imageData.context;
+        }
+
         bool getDeepRefresh()
         {
-            return deepRefresh;
-        };
+            return imageData.mode == gui::RefreshModes::GUI_REFRESH_DEEP;
+        }
+
         bool getSuspend()
         {
             return suspend;
-        };
+        }
+
         bool getShutdown()
         {
             return shutdown;
-        };
+        }
     };
 
-} /* namespace seink */
+} // namespace service::eink

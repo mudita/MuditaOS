@@ -132,7 +132,7 @@ namespace app
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
 
-            auto message = std::make_shared<sgui::DrawMessage>(window->buildDrawList(), mode);
+            auto message = std::make_shared<sgui::DrawMessage>(sgui::DrawData(window->buildDrawList(), mode));
             if (shutdownInProgress) {
                 message->setCommandType(sgui::DrawMessage::Type::SHUTDOWN);
             }

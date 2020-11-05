@@ -24,6 +24,8 @@
 namespace sgui
 {
 
+    using namespace service::renderer;
+
     WorkerGUI::WorkerGUI(ServiceGUI *service) : Worker(service)
     {}
 
@@ -37,18 +39,21 @@ namespace sgui
             sys::WorkerCommand received;
             xQueueReceive(queue, &received, 0);
 
-            std::list<std::unique_ptr<gui::DrawCommand>> uniqueCommands;
-            if (xSemaphoreTake(serviceGUI->semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                uniqueCommands = std::move(serviceGUI->commands);
-                xSemaphoreGive(serviceGUI->semCommands);
-            }
-            else {
-                LOG_ERROR("Failed to acquire semaphore");
-            }
+            auto command = static_cast<WorkerGUICommands>(received.command);
 
-            serviceGUI->renderer.render(serviceGUI->renderContext, uniqueCommands);
+            switch (command) {
+            case WorkerGUICommands::Render: {
+                auto result = serviceGUI->fs.processLastFrame([this](sgui::DrawData &data, ::gui::Context &context) {
+                    renderer.render(&context, data.getCommands());
+                    return true;
+                });
 
-            sys::Bus::SendUnicast(std::make_shared<service::gui::RenderingFinished>(), service->GetName(), service);
+                sys::Bus::SendUnicast(std::make_shared<RenderingFinished>(result), service->GetName(), service);
+            } break;
+
+            case WorkerGUICommands::Finish:
+                break;
+            }
         }
         return true;
     }

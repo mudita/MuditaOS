@@ -29,7 +29,6 @@ namespace sgui
      */
     class WorkerGUI : public sys::Worker
     {
-        // object responsible for rendering images to context
         gui::Renderer renderer;
 
       public:

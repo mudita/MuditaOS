@@ -1,19 +1,11 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * Context.hpp
- *
- *  Created on: 6 maj 2019
- *      Author: robert
- */
-
-#ifndef GUI_CORE_CONTEXT_HPP_
-#define GUI_CORE_CONTEXT_HPP_
+#pragma once
 
 #include <cstdint>
-#include <iostream>
-#include "Common.hpp"
+#include <memory>
+#include <gui/Common.hpp>
 
 namespace gui
 {
@@ -21,14 +13,26 @@ namespace gui
     class Context
     {
       protected:
-        int16_t x, y;
-        uint32_t w, h;
-        uint8_t *data;
+        int16_t x = 0, y = 0;
+        uint32_t w = 0, h = 0;
+        std::unique_ptr<uint8_t[]> data;
 
       public:
-        Context();
+        Context() = default;
         Context(uint16_t width, uint16_t height);
-        virtual ~Context();
+        Context(gui::Size size);
+        virtual ~Context() = default;
+
+        Context(const Context &) = delete;
+        Context &operator=(const Context &) = delete;
+
+        Context(Context &&);
+        Context &operator=(Context &&);
+
+        bool empty()
+        {
+            return data == nullptr;
+        }
 
         /**
          * @brief Creates new context using provided coordinates. If there is no common part Context with 0 width and 0
@@ -53,8 +57,9 @@ namespace gui
          */
         inline uint8_t *getData()
         {
-            return data;
-        };
+            return data.get();
+        }
+
         inline int16_t getX()
         {
             return x;
@@ -74,12 +79,13 @@ namespace gui
 
         inline bool addressInData(const uint8_t *ptr) const
         {
-            return (ptr >= data) && (ptr < data + w * h);
+            return (ptr >= data.get()) && (ptr < data.get() + w * h);
         }
 
-        friend std::ostream &operator<<(std::ostream &out, const Context &c);
+        [[nodiscard]] auto bufferMemorySize() const noexcept
+        {
+            return w * h;
+        }
     };
 
 } /* namespace gui */
-
-#endif /* GUI_CORE_CONTEXT_HPP_ */

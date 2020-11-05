@@ -1,13 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * Context.cpp
- *
- *  Created on: 6 maj 2019
- *      Author: robert
- */
-
 #include <ios>
 #include <cstring>
 
@@ -17,18 +10,33 @@
 namespace gui
 {
 
-    Context::Context() : x{0}, y{0}, w{0}, h{0}, data{nullptr}
-    {}
-
-    Context::Context(uint16_t width, uint16_t height) : x{0}, y{0}, w{width}, h{height}, data(new uint8_t[w * h])
+    Context::Context(uint16_t width, uint16_t height) : w{width}, h{height}, data(std::make_unique<uint8_t[]>(w * h))
     {
-        memset(data, 15, w * h);
+        memset(data.get(), 15, w * h);
     }
 
-    Context::~Context()
+    Context::Context(Size size) : Context(size.width, size.height)
+    {}
+
+    Context &Context::operator=(Context &&right)
     {
-        if (data != nullptr)
-            delete[] data;
+        this->x    = right.x;
+        this->y    = right.y;
+        this->w    = right.w;
+        this->h    = right.h;
+        this->data = std::move(right.data);
+
+        right.x = 0;
+        right.y = 0;
+        right.w = 0;
+        right.h = 0;
+
+        return *this;
+    }
+
+    Context::Context(Context &&right)
+    {
+        operator=(std::move(right));
     }
 
     Context *Context::get(int16_t gx, int16_t gy, uint16_t width, uint16_t height)
@@ -48,7 +56,7 @@ namespace gui
             uint32_t sourceOffset = resultBox.y * w + resultBox.x;
             uint32_t destOffset   = (resultBox.y - gy) * width + (resultBox.x - gx);
             for (int32_t h = 0; h < resultBox.h; h++) {
-                memcpy(retContext->data + destOffset, data + sourceOffset, resultBox.w);
+                memcpy(retContext->data.get() + destOffset, data.get() + sourceOffset, resultBox.w);
                 sourceOffset += w;
                 destOffset += width;
             }
@@ -70,7 +78,7 @@ namespace gui
             uint32_t sourceOffset = (resultBox.y - iy) * context->w + (resultBox.x - ix);
             uint32_t destOffset   = (resultBox.y) * w + (resultBox.x);
             for (int32_t h = 0; h < resultBox.h; h++) {
-                memcpy(data + destOffset, context->data + sourceOffset, resultBox.w);
+                memcpy(data.get() + destOffset, context->data.get() + sourceOffset, resultBox.w);
                 sourceOffset += context->w;
                 destOffset += w;
             }
@@ -96,7 +104,7 @@ namespace gui
             uint32_t sourceOffset = (resultBox.y - iy - yBoxOffset) * context->w + (resultBox.x - ix - xBoxOffset);
             uint32_t destOffset   = (resultBox.y) * w + (resultBox.x);
             for (int32_t h = 0; h < resultBox.h; h++) {
-                memcpy(data + destOffset, context->data + sourceOffset, resultBox.w);
+                memcpy(data.get() + destOffset, context->data.get() + sourceOffset, resultBox.w);
                 sourceOffset += context->w;
                 destOffset += w;
             }
@@ -105,27 +113,9 @@ namespace gui
 
     void Context::fill(uint8_t colour)
     {
-        if (data) {
-            memset(data, colour, w * h);
+        if (data.get() != nullptr) {
+            memset(data.get(), colour, bufferMemorySize());
         }
-        //	uint32_t size = 480*600;
-        //	memset( data, colour, size );
-    }
-
-    std::ostream &operator<<(std::ostream &out, const Context &c)
-    {
-        out << "x:" << c.x << "y:" << c.y << "w:" << c.w << "h:" << c.h << std::endl;
-
-        uint32_t offset = 0;
-        for (uint32_t y = 0; y < c.h; y++) {
-            for (uint32_t x = 0; x < c.w; x++) {
-                uint32_t value = *(c.data + offset);
-                std::cout << std::hex << value;
-                offset++;
-            }
-            std::cout << std::endl;
-        }
-        return out;
     }
 
 } /* namespace gui */

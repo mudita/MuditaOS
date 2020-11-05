@@ -219,7 +219,7 @@ namespace app::manager
     void ApplicationManager::startSystemServices()
     {
         if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<sgui::ServiceGUI>(service::name::gui, GetName(), 480, 600), this);
+                std::make_shared<sgui::ServiceGUI>(service::name::gui, GetName(), gui::Size{480, 600}), this);
             !ret) {
             LOG_ERROR("Failed to initialize GUI service");
         }

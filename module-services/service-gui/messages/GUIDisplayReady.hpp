@@ -5,7 +5,7 @@
 
 #include "GUIMessage.hpp"
 
-namespace service::gui
+namespace service::renderer
 {
     class GUIDisplayReady : public sgui::GUIMessage
     {
@@ -30,4 +30,4 @@ namespace service::gui
 
         operator std::string() const override;
     };
-} // namespace service::gui
+} // namespace service::renderer

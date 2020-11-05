@@ -4,10 +4,14 @@
 #pragma once
 
 #include <memory>
+#include <list>
 
 namespace gui
 {
     class DrawCommand;
 
     using Command = std::unique_ptr<DrawCommand>;
+
+    using Commands = std::list<Command>;
+
 } // namespace gui

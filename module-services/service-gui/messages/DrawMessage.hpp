@@ -4,7 +4,6 @@
 #pragma once
 
 #include "GUIMessage.hpp"
-#include <core/DrawCommand.hpp>
 #include <gui/Common.hpp>
 #include <Service/Message.hpp>
 
@@ -12,15 +11,18 @@
 #include <memory>
 
 #include "Service/Message.hpp"
-#include "core/DrawCommandForward.hpp"
 #include "GUIMessage.hpp"
 #include "gui/Common.hpp"
+#include <service-gui/source/DrawData.hpp>
+#include <utility>
 
 namespace sgui
 {
 
     class DrawMessage : public GUIMessage
     {
+        DrawData data;
+
       public:
         enum class Type
         {
@@ -29,11 +31,8 @@ namespace sgui
             SHUTDOWN
         } type = Type::NORMAL;
 
-      public:
-        gui::RefreshModes mode;
-        std::list<gui::Command> commands;
-
-        DrawMessage(std::list<gui::Command> commandsList, gui::RefreshModes mode);
+        DrawMessage(DrawData data) : data(std::move(data))
+        {}
 
         void setCommandType(Type type) noexcept
         {
@@ -43,6 +42,11 @@ namespace sgui
         bool isType(Type type) const noexcept
         {
             return this->type == type;
+        }
+
+        [[nodiscard]] DrawData takeDrawData()
+        {
+            return std::move(data);
         }
 
         operator std::string() const override;

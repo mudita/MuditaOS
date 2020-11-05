@@ -97,7 +97,7 @@ sys::ReturnCodes ServiceEink::InitHandler()
 
     EinkPowerOn();
 
-    auto msg = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+    auto msg = std::make_shared<service::renderer::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
     sys::Bus::SendUnicast(msg, service::name::gui, this);
 
     return sys::ReturnCodes::Success;
@@ -331,7 +331,7 @@ sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
         if (ret != EinkOK)
             LOG_FATAL("Failed to refresh frame");
 
-        auto msg           = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+        auto msg = std::make_shared<service::renderer::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
         suspendInProgress  = false;
         shutdownInProgress = false;
         sys::Bus::SendUnicast(msg, service::name::gui, this);
@@ -342,8 +342,11 @@ sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
 sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
 {
     auto message = static_cast<service::eink::ImageMessage *>(request);
+    auto &context = message->getContext();
 
-    memcpy(einkRenderBuffer.get(), message->getData(), message->getSize());
+    // TODO memcpy to proper area ( defined with x,y in context )
+    // so to be honest -> put Context in Context
+    memcpy(einkRenderBuffer.get(), context.getData(), context.bufferMemorySize());
     deepRefresh = message->getDeepRefresh();
 
     shutdownInProgress = message->getShutdown();
@@ -360,7 +363,7 @@ sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
 
 sys::Message_t ServiceEink::handleStateRequest(sys::Message *)
 {
-    return std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+    return std::make_shared<service::renderer::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
 }
 
 sys::Message_t ServiceEink::handleTemperatureUpdate(sys::Message *)

@@ -5,8 +5,24 @@
 
 #include "GUIMessage.hpp"
 
-namespace service::gui
+namespace service::renderer
 {
     class RenderingFinished : public sgui::GUIMessage
-    {};
-} // namespace service::gui
+    {
+        bool success = false;
+
+      public:
+        RenderingFinished(bool success) : success(success)
+        {}
+
+        [[nodiscard]] bool isSuccess() const noexcept
+        {
+            return success;
+        }
+
+        operator std::string() const override
+        {
+            return std::string("{ ") + (success ? "Success" : "Fail") + "}";
+        }
+    };
+} // namespace service::renderer

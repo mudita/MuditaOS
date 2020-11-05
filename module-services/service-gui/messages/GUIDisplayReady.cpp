@@ -5,7 +5,7 @@
 #include <json/json11.hpp>
 #include "magic_enum.hpp"
 
-namespace service::gui
+namespace service::renderer
 {
 
     GUIDisplayReady::operator std::string() const
@@ -15,4 +15,4 @@ namespace service::gui
         vals["in_shutdown"] = shutdownInProgress ? "yes" : "no";
         return json11::Json(vals).dump();
     }
-} // namespace service::gui
+} // namespace service::renderer

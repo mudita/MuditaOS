@@ -11,17 +11,11 @@
 namespace sgui
 {
 
-    DrawMessage::DrawMessage(std::list<gui::Command> commands, gui::RefreshModes mode)
-        : GUIMessage(), mode(mode), commands(std::move(commands))
-    {
-    }
-
     DrawMessage::operator std::string() const
     {
         json11::Json::object vals;
         vals["Type"] = std::string(magic_enum::enum_name(type));
-        vals["Mode"] = std::string(magic_enum::enum_name(mode));
-        vals["size"] = std::to_string(commands.size());
+        vals["Mode"] = std::string(magic_enum::enum_name(data.getMode()));
         return json11::Json(vals).dump();
     }
 } /* namespace sgui */
