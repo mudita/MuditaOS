@@ -26,6 +26,7 @@
 * `[GUI]` Fixed filling Label with color
 * `[calculator]` Fix phone hanging when pressing '='.
 * `[messages][cellular]` Fixed special SMS handling -> ASCII instead of number.
+* `[meditation]` Fixed crash on gong sound.
 
 ## [0.44.1 2020-10-30]
 
