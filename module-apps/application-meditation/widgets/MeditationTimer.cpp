@@ -162,7 +162,7 @@ namespace gui
 
     namespace
     {
-        constexpr auto intervalSoundPath = "assets/audio/ringtone.wav";
+        constexpr auto intervalSoundPath = "assets/audio/SMS-drum2.mp3";
     }
 
     void MeditationTimer::onInterval() const
