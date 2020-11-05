@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "URC_Any.hpp"
+#include "Urc.hpp"
 
 #include <common_data/EventStore.hpp>
 
@@ -11,9 +11,8 @@ namespace at::urc
 {
     /// +CREG: <stat> - Indicate network registration status of the ME
     /// +CREG: <stat>[,<lac>,<ci>[,<Act>]] - Indicate network registration and location information of the ME
-    class CREG : public Any
+    class Creg : public Urc
     {
-        const std::string urc_name = "+CREG";
         enum Tokens
         {
             Stat,
@@ -24,12 +23,15 @@ namespace at::urc
         };
 
       public:
-        explicit CREG(const std::string &val);
-        ~CREG() override = default;
+        static constexpr std::string_view head = "+CREG";
+        static bool isURC(const std::string uHead)
+        {
+            return uHead.find(Creg::head) != std::string::npos;
+        }
 
-        [[nodiscard]] auto what() const noexcept -> std::string final;
+        using Urc::Urc;
 
-        [[nodiscard]] auto isValid() const noexcept -> bool;
+        [[nodiscard]] auto isValid() const noexcept -> bool override;
         [[nodiscard]] auto isExtended() const noexcept -> bool;
         [[nodiscard]] auto isShort() const noexcept -> bool;
 
@@ -37,5 +39,10 @@ namespace at::urc
         [[nodiscard]] auto getLocation() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getCellId() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getAccessTechnology() const noexcept -> Store::Network::AccessTechnology;
+
+        void Handle(UrcHandler &h) final
+        {
+            h.Handle(*this);
+        }
     };
-}; // namespace at::urc
+} // namespace at::urc

@@ -2,10 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>       // for removeNewLines, enumToString, split, to_string
-#include <at/URC_QIND.hpp> // for QIND
-#include <at/URC_CUSD.hpp> // for CUSD
-#include <at/URC_CTZE.hpp> // for CTZE
-#include <at/URC_CREG.hpp> // for CREG
+#include <at/UrcQind.hpp>  // for Qind
+#include <at/UrcCusd.hpp>  // for Cusd
+#include <at/UrcCtze.hpp>  // for Ctze
+#include <at/UrcCreg.hpp>  // for Creg
+#include <at/UrcCmti.hpp>  // for Cmti
+#include <at/UrcClip.hpp>  // for CLIP
 #include <at/response.hpp> // for parseQNWINFO
 #include <common_data/EventStore.hpp> // for GSM, GSM::SIM, GSM::SIM::SIM1, GSM::SIM::SIM_FAIL, GSM::SIM::SIM2, GSM::Tray, GSM::Tray::IN, Network
 #include <service-evtmgr/Constants.hpp>                                    // for evt_manager
@@ -13,6 +15,7 @@
 #include <PhoneNumber.hpp>                                                 // for PhoneNumber::View, PhoneNumber
 #include <module-db/queries/notifications/QueryNotificationsIncrement.hpp> // for Increment
 #include <module-db/queries/messages/sms/QuerySMSSearchByType.hpp>         // for SMSSearchByType, SMSSearchByTypeResult
+#include <module-cellular/at/UrcFactory.hpp>                               // for UrcFactory
 #include <log/log.hpp>      // for LOG_DEBUG, LOG_ERROR, LOG_INFO, LOG_FATAL, LOG_WARN, LOG_TRACE
 #include <bits/exception.h> // for exception
 #include <algorithm>        // for remove, max
@@ -28,6 +31,7 @@
 #include "Service/Service.hpp" // for Service
 #include "Service/Timer.hpp"   // for Timer
 #include "ServiceCellular.hpp"
+#include "CellularUrcHandler.hpp" // for CellularUrcHandler
 #include "MessageType.hpp" // for MessageType, MessageType::CellularGetAntenna, MessageType::CellularListCurrentCalls, MessageType::CellularAnswerIncomingCall, MessageType::CellularCall, MessageType::CellularCallRequest, MessageType::CellularGetCREG, MessageType::CellularGetCSQ, MessageType::CellularGetFirmwareVersion, MessageType::CellularGetIMSI, MessageType::CellularGetNWINFO, MessageType::CellularGetNetworkInfo, MessageType::CellularGetOwnNumber, MessageType::CellularGetScanMode, MessageType::CellularGetScanModeResult, MessageType::CellularHangupCall, MessageType::CellularNetworkInfoResult, MessageType::CellularNotification, MessageType::CellularOperatorsScanResult, MessageType::CellularSelectAntenna, MessageType::CellularSetScanMode, MessageType::CellularSimProcedure, MessageType::CellularStartOperatorsScan, MessageType::CellularStateRequest, MessageType::CellularTransmitDtmfTones, MessageType::CellularUSSDRequest, MessageType::DBServiceNotification, MessageType::EVMModemStatus, MessageType::EVMTimeUpdated
 #include "messages/CellularMessage.hpp" // for CellularResponseMessage, CellularNotificationMessage, CellularNotificationMessage::Type, CellularCallMessage, CellularUSSDMessage, RawCommandRespAsync, RawCommandResp, CellularUSSDMessage::RequestType, CellularRequestMessage, StateChange, CellularGetChannelMessage, CellularGetChannelResponseMessage, CellularAntennaResponseMessage, CellularCallMessage::Type, CellularTimeNotificationMessage, CellularUSSDMessage::RequestType::abortSesion, CellularAntennaRequestMessage, CellularCallRequestMessage, CellularNotificationMessage::Type::CallActive, RawCommand, CellularCallMessage::Type::IncomingCall, CellularCallMessage::Type::Ringing, CellularDtmfRequestMessage, CellularNotificationMessage::Type::CallAborted, CellularNotificationMessage::Type::NetworkStatusUpdate, CellularNotificationMessage::Type::NewIncomingSMS, CellularNotificationMessage::Type::NewIncomingUSSD, CellularNotificationMessage::Type::PowerDownDeregistered, CellularNotificationMessage::Type::PowerDownDeregistering, CellularNotificationMessage::Type::SIM, CellularNotificationMessage::Type::SignalStrengthUpdate, CellularUSSDMessage::RequestType::pushSesionRequest, CellularNotificationMessage::Type::PowerUpProcedureComplete, CellularNotificationMessage::Type::RawCommand, CellularUSSDMessage::RequestType::pullSesionRequest
 #include "SignalStrength.hpp"           // for SignalStrength
@@ -994,38 +998,18 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         return std::make_shared<sys::ResponseMessage>();
     }
 }
-namespace
-{
-    bool isAbortCallNotification(const std::string &str)
-    {
-        return ((str.find(at::Chanel::NO_CARRIER) != std::string::npos) ||
-                (str.find(at::Chanel::BUSY) != std::string::npos) ||
-                (str.find(at::Chanel::NO_ANSWER) != std::string::npos));
-    }
-    namespace powerdown
-    {
-        static const std::string powerDownNormal = "NORMAL POWER DOWN";
-        static const std::string poweredDown     = "POWERED DOWN";
-
-        bool isNormalPowerDown(const std::string str)
-        {
-            std::string stripped = utils::removeNewLines(str);
-            return stripped.find(powerDownNormal) == 0;
-        }
-        bool isPoweredDown(const std::string str)
-        {
-            std::string stripped = utils::removeNewLines(str);
-            return stripped.find(poweredDown) == 0;
-        }
-    } // namespace powerdown
-} // namespace
 
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
-    std::string str(data.begin(), data.end());
+    CellularUrcHandler urcHandler(*this);
 
+    std::string str(data.begin(), data.end());
     std::string logStr = utils::removeNewLines(str);
     LOG_DEBUG("Notification:: %s", logStr.c_str());
+
+    auto urc = at::urc::UrcFactory::Create(str);
+    urc->Handle(urcHandler);
+
     if (auto ret = str.find("+CPIN: ") != std::string::npos) {
         /// TODO handle different sim statuses - i.e. no sim, sim error, sim puk, sim pin etc.
         if (str.find("NOT READY", ret) == std::string::npos) {
@@ -1055,118 +1039,11 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
         return std::nullopt;
     }
 
-    // Incoming call
-    if (auto ret = str.find("+CLIP: ") != std::string::npos) {
-        LOG_TRACE("incoming call...");
-
-        auto beg     = str.find("\"", ret);
-        auto end     = str.find("\"", ret + beg + 1);
-        auto message = str.substr(beg + 1, end - beg - 1);
-
-        return std::make_shared<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, message);
+    if (!urc->isHandled()) {
+        LOG_WARN("Unhandled notification: %s", logStr.c_str());
     }
 
-    // Call aborted/failed
-    if (isAbortCallNotification(str)) {
-        LOG_TRACE("call aborted");
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted);
-    }
-
-    // Received new SMS
-    if (str.find("+CMTI: ") != std::string::npos) {
-        LOG_TRACE("received new SMS notification");
-        // find message number
-        auto tokens = utils::split(str, ',');
-        if (tokens.size() == 2) {
-            return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingSMS,
-                                                                 tokens[1]);
-        }
-    }
-
-    // Received signal strength change
-    auto qind = at::urc::QIND(str);
-    if (qind.is() && qind.isCsq()) {
-        AntennaServiceAPI::CSQChange(this);
-        auto rssi = qind.getRSSI();
-        if (!rssi) {
-            LOG_INFO("Invalid csq - ignore");
-        }
-        else {
-            SignalStrength signalStrength(*rssi);
-
-            Store::GSM::get()->setSignalStrength(signalStrength.data);
-            return std::make_shared<CellularNotificationMessage>(
-                CellularNotificationMessage::Type::SignalStrengthUpdate, str);
-        }
-    }
-
-    if (str.find("\"FOTA\",\"HTTPEND\",0") != std::string::npos) {
-        LOG_DEBUG("Fota UPDATE, switching to AT mode");
-        cmux->setMode(TS0710::Mode::AT);
-    }
-
-    auto cusd = at::urc::CUSD(str);
-    if (cusd.is()) {
-        if (cusd.isActionNeeded()) {
-            if (ussdState == ussd::State::pullRequestSent) {
-                ussdState = ussd::State::pullResponseReceived;
-                setUSSDTimer();
-            }
-        }
-        else {
-            CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
-            ussdState = ussd::State::sesionAborted;
-            setUSSDTimer();
-        }
-
-        auto message = cusd.getMessage();
-        if (!message) {
-            return std::nullopt;
-        }
-
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD,
-                                                             *message);
-    }
-    auto ctze = at::urc::CTZE(str);
-    if (ctze.is() && isSettingsAutomaticTimeSyncEnabled()) {
-        auto msg = std::make_shared<CellularTimeNotificationMessage>(
-            ctze.getGMTTime(), ctze.getTimeZoneOffset(), ctze.getTimeZoneString());
-        sys::Bus::SendUnicast(msg, service::name::evt_manager, this);
-        return std::nullopt;
-    }
-
-    auto creg = at::urc::CREG(str);
-    if (creg.is()) {
-        if (creg.isValid()) {
-            auto accessTechnology = creg.getAccessTechnology();
-            auto status           = creg.getStatus();
-
-            LOG_INFO("Network status - %s, access technology %s",
-                     utils::enumToString(status).c_str(),
-                     utils::enumToString(accessTechnology).c_str());
-
-            Store::Network network{status, accessTechnology};
-
-            Store::GSM::get()->setNetwork(network);
-            return std::make_shared<CellularNotificationMessage>(
-                CellularNotificationMessage::Type::NetworkStatusUpdate);
-        }
-
-        LOG_WARN("Network status - not valid");
-
-        return std::nullopt;
-    }
-
-    // Power Down
-    if (powerdown::isNormalPowerDown(str)) {
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistering);
-    }
-    if (powerdown::isPoweredDown(str)) {
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerDownDeregistered);
-    }
-
-    LOG_WARN("Unhandled notification: %s", logStr.c_str());
-    return std::nullopt;
+    return urcHandler.getResponse();
 }
 
 bool ServiceCellular::sendSMS(SMSRecord record)

@@ -3,17 +3,16 @@
 
 #pragma once
 
-#include "URC_Any.hpp"
+#include "Urc.hpp"
 
 #include <optional>
 
 namespace at::urc
 {
 
-    class CUSD : public Any
+    class Cusd : public Urc
     {
 
-        const std::string urc_name = "+CUSD";
         enum Tokens
         {
             Status,
@@ -32,14 +31,24 @@ namespace at::urc
             NetworkTimeOut
         };
 
-        explicit CUSD(const std::string &val);
-        ~CUSD() override = default;
+        static constexpr std::string_view head = "+CUSD";
+        static auto isURC(const std::string uHead) -> bool
+        {
+            return uHead.find(Cusd::head) != std::string::npos;
+        }
 
-        [[nodiscard]] auto what() const noexcept -> std::string final;
-        [[nodiscard]] auto isValid() const noexcept -> bool;
+        using Urc::Urc;
+
+        [[nodiscard]] auto isValid() const noexcept -> bool override;
+
         [[nodiscard]] auto isActionNeeded() const noexcept -> bool;
         [[nodiscard]] auto getMessage() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getStatus() const noexcept -> std::optional<StatusType>;
         [[nodiscard]] auto getDCS() const noexcept -> std::optional<int>;
+
+        void Handle(UrcHandler &h) final
+        {
+            h.Handle(*this);
+        }
     };
 } // namespace at::urc
