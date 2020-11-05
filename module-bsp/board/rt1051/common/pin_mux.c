@@ -305,7 +305,7 @@ void PINMUX_InitBootPins(void)
     PINMUX_InitBatteryCharger();
     PINMUX_InitALS();
     PINMUX_InitPowerSW();
-    PINMUX_InitJACKDET();
+    PINMUX_InitHeadset();
     PINMUX_InitVibrator();
     PINMUX_InitTorch();
     PINMUX_InitMagnetometer();
@@ -1381,7 +1381,7 @@ void PINMUX_InitBluetoothPins(void)
                             PAD_CONFIG_HYSTERESIS_DISABLED);
 }
 
-void PINMUX_InitJACKDET(void)
+void PINMUX_InitHeadset(void)
 {
     CLOCK_EnableClock(kCLOCK_Iomuxc); /* iomuxc clock (iomuxc_clk_enable): 0x03u */
 
@@ -1390,6 +1390,11 @@ void PINMUX_InitJACKDET(void)
 
     IOMUXC_SetPinConfig(PINMUX_JACKDET_IRQ, /* GPIO_AD_B0_02 PAD functional properties : */
                         PAD_CONFIG_PULL_UP_100kOhm | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_KEEPER_ENABLED);
+
+    IOMUXC_SetPinMux(PINMUX_MIC_LDO_EN, 1);
+    IOMUXC_SetPinConfig(PINMUX_MIC_LDO_EN,
+                        PAD_CONFIG_PULL_UP_22kOhm | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_KEEPER_DISABLED |
+                            PAD_CONFIG_DRIVER_STRENGTH_LVL_4 | PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_SPEED_SLOW_50MHz);
 }
 
 void PINMUX_InitBatteryCharger(void)
