@@ -10,81 +10,99 @@
 #include <catch2/catch.hpp>
 #include <module-utils/time/time_conversion.hpp>
 
-#include "URC_QIND.hpp"
-#include "URC_CUSD.hpp"
-#include "URC_CTZE.hpp"
-#include "URC_CREG.hpp"
+#include "UrcQind.hpp"
+#include "UrcCusd.hpp"
+#include "UrcCtze.hpp"
+#include "UrcCreg.hpp"
+#include "UrcCmti.hpp"
+#include "UrcClip.hpp"
+#include "UrcPoweredDown.hpp"
+#include "UrcResponse.hpp"
+#include "UrcFactory.hpp"
 
-TEST_CASE("+QIND: csq")
+template <typename urcType> static auto getURC(std::unique_ptr<at::urc::Urc> &urc) -> std::shared_ptr<urcType>
 {
-    SECTION("Not valid data")
-    {
-        auto qind = at::urc::QIND("Not valid");
-        REQUIRE_FALSE(qind.is());
+    if (urc) {
+        auto &rawUrc = *urc.get();
+        if (typeid(rawUrc) == typeid(urcType)) {
+            return std::unique_ptr<urcType>{static_cast<urcType *>(urc.release())};
+        }
     }
 
+    return nullptr;
+}
+
+TEST_CASE("+Qind: csq")
+{
     SECTION("CSQ")
     {
-        auto qind = at::urc::QIND("+QIND:\"csq\",100,50");
-        REQUIRE(qind.is());
-        REQUIRE(qind.isCsq());
-        REQUIRE(*qind.getRSSI() == 100);
-        REQUIRE(*qind.getBER() == 50);
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\",100,50");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isCsq());
+        REQUIRE(*qind->getRSSI() == 100);
+        REQUIRE(*qind->getBER() == 50);
     }
 
     SECTION("CSQ with white spaces")
     {
-        auto qind = at::urc::QIND("+QIND: \"csq\" , 100 , 50 ");
-        REQUIRE(qind.is());
-        REQUIRE(qind.isCsq());
-        REQUIRE(*qind.getRSSI() == 100);
-        REQUIRE(*qind.getBER() == 50);
+        auto urc  = at::urc::UrcFactory::Create("+QIND: \"csq\" , 100 , 50 ");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isCsq());
+        REQUIRE(*qind->getRSSI() == 100);
+        REQUIRE(*qind->getBER() == 50);
     }
 
     SECTION("too short")
     {
-        auto qind = at::urc::QIND("+QIND:\"csq\",100");
-        REQUIRE(qind.is());
-        REQUIRE_FALSE(qind.isCsq());
-        REQUIRE_FALSE(qind.getRSSI());
-        REQUIRE_FALSE(qind.getBER());
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\",100");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE_FALSE(qind->isCsq());
+        REQUIRE_FALSE(qind->getRSSI());
+        REQUIRE_FALSE(qind->getBER());
     }
 
     SECTION("too long")
     {
-        auto qind = at::urc::QIND("+QIND:\"csq\",100,50,25");
-        REQUIRE(qind.is());
-        REQUIRE_FALSE(qind.isCsq());
-        REQUIRE_FALSE(qind.getRSSI());
-        REQUIRE_FALSE(qind.getBER());
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\",100,50,25");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE_FALSE(qind->isCsq());
+        REQUIRE_FALSE(qind->getRSSI());
+        REQUIRE_FALSE(qind->getBER());
     }
 
     SECTION("no integer values")
     {
-        auto qind = at::urc::QIND("+QIND:\"csq\",abc,def");
-        REQUIRE(qind.is());
-        REQUIRE(qind.isCsq());
-        REQUIRE_FALSE(qind.getRSSI());
-        REQUIRE_FALSE(qind.getBER());
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\",abc,def");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isCsq());
+        REQUIRE_FALSE(qind->getRSSI());
+        REQUIRE_FALSE(qind->getBER());
     }
 
     SECTION("not CSQ")
     {
-        auto qind = at::urc::QIND("+QIND:\"qsc\",100,50");
-        REQUIRE(qind.is());
-        REQUIRE_FALSE(qind.isCsq());
-        REQUIRE_FALSE(qind.getRSSI());
-        REQUIRE_FALSE(qind.getBER());
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"qsc\",100,50");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE_FALSE(qind->isCsq());
+        REQUIRE_FALSE(qind->getRSSI());
+        REQUIRE_FALSE(qind->getBER());
     }
 
     SECTION("valid CSQ")
     {
         std::vector<int> vec = {0, 1, 2, 98, 100, 101, 198, 200};
         for (auto a : vec) {
-            auto qind = at::urc::QIND("+QIND:\"csq\"," + std::to_string(a) + ",50");
-            REQUIRE(qind.is());
-            REQUIRE(qind.isCsq());
-            REQUIRE(*qind.getRSSI() == a);
+            auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\"," + std::to_string(a) + ",50");
+            auto qind = getURC<at::urc::Qind>(urc);
+            REQUIRE(qind);
+            REQUIRE(qind->isCsq());
+            REQUIRE(*qind->getRSSI() == a);
         }
     }
 
@@ -92,297 +110,662 @@ TEST_CASE("+QIND: csq")
     {
         std::vector<std::uint32_t> vec = {99, 199};
         for (auto a : vec) {
-            auto qind = at::urc::QIND("+QIND:\"csq\"," + std::to_string(a) + ",50");
-            REQUIRE(qind.is());
-            REQUIRE(qind.isCsq());
-            REQUIRE_FALSE(qind.getRSSI());
+            auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\"," + std::to_string(a) + ",50");
+            auto qind = getURC<at::urc::Qind>(urc);
+            REQUIRE(qind);
+            REQUIRE(qind->isCsq());
+            REQUIRE_FALSE(qind->getRSSI());
         }
     }
 
     SECTION("not valid BER")
     {
         int ber   = 99;
-        auto qind = at::urc::QIND("+QIND:\"csq\",50," + std::to_string(ber));
-        REQUIRE(qind.is());
-        REQUIRE(qind.isCsq());
-        REQUIRE(*qind.getRSSI() == 50);
-        REQUIRE_FALSE(qind.getBER());
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\",50," + std::to_string(ber));
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isCsq());
+        REQUIRE(*qind->getRSSI() == 50);
+        REQUIRE_FALSE(qind->getBER());
     }
 }
 
-TEST_CASE("+CUSD")
+TEST_CASE("+Qind: FOTA")
 {
-    SECTION("Not valid data")
+    SECTION("FOTA")
     {
-        auto cusd = at::urc::CUSD("Not valid");
-        REQUIRE_FALSE(cusd.is());
+        // fota normal
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"FOTA\",\"HTTPEND\",50");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFotaValid());
+        // fota dirty
+        urc  = at::urc::UrcFactory::Create("\r\r\n\n+QIND: \r\n\"FOTA\",\"HTTPEND\",50\n\n\r\r");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFotaValid());
     }
 
-    SECTION("CUSD action needed")
+    SECTION("FOTA malformed")
     {
-        auto cusd = at::urc::CUSD("+CUSD:1,\"test msg\",14");
-        REQUIRE(cusd.is());
-        REQUIRE(cusd.isValid());
-        REQUIRE(cusd.isActionNeeded());
-        REQUIRE(*cusd.getMessage() == "test msg");
-        REQUIRE(*cusd.getStatus() == at::urc::CUSD::StatusType::FurtherUserActionRequired);
-        REQUIRE(*cusd.getDCS() == 14);
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"FOTA\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE_FALSE(qind->isFotaValid());
     }
 
-    SECTION("CUSD action needed with white spaces")
+    SECTION("FOTA stage and parameter")
     {
-        auto cusd = at::urc::CUSD("+CUSD: 0 , \"test msg\" , 15 ");
-        REQUIRE(cusd.is());
-        REQUIRE(cusd.isValid());
-        REQUIRE_FALSE(cusd.isActionNeeded());
-        REQUIRE(*cusd.getMessage() == "test msg");
-        REQUIRE(*cusd.getStatus() == at::urc::CUSD::StatusType::NoFurtherUserActionRequired);
-        REQUIRE(*cusd.getDCS() == 15);
+        auto urc  = at::urc::UrcFactory::Create("+QIND: \"FOTA\",\"HTTPSTART\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE(qind->getFotaStage() == at::urc::Qind::FotaStage::HTTPSTART);
+        REQUIRE(qind->getFotaParameter().empty());
+
+        urc  = at::urc::UrcFactory::Create("+QIND: \"FOTA\",\"HTTPEND\", 22");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE(qind->getFotaStage() == at::urc::Qind::FotaStage::HTTPEND);
+        REQUIRE(qind->getFotaParameter() == "22");
+
+        urc  = at::urc::UrcFactory::Create("+QIND: \"FOTA\",\"START\"");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE(qind->getFotaStage() == at::urc::Qind::FotaStage::START);
+        REQUIRE(qind->getFotaParameter().empty());
+
+        urc  = at::urc::UrcFactory::Create("+QIND: \"FOTA\",\"UPDATING\", 99");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE(qind->getFotaStage() == at::urc::Qind::FotaStage::UPDATING);
+        REQUIRE(qind->getFotaParameter() == "99");
+
+        urc  = at::urc::UrcFactory::Create("+QIND: \"FOTA\",\"END\", 2");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE(qind->getFotaStage() == at::urc::Qind::FotaStage::END);
+        REQUIRE(qind->getFotaParameter() == "2");
+
+        urc  = at::urc::UrcFactory::Create("+QIND: \"FOTA\",\"TEST\", 3");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE_FALSE(qind->getFotaStage());
+        REQUIRE(qind->getFotaParameter() == "3");
     }
 
-    SECTION("CUSD wrong status and DCS")
+    SECTION("FOTA dirty")
     {
-        auto cusd = at::urc::CUSD("+CUSD:100,\"test msg\", abc");
-        REQUIRE(cusd.is());
-        REQUIRE(cusd.isValid());
-        REQUIRE_FALSE(cusd.isActionNeeded());
-        REQUIRE(*cusd.getMessage() == "test msg");
-        REQUIRE_FALSE(cusd.getStatus());
-        REQUIRE_FALSE(cusd.getDCS());
+        auto urc =
+            at::urc::UrcFactory::Create("\n\r+QIND: \n\r\r \"FOTA\" ,\r \n \"HTTPEND\", \n\r     test test \r\n");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isFota());
+        REQUIRE(qind->isFotaValid());
+        REQUIRE(qind->getFotaStage() == at::urc::Qind::FotaStage::HTTPEND);
+        REQUIRE(qind->getFotaParameter() == "test test");
+    }
+}
+
+TEST_CASE("+Cusd")
+{
+    SECTION("Cusd action needed")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CUSD:1,\"test msg\",14");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+
+        REQUIRE(cusd);
+        REQUIRE(cusd->isValid());
+        REQUIRE(cusd->isActionNeeded());
+        REQUIRE(*cusd->getMessage() == "test msg");
+        REQUIRE(*cusd->getStatus() == at::urc::Cusd::StatusType::FurtherUserActionRequired);
+        REQUIRE(*cusd->getDCS() == 14);
     }
 
-    SECTION("CUSD action not needed")
+    SECTION("Cusd action needed with white spaces")
     {
-        auto cusd = at::urc::CUSD("+CUSD:2,\"test msg\",15");
-        REQUIRE(cusd.is());
-        REQUIRE(cusd.isValid());
-        REQUIRE_FALSE(cusd.isActionNeeded());
+        auto urc  = at::urc::UrcFactory::Create("+CUSD: 0 , \"test msg\" , 15 ");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+        REQUIRE(cusd);
+        REQUIRE(cusd->isValid());
+        REQUIRE_FALSE(cusd->isActionNeeded());
+        REQUIRE(*cusd->getMessage() == "test msg");
+        REQUIRE(*cusd->getStatus() == at::urc::Cusd::StatusType::NoFurtherUserActionRequired);
+        REQUIRE(*cusd->getDCS() == 15);
     }
 
-    SECTION("no CUSD")
+    SECTION("Cusd wrong status and DCS")
     {
-        auto cusd = at::urc::CUSD("+CSUD:1,\"test msg\",15");
-        REQUIRE_FALSE(cusd.is());
+        auto urc  = at::urc::UrcFactory::Create("+CUSD:100,\"test msg\", abc");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+        REQUIRE(cusd);
+        REQUIRE(cusd->isValid());
+        REQUIRE_FALSE(cusd->isActionNeeded());
+        REQUIRE(*cusd->getMessage() == "test msg");
+        REQUIRE_FALSE(cusd->getStatus());
+        REQUIRE_FALSE(cusd->getDCS());
+    }
+
+    SECTION("Cusd action not needed")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CUSD:2,\"test msg\",15");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+        REQUIRE(cusd);
+        REQUIRE(cusd->isValid());
+        REQUIRE_FALSE(cusd->isActionNeeded());
+    }
+
+    SECTION("no Cusd")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CSUD:1,\"test msg\",15");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+        REQUIRE_FALSE(cusd);
     }
 
     SECTION("too short")
     {
-        auto cusd = at::urc::CUSD("+CUSD:1,\"test msg\"");
-        REQUIRE(cusd.is());
-        REQUIRE_FALSE(cusd.isValid());
+        auto urc  = at::urc::UrcFactory::Create("+CUSD:1,\"test msg\"");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+        REQUIRE(cusd);
+        REQUIRE_FALSE(cusd->isValid());
     }
 
     SECTION("too long")
     {
-        auto cusd = at::urc::CUSD("+CUSD:1,\"test msg\",15,15");
-        REQUIRE(cusd.is());
-        REQUIRE_FALSE(cusd.isValid());
+        auto urc  = at::urc::UrcFactory::Create("+CUSD:1,\"test msg\",15,15");
+        auto cusd = getURC<at::urc::Cusd>(urc);
+        REQUIRE(cusd);
+        REQUIRE_FALSE(cusd->isValid());
     }
 }
 
-TEST_CASE("+CTZE")
+TEST_CASE("+Ctze")
 {
     SECTION("Not valid data")
     {
-        auto ctze = at::urc::CTZE("Not valid");
-        REQUIRE_FALSE(ctze.is());
-        REQUIRE_FALSE(ctze.isValid());
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\"");
+        auto ctze = getURC<at::urc::Ctze>(urc);
+        REQUIRE_FALSE(ctze);
     }
 
     SECTION("ctze +08")
     {
-        auto ctze = at::urc::CTZE("+CTZE: \"+08\",1,\"2020/10/21,13:49:57\"");
-        REQUIRE(ctze.is());
-        REQUIRE(ctze.isValid());
-        auto timeInfo = ctze.getTimeInfo();
+        auto urc  = at::urc::UrcFactory::Create("+CTZE: \"+08\",1,\"2020/10/21,13:49:57\"");
+        auto ctze = getURC<at::urc::Ctze>(urc);
+        REQUIRE(ctze);
+        REQUIRE(ctze->isValid());
+        auto timeInfo = ctze->getTimeInfo();
         std::stringstream ss;
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,15:49:57");
 
-        REQUIRE(ctze.getTimeZoneOffset() == 8 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute);
-        REQUIRE(ctze.getTimeZoneString() == "+08,1");
+        REQUIRE(ctze->getTimeZoneOffset() == 8 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute);
+        REQUIRE(ctze->getTimeZoneString() == "+08,1");
         ss.str(std::string());
-        timeInfo = ctze.getGMTTime();
+        timeInfo = ctze->getGMTTime();
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,13:49:57");
     }
 
     SECTION("ctze -08")
     {
-        auto ctze = at::urc::CTZE("+CTZE: \"-08\",1,\"2020/10/21,13:49:57\"");
-        REQUIRE(ctze.is());
-        REQUIRE(ctze.isValid());
-        auto timeInfo = ctze.getTimeInfo();
+        auto urc  = at::urc::UrcFactory::Create("+CTZE: \"-08\",1,\"2020/10/21,13:49:57\"");
+        auto ctze = getURC<at::urc::Ctze>(urc);
+        REQUIRE(ctze);
+        REQUIRE(ctze->isValid());
+        auto timeInfo = ctze->getTimeInfo();
         std::ostringstream ss;
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,11:49:57");
 
-        REQUIRE(ctze.getTimeZoneOffset() == -8 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute);
-        REQUIRE(ctze.getTimeZoneString() == "-08,1");
+        REQUIRE(ctze->getTimeZoneOffset() == -8 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute);
+        REQUIRE(ctze->getTimeZoneString() == "-08,1");
         ss.str(std::string());
-        timeInfo = ctze.getGMTTime();
+        timeInfo = ctze->getGMTTime();
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,13:49:57");
     }
 
     SECTION("ctze -00")
     {
-        auto ctze = at::urc::CTZE("+CTZE: \"-00\",0,\"2020/10/21,13:49:57\"");
-        REQUIRE(ctze.is());
-        REQUIRE(ctze.isValid());
-        auto timeInfo = ctze.getTimeInfo();
+        auto urc  = at::urc::UrcFactory::Create("+CTZE: \"-00\",0,\"2020/10/21,13:49:57\"");
+        auto ctze = getURC<at::urc::Ctze>(urc);
+        REQUIRE(ctze);
+        REQUIRE(ctze->isValid());
+        auto timeInfo = ctze->getTimeInfo();
         std::ostringstream ss;
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,13:49:57");
 
-        REQUIRE(ctze.getTimeZoneOffset() == 0);
-        REQUIRE(ctze.getTimeZoneString() == "-00,0");
+        REQUIRE(ctze->getTimeZoneOffset() == 0);
+        REQUIRE(ctze->getTimeZoneString() == "-00,0");
         ss.str(std::string());
-        timeInfo = ctze.getGMTTime();
+        timeInfo = ctze->getGMTTime();
         ss << std::put_time(&timeInfo, "%Y/%m/%d,%H:%M:%S");
         REQUIRE(ss.str() == "2020/10/21,13:49:57");
     }
 
     SECTION("too short")
     {
-        auto ctze = at::urc::CTZE("+CTZE: \"-08\",\"2020/10/21,13:49:57\"");
-        REQUIRE(ctze.is());
-        REQUIRE_FALSE(ctze.isValid());
-        // auto timeInfo = ctze.getTimeInfo();
+        auto urc  = at::urc::UrcFactory::Create("+CTZE: \"-08\",\"2020/10/21,13:49:57\"");
+        auto ctze = getURC<at::urc::Ctze>(urc);
+        REQUIRE(ctze);
+        REQUIRE_FALSE(ctze->isValid());
+        // auto timeInfo = ctze->getTimeInfo();
     }
 }
 
-TEST_CASE("+CREG")
+TEST_CASE("+Creg")
 {
-    SECTION("Not valid data")
+    SECTION("Creg short")
     {
-        auto creg = at::urc::CUSD("Not valid");
-        REQUIRE_FALSE(creg.is());
+        auto urc  = at::urc::UrcFactory::Create("+CREG: 0");
+        auto creg = getURC<at::urc::Creg>(urc);
+        REQUIRE(creg);
+        REQUIRE(creg->isValid());
+        REQUIRE(creg->isShort());
+        REQUIRE_FALSE(creg->isExtended());
+        REQUIRE(creg->getStatus() == Store::Network::Status::NotRegistered);
+        REQUIRE_FALSE(creg->getLocation());
+        REQUIRE_FALSE(creg->getCellId());
+        REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
     }
 
-    SECTION("CREG short")
+    SECTION("Creg extended")
     {
-        auto creg = at::urc::CREG("+CREG: 0");
-        REQUIRE(creg.is());
-        REQUIRE(creg.isValid());
-        REQUIRE(creg.isShort());
-        REQUIRE_FALSE(creg.isExtended());
-        REQUIRE(creg.getStatus() == Store::Network::Status::NotRegistered);
-        REQUIRE_FALSE(creg.getLocation());
-        REQUIRE_FALSE(creg.getCellId());
-        REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+        auto urc  = at::urc::UrcFactory::Create("+CREG: 1,\"D509\",\"80D413D\",7");
+        auto creg = getURC<at::urc::Creg>(urc);
+        REQUIRE(creg);
+        REQUIRE(creg->isValid());
+        REQUIRE_FALSE(creg->isShort());
+        REQUIRE(creg->isExtended());
+        REQUIRE(creg->getStatus() == Store::Network::Status::RegisteredHomeNetwork);
+        REQUIRE(*creg->getLocation() == "D509");
+        REQUIRE(*creg->getCellId() == "80D413D");
+        REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::EUtran);
     }
 
-    SECTION("CREG extended")
-    {
-        auto creg = at::urc::CREG("+CREG: 1,\"D509\",\"80D413D\",7");
-        REQUIRE(creg.is());
-        REQUIRE(creg.isValid());
-        REQUIRE_FALSE(creg.isShort());
-        REQUIRE(creg.isExtended());
-        REQUIRE(creg.getStatus() == Store::Network::Status::RegisteredHomeNetwork);
-        REQUIRE(*creg.getLocation() == "D509");
-        REQUIRE(*creg.getCellId() == "80D413D");
-        REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::EUtran);
-    }
-
-    SECTION("CREG extended access technology")
+    SECTION("Creg extended access technology")
     {
         {
-            auto creg = at::urc::CREG("+CREG: 1,\"D509\",\"80D413D\",0");
-            REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Gsm);
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 1,\"D509\",\"80D413D\",0");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::Gsm);
         }
         {
-            auto creg = at::urc::CREG("+CREG: 1,\"D509\",\"80D413D\",1");
-            REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 1,\"D509\",\"80D413D\",1");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
         }
         {
-            auto creg = at::urc::CREG("+CREG: 1,\"D509\",\"80D413D\",7");
-            REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::EUtran);
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 1,\"D509\",\"80D413D\",7");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::EUtran);
         }
         {
-            auto creg = at::urc::CREG("+CREG: 1,\"D509\",\"80D413D\",8");
-            REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 1,\"D509\",\"80D413D\",8");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
         }
         {
-            auto creg = at::urc::CREG("+CREG: 1,\"D509\",\"80D413D\",ABX");
-            REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
-        }
-    }
-
-    SECTION("CREG status")
-    {
-        {
-            auto creg = at::urc::CREG("+CREG: 0,\"D509\",\"80D413D\",0");
-            REQUIRE(creg.getStatus() == Store::Network::Status::NotRegistered);
-        }
-        {
-            auto creg = at::urc::CREG("+CREG: 5,\"D509\",\"80D413D\",0");
-            REQUIRE(creg.getStatus() == Store::Network::Status::RegisteredRoaming);
-        }
-        {
-            auto creg = at::urc::CREG("+CREG: 4,\"D509\",\"80D413D\",0");
-            REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
-        }
-        {
-            auto creg = at::urc::CREG("+CREG: 6,\"D509\",\"80D413D\",0");
-            REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
-        }
-        {
-            auto creg = at::urc::CREG("+CREG: A,\"D509\",\"80D413D\",0");
-            REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 1,\"D509\",\"80D413D\",ABX");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
         }
     }
 
-    SECTION("CREG no CREG")
+    SECTION("Creg status")
     {
-        auto creg = at::urc::CREG("+CEGR: 0");
-        REQUIRE_FALSE(creg.is());
-        REQUIRE_FALSE(creg.isValid());
-        REQUIRE(creg.isShort());
-        REQUIRE_FALSE(creg.isExtended());
-        REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
-        REQUIRE_FALSE(creg.getLocation());
-        REQUIRE_FALSE(creg.getCellId());
-        REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+        {
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 0,\"D509\",\"80D413D\",0");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getStatus() == Store::Network::Status::NotRegistered);
+        }
+        {
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 5,\"D509\",\"80D413D\",0");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getStatus() == Store::Network::Status::RegisteredRoaming);
+        }
+        {
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 4,\"D509\",\"80D413D\",0");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getStatus() == Store::Network::Status::Unknown);
+        }
+        {
+            auto urc  = at::urc::UrcFactory::Create("+CREG: 6,\"D509\",\"80D413D\",0");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getStatus() == Store::Network::Status::Unknown);
+        }
+        {
+            auto urc  = at::urc::UrcFactory::Create("+CREG: A,\"D509\",\"80D413D\",0");
+            auto creg = getURC<at::urc::Creg>(urc);
+            REQUIRE(creg->getStatus() == Store::Network::Status::Unknown);
+        }
     }
 
-    SECTION("CREG too short")
+    SECTION("Creg no Creg")
     {
-        auto creg = at::urc::CREG("+CREG:");
-        REQUIRE(creg.is());
-        REQUIRE_FALSE(creg.isValid());
-        REQUIRE_FALSE(creg.isShort());
-        REQUIRE_FALSE(creg.isExtended());
-        REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
-        REQUIRE_FALSE(creg.getLocation());
-        REQUIRE_FALSE(creg.getCellId());
-        REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+        auto urc  = at::urc::UrcFactory::Create("+CEGR: 0");
+        auto creg = getURC<at::urc::Creg>(urc);
+        REQUIRE_FALSE(creg);
     }
 
-    SECTION("CREG too long")
+    SECTION("Creg too short")
     {
-        auto creg = at::urc::CREG("+CREG: 0,\"D509\",\"80D413D\",0,1");
-        REQUIRE(creg.is());
-        REQUIRE_FALSE(creg.isValid());
-        REQUIRE_FALSE(creg.isShort());
-        REQUIRE_FALSE(creg.isExtended());
-        REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
-        REQUIRE_FALSE(creg.getLocation());
-        REQUIRE_FALSE(creg.getCellId());
-        REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+        auto urc  = at::urc::UrcFactory::Create("+CREG:");
+        auto creg = getURC<at::urc::Creg>(urc);
+        REQUIRE(creg);
+        REQUIRE_FALSE(creg->isValid());
     }
 
-    SECTION("CREG wrong length")
+    SECTION("Creg too long")
     {
-        auto creg = at::urc::CREG("+CREG: 0,\"D509\"");
-        REQUIRE(creg.is());
-        REQUIRE_FALSE(creg.isValid());
-        REQUIRE_FALSE(creg.isShort());
-        REQUIRE_FALSE(creg.isExtended());
-        REQUIRE(creg.getStatus() == Store::Network::Status::Unknown);
-        REQUIRE_FALSE(creg.getLocation());
-        REQUIRE_FALSE(creg.getCellId());
-        REQUIRE(creg.getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+        auto urc  = at::urc::UrcFactory::Create("+CREG: 0,\"D509\",\"80D413D\",0,1");
+        auto creg = getURC<at::urc::Creg>(urc);
+        REQUIRE(creg);
+        REQUIRE_FALSE(creg->isValid());
+    }
+
+    SECTION("Creg wrong length")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CREG 0,\"D509\"");
+        auto creg = getURC<at::urc::Creg>(urc);
+        REQUIRE(creg);
+        REQUIRE_FALSE(creg->isValid());
+    }
+}
+
+TEST_CASE("+Cmti")
+{
+    SECTION("Cmti too short")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CMTI: \"ME\"");
+        auto cmti = getURC<at::urc::Cmti>(urc);
+        REQUIRE(cmti);
+        REQUIRE_FALSE(cmti->isValid());
+    }
+
+    SECTION("Cmti too long")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CMTI: \"ME\",1,1");
+        auto cmti = getURC<at::urc::Cmti>(urc);
+        REQUIRE(cmti);
+        REQUIRE_FALSE(cmti->isValid());
+    }
+
+    SECTION("Cmti valid")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CMTI: \"ME\",1");
+        auto cmti = getURC<at::urc::Cmti>(urc);
+        REQUIRE(cmti);
+        REQUIRE(cmti->isValid());
+        REQUIRE(cmti->getIndex() == "1");
+        REQUIRE(cmti->getMemory() == "ME");
+    }
+}
+
+TEST_CASE("+CLIP")
+{
+    SECTION("CLIP too short")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\"");
+        auto clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE_FALSE(clip->isValid());
+    }
+
+    SECTION("CLIP valid")
+    {
+        // two parameters
+        auto urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145");
+        auto clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+
+        // three parameters
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getSubaddr());
+        REQUIRE_FALSE(clip->getAlpha());
+        REQUIRE_FALSE(clip->getSatype());
+        REQUIRE_FALSE(clip->getCLIValidity());
+
+        // four parameters
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getSubaddr());
+        REQUIRE_FALSE(clip->getAlpha());
+        REQUIRE_FALSE(clip->getSatype());
+        REQUIRE_FALSE(clip->getCLIValidity());
+
+        // six parameters
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,,");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getSubaddr());
+        REQUIRE_FALSE(clip->getAlpha());
+        REQUIRE_FALSE(clip->getSatype());
+        REQUIRE_FALSE(clip->getCLIValidity());
+
+        // seven parameters
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,,,");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getSubaddr());
+        REQUIRE_FALSE(clip->getAlpha());
+        REQUIRE_FALSE(clip->getSatype());
+        REQUIRE_FALSE(clip->getCLIValidity());
+
+        // two parameters with validation not empty
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getSubaddr());
+        REQUIRE_FALSE(clip->getAlpha());
+        REQUIRE_FALSE(clip->getSatype());
+        REQUIRE(clip->getCLIValidity() == "0");
+    }
+
+    SECTION("CLIP phone number")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,,,0");
+        auto clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getNumber() == "+48123456789");
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"\",145,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getNumber() == "");
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: ,145,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getNumber() == "");
+    }
+
+    SECTION("CLIP address type")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",,,,,0");
+        auto clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getType());
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",577,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getType());
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",\"test\",,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getType());
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",test,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getType());
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",129,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getType() == at::urc::Clip::AddressType::UnknownType);
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getType() == at::urc::Clip::AddressType::InternationalNumber);
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",161,,,,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getType() == at::urc::Clip::AddressType::NationalNumber);
+    }
+
+    SECTION("CLIP optional parameters")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,,,,");
+        auto clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE_FALSE(clip->getAlpha());
+        REQUIRE_FALSE(clip->getSatype());
+        REQUIRE_FALSE(clip->getSubaddr());
+        REQUIRE_FALSE(clip->getCLIValidity());
+
+        urc  = at::urc::UrcFactory::Create("+CLIP: \"+48123456789\",145,1,2,3,0");
+        clip = getURC<at::urc::Clip>(urc);
+        REQUIRE(clip);
+        REQUIRE(clip->isValid());
+        REQUIRE(clip->getAlpha() == "3");
+        REQUIRE(clip->getSatype() == "2");
+        REQUIRE(clip->getSubaddr() == "1");
+        REQUIRE(clip->getCLIValidity() == "0");
+    }
+}
+
+TEST_CASE("POWERED DOWN")
+{
+    SECTION("POWERED DOWN valid")
+    {
+        auto urc = at::urc::UrcFactory::Create("POWERED DOWN");
+        auto pwd = getURC<at::urc::PoweredDown>(urc);
+        REQUIRE(pwd);
+        REQUIRE(pwd->isValid());
+        REQUIRE(pwd->isImmediatePowerDown());
+        REQUIRE_FALSE(pwd->isNormalPowerDown());
+
+        urc = at::urc::UrcFactory::Create("NORMAL POWER DOWN");
+        pwd = getURC<at::urc::PoweredDown>(urc);
+        REQUIRE(pwd);
+        REQUIRE(pwd->isValid());
+        REQUIRE_FALSE(pwd->isImmediatePowerDown());
+        REQUIRE(pwd->isNormalPowerDown());
+
+        // dirty
+        urc = at::urc::UrcFactory::Create("\n\r POWERED DOWN\n\r ");
+        pwd = getURC<at::urc::PoweredDown>(urc);
+        REQUIRE(pwd);
+        REQUIRE(pwd->isValid());
+        REQUIRE(pwd->isImmediatePowerDown());
+        REQUIRE_FALSE(pwd->isNormalPowerDown());
+
+        urc = at::urc::UrcFactory::Create(" \n\r  NORMAL POWER DOWN \n\r ");
+        pwd = getURC<at::urc::PoweredDown>(urc);
+        REQUIRE(pwd);
+        REQUIRE(pwd->isValid());
+        REQUIRE_FALSE(pwd->isImmediatePowerDown());
+        REQUIRE(pwd->isNormalPowerDown());
+    }
+
+    SECTION("POWERED DOWN invalid")
+    {
+        auto pwd = at::urc::PoweredDown("TEST");
+        REQUIRE_FALSE(pwd.isValid());
+        REQUIRE_FALSE(pwd.isImmediatePowerDown());
+        REQUIRE_FALSE(pwd.isNormalPowerDown());
+    }
+}
+
+TEST_CASE("Urc RESPONSE")
+{
+    SECTION("Urc RESPONSE valid")
+    {
+        auto urc = at::urc::UrcFactory::Create("OK");
+        auto rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Ok);
+
+        urc = at::urc::UrcFactory::Create("CONNECT");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Connect);
+
+        urc = at::urc::UrcFactory::Create("RING");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Ring);
+
+        urc = at::urc::UrcFactory::Create("NO CARRIER");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::NoCarrier);
+
+        urc = at::urc::UrcFactory::Create("ERROR");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Error);
+
+        urc = at::urc::UrcFactory::Create("NO DIALTONE");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::NoDialtone);
+
+        urc = at::urc::UrcFactory::Create("BUSY");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Busy);
+
+        urc = at::urc::UrcFactory::Create("NO ANSWER");
+        rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::NoAnswer);
+    }
+
+    SECTION("Urc RESPONSE dirty")
+    {
+        auto urc = at::urc::UrcFactory::Create("\n\n \rNO ANSWER\n\r\n");
+        auto rsp = getURC<at::urc::UrcResponse>(urc);
+        REQUIRE(rsp);
+        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::NoAnswer);
     }
 }

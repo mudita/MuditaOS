@@ -1,26 +1,18 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <URC_CUSD.hpp>
+#include <UrcCusd.hpp>
 #include <Utils.hpp>
 #include <magic_enum.hpp>
 
 using namespace at::urc;
 
-CUSD::CUSD(const std::string &val) : Any(val)
-{}
-
-auto CUSD::what() const noexcept -> std::string
+auto Cusd::isValid() const noexcept -> bool
 {
-    return urc_name;
+    return tokens.size() == magic_enum::enum_count<Tokens>();
 }
 
-auto CUSD::isValid() const noexcept -> bool
-{
-    return is() && tokens.size() == magic_enum::enum_count<Tokens>();
-}
-
-auto CUSD::isActionNeeded() const noexcept -> bool
+auto Cusd::isActionNeeded() const noexcept -> bool
 {
     if (isValid()) {
         auto status = getStatus();
@@ -31,7 +23,7 @@ auto CUSD::isActionNeeded() const noexcept -> bool
     return false;
 }
 
-auto CUSD::getMessage() const noexcept -> std::optional<std::string>
+auto Cusd::getMessage() const noexcept -> std::optional<std::string>
 {
     if (!isValid()) {
         return std::nullopt;
@@ -43,7 +35,7 @@ auto CUSD::getMessage() const noexcept -> std::optional<std::string>
     return utils::trim(message);
 }
 
-auto CUSD::getStatus() const noexcept -> std::optional<StatusType>
+auto Cusd::getStatus() const noexcept -> std::optional<StatusType>
 {
     if (isValid()) {
         int statusInt;
@@ -63,7 +55,7 @@ auto CUSD::getStatus() const noexcept -> std::optional<StatusType>
     return std::nullopt;
 }
 
-auto CUSD::getDCS() const noexcept -> std::optional<int>
+auto Cusd::getDCS() const noexcept -> std::optional<int>
 {
     if (!isValid()) {
         return std::nullopt;

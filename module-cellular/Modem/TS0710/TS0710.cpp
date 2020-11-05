@@ -8,7 +8,6 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include <Service/Bus.hpp>
-#include <at/URC_QIND.hpp>
 #include <cassert>
 #include <memory>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
