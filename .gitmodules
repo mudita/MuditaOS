@@ -61,4 +61,4 @@
 	url = https://github.com/codeplea/tinyexpr.git
 [submodule "module-bsp/board/rt1051/bsp/usb"]
 	path = module-bsp/board/rt1051/bsp/usb
-	url = git@github.com:mudita/usb_stack.git
+	url = ../usb_stack.git
