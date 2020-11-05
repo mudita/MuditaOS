@@ -18,6 +18,7 @@
 * `[calendar]` Rework to use database model instead of internal model in day events list.
 * `[testing]` Moved test harness into service-desktop
 * `[appmgr]` Application manager actions introduced.
+* `[music player]` Added new music files samples.
 
 ### Fixed
 
@@ -577,4 +578,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-
