@@ -756,6 +756,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
     } break;
 
     case MessageType::CellularCallRequest: {
+        CellularCallRequestHandler handler(*this);
         auto *msg = dynamic_cast<CellularCallRequestMessage *>(msgl);
         assert(msg != nullptr);
         auto channel = cmux->get(TS0710::Channel::Commands);
@@ -765,24 +766,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
 
         auto req = factory.create();
         auto ret = channel->cmd(req->process());
-        if (ret) {
-            if (req->callRequest) {
-
-                // activate call state timer
-                callStateTimer->reload();
-                // Propagate "Ringing" notification into system
-                sys::Bus::SendMulticast(
-                    std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, msg->number),
-                    sys::BusChannels::ServiceCellularNotifications,
-                    this);
-                break;
-            }
-            if (req->ussdRequest) {
-                ussdState = ussd::State::pullRequestSent;
-                setUSSDTimer();
-            }
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
-        }
+        req->handle(handler, ret);
 
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     } break;

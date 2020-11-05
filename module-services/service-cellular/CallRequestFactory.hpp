@@ -8,6 +8,9 @@
 #include <map>
 #include <functional>
 
+#include "CallRequestHandler.hpp"
+
+#include <at/Result.hpp>
 namespace call_request
 {
 
@@ -18,6 +21,8 @@ namespace call_request
         bool callRequest                  = false;
         bool ussdRequest                  = false;
         virtual std::string process(void) = 0;
+
+        virtual void handle(CallRequestHandler &h, at::Result){};
     };
 
     constexpr auto IMEIRegex = "(\\*#06#)";
@@ -30,6 +35,10 @@ namespace call_request
         ~IMEIRequest(){};
         std::string process(void) override final;
         static std::unique_ptr<IMEIRequest> create(const std::string &data);
+        void handle(CallRequestHandler &h, at::Result) final
+        {
+            h.handle(*this);
+        }
     };
 
     class USSDRequest : public IRequest
@@ -47,6 +56,10 @@ namespace call_request
         std::string process(void) override final;
 
         static std::unique_ptr<USSDRequest> create(const std::string &data);
+        void handle(CallRequestHandler &h, at::Result) final
+        {
+            h.handle(*this);
+        }
     };
 
     class CallRequest : public IRequest
@@ -62,8 +75,15 @@ namespace call_request
         };
         ~CallRequest(){};
         std::string process(void) override final;
-
+        [[nodiscard]] std::string getNumber(void)
+        {
+            return request;
+        };
         static std::unique_ptr<CallRequest> create(const std::string &data);
+        void handle(CallRequestHandler &h, at::Result) final
+        {
+            h.handle(*this);
+        }
     };
 
     class Factory

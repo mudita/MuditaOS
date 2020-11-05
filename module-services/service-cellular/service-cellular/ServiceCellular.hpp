@@ -17,6 +17,11 @@
 #include <Service/Service.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
+#include <stdint.h> // for uint32_t
+#include <optional> // for optional
+#include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
+#include <string>   // for string
+#include <vector>   // for vector
 
 #include <cstdint>
 #include <memory>
@@ -179,4 +184,7 @@ class ServiceCellular : public sys::Service
     void handleUSSDTimer(void);
 
     friend class CellularUrcHandler;
+    friend class CellularCallRequestHandler;
 };
+
+#endif // PUREPHONE_SERVICECELLULAR_HPP
