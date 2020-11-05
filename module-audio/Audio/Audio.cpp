@@ -18,7 +18,7 @@ namespace audio
         if (ret) {
             currentOperation = std::move(ret.value());
         }
-        lineSinkAvailable = bsp::headset::IsInserted();
+        audioSinkState.set(sinkBitJack, bsp::headset::IsInserted());
     }
 
     Position Audio::GetPosition()
@@ -39,23 +39,12 @@ namespace audio
 
     audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
     {
-        switch (evt->getType()) {
-        case EventType::HeadphonesPlugin:
-            lineSinkAvailable = true;
-            break;
-        case EventType::HeadphonesUnplug:
-            lineSinkAvailable = false;
-            break;
-        case EventType::BTA2DPOn:
-            btSinkAvailable = true;
-            break;
-        case EventType::BTA2DPOff:
-            btSinkAvailable = false;
-            break;
-        default:
-            break;
+        auto hwUpdateEventIdx = magic_enum::enum_integer(evt->getType());
+        auto isHwUpdateEvent  = hwUpdateEventIdx <= hwStateUpdateMaxEvent;
+        if (isHwUpdateEvent) {
+            audioSinkState.set(hwUpdateEventIdx, evt->getState());
+            UpdateProfiles();
         }
-
         return currentOperation->SendEvent(std::move(evt));
     }
 
@@ -107,12 +96,9 @@ namespace audio
                 break;
             }
             currentOperation = std::move(ret.value());
+            UpdateProfiles();
 
-            if (lineSinkAvailable) {
-                currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
-            }
-            if (btSinkAvailable && btData) {
-                currentOperation->SendEvent(std::make_unique<Event>(EventType::BTA2DPOn));
+            if (btData) {
                 currentOperation->SetBluetoothStreamData(btData);
             }
         }
@@ -183,6 +169,16 @@ namespace audio
     void Audio::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
     {
         btData = data;
+    }
+
+    void Audio::UpdateProfiles()
+    {
+        for (size_t i = 0; i < hwStateUpdateMaxEvent; i++) {
+            auto isAudioSinkState = audioSinkState.test(i);
+            auto updateEvt        = magic_enum::enum_cast<EventType>(i);
+            currentOperation->UpdateProfilesAvailabiliaty(updateEvt.value(), isAudioSinkState);
+        }
+        currentOperation->SwitchToPriorityProfile();
     }
 
 } // namespace audio

@@ -4,7 +4,9 @@
 #pragma once
 
 #include <map>
+#include <bitset>
 #include <bsp/audio/bsp_audio.hpp>
+#include <Utils.hpp>
 
 #include "Profiles/Profile.hpp"
 
@@ -68,22 +70,25 @@ namespace audio
 
     enum class EventType
     {
-        HeadphonesPlugin,
-        HeadphonesUnplug,
-        BTHeadsetOn,
-        BTHeadsetOff,
-        BTA2DPOn,
-        BTA2DPOff,
+        // HW state change notifications
+        JackState,               //!< jack input plugged / unplugged event
+        BlutoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
+        BlutoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
+
+        // call control
         CallMute,
         CallUnmute,
-        CallSpeakerphoneOn,
-        CallSpeakerphoneOff,
+        CallLoudspeakerOn,
+        CallLoudspeakerOff,
     };
+
+    constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BlutoothA2DPDeviceState);
+    typedef std::bitset<magic_enum::enum_count<EventType>()> AudioSinkState;
 
     class Event
     {
       public:
-        explicit Event(EventType eType) : eventType(eType)
+        explicit Event(EventType eType, bool state = true) : eventType(eType), state(state)
         {}
         virtual ~Event() = default;
 
@@ -92,8 +97,14 @@ namespace audio
             return eventType;
         }
 
+        bool getState() const
+        {
+            return state;
+        }
+
       private:
         const EventType eventType;
+        bool state;
     };
 
     enum class RetCode

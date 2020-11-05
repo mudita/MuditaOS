@@ -13,8 +13,8 @@ namespace audio
     {
       public:
         ProfilePlaybackBluetoothA2DP(std::function<int32_t()> callback, Volume volume)
-            : Profile("Playback A2DP",
-                      Type::PlaybackBTA2DP,
+            : Profile("Playback Bluetooth A2DP",
+                      Type::PlaybackBluetoothA2DP,
                       bsp::AudioDevice::Format{.sampleRate_Hz = 44100,
                                                .bitWidth      = 16,
                                                .flags         = 0,

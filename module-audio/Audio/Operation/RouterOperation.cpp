@@ -104,8 +104,8 @@ namespace audio
         constexpr audio::Volume defaultRoutingEarspeakerVolume   = 10;
         constexpr audio::Gain defaultRoutingSpeakerphoneGain     = 20;
         constexpr audio::Volume defaultRoutingSpeakerphoneVolume = 10;
-        constexpr audio::Gain defaultRoutingHeadsetGain          = 50;
-        constexpr audio::Volume defaultRoutingHeadsetVolume      = 10;
+        constexpr audio::Gain defaultRoutingHeadphonesGain       = 50;
+        constexpr audio::Volume defaultRoutingHeadphonesVolume   = 10;
 
         const auto dbRoutingEarspeakerGainPath =
             audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
@@ -113,40 +113,44 @@ namespace audio
         const auto dbRoutingEarspeakerVolumePath =
             audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
         const auto routingEarspeakerVolume = dbCallback(dbRoutingEarspeakerVolumePath, defaultRoutingEarspeakerVolume);
-        const auto dbRoutingSpeakerphoneGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
-        const auto routingSpeakerphoneGain = dbCallback(dbRoutingSpeakerphoneGainPath, defaultRoutingSpeakerphoneGain);
-        const auto dbRoutingSpeakerphoneVolumePath =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
-        const auto routingSpeakerphoneVolume =
-            dbCallback(dbRoutingSpeakerphoneVolumePath, defaultRoutingSpeakerphoneVolume);
+        const auto dbRoutingLoudspeakerGainPath =
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
+        const auto routingLoudspeakerGain = dbCallback(dbRoutingLoudspeakerGainPath, defaultRoutingSpeakerphoneGain);
+        const auto dbRoutingLoudspeakerVolumePath =
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
+        const auto routingLoudspeakerVolume =
+            dbCallback(dbRoutingLoudspeakerVolumePath, defaultRoutingSpeakerphoneVolume);
         const auto dbRoutingHeadsetGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
-        const auto routingHeadsetGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadsetGain);
-        const auto dbRoutingHeadsetVolumePath =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadset);
-        const auto routingHeadsetVolume = dbCallback(dbRoutingHeadsetVolumePath, defaultRoutingHeadsetVolume);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadphones);
+        const auto routingHeadphonesGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadphonesGain);
+        const auto dbRoutingHeadphonesVolumePath =
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadphones);
+        const auto routingHeadphonesVolume = dbCallback(dbRoutingHeadphonesVolumePath, defaultRoutingHeadphonesVolume);
 
-        availableProfiles.push_back(
+        // order in vector defines priority
+        supportedProfiles.emplace_back(
+            false,
+            Profile::Create(
+                Profile::Type::RoutingBluetoothHSP, nullptr, routingHeadphonesVolume, routingHeadphonesGain));
+        supportedProfiles.emplace_back(
+            false,
+            Profile::Create(Profile::Type::RoutingHeadphones, nullptr, routingHeadphonesVolume, routingHeadphonesGain));
+        supportedProfiles.emplace_back(
+            true,
             Profile::Create(Profile::Type::RoutingEarspeaker, nullptr, routingEarspeakerVolume, routingEarspeakerGain));
-        availableProfiles.push_back(Profile::Create(
-            Profile::Type::RoutingSpeakerphone, nullptr, routingSpeakerphoneVolume, routingSpeakerphoneGain));
-        availableProfiles.push_back(
-            Profile::Create(Profile::Type::RoutingHeadset, nullptr, routingHeadsetVolume, routingHeadsetGain));
+        supportedProfiles.emplace_back(
+            true,
+            Profile::Create(
+                Profile::Type::RoutingLoudspeaker, nullptr, routingLoudspeakerVolume, routingLoudspeakerGain));
 
-        currentProfile = availableProfiles[0];
-
-        audioDevice =
-            bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(nullptr);
-        if (audioDevice == nullptr) {
-            LOG_ERROR("Error creating AudioDevice");
+        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
+        if (!defaultProfile) {
+            LOG_ERROR("Error during initializing profile");
             return;
         }
+        currentProfile = defaultProfile.value();
 
-        audioDeviceCellular =
-            bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, audioDeviceCellularCallback).value_or(nullptr);
-        if (audioDeviceCellular == nullptr) {
-            LOG_ERROR("Error creating AudioDeviceCellular");
+        if (SwitchToPriorityProfile() != audio::RetCode::Success) {
             return;
         }
 
@@ -235,23 +239,17 @@ namespace audio
     audio::RetCode RouterOperation::SendEvent(std::shared_ptr<Event> evt)
     {
         switch (evt->getType()) {
-        case EventType::HeadphonesPlugin:
-            SwitchProfile(Profile::Type::RoutingHeadset);
+        case EventType::CallLoudspeakerOn:
+            SwitchProfile(Profile::Type::RoutingLoudspeaker);
             break;
-        case EventType::HeadphonesUnplug:
-            SwitchProfile(Profile::Type::RoutingEarspeaker);
+        case EventType::CallLoudspeakerOff:
+            SwitchToPriorityProfile();
             break;
         case EventType::CallMute:
             Mute(true);
             break;
         case EventType::CallUnmute:
             Mute(false);
-            break;
-        case EventType::CallSpeakerphoneOn:
-            SwitchProfile(Profile::Type::RoutingSpeakerphone);
-            break;
-        case EventType::CallSpeakerphoneOff:
-            SwitchProfile(Profile::Type::RoutingEarspeaker);
             break;
         default:
             return RetCode::UnsupportedEvent;
@@ -272,8 +270,17 @@ namespace audio
 
         audioDevice =
             bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(nullptr);
+        if (audioDevice == nullptr) {
+            LOG_ERROR("Error creating AudioDevice");
+            return RetCode::Failed;
+        }
+
         audioDeviceCellular =
             bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, audioDeviceCellularCallback).value_or(nullptr);
+        if (audioDeviceCellular == nullptr) {
+            LOG_ERROR("Error creating AudioDeviceCellular");
+            return RetCode::Failed;
+        }
 
         switch (state) {
         case State::Idle:
@@ -298,11 +305,6 @@ namespace audio
     Position RouterOperation::GetPosition()
     {
         return 0.0;
-    }
-
-    void RouterOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
-    {
-        LOG_ERROR("UNIMPLEMENTED");
     }
 
 } // namespace audio

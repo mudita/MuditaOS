@@ -232,7 +232,7 @@ class AudioEventRequest : public AudioMessage
     explicit AudioEventRequest(std::shared_ptr<audio::Event> evt) : evt(std::move(evt))
     {}
 
-    explicit AudioEventRequest(audio::EventType eType) : evt(std::make_shared<audio::Event>(eType))
+    explicit AudioEventRequest(audio::EventType eType, bool state) : evt(std::make_shared<audio::Event>(eType, state))
     {}
 
     std::shared_ptr<audio::Event> getEvent()

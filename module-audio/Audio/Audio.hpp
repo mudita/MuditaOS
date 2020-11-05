@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include <bitset>
 
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
@@ -76,14 +77,15 @@ namespace audio
             return GetCurrentOperation().GetState();
         }
 
-        [[nodiscard]] inline bool IsLineSinkAvailable() const
+        audio::Profile::Type GetPriorityPlaybackProfile() const
         {
-            return lineSinkAvailable;
-        }
-
-        [[nodiscard]] inline bool IsBtSinkAvailable() const
-        {
-            return lineSinkAvailable;
+            if (audioSinkState.test(sinkBitBtA2DP)) {
+                return Profile::Type::PlaybackBluetoothA2DP;
+            }
+            else if (audioSinkState.test(sinkBitJack)) {
+                return Profile::Type::PlaybackHeadphones;
+            }
+            return Profile::Type::PlaybackLoudspeaker;
         }
 
         // Operations
@@ -105,8 +107,12 @@ namespace audio
         virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
 
       private:
-        bool lineSinkAvailable = false;
-        bool btSinkAvailable   = false;
+        void UpdateProfiles();
+        AudioSinkState audioSinkState;
+        static constexpr auto sinkBitJack   = magic_enum::enum_integer(EventType::JackState);
+        static constexpr auto sinkBitBtA2DP = magic_enum::enum_integer(EventType::BlutoothA2DPDeviceState);
+        static constexpr auto sinkBitBtHSP  = magic_enum::enum_integer(EventType::BlutoothHSPDeviceState);
+
         std::shared_ptr<BluetoothStreamData> btData;
 
         State currentState = State::Idle;

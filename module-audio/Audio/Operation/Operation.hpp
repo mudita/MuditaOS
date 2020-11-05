@@ -70,7 +70,7 @@ namespace audio
         virtual audio::RetCode SetInputGain(float gain) = 0;
 
         virtual Position GetPosition() = 0;
-        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) = 0;
+        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
 
         Volume GetOutputVolume() const
         {
@@ -87,7 +87,7 @@ namespace audio
             return state;
         }
 
-        const std::shared_ptr<const Profile> GetProfile() const
+        const std::shared_ptr<Profile> GetProfile() const
         {
             return currentProfile;
         }
@@ -112,11 +112,21 @@ namespace audio
             return filePath;
         }
 
+        void UpdateProfilesAvailabiliaty(const EventType eType, bool isEnabled);
+        audio::RetCode SwitchToPriorityProfile();
+
       protected:
         std::shared_ptr<Profile> currentProfile;
-        std::vector<std::shared_ptr<Profile>> availableProfiles;
+        std::unique_ptr<bsp::AudioDevice> audioDevice;
+
+        // pair - enabled / disabled , profile pointer
+        std::vector<std::pair<bool, std::shared_ptr<Profile>>> supportedProfiles;
+        void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);
+
         State state = State::Idle;
         audio::AsyncCallback eventCallback;
+
+        AudioSinkState audioSinkState;
 
         audio::Token operationToken;
         Type opType = Type::Idle;

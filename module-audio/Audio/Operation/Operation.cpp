@@ -10,8 +10,10 @@
 #include "RecorderOperation.hpp"
 #include "RouterOperation.hpp"
 
-#include "bsp/audio/bsp_audio.hpp"
 #include "Audio/decoder/decoder.hpp"
+
+#include <bsp/audio/bsp_audio.hpp>
+#include <module-bsp/board/rt1051/bsp/audio/RT1051BluetoothAudio.hpp>
 
 namespace audio
 {
@@ -50,14 +52,61 @@ namespace audio
 
     std::optional<std::shared_ptr<Profile>> Operation::GetProfile(const Profile::Type type)
     {
-        auto ret = std::find_if(
-            availableProfiles.begin(), availableProfiles.end(), [type](const auto &w) { return w->GetType() == type; });
-        if (ret == availableProfiles.end()) {
+        auto ret = std::find_if(supportedProfiles.begin(), supportedProfiles.end(), [type](const auto &w) {
+            return w.first == true && w.second->GetType() == type;
+        });
+        if (ret == supportedProfiles.end()) {
             return std::nullopt;
         }
         else {
-            return *ret;
+            return ret->second;
         }
     }
 
+    void Operation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
+    {
+        if (auto device = dynamic_cast<bsp::RT1051BluetoothAudio *>(audioDevice.get()); device != nullptr) {
+            GetProfile()->SetSampleRate(data->metadata.sampleRate);
+            device->sourceQueue = data->out;
+            device->metadata    = data->metadata;
+            LOG_INFO("Queue and metadata set!");
+        }
+    }
+
+    void Operation::UpdateProfilesAvailabiliaty(const EventType eType, bool isEnabled)
+    {
+        if (eType == EventType::JackState) {
+            SetProfileAvailability({Profile::Type::RecordingHeadphones,
+                                    Profile::Type::RoutingHeadphones,
+                                    Profile::Type::PlaybackHeadphones},
+                                   isEnabled);
+        }
+        else if (eType == EventType::BlutoothHSPDeviceState) {
+            SetProfileAvailability({Profile::Type::RoutingBluetoothHSP, Profile::Type::RecordingBluetoothHSP},
+                                   isEnabled);
+        }
+        else if (eType == EventType::BlutoothA2DPDeviceState) {
+            SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isEnabled);
+        }
+    }
+
+    audio::RetCode Operation::SwitchToPriorityProfile()
+    {
+        for (auto &p : supportedProfiles) {
+            if (p.first == true) {
+                return SwitchProfile(p.second->GetType());
+            }
+        }
+        return audio::RetCode::Failed;
+    }
+
+    void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)
+    {
+        for (auto &p : supportedProfiles) {
+            auto shouldSet = (std::find(profiles.begin(), profiles.end(), p.second->GetType()) != profiles.end());
+            if (shouldSet) {
+                p.first = available;
+            }
+        }
+    }
 } // namespace audio

@@ -115,10 +115,11 @@ namespace AudioServiceAPI
      * @brief Sends audio event
      * @param serv Requesting service.
      * @param evt Event to be sent.
-     *  @return True is request has been sent successfully, false otherwise
+     * @param state Optional parameter to request.
+     * @return True is request has been sent successfully, false otherwise
      *   Response will come as message AudioSendEventResponse
      */
-    bool SendEvent(sys::Service *serv, audio::EventType evt);
+    bool SendEvent(sys::Service *serv, audio::EventType evt, bool state = 0);
     /**
      * @brief Attempts to parse audio file for metatags.
      *

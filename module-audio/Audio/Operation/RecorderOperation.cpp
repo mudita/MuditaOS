@@ -5,7 +5,7 @@
 #include "Audio/encoder/Encoder.hpp"
 #include "bsp/audio/bsp_audio.hpp"
 #include "Audio/Profiles/Profile.hpp"
-#include "Audio/Profiles/ProfileRecordingHeadset.hpp"
+#include "Audio/Profiles/ProfileRecordingHeadphones.hpp"
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 #include "Audio/AudioCommon.hpp"
 
@@ -50,14 +50,16 @@ namespace audio
         const auto recordingOnBoardMicGain = dbCallback(dbRecordingOnBoardMicGainPath, defaultRecordingOnBoardMicGain);
 
         const auto dbRecordingHeadsetGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadset);
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadphones);
         const auto recordingHeadsetGain = dbCallback(dbRecordingHeadsetGainPath, defaultRecordingHeadsetGain);
 
-        availableProfiles.push_back(
-            Profile::Create(Profile::Type::RecordingBuiltInMic, nullptr, 0, recordingOnBoardMicGain));
-        availableProfiles.push_back(Profile::Create(Profile::Type::RecordingHeadset, nullptr, 0, recordingHeadsetGain));
-
-        currentProfile = availableProfiles[0];
+        // order in vector defines priority
+        supportedProfiles.emplace_back(
+            false, Profile::Create(Profile::Type::RecordingBluetoothHSP, nullptr, 0, recordingHeadsetGain));
+        supportedProfiles.emplace_back(
+            false, Profile::Create(Profile::Type::RecordingHeadphones, nullptr, 0, recordingHeadsetGain));
+        supportedProfiles.emplace_back(
+            true, Profile::Create(Profile::Type::RecordingBuiltInMic, nullptr, 0, recordingOnBoardMicGain));
 
         uint32_t channels = 0;
         if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) ||
@@ -69,15 +71,19 @@ namespace audio
         }
 
         enc = Encoder::Create(file, Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
-
         if (enc == nullptr) {
             LOG_ERROR("Error during initializing encoder");
             return;
         }
 
-        audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
-        if (audioDevice == nullptr) {
-            LOG_ERROR("Error creating AudioDevice");
+        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
+        if (!defaultProfile) {
+            LOG_ERROR("Error during initializing profile");
+            return;
+        }
+        currentProfile = defaultProfile.value();
+
+        if (SwitchToPriorityProfile() != audio::RetCode::Success) {
             return;
         }
 
@@ -139,25 +145,6 @@ namespace audio
 
     audio::RetCode RecorderOperation::SendEvent(std::shared_ptr<Event> evt)
     {
-        switch (evt->getType()) {
-        case EventType::HeadphonesPlugin:
-            SwitchProfile(Profile::Type::RecordingHeadset);
-            break;
-        case EventType::HeadphonesUnplug:
-            // TODO: Switch to recording bt profile if present
-            SwitchProfile(Profile::Type::RecordingBuiltInMic);
-            break;
-        case EventType::BTHeadsetOn:
-            SwitchProfile(Profile::Type::RecordingBTHeadset);
-            break;
-        case EventType::BTHeadsetOff:
-            // TODO: Switch to recording headphones profile if present
-            SwitchProfile(Profile::Type::RecordingBuiltInMic);
-            break;
-        default:
-            return RetCode::UnsupportedEvent;
-        }
-
         return RetCode::Success;
     }
 
@@ -173,6 +160,10 @@ namespace audio
         }
 
         audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        if (audioDevice == nullptr) {
+            LOG_ERROR("Error creating AudioDevice");
+            return RetCode::Failed;
+        }
 
         switch (state) {
         case State::Idle:
@@ -205,10 +196,5 @@ namespace audio
     Position RecorderOperation::GetPosition()
     {
         return enc->getCurrentPosition();
-    }
-
-    void RecorderOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
-    {
-        LOG_ERROR("UNIMPLEMENTED");
     }
 } // namespace audio

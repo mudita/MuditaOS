@@ -79,7 +79,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     i2c->Write(i2cAddr, (uint8_t *)&q_dai_setup, 1);
 
     // OUT configuration
-    if (params.outputPath != CodecParamsMAX98090::OutputPath::None) {
+    if (params.outputPath != bsp::AudioDevice::OutputPath::None) {
         // Set output route
         max98090_reg_playback_quick_setup_t q_playback_setup = {0};
 
@@ -88,7 +88,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         switch (params.outputPath) {
 
-        case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
+        case bsp::AudioDevice::OutputPath::HeadphonesMono: {
 
             // Mix left DAC channel to left&right HP output
             max98090_reg_lhp_mixer_t lmixconf = {0};
@@ -113,7 +113,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::Headphones: {
+        case bsp::AudioDevice::OutputPath::Headphones: {
             // Set DAC headphones output to high performance mode, increasing power consumption but providing the
             // highest quality
             dacperf.dachp           = 1;
@@ -127,7 +127,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::Earspeaker: {
+        case bsp::AudioDevice::OutputPath::Earspeaker: {
             q_playback_setup.dig2ear = 1;
             i2cAddr.subAddress       = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
@@ -170,7 +170,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::Loudspeaker: {
+        case bsp::AudioDevice::OutputPath::Loudspeaker: {
             q_playback_setup.dig2spk = 1;
 
             uint8_t mask       = 0x08; // Set 3th bit (dmono on)
@@ -226,10 +226,10 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     }
 
     // IN configuration
-    if (params.inputPath != CodecParamsMAX98090::InputPath::None) {
+    if (params.inputPath != bsp::AudioDevice::InputPath::None) {
         // Set input path
         switch (params.inputPath) {
-        case CodecParamsMAX98090::InputPath::Headphones: {
+        case bsp::AudioDevice::InputPath::Headphones: {
             /* 			max98090_reg_analog_to_record_quick_t q_analog_setup = {0};
 
                         q_analog_setup.in34mic2 = 1;
@@ -253,7 +253,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         } break;
 
-        case CodecParamsMAX98090::InputPath::Microphone: {
+        case bsp::AudioDevice::InputPath::Microphone: {
             max98090_reg_input_to_record_quick_t q_input_setup   = {0};
             max98090_reg_analog_to_record_quick_t q_analog_setup = {0};
             max98090_reg_digmic_enable_t digena                  = {0};
@@ -384,8 +384,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
     }
 
     switch (currentParams.outputPath) {
-    case CodecParamsMAX98090::OutputPath::Headphones:
-    case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
+    case bsp::AudioDevice::OutputPath::Headphones:
+    case bsp::AudioDevice::OutputPath::HeadphonesMono: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor     = .31f * 10.f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
@@ -404,7 +404,7 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
 
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Earspeaker: {
+    case bsp::AudioDevice::OutputPath::Earspeaker: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor     = .31f * 10.f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
@@ -417,7 +417,7 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         i2c->Write(i2cAddr, (uint8_t *)&vol, 1);
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Loudspeaker: {
+    case bsp::AudioDevice::OutputPath::Loudspeaker: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor = .39f * 10.f;
         uint8_t volume               = static_cast<float>(vol * scale_factor) + 0x18;
@@ -533,7 +533,7 @@ CodecRetCode CodecMAX98090::Reset()
     return CodecRetCode::Success;
 }
 
-CodecRetCode CodecMAX98090::SetOutputPath(const CodecParamsMAX98090::OutputPath path)
+CodecRetCode CodecMAX98090::SetOutputPath(const bsp::AudioDevice::OutputPath path)
 {
     Reset();
     currentParams.outputPath = path;
@@ -542,7 +542,7 @@ CodecRetCode CodecMAX98090::SetOutputPath(const CodecParamsMAX98090::OutputPath 
     return CodecRetCode::Success;
 }
 
-CodecRetCode CodecMAX98090::SetInputPath(const CodecParamsMAX98090::InputPath path)
+CodecRetCode CodecMAX98090::SetInputPath(const bsp::AudioDevice::InputPath path)
 {
     Reset();
     currentParams.inputPath = path;
@@ -558,17 +558,17 @@ CodecRetCode CodecMAX98090::SetMute(const bool enable)
     uint8_t regl, regr = 0;
 
     switch (currentParams.outputPath) {
-    case CodecParamsMAX98090::OutputPath::Headphones: {
+    case bsp::AudioDevice::OutputPath::Headphones: {
         regl = MAX98090_REG_LHP_VOL_CTRL;
         regr = MAX98090_REG_RHP_VOL_CTRL;
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Earspeaker: {
+    case bsp::AudioDevice::OutputPath::Earspeaker: {
         regl = MAX98090_REG_RECV_VOL_CTRL;
         regr = 0;
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Loudspeaker: {
+    case bsp::AudioDevice::OutputPath::Loudspeaker: {
         regl = MAX98090_REG_LSPK_VOL_CTRL;
         regr = MAX98090_REG_RSPK_VOL_CTRL;
     } break;
