@@ -6,6 +6,8 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 #include "UpdateMuditaOS.hpp"
+#include "DeveloperModeHelper.hpp"
+#include "parser/MessageHandler.hpp"
 #include <vfs.hpp>
 
 namespace sdesktop
@@ -62,4 +64,40 @@ namespace sdesktop
         {}
         ~FactoryMessage() override = default;
     };
+
+    namespace developerMode
+    {
+
+        class Event
+        {
+          protected:
+            Context context;
+
+          public:
+            void send();
+        };
+
+        class ATResponseEvent : public Event
+        {
+          public:
+            explicit ATResponseEvent(std::vector<std::string> resp);
+        };
+
+        class AppFocusChangeEvent : public Event
+        {
+          public:
+            AppFocusChangeEvent() = default;
+            explicit AppFocusChangeEvent(std::string appName);
+        };
+
+        class DeveloperModeRequest : public sys::DataMessage
+        {
+          public:
+            std::unique_ptr<Event> event;
+            DeveloperModeRequest(std::unique_ptr<Event> event);
+            DeveloperModeRequest();
+            ~DeveloperModeRequest() override = default;
+        };
+    } // namespace developerMode
+
 } // namespace sdesktop

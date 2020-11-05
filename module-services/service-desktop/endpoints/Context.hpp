@@ -108,6 +108,10 @@ namespace parserFSM
         {
             return endpoint;
         }
+        void setEndpoint(EndpointType newEndpoint)
+        {
+            endpoint = newEndpoint;
+        }
         auto getUuid() -> uint32_t
         {
             return uuid;
