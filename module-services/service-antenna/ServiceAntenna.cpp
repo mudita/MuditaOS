@@ -1,27 +1,29 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ServiceAntenna.hpp"
+#include "service-antenna/ServiceAntenna.hpp"
+#include "service-antenna/AntennaMessage.hpp"
+#include "service-antenna/AntennaServiceAPI.hpp"
+
 #include <service-appmgr/model/ApplicationManager.hpp>
+
+#include <at/response.hpp>
 #include <common_data/EventStore.hpp>
+#include <log/log.hpp>
+#include <MessageType.hpp>
+#include <module-utils/state/ServiceState.hpp>
+#include <projdefs.h>
+#include <Service/Timer.hpp>
+#include <service-cellular/State.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <service-cellular/messages/CellularMessage.hpp>
 
-#include <at/response.hpp> // for parseCSQ, isRegistered, parseCREG, parseNetworkFrequency, parseQNWINFO
-#include <module-utils/state/ServiceState.hpp>           // for State
-#include <service-cellular/messages/CellularMessage.hpp> // for CellularNotificationMessage, StateChange, CellularCallMessage, CellularNotificationMessage::Type, CellularNotificationMessage::Type::CallAborted
-#include <ticks.hpp>                                     // for Ticks
-#include <memory>                                        // for make_shared, unique_ptr, allocator, make_unique
-#include <algorithm>                                     // for max
-#include <string>                                        // for string
-#include <vector>                                        // for vector
+#include <ticks.hpp>
 
-#include <Service/Timer.hpp>                           // for Timer
-#include "api/AntennaServiceAPI.hpp"                   // for LockRequest
-#include <log/log.hpp>                                 // for LOG_INFO, LOG_WARN, LOG_FATAL
-#include "messages/AntennaMessage.hpp"                 // for AntennaLockRequestResponse, AntennaLockRequestMessage
-#include <service-cellular/api/CellularServiceAPI.hpp> // for GetCSQ, GetAntenna, SelectAntenna, GetCREG, GetQNWINFO
-#include <MessageType.hpp> // for MessageType, MessageType::AntennaCSQChange, MessageType::AntennaChanged, MessageType::AntennaGetLockState, MessageType::AntennaLockService, MessageType::CellularCall, MessageType::CellularNotification, MessageType::CellularStateRequest, MessageType::StateChange
-#include <projdefs.h>      // for pdMS_TO_TICKS
-#include <service-cellular/State.hpp> // for State, State::ST, State::ST::Ready
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
 
 const char *ServiceAntenna::serviceName = "ServiceAntenna";
 
