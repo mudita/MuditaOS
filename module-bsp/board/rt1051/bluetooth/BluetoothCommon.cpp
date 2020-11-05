@@ -134,10 +134,12 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 {
     lpuart_transfer_t sendXfer;
 
-    LOG_INFO("write -> [%.*s]", nbytes, buf);
+    //    LOG_INFO("write -> [%.*s]", nbytes, buf);
 
     sendXfer.data     = reinterpret_cast<uint8_t *>(buf);
     sendXfer.dataSize = nbytes;
+
+    uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
 
     // Sends out.
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
@@ -146,10 +148,18 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 
     auto sent = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
     switch (sent) {
-    case kStatus_Success:
+    case kStatus_Success: {
         //    CTS
-        ret = nbytes;
-        break;
+        auto ulNotificationValue = ulTaskNotifyTake(pdFALSE, 100);
+        if (ulNotificationValue == 0) {
+            LOG_ERROR("Cellular Uart error: TX Transmission timeout");
+            ret = -1;
+        }
+        else {
+            LOG_DEBUG("DMA Tx gave");
+            ret = nbytes;
+        }
+    } break;
     case kStatus_LPUART_TxBusy:
         LOG_ERROR("Previous DMA xfer is still pending");
         //        could've checked beforehand with uartDmaHandle.txState == kLPUART_TxIdle
@@ -159,6 +169,8 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
         ret = -1;
         break;
     }
+
+    LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
     return ret;
 }
 
@@ -299,22 +311,21 @@ void BluetoothCommon::configure_lpuart()
 
 void BluetoothCommon::uartCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
 {
+    BaseType_t higherPriorTaskWoken = 0;
+
+    vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
+
+    portEND_SWITCHING_ISR(higherPriorTaskWoken);
+
     switch (status) {
     case kStatus_LPUART_TxIdle:
-        LOG_DEBUG("tx done");
+        LOG_DEBUG("DMA irq: TX done");
         break;
         //    case kStatus_LPUART_RxIdle:
         //        break;
     default:
         break;
     }
-
-    return;
-
-    BaseType_t higherPriorTaskWoken = 0;
-    vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
-
-    portEND_SWITCHING_ISR(higherPriorTaskWoken);
 }
 
 void BluetoothCommon::configure_cts_irq()
