@@ -54,6 +54,11 @@ namespace app
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
+        else if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(msgl)) {
+            if (auto event = dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
+                handled = handle(event);
+            }
+        }
 
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
@@ -87,6 +92,17 @@ namespace app
             if (msg->updateStats.updateFile.has_filename()) {
                 LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
+        }
+
+        return true;
+    }
+
+    auto ApplicationDesktop::handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool
+    {
+        if (event != nullptr) {
+            auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.lock.isLocked());
+            auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            sys::Bus::SendUnicast(std::move(msg), service::name::service_desktop, this);
         }
 
         return true;

@@ -24,6 +24,13 @@ namespace sdesktop::developerMode
         context.setResponseBody(json11::Json::object{{json::developerMode::focus, appName}});
     }
 
+    ScreenlockCheckEvent::ScreenlockCheckEvent(bool isLocked)
+    {
+        context.setResponseStatus(http::Code::OK);
+        context.setEndpoint(EndpointType::developerMode);
+        context.setResponseBody(json11::Json::object{{json::developerMode::isLocked, isLocked}});
+    }
+
     DeveloperModeRequest::DeveloperModeRequest(std::unique_ptr<Event> event)
         : sys::DataMessage(MessageType::DeveloperModeRequest), event(std::move(event))
     {}
