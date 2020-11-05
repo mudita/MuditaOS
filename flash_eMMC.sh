@@ -40,6 +40,18 @@ if [ $? -ne 0 ]; then
 	>&2 echo "PurePhone not mounted. Mount or retry with Ozone. https://github.com/muditacom/PurePhone/blob/master/doc/running_on_phone.md#eMMC_upload"
 	exit 2
 fi
+grep "[[:space:]]ro[[:space:],]" <<< $MOUNT_ENTRY
+if [ $? -eq 0 ]; then
+	>&2 echo "PurePhone mounted in readonly mode please unmount fs and check disc with command"
+	>&2 echo "sudo fsck.vfat -a $(awk '{ print $1 }' <<< $MOUNT_ENTRY)"
+	exit 3
+fi
+grep "[[:space:]]ro[[:space:],]" <<< $MOUNT_ENTRY_RECOVER
+if [ $? -eq 0 ]; then
+	>&2 echo "PurePhone mounted in readonly mode please unmount fs and check disc with command"
+	>&2 echo "sudo fsck.vfat -a $(awk '{ print $1 }' <<< $MOUNT_ENTRY_RECOVER)"
+	exit 4
+fi
 
 MUDITAOS_PATH=$(echo $MOUNT_ENTRY | awk -F " " '{print $2}')
 # unespace
