@@ -8,7 +8,7 @@
 
 #include "messages/SettingsMessages.hpp"
 #include "agents/DatabaseAgent.hpp" // for DatabaseAgent
-#include "Service/Message.hpp"      // for DataMessage (ptr only), Message_t, ResponseMessage (ptr only)
+#include "Service/Message.hpp"      // for DataMessage (ptr only), MessagePointer, ResponseMessage (ptr only)
 #include <map>
 
 namespace Settings
@@ -62,24 +62,24 @@ class SettingsAgent : public DatabaseAgent
 
     // msg handlers
     // variable
-    auto handleGetVariable(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleSetVariable(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleRegisterOnVariableChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleUnregisterOnVariableChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
+    auto handleGetVariable(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetVariable(sys::Message *req) -> sys::MessagePointer;
+    auto handleRegisterOnVariableChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleUnregisterOnVariableChange(sys::Message *req) -> sys::MessagePointer;
 
     // profile
-    auto handleRegisterProfileChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleUnregisterProfileChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleSetCurrentProfile(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleGetCurrentProfile(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleAddProfile(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleListProfiles(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
+    auto handleRegisterProfileChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleUnregisterProfileChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetCurrentProfile(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetCurrentProfile(sys::Message *req) -> sys::MessagePointer;
+    auto handleAddProfile(sys::Message *req) -> sys::MessagePointer;
+    auto handleListProfiles(sys::Message *req) -> sys::MessagePointer;
 
     // mode
-    auto handleRegisterOnModeChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleUnregisterOnModeChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleSetCurrentMode(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleGetCurrentMode(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleAddMode(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleListModes(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
+    auto handleRegisterOnModeChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleUnregisterOnModeChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetCurrentMode(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetCurrentMode(sys::Message *req) -> sys::MessagePointer;
+    auto handleAddMode(sys::Message *req) -> sys::MessagePointer;
+    auto handleListModes(sys::Message *req) -> sys::MessagePointer;
 };

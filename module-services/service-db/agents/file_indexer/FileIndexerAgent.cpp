@@ -29,26 +29,25 @@ void FileIndexerAgent::registerMessages()
 {
     // connect handler & message in parent service
     using std::placeholders::_1;
-    using std::placeholders::_2;
 
     // all API asynchronic
     parentService->connect(FileIndexer::Messages::GetListDirMessage(),
-                           std::bind(&FileIndexerAgent::handleListDir, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleListDir, this, _1));
 
     parentService->connect(FileIndexer::Messages::GetRecordMessage(),
-                           std::bind(&FileIndexerAgent::handleGetRecord, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleGetRecord, this, _1));
     parentService->connect(FileIndexer::Messages::SetRecordMessage(),
-                           std::bind(&FileIndexerAgent::handleSetRecord, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleSetRecord, this, _1));
 
     parentService->connect(FileIndexer::Messages::GetPropertyMessage(),
-                           std::bind(&FileIndexerAgent::handleGetProperty, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleGetProperty, this, _1));
     parentService->connect(FileIndexer::Messages::SetPropertyMessage(),
-                           std::bind(&FileIndexerAgent::handleSetProperty, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleSetProperty, this, _1));
 
     parentService->connect(FileIndexer::Messages::GetAllPropertiesMessage(),
-                           std::bind(&FileIndexerAgent::handleGetAllProperties, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleGetAllProperties, this, _1));
     parentService->connect(FileIndexer::Messages::SetPropertiesMessage(),
-                           std::bind(&FileIndexerAgent::handleSetProperties, this, _1, _2));
+                           std::bind(&FileIndexerAgent::handleSetProperties, this, _1));
 }
 
 auto FileIndexerAgent::getDbInitString() -> const std::string
@@ -98,7 +97,7 @@ auto FileIndexerAgent::dbListDir(std::unique_ptr<FileIndexer::ListDirData> listD
     return listDir;
 }
 
-auto FileIndexerAgent::handleListDir(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto FileIndexerAgent::handleListDir(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::GetListDirMessage *>(req)) {
         return std::make_shared<FileIndexer::Messages::GetListDirResponseMessage>(dbListDir(std::move(msg->listDir)));
@@ -152,7 +151,7 @@ auto FileIndexerAgent::dbUpdateRecord(std::unique_ptr<FileIndexer::FileRecord> r
                              record->file_id);
 }
 
-auto FileIndexerAgent::handleGetRecord(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto FileIndexerAgent::handleGetRecord(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::GetRecordMessage *>(req)) {
         auto record   = std::move(msg->record);
@@ -163,7 +162,7 @@ auto FileIndexerAgent::handleGetRecord(sys::DataMessage *req, sys::ResponseMessa
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto FileIndexerAgent::handleSetRecord(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::SetRecordMessage *>(req)) {
         auto recordPtr                 = std::move(msg->record);
@@ -256,7 +255,7 @@ auto FileIndexerAgent::dbUpdateProperties(std::unique_ptr<FileIndexer::FileMetad
     return statusCode;
 }
 
-auto FileIndexerAgent::handleGetProperty(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto FileIndexerAgent::handleGetProperty(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
@@ -268,8 +267,7 @@ auto FileIndexerAgent::handleGetProperty(sys::DataMessage *req, sys::ResponseMes
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto FileIndexerAgent::handleGetAllProperties(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
-    -> sys::Message_t
+auto FileIndexerAgent::handleGetAllProperties(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
@@ -281,7 +279,7 @@ auto FileIndexerAgent::handleGetAllProperties(sys::DataMessage *req, sys::Respon
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto FileIndexerAgent::handleSetProperty(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
@@ -304,7 +302,7 @@ auto FileIndexerAgent::handleSetProperty(sys::DataMessage *req, sys::ResponseMes
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto FileIndexerAgent::handleSetProperties(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);

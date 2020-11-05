@@ -25,7 +25,7 @@ class ServiceAudio : public sys::Service
 
     ~ServiceAudio();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
 
     sys::ReturnCodes InitHandler() override;
 

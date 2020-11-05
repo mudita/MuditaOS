@@ -11,73 +11,48 @@
 
 namespace sys
 {
-
-    MessageRet_t CreateMessageRet(ReturnCodes retCode, Message_t msg)
+    SendResult CreateSendResult(ReturnCodes retCode, MessagePointer msg)
     {
         return std::make_pair(retCode, msg);
-    };
-
-    Message_t DataMessage::Execute(Service *service)
-    {
-
-        // Ignore incoming data message if this service is not yet initialized
-        if (service->isReady) {
-            return Proxy::handle(service, this, nullptr);
-        }
-        else {
-            return std::make_shared<ResponseMessage>();
-        }
     }
 
-    Message_t SystemMessage::Execute(Service *service)
+    Message::Message(BusChannels channel) : channel{channel}
+    {}
+
+    MessagePointer Message::Execute(Service *service)
     {
-
-        ReturnCodes ret = ReturnCodes ::Success;
-
-        switch (sysMsgType) {
-
-        case SystemMessageType::Ping:
-            service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
-            break;
-
-        case SystemMessageType::SwitchPowerMode:
-            service->SwitchPowerModeHandler(powerMode);
-            break;
-
-        case SystemMessageType::Exit:
-            ret = service->DeinitHandler();
-            service->CloseHandler();
-            break;
-
-        case SystemMessageType::Timer:
-            ret = service->TimerHandle(*this);
-            break;
-
-        case SystemMessageType::Start:
-            ret = service->InitHandler();
-            if (ret == ReturnCodes::Success) {
-                service->isReady = true;
-            }
-
-            break;
-        }
-        return std::make_shared<ResponseMessage>(ret);
+        return Proxy::handleMessage(service, this);
     }
 
-    Message_t ResponseMessage::Execute(Service *service)
+    SystemMessage::SystemMessage(SystemMessageType systemMessageType, ServicePowerMode pwrMode)
+        : Message(BusChannels::System), systemMessageType(systemMessageType), powerMode(pwrMode)
     {
-        // Ignore incoming data message if this service is not yet initialized
-        if (service->isReady) {
-            DataMessage dummy(MessageType::MessageTypeUninitialized);
-            return Proxy::handle(service, &dummy, this);
-        }
-        else {
-            return std::make_shared<ResponseMessage>();
-        }
+        type = Type::System;
     }
 
-#ifdef UNIT_TESTS
-    uint32_t Message::unitestsMsgInstancesCount = 0;
-#endif
+    MessagePointer SystemMessage::Execute(Service *service)
+    {
+        return Proxy::handleSystemMessage(service, this);
+    }
 
+    DataMessage::DataMessage(MessageType messageType) : messageType{messageType}
+    {
+        type = Type::Data;
+    }
+
+    DataMessage::DataMessage(BusChannels channel) : Message(channel)
+    {
+        type = Type::Data;
+    }
+
+    ResponseMessage::ResponseMessage(ReturnCodes retCode, MessageType responseTo)
+        : retCode(retCode), responseTo(responseTo)
+    {
+        type = Type::Response;
+    }
+
+    MessagePointer ResponseMessage::Execute(Service *service)
+    {
+        return Proxy::handleMessage(service, nullptr, this);
+    }
 } // namespace sys

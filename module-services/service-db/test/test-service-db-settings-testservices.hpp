@@ -23,7 +23,7 @@ namespace Settings
                       << " [key, val] = (" << k << ", " << v << ")" << std::endl
                       << std::flush;
         }
-        sys::Message_t DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
         {
             if (auto msg = dynamic_cast<::Settings::UTMsg::ReqRegValChg *>(req)) {
                 debug("ReqRegValChg", msg->name, msg->value);
@@ -79,7 +79,7 @@ namespace Settings
         {}
         ::Settings::Settings::ListOfProfiles profiles;
         std::string profile;
-        sys::Message_t DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
         {
             if (auto msg = dynamic_cast<::Settings::UTMsg::ReqRegProfileChg *>(req)) {
                 debug("ReqRegProfileChg", msg->name, msg->value);
@@ -134,7 +134,7 @@ namespace Settings
         {}
         ::Settings::Settings::ListOfModes modes;
         std::string mode;
-        sys::Message_t DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
         {
             if (auto msg = dynamic_cast<::Settings::UTMsg::ReqRegProfileChg *>(req)) {
                 debug("ReqRegProfileChg", msg->name, msg->value);

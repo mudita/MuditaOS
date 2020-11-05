@@ -8,7 +8,7 @@
 #include <stddef.h>         // for NULL
 
 #include "MessageType.hpp"     // for MessageType, MessageType::LwIP_request
-#include "Service/Message.hpp" // for ResponseMessage, DataMessage, Message_t
+#include "Service/Message.hpp" // for ResponseMessage, DataMessage, MessagePointer
 #include "Service/Service.hpp" // for Service
 
 extern "C"
@@ -76,7 +76,7 @@ sys::ReturnCodes ServiceLwIP::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     LOG_ERROR("TRY START LWIP");
     try {

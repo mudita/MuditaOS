@@ -19,7 +19,7 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
     setActiveWindow(app::char_select);
 }
 
-sys::Message_t ApplicationSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ApplicationSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     auto retMsg = Application::DataReceivedHandler(msgl);
     if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {

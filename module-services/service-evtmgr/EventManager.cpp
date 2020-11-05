@@ -69,7 +69,7 @@ std::string getSettingsTimeZone()
 }
 
 // Invoked upon receiving data message
-sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     bool handled = false;
 
@@ -254,7 +254,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 sys::ReturnCodes EventManager::InitHandler()
 {
 
-    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         using namespace sdesktop::developerMode;
         auto req = static_cast<DeveloperModeRequest *>(msg);
         if (typeid(*req->event.get()) == typeid(AppFocusChangeEvent)) {

@@ -26,7 +26,7 @@ namespace app
         LOG_INFO("ApplicationMusicPlayer::destroy");
     }
 
-    sys::Message_t ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         return Application::DataReceivedHandler(msgl);
     }

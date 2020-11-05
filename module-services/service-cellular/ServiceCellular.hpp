@@ -22,7 +22,7 @@
 #include "bsp/common.hpp"               // for Board, Board::none
 #include "Modem/TS0710/TS0710_types.h"  // for PS460800, PortSpeed_e
 #include "Service/Common.hpp"           // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp"          // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+#include "Service/Message.hpp"          // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 
 class MuxDaemon;
 namespace db
@@ -45,7 +45,7 @@ class ServiceCellular : public sys::Service
 
     ~ServiceCellular() override;
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

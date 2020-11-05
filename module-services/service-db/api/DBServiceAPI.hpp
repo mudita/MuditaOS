@@ -5,7 +5,7 @@
 
 #include <Common/Query.hpp>
 #include <PhoneNumber.hpp>     // for PhoneNumber
-#include <Service/Message.hpp> // for MessageRet_t
+#include <Service/Message.hpp> // for SendResult
 #include <stdint.h>            // for uint32_t
 #include <sys/types.h>         // for time_t
 #include <memory>              // for unique_ptr, shared_ptr
@@ -94,10 +94,10 @@ class DBServiceAPI
     static uint32_t SMSTemplateGetCount(sys::Service *serv);
     static bool SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static auto GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query) -> bool;
-    static sys::MessageRet_t GetQueryWithReply(sys::Service *serv,
-                                               db::Interface::Name database,
-                                               std::unique_ptr<db::Query> query,
-                                               std::uint32_t timeout);
+    static sys::SendResult GetQueryWithReply(sys::Service *serv,
+                                             db::Interface::Name database,
+                                             std::unique_ptr<db::Query> query,
+                                             std::uint32_t timeout);
 
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.

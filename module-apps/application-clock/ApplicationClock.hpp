@@ -24,7 +24,7 @@ namespace app
                          uint32_t stackDepth                 = 4096,
                          sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

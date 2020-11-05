@@ -84,7 +84,7 @@ ServiceAntenna::~ServiceAntenna()
 }
 
 // Invoked upon receiving data message
-sys::Message_t ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     bool handled = false;
 

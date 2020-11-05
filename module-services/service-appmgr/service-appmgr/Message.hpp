@@ -205,11 +205,21 @@ namespace app::manager
     {
       public:
         ApplicationStatusRequest(const ApplicationName &senderName, ApplicationName applicationName)
-            : Message(MessageType::APMCheckAppRunning, senderName),
-              checkAppName(std::move(applicationName)), isRunning{false}
+            : Message(MessageType::APMCheckAppRunning, senderName), checkAppName(std::move(applicationName))
         {}
 
         ApplicationName checkAppName;
+    };
+
+    class ApplicationStatusResponse : public sys::ResponseMessage
+    {
+      public:
+        ApplicationStatusResponse(const ApplicationName &_applicationName, bool _isRunning)
+            : sys::ResponseMessage(sys::ReturnCodes::Success, MessageType::APMCheckAppRunning),
+              applicationName{std::move(_applicationName)}, isRunning{_isRunning}
+        {}
+
+        ApplicationName applicationName;
         bool isRunning;
     };
 

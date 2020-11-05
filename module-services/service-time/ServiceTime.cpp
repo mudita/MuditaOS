@@ -46,7 +46,7 @@ namespace stm
         return sys::ReturnCodes::Success;
     }
 
-    sys::Message_t ServiceTime::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ServiceTime::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         std::shared_ptr<sys::ResponseMessage> responseMsg = nullptr;
 

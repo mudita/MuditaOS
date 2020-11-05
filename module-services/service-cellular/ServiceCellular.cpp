@@ -27,7 +27,7 @@
 #include <optional> // for optional, nullopt, operator==
 #include <map>      // for map
 
-#include "Service/Message.hpp" // for DataMessage, ResponseMessage, Message_t
+#include "Service/Message.hpp" // for DataMessage, ResponseMessage, MessagePointer
 #include "Service/Service.hpp" // for Service
 #include "Service/Timer.hpp"   // for Timer
 #include "ServiceCellular.hpp"
@@ -530,7 +530,7 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
     return true;
 }
 
-sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
@@ -653,7 +653,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 ss >> pin;
                 LOG_DEBUG("PIN SET %s", ss.str().c_str());
 
-                sys::Message_t rmsg;
+                sys::MessagePointer rmsg;
 
                 if (Store::GSM::get()->selected == msg->getSimCard()) {
 
@@ -1624,14 +1624,14 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
 
 void ServiceCellular::handle_CellularGetChannelMessage()
 {
-    connect(CellularGetChannelMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+    connect(CellularGetChannelMessage(), [&](sys::Message *req) {
         auto getChannelMsg = static_cast<CellularGetChannelMessage *>(req);
         LOG_DEBUG("Handle request for channel: %s", TS0710::name(getChannelMsg->dataChannel).c_str());
         std::shared_ptr<CellularGetChannelResponseMessage> channelResponsMessage =
             std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
         LOG_DEBUG("chanel ptr: %p", channelResponsMessage->dataChannelPtr);
         sys::Bus::SendUnicast(std::move(channelResponsMessage), req->sender, this);
-        return sys::Message_t();
+        return sys::MessageNone{};
     });
 }
 bool ServiceCellular::handle_status_check(void)

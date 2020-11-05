@@ -107,7 +107,7 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 }
 
 // Invoked upon receiving data message
-sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
 
     std::shared_ptr<sys::ResponseMessage> responseMsg;
