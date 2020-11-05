@@ -22,7 +22,7 @@ extern "C"
 
 namespace bsp
 {
-    int usbCDCInit(xQueueHandle);
+    void *usbInit(xQueueHandle);
     void usbCDCReceive(void *ptr);
     int usbCDCSend(std::string *sendMsg);
 } // namespace bsp

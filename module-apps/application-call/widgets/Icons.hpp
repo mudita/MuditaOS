@@ -16,9 +16,9 @@ namespace gui
     class AddContactIcon : public Icon<AddContactIconState>
     {
       protected:
-        static const inline std::string crossImg      = "cross";
-        static const inline std::string addContactStr = "app_call_contact";
-        static const inline Icon::IconMap iconMap     = {{AddContactIconState::ADD_CONTACT, {crossImg, addContactStr}}};
+        static constexpr auto crossImg            = "cross";
+        static constexpr auto addContactStr       = "app_call_contact";
+        static const inline Icon::IconMap iconMap = {{AddContactIconState::ADD_CONTACT, {crossImg, addContactStr}}};
 
       public:
         AddContactIcon() = delete;
@@ -35,9 +35,9 @@ namespace gui
     class SendSmsIcon : public Icon<SendSmsIconState>
     {
       protected:
-        static const inline std::string messageImg  = "mail";
-        static const inline std::string sendSmstStr = "app_call_message";
-        static const inline Icon::IconMap iconMap   = {{SendSmsIconState::SEND_SMS, {messageImg, sendSmstStr}}};
+        static constexpr auto messageImg          = "mail";
+        static constexpr auto sendSmstStr         = "app_call_message";
+        static const inline Icon::IconMap iconMap = {{SendSmsIconState::SEND_SMS, {messageImg, sendSmstStr}}};
 
       public:
         SendSmsIcon() = delete;
@@ -55,10 +55,10 @@ namespace gui
     class MicrophoneIcon : public Icon<MicrophoneIconState>
     {
       protected:
-        static const inline std::string muteImg   = "microphone_on";
-        static const inline std::string mutedImg  = "microphone_off";
-        static const inline std::string muteStr   = "app_call_mute";
-        static const inline std::string mutedStr  = "app_call_muted";
+        static constexpr auto muteImg             = "microphone_on";
+        static constexpr auto mutedImg            = "microphone_off";
+        static constexpr auto muteStr             = "app_call_mute";
+        static constexpr auto mutedStr            = "app_call_muted";
         static const inline Icon::IconMap iconMap = {{MicrophoneIconState::MUTE, {muteImg, muteStr}},
                                                      {MicrophoneIconState::MUTED, {mutedImg, mutedStr}}};
 
@@ -80,12 +80,12 @@ namespace gui
     class SpeakerIcon : public Icon<SpeakerIconState>
     {
       protected:
-        static const inline std::string speakerImg   = "speaker_off";
-        static const inline std::string speakerOnImg = "speaker_on";
-        // static const inline std::string bluetoothImg = "app_call_bluetooth";
-        static const inline std::string speakerStr   = "app_call_speaker";
-        static const inline std::string speakerOnStr = "app_call_speaker_on";
-        // static const inline std::string bluetoothStr = "app_call_bluetooth";
+        static constexpr auto speakerImg   = "speaker_off";
+        static constexpr auto speakerOnImg = "speaker_on";
+        // static constexpr auto bluetoothImg = "app_call_bluetooth";
+        static constexpr auto speakerStr   = "app_call_speaker";
+        static constexpr auto speakerOnStr = "app_call_speaker_on";
+        // static constexpr auto bluetoothStr = "app_call_bluetooth";
         static const inline Icon::IconMap iconMap = {
             {SpeakerIconState::SPEAKER, {speakerImg, speakerStr}},
             {SpeakerIconState::SPEAKERON, {speakerOnImg, speakerOnStr}},

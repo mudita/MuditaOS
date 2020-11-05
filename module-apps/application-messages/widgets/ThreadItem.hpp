@@ -46,7 +46,7 @@ namespace gui
 
     class ThreadItemNotRead : public ThreadItemWithIndicator
     {
-        static const inline UTF8 indicatorName = "dot_12px_hard_alpha_W_M";
+        static constexpr auto indicatorName = "dot_12px_hard_alpha_W_M";
 
       public:
         ThreadItemNotRead();

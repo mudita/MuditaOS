@@ -14,16 +14,6 @@
 namespace gui
 {
 
-    Margins::Margins() : left{0}, top{0}, right{0}, bottom{0}
-    {}
-
-    Margins::Margins(const short left, const short top, const short right, const short bottom)
-        : left{left}, top{top}, right{right}, bottom{bottom}
-    {}
-
-    Margins::~Margins()
-    {}
-
     short Margins::getSumInAxis(gui::Axis axis) const
     {
         switch (axis) {

@@ -12,19 +12,19 @@
 
 namespace app
 {
-    inline const std::string name_call      = "ApplicationCall";
-    constexpr std::uint16_t call_stack_size = 8192;
+    inline constexpr auto name_call       = "ApplicationCall";
+    inline constexpr auto call_stack_size = 8192U;
 
     namespace window
     {
-        inline const std::string name_call              = "CallWindow";
-        inline const std::string name_enterNumber       = "EnterNumberWindow";
-        inline const std::string name_emergencyCall     = "EmergencyCallWindow";
-        inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
-        inline const std::string name_dialogConfirm     = "DialogConfirm";
+        inline constexpr auto name_call              = "CallWindow";
+        inline constexpr auto name_enterNumber       = "EnterNumberWindow";
+        inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
+        inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";
+        inline constexpr auto name_dialogConfirm     = "DialogConfirm";
     } // namespace window
 
-    inline const std::string ringtone_path = "assets/audio/Ringtone-drum2.mp3"; // Should bo moved to database
+    inline constexpr auto ringtone_path = "assets/audio/Ringtone-drum2.mp3"; // Should bo moved to database
 
     class ApplicationCall : public Application
     {

@@ -21,7 +21,7 @@ namespace app
             INCOMING_CALL,
             EXECUTE_CALL
         };
-        static const inline std::string descriptionStr = "CallSwitchData";
+        static constexpr auto descriptionStr = "CallSwitchData";
 
       protected:
         Type type = Type::UNDEFINED;
@@ -46,7 +46,7 @@ namespace app
         std::string phoneNumber;
 
       public:
-        static const inline std::string descriptionStr = "EnterNumberSwitchData";
+        static constexpr auto descriptionStr = "EnterNumberSwitchData";
 
         EnterNumberData(const std::string &phoneNumber) : SwitchData(descriptionStr), phoneNumber(phoneNumber)
         {}
@@ -69,7 +69,6 @@ namespace app
       public:
         ExecuteCallData(const utils::PhoneNumber::View &phoneNumber)
             : CallSwitchData(phoneNumber, app::CallSwitchData::Type::EXECUTE_CALL){};
-
     };
 
     class CallAbortData : public gui::SwitchData

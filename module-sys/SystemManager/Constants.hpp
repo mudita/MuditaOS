@@ -7,5 +7,5 @@
 
 namespace service::name
 {
-    const inline std::string system_manager = "SysMgrService";
+    inline constexpr auto system_manager = "SysMgrService";
 };

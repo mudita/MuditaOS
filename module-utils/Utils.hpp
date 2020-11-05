@@ -14,7 +14,7 @@
 
 namespace utils
 {
-    static const std::string WHITESPACE = " \n\r\t\f\v";
+    inline constexpr auto WHITESPACE = " \n\r\t\f\v";
     constexpr unsigned int secondsInMinute =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
 

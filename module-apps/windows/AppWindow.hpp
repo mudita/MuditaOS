@@ -21,8 +21,8 @@ namespace gui
     {
         namespace window
         {
-            const inline std::string main_window = "MainWindow";
-            const inline std::string no_window   = "";
+            inline constexpr auto main_window = "MainWindow";
+            inline constexpr auto no_window   = "";
         } // namespace window
     }     // namespace name
 

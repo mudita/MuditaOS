@@ -8,21 +8,23 @@
 
 #include "time/time_locale.hpp"
 #include <bsp/rtc/rtc.hpp>
+#include <log/log.hpp>
+
 #include <vector>
 #include <string>
-#include <log/log.hpp>
 
 namespace utils
 {
     namespace time
     {
-        constexpr auto secondsInMinute        = 60;
-        constexpr auto minutesInHour          = 60;
-        constexpr auto hoursInday             = 24;
-        constexpr auto minutesInQuarterOfHour = 15;
-        constexpr auto secondsInHour   = minutesInHour * secondsInMinute;
-        constexpr auto secondsInDay    = hoursInday * secondsInHour;
-        constexpr auto milisecondsInSecond = 1000;
+        inline constexpr auto secondsInMinute        = 60;
+        inline constexpr auto minutesInHour          = 60;
+        inline constexpr auto hoursInday             = 24;
+        inline constexpr auto minutesInQuarterOfHour = 15;
+        inline constexpr auto secondsInHour          = minutesInHour * secondsInMinute;
+        inline constexpr auto secondsInDay           = hoursInday * secondsInHour;
+        inline constexpr auto milisecondsInSecond    = 1000;
+
         enum class GetParameters
         {
             Hour,
@@ -35,7 +37,7 @@ namespace utils
         // helper class to not put everything in time
         struct Localer
         {
-            const inline static unsigned int abbrev_len = 3;
+            static constexpr auto abbrev_len = 3U;
             /// order matters, it's used in replace_locale with enum Replacements
             const inline static std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
                                                                                    "%A",  // day long
@@ -277,11 +279,11 @@ namespace utils
             }
 
           private:
-            static constexpr bool verboseConversion             = false; // debug switch
-            static const inline std::string durationFormatH0M0S = "duration_hour_0min_0sec";
-            static const inline std::string durationFormat0M0S  = "duration_0min_0sec";
-            static const inline std::string durationFormat0N0S  = "duration_0hmin_0sec";
-            static const inline std::string durationFormatM0S   = "duration_min_0sec";
+            static constexpr auto verboseConversion   = false; // debug switch
+            static constexpr auto durationFormatH0M0S = "duration_hour_0min_0sec";
+            static constexpr auto durationFormat0M0S  = "duration_0min_0sec";
+            static constexpr auto durationFormat0N0S  = "duration_0hmin_0sec";
+            static constexpr auto durationFormatM0S   = "duration_min_0sec";
 
             struct Format
             {

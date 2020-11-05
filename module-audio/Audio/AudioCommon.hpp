@@ -15,20 +15,20 @@ namespace audio
 
 namespace audio
 {
-    constexpr Volume defaultVolumeStep = 1;
-    constexpr Gain defaultGainStep     = 10;
-    constexpr Volume defaultVolume     = 5;
-    constexpr Gain defaultGain         = 5;
+    inline constexpr Volume defaultVolumeStep = 1;
+    inline constexpr Gain defaultGainStep     = 10;
+    inline constexpr Volume defaultVolume     = 5;
+    inline constexpr Gain defaultGain         = 5;
 
-    constexpr Volume maxVolume = 10;
-    constexpr Volume minVolume = 0;
+    inline constexpr Volume maxVolume = 10;
+    inline constexpr Volume minVolume = 0;
 
-    constexpr Gain maxGain = 100;
-    constexpr Gain minGain = 0;
+    inline constexpr Gain maxGain = 100;
+    inline constexpr Gain minGain = 0;
 
-    constexpr uint32_t audioOperationTimeout = 1000;
+    inline constexpr auto audioOperationTimeout = 1000U;
 
-    static const std::string audioDbPrefix = "audio/";
+    inline constexpr auto audioDbPrefix = "audio/";
 
     enum class Setting
     {

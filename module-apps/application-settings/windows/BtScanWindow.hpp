@@ -18,7 +18,7 @@ namespace gui
 {
     namespace name::window
     {
-        inline const std::string name_btscan = "BT_SCAN";
+        inline constexpr auto name_btscan = "BT_SCAN";
     }
 
     class BtScanWindow : public AppWindow

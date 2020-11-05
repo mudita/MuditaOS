@@ -262,8 +262,8 @@ namespace utils::country
         UNKNOWN,
     };
 
-    constexpr std::size_t count = static_cast<std::size_t>(Id::UNKNOWN) + 1;
-    constexpr Id defaultCountry = Id::UNKNOWN;
+    inline constexpr auto count          = static_cast<std::size_t>(Id::UNKNOWN) + 1;
+    inline constexpr auto defaultCountry = Id::UNKNOWN;
 
     struct Data
     {
@@ -273,7 +273,7 @@ namespace utils::country
         unsigned int un_number;
     };
 
-    constexpr std::array<struct Data, count> map = {{
+    inline constexpr std::array<struct Data, count> map = {{
         {"Afghanistan", "AF", "AFG", 4},                       // AFGHANISTAN
         {"ALA Aland Islands", "AX", "ALA", 248},               // ALA_ALAND_ISLANDS
         {"Albania", "AL", "ALB", 8},                           // ALBANIA
