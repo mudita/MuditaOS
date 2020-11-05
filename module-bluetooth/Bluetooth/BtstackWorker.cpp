@@ -147,7 +147,7 @@ static void local_version_information_handler(uint8_t *packet)
             LOG_INFO("Please update Makefile to include the appropriate bluetooth_init_cc256???.c file");
             exit(10);
         }
-        use_fast_uart();
+//        use_fast_uart();
         hci_set_chipset(btstack_chipset_cc256x_instance());
 #ifdef ENABLE_EHCILL
         LOG_INFO("eHCILL enabled.");

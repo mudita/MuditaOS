@@ -68,6 +68,7 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size)
     BaseType_t taskwoken = 0;
     uint8_t val          = Bt::Message::EvtSent;
 
+#define DO_DEBUG_HCI_COMS
 #ifdef DO_DEBUG_HCI_COMS
     std::stringstream ss;
     for (int i = 0; i < size; ++i) {

@@ -133,6 +133,7 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     auto bt = BlueKitchen::getInstance();
     switch (notification) {
     case Bt::Message::EvtSent:
+#define DO_DEBUG_HCI_COMS
 #ifdef DO_DEBUG_HCI_COMS
         LOG_INFO("[evt] sent");
 #endif
@@ -157,7 +158,7 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
         for (int i = 0; i < bt->to_read_req; ++i) {
             ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
         }
-        LOG_DEBUG("[evt] recieved <-- [%d]>%s<", bt->to_read_req, ss.str().c_str());
+        LOG_DEBUG("[evt] recieved <-- [%ld]>%s<", bt->to_read_req, ss.str().c_str());
 #endif
         bt->to_read_req = 0;
 

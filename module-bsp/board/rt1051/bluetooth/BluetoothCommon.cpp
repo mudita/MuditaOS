@@ -151,13 +151,13 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
     case kStatus_Success: {
         //    CTS
         auto ulNotificationValue = ulTaskNotifyTake(pdFALSE, 100);
-        if (ulNotificationValue == 0) {
-            LOG_ERROR("Cellular Uart error: TX Transmission timeout");
-            ret = -1;
-        }
-        else {
+        if (ulNotificationValue != 0) {
             LOG_DEBUG("DMA Tx gave");
             ret = nbytes;
+        }
+        else {
+            LOG_ERROR("Cellular Uart error: TX Transmission timeout");
+            ret = -1;
         }
     } break;
     case kStatus_LPUART_TxBusy:
@@ -166,25 +166,16 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
         ret = -1;
         break;
     case kStatus_InvalidArgument:
+        LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         ret = -1;
         break;
     }
-
-    LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
     return ret;
 }
 
 ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
 {
-    int yet_to_write = len;
-    if (len > out.size) {
-        LOG_WARN("WRITE: %d vs %d", len, out.size);
-    }
-    while (yet_to_write != 0) {
-        yet_to_write -= write(buf + len - yet_to_write, yet_to_write < out.size ? yet_to_write : (out.size - 1));
-        flush();
-    }
-    return len;
+    return write(buf, len);
 }
 
 BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
@@ -290,7 +281,7 @@ void BluetoothCommon::configure_lpuart()
 
     LPUART_TransferCreateHandleEDMA(BSP_BLUETOOTH_UART_BASE,
                                     &uartDmaHandle,
-                                    uartCallback,
+                                    uartDmaCallback,
                                     nullptr,
                                     reinterpret_cast<edma_handle_t *>(uartTxDmaHandle->GetHandle()),
                                     nullptr); // reinterpret_cast<edma_handle_t *>(uartRxDmaHandle->GetHandle()));
@@ -309,21 +300,20 @@ void BluetoothCommon::configure_lpuart()
     //    LOG_DEBUG("finally");
 }
 
-void BluetoothCommon::uartCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
+void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
 {
     BaseType_t higherPriorTaskWoken = 0;
-
-    vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
-
-    portEND_SWITCHING_ISR(higherPriorTaskWoken);
 
     switch (status) {
     case kStatus_LPUART_TxIdle:
         LOG_DEBUG("DMA irq: TX done");
+        vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
+        portEND_SWITCHING_ISR(higherPriorTaskWoken);
         break;
         //    case kStatus_LPUART_RxIdle:
         //        break;
     default:
+        LOG_DEBUG("DMA irq: something else! (%ld)", status);
         break;
     }
 }
