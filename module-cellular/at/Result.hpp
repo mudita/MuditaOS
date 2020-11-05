@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include <variant>
 #include <string>
 #include <vector>
+
+#include <ErrorCode.hpp>
 
 namespace at
 {
@@ -19,7 +22,18 @@ namespace at
             TOKENS,  // at numbers of tokens needed met
             NONE,    // no code
         } code = Code::NONE;
+
+        //! Information about Equipment or Network error as variant type
+        /*!
+         * Example of checking for specific error type
+            if (std::holds_alternative<at::EquipmentErrorCode>(errorCode)){
+                std::get<at::EquipmentErrorCode>(errorCode);
+            }
+        */
+        std::variant<at::EquipmentErrorCode, at::NetworkErrorCode> errorCode = at::EquipmentErrorCode::NoInformation;
+
         std::vector<std::string> response;
+
         explicit operator bool() const
         {
             return code == Code::OK;
