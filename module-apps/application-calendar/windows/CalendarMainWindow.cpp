@@ -22,8 +22,7 @@ namespace gui
     {
         auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(appCalendar != nullptr);
-        std::chrono::system_clock::time_point tp =
-            std::chrono::system_clock::from_time_t(appCalendar->getCurrentTimeStamp());
+        utils::time::TimePoint tp     = appCalendar->getCurrentTimeStamp();
         this->actualDate = date::year_month_day{date::floor<date::days>(tp)};
         std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         buildInterface();
@@ -197,11 +196,11 @@ namespace gui
 
     void CalendarMainWindow::filterRequest()
     {
-        calendar::YearMonthDay date_from = actualDate.year() / actualDate.month() / 1;
-        calendar::YearMonthDay date_till = date_from + date::months{1};
-        auto filter_from       = TimePointFromYearMonthDay(date_from);
-        auto filter_till       = TimePointFromYearMonthDay(date_till);
-        LOG_DEBUG("filter:  %s", TimePointToString(filter_till).c_str());
+        utils::time::YearMonthDay date_from = actualDate.year() / actualDate.month() / 1;
+        utils::time::YearMonthDay date_till = date_from + date::months{1};
+        auto filter_from       = utils::time::CalendarConversion::TimePointFromYearMonthDay(date_from);
+        auto filter_till       = utils::time::CalendarConversion::TimePointFromYearMonthDay(date_till);
+        LOG_DEBUG("filter:  %s", utils::time::CalendarConversion::TimePointToString(filter_till).c_str());
         auto query = std::make_unique<db::query::events::GetFiltered>(filter_from, filter_till);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
         task->setCallback([this](auto response) { return handleQueryResponse(response); });
@@ -219,7 +218,8 @@ namespace gui
         if (auto response = dynamic_cast<db::query::events::GetAllResult *>(queryResult)) {
             const auto records = response->getResult();
             auto day           = monthBox->getFocusItemIndex() + 1;
-            auto filter = TimePointFromYearMonthDay(monthModel->getYear() / monthModel->getMonth() / date::day(day));
+            auto filter =
+                    utils::time::CalendarConversion::TimePointFromYearMonthDay(monthModel->getYear() / monthModel->getMonth() / date::day(day));
             if (!records.empty()) {
                 auto data = std::make_unique<DayMonthData>();
                 data->setData("", filter);

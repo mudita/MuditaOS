@@ -14,6 +14,7 @@
 #include <iosfwd>
 #include <string>
 #include <sys/types.h>
+#include <chrono>
 
 namespace ModemCall
 {
@@ -84,7 +85,7 @@ namespace CellularCall
         bool isActiveCall = false;
         std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
-        utils::time::Timestamp startActiveTime = 0;
+        utils::time::Timestamp startActiveTime;
 
         void setType(const CallType type)
         {
@@ -98,9 +99,9 @@ namespace CellularCall
 
         void clear()
         {
-            call            = CalllogRecord();
-            isActiveCall    = false;
-            startActiveTime = 0;
+            call              = CalllogRecord();
+            isActiveCall      = false;
+            startActiveTime   = utils::time::TIME_POINT_INVALID;
         }
 
       public:

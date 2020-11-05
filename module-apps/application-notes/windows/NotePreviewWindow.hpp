@@ -29,7 +29,7 @@ namespace app::notes
         void destroyInterface() override;
 
       private:
-        void setEditDateText(std::uint32_t editTimestamp);
+        void setEditDateText(utils::time::TimePoint editTimestamp);
 
         std::unique_ptr<NotePreviewWindowContract::Presenter> presenter;
         std::unique_ptr<NotesRecord> notesRecord;

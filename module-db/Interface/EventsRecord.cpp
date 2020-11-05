@@ -71,8 +71,8 @@ bool EventsRecordInterface::Add(const EventsRecord &rec)
     return false;
 }
 
-std::vector<EventsRecord> EventsRecordInterface::Select(TimePoint filter_from,
-                                                        TimePoint filter_till,
+std::vector<EventsRecord> EventsRecordInterface::Select(utils::time::TimePoint filter_from,
+                                                        utils::time::TimePoint filter_till,
                                                         uint32_t offset,
                                                         uint32_t limit)
 {
@@ -279,17 +279,17 @@ uint32_t EventsRecordInterface::GetCount()
     return eventsDb->events.count();
 }
 
-uint32_t EventsRecordInterface::GetCountFiltered(TimePoint from, TimePoint till)
+uint32_t EventsRecordInterface::GetCountFiltered(utils::time::TimePoint from, utils::time::TimePoint till)
 {
     return eventsDb->events.countFromFilter(from, till);
 }
 
-uint32_t EventsRecordInterface::GetCountFilteredByDay(TimePoint filter)
+uint32_t EventsRecordInterface::GetCountFilteredByDay(utils::time::TimePoint filter)
 {
     return eventsDb->events.countFromDayFilter(filter);
 }
 
-std::vector<EventsRecord> EventsRecordInterface::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
+std::vector<EventsRecord> EventsRecordInterface::SelectFirstUpcoming(utils::time::TimePoint filter_from, utils::time::TimePoint filter_till)
 {
     auto rows = eventsDb->events.SelectFirstUpcoming(filter_from, filter_till);
 

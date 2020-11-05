@@ -69,10 +69,9 @@ namespace gui
 
     UTF8 AllEventsItem::getLabelMarker() const
     {
-        auto startDate = TimePointToYearMonthDay(record->date_from);
+        auto startDate = utils::time::CalendarConversion::TimePointToYearMonthDay(record->date_from);
 
-        std::string monthStr =
-            utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+        std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
         return std::to_string(unsigned(startDate.day())) + " " + monthStr;
     }
 

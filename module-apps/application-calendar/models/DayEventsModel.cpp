@@ -95,7 +95,7 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     return false;
 }
 
-void DayEventsModel::setFilters(TimePoint from, TimePoint till, const std::string &dayMonth)
+void DayEventsModel::setFilters(utils::time::TimePoint from, utils::time::TimePoint till, const std::string &dayMonth)
 {
     /// TODO: change to one filter
     this->filterFrom    = from;

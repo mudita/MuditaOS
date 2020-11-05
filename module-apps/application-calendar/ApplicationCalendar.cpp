@@ -19,6 +19,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <chrono>
 
 namespace app
 {
@@ -95,8 +96,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        utils::time::Timestamp timestamp;
-        applicationStartTime = timestamp.getTime();
+        applicationStartTime = utils::time::TimePointNow();
         auto ret             = Application::InitHandler();
         createUserInterface();
         return ret;
@@ -147,7 +147,7 @@ namespace app
     void ApplicationCalendar::destroyUserInterface()
     {}
 
-    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const TimePoint &dateFilter)
+    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const utils::time::TimePoint &dateFilter)
     {
         if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
             popToWindow(gui::name::window::main_window);

@@ -6,7 +6,7 @@
 #include "module-db/Interface/EventsRecord.hpp"
 #include <Common/Query.hpp>
 #include <string>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 
 namespace db::query::events
 {
@@ -14,11 +14,11 @@ namespace db::query::events
     class SelectFirstUpcoming : public Query
     {
       public:
-        SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
+        SelectFirstUpcoming(utils::time::TimePoint filter_from, utils::time::TimePoint filter_till);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        TimePoint filter_from;
-        TimePoint filter_till;
+        utils::time::TimePoint filter_from;
+        utils::time::TimePoint filter_till;
     };
 
     /// Result of SelectFirstUpcoming query

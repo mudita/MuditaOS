@@ -11,6 +11,7 @@
 #include "Tables/AlarmsTable.hpp"
 
 #include <algorithm>
+#include <time/time_conversion.hpp>
 
 #include <cstdint>
 #include <cstdio>
@@ -40,10 +41,10 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(test.path == "");
     }
 
-    REQUIRE(alarmsTbl.add(
-        AlarmsTableRow(1, TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
-    REQUIRE(alarmsTbl.add(
-        AlarmsTableRow(2, TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+    REQUIRE(alarmsTbl.add(AlarmsTableRow(
+        1, CalendarConv::TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+    REQUIRE(alarmsTbl.add(AlarmsTableRow(
+        2, CalendarConv::TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
 
     REQUIRE(alarmsTbl.count() == 2);
     REQUIRE(alarmsTbl.countByFieldId("status", 0) == 1);
@@ -52,7 +53,7 @@ TEST_CASE("Alarms Table tests")
     {
         auto entry = alarmsTbl.getById(1);
         REQUIRE(entry.ID == 1);
-        REQUIRE(entry.time == TimePointFromString("2020-11-11 15:10:00"));
+        REQUIRE(entry.time == CalendarConv::TimePointFromString("2020-11-11 15:10:00"));
         REQUIRE(entry.snooze == 0);
         REQUIRE(entry.status == AlarmStatus::Off);
         REQUIRE(entry.repeat == 0);
@@ -75,7 +76,7 @@ TEST_CASE("Alarms Table tests")
     SECTION("Entry update")
     {
         auto entryUpdate   = alarmsTbl.getById(1);
-        entryUpdate.time   = TimePointFromString("2020-12-31 23:59:00");
+        entryUpdate.time   = CalendarConv::TimePointFromString("2020-12-31 23:59:00");
         entryUpdate.snooze = 0;
         entryUpdate.status = AlarmStatus::On;
         entryUpdate.path   = "musicFileUpdate.mp3";
@@ -132,18 +133,18 @@ TEST_CASE("Alarms Table tests")
 
     SECTION("Check limit/offset sorting correctness")
     {
-        REQUIRE(alarmsTbl.add(
-            AlarmsTableRow(3, TimePointFromString("2020-11-12 17:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
-        REQUIRE(alarmsTbl.add(
-            AlarmsTableRow(4, TimePointFromString("2020-11-11 19:25:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
-        REQUIRE(alarmsTbl.add(
-            AlarmsTableRow(5, TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+        REQUIRE(alarmsTbl.add(AlarmsTableRow(
+            3, CalendarConv::TimePointFromString("2020-11-12 17:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+        REQUIRE(alarmsTbl.add(AlarmsTableRow(
+            4, CalendarConv::TimePointFromString("2020-11-11 19:25:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+        REQUIRE(alarmsTbl.add(AlarmsTableRow(
+            5, CalendarConv::TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
 
-        const std::array<TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
-                                                 TimePointFromString("2020-11-11 15:10:00"),
-                                                 TimePointFromString("2020-11-11 15:15:00"),
-                                                 TimePointFromString("2020-11-12 17:10:00"),
-                                                 TimePointFromString("2020-11-11 19:25:00")};
+        const std::array<TimePoint, 5> paramTime{CalendarConv::TimePointFromString("2020-12-11 07:15:00"),
+                                                 CalendarConv::TimePointFromString("2020-11-11 15:10:00"),
+                                                 CalendarConv::TimePointFromString("2020-11-11 15:15:00"),
+                                                 CalendarConv::TimePointFromString("2020-11-12 17:10:00"),
+                                                 CalendarConv::TimePointFromString("2020-11-11 19:25:00")};
 
         REQUIRE(alarmsTbl.count() == 5);
         auto entries   = alarmsTbl.getLimitOffset(0, 5);

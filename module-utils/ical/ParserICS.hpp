@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-apps/application-calendar/data/dateCommon.hpp>
 #include "json/json11.hpp"
+#include <time/time_conversion.hpp>
 #include <memory>
 
 /**
@@ -91,8 +91,8 @@ class Event
 {
     std::string uid;
     std::string summary;
-    TimePoint dtstart;
-    TimePoint dtend;
+    utils::time::TimePoint dtstart;
+    utils::time::TimePoint dtend;
 
     auto isDate(const std::string &dt) -> bool;
     auto isTime(const std::string &dt) -> bool;
@@ -112,13 +112,13 @@ class Event
     [[nodiscard]] auto dateStringFrom(const std::string &icalDate) const -> std::string;
     [[nodiscard]] auto timeStringFrom(const std::string &icalTime) const -> std::string;
 
-    [[nodiscard]] auto TimePointFromIcalDate(const std::string &icalDateTime) const -> TimePoint;
-    [[nodiscard]] auto TimePointToIcalDate(const TimePoint &tp) const -> std::string;
+    [[nodiscard]] auto TimePointFromIcalDate(const std::string &icalDateTime) const -> utils::time::TimePoint;
+    [[nodiscard]] auto TimePointToIcalDate(const utils::time::TimePoint &tp) const -> std::string;
 
   public:
     bool isValid = true;
     Event()      = default;
-    Event(const std::string &summary, TimePoint from, TimePoint till, const std::string &uid);
+    Event(const std::string &summary, utils::time::TimePoint from, utils::time::TimePoint till, const std::string &uid);
 
     void setUID(const std::string &property);
     void setSummary(const std::string &property);
@@ -127,8 +127,8 @@ class Event
 
     [[nodiscard]] auto getUID() const -> std::string;
     [[nodiscard]] auto getSummary() const -> std::string;
-    [[nodiscard]] auto getDTStartTimePoint() const -> TimePoint;
-    [[nodiscard]] auto getDTEndTimePoint() const -> TimePoint;
+    [[nodiscard]] auto getDTStartTimePoint() const -> utils::time::TimePoint;
+    [[nodiscard]] auto getDTEndTimePoint() const -> utils::time::TimePoint;
 
     [[nodiscard]] auto getDTStartString() const -> std::string;
     [[nodiscard]] auto getDTEndString() const -> std::string;

@@ -51,7 +51,7 @@ namespace gui
         filterFrom      = item->getDateFilter();
         auto filterTill = filterFrom + date::days{1};
         dayEventsModel->setFilters(filterFrom, filterTill, dayMonthTitle);
-        LOG_DEBUG("FILTER 1: %s", TimePointToString(filterFrom).c_str());
+        LOG_DEBUG("FILTER 1: %s", utils::time::CalendarConversion::TimePointToString(filterFrom).c_str());
         setTitle(dayMonthTitle);
         if (dayMonthTitle == "") {
             return false;

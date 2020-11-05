@@ -66,7 +66,7 @@ namespace gui
 
         imageCallType[static_cast<uint32_t>(callType)]->setVisible(true);
 
-        timestamp->setText(utils::time::DateTime(call->date, false)); // TODO: alek: check for AM/PM and 24h
+        timestamp->setText(utils::time::DateTime(utils::time::TimeConversion::toTimePoint(call->date), false)); // TODO: alek: check for AM/PM and 24h
     }
 
 } /* namespace gui */

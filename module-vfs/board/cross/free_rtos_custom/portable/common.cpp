@@ -24,5 +24,5 @@ struct tm *gmtime_r( const time_t *pxTime, struct tm *tmStruct )
 
 time_t FreeRTOS_time(time_t *pxTime)
 {
-    return utils::time::Time().getTime();
+    return utils::time::TimeConversion::toTime_t(utils::time::TimePointNow());
 }

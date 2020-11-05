@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint>
+#include <module-utils/time/time_conversion.hpp>
 
 #include "Table.hpp"
 #include "Record.hpp"
@@ -14,7 +15,7 @@
 struct NotesTableRow
 {
     std::uint32_t ID = DB_ID_NONE;
-    std::uint32_t date;
+    utils::time::TimePoint date;
     UTF8 snippet;
 };
 

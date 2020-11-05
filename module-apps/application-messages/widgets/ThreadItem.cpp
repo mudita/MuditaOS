@@ -50,7 +50,7 @@ namespace gui
         threadStruct = std::move(_threadStruct);
 
         setContactName(getNumberImportance());
-        timestamp->setText(utils::time::DateTime(threadStruct->thread->date));
+        timestamp->setText(utils::time::DateTime(utils::time::TimeConversion::toTimePoint(threadStruct->thread->date)));
         setPreview();
     }
 

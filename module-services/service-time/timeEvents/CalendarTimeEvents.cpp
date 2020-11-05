@@ -9,7 +9,7 @@
 #include <application-calendar/widgets/CalendarStyle.hpp>
 #include <module-apps/application-calendar/ApplicationCalendar.hpp>
 #include <module-apps/application-calendar/data/CalendarData.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
 #include <module-gui/gui/SwitchData.hpp>
 #include <queries/calendar/QueryEventsEdit.hpp>
@@ -37,9 +37,9 @@ namespace stm
 
     bool CalendarTimeEvents::sendNextEventQuery()
     {
-        TimePoint filterFrom = TimePointNow();
-        TimePoint filterTill = filterFrom;
-        if (startTP != TIME_POINT_INVALID) {
+        utils::time::TimePoint filterFrom = utils::time::TimePointNow();
+        utils::time::TimePoint filterTill = filterFrom;
+        if (startTP != utils::time::TIME_POINT_INVALID) {
             filterFrom = std::min(startTP, filterFrom);
             filterTill = filterFrom;
         }
@@ -65,7 +65,7 @@ namespace stm
         }
 
         eventRecord   = records.at(0);
-        startTP       = eventRecord.date_from - std::chrono::minutes{eventRecord.reminder};
+        startTP       = eventRecord.date_from - minutes{eventRecord.reminder};
         auto duration = eventRecord.date_from - std::chrono::minutes{eventRecord.reminder} - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
@@ -76,7 +76,7 @@ namespace stm
 
     bool CalendarTimeEvents::sendEventFiredQuery()
     {
-        eventRecord.reminder_fired = TimePointNow();
+        eventRecord.reminder_fired = utils::time::TimePointNow();
         const auto [succeed, _]    = DBServiceAPI::GetQuery(
             service(), db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(eventRecord));
         return succeed;

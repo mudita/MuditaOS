@@ -49,7 +49,7 @@ namespace utils::filesystem
 
         std::random_device random_device;
         std::mt19937 generator(random_device());
-        generator.seed(utils::time::Timestamp().getTime());
+        generator.seed(utils::time::TimeConversion::toTime_t(utils::time::TimePointNow()));
         std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
 
         std::string random_string;

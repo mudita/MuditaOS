@@ -7,6 +7,7 @@
 #include <log/log.hpp>
 #include <string>
 #include <ticks.hpp>
+#include <time/time_conversion.hpp>
 
 namespace utils
 {

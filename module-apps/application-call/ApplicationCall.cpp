@@ -50,7 +50,7 @@ namespace app
     }
 
     //  number of seconds after end call to switch back to previous application
-    const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
+    constexpr inline auto delayToSwitchToPreviousApp = utils::time::Duration(std::chrono::seconds(3));
 
     void ApplicationCall::CallAbortHandler()
     {

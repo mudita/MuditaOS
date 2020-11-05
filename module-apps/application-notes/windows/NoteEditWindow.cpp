@@ -138,7 +138,7 @@ namespace app::notes
 
     void NoteEditWindow::saveNote()
     {
-        notesRecord->date    = utils::time::getCurrentTimestamp().getTime();
+        notesRecord->date    = utils::time::TimePointNow();
         notesRecord->snippet = edit->getText();
         presenter->save(*notesRecord);
     }

@@ -8,7 +8,7 @@
 #include "Database/Database.hpp"
 #include "Common/Common.hpp"
 #include <module-utils/utf8/UTF8.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 
 struct AlarmsRecord;
 
@@ -25,14 +25,14 @@ enum class AlarmStatus
 
 struct AlarmsTableRow : public Record
 {
-    TimePoint time     = TIME_POINT_INVALID;
+    utils::time::TimePoint time     = utils::time::TIME_POINT_INVALID;
     uint32_t snooze    = 0;
     AlarmStatus status = AlarmStatus::On;
     uint32_t repeat    = 0;
     UTF8 path;
 
     AlarmsTableRow() = default;
-    AlarmsTableRow(uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path);
+    AlarmsTableRow(uint32_t id, utils::time::TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path);
     explicit AlarmsTableRow(const AlarmsRecord &rec);
     explicit AlarmsTableRow(const QueryResult &result);
 };

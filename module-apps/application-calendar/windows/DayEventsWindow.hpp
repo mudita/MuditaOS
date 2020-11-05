@@ -12,14 +12,13 @@
 #include <ListView.hpp>
 #include <gui/widgets/Item.hpp>
 #include <gui/widgets/Label.hpp>
-#include <application-calendar/data/dateCommon.hpp>
 
 namespace gui
 {
     class DayEventsWindow : public gui::AppWindow
     {
         std::string dayMonthTitle;
-        TimePoint filterFrom;
+        utils::time::TimePoint filterFrom;
         gui::Image *leftArrowImage                               = nullptr;
         gui::Image *newDayEventImage                             = nullptr;
         gui::ListView *dayEventsList                             = nullptr;

@@ -5,6 +5,7 @@
 
 #include "Database/Database.hpp"
 #include "Databases/EventsDB.hpp"
+
 #include "Tables/EventsTable.hpp"
 
 #include <vfs.hpp>
@@ -30,7 +31,6 @@ static auto remove_events(EventsDB &db) -> bool
 
 TEST_CASE("Events Table tests")
 {
-
     Database::initialize();
 
     const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
@@ -166,8 +166,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 7;
-        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
+        utils::time::TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        utils::time::TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addDaily(testRow1));
@@ -201,8 +201,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
+        utils::time::TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        utils::time::TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addWeekly(testRow1));
@@ -236,8 +236,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
+        utils::time::TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        utils::time::TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addTwoWeeks(testRow1));
@@ -367,8 +367,8 @@ TEST_CASE("Events Table tests")
     {
         auto check_custom_repeat = [&](uint32_t customRepeatOption,
                                        uint32_t numberOfEvents,
-                                       TimePoint originalStartDate,
-                                       TimePoint originalEndDate) {
+                                       utils::time::TimePoint originalStartDate,
+                                       utils::time::TimePoint originalEndDate) {
             if (eventsTbl.count() > 0) {
                 REQUIRE(remove_events(eventsDb));
             }
@@ -396,8 +396,8 @@ TEST_CASE("Events Table tests")
                 }
             }
 
-            TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
-            TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
+            utils::time::TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
+            utils::time::TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
 
             uint32_t i = 0;
             for (uint32_t l = 0; l < numberOfWeeks; l++) {
@@ -439,8 +439,8 @@ TEST_CASE("Events Table tests")
             uint32_t customRepeatOption =
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday);
             uint32_t numberOfEvents     = 9;
-            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            utils::time::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            utils::time::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -451,8 +451,8 @@ TEST_CASE("Events Table tests")
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday) +
                 static_cast<uint32_t>(weekDayOption::tuesday) + static_cast<uint32_t>(weekDayOption::sunday);
             uint32_t numberOfEvents     = 17;
-            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            utils::time::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            utils::time::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -461,8 +461,8 @@ TEST_CASE("Events Table tests")
         {
             uint32_t customRepeatOption = static_cast<uint32_t>(weekDayOption::saturday);
             uint32_t numberOfEvents     = 5;
-            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            utils::time::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            utils::time::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -470,8 +470,8 @@ TEST_CASE("Events Table tests")
 
     SECTION("Check count from filter")
     {
-        TimePoint from = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint till = TimePointFromString("2019-10-24 14:20:00");
+        utils::time::TimePoint from = TimePointFromString("2019-10-20 14:30:00");
+        utils::time::TimePoint till = TimePointFromString("2019-10-24 14:20:00");
 
         CHECK(eventsTbl.countFromFilter(from, till) == 4);
     }
@@ -516,7 +516,7 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 6);
 
         std::string newTitle = "Updated Title", newProviderID = "PurePhoneUpdated";
-        TimePoint newDateFrom    = TimePointFromString("2020-10-20 15:00:00"),
+        utils::time::TimePoint newDateFrom    = TimePointFromString("2020-10-20 15:00:00"),
                   newDateTill    = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder     = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption = static_cast<uint32_t>(Repeat::biweekly);
@@ -572,7 +572,7 @@ TEST_CASE("Events Table tests")
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
                     newProvideriCalUid = "new iCalUid";
-        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+        utils::time::TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
                   newDateTill          = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
@@ -630,7 +630,7 @@ TEST_CASE("Events Table tests")
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
                     newProvideriCalUid = "new iCalUid";
-        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+        utils::time::TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
                   newDateTill          = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
@@ -1012,13 +1012,13 @@ TEST_CASE("Events Table tests")
         if (eventsTbl.count() > 0) {
             REQUIRE(remove_events(eventsDb));
         }
-        CHECK(eventsTbl.count() == 0);
+        REQUIRE(eventsTbl.count() == 0);
 
-        TimePoint startDate1 = TimePointFromString("2018-10-20 14:24:00");
-        TimePoint startDate2 = TimePointFromString("2020-10-20 14:24:00");
+        utils::time::TimePoint startDate1 = TimePointFromString("2018-10-20 14:24:00");
+        utils::time::TimePoint startDate2 = TimePointFromString("2020-10-20 14:24:00");
 
-        TimePoint tillDate  = TimePointFromString("2030-10-20 15:24:00");
-        TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
+        utils::time::TimePoint tillDate  = TimePointFromString("2030-10-20 15:24:00");
+        utils::time::TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
 
         EventsTableRow testEvent1 = {{1},
                                      .UID              = "test1",
@@ -1100,13 +1100,13 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.add(testEvent6));
 
         auto entries = eventsTbl.SelectFirstUpcoming(startDate1, tillDate);
-        CHECK(entries.size() == 1);
+        REQUIRE(entries.size() == 1);
         for (auto entry : entries) {
             CHECK(entry.title == "Event2");
         }
 
         entries = eventsTbl.SelectFirstUpcoming(startDate2, tillDate);
-        CHECK(entries.size() == 1);
+        REQUIRE(entries.size() == 1);
         for (auto entry : entries) {
             CHECK(entry.title == "Event5");
         }

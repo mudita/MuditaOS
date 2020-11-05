@@ -307,7 +307,7 @@ TEST_CASE("Testing RecurrenceRule class object", "")
 TEST_CASE("Testing Event class object", "")
 {
 
-    SECTION("Test get DTStart and DTEnd in TimePoint value")
+    SECTION("Test get DTStart and DTEnd in utils::time::TimePoint value")
     {
         auto summary = "test";
         auto DTstart = TimePointFromString("2020-11-05 15:00:00");

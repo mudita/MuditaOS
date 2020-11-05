@@ -25,6 +25,7 @@
 #include "Text.hpp"
 #include <Style.hpp>
 #include <widgets/BoxLayout.hpp>
+#include <chrono>
 
 #include <module-utils/Utils.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>

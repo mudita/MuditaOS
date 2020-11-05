@@ -35,7 +35,7 @@ auto SongsModel::getItem(gui::Order order) -> gui::ListItem *
 void SongsModel::createData(std::vector<audio::Tags> songsList, std::function<bool(const std::string &fileName)> func)
 {
     for (auto song : songsList) {
-        auto item = new gui::SongItem(song.title, song.artist, utils::time::Duration(song.total_duration_s).str());
+        auto item = new gui::SongItem(song.title, song.artist, utils::time::Duration(std::chrono::seconds(song.total_duration_s)).str());
 
         item->activatedCallback = [=](gui::Item &) {
             func(song.filePath);

@@ -25,7 +25,7 @@ int Ctze::getTimeZoneOffset() const
         LOG_ERROR("Failed to parse Ctze time zone offset: %s", tzOffsetToken.c_str());
     }
 
-    int offsetInSeconds = offsetInQuartersOfHour * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
+    int offsetInSeconds = offsetInQuartersOfHour * utils::time::minutes_in_quarter_hour * utils::time::seconds_in_minute;
 
     return offsetInSeconds;
 }
@@ -66,7 +66,7 @@ auto Ctze::getTimeInfo() const noexcept -> tm
 
         int gmtDifference = utils::getNumericValue<int>(gmtDifferenceStr);
         auto time         = system_clock::to_time_t(tp) +
-                    gmtDifference * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
+                    gmtDifference * utils::time::minutes_in_quarter_hour * utils::time::seconds_in_minute;
         timeinfo = *gmtime(&time);
     }
     return timeinfo;

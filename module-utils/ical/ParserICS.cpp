@@ -88,8 +88,8 @@ namespace ical
             constexpr inline auto never_happens_value = 0xFFFF;
         }
     } // namespace duration
-    constexpr inline auto date_char_length = yearDigitsNumb + monthDigitsNumb + dayDigitsNumb;
-    constexpr inline auto time_char_length = HourDigitsNumb + MinDigitsNumb + SecDigitsNumb;
+    constexpr inline auto date_char_length = utils::time::digits::number::year + utils::time::digits::number::month + utils::time::digits::number::day;
+    constexpr inline auto time_char_length = utils::time::digits::number::hours + utils::time::digits::number::minutes + utils::time::digits::number::seconds;
     constexpr inline auto dt_char_length   = date_char_length + 1 + time_char_length;
 } // namespace ical
 
@@ -402,17 +402,17 @@ auto Event::getDateFromIcalFormat(const std::string &icalDateTime) const -> std:
 
 auto Event::getYearFromIcalDate(const std::string &icalDate) const -> std::string
 {
-    return icalDate.substr(0, yearDigitsNumb);
+    return icalDate.substr(0, utils::time::digits::number::year);
 }
 
 auto Event::getMonthFromIcalDate(const std::string &icalDate) const -> std::string
 {
-    return icalDate.substr(yearDigitsNumb, monthDigitsNumb);
+    return icalDate.substr(utils::time::digits::number::year, utils::time::digits::number::month);
 }
 
 auto Event::getDayFromIcalDate(const std::string &icalDate) const -> std::string
 {
-    return icalDate.substr(yearDigitsNumb + monthDigitsNumb, dayDigitsNumb);
+    return icalDate.substr(utils::time::digits::number::year + utils::time::digits::number::month, utils::time::digits::number::day);
 }
 
 auto Event::getTimeFromIcalFormat(const std::string &icalDateTime) const -> std::string
@@ -422,17 +422,17 @@ auto Event::getTimeFromIcalFormat(const std::string &icalDateTime) const -> std:
 
 auto Event::getHourFromIcalTime(const std::string &icalTime) const -> std::string
 {
-    return icalTime.substr(0, HourDigitsNumb);
+    return icalTime.substr(0, utils::time::digits::number::hours);
 }
 
 auto Event::getMinutesFromIcalTime(const std::string &icalTime) const -> std::string
 {
-    return icalTime.substr(HourDigitsNumb, MinDigitsNumb);
+    return icalTime.substr(utils::time::digits::number::hours, utils::time::digits::number::minutes);
 }
 
 auto Event::getSecondsFromIcalTime(const std::string &icalTime) const -> std::string
 {
-    return icalTime.substr(HourDigitsNumb + MinDigitsNumb, SecDigitsNumb);
+    return icalTime.substr(utils::time::digits::number::hours + utils::time::digits::number::minutes, utils::time::digits::number::seconds);
 }
 
 auto Event::dateStringFrom(const std::string &icalDate) const -> std::string
@@ -446,7 +446,7 @@ auto Event::timeStringFrom(const std::string &icalTime) const -> std::string
            getSecondsFromIcalTime(icalTime);
 }
 
-auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> TimePoint
+auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> utils::time::TimePoint
 {
     std::string icalDate(getDateFromIcalFormat(icalDateTime));
     std::string icalTime(getTimeFromIcalFormat(icalDateTime));
@@ -456,13 +456,13 @@ auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> Time
 
     std::string dateTime(date + " " + time);
 
-    return TimePointFromString(dateTime.c_str());
+    return utils::time::CalendarConversion::TimePointFromString(dateTime.c_str());
 }
 
-auto Event::TimePointToIcalDate(const TimePoint &tp) const -> std::string
+auto Event::TimePointToIcalDate(const utils::time::TimePoint &tp) const -> std::string
 {
     constexpr uint32_t bufferLimit = 16;
-    auto time                      = TimePointToTimeT(tp);
+    auto time                      = utils::time::TimeConversion::toTime_t(tp);
     auto utcTime                   = gmtime(&time);
     char Buffer[bufferLimit];
     strftime(Buffer, bufferLimit, "%Y%m%dT%H%M%S", utcTime);
@@ -504,7 +504,7 @@ auto Event::validateDT(const std::string &dt) -> bool
 
     auto separatorIndex = dt.find_first_of('T');
     LOG_DEBUG("Separator index = %d", (int)separatorIndex);
-    if (separatorIndex != (yearDigitsNumb + monthDigitsNumb + dayDigitsNumb)) {
+    if (separatorIndex != (utils::time::digits::number::year + utils::time::digits::number::month + utils::time::digits::number::day)) {
         LOG_ERROR("Date time separator is invalid");
         return false;
     }
@@ -541,7 +541,7 @@ auto Event::validateUID(const std::string &UID) -> bool
     return validateDT(DTimestamp);
 }
 
-Event::Event(const std::string &summary, const TimePoint from, TimePoint till, const std::string &uid)
+Event::Event(const std::string &summary, const utils::time::TimePoint from, utils::time::TimePoint till, const std::string &uid)
 {
     if (summary.empty()) {
         isValid = false;
@@ -595,12 +595,12 @@ auto Event::getSummary() const -> std::string
     return summary;
 }
 
-auto Event::getDTStartTimePoint() const -> TimePoint
+auto Event::getDTStartTimePoint() const -> utils::time::TimePoint
 {
     return dtstart;
 }
 
-auto Event::getDTEndTimePoint() const -> TimePoint
+auto Event::getDTEndTimePoint() const -> utils::time::TimePoint
 {
     return dtend;
 }

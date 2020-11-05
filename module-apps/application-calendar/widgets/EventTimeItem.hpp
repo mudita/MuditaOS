@@ -43,9 +43,7 @@ namespace gui
                                     std::chrono::minutes end_hour,
                                     uint32_t start_minutes,
                                     uint32_t end_minutes);
-        TimePoint calculateEventTime(calendar::YearMonthDay date,
-                                     std::chrono::hours hours,
-                                     std::chrono::minutes minutes);
+        utils::time::TimePoint calculateEventTime(utils::time::YearMonthDay date, std::chrono::hours hours, std::chrono::minutes minutes);
 
       public:
         EventTimeItem(const std::string &description,

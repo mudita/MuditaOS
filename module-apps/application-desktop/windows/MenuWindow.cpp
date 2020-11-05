@@ -12,6 +12,7 @@
 #include <Style.hpp>
 #include <cassert>
 #include <i18n/i18n.hpp>
+#include <time/time_conversion.hpp>
 
 namespace style::design
 {

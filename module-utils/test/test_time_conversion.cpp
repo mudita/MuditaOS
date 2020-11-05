@@ -78,7 +78,7 @@ bool test_time_day_month_format(std::ostream &outstream)
         data.erase(el, std::next(el, 4));
     }
 
-    Time t(date);
+    Time t(TimeConv::toTimePoint(date));
     outstream << "\t"
               << "timestamp format:      " << format << std::endl;
     outstream << "\t"
@@ -113,7 +113,7 @@ bool test_time_date_format(std::ostream &outstream, std::string locale_format, s
     bool retval = true;
     // prepare common point in time
     auto mytime = Timestamp();
-    mytime.set_time(time);
+    mytime.set_time(TimeConv::toTimePoint(time));
 
     if (!(mytime.str(locale_format) == fromtime(time, format))) {
         std::cerr << "Format24HourMin errors: "
@@ -147,7 +147,7 @@ bool test_time_day(std::ostream &outstream)
     bool retval     = true;
     time_t sometime = 1569503186;
     auto mytime     = Timestamp();
-    mytime.set_time(sometime);
+    mytime.set_time(TimeConv::toTimePoint(sometime));
 
     if (!(mytime.day() == fromtime(sometime, "%A"))) {
         std::cerr << "Day mismatch: " << std::endl
@@ -165,7 +165,7 @@ bool test_time_day_abbrew(std::ostream &outstream)
     bool retval     = true;
     time_t sometime = 1569503186;
     auto mytime     = Timestamp();
-    mytime.set_time(sometime);
+    mytime.set_time(TimeConv::toTimePoint(sometime));
 
     if (!(mytime.day(true) == fromtime(sometime, "%a"))) {
         std::cerr << "Day mismatch: " << std::endl
@@ -184,7 +184,7 @@ bool test_time_day_abbrew(std::ostream &outstream)
 bool test_time_from_before(std::ostream &outstream, time_t before, std::string format_expected)
 {
     auto retval   = true;
-    auto mytime   = Timestamp(before);
+    auto mytime   = Timestamp(TimeConv::toTimePoint(before));
     tm todaytime  = *localtime(&before);
     char buf[128] = {0};
 

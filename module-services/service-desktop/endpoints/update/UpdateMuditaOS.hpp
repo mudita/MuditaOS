@@ -5,6 +5,7 @@
 
 #include <json/json11.hpp>
 #include <module-utils/microtar/src/microtar.hpp>
+#include <module-utils/time/time_conversion.hpp>
 #include <boot/bootconfig.hpp>
 
 #include <cstdint>
@@ -106,15 +107,15 @@ namespace updateos
 
     struct UpdateRunStatus
     {
-        uint32_t startTime = 0, endTime = 0;
+        utils::time::TimePoint startTime, endTime;
         UpdateState finishedState = UpdateState::Initial;
         UpdateError finishedError = UpdateError::NoError;
         json11::Json fromVersion, toVersion;
 
         json11::Json to_json() const
         {
-            return json11::Json::object{{updateos::settings::startTime, std::to_string(startTime)},
-                                        {updateos::settings::endTime, std::to_string(endTime)},
+            return json11::Json::object{{updateos::settings::startTime, utils::time::CalendarConversion::TimePointToString(startTime)},
+                                        {updateos::settings::endTime, utils::time::CalendarConversion::TimePointToString(endTime)},
                                         {updateos::settings::finishedState, (int)finishedState},
                                         {updateos::settings::finishedError, (int)finishedError},
                                         {updateos::settings::fromVersion, fromVersion},

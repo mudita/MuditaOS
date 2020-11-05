@@ -72,7 +72,7 @@ namespace callLogStyle
                 constexpr uint32_t w = style::window_width / 2 - x;
             } // namespace data
         }     // namespace type
-        namespace duration
+        namespace duration_label
         {
             namespace label
             {
@@ -87,7 +87,7 @@ namespace callLogStyle
                 constexpr uint32_t w = style::window_width / 2 - style::window::default_right_margin;
             } // namespace data
         }     // namespace duration
-        namespace date
+        namespace date_label
         {
             namespace label
             {

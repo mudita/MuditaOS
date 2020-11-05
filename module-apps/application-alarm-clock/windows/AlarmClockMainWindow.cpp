@@ -98,7 +98,7 @@ namespace app::alarmClock
 
         if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LEFT)) {
             auto rec                              = new AlarmsRecord();
-            rec->time                             = TimePointNow();
+            rec->time                             = utils::time::TimePointNow();
             auto event                            = std::make_shared<AlarmsRecord>(*rec);
             std::unique_ptr<AlarmRecordData> data = std::make_unique<AlarmRecordData>(event);
             data->setDescription(style::alarmClock::newAlarm);

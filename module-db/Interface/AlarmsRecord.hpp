@@ -7,7 +7,6 @@
 #include "module-db/Databases/AlarmsDB.hpp"
 #include "module-db/Common/Common.hpp"
 #include <module-utils/utf8/UTF8.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
 #include <stdint.h>
 
 namespace db::query::alarms
@@ -28,7 +27,7 @@ namespace db::query::alarms
 
 struct AlarmsRecord : public Record
 {
-    TimePoint time     = TIME_POINT_INVALID;
+    utils::time::TimePoint time     = utils::time::TIME_POINT_INVALID;
     uint32_t snooze    = 0;
     AlarmStatus status = AlarmStatus::On;
     uint32_t repeat    = 0;

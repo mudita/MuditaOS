@@ -19,13 +19,13 @@ namespace utils::time
         return utils::localize.get(utils::time::Locale::getPM());
     }
 
-    std::string TimeRangeParser::getCalendarTimeString(TimePoint startDate,
-                                                       TimePoint endDate,
+    std::string TimeRangeParser::getCalendarTimeString(utils::time::TimePoint startDate,
+                                                       utils::time::TimePoint endDate,
                                                        Version version,
                                                        bool isMode24H)
     {
-        auto startTime = TimePointToHourMinSec(startDate);
-        auto endTime   = TimePointToHourMinSec(endDate);
+        auto startTime = CalendarConversion::TimePointToHourMinSec(startDate);
+        auto endTime   = CalendarConversion::TimePointToHourMinSec(endDate);
 
         if (startTime.hours().count() == 0 && startTime.minutes().count() == 0 && endTime.hours().count() == max_hour &&
             endTime.minutes().count() == max_minutes) {
@@ -42,29 +42,34 @@ namespace utils::time
 
             if (version == Version::abbrev) {
                 if (!isMode24H) {
-                    return TimePointToHourString12H(startDate) + ":" + TimePointToMinutesString(startDate) + " " +
-                           AMPMtoString(startIsAm);
+                    return CalendarConversion::TimePointToHourString12H(startDate) + ":" +
+                           CalendarConversion::TimePointToMinutesString(startDate) + " " + AMPMtoString(startIsAm);
                 }
                 else {
-                    return TimePointToHourString24H(startDate) + ":" + TimePointToMinutesString(startDate);
+                    return CalendarConversion::TimePointToHourString24H(startDate) + ":" +
+                           CalendarConversion::TimePointToMinutesString(startDate);
                 }
             }
             else {
                 if (!isMode24H) {
                     if (startIsAm != endIsAm) {
-                        return TimePointToHourString12H(startDate) + ":" + TimePointToMinutesString(startDate) + " " +
-                               AMPMtoString(startIsAm) + " - " + TimePointToHourString12H(endDate) + ":" +
-                               TimePointToMinutesString(endDate) + " " + AMPMtoString(endIsAm);
+                        return CalendarConversion::TimePointToHourString12H(startDate) + ":" +
+                               CalendarConversion::TimePointToMinutesString(startDate) + " " + AMPMtoString(startIsAm) +
+                               " - " + CalendarConversion::TimePointToHourString12H(endDate) + ":" +
+                               CalendarConversion::TimePointToMinutesString(endDate) + " " + AMPMtoString(endIsAm);
                     }
                     else {
-                        return TimePointToHourString12H(startDate) + ":" + TimePointToMinutesString(startDate) + " - " +
-                               TimePointToHourString12H(endDate) + ":" + TimePointToMinutesString(endDate) + " " +
-                               AMPMtoString(startIsAm);
+                        return CalendarConversion::TimePointToHourString12H(startDate) + ":" +
+                               CalendarConversion::TimePointToMinutesString(startDate) + " - " +
+                               CalendarConversion::TimePointToHourString12H(endDate) + ":" +
+                               CalendarConversion::TimePointToMinutesString(endDate) + " " + AMPMtoString(startIsAm);
                     }
                 }
                 else {
-                    return TimePointToHourString24H(startDate) + ":" + TimePointToMinutesString(startDate) + " - " +
-                           TimePointToHourString24H(endDate) + ":" + TimePointToMinutesString(endDate);
+                    return CalendarConversion::TimePointToHourString24H(startDate) + ":" +
+                           CalendarConversion::TimePointToMinutesString(startDate) + " - " +
+                           CalendarConversion::TimePointToHourString24H(endDate) + ":" +
+                           CalendarConversion::TimePointToMinutesString(endDate);
                 }
             }
         }

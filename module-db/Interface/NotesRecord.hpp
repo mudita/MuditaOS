@@ -9,13 +9,14 @@
 #include <filesystem>
 
 #include <utf8/UTF8.hpp>
+#include <module-utils/time/time_conversion.hpp>
 
 #include "module-db/Databases/NotesDB.hpp"
 #include "../Common/Common.hpp"
 
 struct NotesRecord : public Record
 {
-    std::uint32_t date;
+    utils::time::TimePoint date;
     UTF8 snippet;
 };
 

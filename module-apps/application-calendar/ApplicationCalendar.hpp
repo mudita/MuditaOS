@@ -7,9 +7,10 @@
 #include "Service/Message.hpp"
 #include "SystemManager/SystemManager.hpp"
 #include "gui/widgets/Label.hpp"
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "NoEvents.hpp"
+#include "EventsRecord.hpp"
 
 namespace app
 {
@@ -18,7 +19,7 @@ namespace app
 
     class ApplicationCalendar : public Application
     {
-        time_t applicationStartTime       = 0;
+        utils::time::TimePoint applicationStartTime;
         int eventShift                    = 0;
         EquivalentWindow equivalentWindow = EquivalentWindow::EmptyWindow;
 
@@ -37,7 +38,7 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
-        time_t getCurrentTimeStamp()
+        utils::time::TimePoint getCurrentTimeStamp()
         {
             return applicationStartTime;
         }
@@ -55,7 +56,7 @@ namespace app
         }
         void createUserInterface() override;
         void destroyUserInterface() override;
-        void switchToNoEventsWindow(const std::string &title = "", const TimePoint &dateFilter = TimePoint());
+        void switchToNoEventsWindow(const std::string &title = "", const utils::time::TimePoint &dateFilter = utils::time::TimePoint());
 
         static const std::map<Reminder, const char *> reminderOptions;
         static const std::map<Repeat, const char *> repeatOptions;

@@ -3,7 +3,7 @@
 
 #pragma once
 #include "Utils.hpp"
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 
 namespace utils::time
 {
@@ -20,8 +20,8 @@ namespace utils::time
         std::string AMPMtoString(bool isAm);
 
       public:
-        std::string getCalendarTimeString(TimePoint startDate,
-                                          TimePoint endDate,
+        std::string getCalendarTimeString(utils::time::TimePoint startDate,
+                                          utils::time::TimePoint endDate,
                                           Version version = Version::normal,
                                           bool isMode24H  = false);
     };

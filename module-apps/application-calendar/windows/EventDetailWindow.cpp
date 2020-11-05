@@ -64,10 +64,9 @@ namespace gui
         }
 
         eventRecord    = item->getData();
-        auto startDate = TimePointToYearMonthDay(eventRecord->date_from);
-        std::string monthStr =
-            utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
-        setTitle(std::to_string(unsigned(startDate.day())) + " " + monthStr);
+        auto startDate       = utils::time::CalendarConversion::TimePointToYearMonthDay(eventRecord->date_from);
+        std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(static_cast<unsigned>(startDate.month()) - 1));
+        setTitle(std::to_string(static_cast<unsigned>(startDate.day())) + " " + monthStr);
 
         return true;
     }

@@ -246,13 +246,13 @@ TS0710::ConfState TS0710::ConfProcedure()
     bool timed_out                 = false;
     constexpr uint32_t qsclkTmeout = 30;
     const auto qsclkTmeoutTicks =
-        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(qsclkTmeout * utils::time::milisecondsInSecond);
+        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(qsclkTmeout * utils::time::miliseconds_in_second);
     while (!timed_out) {
         if (parser->cmd(at::AT::QSCLK_ON)) {
             break;
         }
         // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
-        vTaskDelay(pdMS_TO_TICKS(utils::time::milisecondsInSecond));
+        vTaskDelay(pdMS_TO_TICKS(utils::time::miliseconds_in_second));
         timed_out = cpp_freertos::Ticks::GetTicks() > qsclkTmeoutTicks;
         if (timed_out) {
             return ConfState::Failure;

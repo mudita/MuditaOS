@@ -56,8 +56,8 @@ namespace gui
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-            auto start_time = TimePointToHourMinSec(event->date_from);
-            auto end_time   = TimePointToHourMinSec(event->date_till);
+            auto start_time = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_from);
+            auto end_time   = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_till);
             if (start_time.hours().count() == 0 && start_time.minutes().count() == 0 &&
                 end_time.hours().count() == style::window::calendar::time::max_hour_24H_mode &&
                 end_time.minutes().count() == style::window::calendar::time::max_minutes) {
@@ -66,7 +66,7 @@ namespace gui
         };
         onSaveCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (checkBox->isChecked()) {
-                auto event_start = TimePointToHourMinSec(event->date_from);
+                auto event_start = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_from);
                 event->date_from =
                     event->date_from - event_start.hours() - event_start.minutes() - event_start.seconds();
                 event->date_till = event->date_from +

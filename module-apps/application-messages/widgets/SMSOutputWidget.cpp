@@ -118,7 +118,7 @@ namespace gui
         timeLabel             = new gui::Label(body, 0, 0, 0, 0);
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
-        timeLabel->setText(utils::time::Time(timestamp));
+        timeLabel->setText(utils::time::Time(utils::time::TimeConversion::toTimePoint(timestamp)));
         timeLabel->setVisible(false);
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         timeLabel->setEdges(RectangleEdge::None);

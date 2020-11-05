@@ -82,6 +82,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <chrono>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -1492,7 +1493,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                 tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
 
                 utils::time::Timestamp time;
-                auto messageDate = time.getTime();
+                auto messageDate = time.getLocalTime();
 
                 // if its single message process
                 if (tokens.size() == 5) {
@@ -1531,7 +1532,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 
                     const auto decodedMessage = UCS2(messageRawBody).toUTF8();
 
-                    const auto record = createSMSRecord(decodedMessage, receivedNumber, messageDate);
+                    const auto record =
+                        createSMSRecord(decodedMessage, receivedNumber, utils::time::TimeConversion::toTime_t(messageDate));
 
                     if (!dbAddSMSRecord(record)) {
                         LOG_ERROR("Failed to add text message to db");

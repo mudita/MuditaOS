@@ -58,7 +58,7 @@ namespace gui
         auto mainWindow = dynamic_cast<CalendarMainWindow *>(parent);
         if (mainWindow->returnedFromWindow) {
             focusChangedCallback = [=](Item &item) {
-                calendar::YearMonthDay date = monthFilterValue.year() / monthFilterValue.month() / date::last;
+                utils::time::YearMonthDay date = monthFilterValue.year() / monthFilterValue.month() / date::last;
                 if (unsigned(date.day()) < mainWindow->dayFocusedBefore) {
                     setFocusOnElement(unsigned(date.day()) - 1);
                 }
@@ -69,7 +69,7 @@ namespace gui
             };
         }
         else {
-            date::year_month_day actualDate = TimePointToYearMonthDay(TimePointNow());
+            date::year_month_day actualDate = utils::time::CalendarConversion::TimePointToYearMonthDay(utils::time::TimePointNow());
             if (model->getYear() == actualDate.year() && model->getMonth() == actualDate.month()) {
                 focusChangedCallback = [=](Item &item) {
                     setFocusOnElement(unsigned(actualDate.day()) - 1);

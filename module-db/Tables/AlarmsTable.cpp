@@ -9,12 +9,12 @@ AlarmsTableRow::AlarmsTableRow(const AlarmsRecord &rec)
 {}
 
 AlarmsTableRow::AlarmsTableRow(
-    uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path)
+    uint32_t id, utils::time::TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path)
     : Record{id}, time{time}, snooze{snooze}, status{status}, repeat{repeat}, path{std::move(path)}
 {}
 
 AlarmsTableRow::AlarmsTableRow(const QueryResult &result)
-    : Record{(result)[0].getUInt32()}, time{TimePointFromString((result)[1].getString().c_str())},
+    : Record{(result)[0].getUInt32()}, time{utils::time::CalendarConversion::TimePointFromString((result)[1].getString().c_str())},
       snooze{(result)[2].getUInt32()}, status{static_cast<AlarmStatus>((result)[3].getInt32())},
       repeat{(result)[4].getUInt32()}, path{(result)[5].getString()}
 {}
@@ -31,7 +31,7 @@ bool AlarmsTable::add(AlarmsTableRow entry)
 {
     return db->execute(
         "INSERT or ignore INTO alarms ( time, snooze, status, repeat, path ) VALUES ('%q', %lu, %i, %lu,'%q');",
-        TimePointToString(entry.time).c_str(),
+        utils::time::CalendarConversion::TimePointToString(entry.time).c_str(),
         entry.snooze,
         entry.status,
         entry.repeat,
@@ -70,7 +70,7 @@ bool AlarmsTable::update(AlarmsTableRow entry)
 {
     return db->execute(
         "UPDATE alarms SET time = '%q', snooze = %lu ,status = %i, repeat = %lu, path = '%q' WHERE _id=%lu;",
-        TimePointToString(entry.time).c_str(),
+        utils::time::CalendarConversion::TimePointToString(entry.time).c_str(),
         entry.snooze,
         entry.status,
         entry.repeat,

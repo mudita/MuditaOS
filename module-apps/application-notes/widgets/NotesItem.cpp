@@ -54,7 +54,7 @@ namespace gui
         snippet->setText(noteText);
     }
 
-    void NotesItem::setDateText(std::uint32_t timestamp)
+    void NotesItem::setDateText(utils::time::TimePoint timestamp)
     {
         if (auto dt = utils::time::DateTime(timestamp); dt.isYesterday()) {
             date->setText(utils::localize.get("common_yesterday"));

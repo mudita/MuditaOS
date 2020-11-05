@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS notes(
     _id INTEGER PRIMARY KEY,
-    date INTEGER,
+    date DATETIME,
     snippet TEXT DEFAULT ''
 );

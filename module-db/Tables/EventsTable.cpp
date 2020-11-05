@@ -27,7 +27,7 @@ bool EventsTable::add(EventsTableRow entry)
 {
     // Prevent duplicates using ANDs:
     if (entry.UID.empty()) {
-        entry.UID = createUID();
+        entry.UID = utils::time::CalendarConversion::createUID();
     }
     return db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                        "reminder_fired, provider_type, provider_id, provider_iCalUid) "
@@ -41,17 +41,17 @@ bool EventsTable::add(EventsTableRow entry)
                        "AND e.repeat=%lu );",
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat);
 }
@@ -59,7 +59,7 @@ bool EventsTable::add(EventsTableRow entry)
 bool EventsTable::addDaily(EventsTableRow entry)
 {
     if (entry.UID.empty()) {
-        entry.UID = createUID();
+        entry.UID = utils::time::CalendarConversion::createUID();
     }
     return db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                        "reminder_fired, provider_type, provider_id, provider_iCalUid) VALUES"
@@ -72,71 +72,71 @@ bool EventsTable::addDaily(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u,'%q', '%q', '%q', '%q');",
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{1}).c_str(),
-                       TimePointToString(entry.date_till + date::days{1}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{1}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{2}).c_str(),
-                       TimePointToString(entry.date_till + date::days{2}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{2}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{3}).c_str(),
-                       TimePointToString(entry.date_till + date::days{3}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{3}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{4}).c_str(),
-                       TimePointToString(entry.date_till + date::days{4}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{4}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{5}).c_str(),
-                       TimePointToString(entry.date_till + date::days{5}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{5}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{5}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{6}).c_str(),
-                       TimePointToString(entry.date_till + date::days{6}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{6}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{6}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str());
@@ -145,7 +145,7 @@ bool EventsTable::addDaily(EventsTableRow entry)
 bool EventsTable::addWeekly(EventsTableRow entry)
 {
     if (entry.UID.empty()) {
-        entry.UID = createUID();
+        entry.UID = utils::time::CalendarConversion::createUID();
     }
     return db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                        "reminder_fired, provider_type, provider_id, provider_iCalUid) VALUES"
@@ -155,41 +155,41 @@ bool EventsTable::addWeekly(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u,'%q', '%q', '%q', '%q');",
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{7}).c_str(),
-                       TimePointToString(entry.date_till + date::days{7}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{7}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{7}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{14}).c_str(),
-                       TimePointToString(entry.date_till + date::days{14}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{14}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{14}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{21}).c_str(),
-                       TimePointToString(entry.date_till + date::days{21}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{21}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{21}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str());
@@ -198,7 +198,7 @@ bool EventsTable::addWeekly(EventsTableRow entry)
 bool EventsTable::addTwoWeeks(EventsTableRow entry)
 {
     if (entry.UID.empty()) {
-        entry.UID = createUID();
+        entry.UID = utils::time::CalendarConversion::createUID();
     }
     return db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                        "reminder_fired, provider_type, provider_id, provider_iCalUid) VALUES"
@@ -208,41 +208,41 @@ bool EventsTable::addTwoWeeks(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u,'%q', '%q', '%q', '%q');",
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{14}).c_str(),
-                       TimePointToString(entry.date_till + date::days{14}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{14}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{14}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{28}).c_str(),
-                       TimePointToString(entry.date_till + date::days{28}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{28}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{28}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::days{42}).c_str(),
-                       TimePointToString(entry.date_till + date::days{42}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::days{42}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::days{42}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str());
@@ -251,7 +251,7 @@ bool EventsTable::addTwoWeeks(EventsTableRow entry)
 bool EventsTable::addMonth(EventsTableRow entry)
 {
     if (entry.UID.empty()) {
-        entry.UID = createUID();
+        entry.UID = utils::time::CalendarConversion::createUID();
     }
     return db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                        "reminder_fired, provider_type, provider_id, provider_iCalUid) VALUES"
@@ -269,131 +269,131 @@ bool EventsTable::addMonth(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u,'%q', '%q', '%q', '%q');",
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{1}).c_str(),
-                       TimePointToString(entry.date_till, date::months{1}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{1}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{2}).c_str(),
-                       TimePointToString(entry.date_till, date::months{2}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{2}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{3}).c_str(),
-                       TimePointToString(entry.date_till, date::months{3}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{3}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{4}).c_str(),
-                       TimePointToString(entry.date_till, date::months{4}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{4}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{5}).c_str(),
-                       TimePointToString(entry.date_till, date::months{5}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{5}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{5}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{6}).c_str(),
-                       TimePointToString(entry.date_till, date::months{6}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{6}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{6}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{7}).c_str(),
-                       TimePointToString(entry.date_till, date::months{7}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{7}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{7}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{8}).c_str(),
-                       TimePointToString(entry.date_till, date::months{8}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{8}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{8}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{9}).c_str(),
-                       TimePointToString(entry.date_till, date::months{9}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{9}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{9}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{10}).c_str(),
-                       TimePointToString(entry.date_till, date::months{10}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{10}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{10}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{11}).c_str(),
-                       TimePointToString(entry.date_till, date::months{11}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{11}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{11}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from, date::months{12}).c_str(),
-                       TimePointToString(entry.date_till, date::months{12}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from, date::months{12}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till, date::months{12}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str());
@@ -402,7 +402,7 @@ bool EventsTable::addMonth(EventsTableRow entry)
 bool EventsTable::addYear(EventsTableRow entry)
 {
     if (entry.UID.empty()) {
-        entry.UID = createUID();
+        entry.UID = utils::time::CalendarConversion::createUID();
     }
     return db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                        "reminder_fired, provider_type, provider_id, provider_iCalUid) VALUES"
@@ -412,51 +412,51 @@ bool EventsTable::addYear(EventsTableRow entry)
                        "('%q','%q', '%q','%q', %u, %u,'%q', '%q', '%q', '%q');",
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{1}).c_str(),
-                       TimePointToString(entry.date_till + date::years{1}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::years{1}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::years{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{2}).c_str(),
-                       TimePointToString(entry.date_till + date::years{2}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::years{2}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::years{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{3}).c_str(),
-                       TimePointToString(entry.date_till + date::years{3}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::years{3}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::years{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{4}).c_str(),
-                       TimePointToString(entry.date_till + date::years{4}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from + date::years{4}).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till + date::years{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str());
@@ -489,22 +489,27 @@ bool EventsTable::addCustom(EventsTableRow entry)
     weekDayOptions          = parseOptions(entry.repeat);
     uint32_t incrementation = 0;
 
+    if (entry.UID.empty()) {
+        entry.UID = utils::time::CalendarConversion::createUID();
+    }
+
     result = result && db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, reminder, repeat, "
                                    "reminder_fired, provider_type, provider_id, provider_iCalUid) VALUES"
                                    "('%q','%q', '%q','%q', %u, %u, '%q','%q', '%q','%q');",
                                    entry.UID.c_str(),
                                    entry.title.c_str(),
-                                   TimePointToString(entry.date_from).c_str(),
-                                   TimePointToString(entry.date_till).c_str(),
+                                   utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                                   utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                                    entry.reminder,
                                    entry.repeat,
-                                   TimePointToString(entry.reminder_fired).c_str(),
+                                   utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                                    entry.provider_type.c_str(),
                                    entry.provider_id.c_str(),
                                    entry.provider_iCalUid.c_str());
 
-    auto dateFrom = getFirstWeekDay(entry.date_from);
-    auto dateTill = getFirstWeekDay(entry.date_till);
+    auto dateFrom = utils::time::CalendarConversion::getFirstWeekDay(entry.date_from);
+    auto dateTill = utils::time::CalendarConversion::getFirstWeekDay(entry.date_till);
+
     for (uint32_t i = 1; i <= numberOfWeeks; i++) {
         for (auto option : weekDayOptions) {
             if (option) {
@@ -515,11 +520,11 @@ bool EventsTable::addCustom(EventsTableRow entry)
                                 "('%q','%q', '%q','%q', %u, %u, '%q','%q', '%q','%q');",
                                 entry.UID.c_str(),
                                 entry.title.c_str(),
-                                TimePointToString(dateFrom + date::days{incrementation}).c_str(),
-                                TimePointToString(dateTill + date::days{incrementation}).c_str(),
+                                utils::time::CalendarConversion::TimePointToString(dateFrom + date::days{incrementation}).c_str(),
+                                utils::time::CalendarConversion::TimePointToString(dateTill + date::days{incrementation}).c_str(),
                                 entry.reminder,
                                 entry.repeat,
-                                TimePointToString(entry.reminder_fired).c_str(),
+                                utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                                 entry.provider_type.c_str(),
                                 entry.provider_id.c_str(),
                                 entry.provider_iCalUid.c_str());
@@ -565,11 +570,11 @@ bool EventsTable::update(EventsTableRow entry)
                        "= %u, repeat = %u, reminder_fired = '%q', provider_type = '%q', provider_id = '%q', "
                        "provider_iCalUid = '%q' WHERE _id = %u;",
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
                        entry.reminder,
                        entry.repeat,
-                       TimePointToString(entry.reminder_fired).c_str(),
+                       utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
                        entry.provider_type.c_str(),
                        entry.provider_id.c_str(),
                        entry.provider_iCalUid.c_str(),
@@ -578,19 +583,19 @@ bool EventsTable::update(EventsTableRow entry)
 
 bool EventsTable::updateByUID(EventsTableRow entry)
 {
-    return db->execute("UPDATE events SET title= '%q', date_from = '%q', date_till = '%q', reminder "
-                       "= %u, repeat = %u, reminder_fired = '%q', provider_type = '%q', provider_id = '%q', "
-                       "provider_iCalUid = '%q' WHERE uid = '%q';",
-                       entry.title.c_str(),
-                       TimePointToString(entry.date_from).c_str(),
-                       TimePointToString(entry.date_till).c_str(),
-                       entry.reminder,
-                       static_cast<uint32_t>(entry.repeat),
-                       TimePointToString(entry.reminder_fired).c_str(),
-                       entry.provider_type.c_str(),
-                       entry.provider_id.c_str(),
-                       entry.provider_iCalUid.c_str(),
-                       entry.UID.c_str());
+return db->execute("UPDATE events SET title= '%q', date_from = '%q', date_till = '%q', reminder "
+                    "= %u, repeat = %u, reminder_fired = '%q', provider_type = '%q', provider_id = '%q', "
+                    "provider_iCalUid = '%q' WHERE uid = '%q';",
+                    entry.title.c_str(),
+utils::time::CalendarConversion::TimePointToString(entry.date_from).c_str(),
+utils::time::CalendarConversion::TimePointToString(entry.date_till).c_str(),
+                    entry.reminder,
+                    static_cast<uint32_t>(entry.repeat),
+utils::time::CalendarConversion::TimePointToString(entry.reminder_fired).c_str(),
+                    entry.provider_type.c_str(),
+                    entry.provider_id.c_str(),
+                    entry.provider_iCalUid.c_str(),
+                    entry.UID.c_str());
 }
 
 EventsTableRow EventsTable::getById(uint32_t id)
@@ -607,11 +612,11 @@ EventsTableRow EventsTable::getById(uint32_t id)
         (*retQuery)[0].getUInt32(),                              // ID
         (*retQuery)[1].getString(),                              // UID
         (*retQuery)[2].getString(),                              // title
-        TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
-        TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
         (*retQuery)[5].getUInt32(),                              // reminder
         (*retQuery)[6].getUInt32(),                              // repeat
-        TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
         (*retQuery)[8].getString(),                              // provider type
         (*retQuery)[9].getString(),                              // provider id
         (*retQuery)[10].getString()                              // provider iCalUid
@@ -632,19 +637,19 @@ EventsTableRow EventsTable::getByUID(const std::string &UID)
         (*retQuery)[0].getUInt32(),                              // ID
         (*retQuery)[1].getString(),                              // UID
         (*retQuery)[2].getString(),                              // title
-        TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
-        TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
         (*retQuery)[5].getUInt32(),                              // reminder
         (*retQuery)[6].getUInt32(),                              // repeat
-        TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
         (*retQuery)[8].getString(),                              // provider type
         (*retQuery)[9].getString(),                              // provider id
         (*retQuery)[10].getString()                              // provider iCalUid
     };
 }
 
-std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint filterFrom,
-                                                            TimePoint filterTill,
+std::vector<EventsTableRow> EventsTable::selectByDatePeriod(utils::time::TimePoint filterFrom,
+                                                            utils::time::TimePoint filterTill,
                                                             uint32_t offset,
                                                             uint32_t limit)
 {
@@ -653,12 +658,12 @@ std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint filterFrom
         " ( date('%q') >= date_till AND date_till > date('%q', 'start of day') ) OR "
         " ( date_till > date('%q') AND date('%q', 'start of day') > date_from ) ORDER BY datetime(date_from) LIMIT %u "
         "OFFSET %u;",
-        TimePointToString(filterFrom).c_str(),
-        TimePointToString(filterTill).c_str(),
-        TimePointToString(filterFrom).c_str(),
-        TimePointToString(filterTill).c_str(),
-        TimePointToString(filterFrom).c_str(),
-        TimePointToString(filterTill).c_str(),
+        utils::time::CalendarConversion::TimePointToString(filterFrom).c_str(),
+        utils::time::CalendarConversion::TimePointToString(filterTill).c_str(),
+        utils::time::CalendarConversion::TimePointToString(filterFrom).c_str(),
+        utils::time::CalendarConversion::TimePointToString(filterTill).c_str(),
+        utils::time::CalendarConversion::TimePointToString(filterFrom).c_str(),
+        utils::time::CalendarConversion::TimePointToString(filterTill).c_str(),
         limit,
         offset);
 
@@ -710,11 +715,11 @@ std::vector<EventsTableRow> EventsTable::selectByDate(TimePoint dateFilter, uint
             (*retQuery)[0].getUInt32(),                              // ID
             (*retQuery)[1].getString(),                              // UID
             (*retQuery)[2].getString(),                              // title
-            TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
-            TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
             (*retQuery)[5].getUInt32(),                              // reminder
             (*retQuery)[6].getUInt32(),                              // repeat
-            TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
             (*retQuery)[8].getString(),                              // provider type
             (*retQuery)[9].getString(),                              // provider id
             (*retQuery)[10].getString()                              // provider iCalUid
@@ -741,11 +746,11 @@ std::vector<EventsTableRow> EventsTable::getLimitOffset(uint32_t offset, uint32_
             (*retQuery)[0].getUInt32(),                              // ID
             (*retQuery)[1].getString(),                              // UID
             (*retQuery)[2].getString(),                              // title
-            TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
-            TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
             (*retQuery)[5].getUInt32(),                              // reminder
             (*retQuery)[6].getUInt32(),                              // repeat
-            TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
             (*retQuery)[8].getString(),                              // provider type
             (*retQuery)[9].getString(),                              // provider id
             (*retQuery)[10].getString()                              // provider iCalUid
@@ -758,6 +763,7 @@ std::vector<EventsTableRow> EventsTable::getLimitOffset(uint32_t offset, uint32_
 
 std::vector<EventsTableRow> EventsTable::getLimitOffsetByDate(uint32_t offset, uint32_t limit)
 {
+
     auto retQuery = db->query("SELECT * from events ORDER BY datetime(date_from) LIMIT %u OFFSET %u;", limit, offset);
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
@@ -771,11 +777,11 @@ std::vector<EventsTableRow> EventsTable::getLimitOffsetByDate(uint32_t offset, u
             (*retQuery)[0].getUInt32(),                              // ID
             (*retQuery)[1].getString(),                              // UID
             (*retQuery)[2].getString(),                              // title
-            TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
-            TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
             (*retQuery)[5].getUInt32(),                              // reminder
             (*retQuery)[6].getUInt32(),                              // repeat
-            TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
             (*retQuery)[8].getString(),                              // provider type
             (*retQuery)[9].getString(),                              // provider id
             (*retQuery)[10].getString()                              // provider iCalUid
@@ -813,12 +819,12 @@ uint32_t EventsTable::count()
     return (*queryRet)[0].getUInt32();
 }
 
-uint32_t EventsTable::countFromFilter(TimePoint from, TimePoint till)
+uint32_t EventsTable::countFromFilter(utils::time::TimePoint from, utils::time::TimePoint till)
 {
     auto queryRet = db->query(
         "SELECT COUNT(*) FROM events WHERE date('%q') <= date_from AND date_from < date('%q', 'start of day');",
-        TimePointToString(from).c_str(),
-        TimePointToString(till).c_str());
+        utils::time::CalendarConversion::TimePointToString(from).c_str(),
+        utils::time::CalendarConversion::TimePointToString(till).c_str());
 
     if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
@@ -827,7 +833,7 @@ uint32_t EventsTable::countFromFilter(TimePoint from, TimePoint till)
     return (*queryRet)[0].getUInt32();
 }
 
-uint32_t EventsTable::countFromDayFilter(TimePoint filter)
+uint32_t EventsTable::countFromDayFilter(utils::time::TimePoint filter)
 {
     auto filterFrom = filter + date::days{1};
     auto queryRet   = db->query("SELECT COUNT(*) FROM events WHERE date_from < datetime('%q', 'start of day') AND "
@@ -849,7 +855,7 @@ uint32_t EventsTable::countByFieldId(const char *field, uint32_t id)
     return 0;
 }
 
-std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
+std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(utils::time::TimePoint filter_from, utils::time::TimePoint filter_till)
 {
     auto retQuery = db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
                               "FROM events "
@@ -858,8 +864,8 @@ std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_fr
                               "AND reminder <> -1 "
                               "ORDER BY calc_dt "
                               "LIMIT 1 ",
-                              TimePointToString(filter_from).c_str(),
-                              TimePointToString(TIME_POINT_INVALID).c_str());
+                              utils::time::CalendarConversion::TimePointToString(filter_from).c_str(),
+                              utils::time::CalendarConversion::TimePointToString(utils::time::TIME_POINT_INVALID).c_str());
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
         return std::vector<EventsTableRow>();
@@ -872,11 +878,11 @@ std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_fr
             (*retQuery)[1].getUInt32(),                              // ID
             (*retQuery)[2].getString(),                              // UID
             (*retQuery)[3].getString(),                              // title
-            TimePointFromString((*retQuery)[4].getString().c_str()), // date_from
-            TimePointFromString((*retQuery)[5].getString().c_str()), // date_till
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[4].getString().c_str()), // date_from
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[5].getString().c_str()), // date_till
             (*retQuery)[6].getUInt32(),                              // reminder
             (*retQuery)[7].getUInt32(),                              // repeat
-            TimePointFromString((*retQuery)[8].getString().c_str()), // reminder_fired
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[8].getString().c_str()), // reminder_fired
             (*retQuery)[9].getString(),                              // provider type
             (*retQuery)[10].getString(),                             // provider id
             (*retQuery)[11].getString()                              // provider iCalUid

@@ -93,13 +93,13 @@ namespace gui
                     minutes = 0;
                 }
 
-                if (mode24H && hours > utils::time::hoursInday - 1) {
+                if (mode24H && hours > utils::time::hours_in_day - 1) {
                     hourInput->setText("0");
                 }
-                else if (!mode24H && hours > utils::time::hoursInday / 2) {
+                else if (!mode24H && hours > utils::time::hours_in_day / 2) {
                     hourInput->setText("12");
                 }
-                if (minutes > utils::time::minutesInHour - 1) {
+                if (minutes > utils::time::minutes_in_hour - 1) {
                     minuteInput->setText("00");
                 }
                 return true;
@@ -118,7 +118,7 @@ namespace gui
             if (!mode24H) {
                 hours = date::make24(hours, isPm(mode12hInput->getText()));
             }
-            record->time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
+            record->time = utils::time::CalendarConversion::TimePointFromYearMonthDay(utils::time::CalendarConversion::TimePointToYearMonthDay(utils::time::TimePointNow())) + hours + minutes;
         };
 
         onInputCallback(*hourInput);
@@ -182,9 +182,9 @@ namespace gui
             minuteInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
 
             onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
-                hourInput->setText(TimePointToHourString12H(alarm->time));
-                minuteInput->setText(TimePointToMinutesString(alarm->time));
-                if (date::is_am(TimePointToHourMinSec(alarm->time).hours())) {
+                hourInput->setText(utils::time::CalendarConversion::TimePointToHourString12H(alarm->time));
+                minuteInput->setText(utils::time::CalendarConversion::TimePointToMinutesString(alarm->time));
+                if (date::is_am(utils::time::CalendarConversion::TimePointToHourMinSec(alarm->time).hours())) {
                     mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
                 }
                 else {
@@ -197,8 +197,8 @@ namespace gui
             minuteInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
 
             onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
-                hourInput->setText(TimePointToHourString24H(alarm->time));
-                minuteInput->setText(TimePointToMinutesString(alarm->time));
+                hourInput->setText(utils::time::CalendarConversion::TimePointToHourString24H(alarm->time));
+                minuteInput->setText(utils::time::CalendarConversion::TimePointToMinutesString(alarm->time));
             };
         }
     }

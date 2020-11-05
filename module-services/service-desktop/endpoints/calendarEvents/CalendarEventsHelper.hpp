@@ -12,12 +12,10 @@
 #include <endpoints/Endpoint.hpp>
 #include <endpoints/Context.hpp>
 #include <endpoints/DBHelper.hpp>
-
 #include <module-utils/ical/ParserICS.hpp>
 
 namespace parserFSM
 {
-
     class CalendarEventsHelper : public DBHelper
     {
         [[nodiscard]] auto frequencyFromCustomRepeat(Repeat repeat) const -> Frequency;

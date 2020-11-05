@@ -8,6 +8,7 @@
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
 
 #include <module-db/Interface/NotesRecord.hpp>
+#include <module-utils/time/time_conversion.hpp>
 
 namespace gui
 {
@@ -23,7 +24,7 @@ namespace gui
 
         void buildInterface();
         void setSnippet(const UTF8 &noteText);
-        void setDateText(std::uint32_t timestamp);
+        void setDateText(utils::time::TimePoint timestamp);
 
         std::shared_ptr<NotesRecord> note;
         gui::Label *date            = nullptr;

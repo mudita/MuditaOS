@@ -111,7 +111,7 @@ namespace CellularCall
         clear();
         CalllogRecord callRec;
         callRec.type        = type;
-        callRec.date        = utils::time::Timestamp().getTime();
+        callRec.date        = utils::time::TimeConversion::toTime_t(utils::time::TimePointNow());
         callRec.name        = number.getFormatted(); // temporary set name to entered number
         callRec.phoneNumber = number;
         call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
@@ -143,7 +143,8 @@ namespace CellularCall
 
         if (isActiveCall) {
             auto endTime  = utils::time::Timestamp();
-            call.duration = (endTime - startActiveTime).get();
+            auto offset = (endTime - startActiveTime).get();
+            call.duration = offset.count();
         }
         else {
             auto callType = call.type;

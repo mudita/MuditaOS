@@ -376,7 +376,7 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 
         auto record = eventsRecordFrom(icalEvent);
         if (record.UID.empty()) {
-            record.UID   = createUID();
+            record.UID   = utils::time::CalendarConversion::createUID();
             auto jsonObj = json11::Json::object({{json::calendar::event::uid, record.UID}});
             context.setResponseBody(jsonObj);
         }

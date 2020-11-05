@@ -5,7 +5,7 @@
 
 namespace db::query::events
 {
-    SelectFirstUpcoming::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
+    SelectFirstUpcoming::SelectFirstUpcoming(utils::time::TimePoint filter_from, utils::time::TimePoint filter_till)
         : Query(Query::Type::Read), filter_from(filter_from), filter_till(filter_till)
     {}
 

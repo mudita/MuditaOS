@@ -16,6 +16,7 @@
 #include "queries/alarms/QueryAlarmsTurnOffAll.hpp"
 
 #include <algorithm>
+#include <time/time_conversion.hpp>
 
 #include <cstdint>
 #include <cstdio>
@@ -41,7 +42,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(test.path == "");
     }
 
-    auto time = TimePointFromString("2020-11-11 15:15:00");
+    auto time = CalendarConv::TimePointFromString("2020-11-11 15:15:00");
     SECTION("Constructor from AlarmsTableRow")
     {
         AlarmsTableRow tableRow(1, time, 0, AlarmStatus::On, 0, "musicFile.mp3");
@@ -97,9 +98,10 @@ TEST_CASE("Alarms Record tests")
         REQUIRE_FALSE(entry.isValid());
     }
 
-    AlarmsTableRow tableRow2(2, TimePointFromString("2020-11-12 18:00:00"), 3, AlarmStatus::On, 0, "musicFile123.mp3");
+    AlarmsTableRow tableRow2(
+        2, CalendarConv::TimePointFromString("2020-11-12 18:00:00"), 3, AlarmStatus::On, 0, "musicFile123.mp3");
     auto rec2 = AlarmsRecord(tableRow2);
-    REQUIRE(rec2.time == TimePointFromString("2020-11-12 18:00:00"));
+    REQUIRE(rec2.time == CalendarConv::TimePointFromString("2020-11-12 18:00:00"));
     REQUIRE(rec2.snooze == 3);
     REQUIRE(rec2.status == AlarmStatus::On);
     REQUIRE(rec2.repeat == 0);
@@ -114,7 +116,7 @@ TEST_CASE("Alarms Record tests")
     SECTION("Entry update")
     {
         auto entryUpdate   = alarmsRecordInterface.GetByID(1);
-        entryUpdate.time   = TimePointFromString("2020-12-31 23:59:00");
+        entryUpdate.time   = CalendarConv::TimePointFromString("2020-12-31 23:59:00");
         entryUpdate.snooze = 0;
         entryUpdate.status = AlarmStatus::On;
         entryUpdate.path   = "musicFileUpdate.mp3";
@@ -184,7 +186,7 @@ TEST_CASE("Alarms Record tests")
     }
 
     auto getQuery = [&](uint32_t id,
-                        TimePoint alarmTime,
+                        utils::time::TimePoint alarmTime,
                         uint32_t snooze,
                         AlarmStatus status,
                         uint32_t repeat,
@@ -257,7 +259,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(entryResult != nullptr);
 
         auto record   = entryResult->getResult();
-        record.time   = TimePointFromString("2021-01-01 09:00:00");
+        record.time   = CalendarConv::TimePointFromString("2021-01-01 09:00:00");
         record.snooze = 1;
         record.status = AlarmStatus::On;
         record.repeat = 0;
@@ -268,12 +270,13 @@ TEST_CASE("Alarms Record tests")
         auto result = dynamic_cast<db::query::alarms::EditResult *>(ret.get());
         REQUIRE(result != nullptr);
 
-        getQuery(1, TimePointFromString("2021-01-01 09:00:00"), 1, AlarmStatus::On, 0, "newFile.wav");
+        getQuery(1, CalendarConv::TimePointFromString("2021-01-01 09:00:00"), 1, AlarmStatus::On, 0, "newFile.wav");
     }
 
     SECTION("Add with query")
     {
-        AlarmsTableRow tableRow3(4, TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, "music.wav");
+        AlarmsTableRow tableRow3(
+            4, CalendarConv::TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, "music.wav");
         auto record = AlarmsRecord(tableRow3);
         auto query  = std::make_shared<db::query::alarms::Add>(record);
         auto ret    = alarmsRecordInterface.runQuery(query);
@@ -282,7 +285,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(result->succeed());
         auto maxID = alarmsRecordInterface.GetCount();
 
-        getQuery(maxID, TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, "music.wav");
+        getQuery(maxID, CalendarConv::TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, "music.wav");
     }
 
     Database::deinitialize();

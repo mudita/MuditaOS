@@ -34,7 +34,7 @@ namespace gui::model
         auto ret = new gui::SearchResultsItem();
         {
             ret->setContact(threadStruct->contact->getFormattedName());
-            ret->setTimestamp(utils::time::DateTime(threadStruct->thread->date));
+            ret->setTimestamp(utils::time::DateTime(utils::time::TimeConversion::toTimePoint(threadStruct->thread->date)));
             // The only thing that differs with ThreadModel actually - here show what was found
             ret->setPreview(threadStruct->thread->snippet);
         }

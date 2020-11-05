@@ -298,7 +298,7 @@ namespace app
         assert(!body.empty()); // precondition check.
 
         record.body = body;
-        record.date = utils::time::getCurrentTimestamp().getTime();
+        record.date = utils::time::TimeConversion::toTime_t(utils::time::TimePointNow());
 
         using db::query::SMSUpdate;
         const auto [succeed, _] =
@@ -315,7 +315,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::DRAFT;
-        record.date   = utils::time::getCurrentTimestamp().getTime();
+        record.date   = utils::time::TimeConversion::toTime_t(utils::time::TimePointNow());
 
         using db::query::SMSAdd;
         const auto [success, _] =
@@ -341,7 +341,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::QUEUED;
-        record.date   = utils::time::getCurrentTimestamp().getTime();
+        record.date   = utils::time::TimeConversion::toTime_t(utils::time::TimePointNow());
 
         using db::query::SMSAdd;
         const auto [succeed, _] =
@@ -354,8 +354,8 @@ namespace app
         auto resendRecord = record;
         resendRecord.type = SMSType::QUEUED;
         resendRecord.date =
-            utils::time::getCurrentTimestamp().getTime(); // update date sent - it will display an old, failed sms at
-                                                          // the the bottom, but this is correct
+                utils::time::TimeConversion::toTime_t(utils::time::TimePointNow()); // update date sent - it will display an old, failed
+                                                                 // sms at the the bottom, but this is correct
 
         using db::query::SMSUpdate;
         const auto [succeed, _] =

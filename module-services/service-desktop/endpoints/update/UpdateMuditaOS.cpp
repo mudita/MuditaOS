@@ -80,7 +80,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
     informDebug("Prepraring temp dir");
 
-    updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
+    updateRunStatus.startTime   = utils::time::TimePointNow();
     updateRunStatus.fromVersion = bootConfig.to_json();
     storeRunStatusInDB();
 
@@ -133,7 +133,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
         informError(err, "runUpdate cleanupAfterUpdate failed, resetting anyway");
     }
 
-    updateRunStatus.endTime = utils::time::Time().getTime();
+    updateRunStatus.endTime = utils::time::TimePointNow();
     storeRunStatusInDB();
 
     // reboot always
@@ -779,7 +779,7 @@ void UpdateMuditaOS::storeRunStatusInDB()
         for (const auto &value : updateHistory.array_items()) {
             try {
                 // need to use stoul as json does not seem to handle it well
-                if (std::stoul(value[updateos::settings::startTime].string_value()) == updateRunStatus.startTime) {
+                if (utils::time::CalendarConversion::TimePointFromString(value[updateos::settings::startTime].string_value().c_str()) == updateRunStatus.startTime) {
                     tempTable.emplace_back(updateRunStatus);
 
                     // this tells us we already found and element in history

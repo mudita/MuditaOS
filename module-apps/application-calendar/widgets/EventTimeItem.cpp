@@ -262,10 +262,10 @@ namespace gui
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
                 if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
-                    auto start_time = TimePointToHourMinSec(event->date_from);
+                    auto start_time = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_from);
 
-                    hourInput->setText(TimePointToHourString12H(event->date_from));
-                    minuteInput->setText(TimePointToMinutesString(event->date_from));
+                    hourInput->setText(utils::time::CalendarConversion::TimePointToHourString12H(event->date_from));
+                    minuteInput->setText(utils::time::CalendarConversion::TimePointToMinutesString(event->date_from));
 
                     if (date::is_am(start_time.hours())) {
                         mode12hInput->setText(timeConstants::before_noon);
@@ -275,10 +275,10 @@ namespace gui
                     }
                 }
                 else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
-                    auto end_time = TimePointToHourMinSec(event->date_till);
+                    auto end_time = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_till);
 
-                    hourInput->setText(TimePointToHourString12H(event->date_till));
-                    minuteInput->setText(TimePointToMinutesString(event->date_till));
+                    hourInput->setText(utils::time::CalendarConversion::TimePointToHourString12H(event->date_till));
+                    minuteInput->setText(utils::time::CalendarConversion::TimePointToMinutesString(event->date_till));
                     if (date::is_am(end_time.hours())) {
                         mode12hInput->setText(timeConstants::before_noon);
                     }
@@ -298,12 +298,12 @@ namespace gui
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
                 if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
-                    auto start_time = TimePointToHourMinSec(event->date_from);
+                    auto start_time = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_from);
                     hourInput->setText(std::to_string(date::make12(start_time.hours()).count()));
                     minuteInput->setText(std::to_string(start_time.minutes().count()));
                 }
                 else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
-                    auto end_time = TimePointToHourMinSec(event->date_till);
+                    auto end_time = utils::time::CalendarConversion::TimePointToHourMinSec(event->date_till);
                     hourInput->setText(std::to_string(date::make12(end_time.hours()).count()));
                     minuteInput->setText(std::to_string(end_time.minutes().count()));
                 }
@@ -346,7 +346,7 @@ namespace gui
             }
             catch (std::exception &e) {
                 LOG_ERROR("EventTimeItem::validateHour start_hour: %s", e.what());
-                start_hour = TimePointToHourMinSec(TimePointNow()).hours();
+                start_hour = utils::time::CalendarConversion::TimePointToHourMinSec(utils::time::TimePointNow()).hours();
             }
 
             try {
@@ -363,7 +363,7 @@ namespace gui
             }
             catch (std::exception &e) {
                 LOG_ERROR("EventTimeItem::validateHour start_minutes: %s", e.what());
-                start_minutes = TimePointToHourMinSec(TimePointNow()).minutes().count();
+                start_minutes = utils::time::CalendarConversion::TimePointToHourMinSec(utils::time::TimePointNow()).minutes().count();
             }
 
             try {
@@ -433,11 +433,11 @@ namespace gui
         }
     }
 
-    TimePoint EventTimeItem::calculateEventTime(calendar::YearMonthDay date,
+    utils::time::TimePoint EventTimeItem::calculateEventTime(utils::time::YearMonthDay date,
                                                 std::chrono::hours hours,
                                                 std::chrono::minutes minutes)
     {
-        return TimePointFromYearMonthDay(date) + hours + minutes;
+        return utils::time::CalendarConversion::TimePointFromYearMonthDay(date) + hours + minutes;
     }
 
 } /* namespace gui */

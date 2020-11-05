@@ -53,7 +53,7 @@ namespace gui
             assert(actualMonthBox != nullptr);
 
             uint32_t numb = cellIndex - firstWeekOffset - style::window::calendar::week_days_number + 1;
-            date::year_month_day actualDate = TimePointToYearMonthDay(TimePointNow());
+            date::year_month_day actualDate = utils::time::CalendarConversion::TimePointToYearMonthDay(utils::time::TimePointNow());
             std::string number              = std::to_string(numb);
             if (!isDayEmpty) {
                 this->dotImage->setVisible(true);
@@ -71,9 +71,9 @@ namespace gui
             this->activatedCallback = [=](gui::Item &item) {
                 auto data       = std::make_unique<DayMonthData>();
                 auto month      = actualMonthBox->month;
-                auto dateFilter = actualMonthBox->monthFilterValue.year() / actualMonthBox->monthFilterValue.month() /
-                                  date::day(numb);
-                auto filter = TimePointFromYearMonthDay(dateFilter);
+                auto dateFilter =
+                    actualMonthBox->monthFilterValue.year() / actualMonthBox->monthFilterValue.month() / date::day(numb);
+                auto filter = utils::time::CalendarConversion::TimePointFromYearMonthDay(dateFilter);
                 data->setData(number + " " + month, filter);
                 LOG_DEBUG("Switch to DayEventsWindow");
                 if (auto calendarApp = dynamic_cast<app::ApplicationCalendar *>(app); calendarApp != nullptr) {
@@ -93,10 +93,6 @@ namespace gui
         std::string text = dayNumber->getText();
         try {
             auto result = std::stoi(text.c_str());
-            if (result == 0 || result > max_month_day) {
-                LOG_ERROR("Wrong day number!");
-                return 0;
-            }
             return result;
         }
         catch (std::exception &e) {

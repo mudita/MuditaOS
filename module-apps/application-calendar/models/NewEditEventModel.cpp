@@ -123,8 +123,8 @@ void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
 {
     list->clear();
     eraseInternalData();
-    auto start_time    = TimePointToHourMinSec(record->date_from);
-    auto end_time      = TimePointToHourMinSec(record->date_till);
+    auto start_time    = utils::time::CalendarConversion::TimePointToHourMinSec(record->date_from);
+    auto end_time      = utils::time::CalendarConversion::TimePointToHourMinSec(record->date_till);
     auto isAllDayEvent = [&]() -> bool {
         return start_time.hours().count() == 0 && start_time.minutes().count() == 0 &&
                end_time.hours().count() == style::window::calendar::time::max_hour_24H_mode &&
@@ -140,10 +140,10 @@ void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
     }
 
     if (isAllDayEvent()) {
-        record->date_from = record->date_from - TimePointToHourMinSec(record->date_from).hours() -
-                            TimePointToHourMinSec(record->date_from).minutes() +
-                            TimePointToHourMinSec(TimePointNow()).hours() +
-                            TimePointToHourMinSec(TimePointNow()).minutes();
+        record->date_from = record->date_from - utils::time::CalendarConversion::TimePointToHourMinSec(record->date_from).hours() -
+                utils::time::CalendarConversion::TimePointToHourMinSec(record->date_from).minutes() +
+                utils::time::CalendarConversion::TimePointToHourMinSec(utils::time::TimePointNow()).hours() +
+                utils::time::CalendarConversion::TimePointToHourMinSec(utils::time::TimePointNow()).minutes();
         record->date_till = record->date_from + std::chrono::hours(1);
         if (dateItem->onLoadCallback) {
             dateItem->onLoadCallback(record);
@@ -203,7 +203,7 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
 
     if (edit) {
         auto record = event.get();
-        record->reminder_fired = TIME_POINT_INVALID;
+        record->reminder_fired = utils::time::TIME_POINT_INVALID;
         if (record->title != "") {
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*record));
@@ -218,10 +218,9 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*record));
 
             auto data       = std::make_unique<DayMonthData>();
-            auto startDate  = TimePointToYearMonthDay(record->date_from);
-            auto filterDate = TimePointFromYearMonthDay(startDate);
-            std::string monthStr =
-                utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+            auto startDate       = utils::time::CalendarConversion::TimePointToYearMonthDay(record->date_from);
+            auto filterDate      = utils::time::CalendarConversion::TimePointFromYearMonthDay(startDate);
+            std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
             data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
 
             if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {

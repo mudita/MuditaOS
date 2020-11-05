@@ -5,7 +5,7 @@
 
 namespace db::query::events
 {
-    GetFiltered::GetFiltered(TimePoint filter_from, TimePoint filter_till, uint32_t offset, uint32_t limit)
+    GetFiltered::GetFiltered(utils::time::TimePoint filter_from, utils::time::TimePoint filter_till, uint32_t offset, uint32_t limit)
         : Query(Query::Type::Read), filter_from(filter_from), filter_till(filter_till), offset(offset), limit(limit)
     {}
 

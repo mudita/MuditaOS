@@ -57,7 +57,7 @@ NotesTableRow NotesTable::getById(std::uint32_t id)
     }
     return NotesTableRow{
         (*retQuery)[0].getUInt32(), // ID
-        (*retQuery)[1].getUInt32(), // date
+        utils::time::CalendarConversion::TimePointFromString((*retQuery)[1].getString().c_str()), // date
         (*retQuery)[2].getString()  // snippet
     };
 }
@@ -73,7 +73,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffset(std::uint32_t offset, std:
     do {
         ret.push_back(NotesTableRow{
             (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // date
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[1].getString().c_str()), // date
             (*retQuery)[2].getString()  // snippet
         });
     } while (retQuery->nextRow());
@@ -110,7 +110,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(std::uint32_t offse
     do {
         ret.push_back(NotesTableRow{
             (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // date
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[1].getString().c_str()), // date
             (*retQuery)[2].getString()  // snippet
         });
     } while (retQuery->nextRow());
@@ -128,7 +128,7 @@ std::vector<NotesTableRow> NotesTable::getByText(const std::string &text)
     do {
         NotesTableRow row{
             (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // date
+            utils::time::CalendarConversion::TimePointFromString((*retQuery)[1].getString().c_str()), // date
             (*retQuery)[2].getString()  // snippet
         };
         records.push_back(std::move(row));

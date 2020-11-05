@@ -94,7 +94,7 @@ namespace app::notes
         note->setText(notesRecord->snippet);
     }
 
-    void NotePreviewWindow::setEditDateText(std::uint32_t timestamp)
+    void NotePreviewWindow::setEditDateText(utils::time::TimePoint timestamp)
     {
         utils::time::DateTime dt{timestamp};
         std::ostringstream dateText;

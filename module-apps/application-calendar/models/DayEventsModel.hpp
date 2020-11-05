@@ -15,13 +15,13 @@ class DayEventsModel : public app::DatabaseModel<EventsRecord>,
 {
     app::Application *application = nullptr;
     std::string dayMonthTitle;
-    TimePoint filterFrom = TIME_POINT_INVALID;
-    TimePoint filterTill = TIME_POINT_INVALID;
+    utils::time::TimePoint filterFrom = utils::time::TIME_POINT_INVALID;
+    utils::time::TimePoint filterTill = utils::time::TIME_POINT_INVALID;
 
   public:
     DayEventsModel(app::Application *app);
 
-    void setFilters(TimePoint from, TimePoint till, const std::string &dayMonth);
+    void setFilters(utils::time::TimePoint from, utils::time::TimePoint till, const std::string &dayMonth);
 
     bool updateRecords(std::vector<EventsRecord> records) override;
     auto handleQueryResponse(db::QueryResult *) -> bool;

@@ -5,24 +5,27 @@
 #include <time/time_locale.hpp>
 #include <time/time_conversion.hpp>
 
-date::year_month_day MonthModel::getYearMonthDayFromTimePoint(TimePoint timePoint) const
+date::year_month_day MonthModel::getYearMonthDayFromTimePoint(utils::time::TimePoint timePoint) const
 {
     return date::year_month_day{date::floor<date::days>(timePoint)};
 }
 
 uint32_t MonthModel::getEventDurationInDays(const EventsRecord &record) const
 {
+    auto eventDuration = utils::time::Duration(record.date_from, record.date_till);
+    ///TODO: save this method logic and return the exact duration in days
+    ///     add getDays method in Duration class
     auto eventStartDuration = utils::time::Duration(TimePointToTimeT(record.date_from));
     auto eventEndDuration   = utils::time::Duration(TimePointToTimeT(record.date_till));
     auto startEventDurationSinceEpochInDaysRoundedDown =
-        (eventStartDuration.getHours() - eventStartDuration.getHours() % utils::time::hoursInday) /
-        utils::time::hoursInday;
+        (eventStartDuration.getHours() - eventStartDuration.getHours() % utils::time::hours_in_day) /
+        utils::time::hours_in_day;
     auto endEventDurationSinceEpochInDaysRoundedDown =
-        (eventEndDuration.getHours() - eventEndDuration.getHours() % utils::time::hoursInday) / utils::time::hoursInday;
+        (eventEndDuration.getHours() - eventEndDuration.getHours() % utils::time::hours_in_day) / utils::time::hours_in_day;
     return endEventDurationSinceEpochInDaysRoundedDown - startEventDurationSinceEpochInDaysRoundedDown;
 }
 
-uint32_t MonthModel::getDayIndex(TimePoint date) const
+uint32_t MonthModel::getDayIndex(utils::time::TimePoint date) const
 {
     date::year_month_day recordDate = TimePointToYearMonthDay(date);
     return (static_cast<unsigned>(recordDate.day()) - 1);
@@ -46,7 +49,7 @@ void MonthModel::markEventsInDays(const std::vector<EventsRecord> &records, std:
         auto eventYearMonthTill = YearMonth(getYearMonthDayFromTimePoint(rec.date_till));
 
         if (eventYearMonthFrom < this->yearMonth && this->yearMonth < eventYearMonthTill) {
-            for (uint32_t i = 0; i < max_month_day; i++) {
+            for (uint32_t i = 0; i < utils::time::max_month_day; i++) {
                 isDayEmpty[i] = false;
             }
             return;

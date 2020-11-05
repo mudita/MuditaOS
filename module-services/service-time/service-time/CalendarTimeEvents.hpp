@@ -4,7 +4,7 @@
 #pragma once
 #include "TimeEvents.hpp"
 
-#include <application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
 
@@ -27,7 +27,7 @@ namespace stm
     {
       private:
         EventsRecord eventRecord;
-        TimePoint startTP = TIME_POINT_INVALID;
+        utils::time::TimePoint startTP = utils::time::TIME_POINT_INVALID;
 
       protected:
         const std::string timerName() override

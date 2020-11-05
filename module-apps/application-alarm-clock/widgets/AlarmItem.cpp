@@ -4,7 +4,6 @@
 #include "AlarmItem.hpp"
 #include "AlarmClockStyle.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
-#include "application-calendar/data/dateCommon.hpp"
 #include <InputEvent.hpp>
 #include <module-utils/time/time_conversion.hpp>
 
@@ -54,7 +53,7 @@ namespace gui
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(
+        timeLabel->setText(utils::time::CalendarConversion::TimePointToLocalizedTimeString(
             alarm->time, utils::time::Locale::format(utils::time::Locale::FormatTime12H)));
         if (alarm->status == AlarmStatus::Off) {
             onOffImage->switchState(ButtonState::Off);

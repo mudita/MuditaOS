@@ -69,11 +69,9 @@ namespace gui
 
     void MeditationTimer::updateTimer()
     {
-        using utils::time::Duration;
-
         const auto secondsRemaining = duration - elapsed;
-        const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
-        timer->setText(remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S));
+        const utils::time::Duration remainingDuration{secondsRemaining};
+        timer->setText(remainingDuration.str(utils::time::Duration::DisplayedFormat::Fixed0M0S));
     }
 
     auto MeditationTimer::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool

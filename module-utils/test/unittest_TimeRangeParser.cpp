@@ -4,7 +4,6 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include "time/TimeRangeParser.hpp"
-#include <module-apps/application-calendar/data/dateCommon.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
 
 #include <cstdint>

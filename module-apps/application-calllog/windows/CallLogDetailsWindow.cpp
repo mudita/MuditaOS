@@ -27,6 +27,7 @@
 #include <Style.hpp>
 #include <cassert>
 #include <module-apps/application-messages/data/SMSdata.hpp>
+#include <chrono>
 
 using namespace calllog;
 using namespace callLogStyle::detailsWindow;
@@ -174,18 +175,20 @@ namespace gui
 
         // Duration
         durationLabel = decorateLabel(new gui::Label(this,
-                                                     duration::label::x,
-                                                     duration::label::y,
-                                                     duration::label::w,
+                                                     duration_label::label::x,
+                                                     duration_label::label::y,
+                                                     duration_label::label::w,
                                                      0,
                                                      utils::localize.get("app_calllog_duration")));
-        durationData  = decorateData(new gui::Label(this, duration::data::x, duration::data::y, duration::data::w, 0));
+        durationData =
+            decorateData(new gui::Label(this, duration_label::data::x, duration_label::data::y, duration_label::data::w, 0));
 
         // Date
         dateLabel = decorateLabel(new gui::Label(
-            this, date::label::x, date::label::y, date::label::w, 0, utils::localize.get("app_calllog_date")));
-        dateDay   = decorateData(new gui::Label(this, date::dataDay::x, date::dataDay::y, date::dataDay::w, 0));
-        dateDate  = decorateData(new gui::Label(this, date::dataDate::x, date::dataDate::y, date::dataDate::w, 0));
+            this, date_label::label::x, date_label::label::y, date_label::label::w, 0, utils::localize.get("app_calllog_date")));
+        dateDay = decorateData(new gui::Label(this, date_label::dataDay::x, date_label::dataDay::y, date_label::dataDay::w, 0));
+        dateDate =
+            decorateData(new gui::Label(this, date_label::dataDate::x, date_label::dataDate::y, date_label::dataDate::w, 0));
     }
 
     void CallLogDetailsWindow::destroyInterface()
@@ -233,9 +236,9 @@ namespace gui
             }
             typeData->setText(callTypeStr);
 
-            durationData->setText(utils::time::Duration(record.duration).str());
+            durationData->setText(utils::time::Duration(std::chrono::seconds(record.duration)).str());
 
-            utils::time::Timestamp t(record.date);
+            utils::time::Timestamp t(utils::time::TimeConversion::toTimePoint(record.date));
             dateDay->setText(t.day() + ",");
             dateDate->setText(t.str(utils::localize.get("locale_date_full") + ", " +
                                     utils::localize.get("locale_12hour_min"))); // TODO: alek 12/24 h

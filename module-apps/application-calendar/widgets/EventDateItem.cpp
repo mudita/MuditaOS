@@ -135,7 +135,7 @@ namespace gui
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> record) {
-            auto date = TimePointToYearMonthDay(record->date_from);
+            auto date = utils::time::CalendarConversion::TimePointToYearMonthDay(record->date_from);
             dayInput->setText(std::to_string(static_cast<unsigned>(date.day())));
             monthInput->setText(std::to_string(static_cast<unsigned>(date.month())));
             yearInput->setText(std::to_string(static_cast<int>(date.year())));
@@ -149,9 +149,9 @@ namespace gui
         return true;
     }
 
-    calendar::YearMonthDay EventDateItem::validateDate()
+    utils::time::YearMonthDay EventDateItem::validateDate()
     {
-        auto actualDate = TimePointToYearMonthDay(TimePointNow());
+        auto actualDate = utils::time::CalendarConversion::TimePointToYearMonthDay(utils::time::TimePointNow());
         uint32_t day;
         try {
             day = std::stoi(dayInput->getText().c_str());
@@ -185,7 +185,7 @@ namespace gui
         }
         month = std::clamp(static_cast<unsigned>(month), 1u, static_cast<unsigned>(date::dec));
 
-        calendar::YearMonthDayLast max_date = date::year(year) / date::month(month) / date::last;
+        utils::time::YearMonthDayLast max_date = date::year(year) / date::month(month) / date::last;
         if (day > static_cast<unsigned>(max_date.day())) {
             dayInput->setText(std::to_string(static_cast<unsigned>(max_date.day())));
         }
@@ -194,7 +194,7 @@ namespace gui
         return date::year(year) / date::month(month) / date::day(day);
     }
 
-    const calendar::YearMonthDay EventDateItem::getChosenDate()
+    const utils::time::YearMonthDay EventDateItem::getChosenDate()
     {
         return validateDate();
     }

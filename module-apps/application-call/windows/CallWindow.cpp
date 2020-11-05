@@ -394,8 +394,8 @@ namespace gui
                 timer.stop();
                 detachTimer(timer);
             }
-            std::chrono::time_point<std::chrono::system_clock> systemUnitDuration(callDuration);
-            updateDuration(std::chrono::system_clock::to_time_t(systemUnitDuration));
+            utils::time::TimePoint systemUnitDuration(callDuration);
+            updateDuration(utils::time::Duration(std::chrono::seconds(utils::time::TimeConversion::toTime_t(systemUnitDuration))));
             callDuration++;
             LOG_DEBUG("Update duration timer callback - %" PRIu32, static_cast<uint32_t>(callDuration.count()));
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

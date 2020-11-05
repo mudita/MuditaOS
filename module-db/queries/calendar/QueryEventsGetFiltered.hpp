@@ -6,18 +6,18 @@
 #include "module-db/Interface/EventsRecord.hpp"
 #include <Common/Query.hpp>
 #include <string>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/time_conversion.hpp>
 
 namespace db::query::events
 {
     class GetFiltered : public Query
     {
       public:
-        GetFiltered(TimePoint filter_from, TimePoint filter_till, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
+        GetFiltered(utils::time::TimePoint filter_from, utils::time::TimePoint filter_till, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        TimePoint filter_from;
-        TimePoint filter_till;
+        utils::time::TimePoint filter_from;
+        utils::time::TimePoint filter_till;
         uint32_t offset;
         uint32_t limit;
     };
