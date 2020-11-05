@@ -34,4 +34,4 @@ namespace vfsn::internal::syscalls
     int chmod(int &_errno_, const char *path, mode_t mode);
     int fchmod(int &_errno_, int fd, mode_t mode);
     int fsync(int &_errno_, int fd);
-} // namespace vfs::io::syscalls
+} // namespace vfsn::internal::syscalls

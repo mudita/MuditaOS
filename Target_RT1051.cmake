@@ -36,6 +36,7 @@ add_compile_definitions(
         SKIP_SYSCLK_INIT
         _HAVE_SQLITE_CONFIG_H
         CPP_FREERTOS_NO_EXCEPTIONS
+        _GLIBCXX_HAVE_DIRENT_H
         )
 
 set(TARGET_COMPILE_OPTIONS
@@ -71,6 +72,7 @@ set(TARGET_SOURCES
 
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/_exit.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/io_syscalls.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/fs_dir.cc
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/memwrap.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_flexspi_nor_config.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_sdram_ini_dcd.c

@@ -14,9 +14,11 @@ namespace vfsn::internal::dirent
         FF_Stat_t fs;
         if (ff_stat(path, &fs)) {
             _errno_ = stdioGET_ERRNO();
+            if (_errno_ == EFAULT)
+                _errno_ = ENOENT;
             return nullptr;
         }
-        if (!(fs.st_mode & FF_FAT_ATTR_DIR)) {
+        if (!(fs.st_mode & FF_IFDIR)) {
             _errno_ = ENOTDIR;
             return nullptr;
         }
@@ -61,6 +63,8 @@ namespace vfsn::internal::dirent
             ret      = ff_findnext(fdd);
         }
         _errno_ = stdioGET_ERRNO();
+        if (_errno_ == EFAULT)
+            _errno_ = ENOENT;
         return ret;
     }
 

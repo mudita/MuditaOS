@@ -46,4 +46,4 @@ namespace vfsn::internal::stdlib
             return reinterpret_cast<T *>(impl::HandleManager::clearHandle(hwnd));
         }
     };
-} // namespace vfs::internal::stdlib
+} // namespace vfsn::internal::stdlib

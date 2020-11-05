@@ -25,4 +25,4 @@ namespace vfsn::internal::stdlib::impl
         }
         return -1;
     }
-} // namespace vfs::internal::stdlib::impl
+} // namespace vfsn::internal::stdlib::impl

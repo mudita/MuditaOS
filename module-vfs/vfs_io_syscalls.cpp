@@ -7,6 +7,7 @@
 #include <log/log.hpp>
 #include <fcntl.h>
 #include <cstring>
+#include <unistd.h>
 #include "vfs_internal_dirent.hpp"
 #include "HandleManager.hpp"
 
@@ -50,6 +51,7 @@ namespace vfsn::internal
                 return "";
             }
         }
+
     } // namespace
 
 } // namespace vfsn::internal
@@ -63,7 +65,6 @@ namespace vfsn::internal::syscalls
             _errno_ = EINVAL;
             return -1;
         }
-        LOG_DEBUG("Trying to open file %s", file);
         auto fil = ff_fopen(file, fflags);
         if (!fil) {
             _errno_ = stdioGET_ERRNO();
@@ -78,7 +79,6 @@ namespace vfsn::internal::syscalls
         }
         else {
             _errno_ = 0;
-            LOG_DEBUG("Assigned handle %i fileptr %p", hwnd, fil);
             return hwnd;
         }
     }
@@ -91,7 +91,6 @@ namespace vfsn::internal::syscalls
             _errno_ = EBADF;
             return -1;
         }
-        LOG_DEBUG("Closing handle %i fileptr %p", fd, fil);
         auto ret = ff_fclose(fil);
         _errno_  = stdioGET_ERRNO();
         return ret;
@@ -99,6 +98,11 @@ namespace vfsn::internal::syscalls
 
     long write(int &_errno_, int fd, const void *buf, size_t cnt)
     {
+        if (fd == STDERR_FILENO || fd == STDOUT_FILENO) {
+            log_WriteToDevice((uint8_t *)buf, cnt);
+            return cnt;
+        }
+        LOG_DEBUG("Call %s ", __PRETTY_FUNCTION__);
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -125,6 +129,7 @@ namespace vfsn::internal::syscalls
 
     off_t lseek(int &_errno_, int fd, off_t pos, int dir)
     {
+        LOG_DEBUG("Call %s ", __PRETTY_FUNCTION__);
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -147,7 +152,7 @@ namespace vfsn::internal::syscalls
         pstat->st_ino  = fil->ulObjectCluster;
         pstat->st_size = fil->ulFileSize;
         pstat->st_dev  = 0;
-        pstat->st_mode = fil->ucMode;
+        pstat->st_mode = S_IFREG | 0666;
         _errno_        = 0;
         return 0;
     }
@@ -160,7 +165,9 @@ namespace vfsn::internal::syscalls
     int unlink(int &_errno_, const char *name)
     {
         auto ret = ff_remove(name);
-        _errno_  = stdioGET_ERRNO();
+        if (ret && stdioGET_ERRNO() == EISDIR)
+            ret = ff_deltree(name, nullptr, nullptr);
+        _errno_ = stdioGET_ERRNO();
         return ret;
     }
 
@@ -170,7 +177,7 @@ namespace vfsn::internal::syscalls
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
         return -1;
     }
-    int stat_r(int &_errno_, const char *file, struct stat *pstat)
+    int stat(int &_errno_, const char *file, struct stat *pstat)
     {
         FF_Stat_t stat_ff;
         auto ret = ff_stat(file, &stat_ff);
@@ -179,11 +186,19 @@ namespace vfsn::internal::syscalls
             pstat->st_ino  = stat_ff.st_ino;
             pstat->st_size = stat_ff.st_size;
             pstat->st_dev  = stat_ff.st_dev;
-            pstat->st_mode = stat_ff.st_mode;
+            // Linux mode compat
+            if (stat_ff.st_mode == FF_IFREG)
+                pstat->st_mode = S_IFREG | 0666;
+            if (stat_ff.st_mode == FF_IFDIR)
+                pstat->st_mode = S_IFDIR | 0777;
         }
         _errno_ = stdioGET_ERRNO();
+        // NOTE: ff_stdio uses wrong errno NOADDRESS
+        if (_errno_ == EFAULT)
+            _errno_ = ENOENT;
         return ret;
     }
+
     int chdir(int &_errno_, const char *path)
     {
         auto ret = ff_chdir(path);
@@ -212,8 +227,8 @@ namespace vfsn::internal::syscalls
 
     DIR *opendir(int &_errno_, const char *dirname)
     {
-        auto dir                 = new DIR;
-        dir->dir_data            = dirent::diropen(_errno_, dirname);
+        auto dir      = new DIR;
+        dir->dir_data = dirent::diropen(_errno_, dirname);
         if (!dir->dir_data) {
             delete dir;
             return nullptr;
@@ -245,7 +260,7 @@ namespace vfsn::internal::syscalls
         auto res = dirent::dirnext(_errno_, dirp->dir_data);
         auto fff = reinterpret_cast<FF_FindData_t *>(dirp->dir_data->dir_state);
         if (res < 0) {
-            if (_errno_ == ENOENT) {
+            if (_errno_ == pdFREERTOS_ERRNO_ENMFILE) {
                 _errno_ = olderrno;
             }
             return nullptr;
