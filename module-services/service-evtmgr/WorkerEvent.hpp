@@ -42,7 +42,6 @@ enum class WorkerEventQueues
     queueHeadsetIRQ,
     queueBattery,
     queueRTC,
-    queueHarness,
     queueCellular,
     queueMagnetometerIRQ,
     queueTorch,

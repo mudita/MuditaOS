@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 
 class CDCSerial:
     def __init__(self, port_name='/dev/ttyACM2'):
+        self.body = ""
         try:
             self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
             self.serial.flushInput()
@@ -24,6 +25,15 @@ class CDCSerial:
     def __del__(self):
         self.serial.close()
 
+    def __wrap_message(self, body):
+        msg = {
+            "endpoint": endpoint["developerMode"],
+            "method": method["put"],
+            "uuid": 0,
+            "body": body
+        }
+        return msg
+
     def get_serial(self):
         return self.serial
 
@@ -31,39 +41,35 @@ class CDCSerial:
         json_dump = json.dumps(json_data)
         return "#%09d%s" % (len(json_dump), json_dump)
 
-    def write(self, msg):
+    def write(self, msg, timeout=10):
         message = self.__build_message(msg)
         self.serial.write(message.encode())
 
-        header = self.serial.read(10).decode()
+        header = self.serial.read(timeout).decode()
         payload_length = int(header[1:])
         result = self.serial.read(payload_length).decode()
         return json.loads(result)
 
-    def send_key(self, key_code, wait=0):
-        uuid = random.randint(1, 32768)
-
-        msg_body = {
+    def send_key(self, key_code, wait=10):
+        body = {
             "keyPressed": key_code
         }
 
-        msg = {
-            "endpoint": endpoint["developerMode"],
-            "method": method["put"],
-            "uuid": uuid,
-            "body": msg_body
+        ret = self.write(self.__wrap_message(body), wait)
+        return ret
+
+    def send_at(self, at_command, wait=10):
+        body = {
+            "AT": at_command + "\r"
         }
 
-        msg_result = {
-            "endpoint": endpoint["developerMode"],
-            "status": status["OK"],
-            "uuid": str(uuid),
-            "body": None
+        ret = self.write(self.__wrap_message(body), wait)
+        return ret["body"]["ATResponse"]
+
+    def get_window(self):
+        body = {
+            "focus": True
         }
-        ret = self.write(msg)
-        if wait > 0:
-            time.sleep(wait)
 
-        return ret == msg_result
-
-
+        ret = self.write(self.__wrap_message(body))
+        return ret["body"]["focus"]

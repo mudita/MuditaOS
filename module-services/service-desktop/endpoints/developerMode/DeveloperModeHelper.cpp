@@ -4,6 +4,9 @@
 #include <module-sys/Service/Bus.hpp>
 #include <module-services/service-evtmgr/Constants.hpp>
 #include <module-services/service-desktop/parser/MessageHandler.hpp>
+#include <module-services/service-cellular/messages/CellularMessage.hpp>
+#include <module-services/service-cellular/ServiceCellular.hpp>
+#include <module-services/service-desktop/messages/DesktopMessages.hpp>
 #include "DeveloperModeHelper.hpp"
 #include "ParserUtils.hpp" // for parserFSM
 
@@ -20,6 +23,18 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         auto keyValue = body[json::developerMode::keyPressed].int_value();
         sendKeypress(getKeyCode(keyValue));
         MessageHandler::putToSendQueue(context.createSimpleResponse());
+    }
+    else if (body[json::developerMode::AT].is_string()) {
+
+        auto msg     = std::make_shared<cellular::RawCommand>();
+        msg->command = body[json::developerMode::AT].string_value();
+        msg->timeout = 3000;
+        sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, ownerServicePtr);
+    }
+    else if (body[json::developerMode::focus].bool_value()) {
+        auto event = std::make_unique<sdesktop::developerMode::AppFocusChangeEvent>();
+        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        sys::Bus::SendUnicast(msg, service::name::evt_manager, ownerServicePtr);
     }
     else {
         context.setResponseStatus(http::Code::BadRequest);

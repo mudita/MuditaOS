@@ -3,9 +3,9 @@
 
 #include "ATParser.hpp"
 #include "Service/Bus.hpp"
+#include "service-fota/api/FotaServiceAPI.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
-#include "service-fota/api/FotaServiceAPI.hpp"
 #include "ticks.hpp"
 #include <Utils.hpp>
 #include <utility>

@@ -75,7 +75,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-utils module-vfs  module-sys module-db )
+target_link_libraries(${PROJECT_NAME} module-bsp module-utils module-vfs module-services module-sys module-db )
 
 if (${ENABLE_TESTS})
     add_subdirectory( test )

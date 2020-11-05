@@ -4,7 +4,7 @@
 #include <messages/QueryMessage.hpp>                              // for QueryResponse
 #include <module-apps/application-desktop/ApplicationDesktop.hpp> // for name_desktop
 #include <module-services/service-desktop/ServiceDesktop.hpp>
-#include <inttypes.h> // for PRIu32
+#include <cinttypes> // for PRIu32
 #include <filesystem> // for path
 
 #include "ServiceDesktop.hpp" // for ServiceDesktop, cdc_queue_len, cdc_queue_object_size, service_desktop, service_stack
@@ -40,6 +40,15 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         {{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
          {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
     desktopWorker->run();
+
+    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
+        if (request->event != nullptr) {
+            request->event->send();
+        }
+
+        return std::make_shared<sys::ResponseMessage>();
+    });
 
     connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
@@ -96,7 +105,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     vfs.updateTimestamp();
-
     return (sys::ReturnCodes::Success);
 }
 
@@ -113,6 +121,10 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
 
 sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
+    if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
+        auto event = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
+        event->send();
+    }
     if (resp != nullptr) {
         if (resp->responseTo == MessageType::DBQuery) {
             if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {

@@ -17,6 +17,7 @@
 #include <list>                                          // for list
 #include <tuple>                                         // for tie, tuple
 #include <vector>                                        // for vector
+#include <module-services/service-desktop/messages/DesktopMessages.hpp>
 
 #include "log/log.hpp"             // for LOG_INFO, LOG_DEBUG, LOG_FATAL
 #include "WorkerEvent.hpp"         // for WorkerEvent
@@ -24,9 +25,6 @@
 #include "service-appmgr/Controller.hpp"                 // for Controller
 #include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
 #include "AudioServiceAPI.hpp"                           // for SendEvent
-#include "bsp/harness/bsp_harness.hpp"                   // for emit
-#include "harness/events/AtResponse.hpp"                 // for AtResponse
-#include "harness/events/FocusApp.hpp"                   // for FocusApp
 #include "bsp/magnetometer/magnetometer.hpp"             // for GetBoard
 #include "bsp/common.hpp"                                // for c_str
 #include "bsp/rtc/rtc.hpp"                               // for rtc_SetDateTime
@@ -76,7 +74,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     bool handled = false;
 
     if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
-        bsp::harness::emit(harness::AtResponse(msg->response).encode());
+
+        auto event   = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
+        auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        sys::Bus::SendUnicast(message, service::name::service_desktop, this);
+
         handled = true;
     }
     if (msgl->messageType == MessageType::DBServiceNotification) {
@@ -110,7 +112,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         }
 
         // send key to focused application
-        if (targetApplication.empty() == false) {
+        if (!targetApplication.empty()) {
             sys::Bus::SendUnicast(message, targetApplication, this);
         }
         // notify application manager to prevent screen locking
@@ -118,16 +120,15 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMFocusApplication) {
-        auto *msg = reinterpret_cast<sevm::EVMFocusApplication *>(msgl);
+        auto *msg = static_cast<sevm::EVMFocusApplication *>(msgl);
         if (msg->sender == "ApplicationManager") {
             targetApplication = msg->getApplication();
             handled           = true;
             LOG_INFO("Switching focus to %s", targetApplication.c_str());
-            bsp::harness::emit(harness::FocusApp(targetApplication).encode());
         }
     }
     else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
-        sevm::BatteryLevelMessage *msg = reinterpret_cast<sevm::BatteryLevelMessage *>(msgl);
+        auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
 
         if (suspended) {
             suspended = false;
@@ -138,14 +139,14 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         message->levelPercents = msg->levelPercents;
         message->fullyCharged  = msg->fullyCharged;
 
-        if (targetApplication.empty() == false) {
+        if (!targetApplication.empty()) {
             sys::Bus::SendUnicast(message, targetApplication, this);
         }
 
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName()) {
-        sevm::BatteryPlugMessage *msg = reinterpret_cast<sevm::BatteryPlugMessage *>(msgl);
+        auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
 
         if (suspended) {
             suspended = false;
@@ -159,7 +160,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::Bus::SendUnicast(message, service::name::system_manager, this);
         }
 
-        if (targetApplication.empty() == false) {
+        if (!targetApplication.empty()) {
             sys::Bus::SendUnicast(message, targetApplication, this);
         }
         handled = true;
@@ -241,15 +242,29 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         sys::SystemManager::ResumeSystem(this);
     }
 
-    if (handled)
+    if (handled) {
         return std::make_shared<sys::ResponseMessage>();
-    else
+    }
+    else {
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
 }
 
 // Invoked during initialization
 sys::ReturnCodes EventManager::InitHandler()
 {
+
+    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        using namespace sdesktop::developerMode;
+        auto req = static_cast<DeveloperModeRequest *>(msg);
+        if (typeid(*req->event.get()) == typeid(AppFocusChangeEvent)) {
+            auto event   = std::make_unique<AppFocusChangeEvent>(targetApplication);
+            auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
+            sys::Bus::SendUnicast(message, service::name::service_desktop, this);
+        }
+
+        return std::make_shared<sys::ResponseMessage>();
+    });
 
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
@@ -263,8 +278,6 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10};
     // RTC irq queue
     sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20};
-    // test harness queue
-    sys::WorkerQueueInfo qHarness = {"qHarness", sizeof(uint8_t), 3};
     // sim tray queue
     sys::WorkerQueueInfo qSIM = {"qSIM", sizeof(uint8_t), 5};
     // magnetometer queue
@@ -278,7 +291,6 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qHeadset);
     list.push_back(qBattery);
     list.push_back(qRTC);
-    list.push_back(qHarness);
     list.push_back(qSIM);
     list.push_back(qMagnetometer);
     list.push_back(qTorch);

@@ -1,13 +1,10 @@
 # MuditaOS changelog
 
-
-
 ## Current release
 
 ### Added
 
 * `[messages][db]` File Indexer db Agent
-* `[testing]` Added key release simulation through service-desktop developerMode
 * `[cellular]` Set pin functionality with Action mockup
 * `[bluetooth]` Added HSP playback and recording
 
@@ -15,6 +12,7 @@
 
 * `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
 * `[calendar]` Rework to use database model instead of internal model in day events list.
+* `[testing]` Moved test harness into service-desktop
 * `[appmgr]` Application manager actions introduced.
 
 ### Fixed
@@ -26,7 +24,7 @@
 
 ## [0.44.1 2020-10-30]
 
-### Addedgit 
+### Added
 
 * `[settings][bluetooth]` Add "Phone name" window.
 * `[cellular]` Add support for modem reset.

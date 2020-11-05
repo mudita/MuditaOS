@@ -192,6 +192,7 @@ enum class MessageType
     Backup,
     Restore,
     Factory,
+    DeveloperModeRequest,
 
     // FOTA messages
     HttpRequest,

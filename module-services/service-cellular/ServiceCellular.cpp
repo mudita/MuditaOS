@@ -614,8 +614,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 for (auto const &el : respMsg->response) {
                     LOG_DEBUG("> %s", el.c_str());
                 }
-                responseMsg = std::make_shared<CellularResponseMessage>(false);
-                break;
             }
             responseMsg = respMsg;
             break;

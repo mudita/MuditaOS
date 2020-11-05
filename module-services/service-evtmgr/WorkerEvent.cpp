@@ -31,6 +31,8 @@ extern "C"
 #include <optional>    // for optional
 #include <string>      // for string
 #include <vector>      // for vector
+#include <module-services/service-desktop/messages/DesktopMessages.hpp>
+#include <module-services/service-desktop/Constants.hpp>
 
 #include "Service/Worker.hpp" // for WorkerQueueInfo, Worker, WorkerCommand
 #include "MessageType.hpp" // for MessageType, MessageType::EVMMinuteUpdated, MessageType::EVMModemStatus, MessageType::EVMRingIndicator
@@ -45,8 +47,6 @@ extern "C"
 #include "bsp/magnetometer/magnetometer.hpp" // for WorkerEventHandler, init
 #include "bsp/torch/torch.hpp"               // for deinit, init
 #include "Constants.hpp"                     // for evt_manager
-#include "bsp/harness/bsp_harness.hpp"       // for Init, emit, flush, read
-#include "harness/Parser.hpp"                // for c_str, parse, Error, Error::Success
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -131,28 +131,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHarness)) {
-        uint8_t notification;
-        if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
-            return false;
-        }
-        if (notification == STX) {
-            if (bsp::harness::flush() != true) {
-                LOG_ERROR("processing in progres...");
-            }
-        }
-        else if (notification == ETX) {
-            std::string text = bsp::harness::read();
-            auto ret         = harness::parse(text, this->service);
-            if (ret != harness::Error::Success) {
-                LOG_ERROR("Harness parser error: %s", c_str(ret));
-            }
-        }
-        else {
-            LOG_ERROR("Unknown event!");
-        }
-    }
-
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueCellular)) {
         uint8_t notification;
         if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
@@ -196,8 +174,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
     return true;
 }
 
-#include "harness/events/SysStart.hpp" // for SysStart
-
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
@@ -207,7 +183,6 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::headset::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]);
     bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
-    bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
@@ -215,7 +190,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);
     bsp::rtc_SetMinuteAlarm(timestamp);
-    bsp::harness::emit(harness::SysStart().encode());
+
     return true;
 }
 

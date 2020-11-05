@@ -46,8 +46,6 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/headset/headset.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/cellular/rt1051_cellular.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pit/pit.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/harness/rt1051_harness.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/harness/rt1051_harness_gpio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/vibrator/vibrator.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/watchdog/watchdog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/RT1051LPM.cpp"

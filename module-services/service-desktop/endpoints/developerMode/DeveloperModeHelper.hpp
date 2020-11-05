@@ -31,6 +31,10 @@ namespace parserFSM
 
     namespace json::developerMode
     {
-        inline constexpr auto keyPressed = "keyPressed";
+        inline constexpr auto keyPressed    = "keyPressed";
+        inline constexpr auto systemStarted = "systemStarted";
+        inline constexpr auto ATResponse    = "ATResponse";
+        inline constexpr auto AT            = "AT";
+        inline constexpr auto focus         = "focus";
     }
 } // namespace parserFSM
