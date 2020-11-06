@@ -46,7 +46,8 @@ set(SOURCES ""
         ${FREERTOS_FAT_EXTSOURCES}
         vfs-utils.cpp
         vfs.cpp
-		vfsNotifier.cpp
+        vfsNotifier.cpp
+        HandleManager.cpp
 )
 
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
