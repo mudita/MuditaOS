@@ -47,7 +47,7 @@ namespace gui
         uint32_t h           = sizeMinusPadding(Axis::Y, Area::Normal);
         auto line_y_position = padding.top;
 
-        BlockCursor draw_cursor(cursor->getDocument(), 0, 0, cursor->getFont());
+        BlockCursor draw_cursor(cursor->getDocument(), 0, 0, getTextFormat().getFont());
 
         unsigned int currentLine = 0;
         unsigned int lineHeight  = format.getFont()->info.line_height + underlinePadding;
@@ -56,7 +56,6 @@ namespace gui
         do {
             auto text_line =
                 gui::TextLine(draw_cursor, w, lineHeight, underline, UnderlineDrawMode::WholeLine, underlinePadding);
-            draw_cursor += text_line.length();
 
             if (text_line.height() > 0 && lineHeight != text_line.height()) {
                 lineHeight = text_line.height();

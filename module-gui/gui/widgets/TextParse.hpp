@@ -12,4 +12,7 @@ namespace gui
     auto textToTextBlocks(const UTF8 &text, const RawFont *font, TextBlock::End end = TextBlock::End::Newline)
         -> std::list<TextBlock>;
     auto textToTextBlocks(const UTF8 &text, TextFormat format) -> std::list<TextBlock>;
+
+    auto addEmptyBlockOnNewline(std::list<TextBlock> &blocks, const RawFont *font) -> void;
+    auto addEmptyBlockOnNewline(std::list<TextBlock> &blocks, TextFormat format) -> void;
 } // namespace gui

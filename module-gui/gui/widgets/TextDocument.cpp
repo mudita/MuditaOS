@@ -41,6 +41,11 @@ namespace gui
         assert(cursor.getBlockNr() < blocks.size());
         auto [l_block, r_block] = split(cursor);
         l_block.setEnd(eol);
+
+        // If we split last block in Document we set its end to None.
+        if (cursor.getBlockNr() == blocks.size() - 2) {
+            r_block.setEnd(TextBlock::End::None);
+        }
     }
 
     auto TextDocument::getText() const -> UTF8

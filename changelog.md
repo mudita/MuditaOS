@@ -10,6 +10,10 @@
 
 * `[calendar]` Set 'all day' as a default option
 
+### Fixed
+
+* `[Text]` Newline handling fix. 
+
 ## [0.45.1 2020-11-06]
 
 ### Added

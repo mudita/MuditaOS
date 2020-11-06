@@ -87,17 +87,13 @@ namespace gui
 
         void linesHAlign(Length parentSize);
         void linesVAlign(Length parentSize);
-        auto checkBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
-        void updateScrollPosition(NavigationDirection scroll, uint32_t lines_to_scroll = 1);
+        auto checkNavigationBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
+        auto checkAdditionBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
+        auto checkRemovalBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
+        void updateScrollPosition(NavigationDirection scroll, unsigned int lines_to_scroll = 1);
 
       protected:
-        auto processTextInput(TextLineCursor &cursor, const InputEvent &event) -> InputBound;
-        auto processNavigation(TextLineCursor &cursor, const InputEvent &event) -> InputBound;
-
-        auto canMove(TextLineCursor &cursor, NavigationDirection dir) -> InputBound;
-        InputBound processRemoval(TextLineCursor &cursor);
         TextLine *getTextLine(uint32_t line);
-        InputBound processAdding(TextLineCursor &cursor, const InputEvent &event);
     };
 
 } // namespace gui

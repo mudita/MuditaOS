@@ -19,7 +19,7 @@ namespace mockup
         return std::tuple{document, testfont};
     }
 
-    std::tuple<gui::TextDocument, gui::RawFont *> buildTestDocument()
+    std::tuple<gui::TextDocument, gui::RawFont *> buildTestDocument(gui::TextBlock::End lineEnd)
     {
         using namespace gui;
 
@@ -28,7 +28,7 @@ namespace mockup
         auto &fontmanager = mockup::fontManager();
         auto testfont     = fontmanager.getFont(0);
         std::string text  = mockup::multiLineString(no_lines);
-        auto blocks       = textToTextBlocks(text, testfont);
+        auto blocks       = textToTextBlocks(text, testfont, lineEnd);
         auto document     = TextDocument(blocks);
         return std::tuple{document, testfont};
     }
