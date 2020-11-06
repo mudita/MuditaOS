@@ -10,6 +10,7 @@
 ## Changed
 
 * `[calendar]` Set 'all day' as a default option
+* `[bus]` Message handling refactored.
 
 ### Fixed
 

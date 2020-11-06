@@ -37,18 +37,16 @@ namespace Settings
     {
         using std::placeholders::_1;
         using std::placeholders::_2;
-        app->connect(::Settings::Messages::VariableChanged(),
-                     std::bind(&Settings::handleVariableChanged, this, _1, _2));
+        app->connect(::Settings::Messages::VariableChanged(), std::bind(&Settings::handleVariableChanged, this, _1));
         app->connect(::Settings::Messages::CurrentProfileChanged(),
-                     std::bind(&Settings::handleCurrentProfileChanged, this, _1, _2));
+                     std::bind(&Settings::handleCurrentProfileChanged, this, _1));
         app->connect(::Settings::Messages::CurrentModeChanged(),
-                     std::bind(&Settings::handleCurrentModeChanged, this, _1, _2));
+                     std::bind(&Settings::handleCurrentModeChanged, this, _1));
         app->connect(::Settings::Messages::ProfileListResponse(),
-                     std::bind(&Settings::handleProfileListResponse, this, _1, _2));
-        app->connect(::Settings::Messages::ModeListResponse(),
-                     std::bind(&Settings::handleModeListResponse, this, _1, _2));
+                     std::bind(&Settings::handleProfileListResponse, this, _1));
+        app->connect(::Settings::Messages::ModeListResponse(), std::bind(&Settings::handleModeListResponse, this, _1));
     }
-    auto Settings::handleVariableChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+    auto Settings::handleVariableChanged(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleVariableChanged");
         if (auto msg = dynamic_cast<::Settings::Messages::VariableChanged *>(req)) {
@@ -63,7 +61,7 @@ namespace Settings
         }
         return std::make_shared<sys::ResponseMessage>();
     }
-    auto Settings::handleCurrentProfileChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+    auto Settings::handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleCurrentProfileChanged");
         if (auto msg = dynamic_cast<::Settings::Messages::CurrentProfileChanged *>(req)) {
@@ -73,7 +71,7 @@ namespace Settings
         }
         return std::make_shared<sys::ResponseMessage>();
     }
-    auto Settings::handleCurrentModeChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+    auto Settings::handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleCurrentModeChanged");
         if (auto msg = dynamic_cast<::Settings::Messages::CurrentModeChanged *>(req)) {
@@ -83,7 +81,7 @@ namespace Settings
         }
         return std::make_shared<sys::ResponseMessage>();
     }
-    auto Settings::handleProfileListResponse(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+    auto Settings::handleProfileListResponse(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleProfileListResponse");
         if (auto msg = dynamic_cast<::Settings::Messages::ProfileListResponse *>(req)) {
@@ -93,7 +91,7 @@ namespace Settings
         }
         return std::make_shared<sys::ResponseMessage>();
     }
-    auto Settings::handleModeListResponse(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+    auto Settings::handleModeListResponse(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleModeListResponse");
         if (auto msg = dynamic_cast<::Settings::Messages::ModeListResponse *>(req)) {

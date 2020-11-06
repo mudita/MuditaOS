@@ -41,7 +41,7 @@ namespace app
         ApplicationCall(std::string name                    = name_call,
                         std::string parent                  = {},
                         StartInBackground startInBackground = {false});
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

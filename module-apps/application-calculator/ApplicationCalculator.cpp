@@ -13,7 +13,7 @@ namespace app
         : Application(name, parent, startInBackground, stack_size)
     {}
 
-    sys::Message_t ApplicationCalculator::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCalculator::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         return Application::DataReceivedHandler(msgl);
     }

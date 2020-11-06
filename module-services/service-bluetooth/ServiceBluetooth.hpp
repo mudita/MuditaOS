@@ -8,7 +8,7 @@
 #include "Bluetooth/BluetoothWorker.hpp"
 #include "Service/Service.hpp" // for Service
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+#include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 
 class BluetoothWorker;
 
@@ -19,7 +19,7 @@ class ServiceBluetooth : public sys::Service
     ServiceBluetooth();
     ~ServiceBluetooth();
 
-    virtual sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
+    virtual sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;

@@ -9,7 +9,7 @@
 #include "Interface/SettingsRecord.hpp"                 // for SettingsRecord
 #include "Service/Bus.hpp"                              // for Bus
 #include "Service/Common.hpp"                           // for ReturnCodes
-#include "Service/Message.hpp"                          // for Message_t
+#include "Service/Message.hpp"                          // for MessagePointer
 #include "Service/Service.hpp"                          // for Service
 #include "SwitchData.hpp"                               // for SwitchData
 #include "SystemManager/SystemManager.hpp"              // for SystemManager
@@ -61,12 +61,12 @@ namespace app
     class Application;
     class GuiTimer;
 
-    inline auto msgHandled() -> sys::Message_t
+    inline auto msgHandled() -> sys::MessagePointer
     {
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    inline auto msgNotHandled() -> sys::Message_t
+    inline auto msgNotHandled() -> sys::MessagePointer
     {
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
@@ -154,27 +154,27 @@ namespace app
         /// c_str() function for Application::State
         static const char *stateStr(State st);
 
-        using OnActionReceived = std::function<void(manager::actions::ActionParamsPtr &&)>;
+        using OnActionReceived = std::function<sys::MessagePointer(manager::actions::ActionParamsPtr &&)>;
 
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
 
-        sys::Message_t handleSignalStrengthUpdate(sys::DataMessage *msgl);
-        sys::Message_t handleNetworkAccessTechnologyUpdate(sys::DataMessage *msgl);
-        sys::Message_t handleInputEvent(sys::DataMessage *msgl);
-        sys::Message_t handleKBDKeyEvent(sys::DataMessage *msgl);
-        sys::Message_t handleBatteryLevel(sys::DataMessage *msgl);
-        sys::Message_t handleChargerPlugged(sys::DataMessage *msgl);
-        sys::Message_t handleMinuteUpdated(sys::DataMessage *msgl);
-        sys::Message_t handleAction(sys::DataMessage *msgl);
-        sys::Message_t handleApplicationSwitch(sys::DataMessage *msgl);
-        sys::Message_t handleSwitchWindow(sys::DataMessage *msgl);
-        sys::Message_t handleAppClose(sys::DataMessage *msgl);
-        sys::Message_t handleAppRebuild(sys::DataMessage *msgl);
-        sys::Message_t handleAppRefresh(sys::DataMessage *msgl);
-        sys::Message_t handleAppFocusLost(sys::DataMessage *msgl);
-        sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
+        sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
+        sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
+        sys::MessagePointer handleInputEvent(sys::Message *msgl);
+        sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
+        sys::MessagePointer handleBatteryLevel(sys::Message *msgl);
+        sys::MessagePointer handleChargerPlugged(sys::Message *msgl);
+        sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
+        sys::MessagePointer handleAction(sys::Message *msgl);
+        sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
+        sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
+        sys::MessagePointer handleAppClose(sys::Message *msgl);
+        sys::MessagePointer handleAppRebuild(sys::Message *msgl);
+        sys::MessagePointer handleAppRefresh(sys::Message *msgl);
+        sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
+        sys::MessagePointer handleSIMMessage(sys::Message *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
@@ -234,7 +234,7 @@ namespace app
 
         /// Mehtod to handle bus messages, all message types are defined in Message.hpp
         /// Message types are in MessageType
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl);
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl);
 
         /// initialization function
         /// 1. it has to be called for each and every application instance, it registeres application in

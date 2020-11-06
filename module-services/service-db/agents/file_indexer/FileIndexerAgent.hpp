@@ -31,11 +31,11 @@ class FileIndexerAgent : public DatabaseAgent
     auto getDbInitString() -> const std::string override;
     auto getDbFilePath() -> const std::string override;
     auto dbGetFilesCount() -> unsigned int;
-    auto handleListDir(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleGetProperty(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleGetAllProperties(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleSetProperty(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleSetProperties(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleGetRecord(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-    auto handleSetRecord(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
+    auto handleListDir(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetProperty(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetAllProperties(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetProperty(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetProperties(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetRecord(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetRecord(sys::Message *req) -> sys::MessagePointer;
 };

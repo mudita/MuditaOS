@@ -16,7 +16,7 @@ namespace service
         virtual ~ServiceFileIndexer()                  = default;
         ServiceFileIndexer(const ServiceFileIndexer &) = delete;
         ServiceFileIndexer &operator=(const ServiceFileIndexer &) = delete;
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;

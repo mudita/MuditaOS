@@ -12,15 +12,7 @@
 #include <string>                     // for string
 #include <optional>                   // for optional
 
-namespace sys
-{
-    class Service;
-    class Message;
-
-    using Message_t = std::shared_ptr<Message>;
-    class DataMessage;
-    class ResponseMessage;
-}; // namespace sys
+#include <module-sys/Service/Message.hpp>
 
 namespace Settings
 {
@@ -75,10 +67,10 @@ namespace Settings
         OnAllProfilesRetrievedCallback cbAllProfiles;
         void sendMsg(std::shared_ptr<::Settings::Messages::SettingsMessage> &&msg);
         void registerHandlers();
-        auto handleVariableChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleCurrentProfileChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleCurrentModeChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleProfileListResponse(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleModeListResponse(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
+        auto handleVariableChanged(sys::Message *req) -> sys::MessagePointer;
+        auto handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer;
+        auto handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer;
+        auto handleProfileListResponse(sys::Message *req) -> sys::MessagePointer;
+        auto handleModeListResponse(sys::Message *req) -> sys::MessagePointer;
     };
 } // namespace Settings

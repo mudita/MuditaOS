@@ -19,7 +19,7 @@
 #include "Interface/NotificationsRecord.hpp"
 #include "Interface/EventsRecord.hpp"
 #include "Interface/SettingsRecord_v2.hpp"
-#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+#include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
 #include "messages/DBNotificationMessage.hpp"
 #include "agents/DatabaseAgent.hpp"
@@ -86,7 +86,7 @@ class ServiceDB : public sys::Service
     ServiceDB();
     ~ServiceDB() override;
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     sys::ReturnCodes InitHandler() override;
 

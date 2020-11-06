@@ -42,34 +42,25 @@ ServiceEink::ServiceEink(const std::string &name, std::string parent)
     waveformSettings.mode        = EinkWaveformGC16;
     waveformSettings.temperature = -1000;
 
-    connect(typeid(service::eink::EinkModeMessage),
-            [this](sys::DataMessage *message, sys::ResponseMessage *) -> sys::Message_t {
-                auto msg          = static_cast<service::eink::EinkModeMessage *>(message);
-                this->displayMode = msg->getMode() == service::eink::EinkModeMessage::Mode::Normal
-                                        ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
-                                        : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
-                return sys::Message_t();
-            });
+    connect(typeid(service::eink::EinkModeMessage), [this](sys::Message *message) -> sys::MessagePointer {
+        auto msg          = static_cast<service::eink::EinkModeMessage *>(message);
+        this->displayMode = msg->getMode() == service::eink::EinkModeMessage::Mode::Normal
+                                ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
+                                : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
+        return sys::MessageNone{};
+    });
 
     connect(typeid(service::eink::EinkDMATransfer),
-            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-                return handleEinkDMATransfer(request);
-            });
+            [&](sys::Message *request) -> sys::MessagePointer { return handleEinkDMATransfer(request); });
 
     connect(typeid(service::eink::ImageMessage),
-            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-                return handleImageMessage(request);
-            });
+            [&](sys::Message *request) -> sys::MessagePointer { return handleImageMessage(request); });
 
     connect(typeid(service::eink::StateRequest),
-            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-                return handleStateRequest(request);
-            });
+            [&](sys::Message *request) -> sys::MessagePointer { return handleStateRequest(request); });
 
     connect(typeid(service::eink::TemperatureUpdate),
-            [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-                return handleTemperatureUpdate(request);
-            });
+            [&](sys::Message *request) -> sys::MessagePointer { return handleTemperatureUpdate(request); });
 }
 
 ServiceEink::~ServiceEink()
@@ -81,7 +72,7 @@ ServiceEink::~ServiceEink()
     waveformSettings.temperature = -1000;
 }
 
-sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     return std::make_shared<sys::ResponseMessage>();
 }
@@ -291,7 +282,7 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
     return true;
 }
 
-sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
+sys::MessagePointer ServiceEink::handleEinkDMATransfer(sys::Message *message)
 {
     utils::time::Scoped scopedtimming("EinkDMATransfer");
 
@@ -344,7 +335,7 @@ sys::Message_t ServiceEink::handleEinkDMATransfer(sys::Message *message)
     return nullptr;
 }
 
-sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
+sys::MessagePointer ServiceEink::handleImageMessage(sys::Message *request)
 {
     auto message = static_cast<service::eink::ImageMessage *>(request);
 
@@ -360,15 +351,15 @@ sys::Message_t ServiceEink::handleImageMessage(sys::Message *request)
     if (suspendInProgress)
         LOG_DEBUG("Suspend In Progress");
     sys::Bus::SendUnicast(std::make_shared<service::eink::EinkDMATransfer>(), GetName(), this);
-    return nullptr;
+    return std::make_shared<sys::ResponseMessage>();
 }
 
-sys::Message_t ServiceEink::handleStateRequest(sys::Message *)
+sys::MessagePointer ServiceEink::handleStateRequest(sys::Message *)
 {
     return std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
 }
 
-sys::Message_t ServiceEink::handleTemperatureUpdate(sys::Message *)
+sys::MessagePointer ServiceEink::handleTemperatureUpdate(sys::Message *)
 {
     return nullptr;
 }

@@ -22,7 +22,7 @@ namespace Settings
         {
             return sys::ReturnCodes::Success;
         }
-        sys::Message_t DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
         {
             return std::make_shared<sys::ResponseMessage>();
         };
@@ -77,7 +77,7 @@ namespace Settings
         {
             return sys::ReturnCodes::Success;
         }
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             if (nullptr != dynamic_cast<::Settings::UTMsg::UTMsgStart *>(msg)) {
@@ -150,7 +150,7 @@ namespace Settings
                            std::shared_ptr<std::mutex> testStart)
             : AppTest(name, setter, getter, testStart)
         {}
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             if (nullptr != dynamic_cast<::Settings::UTMsg::UTMsgStart *>(msg)) {

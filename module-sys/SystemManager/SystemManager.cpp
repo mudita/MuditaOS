@@ -270,7 +270,7 @@ namespace sys
     {
         isReady = true;
 
-        connect(SystemManagerCmd(), [&](DataMessage *msg, ResponseMessage * /*resp*/) {
+        connect(SystemManagerCmd(), [&](Message *msg) {
             if (msg->channel == BusChannels::SystemManagerRequests) {
                 auto *data = static_cast<SystemManagerCmd *>(msg);
 
@@ -285,28 +285,28 @@ namespace sys
                     break;
                 }
             }
-            return Message_t();
+            return MessageNone{};
         });
 
-        connect(sevm::KbdMessage(), [&](DataMessage * /*msg*/, ResponseMessage * /*resp*/) {
+        connect(sevm::KbdMessage(), [&](Message *) {
             // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
             if (state == State::Shutdown) {
                 set(State::Reboot);
             }
-            return Message_t();
+            return MessageNone{};
         });
 
-        connect(sevm::BatteryPlugMessage(), [&](DataMessage * /*msg*/, ResponseMessage * /*resp*/) {
+        connect(sevm::BatteryPlugMessage(), [&](Message *) {
             if (state == State::Shutdown) {
                 set(State::ShutdownReady);
             }
-            return Message_t();
+            return MessageNone{};
         });
 
         return ReturnCodes::Success;
     }
 
-    Message_t SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
+    MessagePointer SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
     {
         return std::make_shared<ResponseMessage>();
     }
