@@ -32,6 +32,9 @@ void FileIndexerAgent::registerMessages()
     using std::placeholders::_2;
 
     // all API asynchronic
+    parentService->connect(FileIndexer::Messages::GetListDirMessage(),
+                           std::bind(&FileIndexerAgent::handleListDir, this, _1, _2));
+
     parentService->connect(FileIndexer::Messages::GetRecordMessage(),
                            std::bind(&FileIndexerAgent::handleGetRecord, this, _1, _2));
     parentService->connect(FileIndexer::Messages::SetRecordMessage(),
@@ -66,6 +69,43 @@ auto FileIndexerAgent::getAgentName() -> const std::string
     return std::string("fileIndexerAgent");
 }
 
+auto FileIndexerAgent::dbGetFilesCount() -> unsigned int
+{
+    auto retQuery = database->query(FileIndexer::Statements::getFilesCount);
+    if (nullptr == retQuery || 1 != retQuery->getRowCount()) {
+        return 0;
+    }
+    return (*retQuery)[0].getInt32();
+}
+
+auto FileIndexerAgent::dbListDir(std::unique_ptr<FileIndexer::ListDirData> listDir)
+    -> std::unique_ptr<FileIndexer::ListDirData>
+{
+
+    auto retQuery = database->query(FileIndexer::Statements::getFilesByDir, listDir->directory.c_str());
+    if (nullptr == retQuery) {
+        listDir->count = 0;
+        return listDir;
+    }
+
+    listDir->count = retQuery->getRowCount();
+    if (retQuery->getRowCount() > 0) {
+        listDir->fileList.clear();
+        do {
+            listDir->fileList.push_back(FileIndexer::FileRecord(retQuery.get()));
+        } while (retQuery->nextRow());
+    }
+    return listDir;
+}
+
+auto FileIndexerAgent::handleListDir(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+{
+    if (auto msg = dynamic_cast<FileIndexer::Messages::GetListDirMessage *>(req)) {
+        return std::make_shared<FileIndexer::Messages::GetListDirResponseMessage>(dbListDir(std::move(msg->listDir)));
+    }
+    return std::make_shared<sys::ResponseMessage>();
+}
+
 auto FileIndexerAgent::dbGetRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> FileIndexer::FileRecord
 {
     std::unique_ptr<QueryResult> retQuery = nullptr;
@@ -85,33 +125,36 @@ auto FileIndexerAgent::dbGetRecord(std::unique_ptr<FileIndexer::FileRecord> reco
     else {
         return FileIndexer::FileRecord{};
     }
-
-    FileIndexer::FileRecord retRecord;
-    retRecord.file_id   = (*retQuery)[0].getInt32();
-    retRecord.path      = (*retQuery)[1].getString();
-    retRecord.size      = (*retQuery)[2].getInt32();
-    retRecord.mime_type = (*retQuery)[3].getInt32();
-    retRecord.mtime     = (*retQuery)[4].getInt32();
-    retRecord.directory = (*retQuery)[5].getString();
-    retRecord.file_type = (*retQuery)[6].getInt32();
-
-    return retRecord;
+    return FileIndexer::FileRecord(retQuery.get());
 }
 
 auto FileIndexerAgent::dbSetRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> bool
 {
     return database->execute(FileIndexer::Statements::insertFileInfo,
+                             record->file_id,
                              record->path.c_str(),
                              record->size,
                              record->mime_type,
                              record->mtime,
-                             record->directory.c_str()),
-           record->file_type;
+                             record->directory.c_str(),
+                             record->file_type);
+}
+
+auto FileIndexerAgent::dbUpdateRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> bool
+{
+    return database->execute(FileIndexer::Statements::updateFileInfo,
+                             record->path.c_str(),
+                             record->size,
+                             record->mime_type,
+                             record->mtime,
+                             record->directory.c_str(),
+                             record->file_type,
+                             record->file_id);
 }
 
 auto FileIndexerAgent::handleGetRecord(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
 {
-    if (auto msg = static_cast<FileIndexer::Messages::GetRecordMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::GetRecordMessage *>(req)) {
         auto record   = std::move(msg->record);
         msg->dbRecord = dbGetRecord(std::move(record));
         return std::make_shared<FileIndexer::Messages::GetRecordResponseMessage>(
@@ -122,7 +165,7 @@ auto FileIndexerAgent::handleGetRecord(sys::DataMessage *req, sys::ResponseMessa
 
 auto FileIndexerAgent::handleSetRecord(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
 {
-    if (auto msg = static_cast<FileIndexer::Messages::SetRecordMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::SetRecordMessage *>(req)) {
         auto recordPtr                 = std::move(msg->record);
         FileIndexer::FileRecord record = *recordPtr;
         msg->dbRecord                  = dbGetRecord(std::make_unique<FileIndexer::FileRecord>(record));
@@ -142,8 +185,10 @@ auto FileIndexerAgent::dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> 
 {
     auto itr      = metaData->properties.begin();
     auto property = itr->first;
-    auto retQuery =
-        database->query(FileIndexer::Statements::getPropertyValue, property.c_str(), metaData->path.c_str());
+
+    std::unique_ptr<QueryResult> retQuery = nullptr;
+
+    retQuery = database->query(FileIndexer::Statements::getPropertyValue, property.c_str(), metaData->path.c_str());
     if (nullptr == retQuery || 1 != retQuery->getRowCount()) {
         return *metaData;
     }
@@ -157,16 +202,20 @@ auto FileIndexerAgent::dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> 
 auto FileIndexerAgent::dbGetAllProperties(std::unique_ptr<FileIndexer::FileMetadata> metaData)
     -> FileIndexer::FileMetadata
 {
-    auto retQuery = database->query(FileIndexer::Statements::getAllProperties, metaData->path.c_str());
+    std::unique_ptr<QueryResult> retQuery = nullptr;
+    FileIndexer::FileMetadata retMetaData = {};
+
+    retQuery = database->query(FileIndexer::Statements::getAllProperties, metaData->path.c_str());
     if (nullptr == retQuery) {
-        return *metaData;
+        return retMetaData;
     }
-    FileIndexer::FileMetadata retMetaData;
-    retMetaData.file_id = (*retQuery)[0].getInt32();
-    retMetaData.properties.clear();
-    do {
-        retMetaData.properties.emplace((*retQuery)[1].getString(), (*retQuery)[2].getString());
-    } while (retQuery->nextRow());
+    if (retQuery->getRowCount() > 0) {
+        retMetaData.file_id = (*retQuery)[0].getInt32();
+        retMetaData.properties.clear();
+        do {
+            retMetaData.properties.emplace((*retQuery)[1].getString(), (*retQuery)[2].getString());
+        } while (retQuery->nextRow());
+    }
     return retMetaData;
 }
 
@@ -193,9 +242,23 @@ auto FileIndexerAgent::dbSetProperties(std::unique_ptr<FileIndexer::FileMetadata
     return statusCode;
 }
 
+auto FileIndexerAgent::dbUpdateProperties(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> bool
+{
+    bool statusCode = true;
+    for (auto propVal : metaData->properties) {
+        statusCode = database->execute(FileIndexer::Statements::updatePropertyValue,
+                                       propVal.second.c_str(),
+                                       metaData->file_id,
+                                       propVal.first.c_str());
+        if (!statusCode)
+            return statusCode;
+    }
+    return statusCode;
+}
+
 auto FileIndexerAgent::handleGetProperty(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
 {
-    if (auto msg = static_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
         FileIndexer::FileMetadata metaData = *metaDataPtr;
         msg->dbMetaData                    = dbGetProperty(std::make_unique<FileIndexer::FileMetadata>(metaData));
@@ -208,7 +271,7 @@ auto FileIndexerAgent::handleGetProperty(sys::DataMessage *req, sys::ResponseMes
 auto FileIndexerAgent::handleGetAllProperties(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
     -> sys::Message_t
 {
-    if (auto msg = static_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
         FileIndexer::FileMetadata metaData = *metaDataPtr;
         msg->dbMetaData                    = dbGetAllProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
@@ -220,7 +283,7 @@ auto FileIndexerAgent::handleGetAllProperties(sys::DataMessage *req, sys::Respon
 
 auto FileIndexerAgent::handleSetProperty(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
 {
-    if (auto msg = static_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
         FileIndexer::FileMetadata metaData = *metaDataPtr;
 
@@ -243,7 +306,7 @@ auto FileIndexerAgent::handleSetProperty(sys::DataMessage *req, sys::ResponseMes
 
 auto FileIndexerAgent::handleSetProperties(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
 {
-    if (auto msg = static_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
         FileIndexer::FileMetadata metaData = *metaDataPtr;
         msg->dbMetaData                    = dbGetAllProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
