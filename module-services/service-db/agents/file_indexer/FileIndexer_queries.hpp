@@ -47,8 +47,8 @@ namespace FileIndexer::Statements
                         )sql";
 
     constexpr auto insertFileInfo = R"sql(
-                        INSERT OR REPLACE INTO file_tab (file_id, path, size, mime_type, mtime, directory, file_type) VALUES
-                        ( '%lu', '%q', '%lu', '%lu' , '%lu', '%q', '%lu') ;
+                        INSERT OR REPLACE INTO file_tab (path, size, mime_type, mtime, directory, file_type) VALUES
+                        ('%q', '%lu', '%lu' , '%lu', '%q', '%lu') ;
                         )sql";
 
     constexpr auto updateFileInfo = R"sql(
@@ -83,6 +83,32 @@ namespace FileIndexer::Statements
     constexpr auto updatePropertyValue = R"sql(
                         UPDATE metadata_tab SET value = '%q'
                         WHERE file_id= '%lu' AND property = '%q' ;
+                        )sql";
+
+    constexpr auto setNotification = R"sql(
+                        INSERT OR REPLACE INTO notifications_tab (path, service) VALUES
+                        ( '%q' , '%q' ) ;
+                        )sql";
+
+    constexpr auto updateNotification = R"sql(
+                        UPDATE notifications_tab SET path = '%q', service = '%q'
+                        WHERE id = '%lu';
+                        )sql";
+
+    constexpr auto clearNotificationdRow = R"sql(
+                        DELETE FROM notifications_tab
+                        WHERE path = '%q' AND service = '%q';
+                        )sql";
+
+    constexpr auto getAllNotifications = R"sql(
+                        SELECT id, path, service
+                        FROM notifications_tab  AS NT;
+                        )sql";
+
+    constexpr auto getNotification = R"sql(
+                        SELECT id, path, service
+                        FROM notifications_tab  AS NT
+                        WHERE path= '%q' AND service = '%q';
                         )sql";
 
 } // namespace FileIndexer::Statements
