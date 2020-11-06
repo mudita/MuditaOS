@@ -233,9 +233,9 @@ namespace gui
         if (elements.networkAccessTechnology) {
             auto accessTechnology = Store::GSM::get()->getNetwork().accessTechnology;
 
-            constexpr auto text2g  = "2g";
-            constexpr auto text3g  = "3g";
-            constexpr auto textLte = "lte";
+            constexpr auto text2g  = "2G";
+            constexpr auto text3g  = "3G";
+            constexpr auto textLte = "LTE";
 
             switch (accessTechnology) {
             case Store::Network::AccessTechnology::Gsm:
