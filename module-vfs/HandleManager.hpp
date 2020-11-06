@@ -12,10 +12,24 @@ namespace vfsn::internal::stdlib
     {
         class HandleManager
         {
+            /* Number of simultaneously open files by the
+             * stdio library
+             */
             static constexpr auto MAX_HANDLES  = 128;
+            /*
+             * According to the POSIX standard handle no 0 is reserved for standard input
+             * stream (STDIN_FILENO),
+             * handle no 1 is reserved for standard output stream (STDOUT_FILENO) ,
+             * handle no 2 is reserved for standard error output stream (STDERR_FILENO),
+             * so the first allowed file descriptor returned by open should be 3 or greater.
+             */
             static constexpr auto FIRST_HANDLE = 3;
-
           protected:
+            /*
+             * Atomically remove file descriptor from
+             * global file descriptor table and return handle
+             * which can be released by underlaying library
+             */
             auto clearHandle(int hwnd) noexcept -> void *;
             auto setHandle(void *hwnd) noexcept -> int;
             auto get(int handle) const noexcept -> void *
@@ -23,7 +37,7 @@ namespace vfsn::internal::stdlib
                 if (handle < FIRST_HANDLE || handle >= FIRST_HANDLE + MAX_HANDLES)
                     return nullptr;
                 else
-                    return reinterpret_cast<void *>(mHandles[handle - FIRST_HANDLE].load());
+                    return mHandles[handle - FIRST_HANDLE].load();
             }
 
           private:

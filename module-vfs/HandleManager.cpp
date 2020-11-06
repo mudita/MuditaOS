@@ -16,8 +16,7 @@ namespace vfsn::internal::stdlib::impl
 
     auto HandleManager::setHandle(void *hwnd) noexcept -> int
     {
-        int h;
-        for (h = 0; h < MAX_HANDLES; ++h) {
+        for (int h = 0; h < MAX_HANDLES; ++h) {
             void *tst_val = nullptr;
             if (mHandles[h].compare_exchange_strong(tst_val, hwnd)) {
                 return h + FIRST_HANDLE;
