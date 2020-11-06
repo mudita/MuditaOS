@@ -15,7 +15,7 @@
 #include <module-gui/gui/widgets/Text.hpp>
 #include <Text.hpp>
 
-const auto maxwidth = std::numeric_limits<unsigned int>().max();
+const auto maxWidth = std::numeric_limits<unsigned int>().max();
 
 TEST_CASE("TextLine - ctor")
 {
@@ -25,7 +25,7 @@ TEST_CASE("TextLine - ctor")
     {
         Text text;
         auto cursor = new TextCursor(&text);
-        auto line   = TextLine(*cursor, maxwidth);
+        auto line   = TextLine(*cursor, maxWidth);
         REQUIRE(line.length() == 0);
     }
 
@@ -34,10 +34,8 @@ TEST_CASE("TextLine - ctor")
         auto texts            = mockup::lineStrings(3);
         auto [document, font] = mockup::buildMultilineTestDocument(texts);
 
-        Text text;
-        text.setText(std::make_unique<TextDocument>(document));
-        auto cursor = new TextCursor(&text);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, 0, font);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() > 0);
         REQUIRE(line.length() == texts.front().length());
@@ -48,11 +46,8 @@ TEST_CASE("TextLine - ctor")
         auto test_text        = mockup::multiWordString(5);
         auto [document, font] = mockup::buildOnelineTestDocument(test_text);
 
-        Text text;
-        text.setText(test_text);
-
-        auto cursor = new TextCursor(&text);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, 0, font);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() > 0);
         REQUIRE(line.length() == test_text.length());
@@ -61,15 +56,15 @@ TEST_CASE("TextLine - ctor")
 
 TEST_CASE("TextLine - non fitting text")
 {
+    using namespace gui;
+
     SECTION("text > one line to show")
     {
         auto test_text        = mockup::multiWordString(5);
         auto [document, font] = mockup::buildOnelineTestDocument(test_text);
 
-        gui::Text text;
-        text.setText(std::make_unique<gui::TextDocument>(document));
-        auto cursor = new gui::TextCursor(&text);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>::max());
+        auto cursor = new BlockCursor(&document, 0, 0, font);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() != 0);
         REQUIRE(line.length() <= test_text.length());
@@ -94,10 +89,8 @@ TEST_CASE("TextLine - multiple styles text")
         auto testblock = mockup::getBlock(mockup::BlockFactory::Type::Block0);
         auto document  = TextDocument(testblock);
 
-        gui::Text txt;
-        txt.setText(std::make_unique<TextDocument>(document));
-        auto cursor = new TextCursor(&txt);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.width() > 0);
         REQUIRE(line.length() == getTextLen(testblock));
@@ -112,10 +105,8 @@ TEST_CASE("TextLine - multiple styles text")
         testblock.insert(testblock.end(), block1.begin(), block1.end());
         auto document = TextDocument(testblock);
 
-        gui::Text txt;
-        txt.setText(std::make_unique<TextDocument>(document));
-        auto cursor = new TextCursor(&txt);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == getTextLen(block0));
     }
@@ -130,10 +121,8 @@ TEST_CASE("TextLine - multiple styles text")
         testblock.insert(testblock.end(), block1.begin(), block1.end());
         auto document = TextDocument(testblock);
 
-        gui::Text txt;
-        txt.setText(std::make_unique<TextDocument>(document));
-        auto cursor = new TextCursor(&txt, 0, block0.size());
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, block0.size(), nullptr);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == getTextLen(block1));
     }
@@ -143,10 +132,8 @@ TEST_CASE("TextLine - multiple styles text")
         auto testblock = mockup::getBlock(mockup::BlockFactory::Type::NoneBlock0);
         auto document  = TextDocument(testblock);
 
-        gui::Text txt;
-        txt.setText(std::make_unique<TextDocument>(document));
-        auto cursor = new TextCursor(&txt);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == 0);
         REQUIRE(line.width() == 0);
@@ -157,10 +144,8 @@ TEST_CASE("TextLine - multiple styles text")
         auto testblock = mockup::getBlock(mockup::BlockFactory::Type::NoneBlock1);
         auto document  = TextDocument(testblock);
 
-        gui::Text txt;
-        txt.setText(std::make_unique<TextDocument>(document));
-        auto cursor = new TextCursor(&txt);
-        auto line   = gui::TextLine(*cursor, std::numeric_limits<unsigned int>().max());
+        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == 0);
         REQUIRE(line.width() == 0);
@@ -174,10 +159,8 @@ TEST_CASE("TextLine - elements sizes checkup")
     auto testblock = mockup::getBlock(mockup::BlockFactory::Type::Block0);
     auto document  = TextDocument(testblock);
 
-    Text text;
-    text.setText(std::make_unique<TextDocument>(testblock));
-    auto cursor    = new TextCursor(&text);
-    auto text_line = TextLine(*cursor, maxwidth);
+    auto cursor    = new BlockCursor(&document, 0, 0, nullptr);
+    auto text_line = TextLine(*cursor, maxWidth);
 
     REQUIRE(text_line.length() > 0);
     const Item *it = nullptr;

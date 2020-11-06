@@ -10,7 +10,8 @@ namespace mockup
 
     auto buildEmptyTestDocument() -> std::tuple<gui::TextDocument, gui::RawFont *>;
 
-    auto buildTestDocument() -> std::tuple<gui::TextDocument, gui::RawFont *>;
+    auto buildTestDocument(gui::TextBlock::End lineEnd = gui::TextBlock::End::Newline)
+        -> std::tuple<gui::TextDocument, gui::RawFont *>;
 
     auto buildOnelineTestDocument(std::string text) -> std::tuple<gui::TextDocument, gui::RawFont *>;
 

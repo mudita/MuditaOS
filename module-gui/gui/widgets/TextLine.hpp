@@ -33,19 +33,19 @@ namespace gui
         UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
         Position underlinePadding           = 0;
         TextBlock::End end                  = TextBlock::End::None;
-        unsigned int block_nr               = text::npos;
         Position storedYOffset              = 0;
+        bool lineEnd                        = false;
 
         void createUnderline(unsigned int max_w, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
 
       public:
         /// creates TextLine with data from text based on TextCursor position filling max_width
-        TextLine(const BlockCursor &, unsigned int max_width);
+        TextLine(BlockCursor &, unsigned int max_width);
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&);
 
-        TextLine(const BlockCursor &cursor,
+        TextLine(BlockCursor &cursor,
                  unsigned int max_width,
                  unsigned int init_height,
                  bool drawUnderline,
@@ -63,30 +63,35 @@ namespace gui
         ~TextLine();
 
         /// number of letters in Whole TextLines
-        unsigned int length() const
+        [[nodiscard]] unsigned int length() const
         {
             return number_letters_shown;
         }
 
         /// count of elements in whole TextLine
-        unsigned int count() const
+        [[nodiscard]] unsigned int count() const
         {
             return elements_to_show_in_line.size();
         }
 
-        Length width() const
+        [[nodiscard]] Length width() const
         {
             return width_used;
         }
 
-        Length height() const
+        [[nodiscard]] Length height() const
         {
             return height_used;
         }
 
-        TextBlock::End getEnd() const
+        [[nodiscard]] TextBlock::End getEnd() const
         {
             return end;
+        }
+
+        [[nodiscard]] bool getLineEnd() const
+        {
+            return lineEnd;
         }
 
         const Item *getElement(unsigned int pos) const
@@ -104,11 +109,6 @@ namespace gui
         int32_t getX() const
         {
             return elements_to_show_in_line.front()->area().pos(Axis::X);
-        }
-
-        unsigned int getBlockNr() const
-        {
-            return block_nr;
         }
 
         void setPosition(const short &x, const short &y);

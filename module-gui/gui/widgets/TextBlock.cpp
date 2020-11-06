@@ -83,12 +83,15 @@ namespace gui
         return End::None;
     }
 
-    void TextBlock::setEnd(End end)
+    void TextBlock::setEnd(End _end)
     {
-        if (getEnd() != End::Newline) {
+        if (_end == End::Newline && getEnd() != End::Newline) {
             text.insertCode(text::newline);
         }
-        this->end = end;
+        else if (_end == End::None && getEnd() == End::Newline) {
+            text.removeChar(text.length() - 1);
+        }
+        this->end = _end;
     }
 
     void TextBlock::addChar(uint32_t utf_val, unsigned int pos)

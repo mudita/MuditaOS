@@ -75,7 +75,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         auto block_nr    = doc.getBlocks().size() - 1;
         REQUIRE(block_nr > 0);
         auto block_len = std::next(doc.getBlocks().begin(), block_nr)->length();
-        REQUIRE(block_len > 0);
+        REQUIRE(block_len == 0);
         auto cursor = BlockCursor(&doc, block_len, block_nr, nullptr);
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
@@ -124,9 +124,18 @@ TEST_CASE("TextDocument <-> BlockCursor fencing tests")
         REQUIRE(text == test_text);
         REQUIRE(cursor->getFormat()->getFont() == testfont);
     }
-    SECTION("fence fence hit - fence of textBlocks and block")
+    SECTION("fence fence hit - fence of textBlocks and block with newline")
     {
         auto cursor = document.getBlockCursor(document.getText().length());
+        REQUIRE(cursor.getPosition() == 0);
+        auto text = document.getText(cursor);
+        REQUIRE(text == "");
+    }
+
+    SECTION("fence fence hit - fence of textBlocks and block without newline")
+    {
+        auto [document, testfont] = mockup::buildTestDocument(gui::TextBlock::End::None);
+        auto cursor               = document.getBlockCursor(document.getText().length());
         REQUIRE(cursor.getPosition() == text::npos);
         auto text = document.getText(cursor);
         REQUIRE(text == "");
