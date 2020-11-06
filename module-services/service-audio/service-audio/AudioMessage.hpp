@@ -1,14 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <Audio/AudioCommon.hpp>
+#include <Audio/decoder/decoder.hpp>
+#include <MessageType.hpp>
+#include <Service/Message.hpp>
+
 #include <memory>
 #include <variant>
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
-#include "module-audio/Audio/AudioCommon.hpp"
-#include "module-audio/Audio/decoder/decoder.hpp"
 
 class AudioMessage : public sys::DataMessage
 {

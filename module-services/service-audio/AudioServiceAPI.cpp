@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "AudioServiceAPI.hpp"
+#include "service-audio/AudioServiceAPI.hpp"
+#include "service-audio/ServiceAudio.hpp"
+#include "service-audio/AudioMessage.hpp"
 
-#include <utility> // for move, pair
+#include <Audio/decoder/decoder.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Common.hpp>
+#include <log/log.hpp>
 
-#include "Service/Bus.hpp"                         // for Bus, defaultCmdTimeout
-#include "../ServiceAudio.hpp"                     // for ServiceAudio, ServiceAudio::serviceName
-#include "Audio/decoder/decoder.hpp"               // for Tags
-#include "Service/Common.hpp"                      // for ReturnCodes, ReturnCodes::Success
-#include "log/log.hpp"                             // for LOG_DEBUG, LOG_ERROR
-#include "service-audio/messages/AudioMessage.hpp" // for AudioStopRequest, AudioResponseMessage, AudioEventRequest, AudioGetFileTagsRequest, AudioGetSetting, AudioKeyPressedRequest, AudioPauseRequest, AudioResumeRequest, AudioStartPlaybackRequest, AudioStartRecorderRequest, AudioStartRoutingRequest, AudioMessage, AudioSetSetting (ptr only)
+#include <utility>
 
 namespace sys
 {

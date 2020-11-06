@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -21,7 +21,7 @@
 #include <memory>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/api/CellularServiceAPI.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>

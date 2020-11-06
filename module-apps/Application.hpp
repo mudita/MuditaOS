@@ -5,7 +5,6 @@
 
 #include "Audio/AudioCommon.hpp"                        // for Volume, Play...
 #include "Audio/Profiles/Profile.hpp"                   // for Profile, Pro...
-#include "AudioServiceAPI.hpp"                          // for GetOutputVolume
 #include "Interface/SettingsRecord.hpp"                 // for SettingsRecord
 #include "Service/Bus.hpp"                              // for Bus
 #include "Service/Common.hpp"                           // for ReturnCodes
@@ -276,10 +275,7 @@ namespace app
 
         auto getVolume(audio::Volume &volume,
                        const audio::Profile::Type &profileType,
-                       const audio::PlaybackType &playbackType)
-        {
-            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, playbackType, profileType);
-        }
+                       const audio::PlaybackType &playbackType);
 
         bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
@@ -290,44 +286,9 @@ namespace app
         {
             return adjustCurrentVolume(-step);
         }
-        auto getCurrentVolume(audio::Volume &volume)
-        {
-            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
-        }
+        audio::RetCode getCurrentVolume(audio::Volume &volume);
 
-        void toggleTorchAndColourTemps()
-        {
-            using namespace bsp;
-
-            auto retGetState = sys::Bus::SendUnicast(std::make_shared<sevm::TorchStateMessage>(torch::Action::getState),
-                                                     service::name::evt_manager,
-                                                     this,
-                                                     pdMS_TO_TICKS(1500));
-            if (retGetState.first == sys::ReturnCodes::Success) {
-                auto msgGetState = dynamic_cast<sevm::TorchStateResultMessage *>(retGetState.second.get());
-                if (msgGetState == nullptr) {
-                    return;
-                }
-                auto msgSetState = std::make_shared<sevm::TorchStateMessage>(torch::Action::setState);
-
-                switch (msgGetState->state) {
-                case torch::State::off:
-                    msgSetState->state      = torch::State::on;
-                    msgSetState->colourTemp = torch::warmest;
-                    break;
-                case torch::State::on:
-                    if (msgGetState->colourTemp == torch::warmest) { // toggle colour temp
-                        msgSetState->state      = torch::State::on;
-                        msgSetState->colourTemp = torch::coldest;
-                    }
-                    else {
-                        msgSetState->state = torch::State::off;
-                    }
-                    break;
-                }
-                sys::Bus::SendUnicast(msgSetState, service::name::evt_manager, this);
-            }
-        }
+        void toggleTorchAndColourTemps();
 
         /// @defgroup Application Application static functions
         /// All this functions are meant to be used in ApplicationManager only

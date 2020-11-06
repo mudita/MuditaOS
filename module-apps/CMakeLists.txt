@@ -91,6 +91,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-appmgr
         service-antenna
+        service-audio
     PUBLIC
         module-bsp
         module-os

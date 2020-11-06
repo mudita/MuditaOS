@@ -12,8 +12,9 @@ set(SOURCES
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-apps
-    module-audio
+    PRIVATE
+        module-apps
+        module-audio
 )
 
 target_include_directories(${PROJECT_NAME}

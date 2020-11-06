@@ -32,6 +32,8 @@
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 
+#include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
+
 namespace gui
 {
     class DrawCommand;
@@ -523,9 +525,55 @@ namespace app
         return ret == audio::RetCode::Success;
     }
 
+    auto Application::getVolume(audio::Volume &volume,
+                                const audio::Profile::Type &profileType,
+                                const audio::PlaybackType &playbackType)
+    {
+        return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, playbackType, profileType);
+    }
+
     bool Application::adjustCurrentVolume(const int step)
     {
         return AudioServiceAPI::KeyPressed(this, step);
+    }
+
+    audio::RetCode Application::getCurrentVolume(audio::Volume &volume)
+    {
+        return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
+    }
+
+    void Application::toggleTorchAndColourTemps()
+    {
+        using namespace bsp;
+
+        auto retGetState = sys::Bus::SendUnicast(std::make_shared<sevm::TorchStateMessage>(torch::Action::getState),
+                                                 service::name::evt_manager,
+                                                 this,
+                                                 pdMS_TO_TICKS(1500));
+        if (retGetState.first == sys::ReturnCodes::Success) {
+            auto msgGetState = dynamic_cast<sevm::TorchStateResultMessage *>(retGetState.second.get());
+            if (msgGetState == nullptr) {
+                return;
+            }
+            auto msgSetState = std::make_shared<sevm::TorchStateMessage>(torch::Action::setState);
+
+            switch (msgGetState->state) {
+            case torch::State::off:
+                msgSetState->state      = torch::State::on;
+                msgSetState->colourTemp = torch::warmest;
+                break;
+            case torch::State::on:
+                if (msgGetState->colourTemp == torch::warmest) { // toggle colour temp
+                    msgSetState->state      = torch::State::on;
+                    msgSetState->colourTemp = torch::coldest;
+                }
+                else {
+                    msgSetState->state = torch::State::off;
+                }
+                break;
+            }
+            sys::Bus::SendUnicast(msgSetState, service::name::evt_manager, this);
+        }
     }
 
     void Application::requestAction(sys::Service *sender,

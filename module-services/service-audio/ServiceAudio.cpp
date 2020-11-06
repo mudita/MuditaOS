@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <type_traits>
-
-#include "ServiceAudio.hpp"
-#include "messages/AudioMessage.hpp"
+#include "service-audio/AudioMessage.hpp"
+#include "service-audio/ServiceAudio.hpp"
 
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
+#include <service-bluetooth/messages/BluetoothMessage.hpp>
+
+#include <type_traits>
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 

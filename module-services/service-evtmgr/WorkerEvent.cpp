@@ -20,7 +20,7 @@ extern "C"
 #include "common_data/RawKey.hpp"     // for RawKey, RawKey::State, RawKey::State::Pressed, RawKey::State::Released
 //#include "harness/harness.hpp"                          // for ETX, STX
 #include "log/log.hpp"                                 // for LOG_DEBUG, LOG_ERROR
-#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
+#include <service-audio/AudioMessage.hpp>              // for AudioEventRequest
 #include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
 #include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 

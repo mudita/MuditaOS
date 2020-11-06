@@ -1,4 +1,4 @@
-
+﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
     PUBLIC
@@ -17,4 +17,9 @@ target_sources( ${PROJECT_NAME}
         
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationMusicPlayer.hpp"
+)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-audio
+        module-audio
 )

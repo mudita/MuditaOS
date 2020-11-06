@@ -1,17 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <optional> // for optional
-#include <memory>   // for shared_ptr
-#include <string>   // for string
-#include <vector>   // for vector
+#include "AudioMessage.hpp"
 
-#include "../messages/AudioMessage.hpp"
-#include "Audio/decoder/decoder.hpp"
-#include "Audio/AudioCommon.hpp" // for PlaybackType, PlaybackType::None, Token (ptr only), RetCode, Setting, Event (ptr only), EventType
-#include "Audio/Profiles/Profile.hpp" // for Profile, Profile::Type, Profile::Type::Idle
+#include <Audio/AudioCommon.hpp>
+#include <Audio/Profiles/Profile.hpp>
+#include <Audio/decoder/decoder.hpp>
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 class Service;
 namespace audio
