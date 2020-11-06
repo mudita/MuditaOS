@@ -116,6 +116,8 @@ namespace parserFSM
         inline constexpr auto backupUpload   = "backupUpload";
         inline constexpr auto restoreRequest = "restoreRequest";
         inline constexpr auto factoryRequest = "factoryRequest";
+        inline constexpr auto networkStatus    = "networkStatus";
+        inline constexpr auto accessTechnology = "accessTechnology";
 
         namespace messages
         {
