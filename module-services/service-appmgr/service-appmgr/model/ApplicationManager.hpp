@@ -106,6 +106,7 @@ namespace app::manager
         auto closeServices() -> bool;
         auto closeApplications() -> bool;
         void closeService(const std::string &name);
+        void closeApplication(ApplicationHandle *application);
 
         // Message handlers
         void registerMessageHandlers();

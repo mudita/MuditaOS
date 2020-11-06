@@ -15,9 +15,7 @@
 ### Fixed
 
 * `[Text]` Newline handling fix. 
-
-
-
+* `[appmgr]` Fix for closing applications.
 
 ## [0.45.1 2020-11-06]
 
