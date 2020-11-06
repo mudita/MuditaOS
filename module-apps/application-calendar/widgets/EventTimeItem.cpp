@@ -181,12 +181,10 @@ namespace gui
                 hours = date::make24(hours, isPm(mode12hInput->getText()));
             }
             if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
-                auto time         = TimePointToHourMinSec(record->date_till);
-                record->date_till = record->date_till - time.hours() - time.minutes() + hours + minutes;
+                record->date_till = calculateEventTime(dateItem->getChosenDate(), hours, minutes);
             }
             else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
-                auto time         = TimePointToHourMinSec(record->date_from);
-                record->date_from = record->date_from - time.hours() - time.minutes() + hours + minutes;
+                record->date_from = calculateEventTime(dateItem->getChosenDate(), hours, minutes);
             }
         };
 
@@ -325,6 +323,11 @@ namespace gui
         this->secondItem = item;
     }
 
+    void EventTimeItem::setConnectionToDateItem(gui::EventDateItem *item)
+    {
+        this->dateItem = item;
+    }
+
     bool EventTimeItem::isPm(const std::string &text)
     {
         return !(text == timeConstants::before_noon);
@@ -428,6 +431,13 @@ namespace gui
             }
             hourInput->setText(std::to_string(hour));
         }
+    }
+
+    TimePoint EventTimeItem::calculateEventTime(YearMonthDay date,
+                                                std::chrono::hours hours,
+                                                std::chrono::minutes minutes)
+    {
+        return TimePointFromYearMonthDay(date) + hours + minutes;
     }
 
 } /* namespace gui */

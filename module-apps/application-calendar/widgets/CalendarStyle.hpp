@@ -70,6 +70,8 @@ namespace style
                 inline constexpr auto max_hour_24H_mode = 23;
                 inline constexpr auto max_hour_12H_mode = 12;
                 inline constexpr auto max_minutes       = 59;
+                inline constexpr auto max_years         = 2038;
+                inline constexpr auto min_years         = 1970;
             } // namespace time
 
             namespace item
@@ -92,7 +94,7 @@ namespace style
                     inline constexpr auto height             = 150;
                     inline constexpr auto title_label_h      = 45;
                     inline constexpr auto title_label_margin = 15;
-                    inline constexpr auto description_w      = style::window::default_body_width / 2 - 30;
+                    inline constexpr auto description_w      = style::window::default_body_width / 2 - title_label_h;
                     inline constexpr auto description_h      = 30;
                 } // namespace repeatAndReminder
 

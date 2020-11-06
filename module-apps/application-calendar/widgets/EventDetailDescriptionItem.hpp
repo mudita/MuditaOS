@@ -5,15 +5,18 @@
 #include "CalendarListItem.hpp"
 #include <Label.hpp>
 #include <Text.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
 
 namespace gui
 {
     class EventDetailDescriptionItem : public CalendarListItem
     {
         gui::VBox *vBox        = nullptr;
+        gui::HBox *hBox         = nullptr;
         gui::Label *title      = nullptr;
         gui::Label *eventTime  = nullptr;
         gui::Text *description = nullptr;
+        gui::Image *squareImage = nullptr;
 
       public:
         EventDetailDescriptionItem();

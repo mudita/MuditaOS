@@ -174,7 +174,8 @@ namespace app
             eventData->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
             event->date_from = dateFilter;
-            event->date_till = dateFilter;
+            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
+                               std::chrono::minutes(style::window::calendar::time::max_minutes);
             eventData->setData(event);
 
             switchWindow(

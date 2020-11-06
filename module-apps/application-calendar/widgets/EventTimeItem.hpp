@@ -3,6 +3,7 @@
 
 #pragma once
 #include "CalendarListItem.hpp"
+#include "EventDateItem.hpp"
 #include <Label.hpp>
 #include <Text.hpp>
 #include <BoxLayout.hpp>
@@ -25,6 +26,7 @@ namespace gui
         gui::Label *mode12hInput       = nullptr;
         bool mode24H                   = false;
         gui::EventTimeItem *secondItem = nullptr;
+        gui::EventDateItem *dateItem   = nullptr;
 
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
@@ -41,6 +43,7 @@ namespace gui
                                     std::chrono::minutes end_hour,
                                     uint32_t start_minutes,
                                     uint32_t end_minutes);
+        TimePoint calculateEventTime(YearMonthDay date, std::chrono::hours hours, std::chrono::minutes minutes);
 
       public:
         EventTimeItem(const std::string &description,
@@ -50,6 +53,7 @@ namespace gui
         virtual ~EventTimeItem() override = default;
 
         void setConnectionToSecondItem(gui::EventTimeItem *item);
+        void setConnectionToDateItem(gui::EventDateItem *item);
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
