@@ -41,6 +41,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
          {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
     desktopWorker->run();
 
+
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
         if (request->event != nullptr) {

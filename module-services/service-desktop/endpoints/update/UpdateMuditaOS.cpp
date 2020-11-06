@@ -121,7 +121,6 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 
     // reboot always
     sys::SystemManager::Reboot(owner);
-    // bsp::watchdog::system_reset();
 
     return err;
 }

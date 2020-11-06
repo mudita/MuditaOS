@@ -6,7 +6,7 @@
 #include <memory> // for allocator, unique_ptr
 
 #include "WorkerDesktop.hpp"
-#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp"
+#include "endpoints/update/UpdateMuditaOS.hpp"
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service

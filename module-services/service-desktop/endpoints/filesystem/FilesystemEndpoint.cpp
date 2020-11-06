@@ -17,9 +17,11 @@ auto FilesystemEndpoint::handle(Context &context) -> void
 }
 static bool isWritable(const fs::path file)
 {
-    vfs::FILE *fp = vfs.fopen(file.c_str(), "w");
-    if (fp != nullptr) {
-        vfs.fclose(fp);
+    auto lamb = [](vfs::FILE *stream) { vfs.fclose(stream); };
+
+    std::unique_ptr<vfs::FILE, decltype(lamb)> sf(vfs.fopen(file.c_str(), "w"), lamb);
+
+    if (sf.get() != nullptr) {
         return true;
     }
     else {
