@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>       // for removeNewLines, enumToString, split, to_string
@@ -42,8 +42,8 @@
 #include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
 #include "service-db/messages/QueryMessage.hpp"          // for QueryResponse
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp" // for GetBoard
-#include "service-antenna/api/AntennaServiceAPI.hpp"     // for CSQChange, LockRequest
-#include "service-antenna/messages/AntennaMessage.hpp"   // for AntennaChangedMessage
+#include <service-antenna/AntennaServiceAPI.hpp>         // for CSQChange, LockRequest
+#include <service-antenna/AntennaMessage.hpp>            // for AntennaChangedMessage
 #include "time/time_conversion.hpp"                      // for Timestamp
 #include "Audio/AudioCommon.hpp"                         // for PlaybackType, PlaybackType::TextMessageRingtone
 #include "AudioServiceAPI.hpp"                           // for PlaybackStart
@@ -776,7 +776,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
-            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
+            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
 
             // are there new messges queued for sending ?
             auto limitTo = 15; // how many to send in this Query

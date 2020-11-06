@@ -90,6 +90,7 @@ include_directories( ../module-db )
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-appmgr
+        service-antenna
     PUBLIC
         module-bsp
         module-os
