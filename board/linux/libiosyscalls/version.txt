@@ -1,0 +1,12 @@
+GLIBC_2.2.5 {
+        global:
+                open;
+                fopen64;
+                fopen;
+                fwrite;
+                fwrite64;
+                opendir;
+                readdir;
+        local:
+                *;
+};

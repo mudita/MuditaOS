@@ -129,6 +129,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR})
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+     add_subdirectory(board/linux/libiosyscalls)
+endif()
 message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
 
