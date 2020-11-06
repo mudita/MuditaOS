@@ -125,7 +125,7 @@ TEST_CASE("Text buildDrawList")
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.Switch(utils::Lang::En); /// needed to load input mode
+    utils::localize.SetDisplayLanguage(utils::Lang::En); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();

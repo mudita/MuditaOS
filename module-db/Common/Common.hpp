@@ -48,8 +48,15 @@ enum class SettingsLanguage
     POLISH  = 0x02,
     GERMAN  = 0x04,
     SPANISH = 0x08,
-
 };
+
+namespace Language
+{
+    constexpr static bool ValidateLanguage(SettingsLanguage lang) noexcept
+    {
+        return lang >= SettingsLanguage::ENGLISH && lang <= SettingsLanguage::SPANISH;
+    }
+}; // namespace Language
 
 enum class SettingsPinMode
 {

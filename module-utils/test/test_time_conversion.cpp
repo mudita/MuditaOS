@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
     }
 
     // set locale to PL
-    utils::localize.Switch(utils::Lang::Pl);
+    utils::localize.SetDisplayLanguage(utils::Lang::Pl);
     std::setlocale(LC_TIME, "pl_PL.UTF-8");
 
     // set default output to nullstream

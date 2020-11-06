@@ -27,7 +27,8 @@ struct SettingsTableRow
     uint32_t lockPassHash;
     // time of inactivity of the user after which phone will be automatically blocked.
     uint32_t lockTime;
-    SettingsLanguage language;
+    SettingsLanguage displayLanguage;
+    SettingsLanguage inputLanguage;
 };
 
 enum class SettingsTableFields
@@ -73,12 +74,14 @@ class SettingsTable : public Table<SettingsTableRow, SettingsTableFields>
                                    "network_operator TEXT DEFAULT '', "
                                    "lock_pass_hash INTEGER DEFAULT 0, "
                                    "lock_time INTEGER DEFAULT 30000, "
-                                   "language INTEGER DEFAULT 1 "
+                                   "display_language INTEGER DEFAULT 1, "
+                                   "input_language INTEGER DEFAULT 1 "
                                    ");";
 
     const char *settingsInitialization = "INSERT OR IGNORE INTO settings (_id, time_format_12, time_auto, "
                                          "time_date_format, brightness_auto, brightness_level, "
                                          "bigger_font, pin_mode, pin_days, pin_days_left, pin1_string,pin2_string, "
-                                         "active_sim,network_operator,lock_pass_hash,lock_time, language) "
-                                         "VALUES(1,0,1,1,1,0,0,1,0,0,'','',1,'',0,30000,1)";
+                                         "active_sim,network_operator,lock_pass_hash,lock_time, display_language, "
+                                         "input_language) "
+                                         "VALUES(1,0,1,1,1,0,0,1,0,0,'','',1,'',0,30000,1,1)";
 };

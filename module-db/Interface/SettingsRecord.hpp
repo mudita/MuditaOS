@@ -31,7 +31,8 @@ struct SettingsRecord
     std::string networkOperator;
     uint32_t lockPassHash;
     uint32_t lockTime;
-    SettingsLanguage language;
+    SettingsLanguage displayLanguage;
+    SettingsLanguage inputLanguage;
 
     static ActiveSim to(const uint32_t sim);
     static uint32_t from(const ActiveSim sim);

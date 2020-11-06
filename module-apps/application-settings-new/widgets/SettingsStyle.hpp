@@ -26,6 +26,12 @@ namespace style
                 constexpr uint32_t w = 24;
                 constexpr uint32_t h = 24;
             } // namespace crossImage
+            namespace languageChange
+            {
+                constexpr uint32_t options_posX             = 17;
+                constexpr uint32_t options_posY             = 100;
+                constexpr uint32_t options_distance_between = 60;
+            } // namespace languageChange
         }     // namespace window
     };        // namespace settings
 } // namespace style
