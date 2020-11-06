@@ -2,7 +2,7 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-# set -eo piefail
+set -o v
 
 #
 # It works when the phone is in USB-MSC mode, it will apply the .tar
@@ -24,22 +24,17 @@ function get_phone_dev() {
 	if [ "$OS" == "Darwin" ]; then
 		diskutil list | grep $PHONE_PARTITION_NAME | awk '{print $6}'
 	else
-		readlink -u /dev/disk/by-id/$LINUX_DEV_FILE		
+		readlink -f /dev/disk/by-id/$LINUX_DEV_FILE		
 	fi
 }
 
 function eject_phone() {
 	if [ "$OS" == "Darwin" ]; then
-		ex diskutil eject $PHONE_DEV
+		diskutil eject $PHONE_DEV
 	else
-		ex udisksctl unmount -b $PHONE_DEV
-		ex timeout --signal=SIGINT 1 udisksctl power-off -b $PHONE_DEV
+		udisksctl unmount -b $PHONE_DEV
+		timeout --signal=SIGINT 1 udisksctl power-off -b $PHONE_DEV
 	fi
-}
-
-function ex() {
-	eval "$@"
-	echo "[exec]: '$@'"
 }
 
 print_help() {
@@ -92,23 +87,23 @@ if [ ! -e $UPDATE_FILE ]; then
 	exit 1
 fi
 
-ex rm -rf $TMPDIR
-ex mkdir $TMPDIR
-ex tar -C $TMPDIR -xpf $UPDATE_FILE
+rm -rf $TMPDIR
+mkdir $TMPDIR
+tar -C $TMPDIR -xpf $UPDATE_FILE
 
 if [ $CLEAN_PHONE == 1 ]; then
 	echo "Clean phone requested"
-	ex rm -rf $PHONE_MOUNT/current
-	ex mkdir -p $PHONE_MOUNT/current
-	ex sync
+	rm -rf $PHONE_MOUNT/current
+	mkdir -p $PHONE_MOUNT/current
+	sync
 fi
 
 echo "Copyind data"
-ex cp $TMPDIR/boot.bin $PHONE_MOUNT/current/
-ex cp $TMPDIR/Luts.bin $PHONE_MOUNT/current/
-ex cp $TMPDIR/country-codes.db $PHONE_MOUNT/current/
-ex cp $TMPDIR/version.json $PHONE_MOUNT/current/
-ex cp -r $TMPDIR/assets $PHONE_MOUNT/current/
+cp $TMPDIR/boot.bin $PHONE_MOUNT/current/
+cp $TMPDIR/Luts.bin $PHONE_MOUNT/current/
+cp $TMPDIR/country-codes.db $PHONE_MOUNT/current/
+cp $TMPDIR/version.json $PHONE_MOUNT/current/
+cp -r $TMPDIR/assets $PHONE_MOUNT/current/
 
 echo "Ejecting phone from OS..."
 eject_phone
