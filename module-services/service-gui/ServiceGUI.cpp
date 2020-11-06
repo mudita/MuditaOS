@@ -57,19 +57,14 @@ namespace sgui
         gui::ImageManager &imageManager = gui::ImageManager::getInstance();
         imageManager.init("assets");
 
-        connect(typeid(sgui::DrawMessage), [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-            return handleDrawMessage(request);
-        });
+        connect(typeid(sgui::DrawMessage),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });
 
         connect(typeid(service::gui::RenderingFinished),
-                [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-                    return handleGUIRenderingFinished(request);
-                });
+                [&](sys::Message *request) -> sys::MessagePointer { return handleGUIRenderingFinished(request); });
 
         connect(typeid(service::gui::GUIDisplayReady),
-                [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
-                    return handleGUIDisplayReady(request);
-                });
+                [&](sys::Message *request) -> sys::MessagePointer { return handleGUIDisplayReady(request); });
     }
 
     ServiceGUI::~ServiceGUI()
@@ -108,7 +103,7 @@ namespace sgui
         worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
     }
 
-    sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ServiceGUI::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         return std::make_shared<sys::ResponseMessage>();
     }
@@ -163,7 +158,7 @@ namespace sgui
         return sys::ReturnCodes::Success;
     }
 
-    sys::Message_t ServiceGUI::handleDrawMessage(sys::Message *message)
+    sys::MessagePointer ServiceGUI::handleDrawMessage(sys::Message *message)
     {
         auto dmsg = static_cast<sgui::DrawMessage *>(message);
         if (!dmsg->commands.empty()) {
@@ -203,7 +198,7 @@ namespace sgui
         return nullptr;
     }
 
-    sys::Message_t ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
+    sys::MessagePointer ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
     {
         rendering = false;
         renderFrameCounter++;
@@ -218,7 +213,7 @@ namespace sgui
         return nullptr;
     }
 
-    sys::Message_t ServiceGUI::handleGUIDisplayReady(sys::Message *message)
+    sys::MessagePointer ServiceGUI::handleGUIDisplayReady(sys::Message *message)
     {
         auto msg    = static_cast<service::gui::GUIDisplayReady *>(message);
         einkReady   = true;

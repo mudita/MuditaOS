@@ -81,7 +81,7 @@ class ServiceAntenna : public sys::Service
     ServiceAntenna();
     ~ServiceAntenna();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

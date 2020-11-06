@@ -38,7 +38,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);
@@ -224,7 +224,7 @@ namespace app
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
 
-        connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
             auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
             if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
@@ -241,7 +241,7 @@ namespace app
                     getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
                 }
             }
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
         auto msgToSend =

@@ -54,41 +54,37 @@ void SettingsAgent::registerMessages()
 {
     // connect handler & message in parent service
     using std::placeholders::_1;
-    using std::placeholders::_2;
 
     // single variable
-    parentService->connect(Settings::Messages::GetVariable(),
-                           std::bind(&SettingsAgent::handleGetVariable, this, _1, _2));
-    parentService->connect(Settings::Messages::SetVariable(),
-                           std::bind(&SettingsAgent::handleSetVariable, this, _1, _2));
+    parentService->connect(Settings::Messages::GetVariable(), std::bind(&SettingsAgent::handleGetVariable, this, _1));
+    parentService->connect(Settings::Messages::SetVariable(), std::bind(&SettingsAgent::handleSetVariable, this, _1));
     parentService->connect(Settings::Messages::RegisterOnVariableChange(),
-                           std::bind(&SettingsAgent::handleRegisterOnVariableChange, this, _1, _2));
+                           std::bind(&SettingsAgent::handleRegisterOnVariableChange, this, _1));
     parentService->connect(Settings::Messages::UnregisterOnVariableChange(),
-                           std::bind(&SettingsAgent::handleUnregisterOnVariableChange, this, _1, _2));
+                           std::bind(&SettingsAgent::handleUnregisterOnVariableChange, this, _1));
     // profile
     parentService->connect(Settings::Messages::RegisterOnProfileChange(),
-                           std::bind(&SettingsAgent::handleRegisterProfileChange, this, _1, _2));
+                           std::bind(&SettingsAgent::handleRegisterProfileChange, this, _1));
     parentService->connect(Settings::Messages::UnregisterOnProfileChange(),
-                           std::bind(&SettingsAgent::handleUnregisterProfileChange, this, _1, _2));
+                           std::bind(&SettingsAgent::handleUnregisterProfileChange, this, _1));
     parentService->connect(Settings::Messages::SetCurrentProfile(),
-                           std::bind(&SettingsAgent::handleSetCurrentProfile, this, _1, _2));
+                           std::bind(&SettingsAgent::handleSetCurrentProfile, this, _1));
     parentService->connect(Settings::Messages::GetCurrentProfile(),
-                           std::bind(&SettingsAgent::handleGetCurrentProfile, this, _1, _2));
-    parentService->connect(Settings::Messages::AddProfile(), std::bind(&SettingsAgent::handleAddProfile, this, _1, _2));
-    parentService->connect(Settings::Messages::ListProfiles(),
-                           std::bind(&SettingsAgent::handleListProfiles, this, _1, _2));
+                           std::bind(&SettingsAgent::handleGetCurrentProfile, this, _1));
+    parentService->connect(Settings::Messages::AddProfile(), std::bind(&SettingsAgent::handleAddProfile, this, _1));
+    parentService->connect(Settings::Messages::ListProfiles(), std::bind(&SettingsAgent::handleListProfiles, this, _1));
 
     // mode
     parentService->connect(Settings::Messages::RegisterOnModeChange(),
-                           std::bind(&SettingsAgent::handleRegisterOnModeChange, this, _1, _2));
+                           std::bind(&SettingsAgent::handleRegisterOnModeChange, this, _1));
     parentService->connect(Settings::Messages::UnregisterOnModeChange(),
-                           std::bind(&SettingsAgent::handleUnregisterOnModeChange, this, _1, _2));
+                           std::bind(&SettingsAgent::handleUnregisterOnModeChange, this, _1));
     parentService->connect(Settings::Messages::SetCurrentMode(),
-                           std::bind(&SettingsAgent::handleSetCurrentMode, this, _1, _2));
+                           std::bind(&SettingsAgent::handleSetCurrentMode, this, _1));
     parentService->connect(Settings::Messages::GetCurrentMode(),
-                           std::bind(&SettingsAgent::handleGetCurrentMode, this, _1, _2));
-    parentService->connect(Settings::Messages::AddMode(), std::bind(&SettingsAgent::handleAddMode, this, _1, _2));
-    parentService->connect(Settings::Messages::ListModes(), std::bind(&SettingsAgent::handleListModes, this, _1, _2));
+                           std::bind(&SettingsAgent::handleGetCurrentMode, this, _1));
+    parentService->connect(Settings::Messages::AddMode(), std::bind(&SettingsAgent::handleAddMode, this, _1));
+    parentService->connect(Settings::Messages::ListModes(), std::bind(&SettingsAgent::handleListModes, this, _1));
 }
 
 auto SettingsAgent::getDbInitString() -> const std::string
@@ -220,7 +216,7 @@ auto SettingsAgent::dbAddMode(const std::string &mode) -> bool
     return database->execute(Settings::Statements::addDictValue, Settings::DbPaths::phone_mode, mode.c_str());
 }
 
-auto SettingsAgent::handleGetVariable(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto SettingsAgent::handleGetVariable(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::GetVariable *>(req)) {
 
@@ -232,7 +228,7 @@ auto SettingsAgent::handleGetVariable(sys::DataMessage *req, sys::ResponseMessag
     return std::make_shared<sys::ResponseMessage>();
 };
 
-auto SettingsAgent::handleSetVariable(sys::DataMessage *req, sys::ResponseMessage * /*response*/) -> sys::Message_t
+auto SettingsAgent::handleSetVariable(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::SetVariable *>(req)) {
 
@@ -254,8 +250,7 @@ auto SettingsAgent::handleSetVariable(sys::DataMessage *req, sys::ResponseMessag
     return std::make_shared<sys::ResponseMessage>();
 };
 
-auto SettingsAgent::handleRegisterOnVariableChange(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
-    -> sys::Message_t
+auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::RegisterOnVariableChange *>(req)) {
         auto path = msg->getPath();
@@ -275,8 +270,7 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::DataMessage *req, sys::R
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto SettingsAgent::handleUnregisterOnVariableChange(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
-    -> sys::Message_t
+auto SettingsAgent::handleUnregisterOnVariableChange(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::UnregisterOnVariableChange *>(req)) {
         auto path = msg->getPath();
@@ -291,7 +285,7 @@ auto SettingsAgent::handleUnregisterOnVariableChange(sys::DataMessage *req, sys:
 }
 
 // profile
-auto SettingsAgent::handleRegisterProfileChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleRegisterProfileChange(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::RegisterOnProfileChange *>(req)) {
         if (dbRegisterOnProfileChange(msg->sender)) {
@@ -302,7 +296,7 @@ auto SettingsAgent::handleRegisterProfileChange(sys::DataMessage *req, sys::Resp
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleUnregisterProfileChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleUnregisterProfileChange(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::UnregisterOnProfileChange *>(req)) {
         if (dbUnregisterOnProfileChange(msg->sender)) {
@@ -311,7 +305,7 @@ auto SettingsAgent::handleUnregisterProfileChange(sys::DataMessage *req, sys::Re
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleSetCurrentProfile(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleSetCurrentProfile(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::SetCurrentProfile *>(req)) {
         auto profile = msg->getProfileName();
@@ -326,7 +320,7 @@ auto SettingsAgent::handleSetCurrentProfile(sys::DataMessage *req, sys::Response
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleGetCurrentProfile(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleGetCurrentProfile(sys::Message *req) -> sys::MessagePointer
 {
     if (nullptr != dynamic_cast<Settings::Messages::GetCurrentProfile *>(req)) {
         auto service = profileChangedRecipents.find(req->sender);
@@ -337,7 +331,7 @@ auto SettingsAgent::handleGetCurrentProfile(sys::DataMessage *req, sys::Response
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleAddProfile(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleAddProfile(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::AddProfile *>(req)) {
         if (dbAddProfile(msg->getProfileName())) {
@@ -352,7 +346,7 @@ auto SettingsAgent::handleAddProfile(sys::DataMessage *req, sys::ResponseMessage
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleListProfiles(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleListProfiles(sys::Message *req) -> sys::MessagePointer
 {
     if (nullptr != dynamic_cast<Settings::Messages::ListProfiles *>(req)) {
         profileChangedRecipents.insert(req->sender);
@@ -363,7 +357,7 @@ auto SettingsAgent::handleListProfiles(sys::DataMessage *req, sys::ResponseMessa
 }
 
 // mode
-auto SettingsAgent::handleRegisterOnModeChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleRegisterOnModeChange(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::RegisterOnModeChange *>(req)) {
         if (dbRegisterOnModeChange(msg->sender)) {
@@ -374,7 +368,7 @@ auto SettingsAgent::handleRegisterOnModeChange(sys::DataMessage *req, sys::Respo
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleUnregisterOnModeChange(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleUnregisterOnModeChange(sys::Message *req) -> sys::MessagePointer
 {
     if (nullptr != dynamic_cast<Settings::Messages::UnregisterOnModeChange *>(req)) {
         dbUnregisterOnModeChange(req->sender);
@@ -382,7 +376,7 @@ auto SettingsAgent::handleUnregisterOnModeChange(sys::DataMessage *req, sys::Res
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleSetCurrentMode(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleSetCurrentMode(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::SetCurrentMode *>(req)) {
         auto newMode = msg->getProfileName();
@@ -399,7 +393,7 @@ auto SettingsAgent::handleSetCurrentMode(sys::DataMessage *req, sys::ResponseMes
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleGetCurrentMode(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleGetCurrentMode(sys::Message *req) -> sys::MessagePointer
 {
     if (nullptr != dynamic_cast<Settings::Messages::GetCurrentMode *>(req)) {
         if (modeChangeRecipents.end() != modeChangeRecipents.find(req->sender)) {
@@ -409,7 +403,7 @@ auto SettingsAgent::handleGetCurrentMode(sys::DataMessage *req, sys::ResponseMes
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleAddMode(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleAddMode(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<Settings::Messages::AddMode *>(req)) {
         if (dbAddMode(msg->getProfileName())) {
@@ -424,7 +418,7 @@ auto SettingsAgent::handleAddMode(sys::DataMessage *req, sys::ResponseMessage *)
     }
     return std::make_shared<sys::ResponseMessage>();
 }
-auto SettingsAgent::handleListModes(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t
+auto SettingsAgent::handleListModes(sys::Message *req) -> sys::MessagePointer
 {
     if (nullptr != dynamic_cast<Settings::Messages::ListModes *>(req)) {
         modeChangeRecipents.insert(req->sender);

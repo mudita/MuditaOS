@@ -20,7 +20,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationNotes::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

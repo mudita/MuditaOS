@@ -5,17 +5,54 @@
 
 #include "Common.hpp"
 #include "MessageType.hpp"
+
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 #include <string>
-#include <vector>
 
 namespace sys
 {
-
     class Service;
-    class ResponseMessage;
     class Message;
+    using MessagePointer = std::shared_ptr<Message>;
+    using MessageNone    = std::nullptr_t;
+    using SendResult     = std::pair<ReturnCodes, std::shared_ptr<Message>>;
+    SendResult CreateSendResult(ReturnCodes retCode, MessagePointer msg);
+
+    class Message
+    {
+      public:
+        enum class TransmissionType
+        {
+            Unicast,
+            Multicast,
+            Broadcast
+        };
+        enum class Type
+        {
+            System,
+            Data,
+            Response
+        };
+
+        Message() = default;
+        explicit Message(BusChannels channel);
+        virtual ~Message() noexcept = default;
+
+        virtual MessagePointer Execute(Service *service);
+
+        virtual operator std::string() const
+        {
+            return {"{}"};
+        }
+
+        std::uint64_t id;
+        std::uint64_t uniID;
+        Type type;
+        TransmissionType transType;
+        BusChannels channel;
+        std::string sender;
+    };
 
     enum class SystemMessageType
     {
@@ -26,116 +63,37 @@ namespace sys
         Exit
     };
 
-    using Message_t    = std::shared_ptr<Message>;
-    using MessageRet_t = std::pair<ReturnCodes, std::shared_ptr<Message>>;
-
-    MessageRet_t CreateMessageRet(ReturnCodes retCode, Message_t msg);
-
-    class Message
-    {
-
-      public:
-        enum class TransmissionType
-        {
-            Unicast,
-            Multicast,
-            Broadcast
-        };
-
-        enum class Type
-        {
-            System,
-            Data,
-            Response
-        };
-
-        Message()
-        {
-#ifdef UNIT_TESTS
-            unitestsMsgInstancesCount++;
-#endif
-        }
-
-        Message(BusChannels chan) : channel(chan)
-        {
-#ifdef UNIT_TESTS
-            unitestsMsgInstancesCount++;
-#endif
-        }
-
-        virtual ~Message()
-        {
-#ifdef UNIT_TESTS
-            unitestsMsgInstancesCount--;
-#endif
-        }
-
-        virtual Message_t Execute(Service *service) = 0;
-
-        Type type;
-        TransmissionType transType;
-        BusChannels channel;
-        std::string sender;
-        uint64_t id;
-        uint64_t uniID;
-
-        virtual operator std::string() const
-        {
-            return "{}";
-        }
-
-#ifdef UNIT_TESTS
-        static uint32_t unitestsMsgInstancesCount;
-#endif
-    };
-
     class SystemMessage : public Message
     {
       public:
-        SystemMessage(SystemMessageType sysMsgType, ServicePowerMode pwrMode = ServicePowerMode::Active)
-            : Message(BusChannels ::System), sysMsgType(sysMsgType), powerMode(pwrMode)
-        {
-            type = Type::System;
-        }
+        explicit SystemMessage(SystemMessageType systemMessageType,
+                               ServicePowerMode pwrMode = ServicePowerMode::Active);
 
-        Message_t Execute(Service *service) override;
+        MessagePointer Execute(Service *service) final;
 
-        SystemMessageType sysMsgType;
+        SystemMessageType systemMessageType;
         ServicePowerMode powerMode;
     };
 
     class DataMessage : public Message
     {
       public:
+        explicit DataMessage(MessageType messageType);
+        explicit DataMessage(BusChannels channel);
+
         // This field must by provided by the class that inherits DataMessage
         MessageType messageType = MessageType::MessageTypeUninitialized;
-
-        DataMessage(MessageType messageType) : messageType{messageType}
-        {
-            type = Type::Data;
-        }
-
-        DataMessage(BusChannels channel) : Message(channel)
-        {
-            type = Type::Data;
-        }
-
-        Message_t Execute(Service *service) override final;
     };
 
     class ResponseMessage : public Message
     {
       public:
-        ResponseMessage(ReturnCodes retCode    = ReturnCodes::Success,
-                        MessageType responseTo = MessageType::MessageTypeUninitialized)
-            : Message(), responseTo(responseTo), retCode(retCode)
-        {
-            type = Type::Response;
-        }
-        MessageType responseTo;
+        explicit ResponseMessage(ReturnCodes retCode    = ReturnCodes::Success,
+                                 MessageType responseTo = MessageType::MessageTypeUninitialized);
+
+        MessagePointer Execute(Service *service) final;
+
         ReturnCodes retCode;
-
-        Message_t Execute(Service *service) override;
+        MessageType responseTo;
     };
-
 } // namespace sys

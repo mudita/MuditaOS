@@ -5,7 +5,7 @@
 
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
-#include "Message.hpp" // for Message_t
+#include "Message.hpp" // for MessagePointer
 #include "thread.hpp"  // for Thread
 #include <algorithm>   // for find, max
 #include <cstdint>     // for uint32_t, uint64_t
@@ -30,7 +30,7 @@ namespace sys
 
 namespace sys
 {
-    using MessageHandler = std::function<Message_t(DataMessage *, ResponseMessage *)>;
+    using MessageHandler = std::function<MessagePointer(Message *)>;
 
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
@@ -46,7 +46,8 @@ namespace sys
 
         // Invoked for not processed already messages
         // override should in in either callback, function or whatever...
-        virtual Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) = 0;
+        [[deprecated("Use connect method instead.")]] virtual MessagePointer DataReceivedHandler(
+            DataMessage *msg, ResponseMessage *resp) = 0;
 
         // Invoked during initialization
         virtual ReturnCodes InitHandler() = 0;
@@ -92,9 +93,17 @@ namespace sys
 
       private:
         /// first point of enttry on messages - actually used method in run
-        /// First calls message_hanlders
+        /// First calls message_handlers
         /// If not - fallback to DataReceivedHandler
-        virtual auto MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t final;
+        auto MessageEntry(Message *message, ResponseMessage *response) -> MessagePointer;
+        auto HandleMessage(Message *message) -> MessagePointer;
+        auto HandleResponse(ResponseMessage *message) -> MessagePointer;
+        /// Execute a message handler functor, if found one.
+        /// \param message  Request message
+        /// \return A pair of:
+        /// - True if message handler called, false otherwise.
+        /// - A response message on success, nullptr otherwise.
+        auto ExecuteMessageHandler(Message *message) -> std::pair<bool, MessagePointer>;
 
         friend Proxy;
 
@@ -144,9 +153,8 @@ namespace sys
     /// for service
     struct Proxy
     {
-        static auto handle(Service *service, DataMessage *message, ResponseMessage *response) -> Message_t
-        {
-            return service->MessageEntry(message, response);
-        }
+        static auto handleMessage(Service *service, Message *message, ResponseMessage *response = nullptr)
+            -> MessagePointer;
+        static auto handleSystemMessage(Service *service, SystemMessage *message) -> MessagePointer;
     };
 } // namespace sys

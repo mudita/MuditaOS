@@ -76,9 +76,8 @@ namespace app
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
         longPressTimer->connect([&](sys::Timer &) { longPressTimerCallback(); });
 
-        connect(typeid(AppRefreshMessage), [this](sys::DataMessage *msg, sys::ResponseMessage *) -> sys::Message_t {
-            return handleAppRefresh(msg);
-        });
+        connect(typeid(AppRefreshMessage),
+                [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
     }
 
     Application::~Application() = default;
@@ -197,7 +196,7 @@ namespace app
         }
     }
 
-    sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
+    sys::MessagePointer Application::DataReceivedHandler(sys::DataMessage *msgl)
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
@@ -253,7 +252,7 @@ namespace app
         return msgNotHandled();
     }
 
-    sys::Message_t Application::handleSignalStrengthUpdate(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleSignalStrengthUpdate(sys::Message *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -261,7 +260,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleNetworkAccessTechnologyUpdate(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -269,7 +268,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleInputEvent(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleInputEvent(sys::Message *msgl)
     {
         AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
         if (msg->getEvent().state == gui::InputEvent::State::keyPressed) {
@@ -284,7 +283,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleKBDKeyEvent(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
     {
         if (this->getState() != app::Application::State::ACTIVE_FORGROUND) {
             LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
@@ -297,7 +296,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleBatteryLevel(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleBatteryLevel(sys::Message *msgl)
     {
         auto msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
         LOG_INFO("Application battery level: %d", msg->levelPercents);
@@ -308,7 +307,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleChargerPlugged(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleChargerPlugged(sys::Message *msgl)
     {
         auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
         if (msg->plugged == true) {
@@ -326,7 +325,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleMinuteUpdated(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
         auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
         getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
@@ -336,7 +335,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleAction(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleAction(sys::Message *msgl)
     {
         auto *msg         = static_cast<AppActionRequest *>(msgl);
         const auto action = msg->getAction();
@@ -348,13 +347,13 @@ namespace app
         catch (const std::out_of_range &) {
             LOG_ERROR("Application %s is not able to handle action #%d", GetName().c_str(), action);
         }
-        return msgHandled();
+        return msgNotHandled();
     }
 
-    sys::Message_t Application::handleApplicationSwitch(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)
     {
-        auto *msg             = static_cast<AppSwitchMessage *>(msgl);
-        bool handled          = false;
+        auto *msg    = static_cast<AppSwitchMessage *>(msgl);
+        bool handled = false;
         LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
         // Application is starting or it is in the background. Upon switch command if name if correct it goes
         // foreground
@@ -398,7 +397,7 @@ namespace app
         return msgNotHandled();
     }
 
-    sys::Message_t Application::handleSwitchWindow(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleSwitchWindow(sys::Message *msgl)
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
         // check if specified window is in the application
@@ -433,14 +432,14 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleAppClose(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
         app::manager::Controller::confirmClose(this);
         return msgHandled();
     }
 
-    sys::Message_t Application::handleAppRebuild(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleAppRebuild(sys::Message *msgl)
     {
         LOG_INFO("Application %s rebuilding gui", GetName().c_str());
         for (auto &[name, window] : windowsStack) {
@@ -455,7 +454,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleAppRefresh(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleAppRefresh(sys::Message *msgl)
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
         assert(msg);
@@ -469,7 +468,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleAppFocusLost(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleAppFocusLost(sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND) {
             setState(State::ACTIVE_BACKGROUND);
@@ -478,7 +477,7 @@ namespace app
         return msgHandled();
     }
 
-    sys::Message_t Application::handleSIMMessage(sys::DataMessage *msgl)
+    sys::MessagePointer Application::handleSIMMessage(sys::Message *msgl)
     {
         getCurrentWindow()->setSIM();
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

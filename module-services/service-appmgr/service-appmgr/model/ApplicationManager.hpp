@@ -95,7 +95,7 @@ namespace app::manager
         auto InitHandler() -> sys::ReturnCodes override;
         auto DeinitHandler() -> sys::ReturnCodes override;
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes override;
-        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool;

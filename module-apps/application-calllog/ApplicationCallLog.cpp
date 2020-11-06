@@ -33,7 +33,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "MessageType.hpp"     // for MessageType, MessageType::LwIP_request
-#include "Service/Message.hpp" // for DataMessage, Message_t, ResponseMessage (ptr only)
+#include "Service/Message.hpp" // for DataMessage, MessagePointer, ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 
@@ -32,7 +32,7 @@ class ServiceLwIP : public sys::Service
     ServiceLwIP();
     ~ServiceLwIP() = default;
 
-    virtual sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
+    virtual sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
