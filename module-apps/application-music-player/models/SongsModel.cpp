@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsModel.hpp"
 #include "application-music-player/widgets/SongItem.hpp"
 
 #include <ListView.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
 SongsModel::SongsModel(app::Application *app) : application(app)

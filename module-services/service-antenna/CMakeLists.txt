@@ -9,9 +9,10 @@ set(SOURCES
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-apps
-    module-cellular
-    module-utils
+    PRIVATE
+        module-apps
+        module-cellular
+        module-utils
 )
 
 target_include_directories(${PROJECT_NAME}

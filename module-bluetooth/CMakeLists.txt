@@ -1,4 +1,4 @@
-project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
+﻿project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
 
 include(${CMAKE_SOURCE_DIR}/config/ModuleConfig.cmake)
 
@@ -63,5 +63,6 @@ target_link_libraries(
     module-vfs
     module-sys
     module-audio
+    service-audio
     ${BOARD_DIR_LIBRARIES}
     )

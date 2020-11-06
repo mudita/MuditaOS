@@ -1,4 +1,4 @@
-
+﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
@@ -27,5 +27,10 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CallSwitchData.hpp"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-audio
 )
 

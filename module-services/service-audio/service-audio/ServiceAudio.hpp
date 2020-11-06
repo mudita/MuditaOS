@@ -1,22 +1,23 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <functional>
 
-#include "messages/AudioMessage.hpp"
+#include "AudioMessage.hpp"
 
-#include <Service/Service.hpp>
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
 #include <MessageType.hpp>
-
-#include <service-db/api/DBServiceAPI.hpp>
-#include <queries/settings/QuerySettingsGet_v2.hpp>
-#include <queries/settings/QuerySettingsAddOrIgnore_v2.hpp>
-#include <queries/settings/QuerySettingsUpdate_v2.hpp>
-#include <service-db/messages/QueryMessage.hpp>
+#include <Service/Service.hpp>
 #include <Utils.hpp>
+
+#include <queries/settings/QuerySettingsAddOrIgnore_v2.hpp>
+#include <queries/settings/QuerySettingsGet_v2.hpp>
+#include <queries/settings/QuerySettingsUpdate_v2.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/messages/QueryMessage.hpp>
+
+#include <functional>
 
 class ServiceAudio : public sys::Service
 {

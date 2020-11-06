@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -24,7 +24,6 @@
 #include "messages/EVMessages.hpp" // for TorchStateResultMessage, EVMFocusApplication, StatusStateMessage, EVMBoardResponseMessage, SIMMessage, TorchStateMessage
 #include "service-appmgr/Controller.hpp"                 // for Controller
 #include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
-#include "AudioServiceAPI.hpp"                           // for SendEvent
 #include "bsp/magnetometer/magnetometer.hpp"             // for GetBoard
 #include "bsp/common.hpp"                                // for c_str
 #include "bsp/rtc/rtc.hpp"                               // for rtc_SetDateTime
@@ -37,7 +36,8 @@
 #include "bsp/keyboard/key_codes.hpp"      // for KeyCodes, KeyCodes::FnRight, bsp
 #include "bsp/torch/torch.hpp" // for State, Action, getColorTemp, getState, toggle, turn, Action::getState, Action::setState, Action::toggle
 #include "common_data/RawKey.hpp"                      // for RawKey, RawKey::State, RawKey::State::Pressed
-#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
+#include <service-audio/AudioServiceAPI.hpp>           // for SendEvent
+#include <service-audio/AudioMessage.hpp>              // for AudioEventRequest
 #include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
 #include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 #include "module-utils/time/time_conversion.hpp"       // for Time Zone handling

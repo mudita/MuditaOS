@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerEmptyWindow.hpp"
@@ -8,7 +8,7 @@
 #include <Style.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 
 namespace gui
 {
