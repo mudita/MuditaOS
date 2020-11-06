@@ -5,6 +5,7 @@
 ## Added
 
 * `[calendar]` Added a new field for date of the event when the user adds/edits event.
+* `[file indexer db]` Added messages for File Indexer db.
 
 ## Changed
 
@@ -13,6 +14,9 @@
 ### Fixed
 
 * `[Text]` Newline handling fix. 
+
+
+
 
 ## [0.45.1 2020-11-06]
 
