@@ -25,6 +25,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/RepeatAndReminderItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxWithLabelItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventTimeItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventDateItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/SeveralOptionsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/TextWithLabelItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/NewEventCheckBoxWithLabel.cpp"

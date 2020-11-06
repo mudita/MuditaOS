@@ -76,7 +76,8 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     if (records.empty()) {
 
         if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
-            app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"));
+            auto filter = TimePointNow();
+            app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
         }
     }
     auto eventShift = app->getEventShift();

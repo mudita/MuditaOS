@@ -221,13 +221,16 @@ namespace gui
         }
         if (auto response = dynamic_cast<db::query::events::GetAllResult *>(queryResult)) {
             const auto records = response->getResult();
+            auto day           = monthBox->getFocusItemIndex() + 1;
+            auto filter = TimePointFromYearMonthDay(monthModel->getYear() / monthModel->getMonth() / date::day(day));
             if (!records->empty()) {
-                application->switchWindow(style::window::calendar::name::all_events_window);
+                auto data = std::make_unique<DayMonthData>();
+                data->setData("", filter);
+                application->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
             }
             else {
                 auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
                 assert(appCalendar != nullptr);
-                auto filter = TimePointFromYearMonthDay(actualDate);
                 appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
             }
             return true;

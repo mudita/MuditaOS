@@ -46,10 +46,24 @@ namespace gui
 
     void AllEventsItem::setMarkerItem(UTF8 text)
     {
-        description->setText("");
-        startTime->setText(text);
-        description->setMinimumSize(0, 0);
-        startTime->setLineMode(true);
+        hBox->erase();
+
+        auto image = new gui::Image();
+        image->set("Rectangle");
+        image->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+
+        auto dayMonthLabel = new gui::Label();
+        dayMonthLabel->setMinimumSize(style::window::calendar::item::allEvents::start_time_min_w,
+                                      style::window::label::big_h);
+        dayMonthLabel->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
+        dayMonthLabel->setEdges(RectangleEdge::None);
+        dayMonthLabel->setFont(style::window::font::small);
+        dayMonthLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        dayMonthLabel->setMargins(gui::Margins(style::margins::small, 0, 0, 0));
+        dayMonthLabel->setText(text);
+
+        hBox->addWidget(image);
+        hBox->addWidget(dayMonthLabel);
         activeItem = false;
         setEdges(RectangleEdge::None);
     }
