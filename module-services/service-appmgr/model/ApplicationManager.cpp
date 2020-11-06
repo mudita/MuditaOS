@@ -141,7 +141,8 @@ namespace app::manager
     {
         settings = DBServiceAPI::SettingsGet(this);
         blockingTimer->setInterval(settings.lockTime != 0 ? settings.lockTime : default_application_locktime_ms);
-        utils::localize.Switch(toUtilsLanguage(settings.language));
+        utils::localize.SetDisplayLanguage(toUtilsLanguage(settings.displayLanguage));
+        utils::localize.setInputLanguage(toUtilsLanguage(settings.inputLanguage));
 
         startSystemServices();
         startBackgroundApplications();
@@ -240,9 +241,14 @@ namespace app::manager
             handleInitApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(LanguageChangeRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<LanguageChangeRequest *>(request);
-            handleLanguageChange(msg);
+        connect(typeid(DisplayLanguageChangeRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
+            handleDisplayLanguageChange(msg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(InputLanguageChangeRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+            auto msg = static_cast<InputLanguageChangeRequest *>(request);
+            handleInputLanguageChange(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(ShutdownRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
@@ -516,20 +522,34 @@ namespace app::manager
         Controller::switchBack(this);
     }
 
-    auto ApplicationManager::handleLanguageChange(app::manager::LanguageChangeRequest *msg) -> bool
+    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
     {
         const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
-        if (requestedLanguage == settings.language) {
+        settings                     = DBServiceAPI::SettingsGet(this);
+
+        if (requestedLanguage == settings.displayLanguage) {
             LOG_WARN("The selected language is already set. Ignore.");
             return true;
         }
-
-        settings          = DBServiceAPI::SettingsGet(this);
-        settings.language = requestedLanguage;
-
-        DBServiceAPI::SettingsUpdate(this, settings);
-        utils::localize.Switch(msg->getLanguage());
+        settings.displayLanguage = requestedLanguage;
+        utils::localize.SetDisplayLanguage(msg->getLanguage());
         rebuildActiveApplications();
+        DBServiceAPI::SettingsUpdate(this, settings);
+        return true;
+    }
+
+    auto ApplicationManager::handleInputLanguageChange(app::manager::InputLanguageChangeRequest *msg) -> bool
+    {
+        const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
+        settings                     = DBServiceAPI::SettingsGet(this);
+
+        if (requestedLanguage == settings.inputLanguage) {
+            LOG_WARN("The selected language is already set. Ignore.");
+            return true;
+        }
+        settings.inputLanguage = requestedLanguage;
+        utils::localize.setInputLanguage(msg->getLanguage());
+        DBServiceAPI::SettingsUpdate(this, settings);
         return true;
     }
 

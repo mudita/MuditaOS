@@ -206,7 +206,6 @@ namespace Settings
         else {
             sendMsg(std::make_shared<::Settings::Messages::RegisterOnModeChange>());
         }
-
         cbMode = cb;
     }
 

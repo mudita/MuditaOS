@@ -36,73 +36,21 @@ namespace utils
         virtual ~LangLoader()
         {}
 
-        json11::Json Create(Lang lang)
-        {
-            std::string err;
-            const char *path = nullptr;
-
-            switch (lang) {
-            case Lang::Pl:
-                path = langPL_path;
-                break;
-            case Lang::En:
-                path = langEN_path;
-                break;
-            case Lang::De:
-                path = langDE_path;
-                break;
-            case Lang::Sp:
-                path = langSP_path;
-                break;
-
-            default:
-                return json11::Json();
-            }
-
-            auto fd = vfs.fopen(path, "r");
-            if (fd == NULL) {
-                LOG_FATAL("Error during opening file %s", path);
-                return json11::Json();
-            }
-
-            uint32_t fsize = vfs.filelength(fd);
-
-            char *stream = static_cast<char *>(malloc(fsize + 1)); // +1 for NULL terminator
-            if (stream == NULL) {
-                LOG_FATAL("Memory allocation failure");
-                vfs.fclose(fd);
-                return json11::Json();
-            }
-
-            memset(stream, 0, fsize + 1);
-
-            vfs.fread(stream, 1, fsize, fd);
-
-            json11::Json js = json11::Json::parse(stream, err);
-
-            free(stream);
-            vfs.fclose(fd);
-
-            // Error
-            if (err.length() != 0) {
-                LOG_FATAL("%s", err.c_str());
-                return json11::Json();
-            }
-            else {
-                return js;
-            }
-        }
+        json11::Json Create(Lang lang);
     };
 
     class i18
     {
 
-        json11::Json langPack;
-        json11::Json langBack; // backup language if item not found
+        json11::Json displayLang;
+        json11::Json inputLang;
+        json11::Json backupLang; // backup language if item not found
         LangLoader loader;
         static const Lang lang_default = Lang::En;
-        Lang current                   = lang_default;
-        bool debugRequests             = true;
+        Lang displayCurrent            = lang_default;
+        Lang inputCurrent              = lang_default;
+        bool display_init              = false;
+        bool input_init                = false;
 
       public:
         // Default constructor, left empty on purpose
@@ -113,48 +61,10 @@ namespace utils
         // which is not available at program's startup.
         virtual ~i18()
         {}
-
-        const std::string &get(const std::string &str)
-        {
-            auto retwithfallback = [this](const std::string &ret, const std::string &str) -> const std::string & {
-                if (debugRequests && ret == "") {
-                    return str;
-                }
-                else {
-                    return ret;
-                }
-            };
-            auto &ret = langPack[str].string_value();
-            // if language pack returnet nothing then try default language
-            if (ret == "" && current != lang_default) {
-                auto &ret = langBack[str].string_value();
-                return retwithfallback(ret, str);
-            }
-            return retwithfallback(ret, str);
-        }
-
-        void Switch(Lang lang)
-        {
-            static bool initialized = false;
-            if (!initialized) {
-                langBack    = loader.Create(lang_default);
-                langPack    = langBack;
-                initialized = true;
-            }
-            if (lang == current)
-                return;
-            current = lang;
-            if (lang == lang_default) {
-                langPack = langBack;
-            }
-            else {
-                json11::Json pack = loader.Create(lang);
-                // Suspend whole system during switching lang packs
-                vTaskSuspendAll();
-                langPack = pack;
-                xTaskResumeAll();
-            }
-        }
+        void setInputLanguage(Lang lang);
+        const std::string &getInputLanguage(const std::string &str);
+        const std::string &get(const std::string &str);
+        void SetDisplayLanguage(Lang lang);
     };
 
     // Global instance of i18 class
