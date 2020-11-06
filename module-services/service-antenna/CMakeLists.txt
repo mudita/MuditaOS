@@ -1,24 +1,22 @@
-include_directories( ${CMAKE_PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
+﻿project(service-antenna)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
-target_sources( ${PROJECT_NAME}
-
-	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceAntenna.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/api/AntennaServiceAPI.cpp"
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceAntenna.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/api/AntennaServiceAPI.hpp"
+set(SOURCES
+    ServiceAntenna.cpp
+    api/AntennaServiceAPI.cpp
 )
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+
+target_link_libraries(${PROJECT_NAME}
+    module-apps
+    module-cellular
+    module-utils
+)
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}
+)
+
 
