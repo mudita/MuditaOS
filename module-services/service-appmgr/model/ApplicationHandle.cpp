@@ -66,4 +66,11 @@ namespace app::manager
             launcher->runBackground(caller);
         }
     }
+
+    void ApplicationHandle::close() noexcept
+    {
+        if (launcher) {
+            launcher->handle = nullptr;
+        }
+    }
 } // namespace app::manager
