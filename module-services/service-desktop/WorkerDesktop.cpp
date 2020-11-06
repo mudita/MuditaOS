@@ -50,11 +50,6 @@ bool WorkerDesktop::deinit(void)
 {
     LOG_DEBUG("deinit");
 
-    if (usbTaskHandle != NULL) {
-        LOG_DEBUG("deinit usbTaskHandle valid, delete task");
-        vTaskDelete(usbTaskHandle);
-    }
-
     if (fileDes != nullptr) {
         LOG_DEBUG("deinit close opened fileDes");
         vfs.fclose(fileDes);
@@ -88,8 +83,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
         if (xQueueReceive(queue, &sendMsg, 0) != pdTRUE)
             return false;
-
-        VirtualComSend(cdcVcomStruct, sendMsg->c_str(), sendMsg->length());
+        bsp::usbCDCSend(sendMsg);
     }
 
     return true;

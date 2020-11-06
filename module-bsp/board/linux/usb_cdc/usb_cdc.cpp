@@ -10,7 +10,11 @@ namespace bsp
     int fd;
     xQueueHandle USBReceiveQueue;
 
-    void usbCDCReceive(void *)
+    void usbDeviceTask(void *ptr) {
+        usbCDCReceive(ptr);
+    }
+
+    int usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         uint8_t inputData[SERIAL_BUFFER_LEN];
@@ -51,13 +55,13 @@ namespace bsp
         }
     }
 
-    void *usbInit(xQueueHandle receiveQueue)
+    int usbInit(xQueueHandle receiveQueue, USBDeviceListener *)
     {
 
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
         if (fd == -1) {
-            return (nullptr);
+            return (-1);
         }
 
         grantpt(fd);
@@ -87,12 +91,12 @@ namespace bsp
         USBReceiveQueue = receiveQueue;
 
         BaseType_t task_error = xTaskCreate(
-            usbCDCReceive, "USBLinuxReceive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
+            &bsp::usbDeviceTask, "USBLinuxReceive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
 
         if (task_error != pdPASS) {
             LOG_ERROR("[ServiceDesktop:BSP_Driver] Failed to start freertos USB_Linux_Receive");
         }
 
-        return (&fd);
+        return (0);
     }
 } // namespace bsp

@@ -2,13 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <log/log.hpp>
-
-#include <bits/exception.h>
-#include <cstddef>
-#include <cstdint>
-#include <stdint.h>
-#include <string>
+#include <stdint.h>         // for uint8_t
+#include <log/log.hpp>      // for LOG_ERROR
+#include <bits/exception.h> // for exception
+#include <stddef.h>         // for size_t
+#include <string>           // for string, allocator, basic_string, stol
 #include <vector>
 
 namespace parserFSM
@@ -30,15 +28,15 @@ namespace parserFSM
         developerMode,
     };
 
-    constexpr int lastEndpoint = static_cast<int>(EndpointType::developerMode);
+    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
     // Message defs and utils
     namespace message
     {
-        constexpr size_t size_length = 9;
-        constexpr size_t size_header = size_length + 1;
+        inline constexpr auto size_length = 9U;
+        inline constexpr auto size_header = size_length + 1;
 
-        constexpr char endpointChar = '#';
-        constexpr char rawDataChar  = '$';
+        inline constexpr auto endpointChar = '#';
+        inline constexpr auto rawDataChar  = '$';
 
         inline void removeHeader(std::string &msg)
         {
@@ -84,7 +82,7 @@ namespace parserFSM
             Accepted            = 202,
             BadRequest          = 400,
             NotAcceptable       = 406,
-            InternalServerError = 500,
+            InternalServerError = 500
         };
 
         /*! Enum class for the HTTP methods.

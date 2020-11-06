@@ -466,7 +466,7 @@ updateos::UpdateError UpdateMuditaOS::writeBootloader(fs::path bootloaderFile)
     status = updateos::UpdateState::UpdatingBootloader;
 
 #if defined(TARGET_Linux)
-    return updateos::BootloaderUpdateError::NoError;
+    return updateos::UpdateError::NoError;
 #else
 
     if (vfs.fileExists(bootloaderFile.c_str()) == false) {
