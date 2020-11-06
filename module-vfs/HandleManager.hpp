@@ -15,7 +15,7 @@ namespace vfsn::internal::stdlib
             /* Number of simultaneously open files by the
              * stdio library
              */
-            static constexpr auto MAX_HANDLES  = 128;
+            static constexpr auto MAX_HANDLES = 128;
             /*
              * According to the POSIX standard handle no 0 is reserved for standard input
              * stream (STDIN_FILENO),
@@ -24,6 +24,7 @@ namespace vfsn::internal::stdlib
              * so the first allowed file descriptor returned by open should be 3 or greater.
              */
             static constexpr auto FIRST_HANDLE = 3;
+
           protected:
             /*
              * Atomically remove file descriptor from

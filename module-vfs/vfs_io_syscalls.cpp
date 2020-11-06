@@ -102,7 +102,6 @@ namespace vfsn::internal::syscalls
             log_WriteToDevice((uint8_t *)buf, cnt);
             return cnt;
         }
-        LOG_DEBUG("Call %s ", __PRETTY_FUNCTION__);
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -129,7 +128,6 @@ namespace vfsn::internal::syscalls
 
     off_t lseek(int &_errno_, int fd, off_t pos, int dir)
     {
-        LOG_DEBUG("Call %s ", __PRETTY_FUNCTION__);
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
