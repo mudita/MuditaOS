@@ -41,7 +41,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
          {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
     desktopWorker->run();
 
-    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
         if (request->event != nullptr) {
             request->event->send();
@@ -50,7 +50,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
 
@@ -59,7 +59,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::RestoreMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::RestoreMessage(), [&](sys::Message *msg) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
 
@@ -68,7 +68,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::FactoryMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::FactoryMessage(), [&](sys::Message *msg) {
         auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
         if (factoryMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: FactoryMessage received");
@@ -77,7 +77,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
         sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
 
         if (updateOsMsg != nullptr &&
@@ -119,7 +119,7 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
         auto event = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);

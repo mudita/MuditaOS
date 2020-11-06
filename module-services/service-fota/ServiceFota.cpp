@@ -21,7 +21,7 @@
 #include "ServiceFota.hpp"
 #include "FotaUrcHandler.hpp"        // FotaUrcHandler
 #include "Service/Service.hpp"       // for Service
-#include "Service/Message.hpp"       // for Message_t, DataMessage, ResponseMessage
+#include "Service/Message.hpp"       // for MessagePointer, DataMessage, ResponseMessage
 #include "MessageType.hpp"           // for MessageType, MessageType::CellularListCurrentCalls
 #include "messages/FotaMessages.hpp" // for FotaResponseMessage, HTTPRequestMessage, ConfigureAPNMessage, HTTPResponseMessage, NotificationMessage, FOTAStart, FOTAProgres, FOTAFinished, FOTARawProgress, InternetRequestMessage, NotificationMessage::Type, ConnectMessage, NotificationMessage::Type::Configured, NotificationMessage::Type::Connected
 #include "Commands.hpp"              // for AT, AT::QIGETERROR
@@ -76,19 +76,17 @@ namespace FotaService
     {
         LOG_DEBUG("Registring Handlers for Fota::Service:");
         using std::placeholders::_1;
-        using std::placeholders::_2;
         connect(CellularGetChannelResponseMessage(),
-                std::bind(&Service::handleCellularGetChannelResponseMessage, this, _1, _2));
-        connect(cellular::StateChange(), std::bind(&Service::handleServiceCellularNotifications, this, _1, _2));
-        connect(ConfigureAPNMessage(), std::bind(&Service::handleConfigureAPN, this, _1, _2));
-        connect(ConnectMessage(), std::bind(&Service::handleConnect, this, _1, _2));
-        connect(HTTPRequestMessage(), std::bind(&Service::handleHttpGet, this, _1, _2));
-        connect(FOTAStart(), std::bind(&Service::handleFotaStart, this, _1, _2));
-        connect(FOTARawProgress(), std::bind(&Service::handleRawProgress, this, _1, _2));
+                std::bind(&Service::handleCellularGetChannelResponseMessage, this, _1));
+        connect(cellular::StateChange(), std::bind(&Service::handleServiceCellularNotifications, this, _1));
+        connect(ConfigureAPNMessage(), std::bind(&Service::handleConfigureAPN, this, _1));
+        connect(ConnectMessage(), std::bind(&Service::handleConnect, this, _1));
+        connect(HTTPRequestMessage(), std::bind(&Service::handleHttpGet, this, _1));
+        connect(FOTAStart(), std::bind(&Service::handleFotaStart, this, _1));
+        connect(FOTARawProgress(), std::bind(&Service::handleRawProgress, this, _1));
     }
 
-    sys::Message_t Service::handleCellularGetChannelResponseMessage(sys::DataMessage *req,
-                                                                    sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleCellularGetChannelResponseMessage(sys::Message *req)
     {
         LOG_DEBUG("Handling channel response");
         auto responseMessage = static_cast<CellularGetChannelResponseMessage *>(req);
@@ -98,11 +96,10 @@ namespace FotaService
         getApnConfiguration();
         setState();
         stopActiveContext();
-        return sys::Message_t();
+        return sys::MessageNone{};
     }
 
-    sys::Message_t Service::handleServiceCellularNotifications(sys::DataMessage *req,
-                                                               sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleServiceCellularNotifications(sys::Message *req)
     {
         if (auto msg = dynamic_cast<cellular::StateChange *>(req)) {
             LOG_DEBUG("cellular::StageChange: %s", cellular::State::c_str(msg->request));
@@ -120,7 +117,7 @@ namespace FotaService
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    sys::Message_t Service::handleConfigureAPN(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleConfigureAPN(sys::Message *req)
     {
         if (dataChannel != nullptr) {
             if (auto msg = dynamic_cast<ConfigureAPNMessage *>(req)) {
@@ -162,7 +159,7 @@ namespace FotaService
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    sys::Message_t Service::handleConnect(sys::DataMessage * /*req*/, sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleConnect(sys::Message * /*req*/)
     {
         if (dataChannel) {
             LOG_DEBUG("ConnectMessage");
@@ -182,7 +179,7 @@ namespace FotaService
         return std::make_shared<FotaResponseMessage>(false);
     }
 
-    sys::Message_t Service::handleHttpGet(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleHttpGet(sys::Message *req)
     {
         std::shared_ptr<sys::ResponseMessage> responseMsg;
         if (auto msg = dynamic_cast<HTTPRequestMessage *>(req)) {
@@ -274,7 +271,7 @@ namespace FotaService
         parseQIND(response);
     }
 
-    sys::Message_t Service::handleFotaStart(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleFotaStart(sys::Message *req)
     {
         LOG_DEBUG("handle Fota Start");
         if (auto msg = dynamic_cast<FOTAStart *>(req)) {
@@ -290,7 +287,7 @@ namespace FotaService
         return std::make_shared<FotaResponseMessage>(true);
     }
 
-    sys::Message_t Service::handleRawProgress(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+    sys::MessagePointer Service::handleRawProgress(sys::Message *req)
     {
         LOG_DEBUG("Handle Fota RawProgress message");
         if (auto msg = dynamic_cast<FOTARawProgress *>(req)) {
@@ -598,7 +595,7 @@ namespace FotaService
         sys::Bus::SendUnicast(std::move(msg), receiver, this);
     }
 
-    sys::Message_t Service::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
+    sys::MessagePointer Service::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
     {
         std::shared_ptr<sys::ResponseMessage> responseMsg;
 

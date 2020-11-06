@@ -10,7 +10,7 @@
 
 #include "Constants.hpp"       // for bluetooth
 #include "Service/Service.hpp" // for Service
-#include "Service/Message.hpp" // for ResponseMessage, Message_t, DataMessage
+#include "Service/Message.hpp" // for ResponseMessage, MessagePointer, DataMessage
 #include "MessageType.hpp" // for MessageType, MessageType::BluetoothAddrResult, MessageType::BluetoothRequest, MessageType::BluetoothRequestStream
 #include "messages/BluetoothMessage.hpp" // for BluetoothMessage, BluetoothRequestStreamResultMessage, BluetoothAddrMessage, BluetoothMessage::PAN, BluetoothMessage::Play, BluetoothMessage::Scan, BluetoothMessage::Start, BluetoothMessage::Stop, BluetoothMessage::StopScan, BluetoothMessage::Visible
 #include "BluetoothWorker.hpp"           // for BluetoothWorker
@@ -42,7 +42,7 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     try {
         switch (static_cast<MessageType>(msg->messageType)) {

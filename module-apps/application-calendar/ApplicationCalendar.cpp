@@ -52,7 +52,7 @@ namespace app
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
 
-    sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
@@ -174,7 +174,8 @@ namespace app
             eventData->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
             event->date_from = dateFilter;
-            event->date_till = dateFilter;
+            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
+                               std::chrono::minutes(style::window::calendar::time::max_minutes);
             eventData->setData(event);
 
             switchWindow(

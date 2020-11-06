@@ -24,7 +24,7 @@ namespace app
                                 StartInBackground startInBackground = {true});
         virtual ~ApplicationSpecialInput() = default;
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final

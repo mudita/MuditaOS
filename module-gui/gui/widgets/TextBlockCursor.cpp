@@ -6,6 +6,7 @@
 #include "TextDocument.hpp"
 #include "TextParse.hpp"
 #include "log/log.hpp"
+#include <cassert>
 
 static const int last_char_inclusive = 0; // if then -1 / else 0
 
@@ -14,20 +15,20 @@ static const int last_char_inclusive = 0; // if then -1 / else 0
 
 namespace gui
 {
-    auto BlockCursor::currentBlock() const
+    auto BlockCursor::currentBlock() const -> std::_List_iterator<TextBlock>
     {
-        if (block_nr == text::npos) {
+        if (currentBlockNr == text::npos) {
             return document->blocks.end();
         }
-        return std::next(document->blocks.begin(), block_nr);
+        return std::next(document->blocks.begin(), currentBlockNr);
     }
 
-    auto BlockCursor::blocksEnd() const
+    auto BlockCursor::blocksEnd() const -> std::_List_iterator<TextBlock>
     {
         return std::end(document->blocks);
     }
 
-    auto BlockCursor::blocksBegin() const
+    auto BlockCursor::blocksBegin() const -> std::_List_iterator<TextBlock>
     {
         return std::begin(document->blocks);
     }
@@ -35,26 +36,26 @@ namespace gui
     BlockCursor::BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, RawFont *default_font)
         : document(document), default_font(default_font)
     {
-        this->pos      = text::npos;
-        this->block_nr = text::npos;
+        this->pos            = text::npos;
+        this->currentBlockNr = text::npos;
         if (checkDocument()) {
-            this->block_nr = block_nr < document->blocks.size() ? block_nr : document->blocks.size() - 1;
-            auto block_len = std::next(document->blocks.begin(), this->block_nr)->length();
-            this->pos      = pos < block_len ? pos : block_len + last_char_inclusive;
+            this->currentBlockNr = block_nr < document->blocks.size() ? block_nr : document->blocks.size() - 1;
+            auto block_len       = std::next(document->blocks.begin(), this->currentBlockNr)->length();
+            this->pos            = pos < block_len ? pos : block_len + last_char_inclusive;
         }
     }
 
     [[nodiscard]] auto BlockCursor::checkNpos() const -> bool
     {
-        return pos == text::npos || block_nr == text::npos;
+        return pos == text::npos || currentBlockNr == text::npos;
     }
 
     void BlockCursor::resetNpos()
     {
         if (pos == text::npos)
             pos = 0;
-        if (block_nr == text::npos)
-            block_nr = 0;
+        if (currentBlockNr == text::npos)
+            currentBlockNr = 0;
     }
 
     [[nodiscard]] auto BlockCursor::checkDocument() const -> bool
@@ -67,25 +68,11 @@ namespace gui
         if (!checkDocument() || checkNpos()) {
             return false;
         }
+
         auto lastBlock = document->blocks.back();
-        return block_nr == document->blocks.size() - 1 &&
+
+        return currentBlockNr == document->blocks.size() - 1 &&
                pos >= lastBlock.length() + (lastBlock.getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
-        ;
-    }
-
-    auto BlockCursor::atEol() const -> bool
-    {
-        if (!checkDocument() || checkNpos()) {
-            return false;
-        }
-
-        auto block = currentBlock();
-        // check if we have jumped to new block because of new line
-        if (pos == 0 && block != blocksBegin() && block_jump) {
-            return (--block)->getEnd() == TextBlock::End::Newline;
-        }
-
-        return pos == block->length() && block->getEnd() == TextBlock::End::Newline;
     }
 
     auto BlockCursor::operator+=(unsigned int val) -> BlockCursor &
@@ -106,24 +93,28 @@ namespace gui
 
         resetNpos();
 
-        auto block = std::next(document->blocks.begin(), block_nr);
+        bool endOfCurrentBlockReached = false;
 
-        size_t block_size = std::next(document->blocks.begin(), block_nr)->length();
-        block_size += (block->getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
+        debug_cursor("Addition: Position: %d, Current block number %d", pos, currentBlockNr);
 
-        bool end_of_current_block_reached = pos >= block_size;
-        bool last_document_reached        = block_nr + 1 == document->blocks.size();
+        size_t blockSize = currentBlock()->length();
 
-        if (end_of_current_block_reached && last_document_reached) {
+        // Skip newline at end
+        if (currentBlock()->getEnd() == TextBlock::End::Newline && (pos + 1) == blockSize) {
+            endOfCurrentBlockReached = true;
+        }
+        else if (pos >= blockSize) {
+            endOfCurrentBlockReached = true;
+        }
+
+        bool lastBlockReached = currentBlockNr + 1 == document->blocks.size();
+
+        if (endOfCurrentBlockReached && lastBlockReached) {
             return *this;
         }
 
-        block_jump = end_of_current_block_reached;
-
-        if (end_of_current_block_reached) {
-            block_nr += 1;
-            pos = 0;
-            return *this;
+        if (endOfCurrentBlockReached) {
+            return goToNextBlock();
         }
 
         pos += 1;
@@ -146,17 +137,14 @@ namespace gui
 
         resetNpos();
 
-        if (pos == 0 && block_nr == 0) {
+        debug_cursor("Subtraction: Position: %d, Current block number %d", pos, currentBlockNr);
+
+        if (pos == 0 && currentBlockNr == 0) {
             return *this;
         }
 
         if (pos == 0) {
-            block_nr -= 1;
-            pos = currentBlock()->length() + last_char_inclusive;
-            if (atEol()) {
-                pos -= 1;
-            }
-            return *this;
+            return goToPreviousBlock();
         }
 
         pos -= 1;
@@ -164,20 +152,44 @@ namespace gui
         return *this;
     } // namespace gui
 
+    auto BlockCursor::goToNextBlock() -> BlockCursor &
+    {
+        if (currentBlockNr < document->getBlocks().size()) {
+            blockChanged = true;
+            currentBlockNr += 1;
+            pos = 0;
+
+            debug_cursor("Addition block changed: Position: %d, Current block number %d", pos, currentBlockNr);
+        }
+
+        return *this;
+    }
+
+    auto BlockCursor::goToPreviousBlock() -> BlockCursor &
+    {
+        if (currentBlockNr > 0) {
+            blockChanged = true;
+            currentBlockNr -= 1;
+            pos = currentBlock()->length() +
+                  (currentBlock()->getEnd() != TextBlock::End::Newline ? last_char_inclusive : -1);
+
+            debug_cursor("Subtraction block changed: Position: %d, Current block number %d", pos, currentBlockNr);
+        }
+        return *this;
+    }
+
     void BlockCursor::addChar(uint32_t utf_val)
     {
         if (document->blocks.size() == 0) {
             if (utf_val == text::newline) {
 
                 /*
-                 * Adding new line to empty document means adding new block with only new line and imidiatelly jumps to
+                 * Adding new line to empty document means adding new block with only new line and immediately jumps to
                  * another block
                  */
-                document->append(TextBlock("", default_font, TextBlock::End::Newline));
                 document->append(TextBlock("", default_font, TextBlock::End::None));
-
-                pos      = 0;
-                block_nr = 1;
+                operator++();
+                document->addNewline(*this, TextBlock::End::Newline);
 
                 return;
             }
@@ -204,6 +216,14 @@ namespace gui
         if (document->isEmpty()) {
             resetNpos();
         }
+
+        // If previously added block ended with newline remove empty added block.
+        if (!document->blocks.empty()) {
+            if ((--blocksEnd())->length() == ((--blocksEnd())->getEnd() == TextBlock::End::Newline ? 1 : 0)) {
+                document->removeBlock(--blocksEnd());
+            }
+        }
+
         document->append(std::move(textblock));
     }
 
@@ -230,17 +250,21 @@ namespace gui
             return false;
         }
 
-        if (nextBlock != blocksEnd() && nextBlock->isEmpty() && block->getEnd() == TextBlock::End::Newline) {
+        if (nextBlock != blocksEnd() && nextBlock->isEmpty() && nextBlock != (--blocksEnd())) {
+            debug_cursor("Next empty block removed");
             document->removeBlock(nextBlock);
-            block->removeChar(pos);
-            return true;
         }
 
-        debug_cursor("From block: [%d], remove pos: [%d] block length [%d]", getBlockNr(), pos, block->length());
+        debug_cursor("From block: [%d], remove pos: [%d] block length [%d], Block count [%lu]",
+                     getBlockNr(),
+                     pos,
+                     block->length(),
+                     document->blocks.size());
+
         block->removeChar(pos);
 
         if (block->isEmpty() && block != blocksEnd() && prevBlock->getEnd() != TextBlock::End::Newline) {
-            debug_cursor("empty block removed");
+            debug_cursor("Current empty block removed");
             document->removeBlock(block);
         }
 
@@ -273,11 +297,6 @@ namespace gui
         return &*currentBlock();
     }
 
-    void BlockCursor::resetJumps()
-    {
-        block_jump = false;
-    }
-
     auto BlockCursor::begin() -> std::list<TextBlock>::iterator
     {
         return document == nullptr ? document->blocks.end() : document->blocks.begin();
@@ -287,4 +306,5 @@ namespace gui
     {
         return document->blocks.end();
     }
+
 } // namespace gui

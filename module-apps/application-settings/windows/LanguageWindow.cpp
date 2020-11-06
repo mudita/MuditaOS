@@ -1,7 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
 #include <functional>
 
 #include "service-appmgr/Controller.hpp"
@@ -11,9 +10,9 @@
 #include "i18/i18.hpp"
 
 #include "Label.hpp"
-#include "Margins.hpp"
 #include "LanguageWindow.hpp"
 #include <Style.hpp>
+#include <module-apps/application-settings-new/widgets/SettingsStyle.hpp>
 
 namespace gui
 {
@@ -21,6 +20,7 @@ namespace gui
     LanguageWindow::LanguageWindow(app::Application *app) : AppWindow(app, "Languages")
     {
         buildInterface();
+        setFocusItem(options[0]);
     }
 
     void LanguageWindow::rebuild()
@@ -50,39 +50,36 @@ namespace gui
 
         setTitle(utils::localize.get("app_settings_title_languages"));
 
-        // add option connectivity option
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_english"), [=](gui::Item &item) {
-            LOG_INFO("selected language: english");
-            app::manager::Controller::changeLanguage(application, utils::Lang::En);
+            LOG_INFO("selected display language: english");
+            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::En);
             return true;
         }));
 
-        // add option date and time option
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_polish"), [=](gui::Item &) {
-            LOG_INFO("selected language: polish");
-            app::manager::Controller::changeLanguage(application, utils::Lang::Pl);
+            LOG_INFO("selected display language: polish");
+            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::Pl);
             return true;
         }));
 
-        // add option display option
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_german"), [=](gui::Item &) {
-            LOG_INFO("selected language: german");
-            app::manager::Controller::changeLanguage(application, utils::Lang::De);
+            LOG_INFO("selected display language: german");
+            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::De);
             return true;
         }));
 
         options.push_back(addOptionLabel(utils::localize.get("app_settings_language_spanish"), [=](gui::Item &) {
-            LOG_INFO("selected language: spanish");
-            app::manager::Controller::changeLanguage(application, utils::Lang::Sp);
+            LOG_INFO("selected display language: spanish");
+            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::Sp);
             return true;
         }));
 
-        // set possition and navigation for labels
-        uint32_t posY = 100;
+        // set position and navigation for labels
         uint32_t size = options.size();
-        for (uint32_t i = 0; i < options.size(); i++) {
-            options[i]->setPosition(17, posY);
-            posY += 60;
+        for (uint32_t i = 0; i < size; i++) {
+            options[i]->setPosition(style::settings::window::languageChange::options_posX,
+                                    style::settings::window::languageChange::options_posY +
+                                        (i * style::settings::window::languageChange::options_distance_between));
             options[i]->setNavigationItem(NavigationDirection::DOWN, options[(i + 1) % size]);
             options[i]->setNavigationItem(NavigationDirection::UP, options[(size + i - 1) % size]);
         }

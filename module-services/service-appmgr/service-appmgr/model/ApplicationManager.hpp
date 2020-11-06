@@ -95,7 +95,7 @@ namespace app::manager
         auto InitHandler() -> sys::ReturnCodes override;
         auto DeinitHandler() -> sys::ReturnCodes override;
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes override;
-        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool;
@@ -106,6 +106,7 @@ namespace app::manager
         auto closeServices() -> bool;
         auto closeApplications() -> bool;
         void closeService(const std::string &name);
+        void closeApplication(ApplicationHandle *application);
 
         // Message handlers
         void registerMessageHandlers();
@@ -116,7 +117,8 @@ namespace app::manager
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
         auto handleInitApplication(ApplicationInitialisation *msg) -> bool;
-        auto handleLanguageChange(LanguageChangeRequest *msg) -> bool;
+        auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
+        auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);

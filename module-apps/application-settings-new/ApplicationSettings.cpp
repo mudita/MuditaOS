@@ -38,7 +38,7 @@ namespace app
 
     // Invoked upon receiving data message
     auto ApplicationSettingsNew::DataReceivedHandler(sys::DataMessage *msgl,
-                                                     [[maybe_unused]] sys::ResponseMessage *resp) -> sys::Message_t
+                                                     [[maybe_unused]] sys::ResponseMessage *resp) -> sys::MessagePointer
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.

@@ -5,9 +5,9 @@
 #include <functional>
 
 #include "Common.hpp"
+#include "service-eink/Common.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "service-appmgr/Controller.hpp"
-
 #include "../ApplicationSettings.hpp"
 
 #include "i18/i18.hpp"

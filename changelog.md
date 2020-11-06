@@ -1,32 +1,45 @@
 # MuditaOS changelog
 
-### Added
+## Current release 
 
-* `[cellular]` Support for CMS and CME errors
+## Added
 
-## Current release
+* `[calendar]` Added a new field for date of the event when the user adds/edits event.
+* `[file indexer db]` Added messages for File Indexer db.
 
-### Added
+## Changed
 
-* `[messages][db]` File Indexer db Agent
-* `[cellular]` Set pin functionality with Action mockup
-* `[bluetooth]` Added HSP playback and recording
-
-### Changed
-
-* `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
-* `[calendar]` Rework to use database model instead of internal model in day events list.
-* `[testing]` Moved test harness into service-desktop
-* `[appmgr]` Application manager actions introduced.
-* `[music player]` Added new music files samples.
+* `[calendar]` Set 'all day' as a default option
+* `[bus]` Message handling refactored.
 
 ### Fixed
 
-* `[GUI][messages]` Fixed not showing number on deleting temporary contact
-* `[GUI]` Fixed filling Label with color
-* `[calculator]` Fix phone hanging when pressing '='.
-* `[messages][cellular]` Fixed special SMS handling -> ASCII instead of number.
+* `[Text]` Newline handling fix. 
+* `[appmgr]` Fix for closing applications.
+
+## [0.45.1 2020-11-06]
+
+### Added
+
+* `[cellular]` Added PIN setting.
+* `[bluetooth]` Added HSP playback and recording.
+* `[cellular]` Added support for CMS and CME errors.
+* `[music player]` Added new samples of music files.
+
+### Fixed
+
+* `[cellular]` Fixed SIM handling.
+* `[GUI][messages]` Fixed not showing a phone number of temporary contact being deleted.
+* `[GUI]` Fixed filling a label with color.
+* `[calculator]` Fix freezing on the '=' keypress.
+* `[messages][cellular]` Fixed handling messages when the recipient field does not contain a phone number.
 * `[meditation]` Fixed crash on gong sound.
+* `[vfs]` Improve data integrity by reducing filesystem operation on databases.
+
+### Other
+
+* `[testing]` Moved test harness into service-desktop.
+* `[system]` Application manager actions introduced.
 
 ## [0.44.1 2020-10-30]
 
@@ -53,7 +66,6 @@
 * `[doc]` Application manager documentation added.
 * `[audio]` Improve synchronization during calls.
 * `[system]` Application manager refactoring and improvements.
-* `[cellular]` URC handling refactor.
 
 ## [0.43.1 2020-10-23]
 

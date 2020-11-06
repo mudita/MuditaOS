@@ -9,6 +9,7 @@
 #include <MessageType.hpp>
 
 #include <utility>
+#include <vector>
 
 extern "C"
 {

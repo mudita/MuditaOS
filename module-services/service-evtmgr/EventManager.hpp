@@ -18,7 +18,7 @@
 
 #include "bsp/keyboard/key_codes.hpp"
 #include "Service/Service.hpp" // for Service
-#include "Service/Message.hpp" // for DataMessage (ptr only), Message_t, ResponseMessage (ptr only)
+#include "Service/Message.hpp" // for DataMessage (ptr only), MessagePointer, ResponseMessage (ptr only)
 #include "Service/Worker.hpp"
 #include "MessageType.hpp"
 #include "bsp/common.hpp"
@@ -52,7 +52,7 @@ class EventManager : public sys::Service
     EventManager(const std::string &name);
     ~EventManager();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

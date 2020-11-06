@@ -450,9 +450,9 @@ bool ServiceAudio::IsBusy()
     return false;
 }
 
-sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-    sys::Message_t responseMsg;
+    sys::MessagePointer responseMsg;
     bool isBusy = IsBusy();
 
     auto &msgType = typeid(*msgl);

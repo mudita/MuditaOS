@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>       // for removeNewLines, enumToString, split, to_string
@@ -27,7 +27,7 @@
 #include <optional> // for optional, nullopt, operator==
 #include <map>      // for map
 
-#include "Service/Message.hpp" // for DataMessage, ResponseMessage, Message_t
+#include "Service/Message.hpp" // for DataMessage, ResponseMessage, MessagePointer
 #include "Service/Service.hpp" // for Service
 #include "Service/Timer.hpp"   // for Timer
 #include "ServiceCellular.hpp"
@@ -42,8 +42,8 @@
 #include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
 #include "service-db/messages/QueryMessage.hpp"          // for QueryResponse
 #include "service-evtmgr/api/EventManagerServiceAPI.hpp" // for GetBoard
-#include "service-antenna/api/AntennaServiceAPI.hpp"     // for CSQChange, LockRequest
-#include "service-antenna/messages/AntennaMessage.hpp"   // for AntennaChangedMessage
+#include <service-antenna/AntennaServiceAPI.hpp>         // for CSQChange, LockRequest
+#include <service-antenna/AntennaMessage.hpp>            // for AntennaChangedMessage
 #include "time/time_conversion.hpp"                      // for Timestamp
 #include "Audio/AudioCommon.hpp"                         // for PlaybackType, PlaybackType::TextMessageRingtone
 #include "AudioServiceAPI.hpp"                           // for PlaybackStart
@@ -530,7 +530,7 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
     return true;
 }
 
-sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
@@ -653,7 +653,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 ss >> pin;
                 LOG_DEBUG("PIN SET %s", ss.str().c_str());
 
-                sys::Message_t rmsg;
+                sys::MessagePointer rmsg;
 
                 if (Store::GSM::get()->selected == msg->getSimCard()) {
 
@@ -776,7 +776,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
-            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
+            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
 
             // are there new messges queued for sending ?
             auto limitTo = 15; // how many to send in this Query
@@ -1624,14 +1624,14 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
 
 void ServiceCellular::handle_CellularGetChannelMessage()
 {
-    connect(CellularGetChannelMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+    connect(CellularGetChannelMessage(), [&](sys::Message *req) {
         auto getChannelMsg = static_cast<CellularGetChannelMessage *>(req);
         LOG_DEBUG("Handle request for channel: %s", TS0710::name(getChannelMsg->dataChannel).c_str());
         std::shared_ptr<CellularGetChannelResponseMessage> channelResponsMessage =
             std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
         LOG_DEBUG("chanel ptr: %p", channelResponsMessage->dataChannelPtr);
         sys::Bus::SendUnicast(std::move(channelResponsMessage), req->sender, this);
-        return sys::Message_t();
+        return sys::MessageNone{};
     });
 }
 bool ServiceCellular::handle_status_check(void)

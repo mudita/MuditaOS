@@ -1,20 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <bsp/cellular/bsp_cellular.hpp>
+#include <MessageType.hpp>
 #include <module-utils/state/ServiceState.hpp>
-#include <stdint.h> // for uint32_t
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Worker.hpp>
+
 #include <algorithm>
 #include <cassert>
-#include <memory> // for unique_ptr
-
-#include "Service/Service.hpp" // for Service
-#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
-#include "Service/Worker.hpp"
-#include "MessageType.hpp"
-#include "bsp/cellular/bsp_cellular.hpp" // for antenna
-#include "Service/Common.hpp"            // for ReturnCodes, ServicePowerMode
+#include <cstdint>
+#include <memory>
 
 namespace sys
 {
@@ -81,7 +81,7 @@ class ServiceAntenna : public sys::Service
     ServiceAntenna();
     ~ServiceAntenna();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

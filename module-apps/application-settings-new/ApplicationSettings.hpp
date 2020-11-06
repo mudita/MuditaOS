@@ -53,7 +53,7 @@ namespace app
         ApplicationSettingsNew(std::string name                    = name_settings_new,
                                std::string parent                  = {},
                                StartInBackground startInBackground = {false});
-        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto InitHandler() -> sys::ReturnCodes override;
 
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes final

@@ -100,7 +100,8 @@ namespace gui
             data->setDescription(style::window::calendar::new_event);
             auto rec       = new EventsRecord();
             rec->date_from = filterFrom;
-            rec->date_till = filterFrom;
+            rec->date_till = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
+                             std::chrono::minutes(style::window::calendar::time::max_minutes);
             auto event     = std::make_shared<EventsRecord>(*rec);
             data->setData(event);
             application->switchWindow(

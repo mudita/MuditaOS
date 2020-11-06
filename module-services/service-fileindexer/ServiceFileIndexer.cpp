@@ -20,7 +20,7 @@ namespace service
     }
 
     // When receive notification handler
-    sys::Message_t ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+    sys::MessagePointer ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
     {
         auto fcm = dynamic_cast<msg::FileChangeMessage *>(msg);
         if (fcm) {
