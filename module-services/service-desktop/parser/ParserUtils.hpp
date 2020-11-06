@@ -102,25 +102,25 @@ namespace parserFSM
 
     namespace json
     {
-        inline constexpr auto batteryLevel   = "batteryLevel";
-        inline constexpr auto batteryState   = "batteryState";
-        inline constexpr auto selectedSim    = "selectedSim";
-        inline constexpr auto trayState      = "trayState";
-        inline constexpr auto signalStrength = "signalStrength";
-        inline constexpr auto fsTotal        = "fsTotal";
-        inline constexpr auto fsFreePercent  = "fsFreePercent";
-        inline constexpr auto fsFree         = "fsFree";
-        inline constexpr auto gitRevision    = "gitRevision";
-        inline constexpr auto gitBranch      = "gitBranch";
-        inline constexpr auto gitTag         = "gitTag";
-        inline constexpr auto currentRTCTime = "currentRTCTime";
-        inline constexpr auto updateReady    = "updateReady";
-        inline constexpr auto updateFileList = "updateFileList";
-        inline constexpr auto backupRequest  = "backupRequest";
-        inline constexpr auto backupReady    = "backupReady";
-        inline constexpr auto backupUpload   = "backupUpload";
-        inline constexpr auto restoreRequest = "restoreRequest";
-        inline constexpr auto factoryRequest = "factoryRequest";
+        inline constexpr auto batteryLevel     = "batteryLevel";
+        inline constexpr auto batteryState     = "batteryState";
+        inline constexpr auto selectedSim      = "selectedSim";
+        inline constexpr auto trayState        = "trayState";
+        inline constexpr auto signalStrength   = "signalStrength";
+        inline constexpr auto fsTotal          = "fsTotal";
+        inline constexpr auto fsFreePercent    = "fsFreePercent";
+        inline constexpr auto fsFree           = "fsFree";
+        inline constexpr auto gitRevision      = "gitRevision";
+        inline constexpr auto gitBranch        = "gitBranch";
+        inline constexpr auto gitTag           = "gitTag";
+        inline constexpr auto currentRTCTime   = "currentRTCTime";
+        inline constexpr auto updateReady      = "updateReady";
+        inline constexpr auto updateFileList   = "updateFileList";
+        inline constexpr auto backupRequest    = "backupRequest";
+        inline constexpr auto backupReady      = "backupReady";
+        inline constexpr auto backupUpload     = "backupUpload";
+        inline constexpr auto restoreRequest   = "restoreRequest";
+        inline constexpr auto factoryRequest   = "factoryRequest";
         inline constexpr auto networkStatus    = "networkStatus";
         inline constexpr auto accessTechnology = "accessTechnology";
         inline constexpr auto fileName         = "fileName";

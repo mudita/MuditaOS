@@ -194,3 +194,7 @@ void WorkerDesktop::Run()
     }
 }
 
+bool WorkerDesktop::getRawMode()
+{
+    return rawModeEnabled;
+}

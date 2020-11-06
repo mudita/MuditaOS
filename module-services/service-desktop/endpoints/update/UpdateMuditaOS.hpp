@@ -19,18 +19,18 @@ namespace updateos
 {
     namespace file
     {
-        const inline std::string checksums = "checksums.txt";
-        const inline std::string sql_mig   = "sqlmig.json";
-        const inline std::string version   = "version.json";
+        inline constexpr auto checksums = "checksums.txt";
+        inline constexpr auto sql_mig   = "sqlmig.json";
+        inline constexpr auto version   = "version.json";
 
     } // namespace file
 
     namespace extension
     {
-        const inline std::string update = ".tar";
+        inline constexpr auto update = ".tar";
     }
 
-    const inline int prefix_len = 8;
+    inline constexpr auto prefix_len = 8;
 
     enum class UpdateError
     {
