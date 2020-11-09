@@ -31,6 +31,8 @@ GLIBC_2.2.5 {
                 setvbuf;
                 setbuffer;
                 setlinebuf;
+                fscanf;
+                vfscanf;
         local:
                 *;
 };

@@ -211,14 +211,7 @@ extern "C"
     }
     __asm__(".symver freopen,freopen@GLIBC_2.2.5");
 
-    int fscanf (FILE *__restrict __stream,
-                   const char *__restrict __format, ...) __wur
-    {
-        real_fprintf(stderr, "Unimplemented call\n");
-        errno = ENOTSUP;
-        return -1;
-    }
-    __asm__(".symver fscanf,fscanf@GLIBC_2.2.5");
+
 
     int fseek (FILE *__stream, long int __off, int __whence)
     {
@@ -327,5 +320,8 @@ extern "C"
         real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__ );
     }
     __asm__(".symver setlinebuf,setlinebuf@GLIBC_2.2.5");
+
+
+
 
 }
