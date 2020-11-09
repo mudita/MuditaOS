@@ -97,10 +97,10 @@ namespace gui
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOff);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOff);
             } break;
             case SpeakerIconState::SPEAKERON: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOn);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOn);
             } break;
             // case SpeakerIconState::BLUETOOTH: {
             //     // TODO: need implementation

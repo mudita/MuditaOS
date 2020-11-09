@@ -7,24 +7,23 @@
 
 namespace audio
 {
-
-    class ProfileRoutingSpeakerphone : public Profile
+    class ProfileRoutingBluetoothHSP : public Profile
     {
       public:
-        ProfileRoutingSpeakerphone(std::function<int32_t()> callback, Volume volume, Gain gain)
-            : Profile("Routing Speakerphone",
-                      Type::RoutingSpeakerphone,
+        ProfileRoutingBluetoothHSP(std::function<int32_t()> callback, Volume volume, Gain gain)
+            : Profile("Routing Bluetooth HSP",
+                      Type::RoutingBluetoothHSP,
                       bsp::AudioDevice::Format{
-                          .sampleRate_Hz = 16000,
+                          .sampleRate_Hz = 8000,
                           .bitWidth      = 16,
                           .flags         = static_cast<uint32_t>(
                                        bsp::AudioDevice::Flags::InputLeft) | // microphone use left audio channel
                                    static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono),
                           .outputVolume = static_cast<float>(volume),
                           .inputGain    = static_cast<float>(gain),
-                          .inputPath    = bsp::AudioDevice::InputPath::Microphone,
-                          .outputPath   = bsp::AudioDevice::OutputPath::Loudspeaker},
-                      bsp::AudioDevice::Type::Audiocodec,
+                          .inputPath    = bsp::AudioDevice::InputPath::BluetoothHSP,
+                          .outputPath   = bsp::AudioDevice::OutputPath::BluetoothHSP},
+                      bsp::AudioDevice::Type::Bluetooth,
                       callback)
         {}
     };

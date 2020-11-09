@@ -8,25 +8,24 @@
 namespace audio
 {
 
-    class ProfileRecordingHeadset : public Profile
+    class ProfileRecordingBluetoothHSP : public Profile
     {
       public:
-        ProfileRecordingHeadset(std::function<int32_t()> callback, Gain gain)
+        ProfileRecordingBluetoothHSP(std::function<int32_t()> callback, Gain gain)
             : Profile(
-                  "Recording Headset",
-                  Type::RecordingHeadset,
-                  bsp::AudioDevice::Format{.sampleRate_Hz = 44100,
+                  "Recording Bluetooth HSP",
+                  Type::RecordingHeadphones,
+                  bsp::AudioDevice::Format{.sampleRate_Hz = 8000,
                                            .bitWidth      = 16,
                                            .flags         = static_cast<uint32_t>(
                                                bsp::AudioDevice::Flags::InputLeft), // microphone use left audio channel
                                            .outputVolume = 0,
                                            .inputGain    = static_cast<float>(gain),
-                                           .inputPath    = bsp::AudioDevice::InputPath::Headphones,
+                                           .inputPath    = bsp::AudioDevice::InputPath::BluetoothHSP,
                                            .outputPath   = bsp::AudioDevice::OutputPath::None},
-                  bsp::AudioDevice::Type::Audiocodec,
+                  bsp::AudioDevice::Type::Bluetooth,
                   callback)
         {}
     };
 
 } // namespace audio
-

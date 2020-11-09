@@ -16,9 +16,9 @@ namespace audio
 
         auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, dbCallback);
         if (ret) {
-            currentOperation = std::move(ret.value());
+            currentOperation = std::move(ret);
         }
-        lineSinkAvailable = bsp::headset::IsInserted();
+        audioSinkState.setConnected(EventType::JackState, bsp::headset::IsInserted());
     }
 
     Position Audio::GetPosition()
@@ -39,23 +39,8 @@ namespace audio
 
     audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
     {
-        switch (evt->getType()) {
-        case EventType::HeadphonesPlugin:
-            lineSinkAvailable = true;
-            break;
-        case EventType::HeadphonesUnplug:
-            lineSinkAvailable = false;
-            break;
-        case EventType::BTA2DPOn:
-            btSinkAvailable = true;
-            break;
-        case EventType::BTA2DPOff:
-            btSinkAvailable = false;
-            break;
-        default:
-            break;
-        }
-
+        audioSinkState.UpdateState(evt);
+        UpdateProfiles();
         return currentOperation->SendEvent(std::move(evt));
     }
 
@@ -106,20 +91,17 @@ namespace audio
             case Operation::Type::Idle:
                 break;
             }
-            currentOperation = std::move(ret.value());
+            currentOperation = std::move(ret);
+            UpdateProfiles();
 
-            if (lineSinkAvailable) {
-                currentOperation->SendEvent(std::make_unique<Event>(EventType::HeadphonesPlugin));
-            }
-            if (btSinkAvailable && btData) {
-                currentOperation->SendEvent(std::make_unique<Event>(EventType::BTA2DPOn));
+            if (btData) {
                 currentOperation->SetBluetoothStreamData(btData);
             }
         }
         else {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
             LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
-            currentOperation = Operation::Create(Operation::Type::Idle).value_or(nullptr);
+            currentOperation = Operation::Create(Operation::Type::Idle);
             currentState     = State ::Idle;
             return RetCode::OperationCreateFailed;
         }
@@ -150,7 +132,7 @@ namespace audio
         auto ret = Operation::Create(Operation::Type::Idle);
         if (ret) {
             currentState     = State::Idle;
-            currentOperation = std::move(ret.value());
+            currentOperation = std::move(ret);
             return RetCode::Success;
         }
         else {
@@ -183,6 +165,15 @@ namespace audio
     void Audio::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
     {
         btData = data;
+    }
+
+    void Audio::UpdateProfiles()
+    {
+        auto updateEvents = audioSinkState.getUpdateEvents();
+        for (auto &event : updateEvents) {
+            currentOperation->SendEvent(event);
+        }
+        currentOperation->SwitchToPriorityProfile();
     }
 
 } // namespace audio

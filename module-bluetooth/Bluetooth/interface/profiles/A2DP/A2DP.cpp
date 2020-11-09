@@ -455,7 +455,7 @@ namespace Bt
             sourceQueue = xQueueCreate(5, sizeof(AudioData_t));
             sinkQueue   = nullptr;
             if (sourceQueue != nullptr) {
-                sendAudioEvent(audio::EventType::BTA2DPOn);
+                sendAudioEvent(audio::EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Connected);
             }
             else {
                 LOG_ERROR("failed to create queue!");
@@ -537,7 +537,7 @@ namespace Bt
                 cid,
                 AVRCP::mediaTracker.local_seid,
                 local_seid);
-            sendAudioEvent(audio::EventType::BTA2DPOff);
+            sendAudioEvent(audio::EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Disconnected);
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.stream_opened = 0;
                 LOG_INFO("A2DP Source: Stream released.\n");
@@ -591,9 +591,9 @@ namespace Bt
         return std::make_shared<BluetoothStreamData>(sinkQueue, sourceQueue, metadata);
     }
 
-    void A2DP::A2DPImpl::sendAudioEvent(audio::EventType event)
+    void A2DP::A2DPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
-        auto evt = std::make_shared<audio::Event>(event);
+        auto evt = std::make_shared<audio::Event>(event, state);
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
         sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
     }

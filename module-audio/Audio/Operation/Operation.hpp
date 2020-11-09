@@ -55,7 +55,7 @@ namespace audio
 
         virtual ~Operation() = default;
 
-        static std::optional<std::unique_ptr<Operation>> Create(
+        static std::unique_ptr<Operation> Create(
             Type t,
             const char *fileName                  = "",
             const audio::PlaybackType &operations = audio::PlaybackType::None,
@@ -70,7 +70,7 @@ namespace audio
         virtual audio::RetCode SetInputGain(float gain) = 0;
 
         virtual Position GetPosition() = 0;
-        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) = 0;
+        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
 
         Volume GetOutputVolume() const
         {
@@ -87,7 +87,7 @@ namespace audio
             return state;
         }
 
-        const std::shared_ptr<const Profile> GetProfile() const
+        const std::shared_ptr<Profile> GetProfile() const
         {
             return currentProfile;
         }
@@ -112,11 +112,29 @@ namespace audio
             return filePath;
         }
 
+        audio::RetCode SwitchToPriorityProfile();
+
       protected:
+        struct SupportedProfile
+        {
+            SupportedProfile(std::shared_ptr<Profile> profile, bool isAvailable)
+                : profile(std::move(profile)), isAvailable(isAvailable)
+            {}
+
+            std::shared_ptr<Profile> profile;
+            bool isAvailable;
+        };
+
         std::shared_ptr<Profile> currentProfile;
-        std::vector<std::shared_ptr<Profile>> availableProfiles;
+        std::unique_ptr<bsp::AudioDevice> audioDevice;
+
+        std::vector<SupportedProfile> supportedProfiles;
+        void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);
+
         State state = State::Idle;
         audio::AsyncCallback eventCallback;
+
+        AudioSinkState audioSinkState;
 
         audio::Token operationToken;
         Type opType = Type::Idle;
@@ -127,7 +145,7 @@ namespace audio
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
 
-        std::optional<std::shared_ptr<Profile>> GetProfile(const Profile::Type type);
+        std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
         std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;
