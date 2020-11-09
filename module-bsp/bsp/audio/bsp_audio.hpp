@@ -24,6 +24,7 @@ namespace bsp {
         enum class InputPath{
             Headphones,
             Microphone,
+            BluetoothHSP,
             None
         };
 
@@ -33,6 +34,7 @@ namespace bsp {
             Earspeaker,
             Loudspeaker,
             BluetoothA2DP,
+            BluetoothHSP,
             None
         };
 

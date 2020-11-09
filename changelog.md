@@ -7,6 +7,7 @@
 * `[calendar]` Added a new field for date of the event when the user adds/edits event.
 * `[file indexer db]` Added messages for File Indexer db.
 * `[settings]` Added Torch window (front-end only).
+* `[audio]` Added support for Bluetooth audio profiles
 
 ## Changed
 

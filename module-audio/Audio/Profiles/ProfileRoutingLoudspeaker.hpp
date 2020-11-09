@@ -8,12 +8,12 @@
 namespace audio
 {
 
-    class ProfileRoutingHeadset : public Profile
+    class ProfileRoutingLoudspeaker : public Profile
     {
       public:
-        ProfileRoutingHeadset(std::function<int32_t()> callback, Volume volume, Gain gain)
-            : Profile("Routing Headset",
-                      Type::RoutingHeadset,
+        ProfileRoutingLoudspeaker(std::function<int32_t()> callback, Volume volume, Gain gain)
+            : Profile("Routing Speakerphone",
+                      Type::RoutingLoudspeaker,
                       bsp::AudioDevice::Format{
                           .sampleRate_Hz = 16000,
                           .bitWidth      = 16,
@@ -22,12 +22,11 @@ namespace audio
                                    static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono),
                           .outputVolume = static_cast<float>(volume),
                           .inputGain    = static_cast<float>(gain),
-                          .inputPath    = bsp::AudioDevice::InputPath::Headphones,
-                          .outputPath   = bsp::AudioDevice::OutputPath::Headphones},
+                          .inputPath    = bsp::AudioDevice::InputPath::Microphone,
+                          .outputPath   = bsp::AudioDevice::OutputPath::Loudspeaker},
                       bsp::AudioDevice::Type::Audiocodec,
                       callback)
         {}
     };
 
 } // namespace audio
-
