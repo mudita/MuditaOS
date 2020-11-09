@@ -9,6 +9,26 @@ namespace style
 {
     namespace settings
     {
+        namespace widget
+        {
+            namespace time
+            {
+                inline constexpr auto h                   = 107;
+                inline constexpr auto description_label_h = 20;
+                inline constexpr auto body_h              = h - description_label_h;
+                inline constexpr auto separator_w         = 30;
+                inline constexpr auto input_w             = 120;
+
+                inline constexpr auto default_time_in_minutes = 720;
+                inline constexpr auto max_hour                = 12;
+                inline constexpr auto max_minutes             = 59;
+                inline constexpr auto max_hour_string         = "12";
+                inline constexpr auto max_minutes_string      = "59";
+                inline constexpr auto default_input_string    = "00";
+                inline constexpr auto before_noon             = "AM";
+                inline constexpr auto after_noon              = "PM";
+            } // namespace time
+        }     // namespace widget
         namespace window
         {
             namespace leftArrowImage
@@ -43,6 +63,13 @@ namespace style
                 inline constexpr auto description_y = 425;
                 inline constexpr auto description_h = 100;
             } // namespace torch
+
+            namespace nightshift
+            {
+                inline constexpr auto body_offset = style::header::height + 16;
+
+                inline constexpr auto separator_h = 55;
+            } // namespace nightshift
         }     // namespace window
     };        // namespace settings
 } // namespace style
