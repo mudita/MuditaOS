@@ -175,6 +175,11 @@ case "${1}" in
         FIX=true
         ;;
     *)
+        if [[ $# -ne 0 ]]; then
+            echo "unknown parameters: '$@'"
+            help
+            exit 1
+        fi
         FILES=$(git diff-index --cached --name-only HEAD)
         LAST="Stage" 
         FIX=$(git config user.fixinstage)
