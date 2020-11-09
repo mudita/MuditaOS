@@ -8,10 +8,10 @@ if [[ $# -ne 0 ]]; then
     cat <<-HELP_MSG &>1
 	This script doesn't support any parameters.
 	
-	If you try to check style call:
+	If you are trying to check style call:
 	    ./config/style_check_hook.sh
 	
-	If you try to check license header call:
+	If you are trying to check license header call:
 	    ./config/license_header_check.sh
 	HELP_MSG
 fi
