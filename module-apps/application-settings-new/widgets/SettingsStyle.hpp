@@ -13,25 +13,36 @@ namespace style
         {
             namespace leftArrowImage
             {
-                constexpr uint32_t x = style::window::default_left_margin;
-                constexpr uint32_t y = 62;
-                constexpr uint32_t w = 11;
-                constexpr uint32_t h = 13;
+                inline constexpr auto x = style::window::default_left_margin;
+                inline constexpr auto y = 62;
+                inline constexpr auto w = 11;
+                inline constexpr auto h = 13;
             } // namespace leftArrowImage
 
             namespace crossImage
             {
-                constexpr uint32_t x = style::window::default_left_margin + 20;
-                constexpr uint32_t y = 55;
-                constexpr uint32_t w = 24;
-                constexpr uint32_t h = 24;
+                inline constexpr auto x = style::window::default_left_margin + 20;
+                inline constexpr auto y = 55;
+                inline constexpr auto w = 24;
+                inline constexpr auto h = 24;
             } // namespace crossImage
             namespace languageChange
             {
-                constexpr uint32_t options_posX             = 17;
-                constexpr uint32_t options_posY             = 100;
-                constexpr uint32_t options_distance_between = 60;
+                inline constexpr auto options_posX             = 17;
+                inline constexpr auto options_posY             = 100;
+                inline constexpr auto options_distance_between = 60;
             } // namespace languageChange
+
+            namespace torch
+            {
+                inline constexpr auto body_offset = 155;
+
+                inline constexpr auto bar_y = 396;
+                inline constexpr auto bar_h = 1;
+
+                inline constexpr auto description_y = 425;
+                inline constexpr auto description_h = 100;
+            } // namespace torch
         }     // namespace window
     };        // namespace settings
 } // namespace style

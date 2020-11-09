@@ -18,6 +18,7 @@
 #include "windows/MessagesWindow.hpp"
 #include "windows/PhoneNameWindow.hpp"
 #include "windows/AutolockWindow.hpp"
+#include "windows/TorchWindow.hpp"
 #include "windows/WallpaperWindow.hpp"
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
@@ -127,6 +128,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::torch, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::TorchWindow>(app);
         });
         windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
             return std::make_unique<gui::WallpaperWindow>(app);
