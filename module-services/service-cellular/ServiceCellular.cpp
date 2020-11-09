@@ -330,6 +330,7 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::Ready:
         handle_ready();
+        handleAllMessagesFromMessageStorage();
         break;
     case State::ST::PowerDownStarted:
         handle_power_down_started();
@@ -1023,6 +1024,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
                 LOG_WARN("Not supported: %s", logStr.c_str());
                 Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
             }
+
             LOG_DEBUG("SIM OK!");
         }
         else {
@@ -1142,13 +1144,12 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 
     auto cmd = at::factory(at::AT::QCMGR);
     auto ret = channel->cmd(cmd + messageNumber, cmd.timeout);
-
     bool messageParsed = false;
 
     std::string messageRawBody;
     UTF8 receivedNumber;
     if (ret) {
-        for (uint32_t i = 0; i < ret.response.size(); i++) {
+        for (std::size_t i = 0; i < ret.response.size(); i++) {
             if (ret.response[i].find("QCMGR") != std::string::npos) {
 
                 std::istringstream ss(ret.response[i]);
@@ -1202,7 +1203,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                     if (current == last) {
                         messageParts.push_back(ret.response[i + 1]);
 
-                        for (uint32_t j = 0; j < messageParts.size(); j++) {
+                        for (std::size_t j = 0; j < messageParts.size(); j++) {
                             messageRawBody += messageParts[j];
                         }
                         messageParts.clear();
@@ -1215,23 +1216,11 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                 if (messageParsed) {
                     messageParsed = false;
 
-                    UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
+                    const auto decodedMessage = UCS2(messageRawBody).toUTF8();
 
-                    SMSRecord record;
-                    record.body   = decodedMessage;
-                    record.number = utils::PhoneNumber::getReceivedNumberView(receivedNumber);
-                    record.type   = SMSType::INBOX;
-                    record.date   = messageDate;
+                    const auto record = createSMSRecord(decodedMessage, receivedNumber, messageDate);
 
-                    if (DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE) {
-                        DBServiceAPI::GetQuery(
-                            this,
-                            db::Interface::Name::Notifications,
-                            std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
-                        const std::string ringtone_path = "assets/audio/SMS-drum2.mp3";
-                        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
-                    }
-                    else {
+                    if (!dbAddSMSRecord(record)) {
                         LOG_ERROR("Failed to add text message to db");
                         return false;
                     }
@@ -1552,6 +1541,56 @@ bool ServiceCellular::handle_sim_init()
 
     state.set(this, State::ST::Ready);
     return success;
+}
+
+bool ServiceCellular::handleAllMessagesFromMessageStorage()
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel == nullptr) {
+        LOG_ERROR("Cant configure sim! no Commands channel!");
+        return false;
+    }
+
+    constexpr std::string_view cmd = "CMGL: ";
+    if (auto ret = channel->cmd("AT+CMGL=\"ALL\"\r", 300)) {
+        for (std::size_t i = 0; i < ret.response.size(); i++) {
+            if (auto pos = ret.response[i].find(cmd); pos != std::string::npos) {
+                auto startPos = pos + cmd.size();
+                auto endPos   = ret.response[i].find_first_of(",");
+                receiveSMS(ret.response[i].substr(startPos, endPos - startPos));
+            }
+        }
+    }
+    else {
+        LOG_ERROR("HANDLE ALL MESSAGE FAILED!");
+    }
+    return false;
+}
+
+SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
+                                           const UTF8 &receivedNumber,
+                                           const time_t &messageDate,
+                                           const SMSType &smsType)
+{
+    SMSRecord record{};
+    record.body   = decodedMessage;
+    record.number = utils::PhoneNumber::getReceivedNumberView(receivedNumber);
+    record.type   = SMSType::INBOX;
+    record.date   = messageDate;
+    return record;
+}
+
+bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
+{
+    if (DBServiceAPI::SMSAdd(this, record) == DB_ID_NONE) {
+        return false;
+    }
+    DBServiceAPI::GetQuery(this,
+                           db::Interface::Name::Notifications,
+                           std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
+    const std::string ringtone_path = "assets/audio/SMS-drum2.mp3";
+    AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
+    return true;
 }
 
 bool ServiceCellular::handle_failure()
