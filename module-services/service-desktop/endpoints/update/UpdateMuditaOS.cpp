@@ -59,11 +59,15 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
             totalBytes = vfs.filelength(updateTar.stream);
         }
         else {
-            return informError(updateos::UpdateError::CantOpenUpdateFile, "UpdateMuditaOS::setUpdateFile can't open TAR file %s", updateFile.c_str());
+            return informError(updateos::UpdateError::CantOpenUpdateFile,
+                               "UpdateMuditaOS::setUpdateFile can't open TAR file %s",
+                               updateFile.c_str());
         }
     }
     else {
-        return informError(updateos::UpdateError::CantOpenUpdateFile, "UpdateMuditaOS::setUpdateFile %s does not exist", updateFile.c_str());
+        return informError(updateos::UpdateError::CantOpenUpdateFile,
+                           "UpdateMuditaOS::setUpdateFile %s does not exist",
+                           updateFile.c_str());
     }
 
     status = updateos::UpdateState::UpdateFileSet;
@@ -137,12 +141,16 @@ updateos::UpdateError UpdateMuditaOS::unpackUpdate()
         if (tarHeader.type == MTAR_TDIR) {
             fs::path tmpPath = getUpdateTmpChild(tarHeader.name);
             if (vfs.mkdir(tmpPath.c_str()) != 0) {
-                return informError(updateos::UpdateError::CantCreateExtractedFile, "unpackUpdate failed to create %s when extracting update tar", tmpPath.c_str());
+                return informError(updateos::UpdateError::CantCreateExtractedFile,
+                                   "unpackUpdate failed to create %s when extracting update tar",
+                                   tmpPath.c_str());
             }
         }
         else {
             if (unpackFileToTemp(tarHeader, &fileCRC32) == false) {
-                return informError(updateos::UpdateError::CantCreateExtractedFile, "unpackUpdate failed to extract update file %s", tarHeader.name);
+                return informError(updateos::UpdateError::CantCreateExtractedFile,
+                                   "unpackUpdate failed to extract update file %s",
+                                   tarHeader.name);
             }
             filesInUpdatePackage.emplace_back(FileInfo(tarHeader, fileCRC32));
         }
@@ -163,7 +171,9 @@ updateos::UpdateError UpdateMuditaOS::verifyChecksums()
     vfs::FILE *fpChecksums = vfs.fopen(checksumsFile.c_str(), "r");
 
     if (fpChecksums == nullptr) {
-        return informError(updateos::UpdateError::CantOpenChecksumsFile, "verifyChecksums can't open checksums file %s", checksumsFile.c_str());
+        return informError(updateos::UpdateError::CantOpenChecksumsFile,
+                           "verifyChecksums can't open checksums file %s",
+                           checksumsFile.c_str());
     }
 
     while (!vfs.eof(fpChecksums)) {
@@ -178,7 +188,11 @@ updateos::UpdateError UpdateMuditaOS::verifyChecksums()
         unsigned long computedCRC32 = getExtractedFileCRC32(filePath);
         if (computedCRC32 != fileCRC32) {
             vfs.fclose(fpChecksums);
-            return informError(updateos::UpdateError::VerifyChecksumsFailure, "verifyChecksums %s crc32 match FAIL %lX != %lX", filePath.c_str(), fileCRC32, computedCRC32);
+            return informError(updateos::UpdateError::VerifyChecksumsFailure,
+                               "verifyChecksums %s crc32 match FAIL %lX != %lX",
+                               filePath.c_str(),
+                               fileCRC32,
+                               computedCRC32);
         }
     }
     vfs.fclose(fpChecksums);
@@ -190,14 +204,17 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
     status = updateos::UpdateState::VersionVerificiation;
 
     if (!vfs.fileExists(getUpdateTmpChild(updateos::file::version).c_str())) {
-        return informError(updateos::UpdateError::VerifyVersionFailure, "verifyVersion %s does not exist", getUpdateTmpChild(updateos::file::version).c_str());
+        return informError(updateos::UpdateError::VerifyVersionFailure,
+                           "verifyVersion %s does not exist",
+                           getUpdateTmpChild(updateos::file::version).c_str());
     }
 
     std::string versionJsonString = vfs.loadFileAsString(getUpdateTmpChild(updateos::file::version));
     std::string parserError;
     json11::Json updateVersionInformation = json11::Json::parse(versionJsonString, parserError);
     if (parserError != "") {
-        return informError(updateos::UpdateError::VerifyVersionFailure, "verifyVersion parse json error: %s", parserError.c_str());
+        return informError(
+            updateos::UpdateError::VerifyVersionFailure, "verifyVersion parse json error: %s", parserError.c_str());
     }
     else {
     }
@@ -263,22 +280,28 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
             "prepareRoot ff_deltree on %s caused an error %s", previousOSPath.c_str(), vfs.lastErrnoToStr().c_str());
     }
 
-    if (vfs.isDir(previousOSPath.c_str())) {
-        return informError(updateos::UpdateError::CantDeletePreviousOS, "prepareRoot %s still exists, we can't continue", previousOSPath.c_str());
+    if (vfs.isDir(purefs::dir::getPreviousOSPath().c_str())) {
+        return informError(updateos::UpdateError::CantDeletePreviousOS,
+                    "prepareRoot ff_deltree on %s caused an error %s",
+                    previousOSPath.c_str(),
+                    vfs.lastErrnoToStr().c_str());
     }
 
     if (vfs.isDir(purefs::dir::getPreviousOSPath().c_str())) {
-        return informError(updateos::UpdateError::CantDeletePreviousOS, "prepareRoot %s still exists, we can't continue", purefs::dir::getPreviousOSPath().c_str());
+        return informError(updateos::UpdateError::CantDeletePreviousOS,
+                           "prepareRoot %s still exists, we can't continue",
+                           purefs::dir::getPreviousOSPath().c_str());
     }
     // rename the current OS to previous on partition
     informDebug("prepareRoot rename: %s->%s", currentOSPath.c_str(), previousOSPath.c_str());
     ret = vfs.rename(currentOSPath.c_str(), previousOSPath.c_str());
 
     if (ret != 0) {
-        return informError(updateos::UpdateError::CantRenameCurrentToPrevious, "prepareRoot can't rename %s -> %s error %s",
-                    purefs::dir::getCurrentOSPath().c_str(),
-                    purefs::dir::getPreviousOSPath().c_str(),
-                    vfs.lastErrnoToStr().c_str());
+        return informError(updateos::UpdateError::CantRenameCurrentToPrevious,
+                           "prepareRoot can't rename %s -> %s error %s",
+                           purefs::dir::getCurrentOSPath().c_str(),
+                           purefs::dir::getPreviousOSPath().c_str(),
+                           vfs.lastErrnoToStr().c_str());
     }
 
     // rename the temp directory to current (extracted update)
@@ -286,10 +309,11 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
     ret = vfs.rename(updateTempDirectory.c_str(), currentOSPath.c_str());
 
     if (ret != 0) {
-        return informError(updateos::UpdateError::CantRenameTempToCurrent, "prepareRoot can't rename %s -> %s error %s",
-                    updateTempDirectory.c_str(),
-                    currentOSPath.c_str(),
-                    vfs.lastErrnoToStr().c_str());
+        return informError(updateos::UpdateError::CantRenameTempToCurrent,
+                           "prepareRoot can't rename %s -> %s error %s",
+                           updateTempDirectory.c_str(),
+                           purefs::dir::getCurrentOSPath().c_str(),
+                           vfs.lastErrnoToStr().c_str());
     }
 
     // move the contents of /sys/current/user if it exists to /user
@@ -353,7 +377,8 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
     int errCode   = MTAR_ESUCCESS;
     vfs::FILE *fp = vfs.fopen(fullPath.c_str(), "w+");
     if (fp == nullptr) {
-        informError(updateos::UpdateError::CantWriteToFile, "unpackFileToTemp %s can't open for writing", fullPath.c_str());
+        informError(
+            updateos::UpdateError::CantWriteToFile, "unpackFileToTemp %s can't open for writing", fullPath.c_str());
         return false;
     }
 
@@ -369,14 +394,17 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
             break;
 
         if ((errCode = mtar_read_data(&updateTar, readBuf.get(), sizeToRead)) != MTAR_ESUCCESS) {
-            informError(updateos::UpdateError::CantWriteToFile, "unpackFileToTemp mtar_read_data failed, errCode=%d", errCode);
+            informError(
+                updateos::UpdateError::CantWriteToFile, "unpackFileToTemp mtar_read_data failed, errCode=%d", errCode);
             return false;
         }
 
         const uint32_t dataWritten = vfs.fwrite(readBuf.get(), 1, sizeToRead, fp);
         if (dataWritten != sizeToRead) {
             informError(updateos::UpdateError::CantWriteToFile,
-                "unpackFileToTemp %s can't write to file error: %s", fullPath.c_str(), vfs.lastErrnoToStr().c_str());
+                        "unpackFileToTemp %s can't write to file error: %s",
+                        fullPath.c_str(),
+                        vfs.lastErrnoToStr().c_str());
             vfs.fclose(fp);
             return false;
         }
@@ -392,7 +420,8 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 {
     if (vfs.isDir(updateTempDirectory.c_str()) && vfs.deltree(updateTempDirectory.c_str())) {
-        return informError(updateos::UpdateError::CantRemoveUniqueTmpDir, "ff_deltree failed on %s", updateTempDirectory.c_str());
+        return informError(
+            updateos::UpdateError::CantRemoveUniqueTmpDir, "ff_deltree failed on %s", updateTempDirectory.c_str());
     }
     mtar_close(&updateTar);
     if (vfs.remove(updateFile.c_str())) {
@@ -415,9 +444,22 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 
     informDebug("Temp dir for update %s", updateTempDirectory.c_str());
 
+    const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
+    if (vfs.isDir(updatesOSPath.c_str()) == false) {
+        if (vfs.mkdir(updatesOSPath.c_str()) != 0) {
+            return informError(updateos::UpdateError::CantCreateUpdatesDir,
+                               "%s can't create it %s",
+                               updatesOSPath.c_str(),
+                               vfs.lastErrnoToStr().c_str());
+        }
+    }
+
     if (vfs.isDir(purefs::dir::getUpdatesOSPath().c_str()) == false) {
         if (vfs.mkdir(purefs::dir::getUpdatesOSPath().c_str()) != 0) {
-            return informError(updateos::UpdateError::CantCreateUpdatesDir, "%s can't create it %s", purefs::dir::getUpdatesOSPath().c_str(), vfs.lastErrnoToStr().c_str());
+            return informError(updateos::UpdateError::CantCreateUpdatesDir,
+                               "%s can't create it %s",
+                               purefs::dir::getUpdatesOSPath().c_str(),
+                               vfs.lastErrnoToStr().c_str());
         }
         else {
             informDebug("prepareTempDirForUpdate %s created", purefs::dir::getUpdatesOSPath().c_str());
@@ -430,7 +472,10 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
     if (vfs.isDir(purefs::dir::getTemporaryPath().c_str()) == false) {
         informDebug("prepareTempDirForUpdate %s is not a directory", purefs::dir::getTemporaryPath().c_str());
         if (vfs.mkdir(purefs::dir::getTemporaryPath().c_str()) != 0) {
-            return informError(updateos::UpdateError::CantCreateTempDir, "%s can't create it %s", purefs::dir::getTemporaryPath().c_str(), vfs.lastErrnoToStr().c_str());
+            return informError(updateos::UpdateError::CantCreateTempDir,
+                               "%s can't create it %s",
+                               purefs::dir::getTemporaryPath().c_str(),
+                               vfs.lastErrnoToStr().c_str());
         }
         else {
             informDebug("prepareTempDirForUpdate %s created", purefs::dir::getTemporaryPath().c_str());
@@ -443,7 +488,9 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
     if (vfs.isDir(updateTempDirectory.c_str())) {
         informDebug("prepareTempDirForUpdate %s exists already, try to remove it", updateTempDirectory.c_str());
         if (vfs.deltree(updateTempDirectory.c_str()) != 0) {
-            return informError(updateos::UpdateError::CantRemoveUniqueTmpDir, "prepareTempDirForUpdate can't remove %s", updateTempDirectory.c_str());
+            return informError(updateos::UpdateError::CantRemoveUniqueTmpDir,
+                               "prepareTempDirForUpdate can't remove %s",
+                               updateTempDirectory.c_str());
         }
         else {
             informDebug("prepareTempDirForUpdate %s removed", updateTempDirectory.c_str());
@@ -452,7 +499,8 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 
     informDebug("prepareTempDirForUpdate trying to create %s as tempDir", updateTempDirectory.c_str());
     if (vfs.mkdir(updateTempDirectory.c_str()) != 0) {
-        informError(updateos::UpdateError::CantCreateUniqueTmpDir, "prepareTempDirForUpdate failed to create: %s error: %s",
+        informError(updateos::UpdateError::CantCreateUniqueTmpDir,
+                    "prepareTempDirForUpdate failed to create: %s error: %s",
                     updateTempDirectory.c_str(),
                     vfs.lastErrnoToStr().c_str());
     }
@@ -469,23 +517,30 @@ updateos::UpdateError UpdateMuditaOS::writeBootloader(fs::path bootloaderFile)
 #else
 
     if (vfs.fileExists(bootloaderFile.c_str()) == false) {
-        return informError(updateos::UpdateError::NoBootloaderFile, "[Bootloader Update] File %s doesn't exist!\n", bootloaderFile.c_str());
+        return informError(updateos::UpdateError::NoBootloaderFile,
+                           "[Bootloader Update] File %s doesn't exist!\n",
+                           bootloaderFile.c_str());
     }
 
     auto fileHandler = vfs.fopen(bootloaderFile.c_str(), "r");
     if (fileHandler == nullptr) {
-        return informError(updateos::UpdateError::CantOpenBootloaderFile, "[Bootloader Update] Failed to open file %s\n", bootloaderFile.c_str());
+        return informError(updateos::UpdateError::CantOpenBootloaderFile,
+                           "[Bootloader Update] Failed to open file %s\n",
+                           bootloaderFile.c_str());
     }
 
     unsigned long fileLen = vfs.filelength(fileHandler);
     auto fileBuf          = std::make_unique<uint8_t[]>(fileLen);
     if (fileBuf == nullptr) {
-        return informError(updateos::UpdateError::CantAllocateBuffer, "[Bootloader Update] Failed to allocate buffer\n");
+        return informError(updateos::UpdateError::CantAllocateBuffer,
+                           "[Bootloader Update] Failed to allocate buffer\n");
     }
 
     auto filesLoaded = vfs.fread(fileBuf.get(), fileLen, 1, fileHandler);
     if (filesLoaded == 0) {
-        return informError(updateos::UpdateError::CantOpenBootloaderFile, "[Bootloader Update] Failed to load file %s\n", bootloaderFile.c_str());
+        return informError(updateos::UpdateError::CantOpenBootloaderFile,
+                           "[Bootloader Update] Failed to load file %s\n",
+                           bootloaderFile.c_str());
     }
 
     informUpdate(status, "[Bootloader Update] File size: %lu B, Writing...", fileLen);
@@ -602,18 +657,14 @@ updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError er
     msgToSend->updateStats = (updateos::UpdateStats)(*this);
     sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 
-    parserFSM::Context response;
-    response.setResponseStatus(parserFSM::http::Code::InternalServerError);
-    response.setEndpoint(parserFSM::EndpointType::update);
-    json11::Json responseJson = json11::Json::object
-        {
-            { parserFSM::json::update,  parserFSM::json::updateError},
-            { parserFSM::json::status, messageText },
-            { parserFSM::json::errorCode, static_cast<uint8_t>(errorCode) }
-        };
-
-    response.setResponseBody(responseJson);
-    parserFSM::MessageHandler::putToSendQueue(response.createSimpleResponse());
+    parserFSM::Context responseContext;
+    responseContext.setResponseStatus(parserFSM::http::Code::InternalServerError);
+    responseContext.setEndpoint(parserFSM::EndpointType::update);
+    json11::Json responseJson = json11::Json::object{{parserFSM::json::update, parserFSM::json::updateError},
+                                                     {parserFSM::json::status, messageText},
+                                                     {parserFSM::json::errorCode, static_cast<uint8_t>(errorCode)}};
+    responseContext.setResponseBody(responseJson);
+    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 
     return errorCode;
 }
@@ -644,15 +695,12 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
     msgToSend->updateStats = (updateos::UpdateStats)(*this);
     sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 
-    parserFSM::Context response;
-    response.setResponseStatus(parserFSM::http::Code::Accepted);
-    response.setEndpoint(parserFSM::EndpointType::update);
-    json11::Json responseJson = json11::Json::object
-        {
-            { parserFSM::json::update,  parserFSM::json::updateInfo},
-            { parserFSM::json::status, messageText },
-            { parserFSM::json::statusCode, static_cast<uint8_t>(statusCode) }
-        };
-    response.setResponseBody(responseJson);
-    parserFSM::MessageHandler::putToSendQueue(response.createSimpleResponse());
+    parserFSM::Context responseContext;
+    responseContext.setResponseStatus(parserFSM::http::Code::Accepted);
+    responseContext.setEndpoint(parserFSM::EndpointType::update);
+    json11::Json responseJson = json11::Json::object{{parserFSM::json::update, parserFSM::json::updateInfo},
+                                                     {parserFSM::json::status, messageText},
+                                                     {parserFSM::json::statusCode, static_cast<uint8_t>(statusCode)}};
+    responseContext.setResponseBody(responseJson);
+    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 }

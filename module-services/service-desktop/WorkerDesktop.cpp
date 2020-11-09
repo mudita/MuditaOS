@@ -33,8 +33,7 @@ WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
     : sys::Worker(ownerServicePtr),
       Timer("WorkerDesktop::Timeout", cpp_freertos::Ticks::MsToTicks(sdesktop::file_transfer_timeout), false),
       ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
-{
-}
+{}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
@@ -112,18 +111,16 @@ sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &destinationPath, c
 
 void WorkerDesktop::stopTransfer(const bool removeDestinationFile)
 {
-    LOG_DEBUG("stopTransfer %s", removeDestinationFile ? "remove desination file" : "" );
+    LOG_DEBUG("stopTransfer %s", removeDestinationFile ? "remove desination file" : "");
     parser.setState(parserFSM::State::NoMsg);
     rawModeEnabled = false;
 
     parserFSM::Context response;
-    response.setResponseStatus(removeDestinationFile ? parserFSM::http::Code::NotAcceptable : parserFSM::http::Code::Accepted);
+    response.setResponseStatus(removeDestinationFile ? parserFSM::http::Code::NotAcceptable
+                                                     : parserFSM::http::Code::Accepted);
     response.setEndpoint(parserFSM::EndpointType::filesystemUpload);
-    json11::Json responseJson = json11::Json::object
-        {
-            { parserFSM::json::fileSize, std::to_string(writeFileDataWritten) },
-            { parserFSM::json::fileName, filePath.filename().c_str() }
-        };
+    json11::Json responseJson = json11::Json::object{{parserFSM::json::fileSize, std::to_string(writeFileDataWritten)},
+                                                     {parserFSM::json::fileName, filePath.filename().c_str()}};
     response.setResponseBody(responseJson);
 
     // close the file descriptor
@@ -138,8 +135,7 @@ void WorkerDesktop::stopTransfer(const bool removeDestinationFile)
 
     if (removeDestinationFile) {
         if (vfs.remove(filePath.c_str()) != 0) {
-            LOG_ERROR("stopTransfer can't delete file(requested) %s",
-                      filePath.c_str());
+            LOG_ERROR("stopTransfer can't delete file(requested) %s", filePath.c_str());
         }
     }
 

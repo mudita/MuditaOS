@@ -15,6 +15,14 @@ namespace sys
 #include <memory>
 #include <string>
 
+#include "MessageHandler.hpp" // for MessageHandler
+#include "ParserUtils.hpp" // for eraseFront, calcPayloadLength, extractPayload, getHeader, removeHeader, size_header, endpointChar, parserFSM
+
+namespace sys
+{
+    class Service;
+}
+
 using namespace parserFSM;
 
 StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerService)

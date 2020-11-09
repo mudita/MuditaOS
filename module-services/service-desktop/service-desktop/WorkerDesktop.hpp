@@ -30,17 +30,18 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp
         return receiveQueue;
     }
     sys::ReturnCodes startDownload(const fs::path &destinationPath, const uint32_t fileSize);
-    void stopTransfer(const bool removeDestinationFile=false);
+    void stopTransfer(const bool removeDestinationFile = false);
     void Run();
 
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
     bool getRawMode() override;
 
+  private:
     xQueueHandle receiveQueue;
-    vfs::FILE *fileDes = nullptr;
+    vfs::FILE *fileDes             = nullptr;
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
     fs::path filePath;
-    TaskHandle_t usbTaskHandle = NULL;
+    TaskHandle_t usbTaskHandle   = NULL;
     volatile bool rawModeEnabled = false;
 };

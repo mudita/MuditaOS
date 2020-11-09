@@ -74,7 +74,7 @@ namespace parserFSM
                     uuid = invalidUuid;
                 }
             }
-            method   = static_cast<http::Method>(js[json::method].int_value());
+            method = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
         Context()
