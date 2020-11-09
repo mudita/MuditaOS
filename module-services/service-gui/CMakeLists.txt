@@ -25,3 +25,6 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/messages"
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(source/tests)
+endif ()

@@ -19,6 +19,10 @@
 namespace sgui
 {
 
+    // TODO this message should say on what area it want to draw too!
+    // on what do we want to render this commands (i.e.) TOP bar doesn't want to:
+    // 1. build draw list for whole screen
+    // 2. while at it - it doesn't want to refresh whole screen
     class DrawMessage : public GUIMessage
     {
         DrawData data;

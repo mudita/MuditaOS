@@ -288,9 +288,11 @@ namespace gui
         delete drawCtx;
     }
 
+    // TODO shrink Context to actual needed size
     void Renderer::render(Context *ctx, Commands &commands)
     {
-        if (ctx == nullptr) {
+        if (ctx == nullptr || ctx->empty()) {
+            LOG_ERROR("Cant render on %s", ctx == nullptr ? "nullptr" : "empty canvas");
             return;
         }
         for (auto &cmd : commands) {

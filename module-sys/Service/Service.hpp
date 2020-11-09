@@ -74,7 +74,7 @@ namespace sys
 
         uint32_t pingTimestamp;
 
-        bool isReady;
+        bool isReady = false;
 
         std::vector<std::pair<uint64_t, uint32_t>> staleUniqueMsg;
 

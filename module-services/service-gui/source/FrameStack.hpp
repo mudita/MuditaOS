@@ -36,7 +36,9 @@ namespace service::renderer
 
         ~Trylock()
         {
-            mutex.Unlock();
+            if (locked) {
+                mutex.Unlock();
+            }
         }
 
         [[nodiscard]] auto isLocked() const noexcept
@@ -81,25 +83,44 @@ namespace service::renderer
     //  and frame stack have single lock for adding/removing frames
     // }
     //
+    //
+    // ok... maybe queue is overengineered...
+    // at max we need 3 frames:
+    // 1. one being send to eink
+    // 2. one being rendered
+    // 3. one slot available for swap
+    // no need for queue
+    // we can at once render only one frame on one canvas
+    // so we need:
+    // - 2 canvas to draw (one to draw on,      one to process data)
+    // - 2 commands slots (one to be processed, one to accept new data)
+    // this leaves us with canvas which should potentially have more memory allocated then needed
+    //
+    // so maybe - do not allocate context as long as it's not needed?
 
     class DrawFrame
     {
-        cpp_freertos::MutexStandard &processingLock;
-        sgui::DrawData data;
-        ::gui::Context context;
-
+      public:
         enum class State
         {
             Fresh,
             Processed
-        } state = State::Fresh;
+        };
+
+      private:
+        cpp_freertos::MutexStandard &processingLock;
+        sgui::DrawData data;
+        ::gui::Context context;
+
+        State state = State::Fresh;
 
       public:
-        DrawFrame(cpp_freertos::MutexStandard &processingLock, sgui::DrawData &&data)
-            : processingLock(processingLock), data(std::move(data))
+        DrawFrame(cpp_freertos::MutexStandard &processingLock, sgui::DrawData &&data, gui::Size canvasSize)
+            : processingLock(processingLock), data(std::move(data)), context(canvasSize)
         {}
 
         /// function to be called in worker processing Frame data
+        /// TODO FEED LOCK HERE pass foo with scoped lock guard so that it would be testable
         bool processFrame(FrameProcessor processor)
         {
             if (processor == nullptr) {
@@ -142,7 +163,7 @@ namespace service::renderer
         // 1. lock for processing (to not remoce memory we are working on)
         cpp_freertos::MutexStandard lockProcessing;
 
-        std::queue<DrawFrame> drawFrames;
+        std::deque<DrawFrame> drawFrames;
 
       public:
         FrameStack(::gui::Size size) : size(size)
@@ -155,7 +176,7 @@ namespace service::renderer
             if (not lock.isLocked()) {
                 return false;
             }
-            this->drawFrames.emplace(DrawFrame{lockProcessing, std::move(data)});
+            this->drawFrames.emplace_back(DrawFrame{lockProcessing, std::move(data), size});
             return true;
         }
 
@@ -183,6 +204,9 @@ namespace service::renderer
                 return false;
             }
 
+            // TODO lock selection of frame selected to be processed
+            // then mark it as "being processed" ?
+
             return drawFrames.back().processFrame(processor);
         }
 
@@ -198,7 +222,7 @@ namespace service::renderer
             // TODO frameskip if there are more than 1 frame ready
             data.mode    = drawFrames.front().getData().getMode();
             data.context = drawFrames.front().takeContext();
-            drawFrames.pop();
+            drawFrames.pop_back();
 
             return true;
         }
