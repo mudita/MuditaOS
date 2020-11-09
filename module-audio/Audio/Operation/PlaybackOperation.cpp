@@ -62,6 +62,7 @@ namespace audio
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
             LOG_ERROR("Error during initializing profile");
+            lastError = RetCode::ProfileNotSet;
             return;
         }
         currentProfile = defaultProfile;
@@ -69,14 +70,11 @@ namespace audio
         dec = decoder::Create(file);
         if (dec == nullptr) {
             LOG_ERROR("Error during initializing decoder");
+            lastError = RetCode::FileDoesntExist;
             return;
         }
 
-        if (SwitchToPriorityProfile() != audio::RetCode::Success) {
-            return;
-        }
-
-        isInitialized = true;
+        lastError = SwitchToPriorityProfile();
     }
 
     audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
@@ -106,6 +104,9 @@ namespace audio
     audio::RetCode PlaybackOperation::Stop()
     {
         state = State::Idle;
+        if (!audioDevice) {
+            return audio::RetCode::DeviceFailure;
+        }
         return GetDeviceError(audioDevice->Stop());
     }
 

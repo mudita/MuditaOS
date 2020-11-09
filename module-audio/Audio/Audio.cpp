@@ -76,6 +76,11 @@ namespace audio
     {
 
         auto ret = Operation::Create(op, fileName, playbackType, dbCallback);
+
+        if (auto retCode = ret->GetLastError(); retCode != audio::RetCode::Success) {
+            return retCode;
+        }
+
         if (ret) {
 
             switch (op) {

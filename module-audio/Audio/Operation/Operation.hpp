@@ -20,7 +20,7 @@ namespace audio
       public:
         Operation(const bool &isInitialized               = false,
                   const audio::PlaybackType &playbackType = audio::PlaybackType::None)
-            : isInitialized{isInitialized}, playbackType{playbackType}
+            : lastError{RetCode::Success}, playbackType{playbackType}
         {}
 
         enum class State
@@ -112,6 +112,12 @@ namespace audio
             return filePath;
         }
 
+        RetCode GetLastError() const noexcept
+        {
+            return lastError;
+        }
+
+        void UpdateProfilesAvailabiliaty(EventType eType, bool isEnabled);
         audio::RetCode SwitchToPriorityProfile();
 
       protected:
@@ -140,7 +146,7 @@ namespace audio
         Type opType = Type::Idle;
         std::string filePath;
 
-        bool isInitialized               = false;
+        audio::RetCode lastError         = audio::RetCode::Success;
         audio::PlaybackType playbackType = audio::PlaybackType::None;
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
