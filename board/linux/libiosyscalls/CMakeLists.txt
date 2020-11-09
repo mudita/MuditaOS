@@ -5,7 +5,16 @@ project(iosyscalls VERSION 1.0
 
 
 set(SOURCES
-	 ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls.c
+		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
+)
+
+set(INCLUDES
+	"${CMAKE_CURRENT_SOURCE_DIR}/include"
+	"${CMAKE_SOURCE_DIR}/module-vfs/board/freeRTOS_FAT/include"
+	"${CMAKE_SOURCE_DIR}/module-os/FreeRTOS/include"
+	"${CMAKE_SOURCE_DIR}/module-os/board/linux"
+	"${CMAKE_SOURCE_DIR}/module-vfs/board/free_rtos_custom/include"
+	"${CMAKE_SOURCE_DIR}/module-utils"
 )
 
 
@@ -21,5 +30,6 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_OPTIONS ${target_options} )
 
 target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--version-script" "-Wl,${CMAKE_CURRENT_SOURCE_DIR}/version.txt")
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES} )
 target_link_libraries( ${PROJECT_NAME} dl )
+target_compile_definitions( ${PROJECT_NAME} PUBLIC TARGET_Linux )
