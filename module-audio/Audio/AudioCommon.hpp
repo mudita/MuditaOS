@@ -83,7 +83,6 @@ namespace audio
     };
 
     constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BlutoothA2DPDeviceState);
-    using AudioSinkState                 = std::bitset<magic_enum::enum_count<EventType>()>;
 
     class Event
     {
@@ -112,7 +111,45 @@ namespace audio
 
       private:
         const EventType eventType;
-        DeviceState deviceState;
+        const DeviceState deviceState;
+    };
+
+    class AudioSinkState
+    {
+      public:
+        void UpdateState(std::shared_ptr<Event> stateChangeEvent)
+        {
+            auto hwUpdateEventIdx = magic_enum::enum_integer(stateChangeEvent->getType());
+            if (hwUpdateEventIdx <= hwStateUpdateMaxEvent) {
+                audioSinkState.set(hwUpdateEventIdx,
+                                   stateChangeEvent->getDeviceState() == Event::DeviceState::Connected ? true : false);
+            }
+        }
+
+        std::vector<std::shared_ptr<Event>> getUpdateEvents() const
+        {
+            std::vector<std::shared_ptr<Event>> updateEvents;
+            for (size_t i = 0; i < hwStateUpdateMaxEvent; i++) {
+                auto isConnected =
+                    audioSinkState.test(i) ? Event::DeviceState::Connected : Event::DeviceState::Disconnected;
+                auto updateEvt = magic_enum::enum_cast<EventType>(i);
+                updateEvents.emplace_back(std::make_unique<Event>(updateEvt.value(), isConnected));
+            }
+            return updateEvents;
+        }
+
+        bool isConnected(EventType deviceUpdateEvent) const
+        {
+            return audioSinkState.test(magic_enum::enum_integer(deviceUpdateEvent));
+        }
+
+        void setConnected(EventType deviceUpdateEvent, bool isConnected)
+        {
+            audioSinkState.set(magic_enum::enum_integer(deviceUpdateEvent), isConnected);
+        }
+
+      private:
+        std::bitset<magic_enum::enum_count<EventType>()> audioSinkState;
     };
 
     enum class RetCode

@@ -79,10 +79,10 @@ namespace audio
 
         audio::Profile::Type GetPriorityPlaybackProfile() const
         {
-            if (audioSinkState.test(sinkBitBtA2DP)) {
+            if (audioSinkState.isConnected(EventType::BlutoothA2DPDeviceState)) {
                 return Profile::Type::PlaybackBluetoothA2DP;
             }
-            if (audioSinkState.test(sinkBitJack)) {
+            if (audioSinkState.isConnected(EventType::JackState)) {
                 return Profile::Type::PlaybackHeadphones;
             }
             return Profile::Type::PlaybackLoudspeaker;
@@ -109,9 +109,6 @@ namespace audio
       private:
         void UpdateProfiles();
         AudioSinkState audioSinkState;
-        static constexpr auto sinkBitJack   = magic_enum::enum_integer(EventType::JackState);
-        static constexpr auto sinkBitBtA2DP = magic_enum::enum_integer(EventType::BlutoothA2DPDeviceState);
-        static constexpr auto sinkBitBtHSP  = magic_enum::enum_integer(EventType::BlutoothHSPDeviceState);
 
         std::shared_ptr<BluetoothStreamData> btData;
 

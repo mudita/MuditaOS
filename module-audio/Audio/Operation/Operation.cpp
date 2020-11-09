@@ -73,23 +73,6 @@ namespace audio
         }
     }
 
-    void Operation::UpdateProfilesAvailabiliaty(EventType eType, bool isEnabled)
-    {
-        if (eType == EventType::JackState) {
-            SetProfileAvailability({Profile::Type::RecordingHeadphones,
-                                    Profile::Type::RoutingHeadphones,
-                                    Profile::Type::PlaybackHeadphones},
-                                   isEnabled);
-        }
-        else if (eType == EventType::BlutoothHSPDeviceState) {
-            SetProfileAvailability({Profile::Type::RoutingBluetoothHSP, Profile::Type::RecordingBluetoothHSP},
-                                   isEnabled);
-        }
-        else if (eType == EventType::BlutoothA2DPDeviceState) {
-            SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isEnabled);
-        }
-    }
-
     audio::RetCode Operation::SwitchToPriorityProfile()
     {
         for (auto &p : supportedProfiles) {

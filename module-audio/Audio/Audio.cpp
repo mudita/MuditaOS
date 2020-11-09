@@ -18,7 +18,7 @@ namespace audio
         if (ret) {
             currentOperation = std::move(ret);
         }
-        audioSinkState.set(sinkBitJack, bsp::headset::IsInserted());
+        audioSinkState.setConnected(EventType::JackState, bsp::headset::IsInserted());
     }
 
     Position Audio::GetPosition()
@@ -39,12 +39,8 @@ namespace audio
 
     audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
     {
-        auto hwUpdateEventIdx = magic_enum::enum_integer(evt->getType());
-        auto isHwUpdateEvent  = hwUpdateEventIdx <= hwStateUpdateMaxEvent;
-        if (isHwUpdateEvent) {
-            audioSinkState.set(hwUpdateEventIdx, evt->getDeviceState() == Event::DeviceState::Connected ? true : false);
-            UpdateProfiles();
-        }
+        audioSinkState.UpdateState(evt);
+        UpdateProfiles();
         return currentOperation->SendEvent(std::move(evt));
     }
 
@@ -173,10 +169,9 @@ namespace audio
 
     void Audio::UpdateProfiles()
     {
-        for (size_t i = 0; i < hwStateUpdateMaxEvent; i++) {
-            auto isAudioSinkState = audioSinkState.test(i);
-            auto updateEvt        = magic_enum::enum_cast<EventType>(i);
-            currentOperation->UpdateProfilesAvailabiliaty(updateEvt.value(), isAudioSinkState);
+        auto updateEvents = audioSinkState.getUpdateEvents();
+        for (auto &event : updateEvents) {
+            currentOperation->SendEvent(event);
         }
         currentOperation->SwitchToPriorityProfile();
     }

@@ -238,7 +238,17 @@ namespace audio
 
     audio::RetCode RouterOperation::SendEvent(std::shared_ptr<Event> evt)
     {
+        auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
+
         switch (evt->getType()) {
+        case EventType::JackState:
+            SetProfileAvailability({Profile::Type::RoutingHeadphones}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
+        case EventType::BlutoothHSPDeviceState:
+            SetProfileAvailability({Profile::Type::RoutingBluetoothHSP}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
         case EventType::CallLoudspeakerOn:
             SwitchProfile(Profile::Type::RoutingLoudspeaker);
             break;

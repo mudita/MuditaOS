@@ -152,6 +152,20 @@ namespace audio
 
     audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
+        auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
+        switch (evt->getType()) {
+        case EventType::JackState:
+            SetProfileAvailability({Profile::Type::PlaybackHeadphones}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
+        case EventType::BlutoothA2DPDeviceState:
+            SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
+        default:
+            return RetCode::UnsupportedEvent;
+        }
+
         return RetCode::Success;
     }
 

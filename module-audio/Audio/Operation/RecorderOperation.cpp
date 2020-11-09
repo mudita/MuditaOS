@@ -145,6 +145,20 @@ namespace audio
 
     audio::RetCode RecorderOperation::SendEvent(std::shared_ptr<Event> evt)
     {
+        auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
+        switch (evt->getType()) {
+        case EventType::JackState:
+            SetProfileAvailability({Profile::Type::RecordingHeadphones}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
+        case EventType::BlutoothHSPDeviceState:
+            SetProfileAvailability({Profile::Type::RecordingBluetoothHSP}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
+        default:
+            return RetCode::UnsupportedEvent;
+        }
+
         return RetCode::Success;
     }
 
