@@ -4,7 +4,7 @@ When submitting code or documentation changes please follow these steps to have 
 
 ## Create a new branch
 
-Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or ``fix/some-fix`.
+Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or `fix/some-fix`.
 
 **Note:** If you're part of the MuditaOS core development team, please precede the branch name with a relevant Jira ticket number e.g. `EGD-5555-some-feature`.
 
