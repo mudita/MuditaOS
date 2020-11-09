@@ -9,6 +9,9 @@
 #include <module-sys/Service/Bus.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/messages/EVMessages.hpp>
+
+#include "service-cellular/SimCard.hpp"
 
 // this static function will be replaced by Settings API
 static bool isSettingsAutomaticTimeSyncEnabled()
@@ -135,6 +138,20 @@ void CellularUrcHandler::Handle(Qind &urc)
         response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SMSDone);
 
         urc.setHandled(true);
+    }
+}
+
+void CellularUrcHandler::Handle(Cpin &urc)
+{
+    if (urc.isValid()) {
+        auto state = urc.getState();
+        if (!state) {
+            LOG_INFO("Invalid cpin - ignore");
+        }
+        else {
+            response = std::make_unique<CellularSimStateMessage>(*state, *urc.getMessage());
+            urc.setHandled(true);
+        }
     }
 }
 

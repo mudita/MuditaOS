@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "SimCardResult.hpp"
 
 #include "CellularCall.hpp"
 #include "CellularMessage.hpp"
@@ -29,6 +31,7 @@
 #include <vector>
 
 class MuxDaemon;
+
 namespace db
 {
     namespace query
@@ -81,8 +84,27 @@ class ServiceCellular : public sys::Service
     std::vector<std::string> getNetworkInfo();
     std::vector<std::string> scanOperators();
 
+    /// group of action/messages send "outside" eg. GUI
+
+    bool requestPin(unsigned int attempts, const std::string msg);
+    bool requestPuk(unsigned int attempts, const std::string msg);
+    bool sendSimUnlocked();
+    bool sendSimBlocked();
+    bool unhandledCME(unsigned int cme_error);
+    bool sendBadPuk();
+    bool sendBadPin();
+    bool sendChangePinResult(SimCardResult res);
+
+    /// sim functionality
+
+    bool changePin(const std::string oldPin, const std::string newPin);
+    bool unlockSimPin(std::string pin);
+    bool unlockSimPuk(std::string puk, std::string pin);
+    bool unlockSim(CellularSimVerifyPinRequestMessage *msg);
+
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+
     // used for polling for call state
     std::unique_ptr<sys::Timer> callStateTimer;
     std::unique_ptr<sys::Timer> stateTimer;
@@ -151,6 +173,7 @@ class ServiceCellular : public sys::Service
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
     bool handle_ready();
+
     bool handleAllMessagesFromMessageStorage();
     [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
                                             const UTF8 &receivedNumber,
@@ -182,6 +205,9 @@ class ServiceCellular : public sys::Service
     bool handleUSSDURC();
     void handleUSSDTimer();
 
+    bool handleSimState(at::SimState state, const std::string message);
+
     friend class CellularUrcHandler;
     friend class CellularCallRequestHandler;
+    friend class SimCard;
 };

@@ -101,6 +101,7 @@ enum class MessageType
     CellularTransmitDtmfTones,
     CellularUSSDRequest,
     CellularTimeUpdated,
+    CellularSimState,
 
     DBNotesAdd,            ///< Add new note's record
     DBNotesRemove,         ///< Remove selected note's record

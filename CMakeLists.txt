@@ -21,7 +21,7 @@ message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
 message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
 message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
-add_executable(${PROJECT_NAME} "")
+add_executable(${PROJECT_NAME} "" module-services/service-cellular/service-cellular/SimCardResult.hpp)
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
 	set(ENABLE_TESTS ON)

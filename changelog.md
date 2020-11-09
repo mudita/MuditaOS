@@ -1,5 +1,13 @@
 # MuditaOS changelog
 
+
+## Added
+
+* `[cellular]` Added SIM PIN/PUK handling
+* `[cellular]` Added change PIN functionality
+* `[cellular]` Added possibility of unlock SIM card (no PIN on start) functionality
+
+
 ## [0.46.1 2020-11-13]
 
 ## Added

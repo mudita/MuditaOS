@@ -16,9 +16,11 @@
 #include "UrcCreg.hpp"
 #include "UrcCmti.hpp"
 #include "UrcClip.hpp"
+#include "UrcCpin.hpp"
 #include "UrcPoweredDown.hpp"
 #include "UrcResponse.hpp"
 #include "UrcFactory.hpp"
+#include "SimState.hpp"
 
 template <typename urcType> static auto getURC(std::unique_ptr<at::urc::Urc> &urc) -> std::shared_ptr<urcType>
 {
@@ -670,6 +672,24 @@ TEST_CASE("+CLIP")
         REQUIRE(clip->getSatype() == "2");
         REQUIRE(clip->getSubaddr() == "1");
         REQUIRE(clip->getCLIValidity() == "0");
+    }
+}
+
+TEST_CASE("+CPIN")
+{
+    SECTION("CPIN supported")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CPIN: SIM PIN");
+        auto cpin = getURC<at::urc::Cpin>(urc);
+        REQUIRE(cpin);
+        REQUIRE(cpin->getState() == at::SimState::SimPin);
+    }
+    SECTION("CPIN not supported")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+CPIN: \"Unknown\"");
+        auto cpin = getURC<at::urc::Cpin>(urc);
+        REQUIRE(cpin);
+        REQUIRE(cpin->getState() == at::SimState::Unknown);
     }
 }
 
