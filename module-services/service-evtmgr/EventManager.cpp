@@ -242,14 +242,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         sys::SystemManager::PrepareSystemToHandleCellular(this);
     }
     else if (msgl->messageType == MessageType::CellularStateRequest) {
-        auto msg = dynamic_cast<cellular::StateChange *>(msgl);
-        if (msg != nullptr) {
+        if (auto msg = static_cast<cellular::StateChange *>(msgl); msg != nullptr) {
             sys::SystemManager::UpdateCellularState(this, msg->request == cellular::State::ST::Ready ? true : false);
         }
     }
     else if (msgl->messageType == MessageType::AudioMessage) {
-        auto msg = dynamic_cast<AudioNotificationMessage *>(msgl);
-        if (msg != nullptr) {
+        if (auto msg = static_cast<AudioNotificationMessage *>(msgl); msg != nullptr) {
             if (msg->type == AudioNotificationMessage::Type::ServiceWakeUp) {
                 sys::SystemManager::UpdateAudioState(this, true);
             }

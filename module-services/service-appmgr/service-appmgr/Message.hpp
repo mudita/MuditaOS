@@ -191,22 +191,6 @@ namespace app::manager
         {}
     };
 
-    /// Requests the application manager to enter power save mode.
-    class APMLockScreen : public Message
-    {
-      public:
-        APMLockScreen(const ApplicationName &senderName) : Message(MessageType::APMLockScreen, senderName)
-        {}
-    };
-
-    /// Requests the application manager to exit power save mode.
-    class APMUnlockScreen : public Message
-    {
-      public:
-        APMUnlockScreen(const ApplicationName &senderName) : Message(MessageType::APMUnlockScreen, senderName)
-        {}
-    };
-
     /// Requests the application manager to check the status of the application.
     class ApplicationStatusRequest : public Message
     {

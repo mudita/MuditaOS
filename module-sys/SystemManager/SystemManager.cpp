@@ -11,6 +11,7 @@
 #include <service-evtmgr/messages/KbdMessage.hpp>
 #include <service-evtmgr/messages/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include "messages/ScreenStateMessage.hpp"
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -101,6 +102,8 @@ namespace sys
         powerManager->Switch(PowerManager::Mode::FullSpeed);
         userInit = init;
 
+        systemState = std::make_unique<SystemState>();
+
         // Start System manager
         StartService();
 
@@ -108,9 +111,9 @@ namespace sys
         // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
         // ReloadTimer(pingPongTimerID);
 
-        lowPowerEnryTimer =
+        lowPowerEntryTimer =
             std::make_unique<sys::Timer>("LowPowerEnryTimer", this, LongWait, sys::Timer::Type::SingleShot);
-        lowPowerEnryTimer->connect([&](sys::Timer &) { LowPowerEntryHandler(); });
+        lowPowerEntryTimer->connect([&](sys::Timer &) { LowPowerEntryHandler(); });
     }
 
     bool SystemManager::CloseSystem(Service *s)
@@ -125,31 +128,33 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::FocusOnApplication(Service *caller, bool enabled)
+    bool SystemManager::FocusOnApplication(Service *caller, bool focusEnabled)
     {
-        isFocusOnApplicationActive = enabled;
-        if (enabled)
+        systemState->SetFocusOnApplication(focusEnabled ? SystemState::ApplicationState::Active
+                                                        : SystemState::ApplicationState::Unactive);
+        if (focusEnabled) {
             return ExitLowPowerMode(caller);
-        else
-            lowPowerEnryTimer->reload(ShortWait);
+        }
+        lowPowerEntryTimer->reload(ShortWait);
         return true;
     }
 
     bool SystemManager::UpdateChargerState(Service *caller, bool plugged)
     {
-        isChargerPlugged = plugged;
-        if (plugged)
+        systemState->SetChargerState(plugged ? SystemState::ChargerState::Plugged
+                                             : SystemState::ChargerState::Unplugged);
+        if (plugged) {
             return ExitLowPowerMode(caller);
-        else
-            lowPowerEnryTimer->reload(ShortWait);
+        }
+        lowPowerEntryTimer->reload(ShortWait);
         return true;
     }
 
     bool SystemManager::UpdateCellularState(Service *caller, bool ready)
     {
-        isCellularReady = ready;
+        systemState->SetCellularState(ready ? SystemState::CellularState::Ready : SystemState::CellularState::Unready);
         if (ready) {
-            lowPowerEnryTimer->reload(ShortWait);
+            lowPowerEntryTimer->reload(ShortWait);
         }
         else {
             return ExitLowPowerMode(caller);
@@ -159,38 +164,31 @@ namespace sys
 
     bool SystemManager::UpdateAudioState(Service *caller, bool active)
     {
-        isAudioActive = active;
+        systemState->SetAudioState(active ? SystemState::AudioState::Active : SystemState::AudioState::Unactive);
         if (active) {
             return ExitLowPowerMode(caller);
         }
-        else {
-            lowPowerEnryTimer->reload(ShortWait);
-        }
+        lowPowerEntryTimer->reload(ShortWait);
         return true;
     }
 
     void SystemManager::RtcUpdate()
     {
-        isRtcUpdate = true;
-        lowPowerEnryTimer->reload(ShortWait);
+        systemState->SetRtcState(SystemState::RtcState::Updated);
+        lowPowerEntryTimer->reload(ShortWait);
     }
 
     void SystemManager::PrepareSystemToHandleCellular(Service *caller)
     {
-        lowPowerEnryTimer->reload(LongWait);
+        lowPowerEntryTimer->reload(LongWait);
         ExitLowPowerMode(caller);
     }
 
     void SystemManager::CheckLowPowerMode(Service *caller)
     {
-        lowPowerEnryTimer->reload(ShortWait);
-        ExitLowPowerMode(caller);
-    }
 
-    bool SystemManager::LowPowerPermission()
-    {
-        return (isScreenLock && !isAudioActive && !isFocusOnApplicationActive && isRtcUpdate && isCellularReady &&
-                !isChargerPlugged);
+        lowPowerEntryTimer->reload(ShortWait);
+        ExitLowPowerMode(caller);
     }
 
     bool SystemManager::EnterLowPowerMode(Service *caller)
@@ -199,7 +197,7 @@ namespace sys
             return false;
         }
 
-        if (!LowPowerPermission()) {
+        if (!systemState->LowPowerPermission()) {
             return false;
         }
 
@@ -379,30 +377,26 @@ namespace sys
             return Message_t();
         });
 
+        connect(typeid(sys::ScreenStateMessage),
+                [this](sys::DataMessage *message, sys::ResponseMessage *) -> sys::Message_t {
+                    auto msg                             = static_cast<sys::ScreenStateMessage *>(message);
+                    sys::ScreenStateMessage::State state = msg->getState();
+                    if (state == sys::ScreenStateMessage::State::Lock) {
+                        systemState->SetScreenState(SystemState::ScreenState::Lock);
+                        lowPowerEntryTimer->reload(ShortWait);
+                    }
+                    else {
+                        systemState->SetScreenState(SystemState::ScreenState::Unlock);
+                    }
+                    return Message_t();
+                });
+
         return ReturnCodes::Success;
     }
 
-    Message_t SystemManager::DataReceivedHandler(DataMessage *msgl, ResponseMessage *resp)
+    Message_t SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
     {
-        bool handled = false;
-
-        switch (msgl->messageType) {
-
-        case MessageType::APMLockScreen: {
-            isScreenLock = true;
-            lowPowerEnryTimer->reload(ShortWait);
-        } break;
-        case MessageType::APMUnlockScreen: {
-            isScreenLock = false;
-        } break;
-        default:
-            break;
-        }
-
-        if (handled)
-            return std::make_shared<sys::ResponseMessage>();
-        else
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        return std::make_shared<ResponseMessage>();
     }
 
     void SystemManager::CloseSystemHandler()
@@ -445,20 +439,14 @@ namespace sys
 
     void SystemManager::LowPowerEntryHandler()
     {
-#if (LOW_POWER_MODE_ENABLED)
+        /// To disable entering LowPower mode, comment out the line below
         EnterLowPowerMode(this);
-#endif
     }
 
-    bool SystemManager::isScreenLock{true};
-    bool SystemManager::isAudioActive{false};
-    bool SystemManager::isFocusOnApplicationActive{false};
-    bool SystemManager::isRtcUpdate{false};
-    bool SystemManager::isCellularReady{false};
-    bool SystemManager::isChargerPlugged{false};
-    std::unique_ptr<sys::Timer> SystemManager::lowPowerEnryTimer;
+    std::unique_ptr<sys::Timer> SystemManager::lowPowerEntryTimer;
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
     std::unique_ptr<PowerManager> SystemManager::powerManager;
+    std::unique_ptr<SystemState> SystemManager::systemState;
 
 } // namespace sys

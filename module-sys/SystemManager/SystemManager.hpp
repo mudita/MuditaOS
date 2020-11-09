@@ -22,13 +22,12 @@
 #include "Service/Timer.hpp"
 #include "PowerManager.hpp"
 #include "Constants.hpp"
-
-#define LOW_POWER_MODE_ENABLED 1
+#include "SystemState.hpp"
 
 namespace sys
 {
-    constexpr sys::ms LongWait{20000};
-    constexpr sys::ms ShortWait{5000};
+    inline constexpr sys::ms LongWait{20000};
+    inline constexpr sys::ms ShortWait{5000};
 
     enum class Code
     {
@@ -101,14 +100,14 @@ namespace sys
         /// exit from low power mode if active
         static void PrepareSystemToHandleCellular(Service *caller);
 
-        static bool FocusOnApplication(Service *caller, bool enabled);
+        static bool FocusOnApplication(Service *caller, bool focusEnabled);
         static bool UpdateChargerState(Service *caller, bool plugged);
         static bool UpdateCellularState(Service *caller, bool ready);
         static bool UpdateAudioState(Service *caller, bool active);
         static void RtcUpdate();
 
       private:
-        Message_t DataReceivedHandler(DataMessage *msgl, ResponseMessage *resp) override;
+        Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
 
         ReturnCodes InitHandler() override;
 
@@ -151,17 +150,12 @@ namespace sys
 
         InitFunction userInit;
 
-        static bool isScreenLock;
-        static bool isAudioActive;
-        static bool isFocusOnApplicationActive;
-        static bool isRtcUpdate;
-        static bool isCellularReady;
-        static bool isChargerPlugged;
-        static std::unique_ptr<sys::Timer> lowPowerEnryTimer;
+        static std::unique_ptr<sys::Timer> lowPowerEntryTimer;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
         static cpp_freertos::MutexStandard destroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
+        static std::unique_ptr<SystemState> systemState;
     };
 
 } // namespace sys

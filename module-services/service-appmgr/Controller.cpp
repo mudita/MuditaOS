@@ -4,7 +4,7 @@
 #include "service-appmgr/Controller.hpp"
 
 #include "service-appmgr/model/ApplicationManager.hpp"
-
+#include <module-sys/SystemManager/messages/ScreenStateMessage.hpp>
 #include <module-sys/Service/Bus.hpp>
 #include <Service/Service.hpp>
 
@@ -90,13 +90,13 @@ namespace app::manager
 
     auto Controller::lockScreen(sys::Service *sender) -> bool
     {
-        auto msg = std::make_shared<app::manager::APMLockScreen>(sender->GetName());
+        auto msg = std::make_shared<sys::ScreenStateMessage>(sys::ScreenStateMessage::State::Lock);
         return sys::Bus::SendUnicast(msg, service::name::system_manager, sender);
     }
 
     auto Controller::unlockScreen(sys::Service *sender) -> bool
     {
-        auto msg = std::make_shared<app::manager::APMUnlockScreen>(sender->GetName());
+        auto msg = std::make_shared<sys::ScreenStateMessage>(sys::ScreenStateMessage::State::Unlock);
         return sys::Bus::SendUnicast(msg, service::name::system_manager, sender);
     }
 } // namespace app::manager

@@ -269,8 +269,7 @@ namespace app::manager
             sys::SystemManager::ResumeService(service::name::gui, this);
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
-            suspendSystemServices();
-            break;
+            [[fallthrough]];
         case sys::ServicePowerMode ::SuspendToNVM:
             suspendSystemServices();
             break;

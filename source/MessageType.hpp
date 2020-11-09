@@ -134,11 +134,9 @@ enum class MessageType
                         ///< gui rebuild command to all applications in background and currently active application.
     APMClose, ///< this message will trigger application manager to close itself, all running applications gui and eink
               ///< services.
-    APMPreventBlocking,   ///< Prevents application manager from initializing device blocking.
-    APMLockScreen,      ///< This message is sent to application manager from desktop when locking timeout has
-                        ///< triggered or user explicitly locked the phone.
-    APMUnlockScreen,    ///< This message is sent to application manager from PinLockWindow to block
-                        ///< switching Low Power Mode
+    APMPreventBlocking, ///< Prevents application manager from initializing device blocking.
+    APMScreenState,     ///< This message is sent to system manager from desktop when screen is locking/unlocking
+                        ///< triggered or user explicitly locked/unlocked the phone.
 
     // keyboard messages
     KBDKeyEvent,
