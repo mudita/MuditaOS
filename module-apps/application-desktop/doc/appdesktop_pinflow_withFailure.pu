@@ -6,30 +6,7 @@ participant "ApplicaionDesktop" as appdsktp
 participant "PinLockWindow" as pinwin
 actor User
 
-    == Pre-Interaction state ==
-!pragma teoz true
-note left of srvclr
-    Desktop side data:
-    None
-end note
-/ note left of pinwin
-    Desktop side data:
-    None
-end note
-/ note left of appdsktp
-    Desktop side state:
-    Screen Locked
-end note
-
-
-    == Pin required: Interaction Init ==
-
-note over srvclr, appdsktp #FFAAAA
-    what kind of data is actually presented tu user:
-    - removed from miro: SIM1/SIM2
-    - removed from miro: phone number
-    Needs to be confirmed
-end note
+    == PIN required - invalid PIN flow ==
 
 note left of srvclr
     Cellular side data:
@@ -38,22 +15,31 @@ note left of srvclr
     phone: +48500500500
     attempts: 4
 end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Locked
+end note
 / note left of pinwin
     Desktop side data:
     None
 end note
 
-[o->srvclr : need PIN
+[o->srvclr : need PIN1
 
-srvclr -> appmgr : requestPIN(attempts, SIM1)
+activate srvclr
+srvclr -> appmgr : ActionMessage{RequestPin1, {SIM1, attempts}} via sys::bus message
+    activate  appmgr
+deactivate srvclr
     appmgr -> appmgr : translate request to action
     appmgr -> appdsktp : forward action
-        appdsktp -> appdsktp : queue action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(RequestPinAction) -> queued
+        deactivate appdsktp
 
-
-    == Pin required: Interaction - User unlocks screen ==
-
+        ... ...
         appdsktp <- User : Unlock screen
+        activate appdsktp
 note left of pinwin
     Desktop side data:
     State: PIN required
@@ -66,13 +52,19 @@ end note
 end note
         appdsktp -> pinwin ** : switchWindow(SIM1, reqPIN, attempts)
             activate pinwin
-            pinwin -> pinwin : setVisablePinRequired
+        deactivate appdsktp
+            pinwin -> pinwin : setVisiblePinRequired
             pinwin <- User : Enters PIN (invalid)
             pinwin <- User : Confirm
         appdsktp <- pinwin : handlePasscode(pinValue)
-srvclr <- appdsktp : verifyPIN(pinValue) via sys::bus message
+        activate appdsktp
+            deactivate pinwin
+srvclr <- appdsktp : PinData(pinValue) via sys::bus message
+activate srvclr
+        deactivate appdsktp
 srvclr -> srvclr : verification failed,
 srvclr -> srvclr : attempts--
+deactivate srvclr
 note over of srvclr
     Cellular side data:
     State: PIN required
@@ -83,9 +75,17 @@ end note
 
     == Pin invalid: Retry with 3 attempts left ==
 
-srvclr -> appdsktp : verificationStatus(failed, attempts, SIM1?) via sys::bus response
-        appdsktp -> appdsktp : handle(response)
-        appdsktp -> pinwin : switchWindow(SIM1, invalidPIN, attempts)
+
+[o->srvclr : need PIN1
+activate srvclr
+srvclr -> appmgr : ActionMessage{RequestPin1, {SIM1, attempts}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(SimUnlockedAction) -> compare cards, attempts?
 note left of pinwin
     Desktop side data:
     State: PIN required
@@ -96,16 +96,25 @@ end note
     Desktop side state:
     Screen Unlocked
 end note
+        appdsktp -> pinwin : switchWindow(SIM1, invalidPIN, attempts)
+            activate pinwin
+        deactivate appdsktp
             pinwin -> pinwin : rebuild
-            pinwin -> pinwin : setVisableInvalidPin
+            pinwin -> pinwin : setVisibleInvalidPin
             pinwin <- User : Confirm
-            pinwin -> pinwin : setVisablePinRequired
+            pinwin -> pinwin : setVisiblePinRequired
             pinwin <- User : Enters PIN (invalid)
             pinwin <- User : Confirm
         appdsktp <- pinwin : handlePasscode(pinValue)
-srvclr <- appdsktp : verifyPIN(pinValue) via sys::bus message
+        activate appdsktp
+            deactivate pinwin
+
+srvclr <- appdsktp : PinData(pinValue) via sys::bus message
+activate srvclr
+    deactivate appdsktp
 srvclr -> srvclr : verification failed
 srvclr -> srvclr : attempts--
+deactivate srvclr
 note over of srvclr
     Cellular side data:
     State: PIN required
@@ -119,65 +128,18 @@ end note
     == Pin invalid: Retry with 1 attempts left ==
     ... ...
 
-srvclr <- appdsktp :  verifyPIN(pinValue) via sys::bus message
+srvclr <- appdsktp :  PinData(pinValue) via sys::bus message
+activate srvclr
 srvclr -> srvclr : verification failed,
 srvclr -> srvclr : attempts--
+deactivate srvclr
 
     == Pin invalid: 0 attempts left, PUK required ==
 
-note right of srvclr #FFAAAA
-    Should cellular respond with Failure to ApplicationDesktop?
-    How to proceed with PUK? new action: requestPUK?
-end note
-
-srvclr -> appdsktp : verificationStatus(failed, attempts, SIM1?) via sys::bus response
-        appdsktp -> appdsktp : handle(response)
-
-note right of appdsktp #FFAAAA
-    Miro design changed?
-    No PIN-Blocked window?
-    Immediate PUKrequest?
-end note
-
-note over of srvclr
-    Cellular side data:
-    State: PUK required
-    SIM: SIM1
-    phone: +48500500500
-    attempts: 8
-end note
-/ note left of pinwin
-    Desktop side data:
-    State: PIN required
-    SIM: SIM1
-    attempts: 0
-end note
-
-srvclr -> appmgr : requestPUK(SIM1, attempts)
-    appmgr -> appmgr : translate request to action
-    appmgr -> appdsktp : forward action
-
-note left of pinwin
-    Desktop side data:
-    State: PUK required
-    SIM: SIM1
-    attempts: 8
-end note
-/ note left of appdsktp
-    Desktop side state:
-    Screen Unlocked
-end note
-
-        appdsktp -> pinwin : switchWindow(SIM1, reqPUK, attempts)
-            pinwin -> pinwin : rebuild
-            pinwin -> pinwin : setVisiblePukRequired
-            pinwin <- User : Enters PUK (good)
-            pinwin <- User : Confirm
-        appdsktp <- pinwin : handlePasscode(pukValue)
-srvclr <- appdsktp : verifyPasscode(pukValue) via sys::bus message
-srvclr -> srvclr : verification success,
-srvclr -> appdsktp : verificationStatus(success) via sys::bus response
-        appdsktp -> pinwin !! : delete
-    == PUK valid, new PIN required ==
-    ... ...
+[o->srvclr : need PUK1
+activate srvclr
+srvclr -> appmgr : ActionMessage{RequestPuk1, {SIM1, attempts}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    ... PUK Flow ...
 @enduml
