@@ -10,8 +10,8 @@ namespace audio
 
     IdleOperation::IdleOperation([[maybe_unused]] const char *file) : Operation{true}
     {
-        supportedProfiles.emplace_back(true, Profile::Create(Profile::Type::Idle, nullptr));
-        currentProfile = supportedProfiles[0].second;
+        supportedProfiles.emplace_back(Profile::Create(Profile::Type::Idle, nullptr), true);
+        currentProfile = supportedProfiles[0].profile;
     }
 
     audio::RetCode IdleOperation::SetOutputVolume(float vol)

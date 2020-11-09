@@ -50,7 +50,7 @@ namespace Bt
         static void initCvsd();
         static void receiveCvsd(uint8_t *packet, uint16_t size);
         static void writeToHostEndian(int16_t *buffer, uint8_t *packet, int length);
-        static void sendEvent(audio::EventType event, bool state);
+        static void sendEvent(audio::EventType event, audio::Event::DeviceState state);
         static void flipEndianess(uint16_t *data, size_t length);
     };
 
@@ -102,7 +102,7 @@ QueueHandle_t SCO::SCOImpl::sourceQueue;
 const sys::Service *SCO::SCOImpl::ownerService = nullptr;
 DeviceMetadata_t SCO::SCOImpl::metadata;
 
-void SCO::SCOImpl::sendEvent(audio::EventType event, bool state)
+void SCO::SCOImpl::sendEvent(audio::EventType event, audio::Event::DeviceState state)
 {
     auto evt = std::make_shared<audio::Event>(event, state);
     auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
@@ -121,7 +121,7 @@ auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Error
     metadata.samplesPerFrame = audioSamplesPerPacket;
 
     if (sourceQueue != nullptr && sinkQueue != nullptr) {
-        sendEvent(audio::EventType::BlutoothHSPDeviceState, true);
+        sendEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Connected);
     }
     else {
         LOG_ERROR("failed to create queue!");

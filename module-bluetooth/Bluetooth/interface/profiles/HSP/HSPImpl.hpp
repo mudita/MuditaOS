@@ -24,7 +24,7 @@ namespace Bt
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
       private:
-        static void sendAudioEvent(audio::EventType event, bool state);
+        static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
         static void processHCIEvent(uint8_t *event);
         static void processHSPEvent(uint8_t *event);
         static std::array<uint8_t, serviceBufferLength> serviceBuffer;

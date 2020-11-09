@@ -82,7 +82,9 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         if (bsp::headset::Handler(notification) == true) {
             bool state = bsp::headset::IsInserted();
-            auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState, state);
+            auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
+                                                               state ? audio::Event::DeviceState::Connected
+                                                                     : audio::Event::DeviceState::Disconnected);
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }

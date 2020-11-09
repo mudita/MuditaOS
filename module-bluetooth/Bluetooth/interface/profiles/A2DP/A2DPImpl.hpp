@@ -67,7 +67,7 @@ namespace Bt
         static void hciPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void sendMediaPacket();
         static auto fillSbcAudioBuffer(MediaContext *context) -> int;
-        static void sendAudioEvent(audio::EventType event, bool state);
+        static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
 
       public:
         auto init() -> Error::Code;

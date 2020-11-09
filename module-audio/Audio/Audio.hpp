@@ -82,7 +82,7 @@ namespace audio
             if (audioSinkState.test(sinkBitBtA2DP)) {
                 return Profile::Type::PlaybackBluetoothA2DP;
             }
-            else if (audioSinkState.test(sinkBitJack)) {
+            if (audioSinkState.test(sinkBitJack)) {
                 return Profile::Type::PlaybackHeadphones;
             }
             return Profile::Type::PlaybackLoudspeaker;

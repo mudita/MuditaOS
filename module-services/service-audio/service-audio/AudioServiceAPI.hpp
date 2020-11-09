@@ -119,7 +119,9 @@ namespace AudioServiceAPI
      * @return True is request has been sent successfully, false otherwise
      *   Response will come as message AudioSendEventResponse
      */
-    bool SendEvent(sys::Service *serv, audio::EventType evt, bool state = 0);
+    bool SendEvent(sys::Service *serv,
+                   audio::EventType evt,
+                   audio::Event::DeviceState state = audio::Event::DeviceState::Connected);
     /**
      * @brief Attempts to parse audio file for metatags.
      *

@@ -53,18 +53,18 @@ namespace audio
 
         // order in vector defines priority
         supportedProfiles.emplace_back(
-            false, Profile::Create(Profile::Type::PlaybackBluetoothA2DP, nullptr, loudspeakerVolume));
-        supportedProfiles.emplace_back(false,
-                                       Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume));
-        supportedProfiles.emplace_back(true,
-                                       Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume));
+            Profile::Create(Profile::Type::PlaybackBluetoothA2DP, nullptr, loudspeakerVolume), false);
+        supportedProfiles.emplace_back(Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume),
+                                       false);
+        supportedProfiles.emplace_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume),
+                                       true);
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
             LOG_ERROR("Error during initializing profile");
             return;
         }
-        currentProfile = defaultProfile.value();
+        currentProfile = defaultProfile;
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
@@ -162,7 +162,7 @@ namespace audio
 
         auto ret = GetProfile(type);
         if (ret) {
-            currentProfile = ret.value();
+            currentProfile = ret;
         }
         else {
             return RetCode::UnsupportedProfile;

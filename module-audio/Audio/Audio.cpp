@@ -16,7 +16,7 @@ namespace audio
 
         auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, dbCallback);
         if (ret) {
-            currentOperation = std::move(ret.value());
+            currentOperation = std::move(ret);
         }
         audioSinkState.set(sinkBitJack, bsp::headset::IsInserted());
     }
@@ -42,7 +42,7 @@ namespace audio
         auto hwUpdateEventIdx = magic_enum::enum_integer(evt->getType());
         auto isHwUpdateEvent  = hwUpdateEventIdx <= hwStateUpdateMaxEvent;
         if (isHwUpdateEvent) {
-            audioSinkState.set(hwUpdateEventIdx, evt->getState());
+            audioSinkState.set(hwUpdateEventIdx, evt->getDeviceState() == Event::DeviceState::Connected ? true : false);
             UpdateProfiles();
         }
         return currentOperation->SendEvent(std::move(evt));
@@ -95,7 +95,7 @@ namespace audio
             case Operation::Type::Idle:
                 break;
             }
-            currentOperation = std::move(ret.value());
+            currentOperation = std::move(ret);
             UpdateProfiles();
 
             if (btData) {
@@ -105,7 +105,7 @@ namespace audio
         else {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
             LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
-            currentOperation = Operation::Create(Operation::Type::Idle).value_or(nullptr);
+            currentOperation = Operation::Create(Operation::Type::Idle);
             currentState     = State ::Idle;
             return RetCode::OperationCreateFailed;
         }
@@ -136,7 +136,7 @@ namespace audio
         auto ret = Operation::Create(Operation::Type::Idle);
         if (ret) {
             currentState     = State::Idle;
-            currentOperation = std::move(ret.value());
+            currentOperation = std::move(ret);
             return RetCode::Success;
         }
         else {

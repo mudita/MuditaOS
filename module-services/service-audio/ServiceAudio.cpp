@@ -326,7 +326,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 {
     auto isBT =
         evt->getType() == EventType::BlutoothHSPDeviceState || evt->getType() == EventType::BlutoothA2DPDeviceState;
-    if (isBT && evt->getState() == true) {
+    if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
         auto req = std::make_shared<BluetoothRequestStreamMessage>();
         sys::Bus::SendUnicast(req, service::name::bluetooth, this);
         return std::make_unique<AudioEventResponse>(RetCode::Success);
@@ -334,7 +334,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
-        if (isBT && evt->getState() == false) {
+        if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
             input.audio->SetBluetoothStreamData(nullptr);
         }
     }
@@ -515,7 +515,8 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
         for (auto &input : audioMux.GetAllInputs()) {
             input.audio->SetBluetoothStreamData(msg->getData());
-            input.audio->SendEvent(std::make_unique<Event>(EventType::BlutoothA2DPDeviceState, true));
+            input.audio->SendEvent(
+                std::make_unique<Event>(EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Connected));
             LOG_INFO("Queues received!");
         }
     }

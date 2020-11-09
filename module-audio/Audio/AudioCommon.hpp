@@ -83,28 +83,36 @@ namespace audio
     };
 
     constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BlutoothA2DPDeviceState);
-    typedef std::bitset<magic_enum::enum_count<EventType>()> AudioSinkState;
+    using AudioSinkState                 = std::bitset<magic_enum::enum_count<EventType>()>;
 
     class Event
     {
       public:
-        explicit Event(EventType eType, bool state = true) : eventType(eType), state(state)
+        enum class DeviceState
+        {
+            Connected,
+            Disconnected
+        };
+
+        explicit Event(EventType eType, DeviceState deviceState = DeviceState::Connected)
+            : eventType(eType), deviceState(deviceState)
         {}
+
         virtual ~Event() = default;
 
-        EventType getType() const
+        EventType getType() const noexcept
         {
             return eventType;
         }
 
-        bool getState() const
+        DeviceState getDeviceState() const noexcept
         {
-            return state;
+            return deviceState;
         }
 
       private:
         const EventType eventType;
-        bool state;
+        DeviceState deviceState;
     };
 
     enum class RetCode

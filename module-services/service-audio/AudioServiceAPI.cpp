@@ -97,7 +97,7 @@ namespace AudioServiceAPI
         return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
     }
 
-    bool SendEvent(sys::Service *serv, audio::EventType eType, bool state)
+    bool SendEvent(sys::Service *serv, audio::EventType eType, audio::Event::DeviceState state)
     {
         auto msg = std::make_shared<AudioEventRequest>(eType, state);
         return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);

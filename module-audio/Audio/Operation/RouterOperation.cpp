@@ -129,26 +129,26 @@ namespace audio
 
         // order in vector defines priority
         supportedProfiles.emplace_back(
-            false,
             Profile::Create(
-                Profile::Type::RoutingBluetoothHSP, nullptr, routingHeadphonesVolume, routingHeadphonesGain));
+                Profile::Type::RoutingBluetoothHSP, nullptr, routingHeadphonesVolume, routingHeadphonesGain),
+            false);
         supportedProfiles.emplace_back(
-            false,
-            Profile::Create(Profile::Type::RoutingHeadphones, nullptr, routingHeadphonesVolume, routingHeadphonesGain));
+            Profile::Create(Profile::Type::RoutingHeadphones, nullptr, routingHeadphonesVolume, routingHeadphonesGain),
+            false);
         supportedProfiles.emplace_back(
-            true,
-            Profile::Create(Profile::Type::RoutingEarspeaker, nullptr, routingEarspeakerVolume, routingEarspeakerGain));
+            Profile::Create(Profile::Type::RoutingEarspeaker, nullptr, routingEarspeakerVolume, routingEarspeakerGain),
+            true);
         supportedProfiles.emplace_back(
-            true,
             Profile::Create(
-                Profile::Type::RoutingLoudspeaker, nullptr, routingLoudspeakerVolume, routingLoudspeakerGain));
+                Profile::Type::RoutingLoudspeaker, nullptr, routingLoudspeakerVolume, routingLoudspeakerGain),
+            true);
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
             LOG_ERROR("Error during initializing profile");
             return;
         }
-        currentProfile = defaultProfile.value();
+        currentProfile = defaultProfile;
 
         if (SwitchToPriorityProfile() != audio::RetCode::Success) {
             return;
@@ -262,7 +262,7 @@ namespace audio
     {
         auto ret = GetProfile(type);
         if (ret) {
-            currentProfile = ret.value();
+            currentProfile = ret;
         }
         else {
             return RetCode::UnsupportedProfile;

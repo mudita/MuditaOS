@@ -17,7 +17,7 @@
 
 namespace audio
 {
-    std::optional<std::unique_ptr<Operation>> Operation::Create(
+    std::unique_ptr<Operation> Operation::Create(
         Operation::Type t,
         const char *fileName,
         const audio::PlaybackType &playbackType,
@@ -50,16 +50,16 @@ namespace audio
         }
     }
 
-    std::optional<std::shared_ptr<Profile>> Operation::GetProfile(const Profile::Type type)
+    std::shared_ptr<Profile> Operation::GetProfile(const Profile::Type type)
     {
         auto ret = std::find_if(supportedProfiles.begin(), supportedProfiles.end(), [type](const auto &w) {
-            return w.first == true && w.second->GetType() == type;
+            return w.isAvailable == true && w.profile->GetType() == type;
         });
         if (ret == supportedProfiles.end()) {
-            return std::nullopt;
+            return nullptr;
         }
         else {
-            return ret->second;
+            return ret->profile;
         }
     }
 
@@ -73,7 +73,7 @@ namespace audio
         }
     }
 
-    void Operation::UpdateProfilesAvailabiliaty(const EventType eType, bool isEnabled)
+    void Operation::UpdateProfilesAvailabiliaty(EventType eType, bool isEnabled)
     {
         if (eType == EventType::JackState) {
             SetProfileAvailability({Profile::Type::RecordingHeadphones,
@@ -93,8 +93,8 @@ namespace audio
     audio::RetCode Operation::SwitchToPriorityProfile()
     {
         for (auto &p : supportedProfiles) {
-            if (p.first == true) {
-                return SwitchProfile(p.second->GetType());
+            if (p.isAvailable == true) {
+                return SwitchProfile(p.profile->GetType());
             }
         }
         return audio::RetCode::Failed;
@@ -103,9 +103,9 @@ namespace audio
     void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)
     {
         for (auto &p : supportedProfiles) {
-            auto shouldSet = (std::find(profiles.begin(), profiles.end(), p.second->GetType()) != profiles.end());
-            if (shouldSet) {
-                p.first = available;
+            if (auto shouldSet = (std::find(profiles.begin(), profiles.end(), p.profile->GetType()) != profiles.end());
+                shouldSet) {
+                p.isAvailable = available;
             }
         }
     }

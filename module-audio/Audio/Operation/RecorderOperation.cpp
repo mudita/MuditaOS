@@ -55,11 +55,18 @@ namespace audio
 
         // order in vector defines priority
         supportedProfiles.emplace_back(
-            false, Profile::Create(Profile::Type::RecordingBluetoothHSP, nullptr, 0, recordingHeadsetGain));
+            Profile::Create(Profile::Type::RecordingBluetoothHSP, nullptr, 0, recordingHeadsetGain), false);
         supportedProfiles.emplace_back(
-            false, Profile::Create(Profile::Type::RecordingHeadphones, nullptr, 0, recordingHeadsetGain));
+            Profile::Create(Profile::Type::RecordingHeadphones, nullptr, 0, recordingHeadsetGain), false);
         supportedProfiles.emplace_back(
-            true, Profile::Create(Profile::Type::RecordingBuiltInMic, nullptr, 0, recordingOnBoardMicGain));
+            Profile::Create(Profile::Type::RecordingBuiltInMic, nullptr, 0, recordingOnBoardMicGain), true);
+
+        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
+        if (!defaultProfile) {
+            LOG_ERROR("Error during initializing profile");
+            return;
+        }
+        currentProfile = defaultProfile;
 
         uint32_t channels = 0;
         if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) ||
@@ -75,13 +82,6 @@ namespace audio
             LOG_ERROR("Error during initializing encoder");
             return;
         }
-
-        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
-        if (!defaultProfile) {
-            LOG_ERROR("Error during initializing profile");
-            return;
-        }
-        currentProfile = defaultProfile.value();
 
         if (SwitchToPriorityProfile() != audio::RetCode::Success) {
             return;
@@ -153,7 +153,7 @@ namespace audio
 
         auto ret = GetProfile(type);
         if (ret) {
-            currentProfile = ret.value();
+            currentProfile = ret;
         }
         else {
             return RetCode::UnsupportedProfile;

@@ -75,7 +75,7 @@ namespace Bt
     const sys::Service *HSP::HSPImpl::ownerService;
     std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
 
-    void HSP::HSPImpl::sendAudioEvent(audio::EventType event, bool state)
+    void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
         auto evt = std::make_shared<audio::Event>(event, state);
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
@@ -135,7 +135,7 @@ namespace Bt
             }
             else {
                 LOG_DEBUG("RFCOMM disconnected.\n");
-                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, false);
+                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             }
             break;
         case HSP_SUBEVENT_AUDIO_CONNECTION_COMPLETE:
@@ -152,7 +152,7 @@ namespace Bt
             break;
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
-            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, false);
+            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             scoHandle = HCI_CON_HANDLE_INVALID;
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:

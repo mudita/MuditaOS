@@ -55,7 +55,7 @@ namespace audio
 
         virtual ~Operation() = default;
 
-        static std::optional<std::unique_ptr<Operation>> Create(
+        static std::unique_ptr<Operation> Create(
             Type t,
             const char *fileName                  = "",
             const audio::PlaybackType &operations = audio::PlaybackType::None,
@@ -112,15 +112,24 @@ namespace audio
             return filePath;
         }
 
-        void UpdateProfilesAvailabiliaty(const EventType eType, bool isEnabled);
+        void UpdateProfilesAvailabiliaty(EventType eType, bool isEnabled);
         audio::RetCode SwitchToPriorityProfile();
 
       protected:
+        struct SupportedProfile
+        {
+            SupportedProfile(std::shared_ptr<Profile> profile, bool isAvailable)
+                : profile(std::move(profile)), isAvailable(isAvailable)
+            {}
+
+            std::shared_ptr<Profile> profile;
+            bool isAvailable;
+        };
+
         std::shared_ptr<Profile> currentProfile;
         std::unique_ptr<bsp::AudioDevice> audioDevice;
 
-        // pair - enabled / disabled , profile pointer
-        std::vector<std::pair<bool, std::shared_ptr<Profile>>> supportedProfiles;
+        std::vector<SupportedProfile> supportedProfiles;
         void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);
 
         State state = State::Idle;
@@ -137,7 +146,7 @@ namespace audio
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
 
-        std::optional<std::shared_ptr<Profile>> GetProfile(const Profile::Type type);
+        std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
         std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;
