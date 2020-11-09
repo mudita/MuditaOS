@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Actions.hpp"
-#include "Message.hpp"
+#include "messages/Message.hpp"
 #include "model/ApplicationManager.hpp"
 
 #include <module-sys/Service/Service.hpp>
