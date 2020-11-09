@@ -54,10 +54,8 @@ void MessageHandler::processMessage()
 
 void MessageHandler::putToSendQueue(const std::string msg)
 {
-#if defined(TARGET_RT1051)
     if (uxQueueSpacesAvailable(sendQueue) != 0) {
         auto *responseString = new std::string(msg);
         xQueueSend(sendQueue, &responseString, portMAX_DELAY);
     }
-#endif
 }

@@ -56,7 +56,6 @@ namespace bsp
 
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
-
         if (fd == -1) {
             return (nullptr);
         }
