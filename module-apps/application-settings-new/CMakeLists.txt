@@ -31,6 +31,7 @@ target_sources( ${PROJECT_NAME}
         windows/MessagesWindow.cpp
         windows/PhoneNameWindow.cpp
         windows/AutolockWindow.cpp
+        windows/TorchWindow.cpp
         windows/WallpaperWindow.cpp
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
