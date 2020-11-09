@@ -44,6 +44,12 @@ auto Qind::getFotaParameter() const noexcept -> std::string
     return std::string();
 }
 
+auto Qind::isSmsDone() const noexcept -> bool
+{
+    constexpr auto smsDonePos = 0;
+    return tokens.size() > 0 && tokens[smsDonePos] == type_sms_done;
+}
+
 auto Qind::validate(enum CSQ check) const noexcept -> bool
 {
     try {

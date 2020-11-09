@@ -147,7 +147,13 @@ class ServiceCellular : public sys::Service
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
     bool handle_ready();
-
+    bool handleAllMessagesFromMessageStorage();
+    [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
+                                            const UTF8 &receivedNumber,
+                                            const time_t messageDate,
+                                            const SMSType &smsType = SMSType::INBOX) const noexcept;
+    bool dbAddSMSRecord(const SMSRecord &record);
+    [[nodiscard]] bool handleListMessages(const at::AT &command, DLC_channel *channel);
     /// @}
 
     bool transmitDtmfTone(uint32_t digit);

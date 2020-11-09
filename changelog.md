@@ -29,6 +29,7 @@
 * `[bluetooth]` Added HSP playback and recording.
 * `[cellular]` Added support for CMS and CME errors.
 * `[music player]` Added new samples of music files.
+* `[cellular]` Added handling SMS messages from modem storage at startup.
 
 ### Fixed
 
