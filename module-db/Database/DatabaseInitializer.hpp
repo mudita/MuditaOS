@@ -36,13 +36,13 @@ class DatabaseInitializer
             vfs.fclose(file);
         }
 
-        vfs::FILE *get() const
+        [[nodiscard]] auto get() const -> vfs::FILE *
         {
             return file;
         }
 
       private:
-        vfs::FILE *file;
+        vfs::FILE *file = nullptr;
     };
 
   public:
@@ -59,9 +59,10 @@ class DatabaseInitializer
 
   private:
     /*
-     * Splits filename in format <prefix>_<num>.ext into arrray
-     *  [0] - prefix
-     *  [1] - num
+     * Splits filename in format <prefix>_<num>.ext into array
+     *  [0] - filename
+     *  [1] - prefix
+     *  [2] - num
      */
     auto splitFilename(std::string filename) -> std::array<std::string, 3>;
 

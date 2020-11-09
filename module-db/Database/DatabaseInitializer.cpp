@@ -44,7 +44,7 @@ std::vector<std::string> DatabaseInitializer::readCommands(fs::path filePath)
 
         if (ends_with(line, std::string(";"))) {
             statements.push_back(currentStatement + line);
-            currentStatement = "";
+            currentStatement.clear();
             continue;
         }
 
