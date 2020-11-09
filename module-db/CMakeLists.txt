@@ -13,6 +13,7 @@ set(SOURCES
         Database/Field.cpp
         Database/QueryResult.cpp
         Database/Database.cpp
+        Database/DatabaseInitializer.cpp
         Database/sqlite3vfs.cpp
         ${SQLITE3_SOURCE}
 

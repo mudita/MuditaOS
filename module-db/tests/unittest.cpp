@@ -6,6 +6,7 @@
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
+#include "Database/DatabaseInitializer.hpp"
 
 #include "Tables/SMSTable.hpp"
 
@@ -97,6 +98,163 @@ TEST_CASE("Create and destroy simple database")
         Database testDB("test.db");
         REQUIRE(testDB.storeIntoFile(backupPathDB) == true);
         REQUIRE(vfs.fileExists(backupPathDB.c_str()) == true);
+    }
+
+    Database::deinitialize();
+}
+
+class ScopedDir
+{
+  public:
+    ScopedDir(std::string p) : path(p)
+    {
+        vfs.mkdir(path.c_str());
+    }
+
+    ~ScopedDir()
+    {
+        vfs.deltree(path.c_str());
+    }
+
+    auto operator()(std::string file = "") -> fs::path
+    {
+        return path / file;
+    }
+
+  private:
+    fs::path path;
+};
+
+TEST_CASE("Database initialization scripts")
+{
+    Database::initialize();
+
+    const char *script_create = "CREATE TABLE IF NOT EXISTS tracks("
+                                "_id	                INTEGER PRIMARY KEY,"
+                                "filename	            TEXT UNIQUE,"
+                                "name	            	TEXT,"
+                                "duration	            INTEGER,"
+                                "artist_id	            INTEGER,"
+                                "album_id	            INTEGER,"
+                                "cover  	            INTEGER,"
+                                "FOREIGN KEY(artist_id) REFERENCES artists(_id),"
+                                "FOREIGN KEY(album_id) 	REFERENCES albums(_id)"
+                                ");";
+
+    const char *script_insert = "insert or ignore into artists(name) VALUES('%q');";
+
+    const char *script_comment = "--insert or ignore into artists(name) VALUES('%q');\n"
+                                 "insert or ignore into artists(name) VALUES('%q');\n"
+                                 "--insert or ignore into artists(name) VALUES('%q');\n"
+                                 "insert or ignore into artists(name) VALUES('%q');\n";
+
+    const char *script_invalid = "insert artists(name) VALUES('%q');";
+
+    SECTION("list files")
+    {
+        ScopedDir dir(USER_PATH("scripts"));
+
+        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+        vfs.fclose(file);
+
+        file = vfs.fopen(dir("test_021.sql").c_str(), "w");
+        vfs.fclose(file);
+
+        file = vfs.fopen(dir("test_011.sql").c_str(), "w");
+        vfs.fclose(file);
+
+        file = vfs.fopen(dir("test_003.sql").c_str(), "w");
+        vfs.fclose(file);
+
+        file = vfs.fopen(dir("noprefix_003.sql").c_str(), "w");
+        vfs.fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto files = initializer.listFiles(PATH_SYS "/" PATH_USER "/", "test", "sql");
+
+        REQUIRE(files.size() == 4);
+        REQUIRE(files[0] == USER_PATH("test_1.sql"));
+        REQUIRE(files[1] == USER_PATH("test_003.sql"));
+        REQUIRE(files[2] == USER_PATH("test_011.sql"));
+        REQUIRE(files[3] == USER_PATH("test_021.sql"));
+    }
+
+    SECTION("read script files")
+    {
+        ScopedDir dir(USER_PATH("scripts"));
+
+        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+
+        vfs.fprintf(file, "%s\n", script_create);
+        vfs.fprintf(file, "%s\n", script_insert);
+
+        vfs.fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir("test_1.sql"));
+
+        REQUIRE(commands.size() == 2);
+    }
+
+    SECTION("read empty script files")
+    {
+        ScopedDir dir(USER_PATH("scripts"));
+
+        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+        vfs.fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir("test_1.sql"));
+
+        REQUIRE(commands.size() == 0);
+    }
+
+    SECTION("read script file with comment")
+    {
+        ScopedDir dir(USER_PATH("scripts"));
+
+        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+        vfs.fprintf(file, "%s\n", script_comment);
+        vfs.fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir("test_1.sql"));
+
+        REQUIRE(commands.size() == 2);
+    }
+
+    SECTION("execute valid script")
+    {
+        ScopedDir dir(USER_PATH("scripts"));
+
+        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+        vfs.fprintf(file, "%s\n", script_create);
+        vfs.fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        bool r = initializer.run(dir());
+
+        REQUIRE(r == true);
+    }
+
+    SECTION("execute invalid script")
+    {
+        ScopedDir dir(USER_PATH("scripts"));
+
+        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+        vfs.fprintf(file, "%s\n", script_invalid);
+        vfs.fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        bool result = initializer.run(dir());
+
+        REQUIRE(result == false);
     }
 
     Database::deinitialize();
