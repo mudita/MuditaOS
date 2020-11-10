@@ -23,6 +23,9 @@
 
 namespace gui
 {
+    std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::memento =
+        std::make_unique<NewMessageWindow::MessageMemento>();
+
     NewMessageWindow::NewMessageWindow(app::Application *app) : AppWindow(app, name::window::new_sms)
     {
         buildInterface();
@@ -35,6 +38,7 @@ namespace gui
 
     void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        memento->getState(message);
         if (data == nullptr) {
             return;
         }
@@ -80,6 +84,7 @@ namespace gui
         if (recipient->getText().empty()) {
             auto data             = std::make_unique<PhonebookSearchReuqest>();
             data->disableAppClose = true;
+            memento->setState(message);
             return app::manager::Controller::switchApplication(
                 application, app::name_phonebook, name::window::main_window, std::move(data));
         }
@@ -242,6 +247,7 @@ namespace gui
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
+                memento->setState(message);
                 return app->newMessageOptions(getName(), message);
             }
             return false;
@@ -262,7 +268,6 @@ namespace gui
             // Nothing to do if text is empty.
             return;
         }
-
         if (const auto handled = handleMessageText(); !handled) {
             message->clear();
         }
@@ -360,4 +365,5 @@ namespace gui
         app->updateDraft(sms, text);
         message->clear();
     }
+
 } // namespace gui
