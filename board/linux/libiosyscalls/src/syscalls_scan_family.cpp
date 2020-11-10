@@ -140,4 +140,3 @@ extern "C" {
     }
     __asm__(".symver fscanf,fscanf@GLIBC_2.2.5");
 }
-

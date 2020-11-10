@@ -1,7 +1,5 @@
 GLIBC_2.2.5 {
         global:
-                open;
-                fopen64;
                 fclose;
                 fdopen;
                 feof;
@@ -12,13 +10,15 @@ GLIBC_2.2.5 {
                 fgetpos64;
                 fgets;
                 fileno;
+                fopen;
+                fopen64;
                 fprintf;
                 fputc;
                 fputs;
                 fread;
                 freopen;
-                fscanf;
                 fseek;
+                fscanf;
                 fsetpos;
                 fsetpos64;
                 ftell;
@@ -33,6 +33,31 @@ GLIBC_2.2.5 {
                 setlinebuf;
                 fscanf;
                 vfscanf;
+                ungetc;
+                link;
+                unlink;
+                stat;
+                fstat;
+                lstat;
+                fcntl;
+                chdir;
+                fchdir;
+                getcwd;
+                getwd;
+                get_current_dir_name;
+                rename;
+                mkdir;
+                chmod;
+                fchmod;
+                fsync;
+                fdatasync;
+                opendir;
+                closedir;
+                readdir;
+                readdir_r;
+                rewinddir;
+                seekdir;
+                telldir;
         local:
                 *;
 };

@@ -122,7 +122,7 @@ EinkStatus_e EinkResetAndInitialize()
     }
 
     // start renderer application
-    system("./service_renderer &");
+    system("LD_PRELOAD=;./service_renderer &");
 
     return EinkOK;
 }

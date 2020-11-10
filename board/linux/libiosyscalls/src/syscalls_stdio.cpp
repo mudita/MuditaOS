@@ -6,15 +6,19 @@
 #include "ff_stdio.h"
 #include <errno.h>
 #include <mutex>
-#include <set>
+#include <unordered_map>
+#include <handle_mapper.hpp>
+#include "internal.hpp"
 
 
 namespace
 {
+    constexpr auto FIRST_FILEDESC = 3;
     int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
     size_t (*real_fwrite)(const void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __s);
-    std::set<FF_FILE*> g_fd_map;
+    std::unordered_map<FF_FILE*,size_t> g_fd_map;
     std::recursive_mutex g_mutex;
+    internal::handle_mapper<FF_FILE*> g_handles;
 
     void __attribute__((constructor)) _lib_stdio_initialize()
     {
@@ -26,13 +30,36 @@ namespace
     }
 }
 
+namespace vfsn::linux::internal {
+    int  ff_file_to_handle( FF_FILE* fil )
+    {
+        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
+        const auto it = g_fd_map.find(fil);
+        return ( it != g_fd_map.end() )?(it->second):(-1);
+    }
+    FF_FILE* handle_to_ff_file( int fd )
+    {
+        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
+        if (fd < FIRST_FILEDESC) {
+            return nullptr;
+        }
+        if( !g_handles.exists(fd-FIRST_FILEDESC) ) {
+            return nullptr;
+        }
+        return g_handles[fd-FIRST_FILEDESC];
+    }
+}
+
 extern "C"
 {
     FILE *fopen(const char *pathname, const char *mode)
     {
-        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
         auto ret = ff_fopen(pathname, mode);
-        if(ret) g_fd_map.insert(ret);
+        if(ret) {
+            std::lock_guard<std::recursive_mutex> _lck(g_mutex);
+            const auto fd = g_handles.insert(ret) + FIRST_FILEDESC;
+            g_fd_map.insert(std::make_pair(ret,fd));
+        }
         errno    = stdioGET_ERRNO();
         return reinterpret_cast<FILE*>(ret);
     }
@@ -40,17 +67,21 @@ extern "C"
 
     FILE *fopen64(const char *pathname, const char *mode)
     {
-        auto ret = reinterpret_cast<FILE *>(ff_fopen(pathname, mode));
-        errno    = stdioGET_ERRNO();
-        return ret;
+        return fopen(pathname,mode);
     }
     __asm__(".symver fopen64,fopen64@GLIBC_2.2.5");
 
     int fclose(FILE *__stream)
     {
-        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
         auto ret = ff_fclose(reinterpret_cast<FF_FILE *>(__stream));
-        g_fd_map.erase(reinterpret_cast<FF_FILE*>(__stream));
+        {
+            std::lock_guard<std::recursive_mutex> _lck(g_mutex);
+            const auto it = g_fd_map.find(reinterpret_cast<FF_FILE *>(__stream));
+            if( it != g_fd_map.end() ) {
+                g_handles.remove(it->second - FIRST_FILEDESC);
+                g_fd_map.erase(it);
+            }
+        }
         errno    = stdioGET_ERRNO();
         return ret;
     }
@@ -131,7 +162,7 @@ extern "C"
         if(__stream==stdin) return STDIN_FILENO;
         else if(__stream==stdout) return STDOUT_FILENO;
         else if(__stream==stderr) return STDERR_FILENO;
-        return reinterpret_cast<uintptr_t>(__stream);
+        return vfsn::linux::internal::ff_file_to_handle(reinterpret_cast<FF_FILE*>(__stream));
     }
     __asm__(".symver fileno,fileno@GLIBC_2.2.5");
 
@@ -320,8 +351,5 @@ extern "C"
         real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__ );
     }
     __asm__(".symver setlinebuf,setlinebuf@GLIBC_2.2.5");
-
-
-
 
 }

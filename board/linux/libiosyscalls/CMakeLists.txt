@@ -7,6 +7,10 @@ project(iosyscalls VERSION 1.0
 set(SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_scan_family.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/dirent_support.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/dirent.cpp
+
 )
 
 set(INCLUDES
