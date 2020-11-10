@@ -766,7 +766,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         CellularCallRequestHandler handler(*this);
 
         auto request = factory.create();
-        auto result  = channel->cmd(request->process());
+        auto result  = channel->cmd(request->command());
         request->handle(handler, result);
 
         responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());

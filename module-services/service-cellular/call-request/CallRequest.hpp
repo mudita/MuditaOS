@@ -1,23 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 #pragma once
 
-#include <string>
-#include <memory>
-#include <map>
-#include <functional>
-
+#include <at/Result.hpp>
 #include "CallRequestHandler.hpp"
 
-#include <at/Result.hpp>
 namespace call_request
 {
 
     class IRequest
     {
       public:
-        virtual std::string process(void) = 0;
+        virtual std::string command(void) = 0;
 
         virtual void handle(CallRequestHandler &h, at::Result &result) = 0;
         virtual void setHandled(bool handled)                          = 0;
@@ -47,7 +39,6 @@ namespace call_request
             return true;
         }
     };
-    constexpr auto IMEIRegex = "(\\*#06#)";
 
     class IMEIRequest : public Request
     {
@@ -55,7 +46,7 @@ namespace call_request
         IMEIRequest() = delete;
         IMEIRequest(const std::string &data){};
         ~IMEIRequest(){};
-        std::string process(void) override final;
+        std::string command(void) override final;
         static std::unique_ptr<IMEIRequest> create(const std::string &data);
         void handle(CallRequestHandler &h, at::Result &result) final
         {
@@ -72,7 +63,7 @@ namespace call_request
         USSDRequest() = delete;
         USSDRequest(const std::string &data) : request(data){};
         ~USSDRequest(){};
-        std::string process(void) override final;
+        std::string command(void) override final;
 
         static std::unique_ptr<USSDRequest> create(const std::string &data);
         void handle(CallRequestHandler &h, at::Result &result) final
@@ -90,7 +81,7 @@ namespace call_request
         CallRequest() = delete;
         CallRequest(const std::string &data) : request(data){};
         ~CallRequest(){};
-        std::string process(void) override final;
+        std::string command(void) override final;
         std::string getNumber(void)
         {
             return request;
@@ -101,22 +92,4 @@ namespace call_request
             h.handle(*this, result);
         }
     };
-
-    class Factory
-    {
-      private:
-        std::string request;
-        std::map<std::string, std::function<std::unique_ptr<IRequest>(const std::string &)>> requestMap;
-        void registerRequest(std::string regex, std::function<std::unique_ptr<IRequest>(const std::string &)>);
-
-      public:
-        Factory() = delete;
-        Factory(const std::string &data) : request(data)
-        {
-            registerRequest(IMEIRegex, IMEIRequest::create);
-        };
-        std::unique_ptr<IRequest> create(void);
-
-        bool isCallRequest(void);
-    };
-} // namespace call_request
+}; // namespace call_request
