@@ -16,6 +16,7 @@
 
 ### Fixed
 
+* `[messages]` In new message window fixed clearing text on options/recipient choice 
 * `[Text]` Newline handling fix. 
 * `[appmgr]` Fix for closing applications.
 
@@ -593,3 +594,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+
