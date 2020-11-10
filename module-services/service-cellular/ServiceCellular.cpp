@@ -9,6 +9,8 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+#include "service-cellular/CallRequestFactory.hpp"
+#include "service-cellular/CellularCallRequestHandler.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>
@@ -999,31 +1001,6 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         return std::make_shared<sys::ResponseMessage>();
     }
 }
-namespace
-{
-    bool isAbortCallNotification(const std::string &str)
-    {
-        return ((str.find(at::Chanel::NO_CARRIER) != std::string::npos) ||
-                (str.find(at::Chanel::BUSY) != std::string::npos) ||
-                (str.find(at::Chanel::NO_ANSWER) != std::string::npos));
-    }
-    namespace powerdown
-    {
-        static const std::string powerDownNormal = "NORMAL POWER DOWN";
-        static const std::string poweredDown     = "POWERED DOWN";
-
-        bool isNormalPowerDown(const std::string str)
-        {
-            std::string stripped = utils::removeNewLines(str);
-            return stripped.find(powerDownNormal) == 0;
-        }
-        bool isPoweredDown(const std::string str)
-        {
-            std::string stripped = utils::removeNewLines(str);
-            return stripped.find(poweredDown) == 0;
-        }
-    } // namespace powerdown
-} // namespace
 
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {

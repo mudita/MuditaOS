@@ -186,5 +186,3 @@ class ServiceCellular : public sys::Service
     friend class CellularUrcHandler;
     friend class CellularCallRequestHandler;
 };
-
-#endif // PUREPHONE_SERVICECELLULAR_HPP

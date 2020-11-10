@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-#include "CallRequest.hpp"
+#include "service-cellular/CallRequest.hpp"
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
 

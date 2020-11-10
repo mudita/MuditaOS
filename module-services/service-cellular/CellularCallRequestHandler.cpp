@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "CellularCallRequestHandler.hpp"
-#include "CallRequestFactory.hpp"
-#include "../ServiceCellular.hpp"
+#include "service-cellular/CellularCallRequestHandler.hpp"
+#include "service-cellular/CallRequestFactory.hpp"
+#include "service-cellular/ServiceCellular.hpp"
 
 #include "Service/Bus.hpp"
 #include "Service/Message.hpp"

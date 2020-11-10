@@ -7,12 +7,16 @@ set(SOURCES
     CellularUrcHandler.cpp
     ServiceCellular.cpp
     SignalStrength.cpp
+    CallRequest.cpp
+    CallRequestFactory.cpp
+    CellularCallRequestHandler.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -22,4 +26,3 @@ target_link_libraries(${PROJECT_NAME}
         module-bsp
         module-cellular
     )
-
