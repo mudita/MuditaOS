@@ -283,47 +283,10 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         // Set input path
         switch (params.inputPath) {
         case bsp::AudioDevice::InputPath::Headphones: {
-            /*
             max98090_reg_input_to_record_quick_t q_input_setup = {0};
             q_input_setup.in34dan                              = 1;
             i2cAddr.subAddress                                 = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
             i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
-            */
-
-            max98090_reg_analog_to_record_quick_t q_analog_setup = {0};
-            q_analog_setup.in34mic2                              = 1;
-            i2cAddr.subAddress                                   = MAX98090_REG_ANALOG_MIC_TO_RECORD_QUICK;
-            i2c->Write(i2cAddr, (uint8_t *)&q_analog_setup, 1);
-
-            // MIC 2 to ADC L
-            max98090_reg_ladc_mix_input_t ladcmix = {0};
-            ladcmix.mixadl                        = 0x40;
-            i2cAddr.subAddress                    = MAX98090_REG_LADC_MIXER_INPUT;
-            i2c->Write(i2cAddr, (uint8_t *)&ladcmix, 1);
-
-            // Turn off ADC R
-            max98090_reg_radc_mix_input_t radcmix = {0};
-            i2cAddr.subAddress                    = MAX98090_REG_RADC_MIXER_INPUT;
-            i2c->Write(i2cAddr, (uint8_t *)&radcmix, 1);
-
-            // Enable ADC L
-            uint8_t mask       = 0x01;
-            i2cAddr.subAddress = MAX98090_REG_INPUT_ENABLE;
-            i2c->Modify(i2cAddr, mask, true, 1);
-
-            // Left ADC Volume
-            max98090_reg_lrec_dig_gain_t lrec_dig_gain = {0};
-            lrec_dig_gain.avl                          = 0x03;
-            i2cAddr.subAddress                         = MAX98090_REG_LREC_DIG_GAIN;
-            i2c->Write(i2cAddr, (uint8_t *)&lrec_dig_gain, 1);
-
-            // Disable ADC R
-            /*
-            uint8_t mask = 0x02;
-            i2cAddr.subAddress = MAX98090_REG_INPUT_ENABLE;
-            i2c->Modify(i2cAddr, mask, false, 1);
-            */
-
             //            MicBias(true);
 
         } break;
@@ -480,7 +443,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         i2c->Write(i2cAddr, (uint8_t *)&vol, 1);
     } break;
 
-    case bsp::AudioDevice::OutputPath::Loudspeaker: {
+    case CodecParamsMAX98090::OutputPath::Loudspeaker:
+    case CodecParamsMAX98090::OutputPath::LoudspeakerMono: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor = .39f * 10.f;
         uint8_t volume               = static_cast<float>(vol * scale_factor) + 0x18;

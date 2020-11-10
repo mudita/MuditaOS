@@ -35,6 +35,7 @@ class CodecParamsMAX98090 : public CodecParams
     };
 
         LoudspeakerMono,
+		BluetoothA2DP,
     enum class MonoStereo
     {
         Mono,
