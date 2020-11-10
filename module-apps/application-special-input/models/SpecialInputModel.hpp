@@ -14,7 +14,7 @@ class SpecialInputModel : public app::InternalModel<gui::ListItem *>, public gui
   private:
     app::Application *application = nullptr;
     [[nodiscard]] auto getMaxGridElements() const -> ssize_t;
-    void buildGrids(const std::vector<char32_t> elements);
+    void buildGrid(const std::vector<char32_t> &elements);
 
   public:
     SpecialInputModel(app::Application *app);

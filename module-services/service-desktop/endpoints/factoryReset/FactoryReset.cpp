@@ -9,6 +9,7 @@
 #include <vector>     // for vector
 
 #include "vfs.hpp" // for vfs, vfs::DirectoryEntry, copy_buf, os_factory, vfs::FILE, eMMC_disk, vfs::FileAttributes, vfs::FileAttributes::Directory, PATH_FACTORY
+#include "vfs_paths.hpp"
 #include "service-db/includes/DBServiceName.hpp" // for db
 #include "SystemManager/SystemManager.hpp"       // for SystemManager
 #include "log/log.hpp"                           // for LOG_ERROR, LOG_INFO
@@ -39,11 +40,12 @@ namespace FactoryReset
 
         recurseDepth = 0;
 
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_factory.c_str(), "");
+        const auto factoryOSPath                 = purefs::dir::getFactoryOSPath();
+        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(factoryOSPath.c_str(), "");
 
         if (dirlist.size() <= empty_dirlist_size) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
-            LOG_ERROR("FactoryReset: directory %s seems empty.", purefs::dir::os_factory.c_str());
+            LOG_ERROR("FactoryReset: directory %s seems empty.", factoryOSPath.c_str());
             return false;
         }
 
@@ -58,7 +60,7 @@ namespace FactoryReset
             return false;
         }
 
-        if (CopyDirContent(purefs::dir::os_factory, purefs::dir::eMMC_disk) != true) {
+        if (CopyDirContent(factoryOSPath, purefs::dir::eMMC_disk) != true) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
             return false;
         }
@@ -111,6 +113,7 @@ namespace FactoryReset
             return false;
         }
 
+        const auto factoryOSPath                 = purefs::dir::getFactoryOSPath();
         std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "");
 
         for (auto &direntry : dirlist) {
@@ -135,7 +138,7 @@ namespace FactoryReset
             }
 
             if (direntry.attributes == vfs::FileAttributes::Directory) {
-                if (targetpath.compare(purefs::dir::os_factory.c_str()) == 0) {
+                if (targetpath.compare(factoryOSPath.c_str()) == 0) {
                     continue;
                 }
 

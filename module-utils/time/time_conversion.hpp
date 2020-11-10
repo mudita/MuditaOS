@@ -37,13 +37,6 @@ namespace utils
         // helper class to not put everything in time
         struct Localer
         {
-            static constexpr auto abbrev_len = 3U;
-            /// order matters, it's used in replace_locale with enum Replacements
-            const inline static std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
-                                                                                   "%A",  // day long
-                                                                                   "%b",  // month abbrew
-                                                                                   "%B",  // month long
-                                                                                   "%Z"}; // timezone
             /// see specifiers_replacements description above
             enum Replacements
             {
@@ -279,24 +272,6 @@ namespace utils
             }
 
           private:
-            static constexpr auto verboseConversion   = false; // debug switch
-            static constexpr auto durationFormatH0M0S = "duration_hour_0min_0sec";
-            static constexpr auto durationFormat0M0S  = "duration_0min_0sec";
-            static constexpr auto durationFormat0N0S  = "duration_0hmin_0sec";
-            static constexpr auto durationFormatM0S   = "duration_min_0sec";
-
-            struct Format
-            {
-                const std::string lowFormat;  /// format used if duration is below 1 hour
-                const std::string highFormat; /// format used if duration exceeds 1 hour
-            };
-            using FormatMap                         = std::map<const DisplayedFormat, const Format>;
-            static const inline FormatMap formatMap = {
-                {DisplayedFormat::Fixed0M0S, {durationFormat0N0S, durationFormat0N0S}},
-                {DisplayedFormat::FixedH0M0S, {durationFormatH0M0S, durationFormatH0M0S}},
-                {DisplayedFormat::AutoM, {durationFormatM0S, durationFormatH0M0S}},
-                {DisplayedFormat::Auto0M, {durationFormat0M0S, durationFormatH0M0S}}};
-
             void fillStr(std::string &formatlong) const;
             void calculate();
             time_t duration         = 0;
