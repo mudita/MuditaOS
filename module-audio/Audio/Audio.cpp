@@ -75,14 +75,8 @@ namespace audio
                                 const audio::PlaybackType &playbackType)
     {
 
-        auto ret = Operation::Create(op, fileName, playbackType, dbCallback);
-
-        if (auto retCode = ret->GetLastError(); retCode != audio::RetCode::Success) {
-            return retCode;
-        }
-
-        if (ret) {
-
+        try {
+            auto ret = Operation::Create(op, fileName, playbackType, dbCallback);
             switch (op) {
             case Operation::Type::Playback:
                 currentState = State::Playback;
@@ -103,12 +97,12 @@ namespace audio
                 currentOperation->SetBluetoothStreamData(btData);
             }
         }
-        else {
+        catch (AudioException &audioException) {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
             LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
             currentOperation = Operation::Create(Operation::Type::Idle);
             currentState     = State ::Idle;
-            return RetCode::OperationCreateFailed;
+            return audioException.getErrorCode();
         }
 
         return currentOperation->Start(asyncCallback, token);

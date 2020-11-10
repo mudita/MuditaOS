@@ -146,12 +146,14 @@ namespace audio
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
             LOG_ERROR("Error during initializing profile");
-            lastError = RetCode::ProfileNotSet;
-            return;
+            throw AudioException(RetCode::ProfileNotSet);
         }
         currentProfile = defaultProfile;
 
-        lastError = SwitchToPriorityProfile();
+        auto retCode = SwitchToPriorityProfile();
+        if (retCode != RetCode::Success) {
+            throw AudioException(retCode);
+        }
     }
 
     audio::RetCode RouterOperation::SetOutputVolume(float vol)

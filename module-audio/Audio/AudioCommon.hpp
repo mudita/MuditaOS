@@ -169,6 +169,21 @@ namespace audio
         Failed
     };
 
+    struct AudioException : public std::exception
+    {
+      protected:
+        audio::RetCode errorCode = audio::RetCode::Failed;
+
+      public:
+        AudioException(audio::RetCode errorCode) : errorCode(errorCode)
+        {}
+
+        audio::RetCode getErrorCode() const
+        {
+            return errorCode;
+        }
+    };
+
     class Token
     {
         using TokenType = int16_t;

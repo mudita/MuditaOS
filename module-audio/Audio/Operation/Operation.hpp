@@ -18,9 +18,7 @@ namespace audio
     class Operation
     {
       public:
-        Operation(const bool &isInitialized               = false,
-                  const audio::PlaybackType &playbackType = audio::PlaybackType::None)
-            : lastError{RetCode::Success}, playbackType{playbackType}
+        Operation(const audio::PlaybackType &playbackType = audio::PlaybackType::None) : playbackType{playbackType}
         {}
 
         enum class State
@@ -62,12 +60,12 @@ namespace audio
             std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
 
         virtual audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) = 0;
-        virtual audio::RetCode Stop() = 0;
-        virtual audio::RetCode Pause() = 0;
-        virtual audio::RetCode Resume() = 0;
-        virtual audio::RetCode SendEvent(std::shared_ptr<Event> evt) = 0;
-        virtual audio::RetCode SetOutputVolume(float vol) = 0;
-        virtual audio::RetCode SetInputGain(float gain) = 0;
+        virtual audio::RetCode Stop()                                                   = 0;
+        virtual audio::RetCode Pause()                                                  = 0;
+        virtual audio::RetCode Resume()                                                 = 0;
+        virtual audio::RetCode SendEvent(std::shared_ptr<Event> evt)                    = 0;
+        virtual audio::RetCode SetOutputVolume(float vol)                               = 0;
+        virtual audio::RetCode SetInputGain(float gain)                                 = 0;
 
         virtual Position GetPosition() = 0;
         virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
@@ -112,11 +110,6 @@ namespace audio
             return filePath;
         }
 
-        RetCode GetLastError() const noexcept
-        {
-            return lastError;
-        }
-
         void UpdateProfilesAvailabiliaty(EventType eType, bool isEnabled);
         audio::RetCode SwitchToPriorityProfile();
 
@@ -146,7 +139,6 @@ namespace audio
         Type opType = Type::Idle;
         std::string filePath;
 
-        audio::RetCode lastError         = audio::RetCode::Success;
         audio::PlaybackType playbackType = audio::PlaybackType::None;
 
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
