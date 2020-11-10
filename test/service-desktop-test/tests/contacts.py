@@ -1,8 +1,8 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+from harness.interface.defs import endpoint, method, status
 
-from interface.defs import *
-from test import *
+from test_api import *
 
 
 class ContactTest:

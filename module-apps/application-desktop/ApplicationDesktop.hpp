@@ -66,7 +66,7 @@ namespace app
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
-
+        auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         /**
          * This static method will be used to lock the phone
          */
