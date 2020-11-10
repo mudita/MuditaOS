@@ -8,7 +8,7 @@
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 
 #include <type_traits>
 

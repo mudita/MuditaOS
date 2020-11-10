@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 project(module-bsp VERSION 1.0
         DESCRIPTION "VFS module library")
@@ -80,5 +80,9 @@ target_include_directories(${PROJECT_NAME}
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
-target_link_libraries(${PROJECT_NAME} module-os ${TARGET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}
+    module-os
+    service-bluetooth
+    ${TARGET_LIBRARIES}
+)
 

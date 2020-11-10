@@ -17,7 +17,7 @@
 
 #include <Style.hpp>
 
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 
 namespace gui
 {
