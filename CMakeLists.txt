@@ -179,20 +179,20 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 # In case of doubt please contact me: mateusz.piesta@mudita.com
 target_link_libraries(${PROJECT_NAME}
         service-antenna
+        service-bluetooth
+        module-bluetooth
+        module-audio
         module-bsp
         module-os
-        module-bsp
         module-utils
         module-vfs
         module-utils
         module-sys
         module-cellular
-        module-audio
         module-db
         module-gui
         module-services
         module-apps
-        module-bluetooth
         ${LWIP_LIBRARIES}
         module-lwip
         ${TARGET_LIBRARIES}

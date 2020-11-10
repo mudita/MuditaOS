@@ -1,19 +1,21 @@
-include_directories( ${CMAKE_PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
+﻿project(service-bluetooth)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
-target_sources( ${PROJECT_NAME}
 
-	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceBluetooth.cpp"
+set(SOURCES
+    ServiceBluetooth.cpp
+)
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        module-bluetooth
+        module-sys
 )
