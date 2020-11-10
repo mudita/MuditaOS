@@ -16,18 +16,40 @@ namespace call_request
 
     class IRequest
     {
-
       public:
-        bool callRequest                  = false;
-        bool ussdRequest                  = false;
         virtual std::string process(void) = 0;
 
-        virtual void handle(CallRequestHandler &h, at::Result){};
+        virtual void handle(CallRequestHandler &h, at::Result &result) = 0;
+        virtual void setHandled(bool handled)                          = 0;
+        virtual bool isHandled(void)                                   = 0;
+        virtual bool checkModemResponse(const at::Result &result)      = 0;
     };
 
+    class Request : public IRequest
+    {
+      private:
+        bool isRequestHandled = false;
+
+      public:
+        void setHandled(bool handled) final
+        {
+            isRequestHandled = handled;
+        }
+        bool isHandled(void) final
+        {
+            return isRequestHandled;
+        }
+        bool checkModemResponse(const at::Result &result)
+        {
+            if (result.code != at::Result::Code::OK) {
+                return false;
+            }
+            return true;
+        }
+    };
     constexpr auto IMEIRegex = "(\\*#06#)";
 
-    class IMEIRequest : public IRequest
+    class IMEIRequest : public Request
     {
       public:
         IMEIRequest() = delete;
@@ -35,54 +57,48 @@ namespace call_request
         ~IMEIRequest(){};
         std::string process(void) override final;
         static std::unique_ptr<IMEIRequest> create(const std::string &data);
-        void handle(CallRequestHandler &h, at::Result) final
+        void handle(CallRequestHandler &h, at::Result &result) final
         {
-            h.handle(*this);
+            h.handle(*this, result);
         }
     };
 
-    class USSDRequest : public IRequest
+    class USSDRequest : public Request
     {
       private:
-        std::string requestData;
+        std::string request;
 
       public:
         USSDRequest() = delete;
-        USSDRequest(const std::string &data) : requestData(data)
-        {
-            ussdRequest = true;
-        };
+        USSDRequest(const std::string &data) : request(data){};
         ~USSDRequest(){};
         std::string process(void) override final;
 
         static std::unique_ptr<USSDRequest> create(const std::string &data);
-        void handle(CallRequestHandler &h, at::Result) final
+        void handle(CallRequestHandler &h, at::Result &result) final
         {
-            h.handle(*this);
+            h.handle(*this, result);
         }
     };
 
-    class CallRequest : public IRequest
+    class CallRequest : public Request
     {
       private:
         std::string request;
 
       public:
         CallRequest() = delete;
-        CallRequest(const std::string &data) : request(data)
-        {
-            callRequest = true;
-        };
+        CallRequest(const std::string &data) : request(data){};
         ~CallRequest(){};
         std::string process(void) override final;
-        [[nodiscard]] std::string getNumber(void)
+        std::string getNumber(void)
         {
             return request;
         };
         static std::unique_ptr<CallRequest> create(const std::string &data);
-        void handle(CallRequestHandler &h, at::Result) final
+        void handle(CallRequestHandler &h, at::Result &result) final
         {
-            h.handle(*this);
+            h.handle(*this, result);
         }
     };
 

@@ -756,19 +756,20 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
     } break;
 
     case MessageType::CellularCallRequest: {
-        CellularCallRequestHandler handler(*this);
+
         auto *msg = dynamic_cast<CellularCallRequestMessage *>(msgl);
         assert(msg != nullptr);
         auto channel = cmux->get(TS0710::Channel::Commands);
         assert(channel != nullptr);
 
         call_request::Factory factory(msg->number.getEntered());
+        CellularCallRequestHandler handler(*this);
 
-        auto req = factory.create();
-        auto ret = channel->cmd(req->process());
-        req->handle(handler, ret);
+        auto request = factory.create();
+        auto result  = channel->cmd(request->process());
+        request->handle(handler, result);
 
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
     } break;
     case MessageType::DBServiceNotification: {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);

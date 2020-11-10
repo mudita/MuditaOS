@@ -9,16 +9,35 @@
 #include "Service/Message.hpp"
 #include "Service/Timer.hpp"
 
-void CellularCallRequestHandler::handle(IMEIRequest &request)
-{}
-void CellularCallRequestHandler::handle(USSDRequest &request)
+void CellularCallRequestHandler::handle(IMEIRequest &request, at::Result &result)
 {
+    LOG_INFO("IMEI handler");
+    if (!request.checkModemResponse(result)) {
+        request.setHandled(false);
+        return;
+    }
+    request.setHandled(true);
+}
+void CellularCallRequestHandler::handle(USSDRequest &request, at::Result &result)
+{
+    LOG_INFO("USSD handler");
+
+    if (!request.checkModemResponse(result)) {
+        request.setHandled(false);
+        return;
+    }
+
     cellular.ussdState = ussd::State::pullRequestSent;
     cellular.setUSSDTimer();
+    request.setHandled(true);
 }
-void CellularCallRequestHandler::handle(CallRequest &request)
+void CellularCallRequestHandler::handle(CallRequest &request, at::Result &result)
 {
-
+    LOG_INFO("Call handler");
+    if (!request.checkModemResponse(result)) {
+        request.setHandled(false);
+        return;
+    }
     // activate call state timer
     cellular.callStateTimer->reload();
     // Propagate "Ringing" notification into system
@@ -26,4 +45,5 @@ void CellularCallRequestHandler::handle(CallRequest &request)
         std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, request.getNumber()),
         sys::BusChannels::ServiceCellularNotifications,
         &cellular);
+    request.setHandled(true);
 }

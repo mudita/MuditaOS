@@ -15,9 +15,9 @@ class CellularCallRequestHandler : public CallRequestHandler
     CellularCallRequestHandler(ServiceCellular &serviceCellular) : cellular(serviceCellular)
     {}
 
-    void handle(IMEIRequest &request) final;
-    void handle(USSDRequest &request) final;
-    void handle(CallRequest &request) final;
+    void handle(IMEIRequest &request, at::Result &result) final;
+    void handle(USSDRequest &request, at::Result &result) final;
+    void handle(CallRequest &request, at::Result &result) final;
 
   private:
     ServiceCellular &cellular;

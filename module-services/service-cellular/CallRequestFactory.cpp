@@ -14,7 +14,6 @@ namespace call_request
     std::string IMEIRequest::process(void)
     {
 
-        LOG_INFO("IMEIRequest::process");
         return std::string(at::factory(at::AT::GET_IMEI));
     }
 
@@ -25,14 +24,11 @@ namespace call_request
     std::string USSDRequest::process(void)
     {
 
-        LOG_INFO("USSDRequest::process");
-        return std::string(at::factory(at::AT::CUSD_SEND) + requestData + ",15\r");
+        return std::string(at::factory(at::AT::CUSD_SEND) + request + ",15\r");
     }
 
     std::string CallRequest::process(void)
     {
-
-        LOG_INFO("CallRequest::process");
         return std::string(at::factory(at::AT::ATD) + request + ";\r");
     }
 

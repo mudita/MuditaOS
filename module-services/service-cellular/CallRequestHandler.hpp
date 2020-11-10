@@ -2,6 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include <at/Result.hpp>
+
 namespace call_request
 {
     class IMEIRequest;
@@ -11,9 +14,9 @@ namespace call_request
     class CallRequestHandler
     {
       public:
-        virtual void handle(IMEIRequest &request) = 0;
-        virtual void handle(USSDRequest &request) = 0;
-        virtual void handle(CallRequest &request) = 0;
+        virtual void handle(IMEIRequest &request, at::Result &result) = 0;
+        virtual void handle(USSDRequest &request, at::Result &result) = 0;
+        virtual void handle(CallRequest &request, at::Result &result) = 0;
     };
 
 } // namespace call_request
