@@ -1,0 +1,156 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#include "module-services/service-gui/source/DrawData.hpp"
+#include <cstdio>
+#define CATCH_CONFIG_MAIN
+
+#include <catch2/catch.hpp>
+#include <RTOSWrapper/include/thread.hpp>
+
+#include "../FrameStack.hpp"
+
+using namespace service::renderer;
+
+class DummyThread : public cpp_freertos::Thread
+{
+  public:
+    std::function<void()> foo;
+
+    DummyThread(std::function<void()> foo) : cpp_freertos::Thread("Dummy", pow(2, 8), 1), foo(foo)
+    {}
+
+    void Run() override
+    {
+        if (foo) {
+            foo();
+        }
+        cpp_freertos::Thread::EndScheduler();
+    }
+};
+
+auto procesor = [](sgui::DrawData &data, ::gui::Context &context) -> bool { return true; };
+
+class EmptyDrawData
+{
+    gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_FAST;
+
+  public:
+    EmptyDrawData() = default;
+    EmptyDrawData(gui::RefreshModes mode) : mode(mode)
+    {}
+
+    operator sgui::DrawData()
+    {
+        return sgui::DrawData(gui::Commands{}, mode);
+    }
+};
+
+TEST_CASE("Trylock")
+{
+    std::function<void()> locktest = []() {
+        cpp_freertos::MutexStandard mutex;
+        auto lock1 = Trylock(mutex, 10000);
+        REQUIRE(lock1.isLocked() == true);
+        auto lock2 = Trylock(mutex, 1);
+        REQUIRE(lock2.isLocked() == false);
+    };
+
+    auto t = DummyThread(locktest);
+    t.Start();
+    cpp_freertos::Thread::StartScheduler();
+}
+
+TEST_CASE("DrawFrame")
+{
+
+    cpp_freertos::MutexStandard mutex;
+    auto frame = DrawFrame(mutex, EmptyDrawData(), {10, 10});
+    REQUIRE(frame.getState() == DrawFrame::State::Fresh);
+
+    SECTION("case 1: we process successfully ")
+    {
+        REQUIRE(frame.processFrame(procesor) == true);
+        REQUIRE(frame.getState() == DrawFrame::State::Processed);
+    }
+
+    SECTION("case 2: we process with fail but process ")
+    {
+        auto failer = [](sgui::DrawData &data, ::gui::Context &context) -> bool { return false; };
+
+        REQUIRE(frame.processFrame(failer) == false);
+        INFO("we processed frame either way - so it should be processed")
+        REQUIRE(frame.getState() == DrawFrame::State::Processed);
+    }
+
+    SECTION("case 3: we hit lock guard - ignore frame")
+    {
+        REQUIRE(false);
+    }
+}
+
+TEST_CASE("FrameStack - positive flow")
+{
+    auto fs = FrameStack(gui::Size{480, 600});
+
+    REQUIRE(fs.processLastFrame(procesor) == false);
+
+    REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+
+    REQUIRE(fs.processLastFrame(procesor) == true);
+
+    service::eink::ImageData data;
+
+    REQUIRE(fs.takeLastProcessedFrame(data) == true);
+
+    REQUIRE(data.context.getH() == 600);
+
+    REQUIRE(data.mode == gui::RefreshModes::GUI_REFRESH_FAST);
+
+    REQUIRE(false);
+}
+
+TEST_CASE("FrameStack - negative flow, frame dropping")
+{
+    auto fs = FrameStack(gui::Size{480, 600});
+
+    SECTION("case 1: simple frame drop")
+    {
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        REQUIRE(fs.processLastFrame(procesor));
+    }
+
+    SECTION("case 2: frame drop with refresh promotion")
+    {
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData(gui::RefreshModes::GUI_REFRESH_DEEP)) == true);
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
+        INFO("Deep refresh should be promoted up to last rendered frame");
+        REQUIRE(fs.processLastFrame(procesor));
+    }
+
+    SECTION("case 3: process one frame, drop 2 frames - we should have one frame processed and one ready")
+    {
+        REQUIRE(false);
+    }
+
+    SECTION("case 4: process 2 frames, we should have one (only last one) frame processed")
+    {
+        REQUIRE(false);
+    }
+
+    SECTION("case 4: process 1 frame, add 3 frames, we should have 2 frames (one processed, one ready to process) ")
+    {
+
+        REQUIRE(false);
+    }
+
+    SECTION("case 4: process 1 frame, add 3 frames process 1 frame : we should have last frame processed")
+    {
+        REQUIRE(false);
+    }
+}

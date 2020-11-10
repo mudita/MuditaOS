@@ -1,0 +1,12 @@
+add_catch2_executable(
+    NAME
+        renderer_FrameStack
+    INCLUDE
+        ${PROJECT_SOURCE_DIR}/../
+        ${PROJECT_SOURCE_DIR}/../service-eink/
+        ${PROJECT_SOURCE_DIR}/../../module-gui/
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_FrameStack.cpp
+    LIBS
+        module-gui
+)
