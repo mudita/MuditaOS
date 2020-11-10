@@ -80,9 +80,10 @@ class ServiceAudio : public sys::Service
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
     auto IsBusy() -> bool;
 
-    void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
+    // void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
 
-    template <typename T>[[nodiscard]] T fetchAudioSettingFromDb(const std::string &profilePath, const T &defaultValue)
+    /*template <typename T>[[nodiscard]] T fetchAudioSettingFromDb(const std::string &profilePath, const T
+    &defaultValue)
     {
         auto [code, msg] =
             DBServiceAPI::GetQueryWithReply(this,
@@ -101,8 +102,8 @@ class ServiceAudio : public sys::Service
             return settingsResult->getResult().getValue<T>({});
         }
         return defaultValue;
-    }
-    void updateDbValue(const std::string &path, const std::string &value);
+    }*/
+    // void updateDbValue(const std::string &path, const std::string &value);
 
     void setSetting(const audio::Setting &setting,
                     const std::string &value,
@@ -113,4 +114,9 @@ class ServiceAudio : public sys::Service
                                          const audio::PlaybackType &playbackType);
 
     const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
+    std::unique_ptr<::Settings::Settings> settingsProvider;
+    void settingsChanged(const std::string &name, std::optional<std::string> value);
+    std::vector<std::vector<std::string>> settings;
+    static const int IdxPath  = 0;
+    static const int IdxValue = 1;
 };
