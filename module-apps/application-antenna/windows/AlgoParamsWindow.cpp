@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlgoParamsWindow.hpp"
@@ -12,7 +12,7 @@
 #include "gui/widgets/BoxLayout.hpp"
 #include "../AntennaAppStyle.hpp"
 #include "../ApplicationAntenna.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
 
 using StringList = std::list<std::string>;
 

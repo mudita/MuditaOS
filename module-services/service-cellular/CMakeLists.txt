@@ -1,29 +1,26 @@
-﻿include_directories( ${CMAKE_PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
+﻿project(service-cellular)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
-target_sources( ${PROJECT_NAME}
-
-	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceCellular.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/CellularUrcHandler.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/api/CellularServiceAPI.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/CellularCall.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/SignalStrength.cpp"
+set(SOURCES
+    CellularCall.cpp
+    CellularServiceAPI.cpp
+    CellularUrcHandler.cpp
+    ServiceCellular.cpp
+    SignalStrength.cpp
 )
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}
+)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-antenna
         service-audio
+        module-bsp
+        module-cellular
     )
 

@@ -20,7 +20,7 @@
 #include "ScanModesWindow.hpp"
 #include "AlgoParamsWindow.hpp"
 #include "../ApplicationAntenna.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <at/response.hpp>
 namespace gui

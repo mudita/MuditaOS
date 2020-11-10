@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -11,7 +11,7 @@
 #include "ApplicationAntenna.hpp"
 #include "Service/Timer.hpp"
 #include "module-cellular/at/response.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
 
 #include "windows/AntennaMainWindow.hpp"
 #include "windows/ScanModesWindow.hpp"

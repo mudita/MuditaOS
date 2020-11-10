@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        service-cellular
         module-apps
         module-audio
 )

@@ -13,7 +13,7 @@
 #include <functional>
 #include <memory>
 #include <Font.hpp>
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
 
 namespace gui
 {

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 project(module-cellular VERSION 1.0
         DESCRIPTION "Cellular module library")
@@ -75,7 +75,15 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-utils module-vfs module-services module-sys module-db )
+target_link_libraries(${PROJECT_NAME}
+    service-cellular
+    module-bsp
+    module-utils
+    module-vfs
+    module-services
+    module-sys
+    module-db
+)
 
 if (${ENABLE_TESTS})
     add_subdirectory( test )
