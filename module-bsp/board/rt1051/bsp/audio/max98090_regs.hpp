@@ -37,7 +37,7 @@ typedef struct
 
 // Device Status Interrupt Mask Register
 // Check Table 86. for more info.
-#define MAX98090_REG_DEVICE_STATUS_MASK 0x01
+#define MAX98090_REG_DEVICE_STATUS_MASK 0x03
 typedef struct
 {
     uint8_t idrcclp : 1;
@@ -74,16 +74,26 @@ typedef struct
 #define MAX98090_REG_OUTPUT_ENABLE 0x3F
 typedef struct
 {
-    uint8_t hpren : 1;
-    uint8_t hplen : 1;
-    uint8_t spren : 1;
-    uint8_t splen : 1;
-    uint8_t rcvlen : 1;
-    uint8_t rcvren : 1;
-    uint8_t daren : 1;
     uint8_t dalen : 1;
+    uint8_t daren : 1;
+    uint8_t rcvren : 1;
+    uint8_t rcvlen : 1;
+    uint8_t splen : 1;
+    uint8_t spren : 1;
+    uint8_t hplen : 1;
+    uint8_t hpren : 1;
 } max98090_reg_outputenable_t;
 
+
+// Line Input Level Configuration Register
+#define MAX98090_REG_LINE_INPUT_LEVEL_CONF 0x0E
+typedef struct
+{
+    uint8_t linbpga : 3;
+	uint8_t linapga : 3;
+	uint8_t mixg246 : 1;
+    uint8_t mixg135 : 1;
+} max98090_reg_line_inp_lvl_t;
 
 // Microphone 1 enable and level configuration register
 #define MAX98090_REG_MIC1_ENABLE_LEVEL_CONF 0x10
@@ -91,6 +101,7 @@ typedef struct
 {
     uint8_t pgam : 5;
     uint8_t pa1en : 2;
+    uint8_t unused :1;
 } max98090_reg_mic1ena_lvlctl_t;
 
 // Microphone 2 enable and level configuration register
@@ -99,6 +110,7 @@ typedef struct
 {
     uint8_t pgam : 5;
     uint8_t pa2en : 2;
+    uint8_t unused :1;
 } max98090_reg_mic2ena_lvlctl_t;
 
 // Microphone Bias Level Configuration Register
@@ -117,7 +129,7 @@ typedef struct
     uint8_t digmicl : 1;
     uint8_t digmicr : 1;
     uint8_t unused : 2;
-    uint8_t dmicclk : 2;
+    uint8_t dmicclk : 3;
     uint8_t unused2 : 1;
 } max98090_reg_digmic_enable_t;
 
@@ -146,6 +158,7 @@ typedef struct
 typedef struct
 {
     uint8_t mixadl : 7;
+    uint8_t unused :1;
 } max98090_reg_ladc_mix_input_t;
 
 /*  Right ADC Mixer Input Configuration Register
@@ -161,6 +174,7 @@ typedef struct
 typedef struct
 {
     uint8_t mixadr : 7;
+    uint8_t unused :1;
 } max98090_reg_radc_mix_input_t;
 
 /*  Left Record Path Digital Gain Configuration Register
@@ -184,46 +198,6 @@ typedef struct
     uint8_t avrg : 3;
     uint8_t unused : 1;
 } max98090_reg_rrec_dig_gain_t;
-
-// Record DSP Filter Configuration Register
-#define MAX98090_REG_REC_DSP_FILTER_CONF 0x14
-typedef struct
-{
-
-    uint8_t unused : 4;
-
-    /*
-    Enables the DAC High Sample Rate Mode (LRCLK > 48kHz, FIR Only)
-    0: LRCLK is less than 48kHz. 8x FIR interpolation filter used.
-    1: LRCLK is greater than 48kHz. 4x FIR interpolation filter used.
-     */
-    uint8_t dhf : 1;
-
-    /*
-    Enables the Playback Path DC-Blocking Filter
-    0: DC-blocking filter disabled.
-    1: DC-blocking filter enabled
-     */
-    uint8_t dhpf : 1;
-
-    /*
-    Enables the Record Path DC-Blocking Filter
-    0: DC-blocking filter disabled.
-    1: DC-blocking filter enabled.
-     */
-    uint8_t ahpf : 1;
-
-    /*
-    Enables the Codec DSP FIR Music Filters (Default IIR Voice Filters)
-    0: The codec DSP filters operate in IIR voice mode with stop band frequencies below
-    the fS/2 Nyquist rate. The voice mode filters are optimized for 8kHz or 16kHz voice
-    application use.
-    1: The codec DSP filters operate in a linear phase FIR audio mode optimized to
-    maintain stereo imaging and operate at higher fS rates while utilizing lower power
-     */
-    uint8_t mode : 1;
-
-} max98090_reg_rec_dspfilter_conf_t;
 
 // System Master Clock (MCLK) Prescaler Configuration Register
 // Check MAX98090 datasheet Table 34 for available configurations
@@ -252,7 +226,7 @@ typedef struct
 #define MAX98090_REG_CLOCK_MODE 0x1C
 typedef struct
 {
-    uint8_t usemi : 4;
+    uint8_t usemi : 1;
     uint8_t unused : 3;
     uint8_t freq : 4;
 } max98090_reg_clock_mode_t;
@@ -262,7 +236,8 @@ typedef struct
 #define MAX98090_REG_NI_MSB 0x1D
 typedef struct
 {
-    uint8_t ni;
+    uint8_t ni : 7;
+    uint8_t unused :1;
 } max98090_reg_manual_clock_ratio_NI_MSB_t;
 
 // Manual Clock Ratio Configuration Register (NI LSB)
@@ -397,7 +372,6 @@ typedef struct
     uint8_t dhpf : 1;
     uint8_t ahpf : 1;
     uint8_t mode : 1;
-
 } max98090_reg_playback_dspfilter_conf_t;
 
 // Master Clock Quick Setup Register
@@ -493,8 +467,8 @@ typedef struct
 #define MAX98090_REG_LHP_VOL_CTRL 0x2C
 typedef struct
 {
-    uint8_t hpvoll : 6;
-    uint8_t unused : 1;
+    uint8_t hpvoll : 5;
+    uint8_t unused : 2;
     uint8_t hplm : 1;
 
 } max98090_reg_lhp_vol_ctrl_t;
@@ -504,8 +478,8 @@ typedef struct
 #define MAX98090_REG_RHP_VOL_CTRL 0x2D
 typedef struct
 {
-    uint8_t hpvolr : 6;
-    uint8_t unused : 1;
+    uint8_t hpvolr : 5;
+    uint8_t unused : 2;
     uint8_t hprm : 1;
 
 } max98090_reg_rhp_vol_ctrl_t;
@@ -537,8 +511,8 @@ typedef struct
 #define MAX98090_REG_RECV_VOL_CTRL 0x39
 typedef struct
 {
-    uint8_t rcvlvol : 6;
-    uint8_t unused : 1;
+    uint8_t rcvlvol : 5;
+    uint8_t unused : 2;
     uint8_t rcvlm : 1;
 
 } max98090_reg_recv_vol_ctrl_t;
@@ -573,7 +547,6 @@ typedef struct
     uint8_t adcdither : 1;
     uint8_t osr128 : 1;
     uint8_t unused : 5;
-
 } max98090_reg_adcperf_mode_t;
 
 #define MAX98090_I2C_ADDR 0x10
