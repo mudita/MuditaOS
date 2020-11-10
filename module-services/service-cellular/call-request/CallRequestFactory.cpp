@@ -15,7 +15,8 @@ namespace call_request
     {
         requestMap.insert(std::pair<std::string, CreateCallback>(regex, callback));
     }
-    std::unique_ptr<IRequest> Factory::create(void)
+
+    std::unique_ptr<IRequest> Factory::create()
     {
 
         re2::StringPiece input(request);

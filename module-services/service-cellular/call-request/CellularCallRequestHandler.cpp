@@ -11,7 +11,6 @@
 
 void CellularCallRequestHandler::handle(IMEIRequest &request, at::Result &result)
 {
-    LOG_INFO("IMEI handler");
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
         return;
@@ -20,8 +19,6 @@ void CellularCallRequestHandler::handle(IMEIRequest &request, at::Result &result
 }
 void CellularCallRequestHandler::handle(USSDRequest &request, at::Result &result)
 {
-    LOG_INFO("USSD handler");
-
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
         return;
@@ -33,7 +30,6 @@ void CellularCallRequestHandler::handle(USSDRequest &request, at::Result &result
 }
 void CellularCallRequestHandler::handle(CallRequest &request, at::Result &result)
 {
-    LOG_INFO("Call handler");
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
         return;

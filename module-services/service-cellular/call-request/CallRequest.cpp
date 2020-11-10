@@ -12,7 +12,7 @@
 namespace call_request
 {
 
-    std::string IMEIRequest::command(void)
+    std::string IMEIRequest::command()
     {
         return std::string(at::factory(at::AT::GET_IMEI));
     }
@@ -22,7 +22,7 @@ namespace call_request
         return std::make_unique<IMEIRequest>(data);
     }
 
-    std::string USSDRequest::command(void)
+    std::string USSDRequest::command()
     {
         return std::string(at::factory(at::AT::CUSD_SEND) + request + ",15\r");
     }
@@ -32,7 +32,7 @@ namespace call_request
         return std::make_unique<USSDRequest>(data);
     }
 
-    std::string CallRequest::command(void)
+    std::string CallRequest::command()
     {
         return std::string(at::factory(at::AT::ATD) + request + ";\r");
     }

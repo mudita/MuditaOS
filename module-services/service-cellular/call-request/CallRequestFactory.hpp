@@ -34,6 +34,7 @@ namespace call_request
             /*It have to be last check due to 3GPP TS 22.030*/
             registerRequest(USSDRegex, USSDRequest::create);
         };
+
         std::unique_ptr<IRequest> create(void);
     };
 } // namespace call_request
