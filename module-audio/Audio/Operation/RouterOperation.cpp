@@ -145,14 +145,13 @@ namespace audio
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
-            LOG_ERROR("Error during initializing profile");
-            throw AudioException(RetCode::ProfileNotSet);
+            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
         }
         currentProfile = defaultProfile;
 
         auto retCode = SwitchToPriorityProfile();
         if (retCode != RetCode::Success) {
-            throw AudioException(retCode);
+            throw AudioInitException("Failed to switch audio profile", retCode);
         }
     }
 

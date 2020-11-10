@@ -61,20 +61,18 @@ namespace audio
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
-            LOG_ERROR("Error during initializing profile");
-            throw AudioException(RetCode::ProfileNotSet);
+            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
         }
         currentProfile = defaultProfile;
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
-            LOG_ERROR("Error during initializing decoder");
-            throw AudioException(RetCode::FileDoesntExist);
+            throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
 
         auto retCode = SwitchToPriorityProfile();
         if (retCode != RetCode::Success) {
-            throw AudioException(retCode);
+            throw AudioInitException("Failed to switch audio profile", retCode);
         }
     }
 

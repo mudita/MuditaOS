@@ -97,9 +97,10 @@ namespace audio
                 currentOperation->SetBluetoothStreamData(btData);
             }
         }
-        catch (AudioException &audioException) {
+        catch (const AudioInitException &audioException) {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
-            LOG_ERROR("Failed to create operation type %s", Operation::c_str(op));
+            LOG_ERROR(
+                "Failed to create operation type %s, error message:\n%s", Operation::c_str(op), audioException.what());
             currentOperation = Operation::Create(Operation::Type::Idle);
             currentState     = State ::Idle;
             return audioException.getErrorCode();

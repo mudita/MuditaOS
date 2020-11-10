@@ -169,16 +169,16 @@ namespace audio
         Failed
     };
 
-    struct AudioException : public std::exception
+    struct AudioInitException : public std::runtime_error
     {
       protected:
         audio::RetCode errorCode = audio::RetCode::Failed;
 
       public:
-        AudioException(audio::RetCode errorCode) : errorCode(errorCode)
+        AudioInitException(const char *message, audio::RetCode errorCode) : runtime_error(message)
         {}
 
-        audio::RetCode getErrorCode() const
+        audio::RetCode getErrorCode() const noexcept
         {
             return errorCode;
         }

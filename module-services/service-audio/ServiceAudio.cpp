@@ -297,7 +297,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
                 try {
                     retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
                 }
-                catch (AudioException &audioException) {
+                catch (const AudioInitException &audioException) {
                     retCode = audio::RetCode::FailedToAllocateMemory;
                 }
             }

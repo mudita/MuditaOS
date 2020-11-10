@@ -110,7 +110,6 @@ namespace audio
             return filePath;
         }
 
-        void UpdateProfilesAvailabiliaty(EventType eType, bool isEnabled);
         audio::RetCode SwitchToPriorityProfile();
 
       protected:
