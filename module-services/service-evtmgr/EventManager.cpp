@@ -10,7 +10,7 @@
 
 #include "EventManager.hpp"
 
-#include <service-cellular/messages/CellularMessage.hpp> // for CellularTimeNotificationMessage, RawCommandResp
+#include <service-cellular/CellularMessage.hpp>          // for CellularTimeNotificationMessage, RawCommandResp
 #include <service-evtmgr/Constants.hpp>                  // for evt_manager
 #include <service-desktop/Constants.hpp>                 // for ServiceDesktop
 #include <cassert>                                       // for assert

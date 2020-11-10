@@ -3,12 +3,12 @@
 
 #include "CellularUrcHandler.hpp"
 
-#include "messages/CellularMessage.hpp"
-#include "api/CellularServiceAPI.hpp"
+#include "service-cellular/CellularMessage.hpp"
+#include "service-cellular/CellularServiceAPI.hpp"
 
-#include <service-evtmgr/Constants.hpp>                              // for evt_manager service name
-#include <module-sys/Service/Bus.hpp>                                // for sys::Bus
-#include <service-antenna/AntennaServiceAPI.hpp>                     // for AntennaServiceAPI
+#include <module-sys/Service/Bus.hpp>
+#include <service-antenna/AntennaServiceAPI.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 // this static function will be replaced by Settings API
 static bool isSettingsAutomaticTimeSyncEnabled()

@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Fota.hpp"
 #include "FotaWindow.hpp"
 
-#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <service-fota/api/FotaServiceAPI.hpp>
 #include <service-fota/messages/FotaMessages.hpp>
 

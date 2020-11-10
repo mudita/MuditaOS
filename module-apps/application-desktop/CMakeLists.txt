@@ -1,4 +1,4 @@
-
+﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
@@ -52,3 +52,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/windows/Names.hpp"
 )
 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-cellular
+    )

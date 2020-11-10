@@ -16,7 +16,7 @@
 #include "i18/i18.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
 #include "service-db/api/DBServiceAPI.hpp"
 
 #include "Label.hpp"

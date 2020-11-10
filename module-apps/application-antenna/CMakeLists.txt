@@ -1,4 +1,4 @@
-
+﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
@@ -20,5 +20,10 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/AlgoParamsWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationAntenna.hpp"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-cellular
 )
 

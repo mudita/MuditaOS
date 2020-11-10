@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/Bus.hpp>                             // for Bus
 #include <module-cellular/at/Result.hpp>               // for Result, Result::Code, Result::Code::OK
-#include <service-cellular/api/CellularServiceAPI.hpp> // for GetDataChannel
 #include <module-cellular/at/UrcFactory.hpp>           // for UrcFactory
 #include <bits/exception.h>                            // for exception
 #include <algorithm>                                   // for find_if, remove, transform
@@ -28,8 +27,10 @@
 #include "Modem/TS0710/DLC_channel.h"                    // for DLC_channel
 #include "log/log.hpp"                                   // for LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR
 #include "portmacro.h"                                   // for TickType_t
-#include "service-cellular/State.hpp"                    // for State, State::ST, State::ST::Ready
-#include "service-cellular/messages/CellularMessage.hpp" // for CellularGetChannelResponseMessage, StateChange
+
+#include <service-cellular/CellularMessage.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular/State.hpp>
 
 namespace FotaService
 {

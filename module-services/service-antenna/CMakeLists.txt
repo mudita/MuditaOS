@@ -13,6 +13,7 @@ target_link_libraries(${PROJECT_NAME}
         module-apps
         module-cellular
         module-utils
+        service-cellular
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -1,77 +1,77 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <Utils.hpp>       // for removeNewLines, enumToString, split, to_string
-#include <at/UrcQind.hpp>  // for Qind
-#include <at/UrcCusd.hpp>  // for Cusd
-#include <at/UrcCtze.hpp>  // for Ctze
-#include <at/UrcCreg.hpp>  // for Creg
-#include <at/UrcCmti.hpp>  // for Cmti
-#include <at/UrcClip.hpp>  // for CLIP
-#include <at/response.hpp> // for parseQNWINFO
-#include <common_data/EventStore.hpp> // for GSM, GSM::SIM, GSM::SIM::SIM1, GSM::SIM::SIM_FAIL, GSM::SIM::SIM2, GSM::Tray, GSM::Tray::IN, Network
-#include <service-evtmgr/Constants.hpp>                                    // for evt_manager
-#include <country.hpp>                                                     // for Id, Id::UNKNOWN
-#include <PhoneNumber.hpp>                                                 // for PhoneNumber::View, PhoneNumber
-#include <module-db/queries/notifications/QueryNotificationsIncrement.hpp> // for Increment
-#include <module-db/queries/messages/sms/QuerySMSSearchByType.hpp>         // for SMSSearchByType, SMSSearchByTypeResult
-#include <module-cellular/at/UrcFactory.hpp>                               // for UrcFactory
-#include <log/log.hpp>      // for LOG_DEBUG, LOG_ERROR, LOG_INFO, LOG_FATAL, LOG_WARN, LOG_TRACE
-#include <bits/exception.h> // for exception
-#include <algorithm>        // for remove, max
-#include <cassert>          // for assert
-#include <iostream>         // for basic_istream, istringstream
-#include <string>   // for string, allocator, basic_string, operator+, char_traits, to_string, stoi, getline, operator!=
-#include <vector>   // for vector
-#include <utility>  // for move
-#include <optional> // for optional, nullopt, operator==
-#include <map>      // for map
+#include "CellularUrcHandler.hpp"
+#include "service-cellular/CellularCall.hpp"
+#include "service-cellular/CellularMessage.hpp"
+#include "service-cellular/CellularServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/SignalStrength.hpp"
+#include "service-cellular/State.hpp"
+#include "service-cellular/USSD.hpp"
 
-#include "Service/Message.hpp" // for DataMessage, ResponseMessage, MessagePointer
-#include "Service/Service.hpp" // for Service
-#include "Service/Timer.hpp"   // for Timer
-#include "ServiceCellular.hpp"
-#include "CellularUrcHandler.hpp" // for CellularUrcHandler
-#include "MessageType.hpp" // for MessageType, MessageType::CellularGetAntenna, MessageType::CellularListCurrentCalls, MessageType::CellularAnswerIncomingCall, MessageType::CellularCall, MessageType::CellularCallRequest, MessageType::CellularGetCREG, MessageType::CellularGetCSQ, MessageType::CellularGetFirmwareVersion, MessageType::CellularGetIMSI, MessageType::CellularGetNWINFO, MessageType::CellularGetNetworkInfo, MessageType::CellularGetOwnNumber, MessageType::CellularGetScanMode, MessageType::CellularGetScanModeResult, MessageType::CellularHangupCall, MessageType::CellularNetworkInfoResult, MessageType::CellularNotification, MessageType::CellularOperatorsScanResult, MessageType::CellularSelectAntenna, MessageType::CellularSetScanMode, MessageType::CellularSimProcedure, MessageType::CellularStartOperatorsScan, MessageType::CellularStateRequest, MessageType::CellularTransmitDtmfTones, MessageType::CellularUSSDRequest, MessageType::DBServiceNotification, MessageType::EVMModemStatus, MessageType::EVMTimeUpdated
-#include "messages/CellularMessage.hpp" // for CellularResponseMessage, CellularNotificationMessage, CellularNotificationMessage::Type, CellularCallMessage, CellularUSSDMessage, RawCommandRespAsync, RawCommandResp, CellularUSSDMessage::RequestType, CellularRequestMessage, StateChange, CellularGetChannelMessage, CellularGetChannelResponseMessage, CellularAntennaResponseMessage, CellularCallMessage::Type, CellularTimeNotificationMessage, CellularUSSDMessage::RequestType::abortSesion, CellularAntennaRequestMessage, CellularCallRequestMessage, CellularNotificationMessage::Type::CallActive, RawCommand, CellularCallMessage::Type::IncomingCall, CellularCallMessage::Type::Ringing, CellularDtmfRequestMessage, CellularNotificationMessage::Type::CallAborted, CellularNotificationMessage::Type::NetworkStatusUpdate, CellularNotificationMessage::Type::NewIncomingSMS, CellularNotificationMessage::Type::NewIncomingUSSD, CellularNotificationMessage::Type::PowerDownDeregistered, CellularNotificationMessage::Type::PowerDownDeregistering, CellularNotificationMessage::Type::SIM, CellularNotificationMessage::Type::SignalStrengthUpdate, CellularUSSDMessage::RequestType::pushSesionRequest, CellularNotificationMessage::Type::PowerUpProcedureComplete, CellularNotificationMessage::Type::RawCommand, CellularUSSDMessage::RequestType::pullSesionRequest
-#include "SignalStrength.hpp"           // for SignalStrength
-#include "service-evtmgr/messages/EVMessages.hpp"        // for SIMMessage, StatusStateMessage
-#include "ucs2/UCS2.hpp"                                 // for UCS2
-#include "api/CellularServiceAPI.hpp"                    // for USSDRequest
-#include "service-db/api/DBServiceAPI.hpp"               // for DBServiceAPI
-#include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
-#include "service-db/messages/QueryMessage.hpp"          // for QueryResponse
-#include "service-evtmgr/api/EventManagerServiceAPI.hpp" // for GetBoard
-#include <service-antenna/AntennaServiceAPI.hpp>         // for CSQChange, LockRequest
-#include <service-antenna/AntennaMessage.hpp>            // for AntennaChangedMessage
-#include "time/time_conversion.hpp"                      // for Timestamp
-#include "Audio/AudioCommon.hpp"                         // for PlaybackType, PlaybackType::TextMessageRingtone
-#include <service-audio/AudioServiceAPI.hpp>             // for PlaybackStart
-#include "BaseInterface.hpp" // for Interface, Interface::Name, Interface::Name::Notifications, Interface::Name::SMS
-#include "CalllogRecord.hpp" // for CalllogRecord
-#include "Commands.hpp" // for AT, factory, Cmd, AT::SMS_GSM, getCommadsSet, AT::CREG, AT::CSQ, AT::QNWINFO, AT::QSIMSTAT, AT::SMS_UCSC2, AT::ATA, AT::ATD, AT::ATH, AT::CEER, AT::CIMI, AT::CLCC, AT::CMGD, AT::CMGS, AT::CNUM, AT::CUSD_CLOSE_SESSION, AT::CUSD_OPEN_SESSION, AT::CUSD_SEND, AT::DISABLE_TIME_ZONE_REPORTING, AT::DISABLE_TIME_ZONE_UPDATE, AT::ENABLE_NETWORK_REGISTRATION_URC, AT::ENABLE_TIME_ZONE_UPDATE, AT::GET_SCANMODE, AT::IPR, AT::QCMGR, AT::QCMGS, AT::QGMR, AT::QLDTMF, AT::SET_SCANMODE, AT::SET_SMS_TEXT_MODE_UCS2, AT::SET_TIME_ZONE_REPORTING, AT::SIMSTAT_ON, AT::SIM_DET, AT::SIM_DET_ON, AT::STORE_SETTINGS_ATW, AT::VTS, commadsSet, commadsSet::simInit
-#include "Common/Common.hpp"          // for SMSType, SMSType::QUEUED, SMSType::FAILED, SMSType::INBOX, SMSType::OUTBOX
-#include "Common/Query.hpp"           // for Query, Query::Type, Query::Type::Create, Query::Type::Update, QueryResult
-#include "Modem/ATCommon.hpp"         // for Chanel, Chanel::BUSY, Chanel::NO_ANSWER, Chanel::NO_CARRIER
-#include "Modem/ATParser.hpp"         // for ATParser
-#include "Modem/TS0710/DLC_channel.h" // for DLC_channel, DLC_channel::Callback_t
-#include "Modem/TS0710/TS0710.h" // for TS0710, TS0710::Channel, TS0710::Channel::Commands, TS0710::ConfState, TS0710::ConfState::Success, TS0710::Channel::Notifications, TS0710::ConfState::Failure, TS0710::Mode, TS0710::Mode::AT
-#include "Modem/TS0710/TS0710_START.h" // for TS0710_START::START_SystemParameters_t
-#include "NotificationsRecord.hpp" // for NotificationsRecord, NotificationsRecord::Key, NotificationsRecord::Key::Calls, NotificationsRecord::Key::Sms
-#include "Result.hpp"              // for Result, Result::Code, Result::Code::OK
-#include "Service/Bus.hpp"         // for Bus
-#include "Tables/CalllogTable.hpp" // for CallType, CallType::CT_INCOMING, CallType::CT_MISSED, CallType::CT_OUTGOING
-#include "Tables/Record.hpp"       // for DB_ID_NONE
-#include "bsp/cellular/bsp_cellular.hpp" // for hotswap_trigger, sim_sel, value, Cellular, antenna, antenna::lowBand, status, value::ACTIVE, value::INACTIVE
-#include "projdefs.h"                         // for pdMS_TO_TICKS
-#include "service-antenna/ServiceAntenna.hpp" // for lockState, lockState::unlocked
-#include "service-cellular/CellularCall.hpp" // for CellularCall, ModemCall, operator<<, CallState, CallState::Active, Forced, Forced::True
-#include "service-cellular/State.hpp" // for State, State::ST, State::ST::CellularConfProcedure, State::ST::Failed, State::ST::PowerUpInProgress, State::ST::PowerUpProcedure, State::ST::ModemFatalFailure, State::ST::PowerDownWaiting, State::ST::AudioConfigurationProcedure, State::ST::Idle, State::ST::PowerDown, State::ST::SimInit, State::ST::ModemOn, State::ST::PowerDownStarted, State::ST::Ready, State::ST::SanityCheck, State::ST::SimSelect, State::ST::StatusCheck, State::ST::URCReady, cellular
-#include "service-cellular/USSD.hpp" // for State, State::pullRequestSent, State::sesionAborted, State::pullResponseReceived, State::pushSesion, noTimeout, State::none, pullResponseTimeout, pullSesionTimeout
+#include <Audio/AudioCommon.hpp>
+#include <BaseInterface.hpp>
+#include <CalllogRecord.hpp>
+#include <Commands.hpp>
+#include <Common/Common.hpp>
+#include <Common/Query.hpp>
+#include <MessageType.hpp>
+#include <Modem/ATCommon.hpp>
+#include <Modem/ATParser.hpp>
+#include <Modem/TS0710/DLC_channel.h>
+#include <Modem/TS0710/TS0710.h>
+#include <Modem/TS0710/TS0710_START.h>
+#include <NotificationsRecord.hpp>
+#include <PhoneNumber.hpp>
+#include <Result.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Timer.hpp>
+#include <Tables/CalllogTable.hpp>
+#include <Tables/Record.hpp>
+#include <Utils.hpp>
+#include <at/UrcClip.hpp>
+#include <at/UrcCmti.hpp>
+#include <at/UrcCreg.hpp>
+#include <at/UrcCtze.hpp>
+#include <at/UrcCusd.hpp>
+#include <at/UrcQind.hpp>
+#include <at/response.hpp>
+#include <bsp/cellular/bsp_cellular.hpp>
+#include <common_data/EventStore.hpp>
+#include <country.hpp>
+#include <log/log.hpp>
+#include <module-cellular/at/UrcFactory.hpp>
+#include <module-db/queries/messages/sms/QuerySMSSearchByType.hpp>
+#include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
+#include <projdefs.h>
+#include <service-antenna/AntennaMessage.hpp>
+#include <service-antenna/AntennaServiceAPI.hpp>
+#include <service-antenna/ServiceAntenna.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/messages/DBNotificationMessage.hpp>
+#include <service-db/messages/QueryMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/api/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/messages/EVMessages.hpp>
+#include <task.h>
+#include <time/time_conversion.hpp>
+#include <ucs2/UCS2.hpp>
+#include <utf8/UTF8.hpp>
 
-#include "task.h"        // for vTaskDelay
-#include "utf8/UTF8.hpp" // for UTF8
+#include <algorithm>
+#include <bits/exception.h>
+#include <cassert>
+#include <iostream>
+#include <map>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 

@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <PhoneNumber.hpp>             // for PhoneNumber::View, PhoneNumber
-#include <Interface/CalllogRecord.hpp> // for CalllogRecord
-#include <time/time_conversion.hpp>    // for Timestamp
-#include <stdint.h>                    // for uint8_t, int8_t
-#include <sys/types.h>                 // for time_t
-#include <functional>                  // for function
-#include <string>                      // for string
-#include <iosfwd>                      // for ostream
+#include <Interface/CalllogRecord.hpp>
+#include <PhoneNumber.hpp>
+#include <Tables/CalllogTable.hpp>
+#include <time/time_conversion.hpp>
+#include <utf8/UTF8.hpp>
 
-#include "Tables/CalllogTable.hpp" // for CallType, CallType::CT_NONE
-#include "utf8/UTF8.hpp"           // for UTF8
+#include <cstdint>
+#include <functional>
+#include <iosfwd>
+#include <string>
+#include <sys/types.h>
 
 namespace ModemCall
 {
@@ -97,9 +97,9 @@ namespace CellularCall
 
         void clear()
         {
-            call              = CalllogRecord();
-            isActiveCall      = false;
-            startActiveTime   = 0;
+            call            = CalllogRecord();
+            isActiveCall    = false;
+            startActiveTime = 0;
         }
 
       public:
