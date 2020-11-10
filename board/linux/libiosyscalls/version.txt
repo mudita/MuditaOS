@@ -58,6 +58,11 @@ GLIBC_2.2.5 {
                 rewinddir;
                 seekdir;
                 telldir;
+                symlink;
+                fstatat;
+                __xstat;
+                __lxstat;
+                __fxstat;
         local:
                 *;
 };

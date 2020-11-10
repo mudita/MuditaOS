@@ -10,16 +10,22 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <cstring>
-#include "internal.hpp"
+#include "debug.hpp"
 
 namespace
 {
     int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
+    int (*real_xstat)(int ver, const char * path, struct stat * stat_buf);
+    int (*real_lxstat)(int ver, const char * path, struct stat * stat_buf);
+    int (*real_fxstat)(int ver, int fildes, struct stat * stat_buf);
 
     void __attribute__((constructor)) _lib_posix_initialize()
     {
         real_fprintf = reinterpret_cast<decltype(real_fprintf)>(dlsym(RTLD_NEXT, "fprintf"));
-        if(!real_fprintf ) {
+        real_xstat = reinterpret_cast<decltype(real_xstat)>(dlsym(RTLD_NEXT, "__xstat"));
+        real_lxstat = reinterpret_cast<decltype(real_lxstat)>(dlsym(RTLD_NEXT, "__lxstat"));
+        real_fxstat = reinterpret_cast<decltype(real_fxstat)>(dlsym(RTLD_NEXT, "__fxstat"));
+        if(!real_fprintf || !real_xstat || !real_lxstat || !real_fxstat ) {
             abort();
         }
     }
@@ -28,6 +34,7 @@ extern "C" {
 
 	int link(const char *oldpath, const char *newpath)
 	{
+        TRACE_SYSCALL();
 		errno = ENOSYS;
 		real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
 		return -1;
@@ -36,6 +43,7 @@ extern "C" {
 
 	 int unlink(const char *name)
 	 {
+        TRACE_SYSCALL();
 		auto ret = ff_remove(name);
         if (ret && stdioGET_ERRNO() == EISDIR)
             ret = ff_deltree(name, nullptr, nullptr);
@@ -46,6 +54,7 @@ extern "C" {
 
 	int stat(const char *file, struct stat *pstat)
 	{
+        TRACE_SYSCALL();
         FF_Stat_t stat_ff;
         auto ret = ff_stat(file, &stat_ff);
         if (!ret) {
@@ -66,8 +75,10 @@ extern "C" {
         return ret;
 	}
     __asm__(".symver stat,stat@GLIBC_2.2.5");
+
     int fstat(int fd, struct stat *pstat)
 	{
+        TRACE_SYSCALL();
 		FF_FILE* fil = vfsn::linux::internal::handle_to_ff_file(fd);
         if(!fil) {
             errno = EBADF;
@@ -85,12 +96,14 @@ extern "C" {
 
     int lstat(const char *pathname, struct stat *statbuf)
 	{
+        TRACE_SYSCALL();
 		return stat(pathname, statbuf);
 	}
     __asm__(".symver lstat,lstat@GLIBC_2.2.5");
 
     int fcntl(int fd, int cmd, ... /* arg */ )
     {
+        TRACE_SYSCALL();
         errno = ENOSYS;
         real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
         return -1;
@@ -99,6 +112,7 @@ extern "C" {
 
     int chdir(const char *path)
     {
+        TRACE_SYSCALL();
         auto ret = ff_chdir(path);
         errno  = stdioGET_ERRNO();
         return ret;
@@ -106,6 +120,7 @@ extern "C" {
     __asm__(".symver chdir,chdir@GLIBC_2.2.5");
     int fchdir(int fd)
     {
+        TRACE_SYSCALL();
         errno = ENOSYS;
         real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
         return -1;
@@ -114,6 +129,7 @@ extern "C" {
 
     char *getcwd(char *buf, size_t size)
     {
+        TRACE_SYSCALL();
         auto cwd = ff_getcwd(buf, size);
         errno  = stdioGET_ERRNO();
         return cwd;
@@ -122,6 +138,7 @@ extern "C" {
 
     char *getwd(char *buf)
     {
+        TRACE_SYSCALL();
         auto cwd = ff_getcwd(buf, ffconfigMAX_FILENAME );
         errno  = stdioGET_ERRNO();
         return cwd;
@@ -131,6 +148,7 @@ extern "C" {
 
     char *get_current_dir_name(void)
     {
+        TRACE_SYSCALL();
         auto buf = new char[ffconfigMAX_FILENAME];
         auto cwd = ff_getcwd(buf, ffconfigMAX_FILENAME );
         errno  = stdioGET_ERRNO();
@@ -141,6 +159,7 @@ extern "C" {
 
     int rename(const char *oldpath, const char *newpath)
     {
+        TRACE_SYSCALL();
         auto ret = ff_rename(oldpath, newpath, true);
         errno  = stdioGET_ERRNO();
         return ret;
@@ -149,6 +168,7 @@ extern "C" {
 
     int mkdir(const char *pathname, mode_t )
     {
+        TRACE_SYSCALL();
         auto ret = ff_mkdir(pathname);
         errno  = stdioGET_ERRNO();
         return ret;
@@ -157,6 +177,7 @@ extern "C" {
 
     int chmod(const char *pathname, mode_t mode)
     {
+        TRACE_SYSCALL();
         errno = ENOSYS;
         real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
         return -1;
@@ -165,6 +186,7 @@ extern "C" {
 
     int fchmod(int fd, mode_t mode)
     {
+        TRACE_SYSCALL();
         errno = ENOSYS;
         real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
         return -1;
@@ -173,6 +195,7 @@ extern "C" {
 
     int fsync(int fd)
     {
+        TRACE_SYSCALL();
         auto fil = vfsn::linux::internal::handle_to_ff_file(fd);
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -187,8 +210,73 @@ extern "C" {
 
     int fdatasync(int fd)
     {
+        TRACE_SYSCALL();
         return fsync(fd);
     }
     __asm__(".symver fdatasync,fdatasync@GLIBC_2.2.5");
+
+    int symlink(const char *target, const char *linkpath)
+    {
+        TRACE_SYSCALL();
+        errno = ENOSYS;
+        real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
+        return -1;
+    }
+    __asm__(".symver symlink,symlink@GLIBC_2.2.5");
+
+    int fstatat(int dirfd, const char *pathname, struct stat *statbuf,
+            int flags)
+    {
+        TRACE_SYSCALL();
+        errno = ENOSYS;
+        real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
+        return -1;
+    }
+    __asm__(".symver fstatat,fstatat@GLIBC_2.2.5");
+
+    int __xstat(int ver, const char * path, struct stat * stat_buf)
+    {
+        TRACE_SYSCALL();
+        if(!dlsym(RTLD_DEFAULT, "ff_stat")) {
+            return real_xstat( ver,path,stat_buf );
+        }
+        else {
+            int ret = stat( path, stat_buf);
+            if(ret) {
+                ret =  real_xstat( ver,path,stat_buf );
+            }
+            return ret;
+        }
+    }
+
+    int __lxstat(int ver, const char * path, struct stat * stat_buf)
+    {
+        TRACE_SYSCALL();
+        if(!dlsym(RTLD_DEFAULT, "ff_stat")) {
+            return real_xstat( ver,path,stat_buf );
+        }
+        else {
+            int ret = lstat( path, stat_buf);
+            if(ret) {
+                ret =  real_lxstat( ver,path,stat_buf );
+            }
+            return ret;
+        }
+    }
+
+    int __fxstat(int ver, int fildes, struct stat * stat_buf)
+    {
+        TRACE_SYSCALL();
+        if(!dlsym(RTLD_DEFAULT, "ff_stat")) {
+            return real_fxstat( ver,fildes,stat_buf );
+        }
+        else {
+            int ret = fstat( fildes, stat_buf);
+            if(ret) {
+                ret =  real_fxstat( ver,fildes,stat_buf );
+            }
+            return ret;
+        }
+    }
 
 }

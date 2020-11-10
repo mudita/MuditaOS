@@ -71,6 +71,10 @@ namespace vfsn::linux::internal::diren
 
     int dirclose(int &_errno_, DIR_ITER *state)
     {
+        if(!state) {
+            _errno_ = 0;
+            return 0;
+        }
         if (state->dir_state) {
             delete reinterpret_cast<FF_FindData_t *>(state->dir_state);
         }

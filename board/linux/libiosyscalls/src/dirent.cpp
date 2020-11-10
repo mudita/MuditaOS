@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <cstring>
 #include "dirent_support.hpp"
+#include "debug.hpp"
 
 
 struct __dirstream {
@@ -13,12 +14,15 @@ struct __dirstream {
     struct dirent   file_data;
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnonnull-compare"
 
 extern "C" {
     using namespace vfsn::linux::internal;
 
     DIR *opendir(const char *dirname)
     {
+        TRACE_SYSCALL();
         auto dir      = new DIR;
         dir->dir_data = diren::diropen(errno, dirname);
         if (!dir->dir_data) {
@@ -34,6 +38,11 @@ extern "C" {
 
     int closedir(DIR *dirp)
     {
+        TRACE_SYSCALL();
+        if (!dirp) {
+            errno = EBADF;
+            return -1;
+        }
         auto res = diren::dirclose(errno, dirp->dir_data);
         delete dirp;
         return res;
@@ -42,6 +51,11 @@ extern "C" {
 
     struct dirent *readdir(DIR *dirp)
     {
+        TRACE_SYSCALL();
+        if (!dirp) {
+            errno = EBADF;
+            return nullptr;
+        }
         auto olderrno{errno};
         auto res = diren::dirnext(errno, dirp->dir_data);
         auto fff = reinterpret_cast<FF_FindData_t *>(dirp->dir_data->dir_state);
@@ -58,6 +72,7 @@ extern "C" {
         }
         dirp->file_data.d_ino  = fff->xDirectoryEntry.ulObjectCluster;
         dirp->file_data.d_type = (fff->ucAttributes & FF_FAT_ATTR_DIR) ? DT_DIR : DT_REG;
+        dirp->file_data.d_reclen = std::strlen( fff->pcFileName );
         std::strncpy(dirp->file_data.d_name, fff->pcFileName, sizeof(dirp->file_data.d_name));
         return &dirp->file_data;
     }
@@ -65,6 +80,11 @@ extern "C" {
 
 int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
     {
+        TRACE_SYSCALL();
+        if (!dirp) {
+            errno = EBADF;
+            return -1;
+        }
         auto olderrno{errno};
         auto res = diren::dirnext(errno, dirp->dir_data);
         auto fff = reinterpret_cast<FF_FindData_t *>(dirp->dir_data->dir_state);
@@ -90,6 +110,11 @@ int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 
     void rewinddir(DIR *dirp)
     {
+        TRACE_SYSCALL();
+        if (!dirp) {
+            errno = EBADF;
+            return;
+        }
         diren::dirreset(errno, dirp->dir_data);
         dirp->position = 0;
     }
@@ -97,6 +122,11 @@ int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 
     void seekdir( DIR *dirp, long int loc)
     {
+        TRACE_SYSCALL();
+        if (!dirp) {
+            errno = EBADF;
+            return;
+        }
         if (loc < 0) {
             return;
         }
@@ -112,7 +142,14 @@ int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 
     long int telldir(DIR *dirp)
     {
+        TRACE_SYSCALL();
+        if (!dirp) {
+            errno = EBADF;
+            return -1;
+        }
         return dirp->position;
     }
     __asm__(".symver telldir,telldir@GLIBC_2.2.5");
+
 }
+#pragma GCC diagnostic pop

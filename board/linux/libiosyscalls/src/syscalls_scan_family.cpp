@@ -5,6 +5,7 @@
 #include <ff_stdio.h>
 #include <errno.h>
 #include <ctype.h>
+#include "debug.hpp"
 namespace {
 
 
@@ -59,6 +60,7 @@ extern "C" {
 
     int ungetc (int __c, FILE *__stream)
     {
+        TRACE_SYSCALL();
         int ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), -1, SEEK_CUR );
         if( ret ) {
             errno = stdioGET_ERRNO();
@@ -81,6 +83,7 @@ extern "C" {
     int vfscanf (FILE *__restrict fp, const char *__restrict fmt,
                     __gnuc_va_list ap)
     {
+        TRACE_SYSCALL();
         int ret = 0;
         int t, c;
         int wid = 1 << 20;
@@ -131,6 +134,7 @@ extern "C" {
     int fscanf (FILE *__restrict fp,
                    const char *__restrict fmt, ...) __wur
     {
+        TRACE_SYSCALL();
         va_list ap;
         int ret;
         va_start(ap, fmt);
