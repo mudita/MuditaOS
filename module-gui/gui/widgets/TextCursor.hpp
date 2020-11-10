@@ -58,7 +58,7 @@ namespace gui
         // TODO this can move our text out of bonds ( and might need calling expand() in Text)
         void addChar(uint32_t utf_val);
         TextCursor &operator<<(const UTF8 &);
-        TextCursor &operator<<(TextBlock);
+        TextCursor &operator<<(const TextBlock &);
         void removeChar();
 
         [[nodiscard]] auto getPosOnScreen() const

@@ -15,7 +15,6 @@ add_catch2_executable(
                 test-gui-TextParse.cpp
                 test-gui-Font.cpp
                 test-gui-TextLineCursor.cpp
-                test-gui-TextBounds.cpp
         INCLUDE
                 ..
                 ../mock/

@@ -85,9 +85,10 @@ namespace gui
         [[nodiscard]] auto checkAndInvalidateBlockChanged() -> bool
         {
             if (blockChanged) {
-                blockChanged = true;
+                blockChanged = false;
+                return true;
             }
-            return blockChanged;
+            return false;
         }
 
         [[nodiscard]] auto checkLastNewLine() -> bool
