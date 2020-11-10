@@ -36,5 +36,6 @@ namespace parserFSM
         inline constexpr auto ATResponse    = "ATResponse";
         inline constexpr auto AT            = "AT";
         inline constexpr auto focus         = "focus";
+        inline constexpr auto isLocked      = "isLocked";
     }
 } // namespace parserFSM

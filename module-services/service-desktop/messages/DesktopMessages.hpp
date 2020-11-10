@@ -75,6 +75,7 @@ namespace sdesktop
 
           public:
             void send();
+            virtual ~Event() = default;
         };
 
         class ATResponseEvent : public Event
@@ -88,6 +89,13 @@ namespace sdesktop
           public:
             AppFocusChangeEvent() = default;
             explicit AppFocusChangeEvent(std::string appName);
+        };
+
+        class ScreenlockCheckEvent : public Event
+        {
+          public:
+            ScreenlockCheckEvent() = default;
+            explicit ScreenlockCheckEvent(bool isLocked);
         };
 
         class DeveloperModeRequest : public sys::DataMessage
