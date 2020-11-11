@@ -20,11 +20,12 @@ namespace call_request
 
     class Request : public IRequest
     {
-      private:
+      protected:
         bool isRequestHandled = false;
         std::string request;
 
       public:
+        Request(const std::string &data) : request(data){};
         void setHandled(bool handled) final
         {
             isRequestHandled = handled;
@@ -45,7 +46,7 @@ namespace call_request
     class IMEIRequest : public Request
     {
       public:
-        IMEIRequest(const std::string &data) : request(data){};
+        IMEIRequest(const std::string &data) : Request(data){};
         std::string command() final;
         static std::unique_ptr<IMEIRequest> create(const std::string &data);
         void handle(CallRequestHandler &h, at::Result &result) final
@@ -57,7 +58,7 @@ namespace call_request
     class USSDRequest : public Request
     {
       public:
-        USSDRequest(const std::string &data) : request(data){};
+        USSDRequest(const std::string &data) : Request(data){};
         std::string command() final;
 
         static std::unique_ptr<USSDRequest> create(const std::string &data);
@@ -70,7 +71,7 @@ namespace call_request
     class CallRequest : public Request
     {
       public:
-        CallRequest(const std::string &data) : request(data){};
+        CallRequest(const std::string &data) : Request(data){};
         std::string command() final;
         std::string getNumber()
         {
