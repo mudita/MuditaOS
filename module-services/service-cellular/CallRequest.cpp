@@ -11,7 +11,6 @@
 
 namespace call_request
 {
-
     std::string IMEIRequest::command()
     {
         return std::string(at::factory(at::AT::GET_IMEI));
@@ -36,5 +35,4 @@ namespace call_request
     {
         return std::string(at::factory(at::AT::ATD) + request + ";\r");
     }
-
 }; // namespace call_request

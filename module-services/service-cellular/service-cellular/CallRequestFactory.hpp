@@ -12,9 +12,8 @@
 
 namespace call_request
 {
-
-    constexpr auto IMEIRegex = "(\\*#06#)";
-    constexpr auto USSDRegex = "^[\\*].*[\\#]$";
+    constexpr inline auto IMEIRegex = "(\\*#06#)";
+    constexpr inline auto USSDRegex = "^[\\*].*[\\#]$";
 
     using CreateCallback = std::function<std::unique_ptr<IRequest>(const std::string &)>;
 
@@ -35,6 +34,6 @@ namespace call_request
             registerRequest(USSDRegex, USSDRequest::create);
         };
 
-        std::unique_ptr<IRequest> create(void);
+        std::unique_ptr<IRequest> create();
     };
 } // namespace call_request

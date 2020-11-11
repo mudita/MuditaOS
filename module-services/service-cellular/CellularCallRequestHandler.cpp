@@ -17,17 +17,18 @@ void CellularCallRequestHandler::handle(IMEIRequest &request, at::Result &result
     }
     request.setHandled(true);
 }
+
 void CellularCallRequestHandler::handle(USSDRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
         return;
     }
-
     cellular.ussdState = ussd::State::pullRequestSent;
     cellular.setUSSDTimer();
     request.setHandled(true);
 }
+
 void CellularCallRequestHandler::handle(CallRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {

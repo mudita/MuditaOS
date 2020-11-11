@@ -10,7 +10,6 @@ using namespace call_request;
 
 class CellularCallRequestHandler : public CallRequestHandler
 {
-
   public:
     CellularCallRequestHandler(ServiceCellular &serviceCellular) : cellular(serviceCellular)
     {}

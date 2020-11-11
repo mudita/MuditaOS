@@ -762,7 +762,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto *msg = dynamic_cast<CellularCallRequestMessage *>(msgl);
         assert(msg != nullptr);
         auto channel = cmux->get(TS0710::Channel::Commands);
-        assert(channel != nullptr);
+        if (channel == nullptr) {
+            responseMsg = std::make_shared<CellularResponseMessage>(false);
+            break;
+        }
 
         call_request::Factory factory(msg->number.getEntered());
         CellularCallRequestHandler handler(*this);

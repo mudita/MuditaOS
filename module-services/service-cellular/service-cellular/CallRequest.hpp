@@ -8,15 +8,13 @@
 
 namespace call_request
 {
-
     class IRequest
     {
       public:
-        virtual std::string command(void) = 0;
-
+        virtual std::string command()                                  = 0;
         virtual void handle(CallRequestHandler &h, at::Result &result) = 0;
         virtual void setHandled(bool handled)                          = 0;
-        virtual bool isHandled(void)                                   = 0;
+        virtual bool isHandled()                                       = 0;
         virtual bool checkModemResponse(const at::Result &result)      = 0;
     };
 
@@ -24,13 +22,14 @@ namespace call_request
     {
       private:
         bool isRequestHandled = false;
+        std::string request;
 
       public:
         void setHandled(bool handled) final
         {
             isRequestHandled = handled;
         }
-        bool isHandled(void) final
+        bool isHandled() final
         {
             return isRequestHandled;
         }
@@ -46,10 +45,8 @@ namespace call_request
     class IMEIRequest : public Request
     {
       public:
-        IMEIRequest() = delete;
-        IMEIRequest(const std::string &data){};
-        ~IMEIRequest(){};
-        std::string command(void) override final;
+        IMEIRequest(const std::string &data) : request(data){};
+        std::string command() final;
         static std::unique_ptr<IMEIRequest> create(const std::string &data);
         void handle(CallRequestHandler &h, at::Result &result) final
         {
@@ -59,14 +56,9 @@ namespace call_request
 
     class USSDRequest : public Request
     {
-      private:
-        std::string request;
-
       public:
-        USSDRequest() = delete;
         USSDRequest(const std::string &data) : request(data){};
-        ~USSDRequest(){};
-        std::string command(void) override final;
+        std::string command() final;
 
         static std::unique_ptr<USSDRequest> create(const std::string &data);
         void handle(CallRequestHandler &h, at::Result &result) final
@@ -77,15 +69,10 @@ namespace call_request
 
     class CallRequest : public Request
     {
-      private:
-        std::string request;
-
       public:
-        CallRequest() = delete;
         CallRequest(const std::string &data) : request(data){};
-        ~CallRequest(){};
-        std::string command(void) override final;
-        std::string getNumber(void)
+        std::string command() final;
+        std::string getNumber()
         {
             return request;
         };

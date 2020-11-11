@@ -18,5 +18,4 @@ namespace call_request
         virtual void handle(USSDRequest &request, at::Result &result) = 0;
         virtual void handle(CallRequest &request, at::Result &result) = 0;
     };
-
 } // namespace call_request

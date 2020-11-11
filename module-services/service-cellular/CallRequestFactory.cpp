@@ -10,24 +10,20 @@
 
 namespace call_request
 {
-
     void Factory::registerRequest(std::string regex, CreateCallback callback)
     {
-        requestMap.insert(std::pair<std::string, CreateCallback>(regex, callback));
+        requestMap.insert(std::make_pair(regex, callback));
     }
 
     std::unique_ptr<IRequest> Factory::create()
     {
-
-        re2::StringPiece input(request);
-
-        for (auto element : requestMap) {
+        for (const auto &element : requestMap) {
+            re2::StringPiece input(request);
             re2::RE2 reg(element.first);
             if (re2::RE2::FullMatch(input, reg)) {
                 return element.second(request);
             }
         }
-
         return std::make_unique<CallRequest>(request);
     }
 
