@@ -12,7 +12,6 @@ set(TARGET_COMPILE_DEFINITIONS CACHE INTERNAL "")
 add_compile_options(-funsigned-char)
 
 set(TARGET_LIBRARIES
-    iosyscalls
     rt
     pthread
     portaudio
