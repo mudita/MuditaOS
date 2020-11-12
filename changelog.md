@@ -14,6 +14,7 @@
 * `[desktop]` info window for incoming MMI messages.
 * `[text]` Added vertical scrolling.
 * `[text]` Added cursor starting position handling.
+* `[alarms]` Added main window
 
 ### Changed
 
