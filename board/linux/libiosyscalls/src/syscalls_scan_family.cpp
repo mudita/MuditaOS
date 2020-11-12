@@ -9,7 +9,7 @@
 namespace {
 
 
-    static int ic(FF_FILE *fp)
+    int ic(FF_FILE *fp)
     {
         char ch;
         return ff_fread( &ch, 1, 1, fp);
@@ -27,7 +27,7 @@ namespace {
         return d == dst;
     }
     /* t is 1 for char, 2 for short, 4 for int, and 8 for long */
-    static int iint(FF_FILE *fp, void *dst, int t, int wid)
+    int iint(FF_FILE *fp, void *dst, int t, int wid)
     {
         long n = 0;
         int c;
@@ -46,13 +46,13 @@ namespace {
         } while (isdigit(c = ic(fp)) && --wid > 0);
         ungetc(c, reinterpret_cast<FILE*>(fp));
         if (t == 8)
-            *(long *) dst = neg ? -n : n;
+            *reinterpret_cast<long *>(dst) = neg ? -n : n;
         else if (t == 4)
-            *(int *) dst = neg ? -n : n;
+            *reinterpret_cast<int *>(dst) = neg ? -n : n;
         else if (t == 2)
-            *(short *) dst = neg ? -n : n;
+            *reinterpret_cast<short *>(dst) = neg ? -n : n;
         else
-            *(char *) dst = neg ? -n : n;
+            *reinterpret_cast<char *>(dst) = neg ? -n : n;
         return 0;
     }
 }
@@ -88,7 +88,7 @@ extern "C" {
         int t, c;
         int wid = 1 << 20;
         while (*fmt) {
-            while (isspace((unsigned char) *fmt))
+            while (isspace(static_cast<unsigned char>(*fmt)))
                 fmt++;
             while (isspace(c = ic(reinterpret_cast<FF_FILE*>(fp))))
                 ;

@@ -10,7 +10,7 @@ namespace internal {
     class handle_mapper
     {
       public:
-        T const& operator[](std::size_t index) const    {return const_cast<handle_mapper&>(*this)[index];}
+        T const& operator[](std::size_t index) const    {return data[index];}
         T&       operator[](std::size_t index)          {return data[index];}
         void        remove(std::size_t index)           {unused.push_back(index);}
         bool exists(std::size_t index) const {return data.size() < index;}
@@ -28,7 +28,7 @@ namespace internal {
             data.push_back(value);
             return data.size() - 1;
         }
-        std::size_t result  = unused.back();
+        const std::size_t result  = unused.back();
         unused.pop_back();
         data[result]    = value;
         return result;

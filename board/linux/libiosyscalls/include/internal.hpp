@@ -10,3 +10,4 @@ namespace vfsn::linux::internal
     int  ff_file_to_handle(_FF_FILE *fil);
     _FF_FILE * handle_to_ff_file(int fd);
 }
+
