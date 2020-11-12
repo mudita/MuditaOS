@@ -11,8 +11,12 @@
 #include <memory>
 #include <set>
 
+class DatabaseInitializer;
+
 class Database
 {
+    static constexpr char INIT_SCRIPTS_EXT[] = "sql";
+
   public:
     Database(const char *name);
 
@@ -59,4 +63,5 @@ class Database
     sqlite3 *dbConnection;
     std::string dbName;
     bool isInitialized_;
+    std::unique_ptr<DatabaseInitializer> initializer;
 };

@@ -18,6 +18,7 @@ bool DatabaseInitializer::run(fs::path path, std::string ext)
 
     auto files = listFiles(path, dbname, ext);
     for (auto file : files) {
+        LOG_DEBUG("Runing db script: %s", file.c_str());
         auto commands = readCommands(file);
         if (!executeOnDb(commands)) {
             LOG_ERROR("Can't initialize database [%s] with [%s]", db->getName().c_str(), file.c_str());

@@ -17,7 +17,7 @@ class AlarmsDB : public Database
 {
   public:
     AlarmsDB();
-    ~AlarmsDB();
+    ~AlarmsDB() = default;
 
     AlarmsTable alarms;
 

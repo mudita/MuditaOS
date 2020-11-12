@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
+#include "DatabaseInitializer.hpp"
+
 #include "log/log.hpp"
 #include "vfs.hpp"
 #include <assert.h>
@@ -61,7 +63,9 @@ extern "C"
     }
 }
 
-Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isInitialized_(false)
+Database::Database(const char *name)
+    : dbConnection(nullptr), dbName(name), isInitialized_(false),
+      initializer(std::make_unique<DatabaseInitializer>(this))
 {
     LOG_INFO("creating database: %s", dbName.c_str());
     auto rc = sqlite3_open(name, &dbConnection);
@@ -71,6 +75,9 @@ Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isIn
     assert(rc == SQLITE_OK);
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
+
+    LOG_INFO("running scripts: %s", USER_PATH("db"));
+    isInitialized_ = initializer->run(USER_PATH("db"), INIT_SCRIPTS_EXT);
 }
 
 Database::~Database()
