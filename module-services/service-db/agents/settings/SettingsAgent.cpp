@@ -9,7 +9,7 @@
 #include <Database/Database.hpp>
 #include <Service/Service.hpp>
 #include <module-sys/Service/Bus.hpp>
-#include <module-vfs/vfs.hpp>
+#include <vfs.hpp>
 
 #include <memory>     // for make_shared, allocator, shared_ptr, make_unique, unique_ptr
 #include <functional> // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
