@@ -14,33 +14,22 @@ namespace call_request
         virtual std::string command()                                  = 0;
         virtual void handle(CallRequestHandler &h, at::Result &result) = 0;
         virtual void setHandled(bool handled)                          = 0;
-        virtual bool isHandled()                                       = 0;
+        virtual bool isHandled() const noexcept                        = 0;
         virtual bool checkModemResponse(const at::Result &result)      = 0;
+        virtual ~IRequest(){};
     };
 
     class Request : public IRequest
     {
+      public:
+        Request(const std::string &data);
+        void setHandled(bool handled) final;
+        bool isHandled() const noexcept final;
+        bool checkModemResponse(const at::Result &result);
+
       protected:
         bool isRequestHandled = false;
         std::string request;
-
-      public:
-        Request(const std::string &data) : request(data){};
-        void setHandled(bool handled) final
-        {
-            isRequestHandled = handled;
-        }
-        bool isHandled() final
-        {
-            return isRequestHandled;
-        }
-        bool checkModemResponse(const at::Result &result)
-        {
-            if (result.code != at::Result::Code::OK) {
-                return false;
-            }
-            return true;
-        }
     };
 
     class IMEIRequest : public Request
@@ -49,10 +38,7 @@ namespace call_request
         IMEIRequest(const std::string &data) : Request(data){};
         std::string command() final;
         static std::unique_ptr<IMEIRequest> create(const std::string &data);
-        void handle(CallRequestHandler &h, at::Result &result) final
-        {
-            h.handle(*this, result);
-        }
+        void handle(CallRequestHandler &h, at::Result &result) final;
     };
 
     class USSDRequest : public Request
@@ -62,10 +48,7 @@ namespace call_request
         std::string command() final;
 
         static std::unique_ptr<USSDRequest> create(const std::string &data);
-        void handle(CallRequestHandler &h, at::Result &result) final
-        {
-            h.handle(*this, result);
-        }
+        void handle(CallRequestHandler &h, at::Result &result) final;
     };
 
     class CallRequest : public Request
@@ -73,14 +56,11 @@ namespace call_request
       public:
         CallRequest(const std::string &data) : Request(data){};
         std::string command() final;
-        std::string getNumber()
+        std::string getNumber() const
         {
             return request;
         };
         static std::unique_ptr<CallRequest> create(const std::string &data);
-        void handle(CallRequestHandler &h, at::Result &result) final
-        {
-            h.handle(*this, result);
-        }
+        void handle(CallRequestHandler &h, at::Result &result) final;
     };
 }; // namespace call_request

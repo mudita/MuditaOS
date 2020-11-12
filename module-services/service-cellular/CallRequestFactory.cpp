@@ -10,6 +10,17 @@
 
 namespace call_request
 {
+    constexpr inline auto IMEIRegex = "(\\*#06#)";
+    constexpr inline auto USSDRegex = "^[\\*].*[\\#]$";
+
+    Factory::Factory(const std::string &data) : request(data)
+    {
+        registerRequest(IMEIRegex, IMEIRequest::create);
+
+        /*It have to be last check due to 3GPP TS 22.030*/
+        registerRequest(USSDRegex, USSDRequest::create);
+    };
+
     void Factory::registerRequest(std::string regex, CreateCallback callback)
     {
         requestMap.insert(std::make_pair(regex, callback));
