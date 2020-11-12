@@ -82,7 +82,7 @@ extern "C" {
     }
     __asm__(".symver readdir,readdir@GLIBC_2.2.5");
 
-int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
+    int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
     {
         TRACE_SYSCALL();
         if (!dirp) {
