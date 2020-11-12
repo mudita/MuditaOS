@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplatesWindow.hpp"
@@ -8,7 +8,7 @@
 #include "application-messages/data/MessagesStyle.hpp"
 
 #include <service-appmgr/Controller.hpp>
-#include <service-db/messages/DBSMSTemplateMessage.hpp>
+#include <service-db/DBSMSTemplateMessage.hpp>
 #include <i18/i18.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>

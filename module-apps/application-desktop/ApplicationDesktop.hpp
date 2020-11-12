@@ -9,7 +9,7 @@
 #include <Application.hpp>
 #include <Service/Message.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <service-db/messages/DBNotificationMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <service-desktop/endpoints/update/UpdateMuditaOS.hpp>
 #include <module-services/service-desktop/ServiceDesktop.hpp>

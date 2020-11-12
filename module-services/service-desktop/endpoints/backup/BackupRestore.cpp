@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BackupRestore.hpp"
@@ -13,8 +13,8 @@
 #include "vfs.hpp" // for vfs, vfs::DirectoryEntry, os_backup, tar_buf, PATH_BACKUP, vfs::FILE, user_disk
 #include "vfs_paths.hpp"
 #include "microtar/src/microtar.hpp" // for mtar_close, mtar_header_t, MTAR_ESUCCESS, mtar_strerror, mtar_open, mtar_finalize, mtar_next, mtar_read_data, mtar_read_header, mtar_write_data, mtar_write_file_header, mtar_t, MTAR_TREG
-#include "api/DBServiceAPI.hpp"      // for DBServiceAPI
-#include "service-db/includes/DBServiceName.hpp" // for db
+#include <service-db/DBServiceAPI.hpp>           // for DBServiceAPI
+#include <service-db/DBServiceName.hpp>          // for db
 #include "SystemManager/SystemManager.hpp"       // for SystemManager
 #include "log/log.hpp"                           // for LOG_INFO, LOG_ERROR
 

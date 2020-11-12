@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBCountryCodeMessage.hpp"
-
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <service-db/DBCountryCodeMessage.hpp>
+#include <service-db/DBMessage.hpp>
 
 DBCountryCodeMessage::DBCountryCodeMessage(MessageType messageType, const uint32_t _mcc, const uint32_t _country_code)
     : DBMessage(messageType), mcc(_mcc), country_code(_country_code)

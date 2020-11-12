@@ -1,10 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadItem.hpp"
 #include "time/time_conversion.hpp"
-
-#include "service-db/api/DBServiceAPI.hpp"
 
 #include <Style.hpp>
 #include "application-messages/data/MessagesStyle.hpp"

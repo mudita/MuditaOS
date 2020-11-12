@@ -1,17 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Settings.hpp"
+#include <service-db/SettingsMessages.hpp>
 
-#include <Service/Service.hpp> // for Service
-#include <Service/Bus.hpp>     // for Bus
-#include <utility>             // for move, pair
-#include <vector>              // for vector
+#include <Service/Bus.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <log/log.hpp>
 
-#include "messages/SettingsMessages.hpp" // for EntryPath, VariableChanged, CurrentModeChanged, CurrentProfileChanged, AddProfile, GetCurrentMode, GetCurrentProfile, GetVariable, ListModes, ListProfiles, RegisterOnModeChange, RegisterOnProfileChange, RegisterOnVariableChange, SetCurrentMode, SetCurrentProfile, SetVariable, UnregisterOnModeChange, UnregisterOnProfileChange, UnregisterOnVariableChange, VariableResponse, ModeListResponse, ModeResponse, ProfileListResponse, ProfileResponse, SettingsMessage (ptr only)
-#include "Service/Common.hpp" // for BusChannels, BusChannels::ServiceDBNotifications, ReturnCodes, ReturnCodes::Success
-#include "Service/Message.hpp" // for ResponseMessage, DataMessage, Message_t
-#include "log/log.hpp"         // for LOG_DEBUG, LOG_INFO, LOG_ERROR
+#include <utility>
+#include <vector>
 
 namespace Settings
 {

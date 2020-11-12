@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
 #include "agents/settings/Settings.hpp"
-#include "messages/SettingsMessages.hpp"
+#include <service-db/SettingsMessages.hpp>
 #include <Service/Service.hpp>
 #include <functional>
 #include <thread> // for Message_t, ResponseMessage, DataMessage, Message

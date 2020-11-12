@@ -18,7 +18,6 @@
 #include "messages/AppMessage.hpp"                       // for AppSwitchMe...
 #include "service-appmgr/Controller.hpp"                 // for Controller
 #include <service-cellular/CellularMessage.hpp>
-#include "service-db/api/DBServiceAPI.hpp"               // for DBServiceAPI
 #include "service-evtmgr/messages/BatteryMessages.hpp"   // for BatteryLeve...
 #include "service-evtmgr/messages/EVMessages.hpp"        // for RtcMinuteAl...
 #include "service-evtmgr/messages/KbdMessage.hpp"        // for KbdMessage
@@ -31,6 +30,7 @@
 #include <type_traits>                                   // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
+#include <service-db/DBServiceAPI.hpp> // for DBServiceAPI
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 

@@ -12,7 +12,7 @@
 
 #include "../ApplicationCallLog.hpp"
 
-#include "service-db/messages/DBMessage.hpp"
+#include <service-db/DBMessage.hpp>
 #include "i18/i18.hpp"
 
 #include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths

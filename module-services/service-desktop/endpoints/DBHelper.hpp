@@ -6,7 +6,6 @@
 #include "Common/Query.hpp"
 #include "Context.hpp"
 #include "ParserFSM.hpp"
-#include "messages/QueryMessage.hpp"
 #include "queries/messages/threads/QueryThreadsSearchForList.hpp"
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>

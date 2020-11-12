@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
@@ -9,8 +9,8 @@
 #include <utility> // for move
 
 #include "messages/TimeMessage.hpp"                      // for TimeResponseMessage
-#include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
-#include "service-db/messages/QueryMessage.hpp"          // for QueryResponse
+#include <service-db/DBNotificationMessage.hpp>          // for NotificationMessage
+#include <service-db/QueryMessage.hpp>                   // for QueryResponse
 #include "BaseInterface.hpp"                             // for Interface, Interface::Name, Interface::Name::Events
 #include "Common/Query.hpp"                              // for QueryResult
 #include "MessageType.hpp" // for MessageType, MessageType::DBServiceNotification, MessageType::ReloadTimers, MessageType::TimersProcessingStart, MessageType::TimersProcessingStop

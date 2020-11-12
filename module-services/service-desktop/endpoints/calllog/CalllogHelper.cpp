@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-db/queries/calllog/QueryCalllogGet.hpp>            // for CalllogGet, CalllogGetResult
@@ -17,7 +17,7 @@
 #include "MessageHandler.hpp"   // for MessageHandler
 #include "ParserUtils.hpp"      // for Code, Code::InternalServerError, Code::OK, parserFSM
 #include "PhoneNumber.hpp"      // for PhoneNumber::View
-#include "api/DBServiceAPI.hpp" // for DBServiceAPI
+#include <service-db/DBServiceAPI.hpp> // for DBServiceAPI
 #include "utf8/UTF8.hpp"        // for UTF8
 
 using namespace parserFSM;

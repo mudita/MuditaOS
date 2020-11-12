@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHelper.hpp"
@@ -15,7 +15,7 @@
 #include "SMSTemplateRecord.hpp"                                   // for SMSTemplateRecord
 #include "Service/Common.hpp"                                      // for ReturnCodes, ReturnCodes::Success
 #include "ThreadRecord.hpp"                                        // for ThreadRecord
-#include "api/DBServiceAPI.hpp"                                    // for DBServiceAPI
+#include <service-db/DBServiceAPI.hpp>                             // for DBServiceAPI
 #include "queries/messages/sms/QuerySMSGet.hpp"                    // for SMSGet, SMSGetResult
 #include "queries/messages/sms/QuerySMSGetByContactID.hpp"         // for SMSGetByContactID, SMSGetByContactIDResult
 #include "queries/messages/sms/QuerySMSGetByThreadID.hpp"          // for SMSGetByThreadID, SMSGetByThreadIDResult

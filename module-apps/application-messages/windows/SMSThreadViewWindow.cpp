@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSThreadViewWindow.hpp"
@@ -11,8 +11,8 @@
 #include "Service/Message.hpp"
 
 #include <TextBubble.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
-#include <service-db/messages/DBNotificationMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
 #include <log/log.hpp>

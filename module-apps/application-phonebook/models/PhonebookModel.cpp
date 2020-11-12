@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -7,11 +7,11 @@
 #include "PhonebookModel.hpp"
 
 #include <Common/Query.hpp>
-#include <messages/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
 #include <queries/RecordQuery.hpp>
 
-#include "service-db/api/DBServiceAPI.hpp"
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include "UiCommonActions.hpp"
 
 #include <string>

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateModel.hpp"
 #include "ListView.hpp"
 #include "application-messages/widgets/SMSTemplateItem.hpp"
 #include "application-messages/ApplicationMessages.hpp"
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <module-db/queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 
 SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app)

@@ -54,9 +54,9 @@
 #include <service-antenna/ServiceAntenna.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
-#include <service-db/messages/DBNotificationMessage.hpp>
-#include <service-db/messages/QueryMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/api/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/messages/EVMessages.hpp>

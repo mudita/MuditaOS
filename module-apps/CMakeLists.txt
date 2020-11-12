@@ -93,6 +93,7 @@ target_link_libraries(${PROJECT_NAME}
         service-antenna
         service-audio
         service-cellular
+        service-db
     PUBLIC
         module-bsp
         module-os

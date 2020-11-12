@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventWindow.hpp"
 #include <module-db/Interface/EventsRecord.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 namespace gui
 {

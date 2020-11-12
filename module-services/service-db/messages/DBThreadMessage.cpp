@@ -1,13 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBThreadMessage.hpp"
+#include <service-db/DBThreadMessage.hpp>
+#include <service-db/DBMessage.hpp> // for DBMessage, DBResponseMessage
+
+#include <ThreadRecord.hpp> // for ThreadRecord
 
 #include <utility> // for move
-
-#include "ThreadRecord.hpp"       // for ThreadRecord
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
-
 DBThreadMessage::DBThreadMessage(MessageType messageType, const ThreadRecord &rec) : DBMessage(messageType), record(rec)
 {}
 

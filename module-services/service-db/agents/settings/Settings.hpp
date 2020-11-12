@@ -1,18 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <includes/DBServiceName.hpp> // for db
-#include <stdint.h>                   // for int16_t
-#include <list>                       // for list
-#include <functional>                 // for function
-#include <map>                        // for map
-#include <memory>                     // for shared_ptr, allocator
-#include <string>                     // for string
-#include <optional>                   // for optional
-
 #include <module-sys/Service/Message.hpp>
+
+#include <service-db/DBServiceName.hpp>
+
+#include <cstdint>
+#include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
 
 namespace Settings
 {

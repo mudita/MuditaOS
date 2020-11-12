@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <application-phonebook/models/PhonebookModel.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
 #include <string> // for string, allocator
 
 #include "Common/Query.hpp"

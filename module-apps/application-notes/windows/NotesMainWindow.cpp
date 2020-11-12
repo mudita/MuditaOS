@@ -9,7 +9,7 @@
 
 #include "../ApplicationNotes.hpp"
 
-#include "service-db/messages/DBNotesMessage.hpp"
+#include <service-db/DBNotesMessage.hpp>
 #include "i18/i18.hpp"
 
 #include "Label.hpp"

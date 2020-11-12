@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <optional> // for optional
-#include <string>   // for string
+#include <service-db/DatabaseAgent.hpp>
+#include <service-db/SettingsMessages.hpp>
+#include <Service/Message.hpp>
 
-#include "messages/SettingsMessages.hpp"
-#include "agents/DatabaseAgent.hpp" // for DatabaseAgent
-#include "Service/Message.hpp"      // for DataMessage (ptr only), MessagePointer, ResponseMessage (ptr only)
 #include <map>
+#include <optional>
+#include <string>
 
 namespace Settings
 {

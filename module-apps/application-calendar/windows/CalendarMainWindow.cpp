@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarMainWindow.hpp"
@@ -7,11 +7,11 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "application-calendar/data/CalendarData.hpp"
 #include "NoEvents.hpp"
-#include <module-services/service-db/messages/QueryMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAll.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 namespace gui
 {

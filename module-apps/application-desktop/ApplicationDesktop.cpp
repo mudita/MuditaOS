@@ -14,13 +14,13 @@
 #include "AppWindow.hpp"
 #include "data/LockPhoneData.hpp"
 
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
-#include <messages/QueryMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 
 #include <cassert>

@@ -1,16 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <includes/DBServiceName.hpp> // for db
-#include <messages/QueryMessage.hpp>  // for QueryMessage
-#include <Service/Message.hpp>        // for SendResult
-#include <stdint.h>                   // for uint32_t
-#include <utility>                    // for move
-#include <memory>                     // for make_shared, allocator, unique_ptr
+#include "service-db/DBServiceAPI.hpp"
+#include "service-db/DBServiceName.hpp"
+#include "service-db/QueryMessage.hpp"
 
-#include "DBServiceAPI.hpp"  // for DBServiceAPI
-#include "BaseInterface.hpp" // for Interface, Interface::Name
-#include "Service/Bus.hpp"   // for Bus
+#include <BaseInterface.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Message.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <utility>
 
 namespace db
 {

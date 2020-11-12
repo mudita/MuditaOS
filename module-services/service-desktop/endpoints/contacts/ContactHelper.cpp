@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <queries/phonebook/QueryContactGet.hpp>    // for ContactGet, ContactGetSize, ContactGetResult
@@ -13,7 +13,7 @@
 #include "Common/Query.hpp"                          // for EndpointListener, Query, QueryListener, QueryResult
 #include "ParserUtils.hpp"                           // for Code, Code::InternalServerError, Code::OK, parserFSM
 #include "Service/Common.hpp"                        // for ReturnCodes, ReturnCodes::Success, ReturnCodes::Failure
-#include "api/DBServiceAPI.hpp"                      // for DBServiceAPI
+#include <service-db/DBServiceAPI.hpp>               // for DBServiceAPI
 #include "log/log.hpp"                               // for LOG_ERROR
 #include "queries/phonebook/QueryContactGetByID.hpp" // for ContactGetByID, ContactGetByIDResult
 #include "queries/phonebook/QueryContactUpdate.hpp"  // for ContactUpdate, ContactUpdateResult

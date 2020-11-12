@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -16,7 +16,7 @@
 #include <i18/i18.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-eink/Common.hpp>

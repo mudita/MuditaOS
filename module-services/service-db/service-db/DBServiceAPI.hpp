@@ -1,30 +1,30 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <BaseInterface.hpp>
+#include <Common/Common.hpp>
 #include <Common/Query.hpp>
-#include <PhoneNumber.hpp>     // for PhoneNumber
-#include <Service/Message.hpp> // for SendResult
-#include <stdint.h>            // for uint32_t
-#include <sys/types.h>         // for time_t
-#include <memory>              // for unique_ptr, shared_ptr
-#include <string>              // for string
-#include <vector>              // for vector
+#include <Interface/AlarmsRecord.hpp>
+#include <Interface/CalllogRecord.hpp>
+#include <Interface/ContactRecord.hpp>
+#include <Interface/NotesRecord.hpp>
+#include <Interface/SMSRecord.hpp>
+#include <Interface/SMSTemplateRecord.hpp>
+#include <Interface/SettingsRecord.hpp>
+#include <Interface/SettingsRecord_v2.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <PhoneNumber.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Message.hpp>
+#include <utf8/UTF8.hpp>
 
-#include "Interface/AlarmsRecord.hpp"  // for AlarmsRecord
-#include "Interface/CalllogRecord.hpp" // for CalllogRecord
-#include "Interface/ContactRecord.hpp"
-#include "Interface/NotesRecord.hpp"
-#include "Interface/SMSRecord.hpp"         // for SMSRecord
-#include "Interface/SettingsRecord.hpp"    // for SettingsRecord
-#include "Interface/ThreadRecord.hpp"      // for ThreadRecord
-#include "Interface/SMSTemplateRecord.hpp" // for SMSTemplateRecord
-#include "Service/Bus.hpp"
-#include "Interface/SettingsRecord_v2.hpp"
-#include "BaseInterface.hpp" // for Interface, Interface::Name
-#include "Common/Common.hpp" // for EntryState, EntryState::ALL
-#include "utf8/UTF8.hpp"     // for UTF8
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <sys/types.h>
+#include <vector>
 
 class DBContactMessage;
 namespace db

@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBNotesMessage.hpp"
+#include <service-db/DBNotesMessage.hpp>
+#include <service-db/DBMessage.hpp>
 
-#include <utility> // for move
+#include <NotesRecord.hpp>
 
-#include "NotesRecord.hpp"        // for NotesRecord
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <utility>
 
 DBNotesMessage::DBNotesMessage(MessageType messageType, const NotesRecord &rec) : DBMessage(messageType), record(rec)
 {}

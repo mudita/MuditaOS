@@ -10,7 +10,7 @@
 
 #include "../ApplicationNotes.hpp"
 
-#include "service-db/messages/DBMessage.hpp"
+#include <service-db/DBMessage.hpp>
 #include "i18/i18.hpp"
 
 #include "Label.hpp"

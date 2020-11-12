@@ -1,4 +1,4 @@
-# service-db tests
+﻿# service-db tests
 add_catch2_executable(
         NAME
                 service-db
@@ -10,5 +10,6 @@ add_catch2_executable(
         LIBS
                 module-services
                 module-utils
+                service-db
 )
 

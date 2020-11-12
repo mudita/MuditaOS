@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogModel.hpp"
@@ -7,8 +7,9 @@
 #include "UiCommonActions.hpp"
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
 #include "widgets/CalllogItem.hpp"
+
+#include <service-db/DBServiceAPI.hpp>
 
 using namespace calllog;
 

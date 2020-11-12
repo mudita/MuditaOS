@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
-#include <Service/Message.hpp>
 #include <MessageType.hpp>
+#include <Service/Message.hpp>
 #include <module-db/Database/QueryResult.hpp>
 
+#include <map>
 #include <memory>
 #include <utility>
-#include <map>
 #include <vector>
 
 namespace FileIndexer
 {
-    constexpr unsigned int FILE_ID_NOT_EXISTS = 0;
+    constexpr unsigned int FILE_ID_NOT_EXISTS       = 0;
     constexpr unsigned int FILE_RECORD_COLUMN_COUNT = 7;
 
     // refers to file_tab

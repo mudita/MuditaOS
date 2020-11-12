@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBServiceMessage.hpp"
-
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <service-db/DBServiceMessage.hpp>
+#include <service-db/DBMessage.hpp>
 
 DBServiceMessageBackup::DBServiceMessageBackup(MessageType messageType, std::string backupPath)
     : DBMessage(messageType), backupPath(backupPath)

@@ -1,13 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <stdint.h> // for uint32_t
-#include <string>   // for string
+#include "DBMessage.hpp"
 
-#include "DBMessage.hpp"   // for DBMessage, DBResponseMessage
-#include "MessageType.hpp" // for MessageType, MessageType::MessageTypeUninitialized
+#include <MessageType.hpp>
+
+#include <cstdint>
+#include <string>
 
 class DBServiceMessageBackup : public DBMessage
 {

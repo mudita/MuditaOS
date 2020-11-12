@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageType.hpp"
 #include "windows/NotesMainWindow.hpp"
 #include "windows/NotesEditWindow.hpp"
-#include "service-db/messages/DBMessage.hpp"
+#include <service-db/DBMessage.hpp>
 
 #include "ApplicationNotes.hpp"
 

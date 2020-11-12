@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <messages/QueryMessage.hpp>                              // for QueryResponse
+#include <service-db/QueryMessage.hpp>                            // for QueryResponse
 #include <module-apps/application-desktop/ApplicationDesktop.hpp> // for name_desktop
 #include <module-services/service-desktop/ServiceDesktop.hpp>
 #include <cinttypes> // for PRIu32
