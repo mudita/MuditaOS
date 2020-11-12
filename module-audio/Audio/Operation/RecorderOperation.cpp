@@ -63,8 +63,7 @@ namespace audio
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
-            LOG_ERROR("Error during initializing profile");
-            return;
+            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
         }
         currentProfile = defaultProfile;
 
@@ -79,15 +78,13 @@ namespace audio
 
         enc = Encoder::Create(file, Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
         if (enc == nullptr) {
-            LOG_ERROR("Error during initializing encoder");
-            return;
+            throw AudioInitException("Error during initializing encoder", RetCode::InvalidFormat);
         }
 
-        if (SwitchToPriorityProfile() != audio::RetCode::Success) {
-            return;
+        auto retCode = SwitchToPriorityProfile();
+        if (retCode != RetCode::Success) {
+            throw AudioInitException("Failed to switch audio profile", retCode);
         }
-
-        isInitialized = true;
     }
 
     audio::RetCode RecorderOperation::Start(audio::AsyncCallback callback, audio::Token token)

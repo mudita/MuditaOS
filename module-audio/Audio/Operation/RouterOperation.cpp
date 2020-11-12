@@ -145,16 +145,14 @@ namespace audio
 
         auto defaultProfile = GetProfile(Profile::Type::RoutingEarspeaker);
         if (!defaultProfile) {
-            LOG_ERROR("Error during initializing profile");
-            return;
+            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
         }
         currentProfile = defaultProfile;
 
-        if (SwitchToPriorityProfile() != audio::RetCode::Success) {
-            return;
+        auto retCode = SwitchToPriorityProfile();
+        if (retCode != RetCode::Success) {
+            throw AudioInitException("Failed to switch audio profile", retCode);
         }
-
-        isInitialized = true;
     }
 
     audio::RetCode RouterOperation::SetOutputVolume(float vol)
