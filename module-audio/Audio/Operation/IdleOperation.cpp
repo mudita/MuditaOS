@@ -8,7 +8,7 @@
 namespace audio
 {
 
-    IdleOperation::IdleOperation([[maybe_unused]] const char *file) : Operation{true}
+    IdleOperation::IdleOperation([[maybe_unused]] const char *file)
     {
         supportedProfiles.emplace_back(Profile::Create(Profile::Type::Idle, nullptr), true);
         currentProfile = supportedProfiles[0].profile;

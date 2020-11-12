@@ -294,7 +294,12 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
             retToken = audioMux.ResetInput(input);
 
             if (IsOperationEnabled(playbackType, opType)) {
-                retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
+                try {
+                    retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
+                }
+                catch (const AudioInitException &audioException) {
+                    retCode = audio::RetCode::FailedToAllocateMemory;
+                }
             }
         }
 
