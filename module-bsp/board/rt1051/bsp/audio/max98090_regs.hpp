@@ -84,14 +84,13 @@ typedef struct
     uint8_t hpren : 1;
 } max98090_reg_outputenable_t;
 
-
 // Line Input Level Configuration Register
 #define MAX98090_REG_LINE_INPUT_LEVEL_CONF 0x0E
 typedef struct
 {
     uint8_t linbpga : 3;
-	uint8_t linapga : 3;
-	uint8_t mixg246 : 1;
+    uint8_t linapga : 3;
+    uint8_t mixg246 : 1;
     uint8_t mixg135 : 1;
 } max98090_reg_line_inp_lvl_t;
 
@@ -101,7 +100,7 @@ typedef struct
 {
     uint8_t pgam : 5;
     uint8_t pa1en : 2;
-    uint8_t unused :1;
+    uint8_t unused : 1;
 } max98090_reg_mic1ena_lvlctl_t;
 
 // Microphone 2 enable and level configuration register
@@ -110,7 +109,7 @@ typedef struct
 {
     uint8_t pgam : 5;
     uint8_t pa2en : 2;
-    uint8_t unused :1;
+    uint8_t unused : 1;
 } max98090_reg_mic2ena_lvlctl_t;
 
 // Microphone Bias Level Configuration Register
@@ -158,7 +157,7 @@ typedef struct
 typedef struct
 {
     uint8_t mixadl : 7;
-    uint8_t unused :1;
+    uint8_t unused : 1;
 } max98090_reg_ladc_mix_input_t;
 
 /*  Right ADC Mixer Input Configuration Register
@@ -174,7 +173,7 @@ typedef struct
 typedef struct
 {
     uint8_t mixadr : 7;
-    uint8_t unused :1;
+    uint8_t unused : 1;
 } max98090_reg_radc_mix_input_t;
 
 /*  Left Record Path Digital Gain Configuration Register
@@ -237,7 +236,7 @@ typedef struct
 typedef struct
 {
     uint8_t ni : 7;
-    uint8_t unused :1;
+    uint8_t unused : 1;
 } max98090_reg_manual_clock_ratio_NI_MSB_t;
 
 // Manual Clock Ratio Configuration Register (NI LSB)
