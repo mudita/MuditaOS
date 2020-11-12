@@ -40,14 +40,9 @@ namespace audio
             break;
         }
 
-        if (inst->isInitialized) {
-            inst->opType   = t;
-            inst->filePath = fileName;
-            return inst;
-        }
-        else {
-            return {};
-        }
+        inst->opType   = t;
+        inst->filePath = fileName;
+        return inst;
     }
 
     std::shared_ptr<Profile> Operation::GetProfile(const Profile::Type type)
@@ -80,7 +75,7 @@ namespace audio
                 return SwitchProfile(p.profile->GetType());
             }
         }
-        return audio::RetCode::Failed;
+        return audio::RetCode::ProfileNotSet;
     }
 
     void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)

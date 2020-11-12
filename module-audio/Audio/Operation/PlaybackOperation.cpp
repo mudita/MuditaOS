@@ -20,7 +20,7 @@ namespace audio
         const char *file,
         const audio::PlaybackType &playbackType,
         std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
-        : Operation(false, playbackType), dec(nullptr)
+        : Operation(playbackType), dec(nullptr)
     {
         audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
 
@@ -61,22 +61,19 @@ namespace audio
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
-            LOG_ERROR("Error during initializing profile");
-            return;
+            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
         }
         currentProfile = defaultProfile;
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
-            LOG_ERROR("Error during initializing decoder");
-            return;
+            throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
 
-        if (SwitchToPriorityProfile() != audio::RetCode::Success) {
-            return;
+        auto retCode = SwitchToPriorityProfile();
+        if (retCode != RetCode::Success) {
+            throw AudioInitException("Failed to switch audio profile", retCode);
         }
-
-        isInitialized = true;
     }
 
     audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
@@ -96,7 +93,6 @@ namespace audio
         currentProfile->SetInOutFlags(tags->num_channel == 2
                                           ? static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo)
                                           : static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
-
         currentProfile->SetSampleRate(tags->sample_rate);
 
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
@@ -106,6 +102,9 @@ namespace audio
     audio::RetCode PlaybackOperation::Stop()
     {
         state = State::Idle;
+        if (!audioDevice) {
+            return audio::RetCode::DeviceFailure;
+        }
         return GetDeviceError(audioDevice->Stop());
     }
 

@@ -20,6 +20,7 @@
 * `[messages]` In new message window fixed clearing text on options/recipient choice 
 * `[Text]` Newline handling fix. 
 * `[appmgr]` Fix for closing applications.
+* `[audio]` Crash on attempt to open non-existent file
 
 ## [0.45.1 2020-11-06]
 
