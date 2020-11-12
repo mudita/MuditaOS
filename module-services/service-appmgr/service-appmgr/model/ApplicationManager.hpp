@@ -9,7 +9,7 @@
 #include <module-apps/Application.hpp>
 #include <module-apps/ApplicationLauncher.hpp>
 
-#include <service-appmgr/Message.hpp>
+#include <service-appmgr/messages/Message.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -116,7 +116,7 @@ namespace app::manager
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
-        auto handleInitApplication(ApplicationInitialisation *msg) -> bool;
+        auto handleInitApplication(ApplicationInitialised *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
