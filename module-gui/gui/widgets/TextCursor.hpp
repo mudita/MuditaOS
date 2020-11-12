@@ -36,7 +36,7 @@ namespace gui
             Error, /// error - now not implemented
         };
 
-        TextCursor(gui::Text *parent, unsigned int pos = 0, unsigned int block = 0);
+        TextCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
         TextCursor() = delete;
 
         /// Up Down - end of line movement like in vi
@@ -64,8 +64,6 @@ namespace gui
         {
             return pos_on_screen;
         }
-
-        auto processBound(InputBound bound, const InputEvent &event) -> InputBound;
     };
 } // namespace gui
 

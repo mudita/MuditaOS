@@ -3,7 +3,7 @@
 
 #include <catch2/catch.hpp>           // for Section, SourceLineInfo, SECTION, SectionInfo, StringRef, TEST_CASE
 #include <Service/Service.hpp>        // for Service
-#include <Service/Message.hpp>        // for Message_t, ResponseMessage, DataMessage
+#include <Service/Message.hpp>        // for MessagePointer, ResponseMessage, DataMessage
 #include <module-sys/Service/Bus.hpp> // for Bus
 #include <functional>                 // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
 #include <list>                       // for list
@@ -33,7 +33,7 @@ namespace Settings
             return value;
         }
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
         {
             return std::make_shared<sys::ResponseMessage>();
         }
@@ -43,8 +43,8 @@ namespace Settings
             using std::placeholders::_1;
             using std::placeholders::_2;
 
-            connect(Settings::Messages::GetVariable(), std::bind(&Service::handleGetVariable, this, _1, _2));
-            connect(Settings::Messages::SetVariable(), std::bind(&Service::handleSetVariable, this, _1, _2));
+            connect(Settings::Messages::GetVariable(), std::bind(&Service::handleGetVariable, this, _1));
+            connect(Settings::Messages::SetVariable(), std::bind(&Service::handleSetVariable, this, _1));
 
             return sys::ReturnCodes::Success;
         }
@@ -59,7 +59,7 @@ namespace Settings
             return sys::ReturnCodes::Success;
         }
 
-        sys::Message_t handleGetVariable(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+        sys::MessagePointer handleGetVariable(sys::Message *req)
         {
             if (auto msg = dynamic_cast<Settings::Messages::GetVariable *>(req)) {
 
@@ -71,7 +71,7 @@ namespace Settings
             return std::make_shared<sys::ResponseMessage>();
         };
 
-        sys::Message_t handleSetVariable(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+        sys::MessagePointer handleSetVariable(sys::Message *req)
         {
             if (auto msg = dynamic_cast<Settings::Messages::SetVariable *>(req)) {
 
@@ -85,7 +85,7 @@ namespace Settings
             return std::make_shared<sys::ResponseMessage>();
         };
 
-        sys::Message_t handleListProfiles(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+        sys::MessagePointer handleListProfiles(sys::Message *req)
         {
             if (dynamic_cast<Settings::Messages::ListProfiles *>(req) != nullptr) {
                 std::list<std::string> profiles = {"silent", "loud"};
@@ -94,7 +94,7 @@ namespace Settings
             return std::make_shared<sys::ResponseMessage>();
         };
 
-        sys::Message_t handleListModes(sys::DataMessage *req, sys::ResponseMessage * /*response*/)
+        sys::MessagePointer handleListModes(sys::Message *req)
         {
             if (dynamic_cast<Settings::Messages::ListProfiles *>(req) != nullptr) {
                 std::list<std::string> modes = {"mode1", "mode2"};

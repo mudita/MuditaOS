@@ -22,8 +22,7 @@ namespace app::manager
                                             StartupStatus status,
                                             StartInBackground startInBackground) -> bool
     {
-        auto msg =
-            std::make_shared<app::manager::ApplicationInitialisation>(sender->GetName(), status, startInBackground);
+        auto msg = std::make_shared<app::manager::ApplicationInitialised>(sender->GetName(), status, startInBackground);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 
@@ -64,9 +63,15 @@ namespace app::manager
         return sys::Bus::SendUnicast(switchMsg, ApplicationManager::ServiceName, sender);
     }
 
-    auto Controller::changeLanguage(sys::Service *sender, utils::Lang language) -> bool
+    auto Controller::changeDisplayLanguage(sys::Service *sender, utils::Lang language) -> bool
     {
-        auto msg = std::make_shared<app::manager::LanguageChangeRequest>(sender->GetName(), language);
+        auto msg = std::make_shared<app::manager::DisplayLanguageChangeRequest>(sender->GetName(), language);
+        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeInputLanguage(sys::Service *sender, utils::Lang language) -> bool
+    {
+        auto msg = std::make_shared<app::manager::InputLanguageChangeRequest>(sender->GetName(), language);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 

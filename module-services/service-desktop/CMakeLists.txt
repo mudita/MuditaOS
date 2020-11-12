@@ -1,4 +1,4 @@
-message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
+﻿message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 add_subdirectory( parser )
 add_subdirectory( endpoints )
@@ -16,3 +16,7 @@ add_dependencies(${PROJECT_NAME} version)
 if (${ENABLE_TESTS})
 	add_subdirectory(tests)
 endif ()
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-cellular
+)

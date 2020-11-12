@@ -12,7 +12,7 @@
 #include "application-special-input/ApplicationSpecialInput.hpp"
 
 #include <service-appmgr/Controller.hpp>
-#include <service-appmgr/Message.hpp>
+#include <service-appmgr/messages/Message.hpp>
 
 #include <i18/i18.hpp>
 #include <log/log.hpp>

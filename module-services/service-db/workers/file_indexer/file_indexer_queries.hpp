@@ -5,6 +5,11 @@
 
 namespace FileIndexer::Statements
 {
+
+    constexpr auto getFilesCount = R"sql(
+                        SELECT COUNT(FT.file_id) AS FILE_PATH_EXISTS FROM  file_tab AS FT;
+                        )sql";
+
     constexpr auto checkFileExists = R"sql(
                         SELECT COUNT(size) AS FILE_PATH_EXISTS FROM  file_tab AS FT
                         WHERE FT.path = '%q'
@@ -37,13 +42,23 @@ namespace FileIndexer::Statements
 
     constexpr auto getFilesByDir = R"sql(
                         SELECT file_id, path, size, mime_type, mtime, directory, file_type   FROM  file_tab AS FT
-                        WHERE FT.directory = '%lu'
+                        WHERE FT.directory = '%q'
                         COLLATE NOCASE;
                         )sql";
 
     constexpr auto insertFileInfo = R"sql(
-                        INSERT OR REPLACE INTO file_tab (path, size, file_type, mtime, directory, file_type) VALUES
-                        ( '%q', '%lu', '%lu' , '%lu', '%q', '%lu') ;
+                        INSERT OR REPLACE INTO file_tab (file_id, path, size, mime_type, mtime, directory, file_type) VALUES
+                        ( '%lu', '%q', '%lu', '%lu' , '%lu', '%q', '%lu') ;
+                        )sql";
+
+    constexpr auto updateFileInfo = R"sql(
+                        UPDATE file_tab SET path= '%q',
+                        size= '%lu',
+                        mime_type= '%lu',
+                        mtime= '%lu',
+                        directory ='%q',
+                        file_type= '%lu'
+                        WHERE file_id = '%lu' ;
                         )sql";
 
     constexpr auto getPropertyValue = R"sql(
@@ -63,6 +78,11 @@ namespace FileIndexer::Statements
     constexpr auto insertPropertyValue = R"sql(
                         INSERT OR REPLACE INTO metadata_tab (file_id, property, value) VALUES
                         ( '%lu', '%q', '%q' ) ;
+                        )sql";
+
+    constexpr auto updatePropertyValue = R"sql(
+                        UPDATE metadata_tab SET value = '%q'
+                        WHERE file_id= '%lu' AND property = '%q' ;
                         )sql";
 
 } // namespace FileIndexer::Statements

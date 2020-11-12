@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSettings.hpp"
@@ -18,6 +18,7 @@
 #include "windows/MessagesWindow.hpp"
 #include "windows/PhoneNameWindow.hpp"
 #include "windows/AutolockWindow.hpp"
+#include "windows/TorchWindow.hpp"
 #include "windows/WallpaperWindow.hpp"
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
@@ -25,7 +26,7 @@
 #include "Dialog.hpp"
 
 #include <service-evtmgr/api/EventManagerServiceAPI.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 #include <i18/i18.hpp>
 
 namespace app
@@ -38,7 +39,7 @@ namespace app
 
     // Invoked upon receiving data message
     auto ApplicationSettingsNew::DataReceivedHandler(sys::DataMessage *msgl,
-                                                     [[maybe_unused]] sys::ResponseMessage *resp) -> sys::Message_t
+                                                     [[maybe_unused]] sys::ResponseMessage *resp) -> sys::MessagePointer
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
@@ -127,6 +128,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::torch, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::TorchWindow>(app);
         });
         windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
             return std::make_unique<gui::WallpaperWindow>(app);

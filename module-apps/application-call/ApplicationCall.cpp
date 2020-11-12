@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -20,8 +20,8 @@
 #include <log/log.hpp>
 #include <memory>
 #include <service-cellular/ServiceCellular.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
@@ -33,8 +33,10 @@ namespace app
     ApplicationCall::ApplicationCall(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, app::call_stack_size)
     {
-        addActionReceiver(manager::actions::Call,
-                          [this](auto data) { switchWindow(window::name_enterNumber, std::move(data)); });
+        addActionReceiver(manager::actions::Call, [this](auto data) {
+            switchWindow(window::name_enterNumber, std::move(data));
+            return msgHandled();
+        });
     }
 
     //  number of seconds after end call to switch back to previous application
@@ -71,7 +73,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCall::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

@@ -7,7 +7,7 @@
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
 #include <Service/Service.hpp> // for Service
-#include <Service/Message.hpp> // for Message_t
+#include <Service/Message.hpp> // for MessagePointer
 #include <stdint.h>            // for uint32_t
 #include <memory>              // for unique_ptr
 #include <sstream>
@@ -46,7 +46,7 @@ namespace FotaService
 
         ~Service();
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
 
         sys::ReturnCodes InitHandler() override;
 
@@ -64,22 +64,22 @@ namespace FotaService
       private:
         /** Get access to data channel
          */
-        sys::Message_t handleCellularGetChannelResponseMessage(sys::DataMessage *req, sys::ResponseMessage *response);
+        sys::MessagePointer handleCellularGetChannelResponseMessage(sys::Message *req);
         /** Do nothing until celular finishes it's startup
          */
-        sys::Message_t handleServiceCellularNotifications(sys::DataMessage *req, sys::ResponseMessage *response);
-        sys::Message_t handleConfigureAPN(sys::DataMessage *req, sys::ResponseMessage *response);
-        sys::Message_t handleConnect(sys::DataMessage *req, sys::ResponseMessage *response);
-        sys::Message_t handleHttpGet(sys::DataMessage *req, sys::ResponseMessage *response);
+        sys::MessagePointer handleServiceCellularNotifications(sys::Message *req);
+        sys::MessagePointer handleConfigureAPN(sys::Message *req);
+        sys::MessagePointer handleConnect(sys::Message *req);
+        sys::MessagePointer handleHttpGet(sys::Message *req);
         /** Send fota update command to modem
          */
-        sys::Message_t handleFotaStart(sys::DataMessage *req, sys::ResponseMessage *response);
+        sys::MessagePointer handleFotaStart(sys::Message *req);
         /** Handle URC from modem, support for asynchronious commands
          */
         void handleChannelNotifications(std::string &data);
         /** Handle fota progress notification (in cellular)
          */
-        sys::Message_t handleRawProgress(sys::DataMessage *req, sys::ResponseMessage *response);
+        sys::MessagePointer handleRawProgress(sys::Message *req);
 
         std::unique_ptr<sys::Timer> connectionTimer;
         void getApnConfiguration();

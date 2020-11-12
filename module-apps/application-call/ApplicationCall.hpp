@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,7 @@
 #include "Service/Message.hpp"
 #include "Service/Timer.hpp"
 #include "SystemManager/SystemManager.hpp"
-#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <time/time_conversion.hpp>
 
 namespace app
@@ -41,7 +41,7 @@ namespace app
         ApplicationCall(std::string name                    = name_call,
                         std::string parent                  = {},
                         StartInBackground startInBackground = {false});
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

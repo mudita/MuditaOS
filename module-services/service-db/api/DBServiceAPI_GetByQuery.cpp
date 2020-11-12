@@ -3,7 +3,7 @@
 
 #include <includes/DBServiceName.hpp> // for db
 #include <messages/QueryMessage.hpp>  // for QueryMessage
-#include <Service/Message.hpp>        // for MessageRet_t
+#include <Service/Message.hpp>        // for SendResult
 #include <stdint.h>                   // for uint32_t
 #include <utility>                    // for move
 #include <memory>                     // for make_shared, allocator, unique_ptr
@@ -27,10 +27,10 @@ bool DBServiceAPI::GetQuery(sys::Service *serv, db::Interface::Name database, st
     return sys::Bus::SendUnicast(msg, service::name::db, serv);
 }
 
-sys::MessageRet_t DBServiceAPI::GetQueryWithReply(sys::Service *serv,
-                                                  db::Interface::Name database,
-                                                  std::unique_ptr<db::Query> query,
-                                                  std::uint32_t timeout)
+sys::SendResult DBServiceAPI::GetQueryWithReply(sys::Service *serv,
+                                                db::Interface::Name database,
+                                                std::unique_ptr<db::Query> query,
+                                                std::uint32_t timeout)
 {
     auto msg = std::make_shared<db::QueryMessage>(database, std::move(query));
     return sys::Bus::SendUnicast(msg, service::name::db, serv, timeout);

@@ -22,7 +22,7 @@ namespace app
                             std::string parent                  = {},
                             StartInBackground startInBackground = {false});
         virtual ~ApplicationSettings();
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

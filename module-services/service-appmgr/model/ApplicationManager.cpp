@@ -15,7 +15,7 @@
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
-#include <service-appmgr/Message.hpp>
+#include <service-appmgr/messages/Message.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-gui/ServiceGUI.hpp>
@@ -141,7 +141,8 @@ namespace app::manager
     {
         settings = DBServiceAPI::SettingsGet(this);
         blockingTimer->setInterval(settings.lockTime != 0 ? settings.lockTime : default_application_locktime_ms);
-        utils::localize.Switch(toUtilsLanguage(settings.language));
+        utils::localize.SetDisplayLanguage(toUtilsLanguage(settings.displayLanguage));
+        utils::localize.setInputLanguage(toUtilsLanguage(settings.inputLanguage));
 
         startSystemServices();
         startBackgroundApplications();
@@ -189,68 +190,72 @@ namespace app::manager
     }
 
     auto ApplicationManager::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
-                                                 [[maybe_unused]] sys::ResponseMessage *resp) -> sys::Message_t
+                                                 [[maybe_unused]] sys::ResponseMessage *resp) -> sys::MessagePointer
     {
         return std::make_shared<sys::ResponseMessage>();
     }
 
     void ApplicationManager::registerMessageHandlers()
     {
-        connect(typeid(ApplicationStatusRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg       = static_cast<ApplicationStatusRequest *>(request);
-            auto ret       = std::make_shared<ApplicationStatusRequest>(GetName(), msg->checkAppName);
-            ret->isRunning = getApplication(msg->checkAppName) != nullptr;
-            return ret;
+        connect(typeid(ApplicationStatusRequest), [this](sys::Message *request) {
+            auto msg = static_cast<ApplicationStatusRequest *>(request);
+            return std::make_shared<ApplicationStatusResponse>(msg->checkAppName,
+                                                               getApplication(msg->checkAppName) != nullptr);
         });
-        connect(typeid(PowerSaveModeInitRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
+        connect(typeid(PowerSaveModeInitRequest), [this](sys::Message *) {
             handlePowerSavingModeInit();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(PreventBlockingRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
+        connect(typeid(PreventBlockingRequest), [this](sys::Message *) {
             blockingTimer->reload();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(SwitchRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+        connect(typeid(SwitchRequest), [this](sys::Message *request) {
             auto msg = static_cast<SwitchRequest *>(request);
             handleSwitchApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(SwitchBackRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+        connect(typeid(SwitchBackRequest), [this](sys::Message *request) {
             auto msg = static_cast<SwitchBackRequest *>(request);
             handleSwitchBack(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(SwitchConfirmation), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+        connect(typeid(SwitchConfirmation), [this](sys::Message *request) {
             auto msg = static_cast<SwitchConfirmation *>(request);
             handleSwitchConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(CloseConfirmation), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+        connect(typeid(CloseConfirmation), [this](sys::Message *request) {
             auto msg = static_cast<CloseConfirmation *>(request);
             handleCloseConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(ApplicationCloseRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+        connect(typeid(ApplicationCloseRequest), [this](sys::Message *request) {
             auto msg = static_cast<ApplicationCloseRequest *>(request);
-            closeService(msg->getApplication());
+            closeApplication(applications.findByName(msg->getApplication()));
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(ApplicationInitialisation), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<ApplicationInitialisation *>(request);
+        connect(typeid(ApplicationInitialised), [this](sys::Message *request) {
+            auto msg = static_cast<ApplicationInitialised *>(request);
             handleInitApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(LanguageChangeRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
-            auto msg = static_cast<LanguageChangeRequest *>(request);
-            handleLanguageChange(msg);
+        connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
+            handleDisplayLanguageChange(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(ShutdownRequest), [this](sys::DataMessage *, sys::ResponseMessage *) {
+        connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<InputLanguageChangeRequest *>(request);
+            handleInputLanguageChange(msg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(ShutdownRequest), [this](sys::Message *) {
             closeApplications();
             closeServices();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(ActionRequest), [this](sys::DataMessage *request, sys::ResponseMessage *) {
+        connect(typeid(ActionRequest), [this](sys::Message *request) {
             auto actionMsg = static_cast<ActionRequest *>(request);
             handleAction(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
@@ -301,7 +306,7 @@ namespace app::manager
         for (const auto &app : getApplications()) {
             if (app->started()) {
                 LOG_INFO("Closing application %s", app->name().c_str());
-                closeService(app->name());
+                closeApplication(app.get());
                 app->setState(ApplicationHandle::State::DEACTIVATED);
             }
         }
@@ -317,6 +322,16 @@ namespace app::manager
         else {
             LOG_FATAL("Service/Application %s is still running", name.c_str());
         }
+    }
+
+    void ApplicationManager::closeApplication(ApplicationHandle *application)
+    {
+        if (application == nullptr) {
+            return;
+        }
+
+        closeService(application->name());
+        application->close();
     }
 
     auto ApplicationManager::handlePowerSavingModeInit() -> bool
@@ -468,7 +483,7 @@ namespace app::manager
         previousApp.switchWindow = std::move(targetWindow);
     }
 
-    auto ApplicationManager::handleInitApplication(ApplicationInitialisation *msg) -> bool
+    auto ApplicationManager::handleInitApplication(ApplicationInitialised *msg) -> bool
     {
         auto app = getApplication(msg->getSenderName());
         if (app == nullptr) {
@@ -516,27 +531,41 @@ namespace app::manager
         Controller::switchBack(this);
     }
 
-    auto ApplicationManager::handleLanguageChange(app::manager::LanguageChangeRequest *msg) -> bool
+    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
     {
         const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
-        if (requestedLanguage == settings.language) {
+        settings                     = DBServiceAPI::SettingsGet(this);
+
+        if (requestedLanguage == settings.displayLanguage) {
             LOG_WARN("The selected language is already set. Ignore.");
             return true;
         }
-
-        settings          = DBServiceAPI::SettingsGet(this);
-        settings.language = requestedLanguage;
-
-        DBServiceAPI::SettingsUpdate(this, settings);
-        utils::localize.Switch(msg->getLanguage());
+        settings.displayLanguage = requestedLanguage;
+        utils::localize.SetDisplayLanguage(msg->getLanguage());
         rebuildActiveApplications();
+        DBServiceAPI::SettingsUpdate(this, settings);
+        return true;
+    }
+
+    auto ApplicationManager::handleInputLanguageChange(app::manager::InputLanguageChangeRequest *msg) -> bool
+    {
+        const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
+        settings                     = DBServiceAPI::SettingsGet(this);
+
+        if (requestedLanguage == settings.inputLanguage) {
+            LOG_WARN("The selected language is already set. Ignore.");
+            return true;
+        }
+        settings.inputLanguage = requestedLanguage;
+        utils::localize.setInputLanguage(msg->getLanguage());
+        DBServiceAPI::SettingsUpdate(this, settings);
         return true;
     }
 
     void ApplicationManager::rebuildActiveApplications()
     {
         for (const auto &app : getApplications()) {
-            if (app && app->launcher && app->launcher->handle) {
+            if (app && app->valid()) {
                 if (const auto appState = app->state(); appState == ApplicationHandle::State::ACTIVE_FORGROUND ||
                                                         appState == ApplicationHandle::State::ACTIVE_BACKGROUND) {
                     app::Application::messageRebuildApplication(this, app->name());

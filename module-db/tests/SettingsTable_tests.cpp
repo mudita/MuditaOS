@@ -33,8 +33,9 @@ TEST_CASE("Settings Table tests")
         settingsRow.timeFormat12   = false;
         settingsRow.timeDateFormat = false;
         settingsRow.pin1           = "4321";
-        settingsRow.pin2           = "5432";
-        settingsRow.language       = SettingsLanguage ::POLISH;
+        settingsRow.pin2            = "5432";
+        settingsRow.displayLanguage = SettingsLanguage ::POLISH;
+        settingsRow.inputLanguage   = SettingsLanguage ::POLISH;
         REQUIRE(settingsDb.settings.update(settingsRow));
 
         settingsRow = settingsDb.settings.getById(1);
@@ -43,7 +44,8 @@ TEST_CASE("Settings Table tests")
         REQUIRE(settingsRow.timeDateFormat == false);
         REQUIRE(settingsRow.pin1 == "4321");
         REQUIRE(settingsRow.pin2 == "5432");
-        REQUIRE(settingsRow.language == SettingsLanguage ::POLISH);
+        REQUIRE(settingsRow.displayLanguage == SettingsLanguage ::POLISH);
+        REQUIRE(settingsRow.inputLanguage == SettingsLanguage ::POLISH);
     }
 
     {
@@ -55,7 +57,8 @@ TEST_CASE("Settings Table tests")
         REQUIRE(settingsRow.timeDateFormat == false);
         REQUIRE(settingsRow.pin1 == "4321");
         REQUIRE(settingsRow.pin2 == "5432");
-        REQUIRE(settingsRow.language == SettingsLanguage ::POLISH);
+        REQUIRE(settingsRow.displayLanguage == SettingsLanguage ::POLISH);
+        REQUIRE(settingsRow.inputLanguage == SettingsLanguage ::POLISH);
     }
 
     Database::deinitialize();

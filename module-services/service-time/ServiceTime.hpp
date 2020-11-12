@@ -13,7 +13,7 @@
 #include "MessageType.hpp"
 #include "timeEvents/CalendarTimeEvents.hpp" // for CalendarTimeEvents
 #include "Service/Common.hpp"                // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp"               // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
+#include "Service/Message.hpp"               // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "service-time/ServiceTime.hpp"
 
 namespace service::name
@@ -36,7 +36,7 @@ namespace stm
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
     };
 
 } /* namespace stm */

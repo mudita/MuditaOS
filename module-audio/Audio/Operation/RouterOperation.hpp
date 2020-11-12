@@ -42,7 +42,6 @@ namespace audio
         audio::RetCode SetInputGain(float gain) final;
 
         Position GetPosition() final;
-        void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) final;
 
       private:
         bool Mute(bool enable);
@@ -51,7 +50,6 @@ namespace audio
 
         std::unique_ptr<Encoder> enc;
 
-        std::unique_ptr<bsp::AudioDevice> audioDevice;
         std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
 
         AudioCallback audioDeviceCallback         = nullptr;

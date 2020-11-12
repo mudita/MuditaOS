@@ -1,20 +1,22 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ServiceBluetooth.hpp"
+#include "Constants.hpp"
+#include "service-bluetooth/ServiceBluetooth.hpp"
+#include "service-bluetooth/BluetoothMessage.hpp"
 
-#include <log/log.hpp>                // for LOG_INFO, LOG_ERROR
-#include <module-sys/Service/Bus.hpp> // for Bus
-#include <bits/exception.h>           // for exception
-#include <utility>                    // for move
+#include <module-sys/Service/Bus.hpp>
 
-#include "Constants.hpp"       // for bluetooth
-#include "Service/Service.hpp" // for Service
-#include "Service/Message.hpp" // for ResponseMessage, Message_t, DataMessage
-#include "MessageType.hpp" // for MessageType, MessageType::BluetoothAddrResult, MessageType::BluetoothRequest, MessageType::BluetoothRequestStream
-#include "messages/BluetoothMessage.hpp" // for BluetoothMessage, BluetoothRequestStreamResultMessage, BluetoothAddrMessage, BluetoothMessage::PAN, BluetoothMessage::Play, BluetoothMessage::Scan, BluetoothMessage::Start, BluetoothMessage::Stop, BluetoothMessage::StopScan, BluetoothMessage::Visible
-#include "BluetoothWorker.hpp"           // for BluetoothWorker
-#include "interface/profiles/Profile.hpp" // for Profile
+#include <Bluetooth/BluetoothWorker.hpp>
+#include <interface/profiles/Profile.hpp>
+#include <MessageType.hpp>
+#include <Service/Service.hpp>
+#include <Service/Message.hpp>
+
+#include <log/log.hpp>
+
+#include <bits/exception.h>
+#include <utility>
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
@@ -42,7 +44,7 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     try {
         switch (static_cast<MessageType>(msg->messageType)) {

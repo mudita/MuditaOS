@@ -36,6 +36,8 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
          {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
+         {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
+         {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},
          {json::fsTotal, std::to_string(fsStats.totalMbytes)},
          {json::fsFree, std::to_string(fsStats.freeMbytes)},
          {json::fsFreePercent, std::to_string(fsStats.freePercent)},

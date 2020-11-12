@@ -26,10 +26,10 @@ namespace app
         ApplicationCalendar(std::string name,
                             std::string parent,
                             StartInBackground startInBackground = {false},
-                            uint32_t stackDepth                 = 4096,
+                            uint32_t stackDepth                 = 8192,
                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-sys/Service/Bus.hpp>
 #include <module-services/service-evtmgr/Constants.hpp>
 #include <module-services/service-desktop/parser/MessageHandler.hpp>
-#include <module-services/service-cellular/messages/CellularMessage.hpp>
-#include <module-services/service-cellular/ServiceCellular.hpp>
+#include <service-cellular/CellularMessage.hpp>
+#include <service-cellular/ServiceCellular.hpp>
 #include <module-services/service-desktop/messages/DesktopMessages.hpp>
 #include "DeveloperModeHelper.hpp"
 #include "ParserUtils.hpp" // for parserFSM
@@ -29,12 +29,17 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         auto msg     = std::make_shared<cellular::RawCommand>();
         msg->command = body[json::developerMode::AT].string_value();
         msg->timeout = 3000;
-        sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, ownerServicePtr);
+        sys::Bus::SendUnicast(std::move(msg), ServiceCellular::serviceName, ownerServicePtr);
     }
     else if (body[json::developerMode::focus].bool_value()) {
         auto event = std::make_unique<sdesktop::developerMode::AppFocusChangeEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        sys::Bus::SendUnicast(msg, service::name::evt_manager, ownerServicePtr);
+        sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, ownerServicePtr);
+    }
+    else if (body[json::developerMode::isLocked].bool_value()) {
+        auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>();
+        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        sys::Bus::SendUnicast(std::move(msg), "ApplicationDesktop", ownerServicePtr);
     }
     else {
         context.setResponseStatus(http::Code::BadRequest);

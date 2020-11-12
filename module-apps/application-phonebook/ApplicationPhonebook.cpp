@@ -28,7 +28,8 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    auto ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t
+    auto ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+        -> sys::MessagePointer
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

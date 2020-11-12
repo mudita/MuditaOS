@@ -6,6 +6,7 @@
 #include <Label.hpp>
 #include <BoxLayout.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
 
 namespace gui
 {

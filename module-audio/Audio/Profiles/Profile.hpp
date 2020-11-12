@@ -23,26 +23,20 @@ namespace audio
         enum class Type
         {
             // Profiles used only during call
-            RoutingSpeakerphone,
-            RoutingHeadset,
-            RoutingBTHeadset,
+            RoutingLoudspeaker,
             RoutingHeadphones,
             RoutingEarspeaker,
+            RoutingBluetoothHSP,
 
             // Recording profiles
             RecordingBuiltInMic,
-            RecordingHeadset,
-            RecordingBTHeadset,
+            RecordingHeadphones,
+            RecordingBluetoothHSP,
 
             // Profiles used by music player
             PlaybackLoudspeaker,
             PlaybackHeadphones,
-            PlaybackBTA2DP,
-
-            // Profiles used by system sounds
-            SystemSoundLoudspeaker,
-            SystemSoundHeadphones,
-            SystemSoundBTA2DP,
+            PlaybackBluetoothA2DP,
 
             Idle,
 

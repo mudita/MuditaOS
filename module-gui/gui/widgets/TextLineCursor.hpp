@@ -17,12 +17,6 @@ namespace gui
             return line;
         }
 
-        RawFont *getFont()
-        {
-            auto format = (*this)->getFormat();
-            return format == nullptr ? default_font : format->getFont();
-        }
-
         auto moveCursor(NavigationDirection direction) -> Move
         {
             Move movement = TextCursor::moveCursor(direction);

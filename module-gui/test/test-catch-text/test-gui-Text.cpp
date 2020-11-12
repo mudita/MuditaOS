@@ -88,7 +88,7 @@ TEST_CASE("Text drawLines")
         REQUIRE(text.linesSize() == 1);
     }
 
-    SECTION("all multiline visible")
+    SECTION("all multiline visible with newline end")
     {
         unsigned int lines_count = 4;
         auto testline            = mockup::multiLineString(lines_count);
@@ -98,7 +98,8 @@ TEST_CASE("Text drawLines")
             textToTextBlocks(testline, fontmanager.getFont(0), TextBlock::End::Newline)));
 
         text.drawLines();
-        REQUIRE(text.linesSize() == lines_count);
+        // Extra one line for empty newline at end
+        REQUIRE(text.linesSize() == lines_count + 1);
     }
 }
 
@@ -114,18 +115,24 @@ TEST_CASE("Text buildDrawList")
     text.setSize(3000, 3000);
     text.setText(std::make_unique<TextDocument>(textToTextBlocks(testline, font, TextBlock::End::Newline)));
 
-    SECTION("check every element in every line if it's in parent and has non zero sizes")
+    SECTION("check every element in every line if it's in parent and has non zero sizes apart from last empty line "
+            "from newline")
     {
         REQUIRE(text.linesGet().size() > 0);
         for (auto &line : text.linesGet()) {
-            REQUIRE(line.length() > 0);
+            if (&line == &text.linesGet().back()) {
+                REQUIRE(line.length() == 0);
+            }
+            else {
+                REQUIRE(line.length() > 0);
+            }
         }
     }
 }
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.Switch(utils::Lang::En); /// needed to load input mode
+    utils::localize.SetDisplayLanguage(utils::Lang::En); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();

@@ -9,18 +9,31 @@
 #include <string>
 #include <vector>
 
-namespace app::manager::actions
+namespace app::manager
 {
-    using ActionId     = int;
-    using ActionFilter = std::vector<ActionId>;
+    class ActionRequest; // Forward declaration.
 
-    enum Action : ActionId
+    namespace actions
     {
-        Launch,
-        Call,
-        UserAction
-    };
+        using ActionId        = int;
+        using ActionFilter    = std::vector<ActionId>;
+        using ActionParams    = gui::SwitchData;
+        using ActionParamsPtr = std::unique_ptr<ActionParams>;
 
-    using ActionParams    = gui::SwitchData;
-    using ActionParamsPtr = std::unique_ptr<ActionParams>;
-} // namespace app::manager::actions
+        enum Action : ActionId
+        {
+            Launch,
+            Call,
+            UserAction // The last enumerator in the Action enum.
+                       // All user-defined actions shall have values greater than UserAction.
+        };
+
+        class ConvertibleToAction
+        {
+          public:
+            virtual ~ConvertibleToAction() noexcept = default;
+
+            virtual auto toAction() const -> std::unique_ptr<ActionRequest> = 0;
+        };
+    } // namespace actions
+} // namespace app::manager

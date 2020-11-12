@@ -16,6 +16,7 @@ namespace gui
         gui::Image *leftArrowImage   = nullptr;
         gui::Image *newDayEventImage = nullptr;
 
+        TimePoint dateFilter                           = TimePointNow();
         gui::ListView *allEventsList                   = nullptr;
         std::shared_ptr<AllEventsModel> allEventsModel = nullptr;
 
@@ -27,7 +28,7 @@ namespace gui
         bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild() override;
         void buildInterface() override;
-
+        auto handleSwitchData(SwitchData *data) -> bool override;
     };
 
 } // namespace gui

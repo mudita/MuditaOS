@@ -7,6 +7,7 @@
 #include "windows/OptionSetting.hpp"
 
 #include <i18/i18.hpp>
+#include <module-services/service-appmgr/service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -19,13 +20,19 @@ namespace gui
     auto InputLanguageWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        std::vector<std::string> availableLanguages = {"English", "Detush", "Polski", "Español", "Français"};
+        std::vector<std::string> languageListJson = {"app_settings_language_english",
+                                                     "app_settings_language_polish",
+                                                     "app_settings_language_german",
+                                                     "app_settings_language_spanish"};
+        std::vector<utils::Lang> languageListEnum = {
+            utils::Lang::En, utils::Lang::Pl, utils::Lang::De, utils::Lang::Sp};
 
-        for (auto lang : availableLanguages) {
+        for (size_t i = 0; i < languageListJson.size(); i++) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
-                lang,
+                utils::localize.get(languageListJson[i]),
                 [=](gui::Item &item) {
-                    selectedLang = lang;
+                    selectedLang = utils::localize.get(languageListJson[i]);
+                    app::manager::Controller::changeInputLanguage(application, languageListEnum[i]);
                     rebuildOptionList();
                     return true;
                 },
@@ -37,7 +44,7 @@ namespace gui
                     return true;
                 },
                 this,
-                selectedLang == lang ? RightItem::Checked : RightItem::Disabled));
+                selectedLang == utils::localize.get(languageListJson[i]) ? RightItem::Checked : RightItem::Disabled));
         }
 
         return optionsList;

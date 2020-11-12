@@ -3,17 +3,18 @@ R"dbInitStr(
 /* Create File indexer  tables */
 BEGIN TRANSACTION;
 
-
 -- Main file table
 CREATE TABLE IF NOT EXISTS file_tab (
-    file_id INTEGER NOT NULL,
+    file_id INTEGER,
     path TEXT NOT NULL UNIQUE,
     size INTEGER,
     mime_type INTEGER,
     mtime INTEGER,
     directory TEXT,
     file_type INTEGER,
-    PRIMARY KEY (file_id)
+    PRIMARY KEY (file_id),
+    CONSTRAINT file_path_unique
+        UNIQUE (file_id, path) ON CONFLICT REPLACE
     );
 
 -- Table contains information
@@ -37,9 +38,10 @@ CREATE TABLE IF NOT EXISTS notifications_tab (
 );
 
 -- ----------- insert default values ----------------------
-INSERT OR REPLACE INTO file_tab (path, size, mime_type, mtime, directory, file_type) VALUES
-    ('mp3/track1.mp3', 456666, 1, 1603929600, 'music',12297),
-    ('mp3/track2.mp3', 345354 ,1, 1603929604, 'my_songs',12297);
+
+INSERT OR REPLACE INTO file_tab (file_id, path, size, mime_type, mtime, directory, file_type) VALUES
+    (1, 'mp3/track1.mp3', 456666, 1, 1603929600, 'mp3',12297),
+    (2, 'mp3/track2.mp3', 345354 ,1, 1603929604, 'mp3',12297);
 
 
 INSERT OR REPLACE INTO metadata_tab (file_id, property, value) VALUES
@@ -49,6 +51,7 @@ INSERT OR REPLACE INTO metadata_tab (file_id, property, value) VALUES
     (2,'artist','Nick Levis'),
     (2,'genre','Soul'),
     (2,'album','Album2');
+
 
 COMMIT;
 

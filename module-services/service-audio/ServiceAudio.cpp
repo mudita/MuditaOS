@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <type_traits>
-
-#include "ServiceAudio.hpp"
-#include "messages/AudioMessage.hpp"
+#include "service-audio/AudioMessage.hpp"
+#include "service-audio/ServiceAudio.hpp"
 
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
+
+#include <type_traits>
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 
@@ -44,39 +44,40 @@ sys::ReturnCodes ServiceAudio::InitHandler()
 
         // PLAYBACK
         {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
         {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
 
         {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
         {dbPath(Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
 
         {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
         {dbPath(Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
 
         {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
         {dbPath(Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
 
         {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackHeadphones),
          defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackBTA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackBluetoothA2DP),
+         defaultVolumeLow},
         {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackLoudspeaker),
          defaultVolumeHigh},
 
         // ROUTING
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBTHeadset), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "20"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "20"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingSpeakerphone), "20"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadset), "50"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "50"},
 
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingBTHeadset), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), defaultVolumeHigh},
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker), defaultVolumeHigh},
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones), defaultVolumeHigh},
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingSpeakerphone), defaultVolumeHigh},
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadset), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker), defaultVolumeHigh},
+        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones), defaultVolumeHigh},
 
         // MISC
         {dbPath(Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle), defaultFalse},
@@ -293,7 +294,12 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
             retToken = audioMux.ResetInput(input);
 
             if (IsOperationEnabled(playbackType, opType)) {
-                retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
+                try {
+                    retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
+                }
+                catch (const AudioInitException &audioException) {
+                    retCode = audio::RetCode::FailedToAllocateMemory;
+                }
             }
         }
 
@@ -323,7 +329,9 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    if (evt->getType() == EventType::BTA2DPOn) {
+    auto isBT =
+        evt->getType() == EventType::BlutoothHSPDeviceState || evt->getType() == EventType::BlutoothA2DPDeviceState;
+    if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
         auto req = std::make_shared<BluetoothRequestStreamMessage>();
         sys::Bus::SendUnicast(req, service::name::bluetooth, this);
         return std::make_unique<AudioEventResponse>(RetCode::Success);
@@ -331,7 +339,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
-        if (evt->getType() == EventType::BTA2DPOff) {
+        if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
             input.audio->SetBluetoothStreamData(nullptr);
         }
     }
@@ -450,9 +458,9 @@ bool ServiceAudio::IsBusy()
     return false;
 }
 
-sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-    sys::Message_t responseMsg;
+    sys::MessagePointer responseMsg;
     bool isBusy = IsBusy();
 
     auto &msgType = typeid(*msgl);
@@ -512,7 +520,8 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
         for (auto &input : audioMux.GetAllInputs()) {
             input.audio->SetBluetoothStreamData(msg->getData());
-            input.audio->SendEvent(std::make_unique<Event>(EventType::BTA2DPOn));
+            input.audio->SendEvent(
+                std::make_unique<Event>(EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Connected));
             LOG_INFO("Queues received!");
         }
     }
@@ -565,13 +574,7 @@ std::string ServiceAudio::getSetting(const Setting &setting,
             targetPlayback = currentPlaybackType;
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == Setting::Volume)) {
-            targetProfile = Profile::Type::PlaybackLoudspeaker;
-            if ((*input)->audio->IsLineSinkAvailable()) {
-                targetProfile = Profile::Type::PlaybackHeadphones;
-            }
-            if ((*input)->audio->IsBtSinkAvailable()) {
-                targetProfile = Profile::Type::PlaybackBTA2DP;
-            }
+            targetProfile = (*input)->audio->GetPriorityPlaybackProfile();
 
             targetPlayback = PlaybackType::CallRingtone;
         }
@@ -607,14 +610,7 @@ void ServiceAudio::setSetting(const Setting &setting,
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
-            updatedProfile = Profile::Type::PlaybackLoudspeaker;
-            if ((*input)->audio->IsLineSinkAvailable()) {
-                updatedProfile = Profile::Type::PlaybackHeadphones;
-            }
-            if ((*input)->audio->IsBtSinkAvailable()) {
-                updatedProfile = Profile::Type::PlaybackBTA2DP;
-            }
-
+            updatedProfile  = (*input)->audio->GetPriorityPlaybackProfile();
             updatedPlayback = PlaybackType::CallRingtone;
             valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
         }
@@ -657,9 +653,7 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
     if (!activeInput.has_value()) {
         const auto idleInput = audioMux.GetIdleInput();
         if (idleInput.has_value()) {
-            return {(*idleInput)->audio->IsLineSinkAvailable() ? Profile::Type::PlaybackHeadphones
-                                                               : Profile::Type::PlaybackLoudspeaker,
-                    audio::PlaybackType::CallRingtone};
+            return {(*idleInput)->audio->GetPriorityPlaybackProfile(), audio::PlaybackType::CallRingtone};
         }
     }
     auto &audio                  = (*activeInput)->audio;

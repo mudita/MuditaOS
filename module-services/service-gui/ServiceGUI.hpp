@@ -84,7 +84,7 @@ namespace sgui
                    uint32_t screenHeight = 600);
         ~ServiceGUI();
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
         sys::ReturnCodes InitHandler() override;
 
@@ -93,9 +93,9 @@ namespace sgui
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
       private:
-        sys::Message_t handleDrawMessage(sys::Message *message);
-        sys::Message_t handleGUIRenderingFinished(sys::Message *message);
-        sys::Message_t handleGUIDisplayReady(sys::Message *message);
+        sys::MessagePointer handleDrawMessage(sys::Message *message);
+        sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
+        sys::MessagePointer handleGUIDisplayReady(sys::Message *message);
     };
 
 } /* namespace sgui */

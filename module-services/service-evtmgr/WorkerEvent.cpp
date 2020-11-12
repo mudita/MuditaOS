@@ -20,7 +20,7 @@ extern "C"
 #include "common_data/RawKey.hpp"     // for RawKey, RawKey::State, RawKey::State::Pressed, RawKey::State::Released
 //#include "harness/harness.hpp"                          // for ETX, STX
 #include "log/log.hpp"                                 // for LOG_DEBUG, LOG_ERROR
-#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
+#include <service-audio/AudioMessage.hpp>              // for AudioEventRequest
 #include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
 #include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 
@@ -82,8 +82,9 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         if (bsp::headset::Handler(notification) == true) {
             bool state = bsp::headset::IsInserted();
-            auto message = std::make_shared<AudioEventRequest>(state ? audio::EventType::HeadphonesPlugin
-                                                                     : audio::EventType::HeadphonesUnplug);
+            auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
+                                                               state ? audio::Event::DeviceState::Connected
+                                                                     : audio::Event::DeviceState::Disconnected);
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }

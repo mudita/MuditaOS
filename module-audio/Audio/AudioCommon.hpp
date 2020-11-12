@@ -4,7 +4,9 @@
 #pragma once
 
 #include <map>
+#include <bitset>
 #include <bsp/audio/bsp_audio.hpp>
+#include <Utils.hpp>
 
 #include "Profiles/Profile.hpp"
 
@@ -68,32 +70,86 @@ namespace audio
 
     enum class EventType
     {
-        HeadphonesPlugin,
-        HeadphonesUnplug,
-        BTHeadsetOn,
-        BTHeadsetOff,
-        BTA2DPOn,
-        BTA2DPOff,
+        // HW state change notifications
+        JackState,               //!< jack input plugged / unplugged event
+        BlutoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
+        BlutoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
+
+        // call control
         CallMute,
         CallUnmute,
-        CallSpeakerphoneOn,
-        CallSpeakerphoneOff,
+        CallLoudspeakerOn,
+        CallLoudspeakerOff,
     };
+
+    constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BlutoothA2DPDeviceState);
 
     class Event
     {
       public:
-        explicit Event(EventType eType) : eventType(eType)
+        enum class DeviceState
+        {
+            Connected,
+            Disconnected
+        };
+
+        explicit Event(EventType eType, DeviceState deviceState = DeviceState::Connected)
+            : eventType(eType), deviceState(deviceState)
         {}
+
         virtual ~Event() = default;
 
-        EventType getType() const
+        EventType getType() const noexcept
         {
             return eventType;
         }
 
+        DeviceState getDeviceState() const noexcept
+        {
+            return deviceState;
+        }
+
       private:
         const EventType eventType;
+        const DeviceState deviceState;
+    };
+
+    class AudioSinkState
+    {
+      public:
+        void UpdateState(std::shared_ptr<Event> stateChangeEvent)
+        {
+            auto hwUpdateEventIdx = magic_enum::enum_integer(stateChangeEvent->getType());
+            if (hwUpdateEventIdx <= hwStateUpdateMaxEvent) {
+                audioSinkState.set(hwUpdateEventIdx,
+                                   stateChangeEvent->getDeviceState() == Event::DeviceState::Connected ? true : false);
+            }
+        }
+
+        std::vector<std::shared_ptr<Event>> getUpdateEvents() const
+        {
+            std::vector<std::shared_ptr<Event>> updateEvents;
+            for (size_t i = 0; i < hwStateUpdateMaxEvent; i++) {
+                auto isConnected =
+                    audioSinkState.test(i) ? Event::DeviceState::Connected : Event::DeviceState::Disconnected;
+                auto updateEvt = magic_enum::enum_cast<EventType>(i);
+                updateEvents.emplace_back(std::make_unique<Event>(updateEvt.value(), isConnected));
+            }
+            return updateEvents;
+        }
+
+        bool isConnected(EventType deviceUpdateEvent) const
+        {
+            return audioSinkState.test(magic_enum::enum_integer(deviceUpdateEvent));
+        }
+
+        void setConnected(EventType deviceUpdateEvent, bool isConnected)
+        {
+            audioSinkState.set(magic_enum::enum_integer(deviceUpdateEvent), isConnected);
+        }
+
+      private:
+        std::bitset<magic_enum::enum_count<EventType>()> audioSinkState;
     };
 
     enum class RetCode
@@ -111,6 +167,21 @@ namespace audio
         DeviceFailure,
         TokenNotFound,
         Failed
+    };
+
+    struct AudioInitException : public std::runtime_error
+    {
+      protected:
+        audio::RetCode errorCode = audio::RetCode::Failed;
+
+      public:
+        AudioInitException(const char *message, audio::RetCode errorCode) : runtime_error(message)
+        {}
+
+        audio::RetCode getErrorCode() const noexcept
+        {
+            return errorCode;
+        }
     };
 
     class Token

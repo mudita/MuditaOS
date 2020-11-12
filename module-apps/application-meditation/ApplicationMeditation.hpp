@@ -20,7 +20,7 @@ namespace app
                                        StartInBackground startInBackground = {false});
 
         auto InitHandler() -> sys::ReturnCodes override;
-        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto SwitchPowerModeHandler(sys::ServicePowerMode mode) -> sys::ReturnCodes final;
 
         void createUserInterface() override;

@@ -79,8 +79,8 @@ namespace bsp
             LOG_ERROR("Unsupported sample rate");
         }
 
-        codecParams.inputPath  = static_cast<CodecParamsMAX98090::InputPath>(format.inputPath);
-        codecParams.outputPath = static_cast<CodecParamsMAX98090::OutputPath>(format.outputPath);
+        codecParams.inputPath  = format.inputPath;
+        codecParams.outputPath = format.outputPath;
         codecParams.outVolume  = format.outputVolume;
         codecParams.inGain     = format.inputGain;
         codec.Start(codecParams);
@@ -146,7 +146,7 @@ namespace bsp
     {
         currentFormat.inputPath = inputPath;
         CodecParamsMAX98090 params;
-        params.inputPath = static_cast<CodecParamsMAX98090::InputPath>(inputPath);
+        params.inputPath = inputPath;
         params.opCmd     = CodecParamsMAX98090::Cmd::SetInput;
         codec.Ioctrl(params);
         return AudioDevice::RetCode::Success;
@@ -156,7 +156,7 @@ namespace bsp
     {
         currentFormat.outputPath = outputPath;
         CodecParamsMAX98090 params;
-        params.outputPath = static_cast<CodecParamsMAX98090::OutputPath>(outputPath);
+        params.outputPath = outputPath;
         params.opCmd      = CodecParamsMAX98090::Cmd::SetOutput;
         codec.Ioctrl(params);
         return AudioDevice::RetCode::Success;
@@ -170,7 +170,6 @@ namespace bsp
         }
         return true;
     }
-
     // INTERNALS
 
     void RT1051Audiocodec::Init()

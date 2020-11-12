@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "PinLock.hpp"
-#include <service-cellular/messages/CellularMessage.hpp>
+#include <service-cellular/CellularMessage.hpp>
 
 #include "Interface/SettingsRecord.hpp"
 namespace app

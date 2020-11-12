@@ -179,7 +179,6 @@ namespace gui
         if (key.state == RawKey::State::Released) {
             prev_key_press = key;
         }
-
         return Profiles::get(keymap).get(key.key_code, times);
     }
 

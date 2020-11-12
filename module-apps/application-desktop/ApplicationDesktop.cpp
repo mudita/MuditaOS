@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
@@ -38,7 +38,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);
@@ -53,6 +53,11 @@ namespace app
         }
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
+        }
+        else if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(msgl)) {
+            if (auto event = dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
+                handled = handle(event);
+            }
         }
 
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
@@ -87,6 +92,17 @@ namespace app
             if (msg->updateStats.updateFile.has_filename()) {
                 LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
+        }
+
+        return true;
+    }
+
+    auto ApplicationDesktop::handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool
+    {
+        if (event != nullptr) {
+            auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.lock.isLocked());
+            auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            sys::Bus::SendUnicast(std::move(msg), service::name::service_desktop, this);
         }
 
         return true;
@@ -224,7 +240,7 @@ namespace app
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
 
-        connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
             auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
             if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
@@ -241,7 +257,7 @@ namespace app
                     getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
                 }
             }
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
         auto msgToSend =

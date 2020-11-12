@@ -24,10 +24,10 @@ namespace sys
         static bool SendUnicast(std::shared_ptr<Message> msg, const std::string &service, Service *s);
 
         // Send message directly to specified service with timeout
-        static MessageRet_t SendUnicast(std::shared_ptr<Message> msg,
-                                        const std::string &service,
-                                        Service *s,
-                                        uint32_t timeout);
+        static SendResult SendUnicast(std::shared_ptr<Message> msg,
+                                      const std::string &service,
+                                      Service *s,
+                                      uint32_t timeout);
 
         // Send message to specific channel
         static void SendMulticast(std::shared_ptr<Message> msg, BusChannels channel, Service *source);
@@ -41,7 +41,7 @@ namespace sys
         // Unregister specified service
         static void Remove(std::shared_ptr<Service> service);
 
-        static void SendResponse(std::shared_ptr<Message> msg, std::shared_ptr<Message> receivedMsg, Service *s);
+        static void SendResponse(std::shared_ptr<Message> response, std::shared_ptr<Message> request, Service *sender);
 
       private:
         Bus();

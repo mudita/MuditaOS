@@ -58,16 +58,18 @@ namespace sys
         CriticalSection::Exit();
     }
 
-    void Bus::SendResponse(std::shared_ptr<Message> msg, std::shared_ptr<Message> receivedMsg, Service *s)
+    void Bus::SendResponse(std::shared_ptr<Message> response, std::shared_ptr<Message> request, Service *sender)
     {
-        assert(msg != nullptr);
-        assert(receivedMsg != nullptr);
-        assert(s != nullptr);
-        msg->sender    = s->GetName();
-        msg->uniID     = receivedMsg->uniID;
-        msg->transType = Message::TransmissionType ::Unicast;
-        if (servicesRegistered.find(receivedMsg->sender) != servicesRegistered.end()) {
-            servicesRegistered[receivedMsg->sender]->mailbox.push(msg);
+        assert(response != nullptr);
+        assert(request != nullptr);
+        assert(sender != nullptr);
+
+        response->id        = uniqueMsgId++;
+        response->uniID     = request->uniID;
+        response->sender    = sender->GetName();
+        response->transType = Message::TransmissionType ::Unicast;
+        if (servicesRegistered.find(request->sender) != servicesRegistered.end()) {
+            servicesRegistered[request->sender]->mailbox.push(response);
         }
         else {
             // silently drop it
@@ -96,10 +98,7 @@ namespace sys
         return true;
     }
 
-    MessageRet_t Bus::SendUnicast(std::shared_ptr<Message> msg,
-                                  const std::string &service,
-                                  Service *s,
-                                  uint32_t timeout)
+    SendResult Bus::SendUnicast(std::shared_ptr<Message> msg, const std::string &service, Service *s, uint32_t timeout)
     {
         std::vector<std::shared_ptr<Message>> tempMsg;
         tempMsg.reserve(4); // reserve space for 4 elements to avoid costly memory allocations
@@ -155,7 +154,7 @@ namespace sys
 
                 // Register that we didn't receive response. Even if it arrives it will be dropped
                 s->staleUniqueMsg.push_back(std::make_pair(unicastID, cpp_freertos::Ticks::GetTicks()));
-                return CreateMessageRet(ReturnCodes::Timeout, nullptr);
+                return CreateSendResult(ReturnCodes::Timeout, nullptr);
             }
 
             // Received response
@@ -166,14 +165,14 @@ namespace sys
                     s->mailbox.push(w);
                 }
 
-                return CreateMessageRet(ReturnCodes::Success, rxmsg);
+                return CreateSendResult(ReturnCodes::Success, rxmsg);
             }
             // Check for system messages
             else if (rxmsg->type == Message::Type::System) {
 
                 SystemMessage *sysmsg = static_cast<SystemMessage *>(rxmsg.get());
 
-                if (sysmsg->sysMsgType == SystemMessageType::Ping) {
+                if (sysmsg->systemMessageType == SystemMessageType::Ping) {
                     rxmsg->Execute(s);
                 }
                 else {

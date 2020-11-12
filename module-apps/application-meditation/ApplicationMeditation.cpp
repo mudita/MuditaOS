@@ -28,7 +28,7 @@ namespace app
     }
 
     auto ApplicationMeditation::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
-        -> sys::Message_t
+        -> sys::MessagePointer
     {
         return Application::DataReceivedHandler(msgl);
     }

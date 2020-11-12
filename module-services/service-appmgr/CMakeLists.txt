@@ -7,13 +7,28 @@ set(SOURCES
     model/ApplicationManager.cpp
     model/ApplicationHandle.cpp
     model/ApplicationsRegistry.cpp
+    messages/ActionRequest.cpp
+    messages/ApplicationCloseRequest.cpp
+    messages/ApplicationInitialised.cpp
+    messages/ApplicationStatus.cpp
+    messages/BaseMessage.cpp
+    messages/CloseConfirmation.cpp
+    messages/LanguageChangeRequest.cpp
+    messages/PowerSaveModeInitRequest.cpp
+    messages/PreventBlockingRequest.cpp
+    messages/ShutdownRequest.cpp
+    messages/SwitchBackRequest.cpp
+    messages/SwitchConfirmation.cpp
+    messages/SwitchRequest.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-apps
-    module-audio
+    PRIVATE
+        service-cellular
+        module-apps
+        module-audio
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Fota.hpp"
 #include "FotaWindow.hpp"
 
-#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <service-fota/api/FotaServiceAPI.hpp>
 #include <service-fota/messages/FotaMessages.hpp>
 
@@ -215,7 +215,7 @@ void Fota::registerHandlers()
 void Fota::handleInternetNotification()
 {
     LOG_DEBUG("handle IntrntNotificationMassage");
-    app->connect(FotaService::NotificationMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+    app->connect(FotaService::NotificationMessage(), [&](sys::Message *req) {
         LOG_DEBUG("IntrntNotificationMassage");
         if (auto msg = dynamic_cast<FotaService::NotificationMessage *>(req)) {
             LOG_DEBUG("IntrntNotificationMassage: %s", msg->c_str());
@@ -250,7 +250,7 @@ void Fota::handleInternetNotification()
 void Fota::handleHTTPResponse()
 {
     LOG_DEBUG("Handling http response");
-    app->connect(FotaService::HTTPResponseMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+    app->connect(FotaService::HTTPResponseMessage(), [&](sys::Message *req) {
         if (auto msg = dynamic_cast<FotaService::HTTPResponseMessage *>(req)) {
             LOG_DEBUG("HTTP Response to: %s", msg->url.c_str());
             LOG_DEBUG("HTPP AT Error   : %s", FotaService::toString(msg->httpError).c_str());
@@ -285,7 +285,7 @@ void Fota::handleHTTPResponse()
 
 void Fota::handleFotaProgres()
 {
-    app->connect(FotaService::FOTAProgres(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+    app->connect(FotaService::FOTAProgres(), [&](sys::Message *req) {
         if (auto msg = dynamic_cast<FotaService::FOTAProgres *>(req)) {
             parent->downloadProgress->setValue(msg->progress);
             app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -296,7 +296,7 @@ void Fota::handleFotaProgres()
 
 void Fota::handleFotaFinished()
 {
-    app->connect(FotaService::FOTAFinished(), [&](sys::DataMessage * /*req*/, sys::ResponseMessage * /*response*/) {
+    app->connect(FotaService::FOTAFinished(), [&](sys::Message *) {
         LOG_DEBUG("Done!");
         currentState = State::Finished;
         parent->statusLabel->setText(getStateString());

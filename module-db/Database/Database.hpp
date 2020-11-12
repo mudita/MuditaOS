@@ -6,7 +6,10 @@
 #include "sqlite3.h"
 
 #include "QueryResult.hpp"
+
+#include <vfs.hpp>
 #include <memory>
+#include <set>
 
 class Database
 {
@@ -34,6 +37,11 @@ class Database
     uint32_t getLastInsertRowId();
     void pragmaQuery(const std::string &pragmaStatemnt);
 
+    [[nodiscard]] std::string getName() const
+    {
+        return dbName;
+    }
+
   private:
     const uint32_t maxQueryLen = (8 * 1024);
 
@@ -49,6 +57,6 @@ class Database
 
   protected:
     sqlite3 *dbConnection;
-    const char *dbName;
+    std::string dbName;
     bool isInitialized_;
 };

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallWindow.hpp"
@@ -15,8 +15,8 @@
 
 #include "i18/i18.hpp"
 
-#include "service-audio/api/AudioServiceAPI.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
+#include <service-audio/AudioServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 #include "service-db/api/DBServiceAPI.hpp"
 
 #include "Label.hpp"
@@ -97,10 +97,10 @@ namespace gui
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOff);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOff);
             } break;
             case SpeakerIconState::SPEAKERON: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOn);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOn);
             } break;
             // case SpeakerIconState::BLUETOOTH: {
             //     // TODO: need implementation

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Actions.hpp"
-#include "Message.hpp"
+#include "messages/Message.hpp"
 #include "model/ApplicationManager.hpp"
 
 #include <module-sys/Service/Service.hpp>
@@ -38,7 +38,8 @@ namespace app::manager
                                       std::unique_ptr<gui::SwitchData> data = nullptr) -> bool;
         static auto switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg = nullptr) -> bool;
         static auto closeApplication(sys::Service *sender, const ApplicationName &name) -> bool;
-        static auto changeLanguage(sys::Service *sender, utils::Lang language) -> bool;
+        static auto changeDisplayLanguage(sys::Service *sender, utils::Lang language) -> bool;
+        static auto changeInputLanguage(sys::Service *sender, utils::Lang language) -> bool;
         static auto changePowerSaveMode(sys::Service *sender) -> bool;
         static auto stopApplicationManager(sys::Service *sender) -> bool;
         static auto preventBlockingDevice(sys::Service *sender) -> bool;
