@@ -59,7 +59,7 @@ namespace call_request
         std::string getNumber() const
         {
             return request;
-        };
+        }
         static std::unique_ptr<CallRequest> create(const std::string &data);
         void handle(CallRequestHandler &h, at::Result &result) final;
     };
