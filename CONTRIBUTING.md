@@ -25,13 +25,13 @@ Feel free to add any screenshots or gifs/screencasts to illustrate the issue.
 
 ## Feature requests
 
-If you have an idea for a feature that could possibly land in MuditaOS please let us know by simply creating an issue on Github in which you **describe the feature**, **why it would be useful** and **how it should work**. Before you create a Feature request on GitHub please:
+If you have an idea for a feature that could possibly land in MuditaOS please let us know by simply creating an issue on GitHub in which you **describe the feature**, **why it would be useful** and **how it should work**. Before you create a Feature request on GitHub please:
 
 - make sure that the feature request hasn't been already reported on GitHub issues (if it has, please add a 👍 reaction to it).
 
 ## Contributing code and documentation changes
 
-If you would like to contribute a new feature or a bug fix to MuditaOS, please discuss your idea first in Github issues. If there is no Github issue for your idea, please open one. It may be that somebody from Mudita core team is already working on it, or that there are particular complexities that you should know about before starting the implementation.
+If you would like to contribute a new feature or a bug fix to MuditaOS, please discuss your idea first in GitHub issues. If there is no Github issue for your idea, please open one. It may be that somebody from Mudita core team is already working on it, or that there are particular complexities that you should know about before starting the implementation.
 
 Please refer to the ["Development workflow" article](./doc/development_workflow.md) to learn how to submit code and documentation changes to the MuditaOS repository.
 
