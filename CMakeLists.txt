@@ -103,6 +103,8 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 
 
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>)
+add_compile_options("-Wno-error=deprecated-declarations")
+target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-error=deprecated-declarations")
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
 target_sources(${CMAKE_PROJECT_NAME}
