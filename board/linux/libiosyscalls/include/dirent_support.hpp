@@ -8,8 +8,8 @@
 namespace vfsn::linux::internal::diren
 {
     struct DIR_ITER {
-        void *dir_state {};
-        char name_state[NAME_MAX+1] {};
+        void *dir_state = nullptr;
+        char name_state[NAME_MAX+1] = { '\0' };
     };
 
     DIR_ITER *diropen(int &_errno_, const char *path);

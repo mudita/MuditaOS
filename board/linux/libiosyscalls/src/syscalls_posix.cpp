@@ -34,7 +34,7 @@ extern "C" {
 
 	int link(const char *oldpath, const char *newpath)
 	{
-        TRACE_SYSCALL();
+		TRACE_SYSCALL();
 		errno = ENOSYS;
 		real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
 		return -1;
