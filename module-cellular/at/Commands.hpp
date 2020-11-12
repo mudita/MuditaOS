@@ -130,7 +130,7 @@ namespace at
         CFUN_FULL_FUNCTIONALITY,   /// Full functionality
         CFUN_DISABLE_TRANSMITTING, /// Disable the ME from both transmitting and receiving RF signals
         LIST_MESSAGES,             /// List all messages from message storage
-        GET_IMEI
+        GET_IMEI,
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -206,14 +206,9 @@ namespace at
             {AT::DISABLE_TIME_ZONE_REPORTING, {"AT+CTZR=0"}},
             {AT::ENABLE_NETWORK_REGISTRATION_URC, {"AT+CREG=2"}},
             {AT::SET_SMS_TEXT_MODE_UCS2, {"AT+CSMP=17,167,0,8"}},
-            {AT::LIST_MESSAGES, {"AT+CMGL=\"ALL\"", default_doc_timeout}}};
-        {
-            AT::GET_IMEI,
-            {
-                "AT+GSN"
-            }
-        }
-    };
+            {AT::LIST_MESSAGES, {"AT+CMGL=\"ALL\"", default_doc_timeout}},
+            {AT::GET_IMEI, {"AT+GSN", default_doc_timeout}}};
+
         if (fact.count(at)) {
             return fact.at(at);
         }
