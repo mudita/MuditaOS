@@ -104,7 +104,7 @@ namespace audio
         constexpr audio::Volume defaultRoutingEarspeakerVolume   = 10;
         constexpr audio::Gain defaultRoutingSpeakerphoneGain     = 20;
         constexpr audio::Volume defaultRoutingSpeakerphoneVolume = 10;
-        constexpr audio::Gain defaultRoutingHeadphonesGain       = 50;
+        constexpr audio::Gain defaultRoutingHeadphonesGain       = 0;
         constexpr audio::Volume defaultRoutingHeadphonesVolume   = 10;
 
         const auto dbRoutingEarspeakerGainPath =
