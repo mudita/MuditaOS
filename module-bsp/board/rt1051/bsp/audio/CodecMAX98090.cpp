@@ -282,13 +282,12 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     if (params.inputPath != bsp::AudioDevice::InputPath::None) {
         // Set input path
         switch (params.inputPath) {
+
         case bsp::AudioDevice::InputPath::Headphones: {
             max98090_reg_input_to_record_quick_t q_input_setup = {0};
             q_input_setup.in34dan                              = 1;
             i2cAddr.subAddress                                 = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
             i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
-            //            MicBias(true);
-
         } break;
 
         case bsp::AudioDevice::InputPath::Microphone: {
@@ -302,9 +301,6 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
             i2cAddr.subAddress = MAX98090_REG_DIG_MIC_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&digena, 1);
-
-            //            MicBias(false);
-
         } break;
 
         default:
@@ -324,7 +320,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     // Set volume to 0 before enabling codec to avoid pops/clicks
     auto currVol = currentParams.outVolume;
     SetOutputVolume(0);
-    // SetInputGain(currentParams.inGain);
+    SetInputGain(currentParams.inGain);
 
     // Turn on device
     dev_shutdown.shdn = 1;
