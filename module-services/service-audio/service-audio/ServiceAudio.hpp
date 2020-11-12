@@ -116,7 +116,5 @@ class ServiceAudio : public sys::Service
     const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
     std::unique_ptr<::Settings::Settings> settingsProvider;
     void settingsChanged(const std::string &name, std::optional<std::string> value);
-    std::vector<std::vector<std::string>> settings;
-    static const int IdxPath  = 0;
-    static const int IdxValue = 1;
+    std::map<std::string, std::string> settings;
 };

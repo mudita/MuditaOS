@@ -93,7 +93,7 @@ sys::ReturnCodes ServiceAudio::InitHandler()
 
     for (auto setting : settings) {
         settingsProvider->registerValueChange(
-            setting[IdxPath],
+            setting.first,
             [this](const std::string &name, std::optional<std::string> value) { settingsChanged(name, value); });
     }
 
@@ -121,7 +121,7 @@ int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
 
 uint32_t ServiceAudio::DbCallback(const std::string &path, const uint32_t &defaultValue)
 {
-    LOG_DEBUG("ServiceAudio::DBbCallback(%s, %ld)", path.c_str(), defaultValue);
+    LOG_DEBUG("ServiceAudio::DBbCallback(%s, %d)", path.c_str(), static_cast<int>(defaultValue));
     /*this->addOrIgnoreEntry(path, std::to_string(defaultValue));
     return this->fetchAudioSettingFromDb(path, defaultValue);*/
     return 0;
@@ -226,24 +226,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &tok
     auto input = audioMux.GetInput(token);
     return HandlePause(input);
 }
-
-/*void ServiceAudio::addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue)
-{
-    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
-        this,
-        db::Interface::Name::Settings_v2,
-        std::make_unique<db::query::settings::AddOrIgnoreQuery>(
-            SettingsRecord_v2{SettingsTableRow_v2{{.ID = DB_ID_NONE}, .path = profilePath, .value = defaultValue}}),
-        audio::audioOperationTimeout);
-
-    if (code == sys::ReturnCodes::Success && msg != nullptr) {
-        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-        assert(queryResponse != nullptr);
-
-        auto settingsResultResponse = queryResponse->getResult();
-        assert(dynamic_cast<db::query::settings::AddOrIgnoreResult *>(settingsResultResponse.get()) != nullptr);
-    }
-}*/
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioMux::Input *> input)
 {
@@ -549,18 +531,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
 }
 
-/*void ServiceAudio::updateDbValue(const std::string &path, const std::string &value)
-{
-    if (path.empty()) {
-        return;
-    }
-
-    auto query = std::make_unique<db::query::settings::UpdateQuery>(
-        SettingsRecord_v2({{.ID = DB_ID_NONE}, .path = path, .value = value}));
-
-    DBServiceAPI::GetQuery(this, db::Interface::Name::Settings_v2, std::move(query));
-}*/
-
 std::string ServiceAudio::getSetting(const Setting &setting,
                                      const Profile::Type &profileType,
                                      const PlaybackType &playbackType)
@@ -594,12 +564,11 @@ std::string ServiceAudio::getSetting(const Setting &setting,
 
     std::string path = dbPath(setting, targetPlayback, targetProfile);
     for (auto _set : settings) {
-        if (_set[IdxPath] == path) {
-            return _set[IdxValue];
+        if (_set.first == path) {
+            return _set.second;
         }
     }
-    /*std::string path = dbPath(setting, targetPlayback, targetProfile);
-    return fetchAudioSettingFromDb(path, defaultValue);*/
+
     LOG_ERROR("ServiceAudio::getSetting setting name %s does not exist", path.c_str());
     return std::string{};
 }
@@ -677,9 +646,9 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
 void ServiceAudio::settingsChanged(const std::string &name, std::optional<std::string> value)
 {
     for (auto setting : settings) {
-        if (name == setting[IdxPath]) {
+        if (name == setting.first) {
             if (value.has_value()) {
-                setting[IdxValue] = value.value();
+                setting.second = value.value();
                 return;
             }
         }
