@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookContactDetails.hpp"
@@ -6,7 +6,7 @@
 #include "application-phonebook/widgets/ContactFlagsWidget.hpp"
 
 #include <Dialog.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 namespace gui
 {

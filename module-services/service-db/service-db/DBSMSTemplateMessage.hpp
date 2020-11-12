@@ -1,15 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <stdint.h> // for uint32_t
-#include <memory>   // for unique_ptr
-#include <vector>   // for vector
+#include "DBMessage.hpp" // for DBMessage, DBResponseMessage
 
-#include "DBMessage.hpp"                   // for DBMessage, DBResponseMessage
-#include "Interface/SMSTemplateRecord.hpp" // for SMSTemplateRecord
-#include "MessageType.hpp"                 // for MessageType, MessageType::MessageTypeUninitialized
+#include <Interface/SMSTemplateRecord.hpp>
+#include <MessageType.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 class DBSMSTemplateMessage : public DBMessage
 {

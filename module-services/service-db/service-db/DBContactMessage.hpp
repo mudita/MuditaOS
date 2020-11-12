@@ -1,19 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <PhoneNumber.hpp> // for PhoneNumber, PhoneNumber::View
-#include <stdint.h>        // for uint32_t
-#include <memory>          // for unique_ptr
-#include <utility>
-#include <vector> // for vector
+#include "DBMessage.hpp"
 
-#include "MessageType.hpp"             // for MessageType, MessageType::MessageTypeUninitialized
-#include "DBMessage.hpp"               // for DBMessage, DBResponseMessage
-#include "Interface/ContactRecord.hpp" // for ContactRecord
-#include "Service/Message.hpp"         // for DataMessage, ResponseMessage
-#include "Service/Common.hpp"          // for ReturnCodes
+#include <Interface/ContactRecord.hpp>
+#include <MessageType.hpp>
+#include <PhoneNumber.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <utility>
+#include <vector>
 
 class DBContactMessage : public DBMessage
 {
@@ -21,7 +22,7 @@ class DBContactMessage : public DBMessage
     DBContactMessage(MessageType messageType, const ContactRecord &rec = ContactRecord{}, bool favourite = false);
 
     ContactRecord record;
-    bool favourite = false;
+    bool favourite     = false;
     bool withTemporary = false;
 };
 

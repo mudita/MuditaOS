@@ -1,12 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FileIndexerAgent.hpp"
-#include <module-services/service-db/workers/file_indexer/file_indexer_queries.hpp>
-#include <log/log.hpp>
+#include "FileIndexer_queries.hpp"
 
+#include <log/log.hpp>
 #include <module-sys/Service/Bus.hpp>
 #include <module-vfs/vfs.hpp>
+
 #include <memory>
 
 FileIndexerAgent::FileIndexerAgent(sys::Service *parentService) : DatabaseAgent(parentService)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -7,7 +7,6 @@
 #include "DialogMetadataMessage.hpp"
 #include "OptionsWindow.hpp"
 #include "application-messages/data/SMSTextToSearch.hpp"
-#include "messages/DBNotificationMessage.hpp"
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
@@ -20,7 +19,9 @@
 #include <Dialog.hpp>
 #include <i18/i18.hpp>
 #include <memory>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <OptionWindow.hpp>
 
 #include <module-db/queries/messages/sms/QuerySMSAdd.hpp>

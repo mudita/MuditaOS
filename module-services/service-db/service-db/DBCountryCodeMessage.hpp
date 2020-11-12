@@ -1,14 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <stdint.h> // for uint32_t
+#include "DBMessage.hpp"
 
-#include "DBMessage.hpp" // for DBMessage, DBResponseMessage
-#include "Interface/CountryCodeRecord.hpp"
-#include "MessageType.hpp"              // for MessageType, MessageType::MessageTypeUninitialized
-#include "Tables/CountryCodesTable.hpp" // for CodesTableRow
+#include <Interface/CountryCodeRecord.hpp>
+#include <MessageType.hpp>
+#include <Tables/CountryCodesTable.hpp>
+
+#include <cstdint>
 
 class DBCountryCodeMessage : public DBMessage
 {

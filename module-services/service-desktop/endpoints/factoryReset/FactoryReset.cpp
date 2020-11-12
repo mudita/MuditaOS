@@ -10,7 +10,7 @@
 
 #include "vfs.hpp" // for vfs, vfs::DirectoryEntry, copy_buf, os_factory, vfs::FILE, eMMC_disk, vfs::FileAttributes, vfs::FileAttributes::Directory, PATH_FACTORY
 #include "vfs_paths.hpp"
-#include "service-db/includes/DBServiceName.hpp" // for db
+#include <service-db/DBServiceName.hpp>
 #include "SystemManager/SystemManager.hpp"       // for SystemManager
 #include "log/log.hpp"                           // for LOG_ERROR, LOG_INFO
 

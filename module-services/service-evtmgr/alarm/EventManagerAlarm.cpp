@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -15,7 +15,7 @@
 
 #include "../EventManager.hpp"             // for EventManager
 #include "../messages/EVMessages.hpp"      // for RtcMinuteAlarmMessage, EVMAlarmSwitchData
-#include "service-db/api/DBServiceAPI.hpp" // for DBServiceAPI
+#include <service-db/DBServiceAPI.hpp>     // for DBServiceAPI
 #include "service-appmgr/Controller.hpp"   // for Controller
 #include "AlarmsRecord.hpp"                // for AlarmsRecord
 #include "MessageType.hpp"                 // for MessageType, MessageType::EVMMinuteUpdated

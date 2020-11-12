@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include <Database/Database.hpp> // for Database
+#include <Database/Database.hpp>
 #include <Service/Service.hpp>
-#include <string> // for string
-#include <memory> // for unique_ptr
+
+#include <string>
+#include <memory>
 
 class Database;
 namespace sys

@@ -1,13 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBCalllogMessage.hpp"
+#include <service-db/DBCalllogMessage.hpp>
+#include <service-db/DBMessage.hpp>
+
+#include <CalllogRecord.hpp>
 
 #include <utility> // for move
-
-#include "CalllogRecord.hpp"      // for CalllogRecord
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
-
 DBCalllogMessage::DBCalllogMessage(MessageType messageType, const CalllogRecord &rec)
     : DBMessage(messageType), record(rec)
 {}

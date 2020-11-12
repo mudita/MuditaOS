@@ -4,7 +4,7 @@
 #include "CalendarTimeEvents.hpp"
 
 #include <service-appmgr/Controller.hpp>                                 // for Controller
-#include <module-services/service-db/api/DBServiceAPI.hpp>               // for DBServiceAPI
+#include <service-db/DBServiceAPI.hpp>                                   // for DBServiceAPI
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp> // for SelectFirstUpcoming, SelectFirstUpcomingResult
 #include <module-gui/gui/SwitchData.hpp>                                 // for SwitchData
 #include <module-apps/application-calendar/data/CalendarData.hpp>        // for EventRecordData

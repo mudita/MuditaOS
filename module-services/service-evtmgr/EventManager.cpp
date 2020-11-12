@@ -23,7 +23,7 @@
 #include "WorkerEvent.hpp"         // for WorkerEvent
 #include "messages/EVMessages.hpp" // for TorchStateResultMessage, EVMFocusApplication, StatusStateMessage, EVMBoardResponseMessage, SIMMessage, TorchStateMessage
 #include "service-appmgr/Controller.hpp"                 // for Controller
-#include "service-db/messages/DBNotificationMessage.hpp" // for NotificationMessage
+#include <service-db/DBNotificationMessage.hpp>
 #include "bsp/magnetometer/magnetometer.hpp"             // for GetBoard
 #include "bsp/common.hpp"                                // for c_str
 #include "bsp/rtc/rtc.hpp"                               // for rtc_SetDateTime

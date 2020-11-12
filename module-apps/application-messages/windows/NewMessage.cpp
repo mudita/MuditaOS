@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewMessage.hpp"
@@ -10,7 +10,7 @@
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <i18/i18.hpp>
 #include <BoxLayout.hpp>
 #include <Text.hpp>

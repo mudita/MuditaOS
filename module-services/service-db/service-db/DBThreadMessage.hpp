@@ -1,16 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <stdint.h> // for uint32_t
-#include <memory>   // for unique_ptr
-#include <vector>   // for vector
+#include "DBMessage.hpp"
 
-#include "DBMessage.hpp"              // for DBMessage, DBResponseMessage
-#include "Interface/ThreadRecord.hpp" // for ThreadRecord
-#include "Common/Common.hpp"          // for EntryState, EntryState::ALL
-#include "MessageType.hpp"            // for MessageType, MessageType::MessageTypeUninitialized
+#include <Common/Common.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <MessageType.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 class DBThreadMessage : public DBMessage
 {

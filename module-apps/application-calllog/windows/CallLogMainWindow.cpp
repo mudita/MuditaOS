@@ -8,7 +8,7 @@
 
 #include <application-call/ApplicationCall.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-db/messages/DBCalllogMessage.hpp>
+#include <service-db/DBCalllogMessage.hpp>
 #include <i18/i18.hpp>
 #include <Label.hpp>
 #include <Margins.hpp>

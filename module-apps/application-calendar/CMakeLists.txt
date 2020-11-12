@@ -1,4 +1,4 @@
-target_sources( ${PROJECT_NAME}
+﻿target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.cpp"
@@ -41,3 +41,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/data/TimeDisplayParser.hpp"
 )
 
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        service-db
+    )

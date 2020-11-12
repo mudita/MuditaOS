@@ -2,19 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsAgent.hpp"
+#include "Settings_queries.hpp"
 
-#include <module-sys/Service/Bus.hpp> // for Bus
-#include <module-vfs/vfs.hpp>         // for USER_PATH
-#include <memory>                     // for make_shared, allocator, shared_ptr, make_unique, unique_ptr
-#include <functional>                 // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
-#include <utility>                    // for move
+#include <service-db/SettingsMessages.hpp>
 
-#include "Database/Database.hpp"         // for Database
-#include "Service/Service.hpp"           // for Service
-#include "messages/SettingsMessages.hpp" // for SetVariable, GetVariable, VariableChanged, VariableResponse, EntryPath
+#include <Database/Database.hpp>
+#include <Service/Service.hpp>
+#include <module-sys/Service/Bus.hpp>
+#include <module-vfs/vfs.hpp>
 
-#include <module-services/service-db/workers/settings/settings_queries.hpp>
-
+#include <memory>     // for make_shared, allocator, shared_ptr, make_unique, unique_ptr
+#include <functional> // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
+#include <utility>    // for move
 namespace Settings
 {
     namespace DbPaths

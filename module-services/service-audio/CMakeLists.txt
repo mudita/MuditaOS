@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
     service-bluetooth
+    service-db
     module-bluetooth
     module-audio
     module-utils

@@ -1,16 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <stdint.h> // for uint32_t
-#include <memory>   // for unique_ptr
-#include <vector>   // for vector
+#include "DBMessage.hpp" // for DBMessage, DBResponseMessage
 
-#include "DBMessage.hpp"               // for DBMessage, DBResponseMessage
-#include "Interface/CalllogRecord.hpp" // for CalllogRecord
-#include "Common/Common.hpp"           // for EntryState
-#include "MessageType.hpp"             // for MessageType, MessageType::MessageTypeUninitialized
+#include <Interface/CalllogRecord.hpp>
+#include <Common/Common.hpp>
+#include <MessageType.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 class DBCalllogMessage : public DBMessage
 {

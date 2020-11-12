@@ -9,9 +9,11 @@
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/SearchStart.hpp"
 
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <i18/i18.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
@@ -21,7 +23,6 @@
 
 #include <memory>
 #include <cassert>
-#include <module-services/service-db/messages/DBNotificationMessage.hpp>
 
 namespace gui
 {

@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBContactMessage.hpp"
+#include <service-db/DBContactMessage.hpp>
+#include <service-db/DBMessage.hpp>
 
-#include <memory>  // for unique_ptr
-#include <utility> // for move
+#include <ContactRecord.hpp>
+#include <MessageType.hpp>
+#include <PhoneNumber.hpp>
 
-#include "MessageType.hpp"        // for MessageType, MessageType::DBContactMatchByNumber
-#include "ContactRecord.hpp"      // for ContactRecord
-#include "PhoneNumber.hpp"        // for PhoneNumber
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <memory>
+#include <utility>
 
 DBContactMessage ::DBContactMessage(MessageType messageType, const ContactRecord &rec, bool favourite)
     : DBMessage(messageType), record(rec), favourite{favourite}

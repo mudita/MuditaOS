@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBAlarmMessage.hpp"
+#include <service-db/DBAlarmMessage.hpp>
+
+#include <AlarmsRecord.hpp>
+#include <service-db/DBMessage.hpp>
 
 #include <utility> // for move
-
-#include "AlarmsRecord.hpp"       // for AlarmsRecord
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
 
 DBAlarmMessage ::DBAlarmMessage(MessageType messageType, const AlarmsRecord &rec) : DBMessage(messageType), record(rec)
 {}

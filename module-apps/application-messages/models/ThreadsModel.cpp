@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadsModel.hpp"
@@ -11,9 +11,9 @@
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
 #include "log/log.hpp"
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
 {}

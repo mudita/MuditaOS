@@ -1,57 +1,58 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceDB.hpp"
 
-#include <messages/DBServiceMessage.hpp> // for DBServiceResponseMessage, DBServiceMessageBackup
-#include <Service/Bus.hpp>               // for Bus
-#include <time/ScopedTime.hpp>           // for Scoped
-#include <inttypes.h>                    // for PRIu32
-#include <stdint.h>                      // for uint32_t
-#include <cassert>                       // for assert
-#include <optional>                      // for optional
-#include <utility>                       // for move
-#include <vector>                        // for vector
+#include "service-db/DBAlarmMessage.hpp"
+#include "service-db/DBCalllogMessage.hpp"
+#include "service-db/DBContactMessage.hpp"
+#include "service-db/DBCountryCodeMessage.hpp"
+#include "service-db/DBNotesMessage.hpp"
+#include "service-db/DBNotificationMessage.hpp"
+#include "service-db/DBSMSMessage.hpp"
+#include "service-db/DBSMSTemplateMessage.hpp"
+#include "service-db/DBServiceMessage.hpp"
+#include "service-db/DBServiceName.hpp"
+#include "service-db/DBSettingsMessage.hpp"
+#include "service-db/DBThreadMessage.hpp"
+#include "service-db/QueryMessage.hpp"
+#include "service-db/DatabaseAgent.hpp"
+#include "agents/settings/SettingsAgent.hpp"
 
-#include "messages/DBSMSMessage.hpp" // for DBSMSResponseMessage, DBSMSMessage
-#include "messages/DBThreadMessage.hpp" // for DBThreadResponseMessage, DBThreadMessage, DBThreadGetCountMessage, DBThreadMessageGet
-#include "messages/DBNotificationMessage.hpp" // for NotificationMessage
-#include "messages/DBSettingsMessage.hpp"     // for DBSettingsResponseMessage, DBSettingsMessage
-#include "messages/DBSMSTemplateMessage.hpp"  // for DBSMSTemplateMessage, DBSMSTemplateResponseMessage
-#include "messages/DBContactMessage.hpp" // for DBContactMessage, DBContactResponseMessage, DBContactNumberResponseMessage, DBContactSearchMessage, DBContactBlock, DBContactNumberMessage
-#include "messages/DBAlarmMessage.hpp"   // for DBAlarmResponseMessage, DBAlarmMessage
-#include "messages/DBNotesMessage.hpp"   // for DBNotesResponseMessage, DBNotesMessage
-#include "messages/DBCalllogMessage.hpp" // for DBCalllogResponseMessage, DBCalllogMessage, DBCalllogGetCount
-#include "messages/DBCountryCodeMessage.hpp" // for DBCountryCodeResponseMessage, DBCountryCodeMessage
-#include "Database/Database.hpp"             // for Database
-#include "log/log.hpp"                       // for LOG_INFO, LOG_DEBUG, LOG_ERROR, LOG_FATAL
-#include "includes/DBServiceName.hpp"        // for db
-#include "messages/QueryMessage.hpp"         // for QueryMessage, QueryResponse
-#include "AlarmsRecord.hpp"                  // for AlarmsRecordInterface, AlarmsRecord
-#include "CalllogRecord.hpp"                 // for CalllogRecordInterface, CalllogRecord
-#include "ContactRecord.hpp" // for ContactRecord, ContactRecordInterface, ContactRecordInterface::ContactNumberMatch
-#include "CountryCodeRecord.hpp"         // for CountryCodeRecordInterface
-#include "Databases/AlarmsDB.hpp"        // for AlarmsDB
-#include "Databases/CalllogDB.hpp"       // for CalllogDB
-#include "Databases/ContactsDB.hpp"      // for ContactsDB
-#include "Databases/CountryCodesDB.hpp"  // for CountryCodesDB
-#include "Databases/EventsDB.hpp"        // for EventsDB
-#include "Databases/NotesDB.hpp"         // for NotesDB
-#include "Databases/NotificationsDB.hpp" // for NotificationsDB
-#include "Databases/SettingsDB.hpp"      // for SettingsDB
-#include "Databases/SmsDB.hpp"           // for SmsDB
-#include "EventsRecord.hpp"              // for EventsRecordInterface
-#include "MessageType.hpp" // for MessageType, MessageType::DBContactGetByID, MessageType::DBContactGetByNumber, MessageType::DBContactGetBySpeedDial, MessageType::DBContactGetLimitOffset, MessageType::DBAlarmAdd, MessageType::DBAlarmGetCount, MessageType::DBAlarmGetLimitOffset, MessageType::DBAlarmGetNext, MessageType::DBAlarmRemove, MessageType::DBAlarmUpdate, MessageType::DBCalllogAdd, MessageType::DBCalllogGetCount, MessageType::DBCalllogGetLimitOffset, MessageType::DBCalllogRemove, MessageType::DBCalllogUpdate, MessageType::DBContactAdd, MessageType::DBContactBlock, MessageType::DBContactGetByName, MessageType::DBContactGetCount, MessageType::DBContactMatchByNumber, MessageType::DBContactRemove, MessageType::DBContactSearch, MessageType::DBContactUpdate, MessageType::DBCountryCode, MessageType::DBNotesAdd, MessageType::DBNotesGetCount, MessageType::DBNotesGetLimitOffset, MessageType::DBNotesRemove, MessageType::DBNotesUpdate, MessageType::DBQuery, MessageType::DBSMSAdd, MessageType::DBSMSGetCount, MessageType::DBSMSGetLastRecord, MessageType::DBSMSGetSMSLimitOffset, MessageType::DBSMSGetSMSLimitOffsetByThreadID, MessageType::DBSMSRemove, MessageType::DBSMSTemplateAdd, MessageType::DBSMSTemplateGetCount, MessageType::DBSMSTemplateGetLimitOffset, MessageType::DBSMSTemplateRemove, MessageType::DBSMSTemplateUpdate, MessageType::DBSMSUpdate, MessageType::DBServiceBackup, MessageType::DBSettingsGet, MessageType::DBSettingsUpdate, MessageType::DBThreadGet, MessageType::DBThreadGetCount, MessageType::DBThreadGetForContact, MessageType::DBThreadGetLimitOffset, MessageType::DBThreadRemove, MessageType::DBThreadUpdate
-#include "NotesRecord.hpp" // for NotesRecordInterface
-#include "NotificationsRecord.hpp"  // for NotificationsRecordInterface
-#include "SMSRecord.hpp"            // for SMSRecord, SMSRecordInterface, SMSRecordField, SMSRecordField::ThreadID
-#include "SMSTemplateRecord.hpp"    // for SMSTemplateRecordInterface
-#include "SettingsRecord.hpp"       // for SettingsRecordInterface, SettingsRecord
-#include "SettingsRecord_v2.hpp"    // for SettingsRecordInterface_v2
-#include "Tables/Record.hpp"        // for DB_ID_NONE
-#include "ThreadRecord.hpp"         // for ThreadRecord, ThreadRecordInterface
-#include "agents/DatabaseAgent.hpp" // for DatabaseAgent
-#include "agents/settings/SettingsAgent.hpp" // for SettingsAgent
+#include <AlarmsRecord.hpp>
+#include <CalllogRecord.hpp>
+#include <ContactRecord.hpp>
+#include <CountryCodeRecord.hpp>
+#include <Database/Database.hpp>
+#include <Databases/AlarmsDB.hpp>
+#include <Databases/CalllogDB.hpp>
+#include <Databases/ContactsDB.hpp>
+#include <Databases/CountryCodesDB.hpp>
+#include <Databases/EventsDB.hpp>
+#include <Databases/NotesDB.hpp>
+#include <Databases/NotificationsDB.hpp>
+#include <Databases/SettingsDB.hpp>
+#include <Databases/SmsDB.hpp>
+#include <EventsRecord.hpp>
+#include <MessageType.hpp>
+#include <NotesRecord.hpp>
+#include <NotificationsRecord.hpp>
+#include <SMSRecord.hpp>
+#include <SMSTemplateRecord.hpp>
+#include <Service/Bus.hpp>
+#include <SettingsRecord.hpp>
+#include <SettingsRecord_v2.hpp>
+#include <Tables/Record.hpp>
+#include <ThreadRecord.hpp>
+#include <log/log.hpp>
+#include <time/ScopedTime.hpp>
+
+#include <cassert>
+#include <cinttypes>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <vector>
 
 static const auto service_db_stack = 1024 * 24;
 
