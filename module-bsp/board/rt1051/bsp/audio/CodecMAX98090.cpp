@@ -223,7 +223,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::LoudspeakerMono: {
+        case bsp::AudioDevice::OutputPath::LoudspeakerMono: {
             max98090_reg_playback_quick_setup_t q_playback_setup = {0};
             q_playback_setup.dig2spk                             = 1;
             i2cAddr.subAddress = MAX98090_REG_PLAYBACK_QUICK_SETUP;
@@ -443,8 +443,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         i2c->Write(i2cAddr, (uint8_t *)&vol, 1);
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Loudspeaker:
-    case CodecParamsMAX98090::OutputPath::LoudspeakerMono: {
+    case bsp::AudioDevice::OutputPath::Loudspeaker:
+    case bsp::AudioDevice::OutputPath::LoudspeakerMono: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor = .39f * 10.f;
         uint8_t volume               = static_cast<float>(vol * scale_factor) + 0x18;
