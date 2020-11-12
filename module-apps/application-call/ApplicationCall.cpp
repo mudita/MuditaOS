@@ -20,7 +20,7 @@
 #include <log/log.hpp>
 #include <memory>
 #include <service-cellular/ServiceCellular.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <time/time_conversion.hpp>

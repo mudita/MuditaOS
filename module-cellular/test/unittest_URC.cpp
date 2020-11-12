@@ -769,3 +769,20 @@ TEST_CASE("Urc RESPONSE")
         REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::NoAnswer);
     }
 }
+
+TEST_CASE("+Qind: SMS DONE")
+{
+    SECTION("SMS DONE")
+    {
+        // SMS DONE normal
+        auto urc  = at::urc::UrcFactory::Create("+QIND: SMS DONE");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isSmsDone());
+        // SMS DONE dirty
+        urc  = at::urc::UrcFactory::Create("\r\r\n\n+QIND: SMS DONE\n\n\r\r");
+        qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isSmsDone());
+    }
+}

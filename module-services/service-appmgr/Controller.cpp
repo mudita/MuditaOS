@@ -22,8 +22,7 @@ namespace app::manager
                                             StartupStatus status,
                                             StartInBackground startInBackground) -> bool
     {
-        auto msg =
-            std::make_shared<app::manager::ApplicationInitialisation>(sender->GetName(), status, startInBackground);
+        auto msg = std::make_shared<app::manager::ApplicationInitialised>(sender->GetName(), status, startInBackground);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 

@@ -1,22 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_CELLULARMESSAGE_HPP
-#define PUREPHONE_CELLULARMESSAGE_HPP
+#pragma once
 
-#include "../SignalStrength.hpp"
+#include "SignalStrength.hpp"
+#include "State.hpp"
+
 #include <MessageType.hpp>
-#include <Service/Message.hpp>
-#include <utf8/UTF8.hpp>
-#include <memory>
-#include "../State.hpp"
 #include <Modem/TS0710/TS0710.h>
-
 #include <PhoneNumber.hpp>
+#include <Service/Message.hpp>
+#include <module-bsp/bsp/cellular/bsp_cellular.hpp>
+#include <utf8/UTF8.hpp>
 
+#include <memory>
 #include <string>
-
-#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
 
 class CellularMessage : public sys::DataMessage
 {
@@ -66,6 +64,7 @@ class CellularNotificationMessage : public CellularMessage
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
         NewIncomingUSSD,          // modem received new ussd code from network
+        SMSDone,                  // SMS initialization finished
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -341,5 +340,3 @@ namespace cellular
     };
 
 } // namespace cellular
-
-#endif // PUREPHONE_CELLULARMESSAGE_HPP

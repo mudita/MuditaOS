@@ -6,13 +6,14 @@ import serial
 import json
 import random
 import logging
-from interface.defs import *
+
+from harness.interface.defs import endpoint, method, status
 
 log = logging.getLogger(__name__)
 
 
 class CDCSerial:
-    def __init__(self, port_name='/dev/ttyACM2'):
+    def __init__(self, port_name):
         self.body = ""
         try:
             self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
@@ -73,3 +74,11 @@ class CDCSerial:
 
         ret = self.write(self.__wrap_message(body))
         return ret["body"]["focus"]
+
+    def is_phone_locked(self):
+        body = {
+            "isLocked": True
+        }
+
+        ret = self.write(self.__wrap_message(body))
+        return ret["body"]["isLocked"]

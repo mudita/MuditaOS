@@ -56,9 +56,9 @@ target_include_directories(
 
 )
 
-target_link_libraries(
-    ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
     module-bsp
+    service-bluetooth
     module-utils
     module-vfs
     module-sys

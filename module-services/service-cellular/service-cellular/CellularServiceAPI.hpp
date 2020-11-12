@@ -1,15 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <Modem/TS0710/TS0710.h> // for TS0710, TS0710::Channel
-#include <PhoneNumber.hpp>       // for PhoneNumber
-#include <stdint.h>              // for uint32_t
-#include <string>                // for string, allocator
 
-#include "../messages/CellularMessage.hpp" // for CellularUSSDMessage, CellularUSSDMessage::RequestType
-#include "utf8/UTF8.hpp"
-#include "module-bsp/bsp/cellular/bsp_cellular.hpp" // for antenna
+#include "CellularMessage.hpp"
+
+#include <Modem/TS0710/TS0710.h>
+#include <PhoneNumber.hpp>
+#include <module-bsp/bsp/cellular/bsp_cellular.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <cstdint>
+#include <string>
 
 class Service;
 namespace sys

@@ -13,7 +13,7 @@
 #include <Bluetooth/Error.hpp>
 #include <log/log.hpp>
 #include <Service/Bus.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>

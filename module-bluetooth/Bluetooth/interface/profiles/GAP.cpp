@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothWorker.hpp"
@@ -7,7 +7,7 @@
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <log/log.hpp>
-#include <module-services/service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 #include <vector>
 
 extern "C"

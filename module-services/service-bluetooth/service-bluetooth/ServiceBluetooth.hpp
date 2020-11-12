@@ -1,14 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory> // for unique_ptr
+#include <Bluetooth/BluetoothWorker.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
 
-#include "Bluetooth/BluetoothWorker.hpp"
-#include "Service/Service.hpp" // for Service
-#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
+#include <memory> // for unique_ptr
 
 class BluetoothWorker;
 

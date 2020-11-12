@@ -2,5 +2,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import logging
+import harness.interface
 # logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 log = logging.getLogger(__name__)
+

@@ -13,9 +13,11 @@
 
 * `[calendar]` Set 'all day' as a default option
 * `[bus]` Message handling refactored.
+* `[appmgr]` Translating messages to actions introduced.
 
 ### Fixed
 
+* `[messages]` In new message window fixed clearing text on options/recipient choice 
 * `[Text]` Newline handling fix. 
 * `[appmgr]` Fix for closing applications.
 * `[audio]` Crash on attempt to open non-existent file
@@ -28,6 +30,7 @@
 * `[bluetooth]` Added HSP playback and recording.
 * `[cellular]` Added support for CMS and CME errors.
 * `[music player]` Added new samples of music files.
+* `[cellular]` Added handling SMS messages from modem storage at startup.
 
 ### Fixed
 
@@ -594,3 +597,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+

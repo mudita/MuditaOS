@@ -1,20 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <PhoneNumber.hpp> // for PhoneNumber
-#include <Service/Bus.hpp> // for Bus
-#include <memory> // for make_shared, shared_ptr, allocator, dynamic_pointer_cast, operator!=, __shared_ptr_access, __shared_ptr<>::element_type
-#include <string> // for string
-#include <utility> // for pair, move
+#include "service-cellular/CellularMessage.hpp"
+#include "service-cellular/CellularServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
 
-#include "../ServiceCellular.hpp" // for ServiceCellular, ServiceCellular::serviceName
-#include "CellularServiceAPI.hpp"
-#include "MessageType.hpp" // for MessageType, MessageType::CellularAnswerIncomingCall, MessageType::CellularGetAntenna, MessageType::CellularGetCREG, MessageType::CellularGetCSQ, MessageType::CellularGetFirmwareVersion, MessageType::CellularGetIMSI, MessageType::CellularGetNWINFO, MessageType::CellularGetNetworkInfo, MessageType::CellularGetOwnNumber, MessageType::CellularGetScanMode, MessageType::CellularHangupCall, MessageType::CellularSelectAntenna, MessageType::CellularSetScanMode, MessageType::CellularStartOperatorsScan
-#include "Modem/TS0710/TS0710.h"                         // for TS0710, TS0710::Channel, TS0710::Channel::Data
-#include "Service/Common.hpp"                            // for ReturnCodes, ReturnCodes::Success
-#include "bsp/cellular/bsp_cellular.hpp"                 // for antenna
-#include "log/log.hpp"                                   // for LOG_ERROR, LOG_DEBUG
-#include "service-cellular/messages/CellularMessage.hpp" // for CellularRequestMessage, CellularResponseMessage, CellularAntennaRequestMessage, CellularUSSDMessage, CellularCallRequestMessage, CellularDtmfRequestMessage, CellularGetChannelMessage, CellularAntennaResponseMessage, CellularUSSDMessage::RequestType
+#include <MessageType.hpp>
+#include <Modem/TS0710/TS0710.h>
+#include <PhoneNumber.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Common.hpp>
+#include <bsp/cellular/bsp_cellular.hpp>
+#include <log/log.hpp>
+
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace sys
 {
@@ -122,7 +123,7 @@ bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenn
 {
     auto msg     = std::make_shared<CellularAntennaRequestMessage>(MessageType::CellularSelectAntenna);
     msg->antenna = antenna;
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret     = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
 
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 

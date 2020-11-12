@@ -1,28 +1,28 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_SERVICECELLULAR_HPP
-#define PUREPHONE_SERVICECELLULAR_HPP
+#pragma once
 
-#include <Modem/TS0710/DLC_channel.h> // for DLC_channel::Callback_t, DLC_channel
-#include <Modem/TS0710/TS0710.h>      // for TS0710
-#include <Service/Service.hpp>        // for Service
+#include "CellularCall.hpp"
+#include "CellularMessage.hpp"
+#include "State.hpp"
+#include "USSD.hpp"
+
+#include <Modem/TS0710/DLC_channel.h>
+#include <Modem/TS0710/TS0710.h>
+#include <Modem/TS0710/TS0710_types.h>
+#include <SMSRecord.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
-#include <stdint.h> // for uint32_t
-#include <optional> // for optional
-#include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
-#include <string>   // for string
-#include <vector>   // for vector
 
-#include "CellularCall.hpp" // for CellularCall
-#include "USSD.hpp"                     // for State, State::none
-#include "SMSRecord.hpp"                // for SMSRecord
-#include "messages/CellularMessage.hpp" // for CellularUSSDMessage, CellularUSSDMessage::RequestType
-#include "State.hpp"                    // for State
-#include "bsp/common.hpp"               // for Board, Board::none
-#include "Modem/TS0710/TS0710_types.h"  // for PS460800, PortSpeed_e
-#include "Service/Common.hpp"           // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp"          // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 class MuxDaemon;
 namespace db
@@ -147,7 +147,13 @@ class ServiceCellular : public sys::Service
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
     bool handle_ready();
-
+    bool handleAllMessagesFromMessageStorage();
+    [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
+                                            const UTF8 &receivedNumber,
+                                            const time_t messageDate,
+                                            const SMSType &smsType = SMSType::INBOX) const noexcept;
+    bool dbAddSMSRecord(const SMSRecord &record);
+    [[nodiscard]] bool handleListMessages(const at::AT &command, DLC_channel *channel);
     /// @}
 
     bool transmitDtmfTone(uint32_t digit);
@@ -174,5 +180,3 @@ class ServiceCellular : public sys::Service
 
     friend class CellularUrcHandler;
 };
-
-#endif // PUREPHONE_SERVICECELLULAR_HPP

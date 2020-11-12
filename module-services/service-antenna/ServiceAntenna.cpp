@@ -15,8 +15,8 @@
 #include <projdefs.h>
 #include <Service/Timer.hpp>
 #include <service-cellular/State.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-#include <service-cellular/messages/CellularMessage.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular/CellularMessage.hpp>
 
 #include <ticks.hpp>
 

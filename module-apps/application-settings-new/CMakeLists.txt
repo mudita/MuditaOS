@@ -1,4 +1,4 @@
-
+﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
     PUBLIC
@@ -54,3 +54,8 @@ target_sources( ${PROJECT_NAME}
 )
 
 add_dependencies(${PROJECT_NAME} version)
+
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        service-bluetooth
+)
