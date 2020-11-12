@@ -13,6 +13,7 @@
 
 * `[calendar]` Set 'all day' as a default option
 * `[bus]` Message handling refactored.
+* `[appmgr]` Translating messages to actions introduced.
 
 ### Fixed
 

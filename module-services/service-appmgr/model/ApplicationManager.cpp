@@ -15,7 +15,7 @@
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
-#include <service-appmgr/Message.hpp>
+#include <service-appmgr/messages/Message.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-gui/ServiceGUI.hpp>
@@ -235,8 +235,8 @@ namespace app::manager
             closeApplication(applications.findByName(msg->getApplication()));
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(ApplicationInitialisation), [this](sys::Message *request) {
-            auto msg = static_cast<ApplicationInitialisation *>(request);
+        connect(typeid(ApplicationInitialised), [this](sys::Message *request) {
+            auto msg = static_cast<ApplicationInitialised *>(request);
             handleInitApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
@@ -483,7 +483,7 @@ namespace app::manager
         previousApp.switchWindow = std::move(targetWindow);
     }
 
-    auto ApplicationManager::handleInitApplication(ApplicationInitialisation *msg) -> bool
+    auto ApplicationManager::handleInitApplication(ApplicationInitialised *msg) -> bool
     {
         auto app = getApplication(msg->getSenderName());
         if (app == nullptr) {
@@ -565,7 +565,7 @@ namespace app::manager
     void ApplicationManager::rebuildActiveApplications()
     {
         for (const auto &app : getApplications()) {
-            if (app && app->launcher && app->launcher->handle) {
+            if (app && app->valid()) {
                 if (const auto appState = app->state(); appState == ApplicationHandle::State::ACTIVE_FORGROUND ||
                                                         appState == ApplicationHandle::State::ACTIVE_BACKGROUND) {
                     app::Application::messageRebuildApplication(this, app->name());

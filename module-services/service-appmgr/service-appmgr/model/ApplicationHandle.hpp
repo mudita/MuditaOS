@@ -19,9 +19,6 @@ namespace app::manager
     class ApplicationHandle
     {
       public:
-        static inline constexpr std::string_view InvalidAppName{"NONE"};
-        static inline const ApplicationManifest InvalidManifest;
-
         using State = app::Application::State;
 
         explicit ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher);
@@ -31,8 +28,8 @@ namespace app::manager
         void runInBackground(sys::Service *caller);
         void close() noexcept;
 
+        auto valid() const noexcept -> bool;
         auto name() const -> ApplicationName;
-        auto manifest() const -> const ApplicationManifest &;
         auto state() const noexcept -> State;
         auto preventsBlocking() const noexcept -> bool;
         auto closeable() const noexcept -> bool;
@@ -42,10 +39,12 @@ namespace app::manager
         std::unique_ptr<app::ApplicationLauncher> launcher; // Handle to the application's start function.
         std::unique_ptr<gui::SwitchData> switchData;
         std::string switchWindow;
-        bool blockClosing =
-            false; //< Informs the application manager that this application mustn't be closed temporarily.
-        //< This flag is used to prevent application closing when application is closeable and there is
-        //< incoming call. This flag is also used when closeable application is on front and there is a
-        //< timeout to block the application.
+        bool blockClosing = false; //< Informs the application manager that this application mustn't be closed
+                                   // temporarily. This flag is used to prevent application closing when application
+                                   // is closeable and there is incoming call. This flag is also used when closeable
+                                   // application is on front and there is a timeout to block the application.
+
+      private:
+        auto getManifest() const -> const ApplicationManifest &;
     };
 } // namespace app::manager
