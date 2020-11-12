@@ -12,6 +12,7 @@ namespace at::urc
 
         const std::string type_csq  = "csq";
         const std::string type_fota = "FOTA";
+        const std::string_view type_sms_done = "SMS DONE";
 
         static const auto invalid_rssi_low  = 99;
         static const auto invalid_rssi_high = 199;
@@ -62,6 +63,8 @@ namespace at::urc
         [[nodiscard]] auto isFotaValid() const noexcept -> bool;
         [[nodiscard]] auto getFotaStage() const noexcept -> std::optional<FotaStage>;
         [[nodiscard]] auto getFotaParameter() const noexcept -> std::string;
+
+        [[nodiscard]] auto isSmsDone() const noexcept -> bool;
 
         void Handle(UrcHandler &h) final
         {

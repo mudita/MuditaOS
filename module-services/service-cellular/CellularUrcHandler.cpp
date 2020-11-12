@@ -131,6 +131,11 @@ void CellularUrcHandler::Handle(Qind &urc)
             urc.setHandled(true);
         }
     }
+    else if (urc.isSmsDone()) {
+        response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SMSDone);
+
+        urc.setHandled(true);
+    }
 }
 
 void CellularUrcHandler::Handle(PoweredDown &urc)
