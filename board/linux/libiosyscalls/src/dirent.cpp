@@ -23,10 +23,10 @@ extern "C" {
     DIR *opendir(const char *dirname)
     {
         TRACE_SYSCALL();
-		if(!dirname) {
-			errno = EINVAL;
-			return nullptr;
-		}
+        if(!dirname) {
+            errno = EINVAL;
+            return nullptr;
+        }
         auto dir      = new DIR;
         dir->dir_data = diren::diropen(errno, dirname);
         if (!dir->dir_data) {

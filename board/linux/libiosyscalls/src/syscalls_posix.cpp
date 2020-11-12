@@ -32,28 +32,28 @@ namespace
 }
 extern "C" {
 
-	int link(const char *oldpath, const char *newpath)
-	{
-		TRACE_SYSCALL();
-		errno = ENOSYS;
-		real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
-		return -1;
-	}
+    int link(const char *oldpath, const char *newpath)
+    {
+        TRACE_SYSCALL();
+        errno = ENOSYS;
+        real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
+        return -1;
+    }
     __asm__(".symver link,link@GLIBC_2.2.5");
 
-	 int unlink(const char *name)
-	 {
+     int unlink(const char *name)
+     {
         TRACE_SYSCALL();
-		auto ret = ff_remove(name);
+        auto ret = ff_remove(name);
         if (ret && stdioGET_ERRNO() == EISDIR)
             ret = ff_deltree(name, nullptr, nullptr);
         errno = stdioGET_ERRNO();
         return ret;
-	 }
+     }
     __asm__(".symver unlink,unlink@GLIBC_2.2.5");
 
-	int stat(const char *file, struct stat *pstat)
-	{
+    int stat(const char *file, struct stat *pstat)
+    {
         TRACE_SYSCALL();
         FF_Stat_t stat_ff;
         auto ret = ff_stat(file, &stat_ff);
@@ -73,13 +73,13 @@ extern "C" {
         if (errno == EFAULT)
             errno = ENOENT;
         return ret;
-	}
+    }
     __asm__(".symver stat,stat@GLIBC_2.2.5");
 
     int fstat(int fd, struct stat *pstat)
-	{
+    {
         TRACE_SYSCALL();
-		FF_FILE* fil = vfsn::linux::internal::handle_to_ff_file(fd);
+        FF_FILE* fil = vfsn::linux::internal::handle_to_ff_file(fd);
         if(!fil) {
             errno = EBADF;
             return -1;
@@ -91,14 +91,14 @@ extern "C" {
         pstat->st_mode = S_IFREG | 0666;
         errno        = 0;
         return 0;
-	}
+    }
     __asm__(".symver fstat,fstat@GLIBC_2.2.5");
 
     int lstat(const char *pathname, struct stat *statbuf)
-	{
+    {
         TRACE_SYSCALL();
-		return stat(pathname, statbuf);
-	}
+        return stat(pathname, statbuf);
+    }
     __asm__(".symver lstat,lstat@GLIBC_2.2.5");
 
     int fcntl(int fd, int cmd, ... /* arg */ )

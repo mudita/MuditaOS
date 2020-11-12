@@ -35,10 +35,10 @@ namespace vfsn::linux::internal::diren
 
     int dirreset(int &_errno_, DIR_ITER *state)
     {
-		if( !state ) {
-			_errno_ = EINVAL;
-			return -1;
-		}
+        if( !state ) {
+            _errno_ = EINVAL;
+            return -1;
+        }
         if (state->dir_state) {
             delete reinterpret_cast<FF_FindData_t *>(state->dir_state);
             state->dir_state = nullptr;
@@ -53,10 +53,10 @@ namespace vfsn::linux::internal::diren
     int dirnext(int &_errno_, DIR_ITER *state)
     {
         int ret;
-		if(!state) {
-			_errno_ = EINVAL;
-			return -1;
-		}
+        if(!state) {
+            _errno_ = EINVAL;
+            return -1;
+        }
         if (!state->dir_state) {
             auto fdd = new (std::nothrow) FF_FindData_t;
             if (!fdd) {
