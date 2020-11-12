@@ -7,6 +7,9 @@ set(SOURCES
     CellularUrcHandler.cpp
     ServiceCellular.cpp
     SignalStrength.cpp
+    CallRequest.cpp
+    CallRequestFactory.cpp
+    CellularCallRequestHandler.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
@@ -23,4 +26,4 @@ target_link_libraries(${PROJECT_NAME}
         module-bsp
         module-cellular
     )
-
+    
