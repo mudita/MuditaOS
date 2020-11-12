@@ -20,8 +20,9 @@ namespace {
     {
         char *d = dst;
         int c;
-        while ((c = ic(fp)) != EOF && wid-- > 0 && !isspace(c))
+        while ((c = ic(fp)) != EOF && wid-- > 0 && !isspace(c)) {
             *d++ = c;
+        }
         *d = '\0';
         ungetc(c, reinterpret_cast<FILE*>(fp));
         return d == dst;
@@ -33,10 +34,12 @@ namespace {
         int c;
         int neg = 0;
         c = ic(fp);
-        if (c == '-')
+        if (c == '-') {
             neg = 1;
-        if ((c == '-' || c == '+') && wid-- > 0)
+        }
+        if ((c == '-' || c == '+') && wid-- > 0) {
             c = ic(fp);
+        }
         if (!isdigit(c) || wid <= 0) {
             ungetc(c, reinterpret_cast<FILE*>(fp));
             return 1;
@@ -45,14 +48,18 @@ namespace {
             n = n * 10 + c - '0';
         } while (isdigit(c = ic(fp)) && --wid > 0);
         ungetc(c, reinterpret_cast<FILE*>(fp));
-        if (t == 8)
+        if (t == 8) {
             *reinterpret_cast<long *>(dst) = neg ? -n : n;
-        else if (t == 4)
+        }
+        else if (t == 4) {
             *reinterpret_cast<int *>(dst) = neg ? -n : n;
-        else if (t == 2)
+        }
+        else if (t == 2) {
             *reinterpret_cast<short *>(dst) = neg ? -n : n;
-        else
+        }
+        else {
             *reinterpret_cast<char *>(dst) = neg ? -n : n;
+        }
         return 0;
     }
 }
@@ -88,8 +95,9 @@ extern "C" {
         int t, c;
         int wid = 1 << 20;
         while (*fmt) {
-            while (isspace(static_cast<unsigned char>(*fmt)))
+            while (isspace(static_cast<unsigned char>(*fmt))) {
                 fmt++;
+            }
             while (isspace(c = ic(reinterpret_cast<FF_FILE*>(fp))))
                 ;
             ungetc(c, fp);
