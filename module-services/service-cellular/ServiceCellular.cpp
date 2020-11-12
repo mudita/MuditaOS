@@ -75,7 +75,7 @@
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
-inline const auto cellularStack = 24000UL;
+inline constexpr auto cellularStack = 24000UL;
 
 using namespace cellular;
 
@@ -625,6 +625,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 break;
             }
             break;
+        case CellularNotificationMessage::Type::SMSDone: {
+            auto resp   = handleAllMessagesFromMessageStorage();
+            responseMsg = std::make_shared<CellularResponseMessage>(resp);
+        } break;
         case CellularNotificationMessage::Type::SignalStrengthUpdate:
         case CellularNotificationMessage::Type::NetworkStatusUpdate:
         case CellularNotificationMessage::Type::NewIncomingUSSD: {
@@ -1142,13 +1146,12 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 
     auto cmd = at::factory(at::AT::QCMGR);
     auto ret = channel->cmd(cmd + messageNumber, cmd.timeout);
-
     bool messageParsed = false;
 
     std::string messageRawBody;
     UTF8 receivedNumber;
     if (ret) {
-        for (uint32_t i = 0; i < ret.response.size(); i++) {
+        for (std::size_t i = 0; i < ret.response.size(); i++) {
             if (ret.response[i].find("QCMGR") != std::string::npos) {
 
                 std::istringstream ss(ret.response[i]);
@@ -1202,7 +1205,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                     if (current == last) {
                         messageParts.push_back(ret.response[i + 1]);
 
-                        for (uint32_t j = 0; j < messageParts.size(); j++) {
+                        for (std::size_t j = 0; j < messageParts.size(); j++) {
                             messageRawBody += messageParts[j];
                         }
                         messageParts.clear();
@@ -1215,23 +1218,11 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                 if (messageParsed) {
                     messageParsed = false;
 
-                    UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
+                    const auto decodedMessage = UCS2(messageRawBody).toUTF8();
 
-                    SMSRecord record;
-                    record.body   = decodedMessage;
-                    record.number = utils::PhoneNumber::getReceivedNumberView(receivedNumber);
-                    record.type   = SMSType::INBOX;
-                    record.date   = messageDate;
+                    const auto record = createSMSRecord(decodedMessage, receivedNumber, messageDate);
 
-                    if (DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE) {
-                        DBServiceAPI::GetQuery(
-                            this,
-                            db::Interface::Name::Notifications,
-                            std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
-                        const std::string ringtone_path = "assets/audio/SMS-drum2.mp3";
-                        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
-                    }
-                    else {
+                    if (!dbAddSMSRecord(record)) {
                         LOG_ERROR("Failed to add text message to db");
                         return false;
                     }
@@ -1301,7 +1292,6 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
     if (channel) {
         auto resp = channel->cmd(at::AT::CSQ);
         if (resp.code == at::Result::Code::OK) {
-
             data.push_back(resp.response[0]);
         }
         else {
@@ -1552,6 +1542,79 @@ bool ServiceCellular::handle_sim_init()
 
     state.set(this, State::ST::Ready);
     return success;
+}
+
+bool ServiceCellular::handleAllMessagesFromMessageStorage()
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel == nullptr) {
+        LOG_ERROR("Cant configure sim! no Commands channel!");
+        return false;
+    }
+
+    auto commands = at::getCommadsSet(at::commadsSet::smsInit);
+
+    const auto errorState = []() {
+        LOG_ERROR("HANDLE ALL MESSAGE FROM MESSAGE STORAGE FAILED!");
+        return false;
+    };
+
+    for (const auto &command : commands) {
+        if (command == at::AT::LIST_MESSAGES && !handleListMessages(command, channel)) {
+            return errorState();
+        }
+        else if (!channel->cmd(command)) {
+            return errorState();
+        }
+    }
+    return true;
+}
+
+SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
+                                           const UTF8 &receivedNumber,
+                                           const time_t messageDate,
+                                           const SMSType &smsType) const noexcept
+{
+    SMSRecord record{};
+    record.body   = decodedMessage;
+    record.number = utils::PhoneNumber::getReceivedNumberView(receivedNumber);
+    record.type   = SMSType::INBOX;
+    record.date   = messageDate;
+    return record;
+}
+
+bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
+{
+    if (DBServiceAPI::SMSAdd(this, record) == DB_ID_NONE) {
+        return false;
+    }
+    DBServiceAPI::GetQuery(this,
+                           db::Interface::Name::Notifications,
+                           std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
+    const std::string ringtone_path = "assets/audio/SMS-drum2.mp3";
+    AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
+    return true;
+}
+
+bool ServiceCellular::handleListMessages(const at::AT &command, DLC_channel *channel)
+{
+    if (channel == nullptr) {
+        return false;
+    }
+    constexpr std::string_view cmd = "CMGL: ";
+    if (auto ret = channel->cmd(command)) {
+        for (std::size_t i = 0; i < ret.response.size(); i++) {
+            if (auto pos = ret.response[i].find(cmd); pos != std::string::npos) {
+                auto startPos = pos + cmd.size();
+                auto endPos   = ret.response[i].find_first_of(",");
+                receiveSMS(ret.response[i].substr(startPos, endPos - startPos));
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 bool ServiceCellular::handle_failure()
