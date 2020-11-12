@@ -104,6 +104,10 @@ namespace purefs
     };
 }; // namespace purefs
 
+/* NOTE: VFS global object class is now deprecated more information
+ * on the confuence page:
+ * https://appnroll.atlassian.net/wiki/spaces/MFP/pages/706248802/VFS+library+migration+guide
+ */
 class vfs
 {
   public:
