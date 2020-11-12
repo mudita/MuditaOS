@@ -9,6 +9,8 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+#include "service-cellular/CallRequestFactory.hpp"
+#include "service-cellular/CellularCallRequestHandler.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>
@@ -614,6 +616,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 for (auto const &el : respMsg->response) {
                     LOG_DEBUG("> %s", el.c_str());
                 }
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                break;
             }
             responseMsg = respMsg;
             break;
@@ -637,6 +641,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         }
     } break;
+
     case MessageType::CellularSimProcedure: {
         state.set(this, State::ST::SimSelect);
         break;
@@ -753,24 +758,23 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
     } break;
 
     case MessageType::CellularCallRequest: {
+
         auto *msg = dynamic_cast<CellularCallRequestMessage *>(msgl);
         assert(msg != nullptr);
         auto channel = cmux->get(TS0710::Channel::Commands);
-        if (channel) {
-            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->number.getEntered() + ";");
-            if (ret) {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
-                // activate call state timer
-                callStateTimer->reload();
-                // Propagate "Ringing" notification into system
-                sys::Bus::SendMulticast(
-                    std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, msg->number),
-                    sys::BusChannels::ServiceCellularNotifications,
-                    this);
-                break;
-            }
+        if (channel == nullptr) {
+            responseMsg = std::make_shared<CellularResponseMessage>(false);
+            break;
         }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+
+        call_request::Factory factory(msg->number.getEntered());
+        CellularCallRequestHandler handler(*this);
+
+        auto request = factory.create();
+        auto result  = channel->cmd(request->command());
+        request->handle(handler, result);
+
+        responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
     } break;
     case MessageType::DBServiceNotification: {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
@@ -1006,6 +1010,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     CellularUrcHandler urcHandler(*this);
 
     std::string str(data.begin(), data.end());
+
     std::string logStr = utils::removeNewLines(str);
     LOG_DEBUG("Notification:: %s", logStr.c_str());
 
@@ -1466,6 +1471,7 @@ bool ServiceCellular::handle_sim_sanity_check()
 
 bool ServiceCellular::handle_select_sim()
 {
+
     bsp::cellular::sim::sim_sel();
     bsp::cellular::sim::hotswap_trigger();
 #if defined(TARGET_Linux)

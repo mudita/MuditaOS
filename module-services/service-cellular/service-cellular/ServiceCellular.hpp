@@ -17,6 +17,10 @@
 #include <Service/Service.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
+#include <optional> // for optional
+#include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
+#include <string>   // for string
+#include <vector>   // for vector
 
 #include <cstdint>
 #include <memory>
@@ -74,8 +78,8 @@ class ServiceCellular : public sys::Service
      * @return true when succeed, false when fails
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
-    std::vector<std::string> getNetworkInfo(void);
-    std::vector<std::string> scanOperators(void);
+    std::vector<std::string> getNetworkInfo();
+    std::vector<std::string> scanOperators();
 
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
@@ -161,22 +165,23 @@ class ServiceCellular : public sys::Service
     void handle_CellularGetChannelMessage();
 
     bool SetScanMode(std::string mode);
-    std::string GetScanMode(void);
+    std::string GetScanMode();
 
     uint32_t stateTimeout = 0;
     void startStateTimer(uint32_t timeout);
-    void stopStateTimer(void);
-    void handleStateTimer(void);
-    void setUSSDTimer(void);
+    void stopStateTimer();
+    void handleStateTimer();
 
     // db response handlers
     auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
 
     // ussd handlers
     uint32_t ussdTimeout = 0;
+    void setUSSDTimer();
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
-    bool handleUSSDURC(void);
-    void handleUSSDTimer(void);
+    bool handleUSSDURC();
+    void handleUSSDTimer();
 
     friend class CellularUrcHandler;
+    friend class CellularCallRequestHandler;
 };
