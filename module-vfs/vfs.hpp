@@ -104,6 +104,10 @@ namespace purefs
     };
 }; // namespace purefs
 
+/* NOTE: VFS global object class is now deprecated more information
+ * on the confuence page:
+ * https://appnroll.atlassian.net/wiki/spaces/MFP/pages/706248802/VFS+library+migration+guide
+ */
 class vfs
 {
   public:
@@ -137,43 +141,43 @@ class vfs
     vfs();
     ~vfs();
     void Init();
-    FILE *fopen(const char *filename, const char *mode);
-    int fclose(FILE *stream);
-    int remove(const char *name);
-    size_t fread(void *ptr, size_t size, size_t count, FILE *stream);
-    size_t fwrite(const void *ptr, size_t size, size_t count, FILE *stream);
-    int fseek(FILE *stream, long int offset, int origin);
-    long int ftell(FILE *stream);
-    void rewind(FILE *stream);
-    size_t filelength(FILE *stream);
-    std::string getcurrdir();
-    char *fgets(char *buffer, size_t count, FILE *stream);
-    bool eof(FILE *stream);
-    std::vector<DirectoryEntry> listdir(const char *path,
-                                        const std::string &ext     = "",
-                                        const bool bypassRootCheck = false);
-    std::string getline(FILE *stream, uint32_t length = 1024);
-    size_t fprintf(FILE *stream, const char *format, ...);
-    FilesystemStats getFilesystemStats();
-    std::string relativeToRoot(const std::string path);
-    std::string lastErrnoToStr();
-    bool isDir(const char *path);
-    bool fileExists(const char *path);
-    int deltree(const char *path);
-    int mkdir(const char *dir);
-    int rename(const char *oldname, const char *newname);
-    std::string loadFileAsString(const fs::path &fileToLoad);
-    bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
-    void updateTimestamp();
-    struct purefs::BootConfig &getBootConfig()
+    [[deprecated]] FILE *fopen(const char *filename, const char *mode);
+    [[deprecated]] int fclose(FILE *stream);
+    [[deprecated]] int remove(const char *name);
+    [[deprecated]] size_t fread(void *ptr, size_t size, size_t count, FILE *stream);
+    [[deprecated]] size_t fwrite(const void *ptr, size_t size, size_t count, FILE *stream);
+    [[deprecated]] int fseek(FILE *stream, long int offset, int origin);
+    [[deprecated]] long int ftell(FILE *stream);
+    [[deprecated]] void rewind(FILE *stream);
+    [[deprecated]] size_t filelength(FILE *stream);
+    [[deprecated]] std::string getcurrdir();
+    [[deprecated]] char *fgets(char *buffer, size_t count, FILE *stream);
+    [[deprecated]] bool eof(FILE *stream);
+    [[deprecated]] std::vector<DirectoryEntry> listdir(const char *path,
+                                                       const std::string &ext     = "",
+                                                       const bool bypassRootCheck = false);
+    [[deprecated]] std::string getline(FILE *stream, uint32_t length = 1024);
+    [[deprecated]] size_t fprintf(FILE *stream, const char *format, ...);
+    [[deprecated]] FilesystemStats getFilesystemStats();
+    [[deprecated]] std::string relativeToRoot(const std::string path);
+    [[deprecated]] std::string lastErrnoToStr();
+    [[deprecated]] bool isDir(const char *path);
+    [[deprecated]] bool fileExists(const char *path);
+    [[deprecated]] int deltree(const char *path);
+    [[deprecated]] int mkdir(const char *dir);
+    [[deprecated]] int rename(const char *oldname, const char *newname);
+    [[deprecated]] std::string loadFileAsString(const fs::path &fileToLoad);
+    [[deprecated]] bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
+    [[deprecated]] void updateTimestamp();
+    [[deprecated]] struct purefs::BootConfig &getBootConfig()
     {
         return bootConfig;
     }
-    void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
+    [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);
     }
-    auto getAbsolutePath(std::string_view path) const -> std::string;
+    [[deprecated]] auto getAbsolutePath(std::string_view path) const -> std::string;
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
@@ -181,10 +185,10 @@ class vfs
 
     FF_Disk_t *emmcFFDisk{};
 
-    static void computeCRC32(FILE *file, unsigned long *outCrc32);
-    static bool verifyCRC(const std::string filePath, const unsigned long crc32);
-    static bool verifyCRC(const fs::path filePath);
-    static std::string generateRandomId(size_t length);
+    [[deprecated]] static void computeCRC32(FILE *file, unsigned long *outCrc32);
+    [[deprecated]] static bool verifyCRC(const std::string filePath, const unsigned long crc32);
+    [[deprecated]] static bool verifyCRC(const fs::path filePath);
+    [[deprecated]] static std::string generateRandomId(size_t length);
 
   private:
     bool updateFileCRC32(const fs::path &file);
