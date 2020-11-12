@@ -22,6 +22,7 @@
 
 ### Fixed
 
+* `[desktop]` Absent call button on desktop with notifications fix
 * `[messages]` Fixed clearing text on options/recipient choice in new message window.
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
@@ -603,3 +604,4 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
+
