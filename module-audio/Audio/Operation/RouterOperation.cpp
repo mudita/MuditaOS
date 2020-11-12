@@ -143,7 +143,7 @@ namespace audio
                 Profile::Type::RoutingLoudspeaker, nullptr, routingLoudspeakerVolume, routingLoudspeakerGain),
             true);
 
-        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
+        auto defaultProfile = GetProfile(Profile::Type::RoutingEarspeaker);
         if (!defaultProfile) {
             LOG_ERROR("Error during initializing profile");
             return;

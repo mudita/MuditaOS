@@ -129,7 +129,7 @@ namespace audio
         std::vector<std::shared_ptr<Event>> getUpdateEvents() const
         {
             std::vector<std::shared_ptr<Event>> updateEvents;
-            for (size_t i = 0; i < hwStateUpdateMaxEvent; i++) {
+            for (size_t i = 0; i <= hwStateUpdateMaxEvent; i++) {
                 auto isConnected =
                     audioSinkState.test(i) ? Event::DeviceState::Connected : Event::DeviceState::Disconnected;
                 auto updateEvt = magic_enum::enum_cast<EventType>(i);
