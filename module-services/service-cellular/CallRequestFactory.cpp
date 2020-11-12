@@ -16,6 +16,7 @@ namespace call_request
     Factory::Factory(const std::string &data) : request(data)
     {
         registerRequest(IMEIRegex, IMEIRequest::create);
+        registerRequest(MMIRegex, MmiRequest::create);
 
         /*It have to be last check due to 3GPP TS 22.030*/
         registerRequest(USSDRegex, USSDRequest::create);
@@ -31,8 +32,11 @@ namespace call_request
         for (const auto &element : requestMap) {
             re2::StringPiece input(request);
             re2::RE2 reg(element.first);
-            if (re2::RE2::FullMatch(input, reg)) {
-                return element.second(request);
+            std::string groupA, groupB, groupC, groupD, groupE;
+            GroupMatch matchPack = {groupA, groupB, groupC, groupD, groupE};
+
+            if (re2::RE2::FullMatch(input, reg, &groupA, &groupB, &groupC, &groupD, &groupE)) {
+                return element.second(request, matchPack);
             }
         }
         return std::make_unique<CallRequest>(request);

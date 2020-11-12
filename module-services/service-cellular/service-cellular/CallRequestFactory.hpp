@@ -9,10 +9,11 @@
 #include <functional>
 
 #include "CallRequest.hpp"
+#include "MmiRequest.hpp"
 
 namespace call_request
 {
-    using CreateCallback = std::function<std::unique_ptr<IRequest>(const std::string &)>;
+    using CreateCallback = std::function<std::unique_ptr<IRequest>(const std::string &, GroupMatch)>;
 
     class Factory
     {

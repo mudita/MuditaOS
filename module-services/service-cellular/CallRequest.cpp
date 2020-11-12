@@ -1,7 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <functional>
 #include <string>
 #include <memory>
 
@@ -35,7 +34,7 @@ namespace call_request
         h.handle(*this, result);
     }
 
-    std::unique_ptr<IMEIRequest> IMEIRequest::create(const std::string &data)
+    std::unique_ptr<IMEIRequest> IMEIRequest::create(const std::string &data, GroupMatch)
     {
         return std::make_unique<IMEIRequest>(data);
     }
@@ -45,7 +44,7 @@ namespace call_request
         return std::string(at::factory(at::AT::CUSD_SEND) + request + ",15");
     }
 
-    std::unique_ptr<USSDRequest> USSDRequest::create(const std::string &data)
+    std::unique_ptr<USSDRequest> USSDRequest::create(const std::string &data, GroupMatch)
     {
         return std::make_unique<USSDRequest>(data);
     }

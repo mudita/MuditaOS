@@ -44,3 +44,12 @@ void CellularCallRequestHandler::handle(CallRequest &request, at::Result &result
         &cellular);
     request.setHandled(true);
 }
+
+void CellularCallRequestHandler::handle(MmiRequest &request, at::Result &result)
+{
+    if (!request.checkModemResponse(result)) {
+        request.setHandled(false);
+        return;
+    }
+    request.setHandled(true);
+}

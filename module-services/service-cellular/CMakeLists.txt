@@ -11,7 +11,10 @@ set(SOURCES
     SimCard.cpp
     CallRequestFactory.cpp
     CellularCallRequestHandler.cpp
+    MmiRequest.cpp
+    MmiRequestCallForwarding.cpp
 )
+
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 

@@ -8,6 +8,9 @@
 
 namespace call_request
 {
+    constexpr inline auto maxGroupsInMmiRequest = 5;
+    using GroupMatch = std::array<std::reference_wrapper<std::string>, maxGroupsInMmiRequest>;
+
     class IRequest
     {
       public:
@@ -37,7 +40,8 @@ namespace call_request
       public:
         IMEIRequest(const std::string &data) : Request(data){};
         std::string command() final;
-        static std::unique_ptr<IMEIRequest> create(const std::string &data);
+
+        static std::unique_ptr<IMEIRequest> create(const std::string &data, GroupMatch);
         void handle(CallRequestHandler &h, at::Result &result) final;
     };
 
@@ -47,7 +51,7 @@ namespace call_request
         USSDRequest(const std::string &data) : Request(data){};
         std::string command() final;
 
-        static std::unique_ptr<USSDRequest> create(const std::string &data);
+        static std::unique_ptr<USSDRequest> create(const std::string &data, GroupMatch);
         void handle(CallRequestHandler &h, at::Result &result) final;
     };
 
@@ -60,7 +64,7 @@ namespace call_request
         {
             return request;
         }
-        static std::unique_ptr<CallRequest> create(const std::string &data);
+        static std::unique_ptr<CallRequest> create(const std::string &data, GroupMatch);
         void handle(CallRequestHandler &h, at::Result &result) final;
     };
 }; // namespace call_request
