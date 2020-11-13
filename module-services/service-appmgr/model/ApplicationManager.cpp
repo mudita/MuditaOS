@@ -260,6 +260,12 @@ namespace app::manager
             handleAction(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(CellularSimGetPinRequest), makeConvertibleToActionHandler());
+        connect(typeid(CellularSimGetPukRequest), makeConvertibleToActionHandler());
+        connect(typeid(CellularSimChangePinRequest), makeConvertibleToActionHandler());
+        connect(typeid(CellularSimUnlockedMessage), makeConvertibleToActionHandler());
+        connect(typeid(CellularSimBlockedMessage), makeConvertibleToActionHandler());
+        connect(typeid(CellularUnhandledCMEMessage), makeConvertibleToActionHandler());
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -643,6 +649,17 @@ namespace app::manager
         return true;
     }
 
+    auto ApplicationManager::makeConvertibleToActionHandler() -> sys::MessageHandler
+    {
+        return [this](sys::Message *request) {
+            auto actionMsg = dynamic_cast<manager::actions::ConvertibleToAction *>(request);
+            auto action    = actionMsg->toAction();
+            if (actionMsg) {
+                handleAction(action.get());
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        };
+    }
     void ApplicationManager::onPhoneLocked()
     {
 #ifdef AUTO_PHONE_LOCK_ENABLED

@@ -24,8 +24,13 @@ namespace app::manager
         {
             Launch,
             Call,
+            RequestPin,
+            RequestPuk,
+            ChangePin,
+            SimUnlocked,
+            SimBlocked,
+            UnhandledCMEError,
             UserAction // The last enumerator in the Action enum.
-                       // All user-defined actions shall have values greater than UserAction.
         };
 
         class ConvertibleToAction

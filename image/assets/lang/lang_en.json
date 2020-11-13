@@ -175,6 +175,7 @@
     "app_desktop_sim_warning3": "have to contact the operator",
     "app_desktop_sim_blocked_info1": "Sorry, SIM card permanently blocked.",
     "app_desktop_sim_blocked_info2": "Please contact your service provider",
+    "app_desktop_sim_cme_error": "<text>SIM card\nCME error:</text>",
 
     "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
     "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",

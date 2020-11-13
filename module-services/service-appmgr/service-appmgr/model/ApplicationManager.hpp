@@ -120,6 +120,7 @@ namespace app::manager
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
+        auto makeConvertibleToActionHandler() -> sys::MessageHandler;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,
@@ -140,7 +141,6 @@ namespace app::manager
                                                    // defined in settings database application
                                                    // manager is sending signal to power manager and changing window to
                                                    // the desktop window in the blocked state.
-
         // Temporary solution - to be replaced with ActionsMiddleware.
         std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
     };

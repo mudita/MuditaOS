@@ -10,12 +10,27 @@ namespace gui
     class PinLockBox
     {
       public:
-        virtual void popChar(uint32_t charNum) = 0;
-        virtual void putChar(uint32_t charNum) = 0;
+        enum class EnterPasscodeType
+        {
+            ProvidePasscode,
+            ProvideNewPasscode,
+            ConfirmNewPasscode
+        };
 
-        virtual void setVisibleStateEnterPin()    = 0;
+        enum class PasscodeErrorType
+        {
+            InvalidPasscode,
+            NewPasscodeConfirmFailed,
+            UnhandledError
+        };
+
+        virtual void popChar(unsigned int charNum) = 0;
+        virtual void putChar(unsigned int charNum) = 0;
+        virtual void clear()                   = 0;
+
+        virtual void setVisibleStateEnterPin(EnterPasscodeType type)                       = 0;
         virtual void setVisibleStateVerifiedPin() = 0;
-        virtual void setVisibleStateInvalidPin()  = 0;
+        virtual void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) = 0;
         virtual void setVisibleStateBlocked()     = 0;
 
         virtual void buildLockBox(unsigned int pinSize) = 0;

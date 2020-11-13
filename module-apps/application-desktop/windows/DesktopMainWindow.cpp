@@ -89,9 +89,7 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         auto app = getAppDesktop();
-
-        if (app->lockHandler.lock.isLocked() && app->lockHandler.lock.getLockType() == PinLock::LockType::Screen) {
-
+        if (app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::RIGHT, false);
@@ -99,12 +97,6 @@ namespace gui
             inputCallback = nullptr;
             setFocusItem(nullptr);
             buildNotifications(app);
-
-            sys::Bus::SendUnicast(
-                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
-        }
-        else if (app->lockHandler.lock.isLocked()) {
-            application->switchWindow(app::window::name::desktop_pin_lock);
 
             sys::Bus::SendUnicast(
                 std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
@@ -135,35 +127,46 @@ namespace gui
         // check if there was a signal to lock the pone due to inactivity.
         if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
             auto app = getAppDesktop();
-            if (app->lockHandler.lock.isLocked()) {
+            if (app->lockHandler.isScreenLocked()) {
                 return;
             }
-
             auto *lockData          = dynamic_cast<LockPhoneData *>(data);
             lockTimeoutApplilcation = lockData->getPreviousApplication();
-
             application->setSuspendFlag(true);
         }
+
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            auto lock = getScreenLock();
+            if (lock->getState() == PinLock::LockState::Unlocked) {
+                setVisibleState();
+                return;
+            }
+            switchToPinLockWindow(std::move(lock));
+        }
+
         setVisibleState();
     }
 
     bool DesktopMainWindow::processLongPressEvent(const InputEvent &inputEvent)
     {
-        auto *app = getAppDesktop();
+        auto app = getAppDesktop();
 
-        if (inputEvent.is(KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
-            app->lockHandler.lock.lock();
-            setVisibleState();
-            application->setSuspendFlag(true);
-            return true;
+        if (!app->lockHandler.isScreenLocked()) {
+            if (inputEvent.is(KeyCode::KEY_PND)) {
+                app->lockHandler.lockScreen();
+                setVisibleState();
+                application->setSuspendFlag(true);
+                return true;
+            }
+            // long press of '0' key is translated to '+'
+            else if (inputEvent.is(KeyCode::KEY_0)) {
+                return app::prepareCall(application, "+");
+            }
         }
-        else if (inputEvent.is(KeyCode::KEY_RF)) {
+
+        if (inputEvent.is(KeyCode::KEY_RF)) {
             application->switchWindow("PowerOffWindow");
             return true;
-        }
-        // long press of '0' key is translated to '+'
-        else if (inputEvent.is(KeyCode::KEY_0)) {
-            return app::prepareCall(application, "+");
         }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
@@ -195,18 +198,16 @@ namespace gui
         if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
-            std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>(LockPhoneData::Request::Pin);
-            // if there was no application on to before closing proceed normally to pin protection
-            if (lockTimeoutApplilcation.empty()) {
-                application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
+
+            auto lock = getScreenLock();
+            // if there is no pin,
+            if (lock->getMaxPinSize() == 0) {
+                lock->verify();
                 return true;
             }
-            else {
-                data->setPrevApplication(lockTimeoutApplilcation);
-                lockTimeoutApplilcation = "";
-                application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
-                return true;
-            }
+
+            switchToPinLockWindow(std::move(lock));
+            return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {
             return true;
@@ -227,7 +228,7 @@ namespace gui
             return processLongPressEvent(inputEvent);
         }
         else if (inputEvent.isShortPress()) {
-            if (app->lockHandler.lock.isLocked()) {
+            if (app->lockHandler.isScreenLocked()) {
                 return processShortPressEventOnLocked(inputEvent);
             }
             else {
@@ -342,5 +343,40 @@ namespace gui
         auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app);
         return app;
+    }
+
+    auto DesktopMainWindow::getScreenLock() -> std::unique_ptr<PinLock>
+    {
+        auto lock = std::make_unique<PinLock>(getAppDesktop()->lockHandler.screenLock);
+        auto app  = getAppDesktop();
+        if (lock->getState() == PinLock::LockState::PasscodeRequired) {
+            lock->onActivatedCallback = [app](const std::vector<unsigned int> &data) {
+                app->lockHandler.handleScreenPin(data);
+                app->switchWindow(app::window::name::desktop_main_window, ShowMode::GUI_SHOW_RETURN);
+            };
+        }
+        else if (lock->getState() == PinLock::LockState::PasscodeInvalidRetryRequired) {
+            lock->onActivatedCallback = [app](const std::vector<unsigned int> &) {
+                app->lockHandler.screenLock.consumeState();
+                app->switchWindow(app::window::name::desktop_main_window, ShowMode::GUI_SHOW_RETURN);
+            };
+        }
+        else if (lock->getState() == PinLock::LockState::Blocked) {
+            lock->onActivatedCallback = [app](const std::vector<unsigned int> &) {
+                app->switchWindow(app::window::name::desktop_main_window, ShowMode::GUI_SHOW_INIT);
+            };
+        }
+        return lock;
+    }
+
+    void DesktopMainWindow::switchToPinLockWindow(std::unique_ptr<PinLock> &&lock)
+    {
+        auto data = std::make_unique<LockPhoneData>(std::move(lock));
+        if (!lockTimeoutApplilcation.empty()) {
+            // if there was no application on to before closing proceed normally to pin protection
+            data->setPrevApplication(lockTimeoutApplilcation);
+            lockTimeoutApplilcation.clear();
+        }
+        application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
     }
 } /* namespace gui */

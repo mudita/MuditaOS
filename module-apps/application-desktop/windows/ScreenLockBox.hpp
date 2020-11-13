@@ -4,8 +4,8 @@
 #pragma once
 
 #include "PinLockBox.hpp"
-#include "Label.hpp"
-
+#include "BoxLayout.hpp"
+#include "Image.hpp"
 namespace gui
 {
     class PinLockBaseWindow;
@@ -20,13 +20,23 @@ namespace gui
         {}
 
       private:
-        PinLockBaseWindow *LockWindow;
-        void popChar(uint32_t charNum) override final;
-        void putChar(uint32_t charNum) override final;
+        struct PinLabel : public HBox
+        {
+            gui::Image *image = nullptr;
+            PinLabel(Item *parent, const uint32_t &w, const uint32_t &h);
+            void setVisibleState(bool isImageVisible);
+        };
 
-        void setVisibleStateEnterPin() override final;
+        std::vector<PinLabel *> pinLabels;
+
+        PinLockBaseWindow *LockWindow;
+        void popChar(unsigned int charNum) override final;
+        void putChar(unsigned int charNum) override final;
+        virtual void clear() override final;
+
+        void setVisibleStateEnterPin(EnterPasscodeType type) override final;
         void setVisibleStateVerifiedPin() override final;
-        void setVisibleStateInvalidPin() override final;
+        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) override final;
         void setVisibleStateBlocked() override final;
 
         void buildLockBox(unsigned int pinSize) override final;

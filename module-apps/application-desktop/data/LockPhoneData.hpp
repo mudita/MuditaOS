@@ -9,6 +9,8 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <filesystem>
 
+#include "application-desktop/widgets/PinLock.hpp"
+
 namespace gui
 {
 
@@ -16,17 +18,10 @@ namespace gui
     class LockPhoneData : public gui::SwitchData
     {
         std::string previousApplication;
-        LockPhoneData() = default;
+        std::unique_ptr<PinLock> lock;
 
       public:
-        enum class Request
-        {
-            NoPin,
-            Pin,
-            ShowPrompt,
-        } request;
-
-        LockPhoneData(Request request) : SwitchData(), request(request)
+        LockPhoneData(std::unique_ptr<PinLock> &&lock) : SwitchData(), lock(std::move(lock))
         {
             description = "LockPhoneData";
         }
@@ -41,6 +36,11 @@ namespace gui
         {
             return previousApplication;
         };
+
+        std::unique_ptr<PinLock> getLock()
+        {
+            return std::move(lock);
+        }
     };
 
     class UpdateSwitchData : public gui::SwitchData
