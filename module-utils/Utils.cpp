@@ -172,6 +172,4 @@ namespace utils {
 
         return contents;
     }
-
-
 }

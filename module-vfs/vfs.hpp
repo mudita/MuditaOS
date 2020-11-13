@@ -135,7 +135,6 @@ class vfs
     [[deprecated]] int deltree(const char *path);
     [[deprecated]] int mkdir(const char *dir);
     [[deprecated]] int rename(const char *oldname, const char *newname);
-
     [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);

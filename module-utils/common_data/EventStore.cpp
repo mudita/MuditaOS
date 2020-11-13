@@ -165,5 +165,4 @@ namespace Store
                                                                 {BootConfigJson::os_git_branch, std::string(GIT_BRANCH)}}},
                 {BootConfigJson::bootloader, json11::Json::object{{BootConfigJson::os_version, bootloader_verion}}}};
     }
-
 }; // namespace Store
