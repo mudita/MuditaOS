@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <vfs_io_syscalls.hpp>
+#include <newlib/vfs_io_syscalls.hpp>
 extern "C"
 {
     using namespace vfsn::internal;

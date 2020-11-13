@@ -44,7 +44,7 @@ set(FREERTOS_FAT_EXTSOURCES
 set(SOURCES ""
         ${FREERTOS_FAT_SOURCES}
         ${FREERTOS_FAT_EXTSOURCES}
-        src/user/vfs_paths.cpp
+        src/purefs/filesystem_paths.cpp
         src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
         src/deprecated/vfsNotifier.cpp
@@ -83,8 +83,9 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/userapi/deprecated
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/deprecated
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/internal/
 )
 
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils)

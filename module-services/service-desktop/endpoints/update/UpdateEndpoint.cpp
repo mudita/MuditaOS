@@ -14,7 +14,7 @@
 #include "UpdateMuditaOS.hpp"  // for update
 #include "json/json11.hpp"     // for Json, Json::object
 #include "vfs.hpp"             // for vfs, os_updates
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 auto UpdateEndpoint::handle(Context &context) -> void
 {

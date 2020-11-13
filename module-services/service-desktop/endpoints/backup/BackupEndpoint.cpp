@@ -14,7 +14,7 @@
 #include "MessageHandler.hpp" // for MessageHandler
 #include "json/json11.hpp"    // for Json, Json::object
 #include "vfs.hpp"            // for vfs, os_backup
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 static bool backupReady = false;
 

@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "vfs_globals.hpp"
-
 #include <filesystem>
 
 namespace purefs
@@ -13,8 +11,7 @@ namespace purefs
 
     namespace dir
     {
-        constexpr inline auto eMMC_disk = PATH_SYS;
-
+        std::filesystem::path getRootDiskPath() noexcept;
         std::filesystem::path getUserDiskPath() noexcept;
         std::filesystem::path getCurrentOSPath() noexcept;
         std::filesystem::path getPreviousOSPath() noexcept;

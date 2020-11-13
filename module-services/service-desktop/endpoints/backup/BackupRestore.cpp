@@ -11,7 +11,7 @@
 #include <vector>     // for vector
 
 #include "vfs.hpp" // for vfs, vfs::DirectoryEntry, os_backup, tar_buf, PATH_BACKUP, vfs::FILE, user_disk
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 #include "microtar/src/microtar.hpp" // for mtar_close, mtar_header_t, MTAR_ESUCCESS, mtar_strerror, mtar_open, mtar_finalize, mtar_next, mtar_read_data, mtar_read_header, mtar_write_data, mtar_write_file_header, mtar_t, MTAR_TREG
 #include <service-db/DBServiceAPI.hpp>           // for DBServiceAPI
 #include <service-db/DBServiceName.hpp>          // for db

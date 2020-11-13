@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include "vfs_internal_dirent.hpp"
 #include "HandleManager.hpp"
-#include "vfs_io_syscalls.hpp"
+#include <newlib/vfs_io_syscalls.hpp>
 
 /** NOTE: This is generic wrapper for newlib syscalls
  * using current VFS implementation. This implementation

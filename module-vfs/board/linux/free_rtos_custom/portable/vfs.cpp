@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 //
 #include "vfs.hpp"
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 #include "ff_image_user_disk.hpp"
 
 namespace
@@ -24,12 +24,12 @@ void vfs::Init()
         LOG_WARN("Disk manager already initialized");
         return;
     }
-    emmcFFDisk = freertos_fat::internals::diskInit(purefs::dir::eMMC_disk, image_name);
+    emmcFFDisk = freertos_fat::internals::diskInit(purefs::dir::getRootDiskPath().c_str(), image_name);
 
     /* Print out information on the disk. */
     freertos_fat::internals::diskShowPartition(emmcFFDisk);
 
-    bootConfig.os_root_path = purefs::dir::eMMC_disk;
+    bootConfig.os_root_path = purefs::dir::getRootDiskPath();
 
     if (loadBootConfig(getCurrentBootJSON())) {
         LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "vfs.hpp"
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 #include <memory>
 
@@ -228,7 +228,7 @@ std::string vfs::relativeToRoot(const std::string path)
         if (bootConfig.os_root_path.root_directory() == fsPath.root_directory())
             return fsPath;
         else
-            return purefs::createPath(purefs::dir::eMMC_disk, fsPath.relative_path()).c_str();
+            return purefs::createPath(purefs::dir::getRootDiskPath(), fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
