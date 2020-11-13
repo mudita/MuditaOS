@@ -4,9 +4,12 @@
 #include "NumberWithIconsWidget.hpp"
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
-#include "UiCommonActions.hpp"
 
 #include <BottomBar.hpp>
+
+#include <application-call/data/CallSwitchData.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <module-apps/application-messages/data/SMSdata.hpp>
 
 namespace gui
 {
@@ -29,8 +32,13 @@ namespace gui
                                 new Image("mail"));
         smsImage->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
-                return app::sms(app, app::SmsOperation::New, number);
                 LOG_INFO("SMS operation started");
+                auto data                        = std::make_unique<SMSSendRequest>(number, std::string{});
+                data->ignoreCurrentWindowOnStack = true;
+                return app::manager::Controller::sendAction(app,
+                                                            app::manager::actions::CreateSms,
+                                                            std::move(data),
+                                                            app::manager::OnSwitchBehaviour::RunInBackground);
             }
             return false;
         };
@@ -47,7 +55,10 @@ namespace gui
                                        0));
         phoneImage->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
-                return app::call(app, number);
+                app::manager::Controller::sendAction(app,
+                                                     app::manager::actions::Dial,
+                                                     std::make_unique<app::ExecuteCallData>(number),
+                                                     app::manager::OnSwitchBehaviour::RunInBackground);
                 LOG_INFO("Call operation started");
             }
             return false;

@@ -24,7 +24,6 @@
 #include "application-call/data/CallAppStyle.hpp"
 #include "time/time_conversion.hpp"
 
-#include <UiCommonActions.hpp>
 #include <application-messages/data/SMSdata.hpp>
 #include <InputMode.hpp>
 
@@ -137,8 +136,9 @@ namespace gui
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send messaage template and reject the call");
-            app::sms(application, app::SmsOperation::Template, phoneNumber);
-            return true;
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::ShowSmsTemplates,
+                                                        std::make_unique<SMSSendTemplateRequest>(phoneNumber));
         };
 
         // define navigation between icons

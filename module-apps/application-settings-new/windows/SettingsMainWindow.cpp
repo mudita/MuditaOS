@@ -32,8 +32,10 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                            return false;
                                        }
                                        LOG_INFO("switching to %s page", window.c_str());
-                                       app::manager::Controller::switchApplication(
-                                           app, "ApplicationSettings", gui::name::window::main_window, nullptr);
+                                       app::manager::Controller::sendAction(
+                                           app,
+                                           app::manager::actions::Launch,
+                                           std::make_unique<app::ApplicationLaunchData>("ApplicationSettings"));
                                        app->switchWindow(window, nullptr);
                                        return true;
                                    },

@@ -191,7 +191,7 @@ namespace app
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
             if (need_sim_select && !lockHandler.isScreenLocked()) {
-                app::manager::Controller::switchApplication(this, app::name_settings, app::sim_select, nullptr);
+                manager::Controller::sendAction(this, manager::actions::SelectSimCard);
                 return true;
             }
             else if (need_sim_select == false) {
@@ -209,8 +209,7 @@ namespace app
     bool ApplicationDesktop::showCalls()
     {
         LOG_DEBUG("show calls!");
-        return app::manager::Controller::switchApplication(
-            this, app::CallLogAppStr, gui::name::window::main_window, nullptr);
+        return manager::Controller::sendAction(this, manager::actions::ShowCallLog);
     }
 
     bool ApplicationDesktop::clearCallsNotification()

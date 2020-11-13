@@ -12,7 +12,6 @@
 #include <i18/i18.hpp>
 #include <Label.hpp>
 #include <Margins.hpp>
-#include <UiCommonActions.hpp>
 #include <Style.hpp>
 
 #include <cassert>
