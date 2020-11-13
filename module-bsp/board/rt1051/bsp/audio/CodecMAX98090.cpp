@@ -476,7 +476,6 @@ CodecRetCode CodecMAX98090::SetupEarspeakerEqualizer()
     return CodecRetCode::Success;
 }
 
-
 CodecRetCode CodecMAX98090::SetupLoudspeakerEqualizer()
 {
     qfilter_coefficients_t band1_filter = {0};
@@ -515,7 +514,7 @@ CodecRetCode CodecMAX98090::SetupLoudspeakerEqualizer()
     i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
     i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
 
-	return CodecRetCode::Success;
+    return CodecRetCode::Success;
 }
 
 CodecRetCode CodecMAX98090::Reset()
