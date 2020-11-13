@@ -21,6 +21,7 @@
 #include "log/log.hpp"                     // for LOG_INFO, LOG_DEBUG, LOG_ERROR
 #include "microtar/src/microtar.hpp" // for mtar_header_t, mtar_close, mtar_open, mtar_read_data, MTAR_ESUCCESS, mtar_find, mtar_next, mtar_read_header, mtar_t, MTAR_ENOTFOUND, MTAR_ENULLRECORD, MTAR_EOPENFAIL, MTAR_TDIR
 #include "vfs.hpp" // for vfs, tar_buf, os_previous, os_updates, os_current, tmp, vfs::FILE, crc_char_size, vfs::DirectoryEntry, os_version, user_disk, version_string, boot_json, crc32, crc_buf, crc_radix, eMMC_disk
+#include "vfs_paths.hpp"
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
@@ -46,7 +47,7 @@ UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerServic
 
 updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
 {
-    updateFile = purefs::dir::os_updates / updateFileToUse;
+    updateFile = purefs::dir::getUpdatesOSPath() / updateFileToUse;
     if (vfs.fileExists(updateFile.c_str())) {
         versioInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
@@ -250,47 +251,50 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
     int ret;
     // basic needed dirs
 
-    informDebug("prepareRoot mkdir: %s", purefs::dir::os_previous.c_str());
-    vfs.mkdir(purefs::dir::os_previous.c_str());
-    informDebug("prepareRoot mkdir: %s", purefs::dir::os_current.c_str());
-    vfs.mkdir(purefs::dir::os_current.c_str());
-    informDebug("prepareRoot mkdir: %s", purefs::dir::user_disk.c_str());
-    vfs.mkdir(purefs::dir::user_disk.c_str());
+    const auto previousOSPath = purefs::dir::getPreviousOSPath();
+    const auto currentOSPath  = purefs::dir::getCurrentOSPath();
+    const auto userDiskPath   = purefs::dir::getUserDiskPath();
+
+    informDebug("prepareRoot mkdir: %s", previousOSPath.c_str());
+    vfs.mkdir(previousOSPath.c_str());
+    informDebug("prepareRoot mkdir: %s", currentOSPath.c_str());
+    vfs.mkdir(currentOSPath.c_str());
+    informDebug("prepareRoot mkdir: %s", userDiskPath.c_str());
+    vfs.mkdir(userDiskPath.c_str());
 
     // remove the previous OS version from partition
-    informDebug("prepareRoot deltree: %s", purefs::dir::os_previous.c_str());
-    ret = vfs.deltree(purefs::dir::os_previous.c_str());
+    informDebug("prepareRoot deltree: %s", previousOSPath.c_str());
+    ret = vfs.deltree(previousOSPath.c_str());
 
     if (ret != 0) {
-        informError("prepareRoot ff_deltree on %s caused an error %s",
-                    purefs::dir::os_previous.c_str(),
-                    vfs.lastErrnoToStr().c_str());
+        informError(
+            "prepareRoot ff_deltree on %s caused an error %s", previousOSPath.c_str(), vfs.lastErrnoToStr().c_str());
     }
 
-    if (vfs.isDir(purefs::dir::os_previous.c_str())) {
-        informError("prepareRoot %s still exists, we can't continue", purefs::dir::os_previous.c_str());
+    if (vfs.isDir(previousOSPath.c_str())) {
+        informError("prepareRoot %s still exists, we can't continue", previousOSPath.c_str());
         return updateos::UpdateError::CantDeletePreviousOS;
     }
     // rename the current OS to previous on partition
-    informDebug("prepareRoot rename: %s->%s", purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str());
-    ret = vfs.rename(purefs::dir::os_current.c_str(), purefs::dir::os_previous.c_str());
+    informDebug("prepareRoot rename: %s->%s", currentOSPath.c_str(), previousOSPath.c_str());
+    ret = vfs.rename(currentOSPath.c_str(), previousOSPath.c_str());
 
     if (ret != 0) {
         informError("prepareRoot can't rename %s -> %s error %s",
-                    purefs::dir::os_current.c_str(),
-                    purefs::dir::os_previous.c_str(),
+                    currentOSPath.c_str(),
+                    previousOSPath.c_str(),
                     vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantRenameCurrentToPrevious;
     }
 
     // rename the temp directory to current (extracted update)
-    informDebug("prepareRoot rename: %s->%s", updateTempDirectory.c_str(), purefs::dir::os_current.c_str());
-    ret = vfs.rename(updateTempDirectory.c_str(), purefs::dir::os_current.c_str());
+    informDebug("prepareRoot rename: %s->%s", updateTempDirectory.c_str(), currentOSPath.c_str());
+    ret = vfs.rename(updateTempDirectory.c_str(), currentOSPath.c_str());
 
     if (ret != 0) {
         informError("prepareRoot can't rename %s -> %s error %s",
                     updateTempDirectory.c_str(),
-                    purefs::dir::os_current.c_str(),
+                    currentOSPath.c_str(),
                     vfs.lastErrnoToStr().c_str());
         return updateos::UpdateError::CantRenameTempToCurrent;
     }
@@ -304,7 +308,7 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
 updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 {
     unsigned long bootJSONAbsoulteCRC = 0;
-    fs::path bootJSONAbsoulte         = purefs::dir::eMMC_disk / purefs::file::boot_json;
+    fs::path bootJSONAbsoulte         = purefs::createPath(purefs::dir::eMMC_disk, purefs::file::boot_json);
     informDebug("updateBootJSON %s", bootJSONAbsoulte.c_str());
 
     vfs::FILE *fp = vfs.fopen(bootJSONAbsoulte.c_str(), "r");
@@ -416,35 +420,37 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 {
     status = updateos::UpdateState::CreatingDirectories;
 
-    updateTempDirectory = purefs::dir::tmp / vfs::generateRandomId(updateos::prefix_len);
+    updateTempDirectory = purefs::dir::getTemporaryPath() / vfs::generateRandomId(updateos::prefix_len);
 
     informDebug("Temp dir for update %s", updateTempDirectory.c_str());
 
-    if (vfs.isDir(purefs::dir::os_updates.c_str()) == false) {
-        if (vfs.mkdir(purefs::dir::os_updates.c_str()) != 0) {
-            informError("%s can't create it %s", purefs::dir::os_updates.c_str(), vfs.lastErrnoToStr().c_str());
+    const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
+    if (vfs.isDir(updatesOSPath.c_str()) == false) {
+        if (vfs.mkdir(updatesOSPath.c_str()) != 0) {
+            informError("%s can't create it %s", updatesOSPath.c_str(), vfs.lastErrnoToStr().c_str());
             return updateos::UpdateError::CantCreateUpdatesDir;
         }
         else {
-            informDebug("prepareTempDirForUpdate %s created", purefs::dir::os_updates.c_str());
+            informDebug("prepareTempDirForUpdate %s created", updatesOSPath.c_str());
         }
     }
     else {
-        informDebug("prepareTempDirForUpdate %s exists", purefs::dir::os_updates.c_str());
+        informDebug("prepareTempDirForUpdate %s exists", updatesOSPath.c_str());
     }
 
-    if (vfs.isDir(purefs::dir::tmp.c_str()) == false) {
-        informDebug("prepareTempDirForUpdate %s is not a directory", purefs::dir::tmp.c_str());
-        if (vfs.mkdir(purefs::dir::tmp.c_str()) != 0) {
-            informError("%s can't create it %s", purefs::dir::tmp.c_str(), vfs.lastErrnoToStr().c_str());
+    const auto tmpPath = purefs::dir::getTemporaryPath();
+    if (vfs.isDir(tmpPath.c_str()) == false) {
+        informDebug("prepareTempDirForUpdate %s is not a directory", tmpPath.c_str());
+        if (vfs.mkdir(tmpPath.c_str()) != 0) {
+            informError("%s can't create it %s", tmpPath.c_str(), vfs.lastErrnoToStr().c_str());
             return updateos::UpdateError::CantCreateTempDir;
         }
         else {
-            informDebug("prepareTempDirForUpdate %s created", purefs::dir::tmp.c_str());
+            informDebug("prepareTempDirForUpdate %s created", tmpPath.c_str());
         }
     }
     else {
-        informDebug("prepareTempDirForUpdate %s exists", purefs::dir::tmp.c_str());
+        informDebug("prepareTempDirForUpdate %s exists", tmpPath.c_str());
     }
 
     if (vfs.isDir(updateTempDirectory.c_str())) {
@@ -576,18 +582,18 @@ bool UpdateMuditaOS::isUpgradeToCurrent(const std::string &versionToCompare)
 
 const fs::path UpdateMuditaOS::checkForUpdate()
 {
-    std::vector<vfs::DirectoryEntry> fileList =
-        vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
+    const auto updatesOSPath                  = purefs::dir::getUpdatesOSPath();
+    std::vector<vfs::DirectoryEntry> fileList = vfs.listdir(updatesOSPath.c_str(), updateos::extension::update, true);
     for (auto &file : fileList) {
 
-        json11::Json versionInfo = UpdateMuditaOS::getVersionInfoFromFile(purefs::dir::os_updates / file.fileName);
+        json11::Json versionInfo = UpdateMuditaOS::getVersionInfoFromFile(updatesOSPath / file.fileName);
         if (versionInfo.is_null())
             continue;
 
         if (versionInfo[purefs::json::os_version][purefs::json::version_string].is_string()) {
             if (UpdateMuditaOS::isUpgradeToCurrent(
                     versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
-                return purefs::dir::os_updates / file.fileName;
+                return updatesOSPath / file.fileName;
             }
         }
     }

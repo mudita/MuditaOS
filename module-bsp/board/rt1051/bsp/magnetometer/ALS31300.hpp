@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <cstring>
-#include <set>
 #include <chrono>
 
 // ALS31300 magnetometer driver
@@ -167,7 +167,7 @@ namespace drivers::als31300
     // --------
 
     /// give eeprom registers time to complete WRITE
-    const std::set<uint8_t> EEPROM_REGS = {CUSTOMER_ACCESS_REG, CONF_REG, INT_REG};
+    constexpr inline std::array<std::uint8_t, 3> EEPROM_REGS = {CONF_REG, INT_REG, CUSTOMER_ACCESS_REG};
 
     using std::chrono_literals::operator""ms;
     constexpr auto EEPROM_REG_WRITE_DELAY_MS = 60ms; // docs say 50ms, +10ms for good measure
