@@ -86,34 +86,6 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-BTdev::Error BluetoothCommon::flush()
-{
-    // LOG_INFO("flush [%d] %s", out.len, out.tail<out.head?"reverse":"normal");
-    Error err  = Success;
-    int len    = out.len;
-    char *from = new char[out.len];
-    for (int i = 0; i < len; ++i) {
-        out.pop(from + i);
-    }
-    int to_write = len;
-    char *fromp  = from;
-    while (to_write) {
-        while (1) {
-            if (read_cts() == 0) {
-                break;
-            }
-            else {
-                sleep_ms(1);
-            }
-        }
-        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, reinterpret_cast<uint8_t *>(fromp), 1);
-        --to_write;
-        ++fromp;
-    }
-    delete[] from;
-    return err;
-}
-
 /*
 ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 {

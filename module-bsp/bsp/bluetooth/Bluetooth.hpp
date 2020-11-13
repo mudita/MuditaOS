@@ -121,7 +121,6 @@ namespace bsp {
             virtual void close() override;
             virtual ssize_t write(char *buf, size_t nbytes);
             virtual ssize_t write_blocking(char *buf, ssize_t len);
-            Error flush();
             Error set_baudrate(uint32_t bd);
             Error set_rts(bool on);
             Error set_reset(bool on);

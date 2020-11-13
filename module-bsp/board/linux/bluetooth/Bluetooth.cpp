@@ -61,11 +61,6 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-BTdev::Error BluetoothCommon::flush()
-{
-    return Success;
-}
-
 ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 {
     return 0;
