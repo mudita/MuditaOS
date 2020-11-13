@@ -176,11 +176,11 @@ namespace gui
                 updateVersion << utils::localize.get("app_desktop_update_to");
                 updateVersion << ": ";
                 updateVersion << msg.updateStats
-                                     .versioInformation[purefs::json::os_version][purefs::json::version_string]
+                                     .versioInformation[BootConfigJson::os_version][BootConfigJson::version_string]
                                      .string_value();
                 updateVersion << " (";
                 updateVersion << msg.updateStats
-                                     .versioInformation[purefs::json::git_info][purefs::json::os_git_revision]
+                                     .versioInformation[BootConfigJson::git_info][BootConfigJson::os_git_revision]
                                      .string_value();
                 updateVersion << ")";
 
@@ -189,7 +189,7 @@ namespace gui
                 updateFileDetails << std::to_string(msg.updateStats.totalBytes / 1024);
                 updateFileDetails << "Kb (";
                 updateFileDetails
-                    << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate].string_value();
+                    << msg.updateStats.versioInformation[BootConfigJson::misc][BootConfigJson::builddate].string_value();
                 updateFileDetails << ")";
 
                 currentVersionInfo->setText(currentVersion.str());
