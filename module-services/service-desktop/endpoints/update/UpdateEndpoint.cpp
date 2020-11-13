@@ -14,6 +14,7 @@
 #include "UpdateMuditaOS.hpp"  // for update
 #include "json/json11.hpp"     // for Json, Json::object
 #include "vfs.hpp"             // for vfs, os_updates
+#include "vfs_paths.hpp"
 
 auto UpdateEndpoint::handle(Context &context) -> void
 {
@@ -32,7 +33,7 @@ auto UpdateEndpoint::handle(Context &context) -> void
 auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 {
     std::string fileName = context.getBody()["fileName"].string_value();
-    auto path            = purefs::dir::os_updates / fileName;
+    auto path            = purefs::dir::getUpdatesOSPath() / fileName;
     auto fileExists      = vfs.fileExists(path.c_str());
     if (fileExists) {
         context.setResponseBody(json11::Json::object({{parserFSM::json::updateReady, true}}));
@@ -52,7 +53,8 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 
 auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
 {
-    json11::Json fileList = vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
+    const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
+    json11::Json fileList    = vfs.listdir(updatesOSPath.c_str(), updateos::extension::update, true);
 
     context.setResponseBody(json11::Json::object{{parserFSM::json::updateFileList, fileList}});
 

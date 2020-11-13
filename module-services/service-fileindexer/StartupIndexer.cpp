@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <ff_stdio_listdir_recursive.h>
 #include <vfs.hpp>
+#include <vfs_paths.hpp>
 #include <Service/Bus.hpp>
 #include "Constants.hpp"
 
@@ -21,7 +22,7 @@ namespace service::detail
             {".txt", mimeType::text}, {".wav", mimeType::audio}, {".mp3", mimeType::audio}, {".flac", mimeType::audio}};
 
         // List of initial dirs for scan
-        const std::vector<std::string> start_dirs{purefs::dir::user_disk, purefs::dir::os_current};
+        const std::vector<std::string> start_dirs{purefs::dir::getUserDiskPath(), purefs::dir::getCurrentOSPath()};
     } // namespace
 
     auto StartupIndexer::getFileType(std::string_view path) -> mimeType

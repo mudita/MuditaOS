@@ -34,6 +34,15 @@ namespace bsp
 {
     namespace magnetometer
     {
+        namespace
+        {
+            bool isTimeToCompleteWriteDefinedForRegistry(std::uint8_t address)
+            {
+                const auto it = std::find(als31300::EEPROM_REGS.begin(), als31300::EEPROM_REGS.end(), address);
+                return it != als31300::EEPROM_REGS.end();
+            }
+        } // namespace
+
         std::shared_ptr<DriverGPIO> gpio;
 
         bsp::KeyCodes current_parsed = bsp::KeyCodes::Undefined;
@@ -75,7 +84,7 @@ namespace bsp
             i2c_buf.whole_reg = whole_reg;
 #endif
             auto wrote = i2c->Write(addr, i2c_buf.buf, sizeof(als31300::whole_reg_t)) == sizeof(als31300::whole_reg_t);
-            if (als31300::EEPROM_REGS.count(reg_addr) == 1) {
+            if (isTimeToCompleteWriteDefinedForRegistry(reg_addr)) {
                 vTaskDelay(pdMS_TO_TICKS(als31300::EEPROM_REG_WRITE_DELAY_MS.count()));
             }
             return wrote;

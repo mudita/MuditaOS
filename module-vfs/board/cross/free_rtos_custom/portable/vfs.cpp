@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "vfs.hpp"
+#include "vfs_paths.hpp"
 #include "ff_eMMC_user_disk.hpp"
 
 vfs::vfs() : emmc()
@@ -17,7 +18,7 @@ void vfs::Init()
 {
     emmc.Init();
 
-    emmcFFDisk = FF_eMMC_user_DiskInit(purefs::dir::eMMC_disk.c_str(), &emmc);
+    emmcFFDisk = FF_eMMC_user_DiskInit(purefs::dir::eMMC_disk, &emmc);
 
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
@@ -38,14 +39,14 @@ void vfs::Init()
 
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
-    if (isDir(purefs::dir::user_disk.c_str()) == false) {
-        LOG_ERROR("vfs::Init looks like %s does not exist, try to create it", purefs::dir::user_disk.c_str());
-        if (ff_mkdir(purefs::dir::user_disk.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't create %s directory", purefs::dir::user_disk.c_str());
+    if (const auto userDiskPath = purefs::dir::getUserDiskPath(); isDir(userDiskPath.c_str()) == false) {
+        LOG_ERROR("vfs::Init looks like %s does not exist, try to create it", userDiskPath.c_str());
+        if (ff_mkdir(userDiskPath.c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't create %s directory", userDiskPath.c_str());
         }
     }
     else {
-        LOG_INFO("vfs::Init looks like %s exists", purefs::dir::user_disk.c_str());
+        LOG_INFO("vfs::Init looks like %s exists", userDiskPath.c_str());
     }
     chnNotifier.onFileSystemInitialized();
 }

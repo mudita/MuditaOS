@@ -51,15 +51,6 @@ namespace audio
         Last = TextMessageRingtone,
     };
 
-    const static std::map<PlaybackType, uint8_t> PlaybackTypePriority = {
-        {PlaybackType::CallRingtone, 2},
-        {PlaybackType::TextMessageRingtone, 3},
-        {PlaybackType::Notifications, 3},
-        {PlaybackType::Multimedia, 4},
-        {PlaybackType::KeypadSound, 5},
-        {PlaybackType::None, static_cast<uint8_t>(PlaybackType::Last)},
-    };
-
     [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
@@ -290,10 +281,3 @@ namespace audio
     const std::string str(RetCode retcode);
     [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> const std::string;
 } // namespace audio
-
-namespace audio::notifications
-{
-    const std::vector<audio::PlaybackType> typesToMute = {audio::PlaybackType::Notifications,
-                                                          audio::PlaybackType::CallRingtone,
-                                                          audio::PlaybackType::TextMessageRingtone};
-} // namespace audio::notifications

@@ -14,6 +14,7 @@
 #include "MessageHandler.hpp" // for MessageHandler
 #include "json/json11.hpp"    // for Json, Json::object
 #include "vfs.hpp"            // for vfs, os_backup
+#include "vfs_paths.hpp"
 
 static bool backupReady = false;
 
@@ -59,7 +60,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
 auto BackupEndpoint::upload(Context &context) -> sys::ReturnCodes
 {
     if (context.getBody()[json::backupUpload] == true) {
-        if (vfs.fileExists(purefs::dir::os_backup.c_str())) {
+        if (const auto backupOSPath = purefs::dir::getBackupOSPath(); vfs.fileExists(backupOSPath.c_str())) {
             context.setResponseBody(json11::Json::object({{json::backupUpload, true}}));
         }
         else {

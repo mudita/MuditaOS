@@ -37,7 +37,7 @@ auto SpecialInputModel::getMaxGridElements() const -> ssize_t
             specialInputStyle::specialCharacterTableWidget::char_grid_h);
 }
 
-void SpecialInputModel::buildGrids(std::vector<char32_t> elements)
+void SpecialInputModel::buildGrid(const std::vector<char32_t> &elements)
 {
     auto add_start = elements.begin();
     while (add_start != elements.end()) {
@@ -58,20 +58,20 @@ void SpecialInputModel::buildGrids(std::vector<char32_t> elements)
 
 void SpecialInputModel::createData(specialInputStyle::CharactersType type)
 {
-    auto create = [&](auto &vector) {
-        buildGrids(vector);
-        for (auto &dataitem : internalData) {
-            dataitem->deleteByList = false;
+    auto create = [&](const auto &vector) {
+        buildGrid(vector);
+        for (auto &item : internalData) {
+            item->deleteByList = false;
         }
         list->rebuildList();
     };
 
     switch (type) {
     case specialInputStyle::CharactersType::SpecialCharacters:
-        create(specialInputStyle::special_chars);
+        create(std::vector<char32_t>{specialInputStyle::special_chars.begin(), specialInputStyle::special_chars.end()});
         break;
     case specialInputStyle::CharactersType::Emoji:
-        create(specialInputStyle::emojis);
+        create(std::vector<char32_t>{specialInputStyle::emojis.begin(), specialInputStyle::emojis.end()});
         break;
     }
 }

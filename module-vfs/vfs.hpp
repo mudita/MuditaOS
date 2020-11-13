@@ -12,6 +12,7 @@
 #include <log/log.hpp>
 #include <json/json11.hpp>
 #include "vfsNotifier.hpp"
+#include "vfs_globals.hpp"
 
 #ifndef TARGET_Linux
 #include "board/cross/eMMC/eMMC.hpp"
@@ -19,40 +20,10 @@
 
 #include "ff_stdio.h"
 
-#define PATH_SYS      "/sys"
-#define PATH_USER     "user"
-#define PATH_CURRENT  "current"
-#define PATH_PREVIOUS "previous"
-#define PATH_UPDATES  "updates"
-#define PATH_TMP      "tmp"
-#define PATH_BACKUP   "backup"
-#define PATH_FACTORY  "factory"
-
-// this just concatenates two strings and creates a /user/ subdirectory filename
-#define USER_PATH(file) PATH_SYS "/" PATH_USER "/" file
-
 namespace fs = std::filesystem;
 
 namespace purefs
 {
-    namespace dir
-    {
-        const inline fs::path eMMC_disk   = PATH_SYS;
-        const inline fs::path user_disk   = eMMC_disk / PATH_USER;
-        const inline fs::path os_current  = eMMC_disk / PATH_CURRENT;
-        const inline fs::path os_previous = eMMC_disk / PATH_PREVIOUS;
-        const inline fs::path os_updates  = eMMC_disk / PATH_UPDATES;
-        const inline fs::path tmp         = eMMC_disk / PATH_TMP;
-        const inline fs::path os_backup   = eMMC_disk / PATH_BACKUP;
-        const inline fs::path os_factory  = eMMC_disk / PATH_FACTORY;
-    } // namespace dir
-
-    namespace file
-    {
-        const inline fs::path boot_json = ".boot.json";
-        const inline fs::path boot_bin  = "boot.bin";
-    }; // namespace file
-
     namespace extension
     {
         inline constexpr auto crc32 = ".crc32";
