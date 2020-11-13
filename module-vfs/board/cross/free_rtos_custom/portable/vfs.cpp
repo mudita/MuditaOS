@@ -4,6 +4,7 @@
 #include "vfs.hpp"
 #include <purefs/filesystem_paths.hpp>
 #include "ff_eMMC_user_disk.hpp"
+#include <module-utils/common_data/EventStore.hpp>
 
 vfs::vfs() : emmc()
 {}
@@ -23,9 +24,10 @@ void vfs::Init()
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
 
+    bootConfig = Store::BootConfig::get();
     bootConfig.os_root_path = purefs::dir::getRootDiskPath();
 
-    if (loadBootConfig(getCurrentBootJSON())) {
+    if (bootConfig.loadBootConfig(bootConfig.getCurrentBootJSON())) {
         LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
         if (ff_chdir(bootConfig.os_root_path.c_str()) != 0) {
             LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path.c_str());

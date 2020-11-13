@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <crc32/crc32.h>
 #include <log/log.hpp>
+#include <module-utils/common_data/EventStore.hpp>
 #include <json/json11.hpp>
 #include "vfsNotifier.hpp"
 #include "vfs_globals.hpp"
@@ -38,41 +39,9 @@ namespace purefs
         inline constexpr auto copy_buf      = 8192 * 4;
     } // namespace buffer
 
-    namespace json
-    {
-        inline constexpr auto main            = "main";
-        inline constexpr auto os_type         = "ostype";
-        inline constexpr auto os_image        = "imagename";
-        inline constexpr auto os_version      = "version";
-        inline constexpr auto version_major   = "major";
-        inline constexpr auto version_inor    = "minor";
-        inline constexpr auto version_patch   = "patch";
-        inline constexpr auto version_string  = "string";
-        inline constexpr auto timestamp       = "timestamp";
-        inline constexpr auto misc            = "misc";
-        inline constexpr auto builddate       = "builddate";
-        inline constexpr auto git_info        = "git";
-        inline constexpr auto os_git_tag      = "git_tag";
-        inline constexpr auto os_git_revision = "git_commit";
-        inline constexpr auto os_git_branch   = "git_branch";
-        inline constexpr auto bootloader      = "bootloader";
-    } // namespace json
+     // namespace json
 
-    struct BootConfig
-    {
-        std::string os_image;
-        std::string os_type;
-        std::string os_version;
-        std::string bootloader_verion;
-        std::string timestamp;
-        json11::Json boot_json_parsed;
 
-        fs::path os_root_path;
-        fs::path boot_json;
-
-        static int version_compare(const std::string &v1, const std::string &v2);
-        [[nodiscard]] json11::Json to_json() const;
-    };
 }; // namespace purefs
 
 /* NOTE: VFS global object class is now deprecated more information
@@ -137,13 +106,7 @@ class vfs
     [[deprecated]] int deltree(const char *path);
     [[deprecated]] int mkdir(const char *dir);
     [[deprecated]] int rename(const char *oldname, const char *newname);
-    [[deprecated]] std::string loadFileAsString(const fs::path &fileToLoad);
-    [[deprecated]] bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
-    [[deprecated]] void updateTimestamp();
-    [[deprecated]] struct purefs::BootConfig &getBootConfig()
-    {
-        return bootConfig;
-    }
+
     [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);
@@ -153,20 +116,11 @@ class vfs
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
 #endif
-
     FF_Disk_t *emmcFFDisk{};
-
-    [[deprecated]] static void computeCRC32(FILE *file, unsigned long *outCrc32);
-    [[deprecated]] static bool verifyCRC(const std::string filePath, const unsigned long crc32);
-    [[deprecated]] static bool verifyCRC(const fs::path filePath);
+    Store::BootConfig bootConfig;
     [[deprecated]] static std::string generateRandomId(size_t length);
 
   private:
-    bool updateFileCRC32(const fs::path &file);
-    const fs::path getCurrentBootJSON();
-    bool loadBootConfig(const fs::path &bootJsonPath);
-    bool updateBootConfig(const fs::path &bootJsonPath);
-    struct purefs::BootConfig bootConfig;
     vfsn::utility::vfsNotifier chnNotifier;
 };
 

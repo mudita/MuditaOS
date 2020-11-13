@@ -45,7 +45,6 @@ set(SOURCES ""
         ${FREERTOS_FAT_SOURCES}
         ${FREERTOS_FAT_EXTSOURCES}
         src/purefs/filesystem_paths.cpp
-        src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
         src/deprecated/vfsNotifier.cpp
 )
