@@ -33,7 +33,7 @@ namespace bsp
         static constexpr uint8_t HEADSET_DEV_SET_DET_EN = 1 << 5;
         static constexpr uint8_t HEADSET_DEV_SET_DEB_1S = 0x06;
 
-        static constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 2500;
+        static constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 500;
 
         static std::shared_ptr<drivers::DriverI2C> i2c;
         static std::shared_ptr<drivers::DriverGPIO> gpio;
@@ -42,6 +42,7 @@ namespace bsp
 
         static xQueueHandle qHandleIrq = nullptr;
         static bool HeadsetInserted    = false;
+        static bool MicrophoneInserted = false;
 
         static bool ReadInsertionStatus()
         {
@@ -56,6 +57,7 @@ namespace bsp
 
             if (((reg & 0x08) == 0) && (HeadsetInserted == true)) {
                 HeadsetInserted = false;
+                MicrophoneInserted = false;
                 LOG_INFO("Headset removed");
                 gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
 
@@ -63,22 +65,29 @@ namespace bsp
             }
 
             if (((reg & 0x08) != 0) && (HeadsetInserted == false)) {
-                HeadsetInserted = true;
                 LOG_INFO("Headset inserted");
+                HeadsetInserted = true;
 
                 if ((reg & 0x01) != 0) {
                     LOG_INFO("Headset 3-pole detected");
-                    gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
+                    MicrophoneInserted = false;
                 }
                 if ((reg & 0x02) != 0) {
                     LOG_INFO("Headset 4-pole OMTP detected");
-                    gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
+                    MicrophoneInserted = true;
                 }
                 if ((reg & 0x04) != 0) {
                     LOG_INFO("Headset 4-pole Standard detected");
-                    gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
+                    MicrophoneInserted = true;
                 }
                 ret = true;
+            }
+
+            if (MicrophoneInserted == true) {
+                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
+            }
+            else {
+                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
             }
 
             return ret;
@@ -109,6 +118,7 @@ namespace bsp
             qHandleIrq = qHandle;
 
             HeadsetInserted = false;
+            MicrophoneInserted = false;
 
             gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
 
@@ -153,6 +163,7 @@ namespace bsp
         {
             qHandleIrq      = nullptr;
             HeadsetInserted = false;
+            MicrophoneInserted = false;
 
             i2c.reset();
 
