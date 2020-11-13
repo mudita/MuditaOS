@@ -120,6 +120,8 @@ class CodecMAX98090 : public Codec
     CodecRetCode SetInputPath(const bsp::AudioDevice::InputPath path);
     CodecRetCode SetOutputPath(const bsp::AudioDevice::OutputPath path);
     CodecRetCode MicBias(const bool enable);
+    CodecRetCode SetupEarspeakerEqualizer();
+    CodecRetCode SetupLoudspeakerEqualizer();
     CodecRetCode WriteFilterCoeff(const float coeff, const uint8_t basereg);
     CodecRetCode Reset();
 };

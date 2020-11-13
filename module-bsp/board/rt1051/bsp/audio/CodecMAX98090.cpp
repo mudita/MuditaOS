@@ -130,41 +130,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress       = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
-            qfilter_coefficients_t band1_filter = {0};
-            qfilter_coefficients_t band2_filter = {0};
-            qfilter_coefficients_t band3_filter = {0};
-
-            // Highpass,lowpass & flat filters don't use Gain parameter
-            qfilter_CalculateCoeffs(FilterHighPass, 800, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
-            qfilter_CalculateCoeffs(FilterLowPass, 6000, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
-
-            // BAND1
-            WriteFilterCoeff(band1_filter.b0, 0x46);
-            WriteFilterCoeff(band1_filter.b1, 0x49);
-            WriteFilterCoeff(band1_filter.b2, 0x4C);
-            WriteFilterCoeff(band1_filter.a1, 0x4F);
-            WriteFilterCoeff(band1_filter.a2, 0x52);
-
-            // BAND2
-            WriteFilterCoeff(band2_filter.b0, 0x55);
-            WriteFilterCoeff(band2_filter.b1, 0x58);
-            WriteFilterCoeff(band2_filter.b2, 0x5B);
-            WriteFilterCoeff(band2_filter.a1, 0x5E);
-            WriteFilterCoeff(band2_filter.a2, 0x61);
-
-            // BAND3
-            WriteFilterCoeff(band3_filter.b0, 0x64);
-            WriteFilterCoeff(band3_filter.b1, 0x67);
-            WriteFilterCoeff(band3_filter.b2, 0x6A);
-            WriteFilterCoeff(band3_filter.a1, 0x6D);
-            WriteFilterCoeff(band3_filter.a2, 0x70);
-
-            // Enable 3-band filter
-            max98090_reg_dsp_biquadfilter_enable_t filter = {0};
-            filter.eq3banden                              = 1;
-            i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
-            i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+            SetupEarspeakerEqualizer();
 
         } break;
 
@@ -185,41 +151,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            qfilter_coefficients_t band1_filter = {0};
-            qfilter_coefficients_t band2_filter = {0};
-            qfilter_coefficients_t band3_filter = {0};
-
-            // Highpass,lowpass & flat filters don't use Gain parameter
-            qfilter_CalculateCoeffs(FilterHighPass, 500, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
-
-            // BAND1
-            WriteFilterCoeff(band1_filter.b0, 0x46);
-            WriteFilterCoeff(band1_filter.b1, 0x49);
-            WriteFilterCoeff(band1_filter.b2, 0x4C);
-            WriteFilterCoeff(band1_filter.a1, 0x4F);
-            WriteFilterCoeff(band1_filter.a2, 0x52);
-
-            // BAND2
-            WriteFilterCoeff(band2_filter.b0, 0x55);
-            WriteFilterCoeff(band2_filter.b1, 0x58);
-            WriteFilterCoeff(band2_filter.b2, 0x5B);
-            WriteFilterCoeff(band2_filter.a1, 0x5E);
-            WriteFilterCoeff(band2_filter.a2, 0x61);
-
-            // BAND3
-            WriteFilterCoeff(band3_filter.b0, 0x64);
-            WriteFilterCoeff(band3_filter.b1, 0x67);
-            WriteFilterCoeff(band3_filter.b2, 0x6A);
-            WriteFilterCoeff(band3_filter.a1, 0x6D);
-            WriteFilterCoeff(band3_filter.a2, 0x70);
-
-            // Enable 3-band filter
-            max98090_reg_dsp_biquadfilter_enable_t filter = {0};
-            filter.eq3banden                              = 1;
-            i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
-            i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+            SetupLoudspeakerEqualizer();
 
         } break;
 
@@ -236,41 +168,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            qfilter_coefficients_t band1_filter = {0};
-            qfilter_coefficients_t band2_filter = {0};
-            qfilter_coefficients_t band3_filter = {0};
-
-            // Highpass,lowpass & flat filters don't use Gain parameter
-            qfilter_CalculateCoeffs(FilterHighPass, 500, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
-
-            // BAND1
-            WriteFilterCoeff(band1_filter.b0, 0x46);
-            WriteFilterCoeff(band1_filter.b1, 0x49);
-            WriteFilterCoeff(band1_filter.b2, 0x4C);
-            WriteFilterCoeff(band1_filter.a1, 0x4F);
-            WriteFilterCoeff(band1_filter.a2, 0x52);
-
-            // BAND2
-            WriteFilterCoeff(band2_filter.b0, 0x55);
-            WriteFilterCoeff(band2_filter.b1, 0x58);
-            WriteFilterCoeff(band2_filter.b2, 0x5B);
-            WriteFilterCoeff(band2_filter.a1, 0x5E);
-            WriteFilterCoeff(band2_filter.a2, 0x61);
-
-            // BAND3
-            WriteFilterCoeff(band3_filter.b0, 0x64);
-            WriteFilterCoeff(band3_filter.b1, 0x67);
-            WriteFilterCoeff(band3_filter.b2, 0x6A);
-            WriteFilterCoeff(band3_filter.a1, 0x6D);
-            WriteFilterCoeff(band3_filter.a2, 0x70);
-
-            // Enable 3-band filter
-            max98090_reg_dsp_biquadfilter_enable_t filter = {0};
-            filter.eq3banden                              = 1;
-            i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
-            i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+            SetupLoudspeakerEqualizer();
         } break;
 
         default:
@@ -291,7 +189,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         } break;
 
         case bsp::AudioDevice::InputPath::Microphone: {
-            max98090_reg_digmic_enable_t digena                  = {0};
+            max98090_reg_digmic_enable_t digena = {0};
 
             // Enable left and right digital mic interface
             digena.digmicl = 1;
@@ -306,7 +204,6 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         default:
             return CodecRetCode::InvalidInputPath;
         }
-
     }
 
     // Turn on DC blocking filters
@@ -536,6 +433,89 @@ CodecRetCode CodecMAX98090::MicBias(const bool enable)
     i2c->Modify(i2cAddr, mask, enable, 1);
 
     return CodecRetCode::Success;
+}
+
+CodecRetCode CodecMAX98090::SetupEarspeakerEqualizer()
+{
+    qfilter_coefficients_t band1_filter = {0};
+    qfilter_coefficients_t band2_filter = {0};
+    qfilter_coefficients_t band3_filter = {0};
+
+    // Highpass,lowpass & flat filters don't use Gain parameter
+    qfilter_CalculateCoeffs(FilterHighPass, 800, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
+    qfilter_CalculateCoeffs(FilterLowPass, 6000, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
+    qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
+
+    // BAND1
+    WriteFilterCoeff(band1_filter.b0, 0x46);
+    WriteFilterCoeff(band1_filter.b1, 0x49);
+    WriteFilterCoeff(band1_filter.b2, 0x4C);
+    WriteFilterCoeff(band1_filter.a1, 0x4F);
+    WriteFilterCoeff(band1_filter.a2, 0x52);
+
+    // BAND2
+    WriteFilterCoeff(band2_filter.b0, 0x55);
+    WriteFilterCoeff(band2_filter.b1, 0x58);
+    WriteFilterCoeff(band2_filter.b2, 0x5B);
+    WriteFilterCoeff(band2_filter.a1, 0x5E);
+    WriteFilterCoeff(band2_filter.a2, 0x61);
+
+    // BAND3
+    WriteFilterCoeff(band3_filter.b0, 0x64);
+    WriteFilterCoeff(band3_filter.b1, 0x67);
+    WriteFilterCoeff(band3_filter.b2, 0x6A);
+    WriteFilterCoeff(band3_filter.a1, 0x6D);
+    WriteFilterCoeff(band3_filter.a2, 0x70);
+
+    // Enable 3-band filter
+    max98090_reg_dsp_biquadfilter_enable_t filter = {0};
+    filter.eq3banden                              = 1;
+    i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
+    i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+
+    return CodecRetCode::Success;
+}
+
+
+CodecRetCode CodecMAX98090::SetupLoudspeakerEqualizer()
+{
+    qfilter_coefficients_t band1_filter = {0};
+    qfilter_coefficients_t band2_filter = {0};
+    qfilter_coefficients_t band3_filter = {0};
+
+    // Highpass,lowpass & flat filters don't use Gain parameter
+    qfilter_CalculateCoeffs(FilterHighPass, 500, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
+    qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
+    qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
+
+    // BAND1
+    WriteFilterCoeff(band1_filter.b0, 0x46);
+    WriteFilterCoeff(band1_filter.b1, 0x49);
+    WriteFilterCoeff(band1_filter.b2, 0x4C);
+    WriteFilterCoeff(band1_filter.a1, 0x4F);
+    WriteFilterCoeff(band1_filter.a2, 0x52);
+
+    // BAND2
+    WriteFilterCoeff(band2_filter.b0, 0x55);
+    WriteFilterCoeff(band2_filter.b1, 0x58);
+    WriteFilterCoeff(band2_filter.b2, 0x5B);
+    WriteFilterCoeff(band2_filter.a1, 0x5E);
+    WriteFilterCoeff(band2_filter.a2, 0x61);
+
+    // BAND3
+    WriteFilterCoeff(band3_filter.b0, 0x64);
+    WriteFilterCoeff(band3_filter.b1, 0x67);
+    WriteFilterCoeff(band3_filter.b2, 0x6A);
+    WriteFilterCoeff(band3_filter.a1, 0x6D);
+    WriteFilterCoeff(band3_filter.a2, 0x70);
+
+    // Enable 3-band filter
+    max98090_reg_dsp_biquadfilter_enable_t filter = {0};
+    filter.eq3banden                              = 1;
+    i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
+    i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+
+	return CodecRetCode::Success;
 }
 
 CodecRetCode CodecMAX98090::Reset()
