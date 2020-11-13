@@ -11,10 +11,10 @@
 #include <optional>
 #include <string>
 
-namespace Settings
+namespace settings
 {
     struct EntryPath;
-} // namespace Settings
+} // namespace settings
 namespace sys
 {
     class Service;
@@ -38,10 +38,10 @@ class SettingsAgent : public DatabaseAgent
     SetOfRecipents profileChangedRecipents;
     SetOfRecipents modeChangeRecipents;
     // db operations
-    auto dbGetValue(Settings::EntryPath path) -> std::optional<std::string>;
-    auto dbSetValue(Settings::EntryPath path, std::string value) -> bool;
-    auto dbRegisterValueChange(Settings::EntryPath path) -> bool;
-    auto dbUnregisterValueChange(Settings::EntryPath path) -> bool;
+    auto dbGetValue(settings::EntryPath path) -> std::optional<std::string>;
+    auto dbSetValue(settings::EntryPath path, std::string value) -> bool;
+    auto dbRegisterValueChange(settings::EntryPath path) -> bool;
+    auto dbUnregisterValueChange(settings::EntryPath path) -> bool;
 
     auto dbRegisterOnProfileChange(const std::string &service) -> bool;
     auto dbUnregisterOnProfileChange(const std::string &service) -> bool;

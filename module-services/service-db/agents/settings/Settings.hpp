@@ -4,7 +4,6 @@
 #pragma once
 
 #include <module-sys/Service/Message.hpp>
-
 #include <service-db/DBServiceName.hpp>
 
 #include <cstdint>
@@ -15,7 +14,7 @@
 #include <optional>
 #include <string>
 
-namespace Settings
+namespace settings
 {
     namespace Messages
     {
@@ -66,7 +65,7 @@ namespace Settings
         OnAllModesRetrievedCallback cbAllModes;
         ProfileChangedCallback cbProfile;
         OnAllProfilesRetrievedCallback cbAllProfiles;
-        void sendMsg(std::shared_ptr<::Settings::Messages::SettingsMessage> &&msg);
+        void sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg);
         void registerHandlers();
         auto handleVariableChanged(sys::Message *req) -> sys::MessagePointer;
         auto handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer;
@@ -74,4 +73,4 @@ namespace Settings
         auto handleProfileListResponse(sys::Message *req) -> sys::MessagePointer;
         auto handleModeListResponse(sys::Message *req) -> sys::MessagePointer;
     };
-} // namespace Settings
+} // namespace settings
