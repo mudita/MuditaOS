@@ -33,12 +33,12 @@ namespace app
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
-            lockHandler.handlePinRequest(std::move(data));
+            lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPin, std::move(data));
             return msgHandled();
         });
 
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
-            lockHandler.handlePukRequest(std::move(data));
+            lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPuk, std::move(data));
             return msgHandled();
         });
 
@@ -49,6 +49,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
             lockHandler.handleSimBlocked(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::UnlockSim, [this](auto &&data) {
+            lockHandler.handleUnlockSim(std::move(data));
             return msgHandled();
         });
 
@@ -257,7 +262,6 @@ namespace app
         reloadSettings();
         requestNotReadNotifications();
         requestNotSeenNotifications();
-        lockHandler.reloadScreenLock();
 
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
