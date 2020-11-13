@@ -33,6 +33,7 @@ namespace bsp {
             HeadphonesMono,
             Earspeaker,
             Loudspeaker,
+            LoudspeakerMono,
             BluetoothA2DP,
             BluetoothHSP,
             None

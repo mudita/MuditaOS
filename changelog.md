@@ -9,6 +9,7 @@
 * `[file indexer db]` Added messages for File Indexer db.
 * `[settings]` Added Torch window (front-end only).
 * `[audio]` Added support for Bluetooth audio profiles
+* `[audio]` Added support for headset microphone.
 * `[filesystem]` Added support for standard file IO library.
 * [`[messages]`] Added fetching text messages at phone startup.
 
