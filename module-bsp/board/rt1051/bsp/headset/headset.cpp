@@ -5,6 +5,7 @@
 
 #include "BoardDefinitions.hpp"
 #include "DriverI2C.hpp"
+#include "DriverGPIO.hpp"
 #include "fsl_common.h"
 #include "timers.h"
 
@@ -32,9 +33,10 @@ namespace bsp
         static constexpr uint8_t HEADSET_DEV_SET_DET_EN = 1 << 5;
         static constexpr uint8_t HEADSET_DEV_SET_DEB_1S = 0x06;
 
-        static constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 500;
+        static constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 2500;
 
         static std::shared_ptr<drivers::DriverI2C> i2c;
+        static std::shared_ptr<drivers::DriverGPIO> gpio;
         static drivers::I2CAddress i2cAddr = {.deviceAddress = HEADSET_I2C_ADDR, .subAddressSize = 0x01};
         static TimerHandle_t timerHandle;
 
@@ -55,12 +57,27 @@ namespace bsp
             if (((reg & 0x08) == 0) && (HeadsetInserted == true)) {
                 HeadsetInserted = false;
                 LOG_INFO("Headset removed");
+                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
+
                 ret = true;
             }
 
             if (((reg & 0x08) != 0) && (HeadsetInserted == false)) {
                 HeadsetInserted = true;
                 LOG_INFO("Headset inserted");
+
+                if ((reg & 0x01) != 0) {
+                    LOG_INFO("Headset 3-pole detected");
+                    gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
+                }
+                if ((reg & 0x02) != 0) {
+                    LOG_INFO("Headset 4-pole OMTP detected");
+                    gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
+                }
+                if ((reg & 0x04) != 0) {
+                    LOG_INFO("Headset 4-pole Standard detected");
+                    gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
+                }
                 ret = true;
             }
 
@@ -81,7 +98,19 @@ namespace bsp
                 static_cast<I2CInstances>(BoardDefinitions::HEADSET_I2C),
                 DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::HEADSET_I2C_BAUDRATE)});
 
+            gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::MIC_BIAS_DRIVER_GPIO),
+                                      DriverGPIOParams{});
+
+            gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                              .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                              .defLogic = 0,
+                                              .pin      = static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN)});
+
             qHandleIrq = qHandle;
+
+            HeadsetInserted = false;
+
+            gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
 
             uint8_t reg =
                 HEADSET_INT_DIS_INT_ENA | HEADSET_INT_DIS_ADC_ENA | HEADSET_INT_DIS_DC_ENA | HEADSET_INT_DIS_INS_ENA;
@@ -101,7 +130,7 @@ namespace bsp
                 }
             }
 
-            xTimerStart(timerHandle, 0);
+            xTimerStart(timerHandle, HEADSET_POLL_INTERVAL_MS);
 
             return kStatus_Success;
         }
@@ -122,9 +151,12 @@ namespace bsp
 
         status_t Deinit()
         {
-            qHandleIrq = nullptr;
+            qHandleIrq      = nullptr;
+            HeadsetInserted = false;
 
             i2c.reset();
+
+            gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
 
             return kStatus_Success;
         }

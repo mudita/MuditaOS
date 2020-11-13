@@ -1,6 +1,5 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 #pragma once
 
 #include "Profile.hpp"
@@ -23,7 +22,7 @@ namespace audio
                           .outputVolume = static_cast<float>(volume),
                           .inputGain    = static_cast<float>(gain),
                           .inputPath    = bsp::AudioDevice::InputPath::Headphones,
-                          .outputPath   = bsp::AudioDevice::OutputPath::Headphones},
+                          .outputPath   = bsp::AudioDevice::OutputPath::HeadphonesMono},
                       bsp::AudioDevice::Type::Audiocodec,
                       callback)
         {}
