@@ -10,7 +10,12 @@
 #include <handle_mapper.hpp>
 #include "internal.hpp"
 #include "debug.hpp"
+#include <deprecated/vfs.hpp>
 
+
+//NOTE: It will be removed in later stage
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 namespace
 {
@@ -60,7 +65,7 @@ extern "C"
     FILE *fopen(const char *pathname, const char *mode)
     {
         TRACE_SYSCALL();
-        auto ret = ff_fopen(pathname, mode);
+        auto ret = ff_fopen(vfs.relativeToRoot(pathname).c_str(), mode);
         if(ret) {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
             const auto fd = g_handles.insert(ret) + FIRST_FILEDESC;
@@ -266,7 +271,7 @@ extern "C"
             errno = stdioGET_ERRNO();
             return nullptr;
         }
-        auto ret = ff_fopen(__filename, __modes);
+        auto ret = ff_fopen(vfs.relativeToRoot(__filename).c_str(), __modes);
         errno = stdioGET_ERRNO();
         return reinterpret_cast<FILE*>(ret);
     }
@@ -346,7 +351,7 @@ extern "C"
     int remove (const char *__filename) __THROW
     {
         TRACE_SYSCALL();
-        auto ret = ff_remove(__filename);
+        auto ret = ff_remove(vfs.relativeToRoot(__filename).c_str());
         errno = stdioGET_ERRNO();
         return ret;
     }
@@ -387,7 +392,8 @@ extern "C"
         errno = ENOTSUP;
     }
     __asm__(".symver setbuffer,setbuffer@GLIBC_2.2.5");
-/* Make STREAM line-buffered.  */
+
+    /* Make STREAM line-buffered.  */
     void setlinebuf (FILE *__stream) __THROW
     {
         TRACE_SYSCALL();
@@ -397,3 +403,4 @@ extern "C"
     __asm__(".symver setlinebuf,setlinebuf@GLIBC_2.2.5");
 
 }
+#pragma GCC diagnostic pop

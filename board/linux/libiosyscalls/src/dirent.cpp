@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <cstring>
 #include "dirent_support.hpp"
+#include <deprecated/vfs.hpp>
 #include "debug.hpp"
 
 
@@ -16,6 +17,7 @@ struct __dirstream {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 extern "C" {
     using namespace vfsn::linux::internal;
@@ -28,7 +30,7 @@ extern "C" {
             return nullptr;
         }
         auto dir      = new DIR;
-        dir->dir_data = diren::diropen(errno, dirname);
+        dir->dir_data = diren::diropen(errno, vfs.relativeToRoot(dirname).c_str());
         if (!dir->dir_data) {
             delete dir;
             return nullptr;

@@ -10,7 +10,12 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <cstring>
+#include <deprecated/vfs.hpp>
 #include "debug.hpp"
+
+//NOTE: It will be removed in later stage
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 namespace
 {
@@ -44,9 +49,9 @@ extern "C" {
      int unlink(const char *name)
      {
         TRACE_SYSCALL();
-        auto ret = ff_remove(name);
+        auto ret = ff_remove(vfs.relativeToRoot(name).c_str());
         if (ret && stdioGET_ERRNO() == EISDIR)
-            ret = ff_deltree(name, nullptr, nullptr);
+            ret = ff_deltree(vfs.relativeToRoot(name).c_str(), nullptr, nullptr);
         errno = stdioGET_ERRNO();
         return ret;
      }
@@ -56,7 +61,7 @@ extern "C" {
     {
         TRACE_SYSCALL();
         FF_Stat_t stat_ff;
-        auto ret = ff_stat(file, &stat_ff);
+        auto ret = ff_stat(vfs.relativeToRoot(file).c_str(), &stat_ff);
         if (!ret) {
             std::memset(pstat, 0, sizeof(*pstat));
             pstat->st_ino  = stat_ff.st_ino;
@@ -113,7 +118,7 @@ extern "C" {
     int chdir(const char *path)
     {
         TRACE_SYSCALL();
-        auto ret = ff_chdir(path);
+        auto ret = ff_chdir(vfs.relativeToRoot(path).c_str());
         errno  = stdioGET_ERRNO();
         return ret;
     }
@@ -160,7 +165,8 @@ extern "C" {
     int rename(const char *oldpath, const char *newpath)
     {
         TRACE_SYSCALL();
-        auto ret = ff_rename(oldpath, newpath, true);
+        auto ret = ff_rename(vfs.relativeToRoot(oldpath).c_str(),
+                             vfs.relativeToRoot(newpath).c_str(), true);
         errno  = stdioGET_ERRNO();
         return ret;
     }
@@ -169,7 +175,7 @@ extern "C" {
     int mkdir(const char *pathname, mode_t )
     {
         TRACE_SYSCALL();
-        auto ret = ff_mkdir(pathname);
+        auto ret = ff_mkdir(vfs.relativeToRoot(pathname).c_str());
         errno  = stdioGET_ERRNO();
         return ret;
     }
@@ -241,7 +247,7 @@ extern "C" {
             return real_xstat( ver,path,stat_buf );
         }
         else {
-            int ret = stat( path, stat_buf);
+            int ret = stat( path, stat_buf );
             if(ret) {
                 ret =  real_xstat( ver,path,stat_buf );
             }
@@ -280,3 +286,4 @@ extern "C" {
     }
 
 }
+#pragma GCC diagnostic pop

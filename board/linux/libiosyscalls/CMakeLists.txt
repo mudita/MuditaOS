@@ -18,7 +18,9 @@ set(INCLUDES
 	"${CMAKE_SOURCE_DIR}/module-vfs/board/freeRTOS_FAT/include"
 	"${CMAKE_SOURCE_DIR}/module-os/FreeRTOS/include"
 	"${CMAKE_SOURCE_DIR}/module-os/board/linux"
+	"${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
 	"${CMAKE_SOURCE_DIR}/module-vfs/board/free_rtos_custom/include"
+	"${CMAKE_SOURCE_DIR}/module-vfs/include/user"
 	"${CMAKE_SOURCE_DIR}/module-utils"
 )
 

@@ -10,6 +10,11 @@
 #include "vfs_internal_dirent.hpp"
 #include "HandleManager.hpp"
 #include <newlib/vfs_io_syscalls.hpp>
+#include <deprecated/vfs.hpp>
+
+// NOTE: It will be removed in later stage
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 /** NOTE: This is generic wrapper for newlib syscalls
  * using current VFS implementation. This implementation
@@ -65,7 +70,7 @@ namespace vfsn::internal::syscalls
             _errno_ = EINVAL;
             return -1;
         }
-        auto fil = ff_fopen(file, fflags);
+        auto fil = ff_fopen(vfs.relativeToRoot(file).c_str(), fflags);
         if (!fil) {
             _errno_ = stdioGET_ERRNO();
             return -1;
@@ -162,9 +167,10 @@ namespace vfsn::internal::syscalls
     }
     int unlink(int &_errno_, const char *name)
     {
-        auto ret = ff_remove(name);
+        const auto rel_name = vfs.relativeToRoot();
+        auto ret            = ff_remove(rel_name.c_str());
         if (ret && stdioGET_ERRNO() == EISDIR)
-            ret = ff_deltree(name, nullptr, nullptr);
+            ret = ff_deltree(rel_name.c_str(), nullptr, nullptr);
         _errno_ = stdioGET_ERRNO();
         return ret;
     }
@@ -178,7 +184,7 @@ namespace vfsn::internal::syscalls
     int stat(int &_errno_, const char *file, struct stat *pstat)
     {
         FF_Stat_t stat_ff;
-        auto ret = ff_stat(file, &stat_ff);
+        auto ret = ff_stat(vfs.relativeToRoot(file).c_str(), &stat_ff);
         if (!ret) {
             std::memset(pstat, 0, sizeof(*pstat));
             pstat->st_ino  = stat_ff.st_ino;
@@ -199,7 +205,7 @@ namespace vfsn::internal::syscalls
 
     int chdir(int &_errno_, const char *path)
     {
-        auto ret = ff_chdir(path);
+        auto ret = ff_chdir(vfs.relativeToRoot(path).c_str());
         _errno_  = stdioGET_ERRNO();
         return ret;
     }
@@ -211,14 +217,14 @@ namespace vfsn::internal::syscalls
     }
     int rename(int &_errno_, const char *oldName, const char *newName)
     {
-        auto ret = ff_rename(oldName, newName, true);
+        auto ret = ff_rename(vfs.relativeToRoot(oldName).c_str(), vfs.relativeToRoot(newName).c_str(), true);
         _errno_  = stdioGET_ERRNO();
         return ret;
     }
 
     int mkdir(int &_errno_, const char *path, uint32_t mode)
     {
-        auto ret = ff_mkdir(path);
+        auto ret = ff_mkdir(vfs.relativeToRoot(path).c_str());
         _errno_  = stdioGET_ERRNO();
         return ret;
     }
@@ -226,7 +232,7 @@ namespace vfsn::internal::syscalls
     DIR *opendir(int &_errno_, const char *dirname)
     {
         auto dir      = new DIR;
-        dir->dir_data = dirent::diropen(_errno_, dirname);
+        dir->dir_data = dirent::diropen(_errno_, vfs.relativeToRoot(dirname).c_str());
         if (!dir->dir_data) {
             delete dir;
             return nullptr;
@@ -356,3 +362,5 @@ namespace vfsn::internal::syscalls
         return ret;
     }
 } // namespace vfsn::internal::syscalls
+
+#pragma GCC diagnostic pop

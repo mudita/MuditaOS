@@ -18,6 +18,9 @@ disk. */
 #define eMMCSIGNATURE             0x61606362
 #define mainIO_MANAGER_CACHE_SIZE (15UL * FSL_SDMMC_DEFAULT_BLOCK_SIZE)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
     const auto filename_rel = relativeToRoot(filename);
@@ -348,3 +351,4 @@ auto vfs::getAbsolutePath(std::string_view path) const -> std::string
         return std::string(path);
     }
 }
+#pragma GCC diagnostic pop
