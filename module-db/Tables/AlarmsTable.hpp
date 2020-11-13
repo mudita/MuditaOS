@@ -36,7 +36,7 @@ class AlarmsTable : public Table<AlarmsTableRow, AlarmsTableFields>
 {
   public:
     AlarmsTable(Database *db);
-    virtual ~AlarmsTable();
+    virtual ~AlarmsTable() = default;
 
     bool create() override final;
     bool add(AlarmsTableRow entry) override final;
@@ -54,15 +54,4 @@ class AlarmsTable : public Table<AlarmsTableRow, AlarmsTableFields>
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
     AlarmsTableRow next(time_t time);
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS alarms("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "time INTEGER,"
-                                   "snooze INTEGER,"
-                                   "status INTEGER,"
-                                   "path TEXT DEFAULT '');";
-    // "INSERT or ignore INTO alarms (_id, time, snooze, status, path ) VALUES (1,0,0,0,'');"
-    const char *alarmsInitialization =
-        "INSERT or ignore INTO alarms (_id, time, snooze, status, path ) VALUES (1,0,0,0,'');";
 };

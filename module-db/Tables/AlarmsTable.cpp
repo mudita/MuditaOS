@@ -13,20 +13,9 @@
 AlarmsTable::AlarmsTable(Database *db) : Table(db)
 {}
 
-AlarmsTable::~AlarmsTable()
-{}
-
 bool AlarmsTable::create()
 {
-    bool ret = true;
-    ret      = db->execute(createTableQuery);
-
-    if (!ret) {
-        return false;
-    }
-
-    ret = db->execute(alarmsInitialization);
-    return ret;
+    return true;
 }
 
 bool AlarmsTable::add(AlarmsTableRow entry)
