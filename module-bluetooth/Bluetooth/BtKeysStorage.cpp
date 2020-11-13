@@ -41,7 +41,7 @@ namespace Bt
     {
         LOG_INFO("opening storage from API");
         fileContent.clear();
-        fileContent = utils::loadFileAsString(strings::keysFilename);
+        fileContent = utils::filesystem::loadFileAsString(strings::keysFilename);
         if (fileContent.empty()) {
             LOG_WARN("opening empty key file!");
             return;
@@ -133,7 +133,7 @@ namespace Bt
     {
         json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
         fileContent            = finalJson.dump();
-        utils::replaceWithString(strings::keysFilename, fileContent);
+        utils::filesystem::replaceWithString(strings::keysFilename, fileContent);
     }
 
 } // namespace Bt

@@ -200,7 +200,7 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
         return updateos::UpdateError::VerifyVersionFailure;
     }
 
-    std::string versionJsonString = utils::loadFileAsString(getUpdateTmpChild(updateos::file::version));
+    std::string versionJsonString = utils::filesystem::loadFileAsString(getUpdateTmpChild(updateos::file::version));
     std::string parserError;
     json11::Json updateVersionInformation = json11::Json::parse(versionJsonString, parserError);
     if (parserError != "") {
@@ -314,7 +314,7 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
     FILE *fp = fopen(bootJSONAbsoulte.c_str(), "r");
 
     if (fp != nullptr) {
-        utils::computeCRC32(fp, &bootJSONAbsoulteCRC);
+        utils::filesystem::computeCRC32(fp, &bootJSONAbsoulteCRC);
         bootJSONAbsoulte += purefs::extension::crc32;
 
         FILE *fpCRC = fopen(bootJSONAbsoulte.c_str(), "w");
@@ -593,7 +593,7 @@ const fs::path UpdateMuditaOS::checkForUpdate()
         if (versionInfo[BootConfigJson::os_version][BootConfigJson::version_string].is_string()) {
             if (UpdateMuditaOS::isUpgradeToCurrent(
                     versionInfo[BootConfigJson::os_version][BootConfigJson::version_string].string_value())) {
-                return purefs::dir::os_updates / file.fileName;
+                return purefs::dir::getUpdatesOSPath() / file.fileName;
             }
         }
     }

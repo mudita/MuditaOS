@@ -148,8 +148,8 @@ namespace Store
         bootConfig.timestamp = utils::time::Timestamp().str("%c");
         LOG_INFO("vfs::updateTimestamp \"%s\"", bootConfig.to_json().dump().c_str());
 
-        if (utils::replaceWithString(bootConfig.boot_json, bootConfig.to_json().dump())) {
-            utils::updateFileCRC32(bootConfig.boot_json);
+        if (utils::filesystem::replaceWithString(bootConfig.boot_json, bootConfig.to_json().dump())) {
+            utils::filesystem::updateFileCRC32(bootConfig.boot_json);
         }
     }
 
