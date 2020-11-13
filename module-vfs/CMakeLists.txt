@@ -44,7 +44,6 @@ set(FREERTOS_FAT_EXTSOURCES
 set(SOURCES ""
         ${FREERTOS_FAT_SOURCES}
         ${FREERTOS_FAT_EXTSOURCES}
-        vfs-utils.cpp
         vfs.cpp
         vfsNotifier.cpp
         HandleManager.cpp

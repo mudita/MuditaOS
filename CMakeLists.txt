@@ -191,7 +191,6 @@ target_link_libraries(${PROJECT_NAME}
         module-os
         module-utils
         module-vfs
-        module-utils
         module-sys
         module-cellular
         module-db
