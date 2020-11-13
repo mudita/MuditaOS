@@ -39,8 +39,7 @@ namespace purefs
         inline constexpr auto copy_buf      = 8192 * 4;
     } // namespace buffer
 
-     // namespace json
-
+    // namespace json
 
 }; // namespace purefs
 
@@ -106,7 +105,6 @@ class vfs
     [[deprecated]] int deltree(const char *path);
     [[deprecated]] int mkdir(const char *dir);
     [[deprecated]] int rename(const char *oldname, const char *newname);
-
     [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);

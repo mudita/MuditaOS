@@ -188,8 +188,8 @@ namespace gui
                 updateFileDetails << ": ";
                 updateFileDetails << std::to_string(msg.updateStats.totalBytes / 1024);
                 updateFileDetails << "Kb (";
-                updateFileDetails
-                    << msg.updateStats.versioInformation[BootConfigJson::misc][BootConfigJson::builddate].string_value();
+                updateFileDetails << msg.updateStats.versioInformation[BootConfigJson::misc][BootConfigJson::builddate]
+                                         .string_value();
                 updateFileDetails << ")";
 
                 currentVersionInfo->setText(currentVersion.str());

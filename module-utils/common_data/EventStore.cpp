@@ -111,12 +111,14 @@ namespace Store
         bootConfig.boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
 
         if (parseErrors == "") {
-            bootConfig.os_type  = bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_type].string_value();
-            bootConfig.os_image = bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_image].string_value();
+            bootConfig.os_type =
+                bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_type].string_value();
+            bootConfig.os_image =
+                bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_image].string_value();
             bootConfig.os_root_path = fs::path(purefs::dir::eMMC_disk) / bootConfig.os_type;
             bootConfig.boot_json    = bootJsonPath;
             bootConfig.bootloader_verion =
-                    bootConfig.boot_json_parsed[BootConfigJson::bootloader][BootConfigJson::os_version].string_value();
+                bootConfig.boot_json_parsed[BootConfigJson::bootloader][BootConfigJson::os_version].string_value();
             bootConfig.timestamp  = utils::time::Timestamp().str("%c");
             bootConfig.os_version = std::string(VERSION);
 
@@ -154,17 +156,16 @@ namespace Store
     json11::Json BootConfig::to_json() const
     {
         return json11::Json::object{
-                {BootConfigJson::main,
-                                           json11::Json::object{{BootConfigJson::os_image, os_image},
-                                                                {BootConfigJson::os_type, os_type},
-                                                                {BootConfigJson::os_version, os_version},
-                                                                {BootConfigJson::timestamp, timestamp}}},
+            {BootConfigJson::main,
+             json11::Json::object{{BootConfigJson::os_image, os_image},
+                                  {BootConfigJson::os_type, os_type},
+                                  {BootConfigJson::os_version, os_version},
+                                  {BootConfigJson::timestamp, timestamp}}},
 
-                {BootConfigJson::git_info,
-                                           json11::Json::object{{BootConfigJson::os_git_tag, std::string(GIT_TAG)},
-                                                                {BootConfigJson::os_git_revision, std::string(GIT_REV)},
-                                                                {BootConfigJson::os_git_branch, std::string(GIT_BRANCH)}}},
-                {BootConfigJson::bootloader, json11::Json::object{{BootConfigJson::os_version, bootloader_verion}}}};
+            {BootConfigJson::git_info,
+             json11::Json::object{{BootConfigJson::os_git_tag, std::string(GIT_TAG)},
+                                  {BootConfigJson::os_git_revision, std::string(GIT_REV)},
+                                  {BootConfigJson::os_git_branch, std::string(GIT_BRANCH)}}},
+            {BootConfigJson::bootloader, json11::Json::object{{BootConfigJson::os_version, bootloader_verion}}}};
     }
-
 }; // namespace Store

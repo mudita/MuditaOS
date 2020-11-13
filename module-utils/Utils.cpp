@@ -1,22 +1,24 @@
-//
-// Created by atom on 12.11.2020.
-//
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <time/time_conversion.hpp>
 #include <random>
 #include <ticks.hpp>
 #include "Utils.hpp"
 
-namespace utils {
+namespace utils
+{
 
-    bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite) {
+    bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite)
+    {
         auto lamb = [](FILE *stream) { fclose(stream); };
         std::unique_ptr<FILE, decltype(lamb)> fp(fopen(fileToModify.c_str(), "w"), lamb);
 
         if (fp.get() != nullptr) {
             size_t dataWritten = fprintf(fp.get(), stringToWrite.c_str());
             return dataWritten == stringToWrite.length();
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -36,7 +38,8 @@ namespace utils {
                      static_cast<std::uint32_t>(fileCRC32),
                      file.c_str());
             if (fileCRC32 != 0) {
-                if ((written = sprintf(crc32Buf.get(), "%08" PRIX32, fileCRC32)) != (purefs::buffer::crc_char_size - 1)) {
+                if ((written = sprintf(crc32Buf.get(), "%08" PRIX32, fileCRC32)) !=
+                    (purefs::buffer::crc_char_size - 1)) {
                     LOG_INFO("updateFileCRC32 can't prepare string for crc32, sprintf returned %d instead of %d",
                              written,
                              purefs::buffer::crc_char_size - 1);
@@ -100,8 +103,9 @@ namespace utils {
 
         if (fp.get() != nullptr) {
             utils::computeCRC32(fp.get(), &crc32Read);
-            LOG_INFO(
-                    "verifyCRC computed crc32 for %s is %08" PRIX32, filePath.c_str(), static_cast<std::uint32_t>(crc32Read));
+            LOG_INFO("verifyCRC computed crc32 for %s is %08" PRIX32,
+                     filePath.c_str(),
+                     static_cast<std::uint32_t>(crc32Read));
             return (crc32Read == crc32);
         }
         LOG_ERROR("verifyCRC can't open %s", filePath.c_str());
@@ -110,7 +114,7 @@ namespace utils {
 
     bool verifyCRC(const fs::path filePath)
     {
-        auto lamb = [](FILE *stream) {fclose(stream); };
+        auto lamb = [](FILE *stream) { fclose(stream); };
         std::unique_ptr<char[]> crcBuf(new char[purefs::buffer::crc_char_size]);
         size_t readSize;
         fs::path crcFilePath(filePath);
@@ -172,6 +176,4 @@ namespace utils {
 
         return contents;
     }
-
-
-}
+} // namespace utils

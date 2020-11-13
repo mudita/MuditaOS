@@ -248,5 +248,4 @@ namespace utils
     bool verifyCRC(const fs::path filePath);
     std::string generateRandomId(uint32_t length = 0);
     std::string loadFileAsString(const fs::path &fileToLoad);
-    void updateBootTimestamp();
 } // namespace utils
