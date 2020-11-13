@@ -4,12 +4,17 @@ import time
 
 import serial
 import json
-import random
+import typing
 import logging
-
+from enum import Enum
 from harness.interface.defs import endpoint, method, status
 
 log = logging.getLogger(__name__)
+
+
+class Keytype(Enum):
+    long_press = 0
+    short_press = 1
 
 
 class CDCSerial:
@@ -51,12 +56,13 @@ class CDCSerial:
         result = self.serial.read(payload_length).decode()
         return json.loads(result)
 
-    def send_key(self, key_code, wait=10):
-        body = {
-            "keyPressed": key_code
-        }
-
+    def send_key(self, key_code, key_type=Keytype.short_press, wait=10):
+        if key_type is Keytype.long_press:
+            body = {"keyPressed": key_code, "state": 4}
+        else:
+            body = {"keyPressed": key_code, "state": 2}
         ret = self.write(self.__wrap_message(body), wait)
+        time.sleep(0.3)
         return ret
 
     def send_at(self, at_command, wait=10):

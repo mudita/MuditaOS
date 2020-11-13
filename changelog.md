@@ -9,6 +9,7 @@
 * `[cellular]` Added SIM PIN/PUK handling
 * `[cellular]` Added change PIN functionality
 * `[cellular]` Added possibility of unlock SIM card (no PIN on start) functionality
+* `[testing]` Added test harness with message sending case
 
 ### Changed
 
