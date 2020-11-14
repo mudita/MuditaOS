@@ -11,7 +11,7 @@ ContactsRingtonesTable::~ContactsRingtonesTable()
 
 bool ContactsRingtonesTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool ContactsRingtonesTable::add(ContactsRingtonesTableRow entry)
