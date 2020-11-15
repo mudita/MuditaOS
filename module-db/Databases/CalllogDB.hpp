@@ -10,7 +10,7 @@ class CalllogDB : public Database
 {
   public:
     CalllogDB();
-    virtual ~CalllogDB();
+    ~CalllogDB() = default;
 
     CalllogTable calls;
 
