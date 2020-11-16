@@ -110,7 +110,7 @@ namespace utils
                 return (crc32Read == crc32);
             }
             LOG_ERROR("verifyCRC can't open %s", filePath.c_str());
-            return (false);
+            return false;
         }
 
         bool verifyCRC(const fs::path filePath)
