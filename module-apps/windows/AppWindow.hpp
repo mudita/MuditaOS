@@ -49,7 +49,6 @@ namespace gui
       public:
         AppWindow() = delete;
         AppWindow(app::Application *app, std::string name);
-        ~AppWindow() override;
 
         app::Application *getApplication()
         {
