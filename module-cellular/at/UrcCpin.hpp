@@ -58,7 +58,7 @@ namespace at::urc
             h.Handle(*this);
         }
 
-        static at::SimState parseState(const std::string_view state);
+        static at::SimState parseState(std::string_view state);
     };
 
 } // namespace at::urc

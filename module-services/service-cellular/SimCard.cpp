@@ -204,7 +204,6 @@ at::SimState SimCard::simState()
 }
 at::SimState SimCard::simStateWithMessage(std::string &message)
 {
-
     auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
     if (channel) {
         auto resp                      = channel->cmd(at::factory(at::AT::GET_CPIN) + "\r");

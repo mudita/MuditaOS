@@ -1149,10 +1149,8 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
     if (sime == SimCardResult::OK) {
         return true;
     }
-    else {
-        unhandledCME(static_cast<unsigned int>(sime));
-        return false;
-    }
+    unhandledCME(static_cast<unsigned int>(sime));
+    return false;
 }
 
 /// Mockup for current message

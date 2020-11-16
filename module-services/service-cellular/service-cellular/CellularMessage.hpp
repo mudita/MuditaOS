@@ -94,12 +94,12 @@ class CellularSimStateMessage : public CellularMessage
     {}
     virtual ~CellularSimStateMessage() = default;
 
-    at::SimState getState(void)
+    at::SimState getState()
     {
         return state;
     }
 
-    std::string getMessage(void)
+    std::string getMessage()
     {
         return message;
     }

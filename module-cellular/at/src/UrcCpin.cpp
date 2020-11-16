@@ -5,10 +5,9 @@
 
 using namespace at::urc;
 
-at::SimState Cpin::parseState(const std::string_view state)
+at::SimState Cpin::parseState(std::string_view state)
 {
-    //    static const std::map<std::string_view, SimState> cpin_convert_map;
-    static const std::map<std::string_view, SimState> cpin_convert_map = {
+    const std::map<std::string_view, SimState> cpin_convert_map = {
         {Cpin::cpin_ready, SimState::Ready},
         {Cpin::cpin_not_ready, SimState::NotReady},
         {Cpin::cpin_sim_pin, SimState::SimPin},
