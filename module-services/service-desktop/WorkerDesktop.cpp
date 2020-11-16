@@ -1,17 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "WorkerDesktop.hpp"
+#include "service-desktop/WorkerDesktop.hpp"
+#include "parser/MessageHandler.hpp"
+#include "parser/ParserFSM.hpp"
 
-#include <map>    // for map
-#include <vector> // for vector
+#include <bsp/usb/usb.hpp>
+#include <log/log.hpp>
+#include <projdefs.h>
+#include <queue.h>
 
-#include "MessageHandler.hpp"      // for MessageHandler, MessageHandler::sendQueue
-#include "ParserFSM.hpp"           // for StateMachine
-#include "bsp/usb/usb.hpp"         // for usbCDCInit, usbCDCSend
-#include "log/log.hpp"             // for LOG_ERROR, LOG_INFO
-#include "projdefs.h"              // for pdTRUE
-#include "queue.h"                 // for xQueueReceive, QueueDefinition, QueueHandle_t
+#include <map>
+#include <vector>
 
 bool WorkerDesktop::handleMessage(uint32_t queueID)
 {

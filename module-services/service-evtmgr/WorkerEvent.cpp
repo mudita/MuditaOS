@@ -31,8 +31,8 @@ extern "C"
 #include <optional>    // for optional
 #include <string>      // for string
 #include <vector>      // for vector
-#include <module-services/service-desktop/messages/DesktopMessages.hpp>
-#include <module-services/service-desktop/Constants.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/Constants.hpp>
 
 #include "Service/Worker.hpp" // for WorkerQueueInfo, Worker, WorkerCommand
 #include "MessageType.hpp" // for MessageType, MessageType::EVMMinuteUpdated, MessageType::EVMModemStatus, MessageType::EVMRingIndicator

@@ -1,25 +1,23 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <string.h>
-#include <stdint.h> // for uint32_t
-#include <list>     // for list
-#include <string>   // for allocator, string
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Worker.hpp>
+#include <bsp/usb/usb.hpp>
+#include <parser/ParserFSM.hpp>
 
 extern "C"
 {
-#include "FreeRTOS.h"
-#include "task.h"
+#include <FreeRTOS.h>
+#include <task.h>
 }
 
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
-#include "Service/Worker.hpp"
-#include "parser/ParserFSM.hpp"
-
-#include "bsp/usb/usb.hpp"
+#include <cstdint>
+#include <list>
+#include <string>
 
 namespace sys
 {

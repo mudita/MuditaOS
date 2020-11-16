@@ -11,9 +11,9 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <service-desktop/endpoints/update/UpdateMuditaOS.hpp>
-#include <module-services/service-desktop/ServiceDesktop.hpp>
-#include "DesktopMessages.hpp"
+#include <endpoints/update/UpdateMuditaOS.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
 namespace app
 {
