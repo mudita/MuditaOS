@@ -25,6 +25,12 @@
 
 namespace gui
 {
+    struct TextBackup
+    {
+        TextDocument document;
+        unsigned int cursorPos;
+    };
+
     class Lines;
 
     ///  @brief Widget that holds multiple lines of text.
@@ -107,6 +113,10 @@ namespace gui
         void setUnderline(const bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
+
+        TextBackup backupText() const;
+        void restoreFrom(const TextBackup &backup);
+
         void setTextChangedCallback(TextChangedCallback &&callback);
 
         void addText(const UTF8 &text);

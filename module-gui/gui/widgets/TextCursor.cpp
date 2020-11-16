@@ -32,6 +32,20 @@ namespace gui
         pos_on_screen = document->getText().length();
     }
 
+    TextCursor::Move TextCursor::moveCursor(NavigationDirection direction, unsigned int n)
+    {
+        auto ret = TextCursor::Move::Start;
+
+        for (unsigned int i = 0; i < n; i++) {
+            ret = moveCursor(direction);
+
+            if (ret == Move::Start || ret == Move::End || ret == Move::Error) {
+                break;
+            }
+        }
+        return ret;
+    }
+
     TextCursor::Move TextCursor::moveCursor(NavigationDirection direction)
     {
         debug_text_cursor("Before move cursor: screen pos: %d block: %d pos: %d %s",
@@ -67,6 +81,8 @@ namespace gui
             if (nr != getBlockNr() && checkCurrentBlockNoNewLine()) {
                 operator--();
             }
+
+            return Move::Left;
         }
 
         if (direction == NavigationDirection::RIGHT) {
@@ -79,6 +95,8 @@ namespace gui
             if (nr != getBlockNr() && checkPreviousBlockNoNewLine()) {
                 operator++();
             }
+
+            return Move::Right;
         }
 
         debug_text_cursor("After move cursor: screen pos: %d block: %d pos: %d %s",
@@ -180,6 +198,7 @@ namespace gui
         moveCursor(NavigationDirection::LEFT);
         BlockCursor::removeChar();
     }
+
 } // namespace gui
 
 const char *c_str(enum gui::TextCursor::Move what)
@@ -193,8 +212,10 @@ const char *c_str(enum gui::TextCursor::Move what)
         return "Up";
     case gui::TextCursor::Move::Down:
         return "Down";
-    case gui::TextCursor::Move::InLine:
-        return "InLine";
+    case gui::TextCursor::Move::Left:
+        return "Left";
+    case gui::TextCursor::Move::Right:
+        return "Right";
     case gui::TextCursor::Move::Error:
         return "Error";
     }
