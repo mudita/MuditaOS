@@ -167,7 +167,7 @@ namespace vfsn::internal::syscalls
     }
     int unlink(int &_errno_, const char *name)
     {
-        const auto rel_name = vfs.relativeToRoot();
+        const auto rel_name = vfs.relativeToRoot(name);
         auto ret            = ff_remove(rel_name.c_str());
         if (ret && stdioGET_ERRNO() == EISDIR)
             ret = ff_deltree(rel_name.c_str(), nullptr, nullptr);
