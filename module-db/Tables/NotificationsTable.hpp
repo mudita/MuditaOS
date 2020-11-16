@@ -40,10 +40,4 @@ class NotificationsTable : public Table<NotificationsTableRow, NotificationsTabl
                                                              uint32_t limit,
                                                              NotificationsTableFields field,
                                                              const char *str) override final;
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS notifications("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "key INTEGER UNIQUE DEFAULT 0,"
-                                   "value INTEGER DEFAULT 0)";
 };
