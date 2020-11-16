@@ -32,7 +32,7 @@ namespace utils
             std::unique_ptr<FILE, decltype(lamb)> fp(fopen(file.c_str(), "r"), lamb);
 
             if (fp.get() != nullptr) {
-                std::unique_ptr<char[]> crc32Buf(new char[purefs::buffer::crc_char_size]);
+                auto crc32Buf = std::make_unique<char[]>(purefs::buffer::crc_char_size);
                 int written = 0;
                 computeCRC32(fp.get(), &fileCRC32);
                 LOG_INFO("updateFileCRC32 writing new crc32 %08" PRIX32 " for %s",
