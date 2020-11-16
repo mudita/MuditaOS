@@ -11,8 +11,6 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/messages/EVMessages.hpp>
 
-#include "service-cellular/SimCard.hpp"
-
 // this static function will be replaced by Settings API
 static bool isSettingsAutomaticTimeSyncEnabled()
 {
