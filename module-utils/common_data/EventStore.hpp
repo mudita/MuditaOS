@@ -152,8 +152,25 @@ namespace Store
         static GSM *get();
     };
 
-    struct BootConfig
+    class BootConfig
     {
+      public:
+        BootConfig(const BootConfig &) = delete;
+        BootConfig &operator=(const BootConfig &) = delete;
+        static BootConfig *get();
+
+        void setRootPath(const std::filesystem::path &newRootPath);
+        const std::filesystem::path getOSRootPath();
+        const std::string getOSType();
+        const std::string getBootloaderVersion();
+
+        bool loadBootConfig(const std::filesystem::path &bootJsonPath);
+        void updateTimestamp();
+        [[nodiscard]] json11::Json to_json() const;
+        static int version_compare(const std::string &v1, const std::string &v2);
+
+      private:
+        BootConfig() = default;
         std::string os_image;
         std::string os_type;
         std::string os_version;
@@ -162,14 +179,7 @@ namespace Store
         json11::Json boot_json_parsed;
         std::filesystem::path os_root_path;
         std::filesystem::path boot_json;
-        static const BootConfig &get();
-        static BootConfig &modify();
-        std::string loadFileAsString(const std::filesystem::path &fileToLoad);
-        bool loadBootConfig(const std::filesystem::path &bootJsonPath);
-        void updateTimestamp();
-        const std::filesystem::path getCurrentBootJSON();
-        [[nodiscard]] json11::Json to_json() const;
-        static int version_compare(const std::string &v1, const std::string &v2);
+        static cpp_freertos::MutexStandard bootConfigMutex;
     };
 
 }; // namespace Store

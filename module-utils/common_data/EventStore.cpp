@@ -71,85 +71,85 @@ namespace Store
         return (sim == SIM::SIM1 || sim == SIM::SIM2);
     }
 
-    BootConfig bootConfig;
-    const BootConfig &BootConfig::get()
+    /**
+     * BootConfig holds all information in .boot.json
+     * @return
+     */
+
+    cpp_freertos::MutexStandard BootConfig::bootConfigMutex;
+    BootConfig *BootConfig::get()
     {
-        return bootConfig;
+        static auto ptr = new BootConfig();
+        return ptr;
     }
 
-    BootConfig &BootConfig::modify()
+    void BootConfig::setRootPath(const std::filesystem::path &newRootPath)
     {
-        return bootConfig;
+        cpp_freertos::LockGuard lock(bootConfigMutex);
+        os_root_path = newRootPath;
     }
 
-    std::string BootConfig::loadFileAsString(const std::filesystem::path &fileToLoad)
+    const std::filesystem::path BootConfig::getOSRootPath()
     {
-        auto lamb = [](FILE *stream) { fclose(stream); };
-        std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
-        std::unique_ptr<FILE, decltype(lamb)> fp(fopen(fileToLoad.c_str(), "r"), lamb);
-        std::string contents;
-        size_t readSize;
+        cpp_freertos::LockGuard lock(bootConfigMutex);
+        return (os_root_path);
+    }
 
-        if (fp.get() != nullptr) {
-            while (feof(fp.get())) {
-                readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp.get());
-                contents.append(static_cast<const char *>(readBuf.get()), readSize);
-            }
-        }
+    const std::string BootConfig::getOSType()
+    {
+        cpp_freertos::LockGuard lock(bootConfigMutex);
+        return (os_type);
+    }
 
-        return contents;
+    const std::string BootConfig::getBootloaderVersion()
+    {
+        cpp_freertos::LockGuard lock(bootConfigMutex);
+        return (bootloader_verion);
     }
 
     bool BootConfig::loadBootConfig(const std::filesystem::path &bootJsonPath)
     {
         std::string parseErrors  = "";
-        std::string jsonContents = loadFileAsString(bootJsonPath);
+        std::string jsonContents = utils::filesystem::loadFileAsString(fs::path("/sys") / bootJsonPath);
 
-        LOG_INFO("vfs::getOSRootFromJSON parsing %s", bootJsonPath.c_str());
-        LOG_INFO("vfs::getOSRootFromJSON \"%s\"", jsonContents.c_str());
+        LOG_INFO("loadBootConfig parsing %s", (fs::path("/sys") / bootJsonPath).c_str());
+        LOG_INFO("loadBootConfig \"%s\"", jsonContents.c_str());
 
-        bootConfig.boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
+        boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
 
+        cpp_freertos::LockGuard lock(bootConfigMutex);
         if (parseErrors == "") {
-            bootConfig.os_type =
-                bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_type].string_value();
-            bootConfig.os_image =
-                bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_image].string_value();
-            bootConfig.os_root_path = purefs::dir::getRootDiskPath() / bootConfig.os_type;
-            bootConfig.boot_json    = bootJsonPath;
-            bootConfig.bootloader_verion =
-                bootConfig.boot_json_parsed[BootConfigJson::bootloader][BootConfigJson::os_version].string_value();
-            bootConfig.timestamp  = utils::time::Timestamp().str("%c");
-            bootConfig.os_version = std::string(VERSION);
+            os_type           = boot_json_parsed[BootConfigJson::main][BootConfigJson::os_type].string_value();
+            os_image          = boot_json_parsed[BootConfigJson::main][BootConfigJson::os_image].string_value();
+            os_root_path      = purefs::dir::getRootDiskPath() / os_type;
+            boot_json         = bootJsonPath;
+            bootloader_verion = boot_json_parsed[BootConfigJson::bootloader][BootConfigJson::os_version].string_value();
+            timestamp         = utils::time::Timestamp().str("%c");
+            os_version        = std::string(VERSION);
 
-            LOG_INFO("boot_config: %s", bootConfig.to_json().dump().c_str());
+            LOG_INFO("boot_config: %s", to_json().dump().c_str());
             return true;
         }
         else {
-            bootConfig.os_type      = PATH_CURRENT;
-            bootConfig.os_image     = purefs::file::boot_bin;
-            bootConfig.os_root_path = purefs::dir::getRootDiskPath() / bootConfig.os_type;
-            bootConfig.boot_json    = bootJsonPath;
-            bootConfig.timestamp    = utils::time::Timestamp().str("%c");
-            bootConfig.os_version   = std::string(VERSION);
+            os_type      = PATH_CURRENT;
+            os_image     = purefs::file::boot_bin;
+            os_root_path = purefs::dir::getRootDiskPath() / os_type;
+            boot_json    = bootJsonPath;
+            timestamp    = utils::time::Timestamp().str("%c");
+            os_version   = std::string(VERSION);
 
-            LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", bootJsonPath.c_str(), parseErrors.c_str());
+            LOG_WARN("loadBootConfig failed to parse %s: \"%s\"", bootJsonPath.c_str(), parseErrors.c_str());
             return false;
         }
     }
 
-    const fs::path BootConfig::getCurrentBootJSON()
-    {
-        return purefs::file::boot_json;
-    }
-
     void BootConfig::updateTimestamp()
     {
-        bootConfig.timestamp = utils::time::Timestamp().str("%c");
-        LOG_INFO("vfs::updateTimestamp \"%s\"", bootConfig.to_json().dump().c_str());
+        timestamp = utils::time::Timestamp().str("%c");
+        LOG_INFO("vfs::updateTimestamp \"%s\"", to_json().dump().c_str());
 
-        if (utils::filesystem::replaceWithString(bootConfig.boot_json, bootConfig.to_json().dump())) {
-            utils::filesystem::updateFileCRC32(bootConfig.boot_json);
+        if (utils::filesystem::replaceWithString(boot_json, to_json().dump())) {
+            utils::filesystem::updateFileCRC32(boot_json);
         }
     }
 

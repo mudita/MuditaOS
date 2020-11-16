@@ -115,8 +115,7 @@ class vfs
     bsp::eMMC emmc;
 #endif
     FF_Disk_t *emmcFFDisk{};
-    Store::BootConfig bootConfig;
-    [[deprecated]] static std::string generateRandomId(size_t length);
+    Store::BootConfig *bootConfig;
 
   private:
     vfsn::utility::vfsNotifier chnNotifier;

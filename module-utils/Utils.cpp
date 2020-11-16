@@ -162,6 +162,7 @@ namespace utils
 
         std::string loadFileAsString(const fs::path &fileToLoad)
         {
+            LOG_DEBUG("loadFileAsString %s", fileToLoad.c_str());
             auto lamb = [](FILE *stream) { fclose(stream); };
             std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
             std::unique_ptr<FILE, decltype(lamb)> fp(fopen(fileToLoad.c_str(), "r"), lamb);
