@@ -40,3 +40,4 @@ class SimCard
 
     SimCardResult convertErrorFromATResult(at::Result);
 };
+
