@@ -63,6 +63,7 @@ GLIBC_2.2.5 {
                 __xstat;
                 __lxstat;
                 __fxstat;
+                __symlink;
         local:
                 *;
 };

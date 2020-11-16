@@ -183,6 +183,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 # They have to be arranged in specific order because of circular dependencies that need to be correctly resolved
 # In case of doubt please contact me: mateusz.piesta@mudita.com
 target_link_libraries(${PROJECT_NAME}
+        iosyscalls
         service-antenna
         service-bluetooth
         module-bluetooth

@@ -10,7 +10,6 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <cstring>
-#include <deprecated/vfs.hpp>
 #include "debug.hpp"
 
 //NOTE: It will be removed in later stage
@@ -36,7 +35,7 @@ namespace
     }
 }
 extern "C" {
-
+    namespace vfs = vfsn::linux::internal;
     int link(const char *oldpath, const char *newpath)
     {
         TRACE_SYSCALL();
@@ -49,9 +48,10 @@ extern "C" {
      int unlink(const char *name)
      {
         TRACE_SYSCALL();
-        auto ret = ff_remove(vfs.relativeToRoot(name).c_str());
+        char namebuf[ffconfigMAX_FILENAME];
+        auto ret = ff_remove(vfs::relative_to_root(namebuf,sizeof namebuf, name));
         if (ret && stdioGET_ERRNO() == EISDIR)
-            ret = ff_deltree(vfs.relativeToRoot(name).c_str(), nullptr, nullptr);
+            ret = ff_deltree(vfs::relative_to_root(namebuf,sizeof namebuf,name), nullptr, nullptr);
         errno = stdioGET_ERRNO();
         return ret;
      }
@@ -60,10 +60,11 @@ extern "C" {
     int stat(const char *file, struct stat *pstat)
     {
         TRACE_SYSCALL();
+        char filebuf[ffconfigMAX_FILENAME];
         FF_Stat_t stat_ff;
-        auto ret = ff_stat(vfs.relativeToRoot(file).c_str(), &stat_ff);
+        auto ret = ff_stat(vfs::relative_to_root(filebuf,sizeof filebuf,file), &stat_ff);
+        std::memset(pstat, 0, sizeof(*pstat));
         if (!ret) {
-            std::memset(pstat, 0, sizeof(*pstat));
             pstat->st_ino  = stat_ff.st_ino;
             pstat->st_size = stat_ff.st_size;
             pstat->st_dev  = stat_ff.st_dev;
@@ -118,7 +119,8 @@ extern "C" {
     int chdir(const char *path)
     {
         TRACE_SYSCALL();
-        auto ret = ff_chdir(vfs.relativeToRoot(path).c_str());
+        char pathbuf[ffconfigMAX_FILENAME];
+        auto ret = ff_chdir(vfs::relative_to_root(pathbuf,sizeof pathbuf,path));
         errno  = stdioGET_ERRNO();
         return ret;
     }
@@ -165,8 +167,10 @@ extern "C" {
     int rename(const char *oldpath, const char *newpath)
     {
         TRACE_SYSCALL();
-        auto ret = ff_rename(vfs.relativeToRoot(oldpath).c_str(),
-                             vfs.relativeToRoot(newpath).c_str(), true);
+        char oldpbuf[ffconfigMAX_FILENAME];
+        char newpbuf[ffconfigMAX_FILENAME];
+        auto ret = ff_rename(vfs::relative_to_root(oldpbuf,sizeof oldpbuf, oldpath),
+                             vfs::relative_to_root(newpbuf,sizeof newpbuf,newpath), true);
         errno  = stdioGET_ERRNO();
         return ret;
     }
@@ -175,7 +179,8 @@ extern "C" {
     int mkdir(const char *pathname, mode_t )
     {
         TRACE_SYSCALL();
-        auto ret = ff_mkdir(vfs.relativeToRoot(pathname).c_str());
+        char pathbuf[ffconfigMAX_FILENAME];
+        auto ret = ff_mkdir(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname));
         errno  = stdioGET_ERRNO();
         return ret;
     }
@@ -228,7 +233,14 @@ extern "C" {
         real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
         return -1;
     }
+
     __asm__(".symver symlink,symlink@GLIBC_2.2.5");
+
+    int __symlink(const char *target, const char *linkpath)
+    {
+        return symlink(target,linkpath);
+    }
+
 
     int fstatat(int dirfd, const char *pathname, struct stat *statbuf,
             int flags)

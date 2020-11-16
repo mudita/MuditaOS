@@ -5,8 +5,8 @@
 #include <errno.h>
 #include <cstring>
 #include "dirent_support.hpp"
-#include <deprecated/vfs.hpp>
 #include "debug.hpp"
+#include <internal.hpp>
 
 
 struct __dirstream {
@@ -24,13 +24,15 @@ extern "C" {
 
     DIR *opendir(const char *dirname)
     {
+        namespace vfs = vfsn::linux::internal;
         TRACE_SYSCALL();
         if(!dirname) {
             errno = EINVAL;
             return nullptr;
         }
         auto dir      = new DIR;
-        dir->dir_data = diren::diropen(errno, vfs.relativeToRoot(dirname).c_str());
+        char dirbuf[ffconfigMAX_FILENAME];
+        dir->dir_data = diren::diropen(errno, vfs::relative_to_root(dirbuf,sizeof dirbuf,dirname));
         if (!dir->dir_data) {
             delete dir;
             return nullptr;

@@ -3,8 +3,8 @@
 
 #include "vfs.hpp"
 #include <purefs/filesystem_paths.hpp>
-
 #include <memory>
+#include <cstring>
 
 #define eMMCHIDDEN_SECTOR_COUNT 8
 #define eMMCPRIMARY_PARTITIONS  2
@@ -351,4 +351,5 @@ auto vfs::getAbsolutePath(std::string_view path) const -> std::string
         return std::string(path);
     }
 }
+
 #pragma GCC diagnostic pop

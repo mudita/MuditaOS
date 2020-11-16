@@ -10,7 +10,6 @@
 #include <handle_mapper.hpp>
 #include "internal.hpp"
 #include "debug.hpp"
-#include <deprecated/vfs.hpp>
 
 
 //NOTE: It will be removed in later stage
@@ -62,10 +61,12 @@ namespace vfsn::linux::internal {
 
 extern "C"
 {
+    namespace vfs = vfsn::linux::internal;
     FILE *fopen(const char *pathname, const char *mode)
     {
         TRACE_SYSCALL();
-        auto ret = ff_fopen(vfs.relativeToRoot(pathname).c_str(), mode);
+        char pathbuf[ffconfigMAX_FILENAME];
+        auto ret = ff_fopen(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname), mode);
         if(ret) {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
             const auto fd = g_handles.insert(ret) + FIRST_FILEDESC;
@@ -267,11 +268,12 @@ extern "C"
                       FILE *__restrict __stream) __wur
     {
         TRACE_SYSCALL();
+        char fnamebuf[ffconfigMAX_FILENAME];
         if( ff_fclose(reinterpret_cast<FF_FILE*>(__stream)) < 0 ) {
             errno = stdioGET_ERRNO();
             return nullptr;
         }
-        auto ret = ff_fopen(vfs.relativeToRoot(__filename).c_str(), __modes);
+        auto ret = ff_fopen(vfs::relative_to_root(fnamebuf,sizeof fnamebuf,__filename), __modes);
         errno = stdioGET_ERRNO();
         return reinterpret_cast<FILE*>(ret);
     }
@@ -351,7 +353,10 @@ extern "C"
     int remove (const char *__filename) __THROW
     {
         TRACE_SYSCALL();
-        auto ret = ff_remove(vfs.relativeToRoot(__filename).c_str());
+        char namebuf[ffconfigMAX_FILENAME];
+        auto ret = ff_remove(vfs::relative_to_root(namebuf,sizeof namebuf, __filename));
+        if (ret && stdioGET_ERRNO() == EISDIR)
+            ret = ff_deltree(vfs::relative_to_root(namebuf,sizeof namebuf,__filename), nullptr, nullptr);
         errno = stdioGET_ERRNO();
         return ret;
     }

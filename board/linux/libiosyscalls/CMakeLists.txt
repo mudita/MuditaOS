@@ -18,9 +18,7 @@ set(INCLUDES
 	"${CMAKE_SOURCE_DIR}/module-vfs/board/freeRTOS_FAT/include"
 	"${CMAKE_SOURCE_DIR}/module-os/FreeRTOS/include"
 	"${CMAKE_SOURCE_DIR}/module-os/board/linux"
-	"${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
 	"${CMAKE_SOURCE_DIR}/module-vfs/board/free_rtos_custom/include"
-	"${CMAKE_SOURCE_DIR}/module-vfs/include/user"
 	"${CMAKE_SOURCE_DIR}/module-utils"
 )
 
@@ -35,7 +33,10 @@ get_target_property( target_options ${PROJECT_NAME} LINK_OPTIONS)
 list(REMOVE_ITEM target_options "-fsanitize=address")
 set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_OPTIONS ${target_options} )
 
-target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--version-script" "-Wl,${CMAKE_CURRENT_SOURCE_DIR}/version.txt")
+target_link_options(${PROJECT_NAME} PRIVATE
+		"-Wl,--version-script"
+		"-Wl,${CMAKE_CURRENT_SOURCE_DIR}/version.txt"
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES} )
 target_link_libraries( ${PROJECT_NAME} dl )
