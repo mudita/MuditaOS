@@ -104,7 +104,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    vfs.updateTimestamp();
+    Store::BootConfig::get()->updateTimestamp();
     return (sys::ReturnCodes::Success);
 }
 
