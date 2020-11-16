@@ -3,16 +3,17 @@
 
 #pragma once
 
-#include <application-phonebook/models/PhonebookModel.hpp>
-#include <string> // for string, allocator
+#include <endpoints/Context.hpp>
+#include <endpoints/DBHelper.hpp>
 
-#include "Common/Query.hpp"
-#include "Context.hpp"
-#include "Service/Service.hpp"
-#include "Service/Common.hpp" // for ReturnCodes
-#include "DBHelper.hpp"       // for DBHelper
-#include "ContactRecord.hpp"  // for ContactRecord
-#include "json/json11.hpp"    // for Json
+#include <Common/Query.hpp>
+#include <ContactRecord.hpp>
+#include <Service/Common.hpp>
+#include <Service/Service.hpp>
+#include <application-phonebook/models/PhonebookModel.hpp>
+#include <json/json11.hpp>
+
+#include <string>
 
 namespace sys
 {

@@ -1,12 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <log/log.hpp>
-#include <string> // for string
 
-#include "Service/Service.hpp"
-#include "json/json11.hpp" // for Json
+#include <Service/Service.hpp>
+#include <json/json11.hpp>
+#include <log/log.hpp>
+
+#include <string>
 
 namespace sys
 {

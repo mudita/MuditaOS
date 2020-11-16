@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <string> // for string
 
-#include "ParserUtils.hpp"
-#include "json/json11.hpp"
 #include "MessageHandler.hpp"
+#include "ParserUtils.hpp"
+
+#include <json/json11.hpp>
+
+#include <string>
 
 namespace sys
 {

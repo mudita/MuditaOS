@@ -1,27 +1,29 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UpdateMuditaOS.hpp"
-#if defined(TARGET_RT1051)
-#include "board/cross/eMMC/eMMC.hpp"
-#endif
-#include <service-desktop/ServiceDesktop.hpp>                     // for ServiceDesktop
-#include <module-apps/application-desktop/ApplicationDesktop.hpp> // for name_desktop
-#include <stdarg.h>                                               // for va_end, va_list, va_start
-#include <stdio.h>                                                // for vsnprintf, snprintf, sprintf
-#include <stdlib.h>                                               // for strtoull
-#include <array>                                                  // for array
-#include <memory> // for unique_ptr, make_shared, allocator, __shared_ptr_access, shared_ptr
+#include <service-desktop/ServiceDesktop.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
-#include "DesktopMessages.hpp"             // for UpdateOsMessage
-#include "Service/Bus.hpp"                 // for Bus
-#include "SystemManager/SystemManager.hpp" // for SystemManager
-#include "crc32/crc32.h"                   // for Crc32_ComputeBuf
-#include "json/json11.hpp"                 // for Json, Json::object
-#include "log/log.hpp"                     // for LOG_INFO, LOG_DEBUG, LOG_ERROR
-#include "microtar/src/microtar.hpp" // for mtar_header_t, mtar_close, mtar_open, mtar_read_data, MTAR_ESUCCESS, mtar_find, mtar_next, mtar_read_header, mtar_t, MTAR_ENOTFOUND, MTAR_ENULLRECORD, MTAR_EOPENFAIL, MTAR_TDIR
-#include "vfs.hpp" // for vfs, tar_buf, os_previous, os_updates, os_current, tmp, vfs::FILE, crc_char_size, vfs::DirectoryEntry, os_version, user_disk, version_string, boot_json, crc32, crc_buf, crc_radix, eMMC_disk
+#include <Service/Bus.hpp>
+#include <SystemManager/SystemManager.hpp>
+#include <crc32/crc32.h>
+#include <json/json11.hpp>
+#include <log/log.hpp>
+#include <microtar/src/microtar.hpp>
+#include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <purefs/filesystem_paths.hpp>
+#include <vfs.hpp>
+
+#if defined(TARGET_RT1051)
+#include <board/cross/eMMC/eMMC.hpp>
+#endif
+
+#include <array>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <memory>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {

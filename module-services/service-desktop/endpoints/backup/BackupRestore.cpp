@@ -3,20 +3,19 @@
 
 #include "BackupRestore.hpp"
 
-#include <assert.h>   // for assert
-#include <stdint.h>   // for uint32_t
-#include <filesystem> // for path
-#include <memory>     // for allocator, unique_ptr
-#include <string>     // for string, operator+, basic_string, char_traits
-#include <vector>     // for vector
-
-#include "vfs.hpp" // for vfs, vfs::DirectoryEntry, os_backup, tar_buf, PATH_BACKUP, vfs::FILE, user_disk
+#include <SystemManager/SystemManager.hpp>
+#include <log/log.hpp>
+#include <microtar/src/microtar.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include "microtar/src/microtar.hpp" // for mtar_close, mtar_header_t, MTAR_ESUCCESS, mtar_strerror, mtar_open, mtar_finalize, mtar_next, mtar_read_data, mtar_read_header, mtar_write_data, mtar_write_file_header, mtar_t, MTAR_TREG
-#include <service-db/DBServiceAPI.hpp>           // for DBServiceAPI
-#include <service-db/DBServiceName.hpp>          // for db
-#include "SystemManager/SystemManager.hpp"       // for SystemManager
-#include "log/log.hpp"                           // for LOG_INFO, LOG_ERROR
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBServiceName.hpp>
+#include <vfs.hpp>
+
+#include <cassert>
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace sys
 {

@@ -1,14 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <string> // for string
+#include <endpoints/Endpoint.hpp>
+#include <parser/ParserUtils.hpp>
 
-#include "Endpoint.hpp" // for Endpoint
-#include "Service/Service.hpp"
-#include "ParserUtils.hpp"    // for parserFSM
-#include "Service/Common.hpp" // for ReturnCodes
+#include <Service/Common.hpp>
+#include <Service/Service.hpp>
+
+#include <string>
 
 namespace parserFSM
 {

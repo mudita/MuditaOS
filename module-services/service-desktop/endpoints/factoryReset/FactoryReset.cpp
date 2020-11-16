@@ -1,18 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
 
-#include <stdint.h>   // for uint32_t
-#include <filesystem> // for path
-#include <memory>     // for unique_ptr, allocator
-#include <vector>     // for vector
-
-#include "vfs.hpp" // for vfs, vfs::DirectoryEntry, copy_buf, os_factory, vfs::FILE, eMMC_disk, vfs::FileAttributes, vfs::FileAttributes::Directory, PATH_FACTORY
+#include <SystemManager/SystemManager.hpp>
+#include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceName.hpp>
-#include "SystemManager/SystemManager.hpp"       // for SystemManager
-#include "log/log.hpp"                           // for LOG_ERROR, LOG_INFO
+#include <vfs.hpp>
+
+#include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <vector>
 
 namespace sys
 {

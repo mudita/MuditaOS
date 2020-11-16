@@ -1,16 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryResetEndpoint.hpp"
 
-#include <Service/Bus.hpp> // for Bus
-#include <memory>          // for make_shared
+#include <endpoints/Context.hpp>
+#include <parser/MessageHandler.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
 
-#include "DesktopMessages.hpp" // for FactoryMessage
-#include "ServiceDesktop.hpp"  // for service_desktop
-#include "Context.hpp"         // for Context
-#include "MessageHandler.hpp"  // for MessageHandler
-#include "json/json11.hpp"     // for Json, Json::object
+#include <Service/Bus.hpp>
+#include <json/json11.hpp>
+
+#include <memory>
 
 auto FactoryResetEndpoint::handle(Context &context) -> void
 {

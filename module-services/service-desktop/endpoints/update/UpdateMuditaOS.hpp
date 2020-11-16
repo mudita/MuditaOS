@@ -1,16 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <module-utils/microtar/src/microtar.hpp> // for mtar_header_t, mtar_t
-#include <vfs.hpp>                                // for PATH_SYS, PATH_TMP
-#include <json/json11.hpp>                        // for Json
-#include <stdint.h>                               // for uint32_t
-#include <filesystem>                             // for path, filesystem
-#include <iosfwd>                                 // for size_t
-#include <string>                                 // for string, allocator
-#include <vector>                                 // for vector
+#include <json/json11.hpp>
+#include <module-utils/microtar/src/microtar.hpp>
+#include <vfs.hpp>
+
+#include <cstdint>
+#include <filesystem>
+#include <iosfwd>
+#include <string>
+#include <vector>
 
 class ServiceDesktop;
 
