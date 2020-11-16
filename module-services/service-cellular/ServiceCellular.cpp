@@ -1036,10 +1036,13 @@ bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
     const std::vector<unsigned int> fakePin({1, 1, 1, 1});
     /// fake puk set to 0 to not cause SIM damage, eg could be set to real one fakePuk({7, 5, 4, 1, 9, 7, 1, 3});
     const std::vector<unsigned int> fakePuk({7, 5, 4, 1, 9, 7, 1, 3});
-    sys::Bus::SendUnicast(std::make_shared<CellularSimVerifyPinRequestMessage>(sim, fakePin, fakePuk),
-                          ServiceCellular::serviceName,
-                          this);
-
+    constexpr bool safety = 0; ///* because this is mockup, for safety reason,
+    ///  test PIN should be not send unconsciously to not lock SIM card accidentally */
+    if (safety) {
+        sys::Bus::SendUnicast(std::make_shared<CellularSimVerifyPinRequestMessage>(sim, fakePin, fakePuk),
+                              ServiceCellular::serviceName,
+                              this);
+    }
     return true;
 }
 
