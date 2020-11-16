@@ -15,21 +15,24 @@ namespace FileIndexer
 {
     constexpr unsigned int FILE_ID_NOT_EXISTS       = 0;
     constexpr unsigned int FILE_RECORD_COLUMN_COUNT = 7;
+    constexpr unsigned int ONE_ROW_FOUND            = 1;
+    constexpr unsigned int ZERO_ROWS_FOUND          = 0;
 
     // refers to file_tab
     struct FileRecord
     {
         unsigned int file_id = FILE_ID_NOT_EXISTS;
-        std::string path     = "";
+        std::string path;
         unsigned int size;
         unsigned int mime_type;
         unsigned int mtime;
-        std::string directory = "";
+        std::string directory;
         unsigned int file_type;
 
         [[nodiscard]] auto RecordEqual(FileRecord fr) const -> bool
         {
-            bool records_equal = (fr.path == path) && (fr.mime_type == mime_type) && (fr.size == size);
+            bool records_equal = (fr.path == path) && (fr.mime_type == mime_type) && (fr.size == size) &&
+                                 (fr.mtime == mtime) && (fr.file_type == file_type) && (fr.directory == directory);
             return records_equal;
         }
 
@@ -46,6 +49,22 @@ namespace FileIndexer
                 file_type = (*query)[6].getInt32();
             }
         }
+        explicit FileRecord(unsigned int fileId,
+                            std::string fpath,
+                            unsigned int fsize,
+                            unsigned int fmime_type,
+                            unsigned int fmtime,
+                            std::string fdirectory,
+                            unsigned int ftype)
+        {
+            file_id   = fileId;
+            path      = fpath;
+            size      = fsize;
+            mime_type = fmime_type;
+            mtime     = fmtime;
+            directory = fdirectory;
+            file_type = ftype;
+        }
     };
 
     // refers to metadata_tab
@@ -59,7 +78,6 @@ namespace FileIndexer
         std::vector<FileRecord> fileList;
         unsigned int list_limit;
         unsigned int list_offset;
-        unsigned int list_size;
         unsigned int count;
     };
 
@@ -70,6 +88,34 @@ namespace FileIndexer
           public:
             explicit FileIndexerMessage(MessageType type = MessageType::FileIndexer) : sys::DataMessage(type){};
             ~FileIndexerMessage() override = default;
+        };
+
+        class RegisterOnFileChange : public FileIndexerMessage
+        {
+          public:
+            RegisterOnFileChange() = default;
+            explicit RegisterOnFileChange(std::string dir) : directory(std::move(dir))
+            {}
+            std::string directory;
+        };
+
+        class UnregisterOnFileChange : public FileIndexerMessage
+        {
+          public:
+            UnregisterOnFileChange() = default;
+            explicit UnregisterOnFileChange(std::string dir) : directory(std::move(dir))
+            {}
+            std::string directory;
+        };
+
+        class FileChanged : public FileIndexerMessage
+        {
+          public:
+            FileChanged() = default;
+            explicit FileChanged(std::string dir) : directory(dir)
+            {}
+
+            std::string directory;
         };
 
         class GetListDirMessage : public FileIndexerMessage
@@ -93,6 +139,10 @@ namespace FileIndexer
             unsigned int getCount()
             {
                 return listDir->count;
+            }
+            auto getResults() -> std::vector<FileRecord>
+            {
+                return listDir->fileList;
             }
         };
 
