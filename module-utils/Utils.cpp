@@ -95,7 +95,7 @@ namespace utils
             }
         }
 
-        bool verifyCRC(const std::string filePath, const unsigned long crc32)
+        bool verifyCRC(const std::string &filePath, unsigned long crc32)
         {
             unsigned long crc32Read;
             auto lamb = [](FILE *stream) { fclose(stream); };
