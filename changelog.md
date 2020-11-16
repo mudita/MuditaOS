@@ -25,6 +25,7 @@
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
 * `[audio]` Fixed crash on attempt to open non-existent file
+* `[audio]` Fixed handling of headset microphone LDO DCDC.
 
 ## [0.45.1 2020-11-06]
 
