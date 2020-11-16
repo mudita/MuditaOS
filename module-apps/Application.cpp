@@ -507,6 +507,12 @@ namespace app
     sys::ReturnCodes Application::DeinitHandler()
     {
         LOG_INFO("Closing an application: %s", GetName().c_str());
+
+        for (const auto &[windowName, window] : windowsStack) {
+            LOG_INFO("Closing a window: %s", windowName.c_str());
+            window->onClose();
+        }
+
         windowsStack.windows.clear();
         return sys::ReturnCodes::Success;
     }
