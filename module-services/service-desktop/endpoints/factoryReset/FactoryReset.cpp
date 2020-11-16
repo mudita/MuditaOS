@@ -9,7 +9,7 @@
 #include <vector>     // for vector
 
 #include "vfs.hpp" // for vfs, vfs::DirectoryEntry, copy_buf, os_factory, vfs::FILE, eMMC_disk, vfs::FileAttributes, vfs::FileAttributes::Directory, PATH_FACTORY
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceName.hpp>
 #include "SystemManager/SystemManager.hpp"       // for SystemManager
 #include "log/log.hpp"                           // for LOG_ERROR, LOG_INFO
@@ -55,12 +55,12 @@ namespace FactoryReset
             (void)sys::SystemManager::DestroyService(dbServiceName, ownerService);
         }
 
-        if (DeleteDirContent(purefs::dir::eMMC_disk) != true) {
+        if (DeleteDirContent(purefs::dir::getRootDiskPath()) != true) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
             return false;
         }
 
-        if (CopyDirContent(factoryOSPath, purefs::dir::eMMC_disk) != true) {
+        if (CopyDirContent(factoryOSPath, purefs::dir::getRootDiskPath()) != true) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
             return false;
         }

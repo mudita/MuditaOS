@@ -203,6 +203,9 @@ target_link_libraries(${PROJECT_NAME}
         ${TARGET_LIBRARIES}
         )
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    target_link_libraries(${PROJECT_NAME} iosyscalls)
+endif()
 
 set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 

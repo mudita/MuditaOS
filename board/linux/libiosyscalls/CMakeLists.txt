@@ -33,7 +33,10 @@ get_target_property( target_options ${PROJECT_NAME} LINK_OPTIONS)
 list(REMOVE_ITEM target_options "-fsanitize=address")
 set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_OPTIONS ${target_options} )
 
-target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--version-script" "-Wl,${CMAKE_CURRENT_SOURCE_DIR}/version.txt")
+target_link_options(${PROJECT_NAME} PRIVATE
+		"-Wl,--version-script"
+		"-Wl,${CMAKE_CURRENT_SOURCE_DIR}/version.txt"
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES} )
 target_link_libraries( ${PROJECT_NAME} dl )

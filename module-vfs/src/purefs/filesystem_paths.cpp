@@ -1,7 +1,30 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
+
+// FIXME: Remove it when deprecated API will be removed
+#undef PATH_SYS
+#undef PATH_USER
+#undef PATH_CURRENT
+#undef PATH_PREVIOUS
+#undef PATH_UPDATES
+#undef PATH_TMP
+#undef PATH_BACKUP
+#undef PATH_FACTORY
+
+namespace
+{
+    constexpr inline auto PATH_SYS      = "/sys";
+    constexpr inline auto PATH_USER     = "user";
+    constexpr inline auto PATH_CURRENT  = "current";
+    constexpr inline auto PATH_PREVIOUS = "previous";
+    constexpr inline auto PATH_UPDATES  = "updates";
+    constexpr inline auto PATH_TMP      = "tmp";
+    constexpr inline auto PATH_BACKUP   = "backup";
+    constexpr inline auto PATH_FACTORY  = "factory";
+    constexpr inline auto eMMC_disk     = PATH_SYS;
+} // namespace
 
 namespace purefs
 {
@@ -12,6 +35,10 @@ namespace purefs
 
     namespace dir
     {
+        std::filesystem::path getRootDiskPath() noexcept
+        {
+            return std::filesystem::path{eMMC_disk};
+        }
         std::filesystem::path getUserDiskPath() noexcept
         {
             return std::filesystem::path{eMMC_disk} / PATH_USER;

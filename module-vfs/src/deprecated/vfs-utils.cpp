@@ -7,7 +7,7 @@
 #include <ticks.hpp>
 #include <source/version.hpp>
 
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 std::string vfs::generateRandomId(size_t length = 0)
 {
@@ -147,7 +147,7 @@ bool vfs::loadBootConfig(const fs::path &bootJsonPath)
     if (parseErrors == "") {
         bootConfig.os_type  = bootConfig.boot_json_parsed[purefs::json::main][purefs::json::os_type].string_value();
         bootConfig.os_image = bootConfig.boot_json_parsed[purefs::json::main][purefs::json::os_image].string_value();
-        bootConfig.os_root_path = purefs::createPath(purefs::dir::eMMC_disk, bootConfig.os_type);
+        bootConfig.os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), bootConfig.os_type);
         bootConfig.boot_json    = bootJsonPath;
         bootConfig.bootloader_verion =
             bootConfig.boot_json_parsed[purefs::json::bootloader][purefs::json::os_version].string_value();
@@ -160,7 +160,7 @@ bool vfs::loadBootConfig(const fs::path &bootJsonPath)
     else {
         bootConfig.os_type      = PATH_CURRENT;
         bootConfig.os_image     = purefs::file::boot_bin;
-        bootConfig.os_root_path = purefs::createPath(purefs::dir::eMMC_disk, bootConfig.os_type);
+        bootConfig.os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), bootConfig.os_type);
         bootConfig.boot_json    = bootJsonPath;
         bootConfig.timestamp    = utils::time::Timestamp().str("%c");
         bootConfig.os_version   = std::string(VERSION);

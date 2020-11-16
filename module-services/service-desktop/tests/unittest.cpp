@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <vfs_paths.hpp>    // for eMMC_disk
+#include <purefs/filesystem_paths.hpp> // for eMMC_disk
 #include <catch2/catch.hpp> // for AssertionHandler, operator""_catch_sr, SourceLineInfo, StringRef, REQUIRE, Section, SECTION, SectionInfo, TEST_CASE
 #include <memory>           // for allocator, unique_ptr, make_unique, operator==, allocator_traits<>::value_type
 #include <filesystem>       // for path
@@ -55,7 +55,7 @@ TEST_CASE("System Update Tests")
 TEST_CASE("Factory Reset Test")
 {
 
-    std::string sysdir = purefs::dir::eMMC_disk;
+    std::string sysdir = purefs::dir::getRootDiskPath();
     sysdir += "/factory-test/sys";
     std::string factorydir = sysdir + "/factory";
     REQUIRE(FactoryReset::DeleteDirContent(sysdir) == true);
