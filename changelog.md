@@ -9,6 +9,7 @@
 * `[file indexer db]` Added messages for File Indexer db.
 * `[settings]` Added Torch window (front-end only).
 * `[audio]` Added support for Bluetooth audio profiles
+* `[audio]` Added support for headset microphone.
 * `[filesystem]` Added support for standard file IO library.
 * [`[messages]`] Added fetching text messages at phone startup.
 
@@ -24,6 +25,7 @@
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
 * `[audio]` Fixed crash on attempt to open non-existent file
+* `[audio]` Fixed handling of headset microphone LDO DCDC.
 
 ## [0.45.1 2020-11-06]
 

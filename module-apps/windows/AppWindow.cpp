@@ -21,12 +21,6 @@ namespace gui
         setSize(style::window_width, style::window_height);
     }
 
-    AppWindow::~AppWindow()
-    {
-        LOG_INFO("deleting window: %s", name.c_str());
-        onClose();
-    }
-
     void AppWindow::destroyInterface()
     {
         erase(bottomBar);
