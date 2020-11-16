@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <ff_stdio_listdir_recursive.h>
 #include <vfs.hpp>
-#include <vfs_paths.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <Service/Bus.hpp>
 #include "Constants.hpp"
 

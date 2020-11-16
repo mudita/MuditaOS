@@ -6,6 +6,7 @@
 #include <cstring>
 #include "dirent_support.hpp"
 #include "debug.hpp"
+#include <internal.hpp>
 
 
 struct __dirstream {
@@ -16,19 +17,22 @@ struct __dirstream {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 extern "C" {
     using namespace vfsn::linux::internal;
 
     DIR *opendir(const char *dirname)
     {
+        namespace vfs = vfsn::linux::internal;
         TRACE_SYSCALL();
         if(!dirname) {
             errno = EINVAL;
             return nullptr;
         }
         auto dir      = new DIR;
-        dir->dir_data = diren::diropen(errno, dirname);
+        char dirbuf[ffconfigMAX_FILENAME];
+        dir->dir_data = diren::diropen(errno, vfs::relative_to_root(dirbuf,sizeof dirbuf,dirname));
         if (!dir->dir_data) {
             delete dir;
             return nullptr;

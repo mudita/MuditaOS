@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "vfs.hpp"
-#include "vfs_paths.hpp"
-
+#include <purefs/filesystem_paths.hpp>
 #include <memory>
+#include <cstring>
 
 #define eMMCHIDDEN_SECTOR_COUNT 8
 #define eMMCPRIMARY_PARTITIONS  2
@@ -17,6 +17,9 @@
 disk. */
 #define eMMCSIGNATURE             0x61606362
 #define mainIO_MANAGER_CACHE_SIZE (15UL * FSL_SDMMC_DEFAULT_BLOCK_SIZE)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
@@ -228,7 +231,7 @@ std::string vfs::relativeToRoot(const std::string path)
         if (bootConfig.os_root_path.root_directory() == fsPath.root_directory())
             return fsPath;
         else
-            return purefs::createPath(purefs::dir::eMMC_disk, fsPath.relative_path()).c_str();
+            return purefs::createPath(purefs::dir::getRootDiskPath(), fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
@@ -348,3 +351,5 @@ auto vfs::getAbsolutePath(std::string_view path) const -> std::string
         return std::string(path);
     }
 }
+
+#pragma GCC diagnostic pop

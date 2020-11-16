@@ -2,13 +2,27 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 //
 #include "vfs.hpp"
-#include "vfs_paths.hpp"
+#include <purefs/filesystem_paths.hpp>
 #include "ff_image_user_disk.hpp"
+#include <cstring>
 
 namespace
 {
     constexpr auto image_name = "PurePhone.img";
 }
+
+// NOTE: Ugly hack relative to root we don't want to use C++ in linking
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+//! Ugly hack for preload will be removed later
+namespace vfsn::linux::internal
+{
+    const char *relative_to_root(char *out_path, size_t out_path_len, const char *inpath)
+    {
+        return std::strncpy(out_path, vfs.relativeToRoot(inpath).c_str(), out_path_len);
+    }
+} // namespace vfsn::linux::internal
 
 vfs::vfs()
 {}
@@ -24,12 +38,12 @@ void vfs::Init()
         LOG_WARN("Disk manager already initialized");
         return;
     }
-    emmcFFDisk = freertos_fat::internals::diskInit(purefs::dir::eMMC_disk, image_name);
+    emmcFFDisk = freertos_fat::internals::diskInit(purefs::dir::getRootDiskPath().c_str(), image_name);
 
     /* Print out information on the disk. */
     freertos_fat::internals::diskShowPartition(emmcFFDisk);
 
-    bootConfig.os_root_path = purefs::dir::eMMC_disk;
+    bootConfig.os_root_path = purefs::dir::getRootDiskPath();
 
     if (loadBootConfig(getCurrentBootJSON())) {
         LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
@@ -56,3 +70,4 @@ void vfs::Init()
     }
     chnNotifier.onFileSystemInitialized();
 }
+#pragma GCC diagnostic pop

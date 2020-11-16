@@ -6,7 +6,7 @@
 
 #include <log/log.hpp>
 #include <module-sys/Service/Bus.hpp>
-#include <module-vfs/vfs.hpp>
+#include <vfs.hpp>
 
 #include <memory>
 

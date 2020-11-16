@@ -3,7 +3,7 @@
 
 #include "EventsDB.hpp"
 
-#include <module-vfs/vfs.hpp>
+#include <vfs.hpp>
 
 const char *EventsDB::dbName = USER_PATH("events.db");
 

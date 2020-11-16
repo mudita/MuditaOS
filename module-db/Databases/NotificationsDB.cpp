@@ -3,7 +3,7 @@
 
 #include "NotificationsDB.hpp"
 
-#include <module-vfs/vfs.hpp>
+#include <vfs.hpp>
 
 const char *NotificationsDB::dbName = USER_PATH("notifications.db");
 

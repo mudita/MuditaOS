@@ -12,6 +12,10 @@
 #include "debug.hpp"
 
 
+//NOTE: It will be removed in later stage
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 namespace
 {
     constexpr auto FIRST_FILEDESC = 3;
@@ -57,10 +61,12 @@ namespace vfsn::linux::internal {
 
 extern "C"
 {
+    namespace vfs = vfsn::linux::internal;
     FILE *fopen(const char *pathname, const char *mode)
     {
         TRACE_SYSCALL();
-        auto ret = ff_fopen(pathname, mode);
+        char pathbuf[ffconfigMAX_FILENAME];
+        auto ret = ff_fopen(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname), mode);
         if(ret) {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
             const auto fd = g_handles.insert(ret) + FIRST_FILEDESC;
@@ -262,11 +268,12 @@ extern "C"
                       FILE *__restrict __stream) __wur
     {
         TRACE_SYSCALL();
+        char fnamebuf[ffconfigMAX_FILENAME];
         if( ff_fclose(reinterpret_cast<FF_FILE*>(__stream)) < 0 ) {
             errno = stdioGET_ERRNO();
             return nullptr;
         }
-        auto ret = ff_fopen(__filename, __modes);
+        auto ret = ff_fopen(vfs::relative_to_root(fnamebuf,sizeof fnamebuf,__filename), __modes);
         errno = stdioGET_ERRNO();
         return reinterpret_cast<FILE*>(ret);
     }
@@ -346,7 +353,10 @@ extern "C"
     int remove (const char *__filename) __THROW
     {
         TRACE_SYSCALL();
-        auto ret = ff_remove(__filename);
+        char namebuf[ffconfigMAX_FILENAME];
+        auto ret = ff_remove(vfs::relative_to_root(namebuf,sizeof namebuf, __filename));
+        if (ret && stdioGET_ERRNO() == EISDIR)
+            ret = ff_deltree(vfs::relative_to_root(namebuf,sizeof namebuf,__filename), nullptr, nullptr);
         errno = stdioGET_ERRNO();
         return ret;
     }
@@ -387,7 +397,8 @@ extern "C"
         errno = ENOTSUP;
     }
     __asm__(".symver setbuffer,setbuffer@GLIBC_2.2.5");
-/* Make STREAM line-buffered.  */
+
+    /* Make STREAM line-buffered.  */
     void setlinebuf (FILE *__stream) __THROW
     {
         TRACE_SYSCALL();
@@ -397,3 +408,4 @@ extern "C"
     __asm__(".symver setlinebuf,setlinebuf@GLIBC_2.2.5");
 
 }
+#pragma GCC diagnostic pop
