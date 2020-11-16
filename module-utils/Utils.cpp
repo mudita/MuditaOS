@@ -33,7 +33,7 @@ namespace utils
 
             if (fp.get() != nullptr) {
                 auto crc32Buf = std::make_unique<char[]>(purefs::buffer::crc_char_size);
-                int written = 0;
+                int written   = 0;
                 computeCRC32(fp.get(), &fileCRC32);
                 LOG_INFO("updateFileCRC32 writing new crc32 %08" PRIX32 " for %s",
                          static_cast<std::uint32_t>(fileCRC32),
@@ -95,7 +95,7 @@ namespace utils
             }
         }
 
-        bool verifyCRC(const std::string &filePath, unsigned long crc32)
+        bool verifyCRC32Value(const std::string &filePath, const unsigned long crc32)
         {
             unsigned long crc32Read;
             auto lamb = [](FILE *stream) { fclose(stream); };
@@ -136,7 +136,7 @@ namespace utils
                 const unsigned long crc32Read = strtoull(crcBuf.get(), nullptr, purefs::buffer::crc_radix);
 
                 LOG_INFO("verifyCRC read %s string:\"%s\" hex:%08lX", crcFilePath.c_str(), crcBuf.get(), crc32Read);
-                return verifyCRC(filePath, crc32Read);
+                return verifyCRC32Value(filePath, crc32Read);
             }
             LOG_ERROR("verifyCRC can't open %s", crcFilePath.c_str());
             return false;

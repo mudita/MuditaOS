@@ -24,7 +24,7 @@ void vfs::Init()
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
 
-    bootConfig = Store::BootConfig::get();
+    bootConfig              = Store::BootConfig::get();
     bootConfig.os_root_path = purefs::dir::getRootDiskPath();
 
     if (bootConfig.loadBootConfig(bootConfig.getCurrentBootJSON())) {

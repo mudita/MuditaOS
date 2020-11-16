@@ -251,7 +251,7 @@ namespace utils
 
         void computeCRC32(FILE *file, unsigned long *outCrc32);
 
-        bool verifyCRC(const std::string filePath, const unsigned long crc32);
+        bool verifyCRC32Value(const std::string &filePath, const unsigned long crc32);
 
         bool verifyCRC(const fs::path filePath);
 

@@ -420,7 +420,7 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 {
     status = updateos::UpdateState::CreatingDirectories;
 
-    updateTempDirectory = purefs::dir::getTemporaryPath() / vfs::generateRandomId(updateos::prefix_len);
+    updateTempDirectory = purefs::dir::getTemporaryPath() / utils::filesystem::generateRandomId(updateos::prefix_len);
 
     informDebug("Temp dir for update %s", updateTempDirectory.c_str());
 
