@@ -6,7 +6,7 @@
 #include <memory>
 #include <mutex.hpp>
 #include <vfs.hpp>
-#include <vfs_paths.hpp>
+#include <module-vfs/include/user/purefs/filesystem_paths.hpp>
 #include <Utils.hpp>
 #include <source/version.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -115,7 +115,7 @@ namespace Store
                 bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_type].string_value();
             bootConfig.os_image =
                 bootConfig.boot_json_parsed[BootConfigJson::main][BootConfigJson::os_image].string_value();
-            bootConfig.os_root_path = fs::path(purefs::dir::eMMC_disk) / bootConfig.os_type;
+            bootConfig.os_root_path = purefs::dir::getRootDiskPath() / bootConfig.os_type;
             bootConfig.boot_json    = bootJsonPath;
             bootConfig.bootloader_verion =
                 bootConfig.boot_json_parsed[BootConfigJson::bootloader][BootConfigJson::os_version].string_value();
@@ -128,7 +128,7 @@ namespace Store
         else {
             bootConfig.os_type      = PATH_CURRENT;
             bootConfig.os_image     = purefs::file::boot_bin;
-            bootConfig.os_root_path = fs::path(purefs::dir::eMMC_disk) / bootConfig.os_type;
+            bootConfig.os_root_path = purefs::dir::getRootDiskPath() / bootConfig.os_type;
             bootConfig.boot_json    = bootJsonPath;
             bootConfig.timestamp    = utils::time::Timestamp().str("%c");
             bootConfig.os_version   = std::string(VERSION);
