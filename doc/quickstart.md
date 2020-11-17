@@ -150,8 +150,15 @@ cd ./config/ && ./bootstrap.sh && cd ../                       # bootstrap requi
 ./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
 cd <build-dir>                                                 # build dir depends on configuration
 make -j                                                        # build
-./PurePhone                                                    # run PurePhone - emulator screen will pop up
+./PurePhone                                                    # run PurePhone - emulator screen will pop up (on the Linux filesystem)
 ```
+
+If you want to run the emulator with image and our VFS implementation
+you need to run the image through the script:
+```bash
+    ./run_emulator_on_filesystem_image.sh
+```
+
 ## Super dirty quickstart with unit tests
 
 After going through the Super dirty quickstart on Linux, run the following commands to build and run all unit tests:
