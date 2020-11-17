@@ -13,6 +13,12 @@
 #include <filesystem>
 #include <module-utils/json/json11.hpp>
 
+#ifndef TARGET_Linux
+#define lockMutex(x) cpp_freertos::LockGuard lock(x);
+#else
+#define lockMutex(x)
+#endif
+
 namespace cpp_freertos
 {
     // fw decl

@@ -85,25 +85,25 @@ namespace Store
 
     void BootConfig::setRootPath(const std::filesystem::path &newRootPath)
     {
-        cpp_freertos::LockGuard lock(bootConfigMutex);
+        lockMutex(bootConfigMutex);
         os_root_path = newRootPath;
     }
 
     const std::filesystem::path BootConfig::getOSRootPath()
     {
-        cpp_freertos::LockGuard lock(bootConfigMutex);
+        lockMutex(bootConfigMutex);
         return (os_root_path);
     }
 
     const std::string BootConfig::getOSType()
     {
-        cpp_freertos::LockGuard lock(bootConfigMutex);
+        lockMutex(bootConfigMutex);
         return (os_type);
     }
 
     const std::string BootConfig::getBootloaderVersion()
     {
-        cpp_freertos::LockGuard lock(bootConfigMutex);
+        lockMutex(bootConfigMutex);
         return (bootloader_verion);
     }
 
@@ -117,7 +117,7 @@ namespace Store
 
         boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
 
-        cpp_freertos::LockGuard lock(bootConfigMutex);
+        lockMutex(bootConfigMutex);
         if (parseErrors == "") {
             os_type           = boot_json_parsed[BootConfigJson::main][BootConfigJson::os_type].string_value();
             os_image          = boot_json_parsed[BootConfigJson::main][BootConfigJson::os_image].string_value();
