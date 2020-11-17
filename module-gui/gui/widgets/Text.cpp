@@ -602,4 +602,23 @@ namespace gui
         }
     }
 
+    TextBackup Text::backupText() const
+    {
+        return TextBackup{std::list<TextBlock>(document->getBlocks().begin(), document->getBlocks().end()),
+                          cursor->getPosOnScreen()};
+    }
+
+    void Text::restoreFrom(const TextBackup &backup)
+    {
+        setText(std::make_unique<TextDocument>(backup.document));
+
+        // If backup cursor position greater than new text length do not move cursor.
+        if (getText().length() > backup.cursorPos) {
+            auto cursorPosDiff = getText().length() - backup.cursorPos;
+
+            // Move cursor to backup position from end of document.
+            cursor->TextCursor::moveCursor(NavigationDirection::LEFT, cursorPosDiff);
+        }
+    };
+
 } /* namespace gui */
