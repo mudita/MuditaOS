@@ -30,8 +30,8 @@ namespace gui
             End,   /// we hit end of document
             Up,    /// we moved up a line
             Down,  /// we moved down a line
-
-            InLine, /// no action - passed movement by `0` or we are just somewhere comfty in visible range
+            Left,  /// we moved left inline
+            Right, /// we moved right inline
 
             Error, /// error - now not implemented
         };
@@ -46,6 +46,7 @@ namespace gui
         /// - with_update - updates position in parent ( if false not - means we handled it already with i.e. addChar or
         /// removeChar)
         virtual Move moveCursor(NavigationDirection direction);
+        virtual Move moveCursor(NavigationDirection direction, unsigned int n);
         void reset();
 
         // TODO note to self - here should be too UTF8 char handling, not in document...
@@ -60,7 +61,7 @@ namespace gui
         TextCursor &operator<<(TextBlock);
         void removeChar();
 
-        auto getPosOnScreen() const
+        [[nodiscard]] auto getPosOnScreen() const
         {
             return pos_on_screen;
         }
