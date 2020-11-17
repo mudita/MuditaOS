@@ -15,13 +15,11 @@
 #include "bsp/keyboard/key_codes.hpp"                   // for bsp
 #include "gui/Common.hpp"                               // for ShowMode
 #include "projdefs.h"                                   // for pdMS_TO_TICKS
-#include "service-evtmgr/messages/EVMessages.hpp"       // for TorchStateMe...
 #include <service-appmgr/ApplicationManifest.hpp>
 #include <list>                                         // for list
 #include <map>                                          // for allocator, map
 #include <memory>                                       // for make_shared
 #include <module-bsp/bsp/torch/torch.hpp>               // for State, State...
-#include <module-services/service-evtmgr/Constants.hpp> // for evt_manager
 #include <stdint.h>                                     // for uint32_t
 #include <string>                                       // for string
 #include <utility>                                      // for move, pair

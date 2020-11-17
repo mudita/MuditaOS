@@ -23,6 +23,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-antenna
         service-audio
+        service-evtmgr
         module-bsp
         module-cellular
     )

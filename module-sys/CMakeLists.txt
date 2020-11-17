@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+﻿cmake_minimum_required(VERSION 3.14)
 
 project(module-sys VERSION 1.0
         DESCRIPTION "Core module library")
@@ -26,7 +26,11 @@ endif()
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-evtmgr
+    PUBLIC
+        module-os)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

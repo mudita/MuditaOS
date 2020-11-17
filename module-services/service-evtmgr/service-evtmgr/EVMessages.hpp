@@ -1,20 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_
-#define MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_
+#pragma once
 
-#include <string>
-#include <Service/Message.hpp>
-#include <MessageType.hpp>
-#include <SwitchData.hpp>
-#include "Service/Service.hpp"
-#include "bsp/keyboard/key_codes.hpp"
-#include "bsp/common.hpp"
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "bsp/torch/torch.hpp"
+
+#include <MessageType.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <SwitchData.hpp>
+#include <bsp/cellular/bsp_cellular.hpp>
+#include <bsp/common.hpp>
+#include <bsp/keyboard/key_codes.hpp>
+#include <bsp/torch/torch.hpp>
+
+#include <string>
 
 namespace sevm
 {
@@ -111,7 +112,7 @@ namespace sevm
         TorchStateMessage(bsp::torch::Action direction) : Message(MessageType::EVMTorchStateMessage), action(direction)
         {}
         bsp::torch::Action action;
-        bsp::torch::State state = bsp::torch::State::off;
+        bsp::torch::State state                  = bsp::torch::State::off;
         bsp::torch::ColourTemperature colourTemp = bsp::torch::ColourTemperature::no_change;
     };
 
@@ -124,5 +125,3 @@ namespace sevm
     };
 
 } /* namespace sevm*/
-
-#endif /* MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_ */

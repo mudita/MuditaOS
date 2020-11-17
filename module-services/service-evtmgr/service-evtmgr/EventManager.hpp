@@ -1,28 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * EventManager.hpp
- *
- *  Created on: 22 maj 2019
- *      Author: robert
- */
+#pragma once
 
-#ifndef MODULE_SERVICES_SERVICE_KBD_EVENTMANAGER_HPP_
-#define MODULE_SERVICES_SERVICE_KBD_EVENTMANAGER_HPP_
+#include <MessageType.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Worker.hpp>
+#include <bsp/common.hpp>
+#include <bsp/keyboard/key_codes.hpp>
 
-#include <stdint.h>    // for uint32_t
-#include <sys/types.h> // for time_t
-#include <memory>      // for unique_ptr
-#include <string>      // for string
-
-#include "bsp/keyboard/key_codes.hpp"
-#include "Service/Service.hpp" // for Service
-#include "Service/Message.hpp" // for DataMessage (ptr only), MessagePointer, ResponseMessage (ptr only)
-#include "Service/Worker.hpp"
-#include "MessageType.hpp"
-#include "bsp/common.hpp"
-#include "Service/Common.hpp" // for ReturnCodes, ServicePowerMode
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <sys/types.h>
 
 class WorkerEvent;
 
@@ -67,5 +59,3 @@ class EventManager : public sys::Service
      */
     static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
 };
-
-#endif /* MODULE_SERVICES_SERVICE_KBD_EventManager_HPP_ */
