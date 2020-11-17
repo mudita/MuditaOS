@@ -33,7 +33,7 @@ namespace vfsn::internal
     {
         auto open_to_fopen_flags(int flags)
         {
-            if (flags & O_RDONLY) {
+            if ((flags & O_RDONLY) || !flags) {
                 return "r";
             }
             else if (flags & (O_WRONLY | O_CREAT | O_TRUNC)) {
