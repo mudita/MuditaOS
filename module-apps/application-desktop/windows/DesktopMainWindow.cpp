@@ -93,6 +93,8 @@ namespace gui
         if (app->lockHandler.lock.isLocked() && app->lockHandler.lock.getLockType() == PinLock::LockType::Screen) {
 
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setActive(BottomBar::Side::RIGHT, false);
             topBar->setActive(TopBar::Elements::LOCK, true);
             inputCallback = nullptr;
             setFocusItem(nullptr);
@@ -273,6 +275,7 @@ namespace gui
         auto onNotificationFocus = [this](bool isFocused) -> void {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_show"), isFocused);
             bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"), isFocused);
+            bottomBar->setActive(BottomBar::Side::LEFT, !isFocused);
         };
 
         if (app->notifications.notSeen.Calls > 0) {
@@ -299,8 +302,7 @@ namespace gui
 
         notifications->focusChangedCallback = [this, app](Item &) -> bool {
             if (notifications->focus == false) {
-                LOG_DEBUG("All notifications removed, notification box lost focus");
-                bottomBar->setActive(BottomBar::Side::RIGHT, false);
+                LOG_DEBUG("Notification box lost focus");
                 setFocusItem(nullptr);
                 setActiveState(app);
                 return true;
@@ -313,27 +315,25 @@ namespace gui
     auto DesktopMainWindow::setActiveState(app::ApplicationDesktop *app) -> bool
     {
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
-        if (app->notifications.notSeen.areEmpty() != true) {
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear_all"));
-            inputCallback = [this, app](Item &, const InputEvent &inputEvent) -> bool {
-                if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_RF) && getFocusItem() == nullptr) {
-                    LOG_DEBUG("KEY_RF pressed to clear all notifications");
-                    setFocusItem(notifications);
-                    return notifications->clearAll(inputEvent);
-                }
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_calls"));
+        auto hasNotifications = !app->notifications.notSeen.areEmpty();
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear_all"), hasNotifications);
+
+        inputCallback = [this, app, hasNotifications](Item &, const InputEvent &inputEvent) -> bool {
+            if (!inputEvent.isShortPress()) {
                 return false;
-            };
-        }
-        else {
-            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_calls"));
-            inputCallback = [app](Item &, const InputEvent &inputEvent) -> bool {
-                if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LF)) {
-                    LOG_DEBUG("KEY_LF pressed to navigate to calls");
-                    return app->showCalls();
-                }
-                return false;
-            };
-        }
+            }
+            if (inputEvent.is(KeyCode::KEY_RF) && hasNotifications) {
+                LOG_DEBUG("KEY_RF pressed to clear all notifications");
+                setFocusItem(notifications);
+                return notifications->clearAll(inputEvent);
+            }
+            if (inputEvent.is(gui::KeyCode::KEY_LF)) {
+                LOG_DEBUG("KEY_LF pressed to navigate to calls");
+                return app->showCalls();
+            }
+            return false;
+        };
         return true;
     }
 

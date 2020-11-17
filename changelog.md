@@ -4,6 +4,7 @@
 
 ## Added
 
+* `[gui][desktop]` SIM PIN flow charts added
 * `[cellular]` Added call request type recognition (URC).
 * `[calendar]` Added a new field for date of the event when the user adds/edits event.
 * `[file indexer db]` Added messages for File Indexer db.
@@ -22,6 +23,7 @@
 
 ### Fixed
 
+* `[desktop]` Absent call button on desktop with notifications fix
 * `[messages]` Fixed clearing text on options/recipient choice in new message window.
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
