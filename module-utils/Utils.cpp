@@ -12,11 +12,11 @@ namespace utils
     {
         bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite)
         {
-            auto lamb = [](FILE *stream) { fclose(stream); };
-            std::unique_ptr<FILE, decltype(lamb)> fp(fopen(fileToModify.c_str(), "w"), lamb);
+            auto lamb = [](vfs::FILE *stream) { vfs.fclose(stream); };
+            std::unique_ptr<vfs::FILE, decltype(lamb)> fp(vfs.fopen(fileToModify.c_str(), "w"), lamb);
 
             if (fp.get() != nullptr) {
-                size_t dataWritten = fprintf(fp.get(), stringToWrite.c_str());
+                size_t dataWritten = vfs.fprintf(fp.get(), stringToWrite.c_str());
                 return dataWritten == stringToWrite.length();
             }
             else {
