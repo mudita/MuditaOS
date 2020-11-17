@@ -8,8 +8,8 @@
 #include <map>
 #include <functional>
 
-#include "CallRequest.hpp"
-#include "MmiRequest.hpp"
+#include "service-cellular/requests/CallRequest.hpp"
+#include "service-cellular/requests/SupplementaryServicesRequest.hpp"
 
 namespace call_request
 {

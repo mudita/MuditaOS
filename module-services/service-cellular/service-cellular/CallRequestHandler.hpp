@@ -10,7 +10,7 @@ namespace call_request
     class IMEIRequest;
     class USSDRequest;
     class CallRequest;
-    class MmiRequest;
+    class SupplementaryServicesRequest;
 
     class CallRequestHandler
     {
@@ -18,6 +18,6 @@ namespace call_request
         virtual void handle(IMEIRequest &request, at::Result &result) = 0;
         virtual void handle(USSDRequest &request, at::Result &result) = 0;
         virtual void handle(CallRequest &request, at::Result &result) = 0;
-        virtual void handle(MmiRequest &request, at::Result &result)  = 0;
+        virtual void handle(SupplementaryServicesRequest &request, at::Result &result) = 0;
     };
 } // namespace call_request

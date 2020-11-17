@@ -15,7 +15,7 @@ class CellularCallRequestHandler : public CallRequestHandler
     {}
 
     void handle(IMEIRequest &request, at::Result &result) final;
-    void handle(MmiRequest &request, at::Result &result) final;
+    void handle(SupplementaryServicesRequest &request, at::Result &result) final;
     void handle(USSDRequest &request, at::Result &result) final;
     void handle(CallRequest &request, at::Result &result) final;
   private:

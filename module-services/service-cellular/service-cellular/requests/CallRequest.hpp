@@ -4,7 +4,7 @@
 #pragma once
 
 #include <at/Result.hpp>
-#include "CallRequestHandler.hpp"
+#include "service-cellular/CallRequestHandler.hpp"
 
 namespace call_request
 {

@@ -1,0 +1,44 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
+
+#include "SupplementaryServicesRequest.hpp"
+
+namespace call_request
+{
+    class CallForwardingRequest : public SupplementaryServicesRequest
+    {
+      public:
+        CallForwardingRequest(const std::string &forwardReason, const std::string &data, GroupMatch matchGroups)
+            : SupplementaryServicesRequest(data, matchGroups), forwardReason(forwardReason)
+        {}
+
+        static std::unique_ptr<CallForwardingRequest> create(const std::string &serviceCode,
+                                                             const std::string &data,
+                                                             GroupMatch matchGroups);
+
+        auto command() -> std::string final;
+        void handle(CallRequestHandler &h, at::Result &result) final;
+
+      private:
+        static constexpr inline auto addressFormatTypeInternational = "145";
+        static constexpr inline auto addressFormatTypeDefault       = "129";
+        static constexpr inline auto subaddrDefault                 = "128";
+
+        std::string forwardReason;
+        std::string &phoneNumber           = supplementaryInfoA;
+        std::string &basicServiceGroup     = supplementaryInfoB;
+        std::string &noReplyConditionTimer = supplementaryInfoB;
+
+        // command decomposition according to EC25&EC21_AT_Commands_Manual_V1.3
+        auto getCommandReason() const -> std::string;
+        auto getCommandMode() const -> std::string;
+        auto getCommandNumber() const -> std::string;
+        auto getCommandType() const -> std::string;
+        auto getCommandClass() const -> std::string;
+        auto getCommandSubAddr() const -> std::string;
+        auto getCommandSatype() const -> std::string;
+        auto getCommandTime() const -> std::string;
+    };
+}; // namespace call_request

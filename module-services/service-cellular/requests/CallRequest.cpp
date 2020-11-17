@@ -4,9 +4,10 @@
 #include <string>
 #include <memory>
 
-#include "service-cellular/CallRequest.hpp"
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
+
+#include "service-cellular/requests/CallRequest.hpp"
 
 namespace call_request
 {

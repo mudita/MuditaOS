@@ -4,17 +4,17 @@
 #pragma once
 
 #include <at/Result.hpp>
-#include "CallRequest.hpp"
+#include "service-cellular/requests/CallRequest.hpp"
 
 namespace call_request
 {
-    constexpr auto MMIRegex =
+    constexpr inline auto SupplementaryServicesRegex =
         "^(\\*|\\*\\*|\\*\\#|\\#|\\#\\#)(\\d{2,3})(?:\\*([^\\*\\#]+))?(?:\\*([^\\*\\#]+))?(?:\\*([^\\*\\#]+))?\\#";
 
     /**
      * (according to 3GPP TS 22.030 V16.0.0):
      */
-    enum class MMIRegexGroups
+    enum class SupplementaryServicesRegexGroups
     {
         ProcedureType, //! (\*|\*\*|\*\#|\#|\#\#)
         //!    * (activation/registration),
@@ -28,9 +28,12 @@ namespace call_request
         SupInfoC     //! (?:\*([^\*\#]+))  - Supplementary Information C (optional)
     };
 
-    class MmiRequest : public Request
+    class SupplementaryServicesRequest : public Request
     {
-      private:
+      public:
+        static std::unique_ptr<SupplementaryServicesRequest> create(const std::string &data, GroupMatch matchGroups);
+        SupplementaryServicesRequest(const std::string &data, GroupMatch matchGroups);
+
         enum class ProcedureType
         {
             Deactivation,
@@ -48,8 +51,15 @@ namespace call_request
         std::string supplementaryInfoC;
         ProcedureType procedureType;
 
-      public:
-        static std::unique_ptr<MmiRequest> create(const std::string &data, GroupMatch matchGroups);
-        MmiRequest(const std::string &data, GroupMatch matchGroups);
+        static constexpr inline auto atInformationClassVoice     = "1";
+        static constexpr inline auto atInformationClassData      = "2";
+        static constexpr inline auto atInformationClassFax       = "4";
+        static constexpr inline auto atInformationClassAllButSms = "7";
+
+        static constexpr inline auto basicServiceVoice     = "11";
+        static constexpr inline auto basicServiceVoiceData = "25";
+        static constexpr inline auto basicServiceVoiceFax  = "13";
+
+        auto getCommandInformationClass(const std::string &basicServiceGroup) const -> std::string;
     };
 }; // namespace call_request

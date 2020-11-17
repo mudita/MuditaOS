@@ -45,7 +45,7 @@ void CellularCallRequestHandler::handle(CallRequest &request, at::Result &result
     request.setHandled(true);
 }
 
-void CellularCallRequestHandler::handle(MmiRequest &request, at::Result &result)
+void CellularCallRequestHandler::handle(SupplementaryServicesRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
