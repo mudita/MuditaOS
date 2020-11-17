@@ -4,6 +4,7 @@
 
 ## Added
 
+* `[gui][desktop]` SIM PIN flow charts added
 * `[cellular]` Added call request type recognition (URC).
 * `[calendar]` Added a new field for date of the event when the user adds/edits event.
 * `[file indexer db]` Added messages for File Indexer db.
@@ -604,4 +605,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-
