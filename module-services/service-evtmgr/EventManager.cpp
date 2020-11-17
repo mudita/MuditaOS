@@ -17,7 +17,7 @@
 #include <list>                                          // for list
 #include <tuple>                                         // for tie, tuple
 #include <vector>                                        // for vector
-#include <module-services/service-desktop/messages/DesktopMessages.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
 #include "log/log.hpp"             // for LOG_INFO, LOG_DEBUG, LOG_FATAL
 #include "WorkerEvent.hpp"         // for WorkerEvent

@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 
 #include "gui/SwitchData.hpp"
+#include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include "DesktopMessages.hpp"
 #include <filesystem>
 
 namespace gui

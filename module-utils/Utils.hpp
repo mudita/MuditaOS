@@ -2,14 +2,17 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "i18/i18.hpp"
 #include <algorithm> // std::find_if_not
 #include <log/log.hpp>
 #include <sstream>
 #include <iomanip>
 #include <cmath>
+#include <filesystem>
 
 #define MAGIC_ENUM_RANGE_MAX 256
+
 #include <magic_enum.hpp>
 
 namespace utils
@@ -240,4 +243,20 @@ namespace utils
 #endif
     }
 
+    namespace filesystem
+    {
+        bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
+
+        bool updateFileCRC32(const fs::path &file);
+
+        void computeCRC32(FILE *file, unsigned long *outCrc32);
+
+        bool verifyCRC32Value(const std::string &filePath, const unsigned long crc32);
+
+        bool verifyCRC(const fs::path filePath);
+
+        std::string generateRandomId(uint32_t length = 0);
+
+        std::string loadFileAsString(const fs::path &fileToLoad);
+    } // namespace filesystem
 } // namespace utils

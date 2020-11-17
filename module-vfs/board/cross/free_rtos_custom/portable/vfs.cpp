@@ -4,6 +4,7 @@
 #include "vfs.hpp"
 #include <purefs/filesystem_paths.hpp>
 #include "ff_eMMC_user_disk.hpp"
+#include <module-utils/common_data/EventStore.hpp>
 
 vfs::vfs() : emmc()
 {}
@@ -23,20 +24,21 @@ void vfs::Init()
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
 
-    bootConfig.os_root_path = purefs::dir::getRootDiskPath();
+    bootConfig = Store::BootConfig::get();
+    bootConfig->setRootPath(purefs::dir::getRootDiskPath());
 
-    if (loadBootConfig(getCurrentBootJSON())) {
-        LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
-        if (ff_chdir(bootConfig.os_root_path.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path.c_str());
+    if (bootConfig->loadBootConfig(purefs::file::boot_json)) {
+        LOG_INFO("vfs::Init osType %s root:%s", bootConfig->getOSType().c_str(), bootConfig->getOSRootPath().c_str());
+        if (ff_chdir(bootConfig->getOSRootPath().c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig->getOSRootPath().c_str());
         }
     }
     else {
-        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", bootConfig.os_root_path.c_str());
+        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", bootConfig->getOSRootPath().c_str());
     }
 
-    LOG_INFO("vfs::Init running on ARM osRootPath: %s", bootConfig.os_root_path.c_str());
-
+    LOG_INFO("vfs::Init running on ARM osRootPath: %s", bootConfig->getOSRootPath().c_str());
+    LOG_INFO("vfs::Init boot_config: %s", bootConfig->to_json().dump().c_str());
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
     if (const auto userDiskPath = purefs::dir::getUserDiskPath(); isDir(userDiskPath.c_str()) == false) {

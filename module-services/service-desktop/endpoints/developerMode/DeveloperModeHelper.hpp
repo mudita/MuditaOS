@@ -1,14 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <endpoints/Context.hpp>
+
+#include <Common/Query.hpp>
+#include <Service/Common.hpp>
+#include <Service/Service.hpp>
 #include <module-bsp/bsp/keyboard/key_codes.hpp>
 #include <module-services/service-evtmgr/messages/KbdMessage.hpp>
-#include "Common/Query.hpp"
-#include "Context.hpp"
-#include "Service/Service.hpp"
-#include "Service/Common.hpp" // for ReturnCodes
 
 namespace sys
 {

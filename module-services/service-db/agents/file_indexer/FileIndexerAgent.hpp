@@ -19,6 +19,12 @@ class FileIndexerAgent : public DatabaseAgent
     void dbTest();
 
   private:
+    using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
+    MapOfRecipentsToBeNotified fileChangeRecipents;
+    auto handleRegisterOnFileChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleUnregisterOnFileChange(sys::Message *req) -> sys::MessagePointer;
+    auto dbRegisterFileChange(std::string dir, std::string service) -> bool;
+    auto dbUnregisterFileChange(std::string dir, std::string service) -> bool;
     auto dbListDir(std::unique_ptr<FileIndexer::ListDirData> listDir) -> std::unique_ptr<FileIndexer::ListDirData>;
     auto dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> FileIndexer::FileMetadata;
     auto dbSetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> bool;

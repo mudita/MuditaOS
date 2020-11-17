@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-sys/Service/Bus.hpp>
-#include <module-services/service-evtmgr/Constants.hpp>
+#include "DeveloperModeHelper.hpp"
+#include <service-desktop/DesktopMessages.hpp>
+#include <parser/ParserUtils.hpp>
+
 #include <module-services/service-desktop/parser/MessageHandler.hpp>
+#include <module-services/service-evtmgr/Constants.hpp>
+#include <module-sys/Service/Bus.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
-#include <module-services/service-desktop/messages/DesktopMessages.hpp>
-#include "DeveloperModeHelper.hpp"
-#include "ParserUtils.hpp" // for parserFSM
 
 namespace parserFSM
 {

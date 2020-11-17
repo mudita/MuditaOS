@@ -1,19 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Endpoint.hpp"
+
 #include "Service/Service.hpp"
-#include "contacts/ContactsEndpoint.hpp"
-#include "messages/MessagesEndpoint.hpp"
 #include "backup/BackupEndpoint.hpp"
-#include "deviceInfo/DeviceInfoEndpoint.hpp"
-#include "update/UpdateEndpoint.hpp"
-#include "restore/RestoreEndpoint.hpp"
-#include "factoryReset/FactoryResetEndpoint.hpp"
 #include "calllog/CalllogEndpoint.hpp"
+#include "contacts/ContactsEndpoint.hpp"
 #include "developerMode/DeveloperModeEndpoint.hpp"
+#include "deviceInfo/DeviceInfoEndpoint.hpp"
+#include "factoryReset/FactoryResetEndpoint.hpp"
+#include "messages/MessagesEndpoint.hpp"
+#include "restore/RestoreEndpoint.hpp"
+#include "update/UpdateEndpoint.hpp"
 
 using namespace parserFSM;
 

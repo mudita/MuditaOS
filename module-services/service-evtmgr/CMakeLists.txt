@@ -34,5 +34,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-audio
         service-cellular
+        service-desktop
 )
 

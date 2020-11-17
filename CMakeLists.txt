@@ -185,13 +185,13 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 target_link_libraries(${PROJECT_NAME}
         service-antenna
         service-bluetooth
+        service-desktop
         module-bluetooth
         module-audio
         module-bsp
         module-os
         module-utils
         module-vfs
-        module-utils
         module-sys
         module-cellular
         module-db

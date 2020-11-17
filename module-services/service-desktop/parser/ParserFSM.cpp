@@ -1,14 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "MessageHandler.hpp"
 #include "ParserFSM.hpp"
+#include "ParserUtils.hpp"
 
-#include <log/log.hpp> // for LOG_DEBUG, LOG_ERROR
-#include <memory>      // for unique_ptr, make_unique
-#include <string>      // for string
+#include <log/log.hpp>
 
-#include "MessageHandler.hpp" // for MessageHandler
-#include "ParserUtils.hpp" // for eraseFront, calcPayloadLength, extractPayload, getHeader, removeHeader, size_header, endpointChar, parserFSM
+#include <memory>
+#include <string>
 
 namespace sys
 {

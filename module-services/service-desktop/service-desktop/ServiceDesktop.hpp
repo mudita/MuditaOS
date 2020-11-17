@@ -1,16 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory> // for allocator, unique_ptr
-
-#include "WorkerDesktop.hpp"
-#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp"
-#include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
-#include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
-#include "Service/Service.hpp" // for Service
 #include "Constants.hpp"
+#include "WorkerDesktop.hpp"
+
+#include <endpoints/update/UpdateMuditaOS.hpp>
+
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+
+#include <memory>
 
 class UpdateMuditaOS;
 class WorkerDesktop;

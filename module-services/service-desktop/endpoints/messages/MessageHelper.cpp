@@ -3,38 +3,39 @@
 
 #include "MessageHelper.hpp"
 
-#include <memory>  // for make_unique, unique_ptr
-#include <string>  // for string
-#include <utility> // for move
-#include <vector>  // for vector
+#include <endpoints/Context.hpp>
+#include <parser/MessageHandler.hpp>
+#include <parser/ParserUtils.hpp>
 
-#include "Common/Query.hpp" // for EndpointListener, Query, QueryListener, QueryResult
-#include "ParserUtils.hpp" // for Code, id, count, Code::InternalServerError, Code::OK, contactID, msgTemplate, threadID, messageBody, templateText, date, isUnread, offset, type, dateSent, msgCount, parserFSM, phoneNumber, snippet, unreadMsgCount
-#include "PhoneNumber.hpp" // for PhoneNumber::View
-#include "SMSRecord.hpp"   // for SMSRecord
-#include "SMSTemplateRecord.hpp"                                   // for SMSTemplateRecord
-#include "Service/Common.hpp"                                      // for ReturnCodes, ReturnCodes::Success
-#include "ThreadRecord.hpp"                                        // for ThreadRecord
-#include <service-db/DBServiceAPI.hpp>                             // for DBServiceAPI
-#include "queries/messages/sms/QuerySMSGet.hpp"                    // for SMSGet, SMSGetResult
-#include "queries/messages/sms/QuerySMSGetByContactID.hpp"         // for SMSGetByContactID, SMSGetByContactIDResult
-#include "queries/messages/sms/QuerySMSGetByThreadID.hpp"          // for SMSGetByThreadID, SMSGetByThreadIDResult
-#include "queries/messages/sms/QuerySMSGetByID.hpp"                // for SMSGetByID, SMSGetByIDResult
-#include "queries/messages/sms/QuerySMSGetByText.hpp"              // for SMSGetByText, SMSGetByTextResult
-#include "queries/messages/sms/QuerySMSGetCount.hpp"               // for SMSGetCount, SMSGetCountResult
-#include "queries/messages/sms/QuerySMSRemove.hpp"                 // for SMSRemove, SMSRemoveResult
-#include "queries/messages/templates/QuerySMSTemplateGet.hpp"      // for SMSTemplateGet, SMSTemplateGetResult
-#include "queries/messages/templates/QuerySMSTemplateRemove.hpp"   // for SMSTemplateRemove, SMSTemplateRemoveResult
-#include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"   // for SMSTemplateUpdate, SMSTemplateUpdateResult
-#include "queries/messages/templates/QuerySMSTemplateAdd.hpp"      // for SMSTemplateAdd, SMSTemplateAddResult
-#include "queries/messages/templates/QuerySMSTemplateGetByID.hpp"  // for SMSTemplateGetByID, SMSTemplateGetByIDResult
-#include "queries/messages/templates/QuerySMSTemplateGetCount.hpp" // for SMSTemplateGetCount, SMSTemplateGetCountResult
-#include "queries/messages/threads/QueryThreadMarkAsRead.hpp" // for MarkAsRead, MarkAsRead::Read, MarkAsReadResult, MarkAsRead::Read::False, MarkAsRead::Read::True, query
-#include "utf8/UTF8.hpp"   // for UTF8
-#include "json/json11.hpp" // for Json, Json::array, Json::object
-#include "BaseInterface.hpp" // for Interface, Interface::Name, Interface::Name::SMS, Interface::Name::SMSTemplate, Interface::Name::SMSThread
-#include "Context.hpp"        // for Context
-#include "MessageHandler.hpp" // for MessageHandler
+#include <BaseInterface.hpp>
+#include <Common/Query.hpp>
+#include <PhoneNumber.hpp>
+#include <SMSRecord.hpp>
+#include <SMSTemplateRecord.hpp>
+#include <Service/Common.hpp>
+#include <ThreadRecord.hpp>
+#include <json/json11.hpp>
+#include <queries/messages/sms/QuerySMSGet.hpp>
+#include <queries/messages/sms/QuerySMSGetByContactID.hpp>
+#include <queries/messages/sms/QuerySMSGetByID.hpp>
+#include <queries/messages/sms/QuerySMSGetByText.hpp>
+#include <queries/messages/sms/QuerySMSGetByThreadID.hpp>
+#include <queries/messages/sms/QuerySMSGetCount.hpp>
+#include <queries/messages/sms/QuerySMSRemove.hpp>
+#include <queries/messages/templates/QuerySMSTemplateAdd.hpp>
+#include <queries/messages/templates/QuerySMSTemplateGet.hpp>
+#include <queries/messages/templates/QuerySMSTemplateGetByID.hpp>
+#include <queries/messages/templates/QuerySMSTemplateGetCount.hpp>
+#include <queries/messages/templates/QuerySMSTemplateRemove.hpp>
+#include <queries/messages/templates/QuerySMSTemplateUpdate.hpp>
+#include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace parserFSM;
 
