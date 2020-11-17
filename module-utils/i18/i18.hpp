@@ -11,48 +11,35 @@
 
 #include "thread.hpp"
 
+using Language = std::string;
+
 namespace utils
 {
-
-    enum class Lang
-    {
-        En,
-        Pl,
-        De,
-        Sp
-    };
-
     class LangLoader
     {
-
-        const char *langEN_path = "assets/lang/lang_en.json";
-        const char *langPL_path = "assets/lang/lang_pl.json";
-        const char *langDE_path = "assets/lang/lang_de.json";
-        const char *langSP_path = "assets/lang/lang_sp.json";
-
       public:
         LangLoader()
         {}
         virtual ~LangLoader()
         {}
-
-        json11::Json Create(Lang lang);
+        std::vector<Language> getAvailableDisplayLanguages() const;
+        json11::Json createJson(const std::string &filename);
     };
 
     class i18
     {
-
-        json11::Json displayLang;
-        json11::Json inputLang;
-        json11::Json backupLang; // backup language if item not found
+      private:
+        json11::Json displayLanguage;
+        json11::Json inputLanguage;
+        json11::Json fallbackLanguage; // backup language if item not found
         LangLoader loader;
-        static const Lang lang_default = Lang::En;
-        Lang displayCurrent            = lang_default;
-        Lang inputCurrent              = lang_default;
-        bool display_init              = false;
-        bool input_init                = false;
+        Language fallbackLanguageName;
+        Language currentDisplayLanguage = fallbackLanguageName;
+        Language currentInputLanguage   = fallbackLanguageName;
+        bool backupLanguageInitializer  = false;
 
       public:
+        static constexpr auto DefaultLanguage = "English";
         // Default constructor, left empty on purpose
         i18()
         {}
@@ -61,10 +48,11 @@ namespace utils
         // which is not available at program's startup.
         virtual ~i18()
         {}
-        void setInputLanguage(Lang lang);
+        void setInputLanguage(const Language &lang);
         const std::string &getInputLanguage(const std::string &str);
         const std::string &get(const std::string &str);
-        void SetDisplayLanguage(Lang lang);
+        void setDisplayLanguage(const Language &lang);
+        void setFallbackLanguage(const Language &lang);
     };
 
     // Global instance of i18 class

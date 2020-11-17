@@ -7,6 +7,9 @@ namespace utils
 {
     namespace
     {
+        const auto LanguageDirPath = std::filesystem::path{"assets"} / "lang";
+        constexpr auto extension   = ".json";
+
         auto returnNonEmptyString(const std::string &str, const std::string &ret) -> const std::string &
         {
             return str.empty() ? ret : str;
@@ -14,31 +17,12 @@ namespace utils
     } // namespace
 
     i18 localize;
-    json11::Json LangLoader::Create(Lang lang)
+    json11::Json LangLoader::createJson(const std::string &filename)
     {
-        const char *path = nullptr;
-
-        switch (lang) {
-        case Lang::Pl:
-            path = langPL_path;
-            break;
-        case Lang::En:
-            path = langEN_path;
-            break;
-        case Lang::De:
-            path = langDE_path;
-            break;
-        case Lang::Sp:
-            path = langSP_path;
-            break;
-
-        default:
-            return json11::Json();
-        }
-
-        auto fd = vfs.fopen(path, "r");
+        const fs::path path = LanguageDirPath / (filename + extension);
+        auto fd             = vfs.fopen(path.c_str(), "r");
         if (fd == nullptr) {
-            LOG_FATAL("Error during opening file %s", path);
+            LOG_FATAL("Error during opening file %s", path.c_str());
             return json11::Json();
         }
 
@@ -66,64 +50,73 @@ namespace utils
         }
     }
 
-    void i18::setInputLanguage(Lang lang)
+    std::vector<Language> LangLoader::getAvailableDisplayLanguages() const
     {
-        if (!input_init) {
-            backupLang = loader.Create(lang_default);
-            inputLang  = backupLang;
-            input_init = true;
+        std::vector<std::string> languageNames;
+        for (const auto &entry : fs::directory_iterator(LanguageDirPath)) {
+            languageNames.push_back(fs::path(entry.path()).stem());
         }
-        if (lang == inputCurrent) {
+        return languageNames;
+    }
+
+    void i18::setInputLanguage(const Language &lang)
+    {
+        if (lang == currentInputLanguage) {
             return;
         }
-        inputCurrent = lang;
-        if (lang == lang_default) {
-            inputLang = backupLang;
+        currentInputLanguage = lang;
+        if (lang == fallbackLanguageName) {
+            inputLanguage = fallbackLanguage;
         }
         else {
-            json11::Json pack = loader.Create(lang);
-            inputLang         = pack;
+            json11::Json pack = loader.createJson(lang);
+            inputLanguage     = pack;
         }
     }
     const std::string &i18::getInputLanguage(const std::string &str)
     {
         // if language pack returned nothing then try default language
-        if (inputLang[str].string_value().empty()) {
-            return returnNonEmptyString(backupLang[str].string_value(), str);
+        if (inputLanguage[str].string_value().empty()) {
+            return returnNonEmptyString(fallbackLanguage[str].string_value(), str);
         }
-        return returnNonEmptyString(inputLang[str].string_value(), str);
+        return returnNonEmptyString(inputLanguage[str].string_value(), str);
     }
 
     const std::string &i18::get(const std::string &str)
     {
         // if language pack returned nothing then try default language
-        if (displayLang[str].string_value().empty()) {
-            return returnNonEmptyString(backupLang[str].string_value(), str);
+        if (displayLanguage[str].string_value().empty()) {
+            return returnNonEmptyString(fallbackLanguage[str].string_value(), str);
         }
-        return returnNonEmptyString(displayLang[str].string_value(), str);
+        return returnNonEmptyString(displayLanguage[str].string_value(), str);
     }
 
-    void i18::SetDisplayLanguage(Lang lang)
+    void i18::setDisplayLanguage(const Language &lang)
     {
-        if (!display_init) {
-            backupLang   = loader.Create(lang_default);
-            displayLang  = backupLang;
-            display_init = true;
+        if (!backupLanguageInitializer) {
+            fallbackLanguage          = loader.createJson(fallbackLanguageName);
+            displayLanguage           = fallbackLanguage;
+            backupLanguageInitializer = true;
         }
-        if (lang == displayCurrent) {
+        if (lang == currentDisplayLanguage) {
             return;
         }
-        displayCurrent = lang;
-        if (lang == lang_default) {
-            displayLang = backupLang;
+        currentDisplayLanguage = lang;
+        if (lang == fallbackLanguageName) {
+            displayLanguage = fallbackLanguage;
         }
         else {
-            json11::Json pack = loader.Create(lang);
+            json11::Json pack = loader.createJson(lang);
             // Suspend whole system during switching lang packs
             vTaskSuspendAll();
-            displayLang = pack;
+            displayLanguage = pack;
             xTaskResumeAll();
         }
+    }
+
+    void i18::setFallbackLanguage(const Language &lang)
+    {
+        fallbackLanguageName = std::move(lang);
     }
 
 } // namespace utils
