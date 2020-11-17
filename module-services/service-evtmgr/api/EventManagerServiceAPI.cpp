@@ -1,18 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "EventManagerServiceAPI.hpp"
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/EVMessages.hpp>
+#include <service-evtmgr/Constants.hpp>
 
-#include <Service/Bus.hpp> // for Bus
-#include <stdint.h>        // for uint32_t
-#include <memory>          // for make_shared, shared_ptr, __shared_ptr<>::element_type
-#include <utility>         // for pair
+#include <MessageType.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
 
-#include "../messages/EVMessages.hpp" // for EVMBoardResponseMessage
-#include "../Constants.hpp"           // for evt_manager
-#include "MessageType.hpp"            // for MessageType, MessageType::EVMGetBoard
-#include "Service/Common.hpp"         // for ReturnCodes, ReturnCodes::Success
-#include "Service/Message.hpp"        // for DataMessage
+#include <cstdint>
+#include <memory>
+#include <utility>
 
 namespace sys
 {

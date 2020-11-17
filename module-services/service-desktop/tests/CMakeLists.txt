@@ -7,11 +7,8 @@ add_catch2_executable(
     SRCS
         unittest.cpp
         tests-main.cpp
-        #"../endpoints/update/UpdateMuditaOS.cpp"
-        #"../endpoints/factoryReset/FactoryReset.cpp"
-        #"${CMAKE_CURRENT_LIST_DIR}/../parser/MessageHandler.cpp"
     LIBS
-        module-services
-        module-sys
         service-desktop
+        module-utils
+        module-apps
 )

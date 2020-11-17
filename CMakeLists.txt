@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -183,29 +183,19 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 # They have to be arranged in specific order because of circular dependencies that need to be correctly resolved
 # In case of doubt please contact me: mateusz.piesta@mudita.com
 target_link_libraries(${PROJECT_NAME}
-        service-antenna
-        service-bluetooth
-        service-desktop
-        module-bluetooth
-        module-audio
-        module-bsp
-        module-os
-        module-utils
-        module-vfs
-        module-utils
-        module-sys
-        module-cellular
-        module-db
-        module-gui
-        module-services
         module-apps
+        service-desktop
+        service-bluetooth
+        service-lwip
         ${LWIP_LIBRARIES}
-        module-lwip
-        ${TARGET_LIBRARIES}
         )
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} iosyscalls)
+else()
+    target_link_libraries(${PROJECT_NAME}
+        service-antenna
+    )
 endif()
 
 set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")

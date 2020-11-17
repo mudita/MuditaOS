@@ -1,4 +1,4 @@
-project(module-lwip VERSION 1.0 DESCRIPTION "LwIP port layer")
+﻿project(module-lwip VERSION 1.0 DESCRIPTION "LwIP port layer")
 
 
 # remove -Werror for lwip
@@ -54,4 +54,5 @@ target_link_libraries(
     module-vfs
     module-sys
     ${BOARD_DIR_LIBRARIES}
+    ${LWIP_LIBRARIES}
     )

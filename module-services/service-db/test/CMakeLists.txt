@@ -8,8 +8,11 @@ add_catch2_executable(
                 test-service-db-settings-messages.cpp
                 test-service-db-settings-api.cpp
         LIBS
+                module-bsp
                 module-services
                 module-utils
                 service-db
+                service-evtmgr
+                service-audio
 )
 

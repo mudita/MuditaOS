@@ -9,7 +9,6 @@
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
 #include <module-bsp/bsp/keyboard/key_codes.hpp>
-#include <module-services/service-evtmgr/messages/KbdMessage.hpp>
 
 namespace sys
 {

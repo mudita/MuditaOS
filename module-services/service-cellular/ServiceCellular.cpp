@@ -58,8 +58,8 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <service-evtmgr/api/EventManagerServiceAPI.hpp>
-#include <service-evtmgr/messages/EVMessages.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 #include <task.h>
 #include <time/time_conversion.hpp>
 #include <ucs2/UCS2.hpp>

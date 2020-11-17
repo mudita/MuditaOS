@@ -8,9 +8,8 @@
 
 // module-utils
 #include "log/log.hpp"
-// module-services
-#include "service-evtmgr/EventManager.hpp"
-#include "service-evtmgr/messages/EVMessages.hpp"
+#include <service-evtmgr/EVMessages.hpp>
+#include <service-evtmgr/EventManager.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 // MessageType
 #include "MessageType.hpp"

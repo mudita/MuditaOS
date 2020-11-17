@@ -94,6 +94,7 @@ target_link_libraries(${PROJECT_NAME}
         service-audio
         service-cellular
         service-db
+        service-evtmgr
     PUBLIC
         module-bsp
         module-os

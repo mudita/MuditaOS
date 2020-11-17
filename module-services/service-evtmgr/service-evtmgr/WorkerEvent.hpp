@@ -1,27 +1,20 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * WorkerEvent.hpp
- *
- *  Created on: May 31, 2019
- *      Author: kuba
- */
+#pragma once
 
-#ifndef MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_
-#define MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_
-
-#include <stdint.h> // for uint32_t, uint8_t
-#include <list>     // for list
-#include <map>      // for map
-
-#include "bsp/keyboard/key_codes.hpp" // for KeyCodes
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "Service/Worker.hpp" // for Worker, WorkerQueueInfo (ptr only)
 #include "EventManager.hpp"
-#include "bsp/common.hpp"             // for KeyEvents, KeyEvents::Released
-#include "bsp/keyboard/key_codes.hpp" // for KeyCodes
+
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Worker.hpp>
+#include <bsp/common.hpp>
+#include <bsp/keyboard/key_codes.hpp>
+#include <bsp/keyboard/key_codes.hpp>
+
+#include <cstdint>
+#include <list>
+#include <map>
 
 namespace sys
 {
@@ -80,5 +73,3 @@ class WorkerEvent : public sys::Worker
      */
     bool handleMessage(uint32_t queueID) override final;
 };
-
-#endif /* MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_ */

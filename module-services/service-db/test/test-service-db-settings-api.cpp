@@ -11,8 +11,8 @@
 #include <module-services/service-db/ServiceDB.hpp>
 #include <module-sys/SystemManager/SystemManager.hpp>
 
-#include <module-services/service-evtmgr/EventManager.hpp>
-#include <module-services/service-evtmgr/Constants.hpp>
+#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 #include <module-services/service-fota/api/FotaServiceAPI.cpp>
 

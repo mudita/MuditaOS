@@ -77,12 +77,13 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     service-cellular
-    module-bsp
+    service-eink
     module-utils
     module-vfs
     module-services
     module-sys
     module-db
+    module-bsp
 )
 
 if (${ENABLE_TESTS})

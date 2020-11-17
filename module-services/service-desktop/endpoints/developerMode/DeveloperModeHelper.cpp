@@ -5,8 +5,9 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <parser/ParserUtils.hpp>
 
-#include <module-services/service-desktop/parser/MessageHandler.hpp>
-#include <module-services/service-evtmgr/Constants.hpp>
+#include <service-desktop/parser/MessageHandler.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
 #include <module-sys/Service/Bus.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>

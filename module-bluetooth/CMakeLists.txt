@@ -57,6 +57,7 @@ target_include_directories(
 )
 
 target_link_libraries(${PROJECT_NAME}
+    service-evtmgr
     module-bsp
     service-bluetooth
     module-utils
