@@ -18,7 +18,6 @@
 #include <vector>
 
 #include <algorithm>
-#include "Utils.hpp"
 
 class vfs vfs;
 
@@ -86,9 +85,9 @@ TEST_CASE("Random strings")
 {
     const std::string allowedChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::string randomIds8, randomIds16, randomIds32;
-    randomIds8  = utils::filesystem::generateRandomId(8);
-    randomIds16 = utils::filesystem::generateRandomId(16);
-    randomIds32 = utils::filesystem::generateRandomId(32);
+    randomIds8  = vfs.generateRandomId(8);
+    randomIds16 = vfs.generateRandomId(16);
+    randomIds32 = vfs.generateRandomId(32);
 
     REQUIRE(randomIds8.size() == 8);
     for (unsigned int i = 0; i < randomIds8.size(); i++)
@@ -107,7 +106,7 @@ TEST_CASE("CRC32 tests")
 {
     unsigned long crc32 = 0;
     char crcBuf[purefs::buffer::crc_char_size];
-    std::string randomData = utils::filesystem::generateRandomId(128);
+    std::string randomData = vfs.generateRandomId(128);
     auto fd                = vfs.fopen("testFile.txt", "w");
     REQUIRE(fd != nullptr);
 
@@ -116,7 +115,7 @@ TEST_CASE("CRC32 tests")
     REQUIRE(vfs.fclose(fd) == 0);
 
     fd = vfs.fopen("testFile.txt", "r");
-    utils::filesystem::computeCRC32((FILE *)fd, &crc32);
+    vfs.computeCRC32(fd, &crc32);
     sprintf(crcBuf, "%lX", crc32);
     auto fdCRC   = vfs.fopen("testFile.txt.crc32", "w");
     bytesWritten = vfs.fwrite(&crcBuf, 1, purefs::buffer::crc_char_size, fdCRC);
@@ -124,7 +123,7 @@ TEST_CASE("CRC32 tests")
     REQUIRE(vfs.fclose(fdCRC) == 0);
     REQUIRE(vfs.fclose(fd) == 0);
 
-    REQUIRE(utils::filesystem::verifyCRC("testFile.txt") == true);
+    REQUIRE(vfs.verifyCRC("testFile.txt") == true);
     REQUIRE(vfs.remove("testFile.txt") == 0);
     REQUIRE(vfs.remove("testFile.txt.crc32") == 0);
 }
@@ -137,11 +136,11 @@ TEST_CASE("File loading and saving")
     const auto slen = std::strlen(test_str);
     REQUIRE(vfs.fwrite(test_str, 1, slen, fd) == slen);
     vfs.fclose(fd);
-    std::string fileContents = utils::filesystem::loadFileAsString("test1.txt");
+    std::string fileContents = vfs.loadFileAsString("test1.txt");
     REQUIRE(strcmp(fileContents.c_str(), test_str) == 0);
     vfs.mkdir("module-vfs/test_dirx");
-    utils::filesystem::replaceWithString("module-vfs/test_dirx/testWrite.txt", "this is a test");
-    fileContents = utils::filesystem::loadFileAsString("module-vfs/test_dirx/testWrite.txt");
+    vfs.replaceWithString("module-vfs/test_dirx/testWrite.txt", "this is a test");
+    fileContents = vfs.loadFileAsString("module-vfs/test_dirx/testWrite.txt");
     REQUIRE(strcmp(fileContents.c_str(), "this is a test") == 0);
     REQUIRE(vfs.remove("module-vfs/test_dirx/testWrite.txt") == 0);
 }

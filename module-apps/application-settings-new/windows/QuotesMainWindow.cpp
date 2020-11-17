@@ -47,7 +47,7 @@ namespace gui
     {
         std::string err;
 
-        std::string fileContents = utils::filesystem::loadFileAsString(fn);
+        std::string fileContents = vfs.loadFileAsString(fn);
 
         auto obj = json11::Json::parse(fileContents, err).array_items();
 
