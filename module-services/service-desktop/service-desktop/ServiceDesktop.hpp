@@ -22,8 +22,8 @@
 namespace sdesktop
 {
     inline constexpr auto service_stack         = 8192;
-    inline constexpr auto cdc_queue_len         = 10;
-    inline constexpr auto cdc_queue_object_size = 10;
+    inline constexpr auto cdc_queue_len             = 32;
+    inline constexpr auto cdc_queue_object_size     = 1024;
     inline constexpr auto file_transfer_timeout     = 5000;
     inline constexpr auto RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     inline constexpr auto SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";

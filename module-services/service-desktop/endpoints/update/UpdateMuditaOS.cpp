@@ -277,14 +277,16 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
 
     if (ret != 0) {
         informError(updateos::UpdateError::CantDeletePreviousOS,
-            "prepareRoot ff_deltree on %s caused an error %s", previousOSPath.c_str(), vfs.lastErrnoToStr().c_str());
+                    "prepareRoot ff_deltree on %s caused an error %s",
+                    previousOSPath.c_str(),
+                    vfs.lastErrnoToStr().c_str());
     }
 
     if (vfs.isDir(purefs::dir::getPreviousOSPath().c_str())) {
         return informError(updateos::UpdateError::CantDeletePreviousOS,
-                    "prepareRoot ff_deltree on %s caused an error %s",
-                    previousOSPath.c_str(),
-                    vfs.lastErrnoToStr().c_str());
+                           "prepareRoot ff_deltree on %s caused an error %s",
+                           previousOSPath.c_str(),
+                           vfs.lastErrnoToStr().c_str());
     }
 
     if (vfs.isDir(purefs::dir::getPreviousOSPath().c_str())) {

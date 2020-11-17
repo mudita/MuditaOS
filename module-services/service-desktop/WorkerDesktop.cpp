@@ -78,11 +78,21 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             parser.processMessage(receiveMsg);
         }
     }
-
-    if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
-        if (xQueueReceive(queue, &sendMsg, 0) != pdTRUE)
+    else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
+        if (xQueueReceive(queue, &sendMsg, 0) != pdTRUE) {
+            LOG_ERROR("handleMessage xQueueReceive failed for %s size %d bytes",
+                      sdesktop::SEND_QUEUE_BUFFER_NAME,
+                      static_cast<unsigned int>(sendMsg->length()));
             return false;
+        }
+        else {
+            LOG_DEBUG("handeMessage sending %d bytes using usbCDCSend", static_cast<unsigned int>(sendMsg->length()));
+        }
+
         bsp::usbCDCSend(sendMsg);
+    }
+    else {
+        LOG_INFO("handeMessage got message on an unhandled queue");
     }
 
     return true;
