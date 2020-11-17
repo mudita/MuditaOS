@@ -2,8 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <algorithm>
-
-#include "Utils.hpp"
 #include "BtKeysStorage.hpp"
 
 json11::Json Bt::KeyStorage::fileJson = json11::Json();
@@ -41,7 +39,7 @@ namespace Bt
     {
         LOG_INFO("opening storage from API");
         fileContent.clear();
-        fileContent = utils::filesystem::loadFileAsString(strings::keysFilename);
+        fileContent = vfs.loadFileAsString(strings::keysFilename);
         if (fileContent.empty()) {
             LOG_WARN("opening empty key file!");
             return;
@@ -133,7 +131,7 @@ namespace Bt
     {
         json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
         fileContent            = finalJson.dump();
-        utils::filesystem::replaceWithString(strings::keysFilename, fileContent);
+        vfs.replaceWithString(strings::keysFilename, fileContent);
     }
 
 } // namespace Bt
