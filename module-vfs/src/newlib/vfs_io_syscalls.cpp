@@ -140,7 +140,15 @@ namespace vfsn::internal::syscalls
             return -1;
         }
         auto ret = ff_fseek(fil, pos, dir);
-        _errno_  = stdioGET_ERRNO();
+        if (ret) {
+            _errno_ = stdioGET_ERRNO();
+            return static_cast<off_t>(-1);
+        }
+        ret = ff_ftell(fil);
+        if (ret < 0) {
+            _errno_ = stdioGET_ERRNO();
+            return static_cast<off_t>(-1);
+        }
         return ret;
     }
     int fstat(int &_errno_, int fd, struct stat *pstat)
