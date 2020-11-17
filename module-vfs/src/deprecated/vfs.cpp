@@ -226,19 +226,18 @@ vfs::FilesystemStats vfs::getFilesystemStats()
 std::string vfs::relativeToRoot(const std::string path)
 {
     fs::path fsPath(path);
-    fs::path osRootPath(Store::BootConfig::get()->getOSRootPath());
 
     if (fsPath.is_absolute()) {
-        if (osRootPath.root_directory() == fsPath.root_directory())
+        if (bootConfig.os_root_path.root_directory() == fsPath.root_directory())
             return fsPath;
         else
             return purefs::createPath(purefs::dir::getRootDiskPath(), fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
-        return osRootPath;
+        return bootConfig.os_root_path;
     else
-        return osRootPath / fsPath;
+        return bootConfig.os_root_path / fsPath;
 }
 
 bool vfs::isDir(const char *path)

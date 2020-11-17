@@ -50,9 +50,9 @@ namespace gui
         addAlignedLabelWithValue(box, "Version:", std::string(VERSION));
         addAlignedLabelWithValue(box,
                                  "Bootloader:",
-                                 (Store::BootConfig::get()->getBootloaderVersion().empty()
+                                 (vfs.getBootConfig().bootloader_verion.empty()
                                       ? utils::localize.get("not available")
-                                      : Store::BootConfig::get()->getBootloaderVersion()));
+                                      : vfs.getBootConfig().bootloader_verion));
 
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
