@@ -67,6 +67,16 @@ namespace gui
         {
             return mode;
         }
+
+        auto moveCursor(NavigationDirection direction, unsigned int n)
+        {
+            cursor->TextCursor::moveCursor(direction, n);
+        }
+
+        [[nodiscard]] auto getCursorPos()
+        {
+            return cursor->getPosOnScreen();
+        }
     };
 } // namespace gui
 
@@ -240,4 +250,63 @@ TEST_CASE("handle text block - moved cursor to end")
     test_text = test_text + newline;
     text.addText(newline);
     REQUIRE(text.getText() == test_text);
+}
+
+TEST_CASE("Text backup and restore tests")
+{
+    std::string testStringOneLine   = "Test String ";
+    std::string testStringTwoLines  = "Test String 1 \n Test String 2";
+    std::string overwriteTestString = "Overwrite test String";
+
+    SECTION("Backup one line text with moved cursor, overwrite text and restore")
+    {
+        mockup::fontManager();
+        auto text = new gui::TestText();
+
+        text->addText(testStringOneLine);
+
+        unsigned int cursorMoveN = 2;
+        text->moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+
+        auto backup = text->backupText();
+
+        REQUIRE(backup.document.getText() == text->getText());
+        REQUIRE(backup.document.getText().length() == text->getText().length());
+        REQUIRE(backup.cursorPos == text->getCursorPos());
+
+        text->setText(overwriteTestString);
+
+        REQUIRE(text->getText() != testStringOneLine);
+
+        text->restoreFrom(backup);
+
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getCursorPos() == testStringOneLine.length() - cursorMoveN);
+    }
+
+    SECTION("Backup two line text with moved cursor, overwrite text and restore")
+    {
+        mockup::fontManager();
+        auto text = new gui::TestText();
+
+        text->addText(testStringTwoLines);
+
+        unsigned int cursorMoveN = 10;
+        text->moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+
+        auto backup = text->backupText();
+
+        REQUIRE(backup.document.getText() == text->getText());
+        REQUIRE(backup.document.getText().length() == text->getText().length());
+        REQUIRE(backup.cursorPos == text->getCursorPos());
+
+        text->setText(overwriteTestString);
+
+        REQUIRE(text->getText() != testStringOneLine);
+
+        text->restoreFrom(backup);
+
+        REQUIRE(text->getText() == testStringTwoLines);
+        REQUIRE(text->getCursorPos() == testStringTwoLines.length() - cursorMoveN);
+    }
 }

@@ -202,7 +202,7 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
         return updateos::UpdateError::VerifyVersionFailure;
     }
 
-    std::string versionJsonString = utils::filesystem::loadFileAsString(getUpdateTmpChild(updateos::file::version));
+    std::string versionJsonString = vfs.loadFileAsString(getUpdateTmpChild(updateos::file::version));
     std::string parserError;
     json11::Json updateVersionInformation = json11::Json::parse(versionJsonString, parserError);
     if (parserError != "") {
@@ -313,24 +313,24 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
     fs::path bootJSONAbsoulte         = purefs::createPath(purefs::dir::getRootDiskPath(), purefs::file::boot_json);
     informDebug("updateBootJSON %s", bootJSONAbsoulte.c_str());
 
-    FILE *fp = fopen(bootJSONAbsoulte.c_str(), "r");
+    vfs::FILE *fp = vfs.fopen(bootJSONAbsoulte.c_str(), "r");
 
     if (fp != nullptr) {
-        utils::filesystem::computeCRC32(fp, &bootJSONAbsoulteCRC);
+        vfs.computeCRC32(fp, &bootJSONAbsoulteCRC);
         bootJSONAbsoulte += purefs::extension::crc32;
 
-        FILE *fpCRC = fopen(bootJSONAbsoulte.c_str(), "w");
+        vfs::FILE *fpCRC = vfs.fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
             std::array<char, purefs::buffer::crc_char_size> crcBuf;
             snprintf(crcBuf.data(), crcBuf.size(), "%lX", bootJSONAbsoulteCRC);
-            fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
-            fclose(fpCRC);
+            vfs.fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
+            vfs.fclose(fpCRC);
         }
         else {
             return updateos::UpdateError::CantUpdateCRC32JSON;
         }
 
-        fclose(fp);
+        vfs.fclose(fp);
     }
     else {
         return updateos::UpdateError::CantUpdateCRC32JSON;
@@ -422,7 +422,7 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 {
     status = updateos::UpdateState::CreatingDirectories;
 
-    updateTempDirectory = purefs::dir::getTemporaryPath() / utils::filesystem::generateRandomId(updateos::prefix_len);
+    updateTempDirectory = purefs::dir::getTemporaryPath() / vfs::generateRandomId(updateos::prefix_len);
 
     informDebug("Temp dir for update %s", updateTempDirectory.c_str());
 
@@ -592,10 +592,10 @@ const fs::path UpdateMuditaOS::checkForUpdate()
         if (versionInfo.is_null())
             continue;
 
-        if (versionInfo[BootConfigJson::os_version][BootConfigJson::version_string].is_string()) {
+        if (versionInfo[purefs::json::os_version][purefs::json::version_string].is_string()) {
             if (UpdateMuditaOS::isUpgradeToCurrent(
-                    versionInfo[BootConfigJson::os_version][BootConfigJson::version_string].string_value())) {
-                return purefs::dir::getUpdatesOSPath() / file.fileName;
+                    versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
+                return updatesOSPath / file.fileName;
             }
         }
     }
