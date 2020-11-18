@@ -7,12 +7,4 @@
 const char *NotesDB::dbName = USER_PATH("notes.db");
 
 NotesDB::NotesDB() : Database(dbName), notes(this)
-{
-
-    if (notes.create() == false)
-        return;
-    isInitialized_ = true;
-}
-
-NotesDB::~NotesDB()
 {}
