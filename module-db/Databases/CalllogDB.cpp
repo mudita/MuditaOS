@@ -7,12 +7,4 @@
 const char *CalllogDB::dbName = USER_PATH("calllog.db");
 
 CalllogDB::CalllogDB() : Database(dbName), calls(this)
-{
-
-    if (calls.create() == false)
-        return;
-    isInitialized_ = true;
-}
-
-CalllogDB::~CalllogDB()
 {}

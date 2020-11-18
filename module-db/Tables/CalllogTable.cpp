@@ -13,7 +13,7 @@ CalllogTable::~CalllogTable()
 
 bool CalllogTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool CalllogTable::add(CalllogTableRow entry)
