@@ -18,11 +18,13 @@
 
 namespace
 {
-    constexpr auto FIRST_FILEDESC = 3;
     int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
     size_t (*real_fwrite)(const void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __s);
     int (*real_fputs)(const char *__restrict __s, FILE *__restrict __stream);
     int (*real_fputc)(int __c, FILE *__stream);
+    int (*real_fileno)(FILE *__stream) __THROW __wur;
+    int (*real_vfprintf)(FILE *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg);
+
     std::unordered_map<FF_FILE*,size_t> g_fd_map;
     std::recursive_mutex g_mutex;
     internal::handle_mapper<FF_FILE*> g_handles;
@@ -33,20 +35,28 @@ namespace
         real_fwrite = reinterpret_cast<decltype(real_fwrite)>(dlsym(RTLD_NEXT, "fwrite"));
         real_fputs = reinterpret_cast<decltype(real_fputs)>(dlsym(RTLD_NEXT, "fputs"));
         real_fputc = reinterpret_cast<decltype(real_fputc)>(dlsym(RTLD_NEXT, "fputc"));
-        if(!real_fprintf || !real_fwrite || !real_fputs || !real_fputc) {
+        real_fileno = reinterpret_cast<decltype(real_fileno)>(dlsym(RTLD_NEXT, "fileno"));
+        real_vfprintf = reinterpret_cast<decltype(real_vfprintf)>(dlsym(RTLD_NEXT, "vfprintf"));
+        if(!real_fprintf || !real_fwrite || !real_fputs || !real_fputc
+            || !real_fileno || !real_vfprintf) {
             abort();
         }
     }
 }
 
 namespace vfsn::linux::internal {
-    int  ff_file_to_handle( FF_FILE* fil )
+    namespace {
+        constexpr auto FIRST_FILEDESC = 64'566'756;
+    }
+    // Convert ff_file to standard fd
+    int  ff_file_to_fd( FF_FILE* fil )
     {
         std::lock_guard<std::recursive_mutex> _lck(g_mutex);
         const auto it = g_fd_map.find(fil);
         return ( it != g_fd_map.end() )?(it->second):(-1);
     }
-    FF_FILE* handle_to_ff_file( int fd )
+    // Convert standard fd for ff file
+    FF_FILE* fd_to_ff_file( int fd )
     {
         std::lock_guard<std::recursive_mutex> _lck(g_mutex);
         if (fd < FIRST_FILEDESC) {
@@ -57,6 +67,13 @@ namespace vfsn::linux::internal {
         }
         return g_handles[fd-FIRST_FILEDESC];
     }
+    // Check if it is our internal FILE* object
+    bool is_ff_handle(FILE* descriptor) {
+        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
+        const auto it = g_fd_map.find(reinterpret_cast<FF_FILE*>(descriptor));
+        return it != g_fd_map.end();
+    }
+
 }
 
 extern "C"
@@ -69,7 +86,7 @@ extern "C"
         auto ret = ff_fopen(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname), mode);
         if(ret) {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
-            const auto fd = g_handles.insert(ret) + FIRST_FILEDESC;
+            const auto fd = g_handles.insert(ret) + vfs::FIRST_FILEDESC;
             g_fd_map.insert(std::make_pair(ret,fd));
         }
         errno    = stdioGET_ERRNO();
@@ -87,12 +104,17 @@ extern "C"
     int fclose(FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fclose(reinterpret_cast<FF_FILE *>(__stream));
         {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
             const auto it = g_fd_map.find(reinterpret_cast<FF_FILE *>(__stream));
             if( it != g_fd_map.end() ) {
-                g_handles.remove(it->second - FIRST_FILEDESC);
+                g_handles.remove(it->second - vfs::FIRST_FILEDESC);
                 g_fd_map.erase(it);
             }
         }
@@ -113,6 +135,11 @@ extern "C"
     int feof(FILE *__stream) __THROW __wur
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_feof(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -129,6 +156,11 @@ extern "C"
     int fflush(FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fflush(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -138,6 +170,11 @@ extern "C"
     int fgetc(FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fgetc(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -147,6 +184,11 @@ extern "C"
     int fgetpos(FILE *__restrict __stream, fpos_t *__restrict __pos)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE *>(__stream));
         if (ret > 0 && __pos) {
             __pos->__pos = ret;
@@ -160,6 +202,11 @@ extern "C"
     int fgetpos64(FILE *__restrict __stream, fpos64_t *__restrict __pos)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE *>(__stream));
         if (ret > 0 && __pos) {
             __pos->__pos = ret;
@@ -173,6 +220,11 @@ extern "C"
     char *fgets(char *__restrict __s, int __n, FILE *__restrict __stream) __wur
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return nullptr;
+        }
         auto ret = ff_fgets(__s, __n, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -181,22 +233,31 @@ extern "C"
 
     int fileno(FILE *__stream) __THROW __wur
     {
-        TRACE_SYSCALL();
-        if(__stream==stdin) return STDIN_FILENO;
-        else if(__stream==stdout) return STDOUT_FILENO;
-        else if(__stream==stderr) return STDERR_FILENO;
-        return vfsn::linux::internal::ff_file_to_handle(reinterpret_cast<FF_FILE*>(__stream));
+        auto ret = vfsn::linux::internal::ff_file_to_fd(reinterpret_cast<FF_FILE*>(__stream));
+        if(ret<0) {
+            return real_fileno(__stream);
+        } else {
+            TRACE_SYSCALL();
+            return ret;
+        }
     }
     __asm__(".symver fileno,fileno@GLIBC_2.2.5");
 
     int fprintf(FILE *__restrict __stream, const char *__restrict __format, ...)
     {
-        TRACE_SYSCALL();
         int iCount;
         size_t xResult;
         char *pcBuffer;
         va_list xArgs;
 
+        if(!vfs::is_ff_handle(__stream)) {
+            va_list arglist;
+            va_start( arglist, __format );
+            auto ret = real_vfprintf( __stream, __format, arglist );
+            va_end( arglist );
+            return ret;
+        }
+        TRACE_SYSCALL();
         pcBuffer = (char *)ffconfigMALLOC(ffconfigFPRINTF_BUFFER_LENGTH);
         if (pcBuffer == NULL) {
             /* Store the errno to thread local storage. */
@@ -224,8 +285,7 @@ extern "C"
 
     int fputc(int __c, FILE *__stream)
     {
-        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
-        if( g_fd_map.find(reinterpret_cast<FF_FILE*>(__stream)) == g_fd_map.end() ) {
+        if(!vfs::is_ff_handle(__stream)) {
             return real_fputc( __c, __stream );
         }
         TRACE_SYSCALL();
@@ -237,8 +297,7 @@ extern "C"
 
     int fputs(const char *__restrict __s, FILE *__restrict __stream)
     {
-        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
-        if( g_fd_map.find(reinterpret_cast<FF_FILE*>(__stream)) == g_fd_map.end() ) {
+        if(!vfs::is_ff_handle(__stream)) {
             return real_fputs( __s, __stream );
         }
         TRACE_SYSCALL();
@@ -256,6 +315,11 @@ extern "C"
     size_t fread(void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __stream) __wur
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return 0;
+        }
         auto ret = ff_fread(__ptr, __size, __n, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -268,22 +332,26 @@ extern "C"
                       FILE *__restrict __stream) __wur
     {
         TRACE_SYSCALL();
-        char fnamebuf[ffconfigMAX_FILENAME];
-        if( ff_fclose(reinterpret_cast<FF_FILE*>(__stream)) < 0 ) {
-            errno = stdioGET_ERRNO();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
             return nullptr;
         }
-        auto ret = ff_fopen(vfs::relative_to_root(fnamebuf,sizeof fnamebuf,__filename), __modes);
-        errno = stdioGET_ERRNO();
-        return reinterpret_cast<FILE*>(ret);
+        if( fclose(__stream) < 0) {
+            return nullptr;
+        }
+        return fopen(__filename, __modes );
     }
     __asm__(".symver freopen,freopen@GLIBC_2.2.5");
-
-
 
     int fseek (FILE *__stream, long int __off, int __whence)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), __off, __whence );
         errno = stdioGET_ERRNO();
         return ret;
@@ -293,6 +361,11 @@ extern "C"
     int fsetpos (FILE *__stream, const fpos_t *__pos)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fseek( reinterpret_cast<FF_FILE*>(__stream), __pos->__pos, SEEK_SET );
         errno = stdioGET_ERRNO();
         return ret;
@@ -302,6 +375,11 @@ extern "C"
     int fsetpos64 (FILE *__stream, const fpos64_t *__pos)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fseek( reinterpret_cast<FF_FILE*>(__stream), __pos->__pos, SEEK_SET );
         errno = stdioGET_ERRNO();
         return ret;
@@ -312,6 +390,11 @@ extern "C"
     long int ftell (FILE *__stream) __wur
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE*>(__stream));
         errno = stdioGET_ERRNO();
         return ret;
@@ -321,8 +404,7 @@ extern "C"
     size_t fwrite (const void *__restrict __ptr, size_t __size,
                           size_t __n, FILE *__restrict __s)
     {
-        std::lock_guard<std::recursive_mutex> _lck(g_mutex);
-        if( g_fd_map.find(reinterpret_cast<FF_FILE*>(__s)) == g_fd_map.end() ) {
+        if(!vfs::is_ff_handle(__s)) {
             return real_fwrite( __ptr, __size, __n, __s );
         }
         TRACE_SYSCALL();
@@ -335,6 +417,11 @@ extern "C"
     int getc(FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fgetc(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -344,6 +431,11 @@ extern "C"
     int putc(int __c, FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         auto ret = ff_fputc(__c, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -365,6 +457,11 @@ extern "C"
     void rewind (FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return;
+        }
         ff_fseek(reinterpret_cast<FF_FILE*>(__stream), 0L, SEEK_SET);
     }
     __asm__(".symver rewind,rewind@GLIBC_2.2.5");
