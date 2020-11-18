@@ -25,6 +25,7 @@ namespace Settings
 
     Settings::~Settings()
     {
+        LOG_DEBUG("Settings::~Settings on %s", app->GetName().c_str());
         sys::Bus::Remove(std::static_pointer_cast<sys::Service>(app));
     }
 
@@ -37,6 +38,7 @@ namespace Settings
     {
         using std::placeholders::_1;
         using std::placeholders::_2;
+        LOG_DEBUG("Settings::registerHandlers for %s", app->GetName().c_str());
         app->connect(::Settings::Messages::VariableChanged(), std::bind(&Settings::handleVariableChanged, this, _1));
         app->connect(::Settings::Messages::CurrentProfileChanged(),
                      std::bind(&Settings::handleCurrentProfileChanged, this, _1));

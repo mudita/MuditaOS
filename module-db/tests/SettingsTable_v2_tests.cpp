@@ -8,8 +8,6 @@
 #include "Database/Database.hpp"
 #include "Databases/SettingsDB.hpp"
 
-#include "Tables/SettingsTable.hpp"
-
 TEST_CASE("Settings Table version 2 tests")
 {
     Database::initialize();
