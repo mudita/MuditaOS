@@ -61,8 +61,7 @@ SimCardResult SimCard::supplyPin(const std::string pin)
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PinCounter > 0) {
-            auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
-            if (channel) {
+            if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
                 auto resp = channel->cmd(at::factory(at::AT::CPIN) + "\"" + pin + "\"");
 
                 if (resp.code == at::Result::Code::OK) {
@@ -89,8 +88,7 @@ SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin)
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PukCounter != 0) {
-            auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
-            if (channel) {
+            if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
                 auto resp = channel->cmd(at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
                 if (resp.code == at::Result::Code::OK) {
                     return SimCardResult::OK;
@@ -110,8 +108,7 @@ SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin)
 
 bool SimCard::isPinLocked()
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
-    if (channel) {
+    if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
         auto resp                      = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
         const std::string_view AT_CLCK = "+CLCK:";
         if (auto tokens = getTokensForATCommand(resp, AT_CLCK); tokens) {
@@ -181,8 +178,7 @@ std::optional<at::SimState> SimCard::simState()
 
 std::optional<at::SimState> SimCard::simStateWithMessage(std::string &message)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
-    if (channel) {
+    if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
         auto resp = channel->cmd(at::factory(at::AT::GET_CPIN));
         if (resp.code == at::Result::Code::OK) {
             if (resp.response.size()) {

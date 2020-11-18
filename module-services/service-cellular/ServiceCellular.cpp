@@ -1169,8 +1169,8 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
 
-    auto simmessage = std::make_shared<sevm::SIMMessage>();
-    sys::Bus::SendUnicast(simmessage, service::name::evt_manager, this);
+    auto simMessage = std::make_shared<sevm::SIMMessage>();
+    sys::Bus::SendUnicast(simMessage, service::name::evt_manager, this);
 
     return true;
 }

@@ -90,16 +90,15 @@ class CellularSimStateMessage : public CellularMessage
   public:
     CellularSimStateMessage() = delete;
     explicit CellularSimStateMessage(at::SimState state, std::string message)
-        : CellularMessage(MessageType::CellularSimState), state(state), message(message)
+        : CellularMessage(MessageType::CellularSimState), state(state), message(std::move(message))
     {}
-    virtual ~CellularSimStateMessage() = default;
 
-    at::SimState getState()
+    at::SimState getState() const noexcept
     {
         return state;
     }
 
-    std::string getMessage()
+    std::string getMessage() const
     {
         return message;
     }
