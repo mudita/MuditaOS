@@ -12,6 +12,7 @@
 #include <Interface/NotesRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
+#include <Interface/SettingsRecord.hpp>
 #include <Interface/SettingsRecord_v2.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <PhoneNumber.hpp>
@@ -50,6 +51,8 @@ class DBServiceAPI
         secondaryNumberError,
         noError
     };
+    static SettingsRecord SettingsGet(sys::Service *serv);
+    static bool SettingsUpdate(sys::Service *serv, const SettingsRecord &rec);
 
     /**
      * @brief Function is adding new SMS to SMSDB.

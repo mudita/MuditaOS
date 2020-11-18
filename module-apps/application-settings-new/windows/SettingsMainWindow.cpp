@@ -34,6 +34,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                        LOG_INFO("switching to %s page", window.c_str());
                                        app::manager::Controller::switchApplication(
                                            app, "ApplicationSettings", gui::name::window::main_window, nullptr);
+                                       app->switchWindow(window, nullptr);
                                        return true;
                                    },
                                    gui::Arrow::Enabled});

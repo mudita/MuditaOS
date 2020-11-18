@@ -19,6 +19,7 @@
 #include <Interface/NotificationsRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
+#include <Interface/SettingsRecord.hpp>
 #include <Interface/SettingsRecord_v2.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <Service/Common.hpp>
@@ -47,6 +48,7 @@ class NotificationsRecordInterface;
 class SMSRecordInterface;
 class SMSTemplateRecordInterface;
 class SettingsDB;
+class SettingsRecordInterface;
 class SettingsRecordInterface_v2;
 class SmsDB;
 class ThreadRecordInterface;
@@ -64,6 +66,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<NotificationsDB> notificationsDB;
     std::unique_ptr<EventsDB> eventsDB;
 
+    std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
     std::unique_ptr<SMSTemplateRecordInterface> smsTemplateRecordInterface;

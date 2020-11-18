@@ -20,7 +20,6 @@
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
 #include <widgets/BoxLayout.hpp>
-#include <module-services/service-db/agents/settings/Settings.hpp>
 namespace gui
 {
 
@@ -42,6 +41,7 @@ namespace gui
         gui::HBox *dateBody = nullptr;
         gui::HBox *timeBody = nullptr;
 
+        bool timeFormat12h  = false;
         bool timeDateFormat = false; // true europe format, flase american format
         bool dayPeriod      = false; // day period indicator false am, true pm
 
@@ -63,6 +63,5 @@ namespace gui
 
       private:
         void invalidate() noexcept;
-        void timeDateChanged(const std::string &name, std::optional<std::string> value);
     };
 } /* namespace gui */

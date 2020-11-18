@@ -13,7 +13,6 @@
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
-#include <module-services/service-db/agents/settings/Settings.hpp>
 
 namespace gui
 {

@@ -7,6 +7,7 @@
 #include "Item.hpp"                                      // for Item
 #include "MessageType.hpp"                               // for MessageType
 #include "Service/Timer.hpp"                             // for Timer
+#include "SettingsRecord.hpp"                            // for SettingsRecord
 #include "Timer.hpp"                                     // for Timer
 #include "Translator.hpp"                                // for KeyInputSim...
 #include "common_data/EventStore.hpp"                    // for Battery
@@ -29,8 +30,7 @@
 #include <type_traits>                                   // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
-#include <module-utils/Utils.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/DBServiceAPI.hpp> // for DBServiceAPI
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
@@ -70,8 +70,7 @@ namespace app
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
         : Service(name, parent, stackDepth, priority), default_window(gui::name::window::main_window),
-          windowsStack(this), startInBackground{startInBackground},
-          settings(std::make_unique<::Settings::Settings>(this))
+          windowsStack(this), startInBackground{startInBackground}
     {
         keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
@@ -81,10 +80,6 @@ namespace app
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
-
-        settings->registerValueChange(
-            ::Settings::SystemProperties::timeFormat12,
-            [this](const std::string &name, std::optional<std::string> value) { timeFormatChanged(name, value); });
     }
 
     Application::~Application() = default;
@@ -335,7 +330,7 @@ namespace app
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
         auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
-        getCurrentWindow()->updateTime(msg->timestamp, !timeFormat12);
+        getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
@@ -494,8 +489,14 @@ namespace app
     sys::ReturnCodes Application::InitHandler()
     {
         setState(State::INITIALIZING);
+        settings = DBServiceAPI::SettingsGet(this);
 
-        app::manager::Controller::applicationInitialised(this, StartupStatus::Success, startInBackground);
+        const auto status = (settings.dbID == 1) ? StartupStatus::Success : StartupStatus::Failure;
+        app::manager::Controller::applicationInitialised(this, status, startInBackground);
+        if (status == StartupStatus::Failure) {
+            setState(State::DEACTIVATED);
+            return sys::ReturnCodes::Failure;
+        }
 
         if (startInBackground) {
             setState(State::ACTIVE_BACKGROUND);
@@ -704,16 +705,4 @@ namespace app
     {
         receivers.insert_or_assign(actionId, std::move(callback));
     }
-
-    void Application::timeFormatChanged(const std::string &name, std::optional<std::string> value)
-    {
-        if (value.has_value() && !value.value().empty()) {
-            timeFormat12 = utils::getValue<bool>(value.value());
-        }
-    }
-    bool Application::isTimeFormat12()
-    {
-        return timeFormat12;
-    }
-
 } /* namespace app */
