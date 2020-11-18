@@ -5,8 +5,8 @@
 
 #include "PinLock.hpp"
 #include <service-cellular/CellularMessage.hpp>
+#include <module-services/service-db/agents/settings/Settings.hpp>
 
-#include "Interface/SettingsRecord.hpp"
 namespace app
 {
     class ApplicationDesktop;
@@ -17,7 +17,6 @@ namespace gui
     class PinLockHandler
     {
         app::ApplicationDesktop *app = nullptr;
-        const SettingsRecord &appSettings;
 
         void parseSimCard(CellularSimResponseMessage *msg);
         void parseSimState(CellularSimResponseMessage *msg);
@@ -27,11 +26,15 @@ namespace gui
         void handleSimPinOrPuk(const std::vector<unsigned int> &pin);
 
       public:
-        PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings);
+        explicit PinLockHandler(app::ApplicationDesktop *app);
         void reloadScreenLock();
         auto handle(CellularSimResponseMessage *msg) -> bool;
         void handle(const std::vector<unsigned int> &pin);
 
         gui::PinLock lock;
+
+      private:
+        void lockPassHashChanged(const std::string &name, std::optional<std::string> value);
+        unsigned int lockPassHash = 0;
     };
 } // namespace gui
