@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <dlfcn.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <cstring>
 #include "debug.hpp"
@@ -22,6 +23,8 @@ namespace
     int (*real_xstat)(int ver, const char * path, struct stat * stat_buf);
     int (*real_lxstat)(int ver, const char * path, struct stat * stat_buf);
     int (*real_fxstat)(int ver, int fildes, struct stat * stat_buf);
+    int (*real_fcntl)(int __fd, int __cmd, ...);
+    int (*real_fcntl64) (int __fd, int __cmd, ...);
 
     void __attribute__((constructor)) _lib_posix_initialize()
     {
@@ -29,9 +32,36 @@ namespace
         real_xstat = reinterpret_cast<decltype(real_xstat)>(dlsym(RTLD_NEXT, "__xstat"));
         real_lxstat = reinterpret_cast<decltype(real_lxstat)>(dlsym(RTLD_NEXT, "__lxstat"));
         real_fxstat = reinterpret_cast<decltype(real_fxstat)>(dlsym(RTLD_NEXT, "__fxstat"));
-        if(!real_fprintf || !real_xstat || !real_lxstat || !real_fxstat ) {
+        real_fcntl = reinterpret_cast<decltype(real_fcntl)>(dlsym(RTLD_NEXT, "fcntl"));
+        real_fcntl64 = reinterpret_cast<decltype(real_fcntl64)>(dlsym(RTLD_NEXT, "fcntl64"));
+        if(!real_fprintf || !real_xstat || !real_lxstat || !real_fxstat
+           || !real_fcntl || !real_fcntl64 )
+        {
             abort();
         }
+    }
+    int ff_cstat(const char *file, struct stat *pstat)
+    {
+        namespace vfs = vfsn::linux::internal;
+        char filebuf[ffconfigMAX_FILENAME];
+        FF_Stat_t stat_ff;
+        auto ret = ff_stat(vfs::relative_to_root(filebuf,sizeof filebuf,file), &stat_ff);
+        std::memset(pstat, 0, sizeof(*pstat));
+        if (!ret && pstat) {
+            pstat->st_ino  = stat_ff.st_ino;
+            pstat->st_size = stat_ff.st_size;
+            pstat->st_dev  = stat_ff.st_dev;
+            // Linux mode compat
+            if (stat_ff.st_mode == FF_IFREG)
+                pstat->st_mode = S_IFREG | 0666;
+            if (stat_ff.st_mode == FF_IFDIR)
+                pstat->st_mode = S_IFDIR | 0777;
+        }
+        errno = stdioGET_ERRNO();
+        // NOTE: ff_stdio uses wrong errno NOADDRESS
+        if (errno == EFAULT)
+            errno = ENOENT;
+        return ret;
     }
 }
 extern "C" {
@@ -57,27 +87,13 @@ extern "C" {
      }
     __asm__(".symver unlink,unlink@GLIBC_2.2.5");
 
-    int stat(const char *file, struct stat *pstat)
-    {
+    int stat(const char *file, struct stat *pstat) {
         TRACE_SYSCALL();
-        char filebuf[ffconfigMAX_FILENAME];
-        FF_Stat_t stat_ff;
-        auto ret = ff_stat(vfs::relative_to_root(filebuf,sizeof filebuf,file), &stat_ff);
-        std::memset(pstat, 0, sizeof(*pstat));
-        if (!ret) {
-            pstat->st_ino  = stat_ff.st_ino;
-            pstat->st_size = stat_ff.st_size;
-            pstat->st_dev  = stat_ff.st_dev;
-            // Linux mode compat
-            if (stat_ff.st_mode == FF_IFREG)
-                pstat->st_mode = S_IFREG | 0666;
-            if (stat_ff.st_mode == FF_IFDIR)
-                pstat->st_mode = S_IFDIR | 0777;
+        auto ret = ff_cstat(file, pstat);
+        if(ret) {
+            real_fprintf(stderr,"WARNING: redirecting stat(%s) to the linux fs\n",file);
+            ret = real_xstat(1,file,pstat);
         }
-        errno = stdioGET_ERRNO();
-        // NOTE: ff_stdio uses wrong errno NOADDRESS
-        if (errno == EFAULT)
-            errno = ENOENT;
         return ret;
     }
     __asm__(".symver stat,stat@GLIBC_2.2.5");
@@ -87,8 +103,8 @@ extern "C" {
         TRACE_SYSCALL();
         FF_FILE* fil = vfsn::linux::internal::fd_to_ff_file(fd);
         if(!fil) {
-            errno = EBADF;
-            return -1;
+            real_fprintf(stderr,"WARNING: redirecting fstat(%i) to the linux fs\n",fd);
+            return real_fxstat(1,fd,pstat);
         }
         std::memset(pstat, 0, sizeof(*pstat));
         pstat->st_ino  = fil->ulObjectCluster;
@@ -103,18 +119,56 @@ extern "C" {
     int lstat(const char *pathname, struct stat *statbuf)
     {
         TRACE_SYSCALL();
-        return stat(pathname, statbuf);
+        real_fprintf(stderr,"WARNING: redirecting lstat(%s) to the linux fs\n",pathname);
+        auto ret = ff_cstat(pathname, statbuf);
+        if(ret) {
+            ret = real_lxstat(1,pathname,statbuf);
+        }
+        return ret;
     }
     __asm__(".symver lstat,lstat@GLIBC_2.2.5");
 
     int fcntl(int fd, int cmd, ... /* arg */ )
     {
         TRACE_SYSCALL();
-        errno = ENOSYS;
-        real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
-        return -1;
+        if( vfs::fd_to_ff_file(fd) ) {
+            TRACE_SYSCALL();
+            errno = ENOSYS;
+            real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
+            return -1;
+        } else {
+            uintptr_t param;
+            va_list args;
+            va_start(args,cmd);
+            param = va_arg(args,uintptr_t);
+            auto ret =  real_fcntl(fd, cmd, param );
+            va_end(args);
+            real_fprintf(stderr,"WARNING: redirecting fcntl (%i) to the linux fs\n",fd);
+            return ret;
+        }
     }
     __asm__(".symver fcntl,fcntl@GLIBC_2.2.5");
+
+    int fcntl64(int fd, int cmd, ... /* arg */ )
+    {
+        TRACE_SYSCALL();
+        if( vfs::fd_to_ff_file(fd) ) {
+            TRACE_SYSCALL();
+            real_fprintf(stderr, "Unsupported syscall %s\n", __PRETTY_FUNCTION__ );
+            errno = ENOSYS;
+            return -1;
+        } else {
+            uintptr_t param;
+            va_list args;
+            va_start(args,cmd);
+            param = va_arg(args,uintptr_t);
+            auto ret =  real_fcntl(fd, cmd, param );
+            va_end(args);
+            real_fprintf(stderr,"WARNING: redirecting fcntl (%i) to the linux fs\n",fd);
+            return ret;
+        }
+    }
+    __asm__(".symver fcntl64,fcntl64@GLIBC_2.2.5");
 
     int chdir(const char *path)
     {
@@ -261,6 +315,7 @@ extern "C" {
         else {
             int ret = stat( path, stat_buf );
             if(ret) {
+                real_fprintf(stderr,"WARNING: redirecting __xstat(%s) to the linux fs\n",path);
                 ret =  real_xstat( ver,path,stat_buf );
             }
             return ret;
@@ -274,9 +329,10 @@ extern "C" {
             return real_xstat( ver,path,stat_buf );
         }
         else {
-            int ret = lstat( path, stat_buf);
+            int ret = ff_cstat(path, stat_buf);
             if(ret) {
-                ret =  real_lxstat( ver,path,stat_buf );
+                real_fprintf(stderr,"WARNING: redirecting __lxstat(%s) to the linux fs\n",path);
+                ret =  real_lxstat(ver,path,stat_buf );
             }
             return ret;
         }
@@ -289,8 +345,9 @@ extern "C" {
             return real_fxstat( ver,fildes,stat_buf );
         }
         else {
-            int ret = fstat( fildes, stat_buf);
+            int ret = fstat(fildes, stat_buf);
             if(ret) {
+                real_fprintf(stderr,"WARNING: redirecting __fxstat(%i) to the linux fs\n",fildes);
                 ret =  real_fxstat( ver,fildes,stat_buf );
             }
             return ret;
