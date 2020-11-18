@@ -122,7 +122,6 @@ class ServiceCellular : public sys::Service
      */
     bool sendBadPin();
 
-
     /** Message send, when modem return incorrect password for PIN message.
      * Probably modem firmware depend. On current version last bad message (attempts=1) return PUK request
      * and generate PUK URC, so finally action on puk request will be call. This implementation allow to
@@ -134,126 +133,126 @@ class ServiceCellular : public sys::Service
     /** Place to send action notifying eg. GUI
      * \param res
      * \return
-    */
+     */
     bool sendChangePinResult(SimCardResult res);
 
-/// sim functionality
+    /// sim functionality
 
     /** Function ready for change pin action send to Service Cellular form eg. GUI
      * \param oldPin
      * \param newPin
      * \return
-    */
+     */
     bool changePin(const std::string oldPin, const std::string newPin);
     bool unlockSimPin(std::string pin);
     bool unlockSimPuk(std::string puk, std::string pin);
 
-private:
-std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+  private:
+    std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
 
-// used for polling for call state
-std::unique_ptr<sys::Timer> callStateTimer;
-std::unique_ptr<sys::Timer> stateTimer;
-std::unique_ptr<sys::Timer> ussdTimer;
-void CallStateTimerHandler();
-DLC_channel::Callback_t notificationCallback = nullptr;
+    // used for polling for call state
+    std::unique_ptr<sys::Timer> callStateTimer;
+    std::unique_ptr<sys::Timer> stateTimer;
+    std::unique_ptr<sys::Timer> ussdTimer;
+    void CallStateTimerHandler();
+    DLC_channel::Callback_t notificationCallback = nullptr;
 
-cellular::State state;
-bsp::Board board = bsp::Board::none;
+    cellular::State state;
+    bsp::Board board = bsp::Board::none;
 
-/// URC GSM notification handler
-std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
+    /// URC GSM notification handler
+    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
 
-std::vector<std::string> messageParts;
+    std::vector<std::string> messageParts;
 
-CellularCall::CellularCall ongoingCall;
+    CellularCall::CellularCall ongoingCall;
 
-ussd::State ussdState = ussd::State::none;
+    ussd::State ussdState = ussd::State::none;
 
-enum class ResetType
-{
-    SoftReset,  //<! AT CFUN reset
-    PowerCycle, //<! PWRKEY pin toggle
-    HardReset   //<! RESET_N pin
-};
-bool resetCellularModule(ResetType type);
-bool isAfterForceReboot = false;
+    enum class ResetType
+    {
+        SoftReset,  //<! AT CFUN reset
+        PowerCycle, //<! PWRKEY pin toggle
+        HardReset   //<! RESET_N pin
+    };
+    bool resetCellularModule(ResetType type);
+    bool isAfterForceReboot = false;
 
-/// one point of state change handling
-void change_state(cellular::StateChange *msg);
+    /// one point of state change handling
+    void change_state(cellular::StateChange *msg);
 
-/// @defgroup state_handlers     all functions on State::ST:: change requests
-/// @{
-/// modem has started to turn off
-bool handle_power_down_started();
-/// wait some time or for change of a status pin
-bool handle_power_down_waiting();
-/// what to do after a full power down
-bool handle_power_down();
-/// idle handler
-bool handle_idle();
-/// cellular power up procedure
-bool handle_status_check();
-/// cellular power up procedure
-bool handle_power_up_in_progress_procedure();
-/// cellular power up procedure
-bool handle_power_up_procedure();
-/// configure basic modem parameters
-bool handle_start_conf_procedure();
-/// configure modem audio parameters
-bool handle_audio_conf_procedure();
-/// modem on event is used in desktop to follow up sim selection
-bool handle_modem_on();
-/// URCReady event is set when serwice is ready to handle URC notifications
-bool handle_URCReady();
-/// check one time modem configuration for sim (hot swap)
-/// if hot swap is not enabled full modem restart is needed (right now at best reboot)
-bool handle_sim_sanity_check();
-/// select sim from settings
-bool handle_select_sim();
-/// initialize sim (GSM commands for initialization)
-bool handle_sim_init();
-/// modem failure handler
-bool handle_failure();
-/// fatal failure handler, if we have power switch - we could handle it here
-/// \note some run state should be added to ignore non system messages now...
-bool handle_fatal_failure();
-bool handle_ready();
+    /// @defgroup state_handlers     all functions on State::ST:: change requests
+    /// @{
+    /// modem has started to turn off
+    bool handle_power_down_started();
+    /// wait some time or for change of a status pin
+    bool handle_power_down_waiting();
+    /// what to do after a full power down
+    bool handle_power_down();
+    /// idle handler
+    bool handle_idle();
+    /// cellular power up procedure
+    bool handle_status_check();
+    /// cellular power up procedure
+    bool handle_power_up_in_progress_procedure();
+    /// cellular power up procedure
+    bool handle_power_up_procedure();
+    /// configure basic modem parameters
+    bool handle_start_conf_procedure();
+    /// configure modem audio parameters
+    bool handle_audio_conf_procedure();
+    /// modem on event is used in desktop to follow up sim selection
+    bool handle_modem_on();
+    /// URCReady event is set when serwice is ready to handle URC notifications
+    bool handle_URCReady();
+    /// check one time modem configuration for sim (hot swap)
+    /// if hot swap is not enabled full modem restart is needed (right now at best reboot)
+    bool handle_sim_sanity_check();
+    /// select sim from settings
+    bool handle_select_sim();
+    /// initialize sim (GSM commands for initialization)
+    bool handle_sim_init();
+    /// modem failure handler
+    bool handle_failure();
+    /// fatal failure handler, if we have power switch - we could handle it here
+    /// \note some run state should be added to ignore non system messages now...
+    bool handle_fatal_failure();
+    bool handle_ready();
 
-bool handleAllMessagesFromMessageStorage();
-[[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
-                                        const UTF8 &receivedNumber,
-                                        const time_t messageDate,
-                                        const SMSType &smsType = SMSType::INBOX) const noexcept;
-bool dbAddSMSRecord(const SMSRecord &record);
-[[nodiscard]] bool handleListMessages(const at::AT &command, DLC_channel *channel);
-/// @}
+    bool handleAllMessagesFromMessageStorage();
+    [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
+                                            const UTF8 &receivedNumber,
+                                            const time_t messageDate,
+                                            const SMSType &smsType = SMSType::INBOX) const noexcept;
+    bool dbAddSMSRecord(const SMSRecord &record);
+    [[nodiscard]] bool handleListMessages(const at::AT &command, DLC_channel *channel);
+    /// @}
 
-bool transmitDtmfTone(uint32_t digit);
-/// Handle message CellularGetChannelMessage
-void handle_CellularGetChannelMessage();
+    bool transmitDtmfTone(uint32_t digit);
+    /// Handle message CellularGetChannelMessage
+    void handle_CellularGetChannelMessage();
 
-bool SetScanMode(std::string mode);
-std::string GetScanMode();
+    bool SetScanMode(std::string mode);
+    std::string GetScanMode();
 
-uint32_t stateTimeout = 0;
-void startStateTimer(uint32_t timeout);
-void stopStateTimer();
-void handleStateTimer();
+    uint32_t stateTimeout = 0;
+    void startStateTimer(uint32_t timeout);
+    void stopStateTimer();
+    void handleStateTimer();
 
-// db response handlers
-auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
+    // db response handlers
+    auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
 
-// ussd handlers
-uint32_t ussdTimeout = 0;
-void setUSSDTimer();
-bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
-bool handleUSSDURC();
-void handleUSSDTimer();
+    // ussd handlers
+    uint32_t ussdTimeout = 0;
+    void setUSSDTimer();
+    bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
+    bool handleUSSDURC();
+    void handleUSSDTimer();
 
-bool handleSimState(at::SimState state, const std::string message);
+    bool handleSimState(at::SimState state, const std::string message);
 
-friend class CellularUrcHandler;
-friend class CellularCallRequestHandler;
-friend class SimCard;
+    friend class CellularUrcHandler;
+    friend class CellularCallRequestHandler;
+    friend class SimCard;
 };

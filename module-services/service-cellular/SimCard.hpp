@@ -27,7 +27,8 @@ class SimCard
 
     /** Get information about attempts of PIN and PUK for standard sim card (eg. not PIN2)
      * @return  As optional SimCard::AttemptsCounters, in case of error nullopt. Should be noted that in some case could
-     * return SIMFailure which could mean 0 attempts (happen if lock during session, on modem/sim reboot again return 0,0);
+     * return SIMFailure which could mean 0 attempts (happen if lock during session, on modem/sim reboot again return
+     * 0,0);
      */
     std::optional<SimCard::AttemptsCounters> getAttemptsCounters();
 
@@ -72,10 +73,10 @@ class SimCard
   private:
     ServiceCellular &cellularService;
 
-    /** Helper function to convert from one enum to another (only with part of them). Base on continuous range of sim errors
-    * in AT.
-    */
+    /** Helper function to convert from one enum to another (only with part of them). Base on continuous range of sim
+     * errors in AT.
+     */
     SimCardResult convertErrorFromATResult(at::Result);
 
-    std::optional<std::vector<std::string>> getTokensForATCommand( const at::Result &resp , std::string_view head );
+    std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
 };
