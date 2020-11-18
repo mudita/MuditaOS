@@ -24,11 +24,11 @@ namespace settings
     class Settings
     {
       public:
-        using ValueChangedCallback   = std::function<void(const std::string &, std::optional<std::string>)>;
-        using ProfileChangedCallback = std::function<void(const std::string &)>;
-        using ModeChangedCallback    = ProfileChangedCallback;
-        using ListOfProfiles         = std::list<std::string>;
-        using ListOfModes            = ListOfProfiles;
+        using ValueChangedCallback           = std::function<void(const std::string &)>;
+        using ProfileChangedCallback         = std::function<void(const std::string &)>;
+        using ModeChangedCallback            = ProfileChangedCallback;
+        using ListOfProfiles                 = std::list<std::string>;
+        using ListOfModes                    = ListOfProfiles;
         using OnAllProfilesRetrievedCallback = std::function<void(const ListOfProfiles &)>;
         using OnAllModesRetrievedCallback    = std::function<void(const ListOfModes &)>;
 
