@@ -11,7 +11,7 @@ NotesTable::~NotesTable()
 
 bool NotesTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool NotesTable::add(NotesTableRow entry)
