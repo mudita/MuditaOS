@@ -1,17 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FotaServiceAPI.hpp"
+#include "service-fota/FotaMessages.hpp"
+#include "service-fota/FotaServiceAPI.hpp"
+#include "service-fota/ServiceFota.hpp"
 
-#include <service-fota/ServiceFota.hpp> // for Service, Service::serviceName
-#include <service-fota/messages/FotaMessages.hpp> // for HTTPRequestMessage, FOTARawProgress, FOTAStart, ConfigureAPNMessage, ConnectMessage, InternetRequestMessage
-#include <Service/Bus.hpp> // for Bus
-#include <sstream> // for operator<<, basic_ostream, basic_ostream::operator<<, ostringstream, basic_ostream<>::__ostream_type
-#include <string> // for allocator, string, operator<<, char_traits, operator+, to_string
-#include <memory> // for make_shared, shared_ptr, __shared_ptr_access
+#include <Service/Bus.hpp>
+#include <MessageType.hpp>
+#include <log/log.hpp>
 
-#include "MessageType.hpp" // for MessageType, MessageType::FotaInternetDisconnect
-#include "log/log.hpp"     // for LOG_DEBUG
+#include <memory>
+#include <sstream>
+#include <string>
 
 namespace FotaService
 {

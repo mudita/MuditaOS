@@ -78,6 +78,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     service-cellular
     service-eink
+    service-fota
     module-utils
     module-vfs
     module-services
