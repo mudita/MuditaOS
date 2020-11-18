@@ -8,13 +8,17 @@ set(SOURCES
     ServiceCellular.cpp
     SignalStrength.cpp
     SimCard.cpp
-    CallRequestFactory.cpp
-    CellularCallRequestHandler.cpp
+    RequestFactory.cpp
+    CellularRequestHandler.cpp
+    requests/Request.cpp
     requests/CallRequest.cpp
     requests/SupplementaryServicesRequest.cpp
     requests/CallForwardingRequest.cpp
+    requests/PasswordRegistrationRequest.cpp
+    requests/PinChangeRequest.cpp
+    requests/ImeiRequest.cpp
+    requests/UssdRequest.cpp
 )
-
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
@@ -32,3 +36,6 @@ target_link_libraries(${PROJECT_NAME}
         module-cellular
     )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

@@ -10,16 +10,15 @@
 
 namespace cellular
 {
-    class CallRequest : public Request
+    constexpr inline auto ImeiRegex = "(\\*#06#)";
+
+    class ImeiRequest : public Request
     {
       public:
-        CallRequest(const std::string &data) : Request(data){};
+        ImeiRequest(const std::string &data) : Request(data){};
         std::string command() final;
-        std::string getNumber() const
-        {
-            return request;
-        }
-        static std::unique_ptr<CallRequest> create(const std::string &data, GroupMatch);
+
+        static std::unique_ptr<ImeiRequest> create(const std::string &data, GroupMatch);
         void handle(RequestHandler &h, at::Result &result) final;
     };
-}; // namespace cellular
+} // namespace cellular

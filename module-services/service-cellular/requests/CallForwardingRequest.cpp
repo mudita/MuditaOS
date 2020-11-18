@@ -21,12 +21,12 @@ namespace
     }};
 } // namespace
 
-namespace call_request
+namespace cellular
 {
 
-    std::unique_ptr<CallForwardingRequest> CallForwardingRequest::create(const std::string &serviceCode,
-                                                                         const std::string &data,
-                                                                         GroupMatch matchGroups)
+    std::unique_ptr<SupplementaryServicesRequest> CallForwardingRequest::create(const std::string &serviceCode,
+                                                                                const std::string &data,
+                                                                                GroupMatch matchGroups)
     {
         if (auto it = reasonCodes.find(serviceCode); it != reasonCodes.end()) {
             return std::make_unique<CallForwardingRequest>(it->second, data, matchGroups);
@@ -87,14 +87,12 @@ namespace call_request
 
     auto CallForwardingRequest::getCommandSubAddr() const -> std::string
     {
-        // default value not used
         return subaddrDefault;
     }
 
     auto CallForwardingRequest::getCommandSatype() const -> std::string
     {
-        // default value not used
-        return "";
+        return std::string();
     }
 
     auto CallForwardingRequest::getCommandTime() const -> std::string
@@ -102,8 +100,8 @@ namespace call_request
         return noReplyConditionTimer;
     }
 
-    void CallForwardingRequest::handle(CallRequestHandler &h, at::Result &result)
+    void CallForwardingRequest::handle(RequestHandler &h, at::Result &result)
     {
         h.handle(*this, result);
     }
-} // namespace call_request
+} // namespace cellular

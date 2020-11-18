@@ -5,7 +5,7 @@
 
 #include "SupplementaryServicesRequest.hpp"
 
-namespace call_request
+namespace cellular
 {
     class CallForwardingRequest : public SupplementaryServicesRequest
     {
@@ -14,17 +14,17 @@ namespace call_request
             : SupplementaryServicesRequest(data, matchGroups), forwardReason(forwardReason)
         {}
 
-        static std::unique_ptr<CallForwardingRequest> create(const std::string &serviceCode,
-                                                             const std::string &data,
-                                                             GroupMatch matchGroups);
+        static std::unique_ptr<SupplementaryServicesRequest> create(const std::string &serviceCode,
+                                                                    const std::string &data,
+                                                                    GroupMatch matchGroups);
 
         auto command() -> std::string final;
-        void handle(CallRequestHandler &h, at::Result &result) final;
+        void handle(RequestHandler &h, at::Result &result) final;
 
       private:
-        static constexpr inline auto addressFormatTypeInternational = "145";
-        static constexpr inline auto addressFormatTypeDefault       = "129";
-        static constexpr inline auto subaddrDefault                 = "128";
+        static constexpr auto addressFormatTypeInternational = "145";
+        static constexpr auto addressFormatTypeDefault       = "129";
+        static constexpr auto subaddrDefault                 = "128";
 
         std::string forwardReason;
         std::string &phoneNumber           = supplementaryInfoA;
@@ -41,4 +41,4 @@ namespace call_request
         auto getCommandSatype() const -> std::string;
         auto getCommandTime() const -> std::string;
     };
-}; // namespace call_request
+}; // namespace cellular

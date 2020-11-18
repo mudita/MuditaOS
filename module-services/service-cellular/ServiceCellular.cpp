@@ -9,9 +9,10 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+
 #include "SimCard.hpp"
-#include "service-cellular/CallRequestFactory.hpp"
-#include "service-cellular/CellularCallRequestHandler.hpp"
+#include "service-cellular/RequestFactory.hpp"
+#include "service-cellular/CellularRequestHandler.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>
@@ -728,8 +729,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             break;
         }
 
-        call_request::Factory factory(msg->number.getEntered());
-        CellularCallRequestHandler handler(*this);
+        cellular::RequestFactory factory(msg->number.getEntered());
+        CellularRequestHandler handler(*this);
 
         auto request = factory.create();
         auto result  = channel->cmd(request->command());

@@ -6,10 +6,10 @@
 #include <at/Result.hpp>
 #include "service-cellular/requests/CallRequest.hpp"
 
-namespace call_request
+namespace cellular
 {
     constexpr inline auto SupplementaryServicesRegex =
-        "^(\\*|\\*\\*|\\*\\#|\\#|\\#\\#)(\\d{2,3})(?:\\*([^\\*\\#]+))?(?:\\*([^\\*\\#]+))?(?:\\*([^\\*\\#]+))?\\#";
+        R"(^(\*|\*\*|\*\#|\#|\#\#)(\d{2,3})(?:\*([^\*\#]*))?(?:\*([^\*\#]*))?(?:\*([^\*\#]*))?\#)";
 
     /**
      * (according to 3GPP TS 22.030 V16.0.0):
@@ -62,4 +62,4 @@ namespace call_request
 
         auto getCommandInformationClass(const std::string &basicServiceGroup) const -> std::string;
     };
-}; // namespace call_request
+}; // namespace cellular

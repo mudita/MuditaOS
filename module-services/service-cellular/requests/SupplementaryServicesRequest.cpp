@@ -8,19 +8,20 @@
 
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
 #include "service-cellular/requests/CallForwardingRequest.hpp"
+#include "service-cellular/requests/PasswordRegistrationRequest.hpp"
 
 namespace
 {
-    const std::map<std::string, call_request::SupplementaryServicesRequest::ProcedureType> procedureTypeMap = {
-        {"*", call_request::SupplementaryServicesRequest::ProcedureType::Activation},
-        {"#", call_request::SupplementaryServicesRequest::ProcedureType::Deactivation},
-        {"*#", call_request::SupplementaryServicesRequest::ProcedureType::Interrogation},
-        {"**", call_request::SupplementaryServicesRequest::ProcedureType::Registration},
-        {"##", call_request::SupplementaryServicesRequest::ProcedureType::Erasure},
+    const std::map<std::string, cellular::SupplementaryServicesRequest::ProcedureType> procedureTypeMap = {
+        {"*", cellular::SupplementaryServicesRequest::ProcedureType::Activation},
+        {"#", cellular::SupplementaryServicesRequest::ProcedureType::Deactivation},
+        {"*#", cellular::SupplementaryServicesRequest::ProcedureType::Interrogation},
+        {"**", cellular::SupplementaryServicesRequest::ProcedureType::Registration},
+        {"##", cellular::SupplementaryServicesRequest::ProcedureType::Erasure},
     };
 }
 
-namespace call_request
+namespace cellular
 {
     SupplementaryServicesRequest::SupplementaryServicesRequest(const std::string &data, GroupMatch matchGroups)
         : Request(data),
@@ -29,7 +30,7 @@ namespace call_request
           supplementaryInfoB(matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::SupInfoB)]),
           supplementaryInfoC(matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::SupInfoC)])
     {
-        static_assert(magic_enum::enum_count<SupplementaryServicesRegexGroups>() == maxGroupsInMmiRequest);
+        static_assert(magic_enum::enum_count<SupplementaryServicesRegexGroups>() <= maxGroupsInRequest);
 
         auto &procedureTypeString =
             matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::ProcedureType)];
@@ -37,7 +38,7 @@ namespace call_request
         auto pType = procedureTypeMap.find(procedureTypeString);
         if (pType == procedureTypeMap.end()) {
 
-            throw std::runtime_error("Procedure type not covered by constructor.");
+            throw std::runtime_error(std::string(__FUNCTION__) + ": procedure type not covered by constructor.");
         }
         procedureType = pType->second;
     }
@@ -47,16 +48,13 @@ namespace call_request
     {
         std::string serviceCode = matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::ServiceCode)];
 
-        auto factoryList = {CallForwardingRequest::create};
+        auto factoryList = {
+            CallForwardingRequest::create,
+        };
 
         for (auto &createCb : factoryList) {
-            try {
-                if (auto req = createCb(serviceCode, data, matchGroups)) {
-                    return req;
-                }
-            }
-            catch (const std::runtime_error &except) {
-                LOG_ERROR("Failed to create MMI request. Error message:\n%s", except.what());
+            if (auto req = createCb(serviceCode, data, matchGroups)) {
+                return req;
             }
         }
 
@@ -79,4 +77,4 @@ namespace call_request
         return atInformationClassAllButSms;
     }
 
-}; // namespace call_request
+}; // namespace cellular
