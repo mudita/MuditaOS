@@ -57,16 +57,4 @@ class SMSTable : public Table<SMSTableRow, SMSTableFields>
     SMSTableRow getDraftByThreadId(uint32_t threadId);
 
     std::pair<uint32_t, std::vector<SMSTableRow>> getManyByType(SMSType type, uint32_t offset, uint32_t limit);
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS sms("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "thread_id INTEGER,"
-                                   "contact_id INTEGER,"
-                                   "date INTEGER,"
-                                   "date_send INTEGER,"
-                                   "error_code INTEGER,"
-                                   "body TEXT NOT_NULL,"
-                                   "type INTEGER,"
-                                   "FOREIGN KEY(thread_id) REFERENCES threads(_id) ON DELETE CASCADE );";
 };
