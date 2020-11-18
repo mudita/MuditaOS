@@ -1,26 +1,20 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * EventManagerAlarm.cpp
- *
- *  Created on: 18 lip 2019
- *      Author: kuba
- */
+#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 
-#include <sys/types.h> // for time_t
-#include <memory>      // for allocator, make_shared, make_unique, __shared_ptr_access, shared_ptr, unique_ptr
-#include <string>      // for string
-#include <utility>     // for move
-
-#include "../EventManager.hpp"             // for EventManager
-#include "../messages/EVMessages.hpp"      // for RtcMinuteAlarmMessage, EVMAlarmSwitchData
+#include <AlarmsRecord.hpp>
+#include <MessageType.hpp>
+#include <Service/Bus.hpp>
+#include <SwitchData.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>     // for DBServiceAPI
-#include "service-appmgr/Controller.hpp"   // for Controller
-#include "AlarmsRecord.hpp"                // for AlarmsRecord
-#include "MessageType.hpp"                 // for MessageType, MessageType::EVMMinuteUpdated
-#include "Service/Bus.hpp"                 // for Bus
-#include "SwitchData.hpp"                  // for SwitchData
+
+#include <memory>
+#include <string>
+#include <sys/types.h>
+#include <utility>
 
 namespace sys
 {

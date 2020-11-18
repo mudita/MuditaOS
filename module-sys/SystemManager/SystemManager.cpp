@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager.hpp"
@@ -8,8 +8,8 @@
 #include "ticks.hpp"
 #include "critical.hpp"
 #include <algorithm>
-#include <service-evtmgr/messages/KbdMessage.hpp>
-#include <service-evtmgr/messages/BatteryMessages.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
+#include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;

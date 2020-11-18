@@ -11,21 +11,27 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-set(SOURCES
-        "Application.cpp"
-        "GuiTimer.cpp"
-        "UiCommonActions.cpp"
-        "WindowsFactory.cpp"
-        "windows/AppWindow.cpp"
-        "windows/OptionWindow.cpp"
-        "windows/Options.cpp"
-        "windows/OptionsWindowOption.cpp"
-        "windows/Dialog.cpp"
-        "windows/NoEvents.cpp"
-        "windows/OptionSetting.cpp"
-        "widgets/ButtonOnOff.cpp"
-        "widgets/InputBox.cpp"
-        )
+set( SOURCES 
+    "Application.cpp"
+    "GuiTimer.cpp"
+    "UiCommonActions.cpp"
+    "WindowsFactory.cpp"
+    "windows/AppWindow.cpp" 
+    "windows/OptionWindow.cpp"
+    "windows/Options.cpp" 
+    "windows/OptionsWindowOption.cpp"
+    "windows/Dialog.cpp"
+    "windows/NoEvents.cpp"
+    "windows/OptionSetting.cpp"
+    "widgets/ButtonOnOff.cpp"
+    "widgets/InputBox.cpp"
+    "windows/VolumeWindow.cpp"
+    "windows/BrightnessWindow.cpp"
+    "windows/HomeModesWindow.cpp"
+    "widgets/BrightnessBox.cpp"
+    "widgets/ModesBox.cpp"
+    "widgets/BarGraph.cpp"
+    )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
@@ -94,6 +100,7 @@ target_link_libraries(${PROJECT_NAME}
         service-audio
         service-cellular
         service-db
+        service-evtmgr
     PUBLIC
         module-bsp
         module-os

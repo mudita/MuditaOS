@@ -1,46 +1,39 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * EventManager.cpp
- *
- *  Created on: 22 maj 2019
- *      Author: robert
- */
+#include "service-evtmgr/BatteryMessages.hpp"
+#include "service-evtmgr/Constants.hpp"
+#include "service-evtmgr/EVMessages.hpp"
+#include "service-evtmgr/EventManager.hpp"
+#include "service-evtmgr/KbdMessage.hpp"
+#include "service-evtmgr/WorkerEvent.hpp"
 
-#include "EventManager.hpp"
-
-#include <service-cellular/CellularMessage.hpp>          // for CellularTimeNotificationMessage, RawCommandResp
-#include <service-evtmgr/Constants.hpp>                  // for evt_manager
-#include <service-desktop/Constants.hpp>                 // for ServiceDesktop
-#include <cassert>                                       // for assert
-#include <list>                                          // for list
-#include <tuple>                                         // for tie, tuple
-#include <vector>                                        // for vector
+#include <BaseInterface.hpp>
+#include <MessageType.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Worker.hpp>
+#include <SystemManager/Constants.hpp>
+#include <SystemManager/SystemManager.hpp>
+#include <bsp/common.hpp>
+#include <bsp/keyboard/key_codes.hpp>
+#include <bsp/magnetometer/magnetometer.hpp>
+#include <bsp/rtc/rtc.hpp>
+#include <bsp/torch/torch.hpp>
+#include <common_data/RawKey.hpp>
+#include <log/log.hpp>
+#include <module-utils/time/time_conversion.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-audio/AudioMessage.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
+#include <service-cellular/CellularMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
-#include "log/log.hpp"             // for LOG_INFO, LOG_DEBUG, LOG_FATAL
-#include "WorkerEvent.hpp"         // for WorkerEvent
-#include "messages/EVMessages.hpp" // for TorchStateResultMessage, EVMFocusApplication, StatusStateMessage, EVMBoardResponseMessage, SIMMessage, TorchStateMessage
-#include "service-appmgr/Controller.hpp"                 // for Controller
-#include <service-db/DBNotificationMessage.hpp>
-#include "bsp/magnetometer/magnetometer.hpp"             // for GetBoard
-#include "bsp/common.hpp"                                // for c_str
-#include "bsp/rtc/rtc.hpp"                               // for rtc_SetDateTime
-#include "BaseInterface.hpp"                             // for Interface, Interface::Name, Interface::Name::Alarms
-#include "MessageType.hpp" // for MessageType, MessageType::EVMModemStatus, MessageType::CellularTimeUpdated, MessageType::DBServiceNotification, MessageType::EVMBatteryLevel, MessageType::EVMChargerPlugged, MessageType::EVMFocusApplication, MessageType::EVMGetBoard, MessageType::EVMMinuteUpdated, MessageType::EVMRingIndicator, MessageType::EVMTimeUpdated, MessageType::EVMTorchStateMessage, MessageType::EVM_GPIO, MessageType::KBDKeyEvent
-#include "Service/Bus.hpp" // for Bus
-#include "Service/Worker.hpp"              // for WorkerQueueInfo
-#include "SystemManager/Constants.hpp"     // for system_manager
-#include "SystemManager/SystemManager.hpp" // for SystemManager
-#include "bsp/keyboard/key_codes.hpp"      // for KeyCodes, KeyCodes::FnRight, bsp
-#include "bsp/torch/torch.hpp" // for State, Action, getColorTemp, getState, toggle, turn, Action::getState, Action::setState, Action::toggle
-#include "common_data/RawKey.hpp"                      // for RawKey, RawKey::State, RawKey::State::Pressed
-#include <service-audio/AudioServiceAPI.hpp>           // for SendEvent
-#include <service-audio/AudioMessage.hpp>              // for AudioEventRequest
-#include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
-#include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
-#include "module-utils/time/time_conversion.hpp"       // for Time Zone handling
+#include <cassert>
+#include <list>
+#include <tuple>
+#include <vector>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {

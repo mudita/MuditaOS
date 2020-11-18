@@ -26,11 +26,17 @@
 #include <Style.hpp>
 #include <widgets/BoxLayout.hpp>
 
+#include <module-utils/Utils.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+
 namespace gui
 {
 
     DateTimeWindow::DateTimeWindow(app::Application *app) : AppWindow(app, "DateTime")
     {
+        getApplication()->settings->registerValueChange(
+            ::Settings::SystemProperties::timeDateFormat,
+            [this](const std::string &name, std::optional<std::string> value) { timeDateChanged(name, value); });
         buildInterface();
     }
 
@@ -57,10 +63,6 @@ namespace gui
         uint32_t w = this->getWidth();
 
         utils::time::Timestamp time;
-
-        SettingsRecord appSettings = application->getSettings();
-        timeFormat12h              = appSettings.timeFormat12;
-        timeDateFormat             = appSettings.timeDateFormat;
 
         // create date widgets
         dateBody = new gui::HBox(this,
@@ -119,7 +121,7 @@ namespace gui
 
         auto hourValue = time.get_date_time_sub_value(utils::time::GetParameters::Hour);
 
-        if (timeFormat12h) {
+        if (application->isTimeFormat12()) {
             if (hourValue > 12) {
                 hourValue -= 12;
                 dayPeriod = true;
@@ -142,7 +144,7 @@ namespace gui
         timeBody->addWidget(addSpacer(""));
 
         item = addDateTimeItem(nullptr, (""), (""));
-        if (timeFormat12h) {
+        if (application->isTimeFormat12()) {
             if (dayPeriod) {
                 item->setText("PM");
             }
@@ -341,7 +343,7 @@ namespace gui
 
             if (utils::time::validateTime(getDateTimeItemValue(DateTimeItems::Hour),
                                           getDateTimeItemValue(DateTimeItems::Minute),
-                                          timeFormat12h)) {
+                                          application->isTimeFormat12())) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
             else {
@@ -364,7 +366,7 @@ namespace gui
             timeinfo.tm_mday = std::stoi(getDateTimeItemValue(DateTimeItems::Day));
 
             auto hourValue = std::stoi(getDateTimeItemValue(DateTimeItems::Hour));
-            if (timeFormat12h) {
+            if (application->isTimeFormat12()) {
                 if (dayPeriod) {
                     hourValue += 12;
                 }
@@ -378,5 +380,18 @@ namespace gui
 
         bsp::rtc_SetDateTime(&timeinfo);
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+    }
+
+    void DateTimeWindow::timeDateChanged(const std::string &name, std::optional<std::string> value)
+    {
+        if (value.has_value()) {
+            auto newTimeDateFormat = utils::getValue<bool>(value.value());
+            if (newTimeDateFormat != timeDateFormat) {
+                timeDateFormat = newTimeDateFormat;
+                if (visible) {
+                    rebuild();
+                }
+            }
+        }
     }
 } /* namespace gui */

@@ -576,6 +576,7 @@ namespace gui
     {
         type = ItemType::VBOX;
     }
+
     VBox::VBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
         : BoxLayout(parent, x, y, w, h)
     {

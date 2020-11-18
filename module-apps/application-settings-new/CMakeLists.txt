@@ -58,4 +58,5 @@ add_dependencies(${PROJECT_NAME} version)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         service-bluetooth
+        service-evtmgr
 )

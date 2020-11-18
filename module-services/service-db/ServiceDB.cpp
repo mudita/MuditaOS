@@ -40,7 +40,6 @@
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <Service/Bus.hpp>
-#include <SettingsRecord.hpp>
 #include <SettingsRecord_v2.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
@@ -79,8 +78,6 @@ ServiceDB::~ServiceDB()
 db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 {
     switch (interface) {
-    case db::Interface::Name::Settings:
-        return settingsRecordInterface.get();
     case db::Interface::Name::SMS:
         return smsRecordInterface.get();
     case db::Interface::Name::SMSThread:
@@ -115,21 +112,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     auto type = static_cast<MessageType>(msgl->messageType);
     switch (type) {
 
-    /*
-     * Settings record
-     */
-    case MessageType::DBSettingsGet: {
-        auto time        = utils::time::Scoped("DBSettingsGet");
-        auto settingsRec = settingsRecordInterface->GetByID(1);
-        responseMsg = std::make_shared<DBSettingsResponseMessage>(settingsRec, settingsRec.dbID == 0 ? false : true);
-    } break;
-    case MessageType::DBSettingsUpdate: {
-        auto time              = utils::time::Scoped("DBSettingsUpdate");
-        DBSettingsMessage *msg = reinterpret_cast<DBSettingsMessage *>(msgl);
-        auto ret               = settingsRecordInterface->Update(msg->record);
-        responseMsg            = std::make_shared<DBSettingsResponseMessage>(SettingsRecord{}, ret);
-        sendUpdateNotification(db::Interface::Name::Settings, db::Query::Type::Update);
-    } break;
         /*
          * SMS records
          */
@@ -619,7 +601,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     eventsDB        = std::make_unique<EventsDB>();
 
     // Create record interfaces
-    settingsRecordInterface      = std::make_unique<SettingsRecordInterface>(settingsDB.get());
     contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
     smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());

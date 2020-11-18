@@ -30,10 +30,6 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-#add_subdirectory( parser )
-#add_subdirectory( endpoints )
-#add_subdirectory( messages )
-
 add_dependencies(${PROJECT_NAME} version)
 
 target_include_directories(${PROJECT_NAME}
@@ -44,6 +40,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-cellular
+        service-evtmgr
         module-utils
         module-cellular
 )

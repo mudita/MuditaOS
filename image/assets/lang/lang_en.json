@@ -74,6 +74,12 @@
     "duration_0hmin_0sec" : "%0N:%0S",
     "duration_hour_0min_0sec" : "%H:%0M:%0S",
 
+    "brightness_text" : "BRIGHTNESS",
+    "volume_text" : "VOLUME",
+    "home_modes_connected" : "CONNECTED",
+    "home_modes_notdisturb" : "DO NOT DISTURB",
+    "home_modes_offline" : "OFFLINE",
+
     "app_calendar_title_main" : "Calendar",
     "app_calendar_options_title": "Options",
     "app_calendar_options_edit": "Edit",

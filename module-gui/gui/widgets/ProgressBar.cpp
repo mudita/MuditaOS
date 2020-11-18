@@ -40,6 +40,11 @@ namespace gui
         currentValue = std::clamp(value, 0U, maxValue);
     }
 
+    void ProgressBar::update(int value) noexcept
+    {
+        setValue(currentValue + value);
+    }
+
     void ProgressBar::setPercentageValue(unsigned int value) noexcept
     {
         const auto percent       = static_cast<float>(value) / 100.0f;
@@ -89,7 +94,7 @@ namespace gui
         progressIndicator = new Circle(this, indicatorParams);
     }
 
-    Point CircularProgressBar::calculateProgressIndicatorCenter() const noexcept
+    Point CircularProgressBar::calculateProgressIndicatorCenter() const
     {
         using namespace trigonometry;
         const auto sweepAngleRadians = toRadians(progressArc->getSweepAngle() + progressArc->getStartAngle());
@@ -110,6 +115,11 @@ namespace gui
         currentValue = std::clamp(value, 0U, maxValue);
     }
 
+    void CircularProgressBar::update(int value) noexcept
+    {
+        setValue(currentValue + value);
+    }
+
     void CircularProgressBar::setPercentageValue(unsigned int value) noexcept
     {
         const auto percent       = static_cast<float>(value) / 100.0f;
@@ -117,7 +127,7 @@ namespace gui
         setValue(absoluteValue);
     }
 
-    float CircularProgressBar::getPercentageValue() const noexcept
+    float CircularProgressBar::getPercentageValue() const
     {
         if (maxValue == 0) {
             return .0f;

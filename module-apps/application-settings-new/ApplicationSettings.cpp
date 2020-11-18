@@ -25,7 +25,7 @@
 
 #include "Dialog.hpp"
 
-#include <service-evtmgr/api/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <i18/i18.hpp>
 

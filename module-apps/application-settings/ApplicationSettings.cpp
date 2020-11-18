@@ -27,7 +27,7 @@
 #include "windows/SettingsChange.hpp"
 
 #include <i18/i18.hpp>
-#include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 
 namespace app
