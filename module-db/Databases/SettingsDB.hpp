@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Database/Database.hpp"
+#include "../Tables/SettingsTable.hpp"
 #include "../Tables/SettingsTable_v2.hpp"
 
 class SettingsDB : public Database
@@ -12,6 +13,7 @@ class SettingsDB : public Database
     SettingsDB();
     ~SettingsDB() override = default;
 
+    SettingsTable settings;
     SettingsTable_v2 settings_v2;
 
     static const char *GetDBName()

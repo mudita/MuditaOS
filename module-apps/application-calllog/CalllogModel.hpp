@@ -10,7 +10,6 @@
 #include "CalllogRecord.hpp"
 #include "Application.hpp"
 #include "ListItemProvider.hpp"
-#include <module-services/service-db/agents/settings/Settings.hpp>
 
 /*
  *
