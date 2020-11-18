@@ -17,7 +17,7 @@ namespace audio
             return;
         }
 
-        if (vfs.fread(&waveHeader, 1, sizeof(waveHeader), fd) != sizeof(WAVE_FormatTypeDef)) {
+        if (std::fread(&waveHeader, 1, sizeof(waveHeader), fd) != sizeof(WAVE_FormatTypeDef)) {
             return;
         }
 
@@ -46,7 +46,7 @@ namespace audio
             break;
 
         case 16:
-            samples_read = vfs.fread(pcmData, sizeof(int16_t), samplesToRead, fd);
+            samples_read = std::fread(pcmData, sizeof(int16_t), samplesToRead, fd);
             break;
 
         case 24:
@@ -70,9 +70,9 @@ namespace audio
     void decoderWAV::setPosition(float pos)
     {
 
-        vfs.fseek(fd, (fileSize * pos) + sizeof(WAVE_FormatTypeDef), SEEK_SET);
+        std::fseek(fd, (fileSize * pos) + sizeof(WAVE_FormatTypeDef), SEEK_SET);
         // Calculate new position
-        position = (float)((float)(vfs.ftell(fd) / sizeof(int16_t) / chanNumber) / (float)(sampleRate));
+        position = (float)((float)(std::ftell(fd) / sizeof(int16_t) / chanNumber) / (float)(sampleRate));
     }
 
 } // namespace audio

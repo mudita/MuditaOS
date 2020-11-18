@@ -9,7 +9,6 @@
 #include <optional>
 #include <cstring>
 
-#include <vfs.hpp>
 
 namespace audio
 {
@@ -104,7 +103,7 @@ namespace audio
         uint32_t sampleRate = 0;
         uint32_t chanNumber = 0;
         float position      = 0;
-        vfs::FILE *fd       = nullptr;
+        std::FILE *fd       = nullptr;
         uint32_t fileSize   = 0;
         std::string filePath;
 

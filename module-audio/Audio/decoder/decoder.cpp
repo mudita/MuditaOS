@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <cstdio>
 #include <Utils.hpp>
 #include "decoder.hpp"
 #include "decoderMP3.hpp"
@@ -18,28 +19,28 @@ namespace audio
         : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
     {
 
-        fd = vfs.fopen(fileName, "r");
+        fd = std::fopen(fileName, "r");
         if (fd == NULL) {
             return;
         }
 
-        vfs.fseek(fd, 0, SEEK_END);
-        fileSize = vfs.ftell(fd);
-        vfs.rewind(fd);
+        std::fseek(fd, 0, SEEK_END);
+        fileSize = std::ftell(fd);
+        std::rewind(fd);
     }
 
     decoder::~decoder()
     {
         if (fd) {
-            vfs.fclose(fd);
+            std::fclose(fd);
         }
     }
 
     std::unique_ptr<Tags> decoder::fetchTags()
     {
         if (fd) {
-            auto inPos = vfs.ftell(fd);
-            vfs.rewind(fd);
+            auto inPos = std::ftell(fd);
+            std::rewind(fd);
             TagLib::FileStream fileStream(fd);
             TagLib::FileRef tagReader(&fileStream);
             if (!tagReader.isNull() && tagReader.tag()) {
@@ -60,9 +61,9 @@ namespace audio
                 tag->num_channel      = properties->channels();
                 tag->bitrate          = properties->bitrate();
             }
-            vfs.rewind(fd);
+            std::rewind(fd);
             fetchTagsSpecific();
-            vfs.fseek(fd, inPos, SEEK_SET);
+            std::fseek(fd, inPos, SEEK_SET);
         }
 
         tag->filePath.append(filePath);
