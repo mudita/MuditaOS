@@ -14,7 +14,6 @@
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <module-services/service-db/agents/settings/Settings.hpp>
 
 namespace app
 {
@@ -22,6 +21,9 @@ namespace app
 
     class ApplicationDesktop : public Application
     {
+      protected:
+        void reloadSettings();
+
       public:
         bool need_sim_select = false;
         struct Notifications
@@ -75,9 +77,6 @@ namespace app
         bool clearMessagesNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
-
-      private:
-        void activeSimChanged(const std::string &name, std::optional<std::string> value);
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>

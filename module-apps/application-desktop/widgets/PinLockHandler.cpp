@@ -5,20 +5,16 @@
 #include "PinHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include <service-cellular/ServiceCellular.hpp>
-#include <module-utils/Utils.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace gui
 {
     constexpr unsigned int default_screen_pin_size = 4;
     constexpr unsigned int default_screen_attempts = 4;
 
-    PinLockHandler::PinLockHandler(app::ApplicationDesktop *app) : app(app), lock(this)
+    PinLockHandler::PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings)
+        : app(app), appSettings(settings), lock(this)
     {
         reloadScreenLock();
-        app->settings->registerValueChange(
-            ::Settings::SystemProperties::lockPassHash,
-            [this](const std::string &name, std::optional<std::string> value) { lockPassHashChanged(name, value); });
     }
 
     auto PinLockHandler::handle(CellularSimResponseMessage *msg) -> bool
@@ -108,7 +104,7 @@ namespace gui
             std::hash<std::vector<unsigned int>> hashEngine;
             uint32_t hash = hashEngine(pin);
             lock.remainingAttempts--;
-            if (hash == lockPassHash) {
+            if (hash == appSettings.lockPassHash) {
                 lock.remainingAttempts = default_screen_attempts;
                 lock.state             = gui::PinLock::State::VerifiedPin;
             }
@@ -135,16 +131,9 @@ namespace gui
         lock.type  = gui::PinLock::LockType::Screen;
         lock.state = gui::PinLock::State::EnterPin;
 
-        unsigned int pinSize   = lockPassHash == 0 ? 0 : default_screen_pin_size;
+        unsigned int pinSize   = appSettings.lockPassHash == 0 ? 0 : default_screen_pin_size;
         lock.pinValue          = std::vector<unsigned int>(pinSize, 0);
         lock.remainingAttempts = default_screen_attempts;
-    }
-
-    void PinLockHandler::lockPassHashChanged(const std::string &name, std::optional<std::string> value)
-    {
-        if (value.has_value() && !value.value().empty()) {
-            lockPassHash = utils::getValue<unsigned int>(value.value());
-        }
     }
 
 } // namespace gui

@@ -9,7 +9,7 @@ BEGIN TRANSACTION;
 -- Main settings table, for string application persistent data
 --
 CREATE TABLE IF NOT EXISTS settings_tab (
-    path TEXT NOT NULL UNIQUE PRIMARY KEY,
+    path TEXT NOT NULL UNIQUE,
     value TEXT
 );
 
@@ -63,19 +63,6 @@ INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
 
 INSERT OR REPLACE INTO settings_tab (path, value) VALUES
     ('system/phone_mode', 'online');
-
---language:En, Pl, De, Sp
---howto put value from magic_enum for activeSim?
---what about keeping available languages to dictionary_tab?
---a list based function to get all languages would be needed
-INSERT OR REPLACE INTO settings_tab (path, value) VALUES
-    ('timeFormat12', '0'),
-    ('timeDateFormat', '1'),
-    ('activeSim', '1'),
-    ('lockPassHash', '0'),
-    ('lockTime', '30000'),
-    ('displayLanguage', 'En'),
-    ('inputLanguag', 'En');
 
 COMMIT TRANSACTION;
 -- )dbInitStr"
