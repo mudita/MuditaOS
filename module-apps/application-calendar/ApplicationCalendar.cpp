@@ -167,8 +167,8 @@ namespace app
         }
         gui::DialogMetadata meta;
         meta.text   = utils::localize.get("app_calendar_no_events_information");
-        meta.title = title;
-        meta.icon  = "phonebook_empty_grey_circle_W_G";
+        meta.title  = title;
+        meta.icon   = "phonebook_empty_grey_circle_W_G";
         meta.action = [=]() -> bool {
             LOG_DEBUG("Switch to new event window");
             std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
