@@ -682,7 +682,9 @@ TEST_CASE("+CPIN")
         auto urc  = at::urc::UrcFactory::Create("+CPIN: SIM PIN");
         auto cpin = getURC<at::urc::Cpin>(urc);
         REQUIRE(cpin);
+        REQUIRE(cpin->isValid());
         REQUIRE(cpin->getState() == at::SimState::SimPin);
+        REQUIRE(cpin->getMessage() == "SIM PIN");
     }
     SECTION("CPIN not supported")
     {
