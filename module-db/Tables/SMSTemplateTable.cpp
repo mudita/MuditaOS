@@ -16,7 +16,7 @@ SMSTemplateTable::~SMSTemplateTable()
 
 bool SMSTemplateTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool SMSTemplateTable::add(SMSTemplateTableRow entry)

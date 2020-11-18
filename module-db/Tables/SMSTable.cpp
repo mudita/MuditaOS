@@ -9,7 +9,7 @@ SMSTable::SMSTable(Database *db) : Table(db)
 
 bool SMSTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool SMSTable::add(SMSTableRow entry)

@@ -9,18 +9,6 @@ ThreadsTable::ThreadsTable(Database *db) : Table(db)
 
 bool ThreadsTable::create()
 {
-    // Create necessary tables
-    if (!db->execute(createTableQuery))
-        return false;
-    if (!db->execute(createTableThreadsCounterQuery))
-        return false;
-    if (!db->execute(threadsCounterInsertionQuery))
-        return false;
-    if (!db->execute(threadInsertTriggerQuery))
-        return false;
-    if (!db->execute(threadRemoveTriggerQuery))
-        return false;
-
     return true;
 }
 

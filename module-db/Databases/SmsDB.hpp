@@ -12,7 +12,7 @@ class SmsDB : public Database
 {
   public:
     SmsDB();
-    ~SmsDB();
+    ~SmsDB() = default;
 
     SMSTable sms;
     ThreadsTable threads;
