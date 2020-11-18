@@ -9,7 +9,7 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
-#include "service-cellular/SimCard.hpp"
+#include "SimCard.hpp"
 #include "service-cellular/CallRequestFactory.hpp"
 #include "service-cellular/CellularCallRequestHandler.hpp"
 
@@ -648,15 +648,6 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         state.set(this, State::ST::SimSelect);
         break;
     }
-    case MessageType::CellularSimVerifyPinRequest: {
-        auto msg = static_cast<CellularSimVerifyPinRequestMessage *>(msgl);
-        if (msg != nullptr) {
-            responseMsg = std::make_shared<CellularResponseMessage>(unlockSim(msg));
-            break;
-        }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
-        break;
-    }
     case MessageType::CellularListCurrentCalls: {
         auto ret  = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
         auto size = ret.response.size();
@@ -1003,112 +994,65 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
     return urcHandler.getResponse();
 }
-/// requestPin is call anytime modem need pin, here should be called any action
-/// which allow user input (or mockup) pin. Then send appropriate action to notify the modem
-/// \param attempts Attempts counter for current action
-/// \param msg Literal name of action eg. SIM PIN
-/// \return
+
 bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 {
     LOG_DEBUG("REQUEST PIN");
-    auto sim = Store::GSM::get()->sim;
-
-    const std::vector<unsigned int> fakePin({1, 1, 1, 2});
-    constexpr bool safety = 0; ///* because this is mockup, for safety reason,
-                               ///  test PIN should be not send unconsciously to not lock SIM card accidentally */
-    if (safety) {
-        sys::Bus::SendUnicast(
-            std::make_shared<CellularSimVerifyPinRequestMessage>(sim, fakePin), ServiceCellular::serviceName, this);
-    }
-
     return true;
 }
 
-/// requestPuk is call anytime modem need puk, here should be called any action
-/// which allow user input (or mockup) puk and new pin. Then send appropriate action to notify the modem
-/// \param attempts Attempts counter for current action
-/// \param msg Literal name of action eg. SIM PUK
-/// \return
 bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 {
     LOG_ERROR("REQUEST PUK");
-    auto sim = Store::GSM::get()->sim;
-    const std::vector<unsigned int> fakePin({1, 1, 1, 1});
-    /// fake puk set to 0 to not cause SIM damage, eg could be set to real one fakePuk({7, 5, 4, 1, 9, 7, 1, 3});
-    const std::vector<unsigned int> fakePuk({7, 5, 4, 1, 9, 7, 1, 3});
-    constexpr bool safety = 0; ///* because this is mockup, for safety reason,
-    ///  test PIN should be not send unconsciously to not lock SIM card accidentally */
-    if (safety) {
-        sys::Bus::SendUnicast(std::make_shared<CellularSimVerifyPinRequestMessage>(sim, fakePin, fakePuk),
-                              ServiceCellular::serviceName,
-                              this);
-    }
     return true;
 }
 
-/// Call in case of SIM card unlocked, MT ready. Place for sending message/action inform rest
-/// \return
 bool ServiceCellular::sendSimUnlocked()
 {
     LOG_DEBUG("SIM UNLOCKED");
     return true;
 }
 
-/// Call in case of SIM card locked (card fail, eg. to many bad PUK). Place for sending message/action inform rest
-/// \return
 bool ServiceCellular::sendSimBlocked()
 {
     LOG_ERROR("SIM BLOCKED");
     return true;
 }
 
-/// From this point should be send message/action call interaction in other layers eg. GUI
-/// \param cme_error
-/// \return
-bool ServiceCellular::unhandledCME(unsigned int cme_error)
+bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
 {
     LOG_ERROR("UNHANDLED CME %d", cme_error);
     return true;
 }
 
-/// Message send, when modem return incorrect password for PIN message.
-/// Propably modem firmware depend. On current version last bad message (attempts=1) return PUK request
-/// and generate PUK URC, so finally action on puk request will be call. This implementation allow to
-/// rethrow URC (so achive similar behavior in all cases).
-/// \return
 bool ServiceCellular::sendBadPin()
 {
     LOG_DEBUG("SEND BAD PIN");
     SimCard simCard(*this);
     std::string msg;
-    auto state = simCard.simStateWithMessage(msg);
-    return handleSimState(state, msg);
+    if (auto state = simCard.simStateWithMessage(msg); state) {
+        return handleSimState(*state, msg);
+    }
+    return false;
 }
 
-/// Similar to sendBadPin
-/// \return
 bool ServiceCellular::sendBadPuk()
 {
     LOG_DEBUG("SEND BAD PUK");
     SimCard simCard(*this);
     std::string msg;
-    auto state = simCard.simStateWithMessage(msg);
-    return handleSimState(state, msg);
+    if (auto state = simCard.simStateWithMessage(msg); state) {
+        return handleSimState(*state, msg);
+    }
+    return false;
 }
 
-/// Place to send action notifying eg. GUI
-/// \param res
-/// \return
 bool ServiceCellular::sendChangePinResult(SimCardResult res)
 {
     LOG_DEBUG("SEND CHANGE PIN RESULT");
     return true;
 }
 
-/// Function ready for change pin action send to Service Cellular form eg. GUI
-/// \param oldPin
-/// \param newPin
-/// \return
 bool ServiceCellular::changePin(const std::string oldPin, const std::string newPin)
 {
     SimCard simCard(*this);
@@ -1132,7 +1076,7 @@ bool ServiceCellular::unlockSimPin(std::string pin)
         return true;
     }
     else {
-        unhandledCME(static_cast<unsigned int>(sime));
+        sendUnhandledCME(static_cast<unsigned int>(sime));
         return false;
     }
 }
@@ -1152,37 +1096,8 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
     if (sime == SimCardResult::OK) {
         return true;
     }
-    unhandledCME(static_cast<unsigned int>(sime));
+    sendUnhandledCME(static_cast<unsigned int>(sime));
     return false;
-}
-
-/// Mockup for current message
-/// \param msg
-/// \return
-bool ServiceCellular::unlockSim(CellularSimVerifyPinRequestMessage *msg)
-{
-    auto vpin = msg->getPinValue();
-    auto vpuk = msg->getPukValue();
-
-    std::stringstream ss;
-    for (unsigned int i : vpin) {
-        ss << i;
-    }
-    std::string pin;
-    ss >> pin;
-
-    if (vpuk.size() > 0) {
-        std::stringstream ssp;
-        for (unsigned int i : vpuk) {
-            ssp << i;
-        }
-        std::string puk;
-        ssp >> puk;
-        return unlockSimPuk(puk, pin);
-    }
-    else {
-        return unlockSimPin(pin);
-    }
 }
 
 bool ServiceCellular::handleSimState(at::SimState state, const std::string message)

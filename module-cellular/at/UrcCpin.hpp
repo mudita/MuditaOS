@@ -18,30 +18,31 @@ namespace at::urc
         };
 
       public:
-        static constexpr std::string_view cpin_ready     = "READY";     /**< MT is not pending for any password */
-        static constexpr std::string_view cpin_not_ready = "NOT READY"; /**< +CPIN urc, SIM not ready */
-        static constexpr std::string_view cpin_sim_pin   = "SIM PIN";   /**< MT is waiting for SIM PIN to be given */
-        static constexpr std::string_view cpin_sim_puk   = "SIM PUK";   /**< MT is waiting for SIM PUK to be given */
-        static constexpr std::string_view cpin_sim_pin2  = "SIM PIN2";  /**< MT is waiting for SIM PIN2 to be given */
-        static constexpr std::string_view cpin_sim_puk2  = "SIM PUK2";  /**< MT is waiting for SIM PUK2 to be given */
-        static constexpr std::string_view cpin_phnet_pin =
-            "PH-NET PIN"; /**< MT is waiting for network personalization password to be given */
-        static constexpr std::string_view cpin_phnet_puk =
-            "PH-NET PUK"; /**< MT is waiting for network personalization unblocking password */
-        static constexpr std::string_view cpin_phnestsub_pin =
-            "PH-NETSUB PIN"; /**< MT is waiting for network subset personalization password to be given */
-        static constexpr std::string_view cpin_phnestsub_puk =
-            "PH-NETSUB PUK"; /**< MT is waiting for network subset personalization unblocking password to be given */
-        static constexpr std::string_view cpin_phsp_pin =
-            "PH-SP PIN"; /**< MT is waiting for service provider personalization password to be given */
-        static constexpr std::string_view cpin_phsp_puk =
-            "PH-SP PUK"; /**< MT is waiting for service provider personalization unblocking password to be given */
-        static constexpr std::string_view cpin_phcorp_pin =
-            "PH-CORP PIN"; /**< MT is waiting for corporate personalization password to be given */
-        static constexpr std::string_view cpin_phcorp_puk =
-            "PH-CORP PUK"; /**< MT is waiting for corporate personalization unblocking password to be given */
+        static constexpr auto cpin_ready     = "READY";     ///<  MT is not pending for any password
+        static constexpr auto cpin_not_ready = "NOT READY"; ///< +CPIN urc, SIM not ready
+        static constexpr auto cpin_sim_pin   = "SIM PIN";   ///< MT is waiting for SIM PIN to be given
+        static constexpr auto cpin_sim_puk   = "SIM PUK";   ///< MT is waiting for SIM PUK to be given
+        static constexpr auto cpin_sim_pin2  = "SIM PIN2";  ///< MT is waiting for SIM PIN2 to be given
+        static constexpr auto cpin_sim_puk2  = "SIM PUK2";  ///<  MT is waiting for SIM PUK2 to be given
+        static constexpr auto cpin_phnet_pin =
+            "PH-NET PIN"; ///<  MT is waiting for network personalization password to be given
+        static constexpr auto cpin_phnet_puk =
+            "PH-NET PUK"; ///<  MT is waiting for network personalization unblocking password
+        static constexpr auto cpin_phnestsub_pin =
+            "PH-NETSUB PIN"; ///<  MT is waiting for network subset personalization password to be given
+        static constexpr auto cpin_phnestsub_puk =
+            "PH-NETSUB PUK"; ///<  MT is waiting for network subset personalization unblocking password to be given
+        static constexpr auto cpin_phsp_pin =
+            "PH-SP PIN"; ///<  MT is waiting for service provider personalization password to be given
+        static constexpr auto cpin_phsp_puk =
+            "PH-SP PUK"; ///<  MT is waiting for service provider personalization unblocking password to be given
+        static constexpr auto cpin_phcorp_pin =
+            "PH-CORP PIN"; ///<  MT is waiting for corporate personalization password to be given
+        static constexpr auto cpin_phcorp_puk =
+            "PH-CORP PUK"; ///<  MT is waiting for corporate personalization unblocking password to be given
 
-        static constexpr std::string_view head = "+CPIN";
+        static constexpr auto head = "+CPIN";
+
         static bool isURC(const std::string uHead)
         {
             return uHead.find(Cpin::head) != std::string::npos;

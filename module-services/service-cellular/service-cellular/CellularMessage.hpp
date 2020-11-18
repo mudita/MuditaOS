@@ -281,11 +281,11 @@ class CellularSimVerifyPinRequestMessage : public CellularSimMessage
           pukValue(std::move(pukValue))
     {}
 
-    std::vector<unsigned int> getPinValue() const noexcept
+    std::vector<unsigned int> getPinValue() const
     {
         return pinValue;
     }
-    std::vector<unsigned int> getPukValue() const noexcept
+    std::vector<unsigned int> getPukValue() const
     {
         return pukValue;
     }

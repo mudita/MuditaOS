@@ -205,7 +205,7 @@ namespace at
             {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"", 300}},
             {AT::CPIN, {"AT+CPIN=", default_timeout}},
             {AT::GET_CPIN, {"AT+CPIN?", default_timeout}},
-            {AT::QPINC, {"AT+QPINC=", default_doc_timeout}},
+            {AT::QPINC, {"AT+QPINC=", default_timeout}},
             {AT::CLCK, {"AT+CLCK=", default_timeout}},
             {AT::CPWD, {"AT+CPWD=", default_timeout}},
             {AT::ENABLE_TIME_ZONE_UPDATE, {"AT+CTZU=3"}},
