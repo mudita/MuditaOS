@@ -85,7 +85,7 @@ extern "C" {
     int fstat(int fd, struct stat *pstat)
     {
         TRACE_SYSCALL();
-        FF_FILE* fil = vfsn::linux::internal::handle_to_ff_file(fd);
+        FF_FILE* fil = vfsn::linux::internal::fd_to_ff_file(fd);
         if(!fil) {
             errno = EBADF;
             return -1;
@@ -207,7 +207,7 @@ extern "C" {
     int fsync(int fd)
     {
         TRACE_SYSCALL();
-        auto fil = vfsn::linux::internal::handle_to_ff_file(fd);
+        auto fil = vfsn::linux::internal::fd_to_ff_file(fd);
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
             errno = EBADF;
