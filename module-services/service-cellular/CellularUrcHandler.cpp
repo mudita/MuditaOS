@@ -9,7 +9,6 @@
 #include <module-sys/Service/Bus.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <service-evtmgr/messages/EVMessages.hpp>
 
 // this static function will be replaced by Settings API
 static bool isSettingsAutomaticTimeSyncEnabled()
