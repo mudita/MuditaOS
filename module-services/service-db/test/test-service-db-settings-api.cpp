@@ -14,7 +14,6 @@
 #include <service-evtmgr/EventManager.hpp>
 #include <service-evtmgr/Constants.hpp>
 
-#include <module-services/service-fota/api/FotaServiceAPI.cpp>
 
 #include "test-service-db-settings-testmsgs.hpp"
 #include "test-service-db-settings-testservices.hpp"

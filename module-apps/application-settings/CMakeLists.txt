@@ -45,4 +45,5 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-bluetooth
         service-evtmgr
+        service-fota
 )

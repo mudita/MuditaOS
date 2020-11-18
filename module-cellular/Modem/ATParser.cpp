@@ -3,7 +3,7 @@
 
 #include "ATParser.hpp"
 #include "Service/Bus.hpp"
-#include "service-fota/api/FotaServiceAPI.hpp"
+#include <service-fota/FotaServiceAPI.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include <service-cellular/CellularMessage.hpp>
 #include "ticks.hpp"
