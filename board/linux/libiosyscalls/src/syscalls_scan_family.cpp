@@ -6,16 +6,28 @@
 #include <errno.h>
 #include <ctype.h>
 #include "debug.hpp"
+#include "internal.hpp"
+#include <dlfcn.h>
+
+namespace
+{
+    int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
+
+    void __attribute__((constructor)) _syscalls_scan_family()
+    {
+        real_fprintf = reinterpret_cast<decltype(real_fprintf)>(dlsym(RTLD_NEXT, "fprintf"));
+        if(!real_fprintf ) {
+            abort();
+        }
+    }
+}
+
 namespace {
-
-
     int ic(FF_FILE *fp)
     {
         char ch;
         return ff_fread( &ch, 1, 1, fp);
     }
-
-
     int istr(FF_FILE *fp, char *dst, int wid)
     {
         char *d = dst;
@@ -65,9 +77,15 @@ namespace {
 }
 extern "C" {
 
+    namespace vfs = vfsn::linux::internal;
     int ungetc (int __c, FILE *__stream)
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(__stream)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         int ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), -1, SEEK_CUR );
         if( ret ) {
             errno = stdioGET_ERRNO();
@@ -90,6 +108,11 @@ extern "C" {
     int vfscanf (FILE *__restrict fp, const char *__restrict fmt,
                     __gnuc_va_list ap)
     {
+        if(!vfs::is_ff_handle(fp)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         TRACE_SYSCALL();
         int ret = 0;
         int t, c;
@@ -143,6 +166,11 @@ extern "C" {
                    const char *__restrict fmt, ...) __wur
     {
         TRACE_SYSCALL();
+        if(!vfs::is_ff_handle(fp)) {
+            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
+            errno = EINVAL;
+            return -1;
+        }
         va_list ap;
         int ret;
         va_start(ap, fmt);
