@@ -1,15 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <stdint.h> // for uint32_t
-#include <memory>   // for allocator, unique_ptr
-#include <string>   // for string
+#include "TimeEvents.hpp"
 
-#include "TimeEvents.hpp"                           // for TimeEvents
-#include "EventsRecord.hpp"                         // for EventsRecord
-#include "application-calendar/data/dateCommon.hpp" // for TIME_POINT_INVALID, TimePoint
+#include <application-calendar/data/dateCommon.hpp>
+#include <module-db/Interface/EventsRecord.hpp>
+#include <module-db/queries/calendar/QueryEventsEdit.hpp>
+
+#include <cstdint>
+#include <memory>
+#include <string>
 
 namespace db
 {

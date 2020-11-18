@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
@@ -14,9 +14,9 @@
 #include "application-desktop/widgets/NotificationsBox.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
-#include "service-appmgr/Controller.hpp"
-#include "service-time/ServiceTime.hpp"
-#include "service-time/messages/TimeMessage.hpp"
+#include <service-appmgr/Controller.hpp>
+#include <service-time/ServiceTime.hpp>
+#include <service-time/TimeMessage.hpp>
 #include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
