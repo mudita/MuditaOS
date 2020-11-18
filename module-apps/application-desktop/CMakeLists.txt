@@ -57,4 +57,5 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-db
         service-desktop
+        service-time
     )
