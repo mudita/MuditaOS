@@ -8,9 +8,11 @@
 #include <Tables/ContactsGroups.hpp>
 
 #include <vfs.hpp>
+#include <filesystem>
 
 #include <iomanip>
 #include <sstream>
+#include <purefs/filesystem_paths.hpp>
 
 namespace consts
 {
@@ -26,8 +28,9 @@ TEST_CASE("Contact Groups tests", "[Groups]")
 {
     INFO("sqlite Init");
     Database::initialize();
-    vfs.remove(ContactsDB::GetDBName());
-    ContactsDB contactDb;
+    const auto callogPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::filesystem::remove(callogPath);
+    ContactsDB contactDb{callogPath};
     INFO("contactDB init");
     REQUIRE(contactDb.isInitialized());
     ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);

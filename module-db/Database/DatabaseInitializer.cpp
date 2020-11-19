@@ -3,18 +3,21 @@
 
 #include "DatabaseInitializer.hpp"
 
-#include <vfs.hpp>
+#include <algorithm>
+#include <cstdio>
 #include <memory>
 #include <set>
+#include <string>
+#include <log/log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)
 {}
 
-bool DatabaseInitializer::run(fs::path path, std::string ext)
+bool DatabaseInitializer::run(std::filesystem::path path, std::string ext)
 {
     // Database name is database file path, need to strip off all filesystem related stuff(path, extension)
-    fs::path dbpath    = db->getName();
-    std::string dbname = dbpath.filename().replace_extension();
+    std::filesystem::path dbpath = db->getName();
+    std::string dbname           = dbpath.filename().replace_extension();
 
     auto files = listFiles(path, dbname, ext);
     for (auto file : files) {
@@ -28,30 +31,54 @@ bool DatabaseInitializer::run(fs::path path, std::string ext)
     return true;
 }
 
-std::vector<std::string> DatabaseInitializer::readCommands(fs::path filePath)
+std::string DatabaseInitializer::readContent(const char *filename) const noexcept
 {
-    ScopedFile file(filePath, "r");
+    std::unique_ptr<char[]> fcontent;
+    long fsize = 0;
 
-    std::string line;
-    std::string currentStatement;
-    std::vector<std::string> statements;
+    auto fp = std::fopen(filename, "r");
+    if (fp) {
+        std::fseek(fp, 0, SEEK_END);
+        fsize = std::ftell(fp);
+        std::rewind(fp);
 
-    while (!vfs.eof(file.get())) {
-        line = vfs.getline(file.get());
+        fcontent = std::make_unique<char[]>(fsize + 1);
 
-        if (line.empty() || starts_with(line, std::string("--"))) {
-            continue;
-        }
+        std::fread(fcontent.get(), 1, fsize, fp);
 
-        if (ends_with(line, std::string(";"))) {
-            statements.push_back(currentStatement + line);
-            currentStatement.clear();
-            continue;
-        }
-
-        currentStatement += line;
+        std::fclose(fp);
     }
 
+    return std::string(fcontent.get());
+}
+
+std::vector<std::string> DatabaseInitializer::readCommands(std::filesystem::path filePath)
+{
+    auto fileContent = readContent(filePath.c_str());
+    std::string currentStatement{};
+    std::vector<std::string> statements{};
+
+    std::string line{};
+    for (auto &c : fileContent) {
+        if (c != '\n') {
+            line += c;
+        }
+        else {
+            if (line.empty() || starts_with(line, std::string("--"))) {
+                line.clear();
+                continue;
+            }
+            if (ends_with(line, std::string(";"))) {
+                statements.push_back(currentStatement + line);
+                currentStatement.clear();
+                line.clear();
+                continue;
+            }
+            currentStatement += line;
+
+            line.clear();
+        }
+    }
     return statements;
 }
 
@@ -64,27 +91,28 @@ std::array<std::string, 3> DatabaseInitializer::splitFilename(std::string filena
     return {name, prefix, postfix};
 }
 
-std::vector<fs::path> DatabaseInitializer::listFiles(fs::path path, std::string prefix, std::string ext)
+std::vector<std::filesystem::path> DatabaseInitializer::listFiles(std::filesystem::path path,
+                                                                  std::string prefix,
+                                                                  std::string ext)
 {
-    std::set<std::pair<int, fs::path>> orderedFiles;
-    auto dirList = vfs.listdir(path.c_str(), ext);
-    for (vfs::DirectoryEntry ent : dirList) {
-        if (ent.attributes != vfs::FileAttributes::Directory) {
+    std::set<std::pair<int, std::filesystem::path>> orderedFiles;
+    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+        if (!entry.is_directory() && entry.path().has_filename()) {
             try {
-                auto parts      = splitFilename(ent.fileName);
+                auto parts      = splitFilename(entry.path().filename().string());
                 auto filePrefix = parts[1];
                 if (filePrefix == prefix) {
                     auto num = std::stoi(parts[2]);
-                    orderedFiles.insert({num, path / ent.fileName});
+                    orderedFiles.insert({num, entry.path()});
                 }
             }
             catch (std::invalid_argument &e) {
-                LOG_INFO("Ignoring file: %s", ent.fileName.c_str());
+                LOG_INFO("Ignoring file: %s", entry.path().c_str());
             }
         }
     }
 
-    std::vector<fs::path> files;
+    std::vector<std::filesystem::path> files;
     std::for_each(orderedFiles.begin(), orderedFiles.end(), [&](auto item) { files.push_back(item.second); });
     return files;
 }

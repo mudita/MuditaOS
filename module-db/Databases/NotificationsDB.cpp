@@ -3,9 +3,5 @@
 
 #include "NotificationsDB.hpp"
 
-#include <vfs.hpp>
-
-const char *NotificationsDB::dbName = USER_PATH("notifications.db");
-
-NotificationsDB::NotificationsDB() : Database(dbName), notifications(this)
+NotificationsDB::NotificationsDB(const char *name) : Database(name), notifications(this)
 {}

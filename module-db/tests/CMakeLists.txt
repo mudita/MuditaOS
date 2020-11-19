@@ -35,4 +35,5 @@ add_catch2_executable(
         
     LIBS
         module-db
+        module-vfs
 )

@@ -7,7 +7,6 @@
 
 #include "QueryResult.hpp"
 
-#include <vfs.hpp>
 #include <memory>
 #include <set>
 

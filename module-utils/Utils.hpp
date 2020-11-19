@@ -240,4 +240,15 @@ namespace utils
 #endif
     }
 
+    namespace filesystem
+    {
+        static inline long int filelength(std::FILE *file) noexcept
+        {
+            if (file == nullptr) {
+                return 0;
+            }
+            std::fseek(file, 0, SEEK_END);
+            return std::ftell(file);
+        }
+    } // namespace filesystem
 } // namespace utils
