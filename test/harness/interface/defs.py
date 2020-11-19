@@ -40,6 +40,7 @@ key_codes = {
     "sliderUp": 16,
     "sliderMid": 18,
     "sliderDown": 17,
-    "#": ord('#')
+    "#": ord('#'),
+    "*": ord('*')
 
 }
