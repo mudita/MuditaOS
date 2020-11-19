@@ -21,36 +21,14 @@ SimCardResult SimCard::convertErrorFromATResult(at::Result atres)
     return SimCardResult::Unknown;
 }
 
-std::optional<std::vector<std::string>> SimCard::getTokensForATCommand(const at::Result &resp, std::string_view head)
-{
-    if (resp.code == at::Result::Code::OK) {
-        if (resp.response.size()) {
-            for (auto el : resp.response) {
-
-                if (el.compare(0, head.length(), head) == 0) {
-                    auto body = el.substr(head.length());
-                    return utils::split(body, ",");
-                }
-            }
-        }
-    }
-    return std::nullopt;
-}
-
-std::optional<SimCard::AttemptsCounters> SimCard::getAttemptsCounters()
+std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters()
 {
     auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
     if (channel) {
-        auto resp                          = channel->cmd(at::factory(at::AT::QPINC) + "\"SC\"");
-        const std::string_view AT_QPINC_SC = "+QPINC: \"SC\",";
-        if (auto tokens = getTokensForATCommand(resp, AT_QPINC_SC); tokens) {
-            constexpr int QPINC_TokensCount = 3;
-            if ((*tokens).size() == QPINC_TokensCount) {
-                AttemptsCounters ret;
-                utils::toNumeric((*tokens)[1], ret.PinCounter);
-                utils::toNumeric((*tokens)[2], ret.PukCounter);
-                return ret;
-            }
+        auto resp = channel->cmd(at::factory(at::AT::QPINC) + "\"SC\"");
+        at::response::qpinc::AttemptsCounters ret;
+        if (at::response::parseQPINC(resp, ret)) {
+            return ret;
         }
     }
 
@@ -109,17 +87,12 @@ SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin)
 bool SimCard::isPinLocked()
 {
     if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
-        auto resp                      = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
-        const std::string_view AT_CLCK = "+CLCK:";
-        if (auto tokens = getTokensForATCommand(resp, AT_CLCK); tokens) {
-            if ((*tokens).size() != 0) {
-                int val = 0;
-                utils::toNumeric((*tokens)[0], val);
-                return val != 0;
-            }
+        auto resp = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
+        int val   = 0;
+        if (at::response::parseCLCK(resp, val)) {
+            return val != 0;
         }
     }
-
     return true;
 }
 

@@ -11,6 +11,7 @@
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include "response.hpp"
 
 class SimCard
 {
@@ -18,19 +19,12 @@ class SimCard
     explicit SimCard(ServiceCellular &cellularService) : cellularService(cellularService)
     {}
 
-    /// Structure that holds parsed information from AT+QPINC command
-    struct AttemptsCounters
-    {
-        int PinCounter; /*!<  PIN attempts counter */
-        int PukCounter; /*!<  PUK attempts counter */
-    };
-
     /** Get information about attempts of PIN and PUK for standard sim card (eg. not PIN2)
      * @return  As optional SimCard::AttemptsCounters, in case of error nullopt. Should be noted that in some case could
      * return SIMFailure which could mean 0 attempts (happen if lock during session, on modem/sim reboot again return
      * 0,0);
      */
-    std::optional<SimCard::AttemptsCounters> getAttemptsCounters();
+    std::optional<at::response::qpinc::AttemptsCounters> getAttemptsCounters();
 
     /** Supply pin for modem
      * \param pin digits as a string from 4-8 digits
