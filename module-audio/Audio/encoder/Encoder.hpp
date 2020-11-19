@@ -4,6 +4,8 @@
 #pragma once
 
 #include <memory>
+#include <cstdio>
+#include <string>
 
 namespace audio
 {

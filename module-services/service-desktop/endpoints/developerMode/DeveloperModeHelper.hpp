@@ -8,7 +8,8 @@
 #include <Common/Query.hpp>
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
-#include <module-bsp/bsp/keyboard/key_codes.hpp>
+#include <bsp/keyboard/key_codes.hpp>
+#include <input/InputEvent.hpp>
 
 namespace sys
 {
@@ -22,7 +23,7 @@ namespace parserFSM
     {
         sys::Service *ownerServicePtr = nullptr;
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
-        void sendKeypress(bsp::KeyCodes keyCode);
+        void sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
 
       public:
         DeveloperModeHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
@@ -32,6 +33,7 @@ namespace parserFSM
     namespace json::developerMode
     {
         inline constexpr auto keyPressed    = "keyPressed";
+        inline constexpr auto state         = "state";
         inline constexpr auto systemStarted = "systemStarted";
         inline constexpr auto ATResponse    = "ATResponse";
         inline constexpr auto AT            = "AT";
