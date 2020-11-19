@@ -30,6 +30,7 @@
 * `[audio]` Added support for Bluetooth audio profiles
 * `[filesystem]` Added support for standard file IO library.
 * [`[messages]`] Added fetching text messages at phone startup.
+* `[cellular]` Support for MMI Call Forwarding call
 
 ## Changed
 

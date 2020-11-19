@@ -8,21 +8,21 @@
 #include <map>
 #include <functional>
 
-#include "CallRequest.hpp"
+#include "requests/CallRequest.hpp"
 
-namespace call_request
+namespace cellular
 {
-    using CreateCallback = std::function<std::unique_ptr<IRequest>(const std::string &)>;
+    using CreateCallback = std::function<std::unique_ptr<IRequest>(const std::string &, GroupMatch)>;
 
-    class Factory
+    class RequestFactory
     {
       public:
-        Factory(const std::string &data);
+        RequestFactory(const std::string &data);
         std::unique_ptr<IRequest> create();
 
       private:
         std::string request;
-        std::map<std::string, CreateCallback> requestMap;
+        std::vector<std::pair<std::string, CreateCallback>> requestMap;
         void registerRequest(std::string regex, CreateCallback);
     };
-} // namespace call_request
+} // namespace cellular

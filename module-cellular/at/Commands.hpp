@@ -135,6 +135,12 @@ namespace at
         CFUN_DISABLE_TRANSMITTING, /// Disable the ME from both transmitting and receiving RF signals
         LIST_MESSAGES,             /// List all messages from message storage
         GET_IMEI,
+        CCFC, /// Supplementary Services - Call Forwarding Number and Conditions Control
+        CCWA, /// Supplementary Services - Call Waiting Control
+        CHLD, /// Supplementary Services - Call Related Supplementary Services
+        CLIR, /// Supplementary Services - Calling Line Identification Restriction
+        COLP, /// Supplementary Services - Connected Line Identification Presentation
+        CSSN, /// Supplementary Services - Supplementary Service Notifications
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -215,7 +221,12 @@ namespace at
             {AT::ENABLE_NETWORK_REGISTRATION_URC, {"AT+CREG=2"}},
             {AT::SET_SMS_TEXT_MODE_UCS2, {"AT+CSMP=17,167,0,8"}},
             {AT::LIST_MESSAGES, {"AT+CMGL=\"ALL\"", default_doc_timeout}},
-            {AT::GET_IMEI, {"AT+GSN", default_doc_timeout}}};
+            {AT::GET_IMEI, {"AT+GSN", default_doc_timeout}},
+            {AT::CCFC, {"AT+CCFC=", default_doc_timeout}},
+            {AT::CCWA, {"AT+CCWA=\"", default_doc_timeout}},
+            {AT::CHLD, {"AT+CHLD=\"", default_doc_timeout}},
+            {AT::COLP, {"AT+COLP=\"", default_doc_timeout}},
+            {AT::CSSN, {"AT+CSSN=\"", default_doc_timeout}}};
 
         if (fact.count(at)) {
             return fact.at(at);

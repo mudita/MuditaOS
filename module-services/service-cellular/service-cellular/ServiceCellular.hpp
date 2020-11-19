@@ -253,6 +253,6 @@ class ServiceCellular : public sys::Service
     bool handleSimState(at::SimState state, const std::string message);
 
     friend class CellularUrcHandler;
-    friend class CellularCallRequestHandler;
     friend class SimCard;
+    friend class CellularRequestHandler;
 };
