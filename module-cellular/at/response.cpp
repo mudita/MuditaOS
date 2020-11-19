@@ -10,6 +10,46 @@ namespace at
 {
     namespace response
     {
+        std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head)
+        {
+            if (resp.code == at::Result::Code::OK) {
+                if (resp.response.size()) {
+                    for (auto el : resp.response) {
+                        if (el.compare(0, head.length(), head) == 0) {
+                            auto body = el.substr(head.length());
+                            return utils::split(body, ",");
+                        }
+                    }
+                }
+            }
+            return std::nullopt;
+        }
+
+        bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret)
+        {
+            /// parse only first result from QPINC
+            const std::string_view AT_QPINC_SC = "+QPINC:";
+            if (auto tokens = getTokensForATCommand(resp, AT_QPINC_SC); tokens) {
+                constexpr int QPINC_TokensCount = 3;
+                if ((*tokens).size() == QPINC_TokensCount) {
+                    utils::toNumeric((*tokens)[1], ret.PinCounter);
+                    utils::toNumeric((*tokens)[2], ret.PukCounter);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool parseCLCK(const at::Result &resp, int &ret)
+        {
+            const std::string_view AT_CLCK = "+CLCK:";
+            if (auto tokens = getTokensForATCommand(resp, AT_CLCK); tokens) {
+                if ((*tokens).size() != 0) {
+                    return utils::toNumeric((*tokens)[0], ret);
+                }
+            }
+            return false;
+        }
 
         bool parseCSQ(std::string response, std::string &result)
         {

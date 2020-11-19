@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -9,6 +9,7 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+#include "SimCard.hpp"
 #include "service-cellular/CallRequestFactory.hpp"
 #include "service-cellular/CellularCallRequestHandler.hpp"
 
@@ -40,6 +41,7 @@
 #include <at/UrcCtze.hpp>
 #include <at/UrcCusd.hpp>
 #include <at/UrcQind.hpp>
+#include <at/UrcCpin.hpp> // for Cpin
 #include <at/response.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <common_data/EventStore.hpp>
@@ -646,47 +648,6 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         state.set(this, State::ST::SimSelect);
         break;
     }
-    case MessageType::CellularSimVerifyPinRequest: {
-        auto msg = dynamic_cast<CellularSimVerifyPinRequestMessage *>(msgl);
-        if (msg != nullptr) {
-            auto channel = cmux->get(TS0710::Channel::Commands);
-            if (channel) {
-
-                auto vpin = msg->gePinValue();
-
-                std::stringstream ss;
-                for (unsigned int i : vpin) {
-                    ss << i;
-                }
-                std::string pin;
-                ss >> pin;
-                LOG_DEBUG("PIN SET %s", ss.str().c_str());
-
-                sys::MessagePointer rmsg;
-
-                if (Store::GSM::get()->selected == msg->getSimCard()) {
-
-                    auto resp = channel->cmd(at::factory(at::AT::CPIN) + pin + ";\r");
-
-                    if (resp.code == at::Result::Code::OK) {
-                        responseMsg = std::make_shared<CellularResponseMessage>(true);
-                    }
-                    else {
-                        responseMsg = std::make_shared<CellularResponseMessage>(false);
-                        // TODO: Sim unlock error.
-                    }
-                }
-                else {
-                    LOG_ERROR("Selected SIM card differ from currently supported");
-                    responseMsg = std::make_shared<CellularResponseMessage>(false);
-                    at::Result fatalError;
-                    fatalError.code = at::Result::Code::ERROR;
-                    // TODO: Sim unlock error.
-                }
-            }
-        }
-        break;
-    }
     case MessageType::CellularListCurrentCalls: {
         auto ret  = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
         auto size = ret.response.size();
@@ -959,6 +920,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto resp   = transmitDtmfTone(msg->getDigit());
         responseMsg = std::make_shared<CellularResponseMessage>(resp);
     } break;
+    case MessageType::CellularSimState: {
+        auto msg    = static_cast<CellularSimStateMessage *>(msgl);
+        responseMsg = std::make_shared<CellularResponseMessage>(handleSimState(msg->getState(), msg->getMessage()));
+    } break;
     case MessageType::CellularUSSDRequest: {
         auto msg = dynamic_cast<CellularUSSDMessage *>(msgl);
         if (msg != nullptr) {
@@ -1005,8 +970,14 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
     }
 }
 
+/**
+ * NOTICE: URC handling function identifyNotification works on different thread, so sending
+ * any AT commands is not allowed here (also in URC handlers and other functions called from here)
+ * @return
+ */
 std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
 {
+
     CellularUrcHandler urcHandler(*this);
 
     std::string str(data.begin(), data.end());
@@ -1017,40 +988,191 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     auto urc = at::urc::UrcFactory::Create(str);
     urc->Handle(urcHandler);
 
-    if (auto ret = str.find("+CPIN: ") != std::string::npos) {
-        /// TODO handle different sim statuses - i.e. no sim, sim error, sim puk, sim pin etc.
-        if (str.find("NOT READY", ret) == std::string::npos) {
-
-            Store::GSM::get()->sim = Store::GSM::get()->selected;
-            if (str.find("SIM PIN", ret) != std::string::npos) {
-                // TODO: Request pin.
-            }
-            else if (str.find("READY", ret) != std::string::npos) {
-                // TODO: Sim unlocked.
-            }
-            else {
-                LOG_WARN("Not supported: %s", logStr.c_str());
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-            }
-            LOG_DEBUG("SIM OK!");
-        }
-        else {
-            LOG_ERROR("SIM ERROR");
-            Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-        }
-        if ((str.find("NOT", ret) == std::string::npos) && (str.find("READY", ret) != std::string::npos)) {
-            return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
-        }
-        auto message = std::make_shared<sevm::SIMMessage>();
-        sys::Bus::SendUnicast(message, service::name::evt_manager, this);
-        return std::nullopt;
-    }
-
     if (!urc->isHandled()) {
         LOG_WARN("Unhandled notification: %s", logStr.c_str());
     }
 
     return urcHandler.getResponse();
+}
+
+bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
+{
+    LOG_DEBUG("REQUEST PIN");
+    return true;
+}
+
+bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
+{
+    LOG_ERROR("REQUEST PUK");
+    return true;
+}
+
+bool ServiceCellular::sendSimUnlocked()
+{
+    LOG_DEBUG("SIM UNLOCKED");
+    return true;
+}
+
+bool ServiceCellular::sendSimBlocked()
+{
+    LOG_ERROR("SIM BLOCKED");
+    return true;
+}
+
+bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
+{
+    LOG_ERROR("UNHANDLED CME %d", cme_error);
+    return true;
+}
+
+bool ServiceCellular::sendBadPin()
+{
+    LOG_DEBUG("SEND BAD PIN");
+    SimCard simCard(*this);
+    std::string msg;
+    if (auto state = simCard.simStateWithMessage(msg); state) {
+        return handleSimState(*state, msg);
+    }
+    return false;
+}
+
+bool ServiceCellular::sendBadPuk()
+{
+    LOG_DEBUG("SEND BAD PUK");
+    SimCard simCard(*this);
+    std::string msg;
+    if (auto state = simCard.simStateWithMessage(msg); state) {
+        return handleSimState(*state, msg);
+    }
+    return false;
+}
+
+bool ServiceCellular::sendChangePinResult(SimCardResult res)
+{
+    LOG_DEBUG("SEND CHANGE PIN RESULT");
+    return true;
+}
+
+bool ServiceCellular::changePin(const std::string oldPin, const std::string newPin)
+{
+    SimCard simCard(*this);
+    sendChangePinResult(simCard.changePin(oldPin, newPin));
+    return true;
+}
+
+bool ServiceCellular::unlockSimPin(std::string pin)
+{
+    SimCard simCard(*this);
+    SimCardResult sime;
+    LOG_DEBUG("PIN:  %s", pin.c_str());
+    sime = simCard.supplyPin(pin);
+
+    if (sime == SimCardResult::IncorrectPassword) {
+        sendBadPin();
+        return false;
+    }
+
+    if (sime == SimCardResult::OK) {
+        return true;
+    }
+    else {
+        sendUnhandledCME(static_cast<unsigned int>(sime));
+        return false;
+    }
+}
+
+bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
+{
+    SimCard simCard(*this);
+    SimCardResult sime;
+    LOG_DEBUG("PUK:  %s  %s", puk.c_str(), pin.c_str());
+    sime = simCard.supplyPuk(puk, pin);
+
+    if (sime == SimCardResult::IncorrectPassword) {
+        sendBadPuk();
+        return false;
+    }
+
+    if (sime == SimCardResult::OK) {
+        return true;
+    }
+    sendUnhandledCME(static_cast<unsigned int>(sime));
+    return false;
+}
+
+bool ServiceCellular::handleSimState(at::SimState state, const std::string message)
+{
+
+    std::optional<std::unique_ptr<CellularMessage>> response;
+    switch (state) {
+    case at::SimState::Ready:
+        Store::GSM::get()->sim = Store::GSM::get()->selected;
+        // SIM causes SIM INIT, only on ready
+        response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
+        sendSimUnlocked();
+        break;
+    case at::SimState::NotReady:
+        LOG_DEBUG("Not ready");
+        Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+        break;
+    case at::SimState::SimPin: {
+        SimCard simCard(*this);
+        if (auto pc = simCard.getAttemptsCounters(); pc) {
+            if (pc.value().PukCounter != 0) {
+                requestPin(pc.value().PinCounter, message);
+                break;
+            }
+        }
+        sendSimBlocked();
+        break;
+    }
+    case at::SimState::SimPuk: {
+        SimCard simCard(*this);
+        if (auto pc = simCard.getAttemptsCounters(); pc) {
+            if (pc.value().PukCounter != 0) {
+                requestPuk(pc.value().PukCounter, message);
+                break;
+            }
+        }
+        sendSimBlocked();
+        break;
+    }
+    case at::SimState::SimPin2:
+        [[fallthrough]];
+    case at::SimState::SimPuk2:
+        [[fallthrough]];
+    case at::SimState::PhNetPin:
+        [[fallthrough]];
+    case at::SimState::PhNetPuk:
+        [[fallthrough]];
+    case at::SimState::PhNetSPin:
+        [[fallthrough]];
+    case at::SimState::PhNetSPuk:
+        [[fallthrough]];
+    case at::SimState::PhSpPin:
+        [[fallthrough]];
+    case at::SimState::PhSpPuk:
+        [[fallthrough]];
+    case at::SimState::PhCorpPin:
+        [[fallthrough]];
+    case at::SimState::PhCorpPuk:
+        Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
+        LOG_ERROR("SimState not supported");
+        break;
+    case at::SimState::Locked:
+        Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+        sendSimBlocked();
+        break;
+    case at::SimState::Unknown:
+        LOG_ERROR("SimState not supported");
+        Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
+        break;
+    }
+
+    auto simMessage = std::make_shared<sevm::SIMMessage>();
+    sys::Bus::SendUnicast(simMessage, service::name::evt_manager, this);
+
+    return true;
 }
 
 bool ServiceCellular::sendSMS(SMSRecord record)

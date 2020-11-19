@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <module-cellular/at/UrcCreg.hpp>
 #include <module-cellular/at/UrcCtze.hpp>
 #include <module-cellular/at/UrcCusd.hpp>
-#include <module-cellular/at/UrcHandler.hpp>
+#include <module-cellular/at/UrcCpin.hpp>
 #include <module-cellular/at/UrcPoweredDown.hpp>
 #include <module-cellular/at/UrcQind.hpp>
 #include <module-cellular/at/UrcResponse.hpp>
@@ -34,6 +34,7 @@ class CellularUrcHandler : public UrcHandler
     void Handle(Cusd &urc) final;
     void Handle(Ctze &urc) final;
     void Handle(Qind &urc) final;
+    void Handle(Cpin &urc) final;
     void Handle(PoweredDown &urc) final;
     void Handle(UrcResponse &urc) final;
 
