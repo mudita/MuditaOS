@@ -73,7 +73,6 @@ target_link_libraries(${PROJECT_NAME}
     module-bsp
     module-os
     module-utils
-    module-vfs
     module-sys
     tag
 )

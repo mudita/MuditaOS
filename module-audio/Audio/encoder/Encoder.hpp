@@ -4,7 +4,6 @@
 #pragma once
 
 #include <memory>
-#include <vfs.hpp>
 
 namespace audio
 {
@@ -40,7 +39,7 @@ namespace audio
 
       protected:
         float position    = 0;
-        vfs::FILE *fd     = nullptr;
+        std::FILE *fd     = nullptr;
         uint32_t fileSize = 0;
         std::string filePath;
 
