@@ -14,8 +14,9 @@ extern "C"
 #include <string.h>
 #include <unistd.h>
 
-#define SERIAL_BUFFER_LEN 512 // this matches the buffer length in rt1051 cdc implementaion
-#define SERIAL_BAUDRATE 115200
+inline constexpr auto SERIAL_BUFFER_LEN = 512;
+inline constexpr auto  SERIAL_BAUDRATE = 115200;
+
 namespace bsp
 {
     class USBDeviceListener {

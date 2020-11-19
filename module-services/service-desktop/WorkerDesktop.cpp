@@ -57,12 +57,12 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     static std::string receivedMsg;
 
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
-        if (xQueueReceive(queue, &receiveMsg, 0) != pdTRUE) {
+        if (xQueueReceive(queue, &receivedMsg, 0) != pdTRUE) {
             LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
             return false;
         }
         else {
-            parser.processMessage(receiveMsg);
+            parser.processMessage(receivedMsg);
         }
     }
     else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {

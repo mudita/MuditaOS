@@ -41,31 +41,29 @@ auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
         json11::Json::object({{json::status, std::to_string(static_cast<int>(sys::ReturnCodes::Failure))}}));
 
     auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
-    if (owner) {
-        if (cmd == parserFSM::json::filesystem::commands::download) {
-            fs::path filePath    = context.getBody()[parserFSM::json::fileName].string_value();
-            fs::path tmpFilePath = purefs::dir::getUpdatesOSPath() / filePath;
 
-            uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
+    if (cmd == parserFSM::json::filesystem::commands::download) {
+        fs::path filePath    = context.getBody()[parserFSM::json::fileName].string_value();
+        fs::path tmpFilePath = purefs::dir::getUpdatesOSPath() / filePath;
 
-            LOG_DEBUG("got owner, file %s", tmpFilePath.c_str());
+        uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
 
-            if (isWritable(tmpFilePath)) {
-                LOG_INFO("download %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
+        LOG_DEBUG("got owner, file %s", tmpFilePath.c_str());
 
-                if (owner->desktopWorker->startDownload(tmpFilePath, fileSize) == sys::ReturnCodes::Success) {
-                    context.setResponseStatus(parserFSM::http::Code::Accepted);
-                    returnCode = sys::ReturnCodes::Success;
-                }
-            }
-            else {
-                LOG_ERROR(
-                    "download command failed, can't write %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
+        if (isWritable(tmpFilePath)) {
+            LOG_INFO("download %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
+
+            if (owner->desktopWorker->startDownload(tmpFilePath, fileSize) == sys::ReturnCodes::Success) {
+                context.setResponseStatus(parserFSM::http::Code::Accepted);
+                returnCode = sys::ReturnCodes::Success;
             }
         }
         else {
-            LOG_ERROR("unknown command: %s", cmd.c_str());
+            LOG_ERROR("download command failed, can't write %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
         }
+    }
+    else {
+        LOG_ERROR("unknown command: %s", cmd.c_str());
     }
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());

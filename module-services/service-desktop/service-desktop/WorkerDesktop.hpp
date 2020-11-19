@@ -49,6 +49,5 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
     std::filesystem::path filePath;
-    TaskHandle_t usbTaskHandle   = NULL;
     volatile bool rawModeEnabled = false;
 };
