@@ -124,7 +124,7 @@ class UpdateMuditaOS : public updateos::UpdateStats
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
 
-    updateos::UpdateError informError(const updateos::UpdateError errorCode, const char *format, ...);
+    updateos::UpdateError informError(updateos::UpdateError errorCode, const char *format, ...);
     void informDebug(const char *format, ...);
     void informUpdate(const updateos::UpdateState statusCode, const char *format, ...);
 
