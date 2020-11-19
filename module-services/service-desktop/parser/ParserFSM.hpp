@@ -10,11 +10,6 @@
 
 #include <string>
 
-namespace sys
-{
-    class Service;
-} // namespace sys
-
 namespace parserFSM
 {
     enum class State
@@ -34,6 +29,11 @@ namespace parserFSM
         {
             return state;
         };
+
+        void setState(const parserFSM::State newState)
+        {
+            state = newState;
+        }
 
       private:
         std::string *receivedMsgPtr = nullptr;
