@@ -11,7 +11,7 @@
 * `[cellular]` Added possibility of unlock SIM card (no PIN on start) functionality
 * `[testing]` Added test harness with message sending case
 * `[text]` Text input boundaries support added (max signs or max widget area).
-* `[usb]` Added first implementation for USB cdc and MTP protocols, activated service-desktop for communication with Mudita Center
+* `[usb]` Added first implementation for USB cdc and MTP protocols, activated service-desktop for communication with Mudita Center.
 ### Changed
 
 
