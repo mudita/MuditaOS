@@ -255,7 +255,7 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
         auto path = msg->getPath();
         if (dbRegisterValueChange(path)) {
             auto it = variableChangeRecipents.find(path.to_string());
-            if (variableChangeRecipents.end() == it) {
+            if (variableChangeRecipents.end() == it || it->second.end() == it->second.find(path.service)) {
                 variableChangeRecipents[path.to_string()] = {path.service};
                 auto currentValue                         = dbGetValue(path).value_or("");
                 auto msgValue = std::make_shared<::Settings::Messages::VariableChanged>(path, currentValue, "");
