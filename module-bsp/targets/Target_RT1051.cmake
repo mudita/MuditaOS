@@ -68,6 +68,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
     "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/magnetometer/magnetometer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/magnetometer/ALS31300.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/torch/torch.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/backlight/backlight.cpp"
 
 	CACHE INTERNAL ""
 )
