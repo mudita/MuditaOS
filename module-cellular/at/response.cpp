@@ -40,7 +40,8 @@ namespace at
             return false;
         }
 
-        bool parseCLCK(const at::Result &resp, int &ret){
+        bool parseCLCK(const at::Result &resp, int &ret)
+        {
             const std::string_view AT_CLCK = "+CLCK:";
             if (auto tokens = getTokensForATCommand(resp, AT_CLCK); tokens) {
                 if ((*tokens).size() != 0) {
@@ -49,7 +50,6 @@ namespace at
             }
             return false;
         }
-
 
         bool parseCSQ(std::string response, std::string &result)
         {

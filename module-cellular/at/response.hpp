@@ -21,7 +21,7 @@ namespace at
                 int PinCounter; /*!<  PIN attempts counter */
                 int PukCounter; /*!<  PUK attempts counter */
             };
-        }
+        } // namespace qpinc
 
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
         std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
@@ -32,7 +32,6 @@ namespace at
         bool parseQNWINFO(std::string &response, std::string &result);
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret);
         bool parseCLCK(const at::Result &resp, int &ret);
-
 
         namespace creg
         {
