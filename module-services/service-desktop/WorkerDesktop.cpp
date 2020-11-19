@@ -186,7 +186,7 @@ void WorkerDesktop::timerHandler()
     }
 }
 
-bool WorkerDesktop::getRawMode()
+bool WorkerDesktop::getRawMode() const noexcept
 {
     return rawModeEnabled;
 }
