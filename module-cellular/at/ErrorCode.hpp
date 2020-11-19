@@ -30,7 +30,7 @@ namespace at
         SIM_PIN_required              = 11,
         SIM_PUKRequired               = 12,
         SIMFailure                    = 13,
-        SIMBusy                       = 14,
+        SIMBusy                       = 14, /*!< could be returned on removed card and QPINC, PINC ret 10 */
         SIMWrong                      = 15,
         IncorrectPassword             = 16,
         SIM_PIN2Required              = 17,

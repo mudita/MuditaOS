@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "SimCardResult.hpp"
 
 #include "CellularCall.hpp"
 #include "CellularMessage.hpp"
@@ -29,6 +31,7 @@
 #include <vector>
 
 class MuxDaemon;
+
 namespace db
 {
     namespace query
@@ -81,8 +84,72 @@ class ServiceCellular : public sys::Service
     std::vector<std::string> getNetworkInfo();
     std::vector<std::string> scanOperators();
 
+    /** group of action/messages send "outside" eg. GUI
+     * requestPin is call anytime modem need pin, here should be called any action
+     * which allow user input (or mockup) pin. Then send appropriate action to notify the modem
+     * \param attempts Attempts counter for current action
+     * \param msg Literal name of action eg. SIM PIN
+     * \return
+     */
+    bool requestPin(unsigned int attempts, const std::string msg);
+
+    /** requestPuk is call anytime modem need puk, here should be called any action
+     * which allow user input (or mockup) puk and new pin. Then send appropriate action to notify the modem
+     * \param attempts Attempts counter for current action
+     * \param msg Literal name of action eg. SIM PUK
+     * \return
+     */
+    bool requestPuk(unsigned int attempts, const std::string msg);
+
+    /** Call in case of SIM card unlocked, MT ready. Place for sending message/action inform rest
+     * \return
+     */
+    bool sendSimUnlocked();
+
+    /** Call in case of SIM card locked (card fail, eg. to many bad PUK). Place for sending message/action inform rest
+     * \return
+     */
+    bool sendSimBlocked();
+
+    /** From this point should be send message/action call interaction in other layers eg. GUI
+     * \param cme_error
+     * \return
+     */
+    bool sendUnhandledCME(unsigned int cme_error);
+
+    /** Similar to sendBadPin
+     * \return
+     */
+    bool sendBadPin();
+
+    /** Message send, when modem return incorrect password for PIN message.
+     * Probably modem firmware depend. On current version last bad message (attempts=1) return PUK request
+     * and generate PUK URC, so finally action on puk request will be call. This implementation allow to
+     * rethrow URC (so achive similar behavior in all cases).
+     * \return
+     */
+    bool sendBadPuk();
+
+    /** Place to send action notifying eg. GUI
+     * \param res
+     * \return
+     */
+    bool sendChangePinResult(SimCardResult res);
+
+    /// sim functionality
+
+    /** Function ready for change pin action send to Service Cellular form eg. GUI
+     * \param oldPin
+     * \param newPin
+     * \return
+     */
+    bool changePin(const std::string oldPin, const std::string newPin);
+    bool unlockSimPin(std::string pin);
+    bool unlockSimPuk(std::string puk, std::string pin);
+
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+
     // used for polling for call state
     std::unique_ptr<sys::Timer> callStateTimer;
     std::unique_ptr<sys::Timer> stateTimer;
@@ -151,6 +218,7 @@ class ServiceCellular : public sys::Service
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
     bool handle_ready();
+
     bool handleAllMessagesFromMessageStorage();
     [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
                                             const UTF8 &receivedNumber,
@@ -182,6 +250,9 @@ class ServiceCellular : public sys::Service
     bool handleUSSDURC();
     void handleUSSDTimer();
 
+    bool handleSimState(at::SimState state, const std::string message);
+
     friend class CellularUrcHandler;
     friend class CellularCallRequestHandler;
+    friend class SimCard;
 };

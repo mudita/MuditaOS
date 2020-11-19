@@ -12,6 +12,7 @@
 #include <Service/Message.hpp>
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
 #include <utf8/UTF8.hpp>
+#include <SimState.hpp>
 
 #include <memory>
 #include <string>
@@ -79,6 +80,29 @@ class CellularNotificationMessage : public CellularMessage
     Type type;
     std::string data;
 };
+
+class CellularSimStateMessage : public CellularMessage
+{
+  private:
+    at::SimState state;
+    std::string message;
+
+  public:
+    explicit CellularSimStateMessage(at::SimState state, std::string message)
+        : CellularMessage(MessageType::CellularSimState), state(state), message(std::move(message))
+    {}
+
+    at::SimState getState() const noexcept
+    {
+        return state;
+    }
+
+    std::string getMessage() const
+    {
+        return message;
+    }
+};
+
 class CellularTimeNotificationMessage : public CellularMessage
 {
   private:
@@ -241,20 +265,32 @@ class CellularSimResponseMessage : public CellularSimMessage
     static const SimState defaultSimState         = SimState::SIMUnlocked;
 };
 
+/// Message use only for mockup GUI purposes
 class CellularSimVerifyPinRequestMessage : public CellularSimMessage
 {
   public:
     CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim, std::vector<unsigned int> pinValue)
         : CellularSimMessage(MessageType::CellularSimVerifyPinRequest, sim), pinValue(std::move(pinValue))
     {}
+    CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim,
+                                       std::vector<unsigned int> pinValue,
+                                       std::vector<unsigned int> pukValue)
+        : CellularSimMessage(MessageType::CellularSimVerifyPinRequest, sim), pinValue(std::move(pinValue)),
+          pukValue(std::move(pukValue))
+    {}
 
-    std::vector<unsigned int> gePinValue() const noexcept
+    std::vector<unsigned int> getPinValue() const
     {
         return pinValue;
+    }
+    std::vector<unsigned int> getPukValue() const
+    {
+        return pukValue;
     }
 
   private:
     std::vector<unsigned int> pinValue;
+    std::vector<unsigned int> pukValue;
 };
 
 class CellularGetChannelMessage : public sys::DataMessage

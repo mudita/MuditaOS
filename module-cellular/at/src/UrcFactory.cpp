@@ -11,7 +11,7 @@
 #include <UrcClip.hpp>
 #include <UrcPoweredDown.hpp>
 #include <UrcResponse.hpp>
-
+#include <UrcCpin.hpp>
 using namespace at::urc;
 
 std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
@@ -42,6 +42,9 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     }
     else if (Clip::isURC(head)) {
         return std::make_unique<Clip>(body);
+    }
+    else if (Cpin::isURC(head)) {
+        return std::make_unique<Cpin>(body);
     }
     else if (PoweredDown::isURC(head)) {
         return std::make_unique<PoweredDown>(body);
