@@ -36,10 +36,17 @@ ServiceDesktop::~ServiceDesktop()
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
     desktopWorker = std::make_unique<WorkerDesktop>(this);
-    desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
-                         {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
-    desktopWorker->run();
+    const bool ret = desktopWorker->init(
+        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+         {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
 
+    if (ret == false) {
+        LOG_ERROR("!!! service-desktop InitHandler failed to initialize worker, service-desktop won't work");
+        return sys::ReturnCodes::Failure;
+    }
+    else {
+        desktopWorker->run();
+    }
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
         if (request->event != nullptr) {
@@ -103,7 +110,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    vfs.updateTimestamp();
     return (sys::ReturnCodes::Success);
 }
 

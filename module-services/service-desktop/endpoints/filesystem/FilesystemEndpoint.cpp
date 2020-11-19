@@ -40,11 +40,10 @@ auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
     context.setResponseBody(
         json11::Json::object({{json::status, std::to_string(static_cast<int>(sys::ReturnCodes::Failure))}}));
 
-    auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr);
+    auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
     if (owner) {
         if (cmd == parserFSM::json::filesystem::commands::download) {
-            fs::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
-            // fs::path tmpFilePath = vfs.getTempPath(filePath);
+            fs::path filePath    = context.getBody()[parserFSM::json::fileName].string_value();
             fs::path tmpFilePath = purefs::dir::getUpdatesOSPath() / filePath;
 
             uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();

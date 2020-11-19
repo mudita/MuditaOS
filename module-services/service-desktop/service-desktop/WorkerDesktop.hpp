@@ -4,6 +4,8 @@
 #pragma once
 
 #include <string.h>
+#include <stdio.h>
+#include <filesystem>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <module-os/RTOSWrapper/include/timer.hpp>
 #include "Service/Message.hpp"
@@ -11,11 +13,15 @@
 #include "Service/Worker.hpp"
 #include "parser/ParserFSM.hpp"
 #include "bsp/usb/usb.hpp"
-#include "vfs.hpp"
 
 class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp::USBDeviceListener
 {
   public:
+    enum TransferFailAction
+    {
+        doNothing,
+        removeDesitnationFile
+    };
     WorkerDesktop(sys::Service *ownerServicePtr);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
@@ -29,19 +35,20 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp
     {
         return receiveQueue;
     }
-    sys::ReturnCodes startDownload(const fs::path &destinationPath, const uint32_t fileSize);
-    void stopTransfer(const bool removeDestinationFile = false);
+    sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize);
+    void stopTransfer(const TransferFailAction action);
     void Run();
 
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
     bool getRawMode() override;
 
   private:
+    void uploadFileFailedResponse();
     xQueueHandle receiveQueue;
-    vfs::FILE *fileDes             = nullptr;
+    FILE *fileDes                  = nullptr;
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
-    fs::path filePath;
+    std::filesystem::path filePath;
     TaskHandle_t usbTaskHandle   = NULL;
     volatile bool rawModeEnabled = false;
 };

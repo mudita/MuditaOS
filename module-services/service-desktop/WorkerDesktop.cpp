@@ -13,21 +13,8 @@
 
 #include <map>
 #include <vector>
+
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
-
-static void uploadFileFailedResponse()
-{
-    LOG_ERROR("Upload file failed, timeout");
-    parserFSM::Context response;
-    response.setResponseStatus(parserFSM::http::Code::InternalServerError);
-    response.setEndpoint(parserFSM::EndpointType::filesystemUpload);
-
-    json11::Json responseJson = json11::Json::object{
-        {parserFSM::json::status, uploadFailedMessage},
-    };
-    response.setResponseBody(responseJson);
-    parserFSM::MessageHandler::putToSendQueue(response.createSimpleResponse());
-}
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
     : sys::Worker(ownerServicePtr),
@@ -51,7 +38,7 @@ bool WorkerDesktop::deinit(void)
 
     if (fileDes != nullptr) {
         LOG_DEBUG("deinit close opened fileDes");
-        vfs.fclose(fileDes);
+        fclose(fileDes);
     }
 
     Worker::deinit();
@@ -66,7 +53,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
 
     std::string qname = queueNameMap[queue];
     LOG_INFO("handleMessage received data from queue: %s", qname.c_str());
-    static std::string *sendMsg;
+    static std::string *sendMsg = nullptr;
     static std::string receiveMsg;
 
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
@@ -98,10 +85,10 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     return true;
 }
 
-sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &destinationPath, const uint32_t fileSize)
+sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize)
 {
     filePath = destinationPath;
-    fileDes  = vfs.fopen(filePath.c_str(), "w");
+    fileDes  = fopen(filePath.c_str(), "w");
 
     if (fileDes == nullptr)
         return sys::ReturnCodes::Failure;
@@ -119,22 +106,24 @@ sys::ReturnCodes WorkerDesktop::startDownload(const fs::path &destinationPath, c
     return sys::ReturnCodes::Success;
 }
 
-void WorkerDesktop::stopTransfer(const bool removeDestinationFile)
+void WorkerDesktop::stopTransfer(const TransferFailAction action)
 {
-    LOG_DEBUG("stopTransfer %s", removeDestinationFile ? "remove desination file" : "");
+    LOG_DEBUG("stopTransfer %s",
+              action == TransferFailAction::removeDesitnationFile ? "remove desination file" : "do nothing");
     parser.setState(parserFSM::State::NoMsg);
     rawModeEnabled = false;
 
-    parserFSM::Context response;
-    response.setResponseStatus(removeDestinationFile ? parserFSM::http::Code::NotAcceptable
-                                                     : parserFSM::http::Code::Accepted);
-    response.setEndpoint(parserFSM::EndpointType::filesystemUpload);
+    parserFSM::Context responseContext;
+    responseContext.setResponseStatus((action == TransferFailAction::removeDesitnationFile)
+                                          ? parserFSM::http::Code::NotAcceptable
+                                          : parserFSM::http::Code::Accepted);
+    responseContext.setEndpoint(parserFSM::EndpointType::filesystemUpload);
     json11::Json responseJson = json11::Json::object{{parserFSM::json::fileSize, std::to_string(writeFileDataWritten)},
                                                      {parserFSM::json::fileName, filePath.filename().c_str()}};
-    response.setResponseBody(responseJson);
+    responseContext.setResponseBody(responseJson);
 
     // close the file descriptor
-    vfs.fclose(fileDes);
+    fclose(fileDes);
 
     // stop the timeout timer
     Stop();
@@ -143,13 +132,13 @@ void WorkerDesktop::stopTransfer(const bool removeDestinationFile)
     writeFileSizeExpected = 0;
     writeFileDataWritten  = 0;
 
-    if (removeDestinationFile) {
-        if (vfs.remove(filePath.c_str()) != 0) {
+    if (action == TransferFailAction::removeDesitnationFile) {
+        if (remove(filePath.c_str()) != 0) {
             LOG_ERROR("stopTransfer can't delete file(requested) %s", filePath.c_str());
         }
     }
 
-    parserFSM::MessageHandler::putToSendQueue(response.createSimpleResponse());
+    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 }
 
 void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
@@ -162,7 +151,7 @@ void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
             return;
         }
 
-        const uint32_t bytesWritten = vfs.fwrite(dataPtr, 1, dataLen, fileDes);
+        const uint32_t bytesWritten = fwrite(dataPtr, 1, dataLen, fileDes);
 
         if (bytesWritten != dataLen) {
             LOG_ERROR("transferDataReceived vfs write failed bytesWritten=%" PRIu32 " != dataLen=%" PRIu32,
@@ -175,7 +164,7 @@ void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
 
         if (writeFileDataWritten >= writeFileSizeExpected) {
             LOG_INFO("transferDataReceived all data transferred, stop now");
-            stopTransfer(false);
+            stopTransfer(TransferFailAction::doNothing);
         }
     }
     else {
@@ -190,11 +179,25 @@ void WorkerDesktop::Run()
     if (getRawMode()) {
         LOG_DEBUG("timeout timer: stopping transfer");
         uploadFileFailedResponse();
-        stopTransfer(true);
+        stopTransfer(TransferFailAction::removeDesitnationFile);
     }
 }
 
 bool WorkerDesktop::getRawMode()
 {
     return rawModeEnabled;
+}
+
+void WorkerDesktop::uploadFileFailedResponse()
+{
+    LOG_ERROR("Upload file failed, timeout");
+    parserFSM::Context responseContext;
+    responseContext.setResponseStatus(parserFSM::http::Code::InternalServerError);
+    responseContext.setEndpoint(parserFSM::EndpointType::filesystemUpload);
+
+    json11::Json responseJson = json11::Json::object{
+        {parserFSM::json::status, uploadFailedMessage},
+    };
+    responseContext.setResponseBody(responseJson);
+    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 }

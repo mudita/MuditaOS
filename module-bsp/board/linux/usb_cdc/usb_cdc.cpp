@@ -62,14 +62,19 @@ namespace bsp
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
         if (fd == -1) {
-            return (-1);
+            LOG_ERROR("bsp::usbInit Failed to open /dev/ptmx, can't allocate new pseudo terminal");
+            return 0;
         }
 
         grantpt(fd);
         unlockpt(fd);
 
         char *pts_name = ptsname(fd);
-        LOG_INFO("[ServiceDesktop:BSP_Driver] VCOMAPPInit linux ptsname: %s", pts_name);
+        if (pts_name == NULL) {
+            LOG_ERROR("bsp::usbInit ptsname returned NULL, no pseudo terminal allocated");
+            return 0;
+        }
+        LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
         struct termios newtio;
         memset(&newtio, 0, sizeof(newtio));
         struct termios oldtio;
@@ -91,17 +96,14 @@ namespace bsp
         xTaskHandle taskHandleReceive;
         USBReceiveQueue = receiveQueue;
 
-        BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
-                                            "USBLinuxReceive",
-                                            SERIAL_BUFFER_LEN * 8,
-                                            (void *)1,
-                                            tskIDLE_PRIORITY,
-                                            &taskHandleReceive);
+        BaseType_t task_error = xTaskCreate(
+            &bsp::usbDeviceTask, "USBLinuxReceive", SERIAL_BUFFER_LEN * 8, NULL, tskIDLE_PRIORITY, &taskHandleReceive);
 
         if (task_error != pdPASS) {
-            LOG_ERROR("[ServiceDesktop:BSP_Driver] Failed to start freertos USB_Linux_Receive");
+            LOG_ERROR("bsp::usbInit Failed to start freertos USB_Linux_Receive");
+            return (0);
         }
 
-        return (0);
+        return (1);
     }
 } // namespace bsp
