@@ -15,7 +15,7 @@ namespace audio
     Encoder::Encoder(const char *fileName, const Format &frmt) : format(frmt), filePath(fileName)
     {
 
-        fd = vfs.fopen(fileName, "w");
+        fd = std::fopen(fileName, "w");
         if (fd == NULL) {
             return;
         }
@@ -25,7 +25,7 @@ namespace audio
     Encoder::~Encoder()
     {
         if (fd) {
-            vfs.fclose(fd);
+            std::fclose(fd);
         }
     }
 

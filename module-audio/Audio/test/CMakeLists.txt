@@ -7,7 +7,7 @@ add_catch2_executable(
     SRCS
         unittest_audio.cpp
     LIBS
-        module-vfs module-audio
+        module-audio
 )
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" DESTINATION "${CMAKE_BINARY_DIR}")

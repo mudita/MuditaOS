@@ -17,15 +17,6 @@
 #include "Audio/Audio.hpp"
 #include "Audio/Operation/Operation.hpp"
 
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_init;
 
 TEST_CASE("Test audio tags")
 {

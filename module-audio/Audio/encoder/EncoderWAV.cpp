@@ -27,10 +27,10 @@ namespace audio
 
     EncoderWAV::~EncoderWAV()
     {
-        vfs.rewind(fd);
+        std::rewind(fd);
         /* Update the wav file header save it into wav file */
         HeaderUpdate();
-        if (vfs.fwrite(pHeaderBuff, 1, sizeof(WAVE_FormatTypeDef), fd) != sizeof(WAVE_FormatTypeDef)) {
+        if (std::fwrite(pHeaderBuff, 1, sizeof(WAVE_FormatTypeDef), fd) != sizeof(WAVE_FormatTypeDef)) {
             LOG_ERROR("Updating WAV header failed");
         }
     }
@@ -40,7 +40,7 @@ namespace audio
         /*
          * Write int16_t PCM samples to file.
          */
-        auto byteswritten = vfs.fwrite(pcmData, sizeof(int16_t), samplesToWrite, fd);
+        auto byteswritten = std::fwrite(pcmData, sizeof(int16_t), samplesToWrite, fd);
         if (byteswritten != samplesToWrite) {
             return 0;
         }

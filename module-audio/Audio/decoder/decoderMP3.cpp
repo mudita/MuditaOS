@@ -8,6 +8,7 @@
 #include "decoderMP3.hpp"
 
 #include <array>
+#include <cstdio>
 
 namespace audio
 {
@@ -34,7 +35,7 @@ namespace audio
     {
         decoderNotFirstRun = false;
 
-        vfs.fseek(fd, (pos * fileSize) + firstValidFrameFileOffset, SEEK_SET);
+        std::fseek(fd, (pos * fileSize) + firstValidFrameFileOffset, SEEK_SET);
 
         // TODO: M.P Currently calculating MP3 position is unsupported, in general seeking is supported though.
         // position += (float) ((float) (samplesToReadChann / chanNumber) / (float) sampleRate);
@@ -43,10 +44,10 @@ namespace audio
     void decoderMP3::fetchTagsSpecific()
     {
 
-        vfs.fseek(fd, firstValidFrameFileOffset + 4, SEEK_SET);
+        std::fseek(fd, firstValidFrameFileOffset + 4, SEEK_SET);
         auto buff = std::make_unique<uint8_t[]>(firstValidFrameByteSize);
 
-        vfs.fread(buff.get(), 1, firstValidFrameByteSize, fd);
+        std::fread(buff.get(), 1, firstValidFrameByteSize, fd);
 
         xing_info_t xinfo = {};
         if (parseXingHeader(buff.get(), firstValidFrameByteSize, &xinfo)) {
@@ -59,7 +60,7 @@ namespace audio
             tag->total_duration_s = frames_count * (samplesPerFrame) / sampleRate;
         }
 
-        vfs.rewind(fd);
+        std::rewind(fd);
     }
 
     bool decoderMP3::find_first_valid_frame()
@@ -72,9 +73,9 @@ namespace audio
 
         auto decBuffer = std::make_unique<uint8_t[]>(DECODER_BUFFER_SIZE);
 
-        vfs.rewind(fd);
+        std::rewind(fd);
 
-        if (vfs.fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
+        if (std::fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
             return false;
         }
 
@@ -82,7 +83,8 @@ namespace audio
             // refill buffer if necessary(only if over 87,5% of bytes are consumed)
             if (bufferIndex > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8))) {
                 memcpy(&decBuffer[0], &decBuffer[bufferIndex], bytesAvailable);
-                uint32_t bytesRead = vfs.fread(&decBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+                uint32_t bytesRead =
+                    std::fread(&decBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
                 if (bytesRead == 0) {
                     return false;
@@ -106,9 +108,9 @@ namespace audio
                     sampleRate                = info.hz;
                     chanNumber                = info.channels;
                     firstValidFrameByteSize   = (144 * info.bitrate_kbps * 1000 / info.hz);
-                    firstValidFrameFileOffset = vfs.ftell(fd) - bytesAvailable - firstValidFrameByteSize;
+                    firstValidFrameFileOffset = std::ftell(fd) - bytesAvailable - firstValidFrameByteSize;
 
-                    vfs.rewind(fd);
+                    std::rewind(fd);
 
                     return true;
                 }
@@ -135,10 +137,10 @@ namespace audio
         auto decBuffer       = std::make_unique<uint8_t[]>(DECODER_BUFFER_SIZE);
 
         // Jump to the file beginning
-        vfs.rewind(fd);
+        std::rewind(fd);
 
         /* Fill decBuffer */
-        if (vfs.fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
+        if (std::fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
             return 0;
         }
 
@@ -148,7 +150,7 @@ namespace audio
         if (bufferIndex > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8))) {
             memcpy(&decBuffer[0], &decBuffer[bufferIndex], bytesAvailable);
             uint32_t bytesRead =
-                vfs.fread(decBuffer.get() + bytesAvailable, 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+                std::fread(decBuffer.get() + bytesAvailable, 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
             if (bytesRead != (DECODER_BUFFER_SIZE - bytesAvailable)) {
                 last_refill = true;
@@ -195,7 +197,7 @@ namespace audio
             pcmsamplesbuffer = std::make_unique<uint16_t[]>(pcmsamplesbuffer_size);
 
             // Fill decoderBuffer
-            uint32_t bytesRead = vfs.fread(decoderBuffer.get(), 1, DECODER_BUFFER_SIZE, fd);
+            uint32_t bytesRead = std::fread(decoderBuffer.get(), 1, DECODER_BUFFER_SIZE, fd);
 
             if (bytesRead == 0) {
                 return 0;
@@ -217,7 +219,8 @@ namespace audio
         // refill buffer if necessary(only if over 87,5% of bytes consumed)
         if (!lastRefill && (decoderBufferIdx > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8)))) {
             memcpy(&decoderBuffer[0], &decoderBuffer[decoderBufferIdx], bytesAvailable);
-            uint32_t bytesRead = vfs.fread(&decoderBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+            uint32_t bytesRead =
+                std::fread(&decoderBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
             if (bytesRead != (DECODER_BUFFER_SIZE - bytesAvailable)) {
                 lastRefill = true;
