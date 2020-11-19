@@ -54,7 +54,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     std::string qname = queueNameMap[queue];
     LOG_INFO("handleMessage received data from queue: %s", qname.c_str());
     static std::string *sendMsg = nullptr;
-    static std::string receiveMsg;
+    static std::string receivedMsg;
 
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
         if (xQueueReceive(queue, &receiveMsg, 0) != pdTRUE) {
