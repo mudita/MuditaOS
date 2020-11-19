@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash 
 
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
@@ -13,8 +13,51 @@ if [ ! -f ${objfile} ]; then
     exit 1
 fi
 
-arm-none-eabi-nm --print-size ${objfile} | grep _Z41__static_initialization_and_destruction_0ii | awk '{print $1" "$2}' | tr 'a-f' 'A-F' | while read -r symbol_start symbol_size;
+type=$( file ${objfile} | grep "ARM" )
+
+if [[ -z "${type}" ]]; then
+    echo "x86"
+    OBJDUMP="objdump"
+    NM="nm"
+else
+    echo "ARM"
+    OBJDUMP="arm-none-eabi-objdump"
+    NM="arm-none-eabi-nm"
+fi
+
+STATIC_SYMBOL="_Z41__static_initialization_and_destruction_0ii"
+
+staticList=($(${NM} --print-size ${objfile} | grep "${STATIC_SYMBOL}"|cut -f1,2 -d" "|tr " " ":" ))
+
+echo "${#staticList[@]}"
+
+I=0
+statcListSize=${#staticList[@]}
+
+searchRegexp='(.*\.hpp:[0-9]+)'
+while [[ $I -lt $statcListSize ]]
 do
-    symbol_end=$(echo "obase=16;ibase=16;$symbol_start+$symbol_size" | bc)
-    arm-none-eabi-objdump --start-address=0x$symbol_start --stop-address=0x$symbol_end -d -l $objfile
-done | grep ".hpp:" | awk '{print $1}' | xargs realpath | sed 's,^'${rootdir}/',,' | sort | uniq -c | sort -n
+    
+    symbol=${staticList[${I}]}
+    symbolStart="0x${staticList[${I}]%:*}"
+    symbolSize="0x${staticList[${I}]#*:}"
+    printf -v symbolEnd "0x%x" $(( ${symbolStart} + ${symbolSize} ))
+    echo "${I}/${statcListSize}: ${symbolStart} - ${symbolEnd}"
+
+    items=( $(${OBJDUMP} --start-address=${symbolStart} --stop-address=${symbolEnd} -d -l ${objfile} ) )
+    J=0
+    while [[ ${J} -lt ${#items[@]} ]]
+    do
+        item=$( echo ${items[$J]} | cut -f1 -d" ")
+        if [[ ${item} =~ ${searchRegexp} ]]; then
+            paths="$paths\n${BASH_REMATCH[1]}"
+        fi
+        J=$(( $J + 1 ))
+    done
+    I=$(( $I + 1 ))
+done
+
+if [[ -n ${paths} ]]; then
+    echo -e ${paths} | sort | uniq -c | sort -n
+fi
+
