@@ -12,7 +12,7 @@ namespace purefs::blkdev
     struct partition
     {
         int phycical_number{};     //! Partition number
-        int logical_number{};      //! Partition number
+        int logical_number{};      //! Partition logical one in the mudita
         sector_t start_sector{};   //! First sector
         std::size_t num_sectors{}; //! Number of sectors
         bool bootable{};           //! Partition is bootable

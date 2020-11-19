@@ -17,12 +17,16 @@ namespace purefs::fs
      */
     class filesystem_operation;
     struct statvfs;
-    struct DIR_ITER;
     struct timespec;
+    namespace internal
+    {
+        class directory_handle;
+    }
 
     class filesystem
     {
       public:
+        using fsdir                    = std::shared_ptr<internal::directory_handle>;
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;
         /** Utility API */
@@ -61,7 +65,7 @@ namespace purefs::fs
          * @param[out] stat Pointer to a statvfs structure
          * @return zero on success otherwise error
          */
-        auto stat_vfs(std::string_view path, statvfs &stat) const -> int;
+        auto stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int;
         /** Standard file access API */
         auto open(std::string_view path, int flags, int mode) noexcept -> int;
         auto close(int fd) noexcept -> int;
@@ -77,10 +81,10 @@ namespace purefs::fs
         auto mkdir(std::string_view path, int mode) noexcept -> int;
 
         /** Directory support API */
-        auto diropen(int &error, DIR_ITER *dirstate, std::string_view path) noexcept -> DIR_ITER *;
-        auto dirreset(DIR_ITER *dirstate) noexcept -> int;
-        auto dirnext(DIR_ITER *dirstate, std::string &filename, struct stat *filestat) noexcept -> int;
-        auto dirclose(DIR_ITER *dirState) noexcept -> int;
+        auto diropen(std::string_view path) noexcept -> fsdir;
+        auto dirreset(fsdir) noexcept -> int;
+        auto dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) noexcept -> int;
+        auto dirclose(fsdir dirstate) noexcept -> int;
 
         /** Other fops API */
         auto ftruncate(int fd, off_t len) noexcept -> int;
@@ -88,8 +92,9 @@ namespace purefs::fs
         auto ioctl(std::string_view path, int cmd, void *arg) noexcept -> int;
         auto utimens(std::string_view path, std::array<timespec, 2> &tv) noexcept -> int;
         auto flock(std::string_view path, int cmd) noexcept -> int;
+        auto isatty(std::string_view path) noexcept -> int;
 
-        auto chmod(struct _reent *r, const char *path, mode_t mode) noexcept -> int;
+        auto chmod(std::string_view path, mode_t mode) noexcept -> int;
         auto fchmod(int fd, mode_t mode) noexcept -> int;
 
         auto getcwd() noexcept -> std::string;

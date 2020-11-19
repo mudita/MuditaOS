@@ -3,6 +3,7 @@
 
 #pragma once
 #include <cstdint>
+#include <memory>
 
 namespace purefs::blkdev
 {
@@ -41,5 +42,4 @@ namespace purefs::blkdev
         force_suspend, //! Device is in force suspend state
         power_off      //! Device is in poweroff state
     };
-
 } // namespace purefs::blkdev
